@@ -591,7 +591,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         {
           role: "establishment-contact",
           userId: "estab.contact",
-          shouldReceiveDiscussionNotifications: true,
+          shouldReceiveDiscussionNotifications: false,
         },
         {
           role: "establishment-contact",
@@ -694,7 +694,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           {
             role: "establishment-contact",
             userId: "estab.contact",
-            shouldReceiveDiscussionNotifications: true,
+            shouldReceiveDiscussionNotifications: false,
           },
           {
             role: "establishment-contact",
@@ -821,7 +821,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
               {
                 role: "establishment-contact",
                 userId: "estab.contact",
-                shouldReceiveDiscussionNotifications: true,
+                shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
