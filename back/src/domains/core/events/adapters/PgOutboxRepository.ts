@@ -73,6 +73,7 @@ export class PgOutboxRepository implements OutboxRepository {
   }
 
   public async saveNewEventsBatch(events: DomainEvent[]): Promise<void> {
+    if (events.length === 0) return;
     await this.transaction
       .insertInto("outbox")
       .values(

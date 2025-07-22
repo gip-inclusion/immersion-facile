@@ -91,6 +91,11 @@ describe("PgOutboxRepository", () => {
   });
 
   describe("saveNewEventsBatch", () => {
+    it("does nothing when array of event is empty", async () => {
+      await outboxRepository.saveNewEventsBatch([]);
+      // (should not throw)
+    });
+
     it("saves a new event to be processed, then adds a failing publication, then a working one", async () => {
       const conventionEventId = "aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa";
       const discussionEventId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
