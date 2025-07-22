@@ -31,17 +31,21 @@ const mappedContents: Record<StandardPageSlugs, VersionnedStandardContent> = {
 export const getStandardContents = (
   path: StandardPageSlugs,
   version?: string,
-): { page: StandardPageContent; version: string } => {
+): { page: StandardPageContent; version: string; allVersions: string[] } => {
+  const allVersions = Object.keys(mappedContents[path]);
+
   if (version) {
     const page = mappedContents[path][version];
     return {
       page: page ?? mappedContents[path].latest,
       version: page ? version : "latest",
+      allVersions,
     };
   }
 
   return {
     page: mappedContents[path].latest,
     version: "latest",
+    allVersions,
   };
 };
