@@ -61,7 +61,8 @@
       "!**/*.tar.gz",
       "!**/.vscode",
       "!**/libs/react-design-system/public/dsfr",
-      "!**/*.css"
+      "!**/*.css",
+      "!**/docker-data"
     ]
   }
 }
