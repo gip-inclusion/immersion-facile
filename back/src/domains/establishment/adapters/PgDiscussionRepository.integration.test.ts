@@ -5,13 +5,12 @@ import {
   type ContactMode,
   DiscussionBuilder,
   type DiscussionDto,
-  type DiscussionEstablishmentContact,
   type DiscussionInList,
-  type Exchange,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   type ImmersionObjective,
+  type SpecificExchangeSender,
   UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -50,13 +49,6 @@ describe("PgDiscussionRepository", () => {
     .withAppellationLabel(styliste.appellationLabel)
     .build();
 
-  const establishmentContactWithoutFirstNameAndLastName: DiscussionEstablishmentContact =
-    {
-      email: "test@test.com",
-      phone: "0123456789",
-      job: "test",
-      copyEmails: [],
-    };
   const secretariatOffer = new OfferEntityBuilder()
     .withRomeCode(secretariat.romeCode)
     .withAppellationCode(secretariat.appellationCode)
@@ -105,9 +97,6 @@ describe("PgDiscussionRepository", () => {
         const discussionWithSiret2 = new DiscussionBuilder(discussionWithSiret1)
           .withId(uuid())
           .withCreatedAt(new Date("2024-01-02"))
-          .withEstablishmentContact(
-            establishmentContactWithoutFirstNameAndLastName,
-          )
           .build();
         const discussionWithoutSiret = new DiscussionBuilder()
           .withId(uuid())
@@ -369,7 +358,6 @@ describe("PgDiscussionRepository", () => {
           .withExchanges([
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
               message: "",
               attachments: [],
               sentAt: new Date().toISOString(),
@@ -382,7 +370,9 @@ describe("PgDiscussionRepository", () => {
           .withExchanges([
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
+              email: "",
+              firstname: "",
+              lastname: "",
               message: "",
               attachments: [],
               sentAt: new Date().toISOString(),
@@ -475,14 +465,15 @@ describe("PgDiscussionRepository", () => {
     });
     describe("combo filters", () => {
       it("exclude discussions that does not match filters", async () => {
-        type ReducedExchange = Pick<Exchange, "sender" | "recipient">;
-        const sendedByBeneficiary: ReducedExchange = {
-          sender: "potentialBeneficiary",
-          recipient: "establishment",
-        };
-        const sendedByEstablishment: ReducedExchange = {
+        const sendedByBeneficiary: SpecificExchangeSender<"potentialBeneficiary"> =
+          {
+            sender: "potentialBeneficiary",
+          };
+        const sendedByEstablishment: SpecificExchangeSender<"establishment"> = {
           sender: "establishment",
-          recipient: "potentialBeneficiary",
+          email: "mail@mail.com",
+          firstname: "billy",
+          lastname: "idol",
         };
 
         const date = new Date("2024-08-02 00:00:00");
@@ -560,7 +551,6 @@ describe("PgDiscussionRepository", () => {
               message: "",
               subject: "",
               sentAt: new Date().toISOString(),
-              recipient: "establishment",
               sender: "potentialBeneficiary",
             },
           ])
@@ -984,14 +974,10 @@ describe("PgDiscussionRepository", () => {
       new DiscussionBuilder()
         .withId(uuid())
         .withSiret("00000000000001")
-        .withEstablishmentContact({
-          email: "test@email.com",
-        })
         .withExchanges([
           {
             message: "",
             sender: "potentialBeneficiary",
-            recipient: "establishment",
             sentAt: new Date("2023-07-07").toISOString(),
             subject: "exchange with potentialBeneficiary 1",
             attachments: [
@@ -1051,15 +1037,6 @@ describe("PgDiscussionRepository", () => {
           since: new Date(
             discussionWithLastExchangeByPotentialBeneficiary1.createdAt,
           ),
-        },
-        result: true,
-      },
-      {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
-        params: {
-          establishmentRepresentativeEmail:
-            discussionWithLastExchangeByPotentialBeneficiary1
-              .establishmentContact.email,
         },
         result: true,
       },
@@ -1137,28 +1114,10 @@ describe("PgDiscussionRepository", () => {
       );
     });
 
-    it("also returns discussion if discussion is searched by contact email and email is in copyEmails", async () => {
-      const discussion = new DiscussionBuilder()
-        .withId(uuid())
-        .withEstablishmentContact({
-          email: "other@email.com",
-          copyEmails: ["searchedEmail@email.com"],
-        })
-        .build();
-      await pgDiscussionRepository.insert(discussion);
-
-      expectToEqual(
-        await pgDiscussionRepository.hasDiscussionMatching({
-          establishmentRepresentativeEmail: "searchedEmail@email.com",
-        }),
-        true,
-      );
-    });
-
     it("when there is no discussion", async () => {
       expectToEqual(
         await pgDiscussionRepository.hasDiscussionMatching({
-          establishmentRepresentativeEmail: "searchedEmail@email.com",
+          siret: discussionWithoutExchanges3.siret,
         }),
         false,
       );
@@ -1188,6 +1147,75 @@ describe("PgDiscussionRepository", () => {
           discussion: new DiscussionBuilder()
             .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
             .withConventionId("some-convention-id")
+            .build(),
+        },
+        {
+          title: "insert with more exchanges cases",
+          discussion: new DiscussionBuilder()
+            .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
+            .withExchanges([
+              {
+                sender: "potentialBeneficiary",
+                message: "TEST message",
+                subject: "Subject",
+                attachments: [],
+                sentAt: subDays(new Date(), 10).toISOString(),
+              },
+              {
+                sender: "establishment",
+                message: "",
+                subject: "",
+                firstname: "",
+                lastname: "",
+                email: "",
+                attachments: [],
+                sentAt: subDays(new Date(), 9).toISOString(),
+              },
+              {
+                sender: "potentialBeneficiary",
+                message: "",
+                subject: "",
+                attachments: [],
+                sentAt: subDays(new Date(), 8).toISOString(),
+              },
+              {
+                sender: "establishment",
+                message: `Ignosco necessario alicuius fuisse aliquid hac iudices si est si humanissimo Atratino est necessitati acerbo
+                  sed humanissimo Si volueritis aetatis quemquam intolerabili intolerabili est etiam vel qui nec utrum Sed qui
+                  est aliquid necessitati ego vellet ignoscendum spei intolerabili tribuo vel necessario pueritiae volueritis 
+                  aliquid odio de iudices tribuo ego cum causa cui Si Sed constituetis iussus fuisse speravit habiturum habet 
+                  volueritis vel modo de iussus ignosco necessitati vere habiturum necessario ad utrum resistendum voluit vel 
+                  liceret intolerabili volueritis si fuisse volueritis causa sic alicuius nisi optimo utrum Ceteris qui vel 
+                  necessario tribuo existimare accusare existimare vel hac meo descendisset.`,
+                subject: "ESTABLISHMENT LARGE subject",
+                firstname: "Nilly",
+                lastname: "Nyolo",
+                email: "sdmlkdif@mail.com",
+                attachments: [
+                  {
+                    link: "http://www.google.fr",
+                    name: "Billy.doc",
+                  },
+                  {
+                    link: "http://www.kiki.fr",
+                    name: "POTO.pdf",
+                  },
+                ],
+                sentAt: subDays(new Date(), 7).toISOString(),
+              },
+              {
+                sender: "potentialBeneficiary",
+                message: `Est post mercenariae nomine incredibile sexus incredibile ardore discessura statum hastam est discessura 
+                  semper ut marito in tabernaculum illis quo apud statum id est semper si dotis est futura eos mercenariae conductae 
+                  sexus si in statum offert fuga conductae semper et ardore illis illis in est nomine fuga apud apud in nomine solvitur 
+                  id atque eos elegerit atque marito incredibile ardore ut marito offert quo sexus mercenariae est apud in est ardore 
+                  post coniunx post matrimonii est diem est conductae solvitur species in incredibile futura venerem offert tempus 
+                  species id atque futura tabernaculum venerem mercenariae uxoresque in pacto statum id.`,
+                subject: "Beneficiary LOARGE SUBJECTTTSDD",
+                attachments: [],
+                sentAt: subDays(new Date(), 6).toISOString(),
+              },
+            ])
             .build(),
         },
         {
@@ -1400,9 +1428,11 @@ describe("PgDiscussionRepository", () => {
           {
             subject: "mon nouveau sujet",
             message: "mon nouveau message",
-            recipient: "potentialBeneficiary",
             sentAt: new Date("2023-11-11").toISOString(),
             sender: "establishment",
+            email: "",
+            firstname: "",
+            lastname: "",
             attachments: [],
           },
         ])
@@ -1416,9 +1446,11 @@ describe("PgDiscussionRepository", () => {
           {
             subject: "mon nouveau sujet",
             message: "mon nouveau message",
-            recipient: "potentialBeneficiary",
             sentAt: new Date("2022-11-11").toISOString(),
             sender: "establishment",
+            email: "",
+            firstname: "",
+            lastname: "",
             attachments: [
               {
                 link: "dlskfjsdmlfsdmlfjsdmlfj",
@@ -1537,7 +1569,6 @@ describe("PgDiscussionRepository", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 24).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],
@@ -1554,17 +1585,18 @@ describe("PgDiscussionRepository", () => {
           subject: "Mise en relation initiale",
           message:
             "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-          recipient: "potentialBeneficiary",
           sentAt: subMonths(now, 12).toISOString(),
-          sender: "establishment",
+          sender: "potentialBeneficiary",
           attachments: [],
         },
         {
           subject: "Réponse de l'entreprise",
           message: "Super, je vais vous envoyer un mail avec les informations",
-          recipient: "potentialBeneficiary",
           sentAt: subMonths(now, 12).toISOString(),
           sender: "establishment",
+          email: "ladalle@estamineyyyyy.com",
+          firstname: "Vianey",
+          lastname: "Du Maroille",
           attachments: [],
         },
       ])
@@ -1580,7 +1612,6 @@ describe("PgDiscussionRepository", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 6).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],
@@ -1598,7 +1629,6 @@ describe("PgDiscussionRepository", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 4).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],
@@ -1607,9 +1637,11 @@ describe("PgDiscussionRepository", () => {
             subject: "Réponse de l'entreprise",
             message:
               "Super, je vais vous envoyer un mail avec les informations",
-            recipient: "potentialBeneficiary",
             sentAt: subMonths(now, 4).toISOString(),
             sender: "establishment",
+            email: "ladalle@estamineyyyyy.com",
+            firstname: "Vianey",
+            lastname: "Du Maroille",
             attachments: [],
           },
         ])
@@ -1629,7 +1661,6 @@ describe("PgDiscussionRepository", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 6).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],

@@ -539,6 +539,8 @@ export class PgEstablishmentAggregateRepository
           role: userRight.role,
           job: userRight.job,
           phone: userRight.phone,
+          should_receive_discussion_notifications:
+            userRight.shouldReceiveDiscussionNotifications,
         })),
       )
       .execute()
@@ -1134,6 +1136,9 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                   role: ref("eu.role"),
                   job: ref("eu.job"),
                   phone: ref("eu.phone"),
+                  shouldReceiveDiscussionNotifications: ref(
+                    "eu.should_receive_discussion_notifications",
+                  ),
                 }).as("userRight"),
               ),
           ),

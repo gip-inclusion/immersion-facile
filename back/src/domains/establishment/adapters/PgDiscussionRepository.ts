@@ -197,15 +197,20 @@ export class PgDiscussionRepository implements DiscussionRepository {
           }).as("potentialBeneficiary"),
           fn
             .jsonAgg(
-              jsonBuildObject({
-                subject: ref("exchanges.subject"),
-                message: ref("exchanges.message"),
-                recipient: ref("exchanges.recipient"),
-                sender: ref("exchanges.sender"),
-                sentAt: sql<string>`TO_CHAR(${ref("exchanges.sent_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
-                attachments: ref("exchanges.attachments"),
-              }),
+              jsonStripNulls(
+                jsonBuildObject({
+                  subject: ref("exchanges.subject"),
+                  message: ref("exchanges.message"),
+                  sentAt: sql<string>`TO_CHAR(${ref("exchanges.sent_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                  attachments: ref("exchanges.attachments"),
+                  sender: ref("exchanges.sender"),
+                  firstname: ref("exchanges.establishment_first_name"),
+                  lastname: ref("exchanges.establishment_last_name"),
+                  email: ref("exchanges.establishment_email"),
+                }),
+              ),
             )
+            .$castTo<Exchange[]>()
             .as("exchanges"),
         ]);
 
@@ -269,26 +274,6 @@ export class PgDiscussionRepository implements DiscussionRepository {
                     params.potentialBeneficiaryEmail,
                   )
                 : builder,
-            (builder) => {
-              const establishmentRepresentativeEmail =
-                params.establishmentRepresentativeEmail;
-              return establishmentRepresentativeEmail
-                ? builder.where(({ eb, or }) =>
-                    or([
-                      eb(
-                        "establishment_contact_email",
-                        "=",
-                        establishmentRepresentativeEmail,
-                      ),
-                      eb(
-                        "establishment_contact_copy_emails",
-                        "?",
-                        establishmentRepresentativeEmail,
-                      ),
-                    ]),
-                  )
-                : builder;
-            },
           ),
         ).as("exists"),
       ])
@@ -327,7 +312,12 @@ export class PgDiscussionRepository implements DiscussionRepository {
           discussion_id: discussionId,
           message: exchange.message,
           sender: exchange.sender,
-          recipient: exchange.recipient,
+          establishment_first_name:
+            exchange.sender === "establishment" ? exchange.firstname : null,
+          establishment_last_name:
+            exchange.sender === "establishment" ? exchange.lastname : null,
+          establishment_email:
+            exchange.sender === "establishment" ? exchange.email : null,
           sent_at: exchange.sentAt,
           attachments: sql`CAST(${JSON.stringify(
             exchange.attachments,
@@ -371,14 +361,6 @@ const discussionToPg = (
   city: discussion.address.city,
   created_at: discussion.createdAt,
   department_code: discussion.address.departmentCode,
-  establishment_contact_copy_emails: JSON.stringify(
-    discussion.establishmentContact.copyEmails,
-  ),
-  establishment_contact_email: discussion.establishmentContact.email,
-  establishment_contact_first_name: discussion.establishmentContact.firstName,
-  establishment_contact_job: discussion.establishmentContact.job,
-  establishment_contact_last_name: discussion.establishmentContact.lastName,
-  establishment_contact_phone: discussion.establishmentContact.phone,
   postcode: discussion.address.postcode,
   potential_beneficiary_email: discussion.potentialBeneficiary.email,
   potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
@@ -503,10 +485,6 @@ const makeDiscussionDtoFromPgDiscussion = (
       address: discussion.address,
       businessName: discussion.businessName,
       createdAt: new Date(discussion.createdAt).toISOString(),
-      exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
-        ...rest,
-        sentAt: new Date(sentAt).toISOString(),
-      })),
       siret: discussion.siret,
       conventionId: discussion.conventionId,
       id: discussion.id,
@@ -532,11 +510,16 @@ const makeDiscussionDtoFromPgDiscussion = (
         return {
           ...common,
           appellationCode: discussion.appellationCode,
-          establishmentContact: discussion.establishmentContact,
           acquisitionCampaign: discussion.acquisition_campaign,
           acquisitionKeyword: discussion.acquisition_keyword,
           contactMode: discussion.contactMode,
           kind: discussion.kind,
+          exchanges: (discussion.exchanges ?? []).map(
+            ({ sentAt, ...rest }) => ({
+              ...rest,
+              sentAt: new Date(sentAt).toISOString(),
+            }),
+          ),
           potentialBeneficiary: {
             ...commonPotentialBeneficiary,
             phone,
@@ -568,10 +551,13 @@ const makeDiscussionDtoFromPgDiscussion = (
       return {
         ...common,
         appellationCode: discussion.appellationCode,
-        establishmentContact: discussion.establishmentContact,
         acquisitionCampaign: discussion.acquisition_campaign,
         acquisitionKeyword: discussion.acquisition_keyword,
         contactMode: discussion.contactMode,
+        exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
+          ...rest,
+          sentAt: new Date(sentAt).toISOString(),
+        })),
         kind: discussion.kind,
         potentialBeneficiary: {
           ...commonPotentialBeneficiary,
@@ -591,11 +577,14 @@ const makeDiscussionDtoFromPgDiscussion = (
       return {
         ...common,
         appellationCode: discussion.appellationCode,
-        establishmentContact: discussion.establishmentContact,
         acquisitionCampaign: discussion.acquisition_campaign,
         acquisitionKeyword: discussion.acquisition_keyword,
         contactMode: discussion.contactMode,
         kind: discussion.kind,
+        exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
+          ...rest,
+          sentAt: new Date(sentAt).toISOString(),
+        })),
         potentialBeneficiary: {
           ...commonPotentialBeneficiary,
           levelOfEducation: discussion.potentialBeneficiary.levelOfEducation,
@@ -606,11 +595,14 @@ const makeDiscussionDtoFromPgDiscussion = (
     return {
       ...common,
       appellationCode: discussion.appellationCode,
-      establishmentContact: discussion.establishmentContact,
       acquisitionCampaign: discussion.acquisition_campaign,
       acquisitionKeyword: discussion.acquisition_keyword,
       contactMode: discussion.contactMode,
       kind: discussion.kind,
+      exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
+        ...rest,
+        sentAt: new Date(sentAt).toISOString(),
+      })),
       potentialBeneficiary: commonPotentialBeneficiary,
     };
   });
@@ -756,16 +748,6 @@ const executeGetDiscussions = (
             datePreferences: ref("d.potential_beneficiary_date_preferences"),
             levelOfEducation: ref("d.potential_beneficiary_level_of_education"),
           }),
-          establishmentContact: jsonBuildObject({
-            firstName: ref("d.establishment_contact_first_name"),
-            lastName: ref("d.establishment_contact_last_name"),
-            email: ref("d.establishment_contact_email"),
-            phone: ref("d.establishment_contact_phone"),
-            job: ref("d.establishment_contact_job"),
-            copyEmails: sql<string[]>`${ref(
-              "establishment_contact_copy_emails",
-            )}`,
-          }),
           address: jsonBuildObject({
             streetNumberAndAddress: ref("d.street_number_and_address"),
             postcode: ref("d.postcode"),
@@ -778,7 +760,9 @@ const executeGetDiscussions = (
                 JSON_BUILD_OBJECT(
                   'subject', e.subject,
                   'message', e.message,
-                  'recipient', e.recipient,
+                  'firstname',e.establishment_first_name,
+                  'lastname',e.establishment_last_name,
+                  'email',e.establishment_email,
                   'sender', e.sender,
                   'sentAt', e.sent_at,
                   'attachments', e.attachments
