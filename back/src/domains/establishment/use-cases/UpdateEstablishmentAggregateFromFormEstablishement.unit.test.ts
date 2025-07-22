@@ -525,7 +525,7 @@ describe("Update Establishment aggregate from form data", () => {
     const newContactRight: EstablishmentContactRight = {
       role: "establishment-contact",
       userId: "nextuser2",
-      shouldReceiveDiscussionNotifications: true,
+      shouldReceiveDiscussionNotifications: false,
     };
     const updatedEstablishmentAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
