@@ -1,8 +1,10 @@
 import { immersionFacileContactEmail } from "shared";
+import type { VersionnedStandardContent } from "src/app/contents/standard/textSetup";
 
 export default {
-  title: "Mentions légales",
-  content: `<strong>Éditeur de la Plateforme</strong>
+  latest: {
+    title: "Mentions légales",
+    content: `<strong>Éditeur de la Plateforme</strong>
   La Plateforme « Immersion Facilitée » est éditée par :
 
   Le Groupement d’intérêt public « Plateforme de l’inclusion » situé : 
@@ -27,4 +29,5 @@ export default {
   Si vous rencontrez un défaut d’accessibilité vous empêchant d’accéder à un contenu ou une fonctionnalité de la plateforme, merci de nous en faire part : <a href="mailto:${immersionFacileContactEmail}">${immersionFacileContactEmail}</a>
 
   Si vous n’obtenez pas de réponse rapide de notre part, vous êtes en droit de faire parvenir vos doléances ou une demande de saisine au Défenseur des droits.`,
-};
+  },
+} satisfies VersionnedStandardContent;

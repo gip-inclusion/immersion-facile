@@ -1,6 +1,9 @@
+import type { VersionnedStandardContent } from "./textSetup";
+
 export default {
-  title: "Obligations des parties",
-  content: `<strong>Le bénéficiaire s’engage</strong> à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs d’insertion socioprofessionnelle attendus, et notamment :
+  latest: {
+    title: "Obligations des parties",
+    content: `<strong>Le bénéficiaire s’engage</strong> à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs d’insertion socioprofessionnelle attendus, et notamment :
 
     • Respecter le règlement intérieur de la structure d’accueil et les consignes qui lui sont données et informer le conseiller référent de tout retard ou absence en fournissant les documents justificatifs requis ;
     • Se conformer à l’ensemble des dispositions et mesures en matière d’hygiène et de sécurité applicables aux salariés dans la structure d’accueil, notamment en matière de port obligatoire des EPI et propres aux activités et tâches confiées ;
@@ -34,4 +37,5 @@ notamment à :
     • Procéder à la déclaration dans les 48 heures de tout accident de travail ou de trajet qui lui serait signalé auprès de la Caisse Primaire d’Assurance Maladie du lieu de résidence du bénéficiaire dès lors qu’il couvre le risque AT/MP.
 
   `,
-};
+  },
+} satisfies VersionnedStandardContent;

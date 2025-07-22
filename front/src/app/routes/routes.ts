@@ -315,7 +315,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.searchForStudent}`,
   ),
   standard: defineRoute(
-    { pagePath: param.path.ofType(standardPagesSerializer) },
+    {
+      pagePath: param.path.ofType(standardPagesSerializer),
+      version: param.query.optional.string,
+    },
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,
   ),
   stats: defineRoute("/stats"),

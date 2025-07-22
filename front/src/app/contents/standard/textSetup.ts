@@ -14,7 +14,11 @@ export type StandardPageContent = {
   layout?: MainWrapperProps["layout"];
 };
 
-const mappedContents: Record<StandardPageSlugs, StandardPageContent> = {
+export type VersionnedStandardContent = {
+  latest: StandardPageContent;
+} & Record<string, StandardPageContent>;
+
+const mappedContents: Record<StandardPageSlugs, VersionnedStandardContent> = {
   cgu: cguContent,
   "mentions-legales": legalsContent,
   "politique-de-confidentialite": policiesContent,
@@ -24,5 +28,20 @@ const mappedContents: Record<StandardPageSlugs, StandardPageContent> = {
   budget: budgetContent,
 };
 
-export const getStandardContents = (path: StandardPageSlugs) =>
-  mappedContents[path];
+export const getStandardContents = (
+  path: StandardPageSlugs,
+  version?: string,
+): { page: StandardPageContent; version: string } => {
+  if (version) {
+    const page = mappedContents[path][version];
+    return {
+      page: page ?? mappedContents[path].latest,
+      version: page ? version : "latest",
+    };
+  }
+
+  return {
+    page: mappedContents[path].latest,
+    version: "latest",
+  };
+};

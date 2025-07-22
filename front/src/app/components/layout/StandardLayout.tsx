@@ -13,14 +13,19 @@ type StandardLayoutProps = {
 };
 
 export const StandardLayout = ({ route }: StandardLayoutProps) => {
-  const contents = getStandardContents(
+  const { page, version } = getStandardContents(
     route.params.pagePath as StandardPageSlugs,
+    route.params.version,
   );
-  const { title, content, layout } = contents;
+  const { title, content, layout } = page;
+
   return (
     <HeaderFooterLayout>
       <MainWrapper layout={layout ?? "boxed"}>
-        <h1 className={fr.cx("fr-h2")}>{title}</h1>
+        <h1 className={fr.cx("fr-h2")}>
+          {title} (
+          {version === "latest" ? "dernière version" : `version du ${version}`})
+        </h1>
         <div
           dangerouslySetInnerHTML={{
             __html: renderContent(content, { wrapInTable: false }) || "",
