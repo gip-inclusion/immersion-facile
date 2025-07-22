@@ -142,12 +142,7 @@ async function makeAgencyDashboards({
 
   return {
     ...(agencyIdsWithEnoughPrivileges.length > 0
-      ? {
-          agencyDashboardUrl: dashboardGateway.getAgencyUserUrl(
-            user.id,
-            timeGateway.now(),
-          ),
-        }
+      ? dashboardGateway.getAgencyUserUrls(user.id, timeGateway.now())
       : {}),
     ...(agencyIdsWithEnoughPrivileges.length > 0
       ? {

@@ -232,9 +232,17 @@ export type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };
 
-export type AgencyDashboards = {
-  agencyDashboardUrl?: AbsoluteUrl;
+export type AgencyStatsDashboards = {
+  // statistics dashboards :
+  statsEstablishmentDetailsUrl?: AbsoluteUrl;
+  statsConventionsByEstablishmentByDepartmentUrl?: AbsoluteUrl;
+  statsAgenciesUrl?: AbsoluteUrl;
+};
+
+export type AgencyDashboards = AgencyStatsDashboards & {
   erroredConventionsDashboardUrl?: AbsoluteUrl;
+  // convention dashboard :
+  agencyDashboardUrl?: AbsoluteUrl;
 };
 
 export type WithAgencyDashboards = {

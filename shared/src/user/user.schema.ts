@@ -75,6 +75,10 @@ const dashboardsSchema: z.Schema<
   agencies: z.object({
     agencyDashboardUrl: absoluteUrlSchema.optional(),
     erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
+    statsEstablishmentDetailsUrl: absoluteUrlSchema.optional(),
+    statsConventionsByEstablishmentByDepartmentUrl:
+      absoluteUrlSchema.optional(),
+    statsAgenciesUrl: absoluteUrlSchema.optional(),
   }),
 });
 
