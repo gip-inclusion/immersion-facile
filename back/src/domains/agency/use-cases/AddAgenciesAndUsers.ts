@@ -1,4 +1,4 @@
-import { splitEvery, uniq, values } from "ramda";
+import { flatten, splitEvery, uniq, values } from "ramda";
 import {
   type AgencyWithUsersRights,
   errors,
@@ -68,81 +68,69 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     timeGateway: TimeGateway;
   }>()
   .build(async ({ inputParams, uow, deps }) => {
-    const chunkSize = 500;
+    const chunkSize = 300;
     const chunks = splitEvery(chunkSize, inputParams);
-    const results = await Promise.all(
-      chunks.map(async (importedAgencies) => {
-        const formattedImportedAgencies =
-          formatImportedAgencyAndUserRow(importedAgencies);
-        const existingAgencies = await uow.agencyRepository.getAgencies({
-          filters: {
-            sirets: formattedImportedAgencies.map(
-              (importedAgency) => importedAgency.SIRET,
-            ),
-          },
-        });
-        const siretsInIF = uniq(
-          existingAgencies.map((agency) => agency.agencySiret),
-        );
-        const rowsNotInIF = formattedImportedAgencies.filter(
-          (importedAgency) => !siretsInIF.includes(importedAgency.SIRET),
-        );
-        const { rowsWithDuplicates, uniqRows } =
-          findDuplicatesInImportedRows(rowsNotInIF);
-
-        const { createdUsersCount, updatedUsersCount } =
-          await createOrUpdateUsers({
-            emails: formattedImportedAgencies.map(
-              (importedAgency) => importedAgency["E-mail authentification"],
-            ),
-            userRepository: uow.userRepository,
-            timeGateway: deps.timeGateway,
-            uuidGenerator: deps.uuidGenerator,
+    const formattedImportedAgencies =
+      formatImportedAgencyAndUserRow(inputParams);
+    const existingAgencies = flatten(
+      await Promise.all(
+        chunks.map(async (importedAgencies) => {
+          return await uow.agencyRepository.getAgencies({
+            filters: {
+              sirets: importedAgencies.map(
+                (importedAgency) => importedAgency.SIRET,
+              ),
+            },
           });
-
-        await addOrUpdateAgencyUsers({
-          agenciesIF: existingAgencies,
-          importedAgencyAndUserRows: formattedImportedAgencies,
-          agencyRepository: uow.agencyRepository,
-          userRepository: uow.userRepository,
-        });
-
-        await createNewAgencies({
-          importedAgencyAndUserRows: rowsWithDuplicates,
-          agencyRepository: uow.agencyRepository,
-          userRepository: uow.userRepository,
-          deps,
-        });
-
-        await createNewAgenciesWithSuffix({
-          allRows: formattedImportedAgencies,
-          rowsToCreateAsAgencies: uniqRows,
-          agencyRepository: uow.agencyRepository,
-          userRepository: uow.userRepository,
-          deps,
-        });
-
-        return {
-          createdAgenciesCount: rowsWithDuplicates.length + uniqRows.length,
-          createdUsersCount: createdUsersCount,
-          updatedUsersCount: updatedUsersCount,
-        };
-      }),
+        }),
+      ),
     );
 
-    return results.reduce(
-      (acc, curr) => ({
-        createdAgenciesCount:
-          acc.createdAgenciesCount + curr.createdAgenciesCount,
-        createdUsersCount: acc.createdUsersCount + curr.createdUsersCount,
-        updatedUsersCount: acc.updatedUsersCount + curr.updatedUsersCount,
-      }),
-      {
-        createdAgenciesCount: 0,
-        createdUsersCount: 0,
-        updatedUsersCount: 0,
-      },
+    const siretsInIF = uniq(
+      existingAgencies.map((agency) => agency.agencySiret),
     );
+    const rowsNotInIF = formattedImportedAgencies.filter(
+      (importedAgency) => !siretsInIF.includes(importedAgency.SIRET),
+    );
+    const { rowsWithDuplicates, uniqRows } =
+      findDuplicatesInImportedRows(rowsNotInIF);
+
+    const { createdUsersCount, updatedUsersCount } = await createOrUpdateUsers({
+      emails: formattedImportedAgencies.map(
+        (importedAgency) => importedAgency["E-mail authentification"],
+      ),
+      userRepository: uow.userRepository,
+      timeGateway: deps.timeGateway,
+      uuidGenerator: deps.uuidGenerator,
+    });
+
+    await addOrUpdateAgencyUsers({
+      agenciesIF: existingAgencies,
+      importedAgencyAndUserRows: formattedImportedAgencies,
+      agencyRepository: uow.agencyRepository,
+      userRepository: uow.userRepository,
+    });
+
+    await createNewAgencies({
+      importedAgencyAndUserRows: rowsWithDuplicates,
+      agencyRepository: uow.agencyRepository,
+      userRepository: uow.userRepository,
+      deps,
+    });
+
+    await createNewAgenciesWithSuffix({
+      allRows: formattedImportedAgencies,
+      rowsToCreateAsAgencies: uniqRows,
+      agencyRepository: uow.agencyRepository,
+      userRepository: uow.userRepository,
+      deps,
+    });
+
+    return {
+      createdAgenciesCount: rowsWithDuplicates.length + uniqRows.length,
+      createdUsersCount,
+      updatedUsersCount,
+    };
   });
 
 const addOrUpdateAgencyUsers = async ({
@@ -388,19 +376,26 @@ const createNewAgenciesWithSuffix = async ({
     {} as Record<string, ImportedAgencyAndUserRow[]>,
   );
 
-  const updatedRowsWithSuffixx = rowsToCreateAsAgencies.map((row) => {
-    const needSuffix = rowsGroupedBySiret[row.SIRET].length > 1;
-    const kind = row["Type structure"];
-    return {
-      ...row,
-      "Nom structure": `${row["Nom structure"]}${needSuffix ? ` - ${kind}` : ""}`,
-    };
-  });
+  const updatedRowsWithSuffix: ImportedAgencyAndUserRow[] =
+    rowsToCreateAsAgencies.map((row) => {
+      const needSuffix = rowsGroupedBySiret[row.SIRET].length > 1;
+      const kind = row["Type structure"];
+      return {
+        ...row,
+        "Nom structure": `${row["Nom structure"]}${needSuffix ? ` - ${kind}` : ""}`,
+      };
+    });
 
-  await createNewAgencies({
-    importedAgencyAndUserRows: updatedRowsWithSuffixx,
-    agencyRepository,
-    userRepository,
-    deps,
-  });
+  const chunkSize = 100;
+  const chunks = splitEvery(chunkSize, updatedRowsWithSuffix);
+  await Promise.all(
+    chunks.map(async (rows) => {
+      await createNewAgencies({
+        importedAgencyAndUserRows: rows,
+        agencyRepository,
+        userRepository,
+        deps,
+      });
+    }),
+  );
 };
