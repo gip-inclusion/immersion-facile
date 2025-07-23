@@ -25,7 +25,7 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const triggerAddAgenciesAndUsers = async () => {
-  logger.info({ message: "Starting to add agencies and users" });
+  logger.info({ message: "Starting to add agencies and users from csv" });
 
   const path = process.argv.slice(2)[0];
   if (!path.endsWith(".csv")) {
@@ -77,20 +77,27 @@ const triggerAddAgenciesAndUsers = async () => {
 
   logger.info({ message: `Ready to import ${validatedRows.length} lines` });
 
-  const { createdAgenciesCount, createdUsersCount, updatedUsersCount } =
-    await makeAddAgenciesAndUsers({
-      uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
-        .uowPerformer,
-      deps: {
-        timeGateway: new RealTimeGateway(),
-        uuidGenerator: new UuidV4Generator(),
-      },
-    }).execute(validatedRows);
-
-  return {
+  const {
+    siretAlreadyInIFCount,
     createdAgenciesCount,
     createdUsersCount,
-    updatedUsersCount,
+    usersAlreadyInIFCount,
+  } = await makeAddAgenciesAndUsers({
+    uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+      .uowPerformer,
+    deps: {
+      timeGateway: new RealTimeGateway(),
+      uuidGenerator: new UuidV4Generator(),
+    },
+  }).execute(validatedRows);
+
+  logger.info({ message: "End of importing agencies and users from csv" });
+
+  return {
+    siretAlreadyInIFCount,
+    createdAgenciesCount,
+    createdUsersCount,
+    usersAlreadyInIFCount,
     errorsCount: keys(parsedErrors).length,
   };
 };
@@ -100,15 +107,16 @@ handleCRONScript(
   config,
   triggerAddAgenciesAndUsers,
   ({
+    siretAlreadyInIFCount,
     createdAgenciesCount,
+    usersAlreadyInIFCount,
     createdUsersCount,
-    updatedUsersCount,
     errorsCount,
   }) =>
     [
-      //`Already existing agencies: ${alreadyExistingAgencies}`,
+      `Already existing agencies: ${siretAlreadyInIFCount}`,
       `Created agencies: ${createdAgenciesCount}`,
-      `Already existing users: ${updatedUsersCount}`,
+      `Already existing users: ${usersAlreadyInIFCount}`,
       `Created users: ${createdUsersCount}`,
       `Errors: ${errorsCount}`,
     ].join("\n"),

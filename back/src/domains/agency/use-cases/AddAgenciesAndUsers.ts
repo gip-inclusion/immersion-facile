@@ -59,16 +59,17 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     z.array(importedAgencyAndUserRowSchema),
   )
   .withOutput<{
+    siretAlreadyInIFCount: number;
     createdAgenciesCount: number;
     createdUsersCount: number;
-    updatedUsersCount: number;
+    usersAlreadyInIFCount: number;
   }>()
   .withDeps<{
     uuidGenerator: UuidGenerator;
     timeGateway: TimeGateway;
   }>()
   .build(async ({ inputParams, uow, deps }) => {
-    const chunkSize = 300;
+    const chunkSize = 100;
     const chunks = splitEvery(chunkSize, inputParams);
     const formattedImportedAgencies =
       formatImportedAgencyAndUserRow(inputParams);
@@ -95,14 +96,15 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     const { rowsWithDuplicates, uniqRows } =
       findDuplicatesInImportedRows(rowsNotInIF);
 
-    const { createdUsersCount, updatedUsersCount } = await createOrUpdateUsers({
-      emails: formattedImportedAgencies.map(
-        (importedAgency) => importedAgency["E-mail authentification"],
-      ),
-      userRepository: uow.userRepository,
-      timeGateway: deps.timeGateway,
-      uuidGenerator: deps.uuidGenerator,
-    });
+    const { createdUsersCount, usersAlreadyInIFCount } =
+      await createOrUpdateUsers({
+        emails: formattedImportedAgencies.map(
+          (importedAgency) => importedAgency["E-mail authentification"],
+        ),
+        userRepository: uow.userRepository,
+        timeGateway: deps.timeGateway,
+        uuidGenerator: deps.uuidGenerator,
+      });
 
     await addOrUpdateAgencyUsers({
       agenciesIF: existingAgencies,
@@ -127,9 +129,10 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     });
 
     return {
+      siretAlreadyInIFCount: siretsInIF.length,
       createdAgenciesCount: rowsWithDuplicates.length + uniqRows.length,
       createdUsersCount,
-      updatedUsersCount,
+      usersAlreadyInIFCount,
     };
   });
 
@@ -348,7 +351,7 @@ const createOrUpdateUsers = async ({
 
   return {
     createdUsersCount: newUsersCount,
-    updatedUsersCount: uniqEmails.length - newUsersCount,
+    usersAlreadyInIFCount: uniqEmails.length - newUsersCount,
   };
 };
 

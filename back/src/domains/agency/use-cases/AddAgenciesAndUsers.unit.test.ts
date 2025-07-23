@@ -113,9 +113,10 @@ describe("AddAgenciesAndUsers", () => {
       const result = await addAgenciesAndUsers.execute(rows);
 
       expect(result).toEqual({
+        siretAlreadyInIFCount: 2,
         createdAgenciesCount: 0,
         createdUsersCount: 1,
-        updatedUsersCount: 1,
+        usersAlreadyInIFCount: 1,
       });
       expect(uow.agencyRepository.agencies).toEqual([
         {
@@ -191,9 +192,10 @@ describe("AddAgenciesAndUsers", () => {
       const result = await addAgenciesAndUsers.execute(rowsWithDuplicates);
 
       expect(result).toEqual({
+        siretAlreadyInIFCount: 0,
         createdAgenciesCount: 1,
         createdUsersCount: 1,
-        updatedUsersCount: 0,
+        usersAlreadyInIFCount: 0,
       });
       expect(uow.userRepository.users).toEqual([
         {
@@ -290,9 +292,10 @@ describe("AddAgenciesAndUsers", () => {
         },
       );
       expect(result).toEqual({
+        siretAlreadyInIFCount: 0,
         createdAgenciesCount: 2,
         createdUsersCount: 1,
-        updatedUsersCount: 0,
+        usersAlreadyInIFCount: 0,
       });
       expectArraysToMatch(uow.agencyRepository.agencies, [
         {
