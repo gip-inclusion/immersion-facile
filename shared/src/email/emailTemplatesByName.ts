@@ -1927,7 +1927,7 @@ Profil du candidat :
         subject: `La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} a été clôturée`,
         content: `Bonjour ${establishmentContactFirstName} ${establishmentContactLastName},
 
-        La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} pour une immersion au sein de votre entreprise ${businessName}, envoyée le ${discussionCreatedAt}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
+        La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} pour une immersion au sein de votre entreprise ${businessName}, envoyée le ${toDisplayedDate({ date: new Date(discussionCreatedAt) })}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
 
         <strong>Nous vous recommandons de :</strong>
 
@@ -1959,7 +1959,7 @@ Profil du candidat :
         subject: `Votre demande d’immersion chez ${businessName} a été clôturée`,
         content: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},
 
-        La candidature pour une immersion au sein de l'entreprise ${businessName}, envoyée le ${discussionCreatedAt}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
+        La candidature pour une immersion au sein de l'entreprise ${businessName}, envoyée le ${toDisplayedDate({ date: new Date(discussionCreatedAt) })}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
 
         <strong>Si vous êtes toujours intéressé(e) par une immersion, nous vous invitons à :</strong>
 
