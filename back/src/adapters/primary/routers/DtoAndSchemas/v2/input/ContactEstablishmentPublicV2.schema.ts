@@ -4,7 +4,7 @@ import {
   emailSchema,
   type ImmersionObjective,
   localization,
-  phoneSchema,
+  phoneNumberSchema,
   siretSchema,
   zEnumValidation,
   zStringCanBeEmpty,
@@ -40,7 +40,7 @@ const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailPubli
     ...commonFields,
     contactMode: preferEmailContactSchema,
     message: zStringMinLength1,
-    potentialBeneficiaryPhone: phoneSchema,
+    potentialBeneficiaryPhone: phoneNumberSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
   });

@@ -21,7 +21,7 @@ import {
   isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
-  type Phone,
+  type PhoneNumber,
   removeEmptyValue,
   type ScheduleDto,
   type SignatoryRole,
@@ -33,7 +33,7 @@ const makeSignatoriesSubsections = (
   convention: ConventionReadDto,
   signatoriesSubsectionButtonProps?: (
     signatoryRole: SignatoryRole,
-    signatoryPhone: Phone,
+    signatoryPhone: PhoneNumber,
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
 ): ConventionSummarySubSection[] => {
@@ -92,7 +92,7 @@ const makeSignatoriesSubsections = (
           signatoriesSubsectionButtonProps
             ? (signatoriesSubsectionButtonProps(
                 "beneficiary",
-                convention.signatories.beneficiary.phone.phoneNumber,
+                convention.signatories.beneficiary.phone,
                 !!convention.signatories.beneficiary.signedAt,
               ) ?? undefined)
             : undefined,
@@ -137,7 +137,7 @@ const makeSignatoriesSubsections = (
         {
           key: "beneficiaryPhone",
           label: "Téléphone",
-          value: convention.signatories.beneficiary.phone.phoneNumber,
+          value: convention.signatories.beneficiary.phone,
         },
       ]),
     },
@@ -165,8 +165,7 @@ const makeSignatoriesSubsections = (
               ) && signatoriesSubsectionButtonProps
                 ? (signatoriesSubsectionButtonProps(
                     "beneficiary-representative",
-                    convention.signatories.beneficiaryRepresentative.phone
-                      .phoneNumber,
+                    convention.signatories.beneficiaryRepresentative.phone,
                     !!convention.signatories.beneficiaryRepresentative.signedAt,
                   ) ?? undefined)
                 : undefined,
@@ -214,9 +213,7 @@ const makeSignatoriesSubsections = (
             {
               key: "beneficiaryRepPhone",
               label: "Téléphone",
-              value:
-                convention.signatories.beneficiaryRepresentative.phone
-                  .phoneNumber,
+              value: convention.signatories.beneficiaryRepresentative.phone,
             },
           ]),
         }
@@ -242,8 +239,7 @@ const makeSignatoriesSubsections = (
           signatoriesSubsectionButtonProps
             ? (signatoriesSubsectionButtonProps(
                 "establishment-representative",
-                convention.signatories.establishmentRepresentative.phone
-                  .phoneNumber,
+                convention.signatories.establishmentRepresentative.phone,
                 !!convention.signatories.establishmentRepresentative.signedAt,
               ) ?? undefined)
             : undefined,
@@ -291,9 +287,7 @@ const makeSignatoriesSubsections = (
         {
           key: "establishmentRepPhone",
           label: "Téléphone",
-          value:
-            convention.signatories.establishmentRepresentative.phone
-              .phoneNumber,
+          value: convention.signatories.establishmentRepresentative.phone,
         },
         {
           key: "establishmentRepSiret",
@@ -327,8 +321,7 @@ const makeSignatoriesSubsections = (
               ) && signatoriesSubsectionButtonProps
                 ? (signatoriesSubsectionButtonProps(
                     "beneficiary-current-employer",
-                    convention.signatories.beneficiaryCurrentEmployer.phone
-                      .phoneNumber,
+                    convention.signatories.beneficiaryCurrentEmployer.phone,
                     !!convention.signatories.beneficiaryCurrentEmployer
                       .signedAt,
                   ) ?? undefined)
@@ -379,9 +372,7 @@ const makeSignatoriesSubsections = (
             {
               key: "beneficiaryCurrentEmployerPhone",
               label: "Téléphone",
-              value:
-                convention.signatories.beneficiaryCurrentEmployer.phone
-                  .phoneNumber,
+              value: convention.signatories.beneficiaryCurrentEmployer.phone,
             },
             {
               key: "beneficiaryCurrentEmployerSiret",
@@ -591,7 +582,7 @@ const makeBeneficiarySubSections = (
 
 const makeEstablishmentSubSections = (
   convention: ConventionReadDto,
-  assesmentReminderButtonProps?: (phone: Phone) => ButtonProps,
+  assesmentReminderButtonProps?: (phone: PhoneNumber) => ButtonProps,
 ): ConventionSummarySubSection[] => {
   return [
     {
@@ -615,9 +606,7 @@ const makeEstablishmentSubSections = (
       header: {
         title: "Tuteur",
         action: assesmentReminderButtonProps
-          ? assesmentReminderButtonProps(
-              convention.establishmentTutor.phone.phoneNumber,
-            )
+          ? assesmentReminderButtonProps(convention.establishmentTutor.phone)
           : undefined,
       },
       fields: [
@@ -664,7 +653,7 @@ const makeEstablishmentSubSections = (
         {
           key: "establishmentTutorPhone",
           label: "Téléphone",
-          value: convention.establishmentTutor.phone.phoneNumber,
+          value: convention.establishmentTutor.phone,
         },
       ],
     },
@@ -808,10 +797,10 @@ export const makeConventionSections = (
   convention: ConventionReadDto,
   signatoriesSubsectionButtonProps?: (
     signatoryRole: SignatoryRole,
-    signatoryPhone: Phone,
+    signatoryPhone: PhoneNumber,
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
-  assesmentReminderButtonProps?: (phone: Phone) => ButtonProps,
+  assesmentReminderButtonProps?: (phone: PhoneNumber) => ButtonProps,
 ): ConventionSummarySection[] => {
   return [
     {
@@ -937,7 +926,7 @@ export const SendAssessmentLinkModalWrapper = ({
   phone,
   onConfirm,
 }: {
-  phone: Phone;
+  phone: PhoneNumber;
   onConfirm: () => void;
 }) =>
   createPortal(
@@ -977,12 +966,12 @@ export const sendSignatureLinkButtonProps =
     signatureLinksSent: SignatureLinkState;
     onClick: (params: {
       signatoryRole: SignatoryRole;
-      signatoryPhone: Phone;
+      signatoryPhone: PhoneNumber;
     }) => void;
   }) =>
   (
     signatoryRole: SignatoryRole,
-    signatoryPhone: Phone,
+    signatoryPhone: PhoneNumber,
     signatoryAlreadySign: boolean,
   ): ButtonProps | null =>
     triggeredByRole && triggeredByRole === signatoryRole
@@ -1007,9 +996,9 @@ export const sendAssessmentLinkButtonProps =
     onClick,
   }: {
     isAssessmentLinkSent: boolean;
-    onClick: (params: { phone: Phone }) => void;
+    onClick: (params: { phone: PhoneNumber }) => void;
   }) =>
-  (phone: Phone): ButtonProps => ({
+  (phone: PhoneNumber): ButtonProps => ({
     priority: "tertiary",
     children: "Renvoyer le bilan par SMS",
     disabled: !isValidMobilePhone(phone) || isAssessmentLinkSent,

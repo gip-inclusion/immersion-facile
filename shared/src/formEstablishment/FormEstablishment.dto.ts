@@ -5,10 +5,10 @@ import type { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import type { Email } from "../email/email.dto";
 import type { GroupName } from "../group/group.dto";
 import type { NafDto } from "../naf/naf.dto";
+import type { PhoneNumber } from "../phone/phone.dto";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
-import type { Phone } from "../sms/smsTemplateByName";
 import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
 import type { DateTimeIsoString } from "../utils/date";
@@ -29,7 +29,7 @@ type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
 
 export type WithJobAndPhone = {
   job: string;
-  phone: Phone;
+  phone: PhoneNumber;
 };
 
 export type AdminFormEstablishmentUserRight =
@@ -108,43 +108,43 @@ export type EstablishmentCSVRow = {
   searchableByStudents: CSVBoolean;
   searchableByJobSeekers: CSVBoolean;
   right1_email: Email;
-  right1_phone: Phone;
+  right1_phone: PhoneNumber;
   right1_job: string;
   right2_role?: EstablishmentRole;
   right2_email?: Email;
-  right2_phone?: Phone;
+  right2_phone?: PhoneNumber;
   right2_job?: string;
   right3_role?: EstablishmentRole;
   right3_email?: Email;
-  right3_phone?: Phone;
+  right3_phone?: PhoneNumber;
   right3_job?: string;
   right4_role?: EstablishmentRole;
   right4_email?: Email;
-  right4_phone?: Phone;
+  right4_phone?: PhoneNumber;
   right4_job?: string;
   right5_role?: EstablishmentRole;
   right5_email?: Email;
-  right5_phone?: Phone;
+  right5_phone?: PhoneNumber;
   right5_job?: string;
   right6_role?: EstablishmentRole;
   right6_email?: Email;
-  right6_phone?: Phone;
+  right6_phone?: PhoneNumber;
   right6_job?: string;
   right7_role?: EstablishmentRole;
   right7_email?: Email;
-  right7_phone?: Phone;
+  right7_phone?: PhoneNumber;
   right7_job?: string;
   right8_role?: EstablishmentRole;
   right8_email?: Email;
-  right8_phone?: Phone;
+  right8_phone?: PhoneNumber;
   right8_job?: string;
   right9_role?: EstablishmentRole;
   right9_email?: Email;
-  right9_phone?: Phone;
+  right9_phone?: PhoneNumber;
   right9_job?: string;
   right10_role?: EstablishmentRole;
   right10_email?: Email;
-  right10_phone?: Phone;
+  right10_phone?: PhoneNumber;
   right10_job?: string;
 };
 

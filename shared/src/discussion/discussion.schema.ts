@@ -11,7 +11,7 @@ import {
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
 import { createPaginatedSchema } from "../pagination/pagination.schema";
-import { phoneSchema } from "../phone.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -219,7 +219,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
           contactMode: preferEmailContactSchema,
           kind: discussionKindIfSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            phone: phoneSchema,
+            phone: phoneNumberSchema,
             datePreferences: zStringMinLength1,
             immersionObjective: immersionObjectiveSchema.or(z.null()),
             resumeLink: zStringCanBeEmpty.optional(),
@@ -231,7 +231,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
           contactMode: preferEmailContactSchema,
           kind: discussionKind1Eleve1StageSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            phone: phoneSchema,
+            phone: phoneNumberSchema,
             datePreferences: zStringMinLength1,
             immersionObjective: z.literal(discoverObjective),
             levelOfEducation: discussionLevelOfEducationSchema,
@@ -295,7 +295,7 @@ export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({
   potentialBeneficiary: z.object({
     firstName: zStringMinLength1,
     lastName: zStringMinLength1,
-    phone: phoneSchema.nullable(),
+    phone: phoneNumberSchema.nullable(),
   }),
   immersionObjective: immersionObjectiveSchema.nullable(),
 });

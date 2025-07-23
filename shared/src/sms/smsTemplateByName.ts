@@ -1,8 +1,6 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
-import type { Flavor } from "../typeFlavors";
+import type { PhoneNumber } from "../phone/phone.dto";
 import type { KeysOfUnion, ValueOf } from "../utils";
-
-export type Phone = Flavor<string, "Phone">;
 
 type GenericTemplatedSms<
   T extends string,
@@ -10,7 +8,7 @@ type GenericTemplatedSms<
 > = {
   kind: T;
   params: P;
-  recipientPhone: Phone;
+  recipientPhone: PhoneNumber;
 };
 
 type WithShortLink = { shortLink: AbsoluteUrl };

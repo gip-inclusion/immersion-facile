@@ -30,7 +30,6 @@ import type {
 } from "../user/user.dto";
 import type { NotEmptyArray } from "../utils";
 import type { DateString } from "../utils/date";
-import type { PhoneDto } from "../utils/phone";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
 
@@ -233,7 +232,7 @@ export type Signatory = GenericSignatory<SignatoryRole>;
 export type GenericActor<R extends Role> = {
   role: R;
   email: string;
-  phone: PhoneDto;
+  phone: string;
   firstName: string;
   lastName: string;
 };

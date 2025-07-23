@@ -2,7 +2,7 @@ import { z } from "zod";
 import { callbackUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
-import { phoneSchema } from "../phone.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { ApiConsumerJwt } from "../tokens/jwt.dto";
 import { dateTimeIsoStringSchema } from "../utils/date";
@@ -29,7 +29,7 @@ const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
   lastName: zStringMinLength1,
   firstName: zStringMinLength1,
   job: zStringMinLength1,
-  phone: phoneSchema,
+  phone: phoneNumberSchema,
   emails: z.array(emailSchema),
 });
 

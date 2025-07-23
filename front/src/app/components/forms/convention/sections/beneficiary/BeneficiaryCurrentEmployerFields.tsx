@@ -172,19 +172,16 @@ export const BeneficiaryCurrentEmployerFields = ({
         hintText={
           formFields["signatories.beneficiaryCurrentEmployer.phone"].hintText
         }
-        selectedCountry={
-          values.signatories.beneficiaryCurrentEmployer?.phone?.codeCountry ||
-          "fr"
-        }
-        registerPhoneNumber={register(
-          "signatories.beneficiaryCurrentEmployer.phone.phoneNumber",
-        )}
-        registerCountryCode={register(
-          "signatories.beneficiaryCurrentEmployer.phone.codeCountry",
-        )}
-        {...getFieldError(
-          "signatories.beneficiaryCurrentEmployer.phone.phoneNumber",
-        )}
+        inputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.phone"],
+          nativeInputProps: {
+            ...register("signatories.beneficiaryCurrentEmployer.phone"),
+          },
+        }}
+        onPhoneNumberChange={(phoneNumber) => {
+          setValue("signatories.beneficiaryCurrentEmployer.phone", phoneNumber);
+        }}
+        {...getFieldError("signatories.beneficiaryCurrentEmployer.phone")}
       />
       <EmailValidationInput
         hintText={

@@ -63,7 +63,7 @@ export const BeneficiaryRepresentativeFields = ({
   useEffect(() => {
     setValue(
       "signatories.beneficiary.emergencyContactPhone",
-      beneficiaryRepresentativePhone?.phoneNumber || "",
+      beneficiaryRepresentativePhone || "",
     );
   }, [beneficiaryRepresentativePhone, setValue]);
 
@@ -151,20 +151,17 @@ export const BeneficiaryRepresentativeFields = ({
         hintText={
           formContents["signatories.beneficiaryRepresentative.phone"].hintText
         }
-        selectedCountry={
-          values.signatories.beneficiaryRepresentative?.phone?.codeCountry ||
-          "fr"
-        }
-        registerPhoneNumber={register(
-          "signatories.beneficiaryRepresentative.phone.phoneNumber",
-        )}
-        registerCountryCode={register(
-          "signatories.beneficiaryRepresentative.phone.codeCountry",
-        )}
+        inputProps={{
+          ...formContents["signatories.beneficiaryRepresentative.phone"],
+          nativeInputProps: {
+            ...register("signatories.beneficiaryRepresentative.phone"),
+          },
+        }}
+        onPhoneNumberChange={(phoneNumber) => {
+          setValue("signatories.beneficiaryRepresentative.phone", phoneNumber);
+        }}
         disabled={disabled}
-        {...getFieldError(
-          "signatories.beneficiaryRepresentative.phone.phoneNumber",
-        )}
+        {...getFieldError("signatories.beneficiaryRepresentative.phone")}
       />
     </>
   );

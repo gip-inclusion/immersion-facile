@@ -225,23 +225,20 @@ export const BeneficiaryFormSection = ({
       />
 
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
-      <div>
-        <PhoneInput
-          label={formContents["signatories.beneficiary.phone"].label}
-          hintText={formContents["signatories.beneficiary.phone"].hintText}
-          selectedCountry={
-            values.signatories.beneficiary.phone?.codeCountry || "fr"
-          }
-          registerPhoneNumber={register(
-            "signatories.beneficiary.phone.phoneNumber",
-          )}
-          registerCountryCode={register(
-            "signatories.beneficiary.phone.codeCountry",
-          )}
-          {...getFieldError("signatories.beneficiary.phone.phoneNumber")}
-        />
-      </div>
-
+      <PhoneInput
+        label={formContents["signatories.beneficiary.phone"].label}
+        hintText={formContents["signatories.beneficiary.phone"].hintText}
+        inputProps={{
+          ...formContents["signatories.beneficiary.phone"],
+          nativeInputProps: {
+            ...register("signatories.beneficiary.phone"),
+          },
+        }}
+        onPhoneNumberChange={(phoneNumber) => {
+          setValue("signatories.beneficiary.phone", phoneNumber);
+        }}
+        {...getFieldError("signatories.beneficiary.phone")}
+      />
       {values.internshipKind === "mini-stage-cci" && (
         <>
           <AddressAutocomplete
@@ -352,7 +349,7 @@ export const BeneficiaryFormSection = ({
                     ? {
                         firstName: "",
                         lastName: "",
-                        phone: { codeCountry: "fr", phoneNumber: "" },
+                        phone: "",
                         email: "",
                         role: "beneficiary-representative",
                       }
@@ -417,7 +414,7 @@ export const BeneficiaryFormSection = ({
                       ? {
                           firstName: "",
                           lastName: "",
-                          phone: { codeCountry: "fr", phoneNumber: "" },
+                          phone: "",
                           email: "",
                           businessName: "",
                           businessSiret: "",

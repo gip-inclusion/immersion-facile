@@ -11,7 +11,6 @@ import type {
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
 import type { DateString } from "../utils/date";
-import type { PhoneDto } from "../utils/phone";
 import {
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
@@ -52,7 +51,7 @@ export const VALID_PHONES = [
 const beneficiary: Beneficiary<"immersion"> = {
   role: "beneficiary",
   email: VALID_EMAILS[0],
-  phone: VALID_PHONES[0],
+  phone: VALID_PHONES[0].phoneNumber,
   firstName: "Esteban",
   lastName: "Ocon",
   signedAt: DATE_SIGNATURE,
@@ -66,7 +65,7 @@ const beneficiary: Beneficiary<"immersion"> = {
 const establishmentTutor: EstablishmentTutor = {
   role: "establishment-tutor",
   email: VALID_EMAILS[1],
-  phone: VALID_PHONES[1],
+  phone: VALID_PHONES[1].phoneNumber,
   firstName: "Alain",
   lastName: "Prost",
   job: "Big Boss",
@@ -76,7 +75,7 @@ const establishmentRepresentative: EstablishmentRepresentative = {
   email: "establishment@example.com",
   firstName: "Billy",
   lastName: "Idol",
-  phone: { codeCountry: "fr", phoneNumber: "+33602010203" },
+  phone: "+33602010203",
   role: "establishment-representative",
   signedAt: DATE_SIGNATURE,
 };
@@ -322,7 +321,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withBeneficiaryPhone(phone: PhoneDto): ConventionDtoBuilder {
+  public withBeneficiaryPhone(phone: string): ConventionDtoBuilder {
     return this.withBeneficiary({ ...this.#beneficiary, phone });
   }
 
@@ -496,7 +495,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withEstablishmentRepresentativePhone(phone: PhoneDto) {
+  public withEstablishmentRepresentativePhone(phone: string) {
     return this.withEstablishmentRepresentative({
       ...this.dto.signatories.establishmentRepresentative,
       phone,
@@ -541,7 +540,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withEstablishmentTutorPhone(phone: PhoneDto): ConventionDtoBuilder {
+  public withEstablishmentTutorPhone(phone: string): ConventionDtoBuilder {
     return this.withEstablishmentTutor({ ...this.#establishmentTutor, phone });
   }
 

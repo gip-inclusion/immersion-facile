@@ -6,7 +6,7 @@ import {
   type ImmersionObjective,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
-import { phoneSchema } from "../phone.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
@@ -49,7 +49,7 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
 const contactEstablishmentByMailCommonSchema =
   contactInformationsCommonSchema.and(
     z.object({
-      potentialBeneficiaryPhone: phoneSchema,
+      potentialBeneficiaryPhone: phoneNumberSchema,
       datePreferences: zStringMinLength1,
       contactMode: preferEmailContactSchema,
     }),
