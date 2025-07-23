@@ -398,15 +398,9 @@ describe("user connexion flow", () => {
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 agencyUser.id
               }/${gateways.timeGateway.now()}`,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${
-                agencyUser.id
-              }/${gateways.timeGateway.now()}`,
-              statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${
-                agencyUser.id
-              }/${gateways.timeGateway.now()}`,
-              statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${
-                agencyUser.id
-              }/${gateways.timeGateway.now()}`,
+              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${gateways.timeGateway.now()}`,
+              statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${gateways.timeGateway.now()}`,
+              statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${gateways.timeGateway.now()}`,
             },
             establishments: {
               conventions: `http://stubEstablishmentConventionsDashboardUrl/${
