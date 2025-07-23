@@ -60,29 +60,45 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     return this.#makeUrl(token, dashboard);
   }
 
+  #makeDashboardUrlByDashboardName(
+    dashboardName: DashboardName,
+    now: Date,
+    userId?: UserId,
+  ) {
+    const dashboard = dashboardByName[dashboardName];
+    return this.#makeUrl(
+      this.#createToken({
+        dashboard,
+        params: userId ? { ic_user_id: userId } : {},
+        now,
+      }),
+      dashboard,
+    );
+  }
+
   public getAgencyUserUrls(
     userId: UserId,
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
-    const getDashboardUrl = (dashboardName: DashboardName) => {
-      const dashboard = dashboardByName[dashboardName];
-      const token = this.#createToken({
-        dashboard,
-        params: { ic_user_id: userId },
-        now,
-      });
-      return this.#makeUrl(token, dashboard);
-    };
-
     return {
-      agencyDashboardUrl: getDashboardUrl("agencyForUser"),
-      statsEstablishmentDetailsUrl: getDashboardUrl(
+      agencyDashboardUrl: this.#makeDashboardUrlByDashboardName(
+        "agencyForUser",
+        now,
+        userId,
+      ),
+      statsEstablishmentDetailsUrl: this.#makeDashboardUrlByDashboardName(
         "statsEstablishmentDetails",
+        now,
       ),
-      statsConventionsByEstablishmentByDepartmentUrl: getDashboardUrl(
-        "statsConventionsByEstablishmentByDepartment",
+      statsConventionsByEstablishmentByDepartmentUrl:
+        this.#makeDashboardUrlByDashboardName(
+          "statsConventionsByEstablishmentByDepartment",
+          now,
+        ),
+      statsAgenciesUrl: this.#makeDashboardUrlByDashboardName(
+        "statsAgencies",
+        now,
       ),
-      statsAgenciesUrl: getDashboardUrl("statsAgencies"),
     };
   }
 
