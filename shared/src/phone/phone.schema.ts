@@ -29,22 +29,23 @@ export const phoneNumberSchema: z.Schema<PhoneNumber> =
     return parsePhoneNumber(phone, countryCode).format("E.164");
   });
 
-export const isValidMobilePhone = (phoneNumber: PhoneNumber) => {
+export const isValidMobilePhone = (phoneNumber: PhoneNumber): boolean => {
   return parsePhoneNumber(phoneNumber).getType() === "MOBILE";
 };
 
-export const toDisplayedPhoneNumber = (phoneNumber: string) => {
+export const toDisplayedPhoneNumber = (
+  phoneNumber: string,
+): string | undefined => {
   return parsePhoneNumber(phoneNumber).format("NATIONAL");
 };
 
 export const toInternationalPhoneNumber = (
   phoneNumber: string,
   countryCode: SupportedCountryCode,
-) => {
+): string | undefined => {
   const validCountryCode = getSupportedCountryCodesForCountry(countryCode).find(
     (countryCode) => isValidPhoneNumber(phoneNumber, countryCode),
   );
-  console.log("validCountryCode", validCountryCode);
   if (!validCountryCode) {
     return;
   }

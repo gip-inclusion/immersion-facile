@@ -202,7 +202,7 @@ export class LocationBuilder implements Builder<Location> {
   #dto: Location;
 }
 
-export const supportedCountryCodes = [
+const supportedCountryCodes = [
   "DE",
   "AT",
   "BE",
