@@ -232,6 +232,7 @@ export const BeneficiaryFormSection = ({
           ...formContents["signatories.beneficiary.phone"],
           nativeInputProps: {
             ...register("signatories.beneficiary.phone"),
+            id: formContents["signatories.beneficiary.phone"].id,
           },
         }}
         onPhoneNumberChange={(phoneNumber) => {

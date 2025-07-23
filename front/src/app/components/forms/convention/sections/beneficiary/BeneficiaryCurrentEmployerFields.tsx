@@ -176,6 +176,7 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.phone"],
           nativeInputProps: {
             ...register("signatories.beneficiaryCurrentEmployer.phone"),
+            id: formFields["signatories.beneficiaryCurrentEmployer.phone"].id,
           },
         }}
         onPhoneNumberChange={(phoneNumber) => {
