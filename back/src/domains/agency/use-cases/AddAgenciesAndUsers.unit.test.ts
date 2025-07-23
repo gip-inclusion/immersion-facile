@@ -140,15 +140,14 @@ describe("AddAgenciesAndUsers", () => {
       ]);
       expect(uow.userRepository.users).toEqual([
         user1,
-        new ConnectedUserBuilder()
-          .withId(newUserId)
-          .withFirstName("")
-          .withLastName("")
-          .withEmail(user2Email)
-          .withCreatedAt(timeGateway.now())
-          .withProConnectInfos(null)
-          .withEstablishments(undefined)
-          .buildUser(),
+        {
+          id: newUserId,
+          firstName: "",
+          lastName: "",
+          email: user2Email,
+          createdAt: timeGateway.now().toISOString(),
+          proConnect: null,
+        },
       ]);
     });
   });
@@ -197,15 +196,14 @@ describe("AddAgenciesAndUsers", () => {
         updatedUsersCount: 0,
       });
       expect(uow.userRepository.users).toEqual([
-        new ConnectedUserBuilder()
-          .withId(newUserId)
-          .withFirstName("")
-          .withLastName("")
-          .withEmail(user1Email)
-          .withCreatedAt(timeGateway.now())
-          .withProConnectInfos(null)
-          .withEstablishments(undefined)
-          .buildUser(),
+        {
+          id: newUserId,
+          firstName: "",
+          lastName: "",
+          email: user1Email,
+          createdAt: timeGateway.now().toISOString(),
+          proConnect: null,
+        },
       ]);
       expectArraysToMatch(uow.agencyRepository.agencies, [
         toAgencyWithRights(
@@ -231,6 +229,82 @@ describe("AddAgenciesAndUsers", () => {
             },
           },
         ),
+      ]);
+    });
+  });
+
+  describe("rows without duplicates", () => {
+    const row = {
+      ID: "1",
+      SIRET: siret1,
+      "Type structure": "ACI",
+      "Nom structure": "Nom Structure",
+      "E-mail authentification": user1Email,
+      "Adresse ligne 1": "adresse ligne 1",
+      "Adresse ligne 2": "adresse ligne 2",
+      Ville: "Ville",
+      "Code postal": "75000",
+      Coordonées: {
+        lat: 23,
+        lon: 12,
+      },
+      Téléphone: "+33600000000",
+    };
+    const rows: ImportedAgencyAndUserRow[] = [
+      row,
+      {
+        ...row,
+        "Type structure": "EI",
+        Téléphone: "+33611111111",
+      },
+    ];
+
+    it("should created one agency per row with kind suffixed to agency name if multiple siret", async () => {
+      const newUserId = "10000000-0000-0000-0000-000000000011";
+      const newAgencyId1 = "20000000-0000-0000-0000-000000000011";
+      const newAgencyId2 = "20000000-0000-0000-0000-000000000012";
+      uuidGenerator.setNextUuids([newUserId, newAgencyId1, newAgencyId2]);
+
+      const result = await addAgenciesAndUsers.execute(rows);
+
+      const agency1 = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId(newAgencyId1)
+          .withKind("structure-IAE")
+          .withAgencySiret(row.SIRET)
+          .withAddress({
+            streetNumberAndAddress: row["Adresse ligne 1"],
+            postcode: row["Code postal"],
+            city: row.Ville,
+            departmentCode: row["Code postal"].slice(0, 2),
+          })
+          .withCoveredDepartments(["75"])
+          .withPosition(23, 12)
+          .withSignature("L'équipe")
+          .build(),
+        {
+          [newUserId]: {
+            isNotifiedByEmail: true,
+            roles: ["agency-admin", "validator"],
+          },
+        },
+      );
+      expect(result).toEqual({
+        createdAgenciesCount: 2,
+        createdUsersCount: 1,
+        updatedUsersCount: 0,
+      });
+      expectArraysToMatch(uow.agencyRepository.agencies, [
+        {
+          ...agency1,
+          name: `${row["Nom structure"]} - ACI`,
+        },
+        {
+          ...agency1,
+          id: newAgencyId2,
+          name: `${row["Nom structure"]} - EI`,
+          phoneNumber: rows[1].Téléphone,
+        },
       ]);
     });
   });

@@ -81,7 +81,9 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
             ),
           },
         });
-        const siretsInIF = existingAgencies.map((agency) => agency.agencySiret);
+        const siretsInIF = uniq(
+          existingAgencies.map((agency) => agency.agencySiret),
+        );
         const rowsNotInIF = formattedImportedAgencies.filter(
           (importedAgency) => !siretsInIF.includes(importedAgency.SIRET),
         );
@@ -107,6 +109,14 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
 
         await createNewAgencies({
           importedAgencyAndUserRows: rowsWithDuplicates,
+          agencyRepository: uow.agencyRepository,
+          userRepository: uow.userRepository,
+          deps,
+        });
+
+        await createNewAgenciesWithSuffix({
+          allRows: formattedImportedAgencies,
+          rowsToCreateAsAgencies: uniqRows,
           agencyRepository: uow.agencyRepository,
           userRepository: uow.userRepository,
           deps,
@@ -352,4 +362,45 @@ const createOrUpdateUsers = async ({
     createdUsersCount: newUsersCount,
     updatedUsersCount: uniqEmails.length - newUsersCount,
   };
+};
+
+const createNewAgenciesWithSuffix = async ({
+  allRows,
+  rowsToCreateAsAgencies,
+  agencyRepository,
+  userRepository,
+  deps,
+}: {
+  allRows: ImportedAgencyAndUserRow[];
+  rowsToCreateAsAgencies: ImportedAgencyAndUserRow[];
+  agencyRepository: AgencyRepository;
+  userRepository: UserRepository;
+  deps: { uuidGenerator: UuidGenerator; timeGateway: TimeGateway };
+}) => {
+  const rowsGroupedBySiret = allRows.reduce(
+    (acc, row) => {
+      if (!acc[row.SIRET]) {
+        acc[row.SIRET] = [];
+      }
+      acc[row.SIRET].push(row);
+      return acc;
+    },
+    {} as Record<string, ImportedAgencyAndUserRow[]>,
+  );
+
+  const updatedRowsWithSuffixx = rowsToCreateAsAgencies.map((row) => {
+    const needSuffix = rowsGroupedBySiret[row.SIRET].length > 1;
+    const kind = row["Type structure"];
+    return {
+      ...row,
+      "Nom structure": `${row["Nom structure"]}${needSuffix ? ` - ${kind}` : ""}`,
+    };
+  });
+
+  await createNewAgencies({
+    importedAgencyAndUserRows: updatedRowsWithSuffixx,
+    agencyRepository,
+    userRepository,
+    deps,
+  });
 };
