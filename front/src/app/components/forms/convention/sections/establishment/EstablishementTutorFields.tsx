@@ -66,6 +66,7 @@ export const EstablishementTutorFields = ({
               ...formContents["establishmentTutor.phone"],
               nativeInputProps: {
                 ...register("establishmentTutor.phone"),
+                id: formContents["establishmentTutor.phone"].id,
               },
             }}
             onPhoneNumberChange={(phoneNumber) => {

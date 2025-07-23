@@ -80,6 +80,8 @@ export const EstablishmentRepresentativeFields = ({
           ...formContents["signatories.establishmentRepresentative.phone"],
           nativeInputProps: {
             ...register("signatories.establishmentRepresentative.phone"),
+            id: formContents["signatories.establishmentRepresentative.phone"]
+              .id,
           },
         }}
         disabled={isFetchingSiret}
