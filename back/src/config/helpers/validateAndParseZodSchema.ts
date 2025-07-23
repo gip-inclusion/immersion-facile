@@ -30,7 +30,7 @@ export const validateAndParseZodSchemaV2 = <T>(
     Issues:
     ${error.issues.join("\n")}`
         : ""
-    }`,
+    }${"schemaName" in props && props.schemaName === "externalFtConnectUserSchema" ? `\n Input: ${JSON.stringify(props.schemaParsingInput)}` : ""}`,
   });
 
   throw error;
