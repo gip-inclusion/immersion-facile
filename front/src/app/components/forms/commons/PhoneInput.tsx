@@ -57,7 +57,7 @@ export const PhoneInput = ({
 
       <div className={fr.cx("fr-grid-row", "fr-mt-1w")}>
         {shouldDisplaySelect && (
-          <div className={fr.cx("fr-col-3")}>
+          <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
             <Select
               label=""
               options={Object.entries(countryCodesData).map(
@@ -74,6 +74,7 @@ export const PhoneInput = ({
                   const updatedCountryCode = event.currentTarget.value;
                   if (isSupportedCountryCode(updatedCountryCode)) {
                     setCountryCode(updatedCountryCode);
+                    setDisplayedPhoneNumber("");
                     const internationalPhoneNumber = toInternationalPhoneNumber(
                       displayedPhoneNumber,
                       updatedCountryCode,
@@ -93,7 +94,12 @@ export const PhoneInput = ({
           </div>
         )}
 
-        <div className={fr.cx("fr-col", shouldDisplaySelect && "fr-ml-1w")}>
+        <div
+          className={fr.cx(
+            "fr-col",
+            shouldDisplaySelect && ["fr-ml-md-1w", "fr-mt-1w", "fr-mt-md-0"],
+          )}
+        >
           <Input
             label=""
             hintText=""
