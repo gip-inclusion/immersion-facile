@@ -4,7 +4,7 @@ import {
   type EmailAttachment,
   emailAttachmentSchema,
   emailSchema,
-  type Phone,
+  type PhoneNumber,
   smsRecipientPhoneSchema,
 } from "shared";
 import { z } from "zod";
@@ -58,7 +58,7 @@ export const sendTransactEmailResponseSchema: z.Schema<SendTransactEmailResponse
 
 export type SendTransactSmsRequestBody = {
   sender: string;
-  recipient: Phone;
+  recipient: PhoneNumber;
   content: string;
   type?: "transactional" | "marketing";
   tag?: string;

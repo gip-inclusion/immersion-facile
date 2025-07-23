@@ -1,63 +1,47 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input, type InputProps } from "@codegouvfr/react-dsfr/Input";
-import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import type { UseFormRegisterReturn } from "react-hook-form";
-
-const countryData = [
-  { code: "DE", name: "Allemagne", flag: "🇩🇪" },
-  { code: "AT", name: "Autriche", flag: "🇦🇹" },
-  { code: "BE", name: "Belgique", flag: "🇧🇪" },
-  { code: "BG", name: "Bulgarie", flag: "🇧🇬" },
-  { code: "CY", name: "Chypre", flag: "🇨🇾" },
-  { code: "HR", name: "Croatie", flag: "🇭🇷" },
-  { code: "DK", name: "Danemark", flag: "🇩🇰" },
-  { code: "ES", name: "Espagne", flag: "🇪🇸" },
-  { code: "EE", name: "Estonie", flag: "🇪🇪" },
-  { code: "FI", name: "Finlande", flag: "🇫🇮" },
-  { code: "FR", name: "France", flag: "🇫🇷" },
-  { code: "GR", name: "Grèce", flag: "🇬🇷" },
-  { code: "HU", name: "Hongrie", flag: "🇭🇺" },
-  { code: "IE", name: "Irlande", flag: "🇮🇪" },
-  { code: "IS", name: "Islande", flag: "🇮🇸" },
-  { code: "IT", name: "Italie", flag: "🇮🇹" },
-  { code: "LV", name: "Lettonie", flag: "🇱🇻" },
-  { code: "LI", name: "Liechtenstein", flag: "🇱🇮" },
-  { code: "LT", name: "Lituanie", flag: "🇱🇹" },
-  { code: "LU", name: "Luxembourg", flag: "🇱🇺" },
-  { code: "MT", name: "Malte", flag: "🇲🇹" },
-  { code: "NO", name: "Norvège", flag: "🇳🇴" },
-  { code: "NL", name: "Pays-Bas", flag: "🇳🇱" },
-  { code: "PL", name: "Pologne", flag: "🇵🇱" },
-  { code: "PT", name: "Portugal", flag: "🇵🇹" },
-  { code: "CZ", name: "République tchèque", flag: "🇨🇿" },
-  { code: "RO", name: "Roumanie", flag: "🇷🇴" },
-  { code: "SK", name: "Slovaquie", flag: "🇸🇰" },
-  { code: "SI", name: "Slovénie", flag: "🇸🇮" },
-  { code: "SE", name: "Suède", flag: "🇸🇪" },
-  { code: "CH", name: "Suisse", flag: "🇨🇭" },
-];
+import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import { useState } from "react";
+import { useFormContext } from "react-hook-form";
+import {
+  countryCodesData,
+  defaultCountryCode,
+  getCountryCodeFromPhoneNumber,
+  isSupportedCountryCode,
+  type OmitFromExistingKeys,
+  type SupportedCountryCode,
+  toInternationalPhoneNumber,
+} from "shared";
 
 export type PhoneInputProps = InputProps.RegularInput & {
-  selectedCountry?: string;
-  registerPhoneNumber: UseFormRegisterReturn;
-  registerCountryCode: UseFormRegisterReturn;
-  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  selectedCountry?: SupportedCountryCode;
   shouldDisplaySelect?: boolean;
+  selectProps?: OmitFromExistingKeys<
+    SelectProps<SelectProps.Option<SupportedCountryCode>[]>,
+    "label" | "options"
+  >;
+  inputProps?: InputProps.RegularInput;
+  onPhoneNumberChange: (phoneNumber: string) => void;
 };
 
-export const PhoneInput = (props: PhoneInputProps) => {
-  const {
-    label,
-    hintText,
-    stateRelatedMessage,
-    registerPhoneNumber,
-    registerCountryCode,
-    onBlur,
-    selectedCountry = "fr",
-    shouldDisplaySelect = false,
-    ...rest
-  } = props;
-
+export const PhoneInput = ({
+  label,
+  hintText,
+  stateRelatedMessage,
+  selectedCountry = defaultCountryCode,
+  shouldDisplaySelect = false,
+  selectProps,
+  inputProps,
+  onPhoneNumberChange,
+  id,
+  disabled,
+}: PhoneInputProps) => {
+  const { setError } = useFormContext();
+  const [countryCode, setCountryCode] =
+    useState<SupportedCountryCode>(selectedCountry);
+  const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState<string>(
+    inputProps?.nativeInputProps?.defaultValue?.toString() ?? "",
+  );
   return (
     <div
       className={fr.cx("fr-input-group", "fr-mb-3w", {
@@ -65,55 +49,95 @@ export const PhoneInput = (props: PhoneInputProps) => {
       })}
     >
       {label && (
-        <label className={fr.cx("fr-label")} htmlFor={props.id}>
+        <label className={fr.cx("fr-label")} htmlFor={id}>
           {label}
         </label>
       )}
       {hintText && <span className={fr.cx("fr-hint-text")}>{hintText}</span>}
 
-      <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+      <div className={fr.cx("fr-grid-row", "fr-mt-1w")}>
         {shouldDisplaySelect && (
           <div className={fr.cx("fr-col-3")}>
             <Select
               label=""
-              options={countryData.map((country) => ({
-                value: country.code,
-                label: `${country.flag} ${country.name}`,
-              }))}
+              options={Object.entries(countryCodesData).map(
+                ([code, { name, flag }]) => ({
+                  value: code,
+                  label: `${flag} ${name}`,
+                }),
+              )}
               nativeSelectProps={{
-                ...registerCountryCode,
-                value: selectedCountry,
+                ...selectProps?.nativeSelectProps,
+                value: countryCode,
+                disabled,
                 onChange: (event) => {
-                  registerCountryCode.onChange(event);
+                  const updatedCountryCode = event.currentTarget.value;
+                  if (isSupportedCountryCode(updatedCountryCode)) {
+                    setCountryCode(updatedCountryCode);
+                    const internationalPhoneNumber = toInternationalPhoneNumber(
+                      displayedPhoneNumber,
+                      updatedCountryCode,
+                    );
+                    if (internationalPhoneNumber) {
+                      onPhoneNumberChange(internationalPhoneNumber);
+                    }
+                    if (!internationalPhoneNumber) {
+                      setError(inputProps?.nativeInputProps?.name ?? "", {
+                        message: "Le numéro de téléphone n'est pas valide",
+                      });
+                    }
+                  }
                 },
-                disabled: props.disabled,
               }}
             />
           </div>
         )}
 
-        <div className={fr.cx(shouldDisplaySelect ? "fr-col-9" : "fr-col-12")}>
+        <div className={fr.cx("fr-col", shouldDisplaySelect && "fr-ml-1w")}>
           <Input
             label=""
             hintText=""
             nativeInputProps={{
-              ...registerPhoneNumber,
-              ...rest,
-              type: "tel",
-              onBlur: (event) => {
-                registerPhoneNumber.onBlur(event);
-                onBlur?.(event);
+              ...inputProps?.nativeInputProps,
+              onChange: (event) => {
+                const updatedPhoneNumber = event.currentTarget.value;
+                const countryCodeFromPhoneNumber =
+                  getCountryCodeFromPhoneNumber(updatedPhoneNumber);
+                const shouldUpdateCountryCode =
+                  updatedPhoneNumber.includes("+") &&
+                  countryCodeFromPhoneNumber &&
+                  countryCodeFromPhoneNumber !== countryCode;
+                inputProps?.nativeInputProps?.onChange?.(event);
+                setDisplayedPhoneNumber(updatedPhoneNumber);
+                if (shouldUpdateCountryCode) {
+                  setCountryCode(countryCodeFromPhoneNumber);
+                }
               },
+              onBlur: (event) => {
+                const internationalPhoneNumber = toInternationalPhoneNumber(
+                  displayedPhoneNumber,
+                  countryCode,
+                );
+                if (internationalPhoneNumber) {
+                  onPhoneNumberChange(internationalPhoneNumber);
+                }
+                if (!internationalPhoneNumber) {
+                  setError(inputProps?.nativeInputProps?.name ?? "", {
+                    message: "Le numéro de téléphone n'est pas valide",
+                  });
+                }
+                inputProps?.nativeInputProps?.onBlur?.(event);
+              },
+              value: displayedPhoneNumber,
+              type: "tel",
+              disabled,
             }}
           />
         </div>
       </div>
 
       {stateRelatedMessage && (
-        <p
-          id={`${props.id}-error-desc-error`}
-          className={fr.cx("fr-error-text")}
-        >
+        <p id={`${id}-error-desc-error`} className={fr.cx("fr-error-text")}>
           {stateRelatedMessage}
         </p>
       )}

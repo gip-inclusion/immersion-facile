@@ -9,7 +9,7 @@ import type {
 import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { phoneSchema } from "../phone.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { allAgencyRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import {
@@ -98,7 +98,7 @@ const commonAgencyShape = {
   signature: stringWithMaxLength255,
   logoUrl: absoluteUrlSchema.or(z.null()),
   agencySiret: siretSchema,
-  phoneNumber: phoneSchema,
+  phoneNumber: phoneNumberSchema,
 };
 
 export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z

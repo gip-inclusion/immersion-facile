@@ -20,13 +20,13 @@ describe("Beneficiary utils", () => {
     {
       firstName: "Thierry",
       lastName: "Aulait",
-      phone: { codeCountry: "fr", phoneNumber: "0610502025" },
+      phone: "0610502025",
     };
   const beneficiaryRepresentative: Partial<BeneficiaryRepresentative> = {
     firstName: "Thierry",
     lastName: "Aulait",
     email: "thierry.aulait@mail.com",
-    phone: { codeCountry: "fr", phoneNumber: "0610502025" },
+    phone: "0610502025",
   };
 
   it("should display correctly emergency contact infos with full infos provided", () => {

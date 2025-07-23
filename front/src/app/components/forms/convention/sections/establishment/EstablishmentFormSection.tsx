@@ -84,10 +84,7 @@ export const EstablishmentFormSection = ({
     setValue("establishmentTutor.firstName", "");
     setValue("establishmentTutor.lastName", "");
     setValue("establishmentTutor.email", "");
-    setValue("establishmentTutor.phone", {
-      codeCountry: "fr",
-      phoneNumber: "",
-    });
+    setValue("establishmentTutor.phone", "");
   };
 
   return (

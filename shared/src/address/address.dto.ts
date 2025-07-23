@@ -1,9 +1,11 @@
+import type { CountryCode } from "libphonenumber-js";
 import type { Builder } from "../Builder";
 import type {
   GeoPositionDto,
   WithGeoPosition,
 } from "../geoPosition/geoPosition.dto";
 import type { Flavor } from "../typeFlavors";
+import type { OmitFromExistingKeys } from "../utils";
 
 export type DepartmentName = Flavor<string, "DepartmentName">;
 export type DepartmentCode = Flavor<string, "DepartmentCode">;
@@ -39,6 +41,15 @@ export type Location = {
 };
 
 export type AddressAndPosition = Omit<Location, "id">;
+
+export type AddressAndPositionWithCountryCode = OmitFromExistingKeys<
+  AddressAndPosition,
+  "address"
+> & {
+  address: AddressDto & {
+    countryCode: CountryCode;
+  };
+};
 
 export const departmentNameToDepartmentCode: Record<
   DepartmentName,
@@ -190,3 +201,126 @@ export class LocationBuilder implements Builder<Location> {
 
   #dto: Location;
 }
+
+export const supportedCountryCodes = [
+  "DE",
+  "AT",
+  "BE",
+  "BG",
+  "CY",
+  "HR",
+  "DK",
+  "ES",
+  "EE",
+  "FI",
+  "FR",
+  "GR",
+  "HU",
+  "IE",
+  "IS",
+  "IT",
+  "LV",
+  "LI",
+  "LT",
+  "LU",
+  "MT",
+  "NO",
+  "NL",
+  "PL",
+  "PT",
+  "CZ",
+  "RO",
+  "SK",
+  "SI",
+  "SE",
+  "CH",
+] as const;
+
+export type SupportedCountryCode = (typeof supportedCountryCodes)[number];
+
+export const defaultCountryCode: SupportedCountryCode = "FR";
+
+export const countryCodesData: Record<
+  SupportedCountryCode,
+  { name: string; flag: string }
+> = {
+  DE: { name: "Allemagne", flag: "🇩🇪" },
+  AT: { name: "Autriche", flag: "🇦🇹" },
+  BE: { name: "Belgique", flag: "🇧🇪" },
+  BG: { name: "Bulgarie", flag: "🇧🇬" },
+  CY: { name: "Chypre", flag: "🇨🇾" },
+  HR: { name: "Croatie", flag: "🇭🇷" },
+  DK: { name: "Danemark", flag: "🇩🇰" },
+  ES: { name: "Espagne", flag: "🇪🇸" },
+  EE: { name: "Estonie", flag: "🇪🇪" },
+  FI: { name: "Finlande", flag: "🇫🇮" },
+  FR: { name: "France", flag: "🇫🇷" },
+  GR: { name: "Grèce", flag: "🇬🇷" },
+  HU: { name: "Hongrie", flag: "🇭🇺" },
+  IE: { name: "Irlande", flag: "🇮🇪" },
+  IS: { name: "Islande", flag: "🇮🇸" },
+  IT: { name: "Italie", flag: "🇮🇹" },
+  LV: { name: "Lettonie", flag: "🇱🇻" },
+  LI: { name: "Liechtenstein", flag: "🇱🇮" },
+  LT: { name: "Lituanie", flag: "🇱🇹" },
+  LU: { name: "Luxembourg", flag: "🇱🇺" },
+  MT: { name: "Malte", flag: "🇲🇹" },
+  NO: { name: "Norvège", flag: "🇳🇴" },
+  NL: { name: "Pays-Bas", flag: "🇳🇱" },
+  PL: { name: "Pologne", flag: "🇵🇱" },
+  PT: { name: "Portugal", flag: "🇵🇹" },
+  CZ: { name: "République tchèque", flag: "🇨🇿" },
+  RO: { name: "Roumanie", flag: "🇷🇴" },
+  SK: { name: "Slovaquie", flag: "🇸🇰" },
+  SI: { name: "Slovénie", flag: "🇸🇮" },
+  SE: { name: "Suède", flag: "🇸🇪" },
+  CH: { name: "Suisse", flag: "🇨🇭" },
+};
+
+export const territoriesByCountryCode: Record<
+  SupportedCountryCode,
+  CountryCode[]
+> = {
+  FR: ["GF", "YT", "GP", "MQ", "RE", "WF", "PM", "NC", "PF"],
+  DE: [],
+  AT: [],
+  BE: [],
+  BG: [],
+  CY: [],
+  HR: [],
+  DK: [],
+  ES: [],
+  EE: [],
+  FI: [],
+  GR: [],
+  HU: [],
+  IE: [],
+  IS: [],
+  IT: [],
+  LV: [],
+  LI: [],
+  LT: [],
+  LU: [],
+  MT: [],
+  NO: [],
+  NL: [],
+  PL: [],
+  PT: [],
+  CZ: [],
+  RO: [],
+  SK: [],
+  SI: [],
+  SE: [],
+  CH: [],
+};
+
+export const getSupportedCountryCodesForCountry = (
+  countryCode: SupportedCountryCode,
+): CountryCode[] => {
+  return [...(territoriesByCountryCode[countryCode] ?? []), countryCode];
+};
+
+export const isSupportedCountryCode = (
+  code: string,
+): code is SupportedCountryCode =>
+  supportedCountryCodes.includes(code as SupportedCountryCode);

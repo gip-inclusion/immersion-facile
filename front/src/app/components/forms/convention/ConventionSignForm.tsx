@@ -15,7 +15,7 @@ import {
   type ConventionReadDto,
   domElementIds,
   isConventionRenewed,
-  type Phone,
+  type PhoneNumber,
   type SignatoryRole,
   toDisplayedDate,
 } from "shared";
@@ -67,7 +67,7 @@ export const ConventionSignForm = ({
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
     useState<{
       signatoryRole: SignatoryRole;
-      signatoryPhone: Phone;
+      signatoryPhone: PhoneNumber;
     } | null>(null);
 
   const [signatureLinksSent, setSignatureLinksSent] =

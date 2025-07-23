@@ -1,14 +1,15 @@
 import parseMobile from "libphonenumber-js/mobile";
 import { z } from "zod";
-import { phoneSchema } from "../phone.schema";
-import type { Phone, TemplatedSms } from "./smsTemplateByName";
+import type { PhoneNumber } from "../phone/phone.dto";
+import { phoneNumberSchema } from "../phone/phone.schema";
+import type { TemplatedSms } from "./smsTemplateByName";
 
 //Mobile number to send SMS with the country code - Limited on this gateway to allow only french mobile phones
-export const smsRecipientPhoneSchema: z.Schema<Phone> = z
+export const smsRecipientPhoneSchema: z.Schema<PhoneNumber> = z
   .string()
   .superRefine((phone, ctx) => {
     if (
-      phoneSchema.safeParse(phone).success &&
+      phoneNumberSchema.safeParse(phone).success &&
       parseMobile(phone)?.getType() !== "MOBILE"
     )
       ctx.addIssue({

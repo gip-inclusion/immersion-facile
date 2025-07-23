@@ -8,12 +8,12 @@ import type {
   ImmersionObjective,
 } from "../convention/convention.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
+import type { PhoneNumber } from "../phone/phone.dto";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
-import type { Phone } from "../sms/smsTemplateByName";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 import type {
@@ -84,7 +84,7 @@ type WithContactByEmailProps<
 > = C extends "EMAIL"
   ? {
       datePreferences: string;
-      phone: Phone;
+      phone: PhoneNumber;
       immersionObjective: D extends "1_ELEVE_1_STAGE"
         ? Extract<ImmersionObjective, typeof discoverObjective>
         : ImmersionObjective | null;

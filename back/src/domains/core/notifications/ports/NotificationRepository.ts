@@ -7,7 +7,7 @@ import type {
   NotificationId,
   NotificationKind,
   NotificationState,
-  Phone,
+  PhoneNumber,
   SmsNotification,
   TemplatedSms,
 } from "shared";
@@ -20,7 +20,7 @@ export type EmailNotificationFilters = {
 };
 
 export type SmsNotificationFilters = {
-  recipientPhoneNumber: Phone;
+  recipientPhoneNumber: PhoneNumber;
   conventionId: ConventionId;
   smsKind: TemplatedSms["kind"];
 };

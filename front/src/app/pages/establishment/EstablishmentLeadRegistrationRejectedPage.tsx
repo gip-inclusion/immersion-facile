@@ -111,7 +111,7 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
                         .lastName,
                     bcPhone:
                       fetchedConvention?.signatories.establishmentRepresentative
-                        .phone.phoneNumber,
+                        .phone,
                   }).href
                 }`,
               }}

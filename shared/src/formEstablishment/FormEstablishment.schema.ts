@@ -4,7 +4,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf/naf.schema";
-import { phoneSchema } from "../phone.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { establishmentRoleSchema } from "../role/role.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -51,14 +51,14 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
     .object({
       role: z.literal("establishment-admin"),
       email: emailSchema,
-      phone: phoneSchema,
+      phone: phoneNumberSchema,
       job: zStringMinLength1,
     })
     .or(
       z.object({
         role: z.literal("establishment-contact"),
         email: emailSchema,
-        phone: phoneSchema.optional(),
+        phone: phoneNumberSchema.optional(),
         job: zStringMinLength1.optional(),
       }),
     );
@@ -180,43 +180,43 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     searchableByJobSeekers: csvBooleanSchema,
     searchableByStudents: csvBooleanSchema,
     right1_email: emailSchema,
-    right1_phone: phoneSchema,
+    right1_phone: phoneNumberSchema,
     right1_job: zStringMinLength1,
     right2_role: establishmentRoleSchema.optional(),
     right2_email: emailSchema.optional(),
-    right2_phone: phoneSchema.optional(),
+    right2_phone: phoneNumberSchema.optional(),
     right2_job: zStringMinLength1.optional(),
     right3_role: establishmentRoleSchema.optional(),
     right3_email: emailSchema.optional(),
-    right3_phone: phoneSchema.optional(),
+    right3_phone: phoneNumberSchema.optional(),
     right3_job: zStringMinLength1.optional(),
     right4_role: establishmentRoleSchema.optional(),
     right4_email: emailSchema.optional(),
-    right4_phone: phoneSchema.optional(),
+    right4_phone: phoneNumberSchema.optional(),
     right4_job: zStringMinLength1.optional(),
     right5_role: establishmentRoleSchema.optional(),
     right5_email: emailSchema.optional(),
-    right5_phone: phoneSchema.optional(),
+    right5_phone: phoneNumberSchema.optional(),
     right5_job: zStringMinLength1.optional(),
     right6_role: establishmentRoleSchema.optional(),
     right6_email: emailSchema.optional(),
-    right6_phone: phoneSchema.optional(),
+    right6_phone: phoneNumberSchema.optional(),
     right6_job: zStringMinLength1.optional(),
     right7_role: establishmentRoleSchema.optional(),
     right7_email: emailSchema.optional(),
-    right7_phone: phoneSchema.optional(),
+    right7_phone: phoneNumberSchema.optional(),
     right7_job: zStringMinLength1.optional(),
     right8_role: establishmentRoleSchema.optional(),
     right8_email: emailSchema.optional(),
-    right8_phone: phoneSchema.optional(),
+    right8_phone: phoneNumberSchema.optional(),
     right8_job: zStringMinLength1.optional(),
     right9_role: establishmentRoleSchema.optional(),
     right9_email: emailSchema.optional(),
-    right9_phone: phoneSchema.optional(),
+    right9_phone: phoneNumberSchema.optional(),
     right9_job: zStringMinLength1.optional(),
     right10_role: establishmentRoleSchema.optional(),
     right10_email: emailSchema.optional(),
-    right10_phone: phoneSchema.optional(),
+    right10_phone: phoneNumberSchema.optional(),
     right10_job: zStringMinLength1.optional(),
   });
 

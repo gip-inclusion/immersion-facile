@@ -62,17 +62,17 @@ export const EstablishementTutorFields = ({
           <PhoneInput
             label={formContents["establishmentTutor.phone"].label}
             hintText={formContents["establishmentTutor.phone"].hintText}
-            selectedCountry={
-              values.establishmentTutor?.phone?.codeCountry || "fr"
-            }
-            registerPhoneNumber={register(
-              "establishmentTutor.phone.phoneNumber",
-            )}
-            registerCountryCode={register(
-              "establishmentTutor.phone.codeCountry",
-            )}
+            inputProps={{
+              ...formContents["establishmentTutor.phone"],
+              nativeInputProps: {
+                ...register("establishmentTutor.phone"),
+              },
+            }}
+            onPhoneNumberChange={(phoneNumber) => {
+              setValue("establishmentTutor.phone", phoneNumber);
+            }}
             disabled={isFetchingSiret}
-            {...getFieldError("establishmentTutor.phone.phoneNumber")}
+            {...getFieldError("establishmentTutor.phone")}
             shouldDisplaySelect={true}
           />
           <EmailValidationInput

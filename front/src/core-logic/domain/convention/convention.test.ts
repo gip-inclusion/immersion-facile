@@ -245,7 +245,7 @@ describe("Convention slice", () => {
       const beneficiary: Beneficiary<"immersion"> = {
         email: "benef@mail.com",
         role: "beneficiary",
-        phone: { codeCountry: "fr", phoneNumber: "0614000000" },
+        phone: "0614000000",
         firstName: "John",
         lastName: "Doe",
         birthdate: "1990-02-21T00:00:00.000Z",
@@ -411,7 +411,7 @@ describe("Convention slice", () => {
             firstName: "tutorName",
             lastName: "tutorLastName",
             job: "Tutor",
-            phone: { codeCountry: "fr", phoneNumber: "0611223344" },
+            phone: "0611223344",
             role: "establishment-tutor",
           };
           const establishmentRepresentative: EstablishmentRepresentative = {
@@ -466,7 +466,7 @@ describe("Convention slice", () => {
           const convention = new ConventionDtoBuilder()
             .withBeneficiaryRepresentative({
               email: "benef-rep@rep.com",
-              phone: { codeCountry: "fr", phoneNumber: "0102" },
+              phone: "0102",
               firstName: "yo",
               lastName: "lo",
               role: "beneficiary-representative",
@@ -602,7 +602,7 @@ describe("Convention slice", () => {
               firstName: "Current",
               lastName: "LastName",
               job: "job",
-              phone: { codeCountry: "fr", phoneNumber: "112233445" },
+              phone: "112233445",
               role: "beneficiary-current-employer",
               businessAddress: "20 rue des merguez ",
             })
@@ -696,7 +696,7 @@ describe("Convention slice", () => {
       const beneficiary: Beneficiary<"immersion"> = {
         email: "benef@mail.com",
         role: "beneficiary",
-        phone: { codeCountry: "fr", phoneNumber: "0614000000" },
+        phone: "0614000000",
         firstName: "John",
         lastName: "Doe",
         birthdate: "1990-02-21T00:00:00.000Z",

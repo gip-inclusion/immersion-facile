@@ -5,7 +5,7 @@ import {
   type ImmersionObjective,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
-import { phoneSchema } from "../phone.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
@@ -46,7 +46,7 @@ export const legacyContactEstablishmentByMailSchema: z.Schema<LegacyContactEstab
     ...commonFields,
     contactMode: preferEmailContactSchema,
     message: zStringMinLength1,
-    potentialBeneficiaryPhone: phoneSchema,
+    potentialBeneficiaryPhone: phoneNumberSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
   });

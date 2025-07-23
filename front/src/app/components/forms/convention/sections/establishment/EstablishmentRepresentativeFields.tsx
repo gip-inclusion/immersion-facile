@@ -2,7 +2,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { useFormContext } from "react-hook-form";
-import { useSelector } from "react-redux";
 import { type ConventionReadDto, toLowerCaseWithoutDiacritics } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import type {
@@ -14,6 +13,7 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 import { PhoneInput } from "../../../commons/PhoneInput";
@@ -33,7 +33,8 @@ export const EstablishmentRepresentativeFields = ({
   );
   const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();
-  const isFetchingSiret = useSelector(siretSelectors.isFetching);
+  const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
+
   return (
     <>
       <hr className={fr.cx("fr-hr")} />
@@ -75,20 +76,20 @@ export const EstablishmentRepresentativeFields = ({
         hintText={
           formContents["signatories.establishmentRepresentative.phone"].hintText
         }
-        selectedCountry={
-          values.signatories.establishmentRepresentative?.phone?.codeCountry ||
-          "fr"
-        }
-        registerPhoneNumber={register(
-          "signatories.establishmentRepresentative.phone.phoneNumber",
-        )}
-        registerCountryCode={register(
-          "signatories.establishmentRepresentative.phone.codeCountry",
-        )}
+        inputProps={{
+          ...formContents["signatories.establishmentRepresentative.phone"],
+          nativeInputProps: {
+            ...register("signatories.establishmentRepresentative.phone"),
+          },
+        }}
         disabled={isFetchingSiret}
-        {...getFieldError(
-          "signatories.establishmentRepresentative.phone.phoneNumber",
-        )}
+        {...getFieldError("signatories.establishmentRepresentative.phone")}
+        onPhoneNumberChange={(phoneNumber) => {
+          setValue(
+            "signatories.establishmentRepresentative.phone",
+            phoneNumber,
+          );
+        }}
         shouldDisplaySelect={true}
       />
       <EmailValidationInput

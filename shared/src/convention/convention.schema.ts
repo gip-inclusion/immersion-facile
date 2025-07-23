@@ -13,7 +13,7 @@ import {
   createPaginatedSchema,
   paginationQueryParamsSchema,
 } from "../pagination/pagination.schema";
-import { phoneSchema } from "../phone.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { allRoles } from "../role/role.dto";
 import { signatoryRoleSchema } from "../role/role.schema";
 import {
@@ -123,15 +123,10 @@ export const conventionIdSchema: z.ZodSchema<ConventionId> = z
 
 const roleSchema = z.enum(allRoles);
 
-const phoneDtoSchema = z.object({
-  codeCountry: z.string(),
-  phoneNumber: phoneSchema,
-});
-
 const actorSchema = z.object({
   role: roleSchema,
   email: emailSchema,
-  phone: phoneDtoSchema,
+  phone: phoneNumberSchema,
   firstName: zTrimmedStringMax255,
   lastName: zTrimmedStringMax255,
 });
@@ -147,7 +142,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
     z.object({
       role: z.literal("beneficiary"),
       emergencyContact: zStringCanBeEmpty.optional(),
-      emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
+      emergencyContactPhone: phoneNumberSchema.optional().or(z.literal("")),
       emergencyContactEmail: emailPossiblyEmptySchema,
       federatedIdentity: peConnectIdentitySchema.optional(),
       financiaryHelp: zStringCanBeEmpty.optional(),
@@ -592,7 +587,7 @@ const addIssuesIfDuplicateSignatoriesPhoneNumbers = (
     .filter(([_, value]) => !!value)
     .map(([key, value]) => ({
       key: key as keyof Signatories,
-      phoneNumber: value.phone.phoneNumber,
+      phoneNumber: value.phone,
     }));
   signatoriesWithPhoneNumber.forEach((signatory) => {
     if (
@@ -605,9 +600,7 @@ const addIssuesIfDuplicateSignatoriesPhoneNumbers = (
     )
       addIssue(
         localization.signatoriesDistinctPhoneNumbers,
-        getConventionFieldName(
-          `signatories.${signatory.key}.phone.phoneNumber`,
-        ),
+        getConventionFieldName(`signatories.${signatory.key}.phone`),
       );
   });
 };

@@ -16,7 +16,7 @@ import {
   allSignatoryRoles,
   type ConventionReadDto,
   isConventionRenewed,
-  type Phone,
+  type PhoneNumber,
   type Role,
   type SignatoryRole,
   toDisplayedDate,
@@ -86,7 +86,7 @@ export const ConventionValidation = ({
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
     useState<{
       signatoryRole: SignatoryRole;
-      signatoryPhone: Phone;
+      signatoryPhone: PhoneNumber;
     } | null>(null);
 
   const [signatureLinksSent, setSignatureLinksSent] =
@@ -234,7 +234,7 @@ export const ConventionValidation = ({
         onConfirm={onSubmitSendSignatureLink}
       />
       <SendAssessmentLinkModalWrapper
-        phone={convention.establishmentTutor.phone.phoneNumber}
+        phone={convention.establishmentTutor.phone}
         onConfirm={onSubmitSendAssessmentLink}
       />
     </>

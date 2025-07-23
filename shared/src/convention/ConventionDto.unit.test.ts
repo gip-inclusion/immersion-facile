@@ -49,7 +49,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
   firstName: "Benef",
   lastName: "Representative",
-  phone: { codeCountry: "fr", phoneNumber: "0600110011" },
+  phone: "0600110011",
   email: "benef.representative@mail.fr",
 };
 
@@ -157,7 +157,7 @@ describe("conventionDtoSchema", () => {
       const currentEmployer: BeneficiaryCurrentEmployer = {
         role: "beneficiary-current-employer",
         email: "email@email.com",
-        phone: { codeCountry: "fr", phoneNumber: "+33600110011" },
+        phone: "+33600110011",
         firstName: "John",
         lastName: "Doe",
         businessSiret: "11112222333344",
@@ -261,35 +261,29 @@ describe("conventionDtoSchema", () => {
   describe("phone validation", () => {
     it("rejects when phone is not a valid number", () => {
       const convention = new ConventionDtoBuilder()
-        .withBeneficiaryPhone({ codeCountry: "fr", phoneNumber: "wrong" })
+        .withBeneficiaryPhone("wrong")
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
-        "signatories.beneficiary.phone.phoneNumber": `Le numéro de téléphone '${convention.signatories.beneficiary.phone.phoneNumber}' n'est pas valide.`,
+        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention.signatories.beneficiary.phone}' n'est pas valide.`,
       });
 
       const convention2 = new ConventionDtoBuilder()
-        .withBeneficiaryPhone({
-          codeCountry: "fr",
-          phoneNumber: "0203stillWrong",
-        })
+        .withBeneficiaryPhone("0203stillWrong")
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention2, {
-        "signatories.beneficiary.phone.phoneNumber": `Le numéro de téléphone '${convention2.signatories.beneficiary.phone.phoneNumber}' n'est pas valide.`,
+        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention2.signatories.beneficiary.phone}' n'est pas valide.`,
       });
     });
 
     it("rejects when establishmentTutorPhone is not a valid number", () => {
       const convention = new ConventionDtoBuilder()
-        .withEstablishmentTutorPhone({
-          codeCountry: "fr",
-          phoneNumber: "wrong",
-        })
+        .withEstablishmentTutorPhone("wrong")
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
-        "establishmentTutor.phone.phoneNumber": `Le numéro de téléphone '${convention.establishmentTutor.phone.phoneNumber}' n'est pas valide.`,
+        "establishmentTutor.phone": `Le numéro de téléphone '${convention.establishmentTutor.phone}' n'est pas valide.`,
       });
     });
 
@@ -302,13 +296,10 @@ describe("conventionDtoSchema", () => {
               2,
             ).toISOString(),
           )
-          .withBeneficiaryPhone({
-            codeCountry: "fr",
-            phoneNumber: "+33632342426",
-          })
+          .withBeneficiaryPhone("+33632342426")
           .withBeneficiaryRepresentative({
             ...beneficiaryRepresentative,
-            phone: { codeCountry: "fr", phoneNumber: "+33632342426" },
+            phone: "+33632342426",
           })
           .build();
 
@@ -320,19 +311,16 @@ describe("conventionDtoSchema", () => {
           conventionSchema,
           new ConventionDtoBuilder()
             .withDateSubmission("2025-05-25")
-            .withBeneficiaryPhone({
-              codeCountry: "fr",
-              phoneNumber: "+33632342426",
-            })
+            .withBeneficiaryPhone("+33632342426")
             .withBeneficiaryRepresentative({
               ...beneficiaryRepresentative,
-              phone: { codeCountry: "fr", phoneNumber: "+33632342426" },
+              phone: "+33632342426",
             })
             .build(),
           {
-            "signatories.beneficiary.phone.phoneNumber":
+            "signatories.beneficiary.phone":
               "Les numéros de téléphone des signataires doivent être différents.",
-            "signatories.beneficiaryRepresentative.phone.phoneNumber":
+            "signatories.beneficiaryRepresentative.phone":
               "Les numéros de téléphone des signataires doivent être différents.",
           },
         );
@@ -343,19 +331,13 @@ describe("conventionDtoSchema", () => {
           conventionSchema,
           new ConventionDtoBuilder()
             .withDateSubmission("2025-05-25")
-            .withBeneficiaryPhone({
-              codeCountry: "fr",
-              phoneNumber: "+33632342426",
-            })
-            .withEstablishmentRepresentativePhone({
-              codeCountry: "fr",
-              phoneNumber: "+33632342426",
-            })
+            .withBeneficiaryPhone("+33632342426")
+            .withEstablishmentRepresentativePhone("+33632342426")
             .build(),
           {
-            "signatories.beneficiary.phone.phoneNumber":
+            "signatories.beneficiary.phone":
               "Les numéros de téléphone des signataires doivent être différents.",
-            "signatories.establishmentRepresentative.phone.phoneNumber":
+            "signatories.establishmentRepresentative.phone":
               "Les numéros de téléphone des signataires doivent être différents.",
           },
         );
@@ -369,7 +351,7 @@ describe("conventionDtoSchema", () => {
         email: "tuteur@entreprise.com",
         firstName: "Jean",
         lastName: "Tuteur",
-        phone: { codeCountry: "fr", phoneNumber: "0102030405" },
+        phone: "0102030405",
         job: "",
         role: "establishment-tutor",
       })
@@ -787,7 +769,7 @@ describe("conventionDtoSchema", () => {
             levelOfEducation: "4ème",
             schoolName: "lycée Jean Moulin",
             schoolPostcode: "06500",
-            phone: { codeCountry: "fr", phoneNumber: "0836656565" },
+            phone: "0836656565",
             address: {
               city: "Paris",
               postcode: "75001",
@@ -822,7 +804,7 @@ describe("conventionDtoSchema", () => {
             levelOfEducation: "4ème",
             schoolName: "lycée Jean Moulin",
             schoolPostcode: "06500",
-            phone: { codeCountry: "fr", phoneNumber: "0836656565" },
+            phone: "0836656565",
             isRqth: false,
           })
           .build();
@@ -899,7 +881,7 @@ describe("conventionDtoSchema", () => {
       email: "b@b.com",
       firstName: "dfssd",
       lastName: "fghfg",
-      phone: { codeCountry: "fr", phoneNumber: "0756435789" },
+      phone: "0756435789",
       role: "establishment-representative",
     };
     const beneficiaryStudent: Beneficiary<"mini-stage-cci"> = {
@@ -908,7 +890,7 @@ describe("conventionDtoSchema", () => {
       email: "a@a.com",
       firstName: "student",
       lastName: "student",
-      phone: { codeCountry: "fr", phoneNumber: "0656435789" },
+      phone: "0656435789",
       role: "beneficiary",
       isRqth: false,
       schoolName: "École du quartier ouest",
@@ -919,7 +901,7 @@ describe("conventionDtoSchema", () => {
       email: "a@a.com",
       firstName: "sdfgf",
       lastName: "sdfs",
-      phone: { codeCountry: "fr", phoneNumber: "0656435789" },
+      phone: "0656435789",
       role: "beneficiary",
       isRqth: false,
     };
@@ -998,7 +980,7 @@ describe("conventionDtoSchema", () => {
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
-        phone: { codeCountry: "fr", phoneNumber: "0656435789" },
+        phone: "0656435789",
         role: "beneficiary",
         isRqth: false,
       };
@@ -1026,7 +1008,7 @@ describe("conventionDtoSchema", () => {
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
-        phone: { codeCountry: "fr", phoneNumber: "0656435789" },
+        phone: "0656435789",
         role: "beneficiary",
         schoolName: "École du quartier ouest",
         address: {
@@ -1060,7 +1042,7 @@ describe("conventionDtoSchema", () => {
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
-        phone: { codeCountry: "fr", phoneNumber: "0656435789" },
+        phone: "0656435789",
         role: "beneficiary",
         isRqth: false,
       };
@@ -1119,7 +1101,7 @@ describe("conventionDtoSchema", () => {
           email: "a@a.com",
           firstName: "sdfgf",
           lastName: "sdfs",
-          phone: { codeCountry: "fr", phoneNumber: "0656435789" },
+          phone: "0656435789",
           role: "beneficiary",
         };
 
@@ -1145,7 +1127,7 @@ describe("conventionDtoSchema", () => {
           email: "a@a.com",
           firstName: "sdfgf",
           lastName: "sdfs",
-          phone: { codeCountry: "fr", phoneNumber: "0656435789" },
+          phone: "0656435789",
           role: "beneficiary",
         };
 
