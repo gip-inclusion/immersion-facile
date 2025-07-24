@@ -133,6 +133,19 @@ const rawAgencyDashboardTabs = ({
           },
         ]
       : []),
+    ...(agenciesUserIsAdminOn.length
+      ? [
+          {
+            tabId: "agencyDashboardAgencies" satisfies AgencyDashboardRouteName,
+            label: "Mes Organismes",
+            content: (
+              <AgencyAdminTabContent
+                agenciesUserIsAdminOn={agenciesUserIsAdminOn}
+              />
+            ),
+          },
+        ]
+      : []),
     ...(dashboards.agencies.statsAgenciesUrl
       ? [
           {
@@ -176,19 +189,6 @@ const rawAgencyDashboardTabs = ({
                   dashboards.agencies
                     .statsConventionsByEstablishmentByDepartmentUrl
                 }
-              />
-            ),
-          },
-        ]
-      : []),
-    ...(agenciesUserIsAdminOn.length
-      ? [
-          {
-            tabId: "agencyDashboardAgencies" satisfies AgencyDashboardRouteName,
-            label: "Mes Organismes",
-            content: (
-              <AgencyAdminTabContent
-                agenciesUserIsAdminOn={agenciesUserIsAdminOn}
               />
             ),
           },
