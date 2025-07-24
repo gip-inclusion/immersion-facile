@@ -424,7 +424,7 @@ const ConventionSummarySection = ({
               closable
             />
           )}
-          <form>
+          <form className={fr.cx("fr-mt-2w")}>
             <Input
               textArea
               label="Expliquer les modifications *"
@@ -437,53 +437,57 @@ const ConventionSummarySection = ({
               {...getFieldError("statusJustification")}
             />
 
-            <Button
-              disabled={isLoading}
-              className={fr.cx("fr-m-1w")}
-              iconId="fr-icon-arrow-go-back-line"
-              iconPosition="left"
-              id={domElementIds.conventionImmersionRoute.summaryEditButton}
-              priority="secondary"
-              onClick={() => {
-                dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-                dispatch(
-                  conventionSlice.actions.showSummaryChangeRequested({
-                    showSummary: false,
-                  }),
-                );
-              }}
+            <div
+              className={fr.cx(
+                "fr-btns-group",
+                "fr-btns-group--inline",
+                "fr-btns-group--icon-left",
+              )}
             >
-              Retourner à la modification
-            </Button>
-
-            {currentSignatory ? (
-              <SignButton
-                className={fr.cx("fr-m-1w")}
-                disabled={isLoading}
-                id={domElementIds.conventionToSign.openSignModalButton}
-                submitButtonId={domElementIds.conventionToSign.submitButton}
-                signatory={currentSignatory}
-                internshipKind={convention?.internshipKind}
-                onConfirmClick={handleSubmit(onConfirmSubmit)}
-                onOpenSignModal={() => trigger("statusJustification")}
-                onCloseSignModalWithoutSignature={
-                  setIsModalClosedWithoutSignature
-                }
-              />
-            ) : (
               <Button
-                className={fr.cx("fr-m-1w")}
-                priority="primary"
-                onClick={handleSubmit(onConfirmSubmit)}
-                nativeButtonProps={{
-                  id: domElementIds.conventionImmersionRoute
-                    .confirmSubmitFormButton,
-                  disabled: isLoading,
+                disabled={isLoading}
+                iconId="fr-icon-arrow-go-back-line"
+                id={domElementIds.conventionImmersionRoute.summaryEditButton}
+                priority="secondary"
+                onClick={() => {
+                  dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                  dispatch(
+                    conventionSlice.actions.showSummaryChangeRequested({
+                      showSummary: false,
+                    }),
+                  );
                 }}
               >
-                Envoyer la convention
+                Retourner à la modification
               </Button>
-            )}
+
+              {currentSignatory ? (
+                <SignButton
+                  disabled={isLoading}
+                  id={domElementIds.conventionToSign.openSignModalButton}
+                  submitButtonId={domElementIds.conventionToSign.submitButton}
+                  signatory={currentSignatory}
+                  internshipKind={convention?.internshipKind}
+                  onConfirmClick={handleSubmit(onConfirmSubmit)}
+                  onOpenSignModal={() => trigger("statusJustification")}
+                  onCloseSignModalWithoutSignature={
+                    setIsModalClosedWithoutSignature
+                  }
+                />
+              ) : (
+                <Button
+                  priority="primary"
+                  onClick={handleSubmit(onConfirmSubmit)}
+                  nativeButtonProps={{
+                    id: domElementIds.conventionImmersionRoute
+                      .confirmSubmitFormButton,
+                    disabled: isLoading,
+                  }}
+                >
+                  Envoyer la convention
+                </Button>
+              )}
+            </div>
           </form>
         </>
       ) : (
