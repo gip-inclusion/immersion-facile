@@ -50,6 +50,7 @@ export const RichTable = ({
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearchValue = useDebounce(searchValue, 500);
   const searchBarRefOnSubmitRef = useRef(searchBar.onSubmit).current;
+  const tableRef = useRef<HTMLTableElement>(null);
 
   useScrollToTop(pagination.defaultPage ?? 1);
 
@@ -64,6 +65,14 @@ export const RichTable = ({
       );
     };
   }, [lgBreakpoint]);
+
+  useLayoutEffect(() => {
+    tableRef.current?.querySelectorAll("th").forEach((th) => {
+      if (th.textContent?.includes("Date")) {
+        th.classList.add("has-date-text");
+      }
+    });
+  }, []);
 
   useEffect(() => {
     searchBarRefOnSubmitRef(debouncedSearchValue);
@@ -122,6 +131,7 @@ export const RichTable = ({
       </header>
 
       <Table
+        ref={tableRef}
         headers={headers}
         data={data}
         bordered={false}

@@ -10,9 +10,11 @@ import {
 export const DiscussionStatusBadge = ({
   discussion,
   id = domElementIds.establishmentDashboard.discussion.statusBadge,
+  small = false,
 }: {
   discussion: DiscussionReadDto | DiscussionInList;
   id?: string;
+  small?: BadgeProps["small"];
 }) => {
   const statusBadge =
     statusBadgeData[
@@ -22,7 +24,7 @@ export const DiscussionStatusBadge = ({
       })
     ];
   return (
-    <Badge id={id} severity={statusBadge.severity}>
+    <Badge id={id} severity={statusBadge.severity} small={small}>
       {statusBadge.label}
     </Badge>
   );
