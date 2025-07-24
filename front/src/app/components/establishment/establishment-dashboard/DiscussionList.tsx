@@ -195,6 +195,7 @@ export const DiscussionList = () => {
                 <DiscussionStatusBadge
                   key={discussion.id}
                   discussion={discussion}
+                  small
                 />,
                 <Button
                   key={discussion.id}

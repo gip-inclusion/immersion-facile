@@ -1935,7 +1935,7 @@ Profil du candidat :
         • Répondre rapidement aux prochaines demandes d'immersion`,
         buttons: [
           {
-            label: "Accéder au tableau de bord établissement",
+            label: "Accéder à votre tableau de bord",
             url: establishmentDashboardUrl,
           },
         ],
