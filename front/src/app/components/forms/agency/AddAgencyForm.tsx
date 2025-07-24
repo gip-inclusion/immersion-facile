@@ -297,7 +297,7 @@ const AgencyForm = ({
                   <>
                     Remplissez ce formulaire afin de recevoir par mail le
                     contact du prescripteur de droit qui peut vous délivrer
-                    votre convention de délégation:{" "}
+                    votre convention de délégation&nbsp;:{" "}
                     <a
                       href="https://tally.so/r/w7WM49"
                       target="_blank"
