@@ -7,6 +7,7 @@ import {
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { SaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
+import { getNotifiedUsersFromEstablishmentUserRights } from "../../helpers/businessContact.helpers";
 
 export type MarkDiscussionDeprecatedAndNotify = ReturnType<
   typeof makeMarkDiscussionDeprecatedAndNotify
@@ -38,17 +39,6 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
     if (!establishment)
       throw errors.establishment.notFound({ siret: discussion.siret });
 
-    const recipients = (
-      await uow.userRepository.getByIds(
-        establishment.userRights
-          .filter(
-            ({ shouldReceiveDiscussionNotifications }) =>
-              shouldReceiveDiscussionNotifications,
-          )
-          .map(({ userId }) => userId),
-      )
-    ).map(({ email }) => email);
-
     await Promise.all([
       uow.discussionRepository.update({
         ...discussion,
@@ -60,7 +50,12 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
           kind: "email",
           templatedContent: {
             kind: "DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT",
-            recipients: recipients,
+            recipients: (
+              await getNotifiedUsersFromEstablishmentUserRights(
+                uow,
+                establishment.userRights,
+              )
+            ).map(({ email }) => email),
             params: {
               beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
               beneficiaryLastName: discussion.potentialBeneficiary.lastName,

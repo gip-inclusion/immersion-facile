@@ -218,11 +218,6 @@ describe("Discussions", () => {
     ])("Test discussionReadSchema", ({ appellationCode, ...rest }) => {
       const discussionRead: DiscussionReadDto = {
         ...rest,
-        // establishmentContact: {
-        //   firstName: establishmentContact.firstName,
-        //   lastName: establishmentContact.lastName,
-        //   job: establishmentContact.job,
-        // },
         appellation: {
           appellationCode: appellationCode,
           appellationLabel: "osef",

@@ -201,7 +201,6 @@ const commonDiscussionSchema: z.Schema<CommonDiscussionDto> = z
     siret: siretSchema,
     businessName: zStringMinLength1,
     address: addressSchema,
-    // exchanges: exchangesSchema,
     conventionId: conventionIdSchema.optional(),
   })
   .and(withDiscussionStatusSchema);

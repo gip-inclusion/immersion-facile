@@ -90,9 +90,12 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
 
     DROP TABLE IF EXISTS __to_delete__discussion_contacts;
 
+    ALTER TABLE exchanges
+      ADD COLUMN recipient exchange_role;
+
     UPDATE exchanges
     SET 
-      recipient = CASE sender WHEN 'establishment' THEN 'potentialBeneficiary' ELSE 'establishment' END;
+      recipient = CASE sender WHEN 'establishment' THEN 'potentialBeneficiary'::exchange_role ELSE 'establishment'::exchange_role END;
   `);
 
   pgm.sql(createContactRequestView("down"));

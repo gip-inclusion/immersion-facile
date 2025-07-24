@@ -19,6 +19,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
+import { getNotifiedUsersFromEstablishmentUserRights } from "../../helpers/businessContact.helpers";
 import { makeContactByEmailRequestParams } from "../../helpers/contactRequest";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
@@ -103,13 +104,9 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     });
 
     const notifiedRecipients = (
-      await uow.userRepository.getByIds(
-        establishment.userRights
-          .filter(
-            ({ shouldReceiveDiscussionNotifications }) =>
-              shouldReceiveDiscussionNotifications,
-          )
-          .map(({ userId }) => userId),
+      await getNotifiedUsersFromEstablishmentUserRights(
+        uow,
+        establishment.userRights,
       )
     ).map((user) => user.email);
 

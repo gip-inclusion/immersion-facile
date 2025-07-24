@@ -15,6 +15,7 @@ import type {
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+import { getNotifiedUsersFromEstablishmentUserRights } from "../helpers/businessContact.helpers";
 
 export type ContactRequestReminderMode = "3days" | "7days";
 export type ContactRequestReminder = ReturnType<
@@ -101,13 +102,9 @@ const makeNotification = async ({
     replyDomain: `reply.${domain}`,
   });
 
-  const usersToContact = await uow.userRepository.getByIds(
-    establishment.userRights
-      .filter(
-        ({ shouldReceiveDiscussionNotifications }) =>
-          shouldReceiveDiscussionNotifications,
-      )
-      .map(({ userId }) => userId),
+  const usersToContact = await getNotifiedUsersFromEstablishmentUserRights(
+    uow,
+    establishment.userRights,
   );
 
   return appellation
