@@ -373,7 +373,7 @@ const establishmentTutorSection = (internshipKind: InternshipKind) => ({
         ? "Numéro de téléphone du tuteur ou de la structure d'accueil"
         : "Numéro de téléphone du tuteur ou de l’entreprise",
     hintText:
-      "Renseignez de préférence un téléphone portable pour recevoir une copie de la convention par SMS. Ex: 0605040302",
+      "Renseignez de préférence un téléphone portable afin de recevoir les rappels liés au bilan par SMS. Format attendu : 0605040302",
     id: establishmentTutorSectionIds.phone,
     required: true,
   },
