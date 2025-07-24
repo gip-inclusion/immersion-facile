@@ -79,14 +79,7 @@ export const PhoneInput = ({
                       displayedPhoneNumber,
                       updatedCountryCode,
                     );
-                    if (internationalPhoneNumber) {
-                      onPhoneNumberChange(internationalPhoneNumber);
-                    }
-                    if (!internationalPhoneNumber) {
-                      setError(inputProps?.nativeInputProps?.name ?? "", {
-                        message: "Le numéro de téléphone n'est pas valide",
-                      });
-                    }
+                    onPhoneNumberChange(internationalPhoneNumber ?? "");
                   }
                 },
               }}
