@@ -19,6 +19,7 @@ import type { NotificationGateway } from "../../../core/notifications/ports/Noti
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getNotifiedUsersFromEstablishmentUserRights } from "../../helpers/businessContact.helpers";
 
 type SendExchangeToRecipientParams = WithDiscussionId &
   Partial<WithTriggeredBy> & {
@@ -165,17 +166,11 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
       );
     if (!establishment) throw errors.establishment.notFound({ siret });
 
-    const establishmentNotifiedContactIds = establishment.userRights
-      .filter(
-        ({ shouldReceiveDiscussionNotifications }) =>
-          shouldReceiveDiscussionNotifications,
+    return (
+      await getNotifiedUsersFromEstablishmentUserRights(
+        uow,
+        establishment.userRights,
       )
-      .map(({ userId }) => userId);
-
-    const users = await uow.userRepository.getByIds(
-      establishmentNotifiedContactIds,
-    );
-
-    return users.map(({ email }) => email);
+    ).map(({ email }) => email);
   }
 }

@@ -822,7 +822,7 @@ export const errors = {
     notFound: ({ discussionId }: { discussionId: DiscussionId }) =>
       new NotFoundError(`La discussion '${discussionId}' n'est pas trouvée.`),
     noExchanges: (discussionId: DiscussionId) =>
-      new Error(`No exchanges on discussion '${discussionId}'.`),
+      new Error(`La discussion '${discussionId}' n'a pas d'échanges.`),
     missingHasWorkingExperience: (id: DiscussionId) =>
       new Error(
         `Propriété hasWorkingExperience manquante pour la discussion de type email '${id}'.`,

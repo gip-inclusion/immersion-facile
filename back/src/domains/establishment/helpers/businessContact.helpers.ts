@@ -3,6 +3,7 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type {
   EstablishmentAdminRight,
   EstablishmentAggregate,
+  EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";
 
 export const getDiscussionContactsFromAggregate = async (
@@ -33,3 +34,16 @@ export const getDiscussionContactsFromAggregate = async (
   );
   return { otherUsers, firstAdminRight, firstAdminUser };
 };
+
+export const getNotifiedUsersFromEstablishmentUserRights = async (
+  uow: UnitOfWork,
+  userRights: EstablishmentUserRight[],
+): Promise<UserWithAdminRights[]> =>
+  uow.userRepository.getByIds(
+    userRights
+      .filter(
+        ({ shouldReceiveDiscussionNotifications }) =>
+          shouldReceiveDiscussionNotifications,
+      )
+      .map(({ userId }) => userId),
+  );
