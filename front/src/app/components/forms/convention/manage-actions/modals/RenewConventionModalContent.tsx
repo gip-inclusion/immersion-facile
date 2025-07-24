@@ -78,7 +78,7 @@ export const RenewConventionModalContent = ({
         <Input
           label="Identifiant de la convention renouvelée"
           hintText={
-            "Il n'est pas modificable, mais vous pouvez le copier pour le garder de côté"
+            "Il n'est pas modifiable, mais vous pouvez le copier pour le garder de côté"
           }
           nativeInputProps={{
             ...methods.register("id"),
