@@ -564,24 +564,40 @@ const ConventionSummarySection = ({
 
 const DuplicateConventionAlert = (props: {
   similarConventionIds: ConventionId[];
-}) => (
-  <Alert
-    severity={"warning"}
-    title={"Attention ! Possible convention en doublon."}
-    description={
-      <div>
-        {props.similarConventionIds.length === 1
-          ? "Une convention a déjà été initiée avec des informations similaires. Voici son identifiant :"
-          : "Des conventions ont déjà été initiées avec des informations similaires. Voici leurs identifiants :"}
-        <ul>
-          {props.similarConventionIds.map((id) => (
-            <li key={id}>{id}</li>
-          ))}
-        </ul>
-      </div>
-    }
-  />
-);
+}) => {
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  return (
+    <Alert
+      severity={"warning"}
+      title={"Attention ! Possible convention en doublon."}
+      description={
+        <div>
+          {props.similarConventionIds.length === 1
+            ? "Une convention a déjà été initiée avec des informations similaires. Voici son identifiant :"
+            : "Des conventions ont déjà été initiées avec des informations similaires. Voici leurs identifiants :"}
+          <ul>
+            {props.similarConventionIds.map((id) => (
+              <li key={id}>
+                {currentUser ? (
+                  <a
+                    {...routes.manageConventionConnectedUser({
+                      conventionId: id,
+                    }).link}
+                    target="_blank"
+                  >
+                    {id}
+                  </a>
+                ) : (
+                  id
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      }
+    />
+  );
+};
 
 const getRouteToRedirectAfterSubmit = ({
   mode,
