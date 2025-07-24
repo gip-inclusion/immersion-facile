@@ -270,7 +270,8 @@ export const ConventionDocumentPage = ({
                   lastname: beneficiaryCurrentEmployer.lastName,
                 })}
               </strong>{" "}
-              en qualité de <strong>représentant(e) de l'entreprise:</strong>{" "}
+              en qualité de{" "}
+              <strong>représentant(e) de l'entreprise&nbsp;:</strong>{" "}
               {beneficiaryCurrentEmployer.businessName}{" "}
               <strong>employant actuellement le bénéficiaire</strong>
               <ul>

@@ -85,7 +85,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
           <p className={fr.cx("fr-text--xs", "fr-mt-2w")}>
             Cette convention est établie en application des dispositions des
             articles L124-3-1, L332-3-1 et L332-3-2 du code de l’éducation et de
-            l’article L.4153-1 du code du travail, offrant la possibilité:
+            l’article L.4153-1 du code du travail, offrant la possibilité&nbsp;:
             <br />⦁ aux collégiens, à partir de la 4e ou aux jeunes des lycées
             de réaliser des périodes d’observation en entreprise d’une durée
             maximale d’une semaine durant les vacances scolaires;
