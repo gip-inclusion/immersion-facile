@@ -642,7 +642,7 @@ describe("PgAgencyRepository", () => {
       });
     });
 
-    describe("filter siret", () => {
+    describe("filter sirets", () => {
       beforeEach(async () => {
         await Promise.all([
           agencyRepository.insert(agency1PEVitrySurSeine),
@@ -650,19 +650,27 @@ describe("PgAgencyRepository", () => {
         ]);
       });
 
-      it("returns all agencies filtered by siret", async () => {
+      it("returns all agencies filtered by sirets", async () => {
         expect(
           await agencyRepository.getAgencies({
-            filters: { siret: agency1PEVitrySurSeine.agencySiret },
+            filters: { sirets: [agency1PEVitrySurSeine.agencySiret] },
           }),
         ).toEqual([agency1PEVitrySurSeine]);
       });
-      it("returns nothing on missing siret", async () => {
+      it("returns nothing on missing sirets", async () => {
         expect(
           await agencyRepository.getAgencies({
-            filters: { siret: "00000000000000" },
+            filters: { sirets: ["00000000000000"] },
           }),
         ).toEqual([]);
+      });
+
+      it("returns all on empty sirets", async () => {
+        expect(
+          await agencyRepository.getAgencies({
+            filters: { sirets: [] },
+          }),
+        ).toEqual([agency1PEVitrySurSeine, agency2PEVitryLeFrancois]);
       });
     });
 

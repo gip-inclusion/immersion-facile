@@ -8,6 +8,7 @@ import {
   type ShortLinkId,
   type SiretDto,
 } from "shared";
+import { makeAddAgenciesAndUsers } from "../../domains/agency/use-cases/AddAgenciesAndUsers";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
@@ -666,6 +667,13 @@ export const createUseCases = ({
         })),
     }),
 
+    addAgenciesAndUsers: makeAddAgenciesAndUsers({
+      uowPerformer,
+      deps: {
+        uuidGenerator,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
     broadcastToFranceTravailOnConventionUpdates:
       makeBroadcastToFranceTravailOrchestrator({
         uowPerformer,
