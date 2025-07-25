@@ -47,24 +47,40 @@ export const contactModeSchema = zEnumValidation(
   "Choisissez parmi les options proposées",
 );
 
+const establishmentContactBaseSchema = z.object({
+  role: z.literal("establishment-contact"),
+  email: emailSchema,
+  shouldReceiveDiscussionNotifications: zBoolean,
+  job: zStringMinLength1.optional(),
+});
+
+const establishmentContactPhoneSchema = z
+  .object({
+    phone: phoneNumberSchema,
+    isMainContactByPhone: zBoolean,
+  })
+  .or(
+    z.object({
+      phone: z.never(),
+      isMainContactByPhone: z.never(),
+    }),
+  );
+
+const establishmentContactSchema = establishmentContactBaseSchema.and(
+  establishmentContactPhoneSchema,
+);
+
 export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRight> =
   z
     .object({
       role: z.literal("establishment-admin"),
       email: emailSchema,
       phone: phoneNumberSchema,
+      isMainContactByPhone: zBoolean,
       shouldReceiveDiscussionNotifications: zBoolean,
       job: zStringMinLength1,
     })
-    .or(
-      z.object({
-        role: z.literal("establishment-contact"),
-        email: emailSchema,
-        phone: phoneNumberSchema.optional(),
-        shouldReceiveDiscussionNotifications: zBoolean,
-        job: zStringMinLength1.optional(),
-      }),
-    );
+    .or(establishmentContactSchema);
 
 export const formEstablishmentUserRightsSchema: z.Schema<
   FormEstablishmentUserRight[]

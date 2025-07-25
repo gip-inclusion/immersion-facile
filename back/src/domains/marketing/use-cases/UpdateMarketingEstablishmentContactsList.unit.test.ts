@@ -45,6 +45,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     phone: "",
     role: "establishment-admin",
     shouldReceiveDiscussionNotifications: true,
+    isMainContactByPhone: false,
   };
 
   const establishment = new EstablishmentAggregateBuilder()

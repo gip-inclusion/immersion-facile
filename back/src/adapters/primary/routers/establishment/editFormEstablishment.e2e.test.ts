@@ -63,6 +63,7 @@ describe("Edit form establishments", () => {
         phone: "+33688774455",
         userId: establishmentAdminUser.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
     ])
     .build();

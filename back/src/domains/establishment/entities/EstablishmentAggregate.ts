@@ -19,7 +19,8 @@ type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
 };
 
 export type EstablishmentAdminRight =
-  GenericEstablishmentUserRight<"establishment-admin"> & WithJobAndPhone;
+  GenericEstablishmentUserRight<"establishment-admin"> &
+    Required<WithJobAndPhone>;
 
 export type EstablishmentContactRight =
   GenericEstablishmentUserRight<"establishment-contact"> &

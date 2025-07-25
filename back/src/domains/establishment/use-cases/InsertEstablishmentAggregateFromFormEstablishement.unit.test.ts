@@ -83,6 +83,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     job: "osef",
     phone: "+33655445544",
     shouldReceiveDiscussionNotifications: true,
+    isMainContactByPhone: false,
   };
 
   const formContactRight: ContactFormEstablishmentUserRight = {
@@ -209,6 +210,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -313,6 +315,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -456,6 +459,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           phone: "",
           userId: establishmentAdmin.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
         {
           role: "establishment-contact",
@@ -587,6 +591,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           phone: "+33612345678",
           userId: "estab.admin",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
         {
           role: "establishment-contact",
@@ -690,6 +695,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             phone: "+33612345678",
             userId: "estab.admin",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
           {
             role: "establishment-contact",
@@ -817,6 +823,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 phone: "+33612345678",
                 userId: "estab.admin",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -846,6 +853,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             phone: "",
             userId: "",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .build();
