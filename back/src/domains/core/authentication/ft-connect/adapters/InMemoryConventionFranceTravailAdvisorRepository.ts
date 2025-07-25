@@ -43,6 +43,14 @@ export class InMemoryConventionFranceTravailAdvisorRepository
     );
   }
 
+  public async deleteByConventionId(conventionId: ConventionId): Promise<void> {
+    this.#conventionFranceTravailUsersAdvisors =
+      this.#conventionFranceTravailUsersAdvisors.filter(
+        (conventionFranceTravailUserAdvisor) =>
+          conventionFranceTravailUserAdvisor.conventionId !== conventionId,
+      );
+  }
+
   public async openSlotForNextConvention(
     peUserAndAdvisor: FtUserAndAdvisor,
   ): Promise<void> {
