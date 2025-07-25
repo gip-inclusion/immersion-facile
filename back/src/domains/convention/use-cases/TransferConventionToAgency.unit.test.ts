@@ -1,4 +1,5 @@
 import type {
+  AgencyDto,
   AgencyRole,
   ConnectedUser,
   ConnectedUserDomainJwtPayload,
@@ -19,6 +20,8 @@ import {
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { createConventionMagicLinkPayload } from "../../../utils/jwt";
+import type { FtConnectImmersionAdvisorDto } from "../../core/authentication/ft-connect/dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../../core/authentication/ft-connect/dto/FtConnectUserDto";
 import {
   type CreateNewEvent,
   makeCreateNewEvent,
@@ -601,6 +604,150 @@ describe("TransferConventionToAgency", () => {
           },
         ]);
       });
+
+      describe("federatedIdentity is set in initial convention", () => {
+        const userFtExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
+        const beneficiary: FtConnectUserDto = {
+          email: "",
+          firstName: "",
+          isJobseeker: true,
+          lastName: "",
+          peExternalId: userFtExternalId,
+        };
+        const ftAdvisor: FtConnectImmersionAdvisorDto = {
+          firstName: "Jean",
+          lastName: "Dupont",
+          email: "jean.dupont@pole-emploi.fr",
+          type: "PLACEMENT",
+        };
+
+        beforeEach(async () => {
+          await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+            {
+              advisor: ftAdvisor,
+              user: beneficiary,
+            },
+          );
+          await uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+            conventionId,
+            userFtExternalId,
+          );
+
+          uow.conventionRepository.setConventions([convention]);
+          uow.userRepository.users = [connectedUser];
+        });
+
+        it("should keep federated identity if new agency is france-travail", async () => {
+          const transferredToAgency: AgencyDto = {
+            ...otherAgency,
+            kind: "pole-emploi",
+          };
+
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [connectedUser.id]: {
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            }),
+            toAgencyWithRights(transferredToAgency, {}),
+          ];
+
+          await usecase.execute(
+            {
+              conventionId,
+              agencyId: transferredToAgency.id,
+              justification: "change of agency",
+            },
+            connectedUserPayload,
+          );
+
+          const transferedConvention = await uow.conventionRepository.getById(
+            convention.id,
+          );
+
+          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(
+            await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+              conventionId,
+            ),
+            {
+              conventionId,
+              advisor: ftAdvisor,
+              peExternalId: userFtExternalId,
+              _entityName: "ConventionFranceTravailAdvisor",
+            },
+          );
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "ConventionTransferredToAgency",
+              payload: {
+                conventionId: transferedConvention.id,
+                agencyId: otherAgency.id,
+                justification: "change of agency",
+                previousAgencyId: convention.agencyId,
+                triggeredBy: {
+                  kind: "connected-user",
+                  userId: connectedUser.id,
+                },
+              },
+            },
+          ]);
+        });
+
+        it("should clear federated identity if new agency is not france-travail", async () => {
+          const transferredToAgency: AgencyDto = {
+            ...otherAgency,
+            kind: "mission-locale",
+          };
+
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [connectedUser.id]: {
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            }),
+            toAgencyWithRights(transferredToAgency, {}),
+          ];
+
+          await usecase.execute(
+            {
+              conventionId,
+              agencyId: transferredToAgency.id,
+              justification: "change of agency kind",
+            },
+            connectedUserPayload,
+          );
+
+          const transferedConvention = await uow.conventionRepository.getById(
+            convention.id,
+          );
+
+          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expect(
+            await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+              conventionId,
+            ),
+          ).toBeUndefined();
+
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "ConventionTransferredToAgency",
+              payload: {
+                conventionId: transferedConvention.id,
+                agencyId: otherAgency.id,
+                justification: "change of agency kind",
+                previousAgencyId: convention.agencyId,
+                triggeredBy: {
+                  kind: "connected-user",
+                  userId: connectedUser.id,
+                },
+              },
+            },
+          ]);
+        });
+      });
     });
 
     describe("with convention jwt payload", () => {
@@ -770,6 +917,164 @@ describe("TransferConventionToAgency", () => {
             },
           },
         ]);
+      });
+
+      describe("federatedIdentity is set in initial convention", () => {
+        const userFtExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
+        const beneficiary: FtConnectUserDto = {
+          email: "",
+          firstName: "",
+          isJobseeker: true,
+          lastName: "",
+          peExternalId: userFtExternalId,
+        };
+        const ftAdvisor: FtConnectImmersionAdvisorDto = {
+          firstName: "Jean",
+          lastName: "Dupont",
+          email: "jean.dupont@pole-emploi.fr",
+          type: "PLACEMENT",
+        };
+
+        beforeEach(async () => {
+          await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+            {
+              advisor: ftAdvisor,
+              user: beneficiary,
+            },
+          );
+          await uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+            conventionId,
+            userFtExternalId,
+          );
+
+          uow.conventionRepository.setConventions([convention]);
+          uow.userRepository.users = [notConnectedUser];
+        });
+
+        it("should keep federated identity if new agency is france-travail", async () => {
+          const transferredToAgency: AgencyDto = {
+            ...otherAgency,
+            kind: "pole-emploi",
+          };
+
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [notConnectedUser.id]: {
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            }),
+            toAgencyWithRights(transferredToAgency, {}),
+          ];
+
+          const jwtPayload = createConventionMagicLinkPayload({
+            id: conventionId,
+            role: "validator",
+            email: notConnectedUser.email,
+            now: new Date(),
+          });
+
+          await usecase.execute(
+            {
+              conventionId,
+              agencyId: transferredToAgency.id,
+              justification: "change of agency",
+            },
+            jwtPayload,
+          );
+
+          const transferedConvention = await uow.conventionRepository.getById(
+            convention.id,
+          );
+
+          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(
+            await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+              conventionId,
+            ),
+            {
+              conventionId,
+              advisor: ftAdvisor,
+              peExternalId: userFtExternalId,
+              _entityName: "ConventionFranceTravailAdvisor",
+            },
+          );
+
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "ConventionTransferredToAgency",
+              payload: {
+                conventionId: transferedConvention.id,
+                agencyId: otherAgency.id,
+                justification: "change of agency",
+                previousAgencyId: convention.agencyId,
+                triggeredBy: {
+                  kind: "convention-magic-link",
+                  role: jwtPayload.role,
+                },
+              },
+            },
+          ]);
+        });
+
+        it("should clear federated identity if new agency is not france-travail", async () => {
+          const transferredToAgency: AgencyDto = {
+            ...otherAgency,
+            kind: "mission-locale",
+          };
+
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [notConnectedUser.id]: {
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            }),
+            toAgencyWithRights(transferredToAgency, {}),
+          ];
+
+          const jwtPayload = createConventionMagicLinkPayload({
+            id: conventionId,
+            role: "validator",
+            email: notConnectedUser.email,
+            now: new Date(),
+          });
+
+          await usecase.execute(
+            {
+              conventionId,
+              agencyId: transferredToAgency.id,
+              justification: "change of agency kind",
+            },
+            jwtPayload,
+          );
+
+          const transferedConvention = await uow.conventionRepository.getById(
+            convention.id,
+          );
+
+          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expect(
+            await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+              conventionId,
+            ),
+          ).toBeUndefined();
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "ConventionTransferredToAgency",
+              payload: {
+                conventionId: transferedConvention.id,
+                agencyId: otherAgency.id,
+                justification: "change of agency kind",
+                previousAgencyId: convention.agencyId,
+                triggeredBy: {
+                  kind: "convention-magic-link",
+                  role: jwtPayload.role,
+                },
+              },
+            },
+          ]);
+        });
       });
     });
   });
