@@ -419,11 +419,11 @@ describe("TransferConventionToAgency", () => {
             connectedUserPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             convention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
           expectToEqual(uow.conventionRepository.conventions, [
             {
               ...convention,
@@ -434,7 +434,7 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
@@ -475,18 +475,18 @@ describe("TransferConventionToAgency", () => {
             connectedUserPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             initialConvention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
 
           expectArraysToMatch(uow.outboxRepository.events, [
             {
               topic: "ConventionTransferredToAgency",
               payload: {
                 agencyId: otherAgency.id,
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
                 triggeredBy: {
@@ -528,17 +528,17 @@ describe("TransferConventionToAgency", () => {
           backofficeAdminPayload,
         );
 
-        const transferedConvention = await uow.conventionRepository.getById(
+        const transferredConvention = await uow.conventionRepository.getById(
           conventionWithAgencyRefersTo.id,
         );
 
-        expectToEqual(transferedConvention.agencyId, otherAgency.id);
+        expectToEqual(transferredConvention.agencyId, otherAgency.id);
         expectArraysToMatch(uow.outboxRepository.events, [
           {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferedConvention.id,
+              conventionId: transferredConvention.id,
               justification: "change of agency",
               previousAgencyId: conventionWithAgencyRefersTo.agencyId,
               triggeredBy: {
@@ -583,17 +583,17 @@ describe("TransferConventionToAgency", () => {
           counsellorPayload,
         );
 
-        const transferedConvention = await uow.conventionRepository.getById(
+        const transferredConvention = await uow.conventionRepository.getById(
           conventionWithAgencyRefersTo.id,
         );
 
-        expectToEqual(transferedConvention.agencyId, otherAgency.id);
+        expectToEqual(transferredConvention.agencyId, otherAgency.id);
         expectArraysToMatch(uow.outboxRepository.events, [
           {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferedConvention.id,
+              conventionId: transferredConvention.id,
               justification: "change of agency",
               previousAgencyId: conventionWithAgencyRefersTo.agencyId,
               triggeredBy: {
@@ -662,11 +662,11 @@ describe("TransferConventionToAgency", () => {
             connectedUserPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             convention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
           expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
@@ -682,7 +682,7 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
@@ -720,11 +720,11 @@ describe("TransferConventionToAgency", () => {
             connectedUserPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             convention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
           expect(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
@@ -735,7 +735,7 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency kind",
                 previousAgencyId: convention.agencyId,
@@ -788,17 +788,17 @@ describe("TransferConventionToAgency", () => {
             jwtPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             convention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
 
           expectArraysToMatch(uow.outboxRepository.events, [
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
@@ -839,18 +839,18 @@ describe("TransferConventionToAgency", () => {
             validatorJwtPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             initialConvention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
 
           expectArraysToMatch(uow.outboxRepository.events, [
             {
               topic: "ConventionTransferredToAgency",
               payload: {
                 agencyId: otherAgency.id,
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
                 triggeredBy: {
@@ -896,18 +896,18 @@ describe("TransferConventionToAgency", () => {
           counsellorPayload,
         );
 
-        const transferedConvention = await uow.conventionRepository.getById(
+        const transferredConvention = await uow.conventionRepository.getById(
           conventionWithAgencyRefersTo.id,
         );
 
-        expectToEqual(transferedConvention.agencyId, otherAgency.id);
+        expectToEqual(transferredConvention.agencyId, otherAgency.id);
 
         expectArraysToMatch(uow.outboxRepository.events, [
           {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferedConvention.id,
+              conventionId: transferredConvention.id,
               justification: "change of agency",
               previousAgencyId: conventionWithAgencyRefersTo.agencyId,
               triggeredBy: {
@@ -983,11 +983,11 @@ describe("TransferConventionToAgency", () => {
             jwtPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             convention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
           expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
@@ -1004,7 +1004,7 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
@@ -1049,11 +1049,11 @@ describe("TransferConventionToAgency", () => {
             jwtPayload,
           );
 
-          const transferedConvention = await uow.conventionRepository.getById(
+          const transferredConvention = await uow.conventionRepository.getById(
             convention.id,
           );
 
-          expectToEqual(transferedConvention.agencyId, otherAgency.id);
+          expectToEqual(transferredConvention.agencyId, otherAgency.id);
           expect(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
@@ -1063,7 +1063,7 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferedConvention.id,
+                conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency kind",
                 previousAgencyId: convention.agencyId,
