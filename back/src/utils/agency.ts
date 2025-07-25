@@ -188,7 +188,7 @@ export const throwErrorIfAgencyNotFound = async ({
 }: {
   agencyId: string;
   agencyRepository: AgencyRepository;
-}) => {
+}): Promise<AgencyWithUsersRights> => {
   const agency = await agencyRepository.getById(agencyId);
 
   if (!agency) {
@@ -196,6 +196,8 @@ export const throwErrorIfAgencyNotFound = async ({
       agencyId,
     });
   }
+
+  return agency;
 };
 
 export const agencyDtoToConventionAgencyFields = (
