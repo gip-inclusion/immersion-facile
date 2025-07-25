@@ -89,6 +89,7 @@ describe("Contact establishment public v2 e2e", () => {
               job: "",
               phone: "",
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
           ])
           .withOffers([immersionOffer])

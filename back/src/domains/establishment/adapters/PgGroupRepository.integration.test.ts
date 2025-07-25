@@ -65,6 +65,7 @@ describe("PgEstablishmentGroupRepository", () => {
     job: "",
     phone: "",
     shouldReceiveDiscussionNotifications: true,
+    isMainContactByPhone: false,
   };
 
   let pool: Pool;

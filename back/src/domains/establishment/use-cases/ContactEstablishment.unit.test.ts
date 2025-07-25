@@ -72,6 +72,7 @@ describe("ContactEstablishment", () => {
     job: "",
     phone: "",
     shouldReceiveDiscussionNotifications: true,
+    isMainContactByPhone: false,
   };
 
   const userRights: EstablishmentUserRight[] = [

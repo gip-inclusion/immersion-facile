@@ -94,6 +94,7 @@ describe("SuggestEditEstablishment", () => {
           job: "Boss1",
           phone: "+33688779955",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
         {
           userId: admin2.id,
@@ -101,6 +102,7 @@ describe("SuggestEditEstablishment", () => {
           job: "Boss2",
           phone: "+33688779666",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
         {
           userId: contact.id,

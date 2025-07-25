@@ -92,6 +92,7 @@ describe("Add form establishment", () => {
         job: "osef",
         phone: "+33600000000",
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       };
 
       const response = await httpClient.addFormEstablishment({

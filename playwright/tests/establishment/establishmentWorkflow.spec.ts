@@ -54,6 +54,7 @@ test.describe("Establishment creation and modification workflow", () => {
             job: faker.person.jobType(),
             phone: faker.helpers.fromRegExp(phoneRegexp),
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .withBusinessAddresses([
@@ -83,6 +84,7 @@ test.describe("Establishment creation and modification workflow", () => {
           job: "Successfully updated job",
           phone: "0165754860",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
         {
           role: "establishment-contact",

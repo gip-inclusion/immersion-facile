@@ -56,6 +56,7 @@ export const makeEstablishmentAggregate = async ({
               job,
               phone,
               shouldReceiveDiscussionNotifications,
+              isMainContactByPhone: false,
             }
           : {
               role,

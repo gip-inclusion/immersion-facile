@@ -55,6 +55,7 @@ describe("AddExchangeToDiscussion", () => {
         phone: "+33655885588",
         userId: adminUserEstablishment1.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
       {
         role: "establishment-contact",
@@ -73,6 +74,7 @@ describe("AddExchangeToDiscussion", () => {
         phone: "+33655885588",
         userId: adminUserEstablishment2.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
       {
         role: "establishment-contact",
@@ -877,6 +879,7 @@ describe("AddExchangeToDiscussion", () => {
             phone: "",
             shouldReceiveDiscussionNotifications: true,
             userId: "osef",
+            isMainContactByPhone: false,
           },
         ])
         .build();

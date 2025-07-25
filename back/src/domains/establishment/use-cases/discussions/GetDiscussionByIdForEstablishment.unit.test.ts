@@ -43,6 +43,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
             phone: "",
             userId: establishmentAdmin.id,
             shouldReceiveDiscussionNotifications: false,
+            isMainContactByPhone: false,
           },
           {
             role: "establishment-contact",

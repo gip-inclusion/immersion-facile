@@ -137,6 +137,7 @@ describe("search route", () => {
                 phone: "",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),
@@ -330,6 +331,7 @@ describe("search route", () => {
                     phone: "",
                     userId: user.id,
                     shouldReceiveDiscussionNotifications: true,
+                    isMainContactByPhone: false,
                   },
                 ])
                 .build(),
@@ -361,6 +363,7 @@ describe("search route", () => {
                     phone: "",
                     userId: user.id,
                     shouldReceiveDiscussionNotifications: true,
+                    isMainContactByPhone: false,
                   },
                 ])
                 .build(),
@@ -392,6 +395,7 @@ describe("search route", () => {
                     phone: "",
                     userId: user.id,
                     shouldReceiveDiscussionNotifications: true,
+                    isMainContactByPhone: false,
                   },
                 ])
                 .build(),
