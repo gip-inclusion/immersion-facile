@@ -50,8 +50,10 @@ export class UpdateConvention extends TransactionalUseCase<
   protected async _execute(
     { convention }: UpdateConventionRequestDto,
     uow: UnitOfWork,
-    jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
+    jwtPayload?: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
+    if (!jwtPayload) throw errors.user.unauthorized();
+
     const conventionFromRepo = await uow.conventionRepository.getById(
       convention.id,
     );

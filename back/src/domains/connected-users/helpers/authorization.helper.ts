@@ -56,8 +56,6 @@ export const throwIfNotAuthorizedForRole = async ({
   isPeAdvisorAllowed: boolean;
   isValidatorOfAgencyRefersToAllowed: boolean;
 }): Promise<void> => {
-  if (!jwtPayload) throw errors.user.unauthorized();
-
   if ("userId" in jwtPayload) {
     await onConnectedUser({
       uow,

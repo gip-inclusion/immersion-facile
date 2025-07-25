@@ -2,7 +2,6 @@ import { map } from "ramda";
 import {
   type AgencyOption,
   type ConnectedUser,
-  errors,
   privateListAgenciesRequestSchema,
 } from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
@@ -13,7 +12,6 @@ export const makePrivateListAgencies = useCaseBuilder("PrivateListAgencies")
   .withInput(privateListAgenciesRequestSchema)
   .withCurrentUser<ConnectedUser>()
   .build(async ({ uow, currentUser, inputParams: { status } }) => {
-    if (!currentUser) throw errors.user.unauthorized();
     throwIfNotAdmin(currentUser);
 
     return uow.agencyRepository
