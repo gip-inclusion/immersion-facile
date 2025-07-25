@@ -63,6 +63,7 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
             phone: "+3366887744",
             userId: establishmentAdmin.id,
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
           {
             role: "establishment-contact",

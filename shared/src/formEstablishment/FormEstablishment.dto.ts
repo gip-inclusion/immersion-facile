@@ -1,6 +1,6 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
-import type { LocationId } from "../address/address.dto";
+import type { AddressDto, LocationId } from "../address/address.dto";
 import type { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
@@ -29,17 +29,28 @@ type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
   shouldReceiveDiscussionNotifications: boolean;
 };
 
-export type WithJobAndPhone = {
-  job: string;
-  phone: PhoneNumber;
+type withJob = {
+  job?: string;
 };
 
+type withPhone =
+  | {
+      phone?: never;
+      isMainContactByPhone?: never;
+    }
+  | {
+      phone: PhoneNumber;
+      isMainContactByPhone: boolean;
+    };
+
+export type WithJobAndPhone = withJob & withPhone;
+
 export type AdminFormEstablishmentUserRight =
-  GenericFormEstablishmentUserRight<"establishment-admin"> & WithJobAndPhone;
+  GenericFormEstablishmentUserRight<"establishment-admin"> &
+    Required<WithJobAndPhone>;
 
 export type ContactFormEstablishmentUserRight =
-  GenericFormEstablishmentUserRight<"establishment-contact"> &
-    Partial<WithJobAndPhone>;
+  GenericFormEstablishmentUserRight<"establishment-contact"> & WithJobAndPhone;
 
 export type FormEstablishmentUserRight =
   | AdminFormEstablishmentUserRight
@@ -68,14 +79,13 @@ export type FormEstablishmentAddress = {
 
 export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
 
-export type FormEstablishmentDto = {
+type CommonFormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
   businessAddresses: FormEstablishmentAddress[];
   userRights: FormEstablishmentUserRight[];
   businessName: BusinessName;
   businessNameCustomized?: string;
-  contactMode: ContactMode;
   fitForDisabledWorkers: boolean;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
@@ -85,7 +95,23 @@ export type FormEstablishmentDto = {
   source: FormEstablishmentSource;
   website?: AbsoluteUrl | "";
   searchableBy: EstablishmentSearchableBy;
-} & WithAcquisition;
+};
+
+type GenericFormEstablishmentDto<T extends ContactMode> =
+  CommonFormEstablishmentDto &
+    WithAcquisition & {
+      contactMode: T;
+    } & (T extends "IN_PERSON"
+      ? {
+          potentialBeneficiaryWelcomeAddress: AddressDto;
+        }
+      : {
+          potentialBeneficiaryWelcomeAddress?: never;
+        });
+
+export type FormEstablishmentDto = GenericFormEstablishmentDto<
+  "EMAIL" | "PHONE" | "IN_PERSON"
+>;
 
 export type WithFormEstablishmentDto = {
   formEstablishment: FormEstablishmentDto;

@@ -34,6 +34,7 @@ describe("GetEstablishmentNameAndAdmins", () => {
         job: "osef",
         phone: "osef",
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
       {
         role: "establishment-contact",

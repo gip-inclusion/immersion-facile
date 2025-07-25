@@ -147,6 +147,7 @@ describe("Update establishments from Sirene API", () => {
                 phone: "",
                 userId: "osef",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build();
@@ -216,6 +217,7 @@ describe("Update establishments from Sirene API", () => {
                 phone: "",
                 userId: "osef",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build();
@@ -242,6 +244,7 @@ describe("Update establishments from Sirene API", () => {
                 phone: "",
                 userId: "osef",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build();
@@ -268,6 +271,7 @@ describe("Update establishments from Sirene API", () => {
                 phone: "",
                 userId: "osef",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build();
@@ -358,6 +362,7 @@ const makeEstablishmentWithLastInseeCheck = (
         phone: "",
         userId: "osef",
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
     ])
     .build();

@@ -81,6 +81,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
             job: "",
             phone: "",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .withOffers([

@@ -52,6 +52,7 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
       phone: "+33600110011",
       job: "Le Boss des merguez",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
     {
       userId: seedUsers.adminUser.id,
@@ -92,6 +93,7 @@ export const decathlon = new EstablishmentAggregateBuilder()
       phone: "+33600110011",
       job: "The Big Boss @Decathlon",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
   ])
   .build();

@@ -385,6 +385,7 @@ describe("GetConnectedUser", () => {
                 userId: notAdminUser.id,
                 phone: "+33600000000",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 job: "Dev",
@@ -392,6 +393,7 @@ describe("GetConnectedUser", () => {
                 userId: anotherUser.id,
                 phone: "+33600000001",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ];
 

@@ -99,24 +99,38 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     );
 
     return userRights.map(
-      ({ role, userId, job, phone, shouldReceiveDiscussionNotifications }) => {
+      ({
+        role,
+        userId,
+        job,
+        phone,
+        shouldReceiveDiscussionNotifications,
+        isMainContactByPhone,
+      }) => {
         const user = users.find(({ id }) => id === userId);
         if (!user) throw errors.user.notFound({ userId });
-        return role === "establishment-admin"
-          ? {
-              role,
-              email: user.email,
-              job,
-              phone,
-              shouldReceiveDiscussionNotifications,
-            }
-          : {
-              role,
-              email: user.email,
-              job,
-              phone,
-              shouldReceiveDiscussionNotifications,
-            };
+
+        if (role === "establishment-admin") {
+          return {
+            role,
+            email: user.email,
+            job,
+            phone,
+            shouldReceiveDiscussionNotifications,
+            isMainContactByPhone,
+          };
+        }
+
+        const baseContact = {
+          role,
+          email: user.email,
+          job,
+          shouldReceiveDiscussionNotifications,
+        };
+
+        return phone && isMainContactByPhone !== undefined
+          ? { ...baseContact, phone, isMainContactByPhone }
+          : baseContact;
       },
     );
   }

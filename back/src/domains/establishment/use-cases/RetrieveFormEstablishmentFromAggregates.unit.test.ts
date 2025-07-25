@@ -66,6 +66,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         job,
         phone,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
       {
         userId: establishmentContact.id,
@@ -133,6 +134,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
               job,
               phone,
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
             {
               userId: establishmentContact.id,
@@ -243,6 +245,7 @@ const makeExpectedFormEstablishment = ({
       job,
       phone,
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
     {
       role: "establishment-contact",

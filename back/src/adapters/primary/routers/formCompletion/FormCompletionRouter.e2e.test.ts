@@ -113,6 +113,7 @@ describe("formCompletion Routes", () => {
             phone: "",
             userId: "osef",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .build();

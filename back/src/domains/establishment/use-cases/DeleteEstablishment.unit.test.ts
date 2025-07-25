@@ -61,6 +61,7 @@ describe("Delete Establishment", () => {
         phone: "+33655447788",
         userId: establishmentAdmin.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
       {
         role: "establishment-contact",

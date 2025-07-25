@@ -114,6 +114,7 @@ describe("Get Convention", () => {
         phone: "",
         userId: tutor.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
     ])
     .build();
@@ -389,6 +390,7 @@ describe("Get Convention", () => {
                   job: "",
                   phone: "",
                   shouldReceiveDiscussionNotifications: true,
+                  isMainContactByPhone: false,
                 },
               ])
               .build();
