@@ -22,17 +22,20 @@ import {
   initialConventionState,
 } from "./convention.slice";
 
-const conventionReadDtoRemainingProps = {
-  agencyDepartment: "75",
-  agencyId: "some-agency-id",
-  agencyName: "some-agency-name",
-  agencyKind: "pole-emploi" as const,
-  agencySiret: "11112222000033",
-  agencyCounsellorEmails: [],
-  agencyValidatorEmails: ["validator@mail.com"],
-};
-
 describe("Convention slice", () => {
+  const conventionReadDtoRemainingProps = {
+    agencyDepartment: "75",
+    agencyId: "some-agency-id",
+    agencyName: "some-agency-name",
+    agencyKind: "pole-emploi" as const,
+    agencySiret: "11112222000033",
+    agencyCounsellorEmails: [],
+    agencyValidatorEmails: ["validator@mail.com"],
+  };
+  const convention = new ConventionDtoBuilder()
+    .withStatus("READY_TO_SIGN")
+    .build();
+
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
@@ -48,9 +51,6 @@ describe("Convention slice", () => {
 
   describe("Save convention", () => {
     it("saves a new convention", () => {
-      const convention = new ConventionDtoBuilder()
-        .withStatus("READY_TO_SIGN")
-        .build();
       store.dispatch(
         conventionSlice.actions.saveConventionRequested({
           convention: {
@@ -104,7 +104,7 @@ describe("Convention slice", () => {
           similarConventionIds: [],
         },
       }));
-      const convention = new ConventionDtoBuilder().build();
+
       store.dispatch(
         conventionSlice.actions.saveConventionRequested({
           convention: {
@@ -745,6 +745,7 @@ describe("Convention slice", () => {
     const jwt = "some-correct-jwt";
     store.dispatch(
       conventionSlice.actions.conventionStatusDashboardRequested({
+        conventionId: convention.id,
         jwt,
         feedbackTopic: "convention-status-dashboard",
       }),
@@ -762,6 +763,7 @@ describe("Convention slice", () => {
     const jwt = "some-correct-jwt";
     store.dispatch(
       conventionSlice.actions.conventionStatusDashboardRequested({
+        conventionId: convention.id,
         jwt,
         feedbackTopic: "convention-status-dashboard",
       }),
