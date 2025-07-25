@@ -44,6 +44,7 @@ describe("Delete establishment", () => {
         phone: "+66",
         userId: user.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
     ])
     .build();

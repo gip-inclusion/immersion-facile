@@ -55,6 +55,7 @@ describe("discussion e2e", () => {
         phone: "+33688774455",
         userId: establishmentAdminUser.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
     ])
     .build();
@@ -196,6 +197,7 @@ describe("discussion e2e", () => {
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),
@@ -331,6 +333,7 @@ describe("discussion e2e", () => {
           phone: "osef",
           userId: user.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();

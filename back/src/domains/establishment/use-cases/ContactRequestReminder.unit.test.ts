@@ -54,6 +54,7 @@ describe("ContactRequestReminder", () => {
         job: "boss",
         phone: "0677889944",
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
       {
         role: "establishment-contact",

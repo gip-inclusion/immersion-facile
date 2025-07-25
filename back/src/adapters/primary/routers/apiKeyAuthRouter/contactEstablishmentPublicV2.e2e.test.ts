@@ -155,6 +155,7 @@ describe("POST contact-establishment public V2 route", () => {
           job: "",
           phone: "",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .withOffers([
@@ -206,6 +207,7 @@ describe("POST contact-establishment public V2 route", () => {
             job: "",
             phone: "",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .withOffers([
@@ -252,6 +254,7 @@ describe("POST contact-establishment public V2 route", () => {
             job: "",
             phone: "",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .withOffers([
@@ -301,6 +304,7 @@ describe("POST contact-establishment public V2 route", () => {
             job: "",
             phone: "",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .withOffers([

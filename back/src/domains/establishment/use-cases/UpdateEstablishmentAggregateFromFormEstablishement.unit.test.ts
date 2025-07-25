@@ -129,6 +129,7 @@ describe("Update Establishment aggregate from form data", () => {
           job: "job",
           phone: "+336558464365",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();
@@ -181,6 +182,7 @@ describe("Update Establishment aggregate from form data", () => {
       job: "new job",
       phone: "+33677445511",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     };
     const updatedFormContact: ContactFormEstablishmentUserRight = {
       role: "establishment-contact",
@@ -275,6 +277,7 @@ describe("Update Establishment aggregate from form data", () => {
                 job: updatedFormAdmin.job,
                 phone: updatedFormAdmin.phone,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -377,6 +380,7 @@ describe("Update Establishment aggregate from form data", () => {
                 job: updatedFormAdmin.job,
                 phone: updatedFormAdmin.phone,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -511,6 +515,7 @@ describe("Update Establishment aggregate from form data", () => {
           phone: "",
           userId: user.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();
@@ -521,6 +526,7 @@ describe("Update Establishment aggregate from form data", () => {
       phone: "+33612345679",
       userId: "nextuser1",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     };
     const newContactRight: EstablishmentContactRight = {
       role: "establishment-contact",
@@ -726,6 +732,7 @@ describe("Update Establishment aggregate from form data", () => {
           phone: "+33612345679",
           userId: "next-user-1",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         };
         const updatedFormEstablishmentWithUserRights: FormEstablishmentDto = {
           ...updatedFormEstablishment,
@@ -741,6 +748,7 @@ describe("Update Establishment aggregate from form data", () => {
               job: newAdminRight.job,
               phone: newAdminRight.phone,
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
           ],
         };
@@ -830,6 +838,7 @@ describe("Update Establishment aggregate from form data", () => {
           job: "new job",
           phone: "+33612345679",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         };
 
         uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -855,6 +864,7 @@ describe("Update Establishment aggregate from form data", () => {
               job: existingEstablishmentAdminRight.job,
               phone: existingEstablishmentAdminRight.phone,
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
           ],
         };

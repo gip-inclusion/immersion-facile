@@ -683,6 +683,7 @@ describe("PgDiscussionRepository", () => {
               job: "",
               phone: "",
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
           ])
           .withOffers([secretariatOffer])
@@ -700,6 +701,7 @@ describe("PgDiscussionRepository", () => {
               job: "",
               phone: "",
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
           ])
           .withOffers([stylisteOffer])
@@ -1414,6 +1416,7 @@ describe("PgDiscussionRepository", () => {
               job: "",
               phone: "",
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
           ])
           .withOffers([stylisteOffer])
@@ -1501,6 +1504,7 @@ describe("PgDiscussionRepository", () => {
           job: "",
           phone: "",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .withOffers([stylisteOffer])

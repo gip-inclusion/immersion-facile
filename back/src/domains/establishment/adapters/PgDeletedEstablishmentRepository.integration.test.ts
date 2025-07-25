@@ -37,6 +37,7 @@ describe("PgDeletedEstablishmentRepository", () => {
           phone: "0600000000",
           userId: "osef",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();

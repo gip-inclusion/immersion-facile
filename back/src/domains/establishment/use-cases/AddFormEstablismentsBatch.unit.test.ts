@@ -207,6 +207,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 phone: "+33612345678",
                 userId: "1",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -264,6 +265,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             phone: "",
             userId: "",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .build(),
@@ -358,6 +360,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 phone: "+33612345678",
                 userId: "1",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -448,6 +451,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 phone: "+33612345678",
                 userId: "1",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -537,6 +541,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             phone: "",
             userId: "",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .build(),
