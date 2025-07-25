@@ -81,6 +81,13 @@ export class PgConventionFranceTravailAdvisorRepository
     );
   }
 
+  public async deleteByConventionId(conventionId: ConventionId): Promise<void> {
+    await this.transaction
+      .deleteFrom("partners_pe_connect")
+      .where("convention_id", "=", conventionId)
+      .execute();
+  }
+
   public async openSlotForNextConvention(
     peUserAndAdvisor: FtUserAndAdvisor,
   ): Promise<void> {
