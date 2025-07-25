@@ -20,4 +20,5 @@ export interface ConventionFranceTravailAdvisorRepository {
   getByConventionId: (
     conventionId: ConventionId,
   ) => Promise<ConventionFtUserAdvisorEntity | undefined>;
+  deleteByConventionId: (conventionId: ConventionId) => Promise<void>;
 }
