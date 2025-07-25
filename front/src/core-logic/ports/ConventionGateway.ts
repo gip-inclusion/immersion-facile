@@ -27,6 +27,7 @@ export interface ConventionGateway {
     payload: FetchConventionRequestedPayload,
   ): Observable<ConventionReadDto | undefined>;
   getConventionStatusDashboardUrl$(
+    conventionId: ConventionId,
     jwt: string,
   ): Observable<DashboardUrlAndName>;
 

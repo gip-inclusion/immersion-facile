@@ -70,7 +70,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     },
   }),
   getConventionStatusDashboard: defineRoute({
-    url: "/auth/status-convention",
+    url: "/auth/status-convention/:conventionId",
     method: "get",
     ...withAuthorizationHeaders,
     responses: {

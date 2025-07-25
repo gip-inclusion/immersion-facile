@@ -1,8 +1,10 @@
 import {
   ConventionDtoBuilder,
+  type ConventionId,
   type ConventionJwt,
   type ConventionMagicLinkRoutes,
   conventionMagicLinkRoutes,
+  type Email,
   expectHttpResponseToEqual,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -12,10 +14,10 @@ import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/a
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
 
-const conventionId = "my-Convention-id";
-const beneficiaryEmail = "joe@lebenef.fr";
-
 describe("getConventionStatusDashboardUrl", () => {
+  const conventionId: ConventionId = "my-Convention-id";
+  const beneficiaryEmail: Email = "joe@lebenef.fr";
+
   let httpClient: HttpClient<ConventionMagicLinkRoutes>;
   let jwt: ConventionJwt;
   let uow: InMemoryUnitOfWork;
@@ -47,6 +49,7 @@ describe("getConventionStatusDashboardUrl", () => {
 
   it("fails if no token is provided", async () => {
     const response = await httpClient.getConventionStatusDashboard({
+      urlParams: { conventionId },
       headers: { authorization: "" },
     });
 
@@ -69,6 +72,7 @@ describe("getConventionStatusDashboardUrl", () => {
     uow.conventionRepository.setConventions([convention]);
 
     const response = await httpClient.getConventionStatusDashboard({
+      urlParams: { conventionId },
       headers: { authorization: jwt },
     });
 

@@ -4,12 +4,11 @@ import {
   agencyRoutes,
   errors,
   type GetDashboardParams,
-  type WithAgencyIdAndUserId,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
-import { getCurrentUserOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createAdminRouter = (deps: AppDependencies): Router => {
   const expressRouter = Router({ mergeParams: true });
@@ -45,12 +44,11 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.getLastNotifications(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getLastNotifications.execute(
-          req.payloads.currentUser,
-        );
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getLastNotifications.execute(
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAdminRouter.updateFeatureFlags(
@@ -81,7 +79,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, () =>
         deps.useCases.getConnectedUsers.execute(
           req.query,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -89,8 +87,8 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.getIcUser(deps.connectedUserAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.getConnectedUser.execute(
-        { userId: req.params.userId },
-        getCurrentUserOrThrow(req.payloads?.currentUser),
+        req.params,
+        getGenericAuthOrThrow(req.payloads?.currentUser),
       ),
     ),
   );
@@ -101,7 +99,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateUserForAgency.execute(
           req.body,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -109,30 +107,23 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.createUserForAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(
-        req,
-        res,
-        async () =>
-          await deps.useCases.createUserForAgency.execute(
-            req.body,
-            getCurrentUserOrThrow(req.payloads?.currentUser),
-          ),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.createUserForAgency.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
       ),
   );
 
   sharedAdminRouter.removeUserFromAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const userWithAgency: WithAgencyIdAndUserId = {
-          agencyId: req.params.agencyId,
-          userId: req.params.userId,
-        };
-        return await deps.useCases.removeUserFromAgency.execute(
-          userWithAgency,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
-        );
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.removeUserFromAgency.execute(
+          req.params,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAdminRouter.rejectIcUserForAgency(
@@ -141,7 +132,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.rejectUserForAgency.execute(
           req.body,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -162,7 +153,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getAllApiConsumers.execute(
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -171,7 +162,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     sendHttpResponse(req, res, () =>
       deps.useCases.getUsers.execute(
         req.query,
-        getCurrentUserOrThrow(req.payloads?.currentUser),
+        getGenericAuthOrThrow(req.payloads?.currentUser),
       ),
     ),
   );
@@ -179,10 +170,10 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAgencyRouter.getAgencyById(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.getAgencyById.execute(
           req.params.agencyId,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -196,7 +187,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
             ...req.body,
             id: req.params.agencyId,
           },
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -207,7 +198,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, () =>
         deps.useCases.updateAgency.execute(
           req.body,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -218,7 +209,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, () =>
         deps.useCases.privateListAgencies.execute(
           req.query,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );

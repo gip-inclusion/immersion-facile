@@ -10,7 +10,6 @@ import {
   isApiConsumerAllowed,
   type LocationId,
   pipeWithValue,
-  type SearchQueryParamsDto,
   type SiretDto,
   type WithAcquisition,
 } from "shared";
@@ -18,6 +17,7 @@ import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/validateAndParseZodSchema";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 import type { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../../../utils/logger";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
@@ -59,8 +59,8 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
 
   searchEstablishmentV2Router.searchImmersion(
     deps.apiConsumerMiddleware,
-    async (req, res) =>
-      sendHttpResponse(req, res, async () => {
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
         if (
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
@@ -70,17 +70,13 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         )
           throw errors.apiConsumer.forbidden();
         return pipeWithValue(
-          req.query,
-          (searchImmersionRequest) => {
-            const searchImmersionRequestWithSortedBy: SearchQueryParamsDto = {
-              ...searchImmersionRequest,
-              sortedBy: searchImmersionRequest.sortedBy ?? "distance",
-            };
-            return deps.useCases.searchImmersion.execute(
-              searchImmersionRequestWithSortedBy,
-              req.apiConsumer,
-            );
-          },
+          deps.useCases.searchImmersion.execute(
+            {
+              ...req.query,
+              sortedBy: req.query.sortedBy ?? "distance",
+            },
+            req.apiConsumer,
+          ),
           andThen(map(domainToSearchImmersionResultPublicV2)),
         );
       }),
@@ -99,20 +95,18 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         )
           throw errors.apiConsumer.forbidden();
 
-        const locationId = await getFirstLocationIdOrThrow(
-          deps.uowPerformer,
-          req.params.siret,
-        );
-
-        return domainToSearchImmersionResultPublicV2(
-          await deps.useCases.getSearchResultBySearchQuery.execute(
+        return deps.useCases.getSearchResultBySearchQuery
+          .execute(
             {
               ...req.params,
-              locationId,
+              locationId: await getFirstLocationIdOrThrow(
+                deps.uowPerformer,
+                req.params.siret,
+              ),
             },
             req.apiConsumer,
-          ),
-        );
+          )
+          .then(domainToSearchImmersionResultPublicV2);
       }),
   );
 
@@ -148,7 +142,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   conventionV2Router.getConventionById(deps.apiConsumerMiddleware, (req, res) =>
-    sendHttpResponse(req, res, async () => {
+    sendHttpResponse(req, res, () => {
       if (
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
@@ -158,20 +152,14 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       )
         throw errors.apiConsumer.forbidden();
 
-      return pipeWithValue(
-        await deps.useCases.getConventionForApiConsumer.execute(
-          {
-            conventionId: req.params.conventionId,
-          },
-          req.apiConsumer,
-        ),
-        conventionReadToConventionReadPublicV2,
-      );
+      return deps.useCases.getConventionForApiConsumer
+        .execute(req.params, req.apiConsumer)
+        .then(conventionReadToConventionReadPublicV2);
     }),
   );
 
   conventionV2Router.getConventions(deps.apiConsumerMiddleware, (req, res) =>
-    sendHttpResponse(req, res, async () => {
+    sendHttpResponse(req, res, () => {
       if (
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
@@ -188,61 +176,57 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           return [req.query.withStatuses];
       };
 
-      return pipeWithValue(
-        await deps.useCases.getConventionsForApiConsumer.execute(
+      return deps.useCases.getConventionsForApiConsumer
+        .execute(
           getConventionsByFiltersV2ToDomain({
             startDateGreater: req.query.startDateGreater,
             startDateLessOrEqual: req.query.startDateLessOrEqual,
             withStatuses: getWithStatus(),
           }),
           req.apiConsumer,
-        ),
-        map(conventionReadToConventionReadPublicV2),
-      );
+        )
+        .then((conventions) =>
+          conventions.map(conventionReadToConventionReadPublicV2),
+        );
     }),
   );
 
   statisticsV2Router.getEstablishmentStats(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        if (!req.apiConsumer) throw errors.user.unauthorized();
-
-        const page = req.query.page ?? defaultPageInPagination;
-        const perPage = req.query.perPage ?? defaultPerPageInApiPagination;
-
-        return deps.useCases.getEstablishmentStats.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getEstablishmentStats.execute(
           {
-            page,
-            perPage,
+            page: req.query.page ?? defaultPageInPagination,
+            perPage: req.query.perPage ?? defaultPerPageInApiPagination,
           },
-          req.apiConsumer,
-        );
-      }),
+          getGenericAuthOrThrow(req.apiConsumer),
+        ),
+      ),
   );
 
   webhooksV2Router.subscribeToWebhook(deps.apiConsumerMiddleware, (req, res) =>
-    sendHttpResponse(req, res.status(201), async () => {
-      const event = req.body.subscribedEvent;
-      const rightNeeded = eventToRightName(event);
-
+    sendHttpResponse(req, res.status(201), () => {
       if (
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
-          rightName: rightNeeded,
+          rightName: eventToRightName(req.body.subscribedEvent),
           consumerKind: "SUBSCRIPTION",
         })
       )
         throw errors.apiConsumer.forbidden();
 
-      await deps.useCases.subscribeToWebhook.execute(req.body, req.apiConsumer);
+      return deps.useCases.subscribeToWebhook.execute(
+        req.body,
+        req.apiConsumer,
+      );
     }),
   );
 
   webhooksV2Router.listActiveSubscriptions(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res.status(200), async () => {
+      sendHttpResponse(req, res.status(200), () => {
         const apiConsumer = req.apiConsumer;
         if (
           !apiConsumer ||
@@ -263,37 +247,31 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   webhooksV2Router.unsubscribeToWebhook(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res.status(204), async () => {
-        await deps.useCases.deleteSubscription.execute(
+      sendHttpResponse(req, res.status(204), () =>
+        deps.useCases.deleteSubscription.execute(
           req.params.subscriptionId,
           req.apiConsumer,
-        );
-      }),
+        ),
+      ),
   );
 
   return v2ExpressRouter;
 };
 
-const getFirstLocationIdOrThrow = async (
+const getFirstLocationIdOrThrow = (
   uowPerformer: UnitOfWorkPerformer,
   siret: SiretDto,
-): Promise<LocationId> => {
-  return uowPerformer.perform(async (uow) => {
-    const aggregate =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
-      );
-
-    if (!aggregate) throw errors.establishment.notFound({ siret });
-
-    const firstLocationId = aggregate.establishment.locations.at(0)?.id;
-    if (firstLocationId) {
-      return firstLocationId;
-    }
-
-    throw errors.establishment.noLocation({ siret });
-  });
-};
+): Promise<LocationId> =>
+  uowPerformer.perform((uow) =>
+    uow.establishmentAggregateRepository
+      .getEstablishmentAggregateBySiret(siret)
+      .then((aggregate) => {
+        if (!aggregate) throw errors.establishment.notFound({ siret });
+        const firstLocationId = aggregate.establishment.locations.at(0)?.id;
+        if (!firstLocationId) throw errors.establishment.noLocation({ siret });
+        return firstLocationId;
+      }),
+  );
 
 const addAcquisitionParams = <T>(
   obj: T,

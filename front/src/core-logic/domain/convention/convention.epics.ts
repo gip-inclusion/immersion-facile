@@ -225,7 +225,10 @@ const getConventionStatusDashboardUrl: ConventionEpic = (
     filter(conventionSlice.actions.conventionStatusDashboardRequested.match),
     switchMap((action) =>
       conventionGateway
-        .getConventionStatusDashboardUrl$(action.payload.jwt)
+        .getConventionStatusDashboardUrl$(
+          action.payload.conventionId,
+          action.payload.jwt,
+        )
         .pipe(
           map(({ url }) =>
             conventionSlice.actions.conventionStatusDashboardSucceeded({
