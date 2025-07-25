@@ -159,7 +159,16 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
       jobSeekers: zBoolean,
     }),
   })
-  .and(withAcquisitionSchema);
+  .and(withAcquisitionSchema)
+  .refine(
+    (formEstablishment) =>
+      formEstablishment.contactMode === "PHONE"
+        ? formEstablishment.userRights.some(
+            (right) => right.isMainContactByPhone,
+          )
+        : true,
+    "En cas de mode de contact par téléphone, vous devez renseigner au moins un contact principal par téléphone.",
+  );
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
   z.object({
