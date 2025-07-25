@@ -9,6 +9,7 @@ import { createExpressSharedRouter } from "shared-routes/express";
 import { match, P } from "ts-pattern";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createMagicLinkRouter = (deps: AppDependencies) => {
   const expressRouter = Router({ mergeParams: true });
@@ -20,7 +21,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
 
   sharedRouter.createAssessment(
     deps.conventionMagicLinkAuthMiddleware,
-    async (req, res) =>
+    (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.createAssessment.execute(
           req.body,
@@ -34,9 +35,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getAssessmentByConventionId.execute(
-          {
-            conventionId: req.params.conventionId,
-          },
+          req.params,
           req.payloads?.convention, // Pas de récupération du bilan possible en mode user connecté?
         ),
       ),
@@ -44,10 +43,10 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
 
   sharedRouter.getConvention(
     deps.conventionMagicLinkAuthMiddleware,
-    async (req, res) =>
-      sendHttpResponse(req, res, async () =>
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.getConvention.execute(
-          { conventionId: req.params.conventionId },
+          req.params,
           getConventionRelatedJwtPayload(req.payloads),
         ),
       ),
@@ -55,7 +54,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
 
   sharedRouter.updateConvention(
     deps.conventionMagicLinkAuthMiddleware,
-    async (req, res) =>
+    (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateConvention.execute(
           req.body,
@@ -66,7 +65,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
 
   sharedRouter.updateConventionStatus(
     deps.conventionMagicLinkAuthMiddleware,
-    async (req, res) =>
+    (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateConventionStatus.execute(
           req.body,
@@ -78,26 +77,24 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   sharedRouter.signConvention(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!req?.payloads?.convention) throw errors.user.unauthorized();
-        return deps.useCases.signConvention.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.signConvention.execute(
           req.params,
-          req.payloads.convention, // Pas de signature possible en mode ConnectedUser (pour les entreprises qui ont un compte qui match l'email) ?
-        );
-      }),
+          getGenericAuthOrThrow(req.payloads?.convention), // Pas de signature possible en mode ConnectedUser (pour les entreprises qui ont un compte qui match l'email) ?
+        ),
+      ),
   );
 
   sharedRouter.getConventionStatusDashboard(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req?.payloads?.convention) throw errors.user.unauthorized();
         return deps.useCases.getDashboard.execute(
           {
+            ...req.params,
             name: "conventionStatus",
-            conventionId: req.payloads.convention.applicationId,
           },
-          req?.payloads?.convention,
+          getGenericAuthOrThrow(req.payloads?.convention),
         );
       }),
   );
@@ -151,7 +148,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.sendAssessmentLink.execute(
-          { conventionId: req.body.conventionId },
+          req.body,
           getConventionRelatedJwtPayload(req.payloads),
         ),
       ),

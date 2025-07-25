@@ -98,7 +98,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.getApiConsumersByconventionResult$;
   }
 
-  public getConventionStatusDashboardUrl$(_jwt: string) {
+  public getConventionStatusDashboardUrl$(
+    _conventionId: ConventionId,
+    _jwt: ConventionJwt,
+  ) {
     return this.conventionDashboardUrl$;
   }
 

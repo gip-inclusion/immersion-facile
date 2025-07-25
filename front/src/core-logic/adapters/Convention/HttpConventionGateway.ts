@@ -156,11 +156,15 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public getConventionStatusDashboardUrl$(
-    jwt: string,
+    conventionId: ConventionId,
+    jwt: ConventionJwt,
   ): Observable<DashboardUrlAndName> {
     return from(
       this.magicLinkHttpClient
         .getConventionStatusDashboard({
+          urlParams: {
+            conventionId,
+          },
           headers: { authorization: jwt },
         })
         .then((response) =>

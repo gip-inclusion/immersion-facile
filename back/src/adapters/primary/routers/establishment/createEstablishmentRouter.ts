@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { errors, establishmentRoutes, formCompletionRoutes } from "shared";
+import { establishmentRoutes, formCompletionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createEstablishmentRouter = (deps: AppDependencies) => {
   const establishmentRouter = Router({ mergeParams: true });
@@ -53,14 +54,12 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   establishmentSharedRouter.getEstablishmentNameAndAdmins(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getEstablishmentNameAndAdmins.execute(
-          { siret: req.params.siret },
-          currentUser,
-        );
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getEstablishmentNameAndAdmins.execute(
+          req.params,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   establishmentSharedRouter.updateFormEstablishment(
@@ -98,34 +97,33 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
 
   establishmentSharedRouter.getDiscussions(
     deps.connectedUserAuthMiddleware,
-    (req, res) => {
-      const currentUser = req.payloads?.currentUser;
-      if (!currentUser) throw errors.user.unauthorized();
-      return sendHttpResponse(req, res, () =>
-        deps.useCases.getDiscussions.execute(req.query, currentUser),
-      );
-    },
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getDiscussions.execute(
+          req.query,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   establishmentSharedRouter.updateDiscussionStatus(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
-        return deps.useCases.updateDiscussionStatus.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.updateDiscussionStatus.execute(
           {
             discussionId: req.params.discussionId,
             ...req.body,
           },
-          req.payloads.currentUser,
-        );
-      }),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   establishmentSharedRouter.replyToDiscussion(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.addExchangeToDiscussion
           .execute(
             {

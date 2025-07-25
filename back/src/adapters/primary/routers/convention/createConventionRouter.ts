@@ -1,13 +1,13 @@
 import { Router } from "express";
 import {
   authenticatedConventionRoutes,
-  errors,
   flatParamsToGetConventionsForAgencyUserParams,
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createConventionRouter = (deps: AppDependencies) => {
   const expressRouter = Router();
@@ -22,26 +22,25 @@ export const createConventionRouter = (deps: AppDependencies) => {
     expressRouter,
   );
 
-  unauthenticatedConventionSharedRouter.shareConvention(async (req, res) =>
+  unauthenticatedConventionSharedRouter.shareConvention((req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.shareConventionByEmail.execute(req.body),
     ),
   );
 
-  unauthenticatedConventionSharedRouter.createConvention(async (req, res) =>
+  unauthenticatedConventionSharedRouter.createConvention((req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.addConvention.execute(req.body),
     ),
   );
 
-  unauthenticatedConventionSharedRouter.findSimilarConventions(
-    async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.findSimilarConventions.execute(req.query),
-      ),
+  unauthenticatedConventionSharedRouter.findSimilarConventions((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.findSimilarConventions.execute(req.query),
+    ),
   );
 
-  unauthenticatedConventionSharedRouter.renewMagicLink(async (req, res) =>
+  unauthenticatedConventionSharedRouter.renewMagicLink((req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.renewConventionMagicLink.execute(req.query),
     ),
@@ -50,53 +49,45 @@ export const createConventionRouter = (deps: AppDependencies) => {
   authenticatedConventionSharedRouter.getApiConsumersByConvention(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return await deps.useCases.getApiConsumersByConvention.execute(
-          { conventionId: req.params.conventionId },
-          currentUser,
-        );
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getApiConsumersByConvention.execute(
+          req.params,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   authenticatedConventionSharedRouter.getConventionsForAgencyUser(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return await deps.useCases.getConventionsForAgencyUser.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getConventionsForAgencyUser.execute(
           flatParamsToGetConventionsForAgencyUserParams(req.query),
-          currentUser,
-        );
-      }),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   authenticatedConventionSharedRouter.markPartnersErroredConventionAsHandled(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const connectedUser = req.payloads?.connectedUser;
-        if (!connectedUser) throw errors.user.unauthorized();
-        await deps.useCases.markPartnersErroredConventionAsHandled.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.markPartnersErroredConventionAsHandled.execute(
           req.body,
-          connectedUser,
-        );
-      }),
+          getGenericAuthOrThrow(req.payloads?.connectedUser),
+        ),
+      ),
   );
 
   authenticatedConventionSharedRouter.broadcastConventionAgain(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        await deps.useCases.broadcastConventionAgain.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.broadcastConventionAgain.execute(
           req.body,
-          currentUser,
-        );
-      }),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   return expressRouter;
