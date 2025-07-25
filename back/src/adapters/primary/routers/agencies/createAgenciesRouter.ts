@@ -3,7 +3,7 @@ import { agencyRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
-import { getCurrentUserOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createAgenciesRouter = (deps: AppDependencies) => {
   const expressRouter = Router();
@@ -20,10 +20,10 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   sharedAgencyRouter.createUserForAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.createUserForAgency.execute(
           req.body,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -34,7 +34,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.getAgencyById.execute(
           req.params.agencyId,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -56,8 +56,8 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getConnectedUsers.execute(
-          { agencyId: req.params.agencyId },
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          req.params,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -74,7 +74,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.updateAgency.execute(
           req.body,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -85,7 +85,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateUserForAgency.execute(
           req.body,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -93,13 +93,10 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   sharedAgencyRouter.removeUserFromAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.removeUserFromAgency.execute(
-          {
-            agencyId: req.params.agencyId,
-            userId: req.params.userId,
-          },
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          req.params,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -110,7 +107,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.registerAgencyToConnectedUser.execute(
           req.body,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );

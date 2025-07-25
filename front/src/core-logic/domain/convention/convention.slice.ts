@@ -149,6 +149,7 @@ export const conventionSlice = createSlice({
     conventionStatusDashboardRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
+        conventionId: ConventionId;
         jwt: ConventionJwt;
       }>,
     ) => {

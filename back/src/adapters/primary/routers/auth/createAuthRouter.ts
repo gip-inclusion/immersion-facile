@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { authRoutes, errors } from "shared";
+import { authRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
-import { getCurrentUserOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createAuthRouter = (deps: AppDependencies) => {
   const router = Router({ mergeParams: true });
@@ -17,13 +17,13 @@ export const createAuthRouter = (deps: AppDependencies) => {
     ),
   );
 
-  authSharedRouter.afterOAuthSuccessRedirection(async (req, res) =>
+  authSharedRouter.afterOAuthSuccessRedirection((req, res) =>
     sendRedirectResponse(req, res, () =>
       deps.useCases.afterOAuthSuccessRedirection.execute(req.query),
     ),
   );
 
-  authSharedRouter.initiateLoginByEmail(async (req, res) =>
+  authSharedRouter.initiateLoginByEmail((req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.initiateLoginByEmail.execute(req.body),
     ),
@@ -32,10 +32,10 @@ export const createAuthRouter = (deps: AppDependencies) => {
   authSharedRouter.getConnectedUser(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.getConnectedUser.execute(
           req.query,
-          getCurrentUserOrThrow(req.payloads?.currentUser),
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -43,14 +43,12 @@ export const createAuthRouter = (deps: AppDependencies) => {
   authSharedRouter.getOAuthLogoutUrl(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getOAuthLogoutUrl.execute(
-          { idToken: req.query.idToken },
-          currentUser,
-        );
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getOAuthLogoutUrl.execute(
+          req.query,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   return router;
