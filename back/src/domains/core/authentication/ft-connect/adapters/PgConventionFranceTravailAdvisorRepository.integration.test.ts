@@ -68,6 +68,7 @@ const franceTravailUpdatedUserAdvisor: FtUserAndAdvisor = {
 describe("PgConventionFranceTravailAdvisorRepository", () => {
   let pool: Pool;
   let conventionFranceTravailAdvisorRepository: PgConventionFranceTravailAdvisorRepository;
+  let conventionRepository: PgConventionRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -91,7 +92,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       }),
     );
 
-    const conventionRepository = new PgConventionRepository(db);
+    conventionRepository = new PgConventionRepository(db);
     const conventionExternalIdRepository = new PgConventionExternalIdRepository(
       db,
     );
@@ -272,6 +273,45 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,
         conventionId,
       });
+    });
+  });
+
+  describe("deleteByConventionId", () => {
+    it("should deleted by conventionId", async () => {
+      expect(
+        (await conventionRepository.getById(conventionId))?.signatories
+          .beneficiary.federatedIdentity,
+      ).toBeUndefined();
+
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailFirstUserAdvisor,
+      );
+      await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionId,
+        userFtExternalId,
+      );
+
+      expect(
+        (await conventionRepository.getById(conventionId))?.signatories
+          .beneficiary.federatedIdentity,
+      ).not.toBeUndefined();
+      expect(
+        (await db.selectFrom("partners_pe_connect").selectAll().execute())
+          .length,
+      ).toBe(1);
+
+      await conventionFranceTravailAdvisorRepository.deleteByConventionId(
+        conventionId,
+      );
+
+      expect(
+        (await conventionRepository.getById(conventionId))?.signatories
+          .beneficiary.federatedIdentity,
+      ).toBeUndefined();
+      expectToEqual(
+        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        [],
+      );
     });
   });
 });

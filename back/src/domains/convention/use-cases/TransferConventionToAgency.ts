@@ -55,7 +55,7 @@ export const makeTransferConventionToAgency = useCaseBuilder(
       }),
     );
 
-    await throwErrorIfAgencyNotFound({
+    const requestedAgency = await throwErrorIfAgencyNotFound({
       agencyId: inputParams.agencyId,
       agencyRepository: uow.agencyRepository,
     });
@@ -92,6 +92,11 @@ export const makeTransferConventionToAgency = useCaseBuilder(
 
     await Promise.all([
       uow.conventionRepository.update(updatedConvention),
+      requestedAgency.kind !== "pole-emploi"
+        ? uow.conventionFranceTravailAdvisorRepository.deleteByConventionId(
+            convention.id,
+          )
+        : undefined,
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "ConventionTransferredToAgency",
