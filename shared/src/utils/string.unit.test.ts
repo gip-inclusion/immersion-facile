@@ -130,7 +130,7 @@ describe("string utils", () => {
     });
   });
 
-  describe("getFullname", () => {
+  describe("getFormattedFirstnameAndLastname", () => {
     it.each([
       {
         inputs: {
