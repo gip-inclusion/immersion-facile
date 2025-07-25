@@ -61,6 +61,7 @@ const osefUserRight: EstablishmentUserRight = {
   phone: "3615-OSEF",
   userId: osefUser.id,
   shouldReceiveDiscussionNotifications: true,
+  isMainContactByPhone: false,
 };
 
 describe("PgEstablishmentAggregateRepository", () => {
@@ -1826,6 +1827,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33600000000",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -1847,6 +1849,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33600000000",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -1875,6 +1878,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33600000000",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -1896,13 +1900,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33666887744",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
-              },
-              {
-                role: "establishment-contact",
-                job: "bbbbbbbbbbbbb",
-                phone: "+33600000099",
-                userId: user2.id,
-                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .withLocations([
@@ -2216,6 +2214,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           phone: "+336887875544",
           userId: user1.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();
@@ -2230,6 +2229,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           phone: "+33688445577",
           userId: user2.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();
@@ -2244,6 +2244,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           phone: "+33688445566",
           userId: user2.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();

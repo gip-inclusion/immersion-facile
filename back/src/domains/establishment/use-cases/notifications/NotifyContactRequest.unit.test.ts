@@ -55,6 +55,7 @@ describe("NotifyContactRequest", () => {
         phone: adminPhone,
         shouldReceiveDiscussionNotifications: true,
         userId: establishmentAdmin.id,
+        isMainContactByPhone: false,
       },
       {
         role: "establishment-contact",

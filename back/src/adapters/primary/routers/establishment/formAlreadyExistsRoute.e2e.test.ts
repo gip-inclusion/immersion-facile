@@ -47,6 +47,7 @@ describe("route to check if a form's siret already exists", () => {
             phone: "",
             userId: "osef",
             shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
         ])
         .build(),

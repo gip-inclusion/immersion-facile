@@ -91,6 +91,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
       job: "a job",
       phone: "+33612345678",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
     {
       role: "establishment-contact",
@@ -151,6 +152,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
       job: "new job",
       phone: "+33612345679",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
     {
       role: "establishment-contact",

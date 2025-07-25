@@ -17,6 +17,7 @@ export type AddressAutocompleteLocator =
   | "convention-beneficiary-current-employer-address"
   | "agency-address"
   | "create-establishment-address"
+  | "create-establishment-in-person-address"
   | MultipleAddressAutocompleteLocator;
 
 const initialState: AutocompleteState<
