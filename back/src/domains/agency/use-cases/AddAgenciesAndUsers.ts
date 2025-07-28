@@ -4,8 +4,8 @@ import {
   errors,
   type GeoPositionDto,
   geoPositionSchema,
-  type Phone,
-  phoneSchema,
+  type PhoneNumber,
+  phoneNumberSchema,
 } from "shared";
 import { z } from "zod";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
@@ -26,7 +26,7 @@ export type ImportedAgencyAndUserRow = {
   Ville: string;
   "Code postal": string;
   Coordonées: GeoPositionDto;
-  Téléphone: Phone;
+  Téléphone: PhoneNumber;
 };
 
 export const importedAgencyAndUserRowSchema: z.Schema<ImportedAgencyAndUserRow> =
@@ -50,7 +50,7 @@ export const importedAgencyAndUserRowSchema: z.Schema<ImportedAgencyAndUserRow> 
       return val;
     }, geoPositionSchema) as z.ZodType<GeoPositionDto>,
     "Code postal": z.string(),
-    Téléphone: phoneSchema,
+    Téléphone: phoneNumberSchema,
   });
 
 export type AddAgenciesAndUsers = ReturnType<typeof makeAddAgenciesAndUsers>;
