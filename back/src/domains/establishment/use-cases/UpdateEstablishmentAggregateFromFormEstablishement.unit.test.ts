@@ -748,7 +748,7 @@ describe("Update Establishment aggregate from form data", () => {
               job: newAdminRight.job,
               phone: newAdminRight.phone,
               shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
+              isMainContactByPhone: true,
             },
           ],
         };
@@ -864,7 +864,7 @@ describe("Update Establishment aggregate from form data", () => {
               job: existingEstablishmentAdminRight.job,
               phone: existingEstablishmentAdminRight.phone,
               shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
+              isMainContactByPhone: true,
             },
           ],
         };

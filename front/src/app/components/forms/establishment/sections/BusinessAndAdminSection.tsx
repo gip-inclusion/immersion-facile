@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { values } from "ramda";
+import { pick, values } from "ramda";
 import { ErrorNotifications, HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { domElementIds, type FormEstablishmentDto } from "shared";
@@ -61,7 +61,7 @@ export const BusinessAndAdminSection = ({
           label={formContents.website.label}
           hintText={formContents.website.hintText}
           nativeInputProps={{
-            ...formContents.website,
+            ...pick(["id", "name", "required"], formContents.website),
             ...register("website"),
           }}
           {...getFieldError("website")}
@@ -71,7 +71,10 @@ export const BusinessAndAdminSection = ({
           hintText={formContents.additionalInformation.hintText}
           textArea
           nativeTextAreaProps={{
-            ...formContents.additionalInformation,
+            ...pick(
+              ["id", "name", "required"],
+              formContents.additionalInformation,
+            ),
             ...register("additionalInformation"),
           }}
           {...getFieldError("additionalInformation")}
@@ -207,7 +210,7 @@ const EstablishmentAdminInfos = () => {
       <Input
         label={formContents["userRights.0.job"].label}
         nativeInputProps={{
-          ...formContents["userRights.0.job"],
+          ...pick(["id", "name", "required"], formContents["userRights.0.job"]),
           ...register("userRights.0.job"),
         }}
         {...getFieldError("userRights.0.job")}
@@ -216,7 +219,10 @@ const EstablishmentAdminInfos = () => {
         label={formContents["userRights.0.phone"].label}
         hintText={formContents["userRights.0.phone"].hintText}
         nativeInputProps={{
-          ...formContents["userRights.0.phone"],
+          ...pick(
+            ["id", "name", "required"],
+            formContents["userRights.0.phone"],
+          ),
           ...register("userRights.0.phone"),
         }}
         {...getFieldError("userRights.0.phone")}

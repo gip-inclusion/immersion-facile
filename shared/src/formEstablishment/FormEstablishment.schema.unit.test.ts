@@ -1,0 +1,101 @@
+import { ZodError } from "zod";
+import { expectToEqual } from "../test.helpers";
+import { formEstablishmentSchema } from "./FormEstablishment.schema";
+import { FormEstablishmentDtoBuilder } from "./FormEstablishmentDtoBuilder";
+
+describe("formEstablishmentSchema", () => {
+  describe("wrong paths", () => {
+    it("invalid establishment : contact mode IN_PERSON but no welcome address", () => {
+      const invalidFormEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withContactMode("IN_PERSON")
+        .build();
+      expect(() =>
+        formEstablishmentSchema.parse(invalidFormEstablishment),
+      ).toThrow(
+        new ZodError([
+          {
+            code: "invalid_type",
+            expected: "object",
+            received: "undefined",
+            path: ["potentialBeneficiaryWelcomeAddress"],
+            message: "L'adresse est invalide",
+          },
+        ]),
+      );
+    });
+    it("invalid establishment : contact mode PHONE but no main contact by phone", () => {
+      const invalidFormEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withContactMode("PHONE")
+        .build();
+      expect(() =>
+        formEstablishmentSchema.parse(invalidFormEstablishment),
+      ).toThrow(
+        new ZodError([
+          {
+            code: "custom",
+            message:
+              "En cas de mode de contact par téléphone, vous devez renseigner au moins un contact principal par téléphone.",
+            path: [],
+          },
+        ]),
+      );
+    });
+  });
+
+  describe("right paths", () => {
+    it("valid basic establishment", () => {
+      const validFormEstablishment =
+        FormEstablishmentDtoBuilder.valid().build();
+      expectToEqual(
+        formEstablishmentSchema.parse(validFormEstablishment),
+        validFormEstablishment,
+      );
+    });
+    it("valid establishment IN_PERSON with welcome address", () => {
+      const validFormEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withContactMode("IN_PERSON")
+        .withUserRights([
+          {
+            email: "test@test.com",
+            phone: "+33612345678",
+            isMainContactByPhone: true,
+            role: "establishment-admin",
+            shouldReceiveDiscussionNotifications: true,
+            job: "test",
+          },
+        ])
+        .withPotentialBeneficiaryWelcomeAddress({
+          streetNumberAndAddress: "127 rue de Grenelle 75007 Paris",
+          city: "Paris",
+          postcode: "75007",
+          departmentCode: "75",
+        })
+        .build();
+
+      expectToEqual(
+        formEstablishmentSchema.parse(validFormEstablishment),
+        validFormEstablishment,
+      );
+    });
+
+    it("valid establishment PHONE with at least one main contact by phone", () => {
+      const validFormEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withContactMode("PHONE")
+        .withUserRights([
+          {
+            email: "test@test.com",
+            phone: "+33612345678",
+            isMainContactByPhone: true,
+            role: "establishment-admin",
+            shouldReceiveDiscussionNotifications: true,
+            job: "test",
+          },
+        ])
+        .build();
+      expectToEqual(
+        formEstablishmentSchema.parse(validFormEstablishment),
+        validFormEstablishment,
+      );
+    });
+  });
+});

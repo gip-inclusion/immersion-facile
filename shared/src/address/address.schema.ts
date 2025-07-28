@@ -12,12 +12,17 @@ import type {
 
 export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
-export const addressSchema: z.Schema<AddressDto> = z.object({
-  streetNumberAndAddress: zStringCanBeEmpty,
-  postcode: zStringMinLength1,
-  departmentCode: zStringMinLength1,
-  city: zStringMinLength1,
-});
+export const addressSchema: z.Schema<AddressDto> = z.object(
+  {
+    streetNumberAndAddress: zStringCanBeEmpty,
+    postcode: zStringMinLength1,
+    departmentCode: zStringMinLength1,
+    city: zStringMinLength1,
+  },
+  {
+    message: "L'adresse est invalide",
+  },
+);
 
 export const lookupSearchResultSchema: z.Schema<LookupSearchResult> = z.object({
   label: z.string(),

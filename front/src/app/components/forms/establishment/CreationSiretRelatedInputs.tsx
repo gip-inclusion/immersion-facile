@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { pick } from "ramda";
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useFormContext } from "react-hook-form";
@@ -84,7 +85,7 @@ export const CreationSiretRelatedInputs = () => {
         label={formContents.siret.label}
         hintText={formContents.siret.hintText}
         nativeInputProps={{
-          ...formContents.siret,
+          ...pick(["id", "name", "required"], formContents.siret),
           ...register("siret"),
           onChange: (event) => {
             updateSiret(event.target.value);
@@ -110,7 +111,7 @@ export const CreationSiretRelatedInputs = () => {
         hintText={formContents.businessName.hintText}
         disabled
         nativeInputProps={{
-          ...formContents.businessName,
+          ...pick(["id", "name", "required"], formContents.businessName),
           ...register("businessName"),
         }}
       />
@@ -119,7 +120,10 @@ export const CreationSiretRelatedInputs = () => {
         hintText={formContents.businessNameCustomized.hintText}
         disabled={isFetchingSiret}
         nativeInputProps={{
-          ...formContents.businessNameCustomized,
+          ...pick(
+            ["id", "name", "required"],
+            formContents.businessNameCustomized,
+          ),
           ...register("businessNameCustomized", {
             setValueAs: (value) => (value ? value : undefined),
           }),

@@ -2,6 +2,7 @@ import { uniq } from "ramda";
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
+import { addressSchema } from "../address/address.schema";
 import { businessNameSchema } from "../business/business";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf/naf.schema";
@@ -37,10 +38,18 @@ import type {
 export const defaultMaxContactsPerMonth = 12;
 export const noContactPerMonth = 0;
 
-const validContactModes: NotEmptyArray<ContactMode> = [
+const contactModesWithoutWelcomeAddress: NotEmptyArray<ContactMode> = [
   "EMAIL",
   "PHONE",
+];
+
+const contactModesWithWelcomeAddress: NotEmptyArray<ContactMode> = [
   "IN_PERSON",
+];
+
+const validContactModes: NotEmptyArray<ContactMode> = [
+  ...contactModesWithoutWelcomeAddress,
+  ...contactModesWithWelcomeAddress,
 ];
 export const contactModeSchema = zEnumValidation(
   validContactModes,
@@ -61,8 +70,8 @@ const establishmentContactPhoneSchema = z
   })
   .or(
     z.object({
-      phone: z.never(),
-      isMainContactByPhone: z.never(),
+      phone: z.undefined(),
+      isMainContactByPhone: z.undefined(),
     }),
   );
 
@@ -113,62 +122,97 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
 ];
 export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources);
 
-export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
-  .object({
-    source: formEstablishmentSourceSchema,
-    siret: siretSchema,
-    businessName: businessNameSchema,
-    businessNameCustomized: zStringMinLength1
-      .refine(
-        (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
-        "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
-      )
-      .optional(),
-    website: absoluteUrlSchema.or(z.literal("")).optional(),
-    additionalInformation: zStringCanBeEmpty.optional(),
-    businessAddresses: z
-      .array(
-        z.object({
-          id: zUuidLike,
-          rawAddress: addressWithPostalCodeSchema,
-        }),
-      )
-      .min(1),
-    isEngagedEnterprise: zBoolean.optional(),
-    fitForDisabledWorkers: zBoolean,
-    naf: nafSchema.optional(),
-    appellations: z
-      .array(appellationDtoSchema)
-      .min(1, localization.atLeastOneJob),
-    contactMode: contactModeSchema,
-    userRights: formEstablishmentUserRightsSchema,
-    maxContactsPerMonth: z
-      .number({
-        invalid_type_error:
-          "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
-      })
-      .nonnegative({
-        message: "La valeur renseignée ne peut pas être négative",
-      })
-      .int({
-        message: "La valeur renseignée ne peut pas contenir de décimale",
+const formEstablishmentCommonShape = {
+  source: formEstablishmentSourceSchema,
+  siret: siretSchema,
+  businessName: businessNameSchema,
+  businessNameCustomized: zStringMinLength1
+    .refine(
+      (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
+      "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
+    )
+    .optional(),
+  website: absoluteUrlSchema.or(z.literal("")).optional(),
+  additionalInformation: zStringCanBeEmpty.optional(),
+  businessAddresses: z
+    .array(
+      z.object({
+        id: zUuidLike,
+        rawAddress: addressWithPostalCodeSchema,
       }),
-    nextAvailabilityDate: dateTimeIsoStringSchema.optional(),
-    searchableBy: z.object({
-      students: zBoolean,
-      jobSeekers: zBoolean,
+    )
+    .min(1),
+  isEngagedEnterprise: zBoolean.optional(),
+  fitForDisabledWorkers: zBoolean,
+  naf: nafSchema.optional(),
+  appellations: z
+    .array(appellationDtoSchema)
+    .min(1, localization.atLeastOneJob),
+  userRights: formEstablishmentUserRightsSchema,
+  maxContactsPerMonth: z
+    .number({
+      invalid_type_error:
+        "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
+    })
+    .nonnegative({
+      message: "La valeur renseignée ne peut pas être négative",
+    })
+    .int({
+      message: "La valeur renseignée ne peut pas contenir de décimale",
     }),
-  })
+  nextAvailabilityDate: dateTimeIsoStringSchema.optional(),
+  searchableBy: z.object({
+    students: zBoolean,
+    jobSeekers: zBoolean,
+  }),
+};
+
+export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
+  .discriminatedUnion("contactMode", [
+    z.object({
+      contactMode: z.enum(contactModesWithoutWelcomeAddress),
+      ...formEstablishmentCommonShape,
+    }),
+    z.object({
+      contactMode: z.enum(contactModesWithWelcomeAddress),
+      potentialBeneficiaryWelcomeAddress: addressSchema,
+      ...formEstablishmentCommonShape,
+    }),
+  ])
   .and(withAcquisitionSchema)
   .refine(
     (formEstablishment) =>
       formEstablishment.contactMode === "PHONE"
         ? formEstablishment.userRights.some(
-            (right) => right.isMainContactByPhone,
+            (right: FormEstablishmentUserRight) => right.isMainContactByPhone,
           )
         : true,
     "En cas de mode de contact par téléphone, vous devez renseigner au moins un contact principal par téléphone.",
   );
+// z.object({
+//   contactMode: z.enum(contactModesWithoutWelcomeAddress),
+// }).and(z.object(formEstablishmentCommonShape)).or(
+//   z
+//     .object({
+//       contactMode: z.enum(contactModesWithWelcomeAddress),
+//     })
+//     .and(z.object(formEstablishmentCommonShape))
+//     .and(
+//       z.object({
+//         potentialBeneficiaryWelcomeAddress: addressSchema,
+//       }),
+//     ),
+// )
+//   .and(withAcquisitionSchema)
+//   .refine(
+//     (formEstablishment) =>
+//       formEstablishment.contactMode === "PHONE"
+//         ? formEstablishment.userRights.some(
+//           (right) => right.isMainContactByPhone,
+//         )
+//         : true,
+//     "En cas de mode de contact par téléphone, vous devez renseigner au moins un contact principal par téléphone.",
+//   );
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
   z.object({
