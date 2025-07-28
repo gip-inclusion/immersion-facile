@@ -44,27 +44,8 @@ const triggerAddAgenciesAndUsers = async () => {
     );
   }
 
-  const parsedErrors: Record<number, string> = {};
-  const skipLines = 2; //1 for index that starts at 0 + 1 for header
-  const validatedRows: ImportedAgencyAndUserRow[] = result.data
-    .map((row, index) => {
-      const parseResult = importedAgencyAndUserRowSchema.safeParse(row);
-      if (parseResult.success) return parseResult.data;
-      parsedErrors[index + skipLines] = JSON.stringify(parseResult.error);
-      return null;
-    })
-    .filter((row) => row !== null);
-
-  if (keys(parsedErrors).length !== 0) {
-    logger.warn({
-      message: `${keys(parsedErrors).length} error(s) during CSV parsing`,
-    });
-    keys(parsedErrors).forEach((key) => {
-      logger.warn({
-        message: `line ${key}: ${parsedErrors[key]}`,
-      });
-    });
-  }
+  const { validatedRows, errorsCount } =
+    validateRowsAndReplaceInvalidPhoneNumber(result.data);
 
   logger.info({ message: `Ready to import ${validatedRows.length} lines` });
 
@@ -89,7 +70,70 @@ const triggerAddAgenciesAndUsers = async () => {
     createdAgenciesCount,
     createdUsersCount,
     usersAlreadyInIFCount,
-    errorsCount: keys(parsedErrors).length,
+    errorsCount,
+  };
+};
+
+const validateRowsAndReplaceInvalidPhoneNumber = (data: any[]) => {
+  const defaultPhoneNumber = "+33500000000";
+  const parsedErrors: Record<number, string> = {};
+  const skipLines = 2; //1 for index that starts at 0 + 1 for header
+
+  const validatedRows: ImportedAgencyAndUserRow[] = data
+    .map((row, index) => {
+      const parseResult = importedAgencyAndUserRowSchema.safeParse(row);
+      if (parseResult.success) return parseResult.data;
+      parsedErrors[index + skipLines] = JSON.stringify(parseResult.error);
+      return null;
+    })
+    .filter((row) => row !== null);
+
+  if (keys(parsedErrors).length !== 0) {
+    const additionnalValidatedLinesAndRows = keys(parsedErrors)
+      .map((key) => {
+        if (parsedErrors[key].includes("Téléphone")) {
+          const parseResult = importedAgencyAndUserRowSchema.safeParse({
+            ...data.at(key - skipLines),
+            Téléphone: defaultPhoneNumber,
+          });
+          if (parseResult.success) {
+            return {
+              line: key,
+              row: parseResult.data,
+            };
+          }
+        }
+        return null;
+      })
+      .filter((row) => row !== null);
+    const additionnalValidatedLines = additionnalValidatedLinesAndRows.map(
+      ({ line }) => line,
+    );
+    const additionnalValidatedRows = additionnalValidatedLinesAndRows.map(
+      ({ row }) => row,
+    );
+
+    logger.warn({
+      message: `${keys(parsedErrors).length - additionnalValidatedLines.length} error(s) during CSV parsing`,
+    });
+
+    keys(parsedErrors).forEach((key) => {
+      if (!additionnalValidatedLines.includes(key)) {
+        logger.warn({
+          message: `line ${key}: ${parsedErrors[key]}`,
+        });
+      }
+    });
+
+    return {
+      validatedRows: [...validatedRows, ...additionnalValidatedRows],
+      errorsCount: keys(parsedErrors).length - additionnalValidatedLines.length,
+    };
+  }
+
+  return {
+    validatedRows,
+    errorsCount: 0,
   };
 };
 
