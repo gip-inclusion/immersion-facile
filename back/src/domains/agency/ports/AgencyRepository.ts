@@ -62,6 +62,7 @@ export interface AgencyRepository {
     kind: AgencyKind;
     idToIgnore: AgencyId;
   }): Promise<boolean>;
+  getExistingActiveSirets(sirets: SiretDto[]): Promise<SiretDto[]>;
 }
 
 export const updateAgencyRightsForUser = async (
