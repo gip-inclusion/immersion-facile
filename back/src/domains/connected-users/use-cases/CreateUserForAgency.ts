@@ -40,7 +40,7 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
     const user = await getUserByEmailAndCreateIfMissing({
       userRepository: uow.userRepository,
       timeGateway: deps.timeGateway,
-      userIdIfNew: inputParams.userId,
+      userIdIfNew: inputParams.userId, //Cet id provient du front. Comment le front le génère? Pourquoi on le gènere pas dans le back vu qu'on check l'existence par email?
       userEmail: inputParams.email,
     });
 

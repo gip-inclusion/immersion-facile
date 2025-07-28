@@ -1,7 +1,6 @@
 import { readFile } from "node:fs/promises";
 import Papa from "papaparse";
-import { keys, splitEvery } from "ramda";
-import { z } from "zod";
+import { keys } from "ramda";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import {
@@ -49,28 +48,20 @@ const triggerAddAgenciesAndUsers = async () => {
   const skipLines = 2; //1 for index that starts at 0 + 1 for header
   const validatedRows: ImportedAgencyAndUserRow[] = result.data
     .map((row, index) => {
-      try {
-        const importedRow = importedAgencyAndUserRowSchema.parse(row);
-        return importedRow;
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          parsedErrors[index + skipLines] = JSON.stringify(error);
-        }
-      }
+      const parseResult = importedAgencyAndUserRowSchema.safeParse(row);
+      if (parseResult.success) return parseResult.data;
+      parsedErrors[index + skipLines] = JSON.stringify(parseResult.error);
       return null;
     })
     .filter((row) => row !== null);
 
   if (keys(parsedErrors).length !== 0) {
-    const batchSize = 30;
     logger.warn({
       message: `${keys(parsedErrors).length} error(s) during CSV parsing`,
     });
-    splitEvery(batchSize, keys(parsedErrors)).forEach((errors) => {
+    keys(parsedErrors).forEach((key) => {
       logger.warn({
-        message: errors
-          .map((error) => `line ${error}: ${parsedErrors[error]}`)
-          .join("\n"),
+        message: `line ${key}: ${parsedErrors[key]}`,
       });
     });
   }
