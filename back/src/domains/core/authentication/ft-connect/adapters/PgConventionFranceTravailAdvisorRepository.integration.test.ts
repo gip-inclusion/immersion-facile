@@ -291,10 +291,17 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         userFtExternalId,
       );
 
-      expect(
+      expectToEqual(
         (await conventionRepository.getById(conventionId))?.signatories
           .beneficiary.federatedIdentity,
-      ).not.toBeUndefined();
+        {
+          provider: "peConnect",
+          token: userFtExternalId,
+          payload: {
+            advisor: placementAdvisor,
+          },
+        },
+      );
       expect(
         (await db.selectFrom("partners_pe_connect").selectAll().execute())
           .length,
