@@ -4,6 +4,8 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { HeadingSection, SectionHighlight } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
+  addressDtoToString,
+  type ContactMode,
   domElementIds,
   type FormEstablishmentDto,
   getFormattedFirstnameAndLastname,
@@ -160,13 +162,42 @@ const DisplaySearchableByValue = ({
 const DisplayContactModeValue = ({
   contactMode,
 }: {
-  contactMode: FormEstablishmentDto["contactMode"];
+  contactMode: ContactMode;
 }) => {
-  const contactModeLabels: Record<FormEstablishmentDto["contactMode"], string> =
-    {
-      EMAIL: "Par email",
-      PHONE: "Par téléphone",
-      IN_PERSON: "En présentiel",
-    };
-  return <div>{contactModeLabels[contactMode]}</div>;
+  const { getValues } = useFormContext<FormEstablishmentDto>();
+  const formValues = getValues();
+  const contactModeLabels: Record<ContactMode, string> = {
+    EMAIL: "Par email",
+    PHONE: "Par téléphone",
+    IN_PERSON: "En présentiel",
+  };
+  return (
+    <div>
+      {contactModeLabels[contactMode]}
+      {contactMode === "IN_PERSON" &&
+        formValues.potentialBeneficiaryWelcomeAddress && (
+          <p>
+            Lieu de rendez-vous :{" "}
+            {addressDtoToString(formValues.potentialBeneficiaryWelcomeAddress)}
+          </p>
+        )}
+      {contactMode === "PHONE" && (
+        <p>
+          Contact principal par téléphone : {formValues.userRights[0].phone}
+        </p>
+      )}
+      {contactMode === "EMAIL" && (
+        <p>
+          Contact principal par email : {formValues.userRights[0].email}
+          <br />
+          En cas non-réponse de l'entreprise au bout de 15 jours,{" "}
+          <strong>
+            {formValues.userRights[0].isMainContactByPhone
+              ? `le candidat peut contacter l'entreprise au numéro de téléphone : ${formValues.userRights[0].phone}`
+              : "le candidat ne peut pas contacter l'entreprise"}
+          </strong>
+        </p>
+      )}
+    </div>
+  );
 };

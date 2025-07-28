@@ -1,6 +1,6 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
-import type { AddressAndPosition } from "../address/address.dto";
+import type { AddressAndPosition, AddressDto } from "../address/address.dto";
 import type { Builder } from "../Builder";
 import { errors } from "../errors/errors";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -152,7 +152,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
       job: "new job",
       phone: "+33612345679",
       shouldReceiveDiscussionNotifications: true,
-      isMainContactByPhone: false,
+      isMainContactByPhone: true,
     },
     {
       role: "establishment-contact",
@@ -343,6 +343,15 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       searchableBy: { jobSeekers, students },
+    });
+  }
+
+  public withPotentialBeneficiaryWelcomeAddress(
+    potentialBeneficiaryWelcomeAddress: AddressDto,
+  ) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      potentialBeneficiaryWelcomeAddress,
     });
   }
 }

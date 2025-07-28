@@ -125,7 +125,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               email: federatedIdentity?.email ?? "",
               job: "",
               phone: "",
-              isMainContactByPhone: false,
+              isMainContactByPhone: true,
               role: "establishment-admin",
               shouldReceiveDiscussionNotifications: true,
             },
@@ -408,9 +408,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       setCurrentStep(targetStep);
       return;
     }
+
     const validatedFields = await Promise.all(
       fieldsToValidate.map((key) => trigger(key)),
     );
+
     if (validatedFields.every((validatedField) => validatedField)) {
       if (
         currentStep === 3 &&
