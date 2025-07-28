@@ -7,6 +7,7 @@ import {
   type AgencyPositionFilter,
   type AgencyStatus,
   type AgencyWithUsersRights,
+  activeAgencyStatuses,
   type DepartmentCode,
   errors,
   type GeoPositionDto,
@@ -206,6 +207,18 @@ export class InMemoryAgencyRepository implements AgencyRepository {
         agency.status !== "rejected" &&
         agency.id !== idToIgnore,
     );
+  }
+
+  public async getExistingActiveSirets(
+    sirets: SiretDto[],
+  ): Promise<SiretDto[]> {
+    return this.agencies
+      .filter(
+        (agency) =>
+          activeAgencyStatuses.includes(agency.status) &&
+          sirets.includes(agency.agencySiret),
+      )
+      .map((agency) => agency.agencySiret);
   }
 }
 

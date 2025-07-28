@@ -1133,4 +1133,44 @@ describe("PgAgencyRepository", () => {
       expect(hasAlreadySimilarAgency).toBe(true);
     });
   });
+
+  describe("findExistingActiveSirets()", () => {
+    const activeAgency = new AgencyDtoBuilder()
+      .withId("00000000-0000-0000-0000-000000000006")
+      .withAgencySiret("00000000000006")
+      .build();
+
+    const closedAgency = new AgencyDtoBuilder()
+      .withId("00000000-0000-0000-0000-000000000002")
+      .withAgencySiret("00000000000002")
+      .withStatus("closed")
+      .build();
+
+    const activeAgencyWithRights = toAgencyWithRights(activeAgency, {
+      [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+    });
+
+    const closedAgencyWithRights = toAgencyWithRights(closedAgency, {
+      [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+    });
+
+    beforeEach(async () => {
+      await agencyRepository.insert(activeAgencyWithRights);
+      await agencyRepository.insert(closedAgencyWithRights);
+    });
+
+    it("returns empty array if requested sirets do not exist or an not active", async () => {
+      const sirets = [closedAgency.agencySiret, "random-id"];
+      const existingSirets =
+        await agencyRepository.getExistingActiveSirets(sirets);
+      expect(existingSirets).toEqual([]);
+    });
+
+    it("returns the sirets of the active agencies", async () => {
+      const sirets = [activeAgency.agencySiret];
+      const existingSirets =
+        await agencyRepository.getExistingActiveSirets(sirets);
+      expect(existingSirets).toEqual([activeAgency.agencySiret]);
+    });
+  });
 });

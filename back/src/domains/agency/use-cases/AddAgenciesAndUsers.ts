@@ -2,10 +2,12 @@ import { flatten, splitEvery, uniq, values } from "ramda";
 import {
   type AgencyWithUsersRights,
   errors,
+  executeInSequence,
   type GeoPositionDto,
   geoPositionSchema,
   type PhoneNumber,
   phoneNumberSchema,
+  type SiretDto,
 } from "shared";
 import { z } from "zod";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
@@ -69,27 +71,22 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     timeGateway: TimeGateway;
   }>()
   .build(async ({ inputParams, uow, deps }) => {
-    const chunkSize = 100;
-    const chunks = splitEvery(chunkSize, inputParams);
+    const chunkSize = 300;
     const formattedImportedAgencies =
       formatImportedAgencyAndUserRow(inputParams);
-    const existingAgencies = flatten(
-      await Promise.all(
-        chunks.map(async (importedAgencies) => {
-          return await uow.agencyRepository.getAgencies({
-            filters: {
-              sirets: importedAgencies.map(
-                (importedAgency) => importedAgency.SIRET,
-              ),
-            },
-          });
-        }),
+    const chunks = splitEvery(chunkSize, formattedImportedAgencies);
+    const siretsInIF = uniq(
+      flatten(
+        await Promise.all(
+          chunks.map(async (importedAgencies) =>
+            uow.agencyRepository.getExistingActiveSirets(
+              importedAgencies.map((importedAgency) => importedAgency.SIRET),
+            ),
+          ),
+        ),
       ),
     );
 
-    const siretsInIF = uniq(
-      existingAgencies.map((agency) => agency.agencySiret),
-    );
     const rowsNotInIF = formattedImportedAgencies.filter(
       (importedAgency) => !siretsInIF.includes(importedAgency.SIRET),
     );
@@ -106,8 +103,8 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
         uuidGenerator: deps.uuidGenerator,
       });
 
-    await addOrUpdateAgencyUsers({
-      agenciesIF: existingAgencies,
+    await linkUsersToExistingAgency({
+      siretsInIF,
       importedAgencyAndUserRows: formattedImportedAgencies,
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
@@ -136,24 +133,31 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     };
   });
 
-const addOrUpdateAgencyUsers = async ({
-  agenciesIF,
+const linkUsersToExistingAgency = async ({
+  siretsInIF,
   importedAgencyAndUserRows,
   agencyRepository,
   userRepository,
 }: {
-  agenciesIF: AgencyWithUsersRights[];
+  siretsInIF: SiretDto[];
   importedAgencyAndUserRows: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
   userRepository: UserRepository;
 }): Promise<void> => {
-  const siretsInIF = agenciesIF.map((agency) => agency.agencySiret);
   const rowsWithSiretAlreadyInIF = importedAgencyAndUserRows.filter((row) =>
     siretsInIF.includes(row.SIRET),
   );
+  const chunkSize = 30;
+  const chunks = splitEvery(chunkSize, rowsWithSiretAlreadyInIF);
 
-  await Promise.all(
-    rowsWithSiretAlreadyInIF.map(async (row) => {
+  await executeInSequence(chunks, async (rows) => {
+    const agenciesIF = await agencyRepository.getAgencies({
+      filters: {
+        sirets: rows.map((row) => row.SIRET),
+      },
+    });
+
+    rows.map(async (row) => {
       const agencyIF = agenciesIF.find(
         (agencyIF) => agencyIF.agencySiret === row.SIRET,
       );
@@ -161,7 +165,6 @@ const addOrUpdateAgencyUsers = async ({
         throw new Error(
           `Should not happen: Agency ${row.SIRET} not found in IF`,
         );
-
       const user = await userRepository.findByEmail(
         row["E-mail authentification"],
       );
@@ -192,8 +195,8 @@ const addOrUpdateAgencyUsers = async ({
           },
         });
       }
-    }),
-  );
+    });
+  });
 };
 
 const formatImportedAgencyAndUserRow = (
@@ -230,52 +233,50 @@ const createNewAgencies = async ({
   userRepository: UserRepository;
   deps: { uuidGenerator: UuidGenerator; timeGateway: TimeGateway };
 }) => {
-  await Promise.all(
-    await importedAgencyAndUserRows.map(async (row) => {
-      const user = await userRepository.findByEmail(
-        row["E-mail authentification"],
-      );
-      if (!user)
-        throw errors.user.notFoundByEmail({
-          email: row["E-mail authentification"],
-        });
+  await executeInSequence(importedAgencyAndUserRows, async (row) => {
+    const user = await userRepository.findByEmail(
+      row["E-mail authentification"],
+    );
+    if (!user)
+      throw errors.user.notFoundByEmail({
+        email: row["E-mail authentification"],
+      });
 
-      const agencyDepartmentCode = row["Code postal"].slice(0, 2);
-      const agency: AgencyWithUsersRights = {
-        id: deps.uuidGenerator.new(),
-        status: "active",
-        agencySiret: row.SIRET,
-        name: row["Nom structure"],
-        address: {
-          streetNumberAndAddress: row["Adresse ligne 1"],
-          postcode: row["Code postal"],
-          city: row.Ville,
-          departmentCode: agencyDepartmentCode,
+    const agencyDepartmentCode = row["Code postal"].slice(0, 2);
+    const agency: AgencyWithUsersRights = {
+      id: deps.uuidGenerator.new(),
+      status: "active",
+      agencySiret: row.SIRET,
+      name: row["Nom structure"],
+      address: {
+        streetNumberAndAddress: row["Adresse ligne 1"],
+        postcode: row["Code postal"],
+        city: row.Ville,
+        departmentCode: agencyDepartmentCode,
+      },
+      position: {
+        lat: row.Coordonées.lat,
+        lon: row.Coordonées.lon,
+      },
+      kind: "structure-IAE",
+      coveredDepartments: [agencyDepartmentCode],
+      logoUrl: null,
+      signature: "L'équipe",
+      refersToAgencyId: null,
+      refersToAgencyName: null,
+      phoneNumber: row.Téléphone,
+      usersRights: {
+        [user.id]: {
+          roles: ["agency-admin", "validator"],
+          isNotifiedByEmail: true,
         },
-        position: {
-          lat: row.Coordonées.lat,
-          lon: row.Coordonées.lon,
-        },
-        kind: "structure-IAE",
-        coveredDepartments: [agencyDepartmentCode],
-        logoUrl: null,
-        signature: "L'équipe",
-        refersToAgencyId: null,
-        refersToAgencyName: null,
-        phoneNumber: row.Téléphone,
-        usersRights: {
-          [user.id]: {
-            roles: ["agency-admin", "validator"],
-            isNotifiedByEmail: true,
-          },
-        },
-        codeSafir: null,
-        rejectionJustification: null,
-      };
+      },
+      codeSafir: null,
+      rejectionJustification: null,
+    };
 
-      await agencyRepository.insert(agency);
-    }),
-  );
+    await agencyRepository.insert(agency);
+  });
 };
 
 // duplicas si même siret + nom structure + e-mail authentification + adresse ligne 1 + code postal + ville + téléphone
@@ -389,16 +390,10 @@ const createNewAgenciesWithSuffix = async ({
       };
     });
 
-  const chunkSize = 100;
-  const chunks = splitEvery(chunkSize, updatedRowsWithSuffix);
-  await Promise.all(
-    chunks.map(async (rows) => {
-      await createNewAgencies({
-        importedAgencyAndUserRows: rows,
-        agencyRepository,
-        userRepository,
-        deps,
-      });
-    }),
-  );
+  await createNewAgencies({
+    importedAgencyAndUserRows: updatedRowsWithSuffix,
+    agencyRepository,
+    userRepository,
+    deps,
+  });
 };

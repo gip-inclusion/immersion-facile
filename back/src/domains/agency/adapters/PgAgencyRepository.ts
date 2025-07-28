@@ -10,6 +10,7 @@ import {
   type AgencyStatus,
   type AgencyUsersRights,
   type AgencyWithUsersRights,
+  activeAgencyStatuses,
   ConflictError,
   type DepartmentCode,
   errors,
@@ -17,6 +18,7 @@ import {
   isWithAgencyRole,
   type OmitFromExistingKeys,
   pipeWithValue,
+  type SiretDto,
   type UserId,
   type WithUserFilters,
 } from "shared";
@@ -453,6 +455,17 @@ export class PgAgencyRepository implements AgencyRepository {
       .insertInto("users__agencies")
       .values(newRights)
       .execute();
+  }
+
+  async getExistingActiveSirets(sirets: SiretDto[]): Promise<SiretDto[]> {
+    const results = await this.transaction
+      .selectFrom("agencies")
+      .select("agency_siret")
+      .where("agency_siret", "in", sirets)
+      .where("status", "in", activeAgencyStatuses)
+      .execute();
+
+    return results.map(({ agency_siret }) => agency_siret);
   }
 }
 
