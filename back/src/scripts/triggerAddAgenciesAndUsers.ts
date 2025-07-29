@@ -2,12 +2,19 @@ import { readFile } from "node:fs/promises";
 import Papa from "papaparse";
 import { keys } from "ramda";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import {
+  createFetchHttpClientForExternalAPIs,
+  createGetPgPoolFn,
+} from "../config/bootstrap/createGateways";
+import { partnerNames } from "../config/bootstrap/partnerNames";
 import {
   type ImportedAgencyAndUserRow,
   importedAgencyAndUserRowSchema,
   makeAddAgenciesAndUsers,
 } from "../domains/agency/use-cases/AddAgenciesAndUsers";
+import { HttpAddressGateway } from "../domains/core/address/adapters/HttpAddressGateway";
+import { addressesExternalRoutes } from "../domains/core/address/adapters/HttpAddressGateway.routes";
+import { withNoCache } from "../domains/core/caching-gateway/adapters/withNoCache";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -60,6 +67,16 @@ const triggerAddAgenciesAndUsers = async () => {
     deps: {
       timeGateway: new RealTimeGateway(),
       uuidGenerator: new UuidV4Generator(),
+      addressGateway: new HttpAddressGateway(
+        createFetchHttpClientForExternalAPIs({
+          partnerName: partnerNames.openCageData,
+          routes: addressesExternalRoutes,
+          config,
+        }),
+        config.apiKeyOpenCageDataGeocoding,
+        config.apiKeyOpenCageDataGeosearch,
+        withNoCache,
+      ),
     },
   }).execute(validatedRows);
 

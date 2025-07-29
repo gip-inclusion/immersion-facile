@@ -1,6 +1,7 @@
 import { flatten, splitEvery, uniq, values } from "ramda";
 import {
   type AgencyWithUsersRights,
+  type DepartmentCode,
   errors,
   executeInSequence,
   type GeoPositionDto,
@@ -11,6 +12,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
+import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -69,6 +71,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
   .withDeps<{
     uuidGenerator: UuidGenerator;
     timeGateway: TimeGateway;
+    addressGateway: AddressGateway;
   }>()
   .build(async ({ inputParams, uow, deps }) => {
     const chunkSize = 300;
@@ -231,7 +234,11 @@ const createNewAgencies = async ({
   importedAgencyAndUserRows: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
   userRepository: UserRepository;
-  deps: { uuidGenerator: UuidGenerator; timeGateway: TimeGateway };
+  deps: {
+    uuidGenerator: UuidGenerator;
+    timeGateway: TimeGateway;
+    addressGateway: AddressGateway;
+  };
 }) => {
   await executeInSequence(importedAgencyAndUserRows, async (row) => {
     const user = await userRepository.findByEmail(
@@ -242,7 +249,10 @@ const createNewAgencies = async ({
         email: row["E-mail authentification"],
       });
 
-    const agencyDepartmentCode = row["Code postal"].slice(0, 2);
+    const agencyDepartmentCode = await getDepartementCode({
+      row,
+      addressGateway: deps.addressGateway,
+    });
     const agency: AgencyWithUsersRights = {
       id: deps.uuidGenerator.new(),
       status: "active",
@@ -367,7 +377,11 @@ const createNewAgenciesWithSuffix = async ({
   rowsToCreateAsAgencies: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
   userRepository: UserRepository;
-  deps: { uuidGenerator: UuidGenerator; timeGateway: TimeGateway };
+  deps: {
+    uuidGenerator: UuidGenerator;
+    timeGateway: TimeGateway;
+    addressGateway: AddressGateway;
+  };
 }) => {
   const rowsGroupedBySiret = allRows.reduce(
     (acc, row) => {
@@ -396,4 +410,36 @@ const createNewAgenciesWithSuffix = async ({
     userRepository,
     deps,
   });
+};
+
+const getDepartementCode = async ({
+  row,
+  addressGateway,
+}: {
+  row: ImportedAgencyAndUserRow;
+  addressGateway: AddressGateway;
+}): Promise<DepartmentCode> => {
+  // DOM-COM
+  if (
+    row["Code postal"].startsWith("97") ||
+    row["Code postal"].startsWith("98")
+  ) {
+    return row["Code postal"].slice(0, 3);
+  }
+
+  // CORSE
+  if (row["Code postal"].startsWith("20")) {
+    const searchQuery = `${row["Adresse ligne 1"]} ${row["Code postal"]} ${row.Ville}`;
+    const results = await addressGateway.lookupStreetAddress(searchQuery);
+    const agencyDepartmentCode = results.at(0)?.address.departmentCode;
+    if (results.length === 0 || !agencyDepartmentCode) {
+      throw errors.address.notFound({
+        address: searchQuery,
+      });
+    }
+    return agencyDepartmentCode;
+  }
+
+  // METROPOLE
+  return row["Code postal"].slice(0, 2);
 };

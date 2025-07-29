@@ -595,6 +595,8 @@ export const errors = {
       new BadRequestError(
         `Vous devez taper au moins ${minLength} caractères pour faire une recherche.`,
       ),
+    notFound: ({ address }: { address: string }) =>
+      new NotFoundError(`Aucune adresse trouvée pour l'adresse ${address}.`),
   },
   agencies: {
     notFound: ({
