@@ -10,6 +10,8 @@ import type {
   WithLookupLocationInputQueryParams,
 } from "./address.dto";
 
+const invalidAddressMessage = "L'adresse est invalide";
+
 export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
 export const addressSchema: z.Schema<AddressDto> = z.object(
@@ -20,7 +22,7 @@ export const addressSchema: z.Schema<AddressDto> = z.object(
     city: zStringMinLength1,
   },
   {
-    message: "L'adresse est invalide",
+    message: invalidAddressMessage,
   },
 );
 
@@ -29,10 +31,15 @@ export const lookupSearchResultSchema: z.Schema<LookupSearchResult> = z.object({
   position: geoPositionSchema,
 });
 
-export const addressAndPositionSchema: z.Schema<AddressAndPosition> = z.object({
-  address: addressSchema,
-  position: geoPositionSchema,
-});
+export const addressAndPositionSchema: z.Schema<AddressAndPosition> = z.object(
+  {
+    address: addressSchema,
+    position: geoPositionSchema,
+  },
+  {
+    message: invalidAddressMessage,
+  },
+);
 
 export const addressAndPositionListSchema: z.ZodSchema<AddressAndPosition[]> =
   z.array(addressAndPositionSchema);

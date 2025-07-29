@@ -6,6 +6,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
+import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { equals } from "ramda";
 import { useState } from "react";
 import { HeadingSection } from "react-design-system";
@@ -39,6 +40,7 @@ import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { match, P } from "ts-pattern";
 import allUsersSvg from "../../../../../assets/img/all.svg";
@@ -566,9 +568,22 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
 };
 
 const UserToContact = ({ mode }: { mode: Mode }) => {
-  const { getValues } = useFormContext<FormEstablishmentDto>();
+  const { getValues, setValue } = useFormContext<FormEstablishmentDto>();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const defaultUserToContact = getValues("userRights.0");
+  const establishment = useAppSelector(
+    establishmentSelectors.formEstablishment,
+  );
+  const currentUserToContact = establishment.userRights.find(
+    (userRight) => userRight.isMainContactByPhone,
+  );
+  const usersToContactOptions: SelectProps.Option[] = establishment.userRights
+    .filter((userRight) => userRight.phone)
+    .map((userRight) => ({
+      label: `${userRight.email} - ${userRight.phone}`,
+      value: userRight.email,
+      selected: userRight.email === currentUserToContact?.email,
+    }));
 
   return match(mode)
     .with("create", () => (
@@ -582,7 +597,29 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
         • {defaultUserToContact.phone}
       </div>
     ))
-    .with(P.union("edit", "admin"), () => <div>TODO</div>)
+    .with(P.union("edit", "admin"), () => (
+      <Select
+        label="Numéro de téléphone"
+        options={usersToContactOptions}
+        nativeSelectProps={{
+          value: currentUserToContact?.email,
+          onChange: (event) => {
+            const newUserToContact = establishment.userRights.find(
+              (userRight) => userRight.email === event.target.value,
+            );
+            const newUserRights = establishment.userRights.map((userRight) => {
+              if (!userRight.phone) return userRight;
+              return {
+                ...userRight,
+                isMainContactByPhone:
+                  userRight.email === newUserToContact?.email,
+              };
+            });
+            setValue("userRights", newUserRights);
+          },
+        }}
+      />
+    ))
     .exhaustive();
 };
 
