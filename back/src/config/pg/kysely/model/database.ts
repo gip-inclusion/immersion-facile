@@ -395,6 +395,12 @@ interface Establishments extends WithAcquisition {
   score: Generated<number>;
   status: EstablishmentStatus | null;
   status_updated_at: Timestamp | null;
+  welcome_address_street_number_and_address: string | null;
+  welcome_address_postcode: string | null;
+  welcome_address_city: string | null;
+  welcome_address_department_code: string | null;
+  welcome_address_lat: number | null;
+  welcome_address_lon: number | null;
 }
 
 interface PublicAppellationsData {
@@ -446,6 +452,7 @@ interface EstablishmentsUsers {
   job: string | null;
   phone: string | null;
   should_receive_discussion_notifications: boolean;
+  is_main_contact_by_phone: boolean | null;
 }
 
 type AgencyGroupKind = "france-travail";
