@@ -87,6 +87,13 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       nextAvailabilityDate:
         establishmentAggregate.establishment.nextAvailabilityDate,
       searchableBy: establishmentAggregate.establishment.searchableBy,
+      ...(establishmentAggregate.establishment.contactMode === "IN_PERSON"
+        ? {
+            potentialBeneficiaryWelcomeAddress:
+              establishmentAggregate.establishment
+                .potentialBeneficiaryWelcomeAddress,
+          }
+        : {}),
     };
   }
 
@@ -106,6 +113,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         phone,
         shouldReceiveDiscussionNotifications,
         isMainContactByPhone,
+        isMainContactInPerson,
       }) => {
         const user = users.find(({ id }) => id === userId);
         if (!user) throw errors.user.notFound({ userId });
@@ -118,6 +126,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
             phone,
             shouldReceiveDiscussionNotifications,
             isMainContactByPhone,
+            isMainContactInPerson,
           };
         }
 
@@ -126,10 +135,16 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
           email: user.email,
           job,
           shouldReceiveDiscussionNotifications,
+          isMainContactInPerson,
         };
 
         return phone && isMainContactByPhone !== undefined
-          ? { ...baseContact, phone, isMainContactByPhone }
+          ? {
+              ...baseContact,
+              phone,
+              isMainContactByPhone,
+              isMainContactInPerson,
+            }
           : baseContact;
       },
     );

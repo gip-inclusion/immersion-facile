@@ -45,7 +45,15 @@ export const makeEstablishmentAggregate = async ({
 
   const updatedUserRights: EstablishmentUserRight[] =
     formEstablishment.userRights.map(
-      ({ email, role, job, phone, shouldReceiveDiscussionNotifications }) => {
+      ({
+        email,
+        role,
+        job,
+        phone,
+        shouldReceiveDiscussionNotifications,
+        isMainContactByPhone,
+        isMainContactInPerson,
+      }) => {
         const user = establishmentUsers.find((user) => user.email === email);
 
         if (!user) throw errors.user.notFoundByEmail({ email });
@@ -56,7 +64,8 @@ export const makeEstablishmentAggregate = async ({
               job,
               phone,
               shouldReceiveDiscussionNotifications,
-              isMainContactByPhone: false,
+              isMainContactByPhone,
+              isMainContactInPerson,
             }
           : {
               role,
@@ -64,6 +73,8 @@ export const makeEstablishmentAggregate = async ({
               job,
               phone,
               shouldReceiveDiscussionNotifications,
+              isMainContactByPhone,
+              isMainContactInPerson,
             };
       },
     );
@@ -99,6 +110,10 @@ export const makeEstablishmentAggregate = async ({
       searchableBy: formEstablishment.searchableBy,
       score,
       contactMode: formEstablishment.contactMode,
+      ...(formEstablishment.contactMode === "IN_PERSON" && {
+        potentialBeneficiaryWelcomeAddress:
+          formEstablishment.potentialBeneficiaryWelcomeAddress,
+      }),
     },
     userRights: updatedUserRights,
     offers: formEstablishment.appellations.map(

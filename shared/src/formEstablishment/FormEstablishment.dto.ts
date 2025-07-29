@@ -43,14 +43,21 @@ type withPhone =
       isMainContactByPhone: boolean;
     };
 
+export type WithIsMainContactInPerson = {
+  isMainContactInPerson?: boolean;
+};
+
 export type WithJobAndPhone = withJob & withPhone;
 
 export type AdminFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-admin"> &
-    Required<WithJobAndPhone>;
+    Required<WithJobAndPhone> &
+    WithIsMainContactInPerson;
 
 export type ContactFormEstablishmentUserRight =
-  GenericFormEstablishmentUserRight<"establishment-contact"> & WithJobAndPhone;
+  GenericFormEstablishmentUserRight<"establishment-contact"> &
+    WithJobAndPhone &
+    WithIsMainContactInPerson;
 
 export type FormEstablishmentUserRight =
   | AdminFormEstablishmentUserRight
