@@ -51,7 +51,7 @@ const triggerAddAgenciesAndUsers = async () => {
     );
   }
 
-  const { validatedRows, errorsCount } =
+  const { validatedRows, parsingErrorsCount } =
     validateRowsAndReplaceInvalidPhoneNumber(result.data);
 
   logger.info({ message: `Ready to import ${validatedRows.length} lines` });
@@ -61,6 +61,7 @@ const triggerAddAgenciesAndUsers = async () => {
     createdAgenciesCount,
     createdUsersCount,
     usersAlreadyInIFCount,
+    usecaseErrors,
   } = await makeAddAgenciesAndUsers({
     uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
       .uowPerformer,
@@ -80,6 +81,16 @@ const triggerAddAgenciesAndUsers = async () => {
     },
   }).execute(validatedRows);
 
+  const usecaseErrorsKeys = keys(usecaseErrors);
+  if (usecaseErrorsKeys) {
+    logger.warn({ message: `${usecaseErrorsKeys.length} errors in usecase` });
+    usecaseErrorsKeys.forEach((key) => {
+      logger.warn({
+        message: `ID ${key}: ${usecaseErrors[key]}`,
+      });
+    });
+  }
+
   logger.info({ message: "End of importing agencies and users from csv" });
 
   return {
@@ -87,11 +98,17 @@ const triggerAddAgenciesAndUsers = async () => {
     createdAgenciesCount,
     createdUsersCount,
     usersAlreadyInIFCount,
-    errorsCount,
+    parsingErrorsCount,
+    usecaseErrorsCount: usecaseErrorsKeys.length,
   };
 };
 
-const validateRowsAndReplaceInvalidPhoneNumber = (data: any[]) => {
+const validateRowsAndReplaceInvalidPhoneNumber = (
+  data: any[],
+): {
+  parsingErrorsCount: number;
+  validatedRows: ImportedAgencyAndUserRow[];
+} => {
   const defaultPhoneNumber = "+33500000000";
   const parsedErrors: Record<number, string> = {};
   const skipLines = 2; //1 for index that starts at 0 + 1 for header
@@ -144,13 +161,14 @@ const validateRowsAndReplaceInvalidPhoneNumber = (data: any[]) => {
 
     return {
       validatedRows: [...validatedRows, ...additionnalValidatedRows],
-      errorsCount: keys(parsedErrors).length - additionnalValidatedLines.length,
+      parsingErrorsCount:
+        keys(parsedErrors).length - additionnalValidatedLines.length,
     };
   }
 
   return {
     validatedRows,
-    errorsCount: 0,
+    parsingErrorsCount: 0,
   };
 };
 
@@ -163,14 +181,16 @@ handleCRONScript(
     createdAgenciesCount,
     usersAlreadyInIFCount,
     createdUsersCount,
-    errorsCount,
+    parsingErrorsCount,
+    usecaseErrorsCount,
   }) =>
     [
       `Already existing agencies: ${siretAlreadyInIFCount}`,
       `Created agencies: ${createdAgenciesCount}`,
       `Already existing users: ${usersAlreadyInIFCount}`,
       `Created users: ${createdUsersCount}`,
-      `Errors: ${errorsCount}`,
+      `Parsing errors count: ${parsingErrorsCount}`,
+      `Usecase errors count: ${usecaseErrorsCount}`,
     ].join("\n"),
   logger,
 );

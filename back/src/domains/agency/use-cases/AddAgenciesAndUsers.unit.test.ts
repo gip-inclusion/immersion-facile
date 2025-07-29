@@ -119,6 +119,7 @@ describe("AddAgenciesAndUsers", () => {
         createdAgenciesCount: 0,
         createdUsersCount: 1,
         usersAlreadyInIFCount: 1,
+        usecaseErrors: {},
       });
       expect(uow.agencyRepository.agencies).toEqual([
         {
@@ -198,6 +199,7 @@ describe("AddAgenciesAndUsers", () => {
         createdAgenciesCount: 1,
         createdUsersCount: 1,
         usersAlreadyInIFCount: 0,
+        usecaseErrors: {},
       });
       expect(uow.userRepository.users).toEqual([
         {
@@ -298,6 +300,7 @@ describe("AddAgenciesAndUsers", () => {
         createdAgenciesCount: 2,
         createdUsersCount: 1,
         usersAlreadyInIFCount: 0,
+        usecaseErrors: {},
       });
       expectArraysToMatch(uow.agencyRepository.agencies, [
         {

@@ -74,6 +74,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     addressGateway: AddressGateway;
   }>()
   .build(async ({ inputParams, uow, deps }) => {
+    const usecaseErrors: Record<string, Error> = {};
     const chunkSize = 300;
     const formattedImportedAgencies =
       formatImportedAgencyAndUserRow(inputParams);
@@ -111,6 +112,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       importedAgencyAndUserRows: formattedImportedAgencies,
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
+      usecaseErrors,
     });
 
     await createNewAgencies({
@@ -118,6 +120,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
       deps,
+      usecaseErrors,
     });
 
     await createNewAgenciesWithSuffix({
@@ -126,6 +129,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
       deps,
+      usecaseErrors,
     });
 
     return {
@@ -133,6 +137,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       createdAgenciesCount: rowsWithDuplicates.length + uniqRows.length,
       createdUsersCount,
       usersAlreadyInIFCount,
+      usecaseErrors,
     };
   });
 
@@ -141,11 +146,13 @@ const linkUsersToExistingAgency = async ({
   importedAgencyAndUserRows,
   agencyRepository,
   userRepository,
+  usecaseErrors,
 }: {
   siretsInIF: SiretDto[];
   importedAgencyAndUserRows: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
   userRepository: UserRepository;
+  usecaseErrors: Record<string, Error>;
 }): Promise<void> => {
   const rowsWithSiretAlreadyInIF = importedAgencyAndUserRows.filter((row) =>
     siretsInIF.includes(row.SIRET),
@@ -171,10 +178,12 @@ const linkUsersToExistingAgency = async ({
       const user = await userRepository.findByEmail(
         row["E-mail authentification"],
       );
-      if (!user)
-        throw errors.user.notFoundByEmail({
+      if (!user) {
+        usecaseErrors[row.ID] = errors.user.notFoundByEmail({
           email: row["E-mail authentification"],
         });
+        return;
+      }
 
       const userWithRoles = agencyIF.usersRights[user.id] ?? undefined;
 
@@ -230,6 +239,7 @@ const createNewAgencies = async ({
   agencyRepository,
   userRepository,
   deps,
+  usecaseErrors,
 }: {
   importedAgencyAndUserRows: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
@@ -239,15 +249,18 @@ const createNewAgencies = async ({
     timeGateway: TimeGateway;
     addressGateway: AddressGateway;
   };
+  usecaseErrors: Record<string, Error>;
 }) => {
   await executeInSequence(importedAgencyAndUserRows, async (row) => {
     const user = await userRepository.findByEmail(
       row["E-mail authentification"],
     );
-    if (!user)
-      throw errors.user.notFoundByEmail({
+    if (!user) {
+      usecaseErrors[row.ID] = errors.user.notFoundByEmail({
         email: row["E-mail authentification"],
       });
+      return;
+    }
 
     const agencyDepartmentCode = await getDepartementCode({
       row,
@@ -372,6 +385,7 @@ const createNewAgenciesWithSuffix = async ({
   agencyRepository,
   userRepository,
   deps,
+  usecaseErrors,
 }: {
   allRows: ImportedAgencyAndUserRow[];
   rowsToCreateAsAgencies: ImportedAgencyAndUserRow[];
@@ -382,6 +396,7 @@ const createNewAgenciesWithSuffix = async ({
     timeGateway: TimeGateway;
     addressGateway: AddressGateway;
   };
+  usecaseErrors: Record<string, Error>;
 }) => {
   const rowsGroupedBySiret = allRows.reduce(
     (acc, row) => {
@@ -409,6 +424,7 @@ const createNewAgenciesWithSuffix = async ({
     agencyRepository,
     userRepository,
     deps,
+    usecaseErrors,
   });
 };
 
