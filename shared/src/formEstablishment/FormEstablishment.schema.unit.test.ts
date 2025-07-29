@@ -65,10 +65,16 @@ describe("formEstablishmentSchema", () => {
           },
         ])
         .withPotentialBeneficiaryWelcomeAddress({
-          streetNumberAndAddress: "127 rue de Grenelle 75007 Paris",
-          city: "Paris",
-          postcode: "75007",
-          departmentCode: "75",
+          address: {
+            streetNumberAndAddress: "127 rue de Grenelle 75007 Paris",
+            city: "Paris",
+            postcode: "75007",
+            departmentCode: "75",
+          },
+          position: {
+            lat: 48.8566,
+            lon: 2.3522,
+          },
         })
         .build();
 

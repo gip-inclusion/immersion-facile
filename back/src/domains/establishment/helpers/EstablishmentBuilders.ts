@@ -1,5 +1,6 @@
 import {
   type AbsoluteUrl,
+  type AddressAndPosition,
   type Builder,
   type ContactMode,
   defaultMaxContactsPerMonth,
@@ -210,6 +211,13 @@ export class EstablishmentEntityBuilder
       score,
     });
   }
+
+  public withWelcomeAddress(welcomeAddress: AddressAndPosition) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      potentialBeneficiaryWelcomeAddress: welcomeAddress,
+    });
+  }
 }
 
 export class EstablishmentAggregateBuilder
@@ -372,6 +380,17 @@ export class EstablishmentAggregateBuilder
         this.aggregate.establishment,
       )
         .withUpdatedAt(updatedAt)
+        .build(),
+    });
+  }
+
+  public withEstablishmentWelcomeAddress(welcomeAddress: AddressAndPosition) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withWelcomeAddress(welcomeAddress)
         .build(),
     });
   }
