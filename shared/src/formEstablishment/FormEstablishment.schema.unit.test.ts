@@ -26,6 +26,16 @@ describe("formEstablishmentSchema", () => {
     it("invalid establishment : contact mode PHONE but no main contact by phone", () => {
       const invalidFormEstablishment = FormEstablishmentDtoBuilder.valid()
         .withContactMode("PHONE")
+        .withUserRights([
+          {
+            email: "test@test.com",
+            phone: "+33612345678",
+            isMainContactByPhone: false,
+            role: "establishment-admin",
+            shouldReceiveDiscussionNotifications: true,
+            job: "test",
+          },
+        ])
         .build();
       expect(() =>
         formEstablishmentSchema.parse(invalidFormEstablishment),
@@ -34,7 +44,7 @@ describe("formEstablishmentSchema", () => {
           {
             code: "custom",
             message:
-              "En cas de mode de contact par téléphone, vous devez renseigner au moins un contact principal par téléphone.",
+              "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
             path: [],
           },
         ]),

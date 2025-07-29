@@ -110,12 +110,6 @@ export const formEstablishmentUserRightsSchema: z.Schema<
     (userRights) =>
       userRights.some((right) => right.shouldReceiveDiscussionNotifications),
     "La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
-  )
-  .refine(
-    (userRights) =>
-      userRights.map((right) => right.isMainContactByPhone).filter(Boolean)
-        .length > 1,
-    "La structure accueillante ne peut avoir qu'un seul contact principal par téléphone.",
   );
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
@@ -189,36 +183,13 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
   .refine(
     (formEstablishment) =>
       formEstablishment.contactMode === "PHONE"
-        ? formEstablishment.userRights.some(
-            (right: FormEstablishmentUserRight) => right.isMainContactByPhone,
-          )
+        ? formEstablishment.userRights
+            .map((right) => right.isMainContactByPhone)
+            .filter((isMainContactByPhone) => isMainContactByPhone === true)
+            .length === 1
         : true,
-    "En cas de mode de contact par téléphone, vous devez renseigner au moins un contact principal par téléphone.",
+    "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
   );
-// z.object({
-//   contactMode: z.enum(contactModesWithoutWelcomeAddress),
-// }).and(z.object(formEstablishmentCommonShape)).or(
-//   z
-//     .object({
-//       contactMode: z.enum(contactModesWithWelcomeAddress),
-//     })
-//     .and(z.object(formEstablishmentCommonShape))
-//     .and(
-//       z.object({
-//         potentialBeneficiaryWelcomeAddress: addressSchema,
-//       }),
-//     ),
-// )
-//   .and(withAcquisitionSchema)
-//   .refine(
-//     (formEstablishment) =>
-//       formEstablishment.contactMode === "PHONE"
-//         ? formEstablishment.userRights.some(
-//           (right) => right.isMainContactByPhone,
-//         )
-//         : true,
-//     "En cas de mode de contact par téléphone, vous devez renseigner au moins un contact principal par téléphone.",
-//   );
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
   z.object({
