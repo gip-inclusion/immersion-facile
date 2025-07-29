@@ -18,10 +18,12 @@ import {
   domElementIds,
   type EstablishmentSearchableBy,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   getFormattedFirstnameAndLastname,
   immersionFacileContactEmail,
   toDateUTCString,
   toDisplayedDate,
+  toDisplayedPhoneNumber,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
@@ -571,16 +573,21 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
   const { getValues, setValue } = useFormContext<FormEstablishmentDto>();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const defaultUserToContact = getValues("userRights.0");
+  const contactMode = getValues("contactMode");
   const establishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
-  const currentUserToContact = establishment.userRights.find(
-    (userRight) => userRight.isMainContactByPhone,
+  const currentUserToContact = establishment.userRights.find((userRight) =>
+    contactMode === "IN_PERSON"
+      ? userRight.isMainContactInPerson
+      : userRight.isMainContactByPhone,
   );
   const usersToContactOptions: SelectProps.Option[] = establishment.userRights
-    .filter((userRight) => userRight.phone)
+    .filter((userRight) =>
+      contactMode === "IN_PERSON" ? true : userRight.phone,
+    )
     .map((userRight) => ({
-      label: `${userRight.email} - ${userRight.phone}`,
+      label: `${userRight.email} - ${userRight.phone && toDisplayedPhoneNumber(userRight.phone)}`,
       value: userRight.email,
       selected: userRight.email === currentUserToContact?.email,
     }));
@@ -588,7 +595,12 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
   return match(mode)
     .with("create", () => (
       <div>
-        <strong>Numéro de téléphone</strong> :{" "}
+        <strong>
+          {contactMode === "IN_PERSON"
+            ? "Interlocuteur sur place"
+            : "Numéro de téléphone"}
+        </strong>{" "}
+        :{" "}
         {federatedIdentity?.provider === "proConnect" &&
           getFormattedFirstnameAndLastname({
             firstname: federatedIdentity.firstName,
@@ -599,7 +611,17 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
     ))
     .with(P.union("edit", "admin"), () => (
       <Select
-        label="Numéro de téléphone"
+        label={
+          contactMode === "IN_PERSON"
+            ? "Interlocuteur sur place"
+            : "Numéro de téléphone"
+        }
+        hint={
+          contactMode === "IN_PERSON"
+            ? "Veuillez choisir la personne qui accueillera les candidats parmi vos utilisateurs"
+            : "Veuillez choisir la personne qui répondra aux candidats parmi vos utilisateurs"
+        }
+        placeholder="Sélectionnez un utilisateur"
         options={usersToContactOptions}
         nativeSelectProps={{
           value: currentUserToContact?.email,
@@ -607,14 +629,15 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
             const newUserToContact = establishment.userRights.find(
               (userRight) => userRight.email === event.target.value,
             );
-            const newUserRights = establishment.userRights.map((userRight) => {
-              if (!userRight.phone) return userRight;
-              return {
-                ...userRight,
-                isMainContactByPhone:
-                  userRight.email === newUserToContact?.email,
-              };
-            });
+            const contactPropToUpdate: keyof FormEstablishmentUserRight =
+              contactMode === "IN_PERSON"
+                ? "isMainContactInPerson"
+                : "isMainContactByPhone";
+            const newUserRights = establishment.userRights.map((userRight) => ({
+              ...userRight,
+              [contactPropToUpdate]:
+                userRight.email === newUserToContact?.email,
+            }));
             setValue("userRights", newUserRights);
           },
         }}

@@ -578,6 +578,7 @@ export class PgEstablishmentAggregateRepository
           should_receive_discussion_notifications:
             userRight.shouldReceiveDiscussionNotifications,
           is_main_contact_by_phone: userRight.isMainContactByPhone,
+          is_main_contact_in_person: userRight.isMainContactInPerson,
         })),
       )
       .execute()
@@ -1217,6 +1218,7 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                     "eu.should_receive_discussion_notifications",
                   ),
                   isMainContactByPhone: ref("eu.is_main_contact_by_phone"),
+                  isMainContactInPerson: ref("eu.is_main_contact_in_person"),
                 }).as("userRight"),
               ),
           ),

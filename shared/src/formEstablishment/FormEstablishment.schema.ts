@@ -61,6 +61,7 @@ const establishmentContactBaseSchema = z.object({
   email: emailSchema,
   shouldReceiveDiscussionNotifications: zBoolean,
   job: zStringMinLength1.optional(),
+  isMainContactInPerson: zBoolean.optional(),
 });
 
 const establishmentContactPhoneSchema = z
@@ -86,6 +87,7 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
       email: emailSchema,
       phone: phoneNumberSchema,
       isMainContactByPhone: zBoolean,
+      isMainContactInPerson: zBoolean.optional(),
       shouldReceiveDiscussionNotifications: zBoolean,
       job: zStringMinLength1,
     })
@@ -189,6 +191,16 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
             .length === 1
         : true,
     "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
+  )
+  .refine(
+    (formEstablishment) =>
+      formEstablishment.contactMode === "IN_PERSON"
+        ? formEstablishment.userRights
+            .map((right) => right.isMainContactInPerson)
+            .filter((isMainContactInPerson) => isMainContactInPerson === true)
+            .length === 1
+        : true,
+    "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
   );
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =

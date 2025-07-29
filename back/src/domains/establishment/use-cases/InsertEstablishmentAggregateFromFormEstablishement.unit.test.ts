@@ -336,6 +336,76 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       );
     });
 
+    it("Can create establishment with potentialBeneficiaryWelcomeAddress", async () => {
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withSiret("90040893100013")
+        .withContactMode("IN_PERSON")
+        .withPotentialBeneficiaryWelcomeAddress(
+          defaultAddress.addressAndPosition,
+        )
+        .withUserRights([formAdminRight, formContactRight])
+        .build();
+
+      await insertEstablishmentAggregateFromForm.execute(
+        { formEstablishment },
+        connectedUser,
+      );
+
+      expectToEqual(
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(formEstablishment.siret)
+                .withCustomizedName(formEstablishment.businessNameCustomized)
+                .withName(formEstablishment.businessName)
+                .withNumberOfEmployeeRange(numberEmployeesRanges)
+                .withLocations([
+                  {
+                    ...defaultAddress.addressAndPosition,
+                    id: defaultAddress.formAddress.id,
+                  },
+                ])
+                .withWebsite(formEstablishment.website)
+                .withNextAvailabilityDate(
+                  formEstablishment.nextAvailabilityDate &&
+                    new Date(formEstablishment.nextAvailabilityDate),
+                )
+                .withAcquisition({
+                  acquisitionCampaign: formEstablishment.acquisitionCampaign,
+                  acquisitionKeyword: formEstablishment.acquisitionKeyword,
+                })
+                .withScore(0)
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withContactMode(formEstablishment.contactMode)
+                .withWelcomeAddress(defaultAddress.addressAndPosition)
+                .withNafDto(expectedNafDto)
+                .build(),
+            )
+            .withOffers([])
+            .withUserRights([
+              {
+                isMainContactByPhone: false,
+                job: "osef",
+                phone: "+33655445544",
+                role: "establishment-admin",
+                shouldReceiveDiscussionNotifications: true,
+                userId: "estab.admin",
+              },
+              {
+                role: "establishment-contact",
+                shouldReceiveDiscussionNotifications: true,
+                userId: "estab.contact",
+              },
+            ])
+            .build(),
+        ],
+      );
+    });
+
     it("Can't create establishment when same email is used in admin and copy contacts", async () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
         .withUserRights([

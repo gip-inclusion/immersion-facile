@@ -176,6 +176,10 @@ export const formEstablishmentFieldsLabels = (
     label: "Numéro de téléphone principal",
     id: "TODO",
   },
+  "userRights.0.isMainContactInPerson": {
+    label: "Contact principal en présentiel",
+    id: "TODO",
+  },
 });
 
 export const mailtoHref = (siret: SiretDto) => {
