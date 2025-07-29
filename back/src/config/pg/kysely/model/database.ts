@@ -453,6 +453,7 @@ interface EstablishmentsUsers {
   phone: string | null;
   should_receive_discussion_notifications: boolean;
   is_main_contact_by_phone: boolean | null;
+  is_main_contact_in_person: boolean | null;
 }
 
 type AgencyGroupKind = "france-travail";
