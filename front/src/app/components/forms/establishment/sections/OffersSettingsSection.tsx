@@ -552,7 +552,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
               onAddressSelected={(addressAndPosition) => {
                 setValue(
                   "potentialBeneficiaryWelcomeAddress",
-                  addressAndPosition.address,
+                  addressAndPosition,
                 );
               }}
               {...getFieldError("potentialBeneficiaryWelcomeAddress")}
