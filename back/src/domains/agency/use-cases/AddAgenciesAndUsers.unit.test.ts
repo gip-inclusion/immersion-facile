@@ -4,6 +4,7 @@ import {
   expectArraysToMatch,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { InMemoryAddressGateway } from "../../core/address/adapters/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -39,6 +40,7 @@ describe("AddAgenciesAndUsers", () => {
       deps: {
         timeGateway,
         uuidGenerator,
+        addressGateway: new InMemoryAddressGateway(),
       },
     });
   });

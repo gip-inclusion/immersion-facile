@@ -122,6 +122,28 @@ export type Gateways = ReturnType<typeof createGateways> extends Promise<
   ? T
   : never;
 
+export const createFetchHttpClientForExternalAPIs = <
+  R extends Record<string, UnknownSharedRoute>,
+>({
+  routes,
+  partnerName,
+  logInputCbOnSuccess,
+  config,
+}: {
+  routes: R;
+  partnerName: string;
+  logInputCbOnSuccess?: LogInputCbOnSuccess;
+  config: AppConfig;
+}) =>
+  createFetchSharedClient(routes, fetch, {
+    timeout: config.externalAxiosTimeout,
+    skipResponseValidation: true,
+    onResponseSideEffect: logPartnerResponses({
+      partnerName: partnerName,
+      logInputCbOnSuccess,
+    }),
+  });
+
 export const createGateways = async (
   config: AppConfig,
   uuidGenerator: UuidGenerator,
@@ -136,26 +158,6 @@ export const createGateways = async (
       apiAddress: config.apiAddress,
     },
   });
-
-  const createFetchHttpClientForExternalAPIs = <
-    R extends Record<string, UnknownSharedRoute>,
-  >({
-    routes,
-    partnerName,
-    logInputCbOnSuccess,
-  }: {
-    routes: R;
-    partnerName: string;
-    logInputCbOnSuccess?: LogInputCbOnSuccess;
-  }) =>
-    createFetchSharedClient(routes, fetch, {
-      timeout: config.externalAxiosTimeout,
-      skipResponseValidation: true,
-      onResponseSideEffect: logPartnerResponses({
-        partnerName: partnerName,
-        logInputCbOnSuccess,
-      }),
-    });
 
   const createLegacyAxiosHttpClientForExternalAPIs = <
     R extends Record<string, UnknownSharedRoute>,
@@ -251,6 +253,7 @@ export const createGateways = async (
           createFetchHttpClientForExternalAPIs({
             partnerName: partnerNames.emailable,
             routes: emailableValidationRoutes,
+            config,
           }),
           config.emailableApiKey,
           withCache,
@@ -265,6 +268,7 @@ export const createGateways = async (
           createFetchHttpClientForExternalAPIs({
             partnerName: partnerNames.diagoriente,
             routes: diagorienteAppellationsRoutes,
+            config,
           }),
           new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
             timeGateway,
@@ -285,6 +289,7 @@ export const createGateways = async (
         createFetchHttpClientForExternalAPIs({
           partnerName: partnerNames.openCageData,
           routes: addressesExternalRoutes,
+          config,
         }),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
@@ -304,6 +309,7 @@ export const createGateways = async (
         httpClient: createFetchHttpClientForExternalAPIs({
           partnerName: partnerNames.brevoNotifications,
           routes: brevoNotificationGatewayRoutes,
+          config,
         }),
         defaultSender: immersionFacileNoReplyEmailSender,
         emailAllowListPredicate: makeEmailAllowListPredicate({
@@ -367,6 +373,7 @@ export const createGateways = async (
             partnerName: partnerNames.annuaireDesEntreprises,
             routes: annuaireDesEntreprisesSiretRoutes,
             logInputCbOnSuccess: logQwhenExists,
+            config,
           }),
           createInseeSiretGateway(),
         ),
@@ -433,6 +440,7 @@ export const createGateways = async (
             createFetchHttpClientForExternalAPIs({
               partnerName: partnerNames.laBonneBoite,
               routes: createLbbRoutes(config.ftApiUrl),
+              config,
             }),
             franceTravailGateway,
             config.franceTravailClientId,

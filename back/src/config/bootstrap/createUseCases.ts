@@ -639,6 +639,7 @@ export const createUseCases = ({
       deps: {
         uuidGenerator,
         timeGateway: gateways.timeGateway,
+        addressGateway: gateways.addressApi,
       },
     }),
 
