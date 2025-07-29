@@ -23,6 +23,46 @@ describe("formEstablishmentSchema", () => {
         ]),
       );
     });
+    it("invalid establishment : contact mode IN_PERSON but no main contact in person", () => {
+      const invalidFormEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withContactMode("IN_PERSON")
+        .withPotentialBeneficiaryWelcomeAddress({
+          address: {
+            streetNumberAndAddress: "127 rue de Grenelle 75007 Paris",
+            city: "Paris",
+            postcode: "75007",
+            departmentCode: "75",
+          },
+          position: {
+            lat: 48.8566,
+            lon: 2.3522,
+          },
+        })
+        .withUserRights([
+          {
+            email: "test@test.com",
+            role: "establishment-admin",
+            shouldReceiveDiscussionNotifications: true,
+            job: "test",
+            phone: "0145784644",
+            isMainContactByPhone: false,
+            isMainContactInPerson: false,
+          },
+        ])
+        .build();
+      expect(() =>
+        formEstablishmentSchema.parse(invalidFormEstablishment),
+      ).toThrow(
+        new ZodError([
+          {
+            code: "custom",
+            message:
+              "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
+            path: [],
+          },
+        ]),
+      );
+    });
     it("invalid establishment : contact mode PHONE but no main contact by phone", () => {
       const invalidFormEstablishment = FormEstablishmentDtoBuilder.valid()
         .withContactMode("PHONE")
@@ -68,7 +108,8 @@ describe("formEstablishmentSchema", () => {
           {
             email: "test@test.com",
             phone: "+33612345678",
-            isMainContactByPhone: true,
+            isMainContactByPhone: false,
+            isMainContactInPerson: true,
             role: "establishment-admin",
             shouldReceiveDiscussionNotifications: true,
             job: "test",
@@ -108,6 +149,40 @@ describe("formEstablishmentSchema", () => {
           },
         ])
         .build();
+
+      expectToEqual(
+        formEstablishmentSchema.parse(validFormEstablishment),
+        validFormEstablishment,
+      );
+    });
+    it("valid establishment IN_PERSON with main contact in person", () => {
+      const validFormEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withContactMode("IN_PERSON")
+        .withPotentialBeneficiaryWelcomeAddress({
+          address: {
+            streetNumberAndAddress: "127 rue de Grenelle 75007 Paris",
+            city: "Paris",
+            postcode: "75007",
+            departmentCode: "75",
+          },
+          position: {
+            lat: 48.8566,
+            lon: 2.3522,
+          },
+        })
+        .withUserRights([
+          {
+            email: "test@test.com",
+            phone: "+33612345678",
+            role: "establishment-admin",
+            shouldReceiveDiscussionNotifications: true,
+            job: "test",
+            isMainContactByPhone: false,
+            isMainContactInPerson: true,
+          },
+        ])
+        .build();
+
       expectToEqual(
         formEstablishmentSchema.parse(validFormEstablishment),
         validFormEstablishment,

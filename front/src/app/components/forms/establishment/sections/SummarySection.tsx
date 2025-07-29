@@ -181,6 +181,9 @@ const DisplayContactModeValue = ({
             {addressDtoToString(
               formValues.potentialBeneficiaryWelcomeAddress.address,
             )}
+            <br />
+            Contact principal en présentiel :{" "}
+            {formValues.userRights[0].isMainContactInPerson ? "Oui" : "Non"}
           </p>
         )}
       {contactMode === "PHONE" && (
