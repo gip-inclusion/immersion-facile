@@ -1,5 +1,6 @@
 import type {
   AbsoluteUrl,
+  AddressAndPosition,
   ContactMode,
   DateTimeIsoString,
   EstablishmentSearchableBy,
@@ -37,4 +38,5 @@ export type EstablishmentEntity = {
   website?: AbsoluteUrl | "";
   score: number;
   contactMode: ContactMode;
+  potentialBeneficiaryWelcomeAddress?: AddressAndPosition;
 } & WithAcquisition;

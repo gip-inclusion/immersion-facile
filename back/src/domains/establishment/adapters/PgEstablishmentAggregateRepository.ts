@@ -478,6 +478,24 @@ export class PgEstablishmentAggregateRepository
         update_date: updatedAt,
         website: establishment.website ?? null,
         contact_mode: establishment.contactMode,
+        welcome_address_street_number_and_address:
+          establishment.potentialBeneficiaryWelcomeAddress?.address
+            .streetNumberAndAddress ?? null,
+        welcome_address_postcode:
+          establishment.potentialBeneficiaryWelcomeAddress?.address.postcode ??
+          null,
+        welcome_address_city:
+          establishment.potentialBeneficiaryWelcomeAddress?.address.city ??
+          null,
+        welcome_address_department_code:
+          establishment.potentialBeneficiaryWelcomeAddress?.address
+            .departmentCode ?? null,
+        welcome_address_lat:
+          establishment.potentialBeneficiaryWelcomeAddress?.position.lat ??
+          null,
+        welcome_address_lon:
+          establishment.potentialBeneficiaryWelcomeAddress?.position.lon ??
+          null,
       })
       .where("siret", "=", establishment.siret)
       .execute();
@@ -520,6 +538,24 @@ export class PgEstablishmentAggregateRepository
         acquisition_keyword: aggregate.establishment.acquisitionKeyword,
         acquisition_campaign: aggregate.establishment.acquisitionCampaign,
         contact_mode: aggregate.establishment.contactMode,
+        welcome_address_street_number_and_address:
+          aggregate.establishment.potentialBeneficiaryWelcomeAddress?.address
+            .streetNumberAndAddress ?? null,
+        welcome_address_postcode:
+          aggregate.establishment.potentialBeneficiaryWelcomeAddress?.address
+            .postcode ?? null,
+        welcome_address_city:
+          aggregate.establishment.potentialBeneficiaryWelcomeAddress?.address
+            .city ?? null,
+        welcome_address_department_code:
+          aggregate.establishment.potentialBeneficiaryWelcomeAddress?.address
+            .departmentCode ?? null,
+        welcome_address_lat:
+          aggregate.establishment.potentialBeneficiaryWelcomeAddress?.position
+            .lat ?? null,
+        welcome_address_lon:
+          aggregate.establishment.potentialBeneficiaryWelcomeAddress?.position
+            .lon ?? null,
       })
       .execute();
   }
@@ -541,6 +577,7 @@ export class PgEstablishmentAggregateRepository
           phone: userRight.phone,
           should_receive_discussion_notifications:
             userRight.shouldReceiveDiscussionNotifications,
+          is_main_contact_by_phone: userRight.isMainContactByPhone,
         })),
       )
       .execute()
@@ -731,6 +768,30 @@ const makeEstablishmentAggregateFromDb = (
         ? new Date(aggregate.establishment.lastInseeCheckDate)
         : undefined,
       voluntaryToImmersion: true,
+      potentialBeneficiaryWelcomeAddress: aggregate.establishment
+        .potentialBeneficiaryWelcomeAddress
+        ? {
+            address: {
+              streetNumberAndAddress:
+                aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                  .address.streetNumberAndAddress,
+              postcode:
+                aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                  .address.postcode,
+              city: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .address.city,
+              departmentCode:
+                aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                  .address.departmentCode,
+            },
+            position: {
+              lat: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .position.lat,
+              lon: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .position.lon,
+            },
+          }
+        : undefined,
     },
     offers: aggregate.immersionOffers.map(
       (immersionOfferWithStringDate: any) => ({
@@ -1095,6 +1156,22 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
               code: ref("e.naf_code"),
               nomenclature: ref("e.naf_nomenclature"),
             }),
+            potentialBeneficiaryWelcomeAddress: sql`CASE WHEN ${ref("e.contact_mode")} = 'IN_PERSON' THEN ${jsonBuildObject(
+              {
+                address: jsonBuildObject({
+                  streetNumberAndAddress: ref(
+                    "e.welcome_address_street_number_and_address",
+                  ),
+                  postcode: ref("e.welcome_address_postcode"),
+                  city: ref("e.welcome_address_city"),
+                  departmentCode: ref("e.welcome_address_department_code"),
+                }),
+                position: jsonBuildObject({
+                  lat: ref("e.welcome_address_lat"),
+                  lon: ref("e.welcome_address_lon"),
+                }),
+              },
+            )} ELSE NULL END`,
           }),
           immersionOffers: jsonArrayFrom(
             eb
@@ -1139,6 +1216,7 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                   shouldReceiveDiscussionNotifications: ref(
                     "eu.should_receive_discussion_notifications",
                   ),
+                  isMainContactByPhone: ref("eu.is_main_contact_by_phone"),
                 }).as("userRight"),
               ),
           ),

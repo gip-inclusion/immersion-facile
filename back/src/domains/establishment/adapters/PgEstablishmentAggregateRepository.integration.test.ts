@@ -1683,6 +1683,37 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
+      it("adds the establishment values in `establishments` table with welcome address", async () => {
+        const establishmentAggregate = new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withMaxContactsPerMonth(24)
+              .withLastInseeCheck(new Date("2020-04-14T12:00:00.000"))
+              .withContactMode("IN_PERSON")
+              .withWelcomeAddress({
+                address: {
+                  streetNumberAndAddress: "127 rue de Grenelle",
+                  postcode: "75007",
+                  city: "Paris",
+                  departmentCode: "75",
+                },
+                position: { lat: 48.8566, lon: 2.3522 },
+              })
+              .build(),
+          )
+          .withUserRights([osefUserRight])
+          .build();
+
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentAggregate,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
+          [establishmentAggregate],
+        );
+      });
+
       it("adds the establishment values in `establishments` table and keeps acquisition params", async () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishment(
@@ -1944,6 +1975,15 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
             .withContactMode("IN_PERSON")
+            .withEstablishmentWelcomeAddress({
+              address: {
+                streetNumberAndAddress: "127 rue de Grenelle",
+                postcode: "75007",
+                city: "Paris",
+                departmentCode: "75",
+              },
+              position: { lat: 48.8566, lon: 2.3522 },
+            })
             .withUserRights([osefUserRight])
             .withEstablishmentUpdatedAt(updatedAt)
             .build(),
@@ -1955,13 +1995,22 @@ describe("PgEstablishmentAggregateRepository", () => {
               new EstablishmentEntityBuilder()
                 .withAdditionalInformation("my additionnal info")
                 .withCustomizedName("my customize name")
-                .withContactMode("EMAIL")
+                .withContactMode("IN_PERSON")
                 .withFitForDisabledWorkers(true)
                 .withIsCommited(true)
                 .withLastInseeCheck(new Date())
                 .withNextAvailabilityDate(new Date())
                 .withMaxContactsPerMonth(2)
                 .withUpdatedAt(new Date())
+                .withWelcomeAddress({
+                  address: {
+                    streetNumberAndAddress: "127 rue de Grenelle",
+                    postcode: "75007",
+                    city: "Paris",
+                    departmentCode: "75",
+                  },
+                  position: { lat: 48.8566, lon: 2.3522 },
+                })
                 .withWebsite("https://www.truc.com")
                 .withAcquisition(aquisition)
                 .build(),
@@ -1976,7 +2025,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   .withCustomizedName("my customize name")
                   .withFitForDisabledWorkers(true)
                   .withIsCommited(true)
-                  .withContactMode("IN_PERSON")
+                  .withContactMode("EMAIL")
                   .withLastInseeCheck(new Date())
                   .withNextAvailabilityDate(new Date())
                   .withMaxContactsPerMonth(5)

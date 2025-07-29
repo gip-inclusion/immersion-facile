@@ -2,7 +2,7 @@ import { uniq } from "ramda";
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
-import { addressSchema } from "../address/address.schema";
+import { addressAndPositionSchema } from "../address/address.schema";
 import { businessNameSchema } from "../business/business";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf/naf.schema";
@@ -110,6 +110,12 @@ export const formEstablishmentUserRightsSchema: z.Schema<
     (userRights) =>
       userRights.some((right) => right.shouldReceiveDiscussionNotifications),
     "La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
+  )
+  .refine(
+    (userRights) =>
+      userRights.map((right) => right.isMainContactByPhone).filter(Boolean)
+        .length > 1,
+    "La structure accueillante ne peut avoir qu'un seul contact principal par téléphone.",
   );
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
@@ -175,7 +181,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
     }),
     z.object({
       contactMode: z.enum(contactModesWithWelcomeAddress),
-      potentialBeneficiaryWelcomeAddress: addressSchema,
+      potentialBeneficiaryWelcomeAddress: addressAndPositionSchema,
       ...formEstablishmentCommonShape,
     }),
   ])

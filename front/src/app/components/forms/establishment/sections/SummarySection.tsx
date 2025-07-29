@@ -178,7 +178,9 @@ const DisplayContactModeValue = ({
         formValues.potentialBeneficiaryWelcomeAddress && (
           <p>
             Lieu de rendez-vous :{" "}
-            {addressDtoToString(formValues.potentialBeneficiaryWelcomeAddress)}
+            {addressDtoToString(
+              formValues.potentialBeneficiaryWelcomeAddress.address,
+            )}
           </p>
         )}
       {contactMode === "PHONE" && (
