@@ -309,7 +309,7 @@ export const ConventionDocumentPage = ({
                 qualité d' <strong>agence accompagnante.</strong>
                 <ul>
                   <li>
-                    <strong>Email de l'agence accompagnante : </strong>
+                    <strong>Contact en cas de besoin : </strong>
                     {convention.agencyCounsellorEmails[0]}
                   </li>
                 </ul>
@@ -322,7 +322,7 @@ export const ConventionDocumentPage = ({
                 <strong>agence prescriptrice.</strong>
                 <ul>
                   <li>
-                    <strong>Email du valideur : </strong>
+                    <strong>Contact en cas de besoin : </strong>
                     {convention.agencyValidatorEmails[0]}
                   </li>
                 </ul>
@@ -336,15 +336,11 @@ export const ConventionDocumentPage = ({
               {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
               qualité d' <strong>agence prescriptrice.</strong>
               <ul>
-                {convention.agencyCounsellorEmails.length > 0 && (
-                  <li>
-                    <strong>Email du conseiller de 1er niveau : </strong>
-                    {convention.agencyCounsellorEmails[0]}
-                  </li>
-                )}
                 <li>
-                  <strong>Email du valideur : </strong>
-                  {convention.agencyValidatorEmails[0]}
+                  <strong>Contact en cas de besoin : </strong>
+                  {convention.agencyCounsellorEmails.length > 0
+                    ? convention.agencyCounsellorEmails[0]
+                    : convention.agencyValidatorEmails[0]}
                 </li>
               </ul>
             </li>
