@@ -1840,7 +1840,7 @@ Profil du candidat :
       niceName: "Établissement - Indication de mise en relation en personne",
       tags: ["mise en relation en personne"],
       createEmailVariables: ({
-        businessAddress,
+        welcomeAddress,
         businessName,
         contactFirstName,
         contactLastName,
@@ -1856,7 +1856,7 @@ Profil du candidat :
 
     Voici les coordonnées :
     ${contactFirstName && contactLastName ? `- Personne à contacter : <strong>${contactFirstName} ${contactLastName}</strong>` : ""}
-    - Adresse de l'entreprise : <strong>${businessAddress}</strong>
+    - Adresse de l'entreprise : <strong>${welcomeAddress}</strong>
     `,
         highlight: {
           content:

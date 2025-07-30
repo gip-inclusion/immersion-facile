@@ -195,7 +195,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
               params: {
                 ...common,
-                businessAddress: addressDtoToString(discussion.address),
+                welcomeAddress: addressDtoToString(discussion.address),
               },
             }
           : {
