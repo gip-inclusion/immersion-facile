@@ -363,8 +363,8 @@ function expectEstablishmentInRepoUpdated(
       return {
         role: right.role,
         userId: user.id,
-        job: right.job,
-        phone: right.phone,
+        ...(right.job !== undefined && { job: right.job }),
+        ...(right.phone !== undefined && { phone: right.phone }),
       };
     }),
   );

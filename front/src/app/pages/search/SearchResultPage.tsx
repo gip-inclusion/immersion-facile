@@ -175,243 +175,233 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
         />
       </Helmet>
       <MainWrapper layout="default">
-        <>
-          {isLoading && <Loader />}
-          {shouldShowError && (
-            <>
-              {isLocationMissing && (
-                <Alert
-                  title="Oups !"
-                  description={
-                    "L'offre ne peut plus être affichée (paramètre de localisation invalide), veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
-                  }
-                  severity="error"
-                  className={fr.cx("fr-my-4w")}
-                />
-              )}
-              <Feedback topics={["search-result"]} />
+        {isLoading && <Loader />}
+        {shouldShowError && (
+          <>
+            {isLocationMissing && (
+              <Alert
+                title="Oups !"
+                description={
+                  "L'offre ne peut plus être affichée (paramètre de localisation invalide), veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
+                }
+                severity="error"
+                className={fr.cx("fr-my-4w")}
+              />
+            )}
+            <Feedback topics={["search-result"]} />
+            <Button
+              type="button"
+              onClick={onGoBackClick}
+              priority="tertiary"
+              iconId="fr-icon-arrow-left-line"
+              iconPosition="left"
+              className={fr.cx("fr-mt-4w")}
+            >
+              Retour à la recherche
+            </Button>
+          </>
+        )}
+        {currentSearchResult && showConfirmationMessage === null && (
+          <>
+            <div className={fr.cx("fr-mb-4w")}>
               <Button
                 type="button"
                 onClick={onGoBackClick}
-                priority="tertiary"
+                priority="tertiary no outline"
                 iconId="fr-icon-arrow-left-line"
                 iconPosition="left"
-                className={fr.cx("fr-mt-4w")}
               >
-                Retour à la recherche
+                Retour
               </Button>
-            </>
-          )}
-          {currentSearchResult && showConfirmationMessage === null && (
-            <>
-              <div className={fr.cx("fr-mb-4w")}>
-                <Button
-                  type="button"
-                  onClick={onGoBackClick}
-                  priority="tertiary no outline"
-                  iconId="fr-icon-arrow-left-line"
-                  iconPosition="left"
-                >
-                  Retour
-                </Button>
-              </div>
-              <SearchResultLabels
-                voluntaryToImmersion={currentSearchResult.voluntaryToImmersion}
-                contactMode={currentSearchResult.contactMode}
-                fitForDisabledWorkers={
-                  currentSearchResult.fitForDisabledWorkers
-                }
-              />
-              <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
-                {currentSearchResult.customizedName ?? currentSearchResult.name}
-              </h1>
-              <div className={fr.cx("fr-grid-row")}>
-                <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
-                  <SearchResultSection title="Adresse">
+            </div>
+            <SearchResultLabels
+              voluntaryToImmersion={currentSearchResult.voluntaryToImmersion}
+              contactMode={currentSearchResult.contactMode}
+              fitForDisabledWorkers={currentSearchResult.fitForDisabledWorkers}
+            />
+            <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
+              {currentSearchResult.customizedName ?? currentSearchResult.name}
+            </h1>
+            <div className={fr.cx("fr-grid-row")}>
+              <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+                <SearchResultSection title="Adresse">
+                  <p>
+                    {currentSearchResult.address.streetNumberAndAddress}
+                    {", "}
+                    <span>
+                      {currentSearchResult.address.postcode}{" "}
+                      {currentSearchResult.address.city}
+                    </span>
+                  </p>
+                  <p>
+                    SIRET&nbsp;:{" "}
+                    <a
+                      href={makeSiretDescriptionLink(currentSearchResult.siret)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {currentSearchResult.siret}
+                    </a>
+                  </p>
+                </SearchResultSection>
+                <SearchResultSection title="Secteur d'activité :">
+                  <p>{currentSearchResult.nafLabel}</p>
+                </SearchResultSection>
+
+                {currentSearchResult.appellations.length > 0 && (
+                  <SearchResultSection
+                    title={`Métier${pluralFromAppellations(
+                      currentSearchResult.appellations,
+                    )} observable${pluralFromAppellations(
+                      currentSearchResult.appellations,
+                    )} :`}
+                  >
+                    <p>
+                      {currentSearchResult.appellations
+                        .map((appellation) => `${appellation.appellationLabel}`)
+                        .join(", ")}
+                    </p>
+                  </SearchResultSection>
+                )}
+                <SearchResultSection>
+                  {currentSearchResult.voluntaryToImmersion && (
+                    <Button type="button" onClick={scrollToContactForm}>
+                      Contacter l'entreprise
+                    </Button>
+                  )}
+
+                  {!currentSearchResult.voluntaryToImmersion && (
                     <>
                       <p>
-                        {currentSearchResult.address.streetNumberAndAddress}
-                        {", "}
-                        <span>
-                          {currentSearchResult.address.postcode}{" "}
-                          {currentSearchResult.address.city}
-                        </span>
+                        Cette entreprise n'est pas inscrite comme entreprise
+                        accueillante mais peut recruter sur le métier que vous
+                        souhaitez tester en immersion.
                       </p>
-                      <p>
-                        SIRET&nbsp;:{" "}
+                      <ButtonsGroup
+                        inlineLayoutWhen="md and up"
+                        buttons={[
+                          {
+                            onClick: scrollToContactForm,
+                            children: "Voir nos conseils",
+                            priority: "secondary",
+                          },
+                          {
+                            linkProps: {
+                              href: currentSearchResult.urlOfPartner,
+                              target: "_blank",
+                            },
+                            children: "Voir l'offre sur La Bonne Boite",
+                          },
+                        ]}
+                      />
+                    </>
+                  )}
+                </SearchResultSection>
+                <SearchResultSection title="Nombre de salariés">
+                  <p>{currentSearchResult.numberOfEmployeeRange}</p>
+                </SearchResultSection>
+
+                {currentSearchResult.additionalInformation && (
+                  <SearchResultSection title="Informations complémentaires">
+                    <p>{currentSearchResult.additionalInformation}</p>
+                  </SearchResultSection>
+                )}
+
+                {currentSearchResult.website && (
+                  <SearchResultSection title="Site web">
+                    <a
+                      href={currentSearchResult.website}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {currentSearchResult.website}
+                    </a>
+                  </SearchResultSection>
+                )}
+                <SearchResultSection title="Avoir plus d'informations avant de contacter l'entreprise">
+                  <ul>
+                    {currentSearchResult.appellations.length > 0 && (
+                      <li>
                         <a
-                          href={makeSiretDescriptionLink(
-                            currentSearchResult.siret,
+                          href={makeAppellationInformationUrl(
+                            currentSearchResult.rome,
                           )}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {currentSearchResult.siret}
+                          S'informer sur le métier
                         </a>
-                      </p>
-                    </>
-                  </SearchResultSection>
-                  <SearchResultSection title="Secteur d'activité :">
-                    <p>{currentSearchResult.nafLabel}</p>
-                  </SearchResultSection>
-
-                  {currentSearchResult.appellations.length > 0 && (
-                    <SearchResultSection
-                      title={`Métier${pluralFromAppellations(
-                        currentSearchResult.appellations,
-                      )} observable${pluralFromAppellations(
-                        currentSearchResult.appellations,
-                      )} :`}
-                    >
-                      <p>
-                        {currentSearchResult.appellations
-                          .map(
-                            (appellation) => `${appellation.appellationLabel}`,
-                          )
-                          .join(", ")}
-                      </p>
-                    </SearchResultSection>
-                  )}
-                  <SearchResultSection>
-                    {currentSearchResult.voluntaryToImmersion && (
-                      <Button type="button" onClick={scrollToContactForm}>
-                        Contacter l'entreprise
-                      </Button>
+                      </li>
                     )}
-
-                    {!currentSearchResult.voluntaryToImmersion && (
-                      <>
-                        <p>
-                          Cette entreprise n'est pas inscrite comme entreprise
-                          accueillante mais peut recruter sur le métier que vous
-                          souhaitez tester en immersion.
-                        </p>
-                        <ButtonsGroup
-                          inlineLayoutWhen="md and up"
-                          buttons={[
-                            {
-                              onClick: scrollToContactForm,
-                              children: "Voir nos conseils",
-                              priority: "secondary",
-                            },
-                            {
-                              linkProps: {
-                                href: currentSearchResult.urlOfPartner,
-                                target: "_blank",
-                              },
-                              children: "Voir l'offre sur La Bonne Boite",
-                            },
-                          ]}
-                        />
-                      </>
-                    )}
-                  </SearchResultSection>
-                  <SearchResultSection title="Nombre de salariés">
-                    <p>{currentSearchResult.numberOfEmployeeRange}</p>
-                  </SearchResultSection>
-
-                  {currentSearchResult.additionalInformation && (
-                    <SearchResultSection title="Informations complémentaires">
-                      <p>{currentSearchResult.additionalInformation}</p>
-                    </SearchResultSection>
-                  )}
-
-                  {currentSearchResult.website && (
-                    <SearchResultSection title="Site web">
+                    <li>
                       <a
-                        href={currentSearchResult.website}
+                        href={makeNafClassInformationUrl(
+                          currentSearchResult.naf,
+                        )}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {currentSearchResult.website}
+                        S'informer sur le domaine
                       </a>
-                    </SearchResultSection>
-                  )}
-                  <SearchResultSection title="Avoir plus d'informations avant de contacter l'entreprise">
-                    <ul>
-                      {currentSearchResult.appellations.length > 0 && (
-                        <li>
-                          <a
-                            href={makeAppellationInformationUrl(
-                              currentSearchResult.rome,
-                            )}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            S'informer sur le métier
-                          </a>
-                        </li>
-                      )}
-                      <li>
-                        <a
-                          href={makeNafClassInformationUrl(
-                            currentSearchResult.naf,
-                          )}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          S'informer sur le domaine
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href={getMapsLink(currentSearchResult)}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Localiser l'entreprise
-                        </a>
-                      </li>
-                    </ul>
-                  </SearchResultSection>
-                </div>
-                <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
-                  <SearchMiniMap
-                    kind="single"
-                    markerProps={{
-                      position: [
-                        currentSearchResult.position.lat,
-                        currentSearchResult.position.lon,
-                      ],
-                      icon: getIconMarker(
-                        miniMapMarkerKey,
-                        currentSearchResult,
-                        miniMapMarkerKey,
-                      ),
-                    }}
-                  />
-                </div>
+                    </li>
+                    <li>
+                      <a
+                        href={getMapsLink(currentSearchResult)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Localiser l'entreprise
+                      </a>
+                    </li>
+                  </ul>
+                </SearchResultSection>
               </div>
-              <SearchResultContactSection
-                onFormSubmitSuccess={onFormSubmitSuccess}
-                formContactRef={formContactRef}
-                currentSearchResult={currentSearchResult}
-              />
-            </>
-          )}
-          {showConfirmationMessage && (
-            <>
-              <Alert
-                title="Bravo !"
-                description={
-                  <p>{getFeedBackMessage(currentSearchResult?.contactMode)}</p>
-                }
-                severity="success"
-                className={fr.cx("fr-my-4w")}
-              />
-              <Button
-                type="button"
-                onClick={onGoBackClick}
-                priority="tertiary"
-                iconId="fr-icon-arrow-left-line"
-                iconPosition="left"
-                className={fr.cx("fr-mt-1w")}
-              >
-                Retour à la recherche
-              </Button>
-            </>
-          )}
-        </>
+              <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+                <SearchMiniMap
+                  kind="single"
+                  markerProps={{
+                    position: [
+                      currentSearchResult.position.lat,
+                      currentSearchResult.position.lon,
+                    ],
+                    icon: getIconMarker(
+                      miniMapMarkerKey,
+                      currentSearchResult,
+                      miniMapMarkerKey,
+                    ),
+                  }}
+                />
+              </div>
+            </div>
+            <SearchResultContactSection
+              onFormSubmitSuccess={onFormSubmitSuccess}
+              formContactRef={formContactRef}
+              currentSearchResult={currentSearchResult}
+            />
+          </>
+        )}
+        {showConfirmationMessage && (
+          <>
+            <Alert
+              title="Bravo !"
+              description={
+                <p>{getFeedBackMessage(currentSearchResult?.contactMode)}</p>
+              }
+              severity="success"
+              className={fr.cx("fr-my-4w")}
+            />
+            <Button
+              type="button"
+              onClick={onGoBackClick}
+              priority="tertiary"
+              iconId="fr-icon-arrow-left-line"
+              iconPosition="left"
+              className={fr.cx("fr-mt-1w")}
+            >
+              Retour à la recherche
+            </Button>
+          </>
+        )}
       </MainWrapper>
     </HeaderFooterLayout>
   );

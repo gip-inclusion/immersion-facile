@@ -291,7 +291,7 @@ describe("NotifyContactRequest", () => {
                   contactLastName: getFormattedFirstnameAndLastname({
                     lastname: establishmentAdmin.lastName,
                   }),
-                  businessAddress: addressDtoToString(discussion.address),
+                  welcomeAddress: addressDtoToString(discussion.address),
                   kind: discussion.kind,
                   potentialBeneficiaryFirstName:
                     getFormattedFirstnameAndLastname({

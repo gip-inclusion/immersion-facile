@@ -343,7 +343,13 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withPotentialBeneficiaryWelcomeAddress(
           defaultAddress.addressAndPosition,
         )
-        .withUserRights([formAdminRight, formContactRight])
+        .withUserRights([
+          {
+            ...formAdminRight,
+            isMainContactInPerson: true,
+          },
+          formContactRight,
+        ])
         .build();
 
       await insertEstablishmentAggregateFromForm.execute(
@@ -389,6 +395,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withUserRights([
               {
                 isMainContactByPhone: false,
+                isMainContactInPerson: true,
                 job: "osef",
                 phone: "+33655445544",
                 role: "establishment-admin",
