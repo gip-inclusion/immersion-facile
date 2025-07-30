@@ -48,20 +48,28 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
     const { validatorEmails, counsellorEmails } =
       await agencyWithRightToAgencyDto(uow, agency);
 
-    const recipientsRoleAndEmail: { email: Email; role: Role }[] = [
-      ...validatorEmails.map(
-        (validatorEmail): { email: Email; role: Role } => ({
-          email: validatorEmail,
-          role: "validator",
-        }),
-      ),
-      ...counsellorEmails.map(
-        (counsellorEmail): { email: Email; role: Role } => ({
-          email: counsellorEmail,
-          role: "counsellor",
-        }),
-      ),
-    ];
+    const conventionAdvisor =
+      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+        convention.id,
+      );
+
+    const recipientsRoleAndEmail: { email: Email; role: Role }[] =
+      conventionAdvisor?.advisor?.email
+        ? [{ email: conventionAdvisor.advisor.email, role: "validator" }]
+        : [
+            ...validatorEmails.map(
+              (validatorEmail): { email: Email; role: Role } => ({
+                email: validatorEmail,
+                role: "validator",
+              }),
+            ),
+            ...counsellorEmails.map(
+              (counsellorEmail): { email: Email; role: Role } => ({
+                email: counsellorEmail,
+                role: "counsellor",
+              }),
+            ),
+          ];
 
     if (assessment.status === "DID_NOT_SHOW") {
       await this.#saveNotificationAndRelatedEvent(uow, {
