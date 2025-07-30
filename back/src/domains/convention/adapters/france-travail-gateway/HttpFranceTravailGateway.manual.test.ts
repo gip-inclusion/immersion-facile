@@ -1,5 +1,10 @@
 import MockAdapter from "axios-mock-adapter";
-import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
+import {
+  ConventionDtoBuilder,
+  errors,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   type AccessTokenResponse,
@@ -297,6 +302,32 @@ describe("HttpFranceTravailGateway", () => {
       'Not an axios error: Unsupported response status 204 with body \'{"message":"yolo"}\'',
     );
     expect(subscriberErrorFeedback.error).toBeDefined();
+  });
+
+  it("send convention to FT api V3", async () => {
+    const httpFranceTravailGateway = new HttpFranceTravailGateway(
+      createFtAxiosHttpClientForTest(config),
+      cachingGateway,
+      config.ftApiUrl,
+      config.franceTravailAccessTokenConfig,
+      noRetries,
+    );
+
+    const response = await httpFranceTravailGateway.notifyOnConventionUpdated({
+      eventType: "CONVENTION_UPDATED",
+      convention: {
+        ...new ConventionDtoBuilder().build(),
+        agencyName: ftConvention.nomAgence,
+        agencyDepartment: "75",
+        agencyKind: "pole-emploi",
+        agencySiret: "00000000000000",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
+        agencyRefersTo: undefined,
+      },
+    });
+
+    expect(response.status).toBe(200);
   });
 });
 
