@@ -20,6 +20,8 @@ export type GetConventionsFilters = {
   startDateLessOrEqual?: Date;
   dateSubmissionEqual?: Date;
   dateSubmissionSince?: Date;
+  endDate?: Partial<DateRange>;
+  updateDate?: Partial<DateRange>;
   withStatuses?: ConventionStatus[];
   withSirets?: SiretDto[];
 };
@@ -61,10 +63,6 @@ export interface ConventionQueries {
 
   // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;
-  getAllConventionsForThoseEndingThatDidntGoThrough: (
-    dateEnd: DateRange,
-    assessmentEmailKind: AssessmentEmailKind,
-  ) => Promise<ConventionDto[]>;
   getConventionsByScope(params: {
     scope: ConventionScope;
     limit: number;

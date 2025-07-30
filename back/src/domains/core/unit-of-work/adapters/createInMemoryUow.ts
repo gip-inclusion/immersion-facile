@@ -40,7 +40,6 @@ export const createInMemoryUow = () => {
   const conventionQueries = new InMemoryConventionQueries(
     conventionRepository,
     agencyRepository,
-    notificationRepository,
     userRepository,
   );
 

@@ -1,16 +1,19 @@
-import { map } from "ramda";
+import { partition, uniqBy } from "ramda";
 import {
-  type AgencyRole,
+  type AbsoluteUrl,
+  type AgencyDto,
   type AgencyWithUsersRights,
   type ConventionDto,
   type ConventionId,
+  calculateDurationInSecondsFrom,
   castError,
   type DateRange,
-  type Email,
+  errors,
   executeInSequence,
   frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
+  validatedConventionStatuses,
   withDateRangeSchema,
 } from "shared";
 import { z } from "zod";
@@ -35,9 +38,10 @@ import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWo
 const logger = createLogger(__filename);
 
 type SendAssessmentNeededNotificationsOutput = {
-  errors?: Record<ConventionId, Error>;
-  numberOfImmersionEndingTomorrow: number;
-  numberOfConventionsWithAlreadyExistingAssessment: number;
+  conventionsQtyWithImmersionEnding: number;
+  conventionsQtyWithAlreadyExistingAssessment: number;
+  conventionsQtyWithAssessmentSentSuccessfully: number;
+  conventionsAssessmentSentErrored?: Record<ConventionId, Error>;
 };
 
 type SendAssessmentParams = {
@@ -63,7 +67,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
 
-  readonly #outOfTrx: OutOfTransaction;
+  readonly #outOfTransaction: OutOfTransaction;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -75,7 +79,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    outOfTrx: OutOfTransaction,
+    outOfTransaction: OutOfTransaction,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     timeGateway: TimeGateway,
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
@@ -85,7 +89,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
   ) {
     super();
     this.#uowPerformer = uowPerformer;
-    this.#outOfTrx = outOfTrx;
+    this.#outOfTransaction = outOfTransaction;
     this.#createNewEvent = createNewEvent;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
@@ -97,88 +101,213 @@ export class SendAssessmentNeededNotifications extends UseCase<
   protected async _execute(
     params: SendAssessmentParams,
   ): Promise<SendAssessmentNeededNotificationsOutput> {
-    const errors: Record<ConventionId, Error> = {};
-    const { conventions, numberOfConventionsWithAlreadyExistingAssessment } =
-      await this.#getConventionsToSendEmailTo(params);
+    const {
+      conventionsQtyWithImmersionEnding,
+      conventionsQtyWithAlreadyExistingAssessment,
+      conventionsThatDontHaveAssessment,
+    } = await this.#getConventionsToSendEmailTo(params);
 
-    if (conventions.length === 0)
-      return {
-        numberOfImmersionEndingTomorrow: 0,
-        numberOfConventionsWithAlreadyExistingAssessment: 0,
-      };
+    const results = await executeInSequence(
+      conventionsThatDontHaveAssessment,
+      (convention) =>
+        this.#uowPerformer
+          // each transaction could fail here without impacting others
+          .perform((uow) => this.#sendAssessmentNotifications(uow, convention))
+          .catch((error) => ({ id: convention.id, error: castError(error) })),
+    );
 
-    await executeInSequence(conventions, (convention) =>
-      this.#sendEmailsForConvention(convention, errors),
+    const [conventionIdsWithError, conventionIdsWithoutError] = partition(
+      (result) => "error" in result,
+      results,
     );
 
     return {
-      numberOfImmersionEndingTomorrow: conventions.length,
-      numberOfConventionsWithAlreadyExistingAssessment,
-      errors,
+      conventionsQtyWithImmersionEnding,
+      conventionsQtyWithAlreadyExistingAssessment,
+      conventionsQtyWithAssessmentSentSuccessfully:
+        conventionIdsWithoutError.length,
+      ...(conventionIdsWithError.length
+        ? {
+            conventionsAssessmentSentErrored: conventionIdsWithError.reduce<
+              Record<ConventionId, Error>
+            >((acc, current) => {
+              acc[current.id] = current.error;
+              return acc;
+            }, {}),
+          }
+        : {}),
     };
   }
 
-  async #sendEmailsForConvention(
-    convention: ConventionDto,
-    errors: Record<ConventionId, Error>,
-  ) {
-    await this.#uowPerformer.perform(async (uow) => {
-      try {
-        await this.#sendEmailsWithAssessmentCreationLink({ uow, convention });
-        await this.#sendEmailToBeneficiary({ uow, convention });
-      } catch (error) {
-        errors[convention.id] = castError(error);
-      }
-    });
-  }
+  async #getConventionsToSendEmailTo(params: SendAssessmentParams): Promise<{
+    conventionsQtyWithImmersionEnding: number;
+    conventionsThatDontHaveAssessment: ConventionDto[];
+    conventionsQtyWithAlreadyExistingAssessment: number;
+  }> {
+    const start = this.#timeGateway.now();
 
-  async #getConventionsToSendEmailTo(params: SendAssessmentParams) {
-    const conventions =
-      await this.#outOfTrx.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-        params.conventionEndDate,
-        "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-      );
+    const conventionsEndingInRange =
+      await this.#outOfTransaction.conventionQueries.getConventions({
+        filters: {
+          endDate: params.conventionEndDate,
+          withStatuses: validatedConventionStatuses,
+        },
+        sortBy: "dateStart",
+      });
+    const conventionsUpdatedInRangeAndEndingUpToRange =
+      await this.#outOfTransaction.conventionQueries.getConventions({
+        filters: {
+          endDate: {
+            to: params.conventionEndDate.to,
+          },
+          updateDate: params.conventionEndDate,
+          withStatuses: validatedConventionStatuses,
+        },
+        sortBy: "dateStart",
+      });
+
+    const conventionsThatRequireAnAssessment = uniqBy(
+      (c) => c.id,
+      [
+        ...conventionsEndingInRange,
+        ...conventionsUpdatedInRangeAndEndingUpToRange,
+      ],
+    );
 
     const conventionIdsWithAlreadyExistingAssessment =
-      await this.#outOfTrx.assessmentRepository
-        .getByConventionIds(conventions.map((convention) => convention.id))
-        .then(map(({ conventionId }) => conventionId));
+      await this.#outOfTransaction.assessmentRepository
+        .getByConventionIds(
+          conventionsThatRequireAnAssessment.map(({ id }) => id),
+        )
+        .then((assessments) =>
+          assessments.map(({ conventionId }) => conventionId),
+        );
 
-    const conventionsToSendAssessmentEmailTo = conventions.filter(
-      (convention) =>
-        !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
-    );
+    const conventionsThatDontHaveAssessment =
+      conventionsThatRequireAnAssessment.filter(
+        ({ id }) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
+      );
 
     logger.info({
-      message: `[${this.#timeGateway.now().toISOString()}]: About to send assessment email to ${
-        conventionsToSendAssessmentEmailTo.length
-      } establishments`,
+      useCaseName: this.constructor.name,
+      durationInSeconds: calculateDurationInSecondsFrom(start),
+      message: `getConventionsToSendEmailTo - conventionsThatRequireAnAssessment: ${conventionsThatRequireAnAssessment.length} - conventionsThatDontHaveAssessment: ${conventionsThatDontHaveAssessment.length}`,
     });
 
     return {
-      conventions: conventionsToSendAssessmentEmailTo,
-      numberOfConventionsWithAlreadyExistingAssessment:
+      conventionsQtyWithImmersionEnding:
+        conventionsThatRequireAnAssessment.length,
+      conventionsQtyWithAlreadyExistingAssessment:
         conventionIdsWithAlreadyExistingAssessment.length,
+      conventionsThatDontHaveAssessment,
     };
   }
 
-  async #sendEmailToBeneficiary({
-    uow,
-    convention,
-  }: {
-    uow: UnitOfWork;
-    convention: ConventionDto;
-  }) {
-    const emails = await uow.notificationRepository.getEmailsByFilters({
-      email: convention.signatories.beneficiary.email,
-      emailType: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
-      conventionId: convention.id,
+  async #sendAssessmentNotifications(
+    uow: UnitOfWork,
+    convention: ConventionDto,
+  ): Promise<{ id: ConventionId }> {
+    const start = this.#timeGateway.now();
+
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const alreadySentNotifications =
+      await uow.notificationRepository.getEmailsByFilters({
+        conventionId: convention.id,
+      });
+
+    const isBeneficiaryNotificationNotSent =
+      alreadySentNotifications.filter(
+        ({ templatedContent }) =>
+          templatedContent.kind === "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+      ).length === 0;
+
+    const isTutorNotificationNotSent =
+      alreadySentNotifications.filter(
+        ({ templatedContent }) =>
+          templatedContent.kind === "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+      ).length === 0;
+
+    // TODO : Tentative de save les notifs en un appel db avec saveNotificationsBatchAndRelatedEvent
+    // problème de test avec des notifs/event de notif existants
+    await Promise.all(
+      [
+        ...(isTutorNotificationNotSent
+          ? [
+              this.#makeTutorAssessmentNotification({
+                convention,
+                agency,
+                assessmentCreationLink:
+                  await prepareConventionMagicShortLinkMaker({
+                    config: this.#config,
+                    conventionMagicLinkPayload: {
+                      id: convention.id,
+                      email: convention.establishmentTutor.email,
+                      role: "establishment-tutor",
+                      now: this.#timeGateway.now(),
+                    },
+                    generateConventionMagicLinkUrl:
+                      this.#generateConventionMagicLinkUrl,
+                    shortLinkIdGeneratorGateway:
+                      this.#shortLinkIdGeneratorGateway,
+                    uow,
+                  })({
+                    targetRoute: frontRoutes.assessment,
+                    lifetime: "short",
+                  }),
+              }),
+              ...(convention.internshipKind === "immersion"
+                ? this.#makeAgencyAssessmentNotifications(
+                    convention,
+                    await agencyWithRightToAgencyDto(uow, agency),
+                  )
+                : []),
+            ]
+          : []),
+        ...(isBeneficiaryNotificationNotSent
+          ? [this.#makeBeneficiaryNotification(convention)]
+          : []),
+      ].map((notif) => this.#saveNotificationAndRelatedEvent(uow, notif)),
+    );
+
+    await Promise.all([
+      ...(isTutorNotificationNotSent
+        ? [
+            uow.outboxRepository.save(
+              this.#createNewEvent({
+                topic: "EmailWithLinkToCreateAssessmentSent",
+                payload: { id: convention.id },
+              }),
+            ),
+          ]
+        : []),
+      ...(isBeneficiaryNotificationNotSent
+        ? [
+            uow.outboxRepository.save(
+              this.#createNewEvent({
+                topic: "BeneficiaryAssessmentEmailSent",
+                payload: { id: convention.id },
+              }),
+            ),
+          ]
+        : []),
+    ]);
+
+    logger.info({
+      useCaseName: this.constructor.name,
+      durationInSeconds: calculateDurationInSecondsFrom(start),
+      message: `sendAssessmentNotifications - convention ${convention.id} - isBeneficiaryNotificationNotSent ${isBeneficiaryNotificationNotSent} - isTutorNotificationNotSent ${isTutorNotificationNotSent}`,
     });
-    const emailAlreadySent = emails.length > 0;
 
-    if (emailAlreadySent) return;
+    return { id: convention.id };
+  }
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+  #makeBeneficiaryNotification(
+    convention: ConventionDto,
+  ): NotificationContentAndFollowedIds {
+    return {
       kind: "email",
       templatedContent: {
         kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
@@ -202,84 +331,28 @@ export class SendAssessmentNeededNotifications extends UseCase<
         agencyId: convention.agencyId,
         establishmentSiret: convention.siret,
       },
-    });
-
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "BeneficiaryAssessmentEmailSent",
-        payload: { id: convention.id },
-      }),
-    );
+    };
   }
 
-  async #sendEmailsWithAssessmentCreationLink({
-    uow,
-    convention,
-  }: {
-    uow: UnitOfWork;
-    convention: ConventionDto;
-  }) {
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (!agency)
-      throw new Error(`Missing agency ${convention.agencyId} on repository.`);
-
-    await this.#saveNotificationAndRelatedEvent(
-      uow,
-      await this.#makeEstablishmentAssessmentEmail({ convention, agency, uow }),
-    );
-
-    if (convention.internshipKind === "immersion")
-      await this.sendEmailToAgencyUsers(uow, convention, agency);
-
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "EmailWithLinkToCreateAssessmentSent",
-        payload: { id: convention.id },
-      }),
-    );
-  }
-
-  private async sendEmailToAgencyUsers(
-    uow: UnitOfWork,
+  #makeAgencyAssessmentNotifications(
     convention: ConventionDto,
-    agency: AgencyWithUsersRights,
-  ) {
-    const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
-
-    const emailsToSendWithRole: { email: Email; role: AgencyRole }[] = [
-      ...agencyDto.validatorEmails.map((email) => ({
+    agency: AgencyDto,
+  ): NotificationContentAndFollowedIds[] {
+    return [
+      ...agency.validatorEmails.map((email) => ({
         email,
         role: "validator" as const,
       })),
-      ...agencyDto.counsellorEmails.map((email) => ({
+      ...agency.counsellorEmails.map((email) => ({
         email,
         role: "counsellor" as const,
       })),
-    ];
-
-    for (const { email, role } of emailsToSendWithRole) {
-      await this.#saveNotificationAndRelatedEvent(
-        uow,
-        this.#makeAgencyAssessmentEmail(convention, agency, email, role),
-      );
-    }
-  }
-
-  #makeAgencyAssessmentEmail(
-    convention: ConventionDto,
-    agency: AgencyWithUsersRights,
-    email: Email,
-    role: AgencyRole,
-  ): NotificationContentAndFollowedIds {
-    return {
-      followedIds: {
-        agencyId: convention.agencyId,
-        conventionId: convention.id,
-        establishmentSiret: convention.siret,
-      },
+    ].map(({ email, role }) => ({
       kind: "email",
       templatedContent: {
         kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+        recipients: [email],
+        sender: immersionFacileNoReplyEmailSender,
         params: {
           agencyReferentName: getFormattedFirstnameAndLastname(
             convention.agencyReferent ?? {},
@@ -302,39 +375,24 @@ export class SendAssessmentNeededNotifications extends UseCase<
             now: this.#timeGateway.now(),
           }),
         },
-        recipients: [email],
-        sender: immersionFacileNoReplyEmailSender,
       },
-    };
+      followedIds: {
+        agencyId: convention.agencyId,
+        conventionId: convention.id,
+        establishmentSiret: convention.siret,
+      },
+    }));
   }
 
-  async #makeEstablishmentAssessmentEmail({
+  #makeTutorAssessmentNotification({
     convention,
     agency,
-    uow,
+    assessmentCreationLink,
   }: {
     convention: ConventionDto;
     agency: AgencyWithUsersRights;
-    uow: UnitOfWork;
-  }): Promise<NotificationContentAndFollowedIds> {
-    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
-      config: this.#config,
-      conventionMagicLinkPayload: {
-        id: convention.id,
-        email: convention.establishmentTutor.email,
-        role: "establishment-tutor",
-        now: this.#timeGateway.now(),
-      },
-      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      uow,
-    });
-
-    const assessmentCreationLink = await makeShortMagicLink({
-      targetRoute: frontRoutes.assessment,
-      lifetime: "short",
-    });
-
+    assessmentCreationLink: AbsoluteUrl;
+  }): NotificationContentAndFollowedIds {
     return {
       kind: "email",
       templatedContent: {

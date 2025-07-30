@@ -99,24 +99,25 @@ handleCRONScript(
   config,
   sendAssessmentNeededNotificationsScript,
   ({
-    numberOfImmersionEndingTomorrow,
-    numberOfConventionsWithAlreadyExistingAssessment,
-    errors = {},
+    conventionsQtyWithImmersionEnding,
+    conventionsQtyWithAlreadyExistingAssessment,
+    conventionsQtyWithAssessmentSentSuccessfully,
+    conventionsAssessmentSentErrored = {},
   }) => {
-    const failures = keys(errors);
+    const failures = keys(conventionsAssessmentSentErrored);
     const numberOfFailures = failures.length;
-    const numberOfSuccess = numberOfImmersionEndingTomorrow - numberOfFailures;
+    const numberOfSuccess = conventionsQtyWithAssessmentSentSuccessfully;
 
     const errorsAsString = failures
       .map(
         (conventionId) =>
-          `For immersion ids ${conventionId} : ${errors[conventionId]} `,
+          `For immersion ids ${conventionId} : ${conventionsAssessmentSentErrored[conventionId]} `,
       )
       .join("\n");
 
     return [
-      `Total of immersion ending tomorrow : ${numberOfSuccess}`,
-      `Number of conventions with already existing assessment : ${numberOfConventionsWithAlreadyExistingAssessment}`,
+      `Total of immersion ending tomorrow : ${conventionsQtyWithImmersionEnding}`,
+      `Number of conventions with already existing assessment : ${conventionsQtyWithAlreadyExistingAssessment}`,
       `Number of successfully sent Assessments : ${numberOfSuccess}`,
       `Number of failures : ${numberOfFailures}`,
       ...(numberOfFailures > 0 ? [`Failures : ${errorsAsString}`] : []),
