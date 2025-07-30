@@ -246,16 +246,24 @@ export class SendAssessmentNeededNotifications extends UseCase<
   ) {
     const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
 
-    const emailsToSendWithRole: { email: Email; role: AgencyRole }[] = [
-      ...agencyDto.validatorEmails.map((email) => ({
-        email,
-        role: "validator" as const,
-      })),
-      ...agencyDto.counsellorEmails.map((email) => ({
-        email,
-        role: "counsellor" as const,
-      })),
-    ];
+    const conventionAdvisorEntity =
+      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+        convention.id,
+      );
+
+    const emailsToSendWithRole: { email: Email; role: AgencyRole }[] =
+      conventionAdvisorEntity?.advisor
+        ? [{ email: conventionAdvisorEntity.advisor.email, role: "validator" }]
+        : [
+            ...agencyDto.validatorEmails.map((email) => ({
+              email,
+              role: "validator" as const,
+            })),
+            ...agencyDto.counsellorEmails.map((email) => ({
+              email,
+              role: "counsellor" as const,
+            })),
+          ];
 
     for (const { email, role } of emailsToSendWithRole) {
       await this.#saveNotificationAndRelatedEvent(
