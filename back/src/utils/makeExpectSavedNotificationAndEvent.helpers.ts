@@ -22,11 +22,12 @@ export type ExpectSavedNotificationsAndEvents = ReturnType<
   typeof makeExpectSavedNotificationsAndEvents
 >;
 
-export const makeExpectSavedNotificationsAndEvents = (
-  notificationRepository: InMemoryNotificationRepository,
-  outboxRepository: InMemoryOutboxRepository,
-) => {
-  return ({ emails = [], sms = [] }: ExpectedNotifications) => {
+export const makeExpectSavedNotificationsAndEvents =
+  (
+    notificationRepository: InMemoryNotificationRepository,
+    outboxRepository: InMemoryOutboxRepository,
+  ) =>
+  ({ emails = [], sms = [] }: ExpectedNotifications) => {
     const paramsByKind = createParamsByKind(
       notificationRepository,
       emails,
@@ -42,16 +43,16 @@ export const makeExpectSavedNotificationsAndEvents = (
       expectNotificationsOfKind(notificationAddedEvents, paramsByKind),
     );
   };
-};
 
 export type ExpectSavedNotificationsBatchAndEvent = ReturnType<
   typeof makeExpectSavedNotificationsBatchAndEvent
 >;
-export const makeExpectSavedNotificationsBatchAndEvent = (
-  notificationRepository: InMemoryNotificationRepository,
-  outboxRepository: InMemoryOutboxRepository,
-) => {
-  return ({ emails = [], sms = [] }: ExpectedNotifications) => {
+export const makeExpectSavedNotificationsBatchAndEvent =
+  (
+    notificationRepository: InMemoryNotificationRepository,
+    outboxRepository: InMemoryOutboxRepository,
+  ) =>
+  ({ emails = [], sms = [] }: ExpectedNotifications) => {
     const paramsByKind = createParamsByKind(
       notificationRepository,
       emails,
@@ -74,7 +75,6 @@ export const makeExpectSavedNotificationsBatchAndEvent = (
       );
     }
   };
-};
 
 type ExpectedNotifications = {
   emails?: TemplatedEmail[];
@@ -161,9 +161,7 @@ const expectNotificationsBatch =
     );
 
     expectToEqual(
-      notificationsOfKind.map(
-        ({ id }): WithNotificationIdAndKind => ({ id, kind }),
-      ),
+      notificationsOfKind.map(({ id }) => ({ id, kind })),
       notificationBatchAddedEvent.payload.filter(
         (payload) => payload.kind === kind,
       ),

@@ -8,21 +8,17 @@ import {
   type ConventionScope,
   conventionSchema,
   type DataWithPagination,
-  type DateRange,
   errors,
   type FindSimilarConventionsParams,
   NotFoundError,
   type SiretDto,
   type UserId,
-  validatedConventionStatuses,
 } from "shared";
 import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
-import type { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
 import type {
-  AssessmentEmailKind,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -39,7 +35,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
   constructor(
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
-    private readonly notificationRepository: InMemoryNotificationRepository,
     private readonly userRepository: InMemoryUserRepository,
   ) {}
 
@@ -66,36 +61,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .map((convention) => convention.id);
   }
 
-  public async getAllConventionsForThoseEndingThatDidntGoThrough(
-    finishingRange: DateRange,
-    assessmentEmailKind: AssessmentEmailKind,
-  ): Promise<ConventionReadDto[]> {
-    const notifications = (
-      await this.notificationRepository.getLastNotifications()
-    ).emails.filter(
-      (notification) =>
-        notification.templatedContent.kind === assessmentEmailKind,
-    );
-    const immersionIdsThatAlreadyGotAnEmail = notifications
-      ? notifications.map(
-          (notification) => notification.followedIds.conventionId,
-        )
-      : [];
-    return await Promise.all(
-      this.conventionRepository.conventions
-        .filter(
-          (convention) =>
-            new Date(convention.dateEnd).getDate() >=
-              finishingRange.from.getDate() &&
-            new Date(convention.dateEnd).getDate() <=
-              finishingRange.to.getDate() &&
-            validatedConventionStatuses.includes(convention.status) &&
-            !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
-        )
-        .map((convention) => this.#addAgencyDataToConvention(convention)),
-    );
-  }
-
   public async getConventionById(
     id: ConventionId,
   ): Promise<ConventionReadDto | undefined> {
@@ -109,20 +74,17 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public getConventionsByFiltersCalled = 0;
 
-  public async getConventions(
-    params: GetConventionsParams,
-  ): Promise<ConventionDto[]> {
+  public async getConventions({
+    filters,
+    sortBy,
+  }: GetConventionsParams): Promise<ConventionDto[]> {
     this.getConventionsByFiltersCalled++;
-    const conventions = await Promise.all(
-      this.conventionRepository.conventions
-        .filter(makeApplyFiltersToConventions(params.filters))
-        .map((convention) => this.#addAgencyDataToConvention(convention)),
-    );
 
-    return conventions
+    return this.conventionRepository.conventions
+      .filter(makeApplyFiltersToConventions(filters))
       .sort((previous, current) => {
-        const previousDate = previous[params.sortBy];
-        const currentDate = current[params.sortBy];
+        const previousDate = previous[sortBy];
+        const currentDate = current[sortBy];
 
         if (!previousDate) return 1;
         if (!currentDate) return -1;
@@ -301,10 +263,23 @@ const makeApplyFiltersToConventions =
     dateSubmissionEqual,
     dateSubmissionSince,
     withSirets,
+    endDate,
+    updateDate,
   }: GetConventionsFilters) =>
   (convention: ConventionDto) =>
     (
       [
+        ({ dateEnd }) => (endDate?.to ? new Date(dateEnd) <= endDate.to : true),
+        ({ dateEnd }) =>
+          endDate?.from ? new Date(dateEnd) >= endDate.from : true,
+        ({ updatedAt }) =>
+          updateDate?.to && updatedAt
+            ? new Date(updatedAt) <= updateDate.to
+            : true,
+        ({ updatedAt }) =>
+          updateDate?.from && updatedAt
+            ? new Date(updatedAt) >= updateDate.from
+            : true,
         ({ dateStart }) =>
           startDateLessOrEqual
             ? new Date(dateStart) <= startDateLessOrEqual

@@ -1,18 +1,18 @@
-import { addDays } from "date-fns";
-import subDays from "date-fns/subDays";
+import { addDays, subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   errors,
+  expectArraysToMatch,
   expectObjectInArrayToMatch,
-  expectPromiseToFailWithError,
   expectToEqual,
   getFormattedFirstnameAndLastname,
   type Notification,
   type TemplatedEmail,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
@@ -76,21 +76,21 @@ describe("SendAssessmentNeededNotifications", () => {
   const conventionEndingYesterday = new ConventionDtoBuilder(
     conventionValidatedWithAgencyStartedTwoDaysAgo,
   )
-    .withId("immersion-ending-yesterday-id")
+    .withId(uuid())
     .withDateEnd(oneDayAgo.toISOString())
     .build();
 
   const conventionEndingTomorrow = new ConventionDtoBuilder(
     conventionValidatedWithAgencyStartedTwoDaysAgo,
   )
-    .withId("convention-ending-tomorrow")
+    .withId(uuid())
     .withDateEnd(inOneDay.toISOString())
     .build();
 
   const conventionEndingInTwoDays = new ConventionDtoBuilder(
     conventionValidatedWithAgencyStartedTwoDaysAgo,
   )
-    .withId("convention-ending-in-two-days")
+    .withId(uuid())
     .withDateEnd(inTwoDays.toISOString())
     .build();
 
@@ -211,15 +211,19 @@ describe("SendAssessmentNeededNotifications", () => {
         conventionEndingInTwoDays,
       ]);
 
-      const useCaseExecution =
+      expectToEqual(
         await sendEmailWithAssessmentCreationLink.execute({
           conventionEndDate: {
             from: now,
             to: inOneDay,
           },
-        });
-
-      expect(useCaseExecution.errors).toEqual({});
+        }),
+        {
+          conventionsQtyWithImmersionEnding: 1,
+          conventionsQtyWithAlreadyExistingAssessment: 0,
+          conventionsQtyWithAssessmentSentSuccessfully: 1,
+        },
+      );
 
       // Assert
       expectSavedNotificationsAndEvents({
@@ -292,11 +296,11 @@ describe("SendAssessmentNeededNotifications", () => {
           topic: "NotificationAdded",
         },
         {
-          topic: "EmailWithLinkToCreateAssessmentSent",
-          payload: { id: conventionEndingTomorrow.id },
+          topic: "NotificationAdded",
         },
         {
-          topic: "NotificationAdded",
+          topic: "EmailWithLinkToCreateAssessmentSent",
+          payload: { id: conventionEndingTomorrow.id },
         },
         {
           topic: "BeneficiaryAssessmentEmailSent",
@@ -328,12 +332,19 @@ describe("SendAssessmentNeededNotifications", () => {
       ]);
 
       // Act
-      await sendEmailWithAssessmentCreationLink.execute({
-        conventionEndDate: {
-          from: now,
-          to: inOneDay,
+      expectToEqual(
+        await sendEmailWithAssessmentCreationLink.execute({
+          conventionEndDate: {
+            from: now,
+            to: inOneDay,
+          },
+        }),
+        {
+          conventionsQtyWithImmersionEnding: 1,
+          conventionsQtyWithAlreadyExistingAssessment: 0,
+          conventionsQtyWithAssessmentSentSuccessfully: 1,
         },
-      });
+      );
 
       // Assert
       expectSavedNotificationsAndEvents({
@@ -399,12 +410,13 @@ describe("SendAssessmentNeededNotifications", () => {
         {
           topic: "NotificationAdded",
         },
+
+        {
+          topic: "NotificationAdded",
+        },
         {
           topic: "EmailWithLinkToCreateAssessmentSent",
           payload: { id: conventionEndingTomorrow.id },
-        },
-        {
-          topic: "NotificationAdded",
         },
         {
           topic: "BeneficiaryAssessmentEmailSent",
@@ -416,7 +428,7 @@ describe("SendAssessmentNeededNotifications", () => {
     });
 
     it("Sends only establishment notification when beneficiary already received assessment notification", async () => {
-      const beneficiaryEmailContent: TemplatedEmail = {
+      const existingBeneficiaryEmailContent: TemplatedEmail = {
         kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
         params: {
           conventionId: conventionEndingTomorrow.id,
@@ -435,6 +447,9 @@ describe("SendAssessmentNeededNotifications", () => {
           name: "Immersion Facilitée",
         },
       };
+
+      uow.conventionRepository.setConventions([conventionEndingTomorrow]);
+
       const existingBeneficiaryNotification: Notification = {
         createdAt: new Date().toISOString(),
         followedIds: {
@@ -444,10 +459,9 @@ describe("SendAssessmentNeededNotifications", () => {
         },
         id: "existing-beneficiary-notification",
         kind: "email",
-        templatedContent: beneficiaryEmailContent,
+        templatedContent: existingBeneficiaryEmailContent,
       };
 
-      uow.conventionRepository.setConventions([conventionEndingTomorrow]);
       uow.notificationRepository.notifications = [
         existingBeneficiaryNotification,
       ];
@@ -463,6 +477,7 @@ describe("SendAssessmentNeededNotifications", () => {
         wasQuarantined: false,
         status: "published",
       });
+
       await uow.outboxRepository.save({
         id: "existing-beneficiary-assessment-email",
         topic: "BeneficiaryAssessmentEmailSent",
@@ -475,16 +490,23 @@ describe("SendAssessmentNeededNotifications", () => {
         status: "published",
       });
 
-      await sendEmailWithAssessmentCreationLink.execute({
-        conventionEndDate: {
-          from: now,
-          to: inOneDay,
+      expectToEqual(
+        await sendEmailWithAssessmentCreationLink.execute({
+          conventionEndDate: {
+            from: now,
+            to: inOneDay,
+          },
+        }),
+        {
+          conventionsQtyWithImmersionEnding: 1,
+          conventionsQtyWithAlreadyExistingAssessment: 0,
+          conventionsQtyWithAssessmentSentSuccessfully: 1,
         },
-      });
+      );
 
       expectSavedNotificationsAndEvents({
         emails: [
-          beneficiaryEmailContent,
+          existingBeneficiaryEmailContent,
           {
             kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
             params: {
@@ -543,9 +565,43 @@ describe("SendAssessmentNeededNotifications", () => {
       ]);
     });
 
-    it("Does not send an email to immersions having already received one", async () => {
+    it("Does not send an email to tutor having already received one", async () => {
+      const existingTutorTemplatedEmail: TemplatedEmail = {
+        kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+        params: {
+          internshipKind: "immersion",
+          assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
+            email: conventionEndingYesterday.establishmentTutor.email,
+            id: conventionEndingYesterday.id,
+            targetRoute: "bilan-immersion",
+            role: "establishment-tutor",
+            now,
+          }),
+          beneficiaryFirstName: getFormattedFirstnameAndLastname({
+            firstname:
+              conventionEndingYesterday.signatories.beneficiary.firstName,
+          }),
+          beneficiaryLastName: getFormattedFirstnameAndLastname({
+            lastname:
+              conventionEndingYesterday.signatories.beneficiary.lastName,
+          }),
+          conventionId: conventionEndingYesterday.id,
+          establishmentTutorName: getFormattedFirstnameAndLastname({
+            firstname: conventionEndingYesterday.establishmentTutor.firstName,
+            lastname: conventionEndingYesterday.establishmentTutor.lastName,
+          }),
+          agencyLogoUrl: undefined,
+        },
+        recipients: [conventionEndingYesterday.establishmentTutor.email],
+        sender: {
+          email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+          name: "Immersion Facilitée",
+        },
+      };
       // Arrange
-      const notification: Notification = {
+
+      uow.conventionRepository.setConventions([conventionEndingYesterday]);
+      const tutorNotification: Notification = {
         createdAt: new Date().toISOString(),
         followedIds: {
           conventionId: conventionEndingYesterday.id,
@@ -554,56 +610,111 @@ describe("SendAssessmentNeededNotifications", () => {
         },
         id: "first-notification-added-manually",
         kind: "email",
-        templatedContent: {
-          kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-          params: {
-            internshipKind: "immersion",
-            assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-              email: conventionEndingYesterday.establishmentTutor.email,
-              id: conventionEndingYesterday.id,
-              targetRoute: "bilan-immersion",
-              role: "establishment-tutor",
-              now,
-            }),
-            beneficiaryFirstName: getFormattedFirstnameAndLastname({
-              firstname:
-                conventionEndingYesterday.signatories.beneficiary.firstName,
-            }),
-            beneficiaryLastName: getFormattedFirstnameAndLastname({
-              lastname:
-                conventionEndingYesterday.signatories.beneficiary.lastName,
-            }),
-            conventionId: conventionEndingYesterday.id,
-            establishmentTutorName: getFormattedFirstnameAndLastname({
-              firstname: conventionEndingYesterday.establishmentTutor.firstName,
-              lastname: conventionEndingYesterday.establishmentTutor.lastName,
-            }),
-            agencyLogoUrl: undefined,
-          },
-          recipients: [conventionEndingYesterday.establishmentTutor.email],
-          sender: {
-            email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-            name: "Immersion Facilitée",
-          },
-        },
+        templatedContent: existingTutorTemplatedEmail,
       };
+      uow.notificationRepository.notifications = [tutorNotification];
 
-      uow.conventionRepository.setConventions([conventionEndingYesterday]);
-      uow.notificationRepository.notifications = [notification];
-
-      expectToEqual(uow.outboxRepository.events, []);
-
-      // Act
-      await sendEmailWithAssessmentCreationLink.execute({
-        conventionEndDate: {
-          from: oneDayAgo,
-          to: now,
+      await uow.outboxRepository.save({
+        id: "existing-notification-added",
+        topic: "NotificationAdded",
+        payload: {
+          id: tutorNotification.id,
+          kind: tutorNotification.kind,
         },
+        occurredAt: new Date().toISOString(),
+        publications: [],
+        wasQuarantined: false,
+        status: "published",
       });
 
+      await uow.outboxRepository.save({
+        id: "existing-beneficiary-assessment-email",
+        topic: "EmailWithLinkToCreateAssessmentSent",
+        payload: {
+          id: conventionEndingYesterday.id,
+        },
+        occurredAt: new Date().toISOString(),
+        publications: [],
+        wasQuarantined: false,
+        status: "published",
+      });
+
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "EmailWithLinkToCreateAssessmentSent",
+          payload: {
+            id: conventionEndingYesterday.id,
+          },
+        },
+      ]);
+
+      // Act
+      expectToEqual(
+        await sendEmailWithAssessmentCreationLink.execute({
+          conventionEndDate: {
+            from: oneDayAgo,
+            to: now,
+          },
+        }),
+        {
+          conventionsQtyWithImmersionEnding: 1,
+          conventionsQtyWithAlreadyExistingAssessment: 0,
+          conventionsQtyWithAssessmentSentSuccessfully: 1,
+        },
+      );
+
       // Assert
-      expectToEqual(uow.notificationRepository.notifications, [notification]);
-      expectToEqual(uow.outboxRepository.events, []);
+      expectSavedNotificationsAndEvents({
+        emails: [
+          existingTutorTemplatedEmail,
+          {
+            kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+            params: {
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionEndingYesterday.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionEndingYesterday.signatories.beneficiary.lastName,
+              }),
+              businessName: conventionEndingYesterday.businessName,
+              establishmentTutorEmail:
+                conventionEndingYesterday.establishmentTutor.email,
+              conventionId: conventionEndingYesterday.id,
+              internshipKind: conventionEndingYesterday.internshipKind,
+            },
+            recipients: [
+              conventionEndingYesterday.signatories.beneficiary.email,
+            ],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        ],
+      });
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "EmailWithLinkToCreateAssessmentSent",
+          payload: {
+            id: conventionEndingYesterday.id,
+          },
+        },
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "BeneficiaryAssessmentEmailSent",
+          payload: { id: conventionEndingYesterday.id },
+        },
+      ]);
     });
 
     describe("When an assessment as already been filled", () => {
@@ -622,12 +733,19 @@ describe("SendAssessmentNeededNotifications", () => {
 
         expectToEqual(uow.outboxRepository.events, []);
 
-        await sendEmailWithAssessmentCreationLink.execute({
-          conventionEndDate: {
-            from: oneDayAgo,
-            to: now,
+        expectToEqual(
+          await sendEmailWithAssessmentCreationLink.execute({
+            conventionEndDate: {
+              from: oneDayAgo,
+              to: now,
+            },
+          }),
+          {
+            conventionsQtyWithImmersionEnding: 1,
+            conventionsQtyWithAlreadyExistingAssessment: 1,
+            conventionsQtyWithAssessmentSentSuccessfully: 0,
           },
-        });
+        );
 
         expectToEqual(uow.notificationRepository.notifications, []);
         expectToEqual(uow.outboxRepository.events, []);
@@ -657,14 +775,19 @@ describe("SendAssessmentNeededNotifications", () => {
 
         expectToEqual(uow.outboxRepository.events, []);
 
-        const { errors } = await sendEmailWithAssessmentCreationLink.execute({
-          conventionEndDate: {
-            from: oneDayAgo,
-            to: now,
+        expectToEqual(
+          await sendEmailWithAssessmentCreationLink.execute({
+            conventionEndDate: {
+              from: oneDayAgo,
+              to: now,
+            },
+          }),
+          {
+            conventionsQtyWithImmersionEnding: 2,
+            conventionsQtyWithAlreadyExistingAssessment: 1,
+            conventionsQtyWithAssessmentSentSuccessfully: 1,
           },
-        });
-
-        expect(errors).toEqual({});
+        );
 
         expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
           {
@@ -720,8 +843,8 @@ describe("SendAssessmentNeededNotifications", () => {
     });
   });
 
-  describe("Wrong paths", () => {
-    it("throws on missing user", async () => {
+  describe("Error handling report", () => {
+    it("shows error in report about convention on missing user but does not fail the entire script", async () => {
       // Arrange
 
       uow.conventionRepository.setConventions([
@@ -731,18 +854,27 @@ describe("SendAssessmentNeededNotifications", () => {
       uow.userRepository.users = [];
 
       // Act
-      await expectPromiseToFailWithError(
-        sendEmailWithAssessmentCreationLink.execute({
+      expectToEqual(
+        await sendEmailWithAssessmentCreationLink.execute({
           conventionEndDate: {
             from: now,
             to: inOneDay,
           },
         }),
-        errors.users.notFound({ userIds: [counsellor.id] }),
+        {
+          conventionsQtyWithAlreadyExistingAssessment: 0,
+          conventionsQtyWithAssessmentSentSuccessfully: 0,
+          conventionsQtyWithImmersionEnding: 1,
+          conventionsAssessmentSentErrored: {
+            [conventionEndingTomorrow.id]: errors.users.notFound({
+              userIds: [counsellor.id],
+            }),
+          },
+        },
       );
     });
 
-    it("throws on missing agency", async () => {
+    it("shows error in report about convention on missing agency but does not fail the entire script", async () => {
       // Arrange
 
       uow.conventionRepository.setConventions([
@@ -752,14 +884,23 @@ describe("SendAssessmentNeededNotifications", () => {
       uow.agencyRepository.agencies = [];
 
       // Act
-      expectPromiseToFailWithError(
-        sendEmailWithAssessmentCreationLink.execute({
+      expectToEqual(
+        await sendEmailWithAssessmentCreationLink.execute({
           conventionEndDate: {
             from: now,
             to: inOneDay,
           },
         }),
-        errors.agency.notFound({ agencyId: agency.id }),
+        {
+          conventionsQtyWithAlreadyExistingAssessment: 0,
+          conventionsQtyWithAssessmentSentSuccessfully: 0,
+          conventionsQtyWithImmersionEnding: 1,
+          conventionsAssessmentSentErrored: {
+            [conventionEndingTomorrow.id]: errors.agency.notFound({
+              agencyId: conventionEndingTomorrow.agencyId,
+            }),
+          },
+        },
       );
     });
   });
