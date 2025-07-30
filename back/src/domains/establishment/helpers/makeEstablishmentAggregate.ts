@@ -1,4 +1,9 @@
-import { errors, type FormEstablishmentDto, noContactPerMonth } from "shared";
+import {
+  errors,
+  type FormEstablishmentDto,
+  noContactPerMonth,
+  type ValueOf,
+} from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
@@ -65,16 +70,25 @@ export const makeEstablishmentAggregate = async ({
               phone,
               shouldReceiveDiscussionNotifications,
               isMainContactByPhone,
-              isMainContactInPerson,
+              ...populateUserRightPropIfDefined(
+                "isMainContactInPerson",
+                isMainContactInPerson,
+              ),
             }
           : {
               role,
               userId: user.id,
-              job,
-              phone,
               shouldReceiveDiscussionNotifications,
-              isMainContactByPhone,
-              isMainContactInPerson,
+              ...populateUserRightPropIfDefined(
+                "isMainContactByPhone",
+                isMainContactByPhone,
+              ),
+              ...populateUserRightPropIfDefined("job", job),
+              ...populateUserRightPropIfDefined("phone", phone),
+              ...populateUserRightPropIfDefined(
+                "isMainContactInPerson",
+                isMainContactInPerson,
+              ),
             };
       },
     );
@@ -127,3 +141,8 @@ export const makeEstablishmentAggregate = async ({
     ),
   };
 };
+
+const populateUserRightPropIfDefined = (
+  prop: keyof EstablishmentUserRight,
+  value: ValueOf<EstablishmentUserRight>,
+) => (value !== undefined ? { [prop]: value } : {});

@@ -158,9 +158,12 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     now: Date;
     uow: UnitOfWork;
   }): Promise<DiscussionDto> {
-    const matchingAddress = establishment.establishment.locations.find(
-      (address) => address.id === contactRequest.locationId,
-    );
+    const matchingAddress =
+      contactRequest.contactMode === "IN_PERSON"
+        ? establishment.establishment.potentialBeneficiaryWelcomeAddress
+        : establishment.establishment.locations.find(
+            (address) => address.id === contactRequest.locationId,
+          );
     if (!matchingAddress)
       throw errors.establishment.missingLocation({
         siret: contactRequest.siret,

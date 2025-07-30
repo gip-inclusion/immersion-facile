@@ -380,7 +380,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     contactFirstName: "CONTACT_FIRST_NAME",
     contactLastName: "CONTACT_LAST_NAME",
-    businessAddress: "BUSINESS_ADDRESS",
+    welcomeAddress: "WELCOME_ADDRESS",
     kind: "IF",
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
