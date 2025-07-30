@@ -191,7 +191,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     });
   });
 
-  it("Send an email to validators when beneficiary did NOT came", async () => {
+  it("Send an email to validators when beneficiary did NOT come", async () => {
     const assessmentDidNotShow: AssessmentDto = {
       conventionId: convention.id,
       status: "DID_NOT_SHOW",
@@ -242,6 +242,158 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
           recipients: [validator.email, validator2.email],
         },
       ],
+    });
+  });
+
+  describe("When the convention is FT connected", () => {
+    beforeEach(() => {
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
+        [
+          {
+            _entityName: "ConventionFranceTravailAdvisor",
+            peExternalId: "pe-external-id",
+            conventionId: convention.id,
+            advisor: {
+              firstName: "John",
+              lastName: "Doe",
+              type: "PLACEMENT",
+              email: "john.doe@mail.fr",
+            },
+          },
+        ],
+      );
+    });
+
+    it("When beneficiary came, send an email to the advisor (and not to other agency users)", async () => {
+      uow.userRepository.users = [validator];
+      await uow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+      await uow.conventionRepository.save(convention);
+      await uow.assessmentRepository.save(
+        createAssessmentEntity(assessment, convention),
+      );
+      const advisorEmail = "john.doe@mail.fr";
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
+        [
+          {
+            _entityName: "ConventionFranceTravailAdvisor",
+            peExternalId: "pe-external-id",
+            conventionId: convention.id,
+            advisor: {
+              firstName: "John",
+              lastName: "Doe",
+              type: "PLACEMENT",
+              email: advisorEmail,
+            },
+          },
+        ],
+      );
+
+      await usecase.execute({ assessment });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
+            params: {
+              agencyReferentName: getFormattedFirstnameAndLastname(
+                convention.agencyReferent ?? {},
+              ),
+              immersionObjective: convention.immersionObjective,
+              conventionId: convention.id,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              businessName: convention.businessName,
+              internshipKind: convention.internshipKind,
+              conventionDateEnd: convention.dateEnd,
+              immersionAppellationLabel:
+                convention.immersionAppellation.appellationLabel,
+              assessment,
+              numberOfHoursMade: "45h",
+              magicLink: fakeGenerateMagicLinkUrlFn({
+                targetRoute: frontRoutes.assessmentDocument,
+                id: convention.id,
+                role: "validator",
+                email: advisorEmail,
+                now: timeGateway.now(),
+                lifetime: "long",
+              }),
+            },
+            recipients: [advisorEmail],
+          },
+        ],
+      });
+    });
+
+    it("When beneficiary did NOT come, send an email to the advisor (and not to other agency users)", async () => {
+      uow.userRepository.users = [validator];
+      await uow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+      await uow.conventionRepository.save(convention);
+      const assessmentDidNotShow: AssessmentDto = {
+        conventionId: convention.id,
+        status: "DID_NOT_SHOW",
+        endedWithAJob: false,
+        establishmentFeedback: "osef feedback",
+        establishmentAdvices: "osef conseil",
+      };
+      await uow.assessmentRepository.save(
+        createAssessmentEntity(assessmentDidNotShow, convention),
+      );
+      const advisorEmail = "john.doe@mail.fr";
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
+        [
+          {
+            _entityName: "ConventionFranceTravailAdvisor",
+            peExternalId: "pe-external-id",
+            conventionId: convention.id,
+            advisor: {
+              firstName: "John",
+              lastName: "Doe",
+              type: "PLACEMENT",
+              email: advisorEmail,
+            },
+          },
+        ],
+      );
+
+      await usecase.execute({ assessment: assessmentDidNotShow });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
+            params: {
+              agencyReferentName: getFormattedFirstnameAndLastname(
+                convention.agencyReferent ?? {},
+              ),
+              immersionObjective: convention.immersionObjective,
+              conventionId: convention.id,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              businessName: convention.businessName,
+              internshipKind: convention.internshipKind,
+              immersionAppellationLabel:
+                convention.immersionAppellation.appellationLabel,
+            },
+            recipients: [advisorEmail],
+          },
+        ],
+      });
     });
   });
 });
