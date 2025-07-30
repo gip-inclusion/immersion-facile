@@ -219,7 +219,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     contactFirstName?: string;
     contactLastName?: string;
-    businessAddress: string;
+    welcomeAddress: string;
     kind: DiscussionKind;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;

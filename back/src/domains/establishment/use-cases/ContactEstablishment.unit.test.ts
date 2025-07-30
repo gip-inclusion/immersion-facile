@@ -220,6 +220,18 @@ describe("ContactEstablishment", () => {
           .withEstablishment(
             new EstablishmentEntityBuilder(establishmentEmailWithSiret)
               .withContactMode("IN_PERSON")
+              .withWelcomeAddress({
+                address: {
+                  streetNumberAndAddress: "24 rue des bouchers",
+                  city: "Strasbourg",
+                  postcode: "67000",
+                  departmentCode: "67",
+                },
+                position: {
+                  lat: 48.584614,
+                  lon: 7.750712,
+                },
+              })
               .build(),
           )
           .withOffers([immersionOffer])
@@ -349,7 +361,24 @@ describe("ContactEstablishment", () => {
 
         it("and contact mode IN_PERSON", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
-            new EstablishmentAggregateBuilder(establishmentAggregateWithEmail)
+            new EstablishmentAggregateBuilder({
+              ...establishmentAggregateWithEmail,
+              establishment: {
+                ...establishmentAggregateWithEmail.establishment,
+                potentialBeneficiaryWelcomeAddress: {
+                  address: {
+                    streetNumberAndAddress: "24 rue des bouchers",
+                    city: "Strasbourg",
+                    postcode: "67000",
+                    departmentCode: "67",
+                  },
+                  position: {
+                    lat: 48.584614,
+                    lon: 7.750712,
+                  },
+                },
+              },
+            })
               .withContactMode("IN_PERSON")
               .build(),
           ];
@@ -470,7 +499,24 @@ describe("ContactEstablishment", () => {
 
         it("and contact mode IN_PERSON", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
-            new EstablishmentAggregateBuilder(establishmentAggregateWithEmail)
+            new EstablishmentAggregateBuilder({
+              ...establishmentAggregateWithEmail,
+              establishment: {
+                ...establishmentAggregateWithEmail.establishment,
+                potentialBeneficiaryWelcomeAddress: {
+                  address: {
+                    streetNumberAndAddress: "24 rue des bouchers",
+                    city: "Strasbourg",
+                    postcode: "67000",
+                    departmentCode: "67",
+                  },
+                  position: {
+                    lat: 48.584614,
+                    lon: 7.750712,
+                  },
+                },
+              },
+            })
               .withContactMode("IN_PERSON")
               .build(),
           ];
@@ -642,6 +688,77 @@ describe("ContactEstablishment", () => {
               .build(),
           ],
         );
+      });
+      it("uses the welcome address for in person contact requests", async () => {
+        const establishment = new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder(establishmentEmailWithSiret)
+              .withContactMode("IN_PERSON")
+              .withWelcomeAddress({
+                address: {
+                  streetNumberAndAddress: "24 rue des bouchers",
+                  city: "Strasbourg",
+                  postcode: "67000",
+                  departmentCode: "67",
+                },
+                position: {
+                  lat: 48.584614,
+                  lon: 7.750712,
+                },
+              })
+              .build(),
+          )
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: adminUser.id,
+              shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
+              job: "job",
+              phone: "+33654783402",
+            },
+            {
+              role: "establishment-contact",
+              userId: contactUser.id,
+              shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
+              job: "job",
+              phone: "+33654783402",
+            },
+          ])
+          .withLocations([location])
+          .build();
+
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishment,
+        ];
+
+        await contactEstablishment.execute({
+          ...validEmailRequest,
+          contactMode: "IN_PERSON",
+        });
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          {
+            id: "discussion_id",
+            status: "PENDING",
+            appellationCode: immersionOffer.appellationCode,
+            exchanges: [],
+            siret: establishment.establishment.siret,
+            businessName: establishment.establishment.name,
+            createdAt: timeGateway.now().toISOString(),
+            address:
+              establishment.establishment.potentialBeneficiaryWelcomeAddress
+                ?.address!,
+            contactMode: "IN_PERSON",
+            kind: "IF",
+            potentialBeneficiary: {
+              firstName: validEmailRequest.potentialBeneficiaryFirstName,
+              lastName: validEmailRequest.potentialBeneficiaryLastName,
+              email: validEmailRequest.potentialBeneficiaryEmail,
+            },
+          },
+        ]);
       });
     });
   });
