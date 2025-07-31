@@ -1,5 +1,4 @@
-import { addDays, addHours, parseISO } from "date-fns";
-import subDays from "date-fns/subDays";
+import { addDays, subDays } from "date-fns";
 import { sql } from "kysely";
 import type { Pool } from "pg";
 import {
@@ -16,11 +15,7 @@ import {
   type ConventionStatus,
   DATE_START,
   type DateString,
-  type EmailNotification,
-  expectArraysToEqualIgnoringOrder,
   expectToEqual,
-  getFormattedFirstnameAndLastname,
-  type Notification,
   reasonableSchedule,
   type SiretDto,
   type UserWithAdminRights,
@@ -32,12 +27,9 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
-import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
-import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
-import type { ConventionRepository } from "../ports/ConventionRepository";
+import type { GetConventionsParams } from "../ports/ConventionQueries";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -47,83 +39,6 @@ describe("Pg implementation of ConventionQueries", () => {
   const agencyIdA: AgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
   const agencyIdB: AgencyId = "bbbbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
   const anyConventionUpdatedAt = new Date("2022-05-20T12:43:11").toISOString();
-
-  const createNotification = ({
-    id,
-    createdAt,
-    convention,
-    emailKind,
-  }: {
-    id: string;
-    createdAt: Date;
-    convention: ConventionDto;
-    emailKind:
-      | "ASSESSMENT_ESTABLISHMENT_NOTIFICATION"
-      | "VALIDATED_CONVENTION_FINAL_CONFIRMATION";
-  }): EmailNotification => {
-    return emailKind === "ASSESSMENT_ESTABLISHMENT_NOTIFICATION"
-      ? {
-          createdAt: createdAt.toISOString(),
-          followedIds: {
-            conventionId: convention.id,
-            establishmentSiret: convention.siret,
-            agencyId: convention.agencyId,
-          },
-          id,
-          kind: "email",
-          templatedContent: {
-            kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-            params: {
-              internshipKind: "immersion",
-              assessmentCreationLink: "fake-link",
-              beneficiaryFirstName: "joe",
-              beneficiaryLastName: "joe",
-              conventionId: convention.id,
-              establishmentTutorName: "tuteur du joe",
-              agencyLogoUrl: "https://super link",
-            },
-            recipients: ["joe-joe@gmail.com"],
-          },
-        }
-      : {
-          createdAt: createdAt.toISOString(),
-          followedIds: {
-            conventionId: convention.id,
-            establishmentSiret: convention.siret,
-            agencyId: convention.agencyId,
-          },
-          id,
-          kind: "email",
-          templatedContent: {
-            kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-            params: {
-              conventionId: convention.id,
-              internshipKind: convention.internshipKind,
-              beneficiaryFirstName: "prénom béneficiaire",
-              beneficiaryLastName: "nom béneficiaire",
-              beneficiaryBirthdate: "1995-05-05",
-              dateStart: parseISO(convention.dateStart).toLocaleDateString(
-                "fr",
-              ),
-              dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-              establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-              businessName: convention.businessName,
-              immersionAppellationLabel:
-                convention.immersionAppellation.appellationLabel,
-              emergencyContactInfos: "",
-              agencyLogoUrl: "https://super link",
-              magicLink: "",
-              assessmentMagicLink: "",
-              validatorName: convention.validators?.agencyValidator
-                ? getFormattedFirstnameAndLastname(
-                    convention.validators.agencyValidator,
-                  )
-                : "",
-            },
-            recipients: ["joe-joe@gmail.com"],
-          },
-        };
-  };
 
   const validator = new ConnectedUserBuilder()
     .withEmail("validator@mail.com")
@@ -164,7 +79,7 @@ describe("Pg implementation of ConventionQueries", () => {
     await pool.end();
   });
 
-  describe("PG implementation of method getConventionById", () => {
+  describe("getConventionById", () => {
     it("Returns undefined if no convention with such id", async () => {
       expect(
         await conventionQueries.getConventionById(conventionIdA),
@@ -215,7 +130,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("PG implementation of method getConventionsByScope", () => {
+  describe("getConventionsByScope", () => {
     let franceTravailConvention: ConventionReadDto;
     let cciConvention: ConventionReadDto;
 
@@ -351,38 +266,36 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("PG implementation of method getConventionsByFilters", () => {
-    const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
-    const agency = AgencyDtoBuilder.create().withId(agencyId).build();
-    const siret1 = "11110000111100";
-    const siret2 = "22220000222200";
-    const siret3 = "33330000333300";
+  describe("getConventionsByFilters", () => {
+    const agency = AgencyDtoBuilder.create()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff")
+      .build();
 
     const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
-      .withSiret(siret1)
+      .withSiret("11111111111111")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
       .withDateStart(new Date("2023-03-27").toISOString())
       .withDateEnd(new Date("2023-03-28").toISOString())
       .withSchedule(reasonableSchedule)
       .withStatus("CANCELLED")
-      .withAgencyId(agencyId)
-      .withUpdatedAt(anyConventionUpdatedAt)
+      .withAgencyId(agency.id)
+      .withUpdatedAt(new Date("2023-03-28").toISOString())
       .build();
 
     const conventionReadyToSignAndDateStart20230330 = new ConventionDtoBuilder()
-      .withSiret(siret3)
+      .withSiret("11111111111112")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
       .withDateSubmission(new Date("2023-03-05").toISOString())
       .withDateStart(new Date("2023-03-30").toISOString())
       .withDateEnd(new Date("2023-03-31").toISOString())
       .withSchedule(reasonableSchedule)
       .withStatus("READY_TO_SIGN")
-      .withAgencyId(agencyId)
-      .withUpdatedAt(anyConventionUpdatedAt)
+      .withAgencyId(agency.id)
+      .withUpdatedAt(new Date("2023-03-31").toISOString())
       .build();
 
     const firstValidatedConvention = new ConventionDtoBuilder()
-      .withSiret(siret1)
+      .withSiret("11111111111113")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa03")
       .withDateSubmission(new Date("2024-06-20").toISOString())
       .withDateStart(new Date("2024-07-01").toISOString())
@@ -391,12 +304,12 @@ describe("Pg implementation of ConventionQueries", () => {
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .validated()
       .withDateValidation(new Date("2024-06-25").toISOString())
-      .withAgencyId(agencyId)
-      .withUpdatedAt(anyConventionUpdatedAt)
+      .withAgencyId(agency.id)
+      .withUpdatedAt(new Date("2025-01-01").toISOString())
       .build();
 
     const secondValidatedConvention = new ConventionDtoBuilder()
-      .withSiret(siret2)
+      .withSiret("11111111111114")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa04")
       .withDateSubmission(new Date("2024-06-21").toISOString())
       .withDateStart(new Date("2024-07-02").toISOString())
@@ -405,8 +318,8 @@ describe("Pg implementation of ConventionQueries", () => {
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .validated()
       .withDateValidation(new Date("2024-06-29").toISOString())
-      .withAgencyId(agencyId)
-      .withUpdatedAt(anyConventionUpdatedAt)
+      .withAgencyId(agency.id)
+      .withUpdatedAt(new Date("2024-07-03").toISOString())
       .build();
 
     beforeEach(async () => {
@@ -422,157 +335,183 @@ describe("Pg implementation of ConventionQueries", () => {
           conventionReadyToSignAndDateStart20230330,
           firstValidatedConvention,
           secondValidatedConvention,
-        ].map((params) =>
-          conventionRepository.save(params, anyConventionUpdatedAt),
+        ].map((convention) =>
+          conventionRepository.save(convention, convention.updatedAt),
         ),
       );
     });
 
-    it(`getConventionsByFilters with filters :
-          - dateSubmissionEqual
-        > expect 1 convention retrieved`, async () => {
-      // Act
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          dateSubmissionEqual: new Date(
-            conventionCancelledAndDateStart20230327.dateSubmission,
-          ),
+    it.each([
+      {
+        testName: "with filter dateSubmissionEqual",
+        params: {
+          filters: {
+            dateSubmissionEqual: new Date(
+              conventionCancelledAndDateStart20230327.dateSubmission,
+            ),
+          },
+          sortBy: "dateStart",
         },
-        sortBy: "dateStart",
-      });
-
-      // Assert
-      expectToEqual(resultAll, [conventionCancelledAndDateStart20230327]);
-    });
-
-    it(`getConventionsByFilters with filters :
-          - withStatuses [READY_TO_SIGN]
-        > expect 1 convention retreived`, async () => {
-      // Act
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          withStatuses: ["READY_TO_SIGN"],
+        expectedConventions: [conventionCancelledAndDateStart20230327],
+      },
+      {
+        testName: "with filter withStatuses [READY_TO_SIGN]",
+        params: {
+          filters: {
+            withStatuses: ["READY_TO_SIGN"],
+          },
+          sortBy: "dateStart",
         },
-        sortBy: "dateStart",
-      });
-
-      // Assert
-      expectToEqual(resultAll, [conventionReadyToSignAndDateStart20230330]);
-    });
-
-    it(`getConventionsByFilters with filters :
+        expectedConventions: [conventionReadyToSignAndDateStart20230330],
+      },
+      {
+        testName: "with filter startDateGreater 2023-03-26",
+        params: {
+          filters: {
+            startDateGreater: addDays(
+              new Date(conventionCancelledAndDateStart20230327.dateStart),
+              -1,
+            ),
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [
+          secondValidatedConvention,
+          firstValidatedConvention,
+          conventionReadyToSignAndDateStart20230330,
+          conventionCancelledAndDateStart20230327,
+        ],
+      },
+      {
+        testName: "with filter startDateLessOrEqual 2023-03-27",
+        params: {
+          filters: {
+            startDateLessOrEqual: new Date(
+              conventionCancelledAndDateStart20230327.dateStart,
+            ),
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [conventionCancelledAndDateStart20230327],
+      },
+      {
+        testName: "with filter withSirets",
+        params: {
+          filters: {
+            withSirets: [
+              firstValidatedConvention.siret,
+              secondValidatedConvention.siret,
+            ],
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [
+          secondValidatedConvention,
+          firstValidatedConvention,
+        ],
+      },
+      {
+        testName: "with filter endDate",
+        params: {
+          filters: {
+            endDate: {
+              from: new Date(firstValidatedConvention.dateEnd),
+              to: new Date(firstValidatedConvention.dateEnd),
+            },
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [firstValidatedConvention],
+      },
+      {
+        testName: "with filter updateDate from + to",
+        params: {
+          filters: {
+            updateDate: {
+              // biome-ignore lint/style/noNonNullAssertion: applied on convention
+              from: new Date(firstValidatedConvention.updatedAt!),
+              // biome-ignore lint/style/noNonNullAssertion: applied on convention
+              to: new Date(firstValidatedConvention.updatedAt!),
+            },
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [firstValidatedConvention],
+      },
+      {
+        testName: "with filter updateDate to only",
+        params: {
+          filters: {
+            updateDate: {
+              // biome-ignore lint/style/noNonNullAssertion: applied on convention
+              to: subDays(new Date(firstValidatedConvention.updatedAt!), 1),
+            },
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [
+          secondValidatedConvention,
+          conventionReadyToSignAndDateStart20230330,
+          conventionCancelledAndDateStart20230327,
+        ],
+      },
+      {
+        testName: `with filters:
           - startDateGreater 2023-03-26
-        > expect 2 convention retreived`, async () => {
-      // Act
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          startDateGreater: addDays(
-            new Date(conventionCancelledAndDateStart20230327.dateStart),
-            -1,
-          ),
-        },
-        sortBy: "dateStart",
-      });
-
-      // Assert
-      expectToEqual(resultAll, [
-        secondValidatedConvention,
-        firstValidatedConvention,
-        conventionReadyToSignAndDateStart20230330,
-        conventionCancelledAndDateStart20230327,
-      ]);
-    });
-
-    it(`getConventionsByFilters with filters :
           - startDateLessOrEqual 2023-03-27
-        > expect 1 convention retreived`, async () => {
-      // Act
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          startDateLessOrEqual: new Date(
-            conventionCancelledAndDateStart20230327.dateStart,
-          ),
+          - withStatuses ["READY_TO_SIGN"]`,
+        params: {
+          filters: {
+            startDateGreater: addDays(
+              new Date(conventionCancelledAndDateStart20230327.dateStart),
+              -1,
+            ),
+            startDateLessOrEqual: new Date(
+              conventionCancelledAndDateStart20230327.dateStart,
+            ),
+            withStatuses: [conventionCancelledAndDateStart20230327.status],
+          },
+          sortBy: "dateStart",
         },
-        sortBy: "dateStart",
-      });
-
-      // Assert
-      expectToEqual(resultAll, [conventionCancelledAndDateStart20230327]);
-    });
-
-    it(`getConventionsByFilters with filters:
-          - startDateGreater 2023-03-26
-          - startDateLessOrEqual 2023-03-27
-          - withStatuses ["READY_TO_SIGN"]
-        > expect 1 convention retreived`, async () => {
-      // Act
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          startDateGreater: addDays(
-            new Date(conventionCancelledAndDateStart20230327.dateStart),
-            -1,
-          ),
-          startDateLessOrEqual: new Date(
-            conventionCancelledAndDateStart20230327.dateStart,
-          ),
-          withStatuses: [conventionCancelledAndDateStart20230327.status],
-        },
-        sortBy: "dateStart",
-      });
-
-      // Assert
-      expectToEqual(resultAll, [conventionCancelledAndDateStart20230327]);
-    });
-
-    it(`getConventionsByFilters with:
+        expectedConventions: [conventionCancelledAndDateStart20230327],
+      },
+      {
+        testName: `with filters:
           - startDateGreater 2023-03-30'
-          - startDateLessOrEqual 2023-03-31
-        > expect 0 convention retreived`, async () => {
-      // Act
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          startDateGreater: new Date("2023-03-30"),
-          startDateLessOrEqual: new Date("2023-03-31"),
+          - startDateLessOrEqual 2023-03-31`,
+        params: {
+          filters: {
+            startDateGreater: new Date("2023-03-30"),
+            startDateLessOrEqual: new Date("2023-03-31"),
+          },
+          sortBy: "dateStart",
         },
-        sortBy: "dateStart",
-      });
-
-      // Assert
-      expectToEqual(resultAll, []);
-    });
-
-    it(`getConventionsByFilters with:
-      - withStatuses ["ACCEPTED-BY-VALIDATOR"]
-      - sort by "date_validation"
-    > expect 2 convention retreived`, async () => {
-      // Act
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          withStatuses: [firstValidatedConvention.status],
+        expectedConventions: [],
+      },
+      {
+        testName: `with filters :
+          - withStatuses ["ACCEPTED-BY-VALIDATOR"]
+          - sort by "date_validation"`,
+        params: {
+          filters: {
+            withStatuses: [firstValidatedConvention.status],
+          },
+          sortBy: "dateValidation",
         },
-        sortBy: "dateValidation",
-      });
-
-      // Assert
-      expectToEqual(resultAll, [
-        secondValidatedConvention,
-        firstValidatedConvention,
-      ]);
-    });
-
-    it("getConventionsByFilters with some sirets", async () => {
-      const resultAll = await conventionQueries.getConventions({
-        filters: {
-          withSirets: [siret1, siret2],
-        },
-        sortBy: "dateStart",
-      });
-
-      expectToEqual(resultAll, [
-        secondValidatedConvention,
-        firstValidatedConvention,
-        conventionCancelledAndDateStart20230327,
-      ]);
+        expectedConventions: [
+          secondValidatedConvention,
+          firstValidatedConvention,
+        ],
+      },
+    ] satisfies {
+      testName: string;
+      params: GetConventionsParams;
+      expectedConventions: ConventionDto[];
+    }[])("$testName", async ({ params, expectedConventions }) => {
+      expectToEqual(
+        await conventionQueries.getConventions(params),
+        expectedConventions,
+      );
     });
   });
 
@@ -718,236 +657,6 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("PG implementation of method getAllConventionsForThoseEndingThatDidntGoThrough", () => {
-    const agency = AgencyDtoBuilder.create().build();
-    const dateStart = new Date("2022-05-10").toISOString();
-    const dateEnd14 = new Date("2022-05-14").toISOString();
-    const dateEnd15 = new Date("2022-05-15").toISOString();
-    const validatedImmersionEndingThe14th = new ConventionDtoBuilder()
-      .withId("aaaaac14-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-      .validated()
-      .withDateStart(dateStart)
-      .withDateEnd(dateEnd14)
-      .withSchedule(reasonableSchedule)
-      .withUpdatedAt(anyConventionUpdatedAt)
-      .build();
-
-    const validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail =
-      new ConventionDtoBuilder()
-        .withId("aaaaac15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-        .validated()
-        .withDateStart(dateStart)
-        .withDateEnd(dateEnd15)
-        .withSchedule(reasonableSchedule)
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-
-    const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
-      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-      .validated()
-      .withDateStart(dateStart)
-      .withDateEnd(dateEnd15)
-      .withSchedule(reasonableSchedule)
-      .withEstablishmentTutorFirstName("Romain")
-      .withEstablishmentTutorLastName("Grandjean")
-      .withUpdatedAt(anyConventionUpdatedAt)
-      .build();
-
-    const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
-      .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-      .withDateStart(dateStart)
-      .withDateEnd(dateEnd15)
-      .withSchedule(reasonableSchedule)
-      .withStatus("IN_REVIEW")
-      .withUpdatedAt(anyConventionUpdatedAt)
-      .build();
-
-    const assessmentNotification: Notification = createNotification({
-      id: "77770000-0000-4777-7777-000077770000",
-      createdAt: subDays(new Date(dateEnd15), 1),
-      convention:
-        validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-      emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-    });
-    const conventionValidateEndingThe14thNotification: Notification =
-      createNotification({
-        id: "77770000-0000-4777-7777-000077770001",
-        createdAt: subDays(new Date(dateEnd14), 7),
-        convention: validatedImmersionEndingThe14th,
-        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      });
-    const conventionValidateEndingThe15thNotification: Notification =
-      createNotification({
-        id: "77770000-0000-4777-7777-000077770002",
-        createdAt: subDays(new Date(dateEnd15), 7),
-        convention:
-          validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      });
-    const conventionValidateEndingThe15thNotification2: Notification =
-      createNotification({
-        id: "77770000-0000-4777-7777-000077770003",
-        createdAt: subDays(new Date(dateEnd15), 7),
-        convention: validatedImmersionEndingThe15th,
-        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      });
-    const ongoingConventionValidateEndingThe15thNotification2: Notification =
-      createNotification({
-        id: "77770000-0000-4777-7777-000077770004",
-        createdAt: subDays(new Date(dateEnd15), 7),
-        convention: ongoingImmersionEndingThe15th,
-        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      });
-
-    let conventionRepo: ConventionRepository;
-    let notificationRepo: NotificationRepository;
-
-    beforeEach(async () => {
-      const validator = makeUniqueUserForTest(uuid());
-      await new PgUserRepository(db).save(validator);
-      await new PgAgencyRepository(db).insert(
-        toAgencyWithRights(agency, {
-          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
-        }),
-      );
-
-      conventionRepo = new PgConventionRepository(db);
-      notificationRepo = new PgNotificationRepository(db);
-
-      await Promise.all(
-        [
-          validatedImmersionEndingThe14th,
-          validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-          validatedImmersionEndingThe15th,
-          ongoingImmersionEndingThe15th,
-        ].map((params) => conventionRepo.save(params, anyConventionUpdatedAt)),
-      );
-      await notificationRepo.saveBatch([
-        assessmentNotification,
-        conventionValidateEndingThe14thNotification,
-        conventionValidateEndingThe15thNotification,
-        conventionValidateEndingThe15thNotification2,
-        ongoingConventionValidateEndingThe15thNotification2,
-      ]);
-    });
-
-    it("Gets all conventions of validated immersions ending at given date that did not receive any assessment link yet", async () => {
-      // Act
-      const date = new Date("2022-05-15T12:43:11");
-      const queryResults =
-        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-          {
-            from: date,
-            to: addHours(date, 24),
-          },
-          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-        );
-
-      // Assert
-      expectToEqual(queryResults, [validatedImmersionEndingThe15th]);
-    });
-
-    it("Gets all conventions of validated conventions that are already passed but has been ACCEPTED_BY_VALIDATOR at a later date", async () => {
-      const validationDate = new Date("2022-05-20T12:43:11");
-      const futureConvention = new ConventionDtoBuilder()
-        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad0")
-        .validated()
-        .withDateStart(addDays(validationDate, 2).toISOString())
-        .withDateEnd(addDays(validationDate, 4).toISOString())
-        .withSchedule(reasonableSchedule)
-        .withEstablishmentTutorFirstName("Romain")
-        .withEstablishmentTutorLastName("Grandjean")
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-      const futureConventionNotification: Notification = createNotification({
-        id: "77770000-0000-4777-7773-000077770000",
-        createdAt: validationDate,
-        convention: futureConvention,
-        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      });
-      const pastConvention = new ConventionDtoBuilder()
-        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad5")
-        .validated()
-        .withDateStart(dateStart)
-        .withDateEnd(dateEnd15)
-        .withSchedule(reasonableSchedule)
-        .withEstablishmentTutorFirstName("Romain")
-        .withEstablishmentTutorLastName("Grandjean")
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-      const pastConventionNotification: Notification = createNotification({
-        id: "77770000-0000-4777-7777-000077770005",
-        createdAt: validationDate,
-        convention: pastConvention,
-        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      });
-      await conventionRepo.save(pastConvention, anyConventionUpdatedAt);
-      await conventionRepo.save(futureConvention, anyConventionUpdatedAt);
-      await notificationRepo.save(pastConventionNotification);
-      await notificationRepo.save(futureConventionNotification);
-
-      const queryResults =
-        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-          {
-            from: subDays(validationDate, 5),
-            to: addHours(validationDate, 24),
-          },
-          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-        );
-
-      expectArraysToEqualIgnoringOrder(queryResults, [
-        validatedImmersionEndingThe14th,
-        validatedImmersionEndingThe15th,
-        pastConvention,
-      ]);
-    });
-
-    it("Gets all conventions of validated conventions that are already passed but has been ACCEPTED_BY_VALIDATOR today", async () => {
-      await db.deleteFrom("notifications_email_recipients").execute();
-      await db.deleteFrom("notifications_email").execute();
-      await db.deleteFrom("conventions").execute();
-      const today = new Date();
-      const pastConvention = new ConventionDtoBuilder()
-        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad5")
-        .validated()
-        .withDateStart(subDays(today, 15).toISOString())
-        .withDateEnd(subDays(today, 10).toISOString())
-        .withSchedule(reasonableSchedule)
-        .withEstablishmentTutorFirstName("Romain")
-        .withEstablishmentTutorLastName("Grandjean")
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-      const pastConventionNotification: Notification = createNotification({
-        id: "77770000-0000-4777-7777-000077770005",
-        createdAt: today,
-        convention: pastConvention,
-        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      });
-      await conventionRepo.save(pastConvention, anyConventionUpdatedAt);
-      await conventionRepo.update(
-        {
-          ...pastConvention,
-          status: "ACCEPTED_BY_VALIDATOR",
-        },
-        today.toISOString(),
-      );
-      await notificationRepo.save(pastConventionNotification);
-
-      const queryResults =
-        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-          {
-            from: today,
-            to: addDays(today, 1),
-          },
-          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-        );
-
-      expectArraysToEqualIgnoringOrder(queryResults, [
-        { ...pastConvention, updatedAt: today.toISOString() },
-      ]);
-    });
-  });
-
   const insertAgencyAndConvention = async ({
     conventionId,
     agencyId,
@@ -1077,7 +786,7 @@ describe("Pg implementation of ConventionQueries", () => {
     } satisfies ConventionReadDto;
   };
 
-  describe("PG implementation of method getPaginatedConventionsForAgencyUser", () => {
+  describe("getPaginatedConventionsForAgencyUser", () => {
     const agencyId = "cccccc99-9c0b-1bbb-bb6d-6bb9bd38cccc";
     const agency = new AgencyDtoBuilder()
       .withId(agencyId)
