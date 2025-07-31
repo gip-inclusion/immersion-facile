@@ -154,6 +154,43 @@ describe("AddAgenciesAndUsers", () => {
         },
       ]);
     });
+
+    it("should add users if two rows with the same siret that already exist in DB", async () => {
+      const userAlreadyInDB = new ConnectedUserBuilder()
+        .withId("10000000-0000-0000-0000-000000000021")
+        .withEmail("user-already-in-db@mail.fr")
+        .buildUser();
+      const agencyAlreadyInDB = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("10000000-0000-0000-0000-000000000011")
+          .withAgencySiret(siret1)
+          .build(),
+        {
+          [userAlreadyInDB.id]: {
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+        },
+      );
+      await uow.userRepository.save(userAlreadyInDB);
+      await uow.agencyRepository.insert(agencyAlreadyInDB);
+
+      const newUserId1 = "10000000-0000-0000-0000-000000000022";
+      const newUserId2 = "10000000-0000-0000-0000-000000000023";
+      uuidGenerator.setNextUuids([newUserId1, newUserId2]);
+      const result = await addAgenciesAndUsers.execute([
+        { ...rows[0], "E-mail authentification": user1Email },
+        { ...rows[0], "E-mail authentification": user2Email },
+      ]);
+
+      expect(result).toEqual({
+        siretAlreadyInIFCount: 1,
+        createdAgenciesCount: 0,
+        createdUsersCount: 2,
+        usersAlreadyInIFCount: 0,
+        usecaseErrors: {},
+      });
+    });
   });
 
   describe("rows with duplicates (same siret + nom structure + e-mail authentification + coordonnées + téléphone)", () => {

@@ -22,7 +22,10 @@ import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
 // Upload a file to the one-off container (target is /tmp/uploads)
-// scalingo --app my-app run --file ./dump.sql <command>
+// scalingo --app my-app --region my-region run --file "/path/to/file.csv" bash
+
+// confirm that file is on the container
+// ls /tmp/uploads
 
 // Then run this file with:
 // pnpm back trigger-add-agencies-and-users /tmp/uploads/export.csv
