@@ -156,7 +156,7 @@ describe("AddAgenciesAndUsers", () => {
     });
   });
 
-  describe("rows with duplicates (same siret + nom structure + e-mail authentification + adresse ligne 1 + code postal + ville + téléphone)", () => {
+  describe("rows with duplicates (same siret + nom structure + e-mail authentification + coordonnées + téléphone)", () => {
     const row = {
       ID: "1",
       SIRET: siret1,
@@ -181,9 +181,7 @@ describe("AddAgenciesAndUsers", () => {
         "Type structure": "EI",
         "Nom structure": row["Nom structure"].toLowerCase(),
         "E-mail authentification": row["E-mail authentification"].toUpperCase(),
-        "Adresse ligne 1": row["Adresse ligne 1"].toUpperCase(),
-        "Adresse ligne 2": row["Adresse ligne 2"].toUpperCase(),
-        Ville: row.Ville.toUpperCase(),
+        Coordonées: row["Coordonées"],
         Téléphone: "+336 00 00 00 00",
       },
     ];

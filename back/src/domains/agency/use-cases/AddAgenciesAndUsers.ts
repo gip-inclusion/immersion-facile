@@ -302,7 +302,7 @@ const createNewAgencies = async ({
   });
 };
 
-// duplicas si même siret + nom structure + e-mail authentification + adresse ligne 1 + code postal + ville + téléphone
+// duplicas si même siret + nom structure + e-mail authentification + lat + long + téléphone
 function findDuplicatesInImportedRows(
   rows: ImportedAgencyAndUserRow[],
 ): Record<string, ImportedAgencyAndUserRow[]> {
@@ -312,9 +312,7 @@ function findDuplicatesInImportedRows(
         row.SIRET,
         row["Nom structure"],
         row["E-mail authentification"],
-        row["Adresse ligne 1"],
-        row["Code postal"],
-        row.Ville,
+        row["Coordonées"],
         row.Téléphone,
       ].join("||");
 
