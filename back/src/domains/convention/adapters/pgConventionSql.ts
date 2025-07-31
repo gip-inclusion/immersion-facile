@@ -270,7 +270,9 @@ const createConventionSelection = <
 };
 
 // Function to create the common joins for both query builders
-const createCommonJoins = <QB extends SelectQueryBuilder<Database, any, any>>(
+const withActorsAndAppellationsAndPartnerPeJoin = <
+  QB extends SelectQueryBuilder<Database, any, any>,
+>(
   builder: QB,
 ): QB => {
   return builder
@@ -296,20 +298,20 @@ const createCommonJoins = <QB extends SelectQueryBuilder<Database, any, any>>(
       "view_appellations_dto as vad",
       "vad.appellation_code",
       "conventions.immersion_appellation",
-    )
-    .leftJoin("agencies", "agencies.id", "conventions.agency_id") as QB;
+    ) as QB;
 };
 
 export const createConventionQueryBuilder = (
   transaction: KyselyDb,
-): ConventionQueryBuilder => {
-  // biome-ignore format: reads better without formatting
-  const builder = transaction
-    .selectFrom("conventions");
-
-  const builderWithJoins = createCommonJoins(builder);
-  return createConventionSelection(builderWithJoins);
-};
+  withAgencyJoin: boolean,
+): ConventionQueryBuilder =>
+  createConventionSelection(
+    withActorsAndAppellationsAndPartnerPeJoin(
+      transaction.selectFrom("conventions"),
+    ),
+  ).$if(withAgencyJoin, (qb) =>
+    qb.leftJoin("agencies", "agencies.id", "conventions.agency_id"),
+  );
 
 export const createConventionQueryBuilderForAgencyUser = ({
   transaction,
@@ -322,6 +324,7 @@ export const createConventionQueryBuilderForAgencyUser = ({
   const builder = transaction
     .selectFrom("users__agencies")
     .innerJoin("conventions", "users__agencies.agency_id", "conventions.agency_id")
+    .leftJoin("agencies", "agencies.id", "conventions.agency_id")
     .where("users__agencies.user_id", "=", agencyUserId)
     .where(({ eb }) => eb.or([
       sql<boolean>`users__agencies.roles ? 'counsellor'`,
@@ -330,7 +333,7 @@ export const createConventionQueryBuilderForAgencyUser = ({
       sql<boolean>`users__agencies.roles ? 'agency-viewer'`,
     ]));
 
-  const builderWithJoins = createCommonJoins(builder);
+  const builderWithJoins = withActorsAndAppellationsAndPartnerPeJoin(builder);
   return createConventionSelection(builderWithJoins);
 };
 
@@ -408,7 +411,7 @@ export const getReadConventionById = async (
   transaction: KyselyDb,
   conventionId: ConventionId,
 ): Promise<ConventionReadDto | undefined> => {
-  const pgConvention = await createConventionQueryBuilder(transaction)
+  const pgConvention = await createConventionQueryBuilder(transaction, true)
     .where("conventions.id", "=", conventionId)
     .executeTakeFirst();
 

@@ -33,7 +33,7 @@ export class PgEstablishmentLeadQueries implements EstablishmentLeadQueries {
     if (!isSiretsListFilled(sirets)) return [];
 
     return pipeWithValue(
-      createConventionQueryBuilder(this.transaction),
+      createConventionQueryBuilder(this.transaction, false),
       makeGetLastConventionWithSiretInList(sirets),
       (builder) =>
         builder.where(
