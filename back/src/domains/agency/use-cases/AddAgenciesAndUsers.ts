@@ -1,11 +1,14 @@
-import { flatten, splitEvery, uniq, values } from "ramda";
+import { flatten, keys, splitEvery, uniq, values } from "ramda";
 import {
+  type AgencyRole,
+  type AgencyUsersRights,
   type AgencyWithUsersRights,
   type DepartmentCode,
   errors,
   executeInSequence,
   type GeoPositionDto,
   geoPositionSchema,
+  NotFoundError,
   type PhoneNumber,
   phoneNumberSchema,
   type SiretDto,
@@ -155,57 +158,83 @@ const linkUsersToExistingAgency = async ({
   const rowsWithSiretAlreadyInIF = importedAgencyAndUserRows.filter((row) =>
     siretsInIF.includes(row.SIRET),
   );
-  const chunkSize = 30;
-  const chunks = splitEvery(chunkSize, rowsWithSiretAlreadyInIF);
+  const rowsBySiret: Record<SiretDto, ImportedAgencyAndUserRow[]> =
+    rowsWithSiretAlreadyInIF.reduce(
+      (acc, row) => {
+        if (!acc[row.SIRET]) {
+          acc[row.SIRET] = [];
+        }
+        acc[row.SIRET].push(row);
+        return acc;
+      },
+      {} as Record<SiretDto, ImportedAgencyAndUserRow[]>,
+    );
 
-  await executeInSequence(chunks, async (rows) => {
+  const chunkSize = 30;
+  const chunks = splitEvery(chunkSize, keys(rowsBySiret));
+
+  await executeInSequence(chunks, async (sirets) => {
     const agenciesIF = await agencyRepository.getAgencies({
       filters: {
-        sirets: rows.map((row) => row.SIRET),
+        sirets,
       },
     });
 
-    rows.map(async (row) => {
-      const agencyIF = agenciesIF.find(
-        (agencyIF) => agencyIF.agencySiret === row.SIRET,
-      );
-      if (!agencyIF)
-        throw new Error(
-          `Should not happen: Agency ${row.SIRET} not found in IF`,
+    await Promise.all(
+      sirets.map(async (siret) => {
+        const agencyIF = agenciesIF.find(
+          (agencyIF) => agencyIF.agencySiret === siret,
         );
-      const user = await userRepository.findByEmail(
-        row["E-mail authentification"],
-      );
-      if (!user) {
-        usecaseErrors[row.ID] = errors.user.notFoundByEmail({
-          email: row["E-mail authentification"],
-        });
-        return;
-      }
+        if (!agencyIF) {
+          usecaseErrors[siret] = new NotFoundError(
+            `Agency with siret ${siret} not found in IF`,
+          );
+          return;
+        }
 
-      const userWithRoles = agencyIF.usersRights[user.id] ?? undefined;
+        const agencyUsersRights: {
+          userId: string;
+          roles: AgencyRole[];
+          isNotifiedByEmail: boolean;
+        }[] = await Promise.all(
+          rowsBySiret[siret]
+            .map((row) => row["E-mail authentification"])
+            .map(async (email) => {
+              const user = await userRepository.findByEmail(email);
 
-      if (
-        !userWithRoles ||
-        !userWithRoles.roles.includes("agency-admin") ||
-        !userWithRoles.roles.includes("validator")
-      ) {
+              if (!user) {
+                throw new Error(
+                  `Should not happen: User ${email} of siret ${siret} should already be created`,
+                );
+              }
+
+              const userWithRoles = agencyIF.usersRights[user.id] ?? undefined;
+
+              return {
+                userId: user.id,
+                roles: uniq([
+                  ...(userWithRoles ? userWithRoles.roles : []),
+                  "agency-admin",
+                  "validator",
+                ]),
+                isNotifiedByEmail: userWithRoles?.isNotifiedByEmail ?? true,
+              };
+            }),
+        );
+
         await agencyRepository.update({
           id: agencyIF.id,
           usersRights: {
             ...agencyIF.usersRights,
-            [user.id]: {
-              roles: uniq([
-                ...(userWithRoles ? userWithRoles.roles : []),
-                "agency-admin",
-                "validator",
-              ]),
-              isNotifiedByEmail: userWithRoles?.isNotifiedByEmail ?? true,
-            },
+            ...agencyUsersRights.reduce((acc, curr) => {
+              const { roles, isNotifiedByEmail } = curr;
+              acc[curr.userId] = { roles, isNotifiedByEmail };
+              return acc;
+            }, {} as AgencyUsersRights),
           },
         });
-      }
-    });
+      }),
+    );
   });
 };
 
@@ -314,8 +343,8 @@ function findDuplicatesInImportedRows(
         row.SIRET,
         row["Nom structure"],
         row["E-mail authentification"],
-        row["Coordonées"].lat,
-        row["Coordonées"].lon,
+        row.Coordonées.lat,
+        row.Coordonées.lon,
         row.Téléphone,
       ].join("||");
 
