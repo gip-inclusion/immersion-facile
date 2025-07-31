@@ -76,9 +76,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
   .build(async ({ inputParams, uow, deps }) => {
     const usecaseErrors: Record<string, Error> = {};
     const chunkSize = 300;
-    const formattedImportedAgencies =
-      formatImportedAgencyAndUserRow(inputParams);
-    const chunks = splitEvery(chunkSize, formattedImportedAgencies);
+    const chunks = splitEvery(chunkSize, inputParams);
     const siretsInIF = uniq(
       flatten(
         await Promise.all(
@@ -91,7 +89,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       ),
     );
 
-    const rowsNotInIF = formattedImportedAgencies.filter(
+    const rowsNotInIF = inputParams.filter(
       (importedAgency) => !siretsInIF.includes(importedAgency.SIRET),
     );
     const { rowsWithDuplicates, uniqRows } =
@@ -99,8 +97,8 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
 
     const { createdUsersCount, usersAlreadyInIFCount } =
       await createOrUpdateUsers({
-        emails: formattedImportedAgencies.map(
-          (importedAgency) => importedAgency["E-mail authentification"],
+        emails: inputParams.map((importedAgency) =>
+          importedAgency["E-mail authentification"].toLowerCase(),
         ),
         userRepository: uow.userRepository,
         timeGateway: deps.timeGateway,
@@ -109,7 +107,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
 
     await linkUsersToExistingAgency({
       siretsInIF,
-      importedAgencyAndUserRows: formattedImportedAgencies,
+      importedAgencyAndUserRows: inputParams,
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
       usecaseErrors,
@@ -124,7 +122,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     });
 
     await createNewAgenciesWithSuffix({
-      allRows: formattedImportedAgencies,
+      allRows: inputParams,
       rowsToCreateAsAgencies: uniqRows,
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
@@ -213,7 +211,7 @@ const linkUsersToExistingAgency = async ({
 
 const formatImportedAgencyAndUserRow = (
   importedAgencyAndUserRow: ImportedAgencyAndUserRow[],
-) => {
+): ImportedAgencyAndUserRow[] => {
   const removeSpaces = (str: string) => str.replace(/\s/g, "");
   const capitalizeFirstLetter = (str: string) =>
     str
@@ -222,16 +220,16 @@ const formatImportedAgencyAndUserRow = (
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
 
-  return importedAgencyAndUserRow.map((row) => ({
-    ...row,
-    "Type structure": row["Type structure"].toUpperCase(),
-    "Nom structure": capitalizeFirstLetter(row["Nom structure"]),
-    "E-mail authentification": row["E-mail authentification"].toLowerCase(),
-    "Adresse ligne 1": row["Adresse ligne 1"].toLowerCase(),
-    "Adresse ligne 2": row["Adresse ligne 2"].toLowerCase(),
-    Ville: capitalizeFirstLetter(row.Ville),
-    Téléphone: removeSpaces(row.Téléphone),
-  }));
+  return importedAgencyAndUserRow.map(
+    (row) =>
+      ({
+        ...row,
+        "Type structure": row["Type structure"].toUpperCase(),
+        "Nom structure": capitalizeFirstLetter(row["Nom structure"]),
+        "E-mail authentification": row["E-mail authentification"].toLowerCase(),
+        Téléphone: removeSpaces(row.Téléphone),
+      }) satisfies ImportedAgencyAndUserRow,
+  );
 };
 
 const createNewAgencies = async ({
@@ -306,20 +304,25 @@ const createNewAgencies = async ({
 function findDuplicatesInImportedRows(
   rows: ImportedAgencyAndUserRow[],
 ): Record<string, ImportedAgencyAndUserRow[]> {
-  const groupedRows = rows.reduce(
+  const rowsById: Record<string, ImportedAgencyAndUserRow> = Object.fromEntries(
+    rows.map((row) => [row.ID, row]),
+  );
+  const formattedRows = formatImportedAgencyAndUserRow(rows);
+  const groupedRows = formattedRows.reduce(
     (acc, row) => {
       const key = [
         row.SIRET,
         row["Nom structure"],
         row["E-mail authentification"],
-        row["Coordonées"],
+        row["Coordonées"].lat,
+        row["Coordonées"].lon,
         row.Téléphone,
       ].join("||");
 
       if (!acc[key]) {
         acc[key] = [];
       }
-      acc[key].push(row);
+      acc[key].push(rowsById[row.ID]);
 
       return acc;
     },

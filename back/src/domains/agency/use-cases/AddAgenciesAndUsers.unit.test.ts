@@ -181,7 +181,6 @@ describe("AddAgenciesAndUsers", () => {
         "Type structure": "EI",
         "Nom structure": row["Nom structure"].toLowerCase(),
         "E-mail authentification": row["E-mail authentification"].toUpperCase(),
-        Coordonées: row["Coordonées"],
         Téléphone: "+336 00 00 00 00",
       },
     ];
@@ -258,6 +257,7 @@ describe("AddAgenciesAndUsers", () => {
       row,
       {
         ...row,
+        ID: "2",
         "Type structure": "EI",
         Téléphone: "+33611111111",
       },
