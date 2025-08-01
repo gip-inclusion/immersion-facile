@@ -87,6 +87,7 @@ export const AgencyFormCommonFields = ({
         geocodingSlice.actions.fetchSuggestionsRequested({
           locator: "agency-address",
           lookup: establishmentInfos.businessAddress,
+          countryCode: "FR",
           selectFirstSuggestion: true,
         }),
       );
@@ -135,6 +136,7 @@ export const AgencyFormCommonFields = ({
         disabled={disableAgencyName}
       />
       <AddressAutocomplete
+        countryCode="FR"
         locator="agency-address"
         {...formContents.address}
         selectProps={{

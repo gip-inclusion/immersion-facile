@@ -5,6 +5,7 @@ import type {
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
+  SupportedCountryCode,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -25,16 +26,19 @@ export class HttpAddressGateway implements AddressGateway {
 
   public lookupStreetAddress$(
     lookup: LookupAddress,
+    countryCode: SupportedCountryCode,
   ): Observable<AddressAndPosition[]> {
-    return from(this.#lookupStreetAddress(lookup));
+    return from(this.#lookupStreetAddress(lookup, countryCode));
   }
 
   async #lookupStreetAddress(
     lookup: LookupAddress,
+    countryCode: SupportedCountryCode,
   ): Promise<AddressAndPosition[]> {
     const response = await this.httpClient.lookupStreetAddress({
       queryParams: {
         lookup,
+        countryCode,
       },
     });
 

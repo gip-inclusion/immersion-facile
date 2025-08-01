@@ -51,6 +51,7 @@ export const MultipleAddressInput = ({
             >
               <div className={fr.cx("fr-col", "fr-mt-2w")}>
                 <AddressAutocomplete
+                  countryCode="FR"
                   multiple
                   disabled={disabled}
                   locator={locator}

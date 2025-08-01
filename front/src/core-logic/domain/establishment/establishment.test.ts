@@ -66,6 +66,7 @@ describe("Establishment", () => {
         } as SiretEstablishmentDto,
         feedbackTopic: "siret-input",
         addressAutocompleteLocator: "convention-immersion-address",
+        countryCode: "FR",
       }),
     );
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered(null);

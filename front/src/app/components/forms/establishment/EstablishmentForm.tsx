@@ -288,6 +288,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           geocodingSlice.actions.fetchSuggestionsRequested({
             locator: `multiple-address-${index}`,
             lookup: address.rawAddress,
+            countryCode: "FR",
             selectFirstSuggestion: true,
           }),
         );
