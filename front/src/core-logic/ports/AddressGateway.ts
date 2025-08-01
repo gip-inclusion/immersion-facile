@@ -4,9 +4,13 @@ import type {
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
+  SupportedCountryCode,
 } from "shared";
 
 export interface AddressGateway {
-  lookupStreetAddress$(lookup: LookupAddress): Observable<AddressAndPosition[]>;
+  lookupStreetAddress$(
+    lookup: LookupAddress,
+    countryCode: SupportedCountryCode,
+  ): Observable<AddressAndPosition[]>;
   lookupLocation$(query: LookupLocationInput): Observable<LookupSearchResult[]>;
 }

@@ -1,8 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type {
-  GetSiretInfoError,
-  SiretDto,
-  SiretEstablishmentDto,
+import {
+  type GetSiretInfoError,
+  getCountrycodeFromAddress,
+  type SiretDto,
+  type SiretEstablishmentDto,
+  type SupportedCountryCode,
 } from "shared";
 import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import type { AddressAutocompleteLocator } from "src/core-logic/domain/geocoding/geocoding.slice";
@@ -16,6 +18,7 @@ export interface SiretState {
   shouldFetchEvenIfAlreadySaved: boolean;
   establishment: SiretEstablishmentDto | null;
   error: GetSiretInfoError | InvalidSiretError | null;
+  countryCode: SupportedCountryCode | null;
 }
 
 const initialState: SiretState = {
@@ -24,6 +27,7 @@ const initialState: SiretState = {
   shouldFetchEvenIfAlreadySaved: true,
   establishment: null,
   error: null,
+  countryCode: null,
 };
 
 export const siretSlice = createSlice({
@@ -68,10 +72,14 @@ export const siretSlice = createSlice({
       action: PayloadActionWithFeedbackTopic<{
         siretEstablishment: SiretEstablishmentDto;
         addressAutocompleteLocator: AddressAutocompleteLocator;
+        countryCode: SupportedCountryCode;
       }>,
     ) => {
       state.isSearching = false;
       state.establishment = action.payload.siretEstablishment;
+      state.countryCode = getCountrycodeFromAddress(
+        action.payload.siretEstablishment.businessAddress,
+      );
     },
     siretInfoDisabledAndNoMatchInDbFound: (
       state,

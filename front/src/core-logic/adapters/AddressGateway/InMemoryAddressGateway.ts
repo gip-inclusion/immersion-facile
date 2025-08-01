@@ -4,6 +4,7 @@ import {
   type LookupAddress,
   type LookupLocationInput,
   type LookupSearchResult,
+  type SupportedCountryCode,
   sleep,
 } from "shared";
 import type { AddressGateway } from "src/core-logic/ports/AddressGateway";
@@ -19,15 +20,21 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   public lookupStreetAddress$(
     lookup: LookupAddress,
+    countryCode: SupportedCountryCode,
   ): Observable<AddressAndPosition[]> {
-    return from(this.#lookupStreetAddress(lookup));
+    return from(this.#lookupStreetAddress(lookup, countryCode));
   }
 
   async #lookupStreetAddress(
     lookup: LookupAddress,
+    countryCode: SupportedCountryCode,
   ): Promise<AddressAndPosition[]> {
     // biome-ignore lint/suspicious/noConsole: <explanation>
-    console.log("InMemoryApiAddresseGateway.lookupStreetAddress", lookup);
+    console.log(
+      "InMemoryApiAddresseGateway.lookupStreetAddress",
+      lookup,
+      countryCode,
+    );
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
 
     if (lookup === "givemeanemptylistplease") return [];
@@ -69,6 +76,15 @@ export class InMemoryAddressGateway implements AddressGateway {
           departmentCode: "75",
         },
         position: { lat: 45.5, lon: 1.9 },
+      },
+      {
+        address: {
+          streetNumberAndAddress: "20 A KRONENSTRASSE",
+          postcode: "30161",
+          city: "Hannover",
+          departmentCode: "99",
+        },
+        position: { lat: 52.370216, lon: 9.73322 },
       },
     ];
   }
