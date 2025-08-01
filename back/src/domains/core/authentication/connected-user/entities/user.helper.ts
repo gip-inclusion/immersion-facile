@@ -1,4 +1,12 @@
-import { type ConnectedUser, type Email, errors, type UserId } from "shared";
+import {
+  type ApiConsumer,
+  type ConnectedUser,
+  type ConnectedUserJwtPayload,
+  type ConventionJwtPayload,
+  type Email,
+  errors,
+  type UserId,
+} from "shared";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
@@ -41,9 +49,15 @@ const createUser = async (
   return userId;
 };
 
-export const getCurrentUserOrThrow = (
-  currentUser: ConnectedUser | undefined,
-): ConnectedUser => {
-  if (!currentUser) throw errors.user.unauthorized();
-  return currentUser;
+export const getGenericAuthOrThrow = <
+  T extends
+    | ConnectedUser
+    | ConnectedUserJwtPayload
+    | ConventionJwtPayload
+    | ApiConsumer,
+>(
+  genericAuth: T | undefined,
+): T => {
+  if (!genericAuth) throw errors.user.unauthorized();
+  return genericAuth;
 };

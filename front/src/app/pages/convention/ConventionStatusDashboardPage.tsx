@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
+import {
+  type ConventionId,
+  type ConventionJwt,
+  type ConventionJwtPayload,
+  decodeMagicLinkJwtWithoutSignatureCheck,
+} from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
@@ -27,34 +33,15 @@ export const ConventionStatusDashboardPage = ({
   </HeaderFooterLayout>
 );
 
-const useConventionStatusDashboardUrl = (jwt: string) => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(
-      conventionSlice.actions.conventionStatusDashboardRequested({
-        jwt,
-        feedbackTopic: "convention-status-dashboard",
-      }),
-    );
-  }, [dispatch, jwt]);
+const ConventionStatusDashboard = ({ jwt }: { jwt: ConventionJwt }) => {
+  const { applicationId } =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
 
-  const conventionStatusDashboardUrl = useAppSelector(
-    conventionSelectors.conventionStatusDashboardUrl,
-  );
-  const isLoading = useAppSelector(conventionSelectors.isLoading);
-
-  return {
-    conventionStatusDashboardUrl,
-    isLoading,
-  };
-};
-
-const ConventionStatusDashboard = ({ jwt }: { jwt: string }) => {
   const conventionStatusDashboardFeedback = useFeedbackTopic(
     "convention-status-dashboard",
   );
   const { conventionStatusDashboardUrl, isLoading } =
-    useConventionStatusDashboardUrl(jwt);
+    useConventionStatusDashboardUrl(jwt, applicationId);
 
   if (isLoading) return <p>Chargement en cours...</p>;
 
@@ -75,4 +62,30 @@ const ConventionStatusDashboard = ({ jwt }: { jwt: string }) => {
       url={conventionStatusDashboardUrl}
     />
   );
+};
+
+const useConventionStatusDashboardUrl = (
+  jwt: ConventionJwt,
+  conventionId: ConventionId,
+) => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(
+      conventionSlice.actions.conventionStatusDashboardRequested({
+        conventionId,
+        jwt,
+        feedbackTopic: "convention-status-dashboard",
+      }),
+    );
+  }, [dispatch, jwt]);
+
+  const conventionStatusDashboardUrl = useAppSelector(
+    conventionSelectors.conventionStatusDashboardUrl,
+  );
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
+
+  return {
+    conventionStatusDashboardUrl,
+    isLoading,
+  };
 };

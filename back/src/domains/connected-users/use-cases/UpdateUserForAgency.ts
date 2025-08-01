@@ -124,7 +124,6 @@ const throwIfUserHasNoRightOnAgency = (
   currentUser: ConnectedUser,
   userParamsForAgency: UserParamsForAgency,
 ): { isBackOfficeOrAgencyAdmin: boolean } => {
-  if (!currentUser) throw errors.user.unauthorized();
   if (currentUser.isBackofficeAdmin) return { isBackOfficeOrAgencyAdmin: true };
 
   const currentUserAgencyRight = currentUser.agencyRights.find(
