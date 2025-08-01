@@ -4,6 +4,7 @@ import {
   errors,
   type GeoPositionDto,
   type LookupSearchResult,
+  type SupportedCountryCode,
 } from "shared";
 import type { AddressGateway } from "../ports/AddressGateway";
 
@@ -30,6 +31,7 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   public async lookupStreetAddress(
     _query: string,
+    _countryCode: SupportedCountryCode,
   ): Promise<AddressAndPosition[]> {
     const nextLookupStreetAndAddresses =
       this.#nextLookupStreetAndAddresses.shift();

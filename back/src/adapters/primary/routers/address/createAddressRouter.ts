@@ -9,11 +9,11 @@ export const createAddressRouter = (deps: AppDependencies) => {
 
   const sharedRouter = createExpressSharedRouter(addressRoutes, addressRouter);
 
-  sharedRouter.lookupStreetAddress(async (req, res) =>
-    sendHttpResponse(req, res, () =>
+  sharedRouter.lookupStreetAddress(async (req, res) => {
+    return sendHttpResponse(req, res, () =>
       deps.useCases.lookupStreetAddress.execute(req.query as any),
-    ),
-  );
+    );
+  });
 
   sharedRouter.lookupLocation(async (req, res) =>
     sendHttpResponse(req, res, () =>

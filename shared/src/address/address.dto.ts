@@ -13,7 +13,10 @@ export type DepartmentCode = Flavor<string, "DepartmentCode">;
 export type Postcode = Flavor<string, "Postcode">;
 
 export type LookupAddress = Flavor<string, "LookupAddress">;
-export type WithLookupAddressQueryParams = { lookup: LookupAddress };
+export type WithLookupAddressQueryParams = {
+  lookup: LookupAddress;
+  countryCode: SupportedCountryCode;
+};
 
 export type LookupLocationInput = Flavor<string, "LookupLocation">;
 export type WithLookupLocationInputQueryParams = { query: LookupLocationInput };
@@ -161,7 +164,7 @@ export const departmentNameToDepartmentCode: Record<
   "Saint-Martin": "978",
 };
 
-export const getDepartmentCodeFromDepartmentNameOrCity: Record<
+export const frenchDepartmentCodeFromDepartmentNameOrCity: Record<
   DepartmentName,
   DepartmentCode
 > = {
@@ -170,6 +173,11 @@ export const getDepartmentCodeFromDepartmentNameOrCity: Record<
   "Métropole de Lyon": "69",
   "Auvergne-Rhône-Alpes": "69",
 };
+
+export const getDepartmentCodeFromDepartmentName = (
+  departmentName: DepartmentName,
+): DepartmentCode =>
+  frenchDepartmentCodeFromDepartmentNameOrCity[departmentName] ?? "99";
 
 export class LocationBuilder implements Builder<Location> {
   constructor(
@@ -202,7 +210,7 @@ export class LocationBuilder implements Builder<Location> {
   #dto: Location;
 }
 
-const supportedCountryCodes = [
+export const supportedCountryCodes = [
   "DE",
   "AT",
   "BE",
@@ -275,6 +283,23 @@ export const countryCodesData: Record<
   SI: { name: "Slovénie", flag: "🇸🇮" },
   SE: { name: "Suède", flag: "🇸🇪" },
   CH: { name: "Suisse", flag: "🇨🇭" },
+};
+
+const countryNameToCountryCode: Record<string, SupportedCountryCode> =
+  Object.fromEntries(
+    Object.entries(countryCodesData).map(([code, { name }]) => [
+      name.toLowerCase(),
+      code as SupportedCountryCode,
+    ]),
+  );
+
+export const getCountrycodeFromAddress = (
+  address: string,
+): SupportedCountryCode => {
+  if (!address) return "FR";
+  const addressSplitted = address.split(" ");
+  const maybeCountryName = addressSplitted[addressSplitted.length - 1];
+  return countryNameToCountryCode[maybeCountryName.toLowerCase()] ?? "FR";
 };
 
 export const territoriesByCountryCode: Record<

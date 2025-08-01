@@ -33,6 +33,7 @@ describe("Lookup Street Address", () => {
 
     const lookupStreetAddressQuery: WithLookupAddressQueryParams = {
       lookup: "1 rue",
+      countryCode: "FR",
     };
     expect(await useCase.execute(lookupStreetAddressQuery)).toEqual(
       expectedStreeAndAddresses,
