@@ -1,6 +1,7 @@
 import {
   type GetSiretInfo,
   type SiretEstablishmentDto,
+  type SupportedCountryCode,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
@@ -78,6 +79,14 @@ describe("Siret validation and fetching", () => {
     numberEmployeesRange: "",
   };
 
+  const foreignEstablishmentFetched: SiretEstablishmentDto = {
+    siret: "94127100900016",
+    businessName: "Kevin SIEMENS (SIEMENS)",
+    businessAddress: "20 A KRONENSTRASSE, 30161 HANNOVER, ALLEMAGNE",
+    isOpen: true,
+    numberEmployeesRange: "",
+  };
+
   describe("Siret fetching when a 14 digit siret is provided", () => {
     it("fetches correctly and keeps the returned establishment", () => {
       setStoreWithInitialSiretState({
@@ -86,8 +95,21 @@ describe("Siret validation and fetching", () => {
       dispatchSiretModified("11110000111100");
       feedSirenGatewayThroughBackWith(establishmentFetched);
       expectEstablishmentToEqual(establishmentFetched);
+      expectCountryCodeToBe("FR");
       expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled();
       expectCurrentSiretToBe("11110000111100");
+    });
+
+    it("fetches correctly foreign establishment and keeps the returned establishment and country code", () => {
+      setStoreWithInitialSiretState({
+        shouldFetchEvenIfAlreadySaved: false,
+      });
+      dispatchSiretModified("94127100900016");
+      feedSirenGatewayThroughBackWith(foreignEstablishmentFetched);
+      expectEstablishmentToEqual(foreignEstablishmentFetched);
+      expectCountryCodeToBe("DE");
+      expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled();
+      expectCurrentSiretToBe("94127100900016");
     });
 
     it("fetches correctly and keeps the returned error", () => {
@@ -108,6 +130,7 @@ describe("Siret validation and fetching", () => {
       dispatchSiretModified("11110000111100");
       feedSirenGatewayThroughBackWith(establishmentFetched);
       expectEstablishmentToEqual(establishmentFetched);
+      expectCountryCodeToBe("FR");
       expectOnly_getSirenInfoObservable_toHaveBeenCalled();
     });
   });
@@ -129,6 +152,7 @@ describe("Siret validation and fetching", () => {
       expectShouldFetchEvenIfAlreadySavedToBe(false);
       expectSiretErrorToBe(null);
       expectEstablishmentToEqual(null);
+      expectCountryCodeToBe(null);
       expectCurrentSiretToBe("10002000300040");
       store.dispatch(
         siretSlice.actions.setShouldFetchEvenIfAlreadySaved({
@@ -152,6 +176,7 @@ describe("Siret validation and fetching", () => {
       expectCurrentSiretToBe("");
       expectEstablishmentToEqual(null);
       expectSiretErrorToBe(null);
+      expectCountryCodeToBe(null);
       expectIsSearchingToBe(false);
     });
   });
@@ -177,6 +202,10 @@ describe("Siret validation and fetching", () => {
 
   const expectIsSearchingToBe = (expected: boolean) => {
     expect(siretSelectors.isFetching(store.getState())).toBe(expected);
+  };
+
+  const expectCountryCodeToBe = (expected: SupportedCountryCode | null) => {
+    expect(siretSelectors.countryCode(store.getState())).toBe(expected);
   };
 
   const expectEstablishmentToEqual = (

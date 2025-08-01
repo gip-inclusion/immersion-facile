@@ -96,6 +96,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         )}
       />
       <AddressAutocomplete
+        countryCode="FR"
         locator="convention-beneficiary-current-employer-address"
         label={
           formFields["signatories.beneficiaryCurrentEmployer.businessAddress"]
