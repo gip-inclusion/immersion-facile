@@ -161,35 +161,27 @@ const rawAgencyDashboardTabs = ({
           },
         ]
       : []),
-    ...(dashboards.agencies.statsEstablishmentDetailsUrl
+    ...(dashboards.agencies.statsEstablishmentDetailsUrl ||
+    dashboards.agencies.statsConventionsByEstablishmentByDepartmentUrl
       ? [
           {
             tabId:
-              "agencyDashboardStatsEstablishmentDetails" satisfies AgencyDashboardRouteName,
-            label: "Détails par établissement",
+              "agencyDashboardStatsActivitiesByEstablishment" satisfies AgencyDashboardRouteName,
+            label: "Activités par établissement",
             content: (
-              <MetabaseView
-                title="Détails par établissement"
-                url={dashboards.agencies.statsEstablishmentDetailsUrl}
-              />
-            ),
-          },
-        ]
-      : []),
-    ...(dashboards.agencies.statsConventionsByEstablishmentByDepartmentUrl
-      ? [
-          {
-            tabId:
-              "agencyDashboardStatsConventionsByEstablishmentByDepartment" satisfies AgencyDashboardRouteName,
-            label: "Conventions par établissement",
-            content: (
-              <MetabaseView
-                title="Conventions par établissement"
-                url={
-                  dashboards.agencies
-                    .statsConventionsByEstablishmentByDepartmentUrl
-                }
-              />
+              <>
+                <MetabaseView
+                  title="Détails par établissement"
+                  url={dashboards.agencies.statsEstablishmentDetailsUrl}
+                />
+                <MetabaseView
+                  title="Conventions par établissement"
+                  url={
+                    dashboards.agencies
+                      .statsConventionsByEstablishmentByDepartmentUrl
+                  }
+                />
+              </>
             ),
           },
         ]

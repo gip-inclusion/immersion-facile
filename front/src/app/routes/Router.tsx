@@ -181,12 +181,7 @@ const getPageByRouteName: {
       <AgencyDashboardPage route={route} />
     </DashboardPrivateRoute>
   ),
-  agencyDashboardStatsEstablishmentDetails: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
-  ),
-  agencyDashboardStatsConventionsByEstablishmentByDepartment: (route) => (
+  agencyDashboardStatsActivitiesByEstablishment: (route) => (
     <DashboardPrivateRoute route={route}>
       <AgencyDashboardPage route={route} />
     </DashboardPrivateRoute>
