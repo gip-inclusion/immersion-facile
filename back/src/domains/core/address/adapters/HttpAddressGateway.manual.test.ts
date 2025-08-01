@@ -7,6 +7,7 @@ import {
   type GeoPositionDto,
   type Location,
   type LookupSearchResult,
+  type SupportedCountryCode,
 } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -267,10 +268,75 @@ describe("HttpOpenCageDataAddressGateway", () => {
               - position: '$expectedResult.position'`,
           async ({ candidateQuery, expectedResult }) => {
             const resultMetropolitanFrance =
-              await httpAddressGateway.lookupStreetAddress(candidateQuery);
+              await httpAddressGateway.lookupStreetAddress(
+                candidateQuery,
+                "FR",
+              );
 
             const firstResult: AddressAndPosition | undefined =
               resultMetropolitanFrance.at(0);
+            expectToEqual(firstResult?.address, expectedResult.address);
+            expect(expectedResult.position.lon).toBeCloseTo(
+              expectedResult.position.lon,
+            );
+            expect(expectedResult.position.lat).toBeCloseTo(
+              expectedResult.position.lat,
+              3,
+            );
+          },
+          10000,
+        );
+      });
+      describe("with foreign addresses", () => {
+        it.each<{
+          candidateQuery: string;
+          countryCode: SupportedCountryCode;
+          expectedResult: Location;
+        }>([
+          {
+            candidateQuery: "J.C. JACOBSENS GADE 1 1799 COPENHAGUE V DANEMARK",
+            countryCode: "DK",
+            expectedResult: {
+              address: {
+                city: "Copenhague",
+                departmentCode: "99",
+                postcode: "1799",
+                streetNumberAndAddress: "1 J.C. Jacobsens Gade",
+              },
+              position: {
+                lat: 55.676098,
+                lon: 12.568337,
+              },
+              id: "123",
+            },
+          },
+          {
+            candidateQuery: "20 A KRONENSTRASSE, 30161 HANNOVER, ALLEMAGNE",
+            countryCode: "DE",
+            expectedResult: {
+              address: {
+                city: "Hanovre",
+                departmentCode: "99",
+                postcode: "30161",
+                streetNumberAndAddress: "Kronenstraße",
+              },
+              position: {
+                lat: 48.532594,
+                lon: 7.511081,
+              },
+              id: "123",
+            },
+          },
+        ])(
+          `Should work if searching for '$candidateQuery' query expect:
+              - address: '$expectedResult.address'
+              - position: '$expectedResult.position'`,
+          async ({ candidateQuery, countryCode, expectedResult }) => {
+            const result = await httpAddressGateway.lookupStreetAddress(
+              candidateQuery,
+              countryCode,
+            );
+            const firstResult: AddressAndPosition | undefined = result.at(0);
             expectToEqual(firstResult?.address, expectedResult.address);
             expect(expectedResult.position.lon).toBeCloseTo(
               expectedResult.position.lon,
@@ -287,7 +353,10 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
     it("Should return expected address DTO when providing address with special characters.", async () => {
       expectToEqual(
-        await httpAddressGateway.lookupStreetAddress("Route d’Huez 38750 Huez"),
+        await httpAddressGateway.lookupStreetAddress(
+          "Route d’Huez 38750 Huez",
+          "FR",
+        ),
         [
           {
             position: {
@@ -415,7 +484,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
     it("Should not support lookup address with only one char.", async () => {
       await expectPromiseToFailWithError(
-        httpAddressGateway.lookupStreetAddress("R"),
+        httpAddressGateway.lookupStreetAddress("R", "FR"),
         errors.address.queryToShort({ minLength: 2 }),
       );
     });
@@ -424,6 +493,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress(
           "a A d S E a a a a a a a a a a a a a a",
+          "FR",
         ),
         errors.generic.testError("Request failed with status code 400"),
       );
@@ -431,21 +501,21 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
     it("Should not support lookup address with two chars including one special char.", async () => {
       await expectPromiseToFailWithError(
-        httpAddressGateway.lookupStreetAddress("R,"),
+        httpAddressGateway.lookupStreetAddress("R,", "FR"),
         errors.address.queryToShort({ minLength: 2 }),
       );
     });
 
     it("Should not support lookup address with 3 chars matching the pattern '{digit} ,'", async () => {
       await expectPromiseToFailWithError(
-        httpAddressGateway.lookupStreetAddress("4 ,"),
+        httpAddressGateway.lookupStreetAddress("4 ,", "FR"),
         errors.address.queryToShort({ minLength: 2 }),
       );
     });
 
     it("Should support lookup address with two char.", async () => {
       const resultPreviousNotFoundWithAddresseAPI =
-        await httpAddressGateway.lookupStreetAddress("Ro");
+        await httpAddressGateway.lookupStreetAddress("Ro", "FR");
 
       expectToEqual(resultPreviousNotFoundWithAddresseAPI.at(0), {
         address: {

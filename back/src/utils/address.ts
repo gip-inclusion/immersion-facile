@@ -15,6 +15,7 @@ export const rawAddressToLocation = async (
   const positionAndAddress = (
     await addressGateway.lookupStreetAddress(
       formEstablishementAddress.rawAddress,
+      "FR",
     )
   ).at(0);
 
