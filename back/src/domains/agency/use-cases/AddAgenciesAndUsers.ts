@@ -476,7 +476,7 @@ const getDepartementCode = async ({
   // CORSE
   if (row["Code postal"].startsWith("20")) {
     const searchQuery = `${row["Adresse ligne 1"]} ${row["Code postal"]} ${row.Ville}`;
-    const results = await addressGateway.lookupStreetAddress(searchQuery);
+    const results = await addressGateway.lookupStreetAddress(searchQuery, "FR");
     const agencyDepartmentCode = results.at(0)?.address.departmentCode;
     if (results.length === 0 || !agencyDepartmentCode) {
       throw errors.address.notFound({
