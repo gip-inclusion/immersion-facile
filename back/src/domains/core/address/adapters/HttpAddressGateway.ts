@@ -8,7 +8,7 @@ import {
   errors,
   filterNotFalsy,
   type GeoPositionDto,
-  getDepartmentCodeFromDepartmentNameOrCity,
+  getDepartmentCodeFromDepartmentName,
   type LookupSearchResult,
   lookupSearchResultsSchema,
   lookupStreetAddressQueryMinLength,
@@ -16,6 +16,7 @@ import {
   type OpenCageGeoSearchKey,
   type Postcode,
   type StreetNumberAndAddress,
+  type SupportedCountryCode,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { WithCache } from "../../caching-gateway/port/WithCache";
@@ -120,6 +121,7 @@ export class HttpAddressGateway implements AddressGateway {
 
   public async lookupStreetAddress(
     query: string,
+    countryCode?: SupportedCountryCode,
   ): Promise<AddressAndPosition[]> {
     return this.#limiter
       .schedule(() => {
@@ -133,7 +135,9 @@ export class HttpAddressGateway implements AddressGateway {
 
         return this.httpClient.geocoding({
           queryParams: {
-            countrycode: franceAndAttachedTerritoryCountryCodes,
+            ...(countryCode && {
+              countrycode: this.#toOpenCageCountryCodeParam(countryCode),
+            }),
             key: this.geocodingApiKey,
             language,
             q: query,
@@ -146,6 +150,14 @@ export class HttpAddressGateway implements AddressGateway {
           .map((feature) => this.#toAddressAndPosition(feature))
           .filter(filterNotFalsy);
       });
+  }
+
+  #toOpenCageCountryCodeParam(
+    countryCode: SupportedCountryCode | undefined,
+  ): string | undefined {
+    if (!countryCode) return undefined;
+
+    return countryCode.toLowerCase();
   }
 
   #toAddressAndPosition(
@@ -172,8 +184,7 @@ export class HttpAddressGateway implements AddressGateway {
     const departmentName = getDepartmentNameFromAliases(components);
     // OpenCageData gives the department name but not the code.
     const departmentCode =
-      departmentName &&
-      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
+      departmentName && getDepartmentCodeFromDepartmentName(departmentName);
     const streetNumberAndAddress = makeStreetNumberAndAddress(
       getStreetNumberFromAliases(components),
       getStreetNameFromAliases(components),

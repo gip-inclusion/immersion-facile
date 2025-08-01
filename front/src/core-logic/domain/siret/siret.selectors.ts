@@ -15,6 +15,11 @@ const establishmentInfos = createSelector(
   ({ establishment }) => establishment,
 );
 
+const countryCode = createSelector(
+  siretState,
+  ({ countryCode }) => countryCode,
+);
+
 const isFetching = createSelector(siretState, ({ isSearching }) => isSearching);
 
 const shouldFetchEvenIfAlreadySaved = createSelector(
@@ -59,4 +64,5 @@ export const siretSelectors = {
   establishmentInfos,
   isFetching,
   shouldFetchEvenIfAlreadySaved,
+  countryCode,
 };

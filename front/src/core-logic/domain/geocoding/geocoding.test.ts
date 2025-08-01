@@ -170,6 +170,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.changeQueryRequested({
         locator,
         lookup: query,
+        countryCode: "FR",
       }),
     );
     expectDebouncingToBe(true);
@@ -185,6 +186,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.changeQueryRequested({
         locator,
         lookup: query,
+        countryCode: "FR",
       }),
     );
     expectDebouncingToBe(true);
@@ -213,6 +215,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.changeQueryRequested({
         locator,
         lookup: query,
+        countryCode: "FR",
       }),
     );
     expectDebouncingToBe(true);
@@ -298,6 +301,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.fetchSuggestionsRequested({
         locator,
         lookup: "bord",
+        countryCode: "FR",
         selectFirstSuggestion: false,
       }),
     );
@@ -326,6 +330,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.fetchSuggestionsRequested({
         locator,
         lookup: "bord",
+        countryCode: "FR",
         selectFirstSuggestion: true,
       }),
     );
@@ -362,6 +367,7 @@ describe("Geocoding epic", () => {
         },
         feedbackTopic: "siret-input",
         addressAutocompleteLocator: locator,
+        countryCode: "FR",
       }),
     );
     dependencies.addressGateway.lookupStreetAddressResults$.next(

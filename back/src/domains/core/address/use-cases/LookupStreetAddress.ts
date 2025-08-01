@@ -21,6 +21,9 @@ export class LookupStreetAddress extends UseCase<
     params: WithLookupAddressQueryParams,
     _jwtPayload?: ConventionJwtPayload | undefined,
   ): Promise<AddressAndPosition[]> {
-    return this.addressApiGateway.lookupStreetAddress(params.lookup);
+    return this.addressApiGateway.lookupStreetAddress(
+      params.lookup,
+      params.countryCode,
+    );
   }
 }
