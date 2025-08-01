@@ -243,6 +243,7 @@ export const BeneficiaryFormSection = ({
       {values.internshipKind === "mini-stage-cci" && (
         <>
           <AddressAutocomplete
+            countryCode="FR"
             locator="convention-beneficiary-address"
             {...formContents["signatories.beneficiary.address"]}
             initialInputValue={

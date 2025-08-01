@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { keys } from "ramda";
-import type { AddressAndPosition, LookupAddress } from "shared";
+import type {
+  AddressAndPosition,
+  LookupAddress,
+  SupportedCountryCode,
+} from "shared";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
   type AutocompleteItem,
@@ -123,6 +127,7 @@ export const geocodingSlice = createSlice({
         AddressAutocompleteLocator,
         {
           lookup: LookupAddress;
+          countryCode: SupportedCountryCode;
         }
       >,
     ) => {
@@ -139,6 +144,7 @@ export const geocodingSlice = createSlice({
         AddressAutocompleteLocator,
         {
           lookup: LookupAddress;
+          countryCode: SupportedCountryCode;
           selectFirstSuggestion: boolean;
         }
       >,
