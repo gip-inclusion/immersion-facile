@@ -320,10 +320,10 @@ describe("NotifyConventionNeedsReview", () => {
       });
     });
 
-    it("Sends notification email to peAdvisor and validators when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
+    it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
-      const shortLinkIds = ["shortlink1", "shortlink2", "shortlink3"];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+      const shortLinkId = "shortlink1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
       const conventionInReviewWithFtAdvisor = new ConventionDtoBuilder(
         defaultConvention,
@@ -353,25 +353,11 @@ describe("NotifyConventionNeedsReview", () => {
       });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+        [shortLinkId]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReviewWithFtAdvisor.id,
           role: "validator",
           targetRoute: frontRoutes.manageConvention,
           email: ftAdvisorEmail,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReviewWithFtAdvisor.id,
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-          email: validator1.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReviewWithFtAdvisor.id,
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-          email: validator2.email,
           now: timeGateway.now(),
         }),
       });
@@ -398,74 +384,12 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              magicLink: makeShortLinkUrl(config, shortLinkId),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
               peAdvisor: {
                 recipientIsPeAdvisor: true,
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                ...userConventionAdvisor.advisor!,
-              },
-            },
-          },
-          {
-            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-            recipients: [validator1.email],
-            params: {
-              agencyReferentName: getFormattedFirstnameAndLastname(
-                conventionInReviewWithFtAdvisor.agencyReferent ?? {},
-              ),
-              conventionId: conventionInReviewWithFtAdvisor.id,
-              internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
-              beneficiaryFirstName: getFormattedFirstnameAndLastname({
-                firstname:
-                  conventionInReviewWithFtAdvisor.signatories.beneficiary
-                    .firstName,
-              }),
-              beneficiaryLastName: getFormattedFirstnameAndLastname({
-                lastname:
-                  conventionInReviewWithFtAdvisor.signatories.beneficiary
-                    .lastName,
-              }),
-              businessName: conventionInReviewWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-              possibleRoleAction: "en considérer la validation",
-              agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
-              validatorName: "",
-              peAdvisor: {
-                recipientIsPeAdvisor: false,
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                ...userConventionAdvisor.advisor!,
-              },
-            },
-          },
-          {
-            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-            recipients: [validator2.email],
-            params: {
-              agencyReferentName: getFormattedFirstnameAndLastname(
-                conventionInReviewWithFtAdvisor.agencyReferent ?? {},
-              ),
-              conventionId: conventionInReviewWithFtAdvisor.id,
-              internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
-              beneficiaryFirstName: getFormattedFirstnameAndLastname({
-                firstname:
-                  conventionInReviewWithFtAdvisor.signatories.beneficiary
-                    .firstName,
-              }),
-              beneficiaryLastName: getFormattedFirstnameAndLastname({
-                lastname:
-                  conventionInReviewWithFtAdvisor.signatories.beneficiary
-                    .lastName,
-              }),
-              businessName: conventionInReviewWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
-              possibleRoleAction: "en considérer la validation",
-              agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
-              validatorName: "",
-              peAdvisor: {
-                recipientIsPeAdvisor: false,
                 // biome-ignore lint/style/noNonNullAssertion: <explanation>
                 ...userConventionAdvisor.advisor!,
               },
@@ -580,17 +504,10 @@ describe("NotifyConventionNeedsReview", () => {
       expectSavedNotificationsAndEvents({ emails: [] });
     });
 
-    it("Sends notification email to peAdvisor and validators when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
+    it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
-      const shortLinkIds = [
-        "shortlink1",
-        "shortlink2",
-        "shortlink3",
-        "shortlink4",
-        "shortlink5",
-        "shortlink6",
-      ];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+      const shortLinkId = "shortlink1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
       const conventionAcceptedByCounsellorWithFtAdvisor =
         new ConventionDtoBuilder(defaultConvention)
@@ -619,25 +536,11 @@ describe("NotifyConventionNeedsReview", () => {
       });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+        [shortLinkId]: fakeGenerateMagicLinkUrlFn({
           id: conventionAcceptedByCounsellorWithFtAdvisor.id,
           role: "validator",
           targetRoute: frontRoutes.manageConvention,
           email: ftAdvisorEmail,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionAcceptedByCounsellorWithFtAdvisor.id,
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-          email: validator1.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionAcceptedByCounsellorWithFtAdvisor.id,
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-          email: validator2.email,
           now: timeGateway.now(),
         }),
       });
@@ -667,80 +570,12 @@ describe("NotifyConventionNeedsReview", () => {
               }),
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              magicLink: makeShortLinkUrl(config, shortLinkId),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
               peAdvisor: {
                 recipientIsPeAdvisor: true,
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                ...userConventionAdvisor.advisor!,
-              },
-            },
-          },
-          {
-            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-            recipients: [validator1.email],
-            params: {
-              agencyReferentName: getFormattedFirstnameAndLastname(
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent ??
-                  {},
-              ),
-              conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
-              internshipKind:
-                conventionAcceptedByCounsellorWithFtAdvisor.internshipKind,
-              beneficiaryFirstName: getFormattedFirstnameAndLastname({
-                firstname:
-                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                    .beneficiary.firstName,
-              }),
-              beneficiaryLastName: getFormattedFirstnameAndLastname({
-                lastname:
-                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                    .beneficiary.lastName,
-              }),
-              businessName:
-                conventionAcceptedByCounsellorWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-              possibleRoleAction: "en considérer la validation",
-              agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
-              validatorName: "",
-              peAdvisor: {
-                recipientIsPeAdvisor: false,
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                ...userConventionAdvisor.advisor!,
-              },
-            },
-          },
-          {
-            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-            recipients: [validator2.email],
-            params: {
-              agencyReferentName: getFormattedFirstnameAndLastname(
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent ??
-                  {},
-              ),
-              conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
-              internshipKind:
-                conventionAcceptedByCounsellorWithFtAdvisor.internshipKind,
-              beneficiaryFirstName: getFormattedFirstnameAndLastname({
-                firstname:
-                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                    .beneficiary.firstName,
-              }),
-              beneficiaryLastName: getFormattedFirstnameAndLastname({
-                lastname:
-                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                    .beneficiary.lastName,
-              }),
-              businessName:
-                conventionAcceptedByCounsellorWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
-              possibleRoleAction: "en considérer la validation",
-              agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
-              validatorName: "",
-              peAdvisor: {
-                recipientIsPeAdvisor: false,
                 // biome-ignore lint/style/noNonNullAssertion: <explanation>
                 ...userConventionAdvisor.advisor!,
               },

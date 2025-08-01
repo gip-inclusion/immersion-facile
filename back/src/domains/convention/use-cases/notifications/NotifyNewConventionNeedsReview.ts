@@ -188,17 +188,6 @@ const determineRecipients = (
         );
 
       if (peAdvisor) {
-        const validatorRecipients = agency.validatorEmails.map(
-          (email): Recipient => ({
-            role: "validator",
-            email,
-            peAdvisor: {
-              recipientIsPeAdvisor: false,
-              ...peAdvisor,
-            },
-          }),
-        );
-
         return [
           {
             role: "validator",
@@ -208,7 +197,6 @@ const determineRecipients = (
               ...peAdvisor,
             },
           },
-          ...validatorRecipients,
         ];
       }
 
@@ -225,17 +213,6 @@ const determineRecipients = (
     }
     case "ACCEPTED_BY_COUNSELLOR":
       if (peAdvisor) {
-        const validatorRecipients = agency.validatorEmails.map(
-          (email): Recipient => ({
-            role: "validator",
-            email,
-            peAdvisor: {
-              recipientIsPeAdvisor: false,
-              ...peAdvisor,
-            },
-          }),
-        );
-
         return [
           {
             role: "validator",
@@ -245,7 +222,6 @@ const determineRecipients = (
               ...peAdvisor,
             },
           },
-          ...validatorRecipients,
         ];
       }
 
