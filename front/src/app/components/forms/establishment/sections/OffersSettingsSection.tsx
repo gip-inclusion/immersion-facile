@@ -6,19 +6,26 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
+import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { equals } from "ramda";
 import { useState } from "react";
 import { HeadingSection } from "react-design-system";
-import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  type ContactMode,
+  type DotNestedKeys,
   domElementIds,
   type EstablishmentSearchableBy,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
+  getFormattedFirstnameAndLastname,
   immersionFacileContactEmail,
   toDateUTCString,
   toDisplayedDate,
+  toDisplayedPhoneNumber,
 } from "shared";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   booleanSelectOptions,
   richBooleanSelectOptions,
@@ -32,8 +39,12 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useRoute } from "src/app/routes/routes";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { match, P } from "ts-pattern";
 import allUsersSvg from "../../../../../assets/img/all.svg";
 import jobSeekerSvg from "../../../../../assets/img/jobseeker.svg";
 import studentSvg from "../../../../../assets/img/student.svg";
@@ -116,32 +127,6 @@ export const OffersSettingsSection = ({
   const currentValueFormatted =
     currentNextAvailabilityDate &&
     toDateUTCString(new Date(currentNextAvailabilityDate));
-
-  const searchableByOptions: RadioButtonsProps["options"] = [
-    {
-      label: "Tout le monde (publics scolaires et non-scolaires)",
-      illustration: <img src={allUsersSvg} alt="" />,
-      nativeInputProps: {
-        value: "all",
-        defaultChecked: true,
-      },
-    },
-    {
-      label:
-        "Uniquement des publics non-scolaires qui ont un projet professionnel",
-      illustration: <img src={jobSeekerSvg} alt="" />,
-      nativeInputProps: {
-        value: "jobSeekers",
-      },
-    },
-    {
-      label: "Uniquement des publics scolaires",
-      illustration: <img src={studentSvg} alt="" />,
-      nativeInputProps: {
-        value: "students",
-      },
-    },
-  ];
 
   const isAvailableForImmersion = () => {
     if (availableForImmersionInProps !== undefined)
@@ -373,12 +358,7 @@ export const OffersSettingsSection = ({
           }))}
         />
         <HeadingSection title="Moyen de contact">
-          <RadioButtons
-            id={domElementIds.establishment[mode].contactMode}
-            {...register("contactMode")}
-            options={preferredContactModeOptions(register("contactMode"))}
-            {...getFieldError("contactMode")}
-          />
+          <ContactModeSection mode={mode} />
         </HeadingSection>
         {isStepMode && (
           <ButtonsGroup
@@ -409,6 +389,7 @@ export const OffersSettingsSection = ({
                     "isEngagedEnterprise",
                     "fitForDisabledWorkers",
                     "contactMode",
+                    ...getConditionalFieldsToValidate(getValues("contactMode")),
                   ]);
                 },
                 iconId: "fr-icon-arrow-right-line",
@@ -458,30 +439,221 @@ export const OffersSettingsSection = ({
   );
 };
 
-const preferredContactModeOptions = (
-  register: UseFormRegisterReturn<string>,
-): RadioButtonsProps["options"] => [
+const searchableByOptions: RadioButtonsProps["options"] = [
   {
-    label:
-      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
+    label: "Tout le monde (publics scolaires et non-scolaires)",
+    illustration: <img src={allUsersSvg} alt="" />,
     nativeInputProps: {
-      value: "EMAIL",
-      ...register,
+      value: "all",
+      defaultChecked: true,
     },
   },
   {
     label:
-      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
+      "Uniquement des publics non-scolaires qui ont un projet professionnel",
+    illustration: <img src={jobSeekerSvg} alt="" />,
     nativeInputProps: {
-      value: "PHONE",
-      ...register,
+      value: "jobSeekers",
     },
   },
   {
-    label: "Se présenter en personne à votre établissement",
+    label: "Uniquement des publics scolaires",
+    illustration: <img src={studentSvg} alt="" />,
     nativeInputProps: {
-      value: "IN_PERSON",
-      ...register,
+      value: "students",
     },
   },
 ];
+
+const ContactModeSection = ({ mode }: { mode: Mode }) => {
+  const { register, formState, getValues, setValue, watch } =
+    useFormContext<FormEstablishmentDto>();
+  const getFieldError = makeFieldError(formState);
+
+  const contactMode = getValues("contactMode");
+  const contactModeRegister = register("contactMode");
+  const isMainContactByPhoneValue = watch("userRights.0.isMainContactByPhone");
+
+  return (
+    <>
+      <RadioButtons
+        id={domElementIds.establishment[mode].contactMode}
+        {...contactModeRegister}
+        options={[
+          {
+            label: "Par mail",
+            hintText:
+              "La demande passera par un formulaire afin de ne pas exposer l'adresse mail",
+            illustration: <img src={allUsersSvg} alt="" />,
+            nativeInputProps: {
+              ...contactModeRegister,
+              value: "EMAIL",
+            },
+          },
+          {
+            label: "Par téléphone",
+            hintText:
+              "Seuls les candidats identifiés auront accès au numéro de téléphone",
+            illustration: <img src={allUsersSvg} alt="" />,
+            nativeInputProps: {
+              ...contactModeRegister,
+              value: "PHONE",
+            },
+          },
+          {
+            label: "Se présenter en personne",
+            hintText: "Vous recevrez un candidat à votre établissement",
+            illustration: <img src={allUsersSvg} alt="" />,
+            nativeInputProps: {
+              ...contactModeRegister,
+              value: "IN_PERSON",
+            },
+          },
+        ]}
+        {...getFieldError("contactMode")}
+      />
+      {match(contactMode)
+        .with(P.nullish, () => <>SHOULDN'T HAPPEN</>)
+        .with("EMAIL", () => (
+          <>
+            <RadioButtons
+              legend="Si vous ne répondez pas dans les 15 jours, est-ce que vous consentez à ce que le numéro choisi soit transmis au candidat ?"
+              id={"TODO"}
+              options={[
+                {
+                  label: "Oui",
+                  nativeInputProps: {
+                    name: register("userRights.0.isMainContactByPhone").name,
+                    onChange: () => {
+                      setValue("userRights.0.isMainContactByPhone", true);
+                    },
+                    checked: isMainContactByPhoneValue === true,
+                  },
+                },
+                {
+                  label: "Non",
+                  nativeInputProps: {
+                    name: register("userRights.0.isMainContactByPhone").name,
+                    onChange: () => {
+                      setValue("userRights.0.isMainContactByPhone", false);
+                    },
+                    checked: isMainContactByPhoneValue === false,
+                  },
+                },
+              ]}
+              {...getFieldError("contactMode")}
+            />
+            <UserToContact mode={mode} />
+          </>
+        ))
+        .with("PHONE", () => <UserToContact mode={mode} />)
+        .with("IN_PERSON", () => (
+          <>
+            <AddressAutocomplete
+              label="Lieu de rendez-vous"
+              locator="create-establishment-in-person-address"
+              onAddressClear={() => {}}
+              onAddressSelected={(addressAndPosition) => {
+                setValue(
+                  "potentialBeneficiaryWelcomeAddress",
+                  addressAndPosition,
+                );
+              }}
+              {...getFieldError("potentialBeneficiaryWelcomeAddress")}
+            />
+            <UserToContact mode={mode} />
+          </>
+        ))
+        .exhaustive()}
+    </>
+  );
+};
+
+const UserToContact = ({ mode }: { mode: Mode }) => {
+  const { getValues, setValue } = useFormContext<FormEstablishmentDto>();
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const defaultUserToContact = getValues("userRights.0");
+  const contactMode = getValues("contactMode");
+  const establishment = useAppSelector(
+    establishmentSelectors.formEstablishment,
+  );
+  const currentUserToContact = establishment.userRights.find((userRight) =>
+    contactMode === "IN_PERSON"
+      ? userRight.isMainContactInPerson
+      : userRight.isMainContactByPhone,
+  );
+  const usersToContactOptions: SelectProps.Option[] = establishment.userRights
+    .filter((userRight) =>
+      contactMode === "IN_PERSON" ? true : userRight.phone,
+    )
+    .map((userRight) => ({
+      label: `${userRight.email} - ${userRight.phone && toDisplayedPhoneNumber(userRight.phone)}`,
+      value: userRight.email,
+      selected: userRight.email === currentUserToContact?.email,
+    }));
+
+  return match(mode)
+    .with("create", () => (
+      <div>
+        <strong>
+          {contactMode === "IN_PERSON"
+            ? "Interlocuteur sur place"
+            : "Numéro de téléphone"}
+        </strong>{" "}
+        :{" "}
+        {federatedIdentity?.provider === "proConnect" &&
+          getFormattedFirstnameAndLastname({
+            firstname: federatedIdentity.firstName,
+            lastname: federatedIdentity.lastName,
+          })}{" "}
+        • {defaultUserToContact.phone}
+      </div>
+    ))
+    .with(P.union("edit", "admin"), () => (
+      <Select
+        label={
+          contactMode === "IN_PERSON"
+            ? "Interlocuteur sur place"
+            : "Numéro de téléphone"
+        }
+        hint={
+          contactMode === "IN_PERSON"
+            ? "Veuillez choisir la personne qui accueillera les candidats parmi vos utilisateurs"
+            : "Veuillez choisir la personne qui répondra aux candidats parmi vos utilisateurs"
+        }
+        placeholder="Sélectionnez un utilisateur"
+        options={usersToContactOptions}
+        nativeSelectProps={{
+          value: currentUserToContact?.email,
+          onChange: (event) => {
+            const newUserToContact = establishment.userRights.find(
+              (userRight) => userRight.email === event.target.value,
+            );
+            const contactPropToUpdate: keyof FormEstablishmentUserRight =
+              contactMode === "IN_PERSON"
+                ? "isMainContactInPerson"
+                : "isMainContactByPhone";
+            const newUserRights = establishment.userRights.map((userRight) => ({
+              ...userRight,
+              [contactPropToUpdate]:
+                userRight.email === newUserToContact?.email,
+            }));
+            setValue("userRights", newUserRights);
+          },
+        }}
+      />
+    ))
+    .exhaustive();
+};
+
+const getConditionalFieldsToValidate = (
+  contactMode: ContactMode,
+): (keyof FormEstablishmentDto | DotNestedKeys<FormEstablishmentDto>)[] => {
+  if (contactMode === "EMAIL") {
+    return ["userRights.0.isMainContactByPhone"];
+  }
+  if (contactMode === "IN_PERSON") {
+    return ["potentialBeneficiaryWelcomeAddress"];
+  }
+  return [];
+};

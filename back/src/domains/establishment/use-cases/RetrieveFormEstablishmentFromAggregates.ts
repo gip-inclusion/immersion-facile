@@ -87,6 +87,13 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       nextAvailabilityDate:
         establishmentAggregate.establishment.nextAvailabilityDate,
       searchableBy: establishmentAggregate.establishment.searchableBy,
+      ...(establishmentAggregate.establishment.contactMode === "IN_PERSON"
+        ? {
+            potentialBeneficiaryWelcomeAddress:
+              establishmentAggregate.establishment
+                .potentialBeneficiaryWelcomeAddress,
+          }
+        : {}),
     };
   }
 
@@ -99,24 +106,46 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     );
 
     return userRights.map(
-      ({ role, userId, job, phone, shouldReceiveDiscussionNotifications }) => {
+      ({
+        role,
+        userId,
+        job,
+        phone,
+        shouldReceiveDiscussionNotifications,
+        isMainContactByPhone,
+        isMainContactInPerson,
+      }) => {
         const user = users.find(({ id }) => id === userId);
         if (!user) throw errors.user.notFound({ userId });
-        return role === "establishment-admin"
+
+        if (role === "establishment-admin") {
+          return {
+            role,
+            email: user.email,
+            job,
+            phone,
+            shouldReceiveDiscussionNotifications,
+            isMainContactByPhone,
+            isMainContactInPerson,
+          };
+        }
+
+        const baseContact = {
+          role,
+          email: user.email,
+          job,
+          shouldReceiveDiscussionNotifications,
+          isMainContactInPerson,
+        };
+
+        return phone && isMainContactByPhone !== undefined
           ? {
-              role,
-              email: user.email,
-              job,
+              ...baseContact,
               phone,
-              shouldReceiveDiscussionNotifications,
+              isMainContactByPhone,
+              isMainContactInPerson,
             }
-          : {
-              role,
-              email: user.email,
-              job,
-              phone,
-              shouldReceiveDiscussionNotifications,
-            };
+          : baseContact;
       },
     );
   }

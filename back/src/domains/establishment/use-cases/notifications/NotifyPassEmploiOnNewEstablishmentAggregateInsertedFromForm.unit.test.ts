@@ -59,6 +59,7 @@ describe("Notify pass-emploi", () => {
           phone: "",
           userId: "osef",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();

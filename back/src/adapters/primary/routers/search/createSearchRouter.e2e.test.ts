@@ -105,6 +105,7 @@ const establishmentAggregate1 = new EstablishmentAggregateBuilder()
       job: "",
       phone: "",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
   ])
   .withOffers([immersionOffer])
@@ -140,6 +141,7 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       job: "",
       phone: "",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
   ])
   .build();
@@ -287,6 +289,7 @@ describe("search-immersion route", () => {
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),
@@ -308,6 +311,7 @@ describe("search-immersion route", () => {
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),
@@ -329,6 +333,7 @@ describe("search-immersion route", () => {
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),
@@ -448,6 +453,7 @@ describe("search-immersion route", () => {
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),
@@ -469,6 +475,7 @@ describe("search-immersion route", () => {
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),
@@ -490,6 +497,7 @@ describe("search-immersion route", () => {
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .build(),

@@ -93,7 +93,7 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
     code: params.nafCode ?? "",
     nomenclature: params.nafNomenclature ?? "",
   },
-  contactMode: params.bcContactMode as ContactMode,
+  contactMode: (params.bcContactMode || "EMAIL") as ContactMode,
   userRights: params.uRights ?? [],
   website: params.website as AbsoluteUrl | "",
   additionalInformation: params.additionalInformation,

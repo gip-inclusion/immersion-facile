@@ -55,6 +55,7 @@ describe("NotifyContactRequest", () => {
         phone: adminPhone,
         shouldReceiveDiscussionNotifications: true,
         userId: establishmentAdmin.id,
+        isMainContactByPhone: false,
       },
       {
         role: "establishment-contact",
@@ -290,7 +291,7 @@ describe("NotifyContactRequest", () => {
                   contactLastName: getFormattedFirstnameAndLastname({
                     lastname: establishmentAdmin.lastName,
                   }),
-                  businessAddress: addressDtoToString(discussion.address),
+                  welcomeAddress: addressDtoToString(discussion.address),
                   kind: discussion.kind,
                   potentialBeneficiaryFirstName:
                     getFormattedFirstnameAndLastname({

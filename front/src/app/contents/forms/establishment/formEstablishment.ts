@@ -168,6 +168,18 @@ export const formEstablishmentFieldsLabels = (
     label: "",
     id: "",
   },
+  potentialBeneficiaryWelcomeAddress: {
+    label: "Adresse d'accueil pour les candidats",
+    id: "TODO",
+  },
+  "userRights.0.isMainContactByPhone": {
+    label: "Numéro de téléphone principal",
+    id: "TODO",
+  },
+  "userRights.0.isMainContactInPerson": {
+    label: "Contact principal en présentiel",
+    id: "TODO",
+  },
 });
 
 export const mailtoHref = (siret: SiretDto) => {

@@ -67,6 +67,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
             shouldReceiveDiscussionNotifications: true,
             job: "osef",
             phone: "osef",
+            isMainContactByPhone: false,
           },
           {
             role: "establishment-contact",

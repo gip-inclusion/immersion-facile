@@ -57,6 +57,7 @@ describe("SendExchangeToRecipient", () => {
       job: "",
       phone: "",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
     {
       role: "establishment-contact",
@@ -199,6 +200,7 @@ describe("SendExchangeToRecipient", () => {
                 shouldReceiveDiscussionNotifications: false,
                 job: "",
                 phone: "",
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",

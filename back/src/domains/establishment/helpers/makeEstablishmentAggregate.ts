@@ -1,4 +1,9 @@
-import { errors, type FormEstablishmentDto, noContactPerMonth } from "shared";
+import {
+  errors,
+  type FormEstablishmentDto,
+  noContactPerMonth,
+  type ValueOf,
+} from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
@@ -45,7 +50,15 @@ export const makeEstablishmentAggregate = async ({
 
   const updatedUserRights: EstablishmentUserRight[] =
     formEstablishment.userRights.map(
-      ({ email, role, job, phone, shouldReceiveDiscussionNotifications }) => {
+      ({
+        email,
+        role,
+        job,
+        phone,
+        shouldReceiveDiscussionNotifications,
+        isMainContactByPhone,
+        isMainContactInPerson,
+      }) => {
         const user = establishmentUsers.find((user) => user.email === email);
 
         if (!user) throw errors.user.notFoundByEmail({ email });
@@ -56,13 +69,26 @@ export const makeEstablishmentAggregate = async ({
               job,
               phone,
               shouldReceiveDiscussionNotifications,
+              isMainContactByPhone,
+              ...populateUserRightPropIfDefined(
+                "isMainContactInPerson",
+                isMainContactInPerson,
+              ),
             }
           : {
               role,
               userId: user.id,
-              job,
-              phone,
               shouldReceiveDiscussionNotifications,
+              ...populateUserRightPropIfDefined(
+                "isMainContactByPhone",
+                isMainContactByPhone,
+              ),
+              ...populateUserRightPropIfDefined("job", job),
+              ...populateUserRightPropIfDefined("phone", phone),
+              ...populateUserRightPropIfDefined(
+                "isMainContactInPerson",
+                isMainContactInPerson,
+              ),
             };
       },
     );
@@ -98,6 +124,10 @@ export const makeEstablishmentAggregate = async ({
       searchableBy: formEstablishment.searchableBy,
       score,
       contactMode: formEstablishment.contactMode,
+      ...(formEstablishment.contactMode === "IN_PERSON" && {
+        potentialBeneficiaryWelcomeAddress:
+          formEstablishment.potentialBeneficiaryWelcomeAddress,
+      }),
     },
     userRights: updatedUserRights,
     offers: formEstablishment.appellations.map(
@@ -111,3 +141,8 @@ export const makeEstablishmentAggregate = async ({
     ),
   };
 };
+
+const populateUserRightPropIfDefined = (
+  prop: keyof EstablishmentUserRight,
+  value: ValueOf<EstablishmentUserRight>,
+) => (value !== undefined ? { [prop]: value } : {});
