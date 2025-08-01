@@ -5,13 +5,14 @@ import {
   zStringCanBeEmpty,
   zStringMinLength1,
 } from "../zodUtils";
-import type {
-  AddressAndPosition,
-  AddressDto,
-  DepartmentCode,
-  LookupSearchResult,
-  WithLookupAddressQueryParams,
-  WithLookupLocationInputQueryParams,
+import {
+  type AddressAndPosition,
+  type AddressDto,
+  type DepartmentCode,
+  type LookupSearchResult,
+  supportedCountryCodes,
+  type WithLookupAddressQueryParams,
+  type WithLookupLocationInputQueryParams,
 } from "./address.dto";
 
 export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
@@ -71,6 +72,7 @@ export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddres
         (arg) => arg.split(" ").length <= lookupStreetAddressQueryMaxWordLength,
         "String must contain a maximum of 18 words",
       ),
+    countryCode: z.enum(supportedCountryCodes),
   });
 
 export const withLookupLocationInputQueryParamsSchema: z.Schema<WithLookupLocationInputQueryParams> =

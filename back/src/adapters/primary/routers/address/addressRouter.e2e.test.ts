@@ -34,6 +34,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: query8bdduportLookup,
+          countryCode: "FR",
         },
       });
       expectHttpResponseToEqual(response, {
@@ -48,6 +49,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: "1",
+          countryCode: "FR",
         },
       });
       expectHttpResponseToEqual(response, {
@@ -69,6 +71,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: "a a a a a a a a a a a a a a a a a a a",
+          countryCode: "FR",
         },
       });
       expectHttpResponseToEqual(response, {
@@ -89,6 +92,7 @@ describe("address router", () => {
         const response = await httpClient.lookupStreetAddress({
           queryParams: {
             lookup,
+            countryCode: "FR",
           },
         });
 
