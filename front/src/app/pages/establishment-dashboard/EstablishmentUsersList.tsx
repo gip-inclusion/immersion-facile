@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { uniqBy } from "ramda";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { NotificationIndicator } from "react-design-system";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -106,20 +107,28 @@ export const EstablishmentUsersList = () => {
         headers={headers}
         data={data}
       />
-      <establishmentUsersEditModal.Component
-        title={
-          editingUserRight ? "Modifier l'utilisateur" : "Ajouter un utilisateur"
-        }
-      >
-        <EstablishmentUsersEditForm
-          alreadyExistingUserRight={editingUserRight}
-        />
-      </establishmentUsersEditModal.Component>
-      <establishmentUsersDeleteModal.Component title="Supprimer l'utilisateur">
-        <EstablishmentUsersDeleteContent
-          alreadyExistingUserRight={editingUserRight}
-        />
-      </establishmentUsersDeleteModal.Component>
+      {createPortal(
+        <establishmentUsersEditModal.Component
+          title={
+            editingUserRight
+              ? "Modifier l'utilisateur"
+              : "Ajouter un utilisateur"
+          }
+        >
+          <EstablishmentUsersEditForm
+            alreadyExistingUserRight={editingUserRight}
+          />
+        </establishmentUsersEditModal.Component>,
+        document.body,
+      )}
+      {createPortal(
+        <establishmentUsersDeleteModal.Component title="Supprimer l'utilisateur">
+          <EstablishmentUsersDeleteContent
+            alreadyExistingUserRight={editingUserRight}
+          />
+        </establishmentUsersDeleteModal.Component>,
+        document.body,
+      )}
     </div>
   );
 };
@@ -219,18 +228,20 @@ const EstablishmentUsersEditForm = ({
     phone: "",
     job: "",
     role: undefined,
+    shouldReceiveDiscussionNotifications: false,
   });
+  const methods = useForm<FormEstablishmentUserRight>({
+    resolver: zodResolver(formEstablishmentUserRightSchema),
+    defaultValues: alreadyExistingUserRight ?? emptyValues.current,
+  });
+
   const {
     register,
-    handleSubmit,
     setValue,
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormEstablishmentUserRight>({
-    resolver: zodResolver(formEstablishmentUserRightSchema),
-    defaultValues: alreadyExistingUserRight ?? emptyValues.current,
-  });
+  } = methods;
 
   const mergeUserRights = (
     userRights: FormEstablishmentUserRight[],
@@ -239,6 +250,7 @@ const EstablishmentUsersEditForm = ({
     const userRightsWithoutPreviousOne = userRights.filter(
       (userRight) => userRight.email !== userRightToMerge.email,
     );
+
     return uniqBy(
       (userRight) => userRight.email,
       [userRightToMerge, ...userRightsWithoutPreviousOne],
@@ -276,8 +288,7 @@ const EstablishmentUsersEditForm = ({
           <strong>{values.email}</strong>
         </p>
       )}
-      {/* biome-ignore lint/suspicious/noConsole: debug purpose */}
-      <form onSubmit={handleSubmit(onSubmit, console.log)}>
+      <form onSubmit={() => onSubmit(values)}>
         {!alreadyExistingUserRight?.email && (
           <Input
             label="Email"
@@ -293,7 +304,7 @@ const EstablishmentUsersEditForm = ({
           }}
           {...(errors.phone && {
             state: "error",
-            errorMessage: localization.required,
+            stateRelatedMessage: localization.required,
           })}
         />
         <Input
@@ -303,7 +314,7 @@ const EstablishmentUsersEditForm = ({
           }}
           {...(errors.job && {
             state: "error",
-            errorMessage: localization.required,
+            stateRelatedMessage: localization.required,
           })}
         />
         <RadioButtons
@@ -340,8 +351,8 @@ const EstablishmentUsersEditForm = ({
             },
             {
               children: "Enregistrer",
-              onClick: handleSubmit(onSubmit),
-              type: "submit",
+              onClick: () => onSubmit(values),
+              type: "button",
             },
           ]}
         />
