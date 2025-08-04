@@ -288,7 +288,7 @@ const EstablishmentUsersEditForm = ({
           <strong>{values.email}</strong>
         </p>
       )}
-      <form onSubmit={() => onSubmit(values)}>
+      <form>
         {!alreadyExistingUserRight?.email && (
           <Input
             label="Email"
