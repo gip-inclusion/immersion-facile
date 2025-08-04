@@ -12,13 +12,17 @@ import {
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   type TemplatedEmail,
+  type UserWithAdminRights,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
+import type {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../../entities/EstablishmentAggregate";
 import { getNotifiedUsersFromEstablishmentUserRights } from "../../helpers/businessContact.helpers";
 import { makeContactByEmailRequestParams } from "../../helpers/contactRequest";
 
@@ -154,27 +158,54 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     discussion: DiscussionDtoInPerson | DiscussionDtoPhone;
     establishment: EstablishmentAggregate;
   }) {
-    const firstAdminRight = establishment.userRights.find(
-      (right) => right.role === "establishment-admin",
+    const establishmentUserRightToContact = establishment.userRights.find(
+      (right) =>
+        (discussion.contactMode === "PHONE" && right.isMainContactByPhone) ||
+        (discussion.contactMode === "IN_PERSON" && right.isMainContactInPerson),
     );
-    if (!firstAdminRight)
-      throw errors.establishment.adminNotFound({
+    if (!establishmentUserRightToContact)
+      throw errors.establishment.contactUserNotFound({
         siret: establishment.establishment.siret,
       });
 
-    const firstAdminUser = await uow.userRepository.getById(
-      firstAdminRight.userId,
+    const establishmentUserToContact = await uow.userRepository.getById(
+      establishmentUserRightToContact.userId,
     );
-    if (!firstAdminUser)
-      throw errors.user.notFound({ userId: firstAdminRight.userId });
+    if (!establishmentUserToContact)
+      throw errors.user.notFound({
+        userId: establishmentUserRightToContact.userId,
+      });
 
+    await this.#saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        sender: immersionFacileNoReplyEmailSender,
+        recipients: [discussion.potentialBeneficiary.email],
+        ...this.#getOtherContactModeParams({
+          discussion,
+          establishmentUserToContact,
+          establishmentUserRightToContact,
+        }),
+      },
+      followedIds: { establishmentSiret: discussion.siret },
+    });
+  }
+  #getOtherContactModeParams({
+    discussion,
+    establishmentUserToContact,
+    establishmentUserRightToContact,
+  }: {
+    discussion: DiscussionDtoInPerson | DiscussionDtoPhone;
+    establishmentUserToContact: UserWithAdminRights;
+    establishmentUserRightToContact: EstablishmentUserRight;
+  }) {
     const common = {
       businessName: discussion.businessName,
       contactFirstName: getFormattedFirstnameAndLastname({
-        firstname: firstAdminUser.firstName,
+        firstname: establishmentUserToContact.firstName,
       }),
       contactLastName: getFormattedFirstnameAndLastname({
-        lastname: firstAdminUser.lastName,
+        lastname: establishmentUserToContact.lastName,
       }),
       kind: discussion.kind,
       potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname({
@@ -184,29 +215,24 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         lastname: discussion.potentialBeneficiary.lastName,
       }),
     };
-
-    await this.#saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        sender: immersionFacileNoReplyEmailSender,
-        recipients: [discussion.potentialBeneficiary.email],
-        ...(discussion.contactMode === "IN_PERSON"
-          ? {
-              kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
-              params: {
-                ...common,
-                welcomeAddress: addressDtoToString(discussion.address),
-              },
-            }
-          : {
-              kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
-              params: {
-                ...common,
-                contactPhone: firstAdminRight.phone,
-              },
-            }),
+    if (
+      discussion.contactMode === "PHONE" &&
+      establishmentUserRightToContact.phone
+    ) {
+      return {
+        kind: "CONTACT_BY_PHONE_INSTRUCTIONS" as const,
+        params: {
+          ...common,
+          contactPhone: establishmentUserRightToContact.phone,
+        },
+      };
+    }
+    return {
+      kind: "CONTACT_IN_PERSON_INSTRUCTIONS" as const,
+      params: {
+        ...common,
+        welcomeAddress: addressDtoToString(discussion.address),
       },
-      followedIds: { establishmentSiret: discussion.siret },
-    });
+    };
   }
 }

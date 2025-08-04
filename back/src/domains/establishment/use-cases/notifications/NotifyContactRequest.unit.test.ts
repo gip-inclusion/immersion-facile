@@ -47,7 +47,7 @@ describe("NotifyContactRequest", () => {
     .build();
   const adminPhone: PhoneNumber = "+66355445544";
 
-  const establishment = new EstablishmentAggregateBuilder()
+  const establishmentAggregate = new EstablishmentAggregateBuilder()
     .withUserRights([
       {
         role: "establishment-admin",
@@ -69,6 +69,86 @@ describe("NotifyContactRequest", () => {
       },
     ])
     .build();
+
+  const establishmentAggregateWithContactPhone =
+    new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("12345678901235")
+      .withContactMode("PHONE")
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "osef",
+          phone: adminPhone,
+          shouldReceiveDiscussionNotifications: true,
+          userId: establishmentAdmin.id,
+          isMainContactByPhone: true,
+        },
+        {
+          role: "establishment-contact",
+          userId: establishmentContact.id,
+          shouldReceiveDiscussionNotifications: true,
+        },
+      ])
+      .build();
+
+  const establishmentAggregateWithContactPhoneNoPhone =
+    new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("12345678901238")
+      .withContactMode("PHONE")
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "osef",
+          phone: "0600000000",
+          shouldReceiveDiscussionNotifications: true,
+          userId: establishmentAdmin.id,
+          isMainContactByPhone: false,
+        },
+        {
+          role: "establishment-contact",
+          userId: establishmentContact.id,
+          shouldReceiveDiscussionNotifications: true,
+        },
+      ])
+      .build();
+
+  const establishmentAggregateWithContactInPerson =
+    new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("12345678901236")
+      .withContactMode("IN_PERSON")
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "osef",
+          phone: adminPhone,
+          shouldReceiveDiscussionNotifications: true,
+          userId: establishmentAdmin.id,
+          isMainContactByPhone: false,
+        },
+        {
+          role: "establishment-contact",
+          userId: establishmentContact.id,
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactInPerson: true,
+        },
+      ])
+      .build();
+
+  const establishmentAggregateWithContactInPersonNoContact =
+    new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("12345678901237")
+      .withContactMode("IN_PERSON")
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "osef",
+          phone: adminPhone,
+          shouldReceiveDiscussionNotifications: true,
+          userId: establishmentAdmin.id,
+          isMainContactByPhone: false,
+        },
+      ])
+      .build();
 
   let uow: InMemoryUnitOfWork;
   let notifyContactRequest: NotifyContactRequest;
@@ -102,7 +182,11 @@ describe("NotifyContactRequest", () => {
     ];
     uow.userRepository.users = [establishmentAdmin, establishmentContact];
     uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment,
+      establishmentAggregate,
+      establishmentAggregateWithContactPhone,
+      establishmentAggregateWithContactInPerson,
+      establishmentAggregateWithContactPhoneNoPhone,
+      establishmentAggregateWithContactInPersonNoContact,
     ];
   });
 
@@ -112,7 +196,7 @@ describe("NotifyContactRequest", () => {
         "Sends ContactByEmailRequest email to establishment users that are only notified with an email kind %s  ",
         async (kind) => {
           const discussion = new DiscussionBuilder()
-            .withSiret(establishment.establishment.siret)
+            .withSiret(establishmentAggregate.establishment.siret)
             .withContactMode("EMAIL")
             .withDiscussionKind(kind)
             .withAppellationCode(TEST_APPELLATION_CODE)
@@ -212,7 +296,9 @@ describe("NotifyContactRequest", () => {
         "Sends ContactByPhoneRequest email to potential beneficiary with an email kind %s",
         async () => {
           const discussion = new DiscussionBuilder()
-            .withSiret(establishment.establishment.siret)
+            .withSiret(
+              establishmentAggregateWithContactPhone.establishment.siret,
+            )
             .withContactMode("PHONE")
             .withAppellationCode(TEST_APPELLATION_CODE)
             .build() as DiscussionDtoPhone;
@@ -263,7 +349,9 @@ describe("NotifyContactRequest", () => {
         "Sends ContactInPersonRequest email to potential beneficiary with an email kind %s ",
         async () => {
           const discussion = new DiscussionBuilder()
-            .withSiret(establishment.establishment.siret)
+            .withSiret(
+              establishmentAggregateWithContactInPerson.establishment.siret,
+            )
             .withContactMode("IN_PERSON")
             .withAppellationCode(TEST_APPELLATION_CODE)
             .build() as DiscussionDtoInPerson;
@@ -327,7 +415,7 @@ describe("NotifyContactRequest", () => {
 
     it("Bad immersion offer with contactMode EMAIL", async () => {
       const discussion = new DiscussionBuilder()
-        .withSiret(establishment.establishment.siret)
+        .withSiret(establishmentAggregate.establishment.siret)
         .withContactMode("EMAIL")
         .withAppellationCode(TEST_APPELLATION_CODE)
         .build();
@@ -342,6 +430,49 @@ describe("NotifyContactRequest", () => {
         }),
         errors.rome.missingAppellation({
           appellationCode: discussion.appellationCode,
+        }),
+      );
+    });
+    it("No user right to contact (isMainContactByPhone false) with contactMode PHONE", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(
+          establishmentAggregateWithContactPhoneNoPhone.establishment.siret,
+        )
+        .withContactMode("PHONE")
+        .withAppellationCode(TEST_APPELLATION_CODE)
+        .build();
+
+      uow.discussionRepository.discussions = [discussion];
+
+      await expectPromiseToFailWithError(
+        notifyContactRequest.execute({
+          discussionId: discussion.id,
+          siret: discussion.siret,
+        }),
+        errors.establishment.contactUserNotFound({
+          siret: discussion.siret,
+        }),
+      );
+    });
+    it("No user right to contact (isMainContactInPerson false) with contactMode IN_PERSON", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(
+          establishmentAggregateWithContactInPersonNoContact.establishment
+            .siret,
+        )
+        .withContactMode("IN_PERSON")
+        .withAppellationCode(TEST_APPELLATION_CODE)
+        .build();
+
+      uow.discussionRepository.discussions = [discussion];
+
+      await expectPromiseToFailWithError(
+        notifyContactRequest.execute({
+          discussionId: discussion.id,
+          siret: discussion.siret,
+        }),
+        errors.establishment.contactUserNotFound({
+          siret: discussion.siret,
         }),
       );
     });
