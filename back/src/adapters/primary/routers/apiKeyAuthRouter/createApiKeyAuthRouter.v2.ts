@@ -207,10 +207,11 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
 
   webhooksV2Router.subscribeToWebhook(deps.apiConsumerMiddleware, (req, res) =>
     sendHttpResponse(req, res.status(201), () => {
+      const rightNeeded = eventToRightName(req.body.subscribedEvent);
       if (
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
-          rightName: eventToRightName(req.body.subscribedEvent),
+          rightName: rightNeeded,
           consumerKind: "SUBSCRIPTION",
         })
       )
