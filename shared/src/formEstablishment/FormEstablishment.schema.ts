@@ -80,18 +80,18 @@ const establishmentContactSchema = establishmentContactBaseSchema.and(
   establishmentContactPhoneSchema,
 );
 
+const establishmentAdminSchema = z.object({
+  role: z.literal("establishment-admin"),
+  email: emailSchema,
+  phone: phoneNumberSchema,
+  isMainContactByPhone: zBoolean,
+  isMainContactInPerson: zBoolean.optional(),
+  shouldReceiveDiscussionNotifications: zBoolean,
+  job: zStringMinLength1,
+});
+
 export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRight> =
-  z
-    .object({
-      role: z.literal("establishment-admin"),
-      email: emailSchema,
-      phone: phoneNumberSchema,
-      isMainContactByPhone: zBoolean,
-      isMainContactInPerson: zBoolean.optional(),
-      shouldReceiveDiscussionNotifications: zBoolean,
-      job: zStringMinLength1,
-    })
-    .or(establishmentContactSchema);
+  establishmentAdminSchema.or(establishmentContactSchema);
 
 export const formEstablishmentUserRightsSchema: z.Schema<
   FormEstablishmentUserRight[]
