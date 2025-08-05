@@ -29,11 +29,11 @@ type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
   shouldReceiveDiscussionNotifications: boolean;
 };
 
-type withJob = {
+type WithJob = {
   job?: string;
 };
 
-type withPhone =
+type WithPhone =
   | {
       phone?: never;
       isMainContactByPhone?: never;
@@ -47,7 +47,7 @@ export type WithIsMainContactInPerson = {
   isMainContactInPerson?: boolean;
 };
 
-export type WithJobAndPhone = withJob & withPhone;
+export type WithJobAndPhone = WithJob & WithPhone;
 
 export type AdminFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-admin"> &

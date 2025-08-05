@@ -894,13 +894,13 @@ export const errors = {
       new BadRequestError(`La raison ${rejectionKind} n'est pas supportée.`),
     badStatus: ({
       discussionId,
-      status,
+      expectedStatus,
     }: {
       discussionId: DiscussionId;
-      status: DiscussionStatus;
+      expectedStatus: DiscussionStatus;
     }) =>
       new BadRequestError(
-        `La discussion '${discussionId}' n'a pas le statut '${status}'.`,
+        `La discussion '${discussionId}' n'a pas le statut '${expectedStatus}'.`,
       ),
   },
   establishmentGroup: {

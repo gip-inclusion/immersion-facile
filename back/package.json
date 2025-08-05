@@ -36,6 +36,7 @@
     "trigger-convention-reminder": "ts-node src/scripts/triggerConventionReminder.ts",
     "trigger-contact-request-reminder-3d": "ts-node src/scripts/triggerContactRequestReminder3Days.ts",
     "trigger-contact-request-reminder-7d": "ts-node src/scripts/triggerContactRequestReminder7Days.ts",
+    "trigger-contact-request-beneficiary-reminder-15d": "ts-node src/scripts/triggerContactRequestBeneficiaryReminder15Days.ts",
     "trigger-delete-email-attachements": "ts-node src/scripts/triggerDeleteEmailAttachements.ts",
     "trigger-establishment-leads-reminders": "ts-node src/scripts/triggerEstablishmentLeadReminders.ts",
     "trigger-mark-old-convention-as-deprecated": "ts-node src/scripts/triggerMarkOldConventionAsDeprecated.ts",

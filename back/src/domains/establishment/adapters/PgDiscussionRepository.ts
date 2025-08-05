@@ -343,6 +343,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
       .where("created_at", "<=", params.olderThan)
       .where("status", "=", "PENDING")
+      .where("contact_method", "=", "EMAIL")
       .having((eb) => eb.fn.count("exchanges.id"), "=", 1)
       .orderBy("created_at", "asc")
       .groupBy(["discussions.id", "discussions.created_at"])
