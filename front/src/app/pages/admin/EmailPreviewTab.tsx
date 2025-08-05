@@ -694,4 +694,13 @@ export const defaultEmailValueByEmailKind: {
     searchPageUrl: "http://example.com",
     discussionCreatedAt: "2023-06-23T10:00:00.000Z",
   },
+  DISCUSSION_BENEFICIARY_FOLLOW_UP: {
+    businessName: "BUSINESS_NAME",
+    contactFirstName: "CONTACT_FIRST_NAME",
+    contactLastName: "CONTACT_LAST_NAME",
+    contactJob: "CONTACT_JOB",
+    contactPhone: "CONTACT_PHONE",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+  },
 };

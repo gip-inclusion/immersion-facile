@@ -1885,6 +1885,51 @@ Profil du candidat :
       }),
       tags: ["réponse candidature impossible"],
     },
+    DISCUSSION_BENEFICIARY_FOLLOW_UP: {
+      niceName: "MER - Candidat - Relance par téléphone",
+      tags: ["mer_candidat_relanceParTelephone"],
+      createEmailVariables: ({
+        businessName,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        contactFirstName,
+        contactLastName,
+        contactJob,
+        contactPhone,
+      }) => ({
+        subject: `Toujours pas de réponse de l’entreprise ${businessName} ?`,
+        greetings: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},`,
+        content: `
+        Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},
+
+        Vous avez contacté l’entreprise ${businessName} il y a 15 jours par email pour demander une immersion, mais vous n’avez pas encore reçu de réponse.
+
+        Vous pouvez relancer l’entreprise par téléphone :
+        - Nom de la personne à contacter : ${contactFirstName} ${contactLastName}
+        ${contactJob ? `- Fonction : ${contactJob}` : ""}
+        - Numéro de téléphone : ${contactPhone}
+
+        N’hésitez pas à vous présenter brièvement, à rappeler l’objet de votre demande, et à mentionner que vous avez obtenu ces informations via Immersion Facilitée.
+
+        ⚠️ Ces informations sont personnelles et confidentielles. Merci de ne pas les transmettre à d’autres personnes.
+
+        
+
+        📝 <strong>Besoin de conseils ?</strong>
+
+        Voici un exemple de phrase pour démarrer la conversation :
+        « Bonjour, je m'appelle ${beneficiaryFirstName} ${beneficiaryLastName}, je vous contacte car j’ai envoyé une demande d’immersion via Immersion Facilitée il y a quelques jours. Je souhaite découvrir le métier de [nom du métier] dans votre entreprise et je voulais savoir si cela était possible. »
+
+
+
+        N’hésitez pas à nous contacter si vous avez des questions.
+
+        Bonne journée,
+        <br/>
+        L'équipe Immersion Facilitée
+        `,
+      }),
+    },
     WARN_DISCUSSION_DELIVERY_FAILED: {
       niceName:
         "Établissement - Alerte de problème d'envoi d'un échange dans une discussion",
