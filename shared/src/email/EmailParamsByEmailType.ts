@@ -284,6 +284,15 @@ export type EmailParamsByEmailType = {
     discussionCreatedAt: string;
     searchPageUrl: string;
   };
+  DISCUSSION_BENEFICIARY_FOLLOW_UP: {
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    contactFirstName: string;
+    contactLastName: string;
+    contactJob: string | undefined;
+    contactPhone: string;
+  };
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: string[];
     errorMessage: string;
