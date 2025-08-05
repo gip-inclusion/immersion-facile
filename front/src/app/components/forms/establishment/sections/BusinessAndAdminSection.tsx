@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { pick, values } from "ramda";
+import { omit, pick, values } from "ramda";
 import { ErrorNotifications, HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { domElementIds, type FormEstablishmentDto } from "shared";
@@ -210,7 +210,7 @@ const EstablishmentAdminInfos = () => {
       <Input
         label={formContents["userRights.0.job"].label}
         nativeInputProps={{
-          ...pick(["id", "name", "required"], formContents["userRights.0.job"]),
+          ...omit(["hintText"], formContents["userRights.0.job"]),
           ...register("userRights.0.job"),
         }}
         {...getFieldError("userRights.0.job")}
@@ -219,10 +219,7 @@ const EstablishmentAdminInfos = () => {
         label={formContents["userRights.0.phone"].label}
         hintText={formContents["userRights.0.phone"].hintText}
         nativeInputProps={{
-          ...pick(
-            ["id", "name", "required"],
-            formContents["userRights.0.phone"],
-          ),
+          ...omit(["hintText"], formContents["userRights.0.phone"]),
           ...register("userRights.0.phone"),
         }}
         {...getFieldError("userRights.0.phone")}

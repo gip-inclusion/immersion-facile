@@ -1,5 +1,4 @@
 // TODO: find the standard for gouv.fr phone verification
-
 import { values } from "ramda";
 import type { Flavor } from "./typeFlavors";
 
@@ -212,3 +211,5 @@ export type RangeOfPosition<
   :
       | (Result["length"] extends 0 ? never : Result["length"])
       | RangeOfPosition<N, [unknown, ...Result]>;
+export const populatePropIfDefined = <T>(prop: keyof T, value: ValueOf<T>) =>
+  value !== undefined ? { [prop]: value } : {};

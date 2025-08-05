@@ -64,17 +64,10 @@ const establishmentContactBaseSchema = z.object({
   isMainContactInPerson: zBoolean.optional(),
 });
 
-const establishmentContactPhoneSchema = z
-  .object({
-    phone: phoneNumberSchema,
-    isMainContactByPhone: zBoolean,
-  })
-  .or(
-    z.object({
-      phone: z.undefined(),
-      isMainContactByPhone: z.undefined(),
-    }),
-  );
+const establishmentContactPhoneSchema = z.object({
+  phone: phoneNumberSchema.optional(),
+  isMainContactByPhone: zBoolean.optional(),
+});
 
 const establishmentContactSchema = establishmentContactBaseSchema.and(
   establishmentContactPhoneSchema,
@@ -190,7 +183,11 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
             .filter((isMainContactByPhone) => isMainContactByPhone === true)
             .length === 1
         : true,
-    "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
+    {
+      message:
+        "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
+      path: ["userRights"],
+    },
   )
   .refine(
     (formEstablishment) =>
@@ -200,7 +197,11 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
             .filter((isMainContactInPerson) => isMainContactInPerson === true)
             .length === 1
         : true,
-    "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
+    {
+      message:
+        "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
+      path: ["userRights"],
+    },
   );
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =

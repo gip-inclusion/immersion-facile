@@ -33,15 +33,10 @@ type WithJob = {
   job?: string;
 };
 
-type WithPhone =
-  | {
-      phone?: never;
-      isMainContactByPhone?: never;
-    }
-  | {
-      phone: PhoneNumber;
-      isMainContactByPhone: boolean;
-    };
+type WithPhone = {
+  phone?: PhoneNumber;
+  isMainContactByPhone?: boolean | null;
+};
 
 export type WithIsMainContactInPerson = {
   isMainContactInPerson?: boolean;
@@ -196,4 +191,11 @@ export type EstablishmentBatchReport = {
   numberOfEstablishmentsProcessed: number;
   numberOfSuccess: number;
   failures: SiretAdditionFailure[];
+};
+
+export type FormEstablishmentReadDto = Omit<
+  FormEstablishmentDto,
+  "contactMode"
+> & {
+  contactMode: ContactMode | null;
 };

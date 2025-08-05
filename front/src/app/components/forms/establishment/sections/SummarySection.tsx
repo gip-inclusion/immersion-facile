@@ -125,9 +125,7 @@ export const SummarySection = ({
           <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
             Moyen de contact :
           </p>
-          <p>
-            <DisplayContactModeValue contactMode={formValues.contactMode} />
-          </p>
+          <DisplayContactModeValue contactMode={formValues.contactMode} />
         </SectionHighlight>
       </HeadingSection>
       <HeadingSection
@@ -172,7 +170,7 @@ const DisplayContactModeValue = ({
     IN_PERSON: "En présentiel",
   };
   return (
-    <div>
+    <div className={fr.cx("fr-mt-1w")}>
       {contactModeLabels[contactMode]}
       {contactMode === "IN_PERSON" &&
         formValues.potentialBeneficiaryWelcomeAddress && (
