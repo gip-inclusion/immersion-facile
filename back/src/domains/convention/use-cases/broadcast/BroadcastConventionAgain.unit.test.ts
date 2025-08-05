@@ -2,6 +2,7 @@ import { addMinutes, subHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
+  type AssessmentDto,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   errors,
@@ -180,6 +181,43 @@ describe("BroadcastConventionAgain", () => {
           }),
         );
       });
+    });
+
+    describe("when assessment if present", () => {
+      it.each([adminUser, userWithEnoughRights])(
+        "trigger ConventionBroadcastAgain event with the convention + assessment in payload",
+        async (user) => {
+          const assessment: AssessmentDto = {
+            conventionId: convention.id,
+            status: "COMPLETED",
+            endedWithAJob: false,
+            establishmentFeedback: "commentaire",
+            establishmentAdvices: "commentaire",
+          };
+          await uow.assessmentRepository.save({
+            _entityName: "Assessment",
+            numberOfHoursActuallyMade: null,
+            ...assessment,
+          });
+
+          await broadcastConventionAgain.execute(
+            { conventionId: convention.id },
+            user,
+          );
+
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "ConventionWithAssessmentBroadcastRequested",
+              status: "never-published",
+              payload: {
+                convention,
+                assessment,
+                triggeredBy: { kind: "connected-user", userId: user.id },
+              },
+            },
+          ]);
+        },
+      );
     });
   });
 });
