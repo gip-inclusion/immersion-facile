@@ -1,6 +1,42 @@
 {
   "jobs": [
     {
+      "command": "0 21 * * * pnpm back run trigger-delete-email-attachements",
+      "size": "M"
+    },
+    {
+      "command": "0 22 * * * pnpm back run trigger-mark-old-convention-as-deprecated",
+      "size": "M"
+    },
+    {
+      "command": "3 22 * * * pnpm back run trigger-delete-old-discussion-messages",
+      "size": "M"
+    },
+    {
+      "command": "41 22 1 * * pnpm back run trigger-update-rome-data",
+      "size": "M"
+    },
+    {
+      "command": "01 23 * * * pnpm back run trigger-update-all-establishments-scores",
+      "size": "M"
+    },
+    {
+      "command": "15 23 * * * pnpm back run trigger-deactivate-unresponsive-establishments",
+      "size": "M"
+    },
+    {
+      "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
+      "size": "M"
+    },
+    {
+      "command": "30 23 * * * pnpm back run trigger-mark-obsolete-discussions-as-deprecated",
+      "size": "M"
+    },
+    {
+      "command": "45 23 * * * pnpm back run trigger-contact-request-beneficiary-reminder-15-days",
+      "size": "M"
+    },
+    {
       "command": "10 0 * * * pnpm back run trigger-suggest-edit-form-establishment-every-6-months",
       "size": "M"
     },
@@ -34,38 +70,6 @@
     },
     {
       "command": "30 08 * * * pnpm back run trigger-contact-request-reminder-7d",
-      "size": "M"
-    },
-    {
-      "command": "0 21 * * * pnpm back run trigger-delete-email-attachements",
-      "size": "M"
-    },
-    {
-      "command": "0 22 * * * pnpm back run trigger-mark-old-convention-as-deprecated",
-      "size": "M"
-    },
-    {
-      "command": "3 22 * * * pnpm back run trigger-delete-old-discussion-messages",
-      "size": "M"
-    },
-    {
-      "command": "15 23 * * * pnpm back run trigger-mark-obsolete-discussions-as-deprecated",
-      "size": "M"
-    },
-    {
-      "command": "01 23 * * * pnpm back run trigger-update-all-establishments-scores",
-      "size": "M"
-    },
-    {
-      "command": "15 23 * * * pnpm back run trigger-deactivate-unresponsive-establishments",
-      "size": "M"
-    },
-    {
-      "command": "41 22 1 * * pnpm back run trigger-update-rome-data",
-      "size": "M"
-    },
-    {
-      "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
       "size": "M"
     }
   ]
