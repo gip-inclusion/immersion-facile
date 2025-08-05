@@ -134,6 +134,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
           role,
           email: user.email,
           job,
+          phone,
           shouldReceiveDiscussionNotifications,
           isMainContactInPerson,
         };
@@ -141,7 +142,6 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         return phone && isMainContactByPhone !== undefined
           ? {
               ...baseContact,
-              phone,
               isMainContactByPhone,
               isMainContactInPerson,
             }

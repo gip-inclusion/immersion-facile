@@ -3,19 +3,19 @@ import type { MigrationBuilder } from "node-pg-migrate";
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumns("establishments", {
     welcome_address_street_number_and_address: {
-      type: "string",
+      type: "TEXT",
       default: null,
     },
     welcome_address_postcode: {
-      type: "string",
+      type: "TEXT",
       default: null,
     },
     welcome_address_city: {
-      type: "string",
+      type: "TEXT",
       default: null,
     },
     welcome_address_department_code: {
-      type: "string",
+      type: "TEXT",
       default: null,
     },
     welcome_address_lat: {
