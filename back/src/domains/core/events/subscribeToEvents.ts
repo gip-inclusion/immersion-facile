@@ -185,6 +185,9 @@ const getUseCasesByTopics = (
 
   //partnersConvention related
   PartnerErroredConventionMarkedAsHandled: [],
+  ConventionWithAssessmentBroadcastRequested: [
+    useCases.broadcastToFranceTravailOnAssessmentCreated,
+  ],
   ConventionBroadcastRequested: [
     useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
