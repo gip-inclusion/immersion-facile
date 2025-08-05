@@ -1,10 +1,11 @@
-import { type ConventionId, errors } from "shared";
+import { type AssessmentDto, type ConventionId, errors } from "shared";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { toAssessmentDto } from "../entities/AssessmentEntity";
 import type { FranceTravailGateway } from "../ports/FranceTravailGateway";
 import {
   type BroadcastToFranceTravailOnConventionUpdates,
@@ -154,8 +155,29 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
       throw errors.convention.notFound({
         conventionId: conventionToSyncId,
       });
-    return isLegacy
-      ? this.#legacyBroadcastToFTUsecase.execute({ convention })
+
+    const assessmentEntity =
+      await uow.assessmentRepository.getByConventionId(conventionToSyncId);
+
+    const assessment =
+      assessmentEntity &&
+      assessmentEntity.status !== "FINISHED" &&
+      assessmentEntity.status !== "ABANDONED"
+        ? (toAssessmentDto(assessmentEntity) as AssessmentDto)
+        : undefined;
+
+    if (isLegacy) {
+      return this.#legacyBroadcastToFTUsecase.execute({
+        convention,
+      });
+    }
+
+    return assessment
+      ? this.#standardBroadcastToFTUsecase.execute({
+          eventType: "ASSESSMENT_CREATED",
+          convention,
+          assessment,
+        })
       : this.#standardBroadcastToFTUsecase.execute({
           eventType: "CONVENTION_UPDATED",
           convention,

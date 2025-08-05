@@ -21,23 +21,23 @@ import {
 } from "../ports/FranceTravailGateway";
 import { ResyncOldConventionsToFt } from "./ResyncOldConventionsToFt";
 
-describe("ResyncOldConventionsToPe use case", () => {
-  const agencyPE = new AgencyDtoBuilder().withKind("pole-emploi").build();
+describe("ResyncOldConventionsToFt use case", () => {
+  const agencyFT = new AgencyDtoBuilder().withKind("pole-emploi").build();
   const conventionToSync1 = new ConventionDtoBuilder()
     .withId("6f59c7b7-c2c9-4a31-a3eb-377ea83ae08b")
-    .withAgencyId(agencyPE.id)
+    .withAgencyId(agencyFT.id)
     .build();
   const conventionToSync2 = new ConventionDtoBuilder()
     .withId("6f59c7b7-c2c9-4a31-a3eb-377ea83ae08a")
-    .withAgencyId(agencyPE.id)
+    .withAgencyId(agencyFT.id)
     .build();
   const conventionToSync3 = new ConventionDtoBuilder()
     .withId("6f59c7b7-c2c9-4a31-a3eb-377ea83ae08d")
-    .withAgencyId(agencyPE.id)
+    .withAgencyId(agencyFT.id)
     .build();
   const conventionToSync4 = new ConventionDtoBuilder()
     .withId("6f59c7b7-c2c9-4a31-a3eb-377ea83ae08e")
-    .withAgencyId(agencyPE.id)
+    .withAgencyId(agencyFT.id)
     .build();
 
   let uow: InMemoryUnitOfWork;
@@ -58,64 +58,320 @@ describe("ResyncOldConventionsToPe use case", () => {
     );
   });
 
-  describe("Right paths", () => {
-    it("broadcast two conventions to pe", async () => {
-      uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
-      uow.conventionRepository.setConventions([
-        conventionToSync1,
-        conventionToSync2,
-      ]);
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync1.id,
-          status: "TO_PROCESS",
-        },
-        {
-          id: conventionToSync2.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+  it("also broadcast assessment if present", async () => {
+    uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+    uow.conventionRepository.setConventions([conventionToSync1]);
+    uow.assessmentRepository.setAssessments([
+      {
+        _entityName: "Assessment",
+        numberOfHoursActuallyMade: null,
+        conventionId: conventionToSync1.id,
+        status: "COMPLETED",
+        endedWithAJob: false,
+        establishmentFeedback: "commentaire",
+        establishmentAdvices: "commentaire",
+      },
+    ]);
+    uow.conventionsToSyncRepository.setForTesting([
+      {
+        id: conventionToSync1.id,
+        status: "TO_PROCESS",
+      },
+    ]);
 
-      const report = await useCase.execute();
+    const report = await useCase.execute();
 
-      expectToEqual(uow.conventionRepository.conventions, [
-        conventionToSync1,
-        conventionToSync2,
-      ]);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync1.id,
-          status: "SUCCESS",
-          processDate: timeGateway.now(),
+    expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+      {
+        id: conventionToSync1.id,
+        status: "SUCCESS",
+        processDate: timeGateway.now(),
+      },
+    ]);
+    expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
+      conventionToConventionNotification(conventionToSync1, agencyFT),
+    ]);
+    expectToEqual(report, {
+      success: 1,
+      skips: {},
+      errors: {},
+    });
+  });
+
+  describe("when feature to standard format for convention broadcast is OFF", () => {
+    beforeEach(() => {
+      uow.featureFlagRepository.featureFlags = {
+        ...uow.featureFlagRepository.featureFlags,
+        enableStandardFormatBroadcastToFranceTravail: {
+          kind: "boolean",
+          isActive: false,
         },
-        {
-          id: conventionToSync2.id,
-          status: "SUCCESS",
-          processDate: timeGateway.now(),
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
-        conventionToConventionNotification(conventionToSync1, agencyPE),
-        conventionToConventionNotification(conventionToSync2, agencyPE),
-      ]);
-      expectToEqual(report, {
-        success: 2,
-        skips: {},
-        errors: {},
+      };
+    });
+
+    describe("Right paths", () => {
+      it("broadcast two conventions to FT", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+          {
+            id: conventionToSync2.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync2.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
+          conventionToConventionNotification(conventionToSync1, agencyFT),
+          conventionToConventionNotification(conventionToSync2, agencyFT),
+        ]);
+        expectToEqual(report, {
+          success: 2,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      it("no convention to sync", async () => {
+        uow.conventionsToSyncRepository.setForTesting([]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, []);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, []);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      it("when agency is not kind pole-emploi", async () => {
+        const agencyCCI = new AgencyDtoBuilder().withKind("cci").build();
+        const conventionToSync = new ConventionDtoBuilder()
+          .withAgencyId(agencyCCI.id)
+          .build();
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyCCI)];
+        uow.conventionRepository.setConventions([conventionToSync]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [conventionToSync]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync.id,
+            status: "SKIP",
+            processDate: timeGateway.now(),
+            reason: "Agency is not of kind pole-emploi",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {
+            [conventionToSync.id]: "Agency is not of kind pole-emploi",
+          },
+          errors: {},
+        });
+      });
+
+      it("only process convention with status TO_PROCESS and ERROR", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([
+          conventionToSync1,
+          conventionToSync2,
+          conventionToSync3,
+          conventionToSync4,
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+          {
+            id: conventionToSync2.id,
+            status: "ERROR",
+            processDate: subDays(timeGateway.now(), 1),
+            reason: "Random error",
+          },
+          {
+            id: conventionToSync3.id,
+            status: "SKIP",
+            processDate: subDays(timeGateway.now(), 1),
+            reason: "Feature flag enablePeConventionBroadcast not enabled",
+          },
+          {
+            id: conventionToSync4.id,
+            status: "SUCCESS",
+            processDate: subDays(timeGateway.now(), 1),
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+          conventionToSync2,
+          conventionToSync3,
+          conventionToSync4,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync2.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync3.id,
+            status: "SKIP",
+            processDate: subDays(timeGateway.now(), 1),
+            reason: "Feature flag enablePeConventionBroadcast not enabled",
+          },
+          {
+            id: conventionToSync4.id,
+            status: "SUCCESS",
+            processDate: subDays(timeGateway.now(), 1),
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
+          conventionToConventionNotification(conventionToSync1, agencyFT),
+          conventionToConventionNotification(conventionToSync2, agencyFT),
+        ]);
+        expectToEqual(report, {
+          success: 2,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      it("should consider limit", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+          {
+            id: conventionToSync2.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await new ResyncOldConventionsToFt(
+          new InMemoryUowPerformer(uow),
+          ftGateway,
+          timeGateway,
+          1,
+        ).execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync2.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
+          conventionToConventionNotification(conventionToSync1, agencyFT),
+        ]);
+        expectToEqual(report, {
+          success: 1,
+          skips: {},
+          errors: {},
+        });
       });
     });
 
-    describe("when feature to standard format for convention broadcast is OFF", () => {
-      it("broadcast one convention to pe, using legacy format", async () => {
-        uow.featureFlagRepository.featureFlags = {
-          ...uow.featureFlagRepository.featureFlags,
-          enableStandardFormatBroadcastToFranceTravail: {
-            kind: "boolean",
-            isActive: false,
+    describe("Wrong paths", () => {
+      it("when no convention in conventionRepository should not sync convention", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
           },
-        };
-        uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, []);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "ERROR",
+            processDate: timeGateway.now(),
+            reason: errors.convention.notFound({
+              conventionId: conventionToSync1.id,
+            }).message,
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {},
+          errors: {
+            [conventionToSync1.id]: errors.convention.notFound({
+              conventionId: conventionToSync1.id,
+            }),
+          },
+        });
+      });
+
+      it("when no agency", async () => {
         uow.conventionRepository.setConventions([conventionToSync1]);
         uow.conventionsToSyncRepository.setForTesting([
           {
@@ -133,319 +389,386 @@ describe("ResyncOldConventionsToPe use case", () => {
         expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
           {
             id: conventionToSync1.id,
+            status: "ERROR",
+            processDate: timeGateway.now(),
+            reason: errors.agency.notFound({ agencyId: agencyFT.id }).message,
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {},
+          errors: {
+            [conventionToSync1.id]: errors.agency.notFound({
+              agencyId: agencyFT.id,
+            }),
+          },
+        });
+      });
+    });
+  });
+
+  describe("when feature to standard format for convention broadcast is ON", () => {
+    beforeEach(() => {
+      uow.featureFlagRepository.featureFlags = {
+        ...uow.featureFlagRepository.featureFlags,
+        enableStandardFormatBroadcastToFranceTravail: {
+          kind: "boolean",
+          isActive: true,
+        },
+      };
+    });
+
+    describe("Right paths", () => {
+      it("broadcast two conventions to FT", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+          {
+            id: conventionToSync2.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync2.id,
             status: "SUCCESS",
             processDate: timeGateway.now(),
           },
         ]);
-        expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
-          conventionToConventionNotification(conventionToSync1, agencyPE),
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(ftGateway.broadcastParamsCalls, [
+          {
+            eventType: "CONVENTION_UPDATED",
+            convention: {
+              ...conventionToSync1,
+              agencyName: agencyFT.name,
+              agencyDepartment: agencyFT.address.departmentCode,
+              agencyKind: agencyFT.kind,
+              agencySiret: agencyFT.agencySiret,
+              agencyCounsellorEmails: [],
+              agencyValidatorEmails: [],
+            },
+          },
+          {
+            eventType: "CONVENTION_UPDATED",
+            convention: {
+              ...conventionToSync2,
+              agencyName: agencyFT.name,
+              agencyDepartment: agencyFT.address.departmentCode,
+              agencyKind: agencyFT.kind,
+              agencySiret: agencyFT.agencySiret,
+              agencyCounsellorEmails: [],
+              agencyValidatorEmails: [],
+            },
+          },
         ]);
         expectToEqual(report, {
-          success: [conventionToSync1.id].length,
+          success: 2,
           skips: {},
           errors: {},
         });
       });
 
-      describe("when feature to standard format for convention broadcast is OFF", () => {
-        it("broadcast one convention to pe, using standard format", async () => {
-          uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
-          uow.featureFlagRepository.featureFlags = {
-            ...uow.featureFlagRepository.featureFlags,
-            enableStandardFormatBroadcastToFranceTravail: {
-              kind: "boolean",
-              isActive: true,
-            },
-          };
-          uow.conventionRepository.setConventions([conventionToSync1]);
-          uow.conventionsToSyncRepository.setForTesting([
-            {
-              id: conventionToSync1.id,
-              status: "TO_PROCESS",
-            },
-          ]);
-          expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+      it("no convention to sync", async () => {
+        uow.conventionsToSyncRepository.setForTesting([]);
 
-          const report = await useCase.execute();
+        const report = await useCase.execute();
 
-          expectToEqual(uow.conventionRepository.conventions, [
-            conventionToSync1,
-          ]);
-          expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-            {
-              id: conventionToSync1.id,
-              status: "SUCCESS",
-              processDate: timeGateway.now(),
+        expectToEqual(uow.conventionRepository.conventions, []);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, []);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(ftGateway.broadcastParamsCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      it("when agency is not kind pole-emploi", async () => {
+        const agencyCCI = new AgencyDtoBuilder().withKind("cci").build();
+        const conventionToSync = new ConventionDtoBuilder()
+          .withAgencyId(agencyCCI.id)
+          .build();
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyCCI)];
+        uow.conventionRepository.setConventions([conventionToSync]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [conventionToSync]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync.id,
+            status: "SKIP",
+            processDate: timeGateway.now(),
+            reason: "Agency is not of kind pole-emploi",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {
+            [conventionToSync.id]: "Agency is not of kind pole-emploi",
+          },
+          errors: {},
+        });
+      });
+
+      it("only process convention with status TO_PROCESS and ERROR", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([
+          conventionToSync1,
+          conventionToSync2,
+          conventionToSync3,
+          conventionToSync4,
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+          {
+            id: conventionToSync2.id,
+            status: "ERROR",
+            processDate: subDays(timeGateway.now(), 1),
+            reason: "Random error",
+          },
+          {
+            id: conventionToSync3.id,
+            status: "SKIP",
+            processDate: subDays(timeGateway.now(), 1),
+            reason: "Feature flag enablePeConventionBroadcast not enabled",
+          },
+          {
+            id: conventionToSync4.id,
+            status: "SUCCESS",
+            processDate: subDays(timeGateway.now(), 1),
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+          conventionToSync2,
+          conventionToSync3,
+          conventionToSync4,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync2.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync3.id,
+            status: "SKIP",
+            processDate: subDays(timeGateway.now(), 1),
+            reason: "Feature flag enablePeConventionBroadcast not enabled",
+          },
+          {
+            id: conventionToSync4.id,
+            status: "SUCCESS",
+            processDate: subDays(timeGateway.now(), 1),
+          },
+        ]);
+        expectToEqual(ftGateway.broadcastParamsCalls, [
+          {
+            eventType: "CONVENTION_UPDATED",
+            convention: {
+              ...conventionToSync1,
+              agencyName: agencyFT.name,
+              agencyDepartment: agencyFT.address.departmentCode,
+              agencyKind: agencyFT.kind,
+              agencySiret: agencyFT.agencySiret,
+              agencyCounsellorEmails: [],
+              agencyValidatorEmails: [],
             },
-          ]);
-          expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-          expectToEqual(ftGateway.broadcastParamsCalls, [
-            {
-              eventType: "CONVENTION_UPDATED",
-              convention: {
-                ...conventionToSync1,
-                agencyName: agencyPE.name,
-                agencyDepartment: agencyPE.address.departmentCode,
-                agencyKind: agencyPE.kind,
-                agencySiret: agencyPE.agencySiret,
-                agencyCounsellorEmails: [],
-                agencyValidatorEmails: [],
-              },
+          },
+          {
+            eventType: "CONVENTION_UPDATED",
+            convention: {
+              ...conventionToSync2,
+              agencyName: agencyFT.name,
+              agencyDepartment: agencyFT.address.departmentCode,
+              agencyKind: agencyFT.kind,
+              agencySiret: agencyFT.agencySiret,
+              agencyCounsellorEmails: [],
+              agencyValidatorEmails: [],
             },
-          ]);
-          expectToEqual(report, {
-            success: [conventionToSync1.id].length,
-            skips: {},
-            errors: {},
-          });
+          },
+        ]);
+        expectToEqual(report, {
+          success: 2,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      it("should consider limit", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+          {
+            id: conventionToSync2.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+        const report = await new ResyncOldConventionsToFt(
+          new InMemoryUowPerformer(uow),
+          ftGateway,
+          timeGateway,
+          1,
+        ).execute();
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+          conventionToSync2,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+          {
+            id: conventionToSync2.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.broadcastParamsCalls, [
+          {
+            eventType: "CONVENTION_UPDATED",
+            convention: {
+              ...conventionToSync1,
+              agencyName: agencyFT.name,
+              agencyDepartment: agencyFT.address.departmentCode,
+              agencyKind: agencyFT.kind,
+              agencySiret: agencyFT.agencySiret,
+              agencyCounsellorEmails: [],
+              agencyValidatorEmails: [],
+            },
+          },
+        ]);
+        expectToEqual(report, {
+          success: 1,
+          skips: {},
+          errors: {},
         });
       });
     });
 
-    it("no convention to sync", async () => {
-      uow.conventionsToSyncRepository.setForTesting([]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+    describe("Wrong paths", () => {
+      it("when no convention in conventionRepository should not sync convention", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
 
-      const report = await useCase.execute();
+        const report = await useCase.execute();
 
-      expectToEqual(uow.conventionRepository.conventions, []);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, []);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-      expectToEqual(report, {
-        success: 0,
-        skips: {},
-        errors: {},
+        expectToEqual(uow.conventionRepository.conventions, []);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "ERROR",
+            processDate: timeGateway.now(),
+            reason: errors.convention.notFound({
+              conventionId: conventionToSync1.id,
+            }).message,
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {},
+          errors: {
+            [conventionToSync1.id]: errors.convention.notFound({
+              conventionId: conventionToSync1.id,
+            }),
+          },
+        });
       });
-    });
 
-    it("when agency is not kind pole-emploi", async () => {
-      const agencyCCI = new AgencyDtoBuilder().withKind("cci").build();
-      const conventionToSync = new ConventionDtoBuilder()
-        .withAgencyId(agencyCCI.id)
-        .build();
-      uow.agencyRepository.agencies = [toAgencyWithRights(agencyCCI)];
-      uow.conventionRepository.setConventions([conventionToSync]);
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+      it("when no agency", async () => {
+        uow.conventionRepository.setConventions([conventionToSync1]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
 
-      const report = await useCase.execute();
+        const report = await useCase.execute();
 
-      expectToEqual(uow.conventionRepository.conventions, [conventionToSync]);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync.id,
-          status: "SKIP",
-          processDate: timeGateway.now(),
-          reason: "Agency is not of kind pole-emploi",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-      expectToEqual(report, {
-        success: 0,
-        skips: {
-          [conventionToSync.id]: "Agency is not of kind pole-emploi",
-        },
-        errors: {},
-      });
-    });
-
-    it("only process convention with status TO_PROCESS and ERROR", async () => {
-      uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
-      uow.conventionRepository.setConventions([
-        conventionToSync1,
-        conventionToSync2,
-        conventionToSync3,
-        conventionToSync4,
-      ]);
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync1.id,
-          status: "TO_PROCESS",
-        },
-        {
-          id: conventionToSync2.id,
-          status: "ERROR",
-          processDate: subDays(timeGateway.now(), 1),
-          reason: "Random error",
-        },
-        {
-          id: conventionToSync3.id,
-          status: "SKIP",
-          processDate: subDays(timeGateway.now(), 1),
-          reason: "Feature flag enablePeConventionBroadcast not enabled",
-        },
-        {
-          id: conventionToSync4.id,
-          status: "SUCCESS",
-          processDate: subDays(timeGateway.now(), 1),
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-
-      const report = await useCase.execute();
-
-      expectToEqual(uow.conventionRepository.conventions, [
-        conventionToSync1,
-        conventionToSync2,
-        conventionToSync3,
-        conventionToSync4,
-      ]);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync1.id,
-          status: "SUCCESS",
-          processDate: timeGateway.now(),
-        },
-        {
-          id: conventionToSync2.id,
-          status: "SUCCESS",
-          processDate: timeGateway.now(),
-        },
-        {
-          id: conventionToSync3.id,
-          status: "SKIP",
-          processDate: subDays(timeGateway.now(), 1),
-          reason: "Feature flag enablePeConventionBroadcast not enabled",
-        },
-        {
-          id: conventionToSync4.id,
-          status: "SUCCESS",
-          processDate: subDays(timeGateway.now(), 1),
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
-        conventionToConventionNotification(conventionToSync1, agencyPE),
-        conventionToConventionNotification(conventionToSync2, agencyPE),
-      ]);
-      expectToEqual(report, {
-        success: 2,
-        skips: {},
-        errors: {},
-      });
-    });
-
-    it("should consider limit", async () => {
-      uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
-      uow.conventionRepository.setConventions([
-        conventionToSync1,
-        conventionToSync2,
-      ]);
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync1.id,
-          status: "TO_PROCESS",
-        },
-        {
-          id: conventionToSync2.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-
-      const report = await new ResyncOldConventionsToFt(
-        new InMemoryUowPerformer(uow),
-        ftGateway,
-        timeGateway,
-        1,
-      ).execute();
-
-      expectToEqual(uow.conventionRepository.conventions, [
-        conventionToSync1,
-        conventionToSync2,
-      ]);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync1.id,
-          status: "SUCCESS",
-          processDate: timeGateway.now(),
-        },
-        {
-          id: conventionToSync2.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
-        conventionToConventionNotification(conventionToSync1, agencyPE),
-      ]);
-      expectToEqual(report, {
-        success: 1,
-        skips: {},
-        errors: {},
-      });
-    });
-  });
-
-  describe("Wrong paths", () => {
-    it("when no convention in conventionRepository should not sync convention", async () => {
-      uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync1.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-
-      const report = await useCase.execute();
-
-      expectToEqual(uow.conventionRepository.conventions, []);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync1.id,
-          status: "ERROR",
-          processDate: timeGateway.now(),
-          reason: errors.convention.notFound({
-            conventionId: conventionToSync1.id,
-          }).message,
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-      expectToEqual(report, {
-        success: 0,
-        skips: {},
-        errors: {
-          [conventionToSync1.id]: errors.convention.notFound({
-            conventionId: conventionToSync1.id,
-          }),
-        },
-      });
-    });
-
-    it("when no agency", async () => {
-      uow.conventionRepository.setConventions([conventionToSync1]);
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync1.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-
-      const report = await useCase.execute();
-
-      expectToEqual(uow.conventionRepository.conventions, [conventionToSync1]);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync1.id,
-          status: "ERROR",
-          processDate: timeGateway.now(),
-          reason: errors.agency.notFound({ agencyId: agencyPE.id }).message,
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
-      expectToEqual(report, {
-        success: 0,
-        skips: {},
-        errors: {
-          [conventionToSync1.id]: errors.agency.notFound({
-            agencyId: agencyPE.id,
-          }),
-        },
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "ERROR",
+            processDate: timeGateway.now(),
+            reason: errors.agency.notFound({ agencyId: agencyFT.id }).message,
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(report, {
+          success: 0,
+          skips: {},
+          errors: {
+            [conventionToSync1.id]: errors.agency.notFound({
+              agencyId: agencyFT.id,
+            }),
+          },
+        });
       });
     });
   });
