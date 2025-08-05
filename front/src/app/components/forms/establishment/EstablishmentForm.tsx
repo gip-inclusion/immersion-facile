@@ -117,7 +117,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     establishmentSelectors.formEstablishment,
   );
 
-  const initialUserRights: FormEstablishmentUserRight[] = useMemo(
+  const initialUserRights:
+    | [
+        Omit<FormEstablishmentUserRight, "isMainContactByPhone"> & {
+          isMainContactByPhone?: boolean | null;
+        },
+      ]
+    | FormEstablishmentUserRight[] = useMemo(
     () =>
       mode === "create"
         ? [
@@ -125,7 +131,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               email: federatedIdentity?.email ?? "",
               job: "",
               phone: "",
-              isMainContactByPhone: true,
+              isMainContactByPhone: null,
               role: "establishment-admin",
               shouldReceiveDiscussionNotifications: true,
             },

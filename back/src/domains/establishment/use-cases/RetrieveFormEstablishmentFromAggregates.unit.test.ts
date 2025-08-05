@@ -15,7 +15,10 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -169,6 +172,147 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           phone,
         }),
       );
+    });
+
+    it("returns a reconstructed schema validated form if establishment with contact mode IN_PERSON (and welcome address)", async () => {
+      const adminUser = new ConnectedUserBuilder()
+        .withId("admin-id")
+        .withEmail("admin@mail.com")
+        .buildUser();
+      const expectedAddress = {
+        address: {
+          streetNumberAndAddress: "45 rue des mimosas",
+          postcode: "86000",
+          city: "Poitiers",
+          departmentCode: "86",
+        },
+        position: {
+          lat: 46.583333,
+          lon: 0.333333,
+        },
+      };
+      const establishmentAggregateWithWelcomeAddress =
+        new EstablishmentAggregateBuilder(establishmentAggregate)
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(siret)
+              .withContactMode("IN_PERSON")
+              .withWelcomeAddress(expectedAddress)
+              .build(),
+          )
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: adminUser.id,
+              job,
+              phone,
+              shouldReceiveDiscussionNotifications: true,
+              isMainContactInPerson: true,
+              isMainContactByPhone: false,
+            },
+          ])
+          .build();
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregateWithWelcomeAddress,
+      ];
+
+      uow.userRepository.users = [connectedAdmin, adminUser];
+
+      const establishmentForm = await useCase.execute(siret, {
+        userId: adminUser.id,
+      });
+
+      expectToEqual(formEstablishmentSchema.parse(establishmentForm), {
+        ...establishmentForm,
+        userRights: [
+          {
+            ...establishmentForm.userRights[0],
+            isMainContactInPerson: true,
+          },
+        ],
+        potentialBeneficiaryWelcomeAddress: expectedAddress,
+      });
+    });
+
+    it("returns a reconstructed schema validated form if establishment with contact mode PHONE (and user rights' phone if set)", async () => {
+      const adminUser = new ConnectedUserBuilder()
+        .withId("admin-id")
+        .withEmail("admin@mail.com")
+        .buildUser();
+      const establishmentContactWithPhoneButMainContactBuPhoneUndefined =
+        new ConnectedUserBuilder()
+          .withId("contact-id")
+          .withEmail("contact@email.com")
+          .buildUser();
+      const adminUserRight: EstablishmentUserRight = {
+        role: "establishment-admin",
+        userId: adminUser.id,
+        job,
+        phone,
+        shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: true,
+      };
+      const establishmentContactWithPhoneRight: EstablishmentUserRight = {
+        role: "establishment-contact",
+        userId: establishmentContactWithPhoneButMainContactBuPhoneUndefined.id,
+        shouldReceiveDiscussionNotifications: true,
+        phone: "+33611111111",
+      };
+      const establishmentUserRights: EstablishmentUserRight[] = [
+        adminUserRight,
+        establishmentContactWithPhoneRight,
+      ];
+
+      const establishmentAggregateWithContactModePhone =
+        new EstablishmentAggregateBuilder(establishmentAggregate)
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(siret)
+              .withContactMode("PHONE")
+              .build(),
+          )
+          .withUserRights(establishmentUserRights)
+          .build();
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregateWithContactModePhone,
+      ];
+
+      uow.userRepository.users = [
+        connectedAdmin,
+        adminUser,
+        establishmentContactWithPhoneButMainContactBuPhoneUndefined,
+      ];
+
+      const establishmentForm = await useCase.execute(siret, {
+        userId: adminUser.id,
+      });
+
+      expectToEqual(formEstablishmentSchema.parse(establishmentForm), {
+        ...establishmentForm,
+        userRights: [
+          {
+            role: "establishment-admin",
+            email: "admin@mail.com",
+            job: adminUserRight.job,
+            phone: adminUserRight.phone,
+            shouldReceiveDiscussionNotifications:
+              adminUserRight.shouldReceiveDiscussionNotifications,
+            isMainContactByPhone: adminUserRight.isMainContactByPhone,
+          },
+          {
+            email: "contact@email.com",
+            job: establishmentContactWithPhoneRight.job,
+            role: "establishment-contact",
+            phone: establishmentContactWithPhoneRight.phone,
+            shouldReceiveDiscussionNotifications:
+              establishmentContactWithPhoneRight.shouldReceiveDiscussionNotifications,
+            isMainContactByPhone:
+              establishmentContactWithPhoneRight.isMainContactByPhone,
+          },
+        ],
+      });
     });
 
     it("returns a reconstructed form if establishment with siret exists & IC jwt payload with backoffice rights", async () => {

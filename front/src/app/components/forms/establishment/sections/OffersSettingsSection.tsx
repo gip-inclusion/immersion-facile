@@ -13,6 +13,7 @@ import { HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  addressDtoToString,
   type ContactMode,
   type DotNestedKeys,
   domElementIds,
@@ -473,6 +474,10 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
   const contactMode = getValues("contactMode");
   const contactModeRegister = register("contactMode");
   const isMainContactByPhoneValue = watch("userRights.0.isMainContactByPhone");
+  const userRightsInForm = getValues("userRights");
+  const potentialBeneficiaryWelcomeAddress = getValues(
+    "potentialBeneficiaryWelcomeAddress",
+  );
 
   return (
     <>
@@ -517,7 +522,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
         .with("EMAIL", () => (
           <>
             <RadioButtons
-              legend="Si vous ne répondez pas dans les 15 jours, est-ce que vous consentez à ce que le numéro choisi soit transmis au candidat ?"
+              legend="Si vous ne répondez pas dans les 15 jours, est-ce que vous consentez à ce que le candidat vous contacte par téléphone ?"
               id={"TODO"}
               options={[
                 {
@@ -535,7 +540,13 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
                   nativeInputProps: {
                     name: register("userRights.0.isMainContactByPhone").name,
                     onChange: () => {
-                      setValue("userRights.0.isMainContactByPhone", false);
+                      const newUserRights = userRightsInForm.map(
+                        (userRight) => ({
+                          ...userRight,
+                          isMainContactByPhone: false,
+                        }),
+                      );
+                      setValue("userRights", newUserRights);
                     },
                     checked: isMainContactByPhoneValue === false,
                   },
@@ -543,7 +554,9 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
               ]}
               {...getFieldError("contactMode")}
             />
-            <UserToContact mode={mode} />
+            {isMainContactByPhoneValue === true && (
+              <UserToContact mode={mode} />
+            )}
           </>
         ))
         .with("PHONE", () => <UserToContact mode={mode} />)
@@ -553,6 +566,10 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
               label="Lieu de rendez-vous"
               locator="create-establishment-in-person-address"
               onAddressClear={() => {}}
+              initialInputValue={
+                potentialBeneficiaryWelcomeAddress &&
+                addressDtoToString(potentialBeneficiaryWelcomeAddress.address)
+              }
               onAddressSelected={(addressAndPosition) => {
                 setValue(
                   "potentialBeneficiaryWelcomeAddress",
@@ -570,18 +587,23 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
 };
 
 const UserToContact = ({ mode }: { mode: Mode }) => {
-  const { getValues, setValue } = useFormContext<FormEstablishmentDto>();
+  const { getValues, setValue, formState } =
+    useFormContext<FormEstablishmentDto>();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const defaultUserToContact = getValues("userRights.0");
   const contactMode = getValues("contactMode");
   const establishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
-  const currentUserToContact = establishment.userRights.find((userRight) =>
-    contactMode === "IN_PERSON"
-      ? userRight.isMainContactInPerson
-      : userRight.isMainContactByPhone,
-  );
+  const getFieldError = makeFieldError(formState);
+  const currentUserToContact =
+    establishment.userRights.length === 1
+      ? establishment.userRights[0]
+      : establishment.userRights.find((userRight) =>
+          contactMode === "IN_PERSON"
+            ? userRight.isMainContactInPerson
+            : userRight.isMainContactByPhone,
+        );
   const usersToContactOptions: SelectProps.Option[] = establishment.userRights
     .filter((userRight) =>
       contactMode === "IN_PERSON" ? true : userRight.phone,
@@ -624,7 +646,7 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
         placeholder="Sélectionnez un utilisateur"
         options={usersToContactOptions}
         nativeSelectProps={{
-          value: currentUserToContact?.email,
+          defaultValue: currentUserToContact?.email,
           onChange: (event) => {
             const newUserToContact = establishment.userRights.find(
               (userRight) => userRight.email === event.target.value,
@@ -641,6 +663,7 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
             setValue("userRights", newUserRights);
           },
         }}
+        {...getFieldError("userRights")}
       />
     ))
     .exhaustive();
