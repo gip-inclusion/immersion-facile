@@ -87,6 +87,7 @@ export const EstablishmentRepresentativeFields = ({
             ...register("signatories.establishmentRepresentative.phone"),
             id: formContents["signatories.establishmentRepresentative.phone"]
               .id,
+            value: values.signatories.establishmentRepresentative?.phone,
           },
         }}
         disabled={isFetchingSiret}

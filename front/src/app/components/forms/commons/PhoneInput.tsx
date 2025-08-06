@@ -41,7 +41,7 @@ export const PhoneInput = ({
     null,
   );
   const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState<string>(
-    inputProps?.nativeInputProps?.defaultValue?.toString() ?? "",
+    inputProps?.nativeInputProps?.value?.toString() ?? "",
   );
 
   return (
