@@ -675,8 +675,16 @@ const getConditionalFieldsToValidate = (
   if (contactMode === "EMAIL") {
     return ["userRights.0.isMainContactByPhone"];
   }
+
+  if (contactMode === "PHONE") {
+    return ["userRights.0.isMainContactByPhone"];
+  }
+
   if (contactMode === "IN_PERSON") {
-    return ["potentialBeneficiaryWelcomeAddress"];
+    return [
+      "potentialBeneficiaryWelcomeAddress",
+      "userRights.0.isMainContactInPerson",
+    ];
   }
   return [];
 };

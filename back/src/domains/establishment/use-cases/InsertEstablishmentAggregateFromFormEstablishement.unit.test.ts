@@ -394,18 +394,20 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withOffers([])
             .withUserRights([
               {
-                isMainContactByPhone: false,
+                isMainContactByPhone: formAdminRight.isMainContactByPhone,
                 isMainContactInPerson: true,
-                job: "osef",
-                phone: "+33655445544",
+                job: formAdminRight.job,
+                phone: formAdminRight.phone,
                 role: "establishment-admin",
-                shouldReceiveDiscussionNotifications: true,
-                userId: "estab.admin",
+                shouldReceiveDiscussionNotifications:
+                  formAdminRight.shouldReceiveDiscussionNotifications,
+                userId: establishmentAdmin.id,
               },
               {
                 role: "establishment-contact",
-                shouldReceiveDiscussionNotifications: true,
-                userId: "estab.contact",
+                shouldReceiveDiscussionNotifications:
+                  formContactRight.shouldReceiveDiscussionNotifications,
+                userId: establishmentContact.id,
               },
             ])
             .build(),

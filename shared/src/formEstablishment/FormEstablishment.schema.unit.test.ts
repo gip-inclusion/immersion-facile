@@ -58,7 +58,7 @@ describe("formEstablishmentSchema", () => {
             code: "custom",
             message:
               "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
-            path: [],
+            path: ["userRights"],
           },
         ]),
       );
@@ -85,7 +85,7 @@ describe("formEstablishmentSchema", () => {
             code: "custom",
             message:
               "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
-            path: [],
+            path: ["userRights"],
           },
         ]),
       );

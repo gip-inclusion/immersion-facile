@@ -740,7 +740,7 @@ describe("ContactEstablishment", () => {
 
         expectToEqual(uow.discussionRepository.discussions, [
           {
-            id: "discussion_id",
+            id: discussionId,
             status: "PENDING",
             appellationCode: immersionOffer.appellationCode,
             exchanges: [],
@@ -748,6 +748,7 @@ describe("ContactEstablishment", () => {
             businessName: establishment.establishment.name,
             createdAt: timeGateway.now().toISOString(),
             address:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               establishment.establishment.potentialBeneficiaryWelcomeAddress
                 ?.address!,
             contactMode: "IN_PERSON",
@@ -756,6 +757,17 @@ describe("ContactEstablishment", () => {
               firstName: validEmailRequest.potentialBeneficiaryFirstName,
               lastName: validEmailRequest.potentialBeneficiaryLastName,
               email: validEmailRequest.potentialBeneficiaryEmail,
+            },
+          },
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ContactRequestedByBeneficiary",
+            payload: {
+              discussionId,
+              siret: establishment.establishment.siret,
+              triggeredBy: null,
             },
           },
         ]);

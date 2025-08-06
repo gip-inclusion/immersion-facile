@@ -349,6 +349,11 @@ export class FormEstablishmentDtoBuilder
   public withPotentialBeneficiaryWelcomeAddress(
     potentialBeneficiaryWelcomeAddress: AddressAndPosition,
   ) {
+    if (this.#dto.contactMode !== "IN_PERSON") {
+      throw new Error(
+        "Potential beneficiary welcome address is only available for IN_PERSON contact mode",
+      );
+    }
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       potentialBeneficiaryWelcomeAddress,

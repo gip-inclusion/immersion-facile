@@ -1,5 +1,9 @@
-import { errors, type FormEstablishmentDto, noContactPerMonth } from "shared";
-import { populatePropIfDefined } from "shared/src/utils";
+import {
+  errors,
+  type FormEstablishmentDto,
+  noContactPerMonth,
+  populatePropIfDefined,
+} from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
