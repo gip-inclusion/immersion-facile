@@ -14,7 +14,7 @@ import {
 } from "shared";
 
 export type PhoneInputProps = InputProps.RegularInput & {
-  selectedCountry?: SupportedCountryCode;
+  defaultCountryCodeValue?: SupportedCountryCode;
   shouldDisplaySelect?: boolean;
   selectProps?: OmitFromExistingKeys<
     SelectProps<SelectProps.Option<SupportedCountryCode>[]>,
@@ -28,7 +28,7 @@ export const PhoneInput = ({
   label,
   hintText,
   stateRelatedMessage,
-  selectedCountry = defaultCountryCode,
+  defaultCountryCodeValue = defaultCountryCode,
   shouldDisplaySelect = false,
   selectProps,
   inputProps,
@@ -37,11 +37,13 @@ export const PhoneInput = ({
   disabled,
 }: PhoneInputProps) => {
   const { setError } = useFormContext();
-  const [countryCode, setCountryCode] =
-    useState<SupportedCountryCode>(selectedCountry);
+  const [countryCode, setCountryCode] = useState<SupportedCountryCode | null>(
+    null,
+  );
   const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState<string>(
     inputProps?.nativeInputProps?.defaultValue?.toString() ?? "",
   );
+
   return (
     <div
       className={fr.cx("fr-input-group", "fr-mb-3w", {
@@ -68,7 +70,7 @@ export const PhoneInput = ({
               )}
               nativeSelectProps={{
                 ...selectProps?.nativeSelectProps,
-                value: countryCode,
+                value: countryCode || defaultCountryCodeValue,
                 disabled,
                 onChange: (event) => {
                   const updatedCountryCode = event.currentTarget.value;
@@ -115,7 +117,7 @@ export const PhoneInput = ({
               onBlur: (event) => {
                 const internationalPhoneNumber = toInternationalPhoneNumber(
                   displayedPhoneNumber,
-                  countryCode,
+                  countryCode || defaultCountryCodeValue,
                 );
                 if (internationalPhoneNumber) {
                   onPhoneNumberChange(internationalPhoneNumber);
