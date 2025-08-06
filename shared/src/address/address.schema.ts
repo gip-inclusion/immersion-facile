@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+} from "../zodUtils";
 import type {
   AddressAndPosition,
   AddressDto,
@@ -9,8 +13,6 @@ import type {
   WithLookupAddressQueryParams,
   WithLookupLocationInputQueryParams,
 } from "./address.dto";
-
-const invalidAddressMessage = "L'adresse est invalide";
 
 export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
@@ -22,7 +24,7 @@ export const addressSchema: z.Schema<AddressDto> = z.object(
     city: zStringMinLength1,
   },
   {
-    message: invalidAddressMessage,
+    message: localization.invalidAddress,
   },
 );
 
@@ -37,7 +39,7 @@ export const addressAndPositionSchema: z.Schema<AddressAndPosition> = z.object(
     position: geoPositionSchema,
   },
   {
-    message: invalidAddressMessage,
+    message: localization.invalidAddress,
   },
 );
 

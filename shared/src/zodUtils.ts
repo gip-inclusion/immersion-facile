@@ -61,6 +61,7 @@ export const localization = {
   signatoriesDistinctPhoneNumbers:
     "Les numéros de téléphone des signataires doivent être différents.",
   invalidAppellations: "Les métiers renseignés sont invalides.",
+  invalidAddress: "L'adresse est invalide",
 };
 
 export const requiredText = {

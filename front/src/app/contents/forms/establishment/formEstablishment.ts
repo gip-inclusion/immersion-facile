@@ -170,15 +170,15 @@ export const formEstablishmentFieldsLabels = (
   },
   potentialBeneficiaryWelcomeAddress: {
     label: "Adresse d'accueil pour les candidats",
-    id: "TODO",
+    id: domElementIds.establishment[mode].potentialBeneficiaryWelcomeAddress,
   },
   "userRights.0.isMainContactByPhone": {
     label: "Numéro de téléphone principal",
-    id: "TODO",
+    id: domElementIds.establishment[mode].businessContact.isMainContactByPhone,
   },
   "userRights.0.isMainContactInPerson": {
     label: "Contact principal en présentiel",
-    id: "TODO",
+    id: domElementIds.establishment[mode].businessContact.isMainContactInPerson,
   },
 });
 
