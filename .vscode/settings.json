@@ -16,13 +16,13 @@
     "**/.git/subtree-cache/**": true,
     "**/node_modules/**": true
   },
-  "terminal.integrated.scrollback": 100000,
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.enable": false
+  "jest.runMode": {
+    "type": "on-demand"
+  }
 }
