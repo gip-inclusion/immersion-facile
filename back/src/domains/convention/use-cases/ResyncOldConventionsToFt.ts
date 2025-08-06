@@ -1,11 +1,11 @@
-import { type AssessmentDto, type ConventionId, errors } from "shared";
+import { type ConventionId, errors } from "shared";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { toAssessmentDto } from "../entities/AssessmentEntity";
+import { getOnlyAssessmentDto } from "../entities/AssessmentEntity";
 import type { FranceTravailGateway } from "../ports/FranceTravailGateway";
 import {
   type BroadcastToFranceTravailOnConventionUpdates,
@@ -159,12 +159,9 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     const assessmentEntity =
       await uow.assessmentRepository.getByConventionId(conventionToSyncId);
 
-    const assessment =
-      assessmentEntity &&
-      assessmentEntity.status !== "FINISHED" &&
-      assessmentEntity.status !== "ABANDONED"
-        ? (toAssessmentDto(assessmentEntity) as AssessmentDto)
-        : undefined;
+    const assessment = assessmentEntity
+      ? getOnlyAssessmentDto(assessmentEntity)
+      : undefined;
 
     if (isLegacy) {
       return this.#legacyBroadcastToFTUsecase.execute({

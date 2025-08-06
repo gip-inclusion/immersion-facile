@@ -6,7 +6,6 @@ import {
 } from "date-fns";
 import fr from "date-fns/locale/fr";
 import {
-  type AssessmentDto,
   type ConnectedUser,
   errors,
   userHasEnoughRightsOnConvention,
@@ -17,7 +16,7 @@ import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { BroadcastFeedback } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
-import { toAssessmentDto } from "../../entities/AssessmentEntity";
+import { getOnlyAssessmentDto } from "../../entities/AssessmentEntity";
 
 const BROADCAST_FEEDBACK_DEBOUNCE_HOUR = 4;
 
@@ -59,12 +58,9 @@ export const makeBroadcastConventionAgain = useCaseBuilder(
     const assessmentEntity =
       await uow.assessmentRepository.getByConventionId(conventionId);
 
-    const assessment =
-      assessmentEntity &&
-      assessmentEntity.status !== "FINISHED" &&
-      assessmentEntity.status !== "ABANDONED"
-        ? (toAssessmentDto(assessmentEntity) as AssessmentDto)
-        : undefined;
+    const assessment = assessmentEntity
+      ? getOnlyAssessmentDto(assessmentEntity)
+      : undefined;
 
     if (assessment) {
       await uow.outboxRepository.save(

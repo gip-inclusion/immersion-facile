@@ -57,3 +57,18 @@ export const toAssessmentDto = ({
   numberOfHoursActuallyMade: _,
   ...assessmentEntity
 }: AssessmentEntity): AssessmentDto | LegacyAssessmentDto => assessmentEntity;
+
+export const getOnlyAssessmentDto = (
+  assessmentEntity: AssessmentEntity,
+): AssessmentDto | undefined => {
+  const assessment = toAssessmentDto(assessmentEntity);
+
+  return isAssessmentDto(assessment) ? assessment : undefined;
+};
+
+const isAssessmentDto = (
+  assessment: AssessmentDto | LegacyAssessmentDto,
+): assessment is AssessmentDto =>
+  assessment &&
+  assessment.status !== "FINISHED" &&
+  assessment.status !== "ABANDONED";
