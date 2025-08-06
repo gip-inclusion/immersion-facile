@@ -156,6 +156,7 @@ export const BeneficiaryRepresentativeFields = ({
           nativeInputProps: {
             ...register("signatories.beneficiaryRepresentative.phone"),
             id: formContents["signatories.beneficiaryRepresentative.phone"].id,
+            value: values.signatories.beneficiaryRepresentative?.phone,
           },
         }}
         onPhoneNumberChange={(phoneNumber) => {
