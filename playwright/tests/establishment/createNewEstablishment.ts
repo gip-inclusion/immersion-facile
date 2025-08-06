@@ -144,6 +144,12 @@ const step3 = async (page: Page) => {
     .locator(`[for='${domElementIds.establishment.create.contactMode}-0']`)
     .click();
 
+  await page
+    .locator(
+      `[for='${domElementIds.establishment.create.businessContact.isMainContactByPhone}-0']`,
+    )
+    .click();
+
   await goToNextStep(page, 3, "create");
 };
 
