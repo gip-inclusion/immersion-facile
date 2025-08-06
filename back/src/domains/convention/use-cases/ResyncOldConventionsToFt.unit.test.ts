@@ -2,6 +2,7 @@ import subDays from "date-fns/subDays";
 import {
   type AgencyDto,
   AgencyDtoBuilder,
+  type AssessmentDto,
   type ConventionDto,
   ConventionDtoBuilder,
   errors,
@@ -56,46 +57,6 @@ describe("ResyncOldConventionsToFt use case", () => {
       timeGateway,
       100,
     );
-  });
-
-  it("also broadcast assessment if present", async () => {
-    uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
-    uow.conventionRepository.setConventions([conventionToSync1]);
-    uow.assessmentRepository.setAssessments([
-      {
-        _entityName: "Assessment",
-        numberOfHoursActuallyMade: null,
-        conventionId: conventionToSync1.id,
-        status: "COMPLETED",
-        endedWithAJob: false,
-        establishmentFeedback: "commentaire",
-        establishmentAdvices: "commentaire",
-      },
-    ]);
-    uow.conventionsToSyncRepository.setForTesting([
-      {
-        id: conventionToSync1.id,
-        status: "TO_PROCESS",
-      },
-    ]);
-
-    const report = await useCase.execute();
-
-    expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-      {
-        id: conventionToSync1.id,
-        status: "SUCCESS",
-        processDate: timeGateway.now(),
-      },
-    ]);
-    expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
-      conventionToConventionNotification(conventionToSync1, agencyFT),
-    ]);
-    expectToEqual(report, {
-      success: 1,
-      skips: {},
-      errors: {},
-    });
   });
 
   describe("when feature to standard format for convention broadcast is OFF", () => {
@@ -678,6 +639,112 @@ describe("ResyncOldConventionsToFt use case", () => {
             status: "TO_PROCESS",
           },
         ]);
+        expectToEqual(ftGateway.broadcastParamsCalls, [
+          {
+            eventType: "CONVENTION_UPDATED",
+            convention: {
+              ...conventionToSync1,
+              agencyName: agencyFT.name,
+              agencyDepartment: agencyFT.address.departmentCode,
+              agencyKind: agencyFT.kind,
+              agencySiret: agencyFT.agencySiret,
+              agencyCounsellorEmails: [],
+              agencyValidatorEmails: [],
+            },
+          },
+        ]);
+        expectToEqual(report, {
+          success: 1,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      it("also broadcast assessment if it is AssessmentDTO", async () => {
+        const assessment: AssessmentDto = {
+          conventionId: conventionToSync1.id,
+          status: "COMPLETED",
+          endedWithAJob: false,
+          establishmentFeedback: "commentaire",
+          establishmentAdvices: "commentaire",
+        };
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([conventionToSync1]);
+        uow.assessmentRepository.setAssessments([
+          {
+            _entityName: "Assessment",
+            numberOfHoursActuallyMade: null,
+            ...assessment,
+          },
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+        expectToEqual(ftGateway.broadcastParamsCalls, [
+          {
+            eventType: "ASSESSMENT_CREATED",
+            assessment,
+            convention: {
+              ...conventionToSync1,
+              agencyName: agencyFT.name,
+              agencyDepartment: agencyFT.address.departmentCode,
+              agencyKind: agencyFT.kind,
+              agencySiret: agencyFT.agencySiret,
+              agencyCounsellorEmails: [],
+              agencyValidatorEmails: [],
+            },
+          },
+        ]);
+        expectToEqual(report, {
+          success: 1,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      it("should not broadcast assessment if it is LegacyAssessmentDto", async () => {
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+        uow.conventionRepository.setConventions([conventionToSync1]);
+        uow.assessmentRepository.setAssessments([
+          {
+            _entityName: "Assessment",
+            status: "FINISHED",
+            conventionId: conventionToSync1.id,
+            establishmentFeedback: "commentaire",
+            numberOfHoursActuallyMade: null,
+          },
+        ]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+
+        const report = await useCase.execute();
+
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
         expectToEqual(ftGateway.broadcastParamsCalls, [
           {
             eventType: "CONVENTION_UPDATED",
