@@ -523,7 +523,10 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
           <>
             <RadioButtons
               legend="Si vous ne répondez pas dans les 15 jours, est-ce que vous consentez à ce que le candidat vous contacte par téléphone ?"
-              id={"TODO"}
+              id={
+                domElementIds.establishment[mode].businessContact
+                  .isMainContactByPhone
+              }
               options={[
                 {
                   label: "Oui",
