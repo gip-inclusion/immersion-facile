@@ -81,7 +81,7 @@ export type FormEstablishmentAddress = {
 
 export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
 
-type CommonFormEstablishmentDto = {
+export type CommonFormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
   businessAddresses: FormEstablishmentAddress[];

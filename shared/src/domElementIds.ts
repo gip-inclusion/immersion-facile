@@ -446,6 +446,8 @@ export const domElementIds = {
       businessNameCustomized:
         "im-form-create-establishment__business-name-customized",
       businessAddresses: "im-form-create-establishment__business-addresses",
+      potentialBeneficiaryWelcomeAddress:
+        "im-form-create-establishment__potential-beneficiary-welcome-address",
       businessContact: {
         lastName: "im-form-create-establishment__business-contact-last-name",
         firstName: "im-form-create-establishment__business-contact-first-name",
@@ -455,6 +457,10 @@ export const domElementIds = {
         copyEmails: "im-form-create-establishment__businessContact-copy-emails",
         shouldReceiveDiscussionNotifications:
           "im-form-create-establishment__businessContact-should-receive-discussion-notifications",
+        isMainContactByPhone:
+          "im-form-create-establishment__businessContact-is-main-contact-by-phone",
+        isMainContactInPerson:
+          "im-form-create-establishment__businessContact-is-main-contact-in-person",
       },
       contactMode:
         "im-form-create-establishment__businessContact-contact-method",
@@ -499,6 +505,8 @@ export const domElementIds = {
       businessNameCustomized:
         "im-form-edit-establishment__business-name-customized",
       businessAddresses: "im-form-edit-establishment__business-addresses",
+      potentialBeneficiaryWelcomeAddress:
+        "im-form-edit-establishment__potential-beneficiary-welcome-address",
       businessContact: {
         lastName: "im-form-edit-establishment__business-contact-last-name",
         firstName: "im-form-edit-establishment__business-contact-first-name",
@@ -508,6 +516,10 @@ export const domElementIds = {
         copyEmails: "im-form-edit-establishment__businessContact-copy-emails",
         shouldReceiveDiscussionNotifications:
           "im-form-edit-establishment__businessContact-should-receive-discussion-notifications",
+        isMainContactByPhone:
+          "im-form-edit-establishment__businessContact-is-main-contact-by-phone",
+        isMainContactInPerson:
+          "im-form-edit-establishment__businessContact-is-main-contact-in-person",
       },
       contactMode: "im-form-edit-establishment__businessContact-contact-method",
       isEngagedEnterprise: "im-form-edit-establishment__is-engaged-enterprise",
@@ -557,6 +569,8 @@ export const domElementIds = {
       businessName: "im-form-manage-establishment-admin__business-name",
       businessNameCustomized:
         "im-form-manage-establishment-admin__business-name-customized",
+      potentialBeneficiaryWelcomeAddress:
+        "im-form-manage-establishment-admin__potential-beneficiary-welcome-address",
       businessContact: {
         lastName:
           "im-form-manage-establishment-admin__business-contact-last-name",
@@ -569,6 +583,10 @@ export const domElementIds = {
           "im-form-manage-establishment-admin__businessContact-copy-emails",
         shouldReceiveDiscussionNotifications:
           "im-form-manage-establishment-admin__businessContact-should-receive-discussion-notifications",
+        isMainContactByPhone:
+          "im-form-manage-establishment-admin__businessContact-is-main-contact-by-phone",
+        isMainContactInPerson:
+          "im-form-manage-establishment-admin__businessContact-is-main-contact-in-person",
       },
       contactMode:
         "im-form-manage-establishment-admin__businessContact-contact-method",
