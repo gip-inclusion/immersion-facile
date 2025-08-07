@@ -5,6 +5,7 @@ import {
   type AddressWithCountryCodeAndPosition,
   type City,
   type DepartmentName,
+  defaultCountryCode,
   errors,
   filterNotFalsy,
   type GeoPositionDto,
@@ -105,7 +106,8 @@ export class HttpAddressGateway implements AddressGateway {
               },
               mode: "cors",
               queryParams: {
-                countrycode: "fr",
+                countrycode:
+                  this.#toOpenCageCountryCodeParam(defaultCountryCode),
                 language,
                 limit: "10",
                 q: cachedQuery,

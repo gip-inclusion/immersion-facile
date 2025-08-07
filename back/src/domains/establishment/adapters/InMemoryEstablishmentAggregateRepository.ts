@@ -101,6 +101,7 @@ export class InMemoryEstablishmentAggregateRepository
           searchedAppellationCode: offer.appellationCode,
         },
       );
+
     return rest;
   }
 
