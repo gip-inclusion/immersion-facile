@@ -183,6 +183,7 @@ const makeUserRightsFromCSV = (
       job: csvRow.right1_job,
       phone: csvRow.right1_phone,
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: true,
     },
     ...otherThanAdminUserRights,
   ];

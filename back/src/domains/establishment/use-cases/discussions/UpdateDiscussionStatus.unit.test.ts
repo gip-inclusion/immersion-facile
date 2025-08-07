@@ -48,6 +48,7 @@ describe("UpdateDiscussionStatus", () => {
           phone: "osef",
           shouldReceiveDiscussionNotifications: false,
           userId: authorizedUser.id,
+          isMainContactByPhone: false,
         },
       ])
       .build();
@@ -108,6 +109,7 @@ describe("UpdateDiscussionStatus", () => {
               job: "",
               phone: "",
               shouldReceiveDiscussionNotifications: false,
+              isMainContactByPhone: false,
             },
           ])
           .build(),
@@ -404,6 +406,7 @@ describe("UpdateDiscussionStatus", () => {
                 job: "osef",
                 phone: "osef",
                 shouldReceiveDiscussionNotifications: false,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",

@@ -63,6 +63,7 @@ describe("Edit form establishments", () => {
         phone: "+33688774455",
         userId: establishmentAdminUser.id,
         shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
       },
     ])
     .build();
@@ -362,8 +363,8 @@ function expectEstablishmentInRepoUpdated(
       return {
         role: right.role,
         userId: user.id,
-        job: right.job,
-        phone: right.phone,
+        ...(right.job !== undefined && { job: right.job }),
+        ...(right.phone !== undefined && { phone: right.phone }),
       };
     }),
   );

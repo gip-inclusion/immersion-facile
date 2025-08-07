@@ -508,6 +508,10 @@ export const errors = {
       new NotFoundError(
         `Aucun administrateur trouvé pour l'établissement avec le siret : ${siret}.`,
       ),
+    contactUserNotFound: ({ siret }: { siret: SiretDto }) =>
+      new NotFoundError(
+        `Aucun utilisateur à contacter trouvé pour l'établissement avec le siret : ${siret}.`,
+      ),
     siretMismatch: () =>
       new ForbiddenError(
         "Il y a un problème de cohérence de Siret entre les données techniques (JWT et formulaire).",
@@ -890,13 +894,13 @@ export const errors = {
       new BadRequestError(`La raison ${rejectionKind} n'est pas supportée.`),
     badStatus: ({
       discussionId,
-      status,
+      expectedStatus,
     }: {
       discussionId: DiscussionId;
-      status: DiscussionStatus;
+      expectedStatus: DiscussionStatus;
     }) =>
       new BadRequestError(
-        `La discussion '${discussionId}' n'a pas le statut '${status}'.`,
+        `La discussion '${discussionId}' n'a pas le statut '${expectedStatus}'.`,
       ),
   },
   establishmentGroup: {

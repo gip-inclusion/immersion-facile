@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+} from "../zodUtils";
 import type {
   AddressAndPosition,
   AddressDto,
@@ -12,22 +16,32 @@ import type {
 
 export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
-export const addressSchema: z.Schema<AddressDto> = z.object({
-  streetNumberAndAddress: zStringCanBeEmpty,
-  postcode: zStringMinLength1,
-  departmentCode: zStringMinLength1,
-  city: zStringMinLength1,
-});
+export const addressSchema: z.Schema<AddressDto> = z.object(
+  {
+    streetNumberAndAddress: zStringCanBeEmpty,
+    postcode: zStringMinLength1,
+    departmentCode: zStringMinLength1,
+    city: zStringMinLength1,
+  },
+  {
+    message: localization.invalidAddress,
+  },
+);
 
 export const lookupSearchResultSchema: z.Schema<LookupSearchResult> = z.object({
   label: z.string(),
   position: geoPositionSchema,
 });
 
-export const addressAndPositionSchema: z.Schema<AddressAndPosition> = z.object({
-  address: addressSchema,
-  position: geoPositionSchema,
-});
+export const addressAndPositionSchema: z.Schema<AddressAndPosition> = z.object(
+  {
+    address: addressSchema,
+    position: geoPositionSchema,
+  },
+  {
+    message: localization.invalidAddress,
+  },
+);
 
 export const addressAndPositionListSchema: z.ZodSchema<AddressAndPosition[]> =
   z.array(addressAndPositionSchema);

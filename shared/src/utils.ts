@@ -1,5 +1,4 @@
 // TODO: find the standard for gouv.fr phone verification
-
 import { values } from "ramda";
 import type { Flavor } from "./typeFlavors";
 
@@ -133,7 +132,7 @@ type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
 
 export type DotNestedKeys<T> = (
   T extends object
-    ? T extends Flavor<string, unknown>
+    ? T extends Flavor<string | number, unknown>
       ? ""
       : T extends Array<infer U>
         ? `${number}${DotPrefix<DotNestedKeys<U>>}`
@@ -212,3 +211,5 @@ export type RangeOfPosition<
   :
       | (Result["length"] extends 0 ? never : Result["length"])
       | RangeOfPosition<N, [unknown, ...Result]>;
+export const populatePropIfDefined = <T>(prop: keyof T, value: ValueOf<T>) =>
+  value !== undefined ? { [prop]: value } : {};

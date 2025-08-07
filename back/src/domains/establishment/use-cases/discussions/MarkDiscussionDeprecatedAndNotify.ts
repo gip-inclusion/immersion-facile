@@ -28,7 +28,7 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
     if (discussion.status !== statusToMatch)
       throw errors.discussion.badStatus({
         discussionId,
-        status: statusToMatch,
+        expectedStatus: statusToMatch,
       });
 
     const establishment =

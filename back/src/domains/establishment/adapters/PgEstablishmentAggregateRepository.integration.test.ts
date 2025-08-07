@@ -61,6 +61,7 @@ const osefUserRight: EstablishmentUserRight = {
   phone: "3615-OSEF",
   userId: osefUser.id,
   shouldReceiveDiscussionNotifications: true,
+  isMainContactByPhone: false,
 };
 
 describe("PgEstablishmentAggregateRepository", () => {
@@ -1682,6 +1683,37 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
+      it("adds the establishment values in `establishments` table with welcome address", async () => {
+        const establishmentAggregate = new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withMaxContactsPerMonth(24)
+              .withLastInseeCheck(new Date("2020-04-14T12:00:00.000"))
+              .withContactMode("IN_PERSON")
+              .withWelcomeAddress({
+                address: {
+                  streetNumberAndAddress: "127 rue de Grenelle",
+                  postcode: "75007",
+                  city: "Paris",
+                  departmentCode: "75",
+                },
+                position: { lat: 48.8566, lon: 2.3522 },
+              })
+              .build(),
+          )
+          .withUserRights([osefUserRight])
+          .build();
+
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentAggregate,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
+          [establishmentAggregate],
+        );
+      });
+
       it("adds the establishment values in `establishments` table and keeps acquisition params", async () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishment(
@@ -1826,6 +1858,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33600000000",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -1847,6 +1880,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33600000000",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -1875,6 +1909,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33600000000",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
               {
                 role: "establishment-contact",
@@ -1896,13 +1931,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 phone: "+33666887744",
                 userId: user.id,
                 shouldReceiveDiscussionNotifications: true,
-              },
-              {
-                role: "establishment-contact",
-                job: "bbbbbbbbbbbbb",
-                phone: "+33600000099",
-                userId: user2.id,
-                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
               },
             ])
             .withLocations([
@@ -1946,6 +1975,15 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
             .withContactMode("IN_PERSON")
+            .withEstablishmentWelcomeAddress({
+              address: {
+                streetNumberAndAddress: "127 rue de Grenelle",
+                postcode: "75007",
+                city: "Paris",
+                departmentCode: "75",
+              },
+              position: { lat: 48.8566, lon: 2.3522 },
+            })
             .withUserRights([osefUserRight])
             .withEstablishmentUpdatedAt(updatedAt)
             .build(),
@@ -1957,13 +1995,22 @@ describe("PgEstablishmentAggregateRepository", () => {
               new EstablishmentEntityBuilder()
                 .withAdditionalInformation("my additionnal info")
                 .withCustomizedName("my customize name")
-                .withContactMode("EMAIL")
+                .withContactMode("IN_PERSON")
                 .withFitForDisabledWorkers(true)
                 .withIsCommited(true)
                 .withLastInseeCheck(new Date())
                 .withNextAvailabilityDate(new Date())
                 .withMaxContactsPerMonth(2)
                 .withUpdatedAt(new Date())
+                .withWelcomeAddress({
+                  address: {
+                    streetNumberAndAddress: "127 rue de Grenelle",
+                    postcode: "75007",
+                    city: "Paris",
+                    departmentCode: "75",
+                  },
+                  position: { lat: 48.8566, lon: 2.3522 },
+                })
                 .withWebsite("https://www.truc.com")
                 .withAcquisition(aquisition)
                 .build(),
@@ -1978,7 +2025,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   .withCustomizedName("my customize name")
                   .withFitForDisabledWorkers(true)
                   .withIsCommited(true)
-                  .withContactMode("IN_PERSON")
+                  .withContactMode("EMAIL")
                   .withLastInseeCheck(new Date())
                   .withNextAvailabilityDate(new Date())
                   .withMaxContactsPerMonth(5)
@@ -2216,6 +2263,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           phone: "+336887875544",
           userId: user1.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();
@@ -2230,6 +2278,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           phone: "+33688445577",
           userId: user2.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();
@@ -2244,6 +2293,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           phone: "+33688445566",
           userId: user2.id,
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
       ])
       .build();

@@ -67,6 +67,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
             shouldReceiveDiscussionNotifications: true,
             job: "osef",
             phone: "osef",
+            isMainContactByPhone: false,
           },
           {
             role: "establishment-contact",
@@ -112,7 +113,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
         }),
         errors.discussion.badStatus({
           discussionId: obsoleteDiscussion.id,
-          status: "PENDING",
+          expectedStatus: "PENDING",
         }),
       );
     });
@@ -133,7 +134,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
         }),
         errors.discussion.badStatus({
           discussionId: alreadyAcceptedDiscussion.id,
-          status: "PENDING",
+          expectedStatus: "PENDING",
         }),
       );
     });

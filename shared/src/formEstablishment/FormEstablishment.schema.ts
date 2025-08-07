@@ -2,6 +2,7 @@ import { uniq } from "ramda";
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
+import { addressAndPositionSchema } from "../address/address.schema";
 import { businessNameSchema } from "../business/business";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf/naf.schema";
@@ -37,34 +38,53 @@ import type {
 export const defaultMaxContactsPerMonth = 12;
 export const noContactPerMonth = 0;
 
-const validContactModes: NotEmptyArray<ContactMode> = [
+const contactModesWithoutWelcomeAddress: NotEmptyArray<ContactMode> = [
   "EMAIL",
   "PHONE",
+];
+
+const contactModesWithWelcomeAddress: NotEmptyArray<ContactMode> = [
   "IN_PERSON",
+];
+
+const validContactModes: NotEmptyArray<ContactMode> = [
+  ...contactModesWithoutWelcomeAddress,
+  ...contactModesWithWelcomeAddress,
 ];
 export const contactModeSchema = zEnumValidation(
   validContactModes,
   "Choisissez parmi les options proposées",
 );
 
+const establishmentContactBaseSchema = z.object({
+  role: z.literal("establishment-contact"),
+  email: emailSchema,
+  shouldReceiveDiscussionNotifications: zBoolean,
+  job: zStringMinLength1.optional(),
+  isMainContactInPerson: zBoolean.optional(),
+});
+
+const establishmentContactPhoneSchema = z.object({
+  phone: phoneNumberSchema.optional(),
+  isMainContactByPhone: zBoolean.optional(),
+});
+
+const establishmentContactSchema = establishmentContactBaseSchema.and(
+  establishmentContactPhoneSchema,
+);
+
+const establishmentAdminSchema = z.object({
+  role: z.literal("establishment-admin"),
+  email: emailSchema,
+  phone: phoneNumberSchema,
+  isMainContactByPhone: zBoolean,
+  isMainContactInPerson: zBoolean.optional(),
+  shouldReceiveDiscussionNotifications: zBoolean,
+  job: zStringMinLength1,
+});
+
 export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRight> =
-  z
-    .object({
-      role: z.literal("establishment-admin"),
-      email: emailSchema,
-      phone: phoneNumberSchema,
-      shouldReceiveDiscussionNotifications: zBoolean,
-      job: zStringMinLength1,
-    })
-    .or(
-      z.object({
-        role: z.literal("establishment-contact"),
-        email: emailSchema,
-        phone: phoneNumberSchema.optional(),
-        shouldReceiveDiscussionNotifications: zBoolean,
-        job: zStringMinLength1.optional(),
-      }),
-    );
+  establishmentAdminSchema.or(establishmentContactSchema);
 
 export const formEstablishmentUserRightsSchema: z.Schema<
   FormEstablishmentUserRight[]
@@ -97,53 +117,92 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
 ];
 export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources);
 
-export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
-  .object({
-    source: formEstablishmentSourceSchema,
-    siret: siretSchema,
-    businessName: businessNameSchema,
-    businessNameCustomized: zStringMinLength1
-      .refine(
-        (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
-        "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
-      )
-      .optional(),
-    website: absoluteUrlSchema.or(z.literal("")).optional(),
-    additionalInformation: zStringCanBeEmpty.optional(),
-    businessAddresses: z
-      .array(
-        z.object({
-          id: zUuidLike,
-          rawAddress: addressWithPostalCodeSchema,
-        }),
-      )
-      .min(1),
-    isEngagedEnterprise: zBoolean.optional(),
-    fitForDisabledWorkers: zBoolean,
-    naf: nafSchema.optional(),
-    appellations: z
-      .array(appellationDtoSchema)
-      .min(1, localization.atLeastOneJob),
-    contactMode: contactModeSchema,
-    userRights: formEstablishmentUserRightsSchema,
-    maxContactsPerMonth: z
-      .number({
-        invalid_type_error:
-          "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
-      })
-      .nonnegative({
-        message: "La valeur renseignée ne peut pas être négative",
-      })
-      .int({
-        message: "La valeur renseignée ne peut pas contenir de décimale",
+const formEstablishmentCommonShape = {
+  source: formEstablishmentSourceSchema,
+  siret: siretSchema,
+  businessName: businessNameSchema,
+  businessNameCustomized: zStringMinLength1
+    .refine(
+      (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
+      "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
+    )
+    .optional(),
+  website: absoluteUrlSchema.or(z.literal("")).optional(),
+  additionalInformation: zStringCanBeEmpty.optional(),
+  businessAddresses: z
+    .array(
+      z.object({
+        id: zUuidLike,
+        rawAddress: addressWithPostalCodeSchema,
       }),
-    nextAvailabilityDate: dateTimeIsoStringSchema.optional(),
-    searchableBy: z.object({
-      students: zBoolean,
-      jobSeekers: zBoolean,
+    )
+    .min(1),
+  isEngagedEnterprise: zBoolean.optional(),
+  fitForDisabledWorkers: zBoolean,
+  naf: nafSchema.optional(),
+  appellations: z
+    .array(appellationDtoSchema)
+    .min(1, localization.atLeastOneJob),
+  userRights: formEstablishmentUserRightsSchema,
+  maxContactsPerMonth: z
+    .number({
+      invalid_type_error:
+        "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
+    })
+    .nonnegative({
+      message: "La valeur renseignée ne peut pas être négative",
+    })
+    .int({
+      message: "La valeur renseignée ne peut pas contenir de décimale",
     }),
-  })
-  .and(withAcquisitionSchema);
+  nextAvailabilityDate: dateTimeIsoStringSchema.optional(),
+  searchableBy: z.object({
+    students: zBoolean,
+    jobSeekers: zBoolean,
+  }),
+};
+
+export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
+  .discriminatedUnion("contactMode", [
+    z.object({
+      contactMode: z.enum(contactModesWithoutWelcomeAddress),
+      ...formEstablishmentCommonShape,
+    }),
+    z.object({
+      contactMode: z.enum(contactModesWithWelcomeAddress),
+      potentialBeneficiaryWelcomeAddress: addressAndPositionSchema,
+      ...formEstablishmentCommonShape,
+    }),
+  ])
+  .and(withAcquisitionSchema)
+  .refine(
+    (formEstablishment) =>
+      formEstablishment.contactMode === "PHONE"
+        ? formEstablishment.userRights
+            .map((right) => right.isMainContactByPhone)
+            .filter((isMainContactByPhone) => isMainContactByPhone === true)
+            .length === 1
+        : true,
+    {
+      message:
+        "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
+      path: ["userRights"],
+    },
+  )
+  .refine(
+    (formEstablishment) =>
+      formEstablishment.contactMode === "IN_PERSON"
+        ? formEstablishment.userRights
+            .map((right) => right.isMainContactInPerson)
+            .filter((isMainContactInPerson) => isMainContactInPerson === true)
+            .length === 1
+        : true,
+    {
+      message:
+        "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
+      path: ["userRights"],
+    },
+  );
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
   z.object({

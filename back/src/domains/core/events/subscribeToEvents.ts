@@ -43,6 +43,9 @@ const getUseCasesByTopics = (
     },
   ],
   DiscussionMarkedAsDeprecated: [useCases.markDiscussionDeprecatedAndNotify],
+  DiscussionBeneficiaryFollowUpRequested: [
+    useCases.notifyBeneficiaryToFollowUpContactRequest,
+  ],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],
 
   // "Happy case" for conventions.

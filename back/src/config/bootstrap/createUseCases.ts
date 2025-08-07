@@ -127,6 +127,7 @@ import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/u
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
 import { makeMarkDiscussionDeprecatedAndNotify } from "../../domains/establishment/use-cases/discussions/MarkDiscussionDeprecatedAndNotify";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
+import { makeNotifyBeneficiaryToFollowUpContactRequest } from "../../domains/establishment/use-cases/discussions/NotifyBeneficiaryToFollowUpContactRequest";
 import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
 import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
 import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
@@ -911,6 +912,11 @@ export const createUseCases = ({
         config,
       },
     }),
+    notifyBeneficiaryToFollowUpContactRequest:
+      makeNotifyBeneficiaryToFollowUpContactRequest({
+        uowPerformer,
+        deps: { saveNotificationsBatchAndRelatedEvent, config },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

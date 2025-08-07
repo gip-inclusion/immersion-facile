@@ -583,6 +583,7 @@ describe("InclusionConnected", () => {
               job: "fake job",
               phone: "+33600000000",
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
             {
               email: otherUserAdminData.email,
@@ -590,6 +591,7 @@ describe("InclusionConnected", () => {
               job: "fake job",
               phone: "+33600000000",
               shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
             },
           ])
           .build();
@@ -629,6 +631,7 @@ describe("InclusionConnected", () => {
           job: "fake job",
           phone: "+33600000000",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         };
         const otherEstablishmentToKeepData: EstablishmentData = {
           admins: [otherUserAdminData],
@@ -717,6 +720,7 @@ describe("InclusionConnected", () => {
           job: "fake job",
           phone: "+33600000000",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         };
         const otherEstablishmentData: EstablishmentData = {
           admins: [otherUserAdminData],
@@ -755,6 +759,7 @@ describe("InclusionConnected", () => {
           job: "fake job",
           phone: "+33600000000",
           shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         };
 
         const establishment = FormEstablishmentDtoBuilder.valid()

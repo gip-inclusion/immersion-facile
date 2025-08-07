@@ -75,6 +75,7 @@ describe("LegacyContactEstablishment", () => {
     phone: "+33877995544",
     userId: establishmentAdmin.id,
     shouldReceiveDiscussionNotifications: true,
+    isMainContactByPhone: false,
   };
   const establishmentRights: EstablishmentUserRight[] = [
     establishmentAdminRight,

@@ -22,6 +22,7 @@ describe("PgScriptsQueries", () => {
     phone: "3615-OSEF",
     userId: user.id,
     shouldReceiveDiscussionNotifications: true,
+    isMainContactByPhone: false,
   };
 
   let pool: Pool;

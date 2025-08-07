@@ -91,6 +91,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
       job: "a job",
       phone: "+33612345678",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
     },
     {
       role: "establishment-contact",
@@ -151,6 +152,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
       job: "new job",
       phone: "+33612345679",
       shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: true,
     },
     {
       role: "establishment-contact",
@@ -341,6 +343,20 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       searchableBy: { jobSeekers, students },
+    });
+  }
+
+  public withPotentialBeneficiaryWelcomeAddress(
+    potentialBeneficiaryWelcomeAddress: AddressAndPosition,
+  ) {
+    if (this.#dto.contactMode !== "IN_PERSON") {
+      throw new Error(
+        "Potential beneficiary welcome address is only available for IN_PERSON contact mode",
+      );
+    }
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      potentialBeneficiaryWelcomeAddress,
     });
   }
 }

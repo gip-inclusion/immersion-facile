@@ -1,4 +1,9 @@
-import type { EstablishmentRole, UserId, WithJobAndPhone } from "shared";
+import type {
+  EstablishmentRole,
+  UserId,
+  WithIsMainContactInPerson,
+  WithJobAndPhone,
+} from "shared";
 import type { EstablishmentEntity } from "./EstablishmentEntity";
 import type { OfferEntity } from "./OfferEntity";
 
@@ -19,11 +24,14 @@ type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
 };
 
 export type EstablishmentAdminRight =
-  GenericEstablishmentUserRight<"establishment-admin"> & WithJobAndPhone;
+  GenericEstablishmentUserRight<"establishment-admin"> &
+    Required<WithJobAndPhone> &
+    WithIsMainContactInPerson;
 
 export type EstablishmentContactRight =
   GenericEstablishmentUserRight<"establishment-contact"> &
-    Partial<WithJobAndPhone>;
+    Partial<WithJobAndPhone> &
+    WithIsMainContactInPerson;
 
 export type EstablishmentUserRight =
   | EstablishmentAdminRight

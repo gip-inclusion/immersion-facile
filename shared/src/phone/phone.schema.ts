@@ -29,15 +29,12 @@ export const phoneNumberSchema: z.Schema<PhoneNumber> =
     return parsePhoneNumber(phone, countryCode).format("E.164");
   });
 
-export const isValidMobilePhone = (phoneNumber: PhoneNumber): boolean => {
-  return parsePhoneNumber(phoneNumber).getType() === "MOBILE";
-};
+export const isValidMobilePhone = (phoneNumber: PhoneNumber): boolean =>
+  parsePhoneNumber(phoneNumber).getType() === "MOBILE";
 
 export const toDisplayedPhoneNumber = (
   phoneNumber: string,
-): string | undefined => {
-  return parsePhoneNumber(phoneNumber).format("NATIONAL");
-};
+): string | undefined => parsePhoneNumber(phoneNumber).format("NATIONAL");
 
 export const toInternationalPhoneNumber = (
   phoneNumber: string,

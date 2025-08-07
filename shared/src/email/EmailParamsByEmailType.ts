@@ -219,7 +219,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     contactFirstName?: string;
     contactLastName?: string;
-    businessAddress: string;
+    welcomeAddress: string;
     kind: DiscussionKind;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
@@ -283,6 +283,15 @@ export type EmailParamsByEmailType = {
     businessName: string;
     discussionCreatedAt: string;
     searchPageUrl: string;
+  };
+  DISCUSSION_BENEFICIARY_FOLLOW_UP: {
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    contactFirstName: string;
+    contactLastName: string;
+    contactJob: string | undefined;
+    contactPhone: string;
   };
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: string[];
