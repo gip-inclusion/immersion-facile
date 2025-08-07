@@ -96,8 +96,24 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     );
 
     addressGateway.setNextLookupStreetAndAddresses([
-      [defaultAddress.addressAndPosition],
-      [defaultAddress.addressAndPosition],
+      [
+        {
+          ...defaultAddress.addressAndPosition,
+          address: {
+            ...defaultAddress.addressAndPosition.address,
+            countryCode: "FR",
+          },
+        },
+      ],
+      [
+        {
+          ...defaultAddress.addressAndPosition,
+          address: {
+            ...defaultAddress.addressAndPosition.address,
+            countryCode: "FR",
+          },
+        },
+      ],
     ]);
 
     uow.romeRepository.appellations =

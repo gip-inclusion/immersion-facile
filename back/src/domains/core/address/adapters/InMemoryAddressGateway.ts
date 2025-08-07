@@ -1,4 +1,5 @@
 import {
+  type AddressDto,
   type AddressDtoWithCountryCode,
   type AddressWithCountryCodeAndPosition,
   errors,
@@ -58,42 +59,37 @@ export class InMemoryAddressGateway implements AddressGateway {
   }
 }
 
-export const rueJacquardDto: AddressDtoWithCountryCode = {
+export const rueJacquardDto: AddressDto = {
   streetNumberAndAddress: "2 RUE JACQUARD",
   postcode: "69120",
   city: "VAULX-EN-VELIN",
   departmentCode: "69",
-  countryCode: "FR",
 };
 
-export const rueGuillaumeTellDto: AddressDtoWithCountryCode = {
+export const rueGuillaumeTellDto: AddressDto = {
   streetNumberAndAddress: "7 rue guillaume tell",
   postcode: "75017",
   city: "Paris",
   departmentCode: "75",
-  countryCode: "FR",
 };
 
-export const rueBitcheDto: AddressDtoWithCountryCode = {
+export const rueBitcheDto: AddressDto = {
   streetNumberAndAddress: "4 rue de Bitche",
   postcode: "44000",
   city: "Nantes",
   departmentCode: "44",
-  countryCode: "FR",
 };
 
-export const rueSaintHonoreDto: AddressDtoWithCountryCode = {
+export const rueSaintHonoreDto: AddressDto = {
   streetNumberAndAddress: "55 rue de Faubourg Saint Honoré",
   postcode: "75008",
   city: "Paris",
   departmentCode: "75",
-  countryCode: "FR",
 };
 
-export const avenueChampsElyseesDto: AddressDtoWithCountryCode = {
+export const avenueChampsElyseesDto: AddressDto = {
   streetNumberAndAddress: "30 avenue des champs Elysées",
   departmentCode: "75",
   city: "Paris",
   postcode: "75017",
-  countryCode: "FR",
 };

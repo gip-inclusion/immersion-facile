@@ -1,9 +1,11 @@
-import type {
-  AddressDto,
-  FormEstablishmentAddress,
-  Location,
-  LocationId,
-  SiretDto,
+import { omit } from "ramda";
+import {
+  type AddressDto,
+  defaultCountryCode,
+  type FormEstablishmentAddress,
+  type Location,
+  type LocationId,
+  type SiretDto,
 } from "shared";
 import type { AddressGateway } from "../domains/core/address/ports/AddressGateway";
 
@@ -12,20 +14,21 @@ export const rawAddressToLocation = async (
   businessSiret: SiretDto,
   formEstablishementAddress: FormEstablishmentAddress,
 ): Promise<Location> => {
-  const positionAndAddress = (
+  const addressWithCountryCodeAndPosition = (
     await addressGateway.lookupStreetAddress(
       formEstablishementAddress.rawAddress,
-      "FR",
+      defaultCountryCode,
     )
   ).at(0);
 
-  if (!positionAndAddress)
+  if (!addressWithCountryCodeAndPosition)
     throw new Error(
       `Cannot find the address ${formEstablishementAddress.rawAddress} in API for establishment with siret ${businessSiret}`,
     );
 
   return {
-    ...positionAndAddress,
+    ...addressWithCountryCodeAndPosition,
+    address: omit(["countryCode"], addressWithCountryCodeAndPosition.address),
     id: formEstablishementAddress.id,
   };
 };

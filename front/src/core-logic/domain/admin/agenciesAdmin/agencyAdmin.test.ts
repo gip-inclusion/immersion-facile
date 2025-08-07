@@ -1,4 +1,5 @@
 import {
+  type AddressDto,
   type AgencyDto,
   AgencyDtoBuilder,
   type AgencyId,
@@ -436,14 +437,13 @@ describe("agencyAdmin", () => {
   });
 
   it("populates address when agency is selected", () => {
-    const agencyDto = new AgencyDtoBuilder()
-      .withAddress({
-        streetNumberAndAddress: "123 Main St",
-        postcode: "12345",
-        departmentCode: "CA",
-        city: "Los Angeles",
-      })
-      .build();
+    const address: AddressDto = {
+      streetNumberAndAddress: "1 rue de la paix",
+      postcode: "75016",
+      departmentCode: "75",
+      city: "Paris",
+    };
+    const agencyDto = new AgencyDtoBuilder().withAddress(address).build();
 
     store.dispatch(agencyAdminSlice.actions.setAgency(agencyDto));
     expectAgencyAdminStateToMatch({
@@ -453,11 +453,8 @@ describe("agencyAdmin", () => {
       makeGeocodingLocatorSelector("agency-address")(store.getState())?.value,
       {
         address: {
-          streetNumberAndAddress: "123 Main St",
-          postcode: "12345",
-          departmentCode: "CA",
-          city: "Los Angeles",
-          countryCode: "US",
+          ...address,
+          countryCode: "FR",
         },
         position: {
           lat: 48.866667,
