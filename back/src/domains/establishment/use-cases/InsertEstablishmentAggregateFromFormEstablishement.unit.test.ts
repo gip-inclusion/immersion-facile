@@ -117,7 +117,15 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       );
 
     addressAPI.setNextLookupStreetAndAddresses([
-      [defaultAddress.addressAndPosition],
+      [
+        {
+          address: {
+            ...defaultAddress.addressAndPosition.address,
+            countryCode: "FR",
+          },
+          position: defaultAddress.addressAndPosition.position,
+        },
+      ],
     ]);
 
     siretGateway.setSirenEstablishment({
@@ -577,7 +585,10 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     addressAPI.setNextLookupStreetAndAddresses([
       [
         {
-          address: rueGuillaumeTellDto,
+          address: {
+            ...rueGuillaumeTellDto,
+            countryCode: "FR",
+          },
           position: { lat: 1, lon: 1 },
         },
       ],

@@ -151,7 +151,10 @@ describe("Update Establishment aggregate from form data", () => {
       addressGateway.setNextLookupStreetAndAddresses([
         [
           {
-            address: rueGuillaumeTellDto,
+            address: {
+              ...rueGuillaumeTellDto,
+              countryCode: "FR",
+            },
             position: { lon: 1, lat: 2 },
           },
         ],
@@ -590,8 +593,24 @@ describe("Update Establishment aggregate from form data", () => {
 
     beforeEach(() => {
       addressGateway.setNextLookupStreetAndAddresses([
-        [updatedAddress1.addressAndPosition],
-        [updatedAddress2.addressAndPosition],
+        [
+          {
+            ...updatedAddress1.addressAndPosition,
+            address: {
+              ...updatedAddress1.addressAndPosition.address,
+              countryCode: "FR",
+            },
+          },
+        ],
+        [
+          {
+            ...updatedAddress2.addressAndPosition,
+            address: {
+              ...updatedAddress2.addressAndPosition.address,
+              countryCode: "FR",
+            },
+          },
+        ],
       ]);
 
       uow.establishmentAggregateRepository.establishmentAggregates = [
