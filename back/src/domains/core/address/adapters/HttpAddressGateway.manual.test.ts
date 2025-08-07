@@ -368,6 +368,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "L'Alpe d'Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -380,6 +381,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -392,6 +394,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -404,6 +407,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -416,6 +420,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -428,6 +433,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -440,6 +446,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -452,6 +459,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -464,6 +472,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
           {
@@ -476,6 +485,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
+              countryCode: "FR",
             },
           },
         ],
@@ -523,6 +533,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
           departmentCode: "14",
           postcode: "14980",
           streetNumberAndAddress: "",
+          countryCode: "FR",
         },
         position: {
           lat: 49.2062576,

@@ -1,5 +1,6 @@
 import {
   type AddressRoutes,
+  type AddressWithCountryCodeAndPosition,
   addressRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
@@ -17,6 +18,14 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 describe("address router", () => {
   let httpClient: HttpClient<AddressRoutes>;
   let addressGateway: InMemoryAddressGateway;
+  const expectedAddressAndPositions: AddressWithCountryCodeAndPosition[] =
+    expected8bdduportAddressAndPositions.map((location) => ({
+      ...location,
+      address: {
+        ...location.address,
+        countryCode: "FR",
+      },
+    }));
 
   beforeEach(async () => {
     const { request, gateways } = await buildTestApp();
@@ -29,7 +38,7 @@ describe("address router", () => {
       addressRoutes.lookupStreetAddress,
     )} 200 with lookup="${query8bdduportLookup}"`, async () => {
       addressGateway.setNextLookupStreetAndAddresses([
-        expected8bdduportAddressAndPositions,
+        expectedAddressAndPositions,
       ]);
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
@@ -38,7 +47,7 @@ describe("address router", () => {
         },
       });
       expectHttpResponseToEqual(response, {
-        body: expected8bdduportAddressAndPositions,
+        body: expectedAddressAndPositions,
         status: 200,
       });
     });

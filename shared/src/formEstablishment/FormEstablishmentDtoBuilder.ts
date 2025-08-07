@@ -1,6 +1,6 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
-import type { AddressAndPosition } from "../address/address.dto";
+import type { AddressWithCountryCodeAndPosition } from "../address/address.dto";
 import type { Builder } from "../Builder";
 import { errors } from "../errors/errors";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -21,7 +21,7 @@ import {
 
 type TestAddress = {
   formAddress: FormEstablishmentAddress;
-  addressAndPosition: AddressAndPosition;
+  addressAndPosition: AddressWithCountryCodeAndPosition;
 };
 
 export const defaultAddress: TestAddress = {
@@ -35,6 +35,7 @@ export const defaultAddress: TestAddress = {
       departmentCode: "27",
       postcode: "27110",
       streetNumberAndAddress: "1 Rue du Moulin",
+      countryCode: "FR",
     },
     position: {
       lat: 49.137593,
@@ -54,6 +55,7 @@ export const updatedAddress1: TestAddress = {
       departmentCode: "75",
       postcode: "75001",
       streetNumberAndAddress: "1 rue de la paix",
+      countryCode: "FR",
     },
     position: {
       lat: 48.8685535,
@@ -73,6 +75,7 @@ export const updatedAddress2: TestAddress = {
       departmentCode: "93",
       postcode: "93100",
       streetNumberAndAddress: "2 rue de la paix",
+      countryCode: "FR",
     },
     position: {
       lat: 48.860428,

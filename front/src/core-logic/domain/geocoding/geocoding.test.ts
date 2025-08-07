@@ -1,5 +1,5 @@
 import {
-  type AddressAndPosition,
+  type AddressWithCountryCodeAndPosition,
   expectArraysToEqual,
   expectObjectsToMatch,
   expectToEqual,
@@ -40,6 +40,7 @@ describe("Geocoding epic", () => {
             departmentCode: "75",
             postcode: "75000",
             streetNumberAndAddress: "123 Rue de la Paix",
+            countryCode: "FR",
           },
           position: {
             lat: 48.8566,
@@ -58,7 +59,7 @@ describe("Geocoding epic", () => {
 
   const multipleAddressData: Record<
     MultipleAddressAutocompleteLocator,
-    AutocompleteItem<AddressAndPosition>
+    AutocompleteItem<AddressWithCountryCodeAndPosition>
   > = {
     "multiple-address-0": {
       ...initialAutocompleteItem,
@@ -68,6 +69,7 @@ describe("Geocoding epic", () => {
           departmentCode: "75",
           postcode: "75018",
           streetNumberAndAddress: "254 Avenue Maxime Gorki",
+          countryCode: "FR",
         },
         position: { lat: 48.8566, lon: 2.3522 },
       },
@@ -80,6 +82,7 @@ describe("Geocoding epic", () => {
           departmentCode: "86",
           postcode: "86000",
           streetNumberAndAddress: "254 Rue de la Paix",
+          countryCode: "FR",
         },
         position: { lat: 46.5833, lon: 0.3333 },
       },
@@ -92,6 +95,7 @@ describe("Geocoding epic", () => {
           departmentCode: "33",
           postcode: "33000",
           streetNumberAndAddress: "25 rue des Chartrons",
+          countryCode: "FR",
         },
         position: { lat: 44.8378, lon: -0.5795 },
       },
@@ -104,6 +108,7 @@ describe("Geocoding epic", () => {
           departmentCode: "75",
           postcode: "75000",
           streetNumberAndAddress: "123 Rue de la Paix",
+          countryCode: "FR",
         },
         position: { lat: 48.8566, lon: 2.3522 },
       },
@@ -111,7 +116,7 @@ describe("Geocoding epic", () => {
   };
   const expectedData1: Record<
     MultipleAddressAutocompleteLocator,
-    AutocompleteItem<AddressAndPosition>
+    AutocompleteItem<AddressWithCountryCodeAndPosition>
   > = {
     "multiple-address-0": multipleAddressData["multiple-address-0"],
     "multiple-address-1": multipleAddressData["multiple-address-2"],
@@ -119,7 +124,7 @@ describe("Geocoding epic", () => {
   };
   const expectedData2: Record<
     MultipleAddressAutocompleteLocator,
-    AutocompleteItem<AddressAndPosition>
+    AutocompleteItem<AddressWithCountryCodeAndPosition>
   > = {
     "multiple-address-0": multipleAddressData["multiple-address-1"],
     "multiple-address-1": multipleAddressData["multiple-address-2"],
@@ -127,7 +132,7 @@ describe("Geocoding epic", () => {
   };
   const expectedData3: Record<
     MultipleAddressAutocompleteLocator,
-    AutocompleteItem<AddressAndPosition>
+    AutocompleteItem<AddressWithCountryCodeAndPosition>
   > = {
     "multiple-address-0": multipleAddressData["multiple-address-0"],
     "multiple-address-1": multipleAddressData["multiple-address-1"],
@@ -197,13 +202,14 @@ describe("Geocoding epic", () => {
 
   it("should trigger a new request to the gateway when query > threshold", () => {
     const query = "Poit";
-    const expectedSuggestions: AddressAndPosition[] = [
+    const expectedSuggestions: AddressWithCountryCodeAndPosition[] = [
       {
         address: {
           city: "Saint-Georges-les-Baillargeaux",
           departmentCode: "86",
           postcode: "86110",
           streetNumberAndAddress: "123 Rue de la Paix",
+          countryCode: "FR",
         },
         position: {
           lat: 45.984,
@@ -230,12 +236,13 @@ describe("Geocoding epic", () => {
   });
 
   it("should update selected suggestion in store", () => {
-    const addressAndPosition: AddressAndPosition = {
+    const addressAndPosition: AddressWithCountryCodeAndPosition = {
       address: {
         city: "Paris",
         departmentCode: "75",
         postcode: "75000",
         streetNumberAndAddress: "123 Rue de la Paix",
+        countryCode: "FR",
       },
       position: {
         lat: 49.6548,
@@ -252,12 +259,13 @@ describe("Geocoding epic", () => {
   });
 
   it("should keep selected suggestion in store when selecting another suggestion", () => {
-    const previouslySelectedSuggestion: AddressAndPosition = {
+    const previouslySelectedSuggestion: AddressWithCountryCodeAndPosition = {
       address: {
         city: "Paris",
         departmentCode: "75",
         postcode: "75000",
         streetNumberAndAddress: "123 Rue de la Paix",
+        countryCode: "FR",
       },
       position: {
         lat: 49.6548,
@@ -270,12 +278,13 @@ describe("Geocoding epic", () => {
         locator,
       }),
     );
-    const newSelectedSuggestion: AddressAndPosition = {
+    const newSelectedSuggestion: AddressWithCountryCodeAndPosition = {
       address: {
         city: "Paris",
         departmentCode: "75",
         postcode: "75000",
         streetNumberAndAddress: "123 Rue de la Paix",
+        countryCode: "FR",
       },
       position: {
         lat: 49.6548,
@@ -312,13 +321,14 @@ describe("Geocoding epic", () => {
   });
 
   it("should select the first suggestion if selectFirstSuggestion is true", () => {
-    const expectedSuggestions: AddressAndPosition[] = [
+    const expectedSuggestions: AddressWithCountryCodeAndPosition[] = [
       {
         address: {
           city: "Paris",
           departmentCode: "75",
           postcode: "75000",
           streetNumberAndAddress: "123 Rue de la Paix",
+          countryCode: "FR",
         },
         position: {
           lat: 48.8566,
@@ -342,13 +352,14 @@ describe("Geocoding epic", () => {
   });
 
   it("should select the first suggestion if siret info is successfully fetched", () => {
-    const expectedSuggestions: AddressAndPosition[] = [
+    const expectedSuggestions: AddressWithCountryCodeAndPosition[] = [
       {
         address: {
           city: "Paris",
           departmentCode: "75",
           postcode: "75000",
           streetNumberAndAddress: "123 Rue de la Paix",
+          countryCode: "FR",
         },
         position: {
           lat: 48.8566,
@@ -395,14 +406,18 @@ describe("Geocoding epic", () => {
       expected,
     );
   };
-  const expectSuggestionsToBe = (expected: AddressAndPosition[]) => {
+  const expectSuggestionsToBe = (
+    expected: AddressWithCountryCodeAndPosition[],
+  ) => {
     expectArraysToEqual(
       makeGeocodingLocatorSelector(locator)?.(store.getState())?.suggestions ??
         [],
       expected,
     );
   };
-  const expectSelectedSuggestionToBe = (expected: AddressAndPosition) => {
+  const expectSelectedSuggestionToBe = (
+    expected: AddressWithCountryCodeAndPosition,
+  ) => {
     expectObjectsToMatch(
       makeGeocodingLocatorSelector(locator)(store.getState())?.value,
       expected,

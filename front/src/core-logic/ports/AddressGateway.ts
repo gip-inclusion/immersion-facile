@@ -1,6 +1,6 @@
 import type { Observable } from "rxjs";
 import type {
-  AddressAndPosition,
+  AddressWithCountryCodeAndPosition,
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
@@ -11,6 +11,6 @@ export interface AddressGateway {
   lookupStreetAddress$(
     lookup: LookupAddress,
     countryCode: SupportedCountryCode,
-  ): Observable<AddressAndPosition[]>;
+  ): Observable<AddressWithCountryCodeAndPosition[]>;
   lookupLocation$(query: LookupLocationInput): Observable<LookupSearchResult[]>;
 }

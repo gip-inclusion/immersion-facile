@@ -1,16 +1,17 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   RSAutocomplete,
   type RSAutocompleteComponentProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  type AddressAndPosition,
+  type AddressWithCountryCodeAndPosition,
   addressDtoToString,
   countryCodesData,
   defaultCountryCode,
+  getCountryCodeFromAddress,
   type SupportedCountryCode,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -22,7 +23,7 @@ import {
 
 export type AddressAutocompleteProps = RSAutocompleteComponentProps<
   "address",
-  AddressAndPosition,
+  AddressWithCountryCodeAndPosition,
   AddressAutocompleteLocator
 > & {
   countryCode?: SupportedCountryCode;
@@ -56,22 +57,19 @@ export const AddressAutocomplete = ({
   multiple,
   countryCode,
   withCountrySelect = false,
+  initialInputValue,
   ...props
 }: AddressAutocompleteProps) => {
   const dispatch = useDispatch();
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const [selectedCountryCode, setSelectedCountryCode] =
-    useState<SupportedCountryCode>(countryCode ?? defaultCountryCode);
-
-  useEffect(() => {
-    if (countryCode) {
-      setSelectedCountryCode(countryCode);
-    }
-  }, [countryCode]);
+    useState<SupportedCountryCode | null>(null);
 
   const { value, options, isSearching, isDebouncing } = useAddressAutocomplete(
     props.locator,
   );
+
+  const inputValue = searchTerm ?? initialInputValue;
 
   const countryOptions = Object.entries(countryCodesData).map(
     ([code, { name, flag }]) => ({
@@ -79,6 +77,19 @@ export const AddressAutocomplete = ({
       label: `${flag} ${name}`,
     }),
   );
+
+  const getSelectedCountryCode = () => {
+    const countryCodeFromAddressValue = inputValue
+      ? getCountryCodeFromAddress(inputValue)
+      : null;
+    if (countryCodeFromAddressValue) {
+      return countryCodeFromAddressValue;
+    }
+    return selectedCountryCode ?? countryCode;
+  };
+
+  //biome-ignore lint/suspicious/noConsole: <explanation>
+  console.log("searchTerm", searchTerm);
 
   return (
     <div className={fr.cx("fr-mb-2w")}>
@@ -88,7 +99,7 @@ export const AddressAutocomplete = ({
             label="Pays où se déroulera l'immersion"
             options={countryOptions}
             nativeSelectProps={{
-              value: selectedCountryCode,
+              value: getSelectedCountryCode(),
               onChange: (event) => {
                 const newCountryCode = event.currentTarget
                   .value as SupportedCountryCode;
@@ -120,13 +131,12 @@ export const AddressAutocomplete = ({
       )}
       <RSAutocomplete
         {...props}
-        key={withCountrySelect ? selectedCountryCode : "default"}
         selectProps={{
           isDebouncing,
           inputId: props.selectProps?.inputId ?? "im-select__input--address",
           isLoading: isSearching,
           loadingMessage: () => <>Recherche d'adresses en cours... 🔎</>,
-          inputValue: searchTerm,
+          inputValue,
           placeholder: "Ex : 123 Rue de la Paix 75001 Paris",
           value:
             value && !Array.isArray(value)
@@ -161,20 +171,31 @@ export const AddressAutocomplete = ({
                   locator: props.locator,
                 }),
               );
+              // biome-ignore lint/suspicious/noConsole: <explanation>
+              console.log("onAddressSelected", searchResult.label);
+              setSearchTerm(searchResult.label);
             }
           },
           options,
-          onInputChange: (newQuery) => {
-            setSearchTerm(newQuery);
-            dispatch(
-              geocodingSlice.actions.changeQueryRequested({
-                locator: props.locator,
-                lookup: newQuery,
-                countryCode: withCountrySelect
-                  ? selectedCountryCode
-                  : defaultCountryCode,
-              }),
-            );
+          onInputChange: (newQuery, actionMeta) => {
+            // biome-ignore lint/suspicious/noConsole: <explanation>
+            console.log("onInputChange", {
+              newQuery,
+              actionMeta,
+            });
+            if (actionMeta.action === "input-change") {
+              setSearchTerm(newQuery);
+              dispatch(
+                geocodingSlice.actions.changeQueryRequested({
+                  locator: props.locator,
+                  lookup: newQuery,
+                  countryCode:
+                    withCountrySelect && selectedCountryCode
+                      ? selectedCountryCode
+                      : defaultCountryCode,
+                }),
+              );
+            }
           },
         }}
       />

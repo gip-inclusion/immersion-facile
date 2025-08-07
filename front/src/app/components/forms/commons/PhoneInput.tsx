@@ -44,6 +44,15 @@ export const PhoneInput = ({
     inputProps?.nativeInputProps?.value?.toString() ?? "",
   );
 
+  const getCountryCodeValue = () => {
+    const countryCodeFromDisplayedNumber =
+      getCountryCodeFromPhoneNumber(displayedPhoneNumber);
+    if (countryCodeFromDisplayedNumber) {
+      return countryCodeFromDisplayedNumber;
+    }
+    return countryCode || defaultCountryCodeValue;
+  };
+
   return (
     <div
       className={fr.cx("fr-input-group", "fr-mb-3w", {
@@ -70,13 +79,12 @@ export const PhoneInput = ({
               )}
               nativeSelectProps={{
                 ...selectProps?.nativeSelectProps,
-                value: countryCode || defaultCountryCodeValue,
+                value: getCountryCodeValue(),
                 disabled,
                 onChange: (event) => {
                   const updatedCountryCode = event.currentTarget.value;
                   if (isSupportedCountryCode(updatedCountryCode)) {
                     setCountryCode(updatedCountryCode);
-                    setDisplayedPhoneNumber("");
                     const internationalPhoneNumber = toInternationalPhoneNumber(
                       displayedPhoneNumber,
                       updatedCountryCode,

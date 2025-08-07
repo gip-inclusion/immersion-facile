@@ -35,6 +35,10 @@ export type AddressDto = {
   city: City;
 };
 
+export type AddressDtoWithCountryCode = AddressDto & {
+  countryCode: SupportedCountryCode;
+};
+
 export type LocationId = Flavor<string, "AddressId">;
 
 export type Location = {
@@ -45,13 +49,11 @@ export type Location = {
 
 export type AddressAndPosition = Omit<Location, "id">;
 
-export type AddressAndPositionWithCountryCode = OmitFromExistingKeys<
+export type AddressWithCountryCodeAndPosition = OmitFromExistingKeys<
   AddressAndPosition,
   "address"
 > & {
-  address: AddressDto & {
-    countryCode: CountryCode;
-  };
+  address: AddressDtoWithCountryCode;
 };
 
 export const departmentNameToDepartmentCode: Record<
@@ -293,7 +295,11 @@ const countryNameToCountryCode: Record<string, SupportedCountryCode> =
     ]),
   );
 
-export const getCountrycodeFromAddress = (
+export const countryCodeToCountryName = (
+  countryCode: SupportedCountryCode,
+): string => countryCodesData[countryCode].name;
+
+export const getCountryCodeFromAddress = (
   address: string,
 ): SupportedCountryCode => {
   if (!address) return "FR";
@@ -349,3 +355,7 @@ export const isSupportedCountryCode = (
   code: string,
 ): code is SupportedCountryCode =>
   supportedCountryCodes.includes(code as SupportedCountryCode);
+
+export const isAddressDtoWithCountryCode = (
+  address: AddressDto | AddressDtoWithCountryCode,
+): address is AddressDtoWithCountryCode => "countryCode" in address;

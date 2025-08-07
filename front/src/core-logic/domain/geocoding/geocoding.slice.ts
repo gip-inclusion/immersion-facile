@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { keys } from "ramda";
-import type {
-  AddressAndPosition,
-  LookupAddress,
-  SupportedCountryCode,
+import {
+  type AddressWithCountryCodeAndPosition,
+  defaultCountryCode,
+  type LookupAddress,
+  type SupportedCountryCode,
 } from "shared";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
@@ -25,7 +26,7 @@ export type AddressAutocompleteLocator =
 
 const initialState: AutocompleteState<
   AddressAutocompleteLocator,
-  AddressAndPosition
+  AddressWithCountryCodeAndPosition
 > = {
   data: {},
 };
@@ -76,7 +77,7 @@ export const geocodingSlice = createSlice({
           },
           {} as Record<
             MultipleAddressAutocompleteLocator,
-            AutocompleteItem<AddressAndPosition>
+            AutocompleteItem<AddressWithCountryCodeAndPosition>
           >,
         );
         const nonMultipleData = keys(state.data).reduce(
@@ -87,7 +88,10 @@ export const geocodingSlice = createSlice({
             }
             return acc;
           },
-          {} as Record<string, AutocompleteItem<AddressAndPosition>>,
+          {} as Record<
+            string,
+            AutocompleteItem<AddressWithCountryCodeAndPosition>
+          >,
         );
 
         return {
@@ -169,7 +173,7 @@ export const geocodingSlice = createSlice({
       action: PayloadActionWithLocator<
         AddressAutocompleteLocator,
         {
-          suggestions: AddressAndPosition[];
+          suggestions: AddressWithCountryCodeAndPosition[];
           selectFirstSuggestion: boolean;
         }
       >,
@@ -212,7 +216,7 @@ export const geocodingSlice = createSlice({
       state,
       action: PayloadActionWithLocator<
         AddressAutocompleteLocator,
-        { item: AddressAndPosition }
+        { item: AddressWithCountryCodeAndPosition }
       >,
     ) => {
       const { locator } = action.payload;
@@ -235,7 +239,10 @@ export const geocodingSlice = createSlice({
       state.data["agency-address"] = {
         ...initialAutocompleteItem,
         value: {
-          address: action.payload.address,
+          address: {
+            ...action.payload.address,
+            countryCode: defaultCountryCode,
+          },
           position: {
             lat: action.payload.position.lat,
             lon: action.payload.position.lon,
