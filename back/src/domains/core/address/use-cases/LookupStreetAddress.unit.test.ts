@@ -1,4 +1,8 @@
-import type { Location, WithLookupAddressQueryParams } from "shared";
+import type {
+  AddressWithCountryCodeAndPosition,
+  Location,
+  WithLookupAddressQueryParams,
+} from "shared";
 import { InMemoryAddressGateway } from "../adapters/InMemoryAddressGateway";
 import { LookupStreetAddress } from "./LookupStreetAddress";
 
@@ -12,23 +16,30 @@ describe("Lookup Street Address", () => {
   });
 
   it("retrieve Street and Addresse from query ''", async () => {
-    const expectedStreeAndAddresses: Location[] = [
+    const location: Location = {
+      id: "123",
+      address: {
+        streetNumberAndAddress: "1 rue de la gare",
+        departmentCode: "75001",
+        city: "Paris",
+        postcode: "75",
+      },
+      position: {
+        lat: 1111,
+        lon: 1111,
+      },
+    };
+    const expectedStreetAndAddresses: AddressWithCountryCodeAndPosition[] = [
       {
-        id: "123",
+        ...location,
         address: {
-          streetNumberAndAddress: "1 rue de la gare",
-          departmentCode: "75001",
-          city: "Paris",
-          postcode: "75",
-        },
-        position: {
-          lat: 1111,
-          lon: 1111,
+          ...location.address,
+          countryCode: "FR",
         },
       },
     ];
     addressApiGateway.setNextLookupStreetAndAddresses([
-      expectedStreeAndAddresses,
+      expectedStreetAndAddresses,
     ]);
 
     const lookupStreetAddressQuery: WithLookupAddressQueryParams = {
@@ -36,7 +47,7 @@ describe("Lookup Street Address", () => {
       countryCode: "FR",
     };
     expect(await useCase.execute(lookupStreetAddressQuery)).toEqual(
-      expectedStreeAndAddresses,
+      expectedStreetAndAddresses,
     );
   });
 });

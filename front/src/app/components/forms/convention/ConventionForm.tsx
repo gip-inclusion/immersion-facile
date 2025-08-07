@@ -441,7 +441,10 @@ export const ConventionForm = ({
       dispatch(
         geocodingSlice.actions.selectSuggestionRequested({
           item: {
-            address: defaultValues.signatories.beneficiary.address,
+            address: {
+              ...defaultValues.signatories.beneficiary.address,
+              countryCode: establishmentAddressCountryCode ?? "FR",
+            },
             position: { lat: 0, lon: 0 },
           },
           locator: "convention-beneficiary-address",
@@ -600,6 +603,7 @@ export const ConventionForm = ({
                       setValue("immersionAddress", "");
                     }}
                     disabled={isFetchingSiret}
+                    initialInputValue={getValues("immersionAddress")}
                     {...getFieldError("immersionAddress")}
                   />
                   <ScheduleSection />

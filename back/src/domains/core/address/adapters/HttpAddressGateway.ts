@@ -1,14 +1,15 @@
 import Bottleneck from "bottleneck";
 import type { Point } from "geojson";
 import {
-  type AddressAndPosition,
-  type AddressDto,
+  type AddressDtoWithCountryCode,
+  type AddressWithCountryCodeAndPosition,
   type City,
   type DepartmentName,
   errors,
   filterNotFalsy,
   type GeoPositionDto,
   getDepartmentCodeFromDepartmentName,
+  isSupportedCountryCode,
   type LookupSearchResult,
   lookupSearchResultsSchema,
   lookupStreetAddressQueryMinLength,
@@ -19,6 +20,7 @@ import {
   type SupportedCountryCode,
 } from "shared";
 import type { HttpClient } from "shared-routes";
+
 import type { WithCache } from "../../caching-gateway/port/WithCache";
 import type { AddressGateway } from "../ports/AddressGateway";
 import type {
@@ -53,7 +55,7 @@ export class HttpAddressGateway implements AddressGateway {
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
-  ): Promise<AddressDto | undefined> {
+  ): Promise<AddressDtoWithCountryCode | undefined> {
     const { status, body } = await this.#limiter.schedule(() =>
       this.httpClient.geocoding({
         queryParams: {
@@ -68,7 +70,7 @@ export class HttpAddressGateway implements AddressGateway {
 
     if (status !== 200) return;
 
-    const addresses: AddressDto[] = body.features
+    const addresses: AddressDtoWithCountryCode[] = body.features
       .map(this.#featureToAddress)
       .filter(filterNotFalsy);
 
@@ -122,7 +124,7 @@ export class HttpAddressGateway implements AddressGateway {
   public async lookupStreetAddress(
     query: string,
     countryCode?: SupportedCountryCode,
-  ): Promise<AddressAndPosition[]> {
+  ): Promise<AddressWithCountryCodeAndPosition[]> {
     return this.#limiter
       .schedule(() => {
         if (
@@ -162,7 +164,7 @@ export class HttpAddressGateway implements AddressGateway {
 
   #toAddressAndPosition(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-  ): AddressAndPosition | undefined {
+  ): AddressWithCountryCodeAndPosition | undefined {
     const address = this.#featureToAddress(feature);
     return (
       address && {
@@ -177,7 +179,7 @@ export class HttpAddressGateway implements AddressGateway {
 
   #featureToAddress(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-  ): AddressDto | undefined {
+  ): AddressDtoWithCountryCode | undefined {
     const components = feature.properties.components;
     const city = getCityFromAliases(components);
     const postcode = getPostcodeFromAliases(components);
@@ -198,8 +200,19 @@ export class HttpAddressGateway implements AddressGateway {
         postcode,
         departmentCode,
         city,
+        countryCode: this.#toSupportedCountryCode(components.country_code),
       }
     );
+  }
+
+  #toSupportedCountryCode(
+    countryCode: string | undefined,
+  ): SupportedCountryCode {
+    const capitalizedCountryCode = (countryCode ?? "").toUpperCase();
+    if (isSupportedCountryCode(capitalizedCountryCode)) {
+      return capitalizedCountryCode;
+    }
+    return "FR";
   }
 }
 

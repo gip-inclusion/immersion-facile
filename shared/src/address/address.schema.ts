@@ -8,6 +8,8 @@ import {
 import {
   type AddressAndPosition,
   type AddressDto,
+  type AddressDtoWithCountryCode,
+  type AddressWithCountryCodeAndPosition,
   type DepartmentCode,
   type LookupSearchResult,
   supportedCountryCodes,
@@ -29,6 +31,9 @@ export const addressSchema: z.Schema<AddressDto> = z.object(
   },
 );
 
+export const addressWithCountryCodeSchema: z.Schema<AddressDtoWithCountryCode> =
+  addressSchema.and(z.object({ countryCode: z.enum(supportedCountryCodes) }));
+
 export const lookupSearchResultSchema: z.Schema<LookupSearchResult> = z.object({
   label: z.string(),
   position: geoPositionSchema,
@@ -44,8 +49,14 @@ export const addressAndPositionSchema: z.Schema<AddressAndPosition> = z.object(
   },
 );
 
-export const addressAndPositionListSchema: z.ZodSchema<AddressAndPosition[]> =
-  z.array(addressAndPositionSchema);
+export const addressWithCountryCodeAndPositionSchema = z.object({
+  address: addressWithCountryCodeSchema,
+  position: geoPositionSchema,
+});
+
+export const addressWithCountryCodeAndPositionListSchema: z.Schema<
+  AddressWithCountryCodeAndPosition[]
+> = z.array(addressWithCountryCodeAndPositionSchema);
 
 export const lookupSearchResultsSchema: z.ZodSchema<LookupSearchResult[]> =
   z.array(lookupSearchResultSchema);

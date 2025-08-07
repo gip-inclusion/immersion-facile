@@ -54,6 +54,7 @@ export type OpenCageDataAddressComponents = {
   city?: string;
   county?: string;
   county_code?: string;
+  country_code?: string;
   department?: string;
   footway?: string;
   house_number?: string;

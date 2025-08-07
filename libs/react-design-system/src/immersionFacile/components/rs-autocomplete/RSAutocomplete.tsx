@@ -71,7 +71,11 @@ export const RSAutocomplete = <T, L>({
         inputId={selectProps?.inputId}
         filterOption={() => true}
         classNames={{
-          input: () => fr.cx("fr-input", { "fr-input--error": hasError }),
+          input: () =>
+            cx(
+              fr.cx("fr-input", { "fr-input--error": hasError }),
+              Styles.input,
+            ),
           menu: () => cx(fr.cx("fr-menu", "fr-p-0", "fr-m-0"), Styles.menu),
           menuList: () =>
             cx(fr.cx("fr-menu__list", "fr-mb-0"), Styles.menuList),
@@ -95,8 +99,7 @@ export const RSAutocomplete = <T, L>({
         noOptionsMessage={
           selectProps?.noOptionsMessage ||
           (({ inputValue }) => {
-            if (inputValue.length < 3)
-              return <>Saisissez au moins 3 caractères</>;
+            if (inputValue.length < 3) return "Saisissez au moins 3 caractères";
             if (selectProps?.isLoading || selectProps?.isDebouncing)
               return selectProps?.loadingMessage ? (
                 selectProps.loadingMessage({ inputValue })

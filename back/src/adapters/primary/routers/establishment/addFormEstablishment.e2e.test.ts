@@ -74,6 +74,7 @@ describe("Add form establishment", () => {
               streetNumberAndAddress: "10 avenue des Champs Elysées",
               postcode: "75008",
               departmentCode: "75",
+              countryCode: "FR",
             },
           },
         ],

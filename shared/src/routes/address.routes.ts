@@ -1,6 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import {
-  addressAndPositionListSchema,
+  addressWithCountryCodeAndPositionListSchema,
   lookupSearchResultsSchema,
   withLookupLocationInputQueryParamsSchema,
   withLookupStreetAddressQueryParamsSchema,
@@ -22,7 +22,7 @@ export const addressRoutes = defineRoutes({
     url: "/address/lookupStreetAddress",
     queryParamsSchema: withLookupStreetAddressQueryParamsSchema,
     responses: {
-      200: addressAndPositionListSchema,
+      200: addressWithCountryCodeAndPositionListSchema,
       400: httpErrorSchema,
     },
   }),

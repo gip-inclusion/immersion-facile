@@ -11,7 +11,10 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { geocodingSlice } from "./geocoding.slice";
+import {
+  type AddressAutocompleteLocator,
+  geocodingSlice,
+} from "./geocoding.slice";
 
 type GeocodingAction = ActionOfSlice<typeof geocodingSlice>;
 
@@ -74,6 +77,15 @@ export const geocodingRequestEpic: AppEpic<GeocodingAction> = (
 const geocodingFromSiretInfoEpic: AppEpic<GeocodingAction> = (action$) =>
   action$.pipe(
     filter(siretSlice.actions.siretInfoSucceeded.match),
+    filter(
+      (
+        action,
+      ): action is typeof action & {
+        payload: {
+          addressAutocompleteLocator: AddressAutocompleteLocator;
+        };
+      } => action.payload.addressAutocompleteLocator !== null,
+    ),
     map((action) => {
       return geocodingSlice.actions.fetchSuggestionsRequested({
         locator: action.payload.addressAutocompleteLocator,

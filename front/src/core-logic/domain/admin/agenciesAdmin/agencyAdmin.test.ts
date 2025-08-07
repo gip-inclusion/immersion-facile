@@ -457,6 +457,7 @@ describe("agencyAdmin", () => {
           postcode: "12345",
           departmentCode: "CA",
           city: "Los Angeles",
+          countryCode: "US",
         },
         position: {
           lat: 48.866667,

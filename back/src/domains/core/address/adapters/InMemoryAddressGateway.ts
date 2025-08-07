@@ -1,6 +1,6 @@
 import {
-  type AddressAndPosition,
-  type AddressDto,
+  type AddressDtoWithCountryCode,
+  type AddressWithCountryCodeAndPosition,
   errors,
   type GeoPositionDto,
   type LookupSearchResult,
@@ -9,15 +9,15 @@ import {
 import type { AddressGateway } from "../ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {
-  #address?: AddressDto;
+  #address?: AddressDtoWithCountryCode;
 
   #lookupSearchResults: LookupSearchResult[] = [];
 
-  #nextLookupStreetAndAddresses: AddressAndPosition[][] = [];
+  #nextLookupStreetAndAddresses: AddressWithCountryCodeAndPosition[][] = [];
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
-  ): Promise<AddressDto | undefined> {
+  ): Promise<AddressDtoWithCountryCode | undefined> {
     if (position.lat === 1111 && position.lon === 1111)
       throw errors.generic.fakeError("getAddressFromPosition fake error");
     return this.#address;
@@ -32,7 +32,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   public async lookupStreetAddress(
     _query: string,
     _countryCode: SupportedCountryCode,
-  ): Promise<AddressAndPosition[]> {
+  ): Promise<AddressWithCountryCodeAndPosition[]> {
     const nextLookupStreetAndAddresses =
       this.#nextLookupStreetAndAddresses.shift();
     if (!nextLookupStreetAndAddresses)
@@ -43,7 +43,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   }
 
   public setNextLookupStreetAndAddresses(
-    nextLookupStreetAndAddresses: AddressAndPosition[][],
+    nextLookupStreetAndAddresses: AddressWithCountryCodeAndPosition[][],
   ) {
     this.#nextLookupStreetAndAddresses = nextLookupStreetAndAddresses;
   }
@@ -53,42 +53,47 @@ export class InMemoryAddressGateway implements AddressGateway {
   }
 
   // for test purposes only
-  public setNextAddress(address: AddressDto | undefined) {
+  public setNextAddress(address: AddressDtoWithCountryCode | undefined) {
     this.#address = address;
   }
 }
 
-export const rueJacquardDto: AddressDto = {
+export const rueJacquardDto: AddressDtoWithCountryCode = {
   streetNumberAndAddress: "2 RUE JACQUARD",
   postcode: "69120",
   city: "VAULX-EN-VELIN",
   departmentCode: "69",
+  countryCode: "FR",
 };
 
-export const rueGuillaumeTellDto: AddressDto = {
+export const rueGuillaumeTellDto: AddressDtoWithCountryCode = {
   streetNumberAndAddress: "7 rue guillaume tell",
   postcode: "75017",
   city: "Paris",
   departmentCode: "75",
+  countryCode: "FR",
 };
 
-export const rueBitcheDto: AddressDto = {
+export const rueBitcheDto: AddressDtoWithCountryCode = {
   streetNumberAndAddress: "4 rue de Bitche",
   postcode: "44000",
   city: "Nantes",
   departmentCode: "44",
+  countryCode: "FR",
 };
 
-export const rueSaintHonoreDto: AddressDto = {
+export const rueSaintHonoreDto: AddressDtoWithCountryCode = {
   streetNumberAndAddress: "55 rue de Faubourg Saint Honoré",
   postcode: "75008",
   city: "Paris",
   departmentCode: "75",
+  countryCode: "FR",
 };
 
-export const avenueChampsElyseesDto: AddressDto = {
+export const avenueChampsElyseesDto: AddressDtoWithCountryCode = {
   streetNumberAndAddress: "30 avenue des champs Elysées",
   departmentCode: "75",
   city: "Paris",
   postcode: "75017",
+  countryCode: "FR",
 };
