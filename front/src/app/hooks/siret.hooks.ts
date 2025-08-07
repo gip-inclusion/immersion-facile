@@ -34,7 +34,7 @@ export const useSiretRelatedField = <K extends keyof SiretEstablishmentDto>(
 
 type SiretFetcherOptions = {
   shouldFetchEvenIfAlreadySaved: boolean;
-  addressAutocompleteLocator: AddressAutocompleteLocator;
+  addressAutocompleteLocator: AddressAutocompleteLocator | null;
 };
 
 export const useSiretFetcher = ({

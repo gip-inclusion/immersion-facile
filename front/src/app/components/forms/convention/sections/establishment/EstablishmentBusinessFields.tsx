@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { useRef } from "react";
 
 import { useFormContext, useWatch } from "react-hook-form";
 import type { ConventionDto } from "shared";
@@ -13,6 +14,12 @@ import {
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 export const EstablishmentBusinessFields = (): JSX.Element => {
+  const { getValues, register, control, setValue } =
+    useFormContext<ConventionDto>();
+  const values = getValues();
+  const shouldUpdateImmersionAddress = useRef(
+    values.status === "READY_TO_SIGN" && values.immersionAddress === "",
+  );
   const {
     currentSiret,
     updateSiret,
@@ -21,23 +28,18 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
     isFetchingSiret,
   } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
-    addressAutocompleteLocator: "convention-immersion-address",
+    addressAutocompleteLocator: shouldUpdateImmersionAddress.current
+      ? "convention-immersion-address"
+      : null,
   });
   const convention = useAppSelector(conventionSelectors.convention);
-  const { getValues, register, control, setValue } =
-    useFormContext<ConventionDto>();
-  const values = getValues();
-  const isSiretFetcherEnabled =
-    values.status === "READY_TO_SIGN" && values.immersionAddress === "";
-
-  const isSiretFetcherDisabled = !isSiretFetcherEnabled;
 
   useSiretRelatedField("businessName", {
     disabled: false, // the input is always disabled, so we can safely update businessName from siret
   });
   useSiretRelatedField("businessAddress", {
     fieldToUpdate: "immersionAddress",
-    disabled: isSiretFetcherDisabled,
+    disabled: !shouldUpdateImmersionAddress.current,
   });
 
   const siretValueOnForm = useWatch({ control, name: "siret" });

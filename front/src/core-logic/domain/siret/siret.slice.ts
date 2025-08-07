@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   type GetSiretInfoError,
-  getCountrycodeFromAddress,
+  getCountryCodeFromAddress,
   type SiretDto,
   type SiretEstablishmentDto,
   type SupportedCountryCode,
@@ -38,7 +38,7 @@ export const siretSlice = createSlice({
       state,
       action: PayloadAction<{
         shouldFetchEvenIfAlreadySaved: boolean;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
       }>,
     ) => {
       state.shouldFetchEvenIfAlreadySaved =
@@ -48,7 +48,7 @@ export const siretSlice = createSlice({
       state,
       action: PayloadActionWithFeedbackTopic<{
         siret: SiretDto;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
       }>,
     ) => {
       state.currentSiret = action.payload.siret;
@@ -62,7 +62,7 @@ export const siretSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{
         siret: SiretDto;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
       }>,
     ) => {
       state.isSearching = true;
@@ -71,13 +71,13 @@ export const siretSlice = createSlice({
       state,
       action: PayloadActionWithFeedbackTopic<{
         siretEstablishment: SiretEstablishmentDto;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
         countryCode: SupportedCountryCode;
       }>,
     ) => {
       state.isSearching = false;
       state.establishment = action.payload.siretEstablishment;
-      state.countryCode = getCountrycodeFromAddress(
+      state.countryCode = getCountryCodeFromAddress(
         action.payload.siretEstablishment.businessAddress,
       );
     },

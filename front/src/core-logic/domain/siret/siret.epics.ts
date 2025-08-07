@@ -2,7 +2,7 @@ import { filter, map, type Observable, switchMap } from "rxjs";
 import {
   type GetSiretInfo,
   type GetSiretInfoError,
-  getCountrycodeFromAddress,
+  getCountryCodeFromAddress,
   type SiretDto,
   siretSchema,
 } from "shared";
@@ -66,7 +66,7 @@ const getSiretEpic: SiretEpic = (
                 feedbackTopic: action.payload.feedbackTopic,
                 addressAutocompleteLocator:
                   action.payload.addressAutocompleteLocator,
-                countryCode: getCountrycodeFromAddress(
+                countryCode: getCountryCodeFromAddress(
                   siretResult.businessAddress,
                 ),
               });
