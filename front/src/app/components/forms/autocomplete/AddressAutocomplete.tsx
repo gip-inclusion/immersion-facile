@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useState } from "react";
 import {
   RSAutocomplete,
@@ -9,9 +8,7 @@ import { useDispatch } from "react-redux";
 import {
   type AddressWithCountryCodeAndPosition,
   addressDtoToString,
-  countryCodesData,
   defaultCountryCode,
-  getCountryCodeFromAddress,
   type SupportedCountryCode,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -27,7 +24,6 @@ export type AddressAutocompleteProps = RSAutocompleteComponentProps<
   AddressAutocompleteLocator
 > & {
   countryCode?: SupportedCountryCode;
-  withCountrySelect?: boolean;
 };
 
 const useAddressAutocomplete = (locator: AddressAutocompleteLocator) => {
@@ -55,15 +51,12 @@ export const AddressAutocomplete = ({
   onAddressClear,
   onAddressSelected,
   multiple,
-  countryCode,
-  withCountrySelect = false,
+  countryCode = defaultCountryCode,
   initialInputValue,
   ...props
 }: AddressAutocompleteProps) => {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
-  const [selectedCountryCode, setSelectedCountryCode] =
-    useState<SupportedCountryCode | null>(null);
 
   const { value, options, isSearching, isDebouncing } = useAddressAutocomplete(
     props.locator,
@@ -71,64 +64,8 @@ export const AddressAutocomplete = ({
 
   const inputValue = searchTerm ?? initialInputValue;
 
-  const countryOptions = Object.entries(countryCodesData).map(
-    ([code, { name, flag }]) => ({
-      value: code as SupportedCountryCode,
-      label: `${flag} ${name}`,
-    }),
-  );
-
-  const getSelectedCountryCode = () => {
-    const countryCodeFromAddressValue = inputValue
-      ? getCountryCodeFromAddress(inputValue)
-      : null;
-    if (countryCodeFromAddressValue) {
-      return countryCodeFromAddressValue;
-    }
-    return selectedCountryCode ?? countryCode;
-  };
-
-  //biome-ignore lint/suspicious/noConsole: <explanation>
-  console.log("searchTerm", searchTerm);
-
   return (
     <div className={fr.cx("fr-mb-2w")}>
-      {withCountrySelect && (
-        <div className={fr.cx("fr-mb-2w")}>
-          <Select
-            label="Pays où se déroulera l'immersion"
-            options={countryOptions}
-            nativeSelectProps={{
-              value: getSelectedCountryCode(),
-              onChange: (event) => {
-                const newCountryCode = event.currentTarget
-                  .value as SupportedCountryCode;
-                setSelectedCountryCode(newCountryCode);
-                setSearchTerm("");
-                dispatch(
-                  geocodingSlice.actions.emptyQueryRequested({
-                    locator: props.locator,
-                  }),
-                );
-                dispatch(
-                  geocodingSlice.actions.clearLocatorDataRequested({
-                    locator: props.locator,
-                    multiple,
-                  }),
-                );
-                onAddressClear();
-                dispatch(
-                  geocodingSlice.actions.changeQueryRequested({
-                    locator: props.locator,
-                    lookup: "",
-                    countryCode: newCountryCode,
-                  }),
-                );
-              },
-            }}
-          />
-        </div>
-      )}
       <RSAutocomplete
         {...props}
         selectProps={{
@@ -189,10 +126,7 @@ export const AddressAutocomplete = ({
                 geocodingSlice.actions.changeQueryRequested({
                   locator: props.locator,
                   lookup: newQuery,
-                  countryCode:
-                    withCountrySelect && selectedCountryCode
-                      ? selectedCountryCode
-                      : defaultCountryCode,
+                  countryCode,
                 }),
               );
             }
