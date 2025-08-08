@@ -75,7 +75,15 @@ describe("discussion e2e", () => {
     ];
 
     gateways.addressApi.setNextLookupStreetAndAddresses([
-      [updatedAddress1.addressAndPosition],
+      [
+        {
+          address: {
+            ...updatedAddress1.addressAndPosition.address,
+            countryCode: "FR",
+          },
+          position: updatedAddress1.addressAndPosition.position,
+        },
+      ],
     ]);
     gateways.timeGateway.defaultDate = new Date();
 

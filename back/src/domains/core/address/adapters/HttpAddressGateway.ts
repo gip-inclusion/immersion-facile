@@ -1,14 +1,16 @@
 import Bottleneck from "bottleneck";
 import type { Point } from "geojson";
 import {
-  type AddressAndPosition,
-  type AddressDto,
+  type AddressDtoWithCountryCode,
+  type AddressWithCountryCodeAndPosition,
   type City,
   type DepartmentName,
+  defaultCountryCode,
   errors,
   filterNotFalsy,
   type GeoPositionDto,
-  getDepartmentCodeFromDepartmentNameOrCity,
+  getDepartmentCodeFromDepartmentName,
+  isSupportedCountryCode,
   type LookupSearchResult,
   lookupSearchResultsSchema,
   lookupStreetAddressQueryMinLength,
@@ -16,8 +18,10 @@ import {
   type OpenCageGeoSearchKey,
   type Postcode,
   type StreetNumberAndAddress,
+  type SupportedCountryCode,
 } from "shared";
 import type { HttpClient } from "shared-routes";
+
 import type { WithCache } from "../../caching-gateway/port/WithCache";
 import type { AddressGateway } from "../ports/AddressGateway";
 import type {
@@ -52,7 +56,7 @@ export class HttpAddressGateway implements AddressGateway {
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
-  ): Promise<AddressDto | undefined> {
+  ): Promise<AddressDtoWithCountryCode | undefined> {
     const { status, body } = await this.#limiter.schedule(() =>
       this.httpClient.geocoding({
         queryParams: {
@@ -67,7 +71,7 @@ export class HttpAddressGateway implements AddressGateway {
 
     if (status !== 200) return;
 
-    const addresses: AddressDto[] = body.features
+    const addresses: AddressDtoWithCountryCode[] = body.features
       .map(this.#featureToAddress)
       .filter(filterNotFalsy);
 
@@ -102,7 +106,8 @@ export class HttpAddressGateway implements AddressGateway {
               },
               mode: "cors",
               queryParams: {
-                countrycode: "fr",
+                countrycode:
+                  this.#toOpenCageCountryCodeParam(defaultCountryCode),
                 language,
                 limit: "10",
                 q: cachedQuery,
@@ -120,7 +125,8 @@ export class HttpAddressGateway implements AddressGateway {
 
   public async lookupStreetAddress(
     query: string,
-  ): Promise<AddressAndPosition[]> {
+    countryCode?: SupportedCountryCode,
+  ): Promise<AddressWithCountryCodeAndPosition[]> {
     return this.#limiter
       .schedule(() => {
         if (
@@ -133,7 +139,9 @@ export class HttpAddressGateway implements AddressGateway {
 
         return this.httpClient.geocoding({
           queryParams: {
-            countrycode: franceAndAttachedTerritoryCountryCodes,
+            ...(countryCode && {
+              countrycode: this.#toOpenCageCountryCodeParam(countryCode),
+            }),
             key: this.geocodingApiKey,
             language,
             q: query,
@@ -148,9 +156,17 @@ export class HttpAddressGateway implements AddressGateway {
       });
   }
 
+  #toOpenCageCountryCodeParam(
+    countryCode: SupportedCountryCode | undefined,
+  ): string | undefined {
+    if (!countryCode) return undefined;
+
+    return countryCode.toLowerCase();
+  }
+
   #toAddressAndPosition(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-  ): AddressAndPosition | undefined {
+  ): AddressWithCountryCodeAndPosition | undefined {
     const address = this.#featureToAddress(feature);
     return (
       address && {
@@ -165,15 +181,14 @@ export class HttpAddressGateway implements AddressGateway {
 
   #featureToAddress(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-  ): AddressDto | undefined {
+  ): AddressDtoWithCountryCode | undefined {
     const components = feature.properties.components;
     const city = getCityFromAliases(components);
     const postcode = getPostcodeFromAliases(components);
     const departmentName = getDepartmentNameFromAliases(components);
     // OpenCageData gives the department name but not the code.
     const departmentCode =
-      departmentName &&
-      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
+      departmentName && getDepartmentCodeFromDepartmentName(departmentName);
     const streetNumberAndAddress = makeStreetNumberAndAddress(
       getStreetNumberFromAliases(components),
       getStreetNameFromAliases(components),
@@ -187,8 +202,19 @@ export class HttpAddressGateway implements AddressGateway {
         postcode,
         departmentCode,
         city,
+        countryCode: this.#toSupportedCountryCode(components.country_code),
       }
     );
+  }
+
+  #toSupportedCountryCode(
+    countryCode: string | undefined,
+  ): SupportedCountryCode {
+    const capitalizedCountryCode = (countryCode ?? "").toUpperCase();
+    if (isSupportedCountryCode(capitalizedCountryCode)) {
+      return capitalizedCountryCode;
+    }
+    return "FR";
   }
 }
 

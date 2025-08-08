@@ -1,8 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type {
-  GetSiretInfoError,
-  SiretDto,
-  SiretEstablishmentDto,
+import {
+  type GetSiretInfoError,
+  getCountryCodeFromAddress,
+  type SiretDto,
+  type SiretEstablishmentDto,
+  type SupportedCountryCode,
 } from "shared";
 import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import type { AddressAutocompleteLocator } from "src/core-logic/domain/geocoding/geocoding.slice";
@@ -16,6 +18,7 @@ export interface SiretState {
   shouldFetchEvenIfAlreadySaved: boolean;
   establishment: SiretEstablishmentDto | null;
   error: GetSiretInfoError | InvalidSiretError | null;
+  countryCode: SupportedCountryCode | null;
 }
 
 const initialState: SiretState = {
@@ -24,6 +27,7 @@ const initialState: SiretState = {
   shouldFetchEvenIfAlreadySaved: true,
   establishment: null,
   error: null,
+  countryCode: null,
 };
 
 export const siretSlice = createSlice({
@@ -34,7 +38,7 @@ export const siretSlice = createSlice({
       state,
       action: PayloadAction<{
         shouldFetchEvenIfAlreadySaved: boolean;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
       }>,
     ) => {
       state.shouldFetchEvenIfAlreadySaved =
@@ -44,7 +48,7 @@ export const siretSlice = createSlice({
       state,
       action: PayloadActionWithFeedbackTopic<{
         siret: SiretDto;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
       }>,
     ) => {
       state.currentSiret = action.payload.siret;
@@ -58,7 +62,7 @@ export const siretSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{
         siret: SiretDto;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
       }>,
     ) => {
       state.isSearching = true;
@@ -67,11 +71,15 @@ export const siretSlice = createSlice({
       state,
       action: PayloadActionWithFeedbackTopic<{
         siretEstablishment: SiretEstablishmentDto;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
+        addressAutocompleteLocator: AddressAutocompleteLocator | null;
+        countryCode: SupportedCountryCode;
       }>,
     ) => {
       state.isSearching = false;
       state.establishment = action.payload.siretEstablishment;
+      state.countryCode = getCountryCodeFromAddress(
+        action.payload.siretEstablishment.businessAddress,
+      );
     },
     siretInfoDisabledAndNoMatchInDbFound: (
       state,

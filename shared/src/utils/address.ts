@@ -1,5 +1,10 @@
 import { keys, trim } from "ramda";
-import type { AddressDto } from "../address/address.dto";
+import {
+  type AddressDto,
+  type AddressDtoWithCountryCode,
+  countryCodeToCountryName,
+  isAddressDtoWithCountryCode,
+} from "../address/address.dto";
 
 export interface CaptureAddressGroupsResult {
   address: string;
@@ -48,10 +53,12 @@ export const inferDepartmentCode = (postcode: string): string => {
   return postcode.slice(0, 2);
 };
 
-export const addressDtoToString = (address: AddressDto): string =>
+export const addressDtoToString = (
+  address: AddressDto | AddressDtoWithCountryCode,
+): string =>
   address.streetNumberAndAddress === address.city
     ? `${address.postcode} ${address.city}`
-    : `${address.streetNumberAndAddress} ${address.postcode} ${address.city}`;
+    : `${address.streetNumberAndAddress} ${address.postcode} ${address.city}${isAddressDtoWithCountryCode(address) ? `, ${countryCodeToCountryName(address.countryCode)}` : ""}`;
 
 export const addressStringToDto = (address: string): AddressDto => {
   const addressGroups = captureAddressGroups(address);

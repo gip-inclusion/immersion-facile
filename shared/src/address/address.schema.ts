@@ -1,13 +1,16 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
-import type {
-  AddressAndPosition,
-  AddressDto,
-  DepartmentCode,
-  LookupSearchResult,
-  WithLookupAddressQueryParams,
-  WithLookupLocationInputQueryParams,
+import {
+  type AddressAndPosition,
+  type AddressDto,
+  type AddressDtoWithCountryCode,
+  type AddressWithCountryCodeAndPosition,
+  type DepartmentCode,
+  type LookupSearchResult,
+  supportedCountryCodes,
+  type WithLookupAddressQueryParams,
+  type WithLookupLocationInputQueryParams,
 } from "./address.dto";
 
 export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
@@ -19,6 +22,9 @@ export const addressSchema: z.Schema<AddressDto> = z.object({
   city: zStringMinLength1,
 });
 
+export const addressWithCountryCodeSchema: z.Schema<AddressDtoWithCountryCode> =
+  addressSchema.and(z.object({ countryCode: z.enum(supportedCountryCodes) }));
+
 export const lookupSearchResultSchema: z.Schema<LookupSearchResult> = z.object({
   label: z.string(),
   position: geoPositionSchema,
@@ -29,8 +35,14 @@ export const addressAndPositionSchema: z.Schema<AddressAndPosition> = z.object({
   position: geoPositionSchema,
 });
 
-export const addressAndPositionListSchema: z.ZodSchema<AddressAndPosition[]> =
-  z.array(addressAndPositionSchema);
+export const addressWithCountryCodeAndPositionSchema = z.object({
+  address: addressWithCountryCodeSchema,
+  position: geoPositionSchema,
+});
+
+export const addressWithCountryCodeAndPositionListSchema: z.Schema<
+  AddressWithCountryCodeAndPosition[]
+> = z.array(addressWithCountryCodeAndPositionSchema);
 
 export const lookupSearchResultsSchema: z.ZodSchema<LookupSearchResult[]> =
   z.array(lookupSearchResultSchema);
@@ -57,6 +69,7 @@ export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddres
         (arg) => arg.split(" ").length <= lookupStreetAddressQueryMaxWordLength,
         "String must contain a maximum of 18 words",
       ),
+    countryCode: z.enum(supportedCountryCodes),
   });
 
 export const withLookupLocationInputQueryParamsSchema: z.Schema<WithLookupLocationInputQueryParams> =

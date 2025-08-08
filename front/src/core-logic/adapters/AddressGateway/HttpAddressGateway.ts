@@ -1,10 +1,11 @@
 import { from, type Observable } from "rxjs";
 import type {
-  AddressAndPosition,
   AddressRoutes,
+  AddressWithCountryCodeAndPosition,
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
+  SupportedCountryCode,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -25,16 +26,19 @@ export class HttpAddressGateway implements AddressGateway {
 
   public lookupStreetAddress$(
     lookup: LookupAddress,
-  ): Observable<AddressAndPosition[]> {
-    return from(this.#lookupStreetAddress(lookup));
+    countryCode: SupportedCountryCode,
+  ): Observable<AddressWithCountryCodeAndPosition[]> {
+    return from(this.#lookupStreetAddress(lookup, countryCode));
   }
 
   async #lookupStreetAddress(
     lookup: LookupAddress,
-  ): Promise<AddressAndPosition[]> {
+    countryCode: SupportedCountryCode,
+  ): Promise<AddressWithCountryCodeAndPosition[]> {
     const response = await this.httpClient.lookupStreetAddress({
       queryParams: {
         lookup,
+        countryCode,
       },
     });
 

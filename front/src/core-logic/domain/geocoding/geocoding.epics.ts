@@ -11,7 +11,10 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { geocodingSlice } from "./geocoding.slice";
+import {
+  type AddressAutocompleteLocator,
+  geocodingSlice,
+} from "./geocoding.slice";
 
 type GeocodingAction = ActionOfSlice<typeof geocodingSlice>;
 
@@ -39,6 +42,7 @@ const geocodingQueryEpic: AppEpic<GeocodingAction> = (
       geocodingSlice.actions.fetchSuggestionsRequested({
         locator: action.payload.locator,
         lookup: action.payload.lookup,
+        countryCode: action.payload.countryCode,
         selectFirstSuggestion: false,
       }),
     ),
@@ -52,32 +56,44 @@ export const geocodingRequestEpic: AppEpic<GeocodingAction> = (
   action$.pipe(
     filter(geocodingSlice.actions.fetchSuggestionsRequested.match),
     mergeMap((action) =>
-      addressGateway.lookupStreetAddress$(action.payload.lookup).pipe(
-        map((suggestions) => ({
-          suggestions,
-          selectFirstSuggestion: action.payload.selectFirstSuggestion,
-          locator: action.payload.locator,
-        })),
-        map(geocodingSlice.actions.fetchSuggestionsSucceeded),
-        catchEpicError(() =>
-          geocodingSlice.actions.fetchSuggestionsFailed({
+      addressGateway
+        .lookupStreetAddress$(action.payload.lookup, action.payload.countryCode)
+        .pipe(
+          map((suggestions) => ({
+            suggestions,
+            selectFirstSuggestion: action.payload.selectFirstSuggestion,
             locator: action.payload.locator,
-          }),
+          })),
+          map(geocodingSlice.actions.fetchSuggestionsSucceeded),
+          catchEpicError(() =>
+            geocodingSlice.actions.fetchSuggestionsFailed({
+              locator: action.payload.locator,
+            }),
+          ),
         ),
-      ),
     ),
   );
 
 const geocodingFromSiretInfoEpic: AppEpic<GeocodingAction> = (action$) =>
   action$.pipe(
     filter(siretSlice.actions.siretInfoSucceeded.match),
-    map((action) =>
-      geocodingSlice.actions.fetchSuggestionsRequested({
+    filter(
+      (
+        action,
+      ): action is typeof action & {
+        payload: {
+          addressAutocompleteLocator: AddressAutocompleteLocator;
+        };
+      } => action.payload.addressAutocompleteLocator !== null,
+    ),
+    map((action) => {
+      return geocodingSlice.actions.fetchSuggestionsRequested({
         locator: action.payload.addressAutocompleteLocator,
         lookup: action.payload.siretEstablishment.businessAddress,
         selectFirstSuggestion: true,
-      }),
-    ),
+        countryCode: action.payload.countryCode,
+      });
+    }),
   );
 
 export const geocodingEpics = [

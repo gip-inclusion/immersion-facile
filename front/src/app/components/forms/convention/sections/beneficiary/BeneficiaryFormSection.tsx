@@ -233,6 +233,7 @@ export const BeneficiaryFormSection = ({
           nativeInputProps: {
             ...register("signatories.beneficiary.phone"),
             id: formContents["signatories.beneficiary.phone"].id,
+            value: values.signatories.beneficiary.phone,
           },
         }}
         onPhoneNumberChange={(phoneNumber) => {
@@ -243,6 +244,7 @@ export const BeneficiaryFormSection = ({
       {values.internshipKind === "mini-stage-cci" && (
         <>
           <AddressAutocomplete
+            countryCode="FR"
             locator="convention-beneficiary-address"
             {...formContents["signatories.beneficiary.address"]}
             initialInputValue={

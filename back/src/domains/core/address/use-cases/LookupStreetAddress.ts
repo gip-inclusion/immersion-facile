@@ -1,5 +1,5 @@
 import {
-  type AddressAndPosition,
+  type AddressWithCountryCodeAndPosition,
   type ConventionJwtPayload,
   type WithLookupAddressQueryParams,
   withLookupStreetAddressQueryParamsSchema,
@@ -9,7 +9,7 @@ import type { AddressGateway } from "../ports/AddressGateway";
 
 export class LookupStreetAddress extends UseCase<
   WithLookupAddressQueryParams,
-  AddressAndPosition[]
+  AddressWithCountryCodeAndPosition[]
 > {
   protected inputSchema = withLookupStreetAddressQueryParamsSchema;
 
@@ -20,7 +20,10 @@ export class LookupStreetAddress extends UseCase<
   protected _execute(
     params: WithLookupAddressQueryParams,
     _jwtPayload?: ConventionJwtPayload | undefined,
-  ): Promise<AddressAndPosition[]> {
-    return this.addressApiGateway.lookupStreetAddress(params.lookup);
+  ): Promise<AddressWithCountryCodeAndPosition[]> {
+    return this.addressApiGateway.lookupStreetAddress(
+      params.lookup,
+      params.countryCode,
+    );
   }
 }

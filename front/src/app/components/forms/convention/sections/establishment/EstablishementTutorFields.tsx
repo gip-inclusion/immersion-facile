@@ -2,7 +2,11 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { useFormContext } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { type ConventionReadDto, toLowerCaseWithoutDiacritics } from "shared";
+import {
+  type ConventionReadDto,
+  defaultCountryCode,
+  toLowerCaseWithoutDiacritics,
+} from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import type {
   EmailValidationErrorsState,
@@ -35,6 +39,8 @@ export const EstablishementTutorFields = ({
   );
   const formContents = getFormFields();
   const isFetchingSiret = useSelector(siretSelectors.isFetching);
+  const countryFromSiret = useSelector(siretSelectors.countryCode);
+
   return (
     <>
       {!isTutorEstablishmentRepresentative && (
@@ -67,6 +73,7 @@ export const EstablishementTutorFields = ({
               nativeInputProps: {
                 ...register("establishmentTutor.phone"),
                 id: formContents["establishmentTutor.phone"].id,
+                value: values.establishmentTutor?.phone,
               },
             }}
             onPhoneNumberChange={(phoneNumber) => {
@@ -75,6 +82,7 @@ export const EstablishementTutorFields = ({
             disabled={isFetchingSiret}
             {...getFieldError("establishmentTutor.phone")}
             shouldDisplaySelect={true}
+            defaultCountryCodeValue={countryFromSiret ?? defaultCountryCode}
           />
           <EmailValidationInput
             label={formContents["establishmentTutor.email"].label}

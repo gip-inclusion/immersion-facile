@@ -1,22 +1,24 @@
 import {
-  type AddressAndPosition,
   type AddressDto,
+  type AddressDtoWithCountryCode,
+  type AddressWithCountryCodeAndPosition,
   errors,
   type GeoPositionDto,
   type LookupSearchResult,
+  type SupportedCountryCode,
 } from "shared";
 import type { AddressGateway } from "../ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {
-  #address?: AddressDto;
+  #address?: AddressDtoWithCountryCode;
 
   #lookupSearchResults: LookupSearchResult[] = [];
 
-  #nextLookupStreetAndAddresses: AddressAndPosition[][] = [];
+  #nextLookupStreetAndAddresses: AddressWithCountryCodeAndPosition[][] = [];
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
-  ): Promise<AddressDto | undefined> {
+  ): Promise<AddressDtoWithCountryCode | undefined> {
     if (position.lat === 1111 && position.lon === 1111)
       throw errors.generic.fakeError("getAddressFromPosition fake error");
     return this.#address;
@@ -30,7 +32,8 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   public async lookupStreetAddress(
     _query: string,
-  ): Promise<AddressAndPosition[]> {
+    _countryCode: SupportedCountryCode,
+  ): Promise<AddressWithCountryCodeAndPosition[]> {
     const nextLookupStreetAndAddresses =
       this.#nextLookupStreetAndAddresses.shift();
     if (!nextLookupStreetAndAddresses)
@@ -41,7 +44,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   }
 
   public setNextLookupStreetAndAddresses(
-    nextLookupStreetAndAddresses: AddressAndPosition[][],
+    nextLookupStreetAndAddresses: AddressWithCountryCodeAndPosition[][],
   ) {
     this.#nextLookupStreetAndAddresses = nextLookupStreetAndAddresses;
   }
@@ -51,7 +54,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   }
 
   // for test purposes only
-  public setNextAddress(address: AddressDto | undefined) {
+  public setNextAddress(address: AddressDtoWithCountryCode | undefined) {
     this.#address = address;
   }
 }

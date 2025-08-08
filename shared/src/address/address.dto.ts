@@ -13,7 +13,10 @@ export type DepartmentCode = Flavor<string, "DepartmentCode">;
 export type Postcode = Flavor<string, "Postcode">;
 
 export type LookupAddress = Flavor<string, "LookupAddress">;
-export type WithLookupAddressQueryParams = { lookup: LookupAddress };
+export type WithLookupAddressQueryParams = {
+  lookup: LookupAddress;
+  countryCode: SupportedCountryCode;
+};
 
 export type LookupLocationInput = Flavor<string, "LookupLocation">;
 export type WithLookupLocationInputQueryParams = { query: LookupLocationInput };
@@ -32,6 +35,10 @@ export type AddressDto = {
   city: City;
 };
 
+export type AddressDtoWithCountryCode = AddressDto & {
+  countryCode: SupportedCountryCode;
+};
+
 export type LocationId = Flavor<string, "AddressId">;
 
 export type Location = {
@@ -42,13 +49,11 @@ export type Location = {
 
 export type AddressAndPosition = Omit<Location, "id">;
 
-export type AddressAndPositionWithCountryCode = OmitFromExistingKeys<
+export type AddressWithCountryCodeAndPosition = OmitFromExistingKeys<
   AddressAndPosition,
   "address"
 > & {
-  address: AddressDto & {
-    countryCode: CountryCode;
-  };
+  address: AddressDtoWithCountryCode;
 };
 
 export const departmentNameToDepartmentCode: Record<
@@ -161,7 +166,7 @@ export const departmentNameToDepartmentCode: Record<
   "Saint-Martin": "978",
 };
 
-export const getDepartmentCodeFromDepartmentNameOrCity: Record<
+export const frenchDepartmentCodeFromDepartmentNameOrCity: Record<
   DepartmentName,
   DepartmentCode
 > = {
@@ -170,6 +175,11 @@ export const getDepartmentCodeFromDepartmentNameOrCity: Record<
   "Métropole de Lyon": "69",
   "Auvergne-Rhône-Alpes": "69",
 };
+
+export const getDepartmentCodeFromDepartmentName = (
+  departmentName: DepartmentName,
+): DepartmentCode =>
+  frenchDepartmentCodeFromDepartmentNameOrCity[departmentName] ?? "99";
 
 export class LocationBuilder implements Builder<Location> {
   constructor(
@@ -202,7 +212,7 @@ export class LocationBuilder implements Builder<Location> {
   #dto: Location;
 }
 
-const supportedCountryCodes = [
+export const supportedCountryCodes = [
   "DE",
   "AT",
   "BE",
@@ -277,6 +287,27 @@ export const countryCodesData: Record<
   CH: { name: "Suisse", flag: "🇨🇭" },
 };
 
+const countryNameToCountryCode: Record<string, SupportedCountryCode> =
+  Object.fromEntries(
+    Object.entries(countryCodesData).map(([code, { name }]) => [
+      name.toLowerCase(),
+      code as SupportedCountryCode,
+    ]),
+  );
+
+export const countryCodeToCountryName = (
+  countryCode: SupportedCountryCode,
+): string => countryCodesData[countryCode].name;
+
+export const getCountryCodeFromAddress = (
+  address: string,
+): SupportedCountryCode => {
+  if (!address) return "FR";
+  const addressSplitted = address.split(" ");
+  const maybeCountryName = addressSplitted[addressSplitted.length - 1];
+  return countryNameToCountryCode[maybeCountryName.toLowerCase()] ?? "FR";
+};
+
 export const territoriesByCountryCode: Record<
   SupportedCountryCode,
   CountryCode[]
@@ -324,3 +355,7 @@ export const isSupportedCountryCode = (
   code: string,
 ): code is SupportedCountryCode =>
   supportedCountryCodes.includes(code as SupportedCountryCode);
+
+export const isAddressDtoWithCountryCode = (
+  address: AddressDto | AddressDtoWithCountryCode,
+): address is AddressDtoWithCountryCode => "countryCode" in address;

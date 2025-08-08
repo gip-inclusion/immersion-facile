@@ -1,5 +1,6 @@
 import {
   type AddressRoutes,
+  type AddressWithCountryCodeAndPosition,
   addressRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
@@ -17,6 +18,14 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 describe("address router", () => {
   let httpClient: HttpClient<AddressRoutes>;
   let addressGateway: InMemoryAddressGateway;
+  const expectedAddressAndPositions: AddressWithCountryCodeAndPosition[] =
+    expected8bdduportAddressAndPositions.map((location) => ({
+      ...location,
+      address: {
+        ...location.address,
+        countryCode: "FR",
+      },
+    }));
 
   beforeEach(async () => {
     const { request, gateways } = await buildTestApp();
@@ -29,15 +38,16 @@ describe("address router", () => {
       addressRoutes.lookupStreetAddress,
     )} 200 with lookup="${query8bdduportLookup}"`, async () => {
       addressGateway.setNextLookupStreetAndAddresses([
-        expected8bdduportAddressAndPositions,
+        expectedAddressAndPositions,
       ]);
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: query8bdduportLookup,
+          countryCode: "FR",
         },
       });
       expectHttpResponseToEqual(response, {
-        body: expected8bdduportAddressAndPositions,
+        body: expectedAddressAndPositions,
         status: 200,
       });
     });
@@ -48,6 +58,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: "1",
+          countryCode: "FR",
         },
       });
       expectHttpResponseToEqual(response, {
@@ -69,6 +80,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: "a a a a a a a a a a a a a a a a a a a",
+          countryCode: "FR",
         },
       });
       expectHttpResponseToEqual(response, {
@@ -89,6 +101,7 @@ describe("address router", () => {
         const response = await httpClient.lookupStreetAddress({
           queryParams: {
             lookup,
+            countryCode: "FR",
           },
         });
 

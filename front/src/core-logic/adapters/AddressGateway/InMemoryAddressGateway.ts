@@ -1,9 +1,10 @@
 import { from, type Observable } from "rxjs";
 import {
-  type AddressAndPosition,
+  type AddressWithCountryCodeAndPosition,
   type LookupAddress,
   type LookupLocationInput,
   type LookupSearchResult,
+  type SupportedCountryCode,
   sleep,
 } from "shared";
 import type { AddressGateway } from "src/core-logic/ports/AddressGateway";
@@ -19,15 +20,21 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   public lookupStreetAddress$(
     lookup: LookupAddress,
-  ): Observable<AddressAndPosition[]> {
-    return from(this.#lookupStreetAddress(lookup));
+    countryCode: SupportedCountryCode,
+  ): Observable<AddressWithCountryCodeAndPosition[]> {
+    return from(this.#lookupStreetAddress(lookup, countryCode));
   }
 
   async #lookupStreetAddress(
     lookup: LookupAddress,
-  ): Promise<AddressAndPosition[]> {
+    countryCode: SupportedCountryCode,
+  ): Promise<AddressWithCountryCodeAndPosition[]> {
     // biome-ignore lint/suspicious/noConsole: <explanation>
-    console.log("InMemoryApiAddresseGateway.lookupStreetAddress", lookup);
+    console.log(
+      "InMemoryApiAddresseGateway.lookupStreetAddress",
+      lookup,
+      countryCode,
+    );
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
 
     if (lookup === "givemeanemptylistplease") return [];
@@ -40,6 +47,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           postcode: "75001",
           city: "Paris",
           departmentCode: "75",
+          countryCode: "FR",
         },
         position: { lat: 45, lon: 2 },
       },
@@ -49,6 +57,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           postcode: "75017",
           city: "Paris",
           departmentCode: "75",
+          countryCode: "FR",
         },
         position: { lat: 45.1, lon: 2.1 },
       },
@@ -58,6 +67,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           postcode: "75005",
           city: "Paris",
           departmentCode: "75",
+          countryCode: "FR",
         },
         position: { lat: 46, lon: 2.5 },
       },
@@ -67,8 +77,19 @@ export class InMemoryAddressGateway implements AddressGateway {
           postcode: "75005",
           city: "Paris",
           departmentCode: "75",
+          countryCode: "FR",
         },
         position: { lat: 45.5, lon: 1.9 },
+      },
+      {
+        address: {
+          streetNumberAndAddress: "20 A KRONENSTRASSE",
+          postcode: "30161",
+          city: "Hannover",
+          departmentCode: "99",
+          countryCode: "DE",
+        },
+        position: { lat: 52.370216, lon: 9.73322 },
       },
     ];
   }

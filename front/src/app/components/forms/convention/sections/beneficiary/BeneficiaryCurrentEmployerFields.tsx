@@ -96,6 +96,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         )}
       />
       <AddressAutocomplete
+        countryCode="FR"
         locator="convention-beneficiary-current-employer-address"
         label={
           formFields["signatories.beneficiaryCurrentEmployer.businessAddress"]
@@ -177,6 +178,7 @@ export const BeneficiaryCurrentEmployerFields = ({
           nativeInputProps: {
             ...register("signatories.beneficiaryCurrentEmployer.phone"),
             id: formFields["signatories.beneficiaryCurrentEmployer.phone"].id,
+            value: values.signatories.beneficiaryCurrentEmployer?.phone,
           },
         }}
         onPhoneNumberChange={(phoneNumber) => {
