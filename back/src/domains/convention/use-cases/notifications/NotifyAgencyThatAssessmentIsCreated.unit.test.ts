@@ -102,7 +102,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     });
   });
 
-  it("Send an email to validators when beneficiary came", async () => {
+  it("Send an email to validators when beneficiary did the immersion", async () => {
     const validator2 = new ConnectedUserBuilder()
       .withEmail("validator2@email.com")
       .withId("validator2")
@@ -191,7 +191,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     });
   });
 
-  it("Send an email to validators when beneficiary did NOT come", async () => {
+  it("Send an email to validators when assessment status is DID_NOT_SHOW", async () => {
     const assessmentDidNotShow: AssessmentDto = {
       conventionId: convention.id,
       status: "DID_NOT_SHOW",
@@ -246,36 +246,9 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   });
 
   describe("When the convention is FT connected", () => {
-    beforeEach(() => {
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [
-          {
-            _entityName: "ConventionFranceTravailAdvisor",
-            peExternalId: "pe-external-id",
-            conventionId: convention.id,
-            advisor: {
-              firstName: "John",
-              lastName: "Doe",
-              type: "PLACEMENT",
-              email: "john.doe@mail.fr",
-            },
-          },
-        ],
-      );
-    });
+    const advisorEmail = "john.doe@mail.fr";
 
-    it("When beneficiary came, send an email to the advisor (and not to other agency users)", async () => {
-      uow.userRepository.users = [validator];
-      await uow.agencyRepository.insert(
-        toAgencyWithRights(agency, {
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
-      );
-      await uow.conventionRepository.save(convention);
-      await uow.assessmentRepository.save(
-        createAssessmentEntity(assessment, convention),
-      );
-      const advisorEmail = "john.doe@mail.fr";
+    beforeEach(() => {
       uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [
           {
@@ -290,6 +263,19 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             },
           },
         ],
+      );
+    });
+
+    it("When beneficiary did the immersion, send an email to the advisor (and not to other agency users)", async () => {
+      uow.userRepository.users = [validator];
+      await uow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+      await uow.conventionRepository.save(convention);
+      await uow.assessmentRepository.save(
+        createAssessmentEntity(assessment, convention),
       );
 
       await usecase.execute({ assessment });
@@ -332,7 +318,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       });
     });
 
-    it("When beneficiary did NOT come, send an email to the advisor (and not to other agency users)", async () => {
+    it("When assessment status is DID_NOT_SHOW, send an email to the advisor (and not to other agency users)", async () => {
       uow.userRepository.users = [validator];
       await uow.agencyRepository.insert(
         toAgencyWithRights(agency, {
@@ -349,22 +335,6 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       };
       await uow.assessmentRepository.save(
         createAssessmentEntity(assessmentDidNotShow, convention),
-      );
-      const advisorEmail = "john.doe@mail.fr";
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [
-          {
-            _entityName: "ConventionFranceTravailAdvisor",
-            peExternalId: "pe-external-id",
-            conventionId: convention.id,
-            advisor: {
-              firstName: "John",
-              lastName: "Doe",
-              type: "PLACEMENT",
-              email: advisorEmail,
-            },
-          },
-        ],
       );
 
       await usecase.execute({ assessment: assessmentDidNotShow });
