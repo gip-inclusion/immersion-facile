@@ -47,7 +47,7 @@ import {
   makeListAgencyOptionsKindFilter,
   notJobSeeker,
 } from "shared";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
 import {
   AgencySelector,
   departmentOptions,
@@ -583,9 +583,8 @@ export const ConventionForm = ({
                   }
                   {...makeAccordionProps(4)}
                 >
-                  <AddressAutocomplete
+                  <AddressAutocompleteWithCountrySelect
                     {...formContents.immersionAddress}
-                    withCountrySelect={true}
                     countryCode={establishmentAddressCountryCode ?? undefined}
                     selectProps={{
                       inputId:
