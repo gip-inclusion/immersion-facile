@@ -748,7 +748,7 @@ describe("SendAssessmentNeededNotifications", () => {
           },
         });
 
-      expect(useCaseExecution.errors).toEqual({});
+      expect(useCaseExecution.conventionsAssessmentSentErrored).toBeUndefined();
 
       expectSavedNotificationsAndEvents({
         emails: [

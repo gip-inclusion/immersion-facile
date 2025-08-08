@@ -2,12 +2,14 @@ import { partition, uniqBy } from "ramda";
 import {
   type AbsoluteUrl,
   type AgencyDto,
+  type AgencyRole,
   type AgencyWithUsersRights,
   type ConventionDto,
   type ConventionId,
   calculateDurationInSecondsFrom,
   castError,
   type DateRange,
+  type Email,
   errors,
   executeInSequence,
   frontRoutes,
@@ -213,6 +215,11 @@ export class SendAssessmentNeededNotifications extends UseCase<
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
+    const conventionAdvisorEntity =
+      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+        convention.id,
+      );
+
     const alreadySentNotifications =
       await uow.notificationRepository.getEmailsByFilters({
         conventionId: convention.id,
@@ -262,6 +269,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
                 ? this.#makeAgencyAssessmentNotifications(
                     convention,
                     await agencyWithRightToAgencyDto(uow, agency),
+                    conventionAdvisorEntity?.advisor?.email,
                   )
                 : []),
             ]
@@ -337,17 +345,23 @@ export class SendAssessmentNeededNotifications extends UseCase<
   #makeAgencyAssessmentNotifications(
     convention: ConventionDto,
     agency: AgencyDto,
+    advisorEmail: Email | undefined,
   ): NotificationContentAndFollowedIds[] {
-    return [
-      ...agency.validatorEmails.map((email) => ({
-        email,
-        role: "validator" as const,
-      })),
-      ...agency.counsellorEmails.map((email) => ({
-        email,
-        role: "counsellor" as const,
-      })),
-    ].map(({ email, role }) => ({
+    const emailsToSendWithRole: { email: Email; role: AgencyRole }[] =
+      advisorEmail
+        ? [{ email: advisorEmail, role: "validator" }]
+        : [
+            ...agency.validatorEmails.map((email) => ({
+              email,
+              role: "validator" as const,
+            })),
+            ...agency.counsellorEmails.map((email) => ({
+              email,
+              role: "counsellor" as const,
+            })),
+          ];
+
+    return emailsToSendWithRole.map(({ email, role }) => ({
       kind: "email",
       templatedContent: {
         kind: "ASSESSMENT_AGENCY_NOTIFICATION",

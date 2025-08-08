@@ -54,8 +54,8 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
       );
 
     const recipientsRoleAndEmail: { email: Email; role: Role }[] =
-      conventionAdvisor?.advisor?.email
-        ? [{ email: conventionAdvisor.advisor.email, role: "validator" }]
+      conventionAdvisor?.advisor
+        ? [{ email: conventionAdvisor?.advisor.email, role: "validator" }]
         : [
             ...validatorEmails.map(
               (validatorEmail): { email: Email; role: Role } => ({
