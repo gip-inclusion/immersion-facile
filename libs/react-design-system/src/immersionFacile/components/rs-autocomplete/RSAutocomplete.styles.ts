@@ -5,7 +5,7 @@ export default {
   menu: "im-select__menu",
   menuList: "im-select__menu-list",
   valueContainer: "im-select__value-container",
-  input: "im-select__input",
+  input: "im-select__select-input",
   inputContainer: "im-select__input-container",
   placeholder: "im-select__placeholder",
   singleValue: "im-select__single-value",
