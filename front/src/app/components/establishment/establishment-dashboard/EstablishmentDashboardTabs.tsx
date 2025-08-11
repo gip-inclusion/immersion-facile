@@ -1,8 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
-import { type ReactNode, useMemo } from "react";
+import { equals } from "ramda";
+import { type ReactNode, useEffect, useMemo } from "react";
 import { HeadingSection, SectionHighlight } from "react-design-system";
+import { useDispatch } from "react-redux";
 import {
   type ConnectedUser,
   type EstablishmentDashboardTab,
@@ -10,6 +12,7 @@ import {
 } from "shared";
 import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
 import { DiscussionManageContent } from "src/app/components/establishment/establishment-dashboard/DiscussionManageContent";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import type {
   EstablishmentDashboardRouteName,
@@ -19,6 +22,12 @@ import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
+import {
+  discussionSlice,
+  initialDiscussionsWithPagination,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import { MetabaseView } from "../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../SelectConventionFromIdForm";
 
@@ -35,14 +44,28 @@ export const EstablishmentDashboardTabs = ({
     () => establishmentDashboardTabFromRouteName[route.name],
     [route.name],
   );
+  const dispatch = useDispatch();
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const { data: discussions, filters: discussionsFilters } = useAppSelector(
+    discussionSelectors.discussionsWithPagination,
+  );
+  const filtersAreEmpty = equals(
+    discussionsFilters,
+    initialDiscussionsWithPagination.filters,
+  );
+  const userHasNoDiscussions = discussions.length === 0 && filtersAreEmpty;
 
   const tabs = useMemo(
     () =>
       getDashboardTabs(
-        makeEstablishmentDashboardTabs(currentUser, route),
+        makeEstablishmentDashboardTabs(
+          currentUser,
+          route,
+          userHasNoDiscussions,
+        ),
         currentTab,
       ),
-    [currentUser, currentTab, route],
+    [currentUser, currentTab, route, userHasNoDiscussions],
   );
   const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
   const shouldRedirectToMainTab =
@@ -53,6 +76,18 @@ export const EstablishmentDashboardTabs = ({
         establishment.siret === route.params.siret &&
         establishment.role === "establishment-admin",
     );
+  useEffect(() => {
+    if (connectedUserJwt) {
+      dispatch(
+        discussionSlice.actions.fetchDiscussionListRequested({
+          jwt: connectedUserJwt,
+          filters: initialDiscussionsWithPagination.filters,
+          feedbackTopic: "establishment-dashboard-discussion-list",
+        }),
+      );
+    }
+  }, [connectedUserJwt, dispatch]);
+
   if (shouldRedirectToMainTab) {
     routes.establishmentDashboard().push();
     return;
@@ -104,6 +139,7 @@ const makeEstablishmentDashboardTabs = (
     establishments,
   }: ConnectedUser,
   route: FrontEstablishmentDashboardRoute,
+  userHasNoDiscussions: boolean,
 ): DashboardTab[] => [
   {
     label: "Conventions",
@@ -130,17 +166,23 @@ const makeEstablishmentDashboardTabs = (
       </>
     ),
   },
-  {
-    label: "Candidatures",
-    tabId: "discussions",
-    content:
-      route.name === "establishmentDashboardDiscussions" &&
-      route.params.discussionId ? (
-        <DiscussionManageContent discussionId={route.params.discussionId} />
-      ) : (
-        <DiscussionList />
-      ),
-  },
+  ...(!userHasNoDiscussions
+    ? [
+        {
+          label: "Candidatures",
+          tabId: "discussions",
+          content:
+            route.name === "establishmentDashboardDiscussions" &&
+            route.params.discussionId ? (
+              <DiscussionManageContent
+                discussionId={route.params.discussionId}
+              />
+            ) : (
+              <DiscussionList />
+            ),
+        },
+      ]
+    : []),
   ...(establishments &&
   establishments?.filter(
     (establishment) => establishment.role === "establishment-admin",
