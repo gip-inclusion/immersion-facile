@@ -112,6 +112,26 @@ describe("Siret validation and fetching", () => {
       expectCurrentSiretToBe("94127100900016");
     });
 
+    it("fetches correctly establishment with default country code if country not found in its address", () => {
+      const establishmentWithoutCountryInAddress: SiretEstablishmentDto = {
+        siret: "94127100900016",
+        businessName: "Existing business",
+        businessAddress: "20 Av de de la République, Rhône",
+        isOpen: true,
+        numberEmployeesRange: "",
+      };
+
+      setStoreWithInitialSiretState({
+        shouldFetchEvenIfAlreadySaved: false,
+      });
+      dispatchSiretModified("94127100900016");
+      feedSirenGatewayThroughBackWith(establishmentWithoutCountryInAddress);
+      expectEstablishmentToEqual(establishmentWithoutCountryInAddress);
+      expectCountryCodeToBe("FR");
+      expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled();
+      expectCurrentSiretToBe("94127100900016");
+    });
+
     it("fetches correctly and keeps the returned error", () => {
       dispatchSiretModified("11110000111100");
       feedSirenGatewayThroughBackWith(tooManiSirenRequestsSiretErrorMessage);
