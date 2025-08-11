@@ -18,7 +18,7 @@ export const makeTriggerContactRequestBeneficiaryReminder15Days =
     }>()
     .build(async ({ uow, deps }) => {
       const now = deps.timeGateway.now();
-      const dayBefore15Days = subDays(now, 16);
+      const dayBefore15Days = subDays(now, 15);
       const dayAfter15Days = subDays(now, 14);
 
       const discussionsToFollowUp =

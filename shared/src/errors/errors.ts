@@ -803,6 +803,10 @@ export const errors = {
           userId ? `qui a l'identifiant '${userId}' ` : ""
         }n'a pas les droits suffisant sur l'agence qui a l'identifiant '${agencyId}'.`,
       ),
+    noContactPhone: ({ userId }: { userId: UserId }) =>
+      new BadRequestError(
+        `L'utilisateur '${userId}' n'a pas de numéro de téléphone pour être contacté.`,
+      ),
   },
   broadcastFeedback: {
     notFound: ({ conventionId }: { conventionId: ConventionId }) =>

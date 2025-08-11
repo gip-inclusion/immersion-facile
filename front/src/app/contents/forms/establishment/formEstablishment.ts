@@ -99,6 +99,14 @@ export const formEstablishmentFieldsLabels = (
     label: "",
     id: "",
   },
+  "userRights.0.isMainContactByPhone": {
+    label: "Numéro de téléphone principal",
+    id: domElementIds.establishment[mode].businessContact.isMainContactByPhone,
+  },
+  "userRights.0.isMainContactInPerson": {
+    label: "Contact principal en présentiel",
+    id: domElementIds.establishment[mode].businessContact.isMainContactInPerson,
+  },
   userRights: {
     label: "Informations de l'administrateur",
     id: "not-used",
@@ -171,14 +179,6 @@ export const formEstablishmentFieldsLabels = (
   potentialBeneficiaryWelcomeAddress: {
     label: "Adresse d'accueil pour les candidats",
     id: domElementIds.establishment[mode].potentialBeneficiaryWelcomeAddress,
-  },
-  "userRights.0.isMainContactByPhone": {
-    label: "Numéro de téléphone principal",
-    id: domElementIds.establishment[mode].businessContact.isMainContactByPhone,
-  },
-  "userRights.0.isMainContactInPerson": {
-    label: "Contact principal en présentiel",
-    id: domElementIds.establishment[mode].businessContact.isMainContactInPerson,
   },
 });
 

@@ -158,6 +158,29 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
         errors.user.notFound({ userId: contactUser.id }),
       );
     });
+
+    it("should throw an error if contact user has no phone number", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(discussion.siret)
+          .withUserRights([
+            {
+              role: "establishment-contact",
+              userId: contactUser.id,
+              phone: undefined,
+              isMainContactByPhone: true,
+              shouldReceiveDiscussionNotifications: false,
+            },
+          ])
+          .build(),
+      ];
+      await expectPromiseToFailWithError(
+        notifyBeneficiaryToFollowUpContactRequest.execute({
+          discussionId: discussion.id,
+        }),
+        errors.user.noContactPhone({ userId: contactUser.id }),
+      );
+    });
   });
 
   describe("Right paths", () => {
@@ -185,52 +208,6 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
               contactLastName: contactUser.lastName,
               contactJob: "Manager",
               contactPhone: "+33123456789",
-            },
-          },
-        },
-      ]);
-    });
-
-    it("should handle missing phone number gracefully", async () => {
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        new EstablishmentAggregateBuilder()
-          .withEstablishmentSiret(discussion.siret)
-          .withUserRights([
-            {
-              role: "establishment-contact",
-              userId: contactUser.id,
-              job: "Manager",
-              phone: undefined, // No phone number
-              isMainContactByPhone: true,
-              shouldReceiveDiscussionNotifications: false,
-            },
-          ])
-          .build(),
-      ];
-
-      await notifyBeneficiaryToFollowUpContactRequest.execute({
-        discussionId: discussion.id,
-      });
-
-      expectToEqual(uow.notificationRepository.notifications, [
-        {
-          createdAt: "2021-09-01T10:10:00.000Z",
-          followedIds: {
-            establishmentSiret: discussion.siret,
-          },
-          id: expectedNotificationId,
-          kind: "email",
-          templatedContent: {
-            kind: "DISCUSSION_BENEFICIARY_FOLLOW_UP",
-            recipients: [discussion.potentialBeneficiary.email],
-            params: {
-              beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-              beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-              businessName: discussion.businessName,
-              contactFirstName: contactUser.firstName,
-              contactLastName: contactUser.lastName,
-              contactJob: "Manager",
-              contactPhone: "NC", // Should default to "NC" when phone is undefined
             },
           },
         },
