@@ -1,5 +1,6 @@
 import {
   type AddressWithCountryCodeAndPosition,
+  defaultCountryCode,
   expectArraysToEqual,
   expectObjectsToMatch,
   expectToEqual,
@@ -40,7 +41,7 @@ describe("Geocoding epic", () => {
             departmentCode: "75",
             postcode: "75000",
             streetNumberAndAddress: "123 Rue de la Paix",
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
           position: {
             lat: 48.8566,
@@ -69,7 +70,7 @@ describe("Geocoding epic", () => {
           departmentCode: "75",
           postcode: "75018",
           streetNumberAndAddress: "254 Avenue Maxime Gorki",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: { lat: 48.8566, lon: 2.3522 },
       },
@@ -82,7 +83,7 @@ describe("Geocoding epic", () => {
           departmentCode: "86",
           postcode: "86000",
           streetNumberAndAddress: "254 Rue de la Paix",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: { lat: 46.5833, lon: 0.3333 },
       },
@@ -95,7 +96,7 @@ describe("Geocoding epic", () => {
           departmentCode: "33",
           postcode: "33000",
           streetNumberAndAddress: "25 rue des Chartrons",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: { lat: 44.8378, lon: -0.5795 },
       },
@@ -108,7 +109,7 @@ describe("Geocoding epic", () => {
           departmentCode: "75",
           postcode: "75000",
           streetNumberAndAddress: "123 Rue de la Paix",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: { lat: 48.8566, lon: 2.3522 },
       },
@@ -175,7 +176,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.changeQueryRequested({
         locator,
         lookup: query,
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       }),
     );
     expectDebouncingToBe(true);
@@ -191,7 +192,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.changeQueryRequested({
         locator,
         lookup: query,
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       }),
     );
     expectDebouncingToBe(true);
@@ -209,7 +210,7 @@ describe("Geocoding epic", () => {
           departmentCode: "86",
           postcode: "86110",
           streetNumberAndAddress: "123 Rue de la Paix",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: {
           lat: 45.984,
@@ -221,7 +222,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.changeQueryRequested({
         locator,
         lookup: query,
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       }),
     );
     expectDebouncingToBe(true);
@@ -242,7 +243,7 @@ describe("Geocoding epic", () => {
         departmentCode: "75",
         postcode: "75000",
         streetNumberAndAddress: "123 Rue de la Paix",
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       },
       position: {
         lat: 49.6548,
@@ -265,7 +266,7 @@ describe("Geocoding epic", () => {
         departmentCode: "75",
         postcode: "75000",
         streetNumberAndAddress: "123 Rue de la Paix",
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       },
       position: {
         lat: 49.6548,
@@ -284,7 +285,7 @@ describe("Geocoding epic", () => {
         departmentCode: "75",
         postcode: "75000",
         streetNumberAndAddress: "123 Rue de la Paix",
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       },
       position: {
         lat: 49.6548,
@@ -310,7 +311,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.fetchSuggestionsRequested({
         locator,
         lookup: "bord",
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
         selectFirstSuggestion: false,
       }),
     );
@@ -328,7 +329,7 @@ describe("Geocoding epic", () => {
           departmentCode: "75",
           postcode: "75000",
           streetNumberAndAddress: "123 Rue de la Paix",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: {
           lat: 48.8566,
@@ -340,7 +341,7 @@ describe("Geocoding epic", () => {
       geocodingSlice.actions.fetchSuggestionsRequested({
         locator,
         lookup: "bord",
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
         selectFirstSuggestion: true,
       }),
     );
@@ -359,7 +360,7 @@ describe("Geocoding epic", () => {
           departmentCode: "75",
           postcode: "75000",
           streetNumberAndAddress: "123 Rue de la Paix",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: {
           lat: 48.8566,
@@ -378,7 +379,7 @@ describe("Geocoding epic", () => {
         },
         feedbackTopic: "siret-input",
         addressAutocompleteLocator: locator,
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       }),
     );
     dependencies.addressGateway.lookupStreetAddressResults$.next(

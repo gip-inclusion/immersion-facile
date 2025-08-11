@@ -9,6 +9,7 @@ import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DotNestedKeys,
+  defaultCountryCode,
   domElementIds,
   errors,
   type FormEstablishmentDto,
@@ -288,7 +289,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           geocodingSlice.actions.fetchSuggestionsRequested({
             locator: `multiple-address-${index}`,
             lookup: address.rawAddress,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
             selectFirstSuggestion: true,
           }),
         );

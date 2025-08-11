@@ -34,6 +34,7 @@ import {
   type ConventionReadDto,
   conventionSchema,
   type DepartmentCode,
+  defaultCountryCode,
   domElementIds,
   type ExcludeFromExisting,
   errors as errorMessage,
@@ -427,7 +428,7 @@ export const ConventionForm = ({
             defaultValues.signatories.beneficiaryCurrentEmployer
               .businessAddress,
           selectFirstSuggestion: true,
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
           locator: "convention-beneficiary-current-employer-address",
         }),
       );

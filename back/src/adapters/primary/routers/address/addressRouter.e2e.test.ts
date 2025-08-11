@@ -2,6 +2,7 @@ import {
   type AddressRoutes,
   type AddressWithCountryCodeAndPosition,
   addressRoutes,
+  defaultCountryCode,
   displayRouteName,
   expectHttpResponseToEqual,
   type LookupSearchResult,
@@ -23,7 +24,7 @@ describe("address router", () => {
       ...location,
       address: {
         ...location.address,
-        countryCode: "FR",
+        countryCode: defaultCountryCode,
       },
     }));
 
@@ -43,7 +44,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: query8bdduportLookup,
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
       });
       expectHttpResponseToEqual(response, {
@@ -58,7 +59,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: "1",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
       });
       expectHttpResponseToEqual(response, {
@@ -80,7 +81,7 @@ describe("address router", () => {
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: "a a a a a a a a a a a a a a a a a a a",
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
       });
       expectHttpResponseToEqual(response, {
@@ -101,7 +102,7 @@ describe("address router", () => {
         const response = await httpClient.lookupStreetAddress({
           queryParams: {
             lookup,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
         });
 

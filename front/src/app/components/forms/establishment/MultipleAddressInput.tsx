@@ -1,7 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { useDispatch } from "react-redux";
-import type { AddressDto, FormEstablishmentAddress } from "shared";
+import {
+  type AddressDto,
+  defaultCountryCode,
+  type FormEstablishmentAddress,
+} from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   type AddressAutocompleteLocator,
@@ -39,54 +43,52 @@ export const MultipleAddressInput = ({
       className={cx(fr.cx("fr-input-group"), "im-multiple-address-input")}
       id={id}
     >
-      <>
-        {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
-        {hintText && <p className={fr.cx("fr-hint-text")}>{hintText}</p>}
-        {currentAddresses.map((address, index) => {
-          const locator: AddressAutocompleteLocator = `multiple-address-${index}`;
-          return (
-            <div
-              className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-              key={address.id}
-            >
-              <div className={fr.cx("fr-col", "fr-mt-2w")}>
-                <AddressAutocomplete
-                  countryCode="FR"
-                  multiple
-                  disabled={disabled}
-                  locator={locator}
-                  label={"Rechercher un lieu *"}
-                  selectProps={{
-                    inputId: `${id}-${index}`,
-                  }}
-                  onAddressSelected={(addressAndPosition) => {
-                    onAddressAdded(addressAndPosition.address, index);
-                  }}
-                  onAddressClear={() => {
-                    onAddressDeleted(index);
-                  }}
-                />
-              </div>
-              <Button
-                type="button"
-                iconId="fr-icon-delete-bin-line"
-                title="Suppression"
+      {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
+      {hintText && <p className={fr.cx("fr-hint-text")}>{hintText}</p>}
+      {currentAddresses.map((address, index) => {
+        const locator: AddressAutocompleteLocator = `multiple-address-${index}`;
+        return (
+          <div
+            className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
+            key={address.id}
+          >
+            <div className={fr.cx("fr-col", "fr-mt-2w")}>
+              <AddressAutocomplete
+                countryCode={defaultCountryCode}
+                multiple
                 disabled={disabled}
-                id={`${id}-delete-option-button-${index}`}
-                onClick={() => {
+                locator={locator}
+                label={"Rechercher un lieu *"}
+                selectProps={{
+                  inputId: `${id}-${index}`,
+                }}
+                onAddressSelected={(addressAndPosition) => {
+                  onAddressAdded(addressAndPosition.address, index);
+                }}
+                onAddressClear={() => {
                   onAddressDeleted(index);
-                  dispatch(
-                    geocodingSlice.actions.clearLocatorDataRequested({
-                      locator,
-                      multiple: true,
-                    }),
-                  );
                 }}
               />
             </div>
-          );
-        })}
-      </>
+            <Button
+              type="button"
+              iconId="fr-icon-delete-bin-line"
+              title="Suppression"
+              disabled={disabled}
+              id={`${id}-delete-option-button-${index}`}
+              onClick={() => {
+                onAddressDeleted(index);
+                dispatch(
+                  geocodingSlice.actions.clearLocatorDataRequested({
+                    locator,
+                    multiple: true,
+                  }),
+                );
+              }}
+            />
+          </div>
+        );
+      })}
       <Button
         className={fr.cx("fr-my-4v")}
         type="button"

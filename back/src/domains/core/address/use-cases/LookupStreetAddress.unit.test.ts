@@ -1,7 +1,8 @@
-import type {
-  AddressWithCountryCodeAndPosition,
-  Location,
-  WithLookupAddressQueryParams,
+import {
+  type AddressWithCountryCodeAndPosition,
+  defaultCountryCode,
+  type Location,
+  type WithLookupAddressQueryParams,
 } from "shared";
 import { InMemoryAddressGateway } from "../adapters/InMemoryAddressGateway";
 import { LookupStreetAddress } from "./LookupStreetAddress";
@@ -34,7 +35,7 @@ describe("Lookup Street Address", () => {
         ...location,
         address: {
           ...location.address,
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
       },
     ];
@@ -44,7 +45,7 @@ describe("Lookup Street Address", () => {
 
     const lookupStreetAddressQuery: WithLookupAddressQueryParams = {
       lookup: "1 rue",
-      countryCode: "FR",
+      countryCode: defaultCountryCode,
     };
     expect(await useCase.execute(lookupStreetAddressQuery)).toEqual(
       expectedStreetAndAddresses,

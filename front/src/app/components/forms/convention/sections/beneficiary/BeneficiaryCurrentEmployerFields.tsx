@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import {
   addressDtoToString,
   type ConventionReadDto,
+  defaultCountryCode,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
@@ -96,7 +97,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         )}
       />
       <AddressAutocomplete
-        countryCode="FR"
+        countryCode={defaultCountryCode}
         locator="convention-beneficiary-current-employer-address"
         label={
           formFields["signatories.beneficiaryCurrentEmployer.businessAddress"]

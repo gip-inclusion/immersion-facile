@@ -4,6 +4,7 @@ import {
   ConnectedUserBuilder,
   type ContactFormEstablishmentUserRight,
   defaultAddress,
+  defaultCountryCode,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -121,7 +122,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         {
           address: {
             ...defaultAddress.addressAndPosition.address,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
           position: defaultAddress.addressAndPosition.position,
         },
@@ -587,7 +588,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         {
           address: {
             ...rueGuillaumeTellDto,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
           position: { lat: 1, lon: 1 },
         },
