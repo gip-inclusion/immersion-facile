@@ -134,7 +134,7 @@ export const DiscussionList = () => {
       ];
     }
     return [
-      "Nous n'avons pas trouvé de candidatures où vous êtes référencés en tant que contact d'entreprise.",
+      "Nous n'avons pas trouvé de candidatures où vous êtes référencé en tant que contact d'entreprise.",
     ];
   };
   return (
@@ -158,7 +158,7 @@ export const DiscussionList = () => {
 
           .with({ discussions: P.nullish }, () => (
             <p>
-              Nous n'avons pas trouvé de candidatures où vous êtes référencés en
+              Nous n'avons pas trouvé de candidatures où vous êtes référencé en
               tant que contact d'entreprise.
             </p>
           ))
