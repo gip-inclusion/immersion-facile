@@ -3,6 +3,7 @@ import {
   ConnectedUserBuilder,
   currentJwtVersions,
   DiscussionBuilder,
+  defaultCountryCode,
   displayRouteName,
   type EstablishmentRoutes,
   type Exchange,
@@ -80,7 +81,7 @@ describe("discussion e2e", () => {
         {
           address: {
             ...updatedAddress1.addressAndPosition.address,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
           position: updatedAddress1.addressAndPosition.position,
         },

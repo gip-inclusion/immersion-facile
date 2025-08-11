@@ -5,6 +5,7 @@ import {
   type ConnectedUserJwtPayload,
   createConnectedUserJwtPayload,
   currentJwtVersions,
+  defaultCountryCode,
   type EstablishmentRoutes,
   errors,
   establishmentRoutes,
@@ -83,7 +84,7 @@ describe("Edit form establishments", () => {
         {
           address: {
             ...updatedAddress1.addressAndPosition.address,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
           position: updatedAddress1.addressAndPosition.position,
         },

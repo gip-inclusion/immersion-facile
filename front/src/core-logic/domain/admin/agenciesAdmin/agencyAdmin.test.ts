@@ -7,6 +7,7 @@ import {
   type AgencyRight,
   type ConnectedUser,
   ConnectedUserBuilder,
+  defaultCountryCode,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -454,7 +455,7 @@ describe("agencyAdmin", () => {
       {
         address: {
           ...address,
-          countryCode: "FR",
+          countryCode: defaultCountryCode,
         },
         position: {
           lat: 48.866667,

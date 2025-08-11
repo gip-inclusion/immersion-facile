@@ -7,6 +7,7 @@ import {
   type ConnectedUserDomainJwtPayload,
   type ContactFormEstablishmentUserRight,
   defaultAddress,
+  defaultCountryCode,
   errors,
   expectObjectInArrayToMatch,
   expectObjectsToMatch,
@@ -153,7 +154,7 @@ describe("Update Establishment aggregate from form data", () => {
           {
             address: {
               ...rueGuillaumeTellDto,
-              countryCode: "FR",
+              countryCode: defaultCountryCode,
             },
             position: { lon: 1, lat: 2 },
           },
@@ -598,7 +599,7 @@ describe("Update Establishment aggregate from form data", () => {
             ...updatedAddress1.addressAndPosition,
             address: {
               ...updatedAddress1.addressAndPosition.address,
-              countryCode: "FR",
+              countryCode: defaultCountryCode,
             },
           },
         ],
@@ -607,7 +608,7 @@ describe("Update Establishment aggregate from form data", () => {
             ...updatedAddress2.addressAndPosition,
             address: {
               ...updatedAddress2.addressAndPosition.address,
-              countryCode: "FR",
+              countryCode: defaultCountryCode,
             },
           },
         ],

@@ -11,6 +11,7 @@ import {
   type BeneficiaryRepresentative,
   type ConventionReadDto,
   type DateString,
+  defaultCountryCode,
   domElementIds,
   emailSchema,
   type InternshipKind,
@@ -244,7 +245,7 @@ export const BeneficiaryFormSection = ({
       {values.internshipKind === "mini-stage-cci" && (
         <>
           <AddressAutocomplete
-            countryCode="FR"
+            countryCode={defaultCountryCode}
             locator="convention-beneficiary-address"
             {...formContents["signatories.beneficiary.address"]}
             initialInputValue={

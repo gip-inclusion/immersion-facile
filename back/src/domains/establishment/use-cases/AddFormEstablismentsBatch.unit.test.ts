@@ -1,6 +1,7 @@
 import {
   ConnectedUserBuilder,
   defaultAddress,
+  defaultCountryCode,
   defaultValidFormEstablishment,
   errors,
   expectObjectInArrayToMatch,
@@ -101,7 +102,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
           ...defaultAddress.addressAndPosition,
           address: {
             ...defaultAddress.addressAndPosition.address,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
         },
       ],
@@ -110,7 +111,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
           ...defaultAddress.addressAndPosition,
           address: {
             ...defaultAddress.addressAndPosition.address,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
         },
       ],

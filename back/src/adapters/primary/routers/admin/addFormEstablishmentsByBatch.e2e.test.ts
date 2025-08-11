@@ -6,6 +6,7 @@ import {
   type ConnectedUserJwt,
   type ConnectedUserJwtPayload,
   currentJwtVersions,
+  defaultCountryCode,
   expectHttpResponseToEqual,
   type FormEstablishmentBatchDto,
   type FormEstablishmentDto,
@@ -87,7 +88,7 @@ describe("POST /add-form-establishment-batch", () => {
         {
           address: {
             ...updatedAddress1.addressAndPosition.address,
-            countryCode: "FR",
+            countryCode: defaultCountryCode,
           },
           position: updatedAddress1.addressAndPosition.position,
         },
