@@ -47,6 +47,10 @@ export const makeNotifyBeneficiaryToFollowUpContactRequest = useCaseBuilder(
     if (!userToContact)
       throw errors.user.notFound({ userId: userRightToContact.userId });
 
+    if (!userRightToContact.phone) {
+      throw errors.user.noContactPhone({ userId: userRightToContact.userId });
+    }
+
     await deps.saveNotificationsBatchAndRelatedEvent(uow, [
       {
         kind: "email",
@@ -60,7 +64,7 @@ export const makeNotifyBeneficiaryToFollowUpContactRequest = useCaseBuilder(
             contactFirstName: userToContact.firstName,
             contactLastName: userToContact.lastName,
             contactJob: userRightToContact.job,
-            contactPhone: userRightToContact.phone?.toString() ?? "NC",
+            contactPhone: userRightToContact.phone,
           },
         },
         followedIds: {
