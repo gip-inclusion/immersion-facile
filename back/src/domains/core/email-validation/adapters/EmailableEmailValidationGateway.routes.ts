@@ -18,7 +18,7 @@ export const emailableValidationRoutes = defineRoutes({
         .object({
           message: z.string().optional(),
         })
-        .passthrough(),
+        .loose(),
     },
   }),
 });

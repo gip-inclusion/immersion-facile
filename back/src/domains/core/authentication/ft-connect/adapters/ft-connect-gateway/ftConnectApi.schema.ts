@@ -67,4 +67,4 @@ export const ftConnectHeadersSchema: z.Schema<FtConnectHeaders> = z
     Accept: z.literal("application/json"),
     Authorization: bearerSchema,
   })
-  .passthrough();
+  .loose();
