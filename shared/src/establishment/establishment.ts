@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";

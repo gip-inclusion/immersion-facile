@@ -4,7 +4,7 @@ import {
   emailSchema,
   siretSchema,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { ConventionReadPublicV2Dto } from "./ConventionReadPublicV2.dto";
 
 export const conventionReadPublicV2Schema: z.Schema<ConventionReadPublicV2Dto> =

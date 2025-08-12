@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import type { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";

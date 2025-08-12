@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { addressSchema } from "../address/address.schema";
 import {
   preferEmailContactSchema,

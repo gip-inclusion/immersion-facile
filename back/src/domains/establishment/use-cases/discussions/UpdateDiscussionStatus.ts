@@ -11,7 +11,7 @@ import {
   withDiscussionStatusSchema,
 } from "shared";
 import { match } from "ts-pattern";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";

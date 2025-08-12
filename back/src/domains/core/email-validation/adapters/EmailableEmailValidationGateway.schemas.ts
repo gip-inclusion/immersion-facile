@@ -3,7 +3,7 @@ import {
   validateEmailReasonSchema,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type {
   EmailableApiKey,
   EmailableEmailValidationParams,

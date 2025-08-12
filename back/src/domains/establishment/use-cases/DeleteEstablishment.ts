@@ -5,7 +5,7 @@ import {
   type SiretDto,
   siretSchema,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";

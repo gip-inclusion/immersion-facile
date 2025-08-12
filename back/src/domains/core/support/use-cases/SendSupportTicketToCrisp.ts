@@ -4,7 +4,7 @@ import {
   type TallyForm,
   tallyFormSchema,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../useCaseBuilder";

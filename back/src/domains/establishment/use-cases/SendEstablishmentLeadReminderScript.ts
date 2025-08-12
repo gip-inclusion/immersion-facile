@@ -9,7 +9,7 @@ import {
   localization,
   type SiretDto,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";

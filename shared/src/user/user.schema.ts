@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import z from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import type { AgencyRight, WithAgencyDashboards } from "../agency/agency.dto";
 import {

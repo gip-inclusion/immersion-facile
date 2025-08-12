@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { emailSchema } from "../email/email.schema";
 import type {
   InitiateLoginByEmailParams,
