@@ -17,7 +17,7 @@ export const codeRomeSchema: z.Schema<RomeCode> = z
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
 export const appellationCodeSchema: z.Schema<AppellationCode> = z
   .string({
-    required_error: localization.required,
+    error: localization.required,
   })
   .regex(codeAppellationRegex, "Code appellation incorrect");
 
@@ -39,13 +39,13 @@ export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
 const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({
   startIndexInclusive: z
     .number({
-      required_error: "Début d'intervalle obligatoire",
+      error: "Début d'intervalle obligatoire",
     })
     .min(0)
     .int(),
   endIndexExclusive: z
     .number({
-      required_error: "Fin d'intervalle obligatoire",
+      error: "Fin d'intervalle obligatoire",
     })
     .min(0)
     .int(),
@@ -56,10 +56,10 @@ export const appellationMatchSchema: z.Schema<AppellationMatchDto> = z.object(
     appellation: appellationDtoSchema,
     matchRanges: z.array(matchRangeSchema),
   },
-  { required_error: "Veuillez saisir un métier" },
+  { error: "Veuillez saisir un métier" },
 );
 
 export const appellationSearchResponseSchema: z.Schema<AppellationMatchDto[]> =
   z.array(appellationMatchSchema, {
-    required_error: "Veuillez saisir un métier",
+    error: "Veuillez saisir un métier",
   });
