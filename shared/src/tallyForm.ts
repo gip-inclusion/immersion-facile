@@ -32,7 +32,7 @@ export const tallyFormSchema = z
       ),
     }),
   })
-  .passthrough();
+  .loose();
 
 export const getTallyFormValueOf = (
   tallyForm: TallyForm,
