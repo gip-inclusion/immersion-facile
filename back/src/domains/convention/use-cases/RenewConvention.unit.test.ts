@@ -60,7 +60,7 @@ describe("RenewConvention", () => {
   const renewConventionEndDate = addDays(renewedConventionStartDate, 5);
 
   const renewConventionParams: RenewConventionParams = {
-    id: "11111111-1111-4111-1111-111111111111",
+    id: "11111111-1111-4111-9111-111111111111",
     dateStart: renewedConventionStartDate.toISOString(),
     dateEnd: renewConventionEndDate.toISOString(),
     schedule: new ScheduleDtoBuilder()

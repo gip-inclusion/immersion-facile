@@ -227,7 +227,7 @@ describe("Magic link router", () => {
     );
     const renewedConventionEndDate = addDays(renewedConventionStartDate, 5);
     const renewedConventionParams: RenewConventionParams = {
-      id: "11111111-1111-4111-1111-111111111111",
+      id: "11111111-1111-4111-9111-111111111111",
       dateStart: renewedConventionStartDate.toISOString(),
       dateEnd: renewedConventionEndDate.toISOString(),
       schedule: new ScheduleDtoBuilder()
@@ -276,7 +276,7 @@ describe("Magic link router", () => {
       );
       const renewedConventionEndDate = addDays(renewedConventionStartDate, 5);
       const renewedConventionParams: RenewConventionParams = {
-        id: "22222222-2222-4222-2222-222222222222",
+        id: "22222222-2222-4222-9222-222222222222",
         dateStart: renewedConventionStartDate.toISOString(),
         dateEnd: renewedConventionEndDate.toISOString(),
         schedule: new ScheduleDtoBuilder()
@@ -337,7 +337,7 @@ describe("Magic link router", () => {
       );
       const renewedConventionEndDate = addDays(renewedConventionStartDate, 5);
       const renewedConventionParams: RenewConventionParams = {
-        id: "22222222-2222-4222-2222-222222222222",
+        id: "22222222-2222-4222-9222-222222222222",
         dateStart: renewedConventionStartDate.toISOString(),
         dateEnd: renewedConventionEndDate.toISOString(),
         schedule: new ScheduleDtoBuilder()
@@ -410,7 +410,7 @@ describe("Magic link router", () => {
       );
       const renewedConventionEndDate = addDays(renewedConventionStartDate, 5);
       const renewedConventionParams: RenewConventionParams = {
-        id: "22222222-2222-4222-2222-222222222222",
+        id: "22222222-2222-4222-9222-222222222222",
         dateStart: renewedConventionStartDate.toISOString(),
         dateEnd: renewedConventionEndDate.toISOString(),
         schedule: new ScheduleDtoBuilder()
@@ -464,7 +464,9 @@ describe("Magic link router", () => {
         .send(renewedConventionParams);
 
       expectToEqual(response.body, {
-        issues: ["authorization : Required"],
+        issues: [
+          "authorization : Invalid input: expected string, received undefined",
+        ],
         message:
           "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /auth/renew-convention",
         status: 400,

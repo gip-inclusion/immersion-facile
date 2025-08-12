@@ -23,7 +23,7 @@ import type {
 } from "./notifications.dto";
 
 export const notificationIdSchema: ZodSchemaWithInputMatchingOutput<NotificationId> =
-  z.string().uuid(localization.invalidUuid);
+  z.uuid(localization.invalidUuid);
 
 const followedIdsSchema: ZodSchemaWithInputMatchingOutput<FollowedIds> =
   z.object({

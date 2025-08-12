@@ -26,7 +26,9 @@ export const numberOfEmployeesRangeSchema: ZodSchemaWithInputMatchingOutput<Numb
 
 export const siretSchema: ZodSchemaWithInputMatchingOutput<SiretDto> =
   zStringMinLength1
-    .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
+    .regex(siretRegex, {
+      error: localization.invalidSiret,
+    })
     .transform(removeSpaces);
 
 export const withSiretSchema: ZodSchemaWithInputMatchingOutput<WithSiretDto> =
