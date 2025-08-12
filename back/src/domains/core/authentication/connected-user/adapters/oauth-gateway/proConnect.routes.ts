@@ -1,6 +1,10 @@
-import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import {
+  type AbsoluteUrl,
+  localization,
+  withAuthorizationHeaders,
+} from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 // TODO : remplacer l'url de documentation Inclusion Connect par la documentation ProConnect
 // see documentation : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md
@@ -18,7 +22,9 @@ type ProConnectAccessTokenResponse = {
 const proConnectAccessTokenResponseSchema: z.Schema<ProConnectAccessTokenResponse> =
   z.object({
     access_token: z.string(),
-    token_type: z.enum(["Bearer"]),
+    token_type: z.enum(["Bearer"], {
+      error: localization.invalidEnum,
+    }),
     expires_in: z.number(),
     id_token: z.string(),
   });

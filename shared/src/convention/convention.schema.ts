@@ -1,5 +1,5 @@
 import { differenceInYears } from "date-fns";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import {
   agencyIdSchema,
@@ -122,7 +122,9 @@ export const conventionIdSchema: z.ZodSchema<ConventionId> = z
   .string()
   .uuid(localization.invalidUuid);
 
-const roleSchema = z.enum(allRoles);
+const roleSchema = z.enum(allRoles, {
+  error: localization.invalidEnum,
+});
 
 const actorSchema = z.object({
   role: roleSchema,
@@ -244,7 +246,9 @@ const renewedSchema = z.object({
 const conventionCommonSchema: z.Schema<ConventionCommon> = z
   .object({
     id: conventionIdSchema,
-    status: z.enum(conventionStatuses),
+    status: z.enum(conventionStatuses, {
+      error: localization.invalidEnum,
+    }),
     statusJustification: z.string().optional(),
     agencyId: agencyIdSchema,
     updatedAt: makeDateStringSchema().optional(),
@@ -279,8 +283,12 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
   })
   .and(withAcquisitionSchema);
 
-export const internshipKindSchema: z.Schema<InternshipKind> =
-  z.enum(internshipKinds);
+export const internshipKindSchema: z.Schema<InternshipKind> = z.enum(
+  internshipKinds,
+  {
+    error: localization.invalidEnum,
+  },
+);
 
 const immersionSignatoriesSchema: z.Schema<Signatories<"immersion">> = z.object(
   {
@@ -444,13 +452,17 @@ const justificationSchema = zStringMinLength1;
 
 export const updateConventionStatusWithoutJustificationSchema: z.Schema<UpdateConventionStatusWithoutJustification> =
   z.object({
-    status: z.enum(conventionStatusesWithoutJustificationNorValidator),
+    status: z.enum(conventionStatusesWithoutJustificationNorValidator, {
+      error: localization.invalidEnum,
+    }),
     conventionId: conventionIdSchema,
   });
 
 export const updateConventionStatusWithJustificationSchema: z.Schema<UpdateConventionStatusWithJustification> =
   z.object({
-    status: z.enum(conventionStatusesWithJustification),
+    status: z.enum(conventionStatusesWithJustification, {
+      error: localization.invalidEnum,
+    }),
     statusJustification: justificationSchema,
     conventionId: conventionIdSchema,
   });
@@ -469,7 +481,9 @@ export const withFirstnameAndLastnameSchema: z.Schema<WithFirstnameAndLastname> 
 const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatusWithValidator> =
   z
     .object({
-      status: z.enum(conventionStatusesWithValidator),
+      status: z.enum(conventionStatusesWithValidator, {
+        error: localization.invalidEnum,
+      }),
       conventionId: conventionIdSchema,
     })
     .and(withFirstnameAndLastnameSchema);
@@ -507,7 +521,9 @@ export const renewConventionParamsSchema: z.Schema<RenewConventionParams> = z
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =
   z.object({
     applicationId: conventionIdSchema,
-    role: z.enum(allRoles),
+    role: z.enum(allRoles, {
+      error: localization.invalidEnum,
+    }),
     expired: z.boolean(), //< defaults to false
   });
 
@@ -724,14 +740,23 @@ export const flatGetConventionsForAgencyUserParamsSchema: z.Schema<FlatGetConven
 
     // sort
     sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission"])
+      .enum(["dateValidation", "dateStart", "dateSubmission"], {
+        error: localization.invalidEnum,
+      })
       .optional(),
 
     // filters
     actorEmailContains: z.string().optional(),
     establishmentNameContains: z.string().optional(),
     beneficiaryNameContains: z.string().optional(),
-    statuses: z.array(z.enum(conventionStatuses)).nonempty().optional(),
+    statuses: z
+      .array(
+        z.enum(conventionStatuses, {
+          error: localization.invalidEnum,
+        }),
+      )
+      .nonempty()
+      .optional(),
     agencyIds: z.array(agencyIdSchema).nonempty().optional(),
     agencyDepartmentCodes: z.array(z.string()).nonempty().optional(),
 
@@ -751,7 +776,14 @@ export const getConventionsForAgencyUserParamsSchema: z.Schema<GetConventionsFor
         actorEmailContains: z.string().optional(),
         establishmentNameContains: z.string().optional(),
         beneficiaryNameContains: z.string().optional(),
-        statuses: z.array(z.enum(conventionStatuses)).nonempty().optional(),
+        statuses: z
+          .array(
+            z.enum(conventionStatuses, {
+              error: localization.invalidEnum,
+            }),
+          )
+          .nonempty()
+          .optional(),
         agencyIds: z.array(agencyIdSchema).nonempty().optional(),
         agencyDepartmentCodes: z.array(z.string()).nonempty().optional(),
         dateStart: dateFilterSchema.optional(),
@@ -760,7 +792,9 @@ export const getConventionsForAgencyUserParamsSchema: z.Schema<GetConventionsFor
       })
       .optional(),
     sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission"])
+      .enum(["dateValidation", "dateStart", "dateSubmission"], {
+        error: localization.invalidEnum,
+      })
       .optional(),
     pagination: paginationQueryParamsSchema.optional(),
   });

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { zSchemaForType } from "./zodUtils";
 
 export type WithAuthorizationHeader = { authorization: string };

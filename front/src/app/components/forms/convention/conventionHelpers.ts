@@ -9,7 +9,7 @@ import {
   type Signatories,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;

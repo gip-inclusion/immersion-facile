@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import type { AgencyRight, WithAgencyDashboards } from "../agency/agency.dto";
 import {
@@ -15,7 +15,11 @@ import type {
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+} from "../zodUtils";
 import type {
   ConnectedUser,
   User,
@@ -55,7 +59,9 @@ const agencyRightSchema: z.Schema<AgencyRight> = z.object({
 const withEstablishmentSiretAndName: z.Schema<EstablishmentData> = z.object({
   siret: siretSchema,
   businessName: businessNameSchema,
-  role: z.enum(establishmentsRoles),
+  role: z.enum(establishmentsRoles, {
+    error: localization.invalidEnum,
+  }),
   admins: z.array(
     z.object({
       firstName: zStringCanBeEmpty,

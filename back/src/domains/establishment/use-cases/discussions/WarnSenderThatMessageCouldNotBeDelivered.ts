@@ -1,12 +1,13 @@
 import {
   errors,
+  localization,
   type NotificationErrored,
   type NotificationId,
   type NotificationKind,
   notificationErroredSchema,
   notificationIdSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
@@ -19,7 +20,9 @@ export type WarnSenderThatMessageCouldNotBeDeliveredParams = {
 const inputSchema: z.Schema<WarnSenderThatMessageCouldNotBeDeliveredParams> =
   z.object({
     notificationId: notificationIdSchema,
-    notificationKind: z.enum(["email", "sms"]),
+    notificationKind: z.enum(["email", "sms"], {
+      error: localization.invalidEnum,
+    }),
     errored: notificationErroredSchema,
   });
 

@@ -16,10 +16,11 @@ import {
   emailSchema,
   errors,
   exchangeRoleSchema,
+  localization,
   type UserId,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -82,7 +83,9 @@ const fullMessageInputSchema = messageInputCommonFieldsSchema.extend({
   senderEmail: emailSchema,
   recipientRole: exchangeRoleSchema,
   attachments: z.array(attachmentSchema),
-  sentAt: z.string().datetime(),
+  sentAt: z.iso.datetime({
+    error: localization.invalidDate,
+  }),
   subject: z.string(),
 });
 

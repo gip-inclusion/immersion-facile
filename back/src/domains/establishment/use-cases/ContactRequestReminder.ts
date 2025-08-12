@@ -6,8 +6,9 @@ import {
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   isTruthy,
+  localization,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
@@ -27,7 +28,11 @@ const MAX_DISCUSSIONS = 5000;
 export const makeContactRequestReminder = useCaseBuilder(
   "ContactRequestReminder",
 )
-  .withInput<ContactRequestReminderMode>(z.enum(["3days", "7days"]))
+  .withInput<ContactRequestReminderMode>(
+    z.enum(["3days", "7days"], {
+      error: localization.invalidEnum,
+    }),
+  )
   .withOutput<{ numberOfNotifications: number }>()
   .withCurrentUser<void>()
   .withDeps<{

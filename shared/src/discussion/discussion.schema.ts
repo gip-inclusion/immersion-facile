@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { addressSchema } from "../address/address.schema";
 import {
   preferEmailContactSchema,
@@ -15,7 +15,11 @@ import { phoneNumberSchema } from "../phone/phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+} from "../zodUtils";
 import {
   type Attachment,
   type CandidateWarnedMethod,
@@ -95,9 +99,16 @@ export const makeExchangeEmailSchema = (
         }),
     );
 
-export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
+export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(
+  exchangeRoles,
+  {
+    error: localization.invalidEnum,
+  },
+);
 export const discussionExchangeForbidenReasonSchema: z.Schema<DiscussionExchangeForbiddenReason> =
-  z.enum(discussionExchangeForbidenReasons);
+  z.enum(discussionExchangeForbidenReasons, {
+    error: localization.invalidEnum,
+  });
 
 export const attachmentSchema: z.Schema<Attachment> = z.object({
   name: z.string(),
@@ -124,9 +135,9 @@ export const exchangeReadSchema: z.Schema<ExchangeRead> = z
     ]),
   );
 
-const candidateWarnedMethodSchema = z.enum(
-  candidateWarnedMethods,
-) satisfies z.Schema<CandidateWarnedMethod>;
+const candidateWarnedMethodSchema = z.enum(candidateWarnedMethods, {
+  error: localization.invalidEnum,
+}) satisfies z.Schema<CandidateWarnedMethod>;
 
 export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
   z.union([
@@ -135,7 +146,9 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
       rejectionReason: zStringMinLength1,
     }),
     z.object({
-      rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"]),
+      rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"], {
+        error: localization.invalidEnum,
+      }),
     }),
     z.object({
       rejectionKind: z.literal("CANDIDATE_ALREADY_WARNED"),
@@ -208,7 +221,9 @@ const commonDiscussionSchema: z.Schema<CommonDiscussionDto> = z
 const discussionKindIfSchema = z.literal("IF");
 const discussionKind1Eleve1StageSchema = z.literal("1_ELEVE_1_STAGE");
 
-const discussionLevelOfEducationSchema = z.enum(["3ème", "2nde"]);
+const discussionLevelOfEducationSchema = z.enum(["3ème", "2nde"], {
+  error: localization.invalidEnum,
+});
 
 export const discussionReadSchema: z.Schema<DiscussionReadDto> =
   commonDiscussionSchema
@@ -251,7 +266,9 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
           contactMode: preferInPersonContactSchema,
           kind: discussionKind1Eleve1StageSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            levelOfEducation: z.enum(["3ème", "2nde"]),
+            levelOfEducation: z.enum(["3ème", "2nde"], {
+              error: localization.invalidEnum,
+            }),
           }),
         }),
         z.object({
@@ -263,7 +280,9 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
           contactMode: preferPhoneContactSchema,
           kind: discussionKind1Eleve1StageSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            levelOfEducation: z.enum(["3ème", "2nde"]),
+            levelOfEducation: z.enum(["3ème", "2nde"], {
+              error: localization.invalidEnum,
+            }),
           }),
         }),
       ]),
@@ -276,8 +295,16 @@ export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedD
     perPage: z.coerce.number().optional(),
 
     // sort
-    orderBy: z.enum(["createdAt"]).optional(),
-    orderDirection: z.enum(["asc", "desc"]).optional(),
+    orderBy: z
+      .enum(["createdAt"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
+    orderDirection: z
+      .enum(["asc", "desc"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
 
     // filters
     statuses: discussionStatusSchema

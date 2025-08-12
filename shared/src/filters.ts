@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { makeDateStringSchema } from "./schedule/Schedule.schema";
 import type { DateString } from "./utils/date";
 

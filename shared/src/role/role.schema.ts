@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { z } from "zod/v4";
+import { localization } from "../zodUtils";
 import {
   allRoles,
   allSignatoryRoles,
@@ -8,10 +9,20 @@ import {
   type SignatoryRole,
 } from "./role.dto";
 
-export const roleSchema: z.Schema<Role> = z.enum(allRoles);
+export const roleSchema: z.Schema<Role> = z.enum(allRoles, {
+  error: localization.invalidEnum,
+});
 
-export const signatoryRoleSchema: z.Schema<SignatoryRole> =
-  z.enum(allSignatoryRoles);
+export const signatoryRoleSchema: z.Schema<SignatoryRole> = z.enum(
+  allSignatoryRoles,
+  {
+    error: localization.invalidEnum,
+  },
+);
 
-export const establishmentRoleSchema: z.Schema<EstablishmentRole> =
-  z.enum(establishmentsRoles);
+export const establishmentRoleSchema: z.Schema<EstablishmentRole> = z.enum(
+  establishmentsRoles,
+  {
+    error: localization.invalidEnum,
+  },
+);

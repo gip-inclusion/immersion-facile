@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { calculateDurationInSecondsFrom, castError } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { validateAndParseZodSchemaV2 } from "../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../utils/logger";
 import type { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
