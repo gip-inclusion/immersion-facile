@@ -41,7 +41,7 @@ export const makeProConnectRoutes = (proConnectBaseUrl: AbsoluteUrl) =>
       method: "post",
       url: `${proConnectBaseUrl}/token`,
       requestBodySchema: z.string(),
-      headersSchema: withContentTypeUrlEncodedSchema.passthrough(),
+      headersSchema: withContentTypeUrlEncodedSchema.loose(),
       responses: { 200: proConnectAccessTokenResponseSchema },
     }),
     getUserInfo: defineRoute({

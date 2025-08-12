@@ -82,7 +82,7 @@ export const technicalRoutes = defineRoutes({
     requestBodySchema: z.any(), // could not find better to not mutate the original object.
     // we need the original object to check the signature
     // validation is still checked in the usecase
-    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
+    headersSchema: z.object({ "tally-signature": z.string() }).loose(),
     responses: {
       201: expressEmptyResponseBody,
       403: httpErrorSchema,
@@ -96,7 +96,7 @@ export const technicalRoutes = defineRoutes({
     requestBodySchema: z.any(), // could not find better to not mutate the original object.
     // we need the original object to check the signature
     // validation is still checked in the usecase
-    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
+    headersSchema: z.object({ "tally-signature": z.string() }).loose(),
     responses: {
       201: expressEmptyResponseBody,
       403: httpErrorSchema,
@@ -110,7 +110,7 @@ export const technicalRoutes = defineRoutes({
     requestBodySchema: z.any(), // could not find better to not mutate the original object.
     // we need the original object to check the signature
     // validation is still checked in the usecase
-    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
+    headersSchema: z.object({ "tally-signature": z.string() }).loose(),
     responses: {
       201: expressEmptyResponseBody,
       403: httpErrorSchema,

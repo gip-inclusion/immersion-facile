@@ -64,14 +64,8 @@ export const makeLegacyExchangeEmailRegex = (replyDomain: string) =>
 
 export const makeExchangeEmailSchema = (
   replyDomain: string,
-): z.ZodUnion<
-  [
-    z.ZodEffects<z.ZodString, DiscussionEmailParams, string>,
-    z.ZodEffects<z.ZodString, LegacyDiscussionEmailParams, string>,
-  ]
-> =>
+): z.Schema<DiscussionEmailParams | LegacyDiscussionEmailParams> =>
   z
-    .string()
     .email()
     .regex(makeExchangeEmailRegex(replyDomain), {
       error: localization.invalidEmailFormat,
@@ -89,7 +83,6 @@ export const makeExchangeEmailSchema = (
     })
     .or(
       z
-        .string()
         .email()
         .regex(makeLegacyExchangeEmailRegex(replyDomain), {
           error: localization.invalidEmailFormat,

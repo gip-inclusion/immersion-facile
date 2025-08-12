@@ -56,7 +56,7 @@ export const ftConnectAccessTokenHeadersSchema: z.Schema<FtConnectAccessTokenHea
     .object({
       "Content-Type": z.literal("application/x-www-form-urlencoded"),
     })
-    .passthrough();
+    .loose();
 
 export type FtConnectOauthConfig = {
   franceTravailClientId: string;
