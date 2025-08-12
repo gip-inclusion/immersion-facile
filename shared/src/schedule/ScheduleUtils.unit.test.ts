@@ -560,6 +560,7 @@ jeudi : 09:00-12:45, 13:15-17:00`,
           new ZodError([
             {
               code: "custom",
+              input: undefined,
               message:
                 "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez remplir les horaires.",
               path: ["schedule"],
@@ -592,6 +593,7 @@ jeudi : 09:00-12:45, 13:15-17:00`,
             new ZodError([
               {
                 code: "custom",
+                input: undefined,
                 message:
                   "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Le nombre total d'heure ne correspond pas à celui du calendrier. Calcul du calendrier: 22.5, Nombre total heures fourni: 3",
                 path: ["schedule"],
@@ -616,6 +618,7 @@ jeudi : 09:00-12:45, 13:15-17:00`,
             new ZodError([
               {
                 code: "custom",
+                input: undefined,
                 message:
                   "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Le nombre total de jours travaillés ne correspond pas à celui du calendrier. Calcul du calendrier: 3, Nombre de jours fourni: 1",
                 path: ["schedule"],
@@ -698,11 +701,14 @@ jeudi : 09:00-12:45, 13:15-17:00`,
         expect(() => dateTimeIsoStringSchema.parse(date)).toThrow(
           new ZodError([
             {
-              code: "invalid_string",
-              validation: "datetime",
-              message: localization.invalidDate,
+              origin: "string",
+              code: "invalid_format",
+              format: "datetime",
+              pattern:
+                "/^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$/",
               path: [],
-            },
+              message: localization.invalidDate,
+            } as unknown as z.core.$ZodIssueInvalidStringFormat, // TODO: fix this, don't know why type is not valid
           ]),
         );
       },
