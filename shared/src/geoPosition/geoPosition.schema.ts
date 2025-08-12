@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { GeoPositionDto } from "./geoPosition.dto";
 
 export const geoPositionSchema: z.Schema<GeoPositionDto> = z.object({

@@ -4,7 +4,7 @@ import {
   type ConventionReadDto,
   conventionReadSchema,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export type BroadcastConventionParams =
   | {

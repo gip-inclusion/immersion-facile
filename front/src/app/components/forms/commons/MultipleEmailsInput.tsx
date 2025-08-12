@@ -6,7 +6,7 @@ import {
   validateMultipleEmailRegex,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
-import type { z } from "zod/v4";
+import type { z } from "zod";
 
 const componentName = "im-fillable-list";
 

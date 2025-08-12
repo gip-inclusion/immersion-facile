@@ -7,7 +7,7 @@ import {
   notificationErroredSchema,
   notificationIdSchema,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 

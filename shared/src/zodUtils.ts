@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",

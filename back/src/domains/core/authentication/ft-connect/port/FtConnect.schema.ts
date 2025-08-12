@@ -1,5 +1,5 @@
 import { localization, makezTrimmedString, zUuidLike } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { ConventionFtUserAdvisorDto } from "../dto/FtConnect.dto";
 import { immersionFranceTravailAdvisors } from "../dto/FtConnectAdvisor.dto";
 

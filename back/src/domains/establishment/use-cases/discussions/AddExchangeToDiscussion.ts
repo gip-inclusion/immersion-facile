@@ -20,7 +20,7 @@ import {
   type UserId,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

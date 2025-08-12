@@ -4,7 +4,7 @@ import {
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 // TODO : remplacer l'url de documentation Inclusion Connect par la documentation ProConnect
 // see documentation : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md

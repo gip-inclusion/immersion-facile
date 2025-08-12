@@ -1,6 +1,6 @@
 import { localization } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export type CrispHeaders = z.infer<typeof crispHeadersSchema>;
 const crispHeadersSchema = z.object({

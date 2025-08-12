@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { DateRange } from "../utils/date";
 import { localization, zEnumValidation, zStringMinLength1 } from "../zodUtils";

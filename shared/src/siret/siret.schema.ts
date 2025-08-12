@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { businessNameSchema } from "../business/business";
 import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";

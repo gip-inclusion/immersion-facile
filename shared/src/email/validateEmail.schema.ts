@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { localization } from "../zodUtils";
 import { emailSchema } from "./email.schema";
 import {

@@ -21,7 +21,7 @@ import {
   type WithOptionalFirstnameAndLastname,
   type WithSiretDto,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import type { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
