@@ -1,9 +1,8 @@
-import { localization } from "shared";
+import { localization, type ZodSchemaWithInputMatchingOutput } from "shared";
 import { z } from "zod";
 import type {
   DiagorienteAccessTokenResponse,
   DiagorienteRawResponse,
-  DiagorienteResultData,
 } from "./DiagorienteAppellationsGateway.routes";
 
 export const diagorienteQueryParamsSchema = z.object({
@@ -19,23 +18,21 @@ export const diagorienteQueryParamsSchema = z.object({
     .optional(),
 });
 
-const data: z.Schema<DiagorienteResultData> = z.object({
-  titre: z.string(),
-  code_ogr: z.string(),
-});
-
-export const diagorienteRawResponseSchema: z.Schema<DiagorienteRawResponse> =
+export const diagorienteRawResponseSchema: ZodSchemaWithInputMatchingOutput<DiagorienteRawResponse> =
   z.object({
     search_results: z.array(
       z.object({
         text: z.string(),
         similarity: z.number(),
-        data: data,
+        data: z.object({
+          titre: z.string(),
+          code_ogr: z.string(),
+        }),
       }),
     ),
   });
 
-export const diagorienteAccessTokenResponseSchema: z.Schema<DiagorienteAccessTokenResponse> =
+export const diagorienteAccessTokenResponseSchema: ZodSchemaWithInputMatchingOutput<DiagorienteAccessTokenResponse> =
   z.object({
     access_token: z.string(),
     expires_in: z.number(),

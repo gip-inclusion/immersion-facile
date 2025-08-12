@@ -1,4 +1,9 @@
-import { emailSchema, localization, zStringMinLength1 } from "shared";
+import {
+  emailSchema,
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+  zStringMinLength1,
+} from "shared";
 import { z } from "zod";
 import type { BearerToken } from "../../dto/BearerToken";
 import {
@@ -12,7 +17,7 @@ import type {
   FtConnectHeaders,
 } from "./ftConnectApi.dto";
 
-export const externalFtConnectUserSchema: z.Schema<ExternalFtConnectUser> =
+export const externalFtConnectUserSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectUser> =
   z.object({
     email: emailSchema.optional(),
     family_name: zStringMinLength1,
@@ -24,7 +29,7 @@ export const externalFtConnectUserSchema: z.Schema<ExternalFtConnectUser> =
     sub: zStringMinLength1,
   });
 
-export const externalFtConnectUserStatutSchema: z.Schema<ExternalFtConnectStatut> =
+export const externalFtConnectUserStatutSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectStatut> =
   z.object({
     codeStatutIndividu: z.enum(["0", "1"], {
       error: localization.invalidEnum,
@@ -37,14 +42,12 @@ export const externalFtConnectUserStatutSchema: z.Schema<ExternalFtConnectStatut
     ),
   });
 
-const ftAdvisorKindSchema: z.Schema<FtConnectAdvisorsKind> = z.enum(
-  ftAdvisorKinds,
-  {
+const ftAdvisorKindSchema: ZodSchemaWithInputMatchingOutput<FtConnectAdvisorsKind> =
+  z.enum(ftAdvisorKinds, {
     error: localization.invalidEnum,
-  },
-);
+  });
 
-const externalftConnectAdvisorSchema: z.Schema<ExternalFtConnectAdvisor> =
+const externalftConnectAdvisorSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectAdvisor> =
   z.object({
     nom: zStringMinLength1,
     prenom: zStringMinLength1,
@@ -55,16 +58,19 @@ const externalftConnectAdvisorSchema: z.Schema<ExternalFtConnectAdvisor> =
     type: ftAdvisorKindSchema,
   });
 
-export const externalFtConnectAdvisorsSchema: z.Schema<
+export const externalFtConnectAdvisorsSchema: ZodSchemaWithInputMatchingOutput<
   ExternalFtConnectAdvisor[]
 > = z.array(externalftConnectAdvisorSchema);
 
-const bearerSchema = z.string().regex(/^Bearer .+$/) as z.Schema<BearerToken>;
+const bearerSchema = z
+  .string()
+  .regex(/^Bearer .+$/) as ZodSchemaWithInputMatchingOutput<BearerToken>;
 
-export const ftConnectHeadersSchema: z.Schema<FtConnectHeaders> = z
-  .object({
-    "Content-Type": z.literal("application/json"),
-    Accept: z.literal("application/json"),
-    Authorization: bearerSchema,
-  })
-  .loose();
+export const ftConnectHeadersSchema: ZodSchemaWithInputMatchingOutput<FtConnectHeaders> =
+  z
+    .object({
+      "Content-Type": z.literal("application/json"),
+      Accept: z.literal("application/json"),
+      Authorization: bearerSchema,
+    })
+    .loose();

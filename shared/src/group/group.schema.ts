@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { searchResultSchema } from "../search/SearchResult.schema";
-import { zStringMinLength1 } from "../zodUtils";
+import {
+  type ZodSchemaWithInputMatchingOutput,
+  zStringMinLength1,
+} from "../zodUtils";
 import type {
   Group,
   GroupOptions,
@@ -10,29 +13,33 @@ import type {
   WithGroupSlug,
 } from "./group.dto";
 
-const groupSlugSchema: z.Schema<GroupSlug> = zStringMinLength1;
+const groupSlugSchema: ZodSchemaWithInputMatchingOutput<GroupSlug> =
+  zStringMinLength1;
 
-export const withGroupSlugSchema: z.Schema<WithGroupSlug> = z.object({
-  groupSlug: groupSlugSchema,
-});
+export const withGroupSlugSchema: ZodSchemaWithInputMatchingOutput<WithGroupSlug> =
+  z.object({
+    groupSlug: groupSlugSchema,
+  });
 
-const groupOptionsSchema: z.Schema<GroupOptions> = z.object({
-  heroHeader: z.object({
-    title: zStringMinLength1,
-    description: zStringMinLength1,
-    logoUrl: absoluteUrlSchema.optional(),
-    backgroundColor: z.string().optional(),
-  }),
-  tintColor: z.string().optional(),
-});
+const groupOptionsSchema: ZodSchemaWithInputMatchingOutput<GroupOptions> =
+  z.object({
+    heroHeader: z.object({
+      title: zStringMinLength1,
+      description: zStringMinLength1,
+      logoUrl: absoluteUrlSchema.optional(),
+      backgroundColor: z.string().optional(),
+    }),
+    tintColor: z.string().optional(),
+  });
 
-export const groupSchema: z.Schema<Group> = z.object({
+export const groupSchema: ZodSchemaWithInputMatchingOutput<Group> = z.object({
   slug: groupSlugSchema,
   name: zStringMinLength1,
   options: groupOptionsSchema,
 });
 
-export const groupWithResultsSchema: z.Schema<GroupWithResults> = z.object({
-  group: groupSchema,
-  results: z.array(searchResultSchema),
-});
+export const groupWithResultsSchema: ZodSchemaWithInputMatchingOutput<GroupWithResults> =
+  z.object({
+    group: groupSchema,
+    results: z.array(searchResultSchema),
+  });

@@ -1,4 +1,8 @@
-import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import {
+  type AbsoluteUrl,
+  withAuthorizationHeaders,
+  type ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
@@ -12,7 +16,7 @@ export const getFtTestPrefix = (ftApiUrl: AbsoluteUrl) =>
 
 export type FrancetTravailRoutes = ReturnType<typeof createFranceTravailRoutes>;
 
-const franceTravailConventionSchema: z.Schema<FranceTravailConvention> =
+const franceTravailConventionSchema: ZodSchemaWithInputMatchingOutput<FranceTravailConvention> =
   z.any();
 
 const ftBusinessError = z.object({
@@ -26,12 +30,13 @@ const ftAuthError = z.object({
   error_description: z.string(),
 });
 
-const ftAccessTokenResponseSchema: z.Schema<AccessTokenResponse> = z.object({
-  access_token: z.string(),
-  expires_in: z.number(),
-  scope: z.string(),
-  token_type: z.string(),
-});
+const ftAccessTokenResponseSchema: ZodSchemaWithInputMatchingOutput<AccessTokenResponse> =
+  z.object({
+    access_token: z.string(),
+    expires_in: z.number(),
+    scope: z.string(),
+    token_type: z.string(),
+  });
 
 export const createFranceTravailRoutes = ({
   ftApiUrl,
@@ -51,10 +56,10 @@ export const createFranceTravailRoutes = ({
       }),
       requestBodySchema: z.string(),
       responses: {
-        [200]: ftAccessTokenResponseSchema,
-        [400]: ftAuthError,
-        [429]: z.any(),
-        [503]: z.any(),
+        200: ftAccessTokenResponseSchema,
+        400: ftAuthError,
+        429: z.any(),
+        503: z.any(),
       },
     }),
     broadcastLegacyConvention: defineRoute({

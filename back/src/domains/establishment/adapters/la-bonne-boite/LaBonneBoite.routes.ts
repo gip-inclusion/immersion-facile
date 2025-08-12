@@ -3,6 +3,7 @@ import {
   siretSchema,
   type WithSiretDto,
   withAuthorizationHeaders,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
@@ -40,15 +41,16 @@ type HttpGetLaBonneBoiteCompanyResponseV2 =
 
 export type LaBonneBoiteRoutes = ReturnType<typeof createLbbRoutes>;
 
-const lbbQueryParamsSchema: z.Schema<HttpGetLaBonneBoiteCompanyParamsV2> =
+const lbbQueryParamsSchema: ZodSchemaWithInputMatchingOutput<HttpGetLaBonneBoiteCompanyParamsV2> =
   z.any();
 
-const lbbQueryGetCompanyParamsSchema: z.Schema<WithSiretDto> = z.object({
-  siret: siretSchema,
-});
+const lbbQueryGetCompanyParamsSchema: ZodSchemaWithInputMatchingOutput<WithSiretDto> =
+  z.object({
+    siret: siretSchema,
+  });
 
 // TODO: define LBBv2 schema if more production typing mismatch issues from response body
-const lbbResponseSchema: z.Schema<HttpGetLaBonneBoiteCompanyResponseV2> =
+const lbbResponseSchema: ZodSchemaWithInputMatchingOutput<HttpGetLaBonneBoiteCompanyResponseV2> =
   z.any();
 
 export const createLbbRoutes = (peApiUrl: AbsoluteUrl) =>

@@ -9,6 +9,7 @@ import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   localization,
   stringWithMaxLength255,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "../zodUtils";
 import {
@@ -25,24 +26,27 @@ import {
   type WriteApiConsumerRights,
 } from "./ApiConsumer";
 
-const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
-  lastName: zStringMinLength1,
-  firstName: zStringMinLength1,
-  job: zStringMinLength1,
-  phone: phoneNumberSchema,
-  emails: z.array(emailSchema),
-});
+const apiConsumerContactSchema: ZodSchemaWithInputMatchingOutput<ApiConsumerContact> =
+  z.object({
+    lastName: zStringMinLength1,
+    firstName: zStringMinLength1,
+    job: zStringMinLength1,
+    phone: phoneNumberSchema,
+    emails: z.array(emailSchema),
+  });
 
-export const apiConsumerJwtSchema: z.Schema<ApiConsumerJwt> = z.string();
+export const apiConsumerJwtSchema: ZodSchemaWithInputMatchingOutput<ApiConsumerJwt> =
+  z.string();
 
-const callbackHeadersSchema: z.Schema<CallbackHeaders> = z.record(
-  z.enum(authorizedCallbackHeaderKeys, {
-    error: localization.invalidEnum,
-  }),
-  zStringMinLength1,
-);
+const callbackHeadersSchema: ZodSchemaWithInputMatchingOutput<CallbackHeaders> =
+  z.record(
+    z.enum(authorizedCallbackHeaderKeys, {
+      error: localization.invalidEnum,
+    }),
+    zStringMinLength1,
+  );
 
-export const createWebhookSubscriptionSchema: z.Schema<CreateWebhookSubscription> =
+export const createWebhookSubscriptionSchema: ZodSchemaWithInputMatchingOutput<CreateWebhookSubscription> =
   z.object({
     subscribedEvent: z.enum(["convention.updated"], {
       error: localization.invalidEnum,
@@ -51,7 +55,7 @@ export const createWebhookSubscriptionSchema: z.Schema<CreateWebhookSubscription
     callbackHeaders: callbackHeadersSchema,
   });
 
-export const webhookSubscriptionSchema: z.Schema<WebhookSubscription> =
+export const webhookSubscriptionSchema: ZodSchemaWithInputMatchingOutput<WebhookSubscription> =
   createWebhookSubscriptionSchema.and(
     z.object({
       id: z.string(),
@@ -115,15 +119,16 @@ const conventionRightSchema = conventionRightCommonSchema.and(
   }),
 );
 
-const writeApiConsumerRightsSchema: z.Schema<WriteApiConsumerRights> = z.object(
-  {
+const writeApiConsumerRightsSchema: ZodSchemaWithInputMatchingOutput<WriteApiConsumerRights> =
+  z.object({
     searchEstablishment: createSearchEstablishmentRightSchema,
     convention: createConventionRightSchema,
     statistics: statisticsRightSchema,
-  },
-);
+  });
 
-const apiConsumerRightsSchema: z.Schema<ApiConsumer["rights"]> = z.object({
+const apiConsumerRightsSchema: ZodSchemaWithInputMatchingOutput<
+  ApiConsumer["rights"]
+> = z.object({
   searchEstablishment: searchEstablishmentRightSchema,
   convention: conventionRightSchema,
   statistics: statisticsRightSchema,
@@ -138,18 +143,19 @@ const commonApiConsumerShape = {
   expirationDate: makeDateStringSchema(),
 };
 
-export const writeApiConsumerSchema: z.Schema<WriteApiConsumerParams> =
+export const writeApiConsumerSchema: ZodSchemaWithInputMatchingOutput<WriteApiConsumerParams> =
   z.object(commonApiConsumerShape);
 
-export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
-  ...commonApiConsumerShape,
-  createdAt: makeDateStringSchema(),
-  rights: apiConsumerRightsSchema,
-});
+export const apiConsumerSchema: ZodSchemaWithInputMatchingOutput<ApiConsumer> =
+  z.object({
+    ...commonApiConsumerShape,
+    createdAt: makeDateStringSchema(),
+    rights: apiConsumerRightsSchema,
+  });
 
-export const apiConsumerSubscriptionIdSchema: z.Schema<ApiConsumerSubscriptionId> =
+export const apiConsumerSubscriptionIdSchema: ZodSchemaWithInputMatchingOutput<ApiConsumerSubscriptionId> =
   z.string();
 
-export const apiConsumerReadSchema: z.Schema<ApiConsumerName[]> = z.array(
-  zStringMinLength1.max(255),
-);
+export const apiConsumerReadSchema: ZodSchemaWithInputMatchingOutput<
+  ApiConsumerName[]
+> = z.array(zStringMinLength1.max(255));

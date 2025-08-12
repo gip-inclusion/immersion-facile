@@ -42,7 +42,7 @@ export const getConventionTooLongMessageAndPath = ({
 }: {
   internshipKind: InternshipKind;
 }) => ({
-  error: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[internshipKind]} jours.`,
+  message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[internshipKind]} jours.`,
   path: [getConventionFieldName("dateEnd")],
 });
 

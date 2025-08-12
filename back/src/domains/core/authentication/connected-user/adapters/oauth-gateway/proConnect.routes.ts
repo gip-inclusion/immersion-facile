@@ -2,6 +2,7 @@ import {
   type AbsoluteUrl,
   localization,
   withAuthorizationHeaders,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
@@ -19,7 +20,7 @@ type ProConnectAccessTokenResponse = {
   id_token: string;
 };
 
-const proConnectAccessTokenResponseSchema: z.Schema<ProConnectAccessTokenResponse> =
+const proConnectAccessTokenResponseSchema: ZodSchemaWithInputMatchingOutput<ProConnectAccessTokenResponse> =
   z.object({
     access_token: z.string(),
     token_type: z.enum(["Bearer"], {

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zUuidLike } from "../zodUtils";
+import { type ZodSchemaWithInputMatchingOutput, zUuidLike } from "../zodUtils";
 import type {
   SearchResultQuery,
   SiretAndAppellationDto,
@@ -12,10 +12,11 @@ const siretAndAppellationShape = {
   siret: siretSchema,
 };
 
-export const siretAndAppellationSchema: z.Schema<SiretAndAppellationDto> =
+export const siretAndAppellationSchema: ZodSchemaWithInputMatchingOutput<SiretAndAppellationDto> =
   z.object(siretAndAppellationShape);
 
-export const searchResultQuerySchema: z.Schema<SearchResultQuery> = z.object({
-  ...siretAndAppellationShape,
-  locationId: zUuidLike,
-});
+export const searchResultQuerySchema: ZodSchemaWithInputMatchingOutput<SearchResultQuery> =
+  z.object({
+    ...siretAndAppellationShape,
+    locationId: zUuidLike,
+  });

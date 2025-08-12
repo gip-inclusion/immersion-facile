@@ -3,6 +3,7 @@ import {
   conventionIdSchema,
   type InternshipKind,
   internshipKindSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -18,13 +19,14 @@ export type RenewMagicLinkPayload = {
   conventionId?: ConventionId;
 };
 
-const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> = z.object({
-  internshipKind: internshipKindSchema,
-  emails: z.array(z.string()),
-  magicLink: z.string(),
-  conventionStatusLink: z.string(),
-  conventionId: conventionIdSchema.optional(),
-});
+const renewMagicLinkPayloadSchema: ZodSchemaWithInputMatchingOutput<RenewMagicLinkPayload> =
+  z.object({
+    internshipKind: internshipKindSchema,
+    emails: z.array(z.string()),
+    magicLink: z.string(),
+    conventionStatusLink: z.string(),
+    conventionId: conventionIdSchema.optional(),
+  });
 
 export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLinkPayload> {
   protected inputSchema = renewMagicLinkPayloadSchema;

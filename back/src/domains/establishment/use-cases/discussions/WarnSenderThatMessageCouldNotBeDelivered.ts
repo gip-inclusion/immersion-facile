@@ -6,6 +6,7 @@ import {
   type NotificationKind,
   notificationErroredSchema,
   notificationIdSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -17,7 +18,7 @@ export type WarnSenderThatMessageCouldNotBeDeliveredParams = {
   errored: NotificationErrored;
 };
 
-const inputSchema: z.Schema<WarnSenderThatMessageCouldNotBeDeliveredParams> =
+const inputSchema: ZodSchemaWithInputMatchingOutput<WarnSenderThatMessageCouldNotBeDeliveredParams> =
   z.object({
     notificationId: notificationIdSchema,
     notificationKind: z.enum(["email", "sms"], {

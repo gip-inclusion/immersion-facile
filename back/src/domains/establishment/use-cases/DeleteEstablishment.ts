@@ -4,6 +4,7 @@ import {
   errors,
   type SiretDto,
   siretSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
@@ -18,7 +19,7 @@ type DeleteEstablishmentPayload = {
   siret: SiretDto;
 };
 
-const deleteEstablishmentPayloadSchema: z.Schema<DeleteEstablishmentPayload> =
+const deleteEstablishmentPayloadSchema: ZodSchemaWithInputMatchingOutput<DeleteEstablishmentPayload> =
   z.object({
     siret: siretSchema,
   });

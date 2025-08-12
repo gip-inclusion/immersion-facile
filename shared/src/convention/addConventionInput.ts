@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { DiscussionId } from "../discussion/discussion.dto";
 import { discussionIdSchema } from "../discussion/discussion.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type { ConventionDto } from "./convention.dto";
 import { conventionSchema } from "./convention.schema";
 
@@ -12,7 +13,8 @@ export type AddConventionInput = {
   discussionId?: DiscussionId;
 };
 
-export const addConventionInputSchema: z.Schema<AddConventionInput> = z.object({
-  convention: conventionSchema,
-  discussionId: discussionIdSchema.optional(),
-});
+export const addConventionInputSchema: ZodSchemaWithInputMatchingOutput<AddConventionInput> =
+  z.object({
+    convention: conventionSchema,
+    discussionId: discussionIdSchema.optional(),
+  });

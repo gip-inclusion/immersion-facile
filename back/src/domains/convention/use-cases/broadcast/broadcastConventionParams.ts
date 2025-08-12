@@ -3,6 +3,7 @@ import {
   assessmentDtoSchema,
   type ConventionReadDto,
   conventionReadSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 
@@ -17,7 +18,7 @@ export type BroadcastConventionParams =
       assessment: AssessmentDto;
     };
 
-export const broadcastConventionParamsSchema: z.Schema<BroadcastConventionParams> =
+export const broadcastConventionParamsSchema: ZodSchemaWithInputMatchingOutput<BroadcastConventionParams> =
   z.union([
     z.object({
       eventType: z.literal("CONVENTION_UPDATED"),

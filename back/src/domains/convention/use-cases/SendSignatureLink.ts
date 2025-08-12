@@ -13,6 +13,7 @@ import {
   type SignatoryRole,
   signatoryRoleSchema,
   type UserId,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -43,7 +44,7 @@ type SendSignatureLinkParams = {
   role: SignatoryRole;
 };
 
-const sendSignatureLinkParamsSchema: z.Schema<SendSignatureLinkParams> =
+const sendSignatureLinkParamsSchema: ZodSchemaWithInputMatchingOutput<SendSignatureLinkParams> =
   z.object({
     conventionId: conventionIdSchema,
     role: signatoryRoleSchema,

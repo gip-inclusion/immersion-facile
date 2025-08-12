@@ -44,7 +44,9 @@ export const zStringMinLength1 = z
 
 export const zStringCanBeEmpty = z.string().trim();
 
-export const zStringPossiblyEmptyWithMax = (max: number): z.Schema<string> =>
+export const zStringPossiblyEmptyWithMax = (
+  max: number,
+): ZodSchemaWithInputMatchingOutput<string> =>
   zStringCanBeEmpty.max(max, localization.maxCharacters(max));
 
 export const zTrimmedStringWithMax = (max: number) =>
@@ -75,13 +77,14 @@ export const zToBoolean = z
     ["true", "1"].includes((v ?? "false").toString().toLowerCase()),
   );
 
-export const zToNumber = z.coerce.number();
+export const zToNumber: ZodSchemaWithInputMatchingOutput<number> =
+  z.coerce.number();
 
 export const zUuidLike = z.string().length(36);
 
-export const emptyObjectSchema: z.Schema<Record<string, never>> = z
-  .object({})
-  .strict();
+export const emptyObjectSchema: ZodSchemaWithInputMatchingOutput<
+  Record<string, never>
+> = z.object({}).strict();
 
 export const personNameSchema = z
   .string()
@@ -106,3 +109,9 @@ export const zEnumValidation = <T extends string>(
   });
 
 export const zAnyObj = z.object({}).loose();
+
+export type ZodSchemaWithInputMatchingOutput<T> = z.ZodType<
+  T,
+  T,
+  z.core.$ZodTypeInternals<T, T>
+>;

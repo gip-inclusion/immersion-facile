@@ -2,7 +2,10 @@ import { z } from "zod";
 import type { InternshipKind } from "./convention/convention.dto";
 import { internshipKindSchema } from "./convention/convention.schema";
 import { emailSchema } from "./email/email.schema";
-import { zStringMinLength1 } from "./zodUtils";
+import {
+  type ZodSchemaWithInputMatchingOutput,
+  zStringMinLength1,
+} from "./zodUtils";
 
 export type ShareLinkByEmailDto = {
   conventionLink: string;
@@ -11,9 +14,10 @@ export type ShareLinkByEmailDto = {
   details: string;
 };
 
-export const shareLinkByEmailSchema: z.Schema<ShareLinkByEmailDto> = z.object({
-  internshipKind: internshipKindSchema,
-  conventionLink: zStringMinLength1,
-  email: emailSchema,
-  details: zStringMinLength1,
-});
+export const shareLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareLinkByEmailDto> =
+  z.object({
+    internshipKind: internshipKindSchema,
+    conventionLink: zStringMinLength1,
+    email: emailSchema,
+    details: zStringMinLength1,
+  });

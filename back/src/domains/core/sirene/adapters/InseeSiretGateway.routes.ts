@@ -1,4 +1,4 @@
-import type { AbsoluteUrl } from "shared";
+import type { AbsoluteUrl, ZodSchemaWithInputMatchingOutput } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import type { SirenGatewayAnswer } from "./InseeSiretGateway";
@@ -29,9 +29,9 @@ export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
       }),
       requestBodySchema: z.string(),
       responses: {
-        [200]: z.any(),
-        [400]: errorInGetAccessTokenError,
-        [401]: errorInGetAccessTokenError,
+        200: z.any(),
+        400: errorInGetAccessTokenError,
+        401: errorInGetAccessTokenError,
       },
     }),
     getEstablishmentUpdatedBetween: defineRoute({
@@ -44,11 +44,11 @@ export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
       }),
       requestBodySchema: z.string(),
       responses: {
-        [200]: siretGatewayAnswerSchema,
-        [400]: inseeErrorSchema,
-        [404]: inseeErrorSchema,
-        [429]: inseeErrorSchema,
-        [503]: z.string(),
+        200: siretGatewayAnswerSchema,
+        400: inseeErrorSchema,
+        404: inseeErrorSchema,
+        429: inseeErrorSchema,
+        503: z.string(),
       },
     }),
     getEstablishmentBySiret: defineRoute({
@@ -64,13 +64,14 @@ export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
         date: z.string().optional(),
       }),
       responses: {
-        [200]: siretGatewayAnswerSchema,
-        [400]: inseeErrorSchema,
-        [404]: inseeErrorSchema,
-        [429]: inseeErrorSchema,
-        [503]: z.any(),
+        200: siretGatewayAnswerSchema,
+        400: inseeErrorSchema,
+        404: inseeErrorSchema,
+        429: inseeErrorSchema,
+        503: z.any(),
       },
     }),
   });
 
-const siretGatewayAnswerSchema: z.Schema<SirenGatewayAnswer> = z.any();
+const siretGatewayAnswerSchema: ZodSchemaWithInputMatchingOutput<SirenGatewayAnswer> =
+  z.any();

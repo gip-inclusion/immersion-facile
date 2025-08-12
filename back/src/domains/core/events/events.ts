@@ -20,6 +20,7 @@ import {
   type WithDiscussionId,
   type WithOptionalFirstnameAndLastname,
   type WithSiretDto,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
@@ -77,14 +78,12 @@ export type TriggeredBy =
   | { kind: "convention-magic-link"; role: Role }
   | { kind: "crawler" };
 
-export const triggeredBySchema: z.Schema<TriggeredBy> = z.discriminatedUnion(
-  "kind",
-  [
+export const triggeredBySchema: ZodSchemaWithInputMatchingOutput<TriggeredBy> =
+  z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("connected-user"), userId: userIdSchema }),
     z.object({ kind: z.literal("convention-magic-link"), role: roleSchema }),
     z.object({ kind: z.literal("crawler") }),
-  ],
-);
+  ]);
 
 export type WithTriggeredBy = {
   triggeredBy: TriggeredBy | null;

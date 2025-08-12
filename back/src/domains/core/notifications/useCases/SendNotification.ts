@@ -3,6 +3,7 @@ import {
   exhaustiveCheck,
   type Notification,
   type NotificationErrored,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { match, P } from "ts-pattern";
 import { z } from "zod";
@@ -14,12 +15,11 @@ import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPer
 import type { WithNotificationIdAndKind } from "../helpers/Notification";
 import type { NotificationGateway } from "../ports/NotificationGateway";
 
-const withNotificationIdAndKind: z.Schema<WithNotificationIdAndKind> = z.object(
-  {
+const withNotificationIdAndKind: ZodSchemaWithInputMatchingOutput<WithNotificationIdAndKind> =
+  z.object({
     id: z.string(),
     kind: z.union([z.literal("email"), z.literal("sms")]),
-  },
-);
+  });
 
 export class SendNotification extends TransactionalUseCase<WithNotificationIdAndKind> {
   protected inputSchema = withNotificationIdAndKind;

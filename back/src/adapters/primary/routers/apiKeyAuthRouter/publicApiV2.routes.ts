@@ -9,12 +9,16 @@ import {
   searchResultSchema,
   searchResultsSchema,
   withAuthorizationHeaders,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import type { EstablishmentStat } from "../../../../domains/core/statistics/use-cases/GetEstablishmentStats";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
-import { conventionReadPublicV2Schema } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
+import {
+  conventionReadPublicListV2Schema,
+  conventionReadPublicV2Schema,
+} from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
 import { getConventionsByFiltersQueryParamsV2Schema } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
 import { searchParamsPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.schema";
 
@@ -84,7 +88,7 @@ export const publicApiV2ConventionRoutes = defineRoutes({
     queryParamsSchema: getConventionsByFiltersQueryParamsV2Schema,
     ...withAuthorizationHeaders,
     responses: {
-      200: z.array(conventionReadPublicV2Schema),
+      200: conventionReadPublicListV2Schema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
@@ -93,12 +97,13 @@ export const publicApiV2ConventionRoutes = defineRoutes({
   }),
 });
 
-const establishmentStatSchema: z.Schema<EstablishmentStat> = z.object({
-  siret: z.string(),
-  name: z.string(),
-  numberOfConventions: z.number(),
-  isReferenced: z.boolean(),
-});
+const establishmentStatSchema: ZodSchemaWithInputMatchingOutput<EstablishmentStat> =
+  z.object({
+    siret: z.string(),
+    name: z.string(),
+    numberOfConventions: z.number(),
+    isReferenced: z.boolean(),
+  });
 
 export const paginatedEstablishmentStatsSchema = createPaginatedSchema(
   establishmentStatSchema,
