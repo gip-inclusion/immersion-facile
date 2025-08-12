@@ -3,6 +3,7 @@ import {
   conventionIdSchema,
   localization,
   reminderKinds,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -11,7 +12,7 @@ import type {
   TransferConventionToAgencyPayload,
 } from "./eventPayload.dto";
 
-export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload> =
+export const conventionReminderPayloadSchema: ZodSchemaWithInputMatchingOutput<ConventionReminderPayload> =
   z.object({
     reminderKind: z.enum(reminderKinds, {
       error: localization.invalidEnum,
@@ -19,7 +20,7 @@ export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload
     conventionId: z.string(),
   });
 
-export const transferConventionToAgencyPayloadSchema: z.Schema<TransferConventionToAgencyPayload> =
+export const transferConventionToAgencyPayloadSchema: ZodSchemaWithInputMatchingOutput<TransferConventionToAgencyPayload> =
   z.object({
     conventionId: conventionIdSchema,
     justification: zStringMinLength1,

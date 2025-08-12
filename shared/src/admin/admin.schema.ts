@@ -4,7 +4,10 @@ import { conventionIdSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { userIdSchema } from "../user/user.schema";
-import { zStringMinLength1 } from "../zodUtils";
+import {
+  type ZodSchemaWithInputMatchingOutput,
+  zStringMinLength1,
+} from "../zodUtils";
 import type {
   GetUsersFilters,
   ManageConventionAdminForm,
@@ -15,13 +18,13 @@ import type {
   WithUserFilters,
 } from "./admin.dto";
 
-export const withAgencyIdAndUserIdSchema: z.Schema<WithAgencyIdAndUserId> =
+export const withAgencyIdAndUserIdSchema: ZodSchemaWithInputMatchingOutput<WithAgencyIdAndUserId> =
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,
   });
 
-export const userParamsForAgencySchema: z.Schema<UserParamsForAgency> =
+export const userParamsForAgencySchema: ZodSchemaWithInputMatchingOutput<UserParamsForAgency> =
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,
@@ -30,33 +33,35 @@ export const userParamsForAgencySchema: z.Schema<UserParamsForAgency> =
     email: emailSchema,
   });
 
-export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectConnectedUserRoleForAgencyParams> =
+export const rejectIcUserRoleForAgencyParamsSchema: ZodSchemaWithInputMatchingOutput<RejectConnectedUserRoleForAgencyParams> =
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,
     justification: zStringMinLength1,
   });
 
-export const withUserFiltersSchema: z.Schema<WithUserFilters> = z
-  .object({
-    agencyRole: agencyRoleSchema,
-  })
-  .or(
-    z.object({
-      agencyId: agencyIdSchema,
-    }),
-  );
+export const withUserFiltersSchema: ZodSchemaWithInputMatchingOutput<WithUserFilters> =
+  z
+    .object({
+      agencyRole: agencyRoleSchema,
+    })
+    .or(
+      z.object({
+        agencyId: agencyIdSchema,
+      }),
+    );
 
-export const manageConventionAdminFormSchema: z.Schema<ManageConventionAdminForm> =
+export const manageConventionAdminFormSchema: ZodSchemaWithInputMatchingOutput<ManageConventionAdminForm> =
   z.object({
     conventionId: conventionIdSchema,
   });
 
-export const manageEstablishmentAdminFormSchema: z.Schema<ManageEstablishmentAdminForm> =
+export const manageEstablishmentAdminFormSchema: ZodSchemaWithInputMatchingOutput<ManageEstablishmentAdminForm> =
   z.object({
     siret: siretSchema,
   });
 
-export const getUsersFiltersSchema: z.Schema<GetUsersFilters> = z.object({
-  emailContains: z.string(),
-});
+export const getUsersFiltersSchema: ZodSchemaWithInputMatchingOutput<GetUsersFilters> =
+  z.object({
+    emailContains: z.string(),
+  });

@@ -1,4 +1,8 @@
-import type { AbsoluteUrl, ShortLinkId } from "shared";
+import type {
+  AbsoluteUrl,
+  ShortLinkId,
+  ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { z } from "zod";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 
@@ -8,7 +12,7 @@ export type PgShortLinkRepositoryDto = {
   created_at: Date;
 };
 
-export const pgShortLinkRepositorySchema: z.Schema<PgShortLinkRepositoryDto> =
+export const pgShortLinkRepositorySchema: ZodSchemaWithInputMatchingOutput<PgShortLinkRepositoryDto> =
   z.object({
     short_link_id: z.string().nonempty(),
     url: z.string().url(),

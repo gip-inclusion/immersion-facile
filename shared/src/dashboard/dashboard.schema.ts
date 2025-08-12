@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { localization } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
 import {
   allDashboardNames,
   type DashboardUrlAndName,
@@ -9,7 +12,7 @@ import {
   simpleDashboardNames,
 } from "./dashboard.dto";
 
-export const getAdminDashboardParamsSchema: z.Schema<GetAdminDashboardParams> =
+export const getAdminDashboardParamsSchema: ZodSchemaWithInputMatchingOutput<GetAdminDashboardParams> =
   z.union([
     z.object({
       name: z.enum(simpleDashboardNames, {
@@ -24,7 +27,7 @@ export const getAdminDashboardParamsSchema: z.Schema<GetAdminDashboardParams> =
     }),
   ]);
 
-export const getConventionMagicLinkDashboardParamsSchema: z.Schema<GetConventionMagicLinkDashboardParams> =
+export const getConventionMagicLinkDashboardParamsSchema: ZodSchemaWithInputMatchingOutput<GetConventionMagicLinkDashboardParams> =
   z.object({
     name: z.enum(["conventionStatus"], {
       error: localization.invalidEnum,
@@ -37,7 +40,7 @@ export const getDashboardParams = z.union([
   getConventionMagicLinkDashboardParamsSchema,
 ]);
 
-export const dashboardUrlAndNameSchema: z.Schema<DashboardUrlAndName> =
+export const dashboardUrlAndNameSchema: ZodSchemaWithInputMatchingOutput<DashboardUrlAndName> =
   z.object({
     name: z.enum(allDashboardNames, {
       error: localization.invalidEnum,

@@ -1,4 +1,8 @@
-import type { AbsoluteUrl, Flavor } from "shared";
+import type {
+  AbsoluteUrl,
+  Flavor,
+  ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { z } from "zod";
 
 export const apiBrevoUrl: AbsoluteUrl = "https://api.sendinblue.com/v3";
@@ -23,13 +27,14 @@ type BrevoBinaryContentHeaders = {
   "api-key": ApiKey;
 };
 
-export const brevoHeaderSchema: z.Schema<BrevoHeaders> = z.object({
-  accept: applicationJsonSchema,
-  "Content-Type": applicationJsonSchema,
-  "api-key": apiKeySchema,
-});
+export const brevoHeaderSchema: ZodSchemaWithInputMatchingOutput<BrevoHeaders> =
+  z.object({
+    accept: applicationJsonSchema,
+    "Content-Type": applicationJsonSchema,
+    "api-key": apiKeySchema,
+  });
 
-export const brevoHeaderBinaryContentSchema: z.Schema<BrevoBinaryContentHeaders> =
+export const brevoHeaderBinaryContentSchema: ZodSchemaWithInputMatchingOutput<BrevoBinaryContentHeaders> =
   z.object({
     accept: applicationOctetStreamSchema,
     "api-key": apiKeySchema,

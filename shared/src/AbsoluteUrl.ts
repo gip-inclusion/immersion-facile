@@ -1,18 +1,19 @@
 import { z } from "zod";
+import type { ZodSchemaWithInputMatchingOutput } from "./zodUtils";
 
 type Http = "http://" | "https://";
 
 export type AbsoluteUrl = `${Http}${string}`;
 
-export const absoluteUrlSchema: z.Schema<AbsoluteUrl> = z
+export const absoluteUrlSchema = z
   .string()
   .trim()
   .regex(
     /^https?:\/\/.+?$/,
     "Le format de saisie est invalide. Exemple : https://www.exemple.fr/chemin-du-lien",
-  ) as z.Schema<AbsoluteUrl>;
+  ) as ZodSchemaWithInputMatchingOutput<AbsoluteUrl>;
 
-export const callbackUrlSchema: z.Schema<AbsoluteUrl> =
+export const callbackUrlSchema: ZodSchemaWithInputMatchingOutput<AbsoluteUrl> =
   absoluteUrlSchema.refine(
     (value) =>
       !(

@@ -7,6 +7,7 @@ import {
   type OmitFromExistingKeys,
   refersToAgencyIdSchema,
   type Signatories,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -44,7 +45,7 @@ export type ConventionPresentation = OmitFromExistingKeys<
   WithIntershipKind &
   WithFromPeConnectedUser;
 
-export const conventionPresentationSchema: z.Schema<ConventionPresentation> =
+export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<ConventionPresentation> =
   conventionSchema.and(
     z.object({
       agencyDepartment: z.string(),
@@ -62,7 +63,7 @@ export type WithStatusJustification = {
   statusJustification: string;
 };
 
-export const statusJustificationSchema: z.Schema<WithStatusJustification> =
+export const statusJustificationSchema: ZodSchemaWithInputMatchingOutput<WithStatusJustification> =
   z.object({
     statusJustification: zStringMinLength1,
   });
