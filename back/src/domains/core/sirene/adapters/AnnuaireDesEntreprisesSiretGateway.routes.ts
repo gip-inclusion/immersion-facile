@@ -1,6 +1,6 @@
 import { localization } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const adeEstablishmentSchema = z.object({
   matching_etablissements: z

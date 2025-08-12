@@ -1,4 +1,4 @@
-import { ZodError } from "zod/v4";
+import { ZodError } from "zod";
 import { expectToEqual } from "../test.helpers";
 import type { DateRange } from "../utils/date";
 import type { AssessmentDto } from "./assessment.dto";

@@ -4,7 +4,7 @@ import {
   zToBoolean,
   zToNumber,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { SearchParamsPublicV2 } from "./SearchParamsPublicV2.dto";
 
 export const searchParamsPublicV2Schema: z.Schema<SearchParamsPublicV2> =

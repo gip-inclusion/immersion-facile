@@ -1,5 +1,5 @@
 import { keys } from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { searchTextSchema } from "../search/searchText.schema";
 import { localization, zStringMinLength1 } from "../zodUtils";
 import {

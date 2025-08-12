@@ -11,7 +11,7 @@ import {
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { EstablishmentStat } from "../../../../domains/core/statistics/use-cases/GetEstablishmentStats";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { conventionReadPublicV2Schema } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";

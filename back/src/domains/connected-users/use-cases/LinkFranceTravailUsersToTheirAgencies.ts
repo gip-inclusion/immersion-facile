@@ -8,7 +8,7 @@ import {
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserWithRights,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   getAgencyAndAdminEmailsByAgencyId,
   updateRightsOnMultipleAgenciesForUser,

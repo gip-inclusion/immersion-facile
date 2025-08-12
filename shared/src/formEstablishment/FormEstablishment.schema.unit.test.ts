@@ -1,4 +1,4 @@
-import { ZodError } from "zod/v4";
+import { ZodError } from "zod";
 import { expectToEqual } from "../test.helpers";
 import { formEstablishmentSchema } from "./FormEstablishment.schema";
 import { FormEstablishmentDtoBuilder } from "./FormEstablishmentDtoBuilder";

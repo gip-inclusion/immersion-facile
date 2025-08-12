@@ -1,5 +1,5 @@
 import { executeInSequence } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";

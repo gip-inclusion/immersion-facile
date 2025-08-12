@@ -23,7 +23,7 @@ import {
   defaultFormEstablishmentValue,
   establishmentSlice,
 } from "src/core-logic/domain/establishment/establishment.slice";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const {
   Component: InitiateConventionModal,

@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { agencyIdSchema, agencyRoleSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";

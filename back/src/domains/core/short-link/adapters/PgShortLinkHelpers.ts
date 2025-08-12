@@ -1,5 +1,5 @@
 import type { AbsoluteUrl, ShortLinkId } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 
 export type PgShortLinkRepositoryDto = {

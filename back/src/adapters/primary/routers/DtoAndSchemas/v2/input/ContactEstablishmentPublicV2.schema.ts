@@ -11,7 +11,7 @@ import {
   zStringMinLength1,
   zUuidLike,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type {
   ContactEstablishmentByMailPublicV2Dto,
   ContactEstablishmentPublicV2Dto,

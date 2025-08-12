@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { searchResultSchema } from "../search/SearchResult.schema";
 import { zStringMinLength1 } from "../zodUtils";

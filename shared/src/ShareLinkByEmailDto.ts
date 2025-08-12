@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { InternshipKind } from "./convention/convention.dto";
 import { internshipKindSchema } from "./convention/convention.schema";
 import { emailSchema } from "./email/email.schema";

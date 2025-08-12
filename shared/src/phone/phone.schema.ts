@@ -4,7 +4,7 @@ import parsePhoneNumberFromString, {
 } from "libphonenumber-js";
 import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { keys } from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   countryCodesData,
   defaultCountryCode,

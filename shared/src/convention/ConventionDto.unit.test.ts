@@ -1,6 +1,6 @@
 import { addDays, format, subDays, subYears } from "date-fns";
 import { keys } from "ramda";
-import { ZodError, type z } from "zod/v4";
+import { ZodError, type z } from "zod";
 import {
   CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
   DATE_CONSIDERED_OLD,

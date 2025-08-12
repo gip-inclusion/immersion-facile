@@ -1,7 +1,7 @@
 import subDays from "date-fns/subDays";
 import { keys } from "ramda";
 import type { SiretDto, SiretEstablishmentDto } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
