@@ -1,4 +1,4 @@
-import type { AbsoluteUrl } from "shared";
+import type { AbsoluteUrl, ZodSchemaWithInputMatchingOutput } from "shared";
 import { z } from "zod";
 import type { BearerToken } from "../../dto/BearerToken";
 import type { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
@@ -51,7 +51,7 @@ export type FtConnectHeaders = {
 type FtConnectAccessTokenHeaders = {
   "Content-Type": "application/x-www-form-urlencoded";
 };
-export const ftConnectAccessTokenHeadersSchema: z.Schema<FtConnectAccessTokenHeaders> =
+export const ftConnectAccessTokenHeadersSchema: ZodSchemaWithInputMatchingOutput<FtConnectAccessTokenHeaders> =
   z
     .object({
       "Content-Type": z.literal("application/x-www-form-urlencoded"),

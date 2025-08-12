@@ -7,6 +7,7 @@ import {
   agencyRoleIsNotToReview,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserWithRights,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import {
@@ -23,10 +24,11 @@ export type UserAuthenticatedPayload = {
   codeSafir: string | null; // Code safir non stocké en DB côté utilisateur
 };
 
-const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
-  userId: z.string(),
-  codeSafir: z.string().or(z.null()),
-});
+const userAuthenticatedSchema: ZodSchemaWithInputMatchingOutput<UserAuthenticatedPayload> =
+  z.object({
+    userId: z.string(),
+    codeSafir: z.string().or(z.null()),
+  });
 
 export type LinkFranceTravailUsersToTheirAgencies = ReturnType<
   typeof makeLinkFranceTravailUsersToTheirAgencies

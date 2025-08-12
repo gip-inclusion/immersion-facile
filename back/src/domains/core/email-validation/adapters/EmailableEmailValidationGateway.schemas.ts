@@ -1,6 +1,7 @@
 import {
   localization,
   validateEmailReasonSchema,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -10,15 +11,16 @@ import type {
   EmailableEmailValidationStatus,
 } from "./EmailableEmailValidationGateway.dto";
 
-const emailableApiKeySchema: z.Schema<EmailableApiKey> = zStringMinLength1;
+const emailableApiKeySchema: ZodSchemaWithInputMatchingOutput<EmailableApiKey> =
+  zStringMinLength1;
 
-export const emailableValidationTargetsQueryParamsSchema: z.Schema<EmailableEmailValidationParams> =
+export const emailableValidationTargetsQueryParamsSchema: ZodSchemaWithInputMatchingOutput<EmailableEmailValidationParams> =
   z.object({
     email: zStringMinLength1,
     api_key: emailableApiKeySchema,
   });
 
-export const emailableEmailValidationStatusSchema: z.Schema<EmailableEmailValidationStatus> =
+export const emailableEmailValidationStatusSchema: ZodSchemaWithInputMatchingOutput<EmailableEmailValidationStatus> =
   z.object({
     accept_all: z.boolean().nullish(),
     did_you_mean: z.string().nullish(),

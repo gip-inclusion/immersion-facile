@@ -7,6 +7,7 @@ import {
   localization,
   type PhoneNumber,
   smsRecipientPhoneSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 
@@ -14,10 +15,11 @@ export type RecipientOrSender = {
   name?: string;
   email: string;
 };
-const recipientOrSenderSchema: z.Schema<RecipientOrSender> = z.object({
-  name: z.string().optional(),
-  email: emailSchema,
-});
+const recipientOrSenderSchema: ZodSchemaWithInputMatchingOutput<RecipientOrSender> =
+  z.object({
+    name: z.string().optional(),
+    email: emailSchema,
+  });
 
 export type SendTransactEmailRequestBody = {
   to: RecipientOrSender[];
@@ -30,7 +32,7 @@ export type SendTransactEmailRequestBody = {
   attachment?: EmailAttachment[];
 };
 
-export const sendTransactEmailRequestBodySchema: z.Schema<SendTransactEmailRequestBody> =
+export const sendTransactEmailRequestBodySchema: ZodSchemaWithInputMatchingOutput<SendTransactEmailRequestBody> =
   z.object({
     to: z.array(recipientOrSenderSchema),
     replyTo: recipientOrSenderSchema.optional(),
@@ -46,7 +48,7 @@ export type SendTransactEmailResponseBody =
   | { messageId: string | number }
   | { messageIds: (string | number)[] };
 
-export const sendTransactEmailResponseSchema: z.Schema<SendTransactEmailResponseBody> =
+export const sendTransactEmailResponseSchema: ZodSchemaWithInputMatchingOutput<SendTransactEmailResponseBody> =
   z
     .object({
       messageId: z.string().or(z.number()),
@@ -68,7 +70,7 @@ export type SendTransactSmsRequestBody = {
   unicodeEnabled?: boolean;
 };
 
-const brevoSmsSenderSchema: z.Schema<string> = z
+const brevoSmsSenderSchema: ZodSchemaWithInputMatchingOutput<string> = z
   .string()
   .refine(
     (sender) =>
@@ -81,7 +83,7 @@ const brevoSmsSenderSchema: z.Schema<string> = z
     },
   );
 
-export const sendTransactSmsRequestBodySchema: z.Schema<SendTransactSmsRequestBody> =
+export const sendTransactSmsRequestBodySchema: ZodSchemaWithInputMatchingOutput<SendTransactSmsRequestBody> =
   z.object({
     sender: brevoSmsSenderSchema,
     recipient: smsRecipientPhoneSchema,
@@ -105,7 +107,7 @@ type SendTransactSmsResponseBody = {
   remainingCredits?: number;
 };
 
-export const sendTransactSmsResponseSchema: z.Schema<SendTransactSmsResponseBody> =
+export const sendTransactSmsResponseSchema: ZodSchemaWithInputMatchingOutput<SendTransactSmsResponseBody> =
   z.object({
     reference: z.string(),
     messageId: z.number(),

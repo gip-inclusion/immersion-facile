@@ -1,4 +1,4 @@
-import { localization } from "shared";
+import { localization, type ZodSchemaWithInputMatchingOutput } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ const adeEstablishmentSchema = z.object({
   }),
 });
 
-const annuaireDesEntreprisesSiretGatewayResponseSchema: z.Schema<AnnuaireDesEntreprisesSiretGatewayResponse> =
+const annuaireDesEntreprisesSiretGatewayResponseSchema: ZodSchemaWithInputMatchingOutput<AnnuaireDesEntreprisesSiretGatewayResponse> =
   z.object({
     results: z.array(adeEstablishmentSchema),
     total_results: z.number(),
@@ -56,7 +56,7 @@ type AnnuaireDesEntreprisesSiretGatewayResponse = {
   total_pages: number;
 };
 
-const annuaireDesEntreprisesQueryParamsSchema: z.Schema<{
+const annuaireDesEntreprisesQueryParamsSchema: ZodSchemaWithInputMatchingOutput<{
   q: string;
   mtm_campaign: "immersion-facilitee";
 }> = z.any();

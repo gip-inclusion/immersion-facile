@@ -2,6 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
   localization,
+  type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
   zStringMinLength1,
 } from "../zodUtils";
@@ -19,34 +20,35 @@ import {
   type WithFeatureFlagTitleValue,
 } from "./featureFlags.dto";
 
-const featureFlagBooleanSchema: z.Schema<FeatureFlagBoolean> = z.object({
-  isActive: z.boolean(),
-  kind: z.literal("boolean"),
-});
+const featureFlagBooleanSchema: ZodSchemaWithInputMatchingOutput<FeatureFlagBoolean> =
+  z.object({
+    isActive: z.boolean(),
+    kind: z.literal("boolean"),
+  });
 
-const withFeatureFlagTitleSchema: z.Schema<WithFeatureFlagTitleValue> =
+const withFeatureFlagTitleSchema: ZodSchemaWithInputMatchingOutput<WithFeatureFlagTitleValue> =
   z.object({
     title: zStringCanBeEmpty,
   });
 
-const withFeatureFlagMessageSchema: z.Schema<WithFeatureFlagTextValue> =
+const withFeatureFlagMessageSchema: ZodSchemaWithInputMatchingOutput<WithFeatureFlagTextValue> =
   z.object({
     message: zStringCanBeEmpty,
   });
 
-const withFeatureFlagButtonSchema: z.Schema<WithFeatureFlagButtonValue> =
+const withFeatureFlagButtonSchema: ZodSchemaWithInputMatchingOutput<WithFeatureFlagButtonValue> =
   z.object({
     href: absoluteUrlSchema,
     label: zStringMinLength1,
   });
 
-export const featureFlagHighlightValueSchema: z.Schema<
+export const featureFlagHighlightValueSchema: ZodSchemaWithInputMatchingOutput<
   FeatureFlagHighlight["value"]
 > = withFeatureFlagTitleSchema
   .and(withFeatureFlagMessageSchema)
   .and(withFeatureFlagButtonSchema);
 
-export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
+export const featureFlagTextImageAndRedirectValueSchema: ZodSchemaWithInputMatchingOutput<
   FeatureFlagTextImageAndRedirect["value"]
 > = z
   .object({
@@ -58,7 +60,7 @@ export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
   .and(withFeatureFlagMessageSchema)
   .and(withFeatureFlagTitleSchema);
 
-export const featureFlagTextWithSeverityValueSchema: z.Schema<
+export const featureFlagTextWithSeverityValueSchema: ZodSchemaWithInputMatchingOutput<
   FeatureFlagTextWithSeverity["value"]
 > = z.object({
   message: z.string(),
@@ -67,47 +69,50 @@ export const featureFlagTextWithSeverityValueSchema: z.Schema<
   }),
 });
 
-const featureFlagTextWithSeveritySchema: z.Schema<FeatureFlagTextWithSeverity> =
+const featureFlagTextWithSeveritySchema: ZodSchemaWithInputMatchingOutput<FeatureFlagTextWithSeverity> =
   z.object({
     isActive: z.boolean(),
     kind: z.literal("textWithSeverity"),
     value: featureFlagTextWithSeverityValueSchema,
   });
 
-const featureFlagTextImageAndRedirectSchema: z.Schema<FeatureFlagTextImageAndRedirect> =
+const featureFlagTextImageAndRedirectSchema: ZodSchemaWithInputMatchingOutput<FeatureFlagTextImageAndRedirect> =
   z.object({
     isActive: z.boolean(),
     kind: z.literal("textImageAndRedirect"),
     value: featureFlagTextImageAndRedirectValueSchema,
   });
 
-const featureFlagHighlightSchema: z.Schema<FeatureFlagHighlight> = z.object({
-  isActive: z.boolean(),
-  kind: z.literal("highlight"),
-  value: featureFlagHighlightValueSchema,
-});
+const featureFlagHighlightSchema: ZodSchemaWithInputMatchingOutput<FeatureFlagHighlight> =
+  z.object({
+    isActive: z.boolean(),
+    kind: z.literal("highlight"),
+    value: featureFlagHighlightValueSchema,
+  });
 
-export const featureFlagSchema: z.Schema<FeatureFlag> =
+export const featureFlagSchema: ZodSchemaWithInputMatchingOutput<FeatureFlag> =
   featureFlagTextImageAndRedirectSchema
     .or(featureFlagTextWithSeveritySchema)
     .or(featureFlagBooleanSchema)
     .or(featureFlagHighlightSchema);
 
-export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParam> = z.object({
-  flagName: z.enum(featureFlagNames, {
-    error: localization.invalidEnum,
-  }),
-  featureFlag: featureFlagSchema,
-});
+export const setFeatureFlagSchema: ZodSchemaWithInputMatchingOutput<SetFeatureFlagParam> =
+  z.object({
+    flagName: z.enum(featureFlagNames, {
+      error: localization.invalidEnum,
+    }),
+    featureFlag: featureFlagSchema,
+  });
 
-export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
-  enableTemporaryOperation: featureFlagTextImageAndRedirectSchema,
-  enableMaintenance: featureFlagTextWithSeveritySchema,
-  enableSearchByScore: featureFlagBooleanSchema,
-  enableBroadcastOfConseilDepartementalToFT: featureFlagBooleanSchema,
-  enableBroadcastOfCapEmploiToFT: featureFlagBooleanSchema,
-  enableBroadcastOfMissionLocaleToFT: featureFlagBooleanSchema,
-  enableStandardFormatBroadcastToFranceTravail: featureFlagBooleanSchema,
-  enableEstablishmentDashboardHighlight: featureFlagHighlightSchema,
-  enableAgencyDashboardHighlight: featureFlagHighlightSchema,
-});
+export const featureFlagsSchema: ZodSchemaWithInputMatchingOutput<FeatureFlags> =
+  z.object({
+    enableTemporaryOperation: featureFlagTextImageAndRedirectSchema,
+    enableMaintenance: featureFlagTextWithSeveritySchema,
+    enableSearchByScore: featureFlagBooleanSchema,
+    enableBroadcastOfConseilDepartementalToFT: featureFlagBooleanSchema,
+    enableBroadcastOfCapEmploiToFT: featureFlagBooleanSchema,
+    enableBroadcastOfMissionLocaleToFT: featureFlagBooleanSchema,
+    enableStandardFormatBroadcastToFranceTravail: featureFlagBooleanSchema,
+    enableEstablishmentDashboardHighlight: featureFlagHighlightSchema,
+    enableAgencyDashboardHighlight: featureFlagHighlightSchema,
+  });

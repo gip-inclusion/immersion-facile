@@ -15,7 +15,7 @@ import {
   typesPublic,
 } from "./BrevoContact.dto";
 
-const createContactAttributesSchema: z.Schema<CreateContactAttributes> =
+const createContactAttributesSchema: ZodSchemaWithInputMatchingOutput<CreateContactAttributes> =
   z.object({
     EMAIL: z.string().or(z.literal("")).optional(),
     ENT_CODE_DEPARTEMENT: z.string().or(z.literal("")).optional(),
@@ -51,26 +51,27 @@ const createContactAttributesSchema: z.Schema<CreateContactAttributes> =
     PRENOM: z.string().or(z.literal("")).optional(),
   });
 
-export const createContactBodySchema: z.Schema<CreateContactBody> = z
-  .object({
-    email: z.string().optional(),
-    ext_id: z.string().optional(),
-    attributes: createContactAttributesSchema.optional(),
-    emailBlacklisted: z.boolean().optional(),
-    smsBlacklisted: z.boolean().optional(),
-    listIds: z.array(z.number()).optional(),
-  })
-  .and(
-    z.discriminatedUnion("updateEnabled", [
-      z.object({
-        updateEnabled: z.literal(false),
-      }),
-      z.object({
-        updateEnabled: z.literal(true),
-        smtpBlacklistSender: z.array(z.string()).optional(),
-      }),
-    ]),
-  );
+export const createContactBodySchema: ZodSchemaWithInputMatchingOutput<CreateContactBody> =
+  z
+    .object({
+      email: z.string().optional(),
+      ext_id: z.string().optional(),
+      attributes: createContactAttributesSchema.optional(),
+      emailBlacklisted: z.boolean().optional(),
+      smsBlacklisted: z.boolean().optional(),
+      listIds: z.array(z.number()).optional(),
+    })
+    .and(
+      z.discriminatedUnion("updateEnabled", [
+        z.object({
+          updateEnabled: z.literal(false),
+        }),
+        z.object({
+          updateEnabled: z.literal(true),
+          smtpBlacklistSender: z.array(z.string()).optional(),
+        }),
+      ]),
+    );
 
 const getContactInfoAttributesSchema: ZodSchemaWithInputMatchingOutput<GetContactInfoAttributes> =
   z.object({

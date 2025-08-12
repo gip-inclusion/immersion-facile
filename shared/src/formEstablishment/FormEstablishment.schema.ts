@@ -16,6 +16,7 @@ import { frenchEstablishmentKinds } from "../utils/establishment";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
+  type ZodSchemaWithInputMatchingOutput,
   zBoolean,
   zEnumValidation,
   zStringCanBeEmpty,
@@ -83,10 +84,10 @@ const establishmentAdminSchema = z.object({
   job: zStringMinLength1,
 });
 
-export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRight> =
+export const formEstablishmentUserRightSchema: ZodSchemaWithInputMatchingOutput<FormEstablishmentUserRight> =
   establishmentAdminSchema.or(establishmentContactSchema);
 
-export const formEstablishmentUserRightsSchema: z.Schema<
+export const formEstablishmentUserRightsSchema: ZodSchemaWithInputMatchingOutput<
   FormEstablishmentUserRight[]
 > = z
   .array(formEstablishmentUserRightSchema)
@@ -164,58 +165,59 @@ const formEstablishmentCommonShape = {
   }),
 };
 
-export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
-  .discriminatedUnion("contactMode", [
-    z.object({
-      contactMode: z.enum(contactModesWithoutWelcomeAddress, {
-        error: localization.invalidEnum,
+export const formEstablishmentSchema: ZodSchemaWithInputMatchingOutput<FormEstablishmentDto> =
+  z
+    .discriminatedUnion("contactMode", [
+      z.object({
+        contactMode: z.enum(contactModesWithoutWelcomeAddress, {
+          error: localization.invalidEnum,
+        }),
+        ...formEstablishmentCommonShape,
       }),
-      ...formEstablishmentCommonShape,
-    }),
-    z.object({
-      contactMode: z.enum(contactModesWithWelcomeAddress, {
-        error: localization.invalidEnum,
+      z.object({
+        contactMode: z.enum(contactModesWithWelcomeAddress, {
+          error: localization.invalidEnum,
+        }),
+        potentialBeneficiaryWelcomeAddress: addressAndPositionSchema,
+        ...formEstablishmentCommonShape,
       }),
-      potentialBeneficiaryWelcomeAddress: addressAndPositionSchema,
-      ...formEstablishmentCommonShape,
-    }),
-  ])
-  .and(withAcquisitionSchema)
-  .refine(
-    (formEstablishment) =>
-      formEstablishment.contactMode === "PHONE"
-        ? formEstablishment.userRights
-            .map((right) => right.isMainContactByPhone)
-            .filter((isMainContactByPhone) => isMainContactByPhone === true)
-            .length === 1
-        : true,
-    {
-      message:
-        "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
-      path: ["userRights"],
-    },
-  )
-  .refine(
-    (formEstablishment) =>
-      formEstablishment.contactMode === "IN_PERSON"
-        ? formEstablishment.userRights
-            .map((right) => right.isMainContactInPerson)
-            .filter((isMainContactInPerson) => isMainContactInPerson === true)
-            .length === 1
-        : true,
-    {
-      message:
-        "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
-      path: ["userRights"],
-    },
-  );
+    ])
+    .and(withAcquisitionSchema)
+    .refine(
+      (formEstablishment) =>
+        formEstablishment.contactMode === "PHONE"
+          ? formEstablishment.userRights
+              .map((right) => right.isMainContactByPhone)
+              .filter((isMainContactByPhone) => isMainContactByPhone === true)
+              .length === 1
+          : true,
+      {
+        message:
+          "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
+        path: ["userRights"],
+      },
+    )
+    .refine(
+      (formEstablishment) =>
+        formEstablishment.contactMode === "IN_PERSON"
+          ? formEstablishment.userRights
+              .map((right) => right.isMainContactInPerson)
+              .filter((isMainContactInPerson) => isMainContactInPerson === true)
+              .length === 1
+          : true,
+      {
+        message:
+          "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
+        path: ["userRights"],
+      },
+    );
 
-export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
+export const withFormEstablishmentSchema: ZodSchemaWithInputMatchingOutput<WithFormEstablishmentDto> =
   z.object({
     formEstablishment: formEstablishmentSchema,
   });
 
-export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
+export const formEstablishmentBatchSchema: ZodSchemaWithInputMatchingOutput<FormEstablishmentBatchDto> =
   z.object({
     groupName: zStringMinLength1,
     title: zStringMinLength1,
@@ -223,22 +225,26 @@ export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
     formEstablishments: z.array(formEstablishmentSchema),
   });
 
-const siretAdditionFailure: z.Schema<SiretAdditionFailure> = z.object({
-  siret: siretSchema,
-  errorMessage: z.string(),
-});
-export const establishmentBatchReportSchema: z.Schema<EstablishmentBatchReport> =
+const siretAdditionFailure: ZodSchemaWithInputMatchingOutput<SiretAdditionFailure> =
+  z.object({
+    siret: siretSchema,
+    errorMessage: z.string(),
+  });
+export const establishmentBatchReportSchema: ZodSchemaWithInputMatchingOutput<EstablishmentBatchReport> =
   z.object({
     numberOfEstablishmentsProcessed: z.number(),
     numberOfSuccess: z.number(),
     failures: z.array(siretAdditionFailure),
   });
 
-const csvBooleanSchema: z.Schema<CSVBoolean> = z.enum(["1", "0", ""], {
-  error: localization.invalidEnum,
-});
+const csvBooleanSchema: ZodSchemaWithInputMatchingOutput<CSVBoolean> = z.enum(
+  ["1", "0", ""],
+  {
+    error: localization.invalidEnum,
+  },
+);
 
-export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
+export const establishmentCSVRowSchema: ZodSchemaWithInputMatchingOutput<EstablishmentCSVRow> =
   z.object({
     siret: siretSchema,
     businessNameCustomized: zStringCanBeEmpty,
@@ -295,5 +301,6 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     right10_job: zStringMinLength1.optional(),
   });
 
-export const establishmentCSVRowsSchema: z.Schema<EstablishmentCSVRow[]> =
-  z.array(establishmentCSVRowSchema);
+export const establishmentCSVRowsSchema: ZodSchemaWithInputMatchingOutput<
+  EstablishmentCSVRow[]
+> = z.array(establishmentCSVRowSchema);

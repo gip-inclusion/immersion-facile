@@ -1,9 +1,14 @@
-import { localization, makezTrimmedString, zUuidLike } from "shared";
+import {
+  localization,
+  makezTrimmedString,
+  type ZodSchemaWithInputMatchingOutput,
+  zUuidLike,
+} from "shared";
 import { z } from "zod";
 import type { ConventionFtUserAdvisorDto } from "../dto/FtConnect.dto";
 import { immersionFranceTravailAdvisors } from "../dto/FtConnectAdvisor.dto";
 
-export const conventionFranceTravailUserAdvisorDtoSchema: z.Schema<ConventionFtUserAdvisorDto> =
+export const conventionFranceTravailUserAdvisorDtoSchema: ZodSchemaWithInputMatchingOutput<ConventionFtUserAdvisorDto> =
   z.object({
     advisor: z
       .object({

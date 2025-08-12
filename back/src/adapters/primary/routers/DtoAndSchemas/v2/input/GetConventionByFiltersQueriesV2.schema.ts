@@ -2,6 +2,7 @@ import {
   type ConventionStatus,
   conventionStatuses,
   localization,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import type { GetConventionsFilters } from "../../../../../../domains/convention/ports/ConventionQueries";
@@ -16,10 +17,12 @@ const conventionStatusSchema = z.enum(conventionStatuses, {
   error: localization.invalidEnum,
 });
 
+const zToDate: ZodSchemaWithInputMatchingOutput<Date> = z.coerce.date();
+
 export const getConventionsByFiltersQueryParamsV2Schema = z
   .object({
-    startDateGreater: z.coerce.date().optional(),
-    startDateLessOrEqual: z.coerce.date().optional(),
+    startDateGreater: zToDate.optional(),
+    startDateLessOrEqual: zToDate.optional(),
     withStatuses: z
       .array(conventionStatusSchema)
       .optional()

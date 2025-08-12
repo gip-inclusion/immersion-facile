@@ -17,6 +17,7 @@ import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   localization,
+  type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
   zStringMinLength1,
 } from "../zodUtils";
@@ -28,13 +29,15 @@ import type {
   WithOptionalUserId,
 } from "./user.dto";
 
-export const userIdSchema: z.Schema<UserId> = zStringMinLength1;
+export const userIdSchema: ZodSchemaWithInputMatchingOutput<UserId> =
+  zStringMinLength1;
 
-export const withOptionalUserIdSchema: z.Schema<WithOptionalUserId> = z.object({
-  userId: userIdSchema.optional(),
-});
+export const withOptionalUserIdSchema: ZodSchemaWithInputMatchingOutput<WithOptionalUserId> =
+  z.object({
+    userId: userIdSchema.optional(),
+  });
 
-const userSchema: z.Schema<User> = z.object({
+const userSchema: ZodSchemaWithInputMatchingOutput<User> = z.object({
   id: userIdSchema,
   email: emailSchema,
   createdAt: dateTimeIsoStringSchema,
@@ -43,35 +46,37 @@ const userSchema: z.Schema<User> = z.object({
   proConnect: proConnectInfoSchema.or(z.null()),
 });
 
-export const userInListSchema: z.Schema<UserWithNumberOfAgencies> =
+export const userInListSchema: ZodSchemaWithInputMatchingOutput<UserWithNumberOfAgencies> =
   userSchema.and(
     z.object({
       numberOfAgencies: z.number(),
     }),
   );
 
-const agencyRightSchema: z.Schema<AgencyRight> = z.object({
-  agency: agencyDtoForAgencyUsersAndAdminsSchema,
-  roles: z.array(agencyRoleSchema),
-  isNotifiedByEmail: z.boolean(),
-});
+const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =
+  z.object({
+    agency: agencyDtoForAgencyUsersAndAdminsSchema,
+    roles: z.array(agencyRoleSchema),
+    isNotifiedByEmail: z.boolean(),
+  });
 
-const withEstablishmentSiretAndName: z.Schema<EstablishmentData> = z.object({
-  siret: siretSchema,
-  businessName: businessNameSchema,
-  role: z.enum(establishmentsRoles, {
-    error: localization.invalidEnum,
-  }),
-  admins: z.array(
-    z.object({
-      firstName: zStringCanBeEmpty,
-      lastName: zStringCanBeEmpty,
-      email: emailSchema,
+const withEstablishmentSiretAndName: ZodSchemaWithInputMatchingOutput<EstablishmentData> =
+  z.object({
+    siret: siretSchema,
+    businessName: businessNameSchema,
+    role: z.enum(establishmentsRoles, {
+      error: localization.invalidEnum,
     }),
-  ),
-});
+    admins: z.array(
+      z.object({
+        firstName: zStringCanBeEmpty,
+        lastName: zStringCanBeEmpty,
+        email: emailSchema,
+      }),
+    ),
+  });
 
-const dashboardsSchema: z.Schema<
+const dashboardsSchema: ZodSchemaWithInputMatchingOutput<
   WithAgencyDashboards & WithEstablishmentDashboards
 > = z.object({
   establishments: z.object({
@@ -89,11 +94,12 @@ const dashboardsSchema: z.Schema<
   }),
 });
 
-export const connectedUserSchema: z.Schema<ConnectedUser> = userSchema.and(
-  z.object({
-    agencyRights: z.array(agencyRightSchema),
-    dashboards: dashboardsSchema,
-    establishments: z.array(withEstablishmentSiretAndName).optional(),
-    isBackofficeAdmin: z.boolean().optional(),
-  }),
-);
+export const connectedUserSchema: ZodSchemaWithInputMatchingOutput<ConnectedUser> =
+  userSchema.and(
+    z.object({
+      agencyRights: z.array(agencyRightSchema),
+      dashboards: dashboardsSchema,
+      establishments: z.array(withEstablishmentSiretAndName).optional(),
+      isBackofficeAdmin: z.boolean().optional(),
+    }),
+  );

@@ -7,14 +7,16 @@ import {
 import type { EmailType, TemplatedEmail } from "./email";
 import type { Email, EmailAttachment } from "./email.dto";
 
-export const emailAttachmentSchema: z.Schema<EmailAttachment> = z
-  .object({
-    name: z.string(),
-    content: z.string(),
-  })
-  .or(z.object({ url: z.string() }));
+export const emailAttachmentSchema: ZodSchemaWithInputMatchingOutput<EmailAttachment> =
+  z
+    .object({
+      name: z.string(),
+      content: z.string(),
+    })
+    .or(z.object({ url: z.string() }));
 
-const emailTypeSchema = z.string() as z.Schema<EmailType>;
+const emailTypeSchema =
+  z.string() as ZodSchemaWithInputMatchingOutput<EmailType>;
 
 // Waiting zod release for bad email regex
 const temporaryEmailRegex =
@@ -39,7 +41,7 @@ export const templatedEmailSchema = z.object({
   recipients: z.array(z.string().transform((arg) => arg.trim())),
   cc: z.array(z.string().transform((arg) => arg.trim())).optional(),
   params: z.any(),
-}) as z.Schema<TemplatedEmail>;
+}) as ZodSchemaWithInputMatchingOutput<TemplatedEmail>;
 
 export const emailPossiblyEmptySchema = emailSchema
   .transform((s) => s.trim())
