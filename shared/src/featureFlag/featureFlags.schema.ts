@@ -1,6 +1,10 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+} from "../zodUtils";
 import {
   type FeatureFlag,
   type FeatureFlagBoolean,
@@ -58,7 +62,9 @@ export const featureFlagTextWithSeverityValueSchema: z.Schema<
   FeatureFlagTextWithSeverity["value"]
 > = z.object({
   message: z.string(),
-  severity: z.enum(["warning", "error", "success", "info"]),
+  severity: z.enum(["warning", "error", "success", "info"], {
+    error: localization.invalidEnum,
+  }),
 });
 
 const featureFlagTextWithSeveritySchema: z.Schema<FeatureFlagTextWithSeverity> =
@@ -88,7 +94,9 @@ export const featureFlagSchema: z.Schema<FeatureFlag> =
     .or(featureFlagHighlightSchema);
 
 export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParam> = z.object({
-  flagName: z.enum(featureFlagNames),
+  flagName: z.enum(featureFlagNames, {
+    error: localization.invalidEnum,
+  }),
   featureFlag: featureFlagSchema,
 });
 

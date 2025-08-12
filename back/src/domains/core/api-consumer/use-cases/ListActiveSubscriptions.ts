@@ -1,6 +1,6 @@
 import { keys } from "ramda";
 import type { ApiConsumer, WebhookSubscription } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { useCaseBuilder } from "../../useCaseBuilder";
 
 export type ListActiveSubscriptions = ReturnType<

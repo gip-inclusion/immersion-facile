@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { callbackUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
@@ -36,13 +36,17 @@ const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
 export const apiConsumerJwtSchema: z.Schema<ApiConsumerJwt> = z.string();
 
 const callbackHeadersSchema: z.Schema<CallbackHeaders> = z.record(
-  z.enum(authorizedCallbackHeaderKeys),
+  z.enum(authorizedCallbackHeaderKeys, {
+    error: localization.invalidEnum,
+  }),
   zStringMinLength1,
 );
 
 export const createWebhookSubscriptionSchema: z.Schema<CreateWebhookSubscription> =
   z.object({
-    subscribedEvent: z.enum(["convention.updated"]),
+    subscribedEvent: z.enum(["convention.updated"], {
+      error: localization.invalidEnum,
+    }),
     callbackUrl: callbackUrlSchema,
     callbackHeaders: callbackHeadersSchema,
   });
@@ -56,7 +60,11 @@ export const webhookSubscriptionSchema: z.Schema<WebhookSubscription> =
   );
 
 const noScopeRightSchema = z.object({
-  kinds: z.array(z.enum(apiConsumerKinds)),
+  kinds: z.array(
+    z.enum(apiConsumerKinds, {
+      error: localization.invalidEnum,
+    }),
+  ),
   scope: z.literal("no-scope"),
 });
 
@@ -77,7 +85,11 @@ const searchEstablishmentRightSchema = noScopeRightSchema.and(
 );
 
 const conventionRightCommonSchema = z.object({
-  kinds: z.array(z.enum(apiConsumerKinds)),
+  kinds: z.array(
+    z.enum(apiConsumerKinds, {
+      error: localization.invalidEnum,
+    }),
+  ),
   scope: z
     .object({
       agencyKinds: z.array(agencyKindSchema),

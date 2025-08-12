@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressSchema } from "../address/address.schema";
@@ -16,7 +16,6 @@ import {
   localization,
   stringWithMaxLength255,
   zEnumValidation,
-  zSchemaForType,
   zStringMinLength1,
 } from "../zodUtils";
 import {
@@ -43,13 +42,13 @@ export const agencyIdsSchema: z.Schema<AgencyId[]> = z
   .array(agencyIdSchema)
   .nonempty();
 
-export const agencyRoleSchema = z.enum(allAgencyRoles);
+export const agencyRoleSchema = z.enum(allAgencyRoles, {
+  error: localization.invalidEnum,
+});
 
-export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
-  z.object({
-    agencyId: agencyIdSchema,
-  }),
-);
+export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
+  agencyId: agencyIdSchema,
+});
 
 export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
   agencyIdSchema.optional();
@@ -58,7 +57,9 @@ export const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
   agencyKindList,
   "Ce type de structure n'est pas supporté",
 );
-const agencyStatusSchema = z.enum(allAgencyStatuses);
+const agencyStatusSchema = z.enum(allAgencyStatuses, {
+  error: localization.invalidEnum,
+});
 
 export const agencyOptionSchema: z.ZodSchema<AgencyOption> = z.object({
   id: agencyIdSchema,
@@ -76,7 +77,11 @@ export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsReques
   z.object({
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
-    filterKind: z.enum(agencyKindFilters).optional(),
+    filterKind: z
+      .enum(agencyKindFilters, {
+        error: localization.invalidEnum,
+      })
+      .optional(),
     siret: z.string().optional(),
     status: z.array(agencyStatusSchema).optional(),
   });

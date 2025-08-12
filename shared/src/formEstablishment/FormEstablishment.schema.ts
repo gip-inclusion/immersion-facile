@@ -1,5 +1,5 @@
 import { uniq } from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressAndPositionSchema } from "../address/address.schema";
@@ -115,7 +115,9 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "unJeuneUneSolution",
   "passeEmploi",
 ];
-export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources);
+export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources, {
+  error: localization.invalidEnum,
+});
 
 const formEstablishmentCommonShape = {
   source: formEstablishmentSourceSchema,
@@ -165,11 +167,15 @@ const formEstablishmentCommonShape = {
 export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
   .discriminatedUnion("contactMode", [
     z.object({
-      contactMode: z.enum(contactModesWithoutWelcomeAddress),
+      contactMode: z.enum(contactModesWithoutWelcomeAddress, {
+        error: localization.invalidEnum,
+      }),
       ...formEstablishmentCommonShape,
     }),
     z.object({
-      contactMode: z.enum(contactModesWithWelcomeAddress),
+      contactMode: z.enum(contactModesWithWelcomeAddress, {
+        error: localization.invalidEnum,
+      }),
       potentialBeneficiaryWelcomeAddress: addressAndPositionSchema,
       ...formEstablishmentCommonShape,
     }),
@@ -228,7 +234,9 @@ export const establishmentBatchReportSchema: z.Schema<EstablishmentBatchReport> 
     failures: z.array(siretAdditionFailure),
   });
 
-const csvBooleanSchema: z.Schema<CSVBoolean> = z.enum(["1", "0", ""]);
+const csvBooleanSchema: z.Schema<CSVBoolean> = z.enum(["1", "0", ""], {
+  error: localization.invalidEnum,
+});
 
 export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
   z.object({

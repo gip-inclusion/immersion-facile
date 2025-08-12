@@ -1,5 +1,6 @@
+import { localization } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export type CrispHeaders = z.infer<typeof crispHeadersSchema>;
 const crispHeadersSchema = z.object({
@@ -39,7 +40,9 @@ export const crispRoutes = defineRoutes({
     url: "https://api.crisp.chat/v1/website/:websiteId/conversation/:sessionId/message",
     headersSchema: crispHeadersSchema,
     requestBodySchema: z.object({
-      type: z.enum(["text", "note"]),
+      type: z.enum(["text", "note"], {
+        error: localization.invalidEnum,
+      }),
       from: z.literal("user"),
       origin: z.string(),
       content: z.string(),

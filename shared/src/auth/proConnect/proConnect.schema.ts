@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { siretSchema } from "../../siret/siret.schema";
 import { zStringCanBeEmpty } from "../../zodUtils";
 import type { ProConnectInfos } from "./proConnect.dto";

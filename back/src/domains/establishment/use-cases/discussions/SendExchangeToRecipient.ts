@@ -9,7 +9,7 @@ import {
   type WithDiscussionId,
   withDiscussionIdSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   triggeredBySchema,
   type WithTriggeredBy,

@@ -5,7 +5,7 @@ import {
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { LaBonneBoiteApiResultV2Props } from "./LaBonneBoiteCompanyDto";
 
 type HttpGetLaBonneBoiteCompanyParamsV2 = {

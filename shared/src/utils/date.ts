@@ -1,7 +1,8 @@
 // Matches valid dates of the format 'yyyy-mm-dd'.
 import { addHours, isValid } from "date-fns";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { Flavor } from "../typeFlavors";
+import { localization } from "../zodUtils";
 
 export type DateString = Flavor<string, "DateString">;
 
@@ -14,9 +15,10 @@ export type DateRange = {
 
 const hourDisplayedSeparator = "h";
 
-export const dateTimeIsoStringSchema: z.Schema<DateTimeIsoString> = z
-  .string()
-  .datetime();
+export const dateTimeIsoStringSchema: z.Schema<DateTimeIsoString> =
+  z.iso.datetime({
+    error: localization.invalidDate,
+  });
 
 export const dateRegExp = /\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
 
