@@ -1,5 +1,5 @@
-import { errors, flattenZodErrors } from "shared";
-import type { z } from "zod/v4";
+import { errors } from "shared";
+import { flattenError, type z } from "zod/v4";
 import type { OpacifiedLogger } from "../../utils/logger";
 
 export const validateAndParseZodSchemaV2 = <T>(
@@ -13,7 +13,7 @@ export const validateAndParseZodSchemaV2 = <T>(
   const result = props.inputSchema.safeParse(props.schemaParsingInput);
   if (result.success) return result.data;
 
-  const flattenErrors = flattenZodErrors(result.error);
+  const flattenErrors = flattenError(result.error).formErrors;
 
   const error = errors.inputs.badSchema({
     id: props.id,
