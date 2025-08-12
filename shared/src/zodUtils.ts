@@ -1,5 +1,4 @@
 import { z } from "zod/v4";
-import { timeHHmmRegExp } from "./utils/date";
 
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",
@@ -52,6 +51,8 @@ export const zTrimmedStringWithMax = (max: number) =>
   zStringMinLength1.max(max, localization.maxCharacters(max));
 
 export const stringWithMaxLength255 = zTrimmedStringWithMax(255);
+
+const timeHHmmRegExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
 
 export const zTimeString = z
   .string({
