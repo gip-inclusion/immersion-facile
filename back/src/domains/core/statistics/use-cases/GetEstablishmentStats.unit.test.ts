@@ -61,7 +61,7 @@ describe("GetEstablishmentStats", () => {
       ),
       errors.inputs.badSchema({
         useCaseName: "GetEstablishmentStats",
-        flattenErrors: ["perPage : Number must be less than or equal to 5000"],
+        flattenErrors: ["perPage : Too big: expected number to be <=5000"],
       }),
     );
   });

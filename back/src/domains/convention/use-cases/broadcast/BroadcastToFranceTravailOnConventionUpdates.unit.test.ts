@@ -69,13 +69,13 @@ describe("Broadcasts events to France Travail", () => {
   );
 
   const conventionLinkedToSIAE = new ConventionDtoBuilder()
-    .withId("11110000-0000-4000-0000-000000000001")
+    .withId("11110000-0000-4000-9000-000000000001")
     .withAgencyId(agencySIAE.id)
     .build();
 
   const conventionLinkedToFTWithoutFederatedIdentity =
     new ConventionDtoBuilder()
-      .withId("00000000-0000-4000-0000-000000000000")
+      .withId("00000000-0000-4000-9000-000000000000")
       .withAgencyId(peAgencyWithoutCounsellorsAndValidators.id)
       .withoutFederatedIdentity()
       .build();
@@ -316,7 +316,7 @@ describe("Broadcasts events to France Travail", () => {
     );
 
     const conventionLinkedToAgencyReferingToOther = new ConventionDtoBuilder()
-      .withId("22222222-2222-4000-2222-222222222222")
+      .withId("22222222-2222-4000-9222-222222222222")
       .withAgencyId(agencyWithRefersTo.id)
       .withImmersionAppellation({
         appellationCode: "11111",
@@ -380,7 +380,7 @@ describe("Broadcasts events to France Travail", () => {
       return {
         agency,
         convention: new ConventionDtoBuilder()
-          .withId("33333333-3333-4000-3333-333333333333")
+          .withId("33333333-3333-4000-9333-333333333333")
           .withAgencyId(agency.id)
           .build(),
       };
@@ -479,7 +479,7 @@ describe("Broadcasts events to France Travail", () => {
 
           const conventionLinkedToAgencyReferingToOther =
             new ConventionDtoBuilder()
-              .withId("22222222-2222-4000-2222-222222222222")
+              .withId("22222222-2222-4000-9222-222222222222")
               .withAgencyId(agencyWithRefersTo.id)
               .withStatus("ACCEPTED_BY_VALIDATOR")
               .build();
@@ -550,7 +550,7 @@ describe("Broadcasts events to France Travail", () => {
           await broadcastToFranceTravailOnConventionUpdates.execute({
             eventType: "CONVENTION_UPDATED",
             convention: conventionReadDtoFrom({
-              convention: convention,
+              convention,
               agency: {
                 ...agency,
                 validatorEmails: [],

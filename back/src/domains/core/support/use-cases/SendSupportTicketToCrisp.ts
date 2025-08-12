@@ -196,7 +196,7 @@ const getConventionRelatedData = async ({
   note: string;
   extraSegment: string[];
 }> => {
-  const conventionIdResult = z.string().uuid().safeParse(conventionId);
+  const conventionIdResult = z.uuid().safeParse(conventionId);
   if (!conventionIdResult.success) {
     return {
       note: `-----------

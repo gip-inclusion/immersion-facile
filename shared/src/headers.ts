@@ -4,11 +4,9 @@ import type { ZodSchemaWithInputMatchingOutput } from "./zodUtils";
 export type WithAuthorizationHeader = { authorization: string };
 
 const withAuthorizationSchema: ZodSchemaWithInputMatchingOutput<WithAuthorizationHeader> =
-  z
-    .object({
-      authorization: z.string(),
-    })
-    .loose();
+  z.looseObject({
+    authorization: z.string(),
+  });
 
 export const withValidateHeadersAuthorization = {
   validateHeaders: (headers: unknown) => withAuthorizationSchema.parse(headers),

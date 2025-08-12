@@ -225,7 +225,7 @@ describe("PgConventionRepository", () => {
     await conventionRepository.save(existingConvention);
 
     const renewedConvention = conventionStylisteBuilder
-      .withId("22222222-2222-4222-2222-222222222222")
+      .withId("22222222-2222-4222-9222-222222222222")
       .withStatus("READY_TO_SIGN")
       .withRenewed({
         from: existingConvention.id,

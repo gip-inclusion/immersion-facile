@@ -368,7 +368,7 @@ export const AddEstablishmentsByBatch = () => {
                       >
                         {establishment.zodErrors.map((error, index) => (
                           <td key={`${error.path}-${index}`}>
-                            {error.path} : {error.message}
+                            {JSON.stringify(error.path)} : {error.message}
                           </td>
                         ))}
                       </tr>

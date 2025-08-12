@@ -557,7 +557,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .build();
 
       const conventionWithWrongSiret = conventionBuilderInitialMatching
-        .withId("22222222-2222-4222-2222-222222222222")
+        .withId("22222222-2222-4222-9222-222222222222")
         .withSiret("40400000000404")
         .build();
 

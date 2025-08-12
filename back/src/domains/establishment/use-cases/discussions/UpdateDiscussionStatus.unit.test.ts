@@ -201,7 +201,7 @@ describe("UpdateDiscussionStatus", () => {
 
     describe("providing a conventionId", () => {
       it("throws if convention is not found", async () => {
-        const conventionId = "40400000-0000-0000-0000-000000000404";
+        const conventionId = "40400000-0000-4000-9000-000000000404";
 
         await expectPromiseToFailWithError(
           updateDiscussionStatus.execute(
