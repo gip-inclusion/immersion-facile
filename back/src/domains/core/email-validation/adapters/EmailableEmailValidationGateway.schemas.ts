@@ -1,5 +1,9 @@
-import { validateEmailReasonSchema, zStringMinLength1 } from "shared";
-import { z } from "zod";
+import {
+  localization,
+  validateEmailReasonSchema,
+  zStringMinLength1,
+} from "shared";
+import { z } from "zod/v4";
 import type {
   EmailableApiKey,
   EmailableEmailValidationParams,
@@ -35,7 +39,9 @@ export const emailableEmailValidationStatusSchema: z.Schema<EmailableEmailValida
     score: z.number().nullish(),
     smtp_provider: z.string().nullish(),
     state: z
-      .enum(["deliverable", "undeliverable", "unknown", "risky"])
+      .enum(["deliverable", "undeliverable", "unknown", "risky"], {
+        error: localization.invalidEnum,
+      })
       .nullish(),
     tag: z.string().nullish(),
     user: z.string().nullish(),

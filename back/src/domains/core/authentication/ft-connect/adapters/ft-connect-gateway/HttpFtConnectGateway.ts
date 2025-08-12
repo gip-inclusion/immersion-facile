@@ -1,7 +1,7 @@
 import Bottleneck from "bottleneck";
 import { errors, HTTP_STATUS, queryParamsAsString } from "shared";
 import type { HttpClient } from "shared-routes";
-import { ZodError } from "zod";
+import { ZodError } from "zod/v4";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
 import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { isAxiosError } from "../../../../../../utils/axiosUtils";

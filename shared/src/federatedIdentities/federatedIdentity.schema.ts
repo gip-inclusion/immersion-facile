@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { z } from "zod/v4";
+import { localization } from "../zodUtils";
 import type { FtConnectIdentity } from "./federatedIdentity.dto";
 
 export const peConnectIdentitySchema: z.Schema<FtConnectIdentity> = z.object({
@@ -11,9 +12,10 @@ export const peConnectIdentitySchema: z.Schema<FtConnectIdentity> = z.object({
           email: z.string(),
           firstName: z.string(),
           lastName: z.string(),
-          type: z.enum(["PLACEMENT", "CAPEMPLOI", "INDEMNISATION"]),
-        })
-        .optional(),
+          type: z.enum(["PLACEMENT", "CAPEMPLOI", "INDEMNISATION"], {
+          error: localization.invalidEnum,
+        }),
+      }).optional(),
     })
     .optional(),
 });

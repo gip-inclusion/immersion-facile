@@ -1,5 +1,9 @@
-import { emailSchema, numberOfEmployeesRangeSchema } from "shared";
-import { z } from "zod";
+import {
+  emailSchema,
+  localization,
+  numberOfEmployeesRangeSchema,
+} from "shared";
+import { z } from "zod/v4";
 import {
   type CreateContactAttributes,
   type CreateContactBody,
@@ -37,7 +41,9 @@ const createContactAttributesSchema: z.Schema<CreateContactAttributes> =
     ENT_SIRET: z.string().or(z.literal("")).optional(),
     ENT_SUPER_ENTREPRISE: z.boolean().or(z.literal("")).optional(),
     ENT_TYPE_PUBLIC_ACCUEILLIS: z
-      .enum(typesPublic)
+      .enum(typesPublic, {
+        error: localization.invalidEnum,
+      })
       .or(z.literal(""))
       .optional(),
     NOM: z.string().or(z.literal("")).optional(),

@@ -4,10 +4,11 @@ import {
   type EmailAttachment,
   emailAttachmentSchema,
   emailSchema,
+  localization,
   type PhoneNumber,
   smsRecipientPhoneSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export type RecipientOrSender = {
   name?: string;
@@ -85,7 +86,11 @@ export const sendTransactSmsRequestBodySchema: z.Schema<SendTransactSmsRequestBo
     sender: brevoSmsSenderSchema,
     recipient: smsRecipientPhoneSchema,
     content: z.string(),
-    type: z.enum(["transactional", "marketing"]).optional(),
+    type: z
+      .enum(["transactional", "marketing"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
     tag: z.string().optional(),
     organisationPrefix: z.string().optional(),
     webUrl: absoluteUrlSchema.optional(),

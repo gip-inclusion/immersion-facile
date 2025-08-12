@@ -5,7 +5,7 @@ import {
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes, type HttpClient } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 

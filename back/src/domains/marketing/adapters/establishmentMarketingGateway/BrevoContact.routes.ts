@@ -1,5 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { apiBrevoUrl, brevoHeaderSchema } from "../../../../utils/apiBrevoUrl";
 import {
   contactErrorResponseBodySchema,

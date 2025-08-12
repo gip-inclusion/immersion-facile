@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import {
   conventionObjectiveOptions,
@@ -68,6 +68,9 @@ const contactEstablishmentByMailIFSchema: z.Schema<ContactEstablishmentByMailIFD
 
 const contactLevelOfEducationSchema: z.Schema<ContactLevelOfEducation> = z.enum(
   contactLevelsOfEducation,
+  {
+    error: localization.invalidEnum,
+  },
 );
 
 const contactEstablishmentByMail1Eleve1StageSchema: z.Schema<ContactEstablishmentByMail1Eleve1StageDto> =
@@ -117,7 +120,9 @@ export const contactEstablishmentInPersonSchema: z.Schema<ContactEstablishmentIn
         }),
         z.object({
           kind: z.literal("1_ELEVE_1_STAGE"),
-          levelOfEducation: z.enum(["3ème", "2nde"]),
+          levelOfEducation: z.enum(["3ème", "2nde"], {
+            error: localization.invalidEnum,
+          }),
         }),
       ]),
     );

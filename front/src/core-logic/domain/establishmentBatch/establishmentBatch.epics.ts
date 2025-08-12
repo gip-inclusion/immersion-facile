@@ -23,7 +23,7 @@ import type {
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
 import { v4 as uuidV4 } from "uuid";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   establishmentBatchSlice,
   type FormEstablishmentDtoWithErrors,

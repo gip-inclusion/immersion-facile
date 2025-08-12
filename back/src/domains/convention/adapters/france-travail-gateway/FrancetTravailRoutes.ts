@@ -1,6 +1,6 @@
 import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
 import type { FranceTravailConvention } from "../../ports/FranceTravailGateway";
 import { broadcastConventionParamsSchema } from "../../use-cases/broadcast/broadcastConventionParams";

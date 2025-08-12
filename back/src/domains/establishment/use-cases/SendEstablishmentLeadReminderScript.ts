@@ -6,9 +6,10 @@ import {
   castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
+  localization,
   type SiretDto,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
@@ -42,7 +43,9 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
   SendEstablishmentLeadReminderOutput
 > {
   protected inputSchema = z.object({
-    kind: z.enum(establishmentLeadEventKind),
+    kind: z.enum(establishmentLeadEventKind, {
+      error: localization.invalidEnum,
+    }),
     beforeDate: z.date().optional(),
   });
 

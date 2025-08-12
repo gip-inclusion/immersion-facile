@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { DiscussionId } from "../discussion/discussion.dto";
 import { discussionIdSchema } from "../discussion/discussion.schema";
 import type { ConventionDto } from "./convention.dto";

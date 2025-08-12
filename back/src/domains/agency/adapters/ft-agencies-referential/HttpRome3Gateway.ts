@@ -1,6 +1,6 @@
 import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes, type HttpClient } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { createLogger } from "../../../../utils/logger";
 import type { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import type { AppellationWithShortLabel } from "./HttpRome4Gateway";

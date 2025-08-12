@@ -1,5 +1,5 @@
-import { makezTrimmedString, zUuidLike } from "shared";
-import { z } from "zod";
+import { localization, makezTrimmedString, zUuidLike } from "shared";
+import { z } from "zod/v4";
 import type { ConventionFtUserAdvisorDto } from "../dto/FtConnect.dto";
 import { immersionFranceTravailAdvisors } from "../dto/FtConnectAdvisor.dto";
 
@@ -14,9 +14,11 @@ export const conventionFranceTravailUserAdvisorDtoSchema: z.Schema<ConventionFtU
           "Le nom du conseiller ne peut pas être vide",
         ),
         email: z.string().email("L'email du conseiller est invalide"),
-        type: z.enum(immersionFranceTravailAdvisors),
+        type: z.enum(immersionFranceTravailAdvisors, {
+          error: localization.invalidEnum,
+        }),
       })
       .optional(),
     peExternalId: zUuidLike,
-    conventionId: z.string().uuid(),
+    conventionId: z.uuid(),
   });

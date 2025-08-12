@@ -10,8 +10,9 @@ import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
+  localization,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
@@ -46,7 +47,9 @@ export type AssessmentReminder = ReturnType<typeof makeAssessmentReminder>;
 export const makeAssessmentReminder = useCaseBuilder("AssessmentReminder")
   .withInput<{ mode: AssessmentReminderMode }>(
     z.object({
-      mode: z.enum(allAssessmentReminderModes),
+      mode: z.enum(allAssessmentReminderModes, {
+        error: localization.invalidEnum,
+      }),
     }),
   )
   .withOutput<AssessmentReminderOutput>()

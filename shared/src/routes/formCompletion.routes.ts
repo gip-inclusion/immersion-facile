@@ -1,5 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { appellationSearchResponseSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { searchTextSchema } from "../search/searchText.schema";

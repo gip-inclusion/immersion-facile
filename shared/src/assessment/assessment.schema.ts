@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { DateRange } from "../utils/date";
 import { localization, zEnumValidation, zStringMinLength1 } from "../zodUtils";
@@ -15,7 +15,9 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
   "status",
   [
     z.object({
-      status: z.enum(["COMPLETED", "DID_NOT_SHOW"]),
+      status: z.enum(["COMPLETED", "DID_NOT_SHOW"], {
+        error: localization.invalidEnum,
+      }),
     }),
     z.object({
       status: z.literal("PARTIALLY_COMPLETED"),
@@ -24,8 +26,8 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
     }),
   ],
   {
-    errorMap: (error) => {
-      if (error.code === "invalid_union_discriminator")
+    error: (error) => {
+      if (error.code === "invalid_union")
         return {
           message: "Veuillez selectionner une option",
         };
@@ -54,7 +56,7 @@ const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
         endedWithAJob: z.literal(false),
       }),
     ],
-    { errorMap: () => ({ message: "Veuillez sélectionnez une option" }) },
+    { error: "Veuillez sélectionnez une option" },
   );
 
 export const assessmentDtoSchema: z.Schema<AssessmentDto> = z
@@ -81,7 +83,9 @@ export const withDateRangeSchema: z.Schema<DateRange> = z
 
 export const legacyAssessmentDtoSchema: z.Schema<LegacyAssessmentDto> =
   z.object({
-    status: z.enum(["FINISHED", "ABANDONED"]),
+    status: z.enum(["FINISHED", "ABANDONED"], {
+      error: localization.invalidEnum,
+    }),
     conventionId: z.string(),
     establishmentFeedback: zStringMinLength1,
   });

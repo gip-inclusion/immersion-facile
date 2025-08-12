@@ -5,7 +5,7 @@ import {
   type NotificationErrored,
 } from "shared";
 import { match, P } from "ts-pattern";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../UseCase";

@@ -1,10 +1,11 @@
 import {
   agencyIdSchema,
   conventionIdSchema,
+  localization,
   reminderKinds,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type {
   ConventionReminderPayload,
   TransferConventionToAgencyPayload,
@@ -12,7 +13,9 @@ import type {
 
 export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload> =
   z.object({
-    reminderKind: z.enum(reminderKinds),
+    reminderKind: z.enum(reminderKinds, {
+      error: localization.invalidEnum,
+    }),
     conventionId: z.string(),
   });
 
