@@ -50,6 +50,12 @@ export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
   agencyId: agencyIdSchema,
 });
 
+export const withAgencyIdSchemaPartial: z.Schema<Partial<WithAgencyId>> = z
+  .object({
+    agencyId: agencyIdSchema,
+  })
+  .partial();
+
 export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
   agencyIdSchema.optional();
 

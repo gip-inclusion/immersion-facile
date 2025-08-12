@@ -630,9 +630,7 @@ describe("conventionDtoSchema", () => {
             {
               dateEnd: getConventionTooLongMessageAndPath({
                 internshipKind,
-                dateEnd: "",
-                dateStart: "",
-              }).message,
+              }).error,
             },
           );
         },

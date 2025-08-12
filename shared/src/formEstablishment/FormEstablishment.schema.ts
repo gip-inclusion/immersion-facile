@@ -148,7 +148,7 @@ const formEstablishmentCommonShape = {
   userRights: formEstablishmentUserRightsSchema,
   maxContactsPerMonth: z
     .number({
-      invalid_type_error:
+      error:
         "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
     })
     .nonnegative({

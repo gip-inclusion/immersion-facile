@@ -87,6 +87,7 @@ import {
   levelsOfEducation,
   type MarkPartnersErroredConventionAsHandledRequest,
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
+  maximumCalendarDayByInternshipKind,
   type RenewConventionParams,
   type RenewMagicLinkRequestDto,
   type RenewMagicLinkResponse,
@@ -105,8 +106,6 @@ import {
   type WithOptionalFirstnameAndLastname,
 } from "./convention.dto";
 import {
-  getConventionTooLongMessageAndPath,
-  getOverMaxWorkedDaysMessageAndPath,
   isTutorEmailDifferentThanBeneficiaryRelatedEmails,
   minorBeneficiaryHasRepresentative,
   mustBeSignedByEveryone,
@@ -322,25 +321,86 @@ export const conventionInternshipKindSpecificSchema: z.Schema<
 
 export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
   .and(conventionInternshipKindSpecificSchema)
-  .refine(startDateIsBeforeEndDate, {
-    message: localization.invalidDateStartDateEnd,
-    path: [getConventionFieldName("dateEnd")],
-  })
-  .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-  .refine(underMaxPresenceDays, getOverMaxWorkedDaysMessageAndPath)
-  .refine(
-    minorBeneficiaryHasRepresentative,
-    ({ dateStart, signatories: { beneficiary } }) => {
-      const beneficiaryAgeAtConventionStart = getExactAge({
-        birthDate: new Date(beneficiary.birthdate),
-        referenceDate: new Date(dateStart),
+  .check((ctx) => {
+    if (
+      !startDateIsBeforeEndDate({
+        dateStart: ctx.value.dateStart,
+        dateEnd: ctx.value.dateEnd,
+      })
+    ) {
+      ctx.issues.push({
+        input: {
+          dateStart: ctx.value.dateStart,
+          dateEnd: ctx.value.dateEnd,
+        },
+        code: "custom",
+        message: localization.invalidDateStartDateEnd,
+        path: [getConventionFieldName("dateEnd")],
       });
-      return {
+    }
+  })
+  .check((ctx) => {
+    if (
+      !underMaxCalendarDuration({
+        dateStart: ctx.value.dateStart,
+        dateEnd: ctx.value.dateEnd,
+        internshipKind: ctx.value.internshipKind,
+      })
+    ) {
+      ctx.issues.push({
+        input: {
+          dateStart: ctx.value.dateStart,
+          dateEnd: ctx.value.dateEnd,
+        },
+        code: "custom",
+        message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[ctx.value.internshipKind]} jours.`,
+        path: [getConventionFieldName("dateEnd")],
+      });
+    }
+  })
+  .check((ctx) => {
+    if (
+      !underMaxPresenceDays({
+        schedule: ctx.value.schedule,
+        internshipKind: ctx.value.internshipKind,
+        dateSubmission: ctx.value.dateSubmission,
+      })
+    ) {
+      ctx.issues.push({
+        input: {
+          schedule: ctx.value.schedule,
+          internshipKind: ctx.value.internshipKind,
+          dateSubmission: ctx.value.dateEnd,
+        },
+        code: "custom",
+        message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[ctx.value.internshipKind]} jours.`,
+        path: [getConventionFieldName("dateEnd")],
+      });
+    }
+  })
+  .check((ctx) => {
+    if (
+      !minorBeneficiaryHasRepresentative({
+        dateStart: ctx.value.dateStart,
+        signatories: ctx.value.signatories,
+        dateSubmission: ctx.value.dateSubmission,
+      })
+    ) {
+      const beneficiaryAgeAtConventionStart = getExactAge({
+        birthDate: new Date(ctx.value.signatories.beneficiary.birthdate),
+        referenceDate: new Date(ctx.value.dateStart),
+      });
+      ctx.issues.push({
+        input: {
+          dateStart: ctx.value.dateStart,
+          dateSubmission: ctx.value.dateSubmission,
+        },
+        code: "custom",
         message: `Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait ${beneficiaryAgeAtConventionStart} ans au démarrage de la convention.`,
         path: [getConventionFieldName("signatories.beneficiaryRepresentative")],
-      };
-    },
-  )
+      });
+    }
+  })
   .superRefine((convention, issueMaker) => {
     const addIssue = (message: string, path: string) => {
       issueMaker.addIssue({
@@ -732,6 +792,10 @@ export const findSimilarConventionsResponseSchema: z.Schema<FindSimilarConventio
     similarConventionIds: z.array(conventionIdSchema),
   });
 
+const statusSchema = z.enum(conventionStatuses, {
+  error: localization.invalidEnum,
+});
+
 export const flatGetConventionsForAgencyUserParamsSchema: z.Schema<FlatGetConventionsForAgencyUserParams> =
   z.object({
     // pagination
@@ -749,16 +813,9 @@ export const flatGetConventionsForAgencyUserParamsSchema: z.Schema<FlatGetConven
     actorEmailContains: z.string().optional(),
     establishmentNameContains: z.string().optional(),
     beneficiaryNameContains: z.string().optional(),
-    statuses: z
-      .array(
-        z.enum(conventionStatuses, {
-          error: localization.invalidEnum,
-        }),
-      )
-      .nonempty()
-      .optional(),
-    agencyIds: z.array(agencyIdSchema).nonempty().optional(),
-    agencyDepartmentCodes: z.array(z.string()).nonempty().optional(),
+    statuses: z.tuple([statusSchema], statusSchema).optional(),
+    agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
+    agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
 
     // date filters
     dateStartFrom: makeDateStringSchema().optional(),
@@ -776,16 +833,9 @@ export const getConventionsForAgencyUserParamsSchema: z.Schema<GetConventionsFor
         actorEmailContains: z.string().optional(),
         establishmentNameContains: z.string().optional(),
         beneficiaryNameContains: z.string().optional(),
-        statuses: z
-          .array(
-            z.enum(conventionStatuses, {
-              error: localization.invalidEnum,
-            }),
-          )
-          .nonempty()
-          .optional(),
-        agencyIds: z.array(agencyIdSchema).nonempty().optional(),
-        agencyDepartmentCodes: z.array(z.string()).nonempty().optional(),
+        statuses: z.tuple([statusSchema], statusSchema).optional(),
+        agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
+        agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
         dateStart: dateFilterSchema.optional(),
         dateEnd: dateFilterSchema.optional(),
         dateSubmission: dateFilterSchema.optional(),
