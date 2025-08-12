@@ -1,11 +1,11 @@
-import { zAnyObj } from "shared";
+import { type ZodSchemaWithInputMatchingOutput, zAnyObj } from "shared";
 import { z } from "zod";
 import type {
   OpenCageDataFeatureCollection,
   OpenCageDataSearchResultCollection,
 } from "./HttpAddressGateway.dto";
 
-export const openCageDataSearchResultCollectionSchema: z.Schema<OpenCageDataSearchResultCollection> =
+export const openCageDataSearchResultCollectionSchema: ZodSchemaWithInputMatchingOutput<OpenCageDataSearchResultCollection> =
   z.object({
     documentation: z.string(),
     licenses: z.array(z.any()),
@@ -71,7 +71,7 @@ const openCageDataFeatureSchema = z.object({
   type: z.literal("Feature"),
 });
 
-export const openCageDataFeatureCollectionSchema: z.Schema<OpenCageDataFeatureCollection> =
+export const openCageDataFeatureCollectionSchema: ZodSchemaWithInputMatchingOutput<OpenCageDataFeatureCollection> =
   z.object({
     features: z.array(openCageDataFeatureSchema),
     type: z.literal("FeatureCollection"),

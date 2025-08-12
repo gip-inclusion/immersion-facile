@@ -12,6 +12,7 @@ import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.sche
 import {
   emptyObjectSchema,
   expressEmptyResponseBody,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "../zodUtils";
 
@@ -20,10 +21,11 @@ export type HtmlToPdfRequest = {
   conventionId: ConventionId;
 };
 
-export const htmlToPdfRequestSchema = z.object({
-  htmlContent: zStringMinLength1,
-  conventionId: z.string(),
-});
+export const htmlToPdfRequestSchema: ZodSchemaWithInputMatchingOutput<HtmlToPdfRequest> =
+  z.object({
+    htmlContent: zStringMinLength1,
+    conventionId: z.string(),
+  });
 
 // @TODO: This should be a proper OpenAPI schema
 const openApiSpecResponseSchema = z.any();

@@ -1,4 +1,7 @@
-import { executeInSequence } from "shared";
+import {
+  executeInSequence,
+  type ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -6,13 +9,14 @@ import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPer
 import type { WithNotificationIdAndKind } from "../helpers/Notification";
 import type { NotificationGateway } from "../ports/NotificationGateway";
 
-const withNotificationIdAndKindArray: z.Schema<WithNotificationIdAndKind[]> =
-  z.array(
-    z.object({
-      id: z.string(),
-      kind: z.union([z.literal("email"), z.literal("sms")]),
-    }),
-  );
+const withNotificationIdAndKindArray: ZodSchemaWithInputMatchingOutput<
+  WithNotificationIdAndKind[]
+> = z.array(
+  z.object({
+    id: z.string(),
+    kind: z.union([z.literal("email"), z.literal("sms")]),
+  }),
+);
 
 // Careful, this use case is transactional,
 // but it should only do queries and NEVER write anything to the DB.

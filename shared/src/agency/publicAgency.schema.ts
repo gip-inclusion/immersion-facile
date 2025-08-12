@@ -3,7 +3,10 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { stringWithMaxLength255 } from "../zodUtils";
+import {
+  stringWithMaxLength255,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
 import { agencyIdSchema, agencyKindSchema } from "./agency.schema";
 import type {
   AgencyPublicDisplayDto,
@@ -12,7 +15,7 @@ import type {
 } from "./publicAgency.dto";
 
 //TODO > wait for zod release with pick feature on object (developed but not released)
-export const agencyPublicDisplayDtoWithoutRefersToAgencySchema: z.Schema<AgencyPublicDisplayDtoWithoutRefersToAgency> =
+export const agencyPublicDisplayDtoWithoutRefersToAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyPublicDisplayDtoWithoutRefersToAgency> =
   z.object({
     id: agencyIdSchema,
     name: stringWithMaxLength255,
@@ -24,14 +27,14 @@ export const agencyPublicDisplayDtoWithoutRefersToAgencySchema: z.Schema<AgencyP
     logoUrl: absoluteUrlSchema.or(z.null()),
   });
 
-export const withOptionalRefersToAgencySchema: z.Schema<WithOptionalRefersToAgency> =
+export const withOptionalRefersToAgencySchema: ZodSchemaWithInputMatchingOutput<WithOptionalRefersToAgency> =
   z.object({
     refersToAgency: agencyPublicDisplayDtoWithoutRefersToAgencySchema.or(
       z.null(),
     ),
   });
 
-export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
+export const agencyPublicDisplaySchema: ZodSchemaWithInputMatchingOutput<AgencyPublicDisplayDto> =
   agencyPublicDisplayDtoWithoutRefersToAgencySchema.and(
     withOptionalRefersToAgencySchema,
   );

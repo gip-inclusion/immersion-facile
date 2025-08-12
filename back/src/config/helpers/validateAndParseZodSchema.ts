@@ -1,10 +1,10 @@
-import { errors } from "shared";
-import { flattenError, type z } from "zod";
+import { errors, type ZodSchemaWithInputMatchingOutput } from "shared";
+import { flattenError } from "zod";
 import type { OpacifiedLogger } from "../../utils/logger";
 
 export const validateAndParseZodSchemaV2 = <T>(
   props: {
-    inputSchema: z.Schema<T>;
+    inputSchema: ZodSchemaWithInputMatchingOutput<T>;
     schemaParsingInput: unknown;
     logger: OpacifiedLogger;
     id?: string;

@@ -1,6 +1,6 @@
 import { addDays, format, subDays, subYears } from "date-fns";
 import { keys } from "ramda";
-import { ZodError, type z } from "zod";
+import { ZodError } from "zod";
 import {
   CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
   DATE_CONSIDERED_OLD,
@@ -12,6 +12,7 @@ import {
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
   toDateUTCString,
   type Weekday,
+  type ZodSchemaWithInputMatchingOutput,
 } from "..";
 import {
   calculateNumberOfWorkedDays,
@@ -630,7 +631,7 @@ describe("conventionDtoSchema", () => {
             {
               dateEnd: getConventionTooLongMessageAndPath({
                 internshipKind,
-              }).error,
+              }).message,
             },
           );
         },
@@ -1214,7 +1215,7 @@ const expectConventionDtoToBeValid = (validConvention: ConventionDto): void => {
 };
 
 const expectConventionInvalidWithIssueMessages = <T>(
-  schema: z.Schema<T>,
+  schema: ZodSchemaWithInputMatchingOutput<T>,
   convention: T,
   issueMessages: Record<string, string>,
 ) => {

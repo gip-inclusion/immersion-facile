@@ -3,11 +3,12 @@ import {
   conventionSchema,
   emailSchema,
   siretSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import type { ConventionReadPublicV2Dto } from "./ConventionReadPublicV2.dto";
 
-export const conventionReadPublicV2Schema: z.Schema<ConventionReadPublicV2Dto> =
+export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<ConventionReadPublicV2Dto> =
   conventionSchema.and(
     z.object({
       agencyName: z.string(),
@@ -25,3 +26,7 @@ export const conventionReadPublicV2Schema: z.Schema<ConventionReadPublicV2Dto> =
         .optional(),
     }),
   );
+
+export const conventionReadPublicListV2Schema: ZodSchemaWithInputMatchingOutput<
+  ConventionReadPublicV2Dto[]
+> = z.array(conventionReadPublicV2Schema);

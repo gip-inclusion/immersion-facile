@@ -3,6 +3,7 @@ import {
   type ConnectedUser,
   errors,
   validateFile,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -18,15 +19,16 @@ export type UploadFileInput = {
 };
 
 // biome-ignore lint/correctness/noUnusedVariables: <explanation>
-const uploadFileInput: z.Schema<UploadFileInput> = z.object({
-  file: z.object({
-    name: zStringMinLength1,
-    encoding: zStringMinLength1,
-    size: z.number(),
-    buffer: z.instanceof(Buffer), // class not supported by NarrowEvent<Topic>["payload"]
-    mimetype: zStringMinLength1,
-  }),
-});
+const uploadFileInput: ZodSchemaWithInputMatchingOutput<UploadFileInput> =
+  z.object({
+    file: z.object({
+      name: zStringMinLength1,
+      encoding: zStringMinLength1,
+      size: z.number(),
+      buffer: z.instanceof(Buffer), // class not supported by NarrowEvent<Topic>["payload"]
+      mimetype: zStringMinLength1,
+    }),
+  });
 
 export class UploadFile extends UseCase<
   UploadFileInput,

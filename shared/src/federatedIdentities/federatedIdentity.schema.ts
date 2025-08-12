@@ -1,21 +1,25 @@
 import { z } from "zod";
-import { localization } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
 import type { FtConnectIdentity } from "./federatedIdentity.dto";
 
-export const peConnectIdentitySchema: z.Schema<FtConnectIdentity> = z.object({
-  provider: z.literal("peConnect"),
-  token: z.string(),
-  payload: z
-    .object({
-      advisor: z
+export const peConnectIdentitySchema: ZodSchemaWithInputMatchingOutput<FtConnectIdentity> =
+  z.object({
+    provider: z.literal("peConnect"),
+    token: z.string(),
+    payload: z
+      .object({
+        advisor: z
         .object({
           email: z.string(),
           firstName: z.string(),
           lastName: z.string(),
           type: z.enum(["PLACEMENT", "CAPEMPLOI", "INDEMNISATION"], {
-          error: localization.invalidEnum,
-        }),
-      }).optional(),
-    })
-    .optional(),
-});
+            error: localization.invalidEnum,
+          }),
+        }).optional(),
+      })
+      .optional(),
+  });

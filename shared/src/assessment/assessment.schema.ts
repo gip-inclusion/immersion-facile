@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { DateRange } from "../utils/date";
-import { localization, zEnumValidation, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+  zEnumValidation,
+  zStringMinLength1,
+} from "../zodUtils";
 import {
   type AssessmentDto,
   type LegacyAssessmentDto,
@@ -37,13 +42,13 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
   },
 );
 
-const withEstablishmentCommentsSchema: z.Schema<WithEstablishmentComments> =
+const withEstablishmentCommentsSchema: ZodSchemaWithInputMatchingOutput<WithEstablishmentComments> =
   z.object({
     establishmentFeedback: zStringMinLength1,
     establishmentAdvices: zStringMinLength1,
   });
 
-const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
+const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJob> =
   z.discriminatedUnion(
     "endedWithAJob",
     [
@@ -59,29 +64,32 @@ const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
     { error: "Veuillez sélectionnez une option" },
   );
 
-export const assessmentDtoSchema: z.Schema<AssessmentDto> = z
-  .object({
-    conventionId: z.string(),
-  })
-  .and(withAssessmentStatusSchema)
-  .and(withEstablishmentCommentsSchema)
-  .and(withEndedWithAJobSchema);
+export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto> =
+  z
+    .object({
+      conventionId: z.string(),
+    })
+    .and(withAssessmentStatusSchema)
+    .and(withEstablishmentCommentsSchema)
+    .and(withEndedWithAJobSchema);
 
-export const withAssessmentSchema: z.Schema<WithAssessmentDto> = z.object({
-  assessment: assessmentDtoSchema,
-});
+export const withAssessmentSchema: ZodSchemaWithInputMatchingOutput<WithAssessmentDto> =
+  z.object({
+    assessment: assessmentDtoSchema,
+  });
 
-export const withDateRangeSchema: z.Schema<DateRange> = z
-  .object({
-    from: z.date(),
-    to: z.date(),
-  })
-  .refine(
-    ({ from, to }) => from < to,
-    "La date de fin doit être après la date de début.",
-  );
+export const withDateRangeSchema: ZodSchemaWithInputMatchingOutput<DateRange> =
+  z
+    .object({
+      from: z.date(),
+      to: z.date(),
+    })
+    .refine(
+      ({ from, to }) => from < to,
+      "La date de fin doit être après la date de début.",
+    );
 
-export const legacyAssessmentDtoSchema: z.Schema<LegacyAssessmentDto> =
+export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyAssessmentDto> =
   z.object({
     status: z.enum(["FINISHED", "ABANDONED"], {
       error: localization.invalidEnum,

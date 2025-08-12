@@ -7,7 +7,10 @@ import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
 import { userIdSchema } from "../user/user.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
-import { localization } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
 import type {
   EmailNotification,
   FollowedIds,
@@ -19,18 +22,18 @@ import type {
   SmsNotification,
 } from "./notifications.dto";
 
-export const notificationIdSchema: z.Schema<NotificationId> = z
-  .string()
-  .uuid(localization.invalidUuid);
+export const notificationIdSchema: ZodSchemaWithInputMatchingOutput<NotificationId> =
+  z.string().uuid(localization.invalidUuid);
 
-const followedIdsSchema: z.Schema<FollowedIds> = z.object({
-  conventionId: conventionIdSchema.optional(),
-  establishmentSiret: siretSchema.optional(),
-  agencyId: agencyIdSchema.optional(),
-  userId: userIdSchema.optional(),
-});
+const followedIdsSchema: ZodSchemaWithInputMatchingOutput<FollowedIds> =
+  z.object({
+    conventionId: conventionIdSchema.optional(),
+    establishmentSiret: siretSchema.optional(),
+    agencyId: agencyIdSchema.optional(),
+    userId: userIdSchema.optional(),
+  });
 
-export const notificationErroredSchema: z.Schema<NotificationErrored> =
+export const notificationErroredSchema: ZodSchemaWithInputMatchingOutput<NotificationErrored> =
   z.object({
     status: z.literal("errored"),
     occurredAt: dateTimeIsoStringSchema,
@@ -38,27 +41,29 @@ export const notificationErroredSchema: z.Schema<NotificationErrored> =
     message: z.string(),
   });
 
-const notificationStateSchema: z.Schema<NotificationState> = z.union([
-  z.object({
-    status: z.literal("to-be-send"),
-    occurredAt: dateTimeIsoStringSchema,
-  }),
-  z.object({
-    status: z.literal("accepted"),
-    occurredAt: dateTimeIsoStringSchema,
-    messageIds: z.array(z.string().or(z.number())),
-  }),
-  notificationErroredSchema,
-]);
+const notificationStateSchema: ZodSchemaWithInputMatchingOutput<NotificationState> =
+  z.union([
+    z.object({
+      status: z.literal("to-be-send"),
+      occurredAt: dateTimeIsoStringSchema,
+    }),
+    z.object({
+      status: z.literal("accepted"),
+      occurredAt: dateTimeIsoStringSchema,
+      messageIds: z.array(z.string().or(z.number())),
+    }),
+    notificationErroredSchema,
+  ]);
 
-const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({
-  id: notificationIdSchema,
-  createdAt: makeDateStringSchema(),
-  followedIds: followedIdsSchema,
-  state: notificationStateSchema.optional(),
-});
+const notificationCommonSchema: ZodSchemaWithInputMatchingOutput<NotificationCommonFields> =
+  z.object({
+    id: notificationIdSchema,
+    createdAt: makeDateStringSchema(),
+    followedIds: followedIdsSchema,
+    state: notificationStateSchema.optional(),
+  });
 
-const emailNotificationSchema: z.Schema<EmailNotification> =
+const emailNotificationSchema: ZodSchemaWithInputMatchingOutput<EmailNotification> =
   notificationCommonSchema.and(
     z.object({
       kind: z.literal("email"),
@@ -66,14 +71,14 @@ const emailNotificationSchema: z.Schema<EmailNotification> =
     }),
   );
 
-const smsNotificationSchema: z.Schema<SmsNotification> =
+const smsNotificationSchema: ZodSchemaWithInputMatchingOutput<SmsNotification> =
   notificationCommonSchema.and(
     z.object({
       kind: z.literal("sms"),
       templatedContent: templatedSmsSchema,
     }),
   );
-export const notificationsByKindSchema: z.Schema<NotificationsByKind> =
+export const notificationsByKindSchema: ZodSchemaWithInputMatchingOutput<NotificationsByKind> =
   z.object({
     emails: z.array(emailNotificationSchema),
     sms: z.array(smsNotificationSchema),

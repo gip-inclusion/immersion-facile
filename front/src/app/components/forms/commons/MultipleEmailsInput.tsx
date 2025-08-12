@@ -4,6 +4,7 @@ import {
   notEqual,
   type OmitFromExistingKeys,
   validateMultipleEmailRegex,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import type { z } from "zod";
@@ -89,12 +90,12 @@ type InputContainerProps = {
   label?: string;
   placeholder?: string;
   description?: ReactNode;
-  validationSchema?: z.ZodSchema<unknown>;
+  validationSchema?: ZodSchemaWithInputMatchingOutput<unknown>;
   disabled?: boolean;
 };
 
 const createGetInputError =
-  (validationSchema?: z.ZodSchema<unknown>) =>
+  (validationSchema?: ZodSchemaWithInputMatchingOutput<unknown>) =>
   (stringToValidate: string): string | null => {
     if (!validationSchema) return null;
 
@@ -103,7 +104,7 @@ const createGetInputError =
       return null;
     } catch (e: any) {
       const zodError: z.ZodError = e;
-      return zodError.errors[0].message;
+      return zodError.issues[0].message;
     }
   };
 
