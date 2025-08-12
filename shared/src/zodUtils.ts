@@ -4,11 +4,6 @@ import { timeHHmmRegExp } from "./utils/date";
 // Change default error map behavior to provide context
 // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
 z.setErrorMap((issue, ctx) => {
-  if (issue.code === "invalid_enum_value")
-    return {
-      message: `Vous devez sélectionner une option parmi celles proposées - valeur fournie : ${ctx.data}`,
-    };
-
   if (issue.code === "invalid_string" && issue.validation === "email")
     return {
       message: `${localization.invalidEmailFormat} - email fourni : ${
@@ -60,22 +55,24 @@ export const localization = {
   invalidEnum: "Vous devez sélectionner une option parmi celles proposées",
 };
 
-export const requiredText = {
-  required_error: localization.required,
-  invalid_type_error: localization.expectText,
-};
+// export const requiredText = {
+//   required_error: localization.required,
+//   invalid_type_error: localization.expectText,
+// };
 
-export const requiredBoolean = {
-  required_error: localization.required,
-  invalid_type_error: localization.expectedBoolean,
-};
+// export const requiredBoolean = {
+//   required_error: localization.required,
+//   invalid_type_error: localization.expectedBoolean,
+// };
 
 export const zStringMinLength1 = z
-  .string(requiredText)
+  .string({
+    error: localization.required,
+  })
   .trim()
   .min(1, localization.required);
 
-export const zStringCanBeEmpty = z.string(requiredText).trim();
+export const zStringCanBeEmpty = z.string().trim();
 
 export const zStringPossiblyEmptyWithMax = (max: number): z.Schema<string> =>
   zStringCanBeEmpty.max(max, localization.maxCharacters(max));
@@ -86,7 +83,9 @@ export const zTrimmedStringWithMax = (max: number) =>
 export const stringWithMaxLength255 = zTrimmedStringWithMax(255);
 
 export const zTimeString = z
-  .string(requiredText)
+  .string({
+    error: localization.required,
+  })
   .regex(timeHHmmRegExp, localization.invalidTimeFormat);
 
 export const makezTrimmedString = (message: string) =>
@@ -94,7 +93,9 @@ export const makezTrimmedString = (message: string) =>
     .transform((s) => s.trim())
     .refine((s) => s.length > 0, message);
 
-export const zBoolean = z.boolean(requiredBoolean);
+export const zBoolean = z.boolean({
+  error: localization.required,
+});
 
 export const zToBoolean = z
   .any()
