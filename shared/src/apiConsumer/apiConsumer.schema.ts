@@ -39,7 +39,7 @@ export const apiConsumerJwtSchema: ZodSchemaWithInputMatchingOutput<ApiConsumerJ
   z.string();
 
 const callbackHeadersSchema: ZodSchemaWithInputMatchingOutput<CallbackHeaders> =
-  z.record(
+  z.partialRecord(
     z.enum(authorizedCallbackHeaderKeys, {
       error: localization.invalidEnum,
     }),
@@ -135,7 +135,7 @@ const apiConsumerRightsSchema: ZodSchemaWithInputMatchingOutput<
 });
 
 const commonApiConsumerShape = {
-  id: z.string().uuid(localization.invalidUuid),
+  id: z.uuid(localization.invalidUuid),
   name: stringWithMaxLength255,
   contact: apiConsumerContactSchema,
   rights: writeApiConsumerRightsSchema,
