@@ -1,24 +1,5 @@
-import { type ZodError, type ZodIssue, z } from "zod/v4";
+import { z } from "zod/v4";
 import { timeHHmmRegExp } from "./utils/date";
-
-// Change default error map behavior to provide context
-// https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
-z.setErrorMap((issue, ctx) => {
-  if (issue.code === "invalid_string" && issue.validation === "email")
-    return {
-      message: `${localization.invalidEmailFormat} - email fourni : ${
-        ctx.data && ctx.data !== "" ? ctx.data : "vide"
-      }`,
-    };
-
-  // Temporary regex instead of email - waiting for zod release
-  if (issue.code === "invalid_string" && issue.validation === "regex")
-    return {
-      message: `invalide - valeur fournie : ${ctx.data}`,
-    };
-
-  return { message: ctx.defaultError };
-});
 
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",
@@ -54,16 +35,6 @@ export const localization = {
   invalidAddress: "L'adresse est invalide",
   invalidEnum: "Vous devez sélectionner une option parmi celles proposées",
 };
-
-// export const requiredText = {
-//   required_error: localization.required,
-//   invalid_type_error: localization.expectText,
-// };
-
-// export const requiredBoolean = {
-//   required_error: localization.required,
-//   invalid_type_error: localization.expectedBoolean,
-// };
 
 export const zStringMinLength1 = z
   .string({
@@ -133,41 +104,4 @@ export const zEnumValidation = <T extends string>(
     error: errorMessage,
   });
 
-// Following is from https://github.com/colinhacks/zod/issues/372#issuecomment-826380330
-
-// the difference with z.Schema<T> is that you keep the original type of the schema
-// and you keep access to the methodes of that schema
-// for example you can use .passthrough() for a z.object() which you could not do with z.Schema<T>
-
-export const zSchemaForType =
-  <T>() =>
-  <S extends z.ZodType<T, z.ZodTypeDef, T>>(arg: S) =>
-    arg;
-
-export const zAnyObj = z.object({}).passthrough();
-
-export const flattenZodErrors = (
-  error: ZodError<any>,
-  path: (string | number)[] = [],
-): string[] => {
-  const result = error.errors.reduce<string[]>((acc, issue: ZodIssue) => {
-    const currentPath = [...path, ...(issue.path || [])];
-
-    if (issue.code === "invalid_union" && issue.unionErrors) {
-      const unionMessages = issue.unionErrors.reduce<string[]>(
-        (unionMsgs: string[], unionError: ZodError<any>) => {
-          return unionMsgs.concat(flattenZodErrors(unionError, currentPath));
-        },
-        [],
-      );
-      return [...acc, ...unionMessages];
-    }
-
-    const key = currentPath.join(".");
-    const message = issue.message;
-    const flatMessage = key ? `${key} : ${message}` : message;
-    return [...acc, flatMessage];
-  }, []);
-
-  return Array.from(new Set(result));
-};
+export const zAnyObj = z.object({}).loose();
