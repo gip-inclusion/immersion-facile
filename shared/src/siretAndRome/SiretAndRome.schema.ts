@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret/siret.schema";
 import type { SiretAndRomeDto } from "./SiretAndRome.dto";

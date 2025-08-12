@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import z from "zod";
 import { createInMemoryUow } from "./unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "./unit-of-work/adapters/InMemoryUowPerformer";
 import type { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";

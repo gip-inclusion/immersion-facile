@@ -13,7 +13,7 @@ import {
   phoneNumberSchema,
   type SiretDto,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";

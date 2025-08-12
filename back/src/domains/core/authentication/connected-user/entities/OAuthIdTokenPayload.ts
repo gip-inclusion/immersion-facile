@@ -5,7 +5,7 @@ import {
   type SiretDto,
   siretSchema,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type ProviderTokenPayloadBase = {
   sub: ExternalId;

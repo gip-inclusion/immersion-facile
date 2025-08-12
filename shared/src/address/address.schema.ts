@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import {
   localization,

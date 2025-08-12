@@ -1,6 +1,6 @@
 import { subMonths } from "date-fns";
 import { castError, type SiretDto } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";

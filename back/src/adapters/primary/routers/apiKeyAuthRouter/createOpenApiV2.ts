@@ -6,7 +6,7 @@ import {
   localization,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import type { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
 import type { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";

@@ -1,5 +1,5 @@
 import type { AbsoluteUrl } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { BearerToken } from "../../dto/BearerToken";
 import type { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
 

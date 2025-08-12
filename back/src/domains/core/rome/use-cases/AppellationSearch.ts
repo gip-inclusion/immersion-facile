@@ -4,7 +4,7 @@ import {
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
 import { findMatchRanges } from "../../../../utils/textSearch";
 import { TransactionalUseCase } from "../../UseCase";

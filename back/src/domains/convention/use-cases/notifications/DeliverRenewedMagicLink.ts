@@ -4,7 +4,7 @@ import {
   type InternshipKind,
   internshipKindSchema,
 } from "shared";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
