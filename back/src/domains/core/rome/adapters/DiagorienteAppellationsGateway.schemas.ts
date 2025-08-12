@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { localization } from "shared";
+import { z } from "zod/v4";
 import type {
   DiagorienteAccessTokenResponse,
   DiagorienteRawResponse,
@@ -9,7 +10,11 @@ export const diagorienteQueryParamsSchema = z.object({
   query: z.string(),
   nb_results: z.number(),
   tags: z
-    .array(z.enum(["ROME4", "alternance"]))
+    .array(
+      z.enum(["ROME4", "alternance"], {
+        error: localization.invalidEnum,
+      }),
+    )
     .min(1)
     .optional(),
 });

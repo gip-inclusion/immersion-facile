@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import {
   localization,
@@ -32,7 +32,13 @@ export const addressSchema: z.Schema<AddressDto> = z.object(
 );
 
 export const addressWithCountryCodeSchema: z.Schema<AddressDtoWithCountryCode> =
-  addressSchema.and(z.object({ countryCode: z.enum(supportedCountryCodes) }));
+  addressSchema.and(
+    z.object({
+      countryCode: z.enum(supportedCountryCodes, {
+        error: localization.invalidEnum,
+      }),
+    }),
+  );
 
 export const lookupSearchResultSchema: z.Schema<LookupSearchResult> = z.object({
   label: z.string(),
@@ -83,7 +89,9 @@ export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddres
         (arg) => arg.split(" ").length <= lookupStreetAddressQueryMaxWordLength,
         "String must contain a maximum of 18 words",
       ),
-    countryCode: z.enum(supportedCountryCodes),
+    countryCode: z.enum(supportedCountryCodes, {
+      error: localization.invalidEnum,
+    }),
   });
 
 export const withLookupLocationInputQueryParamsSchema: z.Schema<WithLookupLocationInputQueryParams> =

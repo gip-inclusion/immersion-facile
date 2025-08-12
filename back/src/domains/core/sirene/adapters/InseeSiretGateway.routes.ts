@@ -1,6 +1,6 @@
 import type { AbsoluteUrl } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { SirenGatewayAnswer } from "./InseeSiretGateway";
 
 // The documentation can be found here:

@@ -1,6 +1,6 @@
 import { type AbsoluteUrl, queryParamsAsString } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { AppConfig } from "../../../../../../config/bootstrap/appConfig";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";

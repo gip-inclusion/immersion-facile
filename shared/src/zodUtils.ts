@@ -1,14 +1,9 @@
-import { type ZodError, type ZodIssue, z } from "zod";
+import { type ZodError, type ZodIssue, z } from "zod/v4";
 import { timeHHmmRegExp } from "./utils/date";
 
 // Change default error map behavior to provide context
 // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
 z.setErrorMap((issue, ctx) => {
-  if (issue.code === "invalid_string" && issue.validation === "datetime")
-    return {
-      message: localization.invalidDate,
-    };
-
   if (issue.code === "invalid_enum_value")
     return {
       message: `Vous devez sélectionner une option parmi celles proposées - valeur fournie : ${ctx.data}`,
@@ -62,6 +57,7 @@ export const localization = {
     "Les numéros de téléphone des signataires doivent être différents.",
   invalidAppellations: "Les métiers renseignés sont invalides.",
   invalidAddress: "L'adresse est invalide",
+  invalidEnum: "Vous devez sélectionner une option parmi celles proposées",
 };
 
 export const requiredText = {
@@ -131,10 +127,9 @@ export const expressEmptyResponseBodyOrEmptyObject =
 export const zEnumValidation = <T extends string>(
   values: readonly [T, ...T[]],
   errorMessage: string,
-): z.ZodType<T, z.ZodTypeDef, T> =>
+) =>
   z.enum(values, {
-    required_error: errorMessage,
-    invalid_type_error: errorMessage,
+    error: errorMessage,
   });
 
 // Following is from https://github.com/colinhacks/zod/issues/372#issuecomment-826380330

@@ -1,15 +1,17 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { withNafCodesSchema } from "../naf/naf.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zToBoolean, zToNumber } from "../zodUtils";
+import { localization, zToBoolean, zToNumber } from "../zodUtils";
 import type { SearchQueryParamsDto } from "./SearchQueryParams.dto";
 
 const geoParamsSchema = z.discriminatedUnion("sortedBy", [
   z.object({
-    sortedBy: z.enum(["date", "score"]),
+    sortedBy: z.enum(["date", "score"], {
+      error: localization.invalidEnum,
+    }),
     latitude: zToNumber.optional(),
     longitude: zToNumber.optional(),
     distanceKm: zToNumber
@@ -31,7 +33,11 @@ export const searchParamsSchema: z.Schema<SearchQueryParamsDto> = z
     siret: siretSchema.optional(),
     voluntaryToImmersion: z.undefined().or(zToBoolean.optional()),
     place: z.string().optional(),
-    establishmentSearchableBy: z.enum(["students", "jobSeekers"]).optional(),
+    establishmentSearchableBy: z
+      .enum(["students", "jobSeekers"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
     fitForDisabledWorkers: z.undefined().or(zToBoolean.optional()),
   })
   .and(withNafCodesSchema)

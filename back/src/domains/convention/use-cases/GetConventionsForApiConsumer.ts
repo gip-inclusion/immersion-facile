@@ -3,8 +3,9 @@ import {
   type ConventionReadDto,
   conventionStatuses,
   ForbiddenError,
+  localization,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { GetConventionsFilters } from "../ports/ConventionQueries";
@@ -19,7 +20,13 @@ export class GetConventionsForApiConsumer extends TransactionalUseCase<
   protected inputSchema = z.object({
     startDateGreater: z.date().optional(),
     startDateLessOrEqual: z.date().optional(),
-    withStatuses: z.array(z.enum(conventionStatuses)).optional(),
+    withStatuses: z
+      .array(
+        z.enum(conventionStatuses, {
+          error: localization.invalidEnum,
+        }),
+      )
+      .optional(),
   });
 
   protected async _execute(

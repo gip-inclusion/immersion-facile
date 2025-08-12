@@ -1,12 +1,15 @@
+import { localization } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const adeEstablishmentSchema = z.object({
   matching_etablissements: z
     .array(
       z.object({
         siret: z.string(),
-        etat_administratif: z.enum(["A", "F"]),
+        etat_administratif: z.enum(["A", "F"], {
+          error: localization.invalidEnum,
+        }),
         adresse: z.string(),
         nom_commercial: z.string().nullable(),
       }),

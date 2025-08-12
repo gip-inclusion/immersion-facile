@@ -19,7 +19,7 @@ import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
 import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";

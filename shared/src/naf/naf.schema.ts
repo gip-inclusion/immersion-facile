@@ -1,7 +1,7 @@
 import { keys } from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { searchTextSchema } from "../search/searchText.schema";
-import { zStringMinLength1 } from "../zodUtils";
+import { localization, zStringMinLength1 } from "../zodUtils";
 import {
   type NafCode,
   type NafDto,
@@ -16,8 +16,12 @@ import {
 export const validNafSectorCodes = keys(nafSectorLabels).filter(
   (val) => val !== "0",
 );
-export const nafSectorCodeSchema: z.Schema<NafSectorCode> =
-  z.enum(nafSectorCodes);
+export const nafSectorCodeSchema: z.Schema<NafSectorCode> = z.enum(
+  nafSectorCodes,
+  {
+    error: localization.invalidEnum,
+  },
+);
 
 const nafCodeSchema: z.Schema<NafCode> = z.string().length(5);
 
