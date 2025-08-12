@@ -15,12 +15,6 @@ import {
   type Signatories,
 } from "./convention.dto";
 
-type DatesInConvention = {
-  dateStart: DateString;
-  dateEnd: DateString;
-  dateSubmission: DateString;
-};
-
 type DatesAndInternshipKing = {
   dateStart: DateString;
   dateEnd: DateString;
@@ -30,7 +24,10 @@ type DatesAndInternshipKing = {
 export const startDateIsBeforeEndDate = ({
   dateStart,
   dateEnd,
-}: DatesInConvention) => new Date(dateEnd) >= new Date(dateStart);
+}: {
+  dateStart: DateString;
+  dateEnd: DateString;
+}) => new Date(dateEnd) >= new Date(dateStart);
 
 export const underMaxCalendarDuration = ({
   dateStart,
@@ -42,8 +39,10 @@ export const underMaxCalendarDuration = ({
 
 export const getConventionTooLongMessageAndPath = ({
   internshipKind,
-}: DatesAndInternshipKing) => ({
-  message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[internshipKind]} jours.`,
+}: {
+  internshipKind: InternshipKind;
+}) => ({
+  error: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[internshipKind]} jours.`,
   path: [getConventionFieldName("dateEnd")],
 });
 
@@ -88,7 +87,7 @@ export const minorBeneficiaryHasRepresentative = ({
   dateStart,
   signatories,
   dateSubmission,
-}: ConventionDto) => {
+}: Pick<ConventionDto, "dateStart" | "signatories" | "dateSubmission">) => {
   const beneficiaryAgeAtConventionStart = getExactAge({
     birthDate: new Date(signatories.beneficiary.birthdate),
     referenceDate: new Date(dateStart),
