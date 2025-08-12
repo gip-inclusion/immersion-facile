@@ -13,7 +13,9 @@ export const conventionFranceTravailUserAdvisorDtoSchema: z.Schema<ConventionFtU
         lastName: makezTrimmedString(
           "Le nom du conseiller ne peut pas être vide",
         ),
-        email: z.string().email("L'email du conseiller est invalide"),
+        email: z.email({
+          error: "L'email du conseiller est invalide",
+        }),
         type: z.enum(immersionFranceTravailAdvisors, {
           error: localization.invalidEnum,
         }),

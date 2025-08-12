@@ -73,7 +73,9 @@ export const makeExchangeEmailSchema = (
   z
     .string()
     .email()
-    .regex(makeExchangeEmailRegex(replyDomain))
+    .regex(makeExchangeEmailRegex(replyDomain), {
+      error: localization.invalidEmailFormat,
+    })
     .transform((email) => {
       const [namepart, discussionPart] = email.split("@")[0].split("__");
       const [firstname, lastname] = namepart.split("_");
@@ -89,7 +91,9 @@ export const makeExchangeEmailSchema = (
       z
         .string()
         .email()
-        .regex(makeLegacyExchangeEmailRegex(replyDomain))
+        .regex(makeLegacyExchangeEmailRegex(replyDomain), {
+          error: localization.invalidEmailFormat,
+        })
         .transform((email) => {
           const [id, rawRecipientKind] = email.split("@")[0].split("_");
           return {
