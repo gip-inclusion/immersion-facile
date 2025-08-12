@@ -12,9 +12,10 @@ export const validateAndParseZodSchemaV2 = <T>(
 ): T => {
   const result = props.inputSchema.safeParse(props.schemaParsingInput);
   if (result.success) return result.data;
-
-  const flattenErrors = flattenError(result.error).formErrors;
-
+  const { fieldErrors } = flattenError(result.error);
+  const flattenErrors = Object.entries(fieldErrors).map(
+    ([key, value]) => `${key} : ${value as string}`,
+  );
   const error = errors.inputs.badSchema({
     id: props.id,
     flattenErrors,

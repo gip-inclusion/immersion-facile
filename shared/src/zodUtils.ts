@@ -33,6 +33,7 @@ export const localization = {
   invalidAppellations: "Les métiers renseignés sont invalides.",
   invalidAddress: "L'adresse est invalide",
   invalidEnum: "Vous devez sélectionner une option parmi celles proposées",
+  invalidSiret: "SIRET doit être composé de 14 chiffres",
 };
 
 export const zStringMinLength1 = z

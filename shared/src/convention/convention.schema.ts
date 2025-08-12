@@ -121,7 +121,7 @@ import {
 const zTrimmedStringMax255 = zTrimmedStringWithMax(255);
 
 export const conventionIdSchema: ZodSchemaWithInputMatchingOutput<ConventionId> =
-  z.string().uuid(localization.invalidUuid);
+  z.uuid(localization.invalidUuid);
 
 const roleSchema = z.enum(allRoles, {
   error: localization.invalidEnum,

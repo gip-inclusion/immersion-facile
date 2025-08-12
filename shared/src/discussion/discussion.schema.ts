@@ -46,7 +46,7 @@ import {
 } from "./discussion.dto";
 
 export const discussionIdSchema: ZodSchemaWithInputMatchingOutput<DiscussionId> =
-  z.string().uuid();
+  z.uuid();
 export const withDiscussionIdSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionId> =
   z.object({
     discussionId: discussionIdSchema,
