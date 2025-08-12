@@ -106,3 +106,9 @@ export const zEnumValidation = <T extends string>(
   });
 
 export const zAnyObj = z.object({}).loose();
+
+export type ZodSchemaWithInputMatchingOutput<T> = z.ZodType<
+  T,
+  T,
+  z.core.$ZodTypeInternals<T, T>
+>;

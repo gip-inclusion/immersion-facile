@@ -2,7 +2,11 @@ import { z } from "zod";
 import { businessNameSchema } from "../business/business";
 import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";
-import { localization, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+  zStringMinLength1,
+} from "../zodUtils";
 import {
   type GetSiretInfo,
   type GetSiretRequestDto,
@@ -15,7 +19,7 @@ import {
   type WithSiretDto,
 } from "./siret";
 
-export const numberOfEmployeesRangeSchema: z.Schema<NumberEmployeesRange> =
+export const numberOfEmployeesRangeSchema: ZodSchemaWithInputMatchingOutput<NumberEmployeesRange> =
   z.enum(numberEmployeesRanges, {
     error: localization.invalidEnum,
   });

@@ -2,6 +2,7 @@ import {
   emailSchema,
   localization,
   numberOfEmployeesRangeSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import {
@@ -71,7 +72,7 @@ export const createContactBodySchema: z.Schema<CreateContactBody> = z
     ]),
   );
 
-const getContactInfoAttributesSchema: z.Schema<GetContactInfoAttributes> =
+const getContactInfoAttributesSchema: ZodSchemaWithInputMatchingOutput<GetContactInfoAttributes> =
   z.object({
     EMAIL: z.string().optional(),
     ENT_CODE_DEPARTEMENT: z.string().optional(),
@@ -99,7 +100,7 @@ const getContactInfoAttributesSchema: z.Schema<GetContactInfoAttributes> =
     PRENOM: z.string().optional(),
   });
 
-export const getContactInfoResponseBodySchema: z.Schema<GetContactInfoResponseBody> =
+export const getContactInfoResponseBodySchema: ZodSchemaWithInputMatchingOutput<GetContactInfoResponseBody> =
   z.object({
     email: z.string(),
     id: z.number(),
@@ -116,11 +117,11 @@ export const contactErrorResponseBodySchema = z.object({
   message: z.string(),
 });
 
-export const deleteContactFromListBodyRequestModeEmailSchema: z.Schema<DeleteContactFromListRequestBodyModeEmail> =
+export const deleteContactFromListBodyRequestModeEmailSchema: ZodSchemaWithInputMatchingOutput<DeleteContactFromListRequestBodyModeEmail> =
   z.object({
     emails: z.array(emailSchema),
   });
-export const deleteContactFromListModeEmailResponseBodySchema: z.Schema<DeleteContactFromListModeEmailResponseBody> =
+export const deleteContactFromListModeEmailResponseBodySchema: ZodSchemaWithInputMatchingOutput<DeleteContactFromListModeEmailResponseBody> =
   z.object({
     contacts: z.object({
       success: z.array(emailSchema),
