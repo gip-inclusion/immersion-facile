@@ -39,7 +39,7 @@ export const apiConsumerJwtSchema: ZodSchemaWithInputMatchingOutput<ApiConsumerJ
   z.string();
 
 const callbackHeadersSchema: ZodSchemaWithInputMatchingOutput<CallbackHeaders> =
-  z.record(
+  z.partialRecord(
     z.enum(authorizedCallbackHeaderKeys, {
       error: localization.invalidEnum,
     }),

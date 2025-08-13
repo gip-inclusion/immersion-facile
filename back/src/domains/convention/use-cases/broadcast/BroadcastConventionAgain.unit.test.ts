@@ -28,10 +28,10 @@ import {
 
 describe("BroadcastConventionAgain", () => {
   const agency = new AgencyDtoBuilder()
-    .withId("11111111-1111-4111-2222-111111111122")
+    .withId("11111111-1111-4111-9222-111111111122")
     .build();
   const convention = new ConventionDtoBuilder()
-    .withId("11111111-1111-4111-1111-111111111111")
+    .withId("11111111-1111-4111-9111-111111111111")
     .withAgencyId(agency.id)
     .build();
   const adminUser = new ConnectedUserBuilder().withIsAdmin(true).build();
@@ -79,7 +79,7 @@ describe("BroadcastConventionAgain", () => {
     });
 
     it("throws notFound when convention is not found", async () => {
-      const notFoundConventionId = "40400000-1111-4000-1111-000000000404";
+      const notFoundConventionId = "40400000-1111-4000-9111-000000000404";
       await expectPromiseToFailWithError(
         broadcastConventionAgain.execute(
           { conventionId: notFoundConventionId },
