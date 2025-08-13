@@ -3,6 +3,8 @@ import {
   type ConventionReadDto,
   type CreateWebhookSubscription,
   conventionReadSchema,
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
 import { z } from "zod";
@@ -175,10 +177,12 @@ const conventionExample: ConventionReadDto = {
   agencyRefersTo: undefined,
 };
 
-const callbackBodySchema: z.Schema<ConventionUpdatedSubscriptionCallbackBody> =
+const callbackBodySchema: ZodSchemaWithInputMatchingOutput<ConventionUpdatedSubscriptionCallbackBody> =
   z.object({
     payload: z.object({ convention: conventionReadSchema }),
-    subscribedEvent: z.enum(["convention.updated"]),
+    subscribedEvent: z.enum(["convention.updated"], {
+      error: localization.invalidEnum,
+    }),
   });
 
 const callbackBodyExample: ConventionUpdatedSubscriptionCallbackBody = {

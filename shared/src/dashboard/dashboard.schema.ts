@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
+import {
   allDashboardNames,
   type DashboardUrlAndName,
   type GetAdminDashboardParams,
@@ -8,20 +12,26 @@ import {
   simpleDashboardNames,
 } from "./dashboard.dto";
 
-export const getAdminDashboardParamsSchema: z.Schema<GetAdminDashboardParams> =
+export const getAdminDashboardParamsSchema: ZodSchemaWithInputMatchingOutput<GetAdminDashboardParams> =
   z.union([
     z.object({
-      name: z.enum(simpleDashboardNames),
+      name: z.enum(simpleDashboardNames, {
+        error: localization.invalidEnum,
+      }),
     }),
     z.object({
-      name: z.enum(["adminAgencyDetails"]),
+      name: z.enum(["adminAgencyDetails"], {
+        error: localization.invalidEnum,
+      }),
       agencyId: z.string(),
     }),
   ]);
 
-export const getConventionMagicLinkDashboardParamsSchema: z.Schema<GetConventionMagicLinkDashboardParams> =
+export const getConventionMagicLinkDashboardParamsSchema: ZodSchemaWithInputMatchingOutput<GetConventionMagicLinkDashboardParams> =
   z.object({
-    name: z.enum(["conventionStatus"]),
+    name: z.enum(["conventionStatus"], {
+      error: localization.invalidEnum,
+    }),
     conventionId: z.string(),
   });
 
@@ -30,8 +40,10 @@ export const getDashboardParams = z.union([
   getConventionMagicLinkDashboardParamsSchema,
 ]);
 
-export const dashboardUrlAndNameSchema: z.Schema<DashboardUrlAndName> =
+export const dashboardUrlAndNameSchema: ZodSchemaWithInputMatchingOutput<DashboardUrlAndName> =
   z.object({
-    name: z.enum(allDashboardNames),
+    name: z.enum(allDashboardNames, {
+      error: localization.invalidEnum,
+    }),
     url: absoluteUrlSchema,
   });

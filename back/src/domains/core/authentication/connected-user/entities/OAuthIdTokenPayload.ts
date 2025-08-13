@@ -4,6 +4,7 @@ import {
   emailSchema,
   type SiretDto,
   siretSchema,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 
@@ -27,7 +28,7 @@ export type ProConnectOAuthIdTokenPayload = ProviderTokenPayloadBase & {
   };
 };
 
-export const proConnectAuthTokenPayloadSchema: z.Schema<ProConnectOAuthIdTokenPayload> =
+export const proConnectAuthTokenPayloadSchema: ZodSchemaWithInputMatchingOutput<ProConnectOAuthIdTokenPayload> =
   z.object({
     sub: z.string(),
     given_name: z.string(),

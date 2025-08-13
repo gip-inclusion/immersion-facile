@@ -1,3 +1,4 @@
+import { localization, type ZodSchemaWithInputMatchingOutput } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 
@@ -6,7 +7,9 @@ const adeEstablishmentSchema = z.object({
     .array(
       z.object({
         siret: z.string(),
-        etat_administratif: z.enum(["A", "F"]),
+        etat_administratif: z.enum(["A", "F"], {
+          error: localization.invalidEnum,
+        }),
         adresse: z.string(),
         nom_commercial: z.string().nullable(),
       }),
@@ -20,7 +23,7 @@ const adeEstablishmentSchema = z.object({
   }),
 });
 
-const annuaireDesEntreprisesSiretGatewayResponseSchema: z.Schema<AnnuaireDesEntreprisesSiretGatewayResponse> =
+const annuaireDesEntreprisesSiretGatewayResponseSchema: ZodSchemaWithInputMatchingOutput<AnnuaireDesEntreprisesSiretGatewayResponse> =
   z.object({
     results: z.array(adeEstablishmentSchema),
     total_results: z.number(),
@@ -53,7 +56,7 @@ type AnnuaireDesEntreprisesSiretGatewayResponse = {
   total_pages: number;
 };
 
-const annuaireDesEntreprisesQueryParamsSchema: z.Schema<{
+const annuaireDesEntreprisesQueryParamsSchema: ZodSchemaWithInputMatchingOutput<{
   q: string;
   mtm_campaign: "immersion-facilitee";
 }> = z.any();

@@ -11,10 +11,13 @@ import {
   type SupportedCountryCode,
   territoriesByCountryCode,
 } from "../address/address.dto";
-import { zStringMinLength1 } from "../zodUtils";
+import {
+  type ZodSchemaWithInputMatchingOutput,
+  zStringMinLength1,
+} from "../zodUtils";
 import type { PhoneNumber } from "./phone.dto";
 
-export const phoneNumberSchema: z.Schema<PhoneNumber> =
+export const phoneNumberSchema: ZodSchemaWithInputMatchingOutput<PhoneNumber> =
   zStringMinLength1.transform((phone, ctx) => {
     const countryCode = getSupportedCountryCodesForCountry("FR").find(
       (countryCode) => isValidPhoneNumber(phone, countryCode),

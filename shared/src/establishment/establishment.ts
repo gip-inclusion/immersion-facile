@@ -5,14 +5,17 @@ import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
-import { zStringMinLength1 } from "../zodUtils";
+import {
+  type ZodSchemaWithInputMatchingOutput,
+  zStringMinLength1,
+} from "../zodUtils";
 
 export type EstablishmentNameAndAdmins = {
   name: string;
   adminEmails: Email[];
 };
 
-export const establishmentNameAndAdminsSchema: z.Schema<EstablishmentNameAndAdmins> =
+export const establishmentNameAndAdminsSchema: ZodSchemaWithInputMatchingOutput<EstablishmentNameAndAdmins> =
   z.object({
     name: zStringMinLength1,
     adminEmails: z.array(emailSchema),

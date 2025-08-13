@@ -1,5 +1,9 @@
 import * as Sentry from "@sentry/node";
-import { calculateDurationInSecondsFrom, castError } from "shared";
+import {
+  calculateDurationInSecondsFrom,
+  castError,
+  type ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { z } from "zod";
 import { validateAndParseZodSchemaV2 } from "../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../utils/logger";
@@ -11,7 +15,7 @@ const logger = createLogger(__filename);
 
 type UseCaseBuilder<Output, Input, Deps, CurrentUser> = {
   withInput: <I>(
-    schema: z.Schema<I>,
+    schema: ZodSchemaWithInputMatchingOutput<I>,
   ) => UseCaseBuilder<Output, I, Deps, CurrentUser>;
   withOutput: <O>() => UseCaseBuilder<O, Input, Deps, CurrentUser>;
   withDeps: <D>() => UseCaseBuilder<Output, Input, D, CurrentUser>;
@@ -43,11 +47,11 @@ export const useCaseBuilder = <
   CurrentUser = void,
 >(
   useCaseName: string,
-  options: { inputSchema: z.Schema<Input> } = {
-    inputSchema: z.void() as unknown as z.Schema<Input>,
+  options: { inputSchema: ZodSchemaWithInputMatchingOutput<Input> } = {
+    inputSchema: z.void() as unknown as ZodSchemaWithInputMatchingOutput<Input>,
   },
 ): UseCaseBuilder<Output, Input, Deps, CurrentUser> => ({
-  withInput: <I>(inputSchema: z.Schema<I>) =>
+  withInput: <I>(inputSchema: ZodSchemaWithInputMatchingOutput<I>) =>
     useCaseBuilder<Output, I, Deps, CurrentUser>(useCaseName, { inputSchema }),
   withOutput: <O>() =>
     useCaseBuilder<O, Input, Deps, CurrentUser>(useCaseName, options),

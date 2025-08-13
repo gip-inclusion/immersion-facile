@@ -14,9 +14,8 @@ describe("formEstablishmentSchema", () => {
       ).toThrow(
         new ZodError([
           {
-            code: "invalid_type",
             expected: "object",
-            received: "undefined",
+            code: "invalid_type",
             path: ["potentialBeneficiaryWelcomeAddress"],
             message: "L'adresse est invalide",
           },
@@ -56,9 +55,9 @@ describe("formEstablishmentSchema", () => {
         new ZodError([
           {
             code: "custom",
+            path: ["userRights"],
             message:
               "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
-            path: ["userRights"],
           },
         ]),
       );
@@ -83,9 +82,9 @@ describe("formEstablishmentSchema", () => {
         new ZodError([
           {
             code: "custom",
+            path: ["userRights"],
             message:
               "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
-            path: ["userRights"],
           },
         ]),
       );

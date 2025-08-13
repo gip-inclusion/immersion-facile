@@ -11,6 +11,7 @@ import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellat
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
+  type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
   zStringCanBeEmpty,
   zStringMinLength1,
@@ -55,7 +56,7 @@ const contactEstablishmentByMailCommonSchema =
     }),
   );
 
-const contactEstablishmentByMailIFSchema: z.Schema<ContactEstablishmentByMailIFDto> =
+const contactEstablishmentByMailIFSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentByMailIFDto> =
   contactEstablishmentByMailCommonSchema.and(
     z.object({
       kind: z.literal("IF"),
@@ -66,11 +67,12 @@ const contactEstablishmentByMailIFSchema: z.Schema<ContactEstablishmentByMailIFD
     }),
   );
 
-const contactLevelOfEducationSchema: z.Schema<ContactLevelOfEducation> = z.enum(
-  contactLevelsOfEducation,
-);
+const contactLevelOfEducationSchema: ZodSchemaWithInputMatchingOutput<ContactLevelOfEducation> =
+  z.enum(contactLevelsOfEducation, {
+    error: localization.invalidEnum,
+  });
 
-const contactEstablishmentByMail1Eleve1StageSchema: z.Schema<ContactEstablishmentByMail1Eleve1StageDto> =
+const contactEstablishmentByMail1Eleve1StageSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentByMail1Eleve1StageDto> =
   contactEstablishmentByMailCommonSchema.and(
     z.object({
       kind: z.literal("1_ELEVE_1_STAGE"),
@@ -79,12 +81,12 @@ const contactEstablishmentByMail1Eleve1StageSchema: z.Schema<ContactEstablishmen
     }),
   );
 
-export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailDto> =
+export const contactEstablishmentByMailSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentByMailDto> =
   contactEstablishmentByMailIFSchema.or(
     contactEstablishmentByMail1Eleve1StageSchema,
   );
 
-export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =
+export const contactEstablishmentByPhoneSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentByPhoneDto> =
   contactInformationsCommonSchema
     .and(
       z.object({
@@ -103,7 +105,7 @@ export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByP
       ]),
     );
 
-export const contactEstablishmentInPersonSchema: z.Schema<ContactEstablishmentInPersonDto> =
+export const contactEstablishmentInPersonSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentInPersonDto> =
   contactInformationsCommonSchema
     .and(
       z.object({
@@ -117,12 +119,14 @@ export const contactEstablishmentInPersonSchema: z.Schema<ContactEstablishmentIn
         }),
         z.object({
           kind: z.literal("1_ELEVE_1_STAGE"),
-          levelOfEducation: z.enum(["3ème", "2nde"]),
+          levelOfEducation: z.enum(["3ème", "2nde"], {
+            error: localization.invalidEnum,
+          }),
         }),
       ]),
     );
 
-export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentRequestDto> =
+export const contactEstablishmentRequestSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentRequestDto> =
   z
     .union([
       contactEstablishmentByMailSchema,
@@ -131,5 +135,5 @@ export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentReq
     ])
     .and(withAcquisitionSchema);
 
-export const contactEstablishmentEventPayloadSchema: z.Schema<ContactEstablishmentEventPayload> =
+export const contactEstablishmentEventPayloadSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentEventPayload> =
   z.object({ discussionId: z.string(), siret: siretSchema });

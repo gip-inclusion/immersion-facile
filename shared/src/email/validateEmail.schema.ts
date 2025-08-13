@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
 import { emailSchema } from "./email.schema";
 import {
   type ValidateEmailFeedback,
@@ -6,14 +10,19 @@ import {
   validateEmailStatuses,
 } from "./validateEmail.dto";
 
-export const validateEmailInputSchema: z.Schema<ValidateEmailInput> = z.object({
-  email: emailSchema,
+export const validateEmailInputSchema: ZodSchemaWithInputMatchingOutput<ValidateEmailInput> =
+  z.object({
+    email: emailSchema,
+  });
+
+export const validateEmailReasonSchema = z.enum(validateEmailStatuses, {
+  error: localization.invalidEnum,
 });
 
-export const validateEmailReasonSchema = z.enum(validateEmailStatuses);
-
-export const validateEmailResponseSchema: z.Schema<ValidateEmailFeedback> =
+export const validateEmailResponseSchema: ZodSchemaWithInputMatchingOutput<ValidateEmailFeedback> =
   z.object({
-    status: z.enum(validateEmailStatuses),
+    status: z.enum(validateEmailStatuses, {
+      error: localization.invalidEnum,
+    }),
     proposal: z.string().or(z.null()),
   });
