@@ -218,7 +218,7 @@ describe("PgConventionRepository", () => {
   it("Adds a convention renewed from another one", async () => {
     const existingConvention = conventionStylisteBuilder
       .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withId("11111111-1111-4111-1111-111111111111")
+      .withId("11111111-1111-4111-9111-111111111111")
       .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
 
@@ -564,7 +564,7 @@ describe("PgConventionRepository", () => {
         role: "establishment-tutor",
       };
 
-      const conventionId = "40400404-0000-0000-0000-6bb9bd38bbbb";
+      const conventionId = "40400404-0000-4000-9000-6bb9bd38bbbb";
 
       const conventionWithSameTutorAndRep = new ConventionDtoBuilder()
         .withId(conventionId)
@@ -614,7 +614,7 @@ describe("PgConventionRepository", () => {
         businessAddress: "Rue des Bouchers 67065 Strasbourg",
       };
 
-      const conventionId = "40400404-0000-0000-0000-6bb9bd38aaaa";
+      const conventionId = "40400404-0000-4000-9000-6bb9bd38aaaa";
 
       const conventionWithoutBeneficiaryCurrentEmployer =
         new ConventionDtoBuilder()
@@ -791,7 +791,7 @@ describe("PgConventionRepository", () => {
         role: "establishment-tutor",
       };
 
-      const conventionId = "40400404-0000-0000-0000-6bb9bd38bbbb";
+      const conventionId = "40400404-0000-4000-9000-6bb9bd38bbbb";
 
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)
@@ -998,12 +998,12 @@ describe("PgConventionRepository", () => {
         .withSchedule(reasonableSchedule);
 
       const convention1ToMarkAsDeprecated = conventionBuilderWithDateInRange
-        .withId("11111111-1111-4111-1111-111111111111")
+        .withId("11111111-1111-4111-9111-111111111111")
         .withStatus("PARTIALLY_SIGNED")
         .build();
 
       const convention2ToKeepAsIs = conventionStylisteBuilder
-        .withId("22221111-1111-4111-1111-111111112222")
+        .withId("22221111-1111-4111-9111-111111112222")
         .withDateStart(subDays(dateSince, 2).toISOString())
         .withDateEnd(addDays(dateSince, 1).toISOString())
         .withSchedule(reasonableSchedule)
@@ -1011,38 +1011,38 @@ describe("PgConventionRepository", () => {
         .build();
 
       const convention3ToKeepAsIs = conventionBuilderWithDateInRange
-        .withId("33331111-1111-4111-1111-111111113333")
+        .withId("33331111-1111-4111-9111-111111113333")
         .withStatus("ACCEPTED_BY_VALIDATOR")
 
         .build();
 
       const convention4ToKeepAsIs = conventionBuilderWithDateInRange
-        .withId("44441111-1111-4111-1111-111111114444")
+        .withId("44441111-1111-4111-9111-111111114444")
         .withStatus("CANCELLED")
         .build();
 
       const convention5ToKeepAsIs = conventionBuilderWithDateInRange
-        .withId("55551111-1111-4111-1111-111111115555")
+        .withId("55551111-1111-4111-9111-111111115555")
         .withStatus("REJECTED")
         .build();
 
       const convention6ToKeepAsIs = conventionBuilderWithDateInRange
-        .withId("66661111-1111-4111-1111-111111116666")
+        .withId("66661111-1111-4111-9111-111111116666")
         .withStatus("DEPRECATED")
         .build();
 
       const convention7ToMarkAsDeprecated = conventionBuilderWithDateInRange
-        .withId("77771111-1111-4111-1111-111111117777")
+        .withId("77771111-1111-4111-9111-111111117777")
         .withStatus("ACCEPTED_BY_COUNSELLOR")
         .build();
 
       const convention8ToMarkAsDeprecated = conventionBuilderWithDateInRange
-        .withId("88881111-1111-4111-1111-111111118888")
+        .withId("88881111-1111-4111-9111-111111118888")
         .withStatus("IN_REVIEW")
         .build();
 
       const convention9ToMarkAsDeprecated = conventionBuilderWithDateInRange
-        .withId("99991111-1111-4111-1111-111111119999")
+        .withId("99991111-1111-4111-9111-111111119999")
         .withStatus("READY_TO_SIGN")
         .build();
 

@@ -523,9 +523,9 @@ describe("Pg implementation of ConventionQueries", () => {
     const matchingDateStart = new Date("2021-01-09").toISOString();
     const someMatchingStatus = "READY_TO_SIGN";
     const conventionMatchingIdA: ConventionId =
-      "aaaa1111-1111-4111-1111-11111111aaaa";
+      "aaaa1111-1111-4111-9111-11111111aaaa";
     const conventionMatchingIdB: ConventionId =
-      "bbbb1111-1111-4111-1111-11111111bbbb";
+      "bbbb1111-1111-4111-9111-11111111bbbb";
 
     beforeEach(async () => {
       await db.deleteFrom("agencies").execute();
