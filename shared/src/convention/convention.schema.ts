@@ -355,10 +355,6 @@ export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
           internshipKind: ctx.value.internshipKind,
         })
       ) {
-        console.log("ctx.value.dateStart", ctx.value.dateStart);
-        console.log("ctx.value.dateEnd", ctx.value.dateEnd);
-        console.log("ctx.value.internshipKind", ctx.value.internshipKind);
-
         ctx.issues.push({
           input: {
             dateStart: ctx.value.dateStart,
