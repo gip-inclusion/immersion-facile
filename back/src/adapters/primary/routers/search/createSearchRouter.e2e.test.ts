@@ -515,9 +515,9 @@ describe("search-immersion route", () => {
           body: {
             status: 400,
             issues: [
-              "latitude : Expected number, received nan",
-              "longitude : Expected number, received nan",
-              "distanceKm : Expected number, received nan",
+              "latitude : Invalid input: expected number, received NaN",
+              "longitude : Invalid input: expected number, received NaN",
+              "distanceKm : Invalid input: expected number, received NaN",
             ],
             message:
               "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
@@ -537,8 +537,8 @@ describe("search-immersion route", () => {
           body: {
             status: 400,
             issues: [
-              "longitude : Expected number, received nan",
-              "distanceKm : Expected number, received nan",
+              "longitude : Invalid input: expected number, received NaN",
+              "distanceKm : Invalid input: expected number, received NaN",
             ],
             message:
               "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",

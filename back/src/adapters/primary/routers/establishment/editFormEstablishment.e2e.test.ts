@@ -223,7 +223,9 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        issues: ["authorization : Required"],
+        issues: [
+          "authorization : Invalid input: expected string, received undefined",
+        ],
         message:
           "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: PUT /form-establishments",
         status: 400,
