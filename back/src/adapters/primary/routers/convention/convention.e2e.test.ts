@@ -155,7 +155,9 @@ describe("convention e2e", () => {
           message:
             "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /demandes-immersion",
           status: 400,
-          issues: ["convention : Required"],
+          issues: [
+            "convention : Invalid input: expected object, received undefined",
+          ],
         },
         status: 400,
       });
@@ -343,7 +345,9 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          issues: ["authorization : Required"],
+          issues: [
+            "authorization : Invalid input: expected string, received undefined",
+          ],
           message:
             "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /auth/demandes-immersion/:conventionId",
           status: 400,
@@ -672,7 +676,9 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          issues: ["authorization : Required"],
+          issues: [
+            "authorization : Invalid input: expected string, received undefined",
+          ],
           message:
             "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /auth/update-application-status",
           status: 400,
