@@ -66,8 +66,8 @@ describe("address router", () => {
         status: 400,
         body: {
           issues: [
-            "lookup : String must contain at least 2 character(s)",
-            "lookup : String must contain at least 2 character(s), excluding special chars",
+            "lookup : Too small: expected string to have >=2 characters",
+            "lookup : Too small: expected string to have >=2 characters, excluding special chars",
           ],
           message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /address/lookupStreetAddress`,
           status: 400,
@@ -110,7 +110,7 @@ describe("address router", () => {
           status: 400,
           body: {
             issues: [
-              "lookup : String must contain at least 2 character(s), excluding special chars",
+              "lookup : Too small: expected string to have >=2 characters, excluding special chars",
             ],
             message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /address/lookupStreetAddress`,
             status: 400,

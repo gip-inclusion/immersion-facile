@@ -130,9 +130,9 @@ describe("POST contact-establishment public V2 route", () => {
       message:
         "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v2/contact-establishment",
       issues: [
-        'contactMode : Invalid literal value, expected "EMAIL"',
-        'contactMode : Invalid literal value, expected "PHONE"',
-        'contactMode : Invalid literal value, expected "IN_PERSON"',
+        'contactMode : Invalid input: expected "EMAIL"',
+        'contactMode : Invalid input: expected "PHONE"',
+        'contactMode : Invalid input: expected "IN_PERSON"',
       ],
     });
     expectToEqual(status, 400);

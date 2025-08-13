@@ -34,6 +34,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
           name: req.params.dashboardName as any,
           ...(req.query.agencyId ? req.query : {}),
         };
+
         return deps.useCases.getDashboard.execute(
           useCaseParams,
           req.payloads?.currentUser,

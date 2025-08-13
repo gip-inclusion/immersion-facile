@@ -49,11 +49,13 @@ describe("authenticatedConventionRoutes", () => {
     )} 400 without headers`, async () => {
       const response = await httpClient.markPartnersErroredConventionAsHandled({
         headers: {} as any,
-        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+        body: { conventionId: "11111111-1111-4111-9111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
         body: {
-          issues: ["authorization : Required"],
+          issues: [
+            "authorization : Invalid input: expected string, received undefined",
+          ],
           message:
             "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /inclusion-connected/mark-errored-convention-as-handled",
           status: 400,
@@ -67,7 +69,7 @@ describe("authenticatedConventionRoutes", () => {
     )} 401 with bad token`, async () => {
       const response = await httpClient.markPartnersErroredConventionAsHandled({
         headers: { authorization: "wrong-token" },
-        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+        body: { conventionId: "11111111-1111-4111-9111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
         body: { message: invalidTokenMessage, status: 401 },
@@ -85,7 +87,7 @@ describe("authenticatedConventionRoutes", () => {
       );
       const response = await httpClient.markPartnersErroredConventionAsHandled({
         headers: { authorization: token },
-        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+        body: { conventionId: "11111111-1111-4111-9111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
         body: { message: authExpiredMessage, status: 401 },
@@ -100,7 +102,7 @@ describe("authenticatedConventionRoutes", () => {
       const conventionAgency = new AgencyDtoBuilder()
         .withId("agency-id-2")
         .build();
-      const conventionId = "11111111-1111-4111-1111-111111111111";
+      const conventionId = "11111111-1111-4111-9111-111111111111";
       const user: User = {
         id: "123456ab",
         email: "joe@mail.com",
@@ -128,7 +130,7 @@ describe("authenticatedConventionRoutes", () => {
 
       const response = await httpClient.markPartnersErroredConventionAsHandled({
         headers: { authorization: token },
-        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+        body: { conventionId },
       });
 
       expectHttpResponseToEqual(response, {
@@ -144,7 +146,7 @@ describe("authenticatedConventionRoutes", () => {
     });
 
     it("mark partners errored convention as handled", async () => {
-      const conventionId = "11111111-1111-4111-1111-111111111111";
+      const conventionId = "11111111-1111-4111-9111-111111111111";
       const agency = new AgencyDtoBuilder().build();
       const user: User = {
         id: "123456ab",
@@ -211,7 +213,7 @@ describe("authenticatedConventionRoutes", () => {
     it("throws an error if user is not authenticated", async () => {
       const response = await httpClient.broadcastConventionAgain({
         headers: { authorization: "wrong-token" },
-        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+        body: { conventionId: "11111111-1111-4111-9111-111111111111" },
       });
 
       expectHttpResponseToEqual(response, {

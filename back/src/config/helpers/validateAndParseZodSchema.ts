@@ -1,3 +1,4 @@
+import { flatten } from "ramda";
 import { errors, type ZodSchemaWithInputMatchingOutput } from "shared";
 import type { ZodError } from "zod";
 import type { $ZodIssue } from "zod/v4/core/errors.cjs";
@@ -42,21 +43,31 @@ const flattenZodErrors = (
   const result = error.issues.reduce<string[]>((acc, issue: $ZodIssue) => {
     const currentPath = [...path, ...(issue.path || [])];
 
-    // if (issue.code === "invalid_union" && issue.errors) {
-    //   const unionMessages = issue.errors.reduce<string[]>(
-    //     (unionMsgs: string[], unionError: $ZodIssue[]) => {
-    //       return unionMsgs.concat(flattenZodErrors(unionError, currentPath));
-    //     },
-    //     [],
-    //   );
-    //   return [...acc, ...unionMessages];
-    // }
-
-    const key = currentPath.join(".");
-    const message = issue.message;
-    const flatMessage = key ? `${key} : ${message}` : message;
-    return [...acc, flatMessage];
+    return [...acc, ...flattenZodIssue(issue, currentPath)];
   }, []);
 
   return Array.from(new Set(result));
+};
+
+const flattenZodIssue = (
+  issue: $ZodIssue,
+  path: PropertyKey[] = [],
+): string[] => {
+  if (issue.code === "invalid_union" && issue.errors) {
+    const unionErrors = flatten(issue.errors);
+    const unionMessages = unionErrors.reduce<string[]>(
+      (unionMsgs: string[], currentIssue: $ZodIssue) => {
+        return unionMsgs.concat(
+          flattenZodIssue(currentIssue, [...path, ...currentIssue.path]),
+        );
+      },
+      [],
+    );
+    return unionMessages;
+  }
+
+  const key = path.join(".");
+  const message = issue.message;
+  const flatMessage = key ? `${key} : ${message}` : message;
+  return [flatMessage];
 };
