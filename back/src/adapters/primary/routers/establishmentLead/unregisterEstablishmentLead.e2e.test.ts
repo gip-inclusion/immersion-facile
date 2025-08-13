@@ -97,7 +97,9 @@ describe("Unregister establishment lead", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          issues: ["authorization : Required"],
+          issues: [
+            "authorization : Invalid input: expected string, received undefined",
+          ],
           message:
             "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /establishment-lead/unregister",
           status: 400,

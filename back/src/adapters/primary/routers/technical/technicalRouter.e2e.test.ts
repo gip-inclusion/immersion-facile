@@ -25,7 +25,7 @@ import {
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
-const discussionId = "11111111-1111-4111-1111-111111111111";
+const discussionId = "11111111-1111-4111-9111-111111111111";
 const domain = "immersion-facile.beta.gouv.fr";
 const tallySecret = "tally-secret";
 
@@ -228,7 +228,7 @@ describe("technical router", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          issues: ["items : Required"],
+          issues: ["items : Invalid input: expected array, received undefined"],
           message:
             "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /inbound-email-parsing",
           status: 400,
@@ -323,7 +323,9 @@ describe("technical router", () => {
       });
       expectHttpResponseToEqual(response, {
         body: {
-          issues: ["email : invalide - valeur fournie : invalid-email"],
+          issues: [
+            "email : Veuillez saisir une adresse e-mail valide - email fourni : invalid-email",
+          ],
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /validate-email",
           status: 400,

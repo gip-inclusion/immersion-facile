@@ -90,7 +90,7 @@ export const withLookupStreetAddressQueryParamsSchema: ZodSchemaWithInputMatchin
           "",
         );
         return withoutSpecialChars.length >= lookupStreetAddressQueryMinLength;
-      }, "String must contain at least 2 character(s), excluding special chars")
+      }, "Too small: expected string to have >=2 characters, excluding special chars")
       .refine(
         (arg) => arg.split(" ").length <= lookupStreetAddressQueryMaxWordLength,
         "String must contain a maximum of 18 words",

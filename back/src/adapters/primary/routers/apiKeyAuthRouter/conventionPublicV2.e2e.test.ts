@@ -202,7 +202,7 @@ describe("Convention routes", () => {
           status: 400,
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/conventions",
-          issues: [" : Unrecognized key(s) in object: 'someUnknownKey'"],
+          issues: [' : Unrecognized key: "someUnknownKey"'],
         },
       });
     });
