@@ -13,7 +13,9 @@ import {
   type WithAgencyDashboards,
   type WithEstablishmentDashboards,
 } from "shared";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { MetabaseView } from "../../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../../SelectConventionFromIdForm";
 
@@ -29,6 +31,7 @@ export const ConventionTabContent = ({
   dashboards: WithAgencyDashboards & WithEstablishmentDashboards;
   activeAgencies: AgencyDtoForAgencyUsersAndAdmins[];
 }) => {
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const [selectedAgency, setSelectedAgency] = useState<AgencyId | null>(null);
 
   const redirectToConventionPage = (
@@ -40,6 +43,8 @@ export const ConventionTabContent = ({
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencyId: agency.id,
+          agencyReferentFirstName: currentUser?.firstName ?? "",
+          agencyReferentLastName: currentUser?.lastName ?? "",
         })
         .push();
       return;
@@ -50,6 +55,8 @@ export const ConventionTabContent = ({
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencyId: agency.id,
+        agencyReferentFirstName: currentUser?.firstName ?? "",
+        agencyReferentLastName: currentUser?.lastName ?? "",
         skipIntro: true,
       })
       .push();
