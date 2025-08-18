@@ -68,7 +68,7 @@ export const PhoneInput = ({
 
       <div className={fr.cx("fr-grid-row", "fr-mt-1w")}>
         {shouldDisplaySelect && (
-          <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
+          <div className={fr.cx("fr-col-12", "fr-col-md-5")}>
             <Select
               label=""
               options={Object.entries(countryCodesData).map(
