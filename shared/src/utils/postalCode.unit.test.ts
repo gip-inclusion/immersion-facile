@@ -15,6 +15,11 @@ describe("postalCode", () => {
       expect(() =>
         addressWithPostalCodeSchema.parse("20 AVENUE DE SEGUR,75007,PARIS 7"),
       ).not.toThrow();
+      expect(() =>
+        addressWithPostalCodeSchema.parse(
+          "14 Boulevard de Berlaimont 1000 Bruxelles, Belgique",
+        ),
+      ).not.toThrow();
     });
 
     it("rejects missing or invalid postal codes", () => {
