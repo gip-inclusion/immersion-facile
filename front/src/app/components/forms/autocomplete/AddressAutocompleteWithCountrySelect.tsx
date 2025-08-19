@@ -98,7 +98,7 @@ export const AddressAutocompleteWithCountrySelect = ({
         onAddressClear={onAddressClear}
         onAddressSelected={onAddressSelected}
         multiple={multiple}
-        countryCode={countryCode}
+        countryCode={getSelectedCountryCode()}
         initialInputValue={inputValue}
       />
     </div>
