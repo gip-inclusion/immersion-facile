@@ -6,7 +6,8 @@ import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { keys } from "ramda";
 import { z } from "zod";
 import {
-  getSupportedCountryCodesForCountry,
+  countryCodesData,
+  defaultCountryCode,
   isSupportedCountryCode,
   type SupportedCountryCode,
   territoriesByCountryCode,
@@ -16,17 +17,17 @@ import type { PhoneNumber } from "./phone.dto";
 
 export const phoneNumberSchema: z.Schema<PhoneNumber> =
   zStringMinLength1.transform((phone, ctx) => {
-    const countryCode = getSupportedCountryCodesForCountry("FR").find(
-      (countryCode) => isValidPhoneNumber(phone, countryCode),
-    );
-    if (!countryCode) {
+    const countryCodeFromPhoneNumber =
+      getCountryCodeFromPhoneNumber(phone) ?? defaultCountryCode;
+    const isValid = isValidPhoneNumber(phone, countryCodeFromPhoneNumber);
+    if (!isValid) {
       ctx.addIssue({
-        message: `Le numéro de téléphone '${phone}' n'est pas valide.`,
+        message: `Le numéro de téléphone '${phone}' n'est pas valide en ${countryCodesData[countryCodeFromPhoneNumber].name}.`,
         code: "custom",
       });
       return z.NEVER;
     }
-    return parsePhoneNumber(phone, countryCode).format("E.164");
+    return parsePhoneNumber(phone, countryCodeFromPhoneNumber).format("E.164");
   });
 
 export const isValidMobilePhone = (phoneNumber: PhoneNumber): boolean =>
@@ -36,17 +37,11 @@ export const toDisplayedPhoneNumber = (
   phoneNumber: string,
 ): string | undefined => parsePhoneNumber(phoneNumber).format("NATIONAL");
 
-export const toInternationalPhoneNumber = (
+export const formatWithPhoneNumberPrefix = (
   phoneNumber: string,
   countryCode: SupportedCountryCode,
 ): string | undefined => {
-  const validCountryCode = getSupportedCountryCodesForCountry(countryCode).find(
-    (countryCode) => isValidPhoneNumber(phoneNumber, countryCode),
-  );
-  if (!validCountryCode) {
-    return;
-  }
-  return parsePhoneNumber(phoneNumber, validCountryCode).format("E.164");
+  return parsePhoneNumber(phoneNumber, countryCode).format("E.164");
 };
 
 export const getCountryCodeFromPhoneNumber = (
