@@ -85,12 +85,8 @@ export const PhoneInput = ({
                   const updatedCountryCode = event.currentTarget.value;
                   if (isSupportedCountryCode(updatedCountryCode)) {
                     setCountryCode(updatedCountryCode);
-                    const internationalPhoneNumber =
-                      formatWithPhoneNumberPrefix(
-                        displayedPhoneNumber,
-                        updatedCountryCode,
-                      );
-                    onPhoneNumberChange(internationalPhoneNumber ?? "");
+                    setDisplayedPhoneNumber("");
+                    onPhoneNumberChange("");
                   }
                 },
               }}
