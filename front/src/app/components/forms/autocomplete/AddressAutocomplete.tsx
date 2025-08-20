@@ -83,6 +83,7 @@ export const AddressAutocomplete = ({
                 }
               : undefined,
           onChange: (searchResult, actionMeta) => {
+            console.log("onChange", searchResult, actionMeta);
             if (
               actionMeta.action === "clear" ||
               actionMeta.action === "remove-value"
