@@ -83,7 +83,6 @@ export const AddressAutocomplete = ({
                 }
               : undefined,
           onChange: (searchResult, actionMeta) => {
-            console.log("onChange", searchResult, actionMeta);
             if (
               actionMeta.action === "clear" ||
               actionMeta.action === "remove-value"
@@ -109,18 +108,11 @@ export const AddressAutocomplete = ({
                   locator: props.locator,
                 }),
               );
-              // biome-ignore lint/suspicious/noConsole: <explanation>
-              console.log("onAddressSelected", searchResult.label);
               setSearchTerm(searchResult.label);
             }
           },
           options,
           onInputChange: (newQuery, actionMeta) => {
-            // biome-ignore lint/suspicious/noConsole: <explanation>
-            console.log("onInputChange", {
-              newQuery,
-              actionMeta,
-            });
             if (actionMeta.action === "input-change") {
               setSearchTerm(newQuery);
               dispatch(
