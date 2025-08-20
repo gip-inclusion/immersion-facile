@@ -6,11 +6,11 @@ import { useFormContext } from "react-hook-form";
 import {
   countryCodesData,
   defaultCountryCode,
+  formatWithPhoneNumberPrefix,
   getCountryCodeFromPhoneNumber,
   isSupportedCountryCode,
   type OmitFromExistingKeys,
   type SupportedCountryCode,
-  toInternationalPhoneNumber,
 } from "shared";
 
 export type PhoneInputProps = InputProps.RegularInput & {
@@ -85,10 +85,11 @@ export const PhoneInput = ({
                   const updatedCountryCode = event.currentTarget.value;
                   if (isSupportedCountryCode(updatedCountryCode)) {
                     setCountryCode(updatedCountryCode);
-                    const internationalPhoneNumber = toInternationalPhoneNumber(
-                      displayedPhoneNumber,
-                      updatedCountryCode,
-                    );
+                    const internationalPhoneNumber =
+                      formatWithPhoneNumberPrefix(
+                        displayedPhoneNumber,
+                        updatedCountryCode,
+                      );
                     onPhoneNumberChange(internationalPhoneNumber ?? "");
                   }
                 },
@@ -123,7 +124,7 @@ export const PhoneInput = ({
                 }
               },
               onBlur: (event) => {
-                const internationalPhoneNumber = toInternationalPhoneNumber(
+                const internationalPhoneNumber = formatWithPhoneNumberPrefix(
                   displayedPhoneNumber,
                   countryCode || defaultCountryCodeValue,
                 );

@@ -91,15 +91,19 @@ export const EstablishmentRepresentativeFields = ({
           },
         }}
         disabled={isFetchingSiret}
-        {...getFieldError("signatories.establishmentRepresentative.phone")}
         onPhoneNumberChange={(phoneNumber) => {
           setValue(
             "signatories.establishmentRepresentative.phone",
             phoneNumber,
+            { shouldValidate: true },
           );
         }}
         shouldDisplaySelect={true}
         defaultCountryCodeValue={countryFromSiret ?? defaultCountryCode}
+        stateRelatedMessage={
+          getFieldError("signatories.establishmentRepresentative.phone")
+            ?.stateRelatedMessage
+        }
       />
       <EmailValidationInput
         label={
