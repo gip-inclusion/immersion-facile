@@ -41,7 +41,11 @@ export const formatWithPhoneNumberPrefix = (
   phoneNumber: string,
   countryCode: SupportedCountryCode,
 ): string | undefined => {
-  return parsePhoneNumber(phoneNumber, countryCode).format("E.164");
+  const nationalNumber =
+    parsePhoneNumberFromString(phoneNumber)?.nationalNumber;
+  return nationalNumber
+    ? parsePhoneNumber(nationalNumber, countryCode).format("E.164")
+    : parsePhoneNumber(phoneNumber, countryCode).format("E.164");
 };
 
 export const getCountryCodeFromPhoneNumber = (
