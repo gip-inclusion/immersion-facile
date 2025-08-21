@@ -205,13 +205,13 @@ const DisplayContactModeValue = ({
           En cas non-réponse de l'entreprise au bout de 15 jours,{" "}
           <strong>
             {formValues.userRights[0].isMainContactByPhone
-              ? `le candidat peut contacter l'entreprise au numéro de téléphone : ${formValues.userRights[0].phone && toDisplayedPhoneNumber(formValues.userRights[0].phone)} (${
+              ? `le candidat peut contacter l'entreprise au numéro de téléphone : ${formValues.userRights[0].phone && toDisplayedPhoneNumber(formValues.userRights[0].phone)} ${
                   federatedIdentity?.provider === "proConnect" &&
-                  getFormattedFirstnameAndLastname({
+                  `(${getFormattedFirstnameAndLastname({
                     firstname: federatedIdentity.firstName,
                     lastname: federatedIdentity.lastName,
-                  })
-                })`
+                  })})`
+                }`
               : "le candidat ne peut pas contacter l'entreprise"}
           </strong>
         </p>
