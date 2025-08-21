@@ -164,7 +164,7 @@ export const OffersSettingsSection = ({
     <>
       <HeadingSection
         title="Disponibilité"
-        description="Êtes-vous disponible actuellement pour recevoir des personnes en immersion ?"
+        description="Êtes-vous disponible actuellement pour recevoir des personnes en immersion ? *"
       >
         <RadioButtons
           id={domElementIds.establishment[mode].availabilityButton}
@@ -473,11 +473,33 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
 
   const contactMode = getValues("contactMode");
   const contactModeRegister = register("contactMode");
-  const isMainContactByPhoneValue = watch("userRights.0.isMainContactByPhone");
-  const userRightsInForm = getValues("userRights");
   const potentialBeneficiaryWelcomeAddress = getValues(
     "potentialBeneficiaryWelcomeAddress",
   );
+  const allUserRights = watch("userRights");
+
+  const currentUserToContact =
+    allUserRights.length === 1
+      ? allUserRights[0]
+      : allUserRights.find((userRight) =>
+          contactMode === "IN_PERSON"
+            ? userRight.isMainContactInPerson
+            : userRight.isMainContactByPhone,
+        );
+
+  const currentUserRight =
+    mode === "create" ? allUserRights[0] : currentUserToContact;
+
+  const currentUserRightIndex = currentUserRight
+    ? allUserRights.findIndex(
+        (userRight) => userRight.email === currentUserRight.email,
+      )
+    : 0;
+
+  const currentUserRightFromWatched = allUserRights[currentUserRightIndex];
+
+  const shouldShowUserToContact =
+    currentUserRightFromWatched?.isMainContactByPhone === true;
 
   return (
     <>
@@ -522,7 +544,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
         .with("EMAIL", () => (
           <>
             <RadioButtons
-              legend="Si vous ne répondez pas dans les 15 jours, est-ce que vous consentez à ce que le candidat vous contacte par téléphone ?"
+              legend="Si vous ne répondez pas dans les 15 jours, est-ce que vous consentez à ce que le candidat vous contacte par téléphone ? *"
               id={
                 domElementIds.establishment[mode].businessContact
                   .isMainContactByPhone
@@ -531,35 +553,47 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
                 {
                   label: "Oui",
                   nativeInputProps: {
-                    name: register("userRights.0.isMainContactByPhone").name,
+                    name: register(
+                      `userRights.${currentUserRightIndex}.isMainContactByPhone`,
+                    ).name,
                     onChange: () => {
-                      setValue("userRights.0.isMainContactByPhone", true);
+                      const newUserRights = allUserRights.map(
+                        (userRight, index) => ({
+                          ...userRight,
+                          isMainContactByPhone: index === currentUserRightIndex,
+                        }),
+                      );
+                      setValue("userRights", newUserRights);
                     },
-                    checked: isMainContactByPhoneValue === true,
+                    checked:
+                      currentUserRightFromWatched?.isMainContactByPhone ===
+                      true,
                   },
                 },
                 {
                   label: "Non",
                   nativeInputProps: {
-                    name: register("userRights.0.isMainContactByPhone").name,
+                    name: register(
+                      `userRights.${currentUserRightIndex}.isMainContactByPhone`,
+                    ).name,
                     onChange: () => {
-                      const newUserRights = userRightsInForm.map(
-                        (userRight) => ({
-                          ...userRight,
-                          isMainContactByPhone: false,
-                        }),
-                      );
+                      const newUserRights = allUserRights.map((userRight) => ({
+                        ...userRight,
+                        isMainContactByPhone: false,
+                      }));
                       setValue("userRights", newUserRights);
                     },
-                    checked: isMainContactByPhoneValue === false,
+                    checked:
+                      currentUserRightFromWatched?.isMainContactByPhone !==
+                      true,
                   },
                 },
               ]}
-              {...getFieldError("contactMode")}
+              {...getFieldError(
+                `userRights.${currentUserRightIndex}.isMainContactByPhone`,
+              )}
             />
-            {isMainContactByPhoneValue === true && (
-              <UserToContact mode={mode} />
-            )}
+            {shouldShowUserToContact && <UserToContact mode={mode} />}
           </>
         ))
         .with("PHONE", () => <UserToContact mode={mode} />)
@@ -625,13 +659,13 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
             ? "Interlocuteur sur place"
             : "Numéro de téléphone"}
         </strong>{" "}
-        :{" "}
+        : {defaultUserToContact.phone} {"("}
         {federatedIdentity?.provider === "proConnect" &&
           getFormattedFirstnameAndLastname({
             firstname: federatedIdentity.firstName,
             lastname: federatedIdentity.lastName,
-          })}{" "}
-        • {defaultUserToContact.phone}
+          })}
+        {")"}
       </div>
     ))
     .with(P.union("edit", "admin"), () => (
