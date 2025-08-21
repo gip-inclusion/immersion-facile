@@ -9,6 +9,7 @@ import {
   domElementIds,
   type FormEstablishmentDto,
   getFormattedFirstnameAndLastname,
+  toDisplayedPhoneNumber,
 } from "shared";
 import type {
   Mode,
@@ -18,6 +19,7 @@ import type {
 import { SearchResultPreview } from "src/app/components/forms/establishment/SearchResultPreview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
 export const SummarySection = ({
   mode,
@@ -125,7 +127,10 @@ export const SummarySection = ({
           <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
             Moyen de contact :
           </p>
-          <DisplayContactModeValue contactMode={formValues.contactMode} />
+          <DisplayContactModeValue
+            contactMode={formValues.contactMode}
+            federatedIdentity={federatedIdentity}
+          />
         </SectionHighlight>
       </HeadingSection>
       <HeadingSection
@@ -159,8 +164,10 @@ const DisplaySearchableByValue = ({
 
 const DisplayContactModeValue = ({
   contactMode,
+  federatedIdentity,
 }: {
   contactMode: ContactMode;
+  federatedIdentity: FederatedIdentityWithUser | null;
 }) => {
   const { getValues } = useFormContext<FormEstablishmentDto>();
   const formValues = getValues();
@@ -186,7 +193,9 @@ const DisplayContactModeValue = ({
         )}
       {contactMode === "PHONE" && (
         <p>
-          Contact principal par téléphone : {formValues.userRights[0].phone}
+          Contact principal par téléphone :{" "}
+          {formValues.userRights[0].phone &&
+            toDisplayedPhoneNumber(formValues.userRights[0].phone)}
         </p>
       )}
       {contactMode === "EMAIL" && (
@@ -196,7 +205,13 @@ const DisplayContactModeValue = ({
           En cas non-réponse de l'entreprise au bout de 15 jours,{" "}
           <strong>
             {formValues.userRights[0].isMainContactByPhone
-              ? `le candidat peut contacter l'entreprise au numéro de téléphone : ${formValues.userRights[0].phone}`
+              ? `le candidat peut contacter l'entreprise au numéro de téléphone : ${formValues.userRights[0].phone && toDisplayedPhoneNumber(formValues.userRights[0].phone)} (${
+                  federatedIdentity?.provider === "proConnect" &&
+                  getFormattedFirstnameAndLastname({
+                    firstname: federatedIdentity.firstName,
+                    lastname: federatedIdentity.lastName,
+                  })
+                })`
               : "le candidat ne peut pas contacter l'entreprise"}
           </strong>
         </p>

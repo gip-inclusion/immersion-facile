@@ -8,7 +8,7 @@ import RadioButtons, {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { equals } from "ramda";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -45,10 +45,16 @@ import { useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
+import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { match, P } from "ts-pattern";
 import allUsersSvg from "../../../../../assets/img/all.svg";
 import jobSeekerSvg from "../../../../../assets/img/jobseeker.svg";
+import mailSvg from "../../../../../assets/img/mail.svg";
+import phoneSvg from "../../../../../assets/img/phone.svg";
 import studentSvg from "../../../../../assets/img/student.svg";
+import userSvg from "../../../../../assets/img/user.svg";
 import type {
   Mode,
   OnStepChange,
@@ -467,9 +473,16 @@ const searchableByOptions: RadioButtonsProps["options"] = [
 ];
 
 const ContactModeSection = ({ mode }: { mode: Mode }) => {
+  const dispatch = useDispatch();
   const { register, formState, getValues, setValue, watch } =
     useFormContext<FormEstablishmentDto>();
   const getFieldError = makeFieldError(formState);
+  const defaultEstablishmentAddress = useAppSelector(
+    siretSelectors.establishmentInfos,
+  )?.businessAddress;
+  const inPersonAddress = useAppSelector(
+    makeGeocodingLocatorSelector("create-establishment-in-person-address"),
+  );
 
   const contactMode = getValues("contactMode");
   const contactModeRegister = register("contactMode");
@@ -477,6 +490,22 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
     "potentialBeneficiaryWelcomeAddress",
   );
   const allUserRights = watch("userRights");
+
+  useEffect(() => {
+    if (
+      contactMode === "IN_PERSON" &&
+      inPersonAddress &&
+      inPersonAddress.value &&
+      !potentialBeneficiaryWelcomeAddress
+    ) {
+      setValue("potentialBeneficiaryWelcomeAddress", inPersonAddress.value);
+    }
+  }, [
+    contactMode,
+    inPersonAddress,
+    potentialBeneficiaryWelcomeAddress,
+    setValue,
+  ]);
 
   const currentUserToContact =
     allUserRights.length === 1
@@ -508,32 +537,70 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
         {...contactModeRegister}
         options={[
           {
-            label: "Par mail",
+            label: "Par e-mail",
             hintText:
-              "La demande passera par un formulaire afin de ne pas exposer l'adresse mail",
-            illustration: <img src={allUsersSvg} alt="" />,
+              "Vous pourrez échanger et suivre vos candidatures sur un tableau de bord.",
+            illustration: <img src={mailSvg} alt="" />,
             nativeInputProps: {
               ...contactModeRegister,
               value: "EMAIL",
+              onChange: (event) => {
+                contactModeRegister.onChange?.(event);
+                const newUserRights = allUserRights.map((userRight) => ({
+                  ...userRight,
+                  isMainContactInPerson: false,
+                }));
+                setValue("userRights", newUserRights);
+              },
             },
           },
           {
             label: "Par téléphone",
             hintText:
-              "Seuls les candidats identifiés auront accès au numéro de téléphone",
-            illustration: <img src={allUsersSvg} alt="" />,
+              "Le candidat recevra un email avec le numéro de téléphone choisi.",
+            illustration: <img src={phoneSvg} alt="" />,
             nativeInputProps: {
               ...contactModeRegister,
               value: "PHONE",
+              onChange: (event) => {
+                contactModeRegister.onChange?.(event);
+                const newUserRights = allUserRights.map((userRight) => ({
+                  ...userRight,
+                  isMainContactInPerson: false,
+                }));
+                setValue("userRights", newUserRights);
+              },
             },
           },
           {
-            label: "Se présenter en personne",
-            hintText: "Vous recevrez un candidat à votre établissement",
-            illustration: <img src={allUsersSvg} alt="" />,
+            label: "En présentiel",
+            hintText:
+              "Le candidat recevra un email avec votre adresse et vos coordonnées.",
+            illustration: <img src={userSvg} alt="" />,
             nativeInputProps: {
               ...contactModeRegister,
               value: "IN_PERSON",
+              onChange: (event) => {
+                contactModeRegister.onChange?.(event);
+                const newUserRights = allUserRights.map((userRight, index) => ({
+                  ...userRight,
+                  isMainContactInPerson: index === currentUserRightIndex,
+                }));
+                setValue("userRights", newUserRights);
+                if (
+                  !potentialBeneficiaryWelcomeAddress &&
+                  defaultEstablishmentAddress
+                ) {
+                  dispatch(
+                    geocodingSlice.actions.fetchSuggestionsRequested({
+                      lookup: defaultEstablishmentAddress,
+                      countryCode: "FR",
+                      selectFirstSuggestion: true,
+                      locator: "create-establishment-in-person-address",
+                    }),
+                  );
+                }
+              },
             },
           },
         ]}
@@ -600,7 +667,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
         .with("IN_PERSON", () => (
           <>
             <AddressAutocomplete
-              label="Lieu de rendez-vous"
+              label="Lieu de rendez-vous *"
               locator="create-establishment-in-person-address"
               onAddressClear={() => {}}
               initialInputValue={
@@ -636,17 +703,21 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
   const currentUserToContact =
     establishment.userRights.length === 1
       ? establishment.userRights[0]
-      : establishment.userRights.find((userRight) =>
-          contactMode === "IN_PERSON"
-            ? userRight.isMainContactInPerson
-            : userRight.isMainContactByPhone,
-        );
+      : establishment.userRights.find((userRight) => {
+          if (contactMode === "IN_PERSON") {
+            return (
+              userRight.isMainContactInPerson ?? establishment.userRights[0]
+            );
+          }
+
+          return userRight.isMainContactByPhone ?? establishment.userRights[0];
+        });
   const usersToContactOptions: SelectProps.Option[] = establishment.userRights
     .filter((userRight) =>
       contactMode === "IN_PERSON" ? true : userRight.phone,
     )
     .map((userRight) => ({
-      label: `${userRight.email} - ${userRight.phone && toDisplayedPhoneNumber(userRight.phone)}`,
+      label: `${userRight.phone && toDisplayedPhoneNumber(userRight.phone)} - (${userRight.email}) `,
       value: userRight.email,
       selected: userRight.email === currentUserToContact?.email,
     }));
@@ -656,10 +727,13 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
       <div>
         <strong>
           {contactMode === "IN_PERSON"
-            ? "Interlocuteur sur place"
-            : "Numéro de téléphone"}
+            ? "Interlocuteur sur place *"
+            : "Numéro de téléphone *"}
         </strong>{" "}
-        : {defaultUserToContact.phone} {"("}
+        :{" "}
+        {defaultUserToContact.phone &&
+          toDisplayedPhoneNumber(defaultUserToContact.phone)}{" "}
+        {"("}
         {federatedIdentity?.provider === "proConnect" &&
           getFormattedFirstnameAndLastname({
             firstname: federatedIdentity.firstName,
@@ -672,8 +746,8 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
       <Select
         label={
           contactMode === "IN_PERSON"
-            ? "Interlocuteur sur place"
-            : "Numéro de téléphone"
+            ? "Interlocuteur sur place *"
+            : "Numéro de téléphone *"
         }
         hint={
           contactMode === "IN_PERSON"

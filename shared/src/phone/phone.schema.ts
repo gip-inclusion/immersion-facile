@@ -35,7 +35,13 @@ export const isValidMobilePhone = (phoneNumber: PhoneNumber): boolean =>
 
 export const toDisplayedPhoneNumber = (
   phoneNumber: string,
-): string | undefined => parsePhoneNumber(phoneNumber).format("NATIONAL");
+): string | undefined => {
+  const countryCode = getSupportedCountryCodesForCountry("FR").find(
+    (countryCode) => isValidPhoneNumber(phoneNumber, countryCode),
+  );
+
+  return parsePhoneNumber(phoneNumber, countryCode).format("E.164");
+};
 
 export const formatWithPhoneNumberPrefix = (
   phoneNumber: string,
