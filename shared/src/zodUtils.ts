@@ -71,7 +71,7 @@ export const requiredText = {
 
 export const requiredBoolean = {
   required_error: localization.required,
-  invalid_type_error: localization.expectText,
+  invalid_type_error: localization.expectedBoolean,
 };
 
 export const zStringMinLength1 = z
