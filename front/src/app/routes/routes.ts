@@ -142,7 +142,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   agencyDashboardStatsAgencies: agencyDashboard.extend("/stats-agences"),
   agencyDashboardStatsActivitiesByEstablishment: agencyDashboard.extend(
-    "/stats-activites-par-etablissement",
+    "/stats-activites-par-entreprise",
   ),
   myProfile,
   myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
