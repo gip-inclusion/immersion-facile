@@ -32,8 +32,8 @@ const defaultSignature = (internshipKind: InternshipKind) =>
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
     LOGIN_BY_EMAIL_REQUESTED: {
-      niceName: "Connexion - Entreprise - Lien magique",
-      tags: ["connexion_entreprise_lienMagique"],
+      niceName: "Connexion - Lien magique",
+      tags: ["connexion_lienMagique"],
       createEmailVariables: ({ loginLink, fullname }) => ({
         subject: "Votre lien de connexion à Immersion Facilitée",
         greetings: `Bonjour ${fullname ?? ""},`,
