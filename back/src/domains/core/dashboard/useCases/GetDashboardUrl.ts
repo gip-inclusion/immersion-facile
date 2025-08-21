@@ -73,7 +73,7 @@ export class GetDashboardUrl extends UseCase<
     if (params.name === "establishmentRepresentativeConventions")
       throw errors.dashboard.establishmentConventionForbidden();
 
-    return this.#dashboardGateway.getDashboardUrl(
+    return this.#dashboardGateway.getAdminDashboardUrl(
       params.name,
       this.#timeGateway.now(),
     );

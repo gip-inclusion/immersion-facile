@@ -38,7 +38,7 @@ export class StubDashboardGateway implements DashboardGateway {
     return `http://stubConventionStatusDashboard/${id}/${now}`;
   }
 
-  public getDashboardUrl(
+  public getAdminDashboardUrl(
     adminDashboardKind: AdminDashboardName,
     now: Date,
   ): AbsoluteUrl {

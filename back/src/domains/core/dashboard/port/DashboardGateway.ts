@@ -9,7 +9,7 @@ import type {
 } from "shared";
 
 export interface DashboardGateway {
-  getDashboardUrl(
+  getAdminDashboardUrl(
     adminDashboardKind: AdminDashboardName,
     now: Date,
   ): AbsoluteUrl;
