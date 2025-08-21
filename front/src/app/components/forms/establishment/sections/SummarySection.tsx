@@ -188,7 +188,13 @@ const DisplayContactModeValue = ({
             )}
             <br />
             Contact principal en présentiel :{" "}
-            {formValues.userRights[0].isMainContactInPerson ? "Oui" : "Non"}
+            {formValues.userRights[0].isMainContactInPerson
+              ? federatedIdentity?.provider === "proConnect" &&
+                ` ${getFormattedFirstnameAndLastname({
+                  firstname: federatedIdentity.firstName,
+                  lastname: federatedIdentity.lastName,
+                })}`
+              : "Non"}
           </p>
         )}
       {contactMode === "PHONE" && (
@@ -196,6 +202,11 @@ const DisplayContactModeValue = ({
           Contact principal par téléphone :{" "}
           {formValues.userRights[0].phone &&
             toDisplayedPhoneNumber(formValues.userRights[0].phone)}
+          {federatedIdentity?.provider === "proConnect" &&
+            ` (${getFormattedFirstnameAndLastname({
+              firstname: federatedIdentity.firstName,
+              lastname: federatedIdentity.lastName,
+            })})`}
         </p>
       )}
       {contactMode === "EMAIL" && (

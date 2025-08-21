@@ -132,7 +132,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               email: federatedIdentity?.email ?? "",
               job: "",
               phone: "",
-              isMainContactByPhone: null,
+              isMainContactByPhone: true,
               role: "establishment-admin",
               shouldReceiveDiscussionNotifications: true,
             },
