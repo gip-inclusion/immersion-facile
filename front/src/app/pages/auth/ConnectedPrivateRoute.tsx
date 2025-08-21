@@ -400,7 +400,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
         </>
       ),
       cardsTitle: "Tous les avantages du compte prescripteur",
-      illustration: loginIllustration,
+      withEmailLogin: true,
       cards: [
         {
           title: "Une connexion simplifiée",
