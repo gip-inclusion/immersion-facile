@@ -398,7 +398,7 @@ describe("user connexion flow", () => {
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 agencyUser.id
               }/${gateways.timeGateway.now()}`,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${gateways.timeGateway.now()}`,
+              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${gateways.timeGateway.now()}/${agency.kind}`,
               statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${gateways.timeGateway.now()}`,
               statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${gateways.timeGateway.now()}`,
             },

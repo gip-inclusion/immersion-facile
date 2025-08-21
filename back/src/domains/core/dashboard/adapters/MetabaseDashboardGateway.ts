@@ -4,6 +4,7 @@ import type {
   AdminDashboardName,
   AgencyDashboards,
   AgencyId,
+  AgencyKind,
   ConventionId,
   DashboardName,
   OmitFromExistingKeys,
@@ -79,6 +80,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
 
   public getAgencyUserUrls(
     userId: UserId,
+    agencyKinds: AgencyKind[],
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
@@ -99,6 +101,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
       statsAgenciesUrl: this.#makeDashboardUrlByDashboardName(
         "statsAgencies",
         now,
+        { "Type de structure": agencyKinds.join(",") },
       ),
     };
   }
