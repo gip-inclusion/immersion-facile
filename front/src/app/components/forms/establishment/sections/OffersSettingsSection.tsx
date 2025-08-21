@@ -733,13 +733,11 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
         :{" "}
         {defaultUserToContact.phone &&
           toDisplayedPhoneNumber(defaultUserToContact.phone)}{" "}
-        {"("}
         {federatedIdentity?.provider === "proConnect" &&
-          getFormattedFirstnameAndLastname({
+          `(${getFormattedFirstnameAndLastname({
             firstname: federatedIdentity.firstName,
             lastname: federatedIdentity.lastName,
-          })}
-        {")"}
+          })})`}
       </div>
     ))
     .with(P.union("edit", "admin"), () => (
