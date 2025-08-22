@@ -21,12 +21,12 @@ export type FormEstablishmentParamsInUrl = Partial<{
 }>;
 
 const formEstablishmentAddressArraySerializer: ValueSerializer<string[]> = {
-  parse: (raw) => JSON.parse(raw),
+  parse: (raw) => JSON.parse(decodeURIComponent(raw)),
   stringify: (stringsArray) => JSON.stringify(stringsArray),
 };
 
 const appellationsDtoSerializer: ValueSerializer<AppellationAndRomeDto[]> = {
-  parse: (raw) => JSON.parse(raw),
+  parse: (raw) => JSON.parse(decodeURIComponent(raw)),
   stringify: (appellationsDto) => JSON.stringify(appellationsDto),
 };
 
@@ -38,7 +38,7 @@ const copyEmailsSerializer: ValueSerializer<Email[]> = {
 const establishmentUserRightsSerializer: ValueSerializer<
   FormEstablishmentUserRight[]
 > = {
-  parse: (raw) => JSON.parse(raw),
+  parse: (raw) => JSON.parse(decodeURIComponent(raw)),
   stringify: (userRights: FormEstablishmentUserRight[]) =>
     JSON.stringify(userRights),
 };
