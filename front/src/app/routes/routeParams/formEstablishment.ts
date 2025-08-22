@@ -38,7 +38,7 @@ const copyEmailsSerializer: ValueSerializer<Email[]> = {
 const establishmentUserRightsSerializer: ValueSerializer<
   FormEstablishmentUserRight[]
 > = {
-  parse: (raw) => JSON.parse(decodeURIComponent(raw)),
+  parse: (raw) => JSON.parse(raw),
   stringify: (userRights: FormEstablishmentUserRight[]) =>
     JSON.stringify(userRights),
 };
