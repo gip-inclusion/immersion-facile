@@ -167,15 +167,15 @@ const rawAgencyDashboardTabs = ({
           {
             tabId:
               "agencyDashboardStatsActivitiesByEstablishment" satisfies AgencyDashboardRouteName,
-            label: "Activités par établissement",
+            label: "Activités par entreprise",
             content: (
               <>
                 <MetabaseView
-                  title="Détails par établissement"
+                  title="Détails par entreprise"
                   url={dashboards.agencies.statsEstablishmentDetailsUrl}
                 />
                 <MetabaseView
-                  title="Conventions par établissement"
+                  title="Conventions par entreprise"
                   url={
                     dashboards.agencies
                       .statsConventionsByEstablishmentByDepartmentUrl

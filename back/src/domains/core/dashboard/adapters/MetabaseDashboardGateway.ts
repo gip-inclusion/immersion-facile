@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
 import type {
   AbsoluteUrl,
+  AdminDashboardName,
   AgencyDashboards,
   AgencyId,
+  AgencyKind,
   ConventionId,
   DashboardName,
   OmitFromExistingKeys,
@@ -63,13 +65,13 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   #makeDashboardUrlByDashboardName(
     dashboardName: DashboardName,
     now: Date,
-    userId?: UserId,
+    params?: Record<string, string | string[]>,
   ) {
     const dashboard = dashboardByName[dashboardName];
     return this.#makeUrl(
       this.#createToken({
         dashboard,
-        params: userId ? { ic_user_id: userId } : {},
+        params,
         now,
       }),
       dashboard,
@@ -78,13 +80,14 @@ export class MetabaseDashboardGateway implements DashboardGateway {
 
   public getAgencyUserUrls(
     userId: UserId,
+    agencyKinds: AgencyKind[],
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
       agencyDashboardUrl: this.#makeDashboardUrlByDashboardName(
         "agencyForUser",
         now,
-        userId,
+        { ic_user_id: userId },
       ),
       statsEstablishmentDetailsUrl: this.#makeDashboardUrlByDashboardName(
         "statsEstablishmentDetails",
@@ -98,70 +101,55 @@ export class MetabaseDashboardGateway implements DashboardGateway {
       statsAgenciesUrl: this.#makeDashboardUrlByDashboardName(
         "statsAgencies",
         now,
+        { "Type de structure": agencyKinds.join(",") },
       ),
     };
   }
 
   public getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.conventionStatus;
-    const token = this.#createToken({
-      dashboard,
-      params: { id: [id] },
-      now,
+    return this.#makeDashboardUrlByDashboardName("conventionStatus", now, {
+      id: [id],
     });
-    return this.#makeUrl(token, dashboard);
   }
 
-  public getDashboardUrl(dashboardName: DashboardName, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName[dashboardName];
-    const token = this.#createToken({
-      dashboard,
-      now,
-    });
-    return this.#makeUrl(token, dashboard);
+  public getAdminDashboardUrl(
+    dashboardName: AdminDashboardName,
+    now: Date,
+  ): AbsoluteUrl {
+    return this.#makeDashboardUrlByDashboardName(dashboardName, now);
   }
 
   public getErroredConventionsDashboardUrl(
     userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    const dashboard = dashboardByName.erroredConventionsForUser;
-    const token = this.#createToken({
-      dashboard,
-      params: { ic_user_id: userId },
+    return this.#makeDashboardUrlByDashboardName(
+      "erroredConventionsForUser",
       now,
-    });
-    return this.#makeUrl(token, dashboard);
+      { ic_user_id: userId },
+    );
   }
 
   public getEstablishmentConventionsDashboardUrl(
     userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    const dashboard = dashboardByName.establishmentRepresentativeConventions;
-    const token = this.#createToken({
-      dashboard,
-      params: {
-        ic_user_id: userId,
-      },
+    return this.#makeDashboardUrlByDashboardName(
+      "establishmentRepresentativeConventions",
       now,
-    });
-    return this.#makeUrl(token, dashboard);
+      { ic_user_id: userId },
+    );
   }
 
   public getEstablishmentDiscussionsDashboardUrl(
     userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    const dashboard = dashboardByName.establishmentRepresentativeDiscussions;
-    const token = this.#createToken({
-      dashboard,
-      params: {
-        ic_user_id: userId,
-      },
+    return this.#makeDashboardUrlByDashboardName(
+      "establishmentRepresentativeDiscussions",
       now,
-    });
-    return this.#makeUrl(token, dashboard);
+      { ic_user_id: userId },
+    );
   }
 
   #makeUrl(token: string, { kind }: MetabaseDashboard): AbsoluteUrl {

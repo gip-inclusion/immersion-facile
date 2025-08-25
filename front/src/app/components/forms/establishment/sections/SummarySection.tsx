@@ -187,15 +187,29 @@ const DisplayContactModeValue = ({
               formValues.potentialBeneficiaryWelcomeAddress.address,
             )}
             <br />
-            Contact principal en présentiel :{" "}
-            {formValues.userRights[0].isMainContactInPerson ? "Oui" : "Non"}
+            {formValues.userRights[0].isMainContactInPerson &&
+              federatedIdentity?.provider === "proConnect" && (
+                <>
+                  Contact principal en présentiel :{" "}
+                  {getFormattedFirstnameAndLastname({
+                    firstname: federatedIdentity.firstName,
+                    lastname: federatedIdentity.lastName,
+                  })}
+                </>
+              )}
           </p>
         )}
       {contactMode === "PHONE" && (
         <p>
           Contact principal par téléphone :{" "}
-          {formValues.userRights[0].phone &&
-            toDisplayedPhoneNumber(formValues.userRights[0].phone)}
+          {`${formValues.userRights[0].phone ? toDisplayedPhoneNumber(formValues.userRights[0].phone) : ""}${
+            federatedIdentity?.provider === "proConnect"
+              ? ` (${getFormattedFirstnameAndLastname({
+                  firstname: federatedIdentity.firstName,
+                  lastname: federatedIdentity.lastName,
+                })})`
+              : ""
+          }`}
         </p>
       )}
       {contactMode === "EMAIL" && (
@@ -205,12 +219,17 @@ const DisplayContactModeValue = ({
           En cas non-réponse de l'entreprise au bout de 15 jours,{" "}
           <strong>
             {formValues.userRights[0].isMainContactByPhone
-              ? `le candidat peut contacter l'entreprise au numéro de téléphone : ${formValues.userRights[0].phone && toDisplayedPhoneNumber(formValues.userRights[0].phone)} ${
-                  federatedIdentity?.provider === "proConnect" &&
-                  `(${getFormattedFirstnameAndLastname({
-                    firstname: federatedIdentity.firstName,
-                    lastname: federatedIdentity.lastName,
-                  })})`
+              ? `le candidat peut contacter l'entreprise au numéro de téléphone : ${
+                  formValues.userRights[0].phone
+                    ? toDisplayedPhoneNumber(formValues.userRights[0].phone)
+                    : ""
+                }${
+                  federatedIdentity?.provider === "proConnect"
+                    ? ` (${getFormattedFirstnameAndLastname({
+                        firstname: federatedIdentity.firstName,
+                        lastname: federatedIdentity.lastName,
+                      })})`
+                    : ""
                 }`
               : "le candidat ne peut pas contacter l'entreprise"}
           </strong>

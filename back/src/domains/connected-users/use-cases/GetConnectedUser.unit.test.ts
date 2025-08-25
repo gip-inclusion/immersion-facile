@@ -143,7 +143,7 @@ describe("GetConnectedUser", () => {
                   agencyDashboardUrl: `http://stubAgencyUserDashboard/${
                     connectedNotAdminUser.id
                   }/${timeGateway.now()}`,
-                  statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}`,
+                  statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/${agency.kind}`,
                   statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
                   statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
                 },
@@ -216,7 +216,7 @@ describe("GetConnectedUser", () => {
                 notAdminUser.id
               }/${timeGateway.now()}`,
               erroredConventionsDashboardUrl: undefined,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}`,
+              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/${agency.kind}`,
               statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
               statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
             },
@@ -300,7 +300,7 @@ describe("GetConnectedUser", () => {
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}`,
+              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/pole-emploi,autre`,
               statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
               statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
             },

@@ -510,11 +510,13 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
   const currentUserToContact =
     allUserRights.length === 1
       ? allUserRights[0]
-      : allUserRights.find((userRight) =>
-          contactMode === "IN_PERSON"
-            ? userRight.isMainContactInPerson
-            : userRight.isMainContactByPhone,
-        );
+      : (allUserRights.find((userRight) => {
+          if (contactMode === "IN_PERSON") {
+            return userRight.isMainContactInPerson === true;
+          }
+
+          return userRight.isMainContactByPhone === true;
+        }) ?? allUserRights[0]);
 
   const currentUserRight =
     mode === "create" ? allUserRights[0] : currentUserToContact;
@@ -546,9 +548,10 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
               value: "EMAIL",
               onChange: (event) => {
                 contactModeRegister.onChange?.(event);
-                const newUserRights = allUserRights.map((userRight) => ({
+                const newUserRights = allUserRights.map((userRight, index) => ({
                   ...userRight,
                   isMainContactInPerson: false,
+                  isMainContactByPhone: index === 0, // Default to first user for phone contact
                 }));
                 setValue("userRights", newUserRights);
               },
@@ -703,21 +706,22 @@ const UserToContact = ({ mode }: { mode: Mode }) => {
   const currentUserToContact =
     establishment.userRights.length === 1
       ? establishment.userRights[0]
-      : establishment.userRights.find((userRight) => {
+      : (establishment.userRights.find((userRight) => {
           if (contactMode === "IN_PERSON") {
-            return (
-              userRight.isMainContactInPerson ?? establishment.userRights[0]
-            );
+            return userRight.isMainContactInPerson === true;
           }
 
-          return userRight.isMainContactByPhone ?? establishment.userRights[0];
-        });
+          return userRight.isMainContactByPhone === true;
+        }) ?? establishment.userRights[0]);
   const usersToContactOptions: SelectProps.Option[] = establishment.userRights
     .filter((userRight) =>
       contactMode === "IN_PERSON" ? true : userRight.phone,
     )
     .map((userRight) => ({
-      label: `${userRight.phone && toDisplayedPhoneNumber(userRight.phone)} - (${userRight.email}) `,
+      label:
+        contactMode === "IN_PERSON"
+          ? `(${userRight.email})`
+          : `${userRight.phone && toDisplayedPhoneNumber(userRight.phone)} - (${userRight.email}) `,
       value: userRight.email,
       selected: userRight.email === currentUserToContact?.email,
     }));
