@@ -35,7 +35,7 @@ import type {
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
 
-export const defaultMaxContactsPerMonth = 12;
+export const defaultMaxContactsPerMonth = 6;
 export const noContactPerMonth = 0;
 
 const contactModesWithoutWelcomeAddress: NotEmptyArray<ContactMode> = [
