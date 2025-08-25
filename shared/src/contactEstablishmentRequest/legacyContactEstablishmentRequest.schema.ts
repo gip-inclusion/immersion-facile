@@ -10,6 +10,7 @@ import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellat
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
+  type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
   zStringCanBeEmpty,
   zStringMinLength1,
@@ -41,7 +42,7 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
   localization.invalidImmersionObjective,
 );
 
-export const legacyContactEstablishmentByMailSchema: z.Schema<LegacyContactEstablishmentByMailDto> =
+export const legacyContactEstablishmentByMailSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentByMailDto> =
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
@@ -51,19 +52,19 @@ export const legacyContactEstablishmentByMailSchema: z.Schema<LegacyContactEstab
     potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
   });
 
-export const legacyContactEstablishmentByPhoneSchema: z.Schema<LegacyContactEstablishmentByPhoneDto> =
+export const legacyContactEstablishmentByPhoneSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentByPhoneDto> =
   z.object({
     ...commonFields,
     contactMode: preferPhoneContactSchema,
   });
 
-export const legacyContactEstablishmentInPersonSchema: z.Schema<LegacyContactEstablishmentInPersonDto> =
+export const legacyContactEstablishmentInPersonSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentInPersonDto> =
   z.object({
     ...commonFields,
     contactMode: preferInPersonContactSchema,
   });
 
-export const legacyContactEstablishmentRequestSchema: z.Schema<LegacyContactEstablishmentRequestDto> =
+export const legacyContactEstablishmentRequestSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentRequestDto> =
   z
     .union([
       legacyContactEstablishmentByMailSchema,

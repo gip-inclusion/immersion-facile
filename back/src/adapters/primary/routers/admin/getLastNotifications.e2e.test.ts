@@ -68,7 +68,9 @@ describe("Get last notification route", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          issues: ["authorization : Required"],
+          issues: [
+            "authorization : Invalid input: expected string, received undefined",
+          ],
           message:
             "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /admin/notifications",
           status: 400,

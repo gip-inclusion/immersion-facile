@@ -56,7 +56,7 @@ const onNotHttpError = (error: any, req: Request, res: Response) => {
     });
   } else if (error instanceof ZodError) {
     logErrorAndNotifyDiscord("ZodError", req, {
-      zodErrors: error.errors.map(
+      zodErrors: error.issues.map(
         (issue) => `${issue.path.join(".")} - ${issue.code} - ${issue.message}`,
       ),
     });

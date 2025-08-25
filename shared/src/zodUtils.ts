@@ -1,34 +1,4 @@
-import { type ZodError, type ZodIssue, z } from "zod";
-import { timeHHmmRegExp } from "./utils/date";
-
-// Change default error map behavior to provide context
-// https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
-z.setErrorMap((issue, ctx) => {
-  if (issue.code === "invalid_string" && issue.validation === "datetime")
-    return {
-      message: localization.invalidDate,
-    };
-
-  if (issue.code === "invalid_enum_value")
-    return {
-      message: `Vous devez sélectionner une option parmi celles proposées - valeur fournie : ${ctx.data}`,
-    };
-
-  if (issue.code === "invalid_string" && issue.validation === "email")
-    return {
-      message: `${localization.invalidEmailFormat} - email fourni : ${
-        ctx.data && ctx.data !== "" ? ctx.data : "vide"
-      }`,
-    };
-
-  // Temporary regex instead of email - waiting for zod release
-  if (issue.code === "invalid_string" && issue.validation === "regex")
-    return {
-      message: `invalide - valeur fournie : ${ctx.data}`,
-    };
-
-  return { message: ctx.defaultError };
-});
+import { z } from "zod";
 
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",
@@ -62,26 +32,22 @@ export const localization = {
     "Les numéros de téléphone des signataires doivent être différents.",
   invalidAppellations: "Les métiers renseignés sont invalides.",
   invalidAddress: "L'adresse est invalide",
-};
-
-export const requiredText = {
-  required_error: localization.required,
-  invalid_type_error: localization.expectText,
-};
-
-export const requiredBoolean = {
-  required_error: localization.required,
-  invalid_type_error: localization.expectedBoolean,
+  invalidEnum: "Vous devez sélectionner une option parmi celles proposées",
+  invalidSiret: "SIRET doit être composé de 14 chiffres",
 };
 
 export const zStringMinLength1 = z
-  .string(requiredText)
+  .string({
+    error: localization.required,
+  })
   .trim()
   .min(1, localization.required);
 
-export const zStringCanBeEmpty = z.string(requiredText).trim();
+export const zStringCanBeEmpty = z.string().trim();
 
-export const zStringPossiblyEmptyWithMax = (max: number): z.Schema<string> =>
+export const zStringPossiblyEmptyWithMax = (
+  max: number,
+): ZodSchemaWithInputMatchingOutput<string> =>
   zStringCanBeEmpty.max(max, localization.maxCharacters(max));
 
 export const zTrimmedStringWithMax = (max: number) =>
@@ -89,8 +55,12 @@ export const zTrimmedStringWithMax = (max: number) =>
 
 export const stringWithMaxLength255 = zTrimmedStringWithMax(255);
 
+const timeHHmmRegExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+
 export const zTimeString = z
-  .string(requiredText)
+  .string({
+    error: localization.required,
+  })
   .regex(timeHHmmRegExp, localization.invalidTimeFormat);
 
 export const makezTrimmedString = (message: string) =>
@@ -98,7 +68,9 @@ export const makezTrimmedString = (message: string) =>
     .transform((s) => s.trim())
     .refine((s) => s.length > 0, message);
 
-export const zBoolean = z.boolean(requiredBoolean);
+export const zBoolean = z.boolean({
+  error: localization.required,
+});
 
 export const zToBoolean = z
   .any()
@@ -106,13 +78,14 @@ export const zToBoolean = z
     ["true", "1"].includes((v ?? "false").toString().toLowerCase()),
   );
 
-export const zToNumber = z.coerce.number();
+export const zToNumber: ZodSchemaWithInputMatchingOutput<number> =
+  z.coerce.number();
 
 export const zUuidLike = z.string().length(36);
 
-export const emptyObjectSchema: z.Schema<Record<string, never>> = z
-  .object({})
-  .strict();
+export const emptyObjectSchema: ZodSchemaWithInputMatchingOutput<
+  Record<string, never>
+> = z.object({}).strict();
 
 export const personNameSchema = z
   .string()
@@ -131,47 +104,15 @@ export const expressEmptyResponseBodyOrEmptyObject =
 export const zEnumValidation = <T extends string>(
   values: readonly [T, ...T[]],
   errorMessage: string,
-): z.ZodType<T, z.ZodTypeDef, T> =>
+) =>
   z.enum(values, {
-    required_error: errorMessage,
-    invalid_type_error: errorMessage,
+    error: errorMessage,
   });
 
-// Following is from https://github.com/colinhacks/zod/issues/372#issuecomment-826380330
+export const zAnyObj = z.object({}).loose();
 
-// the difference with z.Schema<T> is that you keep the original type of the schema
-// and you keep access to the methodes of that schema
-// for example you can use .passthrough() for a z.object() which you could not do with z.Schema<T>
-
-export const zSchemaForType =
-  <T>() =>
-  <S extends z.ZodType<T, z.ZodTypeDef, T>>(arg: S) =>
-    arg;
-
-export const zAnyObj = z.object({}).passthrough();
-
-export const flattenZodErrors = (
-  error: ZodError<any>,
-  path: (string | number)[] = [],
-): string[] => {
-  const result = error.errors.reduce<string[]>((acc, issue: ZodIssue) => {
-    const currentPath = [...path, ...(issue.path || [])];
-
-    if (issue.code === "invalid_union" && issue.unionErrors) {
-      const unionMessages = issue.unionErrors.reduce<string[]>(
-        (unionMsgs: string[], unionError: ZodError<any>) => {
-          return unionMsgs.concat(flattenZodErrors(unionError, currentPath));
-        },
-        [],
-      );
-      return [...acc, ...unionMessages];
-    }
-
-    const key = currentPath.join(".");
-    const message = issue.message;
-    const flatMessage = key ? `${key} : ${message}` : message;
-    return [...acc, flatMessage];
-  }, []);
-
-  return Array.from(new Set(result));
-};
+export type ZodSchemaWithInputMatchingOutput<T> = z.ZodType<
+  T,
+  T,
+  z.core.$ZodTypeInternals<T, T>
+>;

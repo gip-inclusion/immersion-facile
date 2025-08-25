@@ -110,7 +110,7 @@ describe("Get Convention for ApiConsumer", () => {
 
     describe("Not found error", () => {
       it("When the Convention does not exist", async () => {
-        const notFoundId = "40400000-4000-4000-4000-400000000404";
+        const notFoundId = "40400000-4000-4000-9000-400000000404";
         await expectPromiseToFailWithError(
           getConventionForApiConsumer.execute(
             { conventionId: notFoundId },

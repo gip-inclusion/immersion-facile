@@ -10,6 +10,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   legacyAssessmentDtoSchema,
   type Role,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import { getUserWithRights } from "../domains/connected-users/helpers/userRights.helper";
@@ -56,7 +57,7 @@ export const throwForbiddenIfNotAllowedForAssessments = async ({
   }
 };
 
-export const assessmentEntitySchema: z.Schema<AssessmentEntity> =
+export const assessmentEntitySchema: ZodSchemaWithInputMatchingOutput<AssessmentEntity> =
   assessmentDtoSchema.or(legacyAssessmentDtoSchema).and(
     z.object({
       _entityName: z.literal("Assessment"),

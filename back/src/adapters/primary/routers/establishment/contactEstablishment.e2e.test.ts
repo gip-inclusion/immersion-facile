@@ -166,11 +166,11 @@ describe("Contact establishment public v2 e2e", () => {
         issues: [
           "appellationCode : Obligatoire",
           "siret : Obligatoire",
-          'kind : Invalid literal value, expected "1_ELEVE_1_STAGE"',
-          'immersionObjective : Invalid literal value, expected "Découvrir un métier ou un secteur d\'activité"',
-          "levelOfEducation : Required",
-          'contactMode : Invalid literal value, expected "PHONE"',
-          'contactMode : Invalid literal value, expected "IN_PERSON"',
+          'kind : Invalid input: expected "1_ELEVE_1_STAGE"',
+          'immersionObjective : Invalid input: expected "Découvrir un métier ou un secteur d\'activité"',
+          "levelOfEducation : Vous devez sélectionner une option parmi celles proposées",
+          'contactMode : Invalid input: expected "PHONE"',
+          'contactMode : Invalid input: expected "IN_PERSON"',
         ],
       });
     });

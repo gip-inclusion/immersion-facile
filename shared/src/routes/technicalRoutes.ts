@@ -12,6 +12,7 @@ import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.sche
 import {
   emptyObjectSchema,
   expressEmptyResponseBody,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "../zodUtils";
 
@@ -20,10 +21,11 @@ export type HtmlToPdfRequest = {
   conventionId: ConventionId;
 };
 
-export const htmlToPdfRequestSchema = z.object({
-  htmlContent: zStringMinLength1,
-  conventionId: z.string(),
-});
+export const htmlToPdfRequestSchema: ZodSchemaWithInputMatchingOutput<HtmlToPdfRequest> =
+  z.object({
+    htmlContent: zStringMinLength1,
+    conventionId: z.string(),
+  });
 
 // @TODO: This should be a proper OpenAPI schema
 const openApiSpecResponseSchema = z.any();
@@ -82,7 +84,7 @@ export const technicalRoutes = defineRoutes({
     requestBodySchema: z.any(), // could not find better to not mutate the original object.
     // we need the original object to check the signature
     // validation is still checked in the usecase
-    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
+    headersSchema: z.object({ "tally-signature": z.string() }).loose(),
     responses: {
       201: expressEmptyResponseBody,
       403: httpErrorSchema,
@@ -96,7 +98,7 @@ export const technicalRoutes = defineRoutes({
     requestBodySchema: z.any(), // could not find better to not mutate the original object.
     // we need the original object to check the signature
     // validation is still checked in the usecase
-    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
+    headersSchema: z.object({ "tally-signature": z.string() }).loose(),
     responses: {
       201: expressEmptyResponseBody,
       403: httpErrorSchema,
@@ -110,7 +112,7 @@ export const technicalRoutes = defineRoutes({
     requestBodySchema: z.any(), // could not find better to not mutate the original object.
     // we need the original object to check the signature
     // validation is still checked in the usecase
-    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
+    headersSchema: z.object({ "tally-signature": z.string() }).loose(),
     responses: {
       201: expressEmptyResponseBody,
       403: httpErrorSchema,

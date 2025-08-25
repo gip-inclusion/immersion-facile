@@ -10,6 +10,7 @@ import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
+  localization,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -46,7 +47,9 @@ export type AssessmentReminder = ReturnType<typeof makeAssessmentReminder>;
 export const makeAssessmentReminder = useCaseBuilder("AssessmentReminder")
   .withInput<{ mode: AssessmentReminderMode }>(
     z.object({
-      mode: z.enum(allAssessmentReminderModes),
+      mode: z.enum(allAssessmentReminderModes, {
+        error: localization.invalidEnum,
+      }),
     }),
   )
   .withOutput<AssessmentReminderOutput>()
