@@ -229,6 +229,7 @@ const EstablishmentUsersEditForm = ({
     job: "",
     role: undefined,
     shouldReceiveDiscussionNotifications: false,
+    isMainContactByPhone: false,
   });
   const methods = useForm<FormEstablishmentUserRight>({
     resolver: zodResolver(formEstablishmentUserRightSchema),
@@ -331,6 +332,7 @@ const EstablishmentUsersEditForm = ({
             },
           }))}
         />
+
         <ToggleSwitch
           label="Recevoir les notifications pour toutes les candidatures de cet établissement"
           inputTitle="Recevoir les notifications pour toutes les candidatures de cet établissement"
