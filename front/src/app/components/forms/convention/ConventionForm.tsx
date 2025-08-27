@@ -46,7 +46,6 @@ import {
   isFtConnectIdentity,
   keys,
   makeListAgencyOptionsKindFilter,
-  notJobSeeker,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
 import {
@@ -165,7 +164,7 @@ export const ConventionForm = ({
         federatedIdentity,
       ),
     },
-    ...(federatedIdentity?.payload && mode === "create-from-scratch"
+    ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
       ? {
           agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
           agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
@@ -725,9 +724,7 @@ const makeInitialBenefiaryForm = (
 
   return {
     ...beneficiaryOtherProperties,
-    ...(federatedIdentityValue?.token !== notJobSeeker && {
-      federatedIdentity: federatedIdentityValue,
-    }),
+    federatedIdentity: federatedIdentityValue,
   };
 };
 
