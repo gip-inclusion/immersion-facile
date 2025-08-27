@@ -5,11 +5,13 @@ import { SectionHighlight } from "react-design-system";
 import {
   type AgencyRight,
   activeAgencyStatuses,
+  type ConnectedUser,
   type ConnectedUserJwt,
   domElementIds,
   type WithDashboards,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {
   type AgencyDashboardRouteName,
@@ -19,6 +21,7 @@ import {
 } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { MetabaseView } from "../../MetabaseView";
 import { AgencyAdminTabContent } from "./tabs/AgencyAdminTabContent";
 import { ConventionTabContent } from "./tabs/ConventionTabContent";
@@ -35,12 +38,21 @@ export const AgencyDashboard = ({
   activeAgencyRights: AgencyRight[];
 } & WithDashboards): JSX.Element => {
   const currentTab = route.name;
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+
+  const { enableAgencyDashboardHighlight } = useFeatureFlags();
+
+  if (!currentUser) {
+    return <p>Vous n'êtes pas connecté...</p>;
+  }
+
   const agencyTabs = rawAgencyDashboardTabs({
     activeAgencyRights,
     dashboards,
     connectedUserJwt,
+    currentUser,
   });
-  const { enableAgencyDashboardHighlight } = useFeatureFlags();
+
   return (
     <>
       <Feedback
@@ -90,14 +102,12 @@ const rawAgencyDashboardTabs = ({
   dashboards,
   activeAgencyRights,
   connectedUserJwt,
+  currentUser,
 }: {
   connectedUserJwt?: ConnectedUserJwt;
   activeAgencyRights: AgencyRight[];
+  currentUser: ConnectedUser;
 } & WithDashboards): DashboardTab[] => {
-  const agenciesUserIsAdminOn = activeAgencyRights
-    .filter((agencyRight) => agencyRight.roles.includes("agency-admin"))
-    .map((agencyRightWithAdminRole) => agencyRightWithAdminRole.agency);
-
   const agenciesWithActiveStatus = activeAgencyRights
     .filter(({ agency }) => activeAgencyStatuses.includes(agency.status))
     .map((agencyRight) => agencyRight.agency);
@@ -133,14 +143,15 @@ const rawAgencyDashboardTabs = ({
           },
         ]
       : []),
-    ...(agenciesUserIsAdminOn.length
+    ...(activeAgencyRights.length
       ? [
           {
             tabId: "agencyDashboardAgencies" satisfies AgencyDashboardRouteName,
             label: "Mes Organismes",
             content: (
               <AgencyAdminTabContent
-                agenciesUserIsAdminOn={agenciesUserIsAdminOn}
+                activeAgencyRights={activeAgencyRights}
+                currentUser={currentUser}
               />
             ),
           },

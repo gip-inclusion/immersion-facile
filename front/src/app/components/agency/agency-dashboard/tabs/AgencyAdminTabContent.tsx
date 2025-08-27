@@ -1,59 +1,78 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
-import Table from "@codegouvfr/react-dsfr/Table";
-import { Fragment } from "react";
-import { HeadingSection } from "react-design-system";
-import {
-  type AgencyDtoForAgencyUsersAndAdmins,
-  addressDtoToString,
-  agencyKindToLabelIncludingIFAndPrepa,
-} from "shared";
-import { routes } from "src/app/routes/routes";
-import { AgencyStatusBadge } from "../../AgencyStatusBadge";
-import { AgencyTag } from "../../AgencyTag";
+import { HeadingSection, useScrollToTop } from "react-design-system";
+import { useDispatch } from "react-redux";
+import type { UserParamsForAgency } from "shared";
+import { type AgencyRight, type ConnectedUser, domElementIds } from "shared";
+import { AgencyRightsTable } from "src/app/components/agency/agencies-table/AgencyRightsTable";
+import { Feedback } from "src/app/components/feedback/Feedback";
+import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
+import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 
 export const AgencyAdminTabContent = ({
-  agenciesUserIsAdminOn,
+  activeAgencyRights,
+  currentUser,
 }: {
-  agenciesUserIsAdminOn: AgencyDtoForAgencyUsersAndAdmins[];
-}) => (
-  <HeadingSection
-    className={fr.cx("fr-mt-0")}
-    title="Mes Organismes"
-    titleAs="h2"
-    description={`Organismes sur lesquels vous êtes administrateur (${agenciesUserIsAdminOn.length} organismes)`}
-  >
-    <Table
-      headers={["Nom de l'organisme", "Type d'organisme", "Actions"]}
-      data={agenciesUserIsAdminOn.map(AdminAgencyLine)}
-    />
-  </HeadingSection>
-);
+  activeAgencyRights: AgencyRight[];
+  currentUser: ConnectedUser;
+}) => {
+  const dispatch = useDispatch();
 
-const AdminAgencyLine = (agency: AgencyDtoForAgencyUsersAndAdmins) => [
-  <Fragment key={`${agency.id}-agency-infos`}>
-    <AgencyTag refersToAgencyName={agency.refersToAgencyName} />
-    <AgencyStatusBadge status={agency.status} />
-    <br />
-    <span>{agency.name}</span>
-    <br />
-    <span className={fr.cx("fr-hint-text")}>
-      {addressDtoToString(agency.address)}
-    </span>
-  </Fragment>,
-  agencyKindToLabelIncludingIFAndPrepa[agency.kind],
+  const agenciesUserIsAdminOn = activeAgencyRights.filter((agencyRight) =>
+    agencyRight.roles.includes("agency-admin"),
+  );
+  const agenciesUserIsNotAdminOn = activeAgencyRights.filter(
+    (agencyRight) => !agencyRight.roles.includes("agency-admin"),
+  );
 
-  <Button
-    key={`${agency.id}-see-agency-link`}
-    linkProps={
-      routes.agencyDashboardAgencyDetails({
-        agencyId: agency.id,
-      }).link
-    }
-    size="small"
-    priority="tertiary"
-    iconId="fr-icon-arrow-right-line"
-  >
-    Voir l'organisme
-  </Button>,
-];
+  useScrollToTop(useFeedbackTopics(["agency-user-for-dashboard"]).length > 0);
+
+  const onUserUpdateRequested =
+    (feedbackTopic: FeedbackTopic) =>
+    (userParamsForAgency: UserParamsForAgency) => {
+      dispatch(
+        updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+          ...userParamsForAgency,
+          feedbackTopic,
+        }),
+      );
+    };
+  return (
+    <>
+      <Feedback
+        topics={["agency-user-for-dashboard"]}
+        closable
+        className={fr.cx("fr-mb-2w", "fr-mt-0")}
+      />
+      <HeadingSection
+        className={fr.cx("fr-mt-0")}
+        title="Mes Organismes"
+        titleAs="h2"
+      >
+        {agenciesUserIsAdminOn.length > 0 && (
+          <AgencyRightsTable
+            agencyRights={agenciesUserIsAdminOn}
+            user={currentUser}
+            title={`Organismes sur lesquels vous êtes administrateur (${agenciesUserIsAdminOn.length} organismes)`}
+            modalId={domElementIds.agencyDashboard.agencyTab.adminRightsModal}
+            onUserUpdateRequested={onUserUpdateRequested(
+              "agency-user-for-dashboard",
+            )}
+          />
+        )}
+
+        {agenciesUserIsNotAdminOn.length > 0 && (
+          <AgencyRightsTable
+            agencyRights={agenciesUserIsNotAdminOn}
+            user={currentUser}
+            title={`Organismes auquels vous êtes rattaché (${agenciesUserIsNotAdminOn.length} organismes)`}
+            modalId={domElementIds.agencyDashboard.agencyTab.userRightsModal}
+            onUserUpdateRequested={onUserUpdateRequested(
+              "agency-user-for-dashboard",
+            )}
+          />
+        )}
+      </HeadingSection>
+    </>
+  );
+};
