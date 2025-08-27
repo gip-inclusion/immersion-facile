@@ -86,7 +86,7 @@ export const isHashMatchPeAdvisorEmail = ({
   beneficiary: Beneficiary<"immersion" | "mini-stage-cci">;
   emailHash: EmailHash;
 }) => {
-  const peAdvisorEmail = beneficiary.federatedIdentity?.payload?.advisor.email;
+  const peAdvisorEmail = beneficiary.federatedIdentity?.payload?.advisor?.email;
 
   return peAdvisorEmail
     ? isSomeEmailMatchingEmailHash([peAdvisorEmail], emailHash)

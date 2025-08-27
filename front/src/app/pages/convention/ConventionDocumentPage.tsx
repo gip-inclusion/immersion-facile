@@ -362,10 +362,10 @@ export const ConventionDocumentPage = ({
                   {getFormattedFirstnameAndLastname({
                     firstname:
                       convention.signatories.beneficiary.federatedIdentity
-                        .payload.advisor.firstName,
+                        .payload.advisor?.firstName,
                     lastname:
                       convention.signatories.beneficiary.federatedIdentity
-                        .payload.advisor.lastName,
+                        .payload.advisor?.lastName,
                   })}
                 </strong>
               </li>
