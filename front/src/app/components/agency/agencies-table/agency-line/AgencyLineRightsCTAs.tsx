@@ -18,6 +18,7 @@ export const AgencyLineRightsCTAs = ({
     {onUpdateClicked && (
       <Button
         size="small"
+        priority="secondary"
         id={`${domElementIds.profile.editRoleButton}-${agencyRight.agency.id}`}
         onClick={() => {
           onUpdateClicked(agencyRight);
