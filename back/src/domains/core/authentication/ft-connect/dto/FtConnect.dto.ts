@@ -1,10 +1,9 @@
-import {
-  type Beneficiary,
-  type FederatedIdentityProvider,
-  type FtConnectToken,
-  type FtExternalId,
-  type InternshipKind,
-  notJobSeeker,
+import type {
+  Beneficiary,
+  FederatedIdentityProvider,
+  FtConnectToken,
+  FtExternalId,
+  InternshipKind,
 } from "shared";
 import type { EntityFromDto } from "../../../../../utils/EntityFromDto";
 import type { FtConnectImmersionAdvisorDto } from "./FtConnectAdvisor.dto";
@@ -42,8 +41,6 @@ export const toPartialConventionDtoWithFtIdentity = (
   email: ftConnectUserInfo.email || "",
   firstName: ftConnectUserInfo.firstName,
   lastName: ftConnectUserInfo.lastName,
-  fedId: ftConnectUserInfo.isJobseeker
-    ? ftConnectUserInfo.peExternalId
-    : notJobSeeker,
+  fedId: ftConnectUserInfo.peExternalId,
   fedIdProvider: "peConnect",
 });

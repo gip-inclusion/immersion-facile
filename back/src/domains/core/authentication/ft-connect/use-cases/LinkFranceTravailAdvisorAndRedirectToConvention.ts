@@ -75,10 +75,9 @@ export class LinkFranceTravailAdvisorAndRedirectToConvention extends Transaction
         : undefined,
     };
 
-    if (peUserAndAdvisor.user.isJobseeker)
-      await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
-        peUserAndAdvisor,
-      );
+    await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      peUserAndAdvisor,
+    );
 
     return this.#makeRedirectUrl(toPartialConventionDtoWithFtIdentity(user));
   }

@@ -1,4 +1,4 @@
-import { authFailed, expectToEqual, notJobSeeker } from "shared";
+import { authFailed, expectToEqual } from "shared";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -133,7 +133,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
       );
     });
 
-    it("On FtConnected and is not jobseeker should not open slot and provide convention url with notJobSeeker peConnect mode", async () => {
+    it("On FtConnected and is not jobseeker should still open slot", async () => {
       ftConnectGateway.setAccessToken(accessToken);
       ftConnectGateway.setUser(ftNotJobseekerUser);
 
@@ -141,12 +141,20 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${notJobSeeker}&fedIdProvider=peConnect`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftNotJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
       );
       expectToEqual(
         uow.conventionFranceTravailAdvisorRepository
           .conventionFranceTravailUsersAdvisors,
-        [],
+        [
+          conventionFranceTravailUserAdvisorFromDto(
+            {
+              user: ftNotJobseekerUser,
+              advisor: undefined,
+            },
+            CONVENTION_ID_DEFAULT_UUID,
+          ),
+        ],
       );
     });
   });
