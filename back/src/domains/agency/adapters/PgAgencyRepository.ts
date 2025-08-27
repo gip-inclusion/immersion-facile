@@ -311,7 +311,7 @@ export class PgAgencyRepository implements AgencyRepository {
       .selectFrom("agencies")
       .selectAll()
       .where("kind", "=", kind)
-      .where("status", "!=", "rejected")
+      .where("status", "in", [...activeAgencyStatuses, "needsReview"])
       .where("street_number_and_address", "=", address.streetNumberAndAddress)
       .where("city", "=", address.city)
       .where("id", "!=", idToIgnore)
