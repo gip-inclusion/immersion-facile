@@ -34,7 +34,6 @@ type GenericFederatedIdentity<
     };
 
 export const authFailed = "AuthFailed";
-export const notJobSeeker = "NotJobSeeker";
 
 export type FtExternalId = Flavor<string, "FtExternalId">;
 
@@ -47,10 +46,7 @@ type FtConnectAdvisorForBeneficiary = {
   };
 };
 
-export type FtConnectToken =
-  | FtExternalId
-  | typeof authFailed
-  | typeof notJobSeeker;
+export type FtConnectToken = FtExternalId | typeof authFailed;
 
 export type FtConnectIdentity = GenericFederatedIdentity<
   "peConnect",
