@@ -1,11 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 
-import {
-  type ConnectedUser,
-  domElementIds,
-  type UserParamsForAgency,
-} from "shared";
+import { type ConnectedUser, domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 import { AgenciesTablesSection } from "../agency/agencies-table/AgenciesTablesSection";
 import { EstablishmentsTablesSection } from "../establishment/establishments-table/EstablishmentsTablesSection";
@@ -16,7 +12,6 @@ type UserProfileProps = {
   currentUser: ConnectedUser;
   userWithRights: ConnectedUser;
   editInformationsLink?: string;
-  onUserUpdateRequested: (userParamsForAgency: UserParamsForAgency) => void;
 };
 
 export const UserProfile = ({
@@ -24,7 +19,6 @@ export const UserProfile = ({
   currentUser,
   userWithRights,
   editInformationsLink,
-  onUserUpdateRequested,
 }: UserProfileProps) => (
   <div>
     <div className={fr.cx("fr-grid-row")}>
@@ -51,7 +45,6 @@ export const UserProfile = ({
       user={userWithRights}
       agencyRights={userWithRights.agencyRights}
       isBackofficeAdmin={currentUser.isBackofficeAdmin}
-      onUserUpdateRequested={onUserUpdateRequested}
     />
     <EstablishmentsTablesSection
       withEstablishmentData={userWithRights.establishments}

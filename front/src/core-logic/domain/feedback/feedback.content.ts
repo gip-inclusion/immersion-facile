@@ -256,8 +256,7 @@ export const feedbacks: Record<
     },
     "delete.success": {
       action: removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
-      title:
-        "La demande d’accès a bien été annulée. L’administrateur de l’organisme ne la verra plus.",
+      title: "La demande d’accès a bien été annulée.",
       message: "L’administrateur de l’organisme ne la verra plus.",
     },
     "delete.error": {
@@ -350,8 +349,7 @@ export const feedbacks: Record<
     },
     "delete.success": {
       action: removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
-      title:
-        "La demande d’accès a bien été annulée. L’administrateur de l’organisme ne la verra plus.",
+      title: "La demande d’accès a bien été annulée.",
       message: "L’administrateur de l’organisme ne la verra plus.",
     },
     "delete.error": {

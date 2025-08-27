@@ -12,7 +12,7 @@ const agencyStatusToSeverity: Record<AgencyStatus, AlertProps.Severity> = {
 
 export const AgencyStatusBadge = ({ status }: { status: AgencyStatus }) => {
   return (
-    <Badge noIcon severity={agencyStatusToSeverity[status]}>
+    <Badge noIcon severity={agencyStatusToSeverity[status]} small>
       {agencyStatusToLabel[status]}
     </Badge>
   );
