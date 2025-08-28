@@ -8,7 +8,8 @@ import { useFormContext } from "react-hook-form";
 import {
   type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
-  type DateIntervalDto, InternshipKind,
+  type DateIntervalDto,
+  type InternshipKind,
   isStringDate,
   maximumCalendarDayByInternshipKind,
   reasonableSchedule,
@@ -22,19 +23,18 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
-import {props} from "ramda";
 
-export const ScheduleSection = (props: { internshipKind? : InternshipKind}) => {
+export const ScheduleSection = ({
+  internshipKind,
+}: {
+  internshipKind: InternshipKind;
+}) => {
   const { setValue, watch, register, formState, reset } =
     useFormContext<
-      Pick<
-        ConventionReadDto,
-        "dateStart" | "dateEnd" | "schedule" | "internshipKind" | "signatories"
-      >
+      Pick<ConventionReadDto, "dateStart" | "dateEnd" | "schedule">
     >();
   const values = watch();
 
-  const internshipKind = props.internshipKind ?? values.internshipKind;
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels(internshipKind),
   );
@@ -49,9 +49,7 @@ export const ScheduleSection = (props: { internshipKind? : InternshipKind}) => {
   const [dateMax, setDateMax] = useState<string>(computeDatePickerMaxDate);
 
   const excludedDays =
-    internshipKind === "mini-stage-cci"
-      ? (["dimanche"] as Weekday[])
-      : [];
+    internshipKind === "mini-stage-cci" ? (["dimanche"] as Weekday[]) : [];
 
   const getFieldError = makeFieldError(formState);
 
