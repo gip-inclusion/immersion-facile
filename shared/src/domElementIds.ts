@@ -826,6 +826,10 @@ export const domElementIds = {
       selectAgencyToInitiateConventionModal:
         "im-agency-dashboard__select-agency-to-initiate-convention-modal",
     },
+    agencyTab: {
+      adminRightsModal: "im-agency-tab-admin-rights-modal",
+      userRightsModal: "im-agency-tab-user-rights-modal",
+    },
     agencyDetails: {
       editAgencyForm: "im-agency-dashboard-form-edit-agency",
       editAgencyFormEditSubmitButton:

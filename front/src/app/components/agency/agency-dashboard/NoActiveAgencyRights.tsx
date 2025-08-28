@@ -2,22 +2,22 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useState } from "react";
 import type { AgencyRight, ConnectedUser } from "shared";
+import { AgencyRightsTable } from "src/app/components/agency/agencies-table/AgencyRightsTable";
 import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
-import { OnGoingAgencyRightsTable } from "../agencies-table/OnGoingAgencyRightsTable";
 
 export function NoActiveAgencyRights({
   toReviewAgencyRights,
   currentUser,
-  feedbackTopic,
+  onUserRegistrationCancelledRequested,
 }: {
   toReviewAgencyRights: AgencyRight[];
   currentUser: ConnectedUser;
-  feedbackTopic: FeedbackTopic;
+  onUserRegistrationCancelledRequested: (agencyRight: AgencyRight) => void;
 }): JSX.Element {
   const [showRegistrationForm, setShowRegistrationForm] =
     useState<boolean>(false);
+
   return (
     <>
       <h2 className={fr.cx("fr-mt-2w")}>Suivi de mes demandes</h2>
@@ -48,10 +48,14 @@ export function NoActiveAgencyRights({
             par email et pourrez consulter les conventions de l'organisme dans
             votre espace personnel.
           </p>
-          <OnGoingAgencyRightsTable
-            agenciesWithToReviewRights={toReviewAgencyRights}
-            userId={currentUser.id}
-            feedbackTopic={feedbackTopic}
+
+          <AgencyRightsTable
+            agencyRights={toReviewAgencyRights}
+            user={currentUser}
+            title={`Demandes d'accès en cours (${toReviewAgencyRights.length})`}
+            onUserRegistrationCancelledRequested={
+              onUserRegistrationCancelledRequested
+            }
           />
         </div>
       </div>

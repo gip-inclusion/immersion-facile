@@ -4,12 +4,13 @@ import { subMinutes } from "date-fns";
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { distinguishAgencyRights } from "shared";
+import { type AgencyRight, distinguishAgencyRights } from "shared";
 import { NoActiveAgencyRights } from "src/app/components/agency/agency-dashboard/NoActiveAgencyRights";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAgencyDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
+import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
@@ -90,6 +91,19 @@ export const AgencyDashboardPage = ({
             const { activeAgencyRights, toReviewAgencyRights } =
               distinguishAgencyRights(currentUser.agencyRights);
 
+            const onUserRegistrationCancelledRequested =
+              (feedbackTopic: FeedbackTopic) => (agencyRight: AgencyRight) => {
+                dispatch(
+                  removeUserFromAgencySlice.actions.removeUserFromAgencyRequested(
+                    {
+                      agencyId: agencyRight.agency.id,
+                      feedbackTopic,
+                      userId: currentUser.id,
+                    },
+                  ),
+                );
+              };
+
             return activeAgencyRights.length ? (
               <AgencyDashboard
                 route={route}
@@ -101,7 +115,9 @@ export const AgencyDashboardPage = ({
               <NoActiveAgencyRights
                 toReviewAgencyRights={toReviewAgencyRights}
                 currentUser={currentUser}
-                feedbackTopic={feedbackTopic}
+                onUserRegistrationCancelledRequested={onUserRegistrationCancelledRequested(
+                  feedbackTopic,
+                )}
               />
             );
           },

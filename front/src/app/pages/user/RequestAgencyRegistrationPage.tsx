@@ -33,7 +33,7 @@ export const RequestAgencyRegistrationPage = () => {
           </PageHeader>
         }
       >
-        <Feedback topics={["dashboard-agency-register-user"]} />
+        <Feedback topics={["dashboard-agency-register-user"]} closable />
         <RegisterAgenciesForm currentUser={currentUser} />
         <div className={fr.cx("fr-my-6w")}>
           <Button

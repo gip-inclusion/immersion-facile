@@ -1,13 +1,11 @@
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import type { UserParamsForAgency } from "shared";
 import { UserProfile } from "src/app/components/user-profile/UserProfile";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
-import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -47,22 +45,12 @@ export const MyProfile = (_: MyProfileProps) => {
       ? `${currentUser.firstName} ${currentUser.lastName}`
       : currentUser.email;
 
-  const onUserUpdateRequested = (userParamsForAgency: UserParamsForAgency) => {
-    dispatch(
-      updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        ...userParamsForAgency,
-        feedbackTopic: "user",
-      }),
-    );
-  };
-
   return (
     <UserProfile
       title={userDisplayed}
       currentUser={currentUser}
       userWithRights={currentUser}
       editInformationsLink={linkToUpdateAccountInfo}
-      onUserUpdateRequested={onUserUpdateRequested}
     />
   );
 };
