@@ -227,6 +227,7 @@ describe("AssessmentReminder", () => {
               ),
               businessName: convention.businessName,
               agencyLogoUrl: agency.logoUrl ?? undefined,
+              tutorEmail: convention.establishmentTutor.email,
             },
             recipients: [validator.email],
             sender: {
@@ -302,6 +303,7 @@ describe("AssessmentReminder", () => {
               ),
               businessName: convention.businessName,
               agencyLogoUrl: agency.logoUrl ?? undefined,
+              tutorEmail: convention.establishmentTutor.email,
             },
             recipients: [validator.email],
             sender: {
@@ -393,6 +395,7 @@ describe("AssessmentReminder", () => {
               ),
               businessName: convention.businessName,
               agencyLogoUrl: agency.logoUrl ?? undefined,
+              tutorEmail: convention.establishmentTutor.email,
             },
             recipients: [advisorEmail],
             sender: {

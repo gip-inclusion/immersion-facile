@@ -289,6 +289,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
+    tutorEmail: "TUTOR_EMAIL",
     conventionId: "CONVENTION_ID",
     internshipKind: "immersion",
   },
