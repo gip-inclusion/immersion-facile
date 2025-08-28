@@ -101,7 +101,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
       statsAgenciesUrl: this.#makeDashboardUrlByDashboardName(
         "statsAgencies",
         now,
-        { "Type de structure": agencyKinds.join(",") },
+        { type_de_structure: agencyKinds.join(",") },
       ),
     };
   }
