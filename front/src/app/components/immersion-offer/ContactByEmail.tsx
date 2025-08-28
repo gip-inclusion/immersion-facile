@@ -4,7 +4,7 @@ import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 import {
   type ElementRef,
@@ -122,7 +122,7 @@ export const ContactByEmail = ({
   );
 
   const methods = useForm<ContactEstablishmentByMailDto>({
-    resolver: zodResolver(contactEstablishmentByMailSchema),
+    resolver: standardSchemaResolver(contactEstablishmentByMailSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });

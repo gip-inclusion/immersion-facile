@@ -1235,7 +1235,7 @@ describe("SearchImmersionUseCase", () => {
         errors.inputs.badSchema({
           useCaseName: "SearchImmersion",
           flattenErrors: [
-            "nafCodes : Array must contain at least 1 element(s)",
+            "nafCodes : Too small: expected array to have >=1 items",
           ],
         }),
       );

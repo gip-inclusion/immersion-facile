@@ -55,6 +55,8 @@ export const RenewConventionModalContent = ({
     },
     signatories: convention.signatories,
   };
+
+  // internshipKind et signatories ne sont pas nécéssaires dans ce composant mais seulement utiles plus bas dans RegularSchedulePicker (de ScheduleSection -> SchedulePicker). Infos récupérés par getValues(). OK si on est sur le formulaire de convention car on a bien un ConventionReadDto. Mais pas dans RenewConventionModalContent.
   const methods = useForm<RenewConventionParamsInForm>({
     defaultValues,
     resolver: zodResolver(renewConventionParamsSchema),

@@ -4,6 +4,7 @@ import {
   type ConventionJwtPayload,
   calculateDurationInSecondsFrom,
   castError,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import type { z } from "zod";
 import { validateAndParseZodSchemaV2 } from "../../config/helpers/validateAndParseZodSchema";
@@ -19,7 +20,7 @@ export abstract class UseCase<
   Output = void,
   JWTPayload = ConventionJwtPayload,
 > {
-  protected abstract inputSchema: z.ZodSchema<Input>;
+  protected abstract inputSchema: ZodSchemaWithInputMatchingOutput<Input>;
 
   // this method is guaranteed to only receive validated params
   protected abstract _execute(
@@ -72,7 +73,7 @@ export abstract class TransactionalUseCase<
   Output = void,
   JWTPayload = ConventionJwtPayload,
 > {
-  protected abstract inputSchema: z.ZodSchema<Input>;
+  protected abstract inputSchema: z.ZodType<Input, any>;
 
   public constructor(private uowPerformer: UnitOfWorkPerformer) {}
 

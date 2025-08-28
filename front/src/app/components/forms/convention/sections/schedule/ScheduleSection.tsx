@@ -8,7 +8,7 @@ import { useFormContext } from "react-hook-form";
 import {
   type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
-  type DateIntervalDto,
+  type DateIntervalDto, InternshipKind,
   isStringDate,
   maximumCalendarDayByInternshipKind,
   reasonableSchedule,
@@ -22,8 +22,9 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
+import {props} from "ramda";
 
-export const ScheduleSection = () => {
+export const ScheduleSection = (props: { internshipKind? : InternshipKind}) => {
   const { setValue, watch, register, formState, reset } =
     useFormContext<
       Pick<
@@ -33,21 +34,22 @@ export const ScheduleSection = () => {
     >();
   const values = watch();
 
+  const internshipKind = props.internshipKind ?? values.internshipKind;
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels(internshipKind),
   );
 
   const formContents = getFormFields();
 
   const computeDatePickerMaxDate = addDays(
     isStringDate(values.dateStart) ? new Date(values.dateStart) : new Date(),
-    maximumCalendarDayByInternshipKind[values.internshipKind],
+    maximumCalendarDayByInternshipKind[internshipKind],
   ).toISOString();
 
   const [dateMax, setDateMax] = useState<string>(computeDatePickerMaxDate);
 
   const excludedDays =
-    values.internshipKind === "mini-stage-cci"
+    internshipKind === "mini-stage-cci"
       ? (["dimanche"] as Weekday[])
       : [];
 
@@ -56,7 +58,7 @@ export const ScheduleSection = () => {
   const shouldUpdateDateAndSchedule = (dateStart: Date, dateEnd: Date) => {
     return (
       differenceInCalendarDays(dateEnd, dateStart) <=
-      maximumCalendarDayByInternshipKind[values.internshipKind]
+      maximumCalendarDayByInternshipKind[internshipKind]
     );
   };
 
@@ -95,20 +97,20 @@ export const ScheduleSection = () => {
       ) {
         alert(
           `Attention, votre ${
-            values.internshipKind === "immersion" ? "immersion" : "stage"
+            internshipKind === "immersion" ? "immersion" : "stage"
           } ne peut pas dépasser ${
-            maximumCalendarDayByInternshipKind[values.internshipKind]
+            maximumCalendarDayByInternshipKind[internshipKind]
           } jours. Nous avons donc ajusté la date de fin.`,
         );
         newDates.end = addDays(
           newDates.start,
-          maximumCalendarDayByInternshipKind[values.internshipKind],
+          maximumCalendarDayByInternshipKind[internshipKind],
         );
       }
       setDateMax(
         addDays(
           newDates.start,
-          maximumCalendarDayByInternshipKind[values.internshipKind],
+          maximumCalendarDayByInternshipKind[internshipKind],
         ).toISOString(),
       );
       setValue("dateStart", newDates.start.toISOString());
@@ -142,7 +144,7 @@ export const ScheduleSection = () => {
 
   return (
     <>
-      {values.internshipKind === "mini-stage-cci" && (
+      {internshipKind === "mini-stage-cci" && (
         <>
           <Alert
             small

@@ -12,6 +12,7 @@ import {
   type PhoneNumber,
   phoneNumberSchema,
   type SiretDto,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
@@ -55,7 +56,7 @@ export const importedAgencyAndUserRowSchema: z.Schema<ImportedAgencyAndUserRow> 
         } as GeoPositionDto;
       }
       return val;
-    }, geoPositionSchema) as z.ZodType<GeoPositionDto>,
+    }, geoPositionSchema),
     "Code postal": z.string(),
     Téléphone: phoneNumberSchema,
   });
@@ -63,7 +64,9 @@ export const importedAgencyAndUserRowSchema: z.Schema<ImportedAgencyAndUserRow> 
 export type AddAgenciesAndUsers = ReturnType<typeof makeAddAgenciesAndUsers>;
 export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
   .withInput<ImportedAgencyAndUserRow[]>(
-    z.array(importedAgencyAndUserRowSchema),
+    z.array(importedAgencyAndUserRowSchema) as ZodSchemaWithInputMatchingOutput<
+      ImportedAgencyAndUserRow[]
+    >,
   )
   .withOutput<{
     siretAlreadyInIFCount: number;

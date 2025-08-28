@@ -15,8 +15,8 @@ import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
   stringWithMaxLength255,
+  type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
-  zSchemaForType,
   zStringMinLength1,
 } from "../zodUtils";
 import {
@@ -37,46 +37,63 @@ import {
   type WithAgencyStatus,
 } from "./agency.dto";
 
-export const agencyIdSchema: z.ZodSchema<AgencyId> = zStringMinLength1;
-export const refersToAgencyIdSchema: z.ZodSchema<AgencyId> = z.string();
-export const agencyIdsSchema: z.Schema<AgencyId[]> = z
+export const agencyIdSchema: ZodSchemaWithInputMatchingOutput<AgencyId> =
+  zStringMinLength1;
+export const refersToAgencyIdSchema: ZodSchemaWithInputMatchingOutput<AgencyId> =
+  z.string();
+export const agencyIdsSchema: ZodSchemaWithInputMatchingOutput<AgencyId[]> = z
   .array(agencyIdSchema)
   .nonempty();
 
-export const agencyRoleSchema = z.enum(allAgencyRoles);
-
-export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
-  z.object({
-    agencyId: agencyIdSchema,
-  }),
-);
-
-export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
-  agencyIdSchema.optional();
-
-export const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
-  agencyKindList,
-  "Ce type de structure n'est pas supporté",
-);
-const agencyStatusSchema = z.enum(allAgencyStatuses);
-
-export const agencyOptionSchema: z.ZodSchema<AgencyOption> = z.object({
-  id: agencyIdSchema,
-  name: z.string(),
-  kind: agencyKindSchema,
-  status: agencyStatusSchema,
-  address: addressSchema,
-  refersToAgencyName: zStringMinLength1.or(z.null()),
+export const agencyRoleSchema = z.enum(allAgencyRoles, {
+  error: localization.invalidEnum,
 });
 
-export const agencyOptionsSchema: z.ZodSchema<AgencyOption[]> =
-  z.array(agencyOptionSchema);
+export const withAgencyIdSchema: ZodSchemaWithInputMatchingOutput<WithAgencyId> =
+  z.object({
+    agencyId: agencyIdSchema,
+  });
 
-export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsRequestDto> =
+export const withAgencyIdSchemaPartial: ZodSchemaWithInputMatchingOutput<
+  Partial<WithAgencyId>
+> = z
+  .object({
+    agencyId: agencyIdSchema,
+  })
+  .partial();
+
+export const agencyIdResponseSchema: ZodSchemaWithInputMatchingOutput<AgencyIdResponse> =
+  agencyIdSchema.optional();
+
+export const agencyKindSchema: ZodSchemaWithInputMatchingOutput<AgencyKind> =
+  zEnumValidation(agencyKindList, "Ce type de structure n'est pas supporté");
+const agencyStatusSchema = z.enum(allAgencyStatuses, {
+  error: localization.invalidEnum,
+});
+
+export const agencyOptionSchema: ZodSchemaWithInputMatchingOutput<AgencyOption> =
+  z.object({
+    id: agencyIdSchema,
+    name: z.string(),
+    kind: agencyKindSchema,
+    status: agencyStatusSchema,
+    address: addressSchema,
+    refersToAgencyName: zStringMinLength1.or(z.null()),
+  });
+
+export const agencyOptionsSchema: ZodSchemaWithInputMatchingOutput<
+  AgencyOption[]
+> = z.array(agencyOptionSchema);
+
+export const listAgencyOptionsRequestSchema: ZodSchemaWithInputMatchingOutput<ListAgencyOptionsRequestDto> =
   z.object({
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
-    filterKind: z.enum(agencyKindFilters).optional(),
+    filterKind: z
+      .enum(agencyKindFilters, {
+        error: localization.invalidEnum,
+      })
+      .optional(),
     siret: z.string().optional(),
     status: z.array(agencyStatusSchema).optional(),
   });
@@ -101,7 +118,14 @@ const commonAgencyShape = {
   phoneNumber: phoneNumberSchema,
 };
 
-export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
+export type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
+  kind: AgencyKind | "";
+};
+
+export const createAgencySchema: z.ZodType<
+  CreateAgencyDto,
+  CreateAgencyInitialValues
+> = z
   .object({ ...commonAgencyShape, ...withEmails })
   .and(
     z.object({
@@ -124,7 +148,7 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
     }
   });
 
-export const editAgencySchema: z.ZodSchema<AgencyDto> = z
+export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
   .object({ ...commonAgencyShape, ...withEmails })
   .and(
     z.object({
@@ -137,11 +161,13 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
   )
   .and(withAcquisitionSchema);
 
-const withAdminEmailsSchema: z.Schema<{ admins: Email[] }> = z.object({
+const withAdminEmailsSchema: ZodSchemaWithInputMatchingOutput<{
+  admins: Email[];
+}> = z.object({
   admins: z.array(emailSchema),
 });
 
-export const agencyDtoForAgencyUsersAndAdminsSchema: z.Schema<AgencyDtoForAgencyUsersAndAdmins> =
+export const agencyDtoForAgencyUsersAndAdminsSchema: ZodSchemaWithInputMatchingOutput<AgencyDtoForAgencyUsersAndAdmins> =
   z
     .object(commonAgencyShape)
     .merge(
@@ -157,7 +183,7 @@ export const agencyDtoForAgencyUsersAndAdminsSchema: z.Schema<AgencyDtoForAgency
     .and(withAcquisitionSchema)
     .and(withAdminEmailsSchema);
 
-export const agencySchema: z.ZodSchema<AgencyDto> = z
+export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
   .object({ ...commonAgencyShape, ...withEmails })
   .merge(
     z.object({
@@ -171,16 +197,17 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
   )
   .and(withAcquisitionSchema);
 
-export const withAgencySchema: z.ZodSchema<WithAgencyDto> = z.object({
-  agency: agencySchema,
-});
+export const withAgencySchema: ZodSchemaWithInputMatchingOutput<WithAgencyDto> =
+  z.object({
+    agency: agencySchema,
+  });
 
-export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
+export const privateListAgenciesRequestSchema: ZodSchemaWithInputMatchingOutput<PrivateListAgenciesRequestDto> =
   z.object({
     status: agencyStatusSchema.optional(),
   });
 
-export const updateAgencyStatusParamsWithoutIdSchema: z.Schema<UpdateAgencyStatusParamsWithoutId> =
+export const updateAgencyStatusParamsWithoutIdSchema: ZodSchemaWithInputMatchingOutput<UpdateAgencyStatusParamsWithoutId> =
   z
     .object({
       status: z.literal("active"),
@@ -192,9 +219,10 @@ export const updateAgencyStatusParamsWithoutIdSchema: z.Schema<UpdateAgencyStatu
       }),
     );
 
-export const updateAgencyStatusParamsSchema: z.Schema<UpdateAgencyStatusParams> =
+export const updateAgencyStatusParamsSchema: ZodSchemaWithInputMatchingOutput<UpdateAgencyStatusParams> =
   updateAgencyStatusParamsWithoutIdSchema.and(z.object({ id: agencyIdSchema }));
 
-export const withAgencyStatusSchema: z.Schema<WithAgencyStatus> = z.object({
-  status: agencyStatusSchema,
-});
+export const withAgencyStatusSchema: ZodSchemaWithInputMatchingOutput<WithAgencyStatus> =
+  z.object({
+    status: agencyStatusSchema,
+  });

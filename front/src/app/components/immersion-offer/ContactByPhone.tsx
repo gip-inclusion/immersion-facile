@@ -2,7 +2,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -93,7 +93,7 @@ export const ContactByPhone = ({
   }));
 
   const methods = useForm<ContactEstablishmentByPhoneDto>({
-    resolver: zodResolver(contactEstablishmentByPhoneSchema),
+    resolver: standardSchemaResolver(contactEstablishmentByPhoneSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });

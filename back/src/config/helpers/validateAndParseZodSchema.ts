@@ -1,10 +1,12 @@
-import { errors, flattenZodErrors } from "shared";
-import type { z } from "zod";
+import { flatten } from "ramda";
+import { errors, type ZodSchemaWithInputMatchingOutput } from "shared";
+import type { ZodError } from "zod";
+import type { $ZodIssue } from "zod/v4/core/errors.cjs";
 import type { OpacifiedLogger } from "../../utils/logger";
 
 export const validateAndParseZodSchemaV2 = <T>(
   props: {
-    inputSchema: z.Schema<T>;
+    inputSchema: ZodSchemaWithInputMatchingOutput<T>;
     schemaParsingInput: unknown;
     logger: OpacifiedLogger;
     id?: string;
@@ -12,9 +14,7 @@ export const validateAndParseZodSchemaV2 = <T>(
 ): T => {
   const result = props.inputSchema.safeParse(props.schemaParsingInput);
   if (result.success) return result.data;
-
   const flattenErrors = flattenZodErrors(result.error);
-
   const error = errors.inputs.badSchema({
     id: props.id,
     flattenErrors,
@@ -34,4 +34,40 @@ export const validateAndParseZodSchemaV2 = <T>(
   });
 
   throw error;
+};
+
+const flattenZodErrors = (
+  error: ZodError<any>,
+  path: PropertyKey[] = [],
+): string[] => {
+  const result = error.issues.reduce<string[]>((acc, issue: $ZodIssue) => {
+    const currentPath = [...path, ...(issue.path || [])];
+
+    return [...acc, ...flattenZodIssue(issue, currentPath)];
+  }, []);
+
+  return Array.from(new Set(result));
+};
+
+const flattenZodIssue = (
+  issue: $ZodIssue,
+  path: PropertyKey[] = [],
+): string[] => {
+  if (issue.code === "invalid_union" && issue.errors) {
+    const unionErrors = flatten(issue.errors);
+    const unionMessages = unionErrors.reduce<string[]>(
+      (unionMsgs: string[], currentIssue: $ZodIssue) => {
+        return unionMsgs.concat(
+          flattenZodIssue(currentIssue, [...path, ...currentIssue.path]),
+        );
+      },
+      [],
+    );
+    return unionMessages;
+  }
+
+  const key = path.join(".");
+  const message = issue.message;
+  const flatMessage = key ? `${key} : ${message}` : message;
+  return [flatMessage];
 };

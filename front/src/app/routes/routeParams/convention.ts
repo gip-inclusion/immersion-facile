@@ -23,7 +23,7 @@ import {
   type ScheduleDto,
   toDateUTCString,
 } from "shared";
-import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
+import type { CreateConventionPresentationInitialValues } from "src/app/components/forms/convention/conventionHelpers";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
@@ -44,20 +44,21 @@ export const getConventionInitialValuesFromUrl = ({
 }: {
   route: ConventionRoutes;
   internshipKind: InternshipKind;
-}): ConventionPresentation => {
+}): CreateConventionPresentationInitialValues => {
   const params = mergeObjectsExceptFalsyValues(
     outOfReduxDependencies.localDeviceRepository.get(
       "partialConventionInUrl",
     ) ?? {},
     route.params satisfies ConventionParamsInUrl,
   );
-  const initialFormWithStoredAndUrlParams: ConventionPresentation = {
-    ...conventionPresentationFromParams(params),
-    id: uuidV4(),
-    status: "READY_TO_SIGN",
-    dateSubmission: toDateUTCString(new Date()),
-    internshipKind,
-  };
+  const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
+    {
+      ...conventionPresentationFromParams(params),
+      id: uuidV4(),
+      status: "READY_TO_SIGN",
+      dateSubmission: toDateUTCString(new Date()),
+      internshipKind,
+    };
 
   return ENV.prefilledForms
     ? withDevPrefilledValues(initialFormWithStoredAndUrlParams)
@@ -65,13 +66,9 @@ export const getConventionInitialValuesFromUrl = ({
 };
 
 const withDevPrefilledValues = (
-  emptyForm: ConventionPresentation,
-): ConventionPresentation => {
-  const {
-    beneficiary,
-    beneficiaryRepresentative,
-    establishmentRepresentative,
-  } = emptyForm.signatories;
+  emptyForm: CreateConventionPresentationInitialValues,
+): CreateConventionPresentationInitialValues => {
+  const signatories = emptyForm.signatories;
 
   const defaultTutor = {
     firstName: "Joe",
@@ -89,37 +86,44 @@ const withDevPrefilledValues = (
       ...emptyForm.signatories,
       beneficiary: {
         role: "beneficiary",
-        firstName: beneficiary.firstName || "Sylvanie",
-        lastName: beneficiary.lastName || "Durand",
-        email: beneficiary.email || "sylvanie@monemail.fr",
-        phone: beneficiary.phone || "0612345678",
-        birthdate: beneficiary.birthdate || "1990-02-21T00:00:00.000Z",
-        emergencyContact: beneficiary.emergencyContact || "Éric Durand",
+        firstName: signatories?.beneficiary.firstName || "Sylvanie",
+        lastName: signatories?.beneficiary.lastName || "Durand",
+        email: signatories?.beneficiary.email || "sylvanie@monemail.fr",
+        phone: signatories?.beneficiary.phone || "0612345678",
+        birthdate:
+          signatories?.beneficiary.birthdate || "1990-02-21T00:00:00.000Z",
+        emergencyContact:
+          signatories?.beneficiary.emergencyContact || "Éric Durand",
         emergencyContactPhone:
-          beneficiary.emergencyContactPhone || "0662552607",
+          signatories?.beneficiary.emergencyContactPhone || "0662552607",
         emergencyContactEmail:
-          beneficiary.emergencyContactEmail ||
+          signatories?.beneficiary.emergencyContactEmail ||
           "eric.durand@emergencycontact.com",
-        federatedIdentity: beneficiary.federatedIdentity,
+        federatedIdentity: signatories?.beneficiary.federatedIdentity,
         isRqth: false,
       },
-      beneficiaryRepresentative,
+      beneficiaryRepresentative: signatories?.beneficiaryRepresentative,
       establishmentRepresentative: {
         role: "establishment-representative",
         firstName:
-          establishmentRepresentative.firstName || defaultTutor.firstName,
-        lastName: establishmentRepresentative.lastName || defaultTutor.lastName,
-        phone: establishmentRepresentative.phone || defaultTutor.phone,
-        email: establishmentRepresentative.email || defaultTutor.email,
+          signatories?.establishmentRepresentative.firstName ||
+          defaultTutor.firstName,
+        lastName:
+          signatories?.establishmentRepresentative.lastName ||
+          defaultTutor.lastName,
+        phone:
+          signatories?.establishmentRepresentative.phone || defaultTutor.phone,
+        email:
+          signatories?.establishmentRepresentative.email || defaultTutor.email,
       },
     },
     establishmentTutor: {
       role: "establishment-tutor",
-      firstName: tutor.firstName || defaultTutor.firstName,
-      lastName: tutor.lastName || defaultTutor.lastName,
-      phone: tutor.phone || defaultTutor.phone,
-      email: tutor.email || defaultTutor.email,
-      job: tutor.job || defaultTutor.job,
+      firstName: tutor?.firstName || defaultTutor.firstName,
+      lastName: tutor?.lastName || defaultTutor.lastName,
+      phone: tutor?.phone || defaultTutor.phone,
+      email: tutor?.email || defaultTutor.email,
+      job: tutor?.job || defaultTutor.job,
     },
 
     // Enterprise
@@ -152,7 +156,7 @@ const withDevPrefilledValues = (
 };
 
 const conventionToConventionInUrl = (
-  convention: ConventionPresentation,
+  convention: CreateConventionPresentationInitialValues,
 ): ConventionParamsInUrl => {
   const {
     signatories: {
@@ -322,7 +326,9 @@ export const conventionReadToConventionRouteParams = (
   return baseParams;
 };
 
-export const makeValuesToWatchInUrl = (convention: ConventionPresentation) => {
+export const makeValuesToWatchInUrl = (
+  convention: CreateConventionPresentationInitialValues,
+) => {
   const conventionInUrl = conventionToConventionInUrl(convention);
   const keysToWatch: ConventionFormKeysInUrl[] = [
     ...keys(conventionValuesFromUrl),
@@ -518,7 +524,7 @@ const scheduleFromParams = (
 
 const conventionPresentationFromParams = (
   params: ConventionParamsInUrl,
-): Omit<ConventionPresentation, "internshipKind"> => ({
+): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
   // Agency
   agencyId: params.agencyId ?? undefined,
   agencyDepartment: params.agencyDepartment ?? "",

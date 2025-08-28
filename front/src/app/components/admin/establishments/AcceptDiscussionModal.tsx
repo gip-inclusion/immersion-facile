@@ -4,7 +4,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -51,7 +51,7 @@ export const AcceptDiscussionModal = ({
 }): JSX.Element => {
   const { register, watch, handleSubmit, formState, setValue } =
     useForm<WithDiscussionStatusAccepted>({
-      resolver: zodResolver(discussionAcceptedSchema),
+      resolver: standardSchemaResolver(discussionAcceptedSchema),
       defaultValues: {
         status: "ACCEPTED",
         candidateWarnedMethod: null,

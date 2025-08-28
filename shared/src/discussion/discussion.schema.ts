@@ -15,13 +15,18 @@ import { phoneNumberSchema } from "../phone/phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+  zToNumber,
+} from "../zodUtils";
 import {
   type Attachment,
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
   candidateWarnedMethods,
-  type DiscussionEmailParams,
   type DiscussionExchangeForbiddenParams,
   type DiscussionExchangeForbiddenReason,
   type DiscussionId,
@@ -31,7 +36,6 @@ import {
   type ExchangeRead,
   type ExchangeRole,
   type FlatGetPaginatedDiscussionsParams,
-  type LegacyDiscussionEmailParams,
   type PotentialBeneficiaryCommonProps,
   type WithDiscussionId,
   type WithDiscussionRejection,
@@ -41,10 +45,12 @@ import {
   type WithDiscussionStatusRejected,
 } from "./discussion.dto";
 
-export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
-export const withDiscussionIdSchema: z.Schema<WithDiscussionId> = z.object({
-  discussionId: discussionIdSchema,
-});
+export const discussionIdSchema: ZodSchemaWithInputMatchingOutput<DiscussionId> =
+  z.uuid();
+export const withDiscussionIdSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionId> =
+  z.object({
+    discussionId: discussionIdSchema,
+  });
 
 export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export const discussionExchangeForbidenReasons = [
@@ -58,18 +64,12 @@ export const makeExchangeEmailRegex = (replyDomain: string) =>
 export const makeLegacyExchangeEmailRegex = (replyDomain: string) =>
   new RegExp(`^[^_]+_[^_]+@${replyDomain}$`);
 
-export const makeExchangeEmailSchema = (
-  replyDomain: string,
-): z.ZodUnion<
-  [
-    z.ZodEffects<z.ZodString, DiscussionEmailParams, string>,
-    z.ZodEffects<z.ZodString, LegacyDiscussionEmailParams, string>,
-  ]
-> =>
+export const makeExchangeEmailSchema = (replyDomain: string) =>
   z
-    .string()
     .email()
-    .regex(makeExchangeEmailRegex(replyDomain))
+    .regex(makeExchangeEmailRegex(replyDomain), {
+      error: localization.invalidEmailFormat,
+    })
     .transform((email) => {
       const [namepart, discussionPart] = email.split("@")[0].split("__");
       const [firstname, lastname] = namepart.split("_");
@@ -83,9 +83,10 @@ export const makeExchangeEmailSchema = (
     })
     .or(
       z
-        .string()
         .email()
-        .regex(makeLegacyExchangeEmailRegex(replyDomain))
+        .regex(makeLegacyExchangeEmailRegex(replyDomain), {
+          error: localization.invalidEmailFormat,
+        })
         .transform((email) => {
           const [id, rawRecipientKind] = email.split("@")[0].split("_");
           return {
@@ -95,47 +96,56 @@ export const makeExchangeEmailSchema = (
         }),
     );
 
-export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
-export const discussionExchangeForbidenReasonSchema: z.Schema<DiscussionExchangeForbiddenReason> =
-  z.enum(discussionExchangeForbidenReasons);
+export const exchangeRoleSchema: ZodSchemaWithInputMatchingOutput<ExchangeRole> =
+  z.enum(exchangeRoles, {
+    error: localization.invalidEnum,
+  });
+export const discussionExchangeForbidenReasonSchema: ZodSchemaWithInputMatchingOutput<DiscussionExchangeForbiddenReason> =
+  z.enum(discussionExchangeForbidenReasons, {
+    error: localization.invalidEnum,
+  });
 
-export const attachmentSchema: z.Schema<Attachment> = z.object({
-  name: z.string(),
-  link: z.string(),
-});
+export const attachmentSchema: ZodSchemaWithInputMatchingOutput<Attachment> =
+  z.object({
+    name: z.string(),
+    link: z.string(),
+  });
 
-export const exchangeReadSchema: z.Schema<ExchangeRead> = z
-  .object({
-    subject: zStringMinLength1,
-    message: zStringMinLength1,
-    sentAt: makeDateStringSchema(),
-    attachments: z.array(attachmentSchema),
-  })
-  .and(
-    z.discriminatedUnion("sender", [
-      z.object({
-        sender: z.literal("establishment"),
-        firstname: z.string(),
-        lastname: z.string(),
-      }),
-      z.object({
-        sender: z.literal("potentialBeneficiary"),
-      }),
-    ]),
-  );
+export const exchangeReadSchema: ZodSchemaWithInputMatchingOutput<ExchangeRead> =
+  z
+    .object({
+      subject: zStringMinLength1,
+      message: zStringMinLength1,
+      sentAt: makeDateStringSchema(),
+      attachments: z.array(attachmentSchema),
+    })
+    .and(
+      z.discriminatedUnion("sender", [
+        z.object({
+          sender: z.literal("establishment"),
+          firstname: z.string(),
+          lastname: z.string(),
+        }),
+        z.object({
+          sender: z.literal("potentialBeneficiary"),
+        }),
+      ]),
+    );
 
-const candidateWarnedMethodSchema = z.enum(
-  candidateWarnedMethods,
-) satisfies z.Schema<CandidateWarnedMethod>;
+const candidateWarnedMethodSchema = z.enum(candidateWarnedMethods, {
+  error: localization.invalidEnum,
+}) satisfies ZodSchemaWithInputMatchingOutput<CandidateWarnedMethod>;
 
-export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
+export const discussionRejectionSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionRejection> =
   z.union([
     z.object({
       rejectionKind: z.literal("OTHER"),
       rejectionReason: zStringMinLength1,
     }),
     z.object({
-      rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"]),
+      rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"], {
+        error: localization.invalidEnum,
+      }),
     }),
     z.object({
       rejectionKind: z.literal("CANDIDATE_ALREADY_WARNED"),
@@ -152,36 +162,35 @@ const discussionStatusSchema = z.union([
   discussionPendingStatusSchema,
 ]);
 
-export const discussionAcceptedSchema: z.Schema<WithDiscussionStatusAccepted> =
+export const discussionAcceptedSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionStatusAccepted> =
   z.object({
     status: discussionAcceptedStatusSchema,
     candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
     conventionId: conventionIdSchema.optional(),
   });
 
-export const discussionRejectedSchema: z.Schema<WithDiscussionStatusRejected> =
+export const discussionRejectedSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionStatusRejected> =
   z
     .object({
       status: discussionRejectedStatusSchema,
     })
     .and(discussionRejectionSchema);
 
-export const withExchangeMessageSchema: z.Schema<
+export const withExchangeMessageSchema: ZodSchemaWithInputMatchingOutput<
   Pick<ExchangeFromDashboard, "message">
 > = z.object({
   message: zStringMinLength1,
 });
 
-export const exchangeMessageFromDashboardSchema: z.Schema<ExchangeFromDashboard> =
+export const exchangeMessageFromDashboardSchema: ZodSchemaWithInputMatchingOutput<ExchangeFromDashboard> =
   withExchangeMessageSchema.and(z.object({ discussionId: discussionIdSchema }));
 
-const discussionPendingSchema: z.Schema<WithDiscussionStatusPending> = z.object(
-  {
+const discussionPendingSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionStatusPending> =
+  z.object({
     status: discussionPendingStatusSchema,
-  },
-);
+  });
 
-export const withDiscussionStatusSchema: z.Schema<WithDiscussionStatus> =
+export const withDiscussionStatusSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionStatus> =
   z.union([
     discussionRejectedSchema,
     discussionPendingSchema,
@@ -192,25 +201,28 @@ const potentialBeneficiaryCommonSchema = z.object({
   firstName: zStringMinLength1,
   lastName: zStringMinLength1,
   email: zStringCanBeEmpty,
-}) satisfies z.Schema<PotentialBeneficiaryCommonProps>;
+}) satisfies ZodSchemaWithInputMatchingOutput<PotentialBeneficiaryCommonProps>;
 
-const commonDiscussionSchema: z.Schema<CommonDiscussionDto> = z
-  .object({
-    id: discussionIdSchema,
-    createdAt: makeDateStringSchema(),
-    siret: siretSchema,
-    businessName: zStringMinLength1,
-    address: addressSchema,
-    conventionId: conventionIdSchema.optional(),
-  })
-  .and(withDiscussionStatusSchema);
+const commonDiscussionSchema: ZodSchemaWithInputMatchingOutput<CommonDiscussionDto> =
+  z
+    .object({
+      id: discussionIdSchema,
+      createdAt: makeDateStringSchema(),
+      siret: siretSchema,
+      businessName: zStringMinLength1,
+      address: addressSchema,
+      conventionId: conventionIdSchema.optional(),
+    })
+    .and(withDiscussionStatusSchema);
 
 const discussionKindIfSchema = z.literal("IF");
 const discussionKind1Eleve1StageSchema = z.literal("1_ELEVE_1_STAGE");
 
-const discussionLevelOfEducationSchema = z.enum(["3ème", "2nde"]);
+const discussionLevelOfEducationSchema = z.enum(["3ème", "2nde"], {
+  error: localization.invalidEnum,
+});
 
-export const discussionReadSchema: z.Schema<DiscussionReadDto> =
+export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionReadDto> =
   commonDiscussionSchema
     .and(
       z.object({
@@ -251,7 +263,9 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
           contactMode: preferInPersonContactSchema,
           kind: discussionKind1Eleve1StageSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            levelOfEducation: z.enum(["3ème", "2nde"]),
+            levelOfEducation: z.enum(["3ème", "2nde"], {
+              error: localization.invalidEnum,
+            }),
           }),
         }),
         z.object({
@@ -263,21 +277,31 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
           contactMode: preferPhoneContactSchema,
           kind: discussionKind1Eleve1StageSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            levelOfEducation: z.enum(["3ème", "2nde"]),
+            levelOfEducation: z.enum(["3ème", "2nde"], {
+              error: localization.invalidEnum,
+            }),
           }),
         }),
       ]),
     );
 
-export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedDiscussionsParams> =
+export const flatGetPaginatedDiscussionsParamsSchema: ZodSchemaWithInputMatchingOutput<FlatGetPaginatedDiscussionsParams> =
   z.object({
     // pagination
-    page: z.coerce.number().optional(),
-    perPage: z.coerce.number().optional(),
+    page: zToNumber.optional(),
+    perPage: zToNumber.optional(),
 
     // sort
-    orderBy: z.enum(["createdAt"]).optional(),
-    orderDirection: z.enum(["asc", "desc"]).optional(),
+    orderBy: z
+      .enum(["createdAt"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
+    orderDirection: z
+      .enum(["asc", "desc"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
 
     // filters
     statuses: discussionStatusSchema
@@ -287,28 +311,29 @@ export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedD
     search: z.string().optional(),
   });
 
-export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({
-  id: discussionIdSchema,
-  siret: siretSchema,
-  status: discussionStatusSchema,
-  appellation: appellationDtoSchema,
-  businessName: zStringMinLength1,
-  createdAt: makeDateStringSchema(),
-  kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
-  exchanges: z.array(exchangeReadSchema),
-  city: zStringMinLength1,
-  potentialBeneficiary: z.object({
-    firstName: zStringMinLength1,
-    lastName: zStringMinLength1,
-    phone: phoneNumberSchema.nullable(),
-  }),
-  immersionObjective: immersionObjectiveSchema.nullable(),
-});
+export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<DiscussionInList> =
+  z.object({
+    id: discussionIdSchema,
+    siret: siretSchema,
+    status: discussionStatusSchema,
+    appellation: appellationDtoSchema,
+    businessName: zStringMinLength1,
+    createdAt: makeDateStringSchema(),
+    kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
+    exchanges: z.array(exchangeReadSchema),
+    city: zStringMinLength1,
+    potentialBeneficiary: z.object({
+      firstName: zStringMinLength1,
+      lastName: zStringMinLength1,
+      phone: phoneNumberSchema.nullable(),
+    }),
+    immersionObjective: immersionObjectiveSchema.nullable(),
+  });
 
 export const paginatedDiscussionListSchema = createPaginatedSchema(
   discussionInListSchema,
 );
-export const discussionExchangeForbiddenParamsSchema: z.Schema<DiscussionExchangeForbiddenParams> =
+export const discussionExchangeForbiddenParamsSchema: ZodSchemaWithInputMatchingOutput<DiscussionExchangeForbiddenParams> =
   z.object({
     sender: exchangeRoleSchema,
     reason: discussionExchangeForbidenReasonSchema,

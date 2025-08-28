@@ -120,7 +120,9 @@ describe("POST /add-form-establishment-batch", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        issues: ["authorization : Required"],
+        issues: [
+          "authorization : Invalid input: expected string, received undefined",
+        ],
         message:
           "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /admin/add-form-establishment-batch",
         status: 400,

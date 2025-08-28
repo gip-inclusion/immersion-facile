@@ -1,7 +1,13 @@
 import { z } from "zod";
+import type { ConventionId } from "../convention/convention.dto";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { DateRange } from "../utils/date";
-import { localization, zEnumValidation, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+  zEnumValidation,
+  zStringMinLength1,
+} from "../zodUtils";
 import {
   type AssessmentDto,
   type LegacyAssessmentDto,
@@ -15,7 +21,9 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
   "status",
   [
     z.object({
-      status: z.enum(["COMPLETED", "DID_NOT_SHOW"]),
+      status: z.enum(["COMPLETED", "DID_NOT_SHOW"], {
+        error: localization.invalidEnum,
+      }),
     }),
     z.object({
       status: z.literal("PARTIALLY_COMPLETED"),
@@ -24,8 +32,8 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
     }),
   ],
   {
-    errorMap: (error) => {
-      if (error.code === "invalid_union_discriminator")
+    error: (error) => {
+      if (error.code === "invalid_union")
         return {
           message: "Veuillez selectionner une option",
         };
@@ -35,13 +43,13 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
   },
 );
 
-const withEstablishmentCommentsSchema: z.Schema<WithEstablishmentComments> =
+const withEstablishmentCommentsSchema: ZodSchemaWithInputMatchingOutput<WithEstablishmentComments> =
   z.object({
     establishmentFeedback: zStringMinLength1,
     establishmentAdvices: zStringMinLength1,
   });
 
-const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
+const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJob> =
   z.discriminatedUnion(
     "endedWithAJob",
     [
@@ -54,34 +62,50 @@ const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
         endedWithAJob: z.literal(false),
       }),
     ],
-    { errorMap: () => ({ message: "Veuillez sélectionnez une option" }) },
+    { error: "Veuillez sélectionnez une option" },
   );
 
-export const assessmentDtoSchema: z.Schema<AssessmentDto> = z
-  .object({
-    conventionId: z.string(),
-  })
-  .and(withAssessmentStatusSchema)
-  .and(withEstablishmentCommentsSchema)
-  .and(withEndedWithAJobSchema);
+export type CreateFormAssessmentInitialValues = {
+  conventionId: ConventionId;
+} & (WithEndedWithAJob | { endedWithAJob: null }) &
+  WithEstablishmentComments & { status: null };
 
-export const withAssessmentSchema: z.Schema<WithAssessmentDto> = z.object({
+export type FormAssessmentDto =
+  | AssessmentDto
+  | CreateFormAssessmentInitialValues;
+
+export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
+  z
+    .object({
+      conventionId: z.string(),
+    })
+    .and(withAssessmentStatusSchema)
+    .and(withEstablishmentCommentsSchema)
+    .and(withEndedWithAJobSchema);
+
+export const withAssessmentSchema: z.ZodType<
+  WithAssessmentDto,
+  { assessment: FormAssessmentDto }
+> = z.object({
   assessment: assessmentDtoSchema,
 });
 
-export const withDateRangeSchema: z.Schema<DateRange> = z
-  .object({
-    from: z.date(),
-    to: z.date(),
-  })
-  .refine(
-    ({ from, to }) => from < to,
-    "La date de fin doit être après la date de début.",
-  );
+export const withDateRangeSchema: ZodSchemaWithInputMatchingOutput<DateRange> =
+  z
+    .object({
+      from: z.date(),
+      to: z.date(),
+    })
+    .refine(
+      ({ from, to }) => from < to,
+      "La date de fin doit être après la date de début.",
+    );
 
-export const legacyAssessmentDtoSchema: z.Schema<LegacyAssessmentDto> =
+export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyAssessmentDto> =
   z.object({
-    status: z.enum(["FINISHED", "ABANDONED"]),
+    status: z.enum(["FINISHED", "ABANDONED"], {
+      error: localization.invalidEnum,
+    }),
     conventionId: z.string(),
     establishmentFeedback: zStringMinLength1,
   });

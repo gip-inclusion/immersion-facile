@@ -6,6 +6,7 @@ import {
   localization,
   phoneNumberSchema,
   siretSchema,
+  type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
   zStringCanBeEmpty,
   zStringMinLength1,
@@ -35,7 +36,7 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
   localization.invalidImmersionObjective,
 );
 
-const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailPublicV2Dto> =
+const contactEstablishmentByMailSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentByMailPublicV2Dto> =
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
@@ -55,7 +56,7 @@ const contactEstablishmentInPersonSchema = z.object({
   contactMode: preferInPersonContactSchema,
 });
 
-export const contactEstablishmentPublicV2Schema: z.Schema<ContactEstablishmentPublicV2Dto> =
+export const contactEstablishmentPublicV2Schema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentPublicV2Dto> =
   z.union([
     contactEstablishmentByMailSchema,
     contactEstablishmentByPhoneSchema,

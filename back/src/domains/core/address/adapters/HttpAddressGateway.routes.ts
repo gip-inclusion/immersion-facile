@@ -1,4 +1,7 @@
-import type { OpenCageGeoSearchKey } from "shared";
+import type {
+  OpenCageGeoSearchKey,
+  ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import type { GeoCodingQueryParams } from "./HttpAddressGateway.dto";
@@ -11,13 +14,14 @@ import {
 // const apiAddressBaseUrl: AbsoluteUrl = `https://api-adresse.data.gouv.fr`;
 // const getDepartmentCodeUrl = `${apiAddressBaseUrl}/search` as const;
 
-const geoCodingQueryParamsSchema: z.Schema<GeoCodingQueryParams> = z.object({
-  q: z.string(),
-  key: z.string(),
-  language: z.string().optional(),
-  countrycode: z.string().optional(),
-  limit: z.string().optional(),
-});
+const geoCodingQueryParamsSchema: ZodSchemaWithInputMatchingOutput<GeoCodingQueryParams> =
+  z.object({
+    q: z.string(),
+    key: z.string(),
+    language: z.string().optional(),
+    countrycode: z.string().optional(),
+    limit: z.string().optional(),
+  });
 
 type GeoSearchQueryParams = {
   q: string;
@@ -26,22 +30,25 @@ type GeoSearchQueryParams = {
   limit?: string;
 };
 
-const geoSearchQueryParamsSchema: z.Schema<GeoSearchQueryParams> = z.object({
-  q: z.string(),
-  language: z.string().optional(),
-  countrycode: z.string().optional(),
-  limit: z.string().optional(),
-});
+const geoSearchQueryParamsSchema: ZodSchemaWithInputMatchingOutput<GeoSearchQueryParams> =
+  z.object({
+    q: z.string(),
+    language: z.string().optional(),
+    countrycode: z.string().optional(),
+    limit: z.string().optional(),
+  });
 
 type GeoSearchHeaders = {
   "OpenCage-Geosearch-Key": OpenCageGeoSearchKey;
   Origin: string;
 };
 
-const geoSearchHeadersSchema: z.Schema<GeoSearchHeaders> = z.object({
-  "OpenCage-Geosearch-Key": z.string() as z.Schema<OpenCageGeoSearchKey>,
-  Origin: z.string(),
-});
+const geoSearchHeadersSchema: ZodSchemaWithInputMatchingOutput<GeoSearchHeaders> =
+  z.object({
+    "OpenCage-Geosearch-Key":
+      z.string() as ZodSchemaWithInputMatchingOutput<OpenCageGeoSearchKey>,
+    Origin: z.string(),
+  });
 
 const openCageDataBaseUrl = "https://api.opencagedata.com" as const;
 

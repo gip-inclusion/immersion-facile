@@ -1,4 +1,9 @@
-import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import {
+  type AbsoluteUrl,
+  localization,
+  withAuthorizationHeaders,
+  type ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 
@@ -15,10 +20,12 @@ type ProConnectAccessTokenResponse = {
   id_token: string;
 };
 
-const proConnectAccessTokenResponseSchema: z.Schema<ProConnectAccessTokenResponse> =
+const proConnectAccessTokenResponseSchema: ZodSchemaWithInputMatchingOutput<ProConnectAccessTokenResponse> =
   z.object({
     access_token: z.string(),
-    token_type: z.enum(["Bearer"]),
+    token_type: z.enum(["Bearer"], {
+      error: localization.invalidEnum,
+    }),
     expires_in: z.number(),
     id_token: z.string(),
   });
@@ -35,7 +42,7 @@ export const makeProConnectRoutes = (proConnectBaseUrl: AbsoluteUrl) =>
       method: "post",
       url: `${proConnectBaseUrl}/token`,
       requestBodySchema: z.string(),
-      headersSchema: withContentTypeUrlEncodedSchema.passthrough(),
+      headersSchema: withContentTypeUrlEncodedSchema.loose(),
       responses: { 200: proConnectAccessTokenResponseSchema },
     }),
     getUserInfo: defineRoute({

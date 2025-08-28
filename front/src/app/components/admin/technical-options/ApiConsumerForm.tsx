@@ -4,7 +4,7 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { keys } from "ramda";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -31,7 +31,7 @@ export const ApiConsumerForm = ({
 }) => {
   const dispatch = useDispatch();
   const methods = useForm<ApiConsumer>({
-    resolver: zodResolver(apiConsumerSchema),
+    resolver: standardSchemaResolver(apiConsumerSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });

@@ -462,9 +462,9 @@ describe("search route", () => {
         body: {
           status: 400,
           issues: [
-            "latitude : Expected number, received nan",
-            "longitude : Expected number, received nan",
-            "distanceKm : Expected number, received nan",
+            "latitude : Invalid input: expected number, received NaN",
+            "longitude : Invalid input: expected number, received NaN",
+            "distanceKm : Invalid input: expected number, received NaN",
           ],
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/search",

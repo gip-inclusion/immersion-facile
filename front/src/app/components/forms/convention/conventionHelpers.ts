@@ -1,12 +1,12 @@
 import {
   agencyKindSchema,
   type ConventionReadDto,
-  conventionSchema,
+  conventionReadSchema, conventionSchema,
   type EstablishmentTutor,
   type InternshipKind,
-  type OmitFromExistingKeys,
-  refersToAgencyIdSchema,
+  type OmitFromExistingKeys, refersToAgencyIdSchema,
   type Signatories,
+  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -32,7 +32,7 @@ type WithFromPeConnectedUser = {
   fromPeConnectedUser?: boolean;
 };
 
-export type ConventionPresentation = OmitFromExistingKeys<
+export type CreateConventionPresentationInitialValues = OmitFromExistingKeys<
   Partial<ConventionReadDto>,
   | "agencyName"
   | "agencyCounsellorEmails"
@@ -44,7 +44,18 @@ export type ConventionPresentation = OmitFromExistingKeys<
   WithIntershipKind &
   WithFromPeConnectedUser;
 
-export const conventionPresentationSchema: z.Schema<ConventionPresentation> =
+export type ConventionPresentation = OmitFromExistingKeys<
+  ConventionReadDto,
+  | "agencyKind"
+  | "agencyName"
+  | "agencyCounsellorEmails"
+  | "agencyValidatorEmails"
+  | "agencySiret"
+> &
+  WithSignatures &
+  WithFromPeConnectedUser;
+
+export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<ConventionPresentation> =
   conventionSchema.and(
     z.object({
       agencyDepartment: z.string(),
@@ -62,7 +73,7 @@ export type WithStatusJustification = {
   statusJustification: string;
 };
 
-export const statusJustificationSchema: z.Schema<WithStatusJustification> =
+export const statusJustificationSchema: ZodSchemaWithInputMatchingOutput<WithStatusJustification> =
   z.object({
     statusJustification: zStringMinLength1,
   });

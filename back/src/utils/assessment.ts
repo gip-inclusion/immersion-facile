@@ -1,5 +1,6 @@
 import {
   type AgencyDto,
+  type AssessmentDto,
   type AssessmentMode,
   assessmentDtoSchema,
   type ConventionDto,
@@ -10,6 +11,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   legacyAssessmentDtoSchema,
   type Role,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
 import { getUserWithRights } from "../domains/connected-users/helpers/userRights.helper";
@@ -56,13 +58,15 @@ export const throwForbiddenIfNotAllowedForAssessments = async ({
   }
 };
 
-export const assessmentEntitySchema: z.Schema<AssessmentEntity> =
-  assessmentDtoSchema.or(legacyAssessmentDtoSchema).and(
-    z.object({
-      _entityName: z.literal("Assessment"),
-      numberOfHoursActuallyMade: z.number().or(z.null()),
-    }),
-  );
+export const assessmentEntitySchema: ZodSchemaWithInputMatchingOutput<AssessmentEntity> =
+  (assessmentDtoSchema as ZodSchemaWithInputMatchingOutput<AssessmentDto>)
+    .or(legacyAssessmentDtoSchema)
+    .and(
+      z.object({
+        _entityName: z.literal("Assessment"),
+        numberOfHoursActuallyMade: z.number().or(z.null()),
+      }),
+    );
 
 const assessmentEmailsByRole = (
   convention: ConventionDto,

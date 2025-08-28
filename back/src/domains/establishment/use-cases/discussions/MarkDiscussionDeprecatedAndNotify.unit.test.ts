@@ -22,7 +22,7 @@ import {
 
 describe("MarkDiscussionDeprecatedAndNotify", () => {
   const discussion = new DiscussionBuilder()
-    .withId("11111111-1111-a111-1111-111111111111")
+    .withId("11111111-1111-4111-a111-111111111111")
     .build();
 
   const admin = new ConnectedUserBuilder()

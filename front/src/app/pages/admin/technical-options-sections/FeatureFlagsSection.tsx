@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { keys } from "ramda";
 import type { ReactNode } from "react";
 import { ErrorNotifications } from "react-design-system";
@@ -168,7 +168,7 @@ const FeatureFlagTextWithSeverityForm = ({
   >({
     defaultValues: featureFlag.value,
     mode: "onTouched",
-    resolver: zodResolver(featureFlagTextWithSeverityValueSchema),
+    resolver: standardSchemaResolver(featureFlagTextWithSeverityValueSchema),
   });
 
   const { getFormErrors, getFormFields } = getFormContents(
@@ -238,7 +238,9 @@ const FeatureFlagTextImageAndRedirectForm = ({
   >({
     defaultValues: featureFlag.value,
     mode: "onTouched",
-    resolver: zodResolver(featureFlagTextImageAndRedirectValueSchema),
+    resolver: standardSchemaResolver(
+      featureFlagTextImageAndRedirectValueSchema,
+    ),
   });
   const { getFormErrors, getFormFields } = getFormContents(
     formTextImageAndRedirectFieldsLabels,
@@ -332,7 +334,7 @@ const FeatureFlagHighlightForm = ({
   >({
     defaultValues: featureFlag.value,
     mode: "onTouched",
-    resolver: zodResolver(featureFlagHighlightValueSchema),
+    resolver: standardSchemaResolver(featureFlagHighlightValueSchema),
   });
   const { getFormErrors, getFormFields } = getFormContents(
     formHighlightFieldsLabels,
