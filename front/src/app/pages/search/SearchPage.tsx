@@ -310,7 +310,7 @@ export const SearchPage = ({
                 </div>
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
                   <Select
-                    label="Distance maximum"
+                    label="Dans un rayon de :"
                     options={radiusOptions}
                     disabled={!lat || !lon}
                     nativeSelectProps={{
