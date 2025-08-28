@@ -586,7 +586,7 @@ export const renewConventionParamsSchema: ZodSchemaWithInputMatchingOutput<Renew
     .superRefine((renewConventionParams, issueMaker) => {
       const addIssue = (message: string, path: string) => {
         issueMaker.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message,
           path: [path],
         });
