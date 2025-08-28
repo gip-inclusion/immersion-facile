@@ -1,15 +1,12 @@
 import { partition, uniqBy } from "ramda";
 import {
   type AbsoluteUrl,
-  type AgencyDto,
-  type AgencyRole,
   type AgencyWithUsersRights,
   type ConventionDto,
   type ConventionId,
   calculateDurationInSecondsFrom,
   castError,
   type DateRange,
-  type Email,
   errors,
   executeInSequence,
   frontRoutes,
@@ -21,7 +18,6 @@ import {
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import type { ConventionQueries } from "../../convention/ports/ConventionQueries";
@@ -215,11 +211,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
-    const conventionAdvisorEntity =
-      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
-        convention.id,
-      );
-
     const alreadySentNotifications =
       await uow.notificationRepository.getEmailsByFilters({
         conventionId: convention.id,
@@ -265,13 +256,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
                     lifetime: "short",
                   }),
               }),
-              ...(convention.internshipKind === "immersion"
-                ? this.#makeAgencyAssessmentNotifications(
-                    convention,
-                    await agencyWithRightToAgencyDto(uow, agency),
-                    conventionAdvisorEntity?.advisor?.email,
-                  )
-                : []),
             ]
           : []),
         ...(isBeneficiaryNotificationNotSent
@@ -340,62 +324,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
         establishmentSiret: convention.siret,
       },
     };
-  }
-
-  #makeAgencyAssessmentNotifications(
-    convention: ConventionDto,
-    agency: AgencyDto,
-    advisorEmail: Email | undefined,
-  ): NotificationContentAndFollowedIds[] {
-    const emailsToSendWithRole: { email: Email; role: AgencyRole }[] =
-      advisorEmail
-        ? [{ email: advisorEmail, role: "validator" }]
-        : [
-            ...agency.validatorEmails.map((email) => ({
-              email,
-              role: "validator" as const,
-            })),
-            ...agency.counsellorEmails.map((email) => ({
-              email,
-              role: "counsellor" as const,
-            })),
-          ];
-
-    return emailsToSendWithRole.map(({ email, role }) => ({
-      kind: "email",
-      templatedContent: {
-        kind: "ASSESSMENT_AGENCY_NOTIFICATION",
-        recipients: [email],
-        sender: immersionFacileNoReplyEmailSender,
-        params: {
-          agencyReferentName: getFormattedFirstnameAndLastname(
-            convention.agencyReferent ?? {},
-          ),
-          beneficiaryFirstName: getFormattedFirstnameAndLastname({
-            firstname: convention.signatories.beneficiary.firstName,
-          }),
-          beneficiaryLastName: getFormattedFirstnameAndLastname({
-            lastname: convention.signatories.beneficiary.lastName,
-          }),
-          conventionId: convention.id,
-          internshipKind: convention.internshipKind,
-          businessName: convention.businessName,
-          agencyLogoUrl: agency.logoUrl ?? undefined,
-          assessmentCreationLink: this.#generateConventionMagicLinkUrl({
-            id: convention.id,
-            email,
-            role,
-            targetRoute: frontRoutes.assessment,
-            now: this.#timeGateway.now(),
-          }),
-        },
-      },
-      followedIds: {
-        agencyId: convention.agencyId,
-        conventionId: convention.id,
-        establishmentSiret: convention.siret,
-      },
-    }));
   }
 
   #makeTutorAssessmentNotification({
