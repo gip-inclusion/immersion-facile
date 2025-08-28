@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 import { useForm } from "react-hook-form";
 import {
@@ -16,7 +16,7 @@ import { BackofficeDashboardTabContent } from "../../layout/BackofficeDashboardT
 export const ManageEstablishment = (): JSX.Element => {
   const { register, handleSubmit, formState, setValue } =
     useForm<ManageEstablishmentAdminForm>({
-      resolver: zodResolver(manageEstablishmentAdminFormSchema),
+      resolver: standardSchemaResolver(manageEstablishmentAdminFormSchema),
       mode: "onTouched",
     });
   return (

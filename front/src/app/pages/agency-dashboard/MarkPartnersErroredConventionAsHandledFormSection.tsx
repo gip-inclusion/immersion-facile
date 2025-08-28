@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 import { HeadingSection } from "react-design-system";
 import { createPortal } from "react-dom";
@@ -34,7 +34,9 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
   isPeUser: boolean;
 }) => {
   const methods = useForm<MarkPartnersErroredConventionAsHandledRequest>({
-    resolver: zodResolver(markPartnersErroredConventionAsHandledRequestSchema),
+    resolver: standardSchemaResolver(
+      markPartnersErroredConventionAsHandledRequestSchema,
+    ),
     mode: "onTouched",
   });
 

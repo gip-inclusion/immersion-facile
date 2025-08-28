@@ -3,7 +3,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ProConnectButton from "@codegouvfr/react-dsfr/ProConnectButton";
 import Tile from "@codegouvfr/react-dsfr/Tile";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 import { type ReactElement, type ReactNode, useEffect } from "react";
 import {
@@ -440,7 +440,7 @@ const LoginWithEmail = ({ page }: { page: AllowedLoginSource }) => {
   const methods = useForm<{
     email: Email;
   }>({
-    resolver: zodResolver(z.object({ email: emailSchema })),
+    resolver: standardSchemaResolver(z.object({ email: emailSchema })),
     mode: "onTouched",
   });
   const dispatch = useDispatch();

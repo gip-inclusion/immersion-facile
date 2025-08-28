@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -30,10 +30,8 @@ export const JustificationModalContent = ({
   currentSignatoryRoles: Role[];
   onModalPropsChange: (props: Partial<ModalWrapperProps>) => void;
 }) => {
-  const { register, handleSubmit, formState } = useForm<
-    Partial<UpdateConventionStatusRequestDto>
-  >({
-    resolver: zodResolver(updateConventionStatusRequestSchema),
+  const { register, handleSubmit, formState } = useForm({
+    resolver: standardSchemaResolver(updateConventionStatusRequestSchema),
     mode: "onTouched",
     defaultValues: {
       status: newStatus,

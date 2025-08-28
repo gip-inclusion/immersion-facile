@@ -1,5 +1,6 @@
 import {
   type AgencyDto,
+  type AssessmentDto,
   type AssessmentMode,
   assessmentDtoSchema,
   type ConventionDto,
@@ -58,12 +59,14 @@ export const throwForbiddenIfNotAllowedForAssessments = async ({
 };
 
 export const assessmentEntitySchema: ZodSchemaWithInputMatchingOutput<AssessmentEntity> =
-  assessmentDtoSchema.or(legacyAssessmentDtoSchema).and(
-    z.object({
-      _entityName: z.literal("Assessment"),
-      numberOfHoursActuallyMade: z.number().or(z.null()),
-    }),
-  );
+  (assessmentDtoSchema as ZodSchemaWithInputMatchingOutput<AssessmentDto>)
+    .or(legacyAssessmentDtoSchema)
+    .and(
+      z.object({
+        _entityName: z.literal("Assessment"),
+        numberOfHoursActuallyMade: z.number().or(z.null()),
+      }),
+    );
 
 const assessmentEmailsByRole = (
   convention: ConventionDto,

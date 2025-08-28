@@ -15,7 +15,7 @@ const logger = createLogger(__filename);
 
 type UseCaseBuilder<Output, Input, Deps, CurrentUser> = {
   withInput: <I>(
-    schema: ZodSchemaWithInputMatchingOutput<I>,
+    schema: z.ZodType<I, any>,
   ) => UseCaseBuilder<Output, I, Deps, CurrentUser>;
   withOutput: <O>() => UseCaseBuilder<O, Input, Deps, CurrentUser>;
   withDeps: <D>() => UseCaseBuilder<Output, Input, D, CurrentUser>;
