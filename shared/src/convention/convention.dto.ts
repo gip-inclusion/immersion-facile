@@ -375,10 +375,6 @@ export type GenerateMagicLinkRequestDto = {
   expired: boolean;
 };
 
-export type GenerateMagicLinkResponseDto = {
-  jwt: string;
-};
-
 export type RenewMagicLinkRequestDto = {
   originalUrl: string;
   expiredJwt: AppSupportedJwt;

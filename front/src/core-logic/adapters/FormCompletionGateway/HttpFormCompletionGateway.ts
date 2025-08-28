@@ -9,8 +9,11 @@ import {
   siretApiUnavailableSiretErrorMessage,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
-import type { HttpClient, HttpResponse } from "shared-routes";
-import type { ResponsesToHttpResponse } from "shared-routes/defineRoutes";
+import type {
+  HttpClient,
+  HttpResponse,
+  ResponsesToHttpResponse,
+} from "shared-routes";
 import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
 import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 import { match, P } from "ts-pattern";

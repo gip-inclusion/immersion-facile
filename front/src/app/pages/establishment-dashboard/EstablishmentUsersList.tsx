@@ -7,7 +7,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { uniqBy } from "ramda";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { NotificationIndicator } from "react-design-system";
@@ -232,7 +232,7 @@ const EstablishmentUsersEditForm = ({
     isMainContactByPhone: false,
   });
   const methods = useForm<FormEstablishmentUserRight>({
-    resolver: zodResolver(formEstablishmentUserRightSchema),
+    resolver: standardSchemaResolver(formEstablishmentUserRightSchema),
     defaultValues: alreadyExistingUserRight ?? emptyValues.current,
   });
 

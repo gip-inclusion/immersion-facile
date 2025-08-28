@@ -4,7 +4,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import {
   type Dispatch,
   type ElementRef,
@@ -60,6 +60,7 @@ import {
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import {
   type ConventionPresentation,
+  type CreateConventionPresentationInitialValues,
   conventionPresentationSchema,
   undefinedIfEmptyString,
 } from "src/app/components/forms/convention/conventionHelpers";
@@ -155,7 +156,7 @@ export const ConventionForm = ({
   });
   const acquisitionParams = useGetAcquisitionParams();
 
-  const initialValues = useRef<ConventionPresentation>({
+  const initialValues = useRef<CreateConventionPresentationInitialValues>({
     ...conventionInitialValuesFromUrl,
     ...acquisitionParams,
     signatories: {
@@ -181,15 +182,16 @@ export const ConventionForm = ({
     initialValues,
     mode,
   );
-  const defaultValues = creationFormModes.includes(
-    mode as ExcludeFromExisting<ConventionFormMode, "edit">,
-  )
-    ? initialValues
-    : fetchedConvention || initialValues;
+  const defaultValues: CreateConventionPresentationInitialValues =
+    creationFormModes.includes(
+      mode as ExcludeFromExisting<ConventionFormMode, "edit">,
+    )
+      ? initialValues
+      : fetchedConvention || initialValues;
 
-  const methods = useForm<Required<ConventionPresentation>>({
+  const methods = useForm<ConventionPresentation>({
     defaultValues,
-    resolver: zodResolver(conventionPresentationSchema),
+    resolver: standardSchemaResolver(conventionPresentationSchema),
     mode: "onTouched",
   });
 
@@ -228,9 +230,7 @@ export const ConventionForm = ({
     conventionValues.internshipKind ?? "immersion",
   );
 
-  const onSubmit: SubmitHandler<Required<ConventionPresentation>> = (
-    convention,
-  ) => {
+  const onSubmit: SubmitHandler<ConventionPresentation> = (convention) => {
     const selectedAgency = agencyOptions.find(
       (agencyOption) => agencyOption.id === convention.agencyId,
     );
@@ -732,7 +732,7 @@ const makeInitialBenefiaryForm = (
 };
 
 const useWaitForReduxFormUiReadyBeforeInitialisation = (
-  initialValues: ConventionPresentation,
+  initialValues: CreateConventionPresentationInitialValues,
   mode: ConventionFormMode,
 ) => {
   const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);

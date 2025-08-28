@@ -1,6 +1,6 @@
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionId,
@@ -20,7 +20,7 @@ export const EditCounsellorNameModalContent = ({
   conventionId: ConventionId;
 }) => {
   const { register, handleSubmit } = useForm<WithOptionalFirstnameAndLastname>({
-    resolver: zodResolver(withOptionalFirstnameAndLastnameSchema),
+    resolver: standardSchemaResolver(withOptionalFirstnameAndLastnameSchema),
     mode: "onTouched",
   });
   const onFormSubmit: SubmitHandler<WithOptionalFirstnameAndLastname> = ({

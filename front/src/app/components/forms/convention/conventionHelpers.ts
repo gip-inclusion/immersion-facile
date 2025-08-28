@@ -1,11 +1,10 @@
 import {
   agencyKindSchema,
   type ConventionReadDto,
-  conventionSchema,
+  conventionReadSchema, conventionSchema,
   type EstablishmentTutor,
   type InternshipKind,
-  type OmitFromExistingKeys,
-  refersToAgencyIdSchema,
+  type OmitFromExistingKeys, refersToAgencyIdSchema,
   type Signatories,
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
@@ -33,7 +32,7 @@ type WithFromPeConnectedUser = {
   fromPeConnectedUser?: boolean;
 };
 
-export type ConventionPresentation = OmitFromExistingKeys<
+export type CreateConventionPresentationInitialValues = OmitFromExistingKeys<
   Partial<ConventionReadDto>,
   | "agencyName"
   | "agencyCounsellorEmails"
@@ -43,6 +42,17 @@ export type ConventionPresentation = OmitFromExistingKeys<
   WithSignatures &
   WithEstablishmentTutor &
   WithIntershipKind &
+  WithFromPeConnectedUser;
+
+export type ConventionPresentation = OmitFromExistingKeys<
+  ConventionReadDto,
+  | "agencyKind"
+  | "agencyName"
+  | "agencyCounsellorEmails"
+  | "agencyValidatorEmails"
+  | "agencySiret"
+> &
+  WithSignatures &
   WithFromPeConnectedUser;
 
 export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<ConventionPresentation> =

@@ -118,29 +118,35 @@ const commonAgencyShape = {
   phoneNumber: phoneNumberSchema,
 };
 
-export const createAgencySchema: ZodSchemaWithInputMatchingOutput<CreateAgencyDto> =
-  z
-    .object({ ...commonAgencyShape, ...withEmails })
-    .and(
-      z.object({
-        refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
-        refersToAgencyName: zStringMinLength1.or(z.null()),
-      }),
-    )
-    .and(withAcquisitionSchema)
-    .superRefine((createAgency, context) => {
-      if (
-        createAgency.refersToAgencyId &&
-        !createAgency.counsellorEmails.length
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: ["counsellorEmails"],
-          message:
-            "Une structure d'accompagnement doit avoir au moins un email de conseiller pour examen préabable",
-        });
-      }
-    });
+export type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
+  kind: AgencyKind | "";
+};
+
+export const createAgencySchema: z.ZodType<
+  CreateAgencyDto,
+  CreateAgencyInitialValues
+> = z
+  .object({ ...commonAgencyShape, ...withEmails })
+  .and(
+    z.object({
+      refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+      refersToAgencyName: zStringMinLength1.or(z.null()),
+    }),
+  )
+  .and(withAcquisitionSchema)
+  .superRefine((createAgency, context) => {
+    if (
+      createAgency.refersToAgencyId &&
+      !createAgency.counsellorEmails.length
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["counsellorEmails"],
+        message:
+          "Une structure d'accompagnement doit avoir au moins un email de conseiller pour examen préabable",
+      });
+    }
+  });
 
 export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
   .object({ ...commonAgencyShape, ...withEmails })

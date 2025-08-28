@@ -6,6 +6,7 @@ import {
   castError,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
+import type { z } from "zod";
 import { validateAndParseZodSchemaV2 } from "../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../utils/logger";
 import type { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
@@ -72,7 +73,7 @@ export abstract class TransactionalUseCase<
   Output = void,
   JWTPayload = ConventionJwtPayload,
 > {
-  protected abstract inputSchema: ZodSchemaWithInputMatchingOutput<Input>;
+  protected abstract inputSchema: z.ZodType<Input, any>;
 
   public constructor(private uowPerformer: UnitOfWorkPerformer) {}
 

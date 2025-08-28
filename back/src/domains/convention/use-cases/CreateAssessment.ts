@@ -72,7 +72,7 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
             topic: "AssessmentCreated",
             payload: {
               convention,
-              assessment: assessment,
+              assessment,
               triggeredBy,
             },
           }),
