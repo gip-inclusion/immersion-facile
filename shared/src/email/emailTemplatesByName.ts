@@ -113,6 +113,7 @@ export const emailTemplatesByName =
         assessmentCreationLink,
         beneficiaryFirstName,
         beneficiaryLastName,
+        tutorEmail,
         businessName,
         conventionId,
         internshipKind,
@@ -120,13 +121,16 @@ export const emailTemplatesByName =
         subject: `Immersion Facilitée - Bilan disponible pour l'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      ${
-        internshipKind === "immersion"
-          ? "L'immersion professionnelle"
-          : "Le mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l’entreprise ${businessName} est en passe de s'achever.
-
-      Nous venons d’envoyer le bilan de l’immersion à l’entreprise. Vous pouvez, si vous le souhaitez, les contacter par téléphone pour les accompagner dans la saisie du bilan.
+        Nous constatons que le bilan ${
+          internshipKind === "immersion"
+            ? " de l'immersion professionnelle"
+            : " du mini stage"
+        } de ${beneficiaryFirstName} ${beneficiaryLastName} n'a pas encore été complété par l’entreprise ${businessName}.
+      
+      Afin de clôturer cette étape, vous pouvez:
+      
+      1. <a href="mailto:${tutorEmail}" target="_blank">Relancer directement l'entreprise</a> pour qu'elle remplisse le bilan en ligne.
+      2. Les contacter par téléphone pour les accompagner dans la saisie du bilan.
       `,
         buttons: [
           {
@@ -135,7 +139,6 @@ export const emailTemplatesByName =
           },
         ],
         subContent: `
-      Ces informations sont importantes pour la suite du parcours professionnel de ${beneficiaryFirstName} ${beneficiaryLastName}.    
       ${
         agencyReferentName &&
         `
