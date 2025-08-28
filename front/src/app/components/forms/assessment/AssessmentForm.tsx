@@ -3,11 +3,10 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import Select from "@codegouvfr/react-dsfr/SelectNext";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { keys } from "ramda";
-
 import { type ChangeEvent, useEffect, useState } from "react";
 import {
   ConventionJobAndObjective,
@@ -22,18 +21,16 @@ import {
   assessmentDtoSchema,
   assessmentStatuses,
   type ConventionDto,
-  type ConventionId,
   type ConventionReadDto,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   type DotNestedKeys,
   domElementIds,
+  type FormAssessmentDto,
   type InternshipKind,
   type Role,
   toDisplayedDate,
   typeOfContracts,
-  type WithEndedWithAJob,
-  type WithEstablishmentComments,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ImmersionDescription } from "src/app/components/forms/assessment/ImmersionDescription";
@@ -49,15 +46,7 @@ type AssessmentFormProperties = {
   currentUserRoles: Role[];
 };
 
-type FormAssessmentDto =
-  | AssessmentDto
-  | ({
-      conventionId: ConventionId;
-    } & (WithEndedWithAJob | { endedWithAJob: null }) &
-      WithEstablishmentComments & { status: null });
-
 export type OnStepChange = (
-  // @TODO: make it generic to handle FormEstablishment and AssessmentForm
   step: Step,
   fieldsToValidate: (keyof AssessmentDto | DotNestedKeys<AssessmentDto>)[],
 ) => void;
@@ -93,13 +82,19 @@ export const AssessmentForm = ({
     status: null,
   };
   const methods = useForm<FormAssessmentDto>({
-    resolver: zodResolver(assessmentDtoSchema),
+    resolver: standardSchemaResolver(assessmentDtoSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });
   const { handleSubmit, trigger } = methods;
 
   const onSubmit = (values: FormAssessmentDto) => {
+    if (values.status === null || values.endedWithAJob === null) {
+      throw new Error(
+        "Form validation failed: status or endedWithAJob is null",
+      );
+    }
+
     dispatch(
       assessmentSlice.actions.creationRequested({
         assessmentAndJwt: {
@@ -204,7 +199,7 @@ const AssessmentStatusSection = ({
   onStepChange: OnStepChange;
 }) => {
   const { register, formState, watch, setValue } =
-    useFormContext<FormAssessmentDto>();
+    useFormContext<AssessmentDto>();
   const getFieldError = makeFieldError(formState);
   const formValues = watch();
   const [numberOfMissedHoursDisplayed, setNumberOfMissedHoursDisplayed] =
@@ -584,7 +579,11 @@ export const formAssessmentDtoToAssessmentDto = (
     };
   }
 
-  if (formAssessmentDto.endedWithAJob) {
+  if (
+    formAssessmentDto.endedWithAJob &&
+    formAssessmentDto.typeOfContract &&
+    formAssessmentDto.contractStartDate
+  ) {
     assessmentDto = {
       ...assessmentDto,
       endedWithAJob: true,
@@ -593,7 +592,11 @@ export const formAssessmentDtoToAssessmentDto = (
     };
   }
 
-  if (formAssessmentDto.status === "PARTIALLY_COMPLETED") {
+  if (
+    formAssessmentDto.status === "PARTIALLY_COMPLETED" &&
+    formAssessmentDto.lastDayOfPresence &&
+    formAssessmentDto.numberOfMissedHours !== undefined
+  ) {
     assessmentDto = {
       ...assessmentDto,
       status: "PARTIALLY_COMPLETED",

@@ -27,8 +27,7 @@ import {
   toAgencyDtoForAgencyUsersAndAdmins,
   type User,
 } from "shared";
-import type { HttpClient } from "shared-routes";
-import type { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
+import type { HttpClient, ResponsesToHttpResponse } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";

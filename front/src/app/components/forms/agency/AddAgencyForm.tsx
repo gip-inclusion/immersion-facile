@@ -5,7 +5,7 @@ import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ErrorNotifications,
@@ -16,10 +16,9 @@ import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AgencyDto,
-  type AgencyKind,
   type AllowedAgencyKindToAdd,
   allAgencyKindsAllowedToAdd,
-  type CreateAgencyDto,
+  type CreateAgencyInitialValues,
   createAgencySchema,
   type DepartmentCode,
   domElementIds,
@@ -50,10 +49,6 @@ import {
 } from "src/core-logic/domain/agencies/agencies.slice";
 import { match, P } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
-
-type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
-  kind: AgencyKind | "";
-};
 
 export const AddAgencyForm = () => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
@@ -154,7 +149,7 @@ const AgencyForm = ({
     [refersToOtherAgency, acquisitionParams],
   );
   const methods = useForm<CreateAgencyInitialValues>({
-    resolver: zodResolver(createAgencySchema),
+    resolver: standardSchemaResolver(createAgencySchema),
     mode: "onTouched",
     defaultValues: formInitialValues,
   });

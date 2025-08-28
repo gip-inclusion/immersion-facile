@@ -1,6 +1,6 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -68,7 +68,7 @@ export const ShareForm = ({
       ...conventionFormData,
       link: window.location.href,
     }),
-    resolver: zodResolver(shareLinkByEmailSchema),
+    resolver: standardSchemaResolver(shareLinkByEmailSchema),
   });
   const { register, handleSubmit, formState, reset } = methods;
 
