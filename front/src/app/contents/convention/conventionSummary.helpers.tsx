@@ -293,6 +293,15 @@ const makeSignatoriesSubsections = (
           key: "establishmentRepSiret",
           label: "SIRET",
           value: renderSiret(convention.siret),
+          copyButton: (
+            <CopyButton
+              withIcon={true}
+              textToCopy={convention.siret}
+              label="Copier le SIRET"
+              iconOnly
+              className="fr-ml-1v"
+            />
+          ),
         },
       ]),
     },
