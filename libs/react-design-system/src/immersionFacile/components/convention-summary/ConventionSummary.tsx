@@ -247,7 +247,7 @@ const SubSection = ({
                         </dt>
                         <dd
                           className={cx(
-                            fr.cx("fr-text--sm", "fr-m-0"),
+                            fr.cx("fr-text--sm", "fr-m-0", "fr-mr-2w"),
                             conventionSummaryStyles.subsectionValue,
                           )}
                           id={`${conventionSummaryStyles.subsectionValue}-${field.key}`}
