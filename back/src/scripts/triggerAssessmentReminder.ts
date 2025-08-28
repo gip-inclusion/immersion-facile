@@ -34,7 +34,7 @@ const triggerAssessmentReminder = async () => {
     notificationRepository: new PgNotificationRepository(kyselyDb),
   };
 
-  const { numberOfReminders: numberOfFirstReminders } =
+  const { numberOfConventionsReminded: numberOfFirstReminders } =
     await makeAssessmentReminder({
       uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
         .uowPerformer,
@@ -54,7 +54,7 @@ const triggerAssessmentReminder = async () => {
       },
     }).execute({ mode: "3daysAfterInitialAssessmentEmail" });
 
-  const { numberOfReminders: numberOfSecondReminders } =
+  const { numberOfConventionsReminded: numberOfSecondReminders } =
     await makeAssessmentReminder({
       uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
         .uowPerformer,

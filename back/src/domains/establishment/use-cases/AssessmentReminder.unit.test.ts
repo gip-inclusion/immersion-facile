@@ -3,6 +3,8 @@ import subDays from "date-fns/subDays";
 import {
   type AgencyDto,
   AgencyDtoBuilder,
+  type ConnectedUser,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   type DateString,
@@ -92,11 +94,11 @@ describe("AssessmentReminder", () => {
         });
       await uow.notificationRepository.save(initialEstablishmentNotification);
 
-      const { numberOfReminders } = await assessmentReminder.execute({
+      const { numberOfConventionsReminded } = await assessmentReminder.execute({
         mode: "10daysAfterInitialAssessmentEmail",
       });
 
-      expect(numberOfReminders).toBe(0);
+      expect(numberOfConventionsReminded).toBe(0);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
         initialEstablishmentNotification,
       ]);
@@ -121,11 +123,11 @@ describe("AssessmentReminder", () => {
       };
       await uow.assessmentRepository.save(assessment);
 
-      const { numberOfReminders } = await assessmentReminder.execute({
+      const { numberOfConventionsReminded } = await assessmentReminder.execute({
         mode: "3daysAfterInitialAssessmentEmail",
       });
 
-      expect(numberOfReminders).toBe(0);
+      expect(numberOfConventionsReminded).toBe(0);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
         initialEstablishmentNotification,
       ]);
@@ -137,6 +139,7 @@ describe("AssessmentReminder", () => {
     let now: Date;
     let agency: AgencyDto;
     let convention: ConventionDto;
+    let validator: ConnectedUser;
 
     beforeEach(async () => {
       now = timeGateway.now();
@@ -148,11 +151,23 @@ describe("AssessmentReminder", () => {
         .build();
 
       await uow.conventionRepository.save(convention);
-      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+      validator = new ConnectedUserBuilder()
+        .withId("validator1")
+        .withEmail("validator@mail.com")
+        .build();
+      uow.userRepository.save(validator);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      ];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([
+        "short-link-id-1",
+        "short-link-id-2",
+      ]);
     });
 
-    it("send first assessment reminder", async () => {
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(["short-link-id-1"]);
+    it("send first assessment reminder to tutor and validator", async () => {
       const initialEstablishmentNotification: Notification =
         buildEstablishmentNotificationFrom({
           convention,
@@ -160,11 +175,11 @@ describe("AssessmentReminder", () => {
         });
       await uow.notificationRepository.save(initialEstablishmentNotification);
 
-      const { numberOfReminders } = await assessmentReminder.execute({
+      const { numberOfConventionsReminded } = await assessmentReminder.execute({
         mode: "3daysAfterInitialAssessmentEmail",
       });
 
-      expect(numberOfReminders).toBe(1);
+      expect(numberOfConventionsReminded).toBe(1);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
         initialEstablishmentNotification,
         {
@@ -194,14 +209,40 @@ describe("AssessmentReminder", () => {
             },
           },
         },
+        {
+          templatedContent: {
+            kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
+              agencyReferentName: getFormattedFirstnameAndLastname(
+                convention.agencyReferent ?? {},
+              ),
+              businessName: convention.businessName,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
+            },
+            recipients: [validator.email],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        },
       ]);
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
         { topic: "NotificationAdded" },
       ]);
     });
 
-    it("send second assessment reminder", async () => {
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(["short-link-id-2"]);
+    it("send second assessment reminder to tutor and validator", async () => {
       const initialEstablishmentNotification: Notification =
         buildEstablishmentNotificationFrom({
           convention,
@@ -209,11 +250,11 @@ describe("AssessmentReminder", () => {
         });
       await uow.notificationRepository.save(initialEstablishmentNotification);
 
-      const { numberOfReminders } = await assessmentReminder.execute({
+      const { numberOfConventionsReminded } = await assessmentReminder.execute({
         mode: "10daysAfterInitialAssessmentEmail",
       });
 
-      expect(numberOfReminders).toBe(1);
+      expect(numberOfConventionsReminded).toBe(1);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
         initialEstablishmentNotification,
         {
@@ -234,9 +275,184 @@ describe("AssessmentReminder", () => {
               establishmentTutorLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.establishmentTutor.lastName,
               }),
-              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
             },
             recipients: [convention.establishmentTutor.email],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        },
+        {
+          templatedContent: {
+            kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
+              agencyReferentName: getFormattedFirstnameAndLastname(
+                convention.agencyReferent ?? {},
+              ),
+              businessName: convention.businessName,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
+            },
+            recipients: [validator.email],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        },
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        { topic: "NotificationAdded" },
+      ]);
+    });
+
+    it("when there is an advisor, send assessment reminder to tutor and advisor", async () => {
+      const advisorEmail = "john.doe@mail.fr";
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
+        [
+          {
+            _entityName: "ConventionFranceTravailAdvisor",
+            peExternalId: "pe-external-id",
+            conventionId: convention.id,
+            advisor: {
+              firstName: "John",
+              lastName: "Doe",
+              type: "PLACEMENT",
+              email: advisorEmail,
+            },
+          },
+        ],
+      );
+      const initialEstablishmentNotification: Notification =
+        buildEstablishmentNotificationFrom({
+          convention,
+          createdAt: subDays(now, 3).toISOString(),
+        });
+      await uow.notificationRepository.save(initialEstablishmentNotification);
+
+      const { numberOfConventionsReminded } = await assessmentReminder.execute({
+        mode: "3daysAfterInitialAssessmentEmail",
+      });
+
+      expect(numberOfConventionsReminded).toBe(1);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        initialEstablishmentNotification,
+        {
+          templatedContent: {
+            kind: "ASSESSMENT_ESTABLISHMENT_REMINDER",
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              establishmentTutorFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.establishmentTutor.firstName,
+              }),
+              establishmentTutorLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.establishmentTutor.lastName,
+              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
+            },
+            recipients: [convention.establishmentTutor.email],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        },
+        {
+          templatedContent: {
+            kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
+              agencyReferentName: getFormattedFirstnameAndLastname(
+                convention.agencyReferent ?? {},
+              ),
+              businessName: convention.businessName,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
+            },
+            recipients: [advisorEmail],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        },
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        { topic: "NotificationAdded" },
+      ]);
+    });
+
+    it("when internshipKind is mini-stage-cci, only send reminder to tutor and not agency", async () => {
+      const miniStageConvention = new ConventionDtoBuilder()
+        .withId("77777777-6666-4777-7777-777777777777")
+        .withInternshipKind("mini-stage-cci")
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateEnd(subMonths(now, 3).toISOString())
+        .withAgencyId(agency.id)
+        .build();
+      await uow.conventionRepository.save(miniStageConvention);
+      const initialEstablishmentNotification: Notification =
+        buildEstablishmentNotificationFrom({
+          convention: miniStageConvention,
+          createdAt: subDays(now, 3).toISOString(),
+        });
+      await uow.notificationRepository.save(initialEstablishmentNotification);
+
+      const { numberOfConventionsReminded } = await assessmentReminder.execute({
+        mode: "3daysAfterInitialAssessmentEmail",
+      });
+
+      expect(numberOfConventionsReminded).toBe(1);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        initialEstablishmentNotification,
+        {
+          templatedContent: {
+            kind: "ASSESSMENT_ESTABLISHMENT_REMINDER",
+            params: {
+              conventionId: miniStageConvention.id,
+              internshipKind: miniStageConvention.internshipKind,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  miniStageConvention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: miniStageConvention.signatories.beneficiary.lastName,
+              }),
+              establishmentTutorFirstName: getFormattedFirstnameAndLastname({
+                firstname: miniStageConvention.establishmentTutor.firstName,
+              }),
+              establishmentTutorLastName: getFormattedFirstnameAndLastname({
+                lastname: miniStageConvention.establishmentTutor.lastName,
+              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
+            },
+            recipients: [miniStageConvention.establishmentTutor.email],
             sender: {
               email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
               name: "Immersion Facilitée",
