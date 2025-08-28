@@ -313,6 +313,7 @@ const sendAgencyAssessmentReminder = async ({
             businessName: convention.businessName,
             agencyLogoUrl: agency.logoUrl ?? undefined,
             assessmentCreationLink,
+            tutorEmail: convention.establishmentTutor.email,
           },
         },
         followedIds: {
