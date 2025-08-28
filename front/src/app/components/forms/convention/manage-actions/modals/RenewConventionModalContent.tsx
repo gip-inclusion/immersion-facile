@@ -6,7 +6,6 @@ import { ErrorNotifications } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   type ConventionDto,
-  type ConventionReadDto,
   type DateIntervalDto,
   domElementIds,
   type RenewConventionParams,
@@ -23,8 +22,8 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { v4 as uuidV4 } from "uuid";
 
-type RenewConventionParamsInForm = RenewConventionParams &
-  Pick<ConventionReadDto, "internshipKind" | "signatories">;
+type RenewConventionParamsInForm = RenewConventionParams;
+// Pick<ConventionReadDto, "internshipKind" | "signatories">;
 
 export const RenewConventionModalContent = ({
   onSubmit,
@@ -55,6 +54,7 @@ export const RenewConventionModalContent = ({
     },
     signatories: convention.signatories,
   };
+
   const methods = useForm<RenewConventionParamsInForm>({
     defaultValues,
     resolver: zodResolver(renewConventionParamsSchema),
@@ -63,10 +63,8 @@ export const RenewConventionModalContent = ({
   const { errors, submitCount } = methods.formState;
   const getFieldError = makeFieldError(methods.formState);
 
-  const conventionValues = methods.getValues();
-
   const { getFormErrors } = getFormContents(
-    formConventionFieldsLabels(conventionValues.internshipKind),
+    formConventionFieldsLabels(convention.internshipKind),
   );
 
   return (
@@ -86,7 +84,7 @@ export const RenewConventionModalContent = ({
             defaultValue: defaultValues.id,
           }}
         />
-        <ScheduleSection />
+        <ScheduleSection internshipKind={convention.internshipKind} />
         <Input
           label="Motif de renouvellement *"
           textArea

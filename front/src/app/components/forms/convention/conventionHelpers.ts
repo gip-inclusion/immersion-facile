@@ -1,10 +1,11 @@
 import {
   agencyKindSchema,
   type ConventionReadDto,
-  conventionReadSchema, conventionSchema,
+  conventionSchema,
   type EstablishmentTutor,
   type InternshipKind,
-  type OmitFromExistingKeys, refersToAgencyIdSchema,
+  type OmitFromExistingKeys,
+  refersToAgencyIdSchema,
   type Signatories,
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,

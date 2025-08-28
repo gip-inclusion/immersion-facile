@@ -12,14 +12,15 @@ export const peConnectIdentitySchema: ZodSchemaWithInputMatchingOutput<FtConnect
     payload: z
       .object({
         advisor: z
-        .object({
-          email: z.string(),
-          firstName: z.string(),
-          lastName: z.string(),
-          type: z.enum(["PLACEMENT", "CAPEMPLOI", "INDEMNISATION"], {
-            error: localization.invalidEnum,
-          }),
-        }).optional(),
+          .object({
+            email: z.string(),
+            firstName: z.string(),
+            lastName: z.string(),
+            type: z.enum(["PLACEMENT", "CAPEMPLOI", "INDEMNISATION"], {
+              error: localization.invalidEnum,
+            }),
+          })
+          .optional(),
       })
       .optional(),
   });

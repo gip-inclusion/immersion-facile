@@ -237,7 +237,6 @@ export const ConventionForm = ({
       throw errorMessage.agency.notFound({ agencyId: convention.agencyId });
     const conventionToSave: ConventionReadDto = {
       ...conventionSchema.parse(convention),
-      agencyKind: convention.agencyKind,
       agencyDepartment: convention.agencyDepartment,
       workConditions: undefinedIfEmptyString(convention.workConditions),
       agencyReferent: {
@@ -249,6 +248,7 @@ export const ConventionForm = ({
           ? undefined
           : establishmentNumberEmployeesRange,
       agencySiret: "",
+      agencyKind: selectedAgency.kind,
       agencyName: selectedAgency.name,
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
@@ -605,7 +605,9 @@ export const ConventionForm = ({
                     initialInputValue={getValues("immersionAddress")}
                     {...getFieldError("immersionAddress")}
                   />
-                  <ScheduleSection />
+                  <ScheduleSection
+                    internshipKind={conventionValues.internshipKind}
+                  />
                 </Accordion>
                 <Accordion
                   label={
