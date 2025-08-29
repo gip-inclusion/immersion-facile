@@ -83,6 +83,7 @@ export type EmailParamsByEmailType = {
     assessmentCreationLink: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
+    tutorEmail: string;
     businessName: string;
     conventionId: ConventionId;
     internshipKind: InternshipKind;
