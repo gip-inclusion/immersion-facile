@@ -28,6 +28,12 @@ const defaultSignature = (internshipKind: InternshipKind) =>
     L’équipe de votre Chambre consulaire.
 `;
 
+const displayDate = (date: string) => {
+  return isStringDate(date)
+    ? toDisplayedDate({ date: new Date(date) })
+    : "DATE INVALIDE";
+};
+
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
@@ -636,8 +642,8 @@ L'équipe d'Immersion Facilitée`,
       <strong>Dates ${
         internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
       } :</strong> 
-      - du ${dateStart}
-      - au ${dateEnd}      
+      - du ${displayDate(dateStart)}
+      - au ${displayDate(dateEnd)} 
 
       <strong>Bénéficiaire :</strong> 
       ${firstName} ${lastName}    
@@ -760,8 +766,8 @@ L'équipe d'Immersion Facilitée`,
       N'hésitez pas à le joindre ou à appeler l'entreprise. Leurs coordonnées sont présentes dans la demande de convention.        
       
       <strong>Dates de l'immersion :</strong> 
-      - du ${dateStart}
-      - au ${dateEnd}
+      - du ${displayDate(dateStart)}
+      - au ${displayDate(dateEnd)}
       
       <strong>Entreprise d'accueil :</strong>
       - ${businessName}
@@ -1210,15 +1216,7 @@ Tél : ${beneficiaryPhone}`,
         internshipKind === "immersion"
           ? "d'immersion professionnelle"
           : "de mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${
-        isStringDate(dateStart)
-          ? toDisplayedDate({ date: new Date(dateStart) })
-          : "DATE INVALIDE"
-      } au ${
-        isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd) })
-          : "DATE INVALIDE"
-      } a été annulée par ${agencyName}.
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${displayDate(dateStart)} au ${displayDate(dateEnd)} a été annulée par ${agencyName}.
       
       La demande a été annulée pour la raison suivante :
       
@@ -1264,17 +1262,7 @@ Tél : ${beneficiaryPhone}`,
         internshipKind === "immersion"
           ? "une immersion professionnelle"
           : "un mini stage"
-      } du ${
-        isStringDate(dateStart)
-          ? toDisplayedDate({
-              date: new Date(dateStart),
-            })
-          : "DATE INVALIDE"
-      } au ${
-        isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd) })
-          : "DATE INVALIDE"
-      } dans l'entreprise ${businessName} est supprimée.
+      } du ${displayDate(dateStart)} au ${displayDate(dateEnd)} dans l'entreprise ${businessName} est supprimée.
       
       Les raisons en sont: ${deprecationReason}.         
       
