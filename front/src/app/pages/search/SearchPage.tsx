@@ -57,6 +57,7 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
   }),
 );
 const nafLabelMaxLength = 30;
+const DEFAULT_DISTANCE_KM = 10;
 
 const getSearchRouteParam = (
   currentKey: keyof SearchPageParams,
@@ -291,7 +292,7 @@ export const SearchPage = ({
                       setValue("longitude", lookupSearchResult.position.lon);
                       setValue("place", lookupSearchResult.label);
                       if (!formValues.distanceKm) {
-                        setValue("distanceKm", 10);
+                        setValue("distanceKm", DEFAULT_DISTANCE_KM);
                       }
                     }}
                     selectProps={{
@@ -314,13 +315,12 @@ export const SearchPage = ({
                     options={radiusOptions}
                     disabled={!lat || !lon}
                     nativeSelectProps={{
-                      ...register("distanceKm"),
                       title:
                         !lat || !lon
                           ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
                           : undefined,
                       id: domElementIds[route.name].distanceSelect,
-                      value: `${distanceKm === undefined ? "" : distanceKm}`,
+                      value: `${distanceKm === undefined ? DEFAULT_DISTANCE_KM : distanceKm}`,
                       onChange: (event) => {
                         const value = Number.parseInt(
                           event.currentTarget.value,
@@ -505,7 +505,7 @@ export const SearchPage = ({
                           setTempValue({
                             ...tempValue,
                             ...newValues,
-                            distanceKm: tempValue.distanceKm || 10,
+                            distanceKm: tempValue.distanceKm || DEFAULT_DISTANCE_KM,
                           });
                         }}
                         onPlaceClear={() => {
