@@ -14,7 +14,6 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionActionSelectors } from "src/core-logic/domain/convention/convention-action/conventionAction.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
 const broadcastAgainModal = createModal({
   isOpenedByDefault: false,
@@ -43,11 +42,6 @@ export const BroadcastAgainButton = ({
     feedbacks["convention-action-accept-by-validator"].on === "update";
   const isModalButtonDisabled = disabled ?? false;
 
-  const closeBroadcastFeedbackModal = () => {
-    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    broadcastAgainModal.close();
-  };
-
   useEffect(() => {
     jwt &&
       zUuidLike.safeParse(conventionId).success &&
@@ -63,9 +57,7 @@ export const BroadcastAgainButton = ({
     };
   }, [jwt, conventionId, dispatch]);
 
-  useIsModalOpen(broadcastAgainModal, {
-    onConceal: () => closeBroadcastFeedbackModal(),
-  });
+  useIsModalOpen(broadcastAgainModal);
 
   return (
     <>

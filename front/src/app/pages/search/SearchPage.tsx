@@ -505,7 +505,8 @@ export const SearchPage = ({
                           setTempValue({
                             ...tempValue,
                             ...newValues,
-                            distanceKm: tempValue.distanceKm || DEFAULT_DISTANCE_KM,
+                            distanceKm:
+                              tempValue.distanceKm || DEFAULT_DISTANCE_KM,
                           });
                         }}
                         onPlaceClear={() => {
