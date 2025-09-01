@@ -11,6 +11,7 @@ import type {
   ConventionSummarySubSection,
 } from "react-design-system/src/immersionFacile/components/convention-summary";
 import { createPortal } from "react-dom";
+import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
   type ConventionReadDto,
@@ -28,6 +29,7 @@ import {
   titleByRole,
   toDisplayedDate,
 } from "shared";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
 const makeSignatoriesSubsections = (
   convention: ConventionReadDto,
@@ -898,8 +900,10 @@ export const SendSignatureLinkModalWrapper = ({
   signatory?: SignatoryRole;
   signatoryPhone?: string;
   onConfirm: () => void;
-}) =>
-  createPortal(
+}) => {
+  const dispatch = useDispatch();
+
+  return createPortal(
     <sendSignatureLinkModal.Component
       title="Envoyer le lien de signature par SMS"
       buttons={[
@@ -907,6 +911,7 @@ export const SendSignatureLinkModalWrapper = ({
           priority: "secondary",
           children: "Annuler",
           onClick: () => {
+            dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
             sendSignatureLinkModal.close();
           },
         },
@@ -925,6 +930,7 @@ export const SendSignatureLinkModalWrapper = ({
     </sendSignatureLinkModal.Component>,
     document.body,
   );
+};
 
 export const sendAssessmentLinkModal = createModal({
   id: domElementIds.manageConvention.sendAssessmentLinkModal,

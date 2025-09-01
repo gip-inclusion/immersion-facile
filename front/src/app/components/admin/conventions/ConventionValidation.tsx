@@ -35,7 +35,6 @@ import {
   isConventionEndingInOneDayOrMore,
 } from "src/core-logic/domain/convention/convention.utils";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
-import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
 import {
   makeConventionSections,
@@ -97,14 +96,7 @@ export const ConventionValidation = ({
       "beneficiary-current-employer": false,
     });
 
-  const closeSendSignatureLinkModal = () => {
-    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    sendSignatureLinkModal.close();
-  };
-
-  const isSignatureModalOpen = useIsModalOpen(sendSignatureLinkModal, {
-    onConceal: () => closeSendSignatureLinkModal(),
-  });
+  const isSignatureModalOpen = useIsModalOpen(sendSignatureLinkModal);
 
   useEffect(() => {
     if (!isSignatureModalOpen) setSignatoryToSendSignatureLink(null);
