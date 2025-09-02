@@ -3,7 +3,12 @@ import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { type AllowedLoginSource, domElementIds } from "shared";
+import {
+  type AllowedLoginSource,
+  displayDuration,
+  domElementIds,
+  fiveMinutesInSeconds,
+} from "shared";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -30,6 +35,7 @@ export const LoginByEmailFeedbackPage = ({
   const isRequestingLoginByEmail = useAppSelector(
     authSelectors.isRequestingLoginByEmail,
   );
+  const expiryDuration = displayDuration(fiveMinutesInSeconds, "minutes");
   const contents: Record<
     Mode,
     {
@@ -45,9 +51,9 @@ export const LoginByEmailFeedbackPage = ({
           {email && (
             <p className={fr.cx("fr-text--regular")}>
               Un email contenant votre lien de connexion vient d’être envoyé à
-              l’adresse <strong>{email}</strong>. Ce lien est valable pendant 12
-              heures. Pensez à vérifier vos spams si vous ne le voyez pas
-              rapidement.
+              l’adresse <strong>{email}</strong>. Ce lien est valable pendant{" "}
+              {expiryDuration}. Pensez à vérifier vos spams si vous ne le voyez
+              pas rapidement.
             </p>
           )}
           <Highlight>

@@ -144,6 +144,7 @@ export * from "./utils/address";
 export * from "./utils/beneficiary";
 export * from "./utils/csv";
 export * from "./utils/date";
+export * from "./utils/durations";
 export * from "./utils/establishment";
 export * from "./utils/json";
 export * from "./utils/mergeObjectsExpectFalsyValues";

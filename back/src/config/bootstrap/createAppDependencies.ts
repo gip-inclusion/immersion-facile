@@ -1,4 +1,10 @@
-import { type AbsoluteUrl, frontRoutes } from "shared";
+import {
+  type AbsoluteUrl,
+  fiveMinutesInSeconds,
+  frontRoutes,
+  oneDayInSecond,
+  oneHourInSeconds,
+} from "shared";
 import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEventBus";
 import {
   type GenerateApiConsumerJwt,
@@ -45,9 +51,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     config.nodeEnv === "test",
   );
 
-  const oneHourInSeconds = 3600;
-  const oneDayInSecond = oneHourInSeconds * 24;
-
   const generateApiConsumerJwt: GenerateApiConsumerJwt =
     makeGenerateJwtES256<"apiConsumer">(
       config.apiJwtPrivateKey,
@@ -67,7 +70,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt =
     makeGenerateJwtES256<"emailAuthCode">(
       config.jwtPrivateKey,
-      oneHourInSeconds * 24,
+      fiveMinutesInSeconds,
     );
 
   const verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode"> =
