@@ -23,7 +23,6 @@ import {
 import { v4 as uuidV4 } from "uuid";
 
 type RenewConventionParamsInForm = RenewConventionParams;
-// Pick<ConventionReadDto, "internshipKind" | "signatories">;
 
 export const RenewConventionModalContent = ({
   onSubmit,
