@@ -2,9 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { equals } from "ramda";
-import { type ReactNode, useEffect, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { HeadingSection, SectionHighlight } from "react-design-system";
-import { useDispatch } from "react-redux";
 import {
   type ConnectedUser,
   type EstablishmentDashboardTab,
@@ -22,12 +21,8 @@ import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
-import {
-  discussionSlice,
-  initialDiscussionsWithPagination,
-} from "src/core-logic/domain/discussion/discussion.slice";
+import { initialDiscussionsWithPagination } from "src/core-logic/domain/discussion/discussion.slice";
 import { MetabaseView } from "../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../SelectConventionFromIdForm";
 
@@ -44,8 +39,6 @@ export const EstablishmentDashboardTabs = ({
     () => establishmentDashboardTabFromRouteName[route.name],
     [route.name],
   );
-  const dispatch = useDispatch();
-  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const { data: discussions, filters: discussionsFilters } = useAppSelector(
     discussionSelectors.discussionsWithPagination,
   );
@@ -76,17 +69,6 @@ export const EstablishmentDashboardTabs = ({
         establishment.siret === route.params.siret &&
         establishment.role === "establishment-admin",
     );
-  useEffect(() => {
-    if (connectedUserJwt) {
-      dispatch(
-        discussionSlice.actions.fetchDiscussionListRequested({
-          jwt: connectedUserJwt,
-          filters: initialDiscussionsWithPagination.filters,
-          feedbackTopic: "establishment-dashboard-discussion-list",
-        }),
-      );
-    }
-  }, [connectedUserJwt, dispatch]);
 
   if (shouldRedirectToMainTab) {
     routes.establishmentDashboard().push();
