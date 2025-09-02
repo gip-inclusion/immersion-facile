@@ -40,6 +40,10 @@ export type CreateAgencyDto = {
   phoneNumber: string;
 } & WithAcquisition;
 
+export type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
+  kind: AgencyKind | "";
+};
+
 export type AgencyDtoSensitiveFields = {
   status: AgencyStatus;
   codeSafir: CodeSafir | null;

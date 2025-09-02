@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { ConventionId } from "../convention/convention.dto";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { DateRange } from "../utils/date";
 import {
@@ -10,6 +9,7 @@ import {
 } from "../zodUtils";
 import {
   type AssessmentDto,
+  type FormAssessmentDto,
   type LegacyAssessmentDto,
   typeOfContracts,
   type WithAssessmentDto,
@@ -64,15 +64,6 @@ const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJo
     ],
     { error: "Veuillez sélectionnez une option" },
   );
-
-export type CreateFormAssessmentInitialValues = {
-  conventionId: ConventionId;
-} & (WithEndedWithAJob | { endedWithAJob: null }) &
-  WithEstablishmentComments & { status: null };
-
-export type FormAssessmentDto =
-  | AssessmentDto
-  | CreateFormAssessmentInitialValues;
 
 export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
   z

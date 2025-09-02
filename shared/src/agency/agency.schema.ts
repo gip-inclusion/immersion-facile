@@ -30,6 +30,7 @@ import {
   agencyKindList,
   allAgencyStatuses,
   type CreateAgencyDto,
+  type CreateAgencyInitialValues,
   type ListAgencyOptionsRequestDto,
   type PrivateListAgenciesRequestDto,
   type WithAgencyDto,
@@ -116,10 +117,6 @@ const commonAgencyShape = {
   logoUrl: absoluteUrlSchema.or(z.null()),
   agencySiret: siretSchema,
   phoneNumber: phoneNumberSchema,
-};
-
-export type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
-  kind: AgencyKind | "";
 };
 
 export const createAgencySchema: z.ZodType<
