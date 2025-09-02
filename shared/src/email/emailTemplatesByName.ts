@@ -11,6 +11,7 @@ import type {
 import type { AgencyRole } from "../role/role.dto";
 import { frontRoutes } from "../routes/route.utils";
 import { isStringDate, toDisplayedDate } from "../utils/date";
+import { displayDuration, fiveMinutesInSeconds } from "../utils/durations";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
@@ -52,7 +53,7 @@ export const emailTemplatesByName =
           },
         ],
         subContent: `
-          Ce lien est valable pendant 24 heures et ne peut être utilisé qu’une seule fois.
+          Ce lien est valable pendant ${displayDuration(fiveMinutesInSeconds, "minutes")} et ne peut être utilisé qu’une seule fois.
           
           Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
           
