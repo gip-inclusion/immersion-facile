@@ -8,6 +8,11 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontEstablishmentDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
+import {
+  discussionSlice,
+  initialDiscussionsWithPagination,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { EstablishmentDashboardAccessNotAllowedContent } from "../../components/establishment/establishment-dashboard/EstablishmentDashboardAccessNotAllowedContent";
@@ -21,6 +26,7 @@ export const EstablishmentDashboardPage = ({
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const isLoadingUser = useAppSelector(connectedUserSelectors.isLoading);
+  const isLoadingDiscussionList = useAppSelector(discussionSelectors.isLoading);
   const isLoadingEstablishment = useAppSelector(
     establishmentSelectors.isLoading,
   );
@@ -55,13 +61,28 @@ export const EstablishmentDashboardPage = ({
     connectedUserJwt,
     dispatch,
   ]);
+
+  useEffect(() => {
+    if (connectedUserJwt) {
+      dispatch(
+        discussionSlice.actions.fetchDiscussionListRequested({
+          jwt: connectedUserJwt,
+          filters: initialDiscussionsWithPagination.filters,
+          feedbackTopic: "establishment-dashboard-discussion-list",
+        }),
+      );
+    }
+  }, [connectedUserJwt, dispatch]);
+
   const isUserConnected = currentUser && connectedUserJwt;
   return (
     <>
       <div className={fr.cx("fr-grid-row")}>
         <h1>Mon espace établissement</h1>
       </div>
-      {isLoadingUser || (isLoadingEstablishment && <Loader />)}
+      {(isLoadingUser || isLoadingEstablishment || isLoadingDiscussionList) && (
+        <Loader />
+      )}
       {isUserConnected &&
         (isDashboardAccessNotAllowed ? (
           <EstablishmentDashboardAccessNotAllowedContent
