@@ -827,8 +827,8 @@ export const domElementIds = {
         "im-agency-dashboard__select-agency-to-initiate-convention-modal",
     },
     agencyTab: {
-      adminRightsModal: "im-agency-tab-admin-rights-modal",
-      userRightsModal: "im-agency-tab-user-rights-modal",
+      adminRightsModal: "im-agency-dashboard__agency-tab-admin-rights-modal",
+      userRightsModal: "im-agency-dashboard__agency-tab-user-rights-modal",
     },
     agencyDetails: {
       editAgencyForm: "im-agency-dashboard-form-edit-agency",

@@ -3,6 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Table from "@codegouvfr/react-dsfr/Table";
 import { Fragment, useMemo, useState } from "react";
+import { HeadingSection, NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
 import {
   type AgencyRight,
@@ -63,9 +64,7 @@ export const AgencyRightsTable = ({
   };
 
   return (
-    <>
-      <h2 className={fr.cx("fr-h6")}>{title}</h2>
-
+    <HeadingSection title={title} titleAs="h4">
       <Table
         fixed
         headers={[
@@ -115,7 +114,7 @@ export const AgencyRightsTable = ({
           </userModal.Component>,
           document.body,
         )}
-    </>
+    </HeadingSection>
   );
 };
 
@@ -152,27 +151,26 @@ const AgencyRightLine = (
   </Fragment>,
   agencyKindToLabelIncludingIFAndPrepa[agencyRight.agency.kind],
 
-  AgencyLineAdminEmails({ agencyRight }),
+  <AgencyLineAdminEmails
+    key={`${agencyRight.agency.id}-admin-emails`}
+    agencyRight={agencyRight}
+  />,
 
   <Fragment key={`${agencyRight.agency.id}-agency-infos`}>
-    {/* {!agencyRight.roles.includes("to-review") && (
-      <> */}
     <div className={fr.cx("fr-mb-1w")}>
       {agencyRight.roles
         .map((role) => agencyRolesToDisplay[role].label)
         .join(", ")}
     </div>
-    <div className={fr.cx("fr-hint-text", "fr-mb-1w")}>
-      {agencyRight.isNotifiedByEmail
-        ? "✅ reçoit les notifications"
-        : "❌ ne reçoit pas les notifications"}
+    <div className={fr.cx("fr-mb-1w")}>
+      <NotificationIndicator isNotified={agencyRight.isNotifiedByEmail} />
     </div>
-
-    {AgencyLineRightsCTAs({
-      agencyRight,
-      onUpdateClicked,
-      onRegistrationCancelledClicked,
-      isBackofficeAdmin,
-    })}
+    <AgencyLineRightsCTAs
+      key={`${agencyRight.agency.id}-rights-ctas`}
+      agencyRight={agencyRight}
+      onUpdateClicked={onUpdateClicked}
+      onRegistrationCancelledClicked={onRegistrationCancelledClicked}
+      isBackofficeAdmin={isBackofficeAdmin}
+    />
   </Fragment>,
 ];

@@ -65,7 +65,6 @@ export const AgenciesTablesSection = ({
             agencyRights={toReviewAgencyRights}
             user={user}
             title={`Demandes d'accès en cours (${toReviewAgencyRights.length})`}
-            modalId={domElementIds.admin.agencyTab.editAgencyManageUserModal}
             onUserRegistrationCancelledRequested={onUserRegistrationCancelledRequested(
               "user",
             )}
