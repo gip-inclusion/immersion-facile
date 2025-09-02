@@ -81,6 +81,7 @@ export const AgencyRightsTable = ({
               agencyRight,
               onUserUpdateRequested && onUpdateClicked,
               onUserRegistrationCancelledRequested,
+              isBackofficeAdmin,
             ),
           )}
       />
@@ -122,6 +123,7 @@ const AgencyRightLine = (
   agencyRight: AgencyRight,
   onUpdateClicked?: (agencyRight: AgencyRight) => void,
   onRegistrationCancelledClicked?: (agencyRight: AgencyRight) => void,
+  isBackofficeAdmin?: boolean,
 ) => [
   <Fragment key={`${agencyRight.agency.id}-agency-infos`}>
     <AgencyTag refersToAgencyName={agencyRight.agency.refersToAgencyName} />
@@ -165,13 +167,12 @@ const AgencyRightLine = (
         ? "✅ reçoit les notifications"
         : "❌ ne reçoit pas les notifications"}
     </div>
-    {/* </>
-    )} */}
 
     {AgencyLineRightsCTAs({
       agencyRight,
       onUpdateClicked,
       onRegistrationCancelledClicked,
+      isBackofficeAdmin,
     })}
   </Fragment>,
 ];
