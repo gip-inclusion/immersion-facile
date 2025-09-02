@@ -66,3 +66,12 @@ export type LegacyAssessmentDto = {
   conventionId: ConventionId;
   establishmentFeedback: string;
 };
+
+export type CreateFormAssessmentInitialValues = {
+  conventionId: ConventionId;
+} & (WithEndedWithAJob | { endedWithAJob: null }) &
+  WithEstablishmentComments & { status: null };
+
+export type FormAssessmentDto =
+  | AssessmentDto
+  | CreateFormAssessmentInitialValues;
