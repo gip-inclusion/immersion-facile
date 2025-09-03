@@ -66,7 +66,6 @@ export const AgencyRightsTable = ({
   return (
     <HeadingSection title={title} titleAs="h4">
       <Table
-        fixed
         headers={[
           "Organisme",
           "Type",
