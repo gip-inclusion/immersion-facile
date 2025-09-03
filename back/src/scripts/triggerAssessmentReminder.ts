@@ -34,7 +34,7 @@ const triggerAssessmentReminder = async () => {
     notificationRepository: new PgNotificationRepository(kyselyDb),
   };
 
-  const { numberOfConventionsReminded: numberOfFirstReminders } =
+  const { numberOfConventionsReminded: numberOfConventionsReminded3DaysAfter } =
     await makeAssessmentReminder({
       uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
         .uowPerformer,
@@ -54,31 +54,32 @@ const triggerAssessmentReminder = async () => {
       },
     }).execute({ mode: "3daysAfterInitialAssessmentEmail" });
 
-  const { numberOfConventionsReminded: numberOfSecondReminders } =
-    await makeAssessmentReminder({
-      uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
-        .uowPerformer,
-      deps: {
-        outOfTrx,
+  const {
+    numberOfConventionsReminded: numberOfConventionsReminded10DaysAfter,
+  } = await makeAssessmentReminder({
+    uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+      .uowPerformer,
+    deps: {
+      outOfTrx,
+      timeGateway,
+      saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
         timeGateway,
-        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
-          new UuidV4Generator(),
-          timeGateway,
-        ),
-        generateConventionMagicLinkUrl: makeGenerateConventionMagicLinkUrl(
-          config,
-          generateConventionJwt,
-        ),
-        shortLinkIdGeneratorGateway,
+      ),
+      generateConventionMagicLinkUrl: makeGenerateConventionMagicLinkUrl(
         config,
-      },
-    }).execute({ mode: "10daysAfterInitialAssessmentEmail" });
+        generateConventionJwt,
+      ),
+      shortLinkIdGeneratorGateway,
+      config,
+    },
+  }).execute({ mode: "10daysAfterInitialAssessmentEmail" });
 
   await pgPool.end();
 
   return {
-    numberOfFirstReminders,
-    numberOfSecondReminders,
+    numberOfConventionsReminded3DaysAfter,
+    numberOfConventionsReminded10DaysAfter,
   };
 };
 
@@ -86,10 +87,13 @@ handleCRONScript(
   "assessmentReminder",
   config,
   triggerAssessmentReminder,
-  ({ numberOfFirstReminders, numberOfSecondReminders }) =>
+  ({
+    numberOfConventionsReminded3DaysAfter,
+    numberOfConventionsReminded10DaysAfter,
+  }) =>
     [
-      `Total of first reminders : ${numberOfFirstReminders}`,
-      `Total if second reminders: ${numberOfSecondReminders}`,
+      `Total of reminders D+3 : ${numberOfConventionsReminded3DaysAfter}`,
+      `Total of reminders D+10 : ${numberOfConventionsReminded10DaysAfter}`,
     ].join("\n"),
   logger,
 );
