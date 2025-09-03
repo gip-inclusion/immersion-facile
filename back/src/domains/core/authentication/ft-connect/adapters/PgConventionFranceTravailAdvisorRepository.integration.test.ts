@@ -74,7 +74,8 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
-    await db.deleteFrom("partners_pe_connect").execute();
+    await db.deleteFrom("conventions__ft_connect_users").execute();
+    await db.deleteFrom("ft_connect_users").execute();
     // REVIEW I had to add this not to have an error
     // TODO Remove when https://git.beta.pole-emploi.fr/jburkard/immersion-facile/-/merge_requests/967 is merged ?
     await db.deleteFrom("immersion_assessments").execute();
@@ -105,76 +106,101 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
   });
 
   beforeEach(async () => {
-    await db.deleteFrom("partners_pe_connect").execute();
+    await db.deleteFrom("conventions__ft_connect_users").execute();
+    await db.deleteFrom("ft_connect_users").execute();
     conventionFranceTravailAdvisorRepository =
       new PgConventionFranceTravailAdvisorRepository(db);
   });
 
-  describe("openSlotForNextConvention", () => {
+  describe("saveFtUserAndAdvisor", () => {
     it("should open a slot if no open slot is present", async () => {
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailFirstUserAdvisor,
       );
 
       expectToEqual(
-        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            user_pe_external_id:
-              franceTravailFirstUserAdvisor.user.peExternalId,
-            convention_id: "00000000-0000-0000-0000-000000000000",
-            firstname: placementAdvisor.firstName,
-            lastname: placementAdvisor.lastName,
-            email: placementAdvisor.email,
-            type: placementAdvisor.type,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            advisor_firstname: placementAdvisor.firstName,
+            advisor_lastname: placementAdvisor.lastName,
+            advisor_email: placementAdvisor.email,
+            advisor_kind: placementAdvisor.type,
+            created_at: expect.any(Date),
+            updated_at: expect.any(Date),
           },
         ],
+      );
+
+      expectToEqual(
+        await db
+          .selectFrom("conventions__ft_connect_users")
+          .selectAll()
+          .execute(),
+        [],
       );
     });
 
     it("should open a slot with no advisor", async () => {
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailFirstUserWithoutAdvisor,
       );
 
       expectToEqual(
-        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            user_pe_external_id:
-              franceTravailFirstUserAdvisor.user.peExternalId,
-            convention_id: "00000000-0000-0000-0000-000000000000",
-            firstname: null,
-            lastname: null,
-            email: null,
-            type: null,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            advisor_firstname: null,
+            advisor_lastname: null,
+            advisor_email: null,
+            advisor_kind: null,
+            created_at: expect.any(Date),
+            updated_at: expect.any(Date),
           },
         ],
+      );
+
+      expectToEqual(
+        await db
+          .selectFrom("conventions__ft_connect_users")
+          .selectAll()
+          .execute(),
+        [],
       );
     });
 
     it("should update the open slot if it already exist", async () => {
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailFirstUserAdvisor,
       );
 
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailUpdatedUserAdvisor,
       );
 
       expectToEqual(
-        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            user_pe_external_id:
-              franceTravailUpdatedUserAdvisor.user.peExternalId,
-            convention_id: "00000000-0000-0000-0000-000000000000",
-            firstname: capemploiAdvisor.firstName,
-            lastname: capemploiAdvisor.lastName,
-            email: capemploiAdvisor.email,
-            type: capemploiAdvisor.type,
+            ft_connect_id: franceTravailUpdatedUserAdvisor.user.peExternalId,
+            advisor_firstname: capemploiAdvisor.firstName,
+            advisor_lastname: capemploiAdvisor.lastName,
+            advisor_email: capemploiAdvisor.email,
+            advisor_kind: capemploiAdvisor.type,
+            created_at: expect.any(Date),
+            updated_at: expect.any(Date),
           },
         ],
+      );
+
+      expectToEqual(
+        await db
+          .selectFrom("conventions__ft_connect_users")
+          .selectAll()
+          .execute(),
+        [],
       );
     });
   });
@@ -196,7 +222,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
     });
 
     it("should update the entity in db if a suitable conventionFranceTravailUserAdvisor was found", async () => {
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailFirstUserAdvisor,
       );
       await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
@@ -205,16 +231,30 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       );
 
       expectToEqual(
-        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            user_pe_external_id:
-              franceTravailFirstUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            advisor_firstname: placementAdvisor.firstName,
+            advisor_lastname: placementAdvisor.lastName,
+            advisor_email: placementAdvisor.email,
+            advisor_kind: placementAdvisor.type,
+            created_at: expect.any(Date),
+            updated_at: expect.any(Date),
+          },
+        ],
+      );
+
+      expectToEqual(
+        await db
+          .selectFrom("conventions__ft_connect_users")
+          .selectAll()
+          .execute(),
+        [
+          {
             convention_id: conventionId,
-            email: placementAdvisor.email,
-            firstname: placementAdvisor.firstName,
-            lastname: placementAdvisor.lastName,
-            type: placementAdvisor.type,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            created_at: expect.any(Date),
           },
         ],
       );
@@ -232,7 +272,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
     });
 
     it("should get the convention Advisor by the convention id", async () => {
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailFirstUserAdvisor,
       );
       await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
@@ -254,7 +294,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
     });
 
     it("convention advisor without advisor", async () => {
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailFirstUserWithoutAdvisor,
       );
       await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
@@ -283,7 +323,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           .beneficiary.federatedIdentity,
       ).toBeUndefined();
 
-      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
         franceTravailFirstUserAdvisor,
       );
       await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
@@ -303,8 +343,12 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         },
       );
       expect(
-        (await db.selectFrom("partners_pe_connect").selectAll().execute())
-          .length,
+        (
+          await db
+            .selectFrom("conventions__ft_connect_users")
+            .selectAll()
+            .execute()
+        ).length,
       ).toBe(1);
 
       await conventionFranceTravailAdvisorRepository.deleteByConventionId(
@@ -316,9 +360,16 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           .beneficiary.federatedIdentity,
       ).toBeUndefined();
       expectToEqual(
-        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        await db
+          .selectFrom("conventions__ft_connect_users")
+          .selectAll()
+          .execute(),
         [],
       );
+      // FT user should still exist
+      expect(
+        (await db.selectFrom("ft_connect_users").selectAll().execute()).length,
+      ).toBe(1);
     });
   });
 });

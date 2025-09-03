@@ -10,9 +10,7 @@ export type ConventionAndFtExternalIds = {
 };
 
 export interface ConventionFranceTravailAdvisorRepository {
-  openSlotForNextConvention: (
-    ftUserAndAdvisor: FtUserAndAdvisor,
-  ) => Promise<void>;
+  saveFtUserAndAdvisor: (ftUserAndAdvisor: FtUserAndAdvisor) => Promise<void>;
   associateConventionAndUserAdvisor: (
     conventionId: ConventionId,
     userFtExternalId: FtExternalId,

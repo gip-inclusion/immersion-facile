@@ -27,6 +27,7 @@ export interface Database {
   convention_external_ids: ConventionExternalIds;
   conventions_to_sync_with_pe: ConventionsToSyncWithPe;
   conventions: Conventions;
+  conventions__ft_connect_users: ConventionsFtConnectUsers;
   delegation_contacts: DelegationContacts;
   discussions: Discussions;
   establishment_lead_events: EstablishmentLeadEvents;
@@ -37,6 +38,7 @@ export interface Database {
   establishments: Establishments;
   exchanges: Exchanges;
   feature_flags: FeatureFlags;
+  ft_connect_users: FtConnectUsers;
   groups__sirets: GroupsSirets;
   groups: Groups;
   immersion_assessments: ImmersionAssessments;
@@ -50,7 +52,6 @@ export interface Database {
   outbox_failures: OutboxFailures;
   outbox_publications: OutboxPublications;
   outbox: Outbox;
-  partners_pe_connect: PartnersFtConnect;
   public_appellations_data: PublicAppellationsData;
   public_department_region: PublicDepartmentRegion;
   public_naf_classes_2008_old: PublicNafClasses2008; // TO DELETE
@@ -285,13 +286,20 @@ interface Actors {
   id: Generated<number>;
 }
 
-interface PartnersFtConnect {
-  user_pe_external_id: string;
-  convention_id: Generated<string>;
-  firstname: string | null;
-  lastname: string | null;
-  email: string | null;
-  type: string | null;
+interface FtConnectUsers {
+  ft_connect_id: string;
+  advisor_firstname: string | null;
+  advisor_lastname: string | null;
+  advisor_email: string | null;
+  advisor_kind: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+interface ConventionsFtConnectUsers {
+  convention_id: string;
+  ft_connect_id: string;
+  created_at: Generated<Timestamp>;
 }
 
 interface ViewAppellationsDto {

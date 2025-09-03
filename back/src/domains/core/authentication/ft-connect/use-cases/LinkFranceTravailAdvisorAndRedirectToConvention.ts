@@ -75,7 +75,7 @@ export class LinkFranceTravailAdvisorAndRedirectToConvention extends Transaction
         : undefined,
     };
 
-    await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+    await uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
       peUserAndAdvisor,
     );
 
