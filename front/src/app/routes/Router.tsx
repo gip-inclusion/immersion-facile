@@ -126,7 +126,7 @@ const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
 const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => ReactNode;
 } = {
-  addAgency: () => <AddAgencyPage />,
+  addAgency: (route) => <AddAgencyPage route={route} />,
   admin: (route) => (
     <AdminPrivateRoute route={routes.adminConventions(route.params)}>
       <AdminTabs route={routes.adminConventions(route.params)} />

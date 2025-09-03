@@ -212,6 +212,13 @@ export const domElementIds = {
   },
   searchResultExternal: {},
   addAgency: {
+    login: {
+      byEmailButton: "im-login-form__connect-button--agency-email",
+      proConnectButton: "im-login-form__inclusion-connect-button--agency",
+      navigateToHome: "im-login-form__navigate-to-home-button--agency",
+      retryButton: "im-login-form__retry-login-button--agency",
+      contactSupport: "im-login-form__contact-support-link--agency",
+    },
     form: "im-form-add-agency",
     uploadLogoInput: "im-form-add-agency__file-upload-logo",
     id: "im-form-add-agency__id",

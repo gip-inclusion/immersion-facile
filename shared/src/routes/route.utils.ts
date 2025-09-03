@@ -15,12 +15,12 @@ export const makeUrlWithParams = <
   ) as U;
 
 export const frontRoutes = {
-  addAgency: "ajouter-prescripteur",
   [allowedLoginSources[0]]: "admin",
   [allowedLoginSources[1]]: "establishment",
   [allowedLoginSources[2]]: "tableau-de-bord-etablissement",
   [allowedLoginSources[3]]: "tableau-de-bord-etablissement/discussions",
   [allowedLoginSources[4]]: "tableau-de-bord-agence",
+  [allowedLoginSources[5]]: "ajouter-prescripteur",
   assessmentDocument: "bilan-document",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   initiateConvention: "initier-convention",

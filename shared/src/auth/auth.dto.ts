@@ -10,6 +10,7 @@ export const allowedLoginSources = [
   "establishmentDashboard",
   "establishmentDashboardDiscussions",
   "agencyDashboard",
+  "addAgency",
 ] as const;
 
 export type ExternalId = Flavor<string, "ExternalId">;
