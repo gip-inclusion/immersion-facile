@@ -622,7 +622,7 @@ describe("TransferConventionToAgency", () => {
         };
 
         beforeEach(async () => {
-          await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+          await uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
             {
               advisor: ftAdvisor,
               user: beneficiary,
@@ -936,7 +936,7 @@ describe("TransferConventionToAgency", () => {
         };
 
         beforeEach(async () => {
-          await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+          await uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
             {
               advisor: ftAdvisor,
               user: beneficiary,
