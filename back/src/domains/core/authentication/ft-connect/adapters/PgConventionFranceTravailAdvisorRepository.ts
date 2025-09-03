@@ -14,8 +14,6 @@ import type {
 } from "../port/ConventionFranceTravailAdvisorRepository";
 import { conventionFranceTravailUserAdvisorDtoSchema } from "../port/FtConnect.schema";
 
-const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
-
 const logger = createLogger(__filename);
 
 export class PgConventionFranceTravailAdvisorRepository
@@ -27,11 +25,30 @@ export class PgConventionFranceTravailAdvisorRepository
     conventionId: ConventionId,
     userFtExternalId: FtExternalId,
   ): Promise<ConventionAndFtExternalIds> {
+    // Check if the ft user exists
+    const ftUser = await this.transaction
+      .selectFrom("ft_connect_users")
+      .where("ft_connect_id", "=", userFtExternalId)
+      .select("ft_connect_id")
+      .executeTakeFirst();
+
+    if (!ftUser)
+      throw errors.ftConnect.associationFailed({
+        rowCount: 0,
+        conventionId,
+        ftExternalId: userFtExternalId,
+      });
+
+    // Insert the association into the join table
     const result = await this.transaction
-      .updateTable("partners_pe_connect")
-      .set({ convention_id: conventionId })
-      .where("user_pe_external_id", "=", userFtExternalId)
-      .where("convention_id", "=", CONVENTION_ID_DEFAULT_UUID)
+      .insertInto("conventions__ft_connect_users")
+      .values({
+        convention_id: conventionId,
+        ft_connect_id: userFtExternalId,
+      })
+      .onConflict((oc) =>
+        oc.columns(["convention_id", "ft_connect_id"]).doNothing(),
+      )
       .returning("convention_id")
       .execute();
 
@@ -52,15 +69,20 @@ export class PgConventionFranceTravailAdvisorRepository
     conventionId: ConventionId,
   ): Promise<ConventionFtUserAdvisorEntity | undefined> {
     const result = await this.transaction
-      .selectFrom("partners_pe_connect")
-      .where("convention_id", "=", conventionId)
+      .selectFrom("conventions__ft_connect_users")
+      .innerJoin(
+        "ft_connect_users",
+        "ft_connect_users.ft_connect_id",
+        "conventions__ft_connect_users.ft_connect_id",
+      )
+      .where("conventions__ft_connect_users.convention_id", "=", conventionId)
       .select([
-        "user_pe_external_id",
-        "convention_id",
-        "firstname",
-        "lastname",
-        "email",
-        "type",
+        "conventions__ft_connect_users.ft_connect_id as ft_connect_id",
+        "conventions__ft_connect_users.convention_id as convention_id",
+        "ft_connect_users.advisor_firstname",
+        "ft_connect_users.advisor_lastname",
+        "ft_connect_users.advisor_email",
+        "ft_connect_users.advisor_kind",
       ])
       .executeTakeFirst();
 
@@ -83,32 +105,34 @@ export class PgConventionFranceTravailAdvisorRepository
 
   public async deleteByConventionId(conventionId: ConventionId): Promise<void> {
     await this.transaction
-      .deleteFrom("partners_pe_connect")
+      .deleteFrom("conventions__ft_connect_users")
       .where("convention_id", "=", conventionId)
       .execute();
   }
 
-  public async openSlotForNextConvention(
-    peUserAndAdvisor: FtUserAndAdvisor,
+  public async saveFtUserAndAdvisor(
+    ftUserAndAdvisor: FtUserAndAdvisor,
   ): Promise<void> {
-    const { user, advisor } = peUserAndAdvisor;
+    const { user, advisor } = ftUserAndAdvisor;
 
     await this.transaction
-      .insertInto("partners_pe_connect")
+      .insertInto("ft_connect_users")
       .values({
-        user_pe_external_id: user.peExternalId,
-        convention_id: CONVENTION_ID_DEFAULT_UUID,
-        firstname: advisor?.firstName,
-        lastname: advisor?.lastName,
-        email: advisor?.email,
-        type: advisor?.type,
+        ft_connect_id: user.peExternalId,
+        advisor_firstname: advisor?.firstName ?? null,
+        advisor_lastname: advisor?.lastName ?? null,
+        advisor_email: advisor?.email ?? null,
+        advisor_kind: advisor?.type ?? null,
+        created_at: new Date(),
+        updated_at: new Date(),
       })
       .onConflict((oc) =>
-        oc.columns(["user_pe_external_id", "convention_id"]).doUpdateSet({
-          firstname: (eb) => eb.ref("excluded.firstname"),
-          lastname: (eb) => eb.ref("excluded.lastname"),
-          email: (eb) => eb.ref("excluded.email"),
-          type: (eb) => eb.ref("excluded.type"),
+        oc.column("ft_connect_id").doUpdateSet({
+          advisor_firstname: (eb) => eb.ref("excluded.advisor_firstname"),
+          advisor_lastname: (eb) => eb.ref("excluded.advisor_lastname"),
+          advisor_email: (eb) => eb.ref("excluded.advisor_email"),
+          advisor_kind: (eb) => eb.ref("excluded.advisor_kind"),
+          updated_at: new Date(),
         }),
       )
       .execute();
@@ -116,32 +140,36 @@ export class PgConventionFranceTravailAdvisorRepository
 }
 
 type PgConventionFranceTravailUserAdvisorDto = {
-  user_pe_external_id: string;
+  ft_connect_id: string;
   convention_id: string;
-  firstname: string | null;
-  lastname: string | null;
-  email: string | null;
-  type: string | null;
+  advisor_firstname: string | null;
+  advisor_lastname: string | null;
+  advisor_email: string | null;
+  advisor_kind: string | null;
 };
 
 const toConventionFranceTravailUserAdvisorDTO = ({
-  user_pe_external_id,
+  ft_connect_id,
   convention_id,
-  firstname,
-  lastname,
-  email,
-  type,
+  advisor_firstname,
+  advisor_lastname,
+  advisor_email,
+  advisor_kind,
 }: PgConventionFranceTravailUserAdvisorDto): ConventionFtUserAdvisorDto => ({
   advisor:
-    firstname && lastname && email && type && isFtAdvisorImmersionKind(type)
+    advisor_firstname &&
+    advisor_lastname &&
+    advisor_email &&
+    advisor_kind &&
+    isFtAdvisorImmersionKind(advisor_kind)
       ? {
-          firstName: firstname,
-          lastName: lastname,
-          email,
-          type,
+          firstName: advisor_firstname,
+          lastName: advisor_lastname,
+          email: advisor_email,
+          type: advisor_kind,
         }
       : undefined,
-  peExternalId: user_pe_external_id,
+  peExternalId: ft_connect_id,
   conventionId: convention_id,
 });
 
