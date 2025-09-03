@@ -1,20 +1,24 @@
-import { MainWrapper, PageHeader } from "react-design-system";
+import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AddAgencyForm } from "src/app/components/forms/agency/AddAgencyForm";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 
-export const AddAgencyPage = () => (
-  <HeaderFooterLayout>
-    <MainWrapper
-      layout="default"
-      pageHeader={
-        <PageHeader
-          title="Ajout d'organisme encadrant les PMSMP"
-          breadcrumbs={<Breadcrumbs />}
-        />
-      }
-    >
-      <AddAgencyForm />
-    </MainWrapper>
-  </HeaderFooterLayout>
+export const AddAgencyPage = ({
+  route,
+}: {
+  route: Route<typeof routes.addAgency>;
+}) => (
+  <ConnectedPrivateRoute
+    route={route}
+    oAuthConnectionPageHeader={
+      <PageHeader
+        title="Ajout d'organisme encadrant les PMSMP"
+        breadcrumbs={<Breadcrumbs />}
+      />
+    }
+  >
+    <AddAgencyForm />
+  </ConnectedPrivateRoute>
 );

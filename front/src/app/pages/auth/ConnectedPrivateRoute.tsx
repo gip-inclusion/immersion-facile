@@ -106,7 +106,8 @@ type ConnectPrivateRoute =
   | FrontAdminRoute
   | FrontDashboardRoute
   | Route<typeof routes.formEstablishment>
-  | Route<typeof routes.myProfile>;
+  | Route<typeof routes.myProfile>
+  | Route<typeof routes.addAgency>;
 
 type ConnectedPrivateRouteProps = {
   route: ConnectPrivateRoute;
@@ -290,6 +291,7 @@ const getAllowedStartAuthPage = (
 ): AllowedLoginSource => {
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
+  if (routeName === "addAgency") return "addAgency";
   if (
     establishmentDashboardRoutes.includes(
       routeName as EstablishmentDashboardRouteName,
@@ -391,6 +393,28 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
     },
     establishmentDashboard: establishmentDashboardContent,
     establishmentDashboardDiscussions: establishmentDashboardContent,
+    addAgency: {
+      title: "Inscrire mon organisme",
+      description: (
+        <>
+          L'inscription vous permet de{" "}
+          <strong>valider les demandes d'immersion</strong> remplies sur
+          Immersion Facilitée. Elle est accessible aux{" "}
+          <a
+            className={fr.cx("fr-link", "fr-text--lead")}
+            href="https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-prescrire-une-immersion-6frnyn/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            prescripteurs de droit, structures d'accompagnement et prescripteurs
+            délégataires
+          </a>
+          .
+        </>
+      ),
+      cardsTitle: "Tous les avantages du compte prescripteur",
+      withEmailLogin: true,
+    },
     agencyDashboard: {
       title: "Mon espace prescripteur",
       description: (
