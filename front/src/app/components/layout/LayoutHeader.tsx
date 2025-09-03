@@ -250,8 +250,8 @@ export const LayoutHeader = () => {
           text: "Inscrire mon organisme",
           isActive: currentRoute.name === routes.addAgency().name,
           linkProps: {
-            ...routes.addAgency().link,
-            id: agencyIds.addAgencyForm,
+            ...routes.agencyDashboardAgencies().link,
+            id: agencyIds.agencyDashboardAgencies,
           },
         },
         {

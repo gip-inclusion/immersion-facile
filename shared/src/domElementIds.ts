@@ -58,7 +58,9 @@ export const domElementIds = {
       },
       agency: {
         home: buildHeaderNavLinkId("agency-home"),
-        addAgencyForm: buildHeaderNavLinkId("agency-form"),
+        agencyDashboardAgencies: buildHeaderNavLinkId(
+          "agency-dashboard-agencies",
+        ),
         formConvention: buildHeaderNavLinkId("agency-form-convention"),
         dashboard: buildHeaderNavLinkId("agency-my-dashboard"),
         resourcesAndWebinars: buildHeaderNavLinkId(
