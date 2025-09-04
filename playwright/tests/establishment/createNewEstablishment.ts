@@ -8,7 +8,6 @@ import {
 } from "shared";
 import { testConfig } from "../../custom.config";
 import {
-  expectLocatorToBeVisibleAndEnabled,
   expectNoErrorVisible,
   fillAutocomplete,
   type PlaywrightTestCallback,
@@ -32,8 +31,6 @@ export const createEstablishmentForm =
 
     await goToCreateEstablishmentForm(page);
 
-    await step0(page);
-
     await step1(page, adminRight, establishment);
 
     await step2(page);
@@ -51,14 +48,6 @@ export const goToCreateEstablishmentForm = async (page: Page) => {
   await page.click(
     `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
   );
-};
-
-export const step0 = async (page: Page) => {
-  const addEstablishmentButton = page.locator(
-    `#${domElementIds.establishment.create.startFormButton}`,
-  );
-  await expectLocatorToBeVisibleAndEnabled(addEstablishmentButton);
-  await addEstablishmentButton.click();
 };
 
 const step1 = async (
