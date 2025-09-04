@@ -7,7 +7,7 @@ import {
 
 type AdminPrivateRouteProps = {
   route: FrontAdminRoute;
-  children: ReactElement;
+  children: ReactElement | ReactElement[];
 };
 
 export const AdminPrivateRoute = ({
