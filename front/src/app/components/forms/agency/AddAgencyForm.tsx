@@ -22,6 +22,7 @@ import {
   createAgencySchema,
   type DepartmentCode,
   domElementIds,
+  type SiretDto,
 } from "shared";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
@@ -39,6 +40,7 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { routes } from "src/app/routes/routes";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";
@@ -50,7 +52,7 @@ import {
 import { match, P } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 
-export const AddAgencyForm = () => {
+export const AddAgencyForm = ({ siret }: { siret?: string }) => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
     boolean | undefined
   >(undefined);
@@ -112,6 +114,7 @@ export const AddAgencyForm = () => {
       {match(refersToOtherAgency)
         .with(P.boolean, (refersToOtherAgency) => (
           <AgencyForm
+            siret={siret}
             refersToOtherAgency={refersToOtherAgency}
             key={`add-agency-form-${refersToOtherAgency}`}
             submitFeedback={feedback}
@@ -125,12 +128,14 @@ export const AddAgencyForm = () => {
 };
 
 type AgencyFormProps = {
+  siret?: SiretDto;
   refersToOtherAgency: boolean;
   submitFeedback: AgenciesSubmitFeedback;
   onFormValid: SubmitHandler<CreateAgencyInitialValues>;
 };
 
 const AgencyForm = ({
+  siret,
   refersToOtherAgency,
   submitFeedback,
   onFormValid,
@@ -145,8 +150,9 @@ const AgencyForm = ({
       ...initialValues(uuidV4()),
       ...acquisitionParams,
       validatorEmails: refersToOtherAgency ? ["temp@temp.com"] : [],
+      agencySiret: siret,
     }),
-    [refersToOtherAgency, acquisitionParams],
+    [refersToOtherAgency, acquisitionParams, siret],
   );
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: standardSchemaResolver(createAgencySchema),
@@ -184,6 +190,11 @@ const AgencyForm = ({
   useEffect(() => {
     reset(formInitialValues);
   }, [reset, formInitialValues]);
+
+  useInitialSiret({
+    siret,
+    addressAutocompleteLocator: "agency-address",
+  });
 
   return (
     <FormProvider {...methods}>

@@ -19,6 +19,6 @@ export const AddAgencyPage = ({
       />
     }
   >
-    <AddAgencyForm />
+    <AddAgencyForm siret={route.params.siret} />
   </ConnectedPrivateRoute>
 );
