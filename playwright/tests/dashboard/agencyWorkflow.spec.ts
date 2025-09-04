@@ -9,7 +9,9 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Agency dashboard workflow", () => {
   let agencyId: AgencyId | null = null;
+
   test.describe("Agency creation", () => {
+    test.use({ storageState: testConfig.agencyAuthFile });
     test("creates a new agency", async ({ page }) => {
       agencyId = await fillAndSubmitBasicAgencyForm(page, {
         siret: "34792240300030",
