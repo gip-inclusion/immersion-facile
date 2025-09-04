@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import { HeadingSection, useScrollToTop } from "react-design-system";
 import { useDispatch } from "react-redux";
 import type { UserParamsForAgency } from "shared";
@@ -6,6 +7,7 @@ import { type AgencyRight, type ConnectedUser, domElementIds } from "shared";
 import { AgencyRightsTable } from "src/app/components/agency/agencies-table/AgencyRightsTable";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
+import { routes } from "src/app/routes/routes";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 
@@ -37,6 +39,13 @@ export const AgencyAdminTabContent = ({
         }),
       );
     };
+
+  const proConnectSiret = currentUser.proConnect?.siret;
+  const hasAgencyRoleOnProConnectSiret =
+    activeAgencyRights.filter(
+      (agencyRight) => agencyRight.agency.agencySiret === proConnectSiret,
+    ).length > 0;
+
   return (
     <>
       <Feedback
@@ -48,6 +57,22 @@ export const AgencyAdminTabContent = ({
         className={fr.cx("fr-mt-0")}
         title="Mes Organismes"
         titleAs="h2"
+        titleAction={
+          <Button
+            id={
+              domElementIds.agencyDashboard.dashboard.initiateConventionButton
+            }
+            linkProps={
+              routes.addAgency({
+                siret: hasAgencyRoleOnProConnectSiret
+                  ? undefined
+                  : proConnectSiret,
+              }).link
+            }
+          >
+            Inscrire un nouvel organisme
+          </Button>
+        }
       >
         {agenciesUserIsAdminOn.length > 0 && (
           <AgencyRightsTable
