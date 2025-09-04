@@ -115,7 +115,10 @@ const { adminConventions, adminAgencies, adminUsers, ...restOfAdminRoutes } =
   );
 
 export const { RouteProvider, useRoute, routes } = createRouter({
-  addAgency: defineRoute(`/${frontRoutes.addAgency}`),
+  addAgency: defineRoute(
+    { ...connectedUserParams, siret: param.query.optional.string },
+    () => `/${frontRoutes.addAgency}`,
+  ),
 
   admin,
   ...restOfAdminRoutes,

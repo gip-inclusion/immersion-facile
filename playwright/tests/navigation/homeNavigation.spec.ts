@@ -44,7 +44,7 @@ test.describe("Home user flow", () => {
     await page.goto("/");
     await page.click(`#${domElementIds.home.heroHeader.agency}`);
     await page.click(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`);
-    await expect(page).toHaveURL(`/${frontRoutes.addAgency}`);
+    await expect(page.url()).toContain(`/${frontRoutes.agencyDashboard}`);
   });
 
   test("User flow: Agency -> convention form", async ({ page }) => {

@@ -58,7 +58,9 @@ export const domElementIds = {
       },
       agency: {
         home: buildHeaderNavLinkId("agency-home"),
-        addAgencyForm: buildHeaderNavLinkId("agency-form"),
+        agencyDashboardAgencies: buildHeaderNavLinkId(
+          "agency-dashboard-agencies",
+        ),
         formConvention: buildHeaderNavLinkId("agency-form-convention"),
         dashboard: buildHeaderNavLinkId("agency-my-dashboard"),
         resourcesAndWebinars: buildHeaderNavLinkId(
@@ -212,6 +214,13 @@ export const domElementIds = {
   },
   searchResultExternal: {},
   addAgency: {
+    login: {
+      byEmailButton: "im-login-form__connect-button--agency-email",
+      proConnectButton: "im-login-form__inclusion-connect-button--agency",
+      navigateToHome: "im-login-form__navigate-to-home-button--agency",
+      retryButton: "im-login-form__retry-login-button--agency",
+      contactSupport: "im-login-form__contact-support-link--agency",
+    },
     form: "im-form-add-agency",
     uploadLogoInput: "im-form-add-agency__file-upload-logo",
     id: "im-form-add-agency__id",
@@ -813,6 +822,7 @@ export const domElementIds = {
       contactSupport: "im-login-form__contact-support-link--agency",
     },
     registerAgencies: {
+      newAgencyButton: "im-register-agencies__new-agency-button",
       table: "im-register-agencies-table",
       search: "im-register-agencies__search",
       submitButton: "im-register-agencies__submit-button",

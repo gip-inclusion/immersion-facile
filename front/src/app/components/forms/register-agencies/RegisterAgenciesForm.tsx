@@ -134,6 +134,9 @@ export const RegisterAgenciesForm = ({
               Vous ne trouvez pas votre organisme ?
             </h2>
             <Button
+              id={
+                domElementIds.agencyDashboard.registerAgencies.newAgencyButton
+              }
               linkProps={{
                 href: `${routes.addAgency().href}`,
               }}
