@@ -156,7 +156,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-hotel-line",
         type: "agency",
         id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
-        link: routes.addAgency().link,
+        link: routes.agencyDashboardAgencies().link,
       },
       {
         title: "Remplir la demande de convention",
