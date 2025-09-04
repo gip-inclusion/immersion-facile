@@ -822,6 +822,7 @@ export const domElementIds = {
       contactSupport: "im-login-form__contact-support-link--agency",
     },
     registerAgencies: {
+      newAgencyButton: "im-register-agencies__new-agency-button",
       table: "im-register-agencies-table",
       search: "im-register-agencies__search",
       submitButton: "im-register-agencies__submit-button",

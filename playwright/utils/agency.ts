@@ -1,11 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { expect, type Page } from "@playwright/test";
-import {
-  type AgencyId,
-  addressRoutes,
-  domElementIds,
-  frontRoutes,
-} from "shared";
+import { type AgencyId, addressRoutes, domElementIds } from "shared";
 import { goToAdminTab } from "./admin";
 import { expectLocatorToBeVisibleAndEnabled, fillAutocomplete } from "./utils";
 
@@ -17,7 +12,7 @@ export const fillAndSubmitBasicAgencyForm = async (
     rawAddress?: string;
   },
 ): Promise<AgencyId | null> => {
-  await page.goto(frontRoutes.addAgency);
+  await goToAddAgencyForm(page);
   await page
     .locator(`[for="${domElementIds.addAgency.agencyRefersToInput}-0"]`)
     .click();
@@ -153,4 +148,13 @@ export const addUserToAgency = async (page: Page, agencyName: string) => {
     .locator(`#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`)
     .click();
   await expect(page.locator(".fr-alert--success").first()).toBeVisible();
+};
+
+export const goToAddAgencyForm = async (page: Page) => {
+  await page.goto("/");
+  await page.click(`#${domElementIds.home.heroHeader.agency}`);
+  await page.click(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`);
+  await page.click(
+    `#${domElementIds.agencyDashboard.registerAgencies.newAgencyButton}`,
+  );
 };
