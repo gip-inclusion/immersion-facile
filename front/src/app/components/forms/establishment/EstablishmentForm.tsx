@@ -20,7 +20,6 @@ import {
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { BusinessAndAdminSection } from "src/app/components/forms/establishment/sections/BusinessAndAdminSection";
-import { CreateIntroSection } from "src/app/components/forms/establishment/sections/CreateIntroSection";
 import { OffersSection } from "src/app/components/forms/establishment/sections/OffersSection";
 import { OffersSettingsSection } from "src/app/components/forms/establishment/sections/OffersSettingsSection";
 import { SummarySection } from "src/app/components/forms/establishment/sections/SummarySection";
@@ -63,9 +62,7 @@ type EstablishmentFormProps = {
   mode: Mode;
 };
 
-export const formSteps = 4;
-
-type FormStep = RangeOfPosition<typeof formSteps>;
+type FormStep = RangeOfPosition<4>;
 
 const steps: Record<FormStep, Pick<StepperProps, "title" | "nextTitle">> = {
   1: {
@@ -90,7 +87,7 @@ export type FieldsToValidate = (
   | DotNestedKeys<FormEstablishmentDto>
 )[];
 
-export type Step = 0 | FormStep | null;
+export type Step = FormStep | null;
 export type OnStepChange = (
   step: Step,
   fieldsToValidate: FieldsToValidate,
@@ -147,7 +144,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   >(undefined);
 
   const [currentStep, setCurrentStep] = useState<Step>(
-    isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,
+    isEstablishmentAdmin || isEstablishmentDashboard ? null : 1,
   );
   const acquisitionParams = useGetAcquisitionParams();
 
@@ -488,7 +485,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   />
                 </>
               ))
-              .with(0, () => <CreateIntroSection onStepChange={onStepChange} />)
               .otherwise((currentStep) => (
                 <div className={fr.cx("fr-col")}>
                   <Stepper
