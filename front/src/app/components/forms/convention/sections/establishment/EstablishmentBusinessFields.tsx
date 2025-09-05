@@ -67,15 +67,28 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
         stateRelatedMessage={siretErrorToDisplay}
         className={fr.cx("fr-mb-1w")}
       />
-      <a
-        href="https://annuaire-entreprises.data.gouv.fr/"
-        target="_blank"
-        rel="noreferrer"
-        className={fr.cx("fr-link")}
-      >
-        <i className={fr.cx("fr-icon-information-fill", "fr-icon--sm")} />
-        Retrouver votre siret sur l'Annuaire des Entreprises
-      </a>
+      <p className={fr.cx("fr-mb-1w")}>
+        <a
+          href="https://annuaire-entreprises.data.gouv.fr/"
+          target="_blank"
+          rel="noreferrer"
+          className={fr.cx("fr-link")}
+        >
+          <i className={fr.cx("fr-icon-information-fill", "fr-icon--sm")} />
+          Retrouver votre siret sur l'Annuaire des Entreprises
+        </a>
+      </p>
+      <p className={fr.cx("fr-mt-1w", "fr-mb-1w")}>
+        <a
+          href="https://tally.so/r/w2X7xV"
+          target="_blank"
+          rel="noreferrer"
+          className={fr.cx("fr-link")}
+        >
+          <i className={fr.cx("fr-icon-information-fill", "fr-icon--sm")} />
+          Mon entreprise n'a pas de SIRET
+        </a>
+      </p>
       <Input
         label={formContents.businessName.label}
         hintText={formContents.businessName.hintText}
