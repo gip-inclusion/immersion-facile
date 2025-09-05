@@ -188,6 +188,9 @@ export const createGateways = async (
   const { axiosWithValidateStatus, axiosWithoutValidateStatus } =
     makeAxiosInstances(config.externalAxiosTimeout);
 
+  const { axiosWithValidateStatus: axiosWithValidateStatusForFranceTravail } =
+    makeAxiosInstances(config.externalAxiosTimeoutForFranceTravail);
+
   const franceTravailGateway =
     config.franceTravailGateway === "HTTPS"
       ? new HttpFranceTravailGateway(
@@ -197,7 +200,7 @@ export const createGateways = async (
               ftApiUrl: config.ftApiUrl,
               ftEnterpriseUrl: config.ftEnterpriseUrl,
             }),
-            axiosInstance: axiosWithValidateStatus,
+            axiosInstance: axiosWithValidateStatusForFranceTravail,
           }),
           new InMemoryCachingGateway<AccessTokenResponse>(
             timeGateway,

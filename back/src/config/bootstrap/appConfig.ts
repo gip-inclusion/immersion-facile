@@ -247,6 +247,15 @@ export class AppConfig {
     );
   }
 
+  public get externalAxiosTimeoutForFranceTravail(): number {
+    return Number.parseInt(
+      this.#throwIfNotDefinedOrDefault(
+        "EXTERNAL_AXIOS_TIMEOUT_FOR_FRANCE_TRAVAIL",
+        "10000",
+      ),
+    );
+  }
+
   // == Magic links ==
   public get immersionFacileBaseUrl(): AbsoluteUrl {
     return this.immersionFacileDomain.includes("localhost")
