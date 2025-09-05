@@ -28,7 +28,8 @@ const executeUsecase = async () => {
         ftApiUrl: config.ftApiUrl,
         ftEnterpriseUrl: config.ftEnterpriseUrl,
       }),
-      makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
+      makeAxiosInstances(config.externalAxiosTimeoutForFranceTravail)
+        .axiosWithValidateStatus,
     ),
     new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
     config.ftApiUrl,
