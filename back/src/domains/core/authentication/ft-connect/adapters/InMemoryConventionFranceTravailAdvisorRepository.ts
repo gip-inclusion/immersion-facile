@@ -51,7 +51,7 @@ export class InMemoryConventionFranceTravailAdvisorRepository
       );
   }
 
-  public async openSlotForNextConvention(
+  public async saveFtUserAndAdvisor(
     peUserAndAdvisor: FtUserAndAdvisor,
   ): Promise<void> {
     this.#conventionFranceTravailUsersAdvisors.push({

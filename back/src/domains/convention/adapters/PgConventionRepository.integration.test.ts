@@ -83,10 +83,12 @@ describe("PgConventionRepository", () => {
 
   beforeEach(async () => {
     timeGateway = new CustomTimeGateway();
-    await db.deleteFrom("partners_pe_connect").execute();
+    await db.deleteFrom("conventions__ft_connect_users").execute();
+    await db.deleteFrom("ft_connect_users").execute();
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("actors").execute();
-    await db.deleteFrom("partners_pe_connect").execute();
+    await db.deleteFrom("conventions__ft_connect_users").execute();
+    await db.deleteFrom("ft_connect_users").execute();
     await db.deleteFrom("convention_external_ids").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agency_groups").execute();
@@ -327,18 +329,27 @@ describe("PgConventionRepository", () => {
       .build();
 
     await db
-      .insertInto("partners_pe_connect")
+      .insertInto("ft_connect_users")
       .values({
-        user_pe_external_id: userFtExternalId,
-        convention_id: convention.id,
-        email: "john@mail.com",
-        firstname: "John",
-        lastname: "Doe",
-        type: "PLACEMENT",
+        ft_connect_id: userFtExternalId,
+        advisor_email: "john@mail.com",
+        advisor_firstname: "John",
+        advisor_lastname: "Doe",
+        advisor_kind: "PLACEMENT",
+        created_at: new Date(),
+        updated_at: new Date(),
       })
       .execute();
 
     await conventionRepository.save(convention);
+
+    await db
+      .insertInto("conventions__ft_connect_users")
+      .values({
+        convention_id: convention.id,
+        ft_connect_id: userFtExternalId,
+      })
+      .execute();
 
     const conventionRetreived = await conventionRepository.getById(
       convention.id,
@@ -382,18 +393,27 @@ describe("PgConventionRepository", () => {
       .build();
 
     await db
-      .insertInto("partners_pe_connect")
+      .insertInto("ft_connect_users")
       .values({
-        user_pe_external_id: userFtExternalId,
-        convention_id: convention.id,
-        email: null,
-        firstname: null,
-        lastname: null,
-        type: null,
+        ft_connect_id: userFtExternalId,
+        advisor_email: null,
+        advisor_firstname: null,
+        advisor_lastname: null,
+        advisor_kind: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       })
       .execute();
 
     await conventionRepository.save(convention);
+
+    await db
+      .insertInto("conventions__ft_connect_users")
+      .values({
+        convention_id: convention.id,
+        ft_connect_id: userFtExternalId,
+      })
+      .execute();
 
     const conventionRetreived = await conventionRepository.getById(
       convention.id,
@@ -494,18 +514,27 @@ describe("PgConventionRepository", () => {
       .build();
 
     await db
-      .insertInto("partners_pe_connect")
+      .insertInto("ft_connect_users")
       .values({
-        user_pe_external_id: ftConnectId,
-        convention_id: convention.id,
-        email: "john@mail.com",
-        firstname: "John",
-        lastname: "Doe",
-        type: "PLACEMENT",
+        ft_connect_id: ftConnectId,
+        advisor_email: "john@mail.com",
+        advisor_firstname: "John",
+        advisor_lastname: "Doe",
+        advisor_kind: "PLACEMENT",
+        created_at: new Date(),
+        updated_at: new Date(),
       })
       .execute();
 
     await conventionRepository.save(convention, anyConventionUpdatedAt);
+
+    await db
+      .insertInto("conventions__ft_connect_users")
+      .values({
+        convention_id: convention.id,
+        ft_connect_id: ftConnectId,
+      })
+      .execute();
 
     expectToEqual(
       await conventionRepository.getById(convention.id),

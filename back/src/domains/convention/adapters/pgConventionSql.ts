@@ -39,7 +39,8 @@ type ConventionQueryBuilderDb = Database & {
   et: Database["actors"];
   br: Database["actors"] | null;
   bce: Database["actors"] | null;
-  p: Database["partners_pe_connect"] | null;
+  ftu: Database["ft_connect_users"] | null;
+  cftu: Database["conventions__ft_connect_users"] | null;
   vad: Database["view_appellations_dto"] | null;
 };
 
@@ -85,21 +86,21 @@ const createConventionSelection = <
             emergencyContactEmail: sql`b.extra_fields ->> 'emergencyContactEmail'`,
             federatedIdentity: eb
               .case()
-              .when("p.user_pe_external_id", "is not", null)
+              .when("ftu.ft_connect_id", "is not", null)
               .then(
                 jsonBuildObject({
                   provider: sql`'peConnect'`,
-                  token: ref("p.user_pe_external_id"),
+                  token: ref("ftu.ft_connect_id"),
                   payload: eb
                     .case()
-                    .when("p.email", "is not", null)
+                    .when("ftu.advisor_email", "is not", null)
                     .then(
                       jsonBuildObject({
                         advisor: jsonBuildObject({
-                          email: ref("p.email"),
-                          firstName: ref("p.firstname"),
-                          lastName: ref("p.lastname"),
-                          type: ref("p.type"),
+                          email: ref("ftu.advisor_email"),
+                          firstName: ref("ftu.advisor_firstname"),
+                          lastName: ref("ftu.advisor_lastname"),
+                          type: ref("ftu.advisor_kind"),
                         }),
                       }),
                     )
@@ -293,7 +294,16 @@ const withActorsAndAppellationsAndPartnerPeJoin = <
       "bce.id",
       "conventions.beneficiary_current_employer_id",
     )
-    .leftJoin("partners_pe_connect as p", "p.convention_id", "conventions.id")
+    .leftJoin(
+      "conventions__ft_connect_users as cftu",
+      "cftu.convention_id",
+      "conventions.id",
+    )
+    .leftJoin(
+      "ft_connect_users as ftu",
+      "ftu.ft_connect_id",
+      "cftu.ft_connect_id",
+    )
     .leftJoin(
       "view_appellations_dto as vad",
       "vad.appellation_code",
