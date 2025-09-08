@@ -18,10 +18,30 @@ export class InMemoryConventionRepository implements ConventionRepository {
     return Object.values(this.#conventions);
   }
 
-  public async deprecateConventionsWithoutDefinitiveStatusEndedSince(): Promise<
-    ConventionId[]
-  > {
-    throw errors.generic.fakeError("not implemented");
+  public async deprecateConventionsWithoutDefinitiveStatusEndedSince(
+    endedSince: Date,
+  ): Promise<ConventionId[]> {
+    const conventionsToDeprecate = await Promise.all(
+      values(this.#conventions)
+        .filter(
+          (convention) =>
+            convention.dateEnd <= endedSince.toISOString() &&
+            ![
+              "REJECTED",
+              "CANCELLED",
+              "DEPRECATED",
+              "ACCEPTED_BY_VALIDATOR",
+            ].includes(convention.status),
+        )
+        .map((convention) =>
+          this.update({
+            ...convention,
+            status: "DEPRECATED",
+            statusJustification: `Devenu obsolète car statut ${convention.status} alors que la date de fin est dépassée depuis longtemps`,
+          }),
+        ),
+    );
+    return conventionsToDeprecate.filter((id) => id !== undefined);
   }
 
   public async getIdsValidatedByEndDateAround(
