@@ -11,6 +11,7 @@ import {
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   errors,
+  expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
   type FtConnectToken,
@@ -1119,7 +1120,12 @@ describe("PgConventionRepository", () => {
           dateSince,
         );
 
-      expectToEqual(numberOfUpdatedConventions, 4);
+      expectArraysToEqualIgnoringOrder(numberOfUpdatedConventions, [
+        convention1ToMarkAsDeprecated.id,
+        convention7ToMarkAsDeprecated.id,
+        convention8ToMarkAsDeprecated.id,
+        convention9ToMarkAsDeprecated.id,
+      ]);
 
       await expectConventionInRepoToBeDeprecated(convention1ToMarkAsDeprecated);
       await expectConventionInRepoToBeDeprecated(convention7ToMarkAsDeprecated);

@@ -18,7 +18,9 @@ export class InMemoryConventionRepository implements ConventionRepository {
     return Object.values(this.#conventions);
   }
 
-  public async deprecateConventionsWithoutDefinitiveStatusEndedSince(): Promise<number> {
+  public async deprecateConventionsWithoutDefinitiveStatusEndedSince(): Promise<
+    ConventionId[]
+  > {
     throw errors.generic.fakeError("not implemented");
   }
 

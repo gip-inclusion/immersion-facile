@@ -21,12 +21,12 @@ const triggerMarkOldConventionAsDeprecated = async () => {
 
   const deprecateSince = subMonths(new Date(), 1);
 
-  const numberOfUpdatedConventions =
+  const updatedConventionsIds =
     await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
       deprecateSince,
     );
 
-  return { numberOfUpdatedConventions };
+  return { numberOfUpdatedConventions: updatedConventionsIds.length };
 };
 
 handleCRONScript(
