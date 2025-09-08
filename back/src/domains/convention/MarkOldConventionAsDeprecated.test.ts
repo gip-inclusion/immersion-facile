@@ -1,9 +1,12 @@
 import { ConventionDtoBuilder } from "shared";
+import { makeCreateNewEvent } from "../core/events/ports/EventBus";
+import { CustomTimeGateway } from "../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
 } from "../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { TestUuidGenerator } from "../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type MarkOldConventionAsDeprecated,
   makeMarkOldConventionAsDeprecated,
@@ -15,8 +18,15 @@ describe("MarkOldConventionAsDeprecated", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway: new CustomTimeGateway(),
+      uuidGenerator: new TestUuidGenerator(),
+    });
     markOldConventionAsDeprecated = makeMarkOldConventionAsDeprecated({
       uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent,
+      },
     });
   });
 
@@ -47,6 +57,10 @@ describe("MarkOldConventionAsDeprecated", () => {
     expect(deprecatedConvention.status).toEqual("DEPRECATED");
     expect(deprecatedConvention.statusJustification).toEqual(
       "Devenu obsolète car statut PARTIALLY_SIGNED alors que la date de fin est dépassée depuis longtemps",
+    );
+    expect(uow.outboxRepository.events).toHaveLength(1);
+    expect(uow.outboxRepository.events[0].topic).toEqual(
+      "ConventionDeprecated",
     );
   });
 });
