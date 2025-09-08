@@ -43,9 +43,10 @@ export class PgConventionRepository implements ConventionRepository {
         "DEPRECATED",
         "ACCEPTED_BY_VALIDATOR",
       ])
-      .executeTakeFirst();
+      .returning("id")
+      .execute();
 
-    return Number(result.numUpdatedRows);
+    return result.map(({ id }) => id);
   }
 
   public async getById(
