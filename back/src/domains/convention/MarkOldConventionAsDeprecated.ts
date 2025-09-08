@@ -25,11 +25,10 @@ export const makeMarkOldConventionAsDeprecated = useCaseBuilder(
         inputParams.deprecateSince,
       );
 
-    const conventions = await Promise.all(
-      updatedConventionsIds.map((conventionId) =>
-        uow.conventionRepository.getById(conventionId),
-      ),
-    );
+    const conventions = await uow.conventionQueries.getConventions({
+      filters: { ids: updatedConventionsIds },
+      sortBy: "dateStart",
+    });
 
     await uow.outboxRepository.saveNewEventsBatch(
       conventions
@@ -43,6 +42,8 @@ export const makeMarkOldConventionAsDeprecated = useCaseBuilder(
     );
 
     return {
-      numberOfUpdatedConventions: updatedConventionsIds.length,
+      numberOfUpdatedConventions: conventions.filter(
+        (convention) => convention !== undefined,
+      ).length,
     };
   });

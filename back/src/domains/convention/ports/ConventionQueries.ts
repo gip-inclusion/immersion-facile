@@ -16,6 +16,7 @@ import type {
 } from "shared";
 
 export type GetConventionsFilters = {
+  ids?: ConventionId[];
   startDateGreater?: Date;
   startDateLessOrEqual?: Date;
   dateSubmissionEqual?: Date;

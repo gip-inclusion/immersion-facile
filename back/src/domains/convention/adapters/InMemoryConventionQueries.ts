@@ -257,6 +257,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
 const makeApplyFiltersToConventions =
   ({
+    ids,
     startDateLessOrEqual,
     startDateGreater,
     withStatuses,
@@ -269,6 +270,7 @@ const makeApplyFiltersToConventions =
   (convention: ConventionDto) =>
     (
       [
+        ({ id }) => (ids && ids.length > 0 ? ids.includes(id) : true),
         ({ dateEnd }) => (endDate?.to ? new Date(dateEnd) <= endDate.to : true),
         ({ dateEnd }) =>
           endDate?.from ? new Date(dateEnd) >= endDate.from : true,
