@@ -1,4 +1,4 @@
-import { ConventionDtoBuilder } from "shared";
+import { ConventionDtoBuilder, reasonableSchedule } from "shared";
 import { makeCreateNewEvent } from "../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -34,12 +34,16 @@ describe("MarkOldConventionAsDeprecated", () => {
     const conventionToDeprecate = new ConventionDtoBuilder()
       .withId("11111111-1111-4111-a111-111111111111")
       .withStatus("PARTIALLY_SIGNED")
+      .withDateStart(new Date("2025-02-12").toISOString())
       .withDateEnd(new Date("2025-02-14").toISOString())
+      .withSchedule(reasonableSchedule)
       .build();
     const conventionToKeep = new ConventionDtoBuilder()
       .withId("11111111-1111-4111-a111-111111111112")
       .withStatus("PARTIALLY_SIGNED")
+      .withDateStart(new Date("2025-04-12").toISOString())
       .withDateEnd(new Date("2025-04-14").toISOString())
+      .withSchedule(reasonableSchedule)
       .build();
     uow.conventionRepository.setConventions([
       conventionToDeprecate,

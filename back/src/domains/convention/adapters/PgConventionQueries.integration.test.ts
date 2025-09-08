@@ -343,6 +343,16 @@ describe("Pg implementation of ConventionQueries", () => {
 
     it.each([
       {
+        testName: "with filter ids",
+        params: {
+          filters: {
+            ids: [conventionCancelledAndDateStart20230327.id],
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [conventionCancelledAndDateStart20230327],
+      },
+      {
         testName: "with filter dateSubmissionEqual",
         params: {
           filters: {

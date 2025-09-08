@@ -339,6 +339,7 @@ const filterByBeneficiaryName =
 
 const addFiltersToBuilder =
   ({
+    ids,
     startDateGreater,
     startDateLessOrEqual,
     withStatuses,
@@ -351,6 +352,7 @@ const addFiltersToBuilder =
   (builder: ConventionQueryBuilder) =>
     pipeWithValue(
       builder,
+      (b) => (ids && ids.length > 0 ? b.where("conventions.id", "in", ids) : b),
       (b) =>
         withStatuses && withStatuses.length > 0
           ? b.where("conventions.status", "in", withStatuses)
