@@ -111,7 +111,7 @@ type ConnectPrivateRoute =
 
 type ConnectedPrivateRouteProps = {
   route: ConnectPrivateRoute;
-  children: ReactElement | ReactElement[];
+  children: ReactNode;
   oAuthConnectionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
 };

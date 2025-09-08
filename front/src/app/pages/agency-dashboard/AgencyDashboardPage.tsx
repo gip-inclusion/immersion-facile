@@ -58,7 +58,7 @@ export const AgencyDashboardPage = ({
                 <Alert
                   severity="warning"
                   title="Rattachement à vos organismes en cours"
-                  description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
+                  description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ça ne devrait pas prendre plus d'une minute. Veuillez recharger la page après ce délai."
                 />
               );
             return (
