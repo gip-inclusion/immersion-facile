@@ -1,8 +1,8 @@
 import { subMonths } from "date-fns";
-import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
-import { PgConventionRepository } from "../domains/convention/adapters/PgConventionRepository";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { makeMarkOldConventionAsDeprecated } from "../domains/convention/MarkOldConventionAsDeprecated";
+import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -11,22 +11,17 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const triggerMarkOldConventionAsDeprecated = async () => {
-  const dbUrl = config.pgImmersionDbUrl;
-
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
-
-  const conventionRepository = new PgConventionRepository(makeKyselyDb(pool));
-
   const deprecateSince = subMonths(new Date(), 1);
 
-  const updatedConventionsIds =
-    await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
+  const { numberOfUpdatedConventions } =
+    await makeMarkOldConventionAsDeprecated({
+      uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+        .uowPerformer,
+    }).execute({
       deprecateSince,
-    );
+    });
 
-  return { numberOfUpdatedConventions: updatedConventionsIds.length };
+  return { numberOfUpdatedConventions };
 };
 
 handleCRONScript(
