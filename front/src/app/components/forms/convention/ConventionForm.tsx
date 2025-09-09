@@ -4,7 +4,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Dispatch,
   type ElementRef,
@@ -190,7 +190,7 @@ export const ConventionForm = ({
 
   const methods = useForm<ConventionPresentation>({
     defaultValues,
-    resolver: standardSchemaResolver(conventionPresentationSchema),
+    resolver: zodResolver(conventionPresentationSchema),
     mode: "onTouched",
   });
 

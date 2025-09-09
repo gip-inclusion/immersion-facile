@@ -1,6 +1,6 @@
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback } from "react";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -35,7 +35,7 @@ export const TransferModalContent = ({
   const isAgenciesLoading = useAppSelector(agenciesSelectors.isLoading);
   const agenciesFeedback = useAppSelector(agenciesSelectors.feedback);
   const methods = useForm<TransferConventionToAgencyRequestDto>({
-    resolver: standardSchemaResolver(transferConventionToAgencyRequestSchema),
+    resolver: zodResolver(transferConventionToAgencyRequestSchema),
     mode: "onTouched",
     defaultValues: {
       agencyId: "",

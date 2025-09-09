@@ -4,7 +4,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import { ConventionSummary, Loader, useScrollToTop } from "react-design-system";
@@ -361,7 +361,7 @@ const ConventionSummarySection = ({
     useForm<WithStatusJustification>({
       mode: "onTouched",
       defaultValues: { statusJustification: "" },
-      resolver: standardSchemaResolver(statusJustificationSchema),
+      resolver: zodResolver(statusJustificationSchema),
     });
   const getFieldError = makeFieldError(formState);
 

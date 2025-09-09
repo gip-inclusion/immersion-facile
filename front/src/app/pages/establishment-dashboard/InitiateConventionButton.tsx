@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { equals } from "ramda";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -69,7 +69,7 @@ export const InitiateConventionButton = () => {
     formState: { errors },
     watch,
   } = useForm<InitiateConventionFormData>({
-    resolver: standardSchemaResolver(initiateConventionFormSchema),
+    resolver: zodResolver(initiateConventionFormSchema),
     defaultValues,
   });
   const values = watch();

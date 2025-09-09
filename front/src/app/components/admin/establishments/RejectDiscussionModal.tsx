@@ -6,7 +6,7 @@ import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -77,7 +77,7 @@ export const RejectDiscussionModal = ({
 }): JSX.Element => {
   const { register, watch, handleSubmit, formState, setValue } =
     useForm<WithDiscussionRejection>({
-      resolver: standardSchemaResolver(discussionRejectionSchema),
+      resolver: zodResolver(discussionRejectionSchema),
     });
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);

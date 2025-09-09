@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { type ReactNode, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -37,7 +37,7 @@ export const AgencyUserModificationForm = ({
   routeName: AgencyOverviewRouteName;
 }) => {
   const methods = useForm<UserParamsForAgency>({
-    resolver: standardSchemaResolver(userParamsForAgencySchema),
+    resolver: zodResolver(userParamsForAgencySchema),
     mode: "onTouched",
     defaultValues: agencyUser,
   });
