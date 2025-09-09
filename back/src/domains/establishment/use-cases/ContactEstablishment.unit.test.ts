@@ -108,6 +108,7 @@ describe("ContactEstablishment", () => {
     potentialBeneficiaryLastName: "potential_beneficiary_last_name",
     potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
     locationId: location.id,
+    experienceAdditionalInformation: "other stuff",
   };
 
   const validEmailRequest: CreateDiscussionDto = {
@@ -354,15 +355,15 @@ describe("ContactEstablishment", () => {
               contactMode: "PHONE",
               kind: "IF",
               potentialBeneficiary: {
-                firstName: validEmailRequest.potentialBeneficiaryFirstName,
-                lastName: validEmailRequest.potentialBeneficiaryLastName,
-                email: validEmailRequest.potentialBeneficiaryEmail,
-                phone: validEmailRequest.potentialBeneficiaryPhone,
-                resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
+                firstName: validPhoneRequest.potentialBeneficiaryFirstName,
+                lastName: validPhoneRequest.potentialBeneficiaryLastName,
+                email: validPhoneRequest.potentialBeneficiaryEmail,
+                phone: validPhoneRequest.potentialBeneficiaryPhone,
+                resumeLink: validPhoneRequest.potentialBeneficiaryResumeLink,
                 experienceAdditionalInformation:
-                  validEmailRequest.experienceAdditionalInformation,
-                hasWorkingExperience: validEmailRequest.hasWorkingExperience,
-                datePreferences: validEmailRequest.datePreferences,
+                  validPhoneRequest.experienceAdditionalInformation,
+                hasWorkingExperience: validPhoneRequest.hasWorkingExperience,
+                datePreferences: validPhoneRequest.datePreferences,
                 immersionObjective: "Confirmer un projet professionnel",
               },
             },
@@ -406,15 +407,15 @@ describe("ContactEstablishment", () => {
               contactMode: "IN_PERSON",
               kind: "IF",
               potentialBeneficiary: {
-                firstName: validEmailRequest.potentialBeneficiaryFirstName,
-                lastName: validEmailRequest.potentialBeneficiaryLastName,
-                email: validEmailRequest.potentialBeneficiaryEmail,
-                phone: validEmailRequest.potentialBeneficiaryPhone,
-                resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
+                firstName: validPhoneRequest.potentialBeneficiaryFirstName,
+                lastName: validPhoneRequest.potentialBeneficiaryLastName,
+                email: validPhoneRequest.potentialBeneficiaryEmail,
+                phone: validPhoneRequest.potentialBeneficiaryPhone,
+                resumeLink: validPhoneRequest.potentialBeneficiaryResumeLink,
                 experienceAdditionalInformation:
-                  validEmailRequest.experienceAdditionalInformation,
-                hasWorkingExperience: validEmailRequest.hasWorkingExperience,
-                datePreferences: validEmailRequest.datePreferences,
+                  validPhoneRequest.experienceAdditionalInformation,
+                hasWorkingExperience: validPhoneRequest.hasWorkingExperience,
+                datePreferences: validPhoneRequest.datePreferences,
                 immersionObjective: "Confirmer un projet professionnel",
               },
             },
@@ -784,6 +785,10 @@ describe("ContactEstablishment", () => {
               phone: validEmailRequest.potentialBeneficiaryPhone,
               datePreferences: validEmailRequest.datePreferences,
               immersionObjective: "Confirmer un projet professionnel",
+              experienceAdditionalInformation:
+                validEmailRequest.experienceAdditionalInformation,
+              hasWorkingExperience: validEmailRequest.hasWorkingExperience,
+              resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
             },
           },
         ]);
