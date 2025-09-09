@@ -94,7 +94,7 @@ export const makeFieldError =
     return error
       ? {
           state: "error" as const,
-          stateRelatedMessage: "message" in error ? error.message : error,
+          stateRelatedMessage: getErrorMessage(error),
         }
       : null;
   };
@@ -110,6 +110,26 @@ const isErrorAddressError = (error: unknown) => {
     typeof error === "object" &&
     keys(error).every((key) => keysOfAddressSchema.includes(key))
   );
+};
+
+type RootError = {
+  root: {
+    message: string;
+  };
+};
+
+const isRootError = (error: unknown): error is RootError => {
+  return !!(error && typeof error === "object" && "root" in error);
+};
+
+const getErrorMessage = (error: unknown): string => {
+  if (isRootError(error)) {
+    return error.root.message;
+  }
+  if (error && typeof error === "object" && "message" in error) {
+    return error.message as string;
+  }
+  return String(error);
 };
 
 export const formErrorsToFlatErrors = (obj: AnyErrors): AnyErrors => {

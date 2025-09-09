@@ -693,7 +693,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
   );
 };
 
-const UserToContact = ({ mode }: { mode: Mode }) => {
+const UserToContact = ({ mode }: { mode: Mode }): React.ReactNode => {
   const { getValues, setValue, formState } =
     useFormContext<FormEstablishmentDto>();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
