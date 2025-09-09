@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
@@ -44,7 +44,7 @@ const RejectAgencyModalContent = ({
     defaultValues: {
       rejectionJustification: undefined,
     },
-    resolver: standardSchemaResolver(
+    resolver: zodResolver(
       z.object({ rejectionJustification: zStringMinLength1 }),
     ),
   });
@@ -114,7 +114,7 @@ export const ActivateAgency = () => {
     defaultValues: {
       agencyId: undefined,
     },
-    resolver: standardSchemaResolver(withAgencyIdSchema),
+    resolver: zodResolver(withAgencyIdSchema),
   });
   const { register, handleSubmit, formState, reset } = methods;
 

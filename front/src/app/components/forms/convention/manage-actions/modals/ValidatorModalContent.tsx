@@ -1,6 +1,6 @@
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { pick } from "ramda";
 import type { Dispatch, SetStateAction } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -49,7 +49,7 @@ export const ValidatorModalContent = ({
 
   const { register, handleSubmit, formState } =
     useForm<WithFirstnameAndLastname>({
-      resolver: standardSchemaResolver(withFirstnameAndLastnameSchema),
+      resolver: zodResolver(withFirstnameAndLastnameSchema),
       mode: "onTouched",
       defaultValues: currentUserName ?? counsellorNameInConvention,
     });

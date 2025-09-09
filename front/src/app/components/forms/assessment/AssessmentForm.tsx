@@ -5,7 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import { type ChangeEvent, useEffect, useState } from "react";
 import {
@@ -82,7 +82,7 @@ export const AssessmentForm = ({
     status: null,
   };
   const methods = useForm<FormAssessmentDto>({
-    resolver: standardSchemaResolver(assessmentDtoSchema),
+    resolver: zodResolver(assessmentDtoSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });

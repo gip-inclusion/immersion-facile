@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ErrorNotifications } from "react-design-system";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -58,7 +58,7 @@ export const EditAgencyForm = ({
   const agencyState = useAppSelector(agencyAdminSelectors.agencyState);
   const { getFormErrors } = getFormContents(formAgencyFieldsLabels);
   const methods = useForm<AgencyDto>({
-    resolver: standardSchemaResolver(editAgencySchema),
+    resolver: zodResolver(editAgencySchema),
     mode: "onTouched",
     defaultValues: agency,
   });

@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -192,7 +192,7 @@ const RejectIcUserRegistrationToAgencyForm = ({
   const dispatch = useDispatch();
   const { register, handleSubmit, formState } =
     useForm<RejectConnectedUserRoleForAgencyParams>({
-      resolver: standardSchemaResolver(rejectIcUserRoleForAgencyParamsSchema),
+      resolver: zodResolver(rejectIcUserRoleForAgencyParamsSchema),
       mode: "onTouched",
       defaultValues: {
         agencyId: agency.id,

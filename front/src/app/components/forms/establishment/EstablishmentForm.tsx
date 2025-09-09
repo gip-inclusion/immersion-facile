@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, useDebounce, useScrollToTop } from "react-design-system";
@@ -178,7 +178,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: defaultFormValues,
-    resolver: standardSchemaResolver(formEstablishmentSchema),
+    resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
   const { handleSubmit, getValues, reset, trigger } = methods;

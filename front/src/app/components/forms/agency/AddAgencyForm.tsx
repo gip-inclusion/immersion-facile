@@ -5,7 +5,7 @@ import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ErrorNotifications,
@@ -155,7 +155,7 @@ const AgencyForm = ({
     [refersToOtherAgency, acquisitionParams, siret],
   );
   const methods = useForm<CreateAgencyInitialValues>({
-    resolver: standardSchemaResolver(createAgencySchema),
+    resolver: zodResolver(createAgencySchema),
     mode: "onTouched",
     defaultValues: formInitialValues,
   });
