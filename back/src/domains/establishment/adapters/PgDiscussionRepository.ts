@@ -365,25 +365,20 @@ const discussionToPg = (
   potential_beneficiary_email: discussion.potentialBeneficiary.email,
   potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
   kind: discussion.kind,
-  ...(discussion.contactMode === "EMAIL"
+  immersion_objective: discussion.potentialBeneficiary.immersionObjective,
+  potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
+  potential_beneficiary_date_preferences:
+    discussion.potentialBeneficiary.datePreferences,
+  ...(discussion.kind === "IF"
     ? {
-        immersion_objective: discussion.potentialBeneficiary.immersionObjective,
-        potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
-        potential_beneficiary_date_preferences:
-          discussion.potentialBeneficiary.datePreferences,
-        ...(discussion.kind === "IF"
-          ? {
-              potential_beneficiary_resume_link:
-                discussion.potentialBeneficiary.resumeLink,
-              potential_beneficiary_experience_additional_information:
-                discussion.potentialBeneficiary.experienceAdditionalInformation,
-              potential_beneficiary_has_working_experience:
-                discussion.potentialBeneficiary.hasWorkingExperience ===
-                undefined
-                  ? null
-                  : discussion.potentialBeneficiary.hasWorkingExperience,
-            }
-          : {}),
+        potential_beneficiary_resume_link:
+          discussion.potentialBeneficiary.resumeLink,
+        potential_beneficiary_experience_additional_information:
+          discussion.potentialBeneficiary.experienceAdditionalInformation,
+        potential_beneficiary_has_working_experience:
+          discussion.potentialBeneficiary.hasWorkingExperience === undefined
+            ? null
+            : discussion.potentialBeneficiary.hasWorkingExperience,
       }
     : {}),
   potential_beneficiary_level_of_education:
@@ -495,85 +490,11 @@ const makeDiscussionDtoFromPgDiscussion = (
       firstName: discussion.potentialBeneficiary.firstName,
       lastName: discussion.potentialBeneficiary.lastName,
       email: discussion.potentialBeneficiary.email,
+      phone: discussion.potentialBeneficiary.phone,
+      datePreferences: discussion.potentialBeneficiary.datePreferences,
     };
 
-    if (discussion.contactMode === "EMAIL") {
-      const phone = discussion.potentialBeneficiary.phone;
-      const datePreferences = discussion.potentialBeneficiary.datePreferences;
-
-      if (phone === undefined)
-        throw errors.discussion.missingPhone(discussion.id);
-      if (datePreferences === undefined)
-        throw errors.discussion.missingDatePreferences(discussion.id);
-
-      if (discussion.kind === "IF") {
-        return {
-          ...common,
-          appellationCode: discussion.appellationCode,
-          acquisitionCampaign: discussion.acquisition_campaign,
-          acquisitionKeyword: discussion.acquisition_keyword,
-          contactMode: discussion.contactMode,
-          kind: discussion.kind,
-          exchanges: (discussion.exchanges ?? []).map(
-            ({ sentAt, ...rest }) => ({
-              ...rest,
-              sentAt: new Date(sentAt).toISOString(),
-            }),
-          ),
-          potentialBeneficiary: {
-            ...commonPotentialBeneficiary,
-            phone,
-            immersionObjective: discussion.immersionObjective ?? null,
-            datePreferences,
-            hasWorkingExperience:
-              discussion.potentialBeneficiary.hasWorkingExperience,
-            resumeLink: discussion.potentialBeneficiary.resumeLink,
-            experienceAdditionalInformation:
-              discussion.potentialBeneficiary.experienceAdditionalInformation,
-          },
-        };
-      }
-
-      if (
-        discussion.immersionObjective !==
-        "Découvrir un métier ou un secteur d'activité"
-      )
-        throw errors.discussion.badImmersionObjective(
-          discussion.id,
-          discussion.kind,
-          discussion.immersionObjective,
-        );
-      if (!discussion.potentialBeneficiary.levelOfEducation)
-        throw errors.discussion.missingLevelOfEducation({
-          id: discussion.id,
-          kind: discussion.kind,
-        });
-      return {
-        ...common,
-        appellationCode: discussion.appellationCode,
-        acquisitionCampaign: discussion.acquisition_campaign,
-        acquisitionKeyword: discussion.acquisition_keyword,
-        contactMode: discussion.contactMode,
-        exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
-          ...rest,
-          sentAt: new Date(sentAt).toISOString(),
-        })),
-        kind: discussion.kind,
-        potentialBeneficiary: {
-          ...commonPotentialBeneficiary,
-          phone,
-          immersionObjective: discussion.immersionObjective,
-          datePreferences,
-          levelOfEducation: discussion.potentialBeneficiary.levelOfEducation,
-        },
-      };
-    }
-    if (discussion.kind === "1_ELEVE_1_STAGE") {
-      if (!discussion.potentialBeneficiary.levelOfEducation)
-        throw new Error(
-          `Missing level of education for discussion kind ${discussion.kind}`,
-        );
-
+    if (discussion.kind === "IF") {
       return {
         ...common,
         appellationCode: discussion.appellationCode,
@@ -587,10 +508,31 @@ const makeDiscussionDtoFromPgDiscussion = (
         })),
         potentialBeneficiary: {
           ...commonPotentialBeneficiary,
-          levelOfEducation: discussion.potentialBeneficiary.levelOfEducation,
+          immersionObjective: discussion.immersionObjective ?? null,
+          hasWorkingExperience:
+            discussion.potentialBeneficiary.hasWorkingExperience,
+          resumeLink: discussion.potentialBeneficiary.resumeLink,
+          experienceAdditionalInformation:
+            discussion.potentialBeneficiary.experienceAdditionalInformation,
         },
       };
     }
+
+    if (
+      discussion.immersionObjective !==
+      "Découvrir un métier ou un secteur d'activité"
+    )
+      throw errors.discussion.badImmersionObjective(
+        discussion.id,
+        discussion.kind,
+        discussion.immersionObjective,
+      );
+
+    if (!discussion.potentialBeneficiary.levelOfEducation)
+      throw errors.discussion.missingLevelOfEducation({
+        id: discussion.id,
+        kind: discussion.kind,
+      });
 
     return {
       ...common,
@@ -598,12 +540,16 @@ const makeDiscussionDtoFromPgDiscussion = (
       acquisitionCampaign: discussion.acquisition_campaign,
       acquisitionKeyword: discussion.acquisition_keyword,
       contactMode: discussion.contactMode,
-      kind: discussion.kind,
       exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
         ...rest,
         sentAt: new Date(sentAt).toISOString(),
       })),
-      potentialBeneficiary: commonPotentialBeneficiary,
+      kind: discussion.kind,
+      potentialBeneficiary: {
+        ...commonPotentialBeneficiary,
+        immersionObjective: discussion.immersionObjective,
+        levelOfEducation: discussion.potentialBeneficiary.levelOfEducation,
+      },
     };
   });
 

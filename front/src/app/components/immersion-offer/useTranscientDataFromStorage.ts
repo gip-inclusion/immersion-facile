@@ -1,19 +1,21 @@
 import { useState } from "react";
-import type {
-  ContactEstablishmentByMailDto,
-  OmitFromExistingKeys,
-} from "shared";
+import type { CreateDiscussionDto, OmitFromExistingKeys } from "shared";
 import { keys } from "shared";
 
 const transcientDataStorageKey = "IfTranscientData";
 const preferUseTranscientDataStorageKey = "IfPreferUseTranscientData";
 
 // TODO: fix circular reference to avoid ContactTranscientData empty object
-const unrelevantDataKeysForContactScope: (keyof ContactEstablishmentByMailDto)[] =
-  ["locationId", "appellationCode", "contactMode", "siret", "kind"] as const;
+const unrelevantDataKeysForContactScope: (keyof CreateDiscussionDto)[] = [
+  "locationId",
+  "appellationCode",
+  "contactMode",
+  "siret",
+  "kind",
+] as const;
 
 export type ContactTranscientData = OmitFromExistingKeys<
-  ContactEstablishmentByMailDto,
+  CreateDiscussionDto,
   (typeof unrelevantDataKeysForContactScope)[number]
 >;
 

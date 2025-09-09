@@ -2,15 +2,9 @@ import subDays from "date-fns/subDays";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
   type CommonDiscussionDto,
-  type ContactEstablishmentByMailDto,
-  type ContactEstablishmentByPhoneDto,
-  type ContactEstablishmentInPersonDto,
-  type ContactEstablishmentRequestDto,
-  contactEstablishmentRequestSchema,
+  type CreateDiscussionDto,
+  createDiscussionSchema,
   type DiscussionDto,
-  type DiscussionDtoEmail,
-  type DiscussionDtoInPerson,
-  type DiscussionDtoPhone,
   type ExtraDiscussionDtoProperties,
   emailTemplatesByName,
   errors,
@@ -27,8 +21,8 @@ import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate"
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { makeContactByEmailRequestParams } from "../helpers/contactRequest";
 
-export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
-  protected inputSchema = contactEstablishmentRequestSchema;
+export class ContactEstablishment extends TransactionalUseCase<CreateDiscussionDto> {
+  protected inputSchema = createDiscussionSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -59,7 +53,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   }
 
   public async _execute(
-    contactRequest: ContactEstablishmentRequestDto,
+    contactRequest: CreateDiscussionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const now = this.#timeGateway.now();
@@ -153,7 +147,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     now,
     uow,
   }: {
-    contactRequest: ContactEstablishmentRequestDto;
+    contactRequest: CreateDiscussionDto;
     establishment: EstablishmentAggregate;
     now: Date;
     uow: UnitOfWork;
@@ -188,28 +182,13 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       exchanges: [],
     };
 
-    if (contactRequest.contactMode === "EMAIL") {
-      return makeDiscussionDtoEmail({
-        contactRequest,
-        immersionFacileBaseUrl: this.#immersionFacileBaseUrl,
-        common,
-        extraDiscussionDtoProperties,
-        now,
-        uow,
-      });
-    }
-
-    if (contactRequest.contactMode === "PHONE")
-      return makeDiscussionDtoPhone({
-        common,
-        extraDiscussionDtoProperties,
-        contactRequest,
-      });
-
-    return makeDiscussionDtoInPerson({
+    return makeDiscussionDto({
+      contactRequest,
+      immersionFacileBaseUrl: this.#immersionFacileBaseUrl,
       common,
       extraDiscussionDtoProperties,
-      contactRequest,
+      now,
+      uow,
     });
   }
 
@@ -289,7 +268,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   }
 }
 
-const makeDiscussionDtoEmail = async ({
+const makeDiscussionDto = async ({
   common,
   extraDiscussionDtoProperties,
   contactRequest,
@@ -299,12 +278,12 @@ const makeDiscussionDtoEmail = async ({
 }: {
   common: CommonDiscussionDto;
   extraDiscussionDtoProperties: ExtraDiscussionDtoProperties;
-  contactRequest: ContactEstablishmentByMailDto;
+  contactRequest: CreateDiscussionDto;
   immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"];
   uow: UnitOfWork;
   now: Date;
-}): Promise<DiscussionDtoEmail> => {
-  const discussion: DiscussionDtoEmail = {
+}): Promise<DiscussionDto> => {
+  const discussion: DiscussionDto = {
     ...common,
     ...extraDiscussionDtoProperties,
     contactMode: contactRequest.contactMode,
@@ -348,7 +327,7 @@ const makeDiscussionDtoEmail = async ({
     footer: undefined,
   })(
     "CONTACT_BY_EMAIL_REQUEST",
-    await makeContactByEmailRequestParams({
+    makeContactByEmailRequestParams({
       discussion,
       immersionFacileBaseUrl,
       appellation,
@@ -374,67 +353,3 @@ const makeDiscussionDtoEmail = async ({
     ],
   };
 };
-
-const makeDiscussionDtoInPerson = ({
-  common,
-  extraDiscussionDtoProperties,
-  contactRequest,
-}: {
-  common: CommonDiscussionDto;
-  extraDiscussionDtoProperties: ExtraDiscussionDtoProperties;
-  contactRequest: ContactEstablishmentInPersonDto;
-}): DiscussionDtoInPerson => ({
-  ...common,
-  ...extraDiscussionDtoProperties,
-  contactMode: contactRequest.contactMode,
-  ...(contactRequest.kind === "IF"
-    ? {
-        kind: contactRequest.kind,
-        potentialBeneficiary: {
-          firstName: contactRequest.potentialBeneficiaryFirstName,
-          lastName: contactRequest.potentialBeneficiaryLastName,
-          email: contactRequest.potentialBeneficiaryEmail,
-        },
-      }
-    : {
-        kind: contactRequest.kind,
-        potentialBeneficiary: {
-          firstName: contactRequest.potentialBeneficiaryFirstName,
-          lastName: contactRequest.potentialBeneficiaryLastName,
-          email: contactRequest.potentialBeneficiaryEmail,
-          levelOfEducation: contactRequest.levelOfEducation,
-        },
-      }),
-});
-
-const makeDiscussionDtoPhone = ({
-  common,
-  extraDiscussionDtoProperties,
-  contactRequest,
-}: {
-  common: CommonDiscussionDto;
-  extraDiscussionDtoProperties: ExtraDiscussionDtoProperties;
-  contactRequest: ContactEstablishmentByPhoneDto;
-}): DiscussionDtoPhone => ({
-  ...common,
-  ...extraDiscussionDtoProperties,
-  contactMode: contactRequest.contactMode,
-  ...(contactRequest.kind === "IF"
-    ? {
-        kind: contactRequest.kind,
-        potentialBeneficiary: {
-          firstName: contactRequest.potentialBeneficiaryFirstName,
-          lastName: contactRequest.potentialBeneficiaryLastName,
-          email: contactRequest.potentialBeneficiaryEmail,
-        },
-      }
-    : {
-        kind: contactRequest.kind,
-        potentialBeneficiary: {
-          firstName: contactRequest.potentialBeneficiaryFirstName,
-          lastName: contactRequest.potentialBeneficiaryLastName,
-          email: contactRequest.potentialBeneficiaryEmail,
-          levelOfEducation: contactRequest.levelOfEducation,
-        },
-      }),
-});

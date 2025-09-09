@@ -1,18 +1,19 @@
 import { z } from "zod";
+import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressSchema } from "../address/address.schema";
-import {
-  preferEmailContactSchema,
-  preferInPersonContactSchema,
-  preferPhoneContactSchema,
-} from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
 import { discoverObjective } from "../convention/convention.dto";
 import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
+import { emailSchema } from "../email/email.schema";
+import { contactModeSchema } from "../formEstablishment/FormEstablishment.schema";
 import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
-import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import {
+  appellationCodeSchema,
+  appellationDtoSchema,
+} from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
@@ -21,12 +22,19 @@ import {
   zStringCanBeEmpty,
   zStringMinLength1,
   zToNumber,
+  zUuidLike,
 } from "../zodUtils";
 import {
   type Attachment,
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
+  type ContactEstablishmentEventPayload,
+  type ContactLevelOfEducation,
+  type CreateDiscussion1Eleve1StageDto,
+  type CreateDiscussionDto,
+  type CreateDiscussionIFDto,
   candidateWarnedMethods,
+  contactLevelsOfEducation,
   type DiscussionExchangeForbiddenParams,
   type DiscussionExchangeForbiddenReason,
   type DiscussionId,
@@ -201,6 +209,8 @@ const potentialBeneficiaryCommonSchema = z.object({
   firstName: zStringMinLength1,
   lastName: zStringMinLength1,
   email: zStringCanBeEmpty,
+  phone: phoneNumberSchema,
+  datePreferences: zStringMinLength1,
 }) satisfies ZodSchemaWithInputMatchingOutput<PotentialBeneficiaryCommonProps>;
 
 const commonDiscussionSchema: ZodSchemaWithInputMatchingOutput<CommonDiscussionDto> =
@@ -233,11 +243,9 @@ export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionRe
     .and(
       z.union([
         z.object({
-          contactMode: preferEmailContactSchema,
+          contactMode: contactModeSchema,
           kind: discussionKindIfSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            phone: phoneNumberSchema,
-            datePreferences: zStringMinLength1,
             immersionObjective: immersionObjectiveSchema.or(z.null()),
             resumeLink: zStringCanBeEmpty.optional(),
             hasWorkingExperience: z.boolean().optional(),
@@ -245,41 +253,11 @@ export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionRe
           }),
         }),
         z.object({
-          contactMode: preferEmailContactSchema,
+          contactMode: contactModeSchema,
           kind: discussionKind1Eleve1StageSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            phone: phoneNumberSchema,
-            datePreferences: zStringMinLength1,
             immersionObjective: z.literal(discoverObjective),
             levelOfEducation: discussionLevelOfEducationSchema,
-          }),
-        }),
-        z.object({
-          contactMode: preferInPersonContactSchema,
-          kind: discussionKindIfSchema,
-          potentialBeneficiary: potentialBeneficiaryCommonSchema,
-        }),
-        z.object({
-          contactMode: preferInPersonContactSchema,
-          kind: discussionKind1Eleve1StageSchema,
-          potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            levelOfEducation: z.enum(["3ème", "2nde"], {
-              error: localization.invalidEnum,
-            }),
-          }),
-        }),
-        z.object({
-          contactMode: preferPhoneContactSchema,
-          kind: discussionKindIfSchema,
-          potentialBeneficiary: potentialBeneficiaryCommonSchema,
-        }),
-        z.object({
-          contactMode: preferPhoneContactSchema,
-          kind: discussionKind1Eleve1StageSchema,
-          potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-            levelOfEducation: z.enum(["3ème", "2nde"], {
-              error: localization.invalidEnum,
-            }),
           }),
         }),
       ]),
@@ -338,3 +316,53 @@ export const discussionExchangeForbiddenParamsSchema: ZodSchemaWithInputMatching
     sender: exchangeRoleSchema,
     reason: discussionExchangeForbidenReasonSchema,
   });
+
+const contactInformationsCommonSchema = z.object({
+  appellationCode: appellationCodeSchema,
+  siret: siretSchema,
+  potentialBeneficiaryFirstName: zStringMinLength1,
+  potentialBeneficiaryLastName: zStringMinLength1,
+  potentialBeneficiaryEmail: emailSchema,
+  locationId: zUuidLike,
+});
+
+const createDiscussionCommonSchema = contactInformationsCommonSchema.and(
+  z.object({
+    potentialBeneficiaryPhone: phoneNumberSchema,
+    datePreferences: zStringMinLength1,
+    contactMode: contactModeSchema,
+  }),
+);
+
+const createDiscussionIFSchema: ZodSchemaWithInputMatchingOutput<CreateDiscussionIFDto> =
+  createDiscussionCommonSchema.and(
+    z.object({
+      kind: z.literal("IF"),
+      immersionObjective: immersionObjectiveSchema,
+      hasWorkingExperience: z.boolean(),
+      experienceAdditionalInformation: zStringMinLength1.optional(),
+      potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
+    }),
+  );
+
+const contactLevelOfEducationSchema: ZodSchemaWithInputMatchingOutput<ContactLevelOfEducation> =
+  z.enum(contactLevelsOfEducation, {
+    error: localization.invalidEnum,
+  });
+
+const createDiscussion1Eleve1StageSchema: ZodSchemaWithInputMatchingOutput<CreateDiscussion1Eleve1StageDto> =
+  createDiscussionCommonSchema.and(
+    z.object({
+      kind: z.literal("1_ELEVE_1_STAGE"),
+      immersionObjective: z.literal(discoverObjective),
+      levelOfEducation: contactLevelOfEducationSchema,
+    }),
+  );
+
+export const createDiscussionSchema: ZodSchemaWithInputMatchingOutput<CreateDiscussionDto> =
+  createDiscussionIFSchema
+    .or(createDiscussion1Eleve1StageSchema)
+    .and(withAcquisitionSchema);
+
+export const contactEstablishmentEventPayloadSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentEventPayload> =
+  z.object({ discussionId: z.string(), siret: siretSchema });

@@ -18,11 +18,11 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   type AppellationCode,
   type AppellationDto,
-  type ContactEstablishmentByMailDto,
   type ContactLevelOfEducation,
-  contactEstablishmentByMailSchema,
+  type CreateDiscussionDto,
   contactLevelsOfEducation,
   conventionObjectiveOptions,
+  createDiscussionSchema,
   discoverObjective,
   domElementIds,
   type ImmersionObjective,
@@ -79,7 +79,7 @@ export const ContactByEmail = ({
   const transcientDataForScope = getTranscientDataForScope();
   const preferUseTranscientData = getPreferUseTranscientDataForScope();
   const acquisitionParams = useGetAcquisitionParams();
-  const initialValues = useMemo<ContactEstablishmentByMailDto>(
+  const initialValues = useMemo<CreateDiscussionDto>(
     () => ({
       contactMode: "EMAIL",
       siret: route.params.siret,
@@ -121,8 +121,8 @@ export const ContactByEmail = ({
     ],
   );
 
-  const methods = useForm<ContactEstablishmentByMailDto>({
-    resolver: zodResolver(contactEstablishmentByMailSchema),
+  const methods = useForm<CreateDiscussionDto>({
+    resolver: zodResolver(createDiscussionSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });
@@ -149,7 +149,7 @@ export const ContactByEmail = ({
 
   const getFieldError = makeFieldError(formState);
 
-  const onFormValid = async (values: ContactEstablishmentByMailDto) => {
+  const onFormValid = async (values: CreateDiscussionDto) => {
     setTranscientDataForScope(values, transcientExpirationTimeInMinutes);
     const errorKind =
       await outOfReduxDependencies.searchGateway.contactEstablishment({

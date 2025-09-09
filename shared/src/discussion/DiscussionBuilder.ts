@@ -18,8 +18,6 @@ import type {
 import type { SiretDto } from "../siret/siret";
 import type {
   DiscussionDto,
-  DiscussionDtoEmail,
-  DiscussionDtoInPerson,
   DiscussionId,
   DiscussionKind,
   DiscussionReadDto,
@@ -65,7 +63,7 @@ const defaultDiscussion = {
   status: "PENDING",
   kind: "IF",
   contactMode: "EMAIL",
-} satisfies DiscussionDtoEmail;
+} satisfies DiscussionDto;
 
 export const cartographeAppellationAndRome: AppellationAndRomeDto = {
   romeCode: "M1808",
@@ -153,181 +151,71 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
 
   public withContactMode(contactMode: ContactMode) {
     const { potentialBeneficiary, ...rest } = this.discussion;
-    if (contactMode === "EMAIL") {
-      return new DiscussionBuilder(
-        (rest.kind === "IF"
-          ? {
-              ...rest,
-              contactMode,
-              potentialBeneficiary: {
-                ...defaultDiscussion.potentialBeneficiary,
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                immersionObjective:
-                  defaultDiscussion.potentialBeneficiary.immersionObjective,
-              },
-            }
-          : {
-              ...rest,
-              contactMode,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                levelOfEducation: "2nde",
-                datePreferences:
-                  defaultDiscussion.potentialBeneficiary.datePreferences,
-                phone: defaultDiscussion.potentialBeneficiary.phone,
-                immersionObjective:
-                  "Découvrir un métier ou un secteur d'activité",
-              },
-            }) satisfies DiscussionDtoEmail,
-      );
-    }
 
-    if (contactMode === "PHONE") {
-      return new DiscussionBuilder(
-        rest.kind === "IF"
-          ? {
-              ...rest,
-              contactMode,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-              },
-            }
-          : {
-              ...rest,
-              contactMode,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                levelOfEducation: "2nde",
-              },
+    return new DiscussionBuilder(
+      (rest.kind === "IF"
+        ? {
+            ...rest,
+            contactMode,
+            potentialBeneficiary: {
+              ...defaultDiscussion.potentialBeneficiary,
+              email: potentialBeneficiary.email,
+              firstName: potentialBeneficiary.firstName,
+              lastName: potentialBeneficiary.lastName,
+              immersionObjective:
+                defaultDiscussion.potentialBeneficiary.immersionObjective,
             },
-      );
-    }
-
-    if (contactMode === "IN_PERSON") {
-      return new DiscussionBuilder(
-        (rest.kind === "IF"
-          ? {
-              ...rest,
-              contactMode,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-              },
-            }
-          : {
-              ...rest,
-              contactMode,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                levelOfEducation: "2nde",
-              },
-            }) satisfies DiscussionDtoInPerson,
-      );
-    }
-
-    throw new Error(
-      `Invalid contact mode ${contactMode} for discussion kind ${this.discussion.kind}`,
+          }
+        : {
+            ...rest,
+            contactMode,
+            potentialBeneficiary: {
+              email: potentialBeneficiary.email,
+              firstName: potentialBeneficiary.firstName,
+              lastName: potentialBeneficiary.lastName,
+              levelOfEducation: "2nde",
+              datePreferences:
+                defaultDiscussion.potentialBeneficiary.datePreferences,
+              phone: defaultDiscussion.potentialBeneficiary.phone,
+              immersionObjective:
+                "Découvrir un métier ou un secteur d'activité",
+            },
+          }) satisfies DiscussionDto,
     );
   }
 
   public withDiscussionKind(discussionKind: DiscussionKind) {
     const { potentialBeneficiary, ...rest } = this.discussion;
-    if (rest.contactMode === "EMAIL") {
-      return new DiscussionBuilder(
-        (discussionKind === "IF"
-          ? {
-              ...rest,
-              kind: discussionKind,
-              potentialBeneficiary: {
-                ...defaultDiscussion.potentialBeneficiary,
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                immersionObjective:
-                  defaultDiscussion.potentialBeneficiary.immersionObjective,
-              },
-            }
-          : {
-              ...rest,
-              kind: discussionKind,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                levelOfEducation: "2nde",
-                datePreferences:
-                  defaultDiscussion.potentialBeneficiary.datePreferences,
-                phone: defaultDiscussion.potentialBeneficiary.phone,
-                immersionObjective:
-                  "Découvrir un métier ou un secteur d'activité",
-              },
-            }) satisfies DiscussionDtoEmail,
-      );
-    }
 
-    if (rest.contactMode === "PHONE") {
-      return new DiscussionBuilder(
-        discussionKind === "IF"
-          ? {
-              ...rest,
-              kind: discussionKind,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-              },
-            }
-          : {
-              ...rest,
-              kind: discussionKind,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                levelOfEducation: "2nde",
-              },
+    return new DiscussionBuilder(
+      (discussionKind === "IF"
+        ? {
+            ...rest,
+            kind: discussionKind,
+            potentialBeneficiary: {
+              ...defaultDiscussion.potentialBeneficiary,
+              email: potentialBeneficiary.email,
+              firstName: potentialBeneficiary.firstName,
+              lastName: potentialBeneficiary.lastName,
+              immersionObjective:
+                defaultDiscussion.potentialBeneficiary.immersionObjective,
             },
-      );
-    }
-
-    if (rest.contactMode === "IN_PERSON") {
-      return new DiscussionBuilder(
-        (discussionKind === "IF"
-          ? {
-              ...rest,
-              kind: discussionKind,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-              },
-            }
-          : {
-              ...rest,
-              kind: discussionKind,
-              potentialBeneficiary: {
-                email: potentialBeneficiary.email,
-                firstName: potentialBeneficiary.firstName,
-                lastName: potentialBeneficiary.lastName,
-                levelOfEducation: "2nde",
-              },
-            }) satisfies DiscussionDtoInPerson,
-      );
-    }
-
-    throw new Error(
-      `Invalid discussion kind ${discussionKind} for contact mode ${this.discussion.contactMode}`,
+          }
+        : {
+            ...rest,
+            kind: discussionKind,
+            potentialBeneficiary: {
+              email: potentialBeneficiary.email,
+              firstName: potentialBeneficiary.firstName,
+              lastName: potentialBeneficiary.lastName,
+              levelOfEducation: "2nde",
+              datePreferences:
+                defaultDiscussion.potentialBeneficiary.datePreferences,
+              phone: defaultDiscussion.potentialBeneficiary.phone,
+              immersionObjective:
+                "Découvrir un métier ou un secteur d'activité",
+            },
+          }) satisfies DiscussionDto,
     );
   }
 

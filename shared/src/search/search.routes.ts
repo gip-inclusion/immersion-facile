@@ -1,5 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
+import { createDiscussionSchema } from "../discussion/discussion.schema";
 import { groupWithResultsSchema } from "../group/group.schema";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import {
@@ -32,7 +32,7 @@ export const searchImmersionRoutes = defineRoutes({
   contactEstablishment: defineRoute({
     method: "post",
     url: "/contact-establishment",
-    requestBodySchema: contactEstablishmentRequestSchema,
+    requestBodySchema: createDiscussionSchema,
     responses: {
       201: expressEmptyResponseBody,
       400: httpErrorSchema,

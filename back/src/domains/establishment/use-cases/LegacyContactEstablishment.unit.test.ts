@@ -2,12 +2,14 @@ import { addHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   type AppellationAndRomeDto,
-  type ContactEstablishmentRequestDto,
+  type CreateDiscussionDto,
   DiscussionBuilder,
   errors,
   expectArraysToEqual,
   expectPromiseToFailWithError,
   expectToEqual,
+  type LegacyContactEstablishmentByPhoneDto,
+  type LegacyContactEstablishmentInPersonDto,
   type LegacyContactEstablishmentRequestDto,
   type Location,
   UserBuilder,
@@ -99,7 +101,7 @@ describe("LegacyContactEstablishment", () => {
       .withOffers([immersionOffer])
       .build();
 
-  const validRequest: LegacyContactEstablishmentRequestDto = {
+  const legacyValidRequest: LegacyContactEstablishmentRequestDto = {
     appellationCode: appellationAndRome.appellationCode,
     siret: establishmentAggregateWithEmailContact.establishment.siret,
     contactMode: "PHONE",
@@ -110,7 +112,7 @@ describe("LegacyContactEstablishment", () => {
   };
 
   const validEmailRequest: LegacyContactEstablishmentRequestDto = {
-    ...validRequest,
+    ...legacyValidRequest,
     contactMode: "EMAIL",
     message: "message_to_send",
     immersionObjective: "Confirmer un projet professionnel",
@@ -204,12 +206,19 @@ describe("LegacyContactEstablishment", () => {
       const now = new Date("2021-12-08T15:00");
       timeGateway.setNextDates([now, now]);
 
-      const validPhoneRequest: ContactEstablishmentRequestDto = {
-        ...validRequest,
+      const validPhoneRequest: CreateDiscussionDto = {
+        ...legacyValidRequest,
         contactMode: "PHONE",
         kind: "IF",
+        datePreferences: "",
+        hasWorkingExperience: false,
+        potentialBeneficiaryPhone: "+33600000000",
+        immersionObjective: null,
       };
-      await contactEstablishment.execute(validPhoneRequest);
+
+      await contactEstablishment.execute(
+        validPhoneRequest as LegacyContactEstablishmentByPhoneDto,
+      );
 
       expectArraysToEqual(uow.outboxRepository.events, [
         {
@@ -254,12 +263,18 @@ describe("LegacyContactEstablishment", () => {
       const now = new Date("2021-12-08T15:00");
       timeGateway.setNextDates([now, now]);
 
-      const validInPersonRequest: ContactEstablishmentRequestDto = {
-        ...validRequest,
+      const validInPersonRequest: CreateDiscussionDto = {
+        ...legacyValidRequest,
         kind: "IF",
         contactMode: "IN_PERSON",
+        datePreferences: "",
+        hasWorkingExperience: false,
+        potentialBeneficiaryPhone: "+33600000000",
+        immersionObjective: null,
       };
-      await contactEstablishment.execute(validInPersonRequest);
+      await contactEstablishment.execute(
+        validInPersonRequest as LegacyContactEstablishmentInPersonDto,
+      );
 
       expectArraysToEqual(uow.outboxRepository.events, [
         {
@@ -501,7 +516,7 @@ describe("LegacyContactEstablishment", () => {
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
-          ...validRequest,
+          ...legacyValidRequest,
           contactMode: "IN_PERSON",
         }),
         errors.establishment.contactRequestContactModeMismatch({
@@ -517,10 +532,10 @@ describe("LegacyContactEstablishment", () => {
     it("throws NotFoundError when no establishments found with given siret", async () => {
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
-          ...validRequest,
+          ...legacyValidRequest,
           contactMode: "PHONE",
         }),
-        errors.establishment.notFound({ siret: validRequest.siret }),
+        errors.establishment.notFound({ siret: legacyValidRequest.siret }),
       );
     });
 
@@ -544,11 +559,11 @@ describe("LegacyContactEstablishment", () => {
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
-          ...validRequest,
+          ...legacyValidRequest,
           contactMode: "PHONE",
         }),
         errors.establishment.offerMissing({
-          siret: validRequest.siret,
+          siret: legacyValidRequest.siret,
           appellationCode: validEmailRequest.appellationCode,
           mode: "bad request",
         }),

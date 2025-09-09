@@ -1,6 +1,6 @@
 import {
   type AppellationAndRomeDto,
-  type DiscussionDtoEmail,
+  type DiscussionDto,
   type EmailParamsByEmailType,
   frontRoutes,
   getFormattedFirstnameAndLastname,
@@ -12,7 +12,7 @@ export const makeContactByEmailRequestParams = ({
   immersionFacileBaseUrl,
   appellation,
 }: {
-  discussion: DiscussionDtoEmail;
+  discussion: DiscussionDto;
   immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"];
   appellation: AppellationAndRomeDto;
 }): EmailParamsByEmailType["CONTACT_BY_EMAIL_REQUEST"] => ({

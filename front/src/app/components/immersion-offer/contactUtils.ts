@@ -1,9 +1,9 @@
 import type {
   AppellationCode,
   AppellationDto,
-  ContactEstablishmentByMail1Eleve1StageDto,
-  ContactEstablishmentByMailIFDto,
   ContactEstablishmentByPhoneDto,
+  CreateDiscussion1Eleve1StageDto,
+  CreateDiscussionIFDto,
   DiscussionKind,
   ExcludeFromExisting,
 } from "shared";
@@ -19,8 +19,8 @@ export const getDefaultAppellationCode = (
 };
 
 type ContactInputKeys = ExcludeFromExisting<
-  | keyof ContactEstablishmentByMailIFDto
-  | keyof ContactEstablishmentByMail1Eleve1StageDto
+  | keyof CreateDiscussionIFDto
+  | keyof CreateDiscussion1Eleve1StageDto
   | keyof ContactEstablishmentByPhoneDto,
   | "kind"
   | "siret"

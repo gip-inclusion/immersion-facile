@@ -27,8 +27,6 @@ export * from "./auth/proConnect/proConnect.dto";
 export * from "./auth/proConnect/proConnect.schema";
 export * from "./Builder";
 export * from "./business/business";
-export * from "./contactEstablishmentRequest/contactEstablishmentRequest.dto";
-export * from "./contactEstablishmentRequest/contactEstablishmentRequest.schema";
 export * from "./contactEstablishmentRequest/legacyContactEstablishmentRequest.dto";
 export * from "./contactEstablishmentRequest/legacyContactEstablishmentRequest.schema";
 export * from "./convention/addConventionInput";

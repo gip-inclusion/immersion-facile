@@ -2,9 +2,8 @@ import { addHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   type CommonDiscussionDto,
-  type ContactEstablishment1Eleve1StageDto,
-  type ContactEstablishmentByMail1Eleve1StageDto,
-  type ContactEstablishmentRequestDto,
+  type CreateDiscussion1Eleve1StageDto,
+  type CreateDiscussionDto,
   DiscussionBuilder,
   type DiscussionDto,
   errors,
@@ -96,10 +95,14 @@ describe("ContactEstablishment", () => {
     .withUserRights(userRights)
     .build();
 
-  const validPhoneRequest: ContactEstablishmentRequestDto = {
+  const validPhoneRequest: CreateDiscussionDto = {
     appellationCode: immersionOffer.appellationCode,
     siret: establishmentEmailWithSiret.siret,
     contactMode: "PHONE",
+    datePreferences: "fake date preferences",
+    potentialBeneficiaryPhone: "+33654783402",
+    hasWorkingExperience: true,
+    immersionObjective: "Confirmer un projet professionnel",
     kind: "IF",
     potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
     potentialBeneficiaryLastName: "potential_beneficiary_last_name",
@@ -107,7 +110,7 @@ describe("ContactEstablishment", () => {
     locationId: location.id,
   };
 
-  const validEmailRequest: ContactEstablishmentRequestDto = {
+  const validEmailRequest: CreateDiscussionDto = {
     ...validPhoneRequest,
     contactMode: "EMAIL",
     datePreferences: "fake date preferences",
@@ -354,6 +357,13 @@ describe("ContactEstablishment", () => {
                 firstName: validEmailRequest.potentialBeneficiaryFirstName,
                 lastName: validEmailRequest.potentialBeneficiaryLastName,
                 email: validEmailRequest.potentialBeneficiaryEmail,
+                phone: validEmailRequest.potentialBeneficiaryPhone,
+                resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
+                experienceAdditionalInformation:
+                  validEmailRequest.experienceAdditionalInformation,
+                hasWorkingExperience: validEmailRequest.hasWorkingExperience,
+                datePreferences: validEmailRequest.datePreferences,
+                immersionObjective: "Confirmer un projet professionnel",
               },
             },
           ]);
@@ -399,6 +409,13 @@ describe("ContactEstablishment", () => {
                 firstName: validEmailRequest.potentialBeneficiaryFirstName,
                 lastName: validEmailRequest.potentialBeneficiaryLastName,
                 email: validEmailRequest.potentialBeneficiaryEmail,
+                phone: validEmailRequest.potentialBeneficiaryPhone,
+                resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
+                experienceAdditionalInformation:
+                  validEmailRequest.experienceAdditionalInformation,
+                hasWorkingExperience: validEmailRequest.hasWorkingExperience,
+                datePreferences: validEmailRequest.datePreferences,
+                immersionObjective: "Confirmer un projet professionnel",
               },
             },
           ]);
@@ -411,14 +428,12 @@ describe("ContactEstablishment", () => {
             establishmentAggregateWithEmail,
           ];
 
-          const valid1J1SEmailRequest: ContactEstablishmentByMail1Eleve1StageDto =
-            {
-              ...validEmailRequest,
-              kind: "1_ELEVE_1_STAGE",
-              levelOfEducation: "2nde",
-              immersionObjective:
-                "Découvrir un métier ou un secteur d'activité",
-            };
+          const valid1J1SEmailRequest: CreateDiscussion1Eleve1StageDto = {
+            ...validEmailRequest,
+            kind: "1_ELEVE_1_STAGE",
+            levelOfEducation: "2nde",
+            immersionObjective: "Découvrir un métier ou un secteur d'activité",
+          };
           await contactEstablishment.execute(valid1J1SEmailRequest);
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -472,10 +487,11 @@ describe("ContactEstablishment", () => {
               .build(),
           ];
 
-          const validPhone1E1SRequest: ContactEstablishment1Eleve1StageDto = {
+          const validPhone1E1SRequest: CreateDiscussion1Eleve1StageDto = {
             ...validPhoneRequest,
             kind: "1_ELEVE_1_STAGE",
             levelOfEducation: "2nde",
+            immersionObjective: "Découvrir un métier ou un secteur d'activité",
           };
 
           await contactEstablishment.execute(validPhone1E1SRequest);
@@ -491,6 +507,10 @@ describe("ContactEstablishment", () => {
                 firstName: validPhone1E1SRequest.potentialBeneficiaryFirstName,
                 lastName: validPhone1E1SRequest.potentialBeneficiaryLastName,
                 email: validPhone1E1SRequest.potentialBeneficiaryEmail,
+                phone: validPhone1E1SRequest.potentialBeneficiaryPhone,
+                datePreferences: validPhone1E1SRequest.datePreferences,
+                immersionObjective:
+                  "Découvrir un métier ou un secteur d'activité",
                 levelOfEducation: validPhone1E1SRequest.levelOfEducation,
               },
             },
@@ -521,13 +541,13 @@ describe("ContactEstablishment", () => {
               .build(),
           ];
 
-          const validInPerson1E1SRequest: ContactEstablishment1Eleve1StageDto =
-            {
-              ...validPhoneRequest,
-              contactMode: "IN_PERSON",
-              kind: "1_ELEVE_1_STAGE",
-              levelOfEducation: "2nde",
-            };
+          const validInPerson1E1SRequest: CreateDiscussion1Eleve1StageDto = {
+            ...validPhoneRequest,
+            contactMode: "IN_PERSON",
+            kind: "1_ELEVE_1_STAGE",
+            levelOfEducation: "2nde",
+            immersionObjective: "Découvrir un métier ou un secteur d'activité",
+          };
 
           await contactEstablishment.execute(validInPerson1E1SRequest);
 
@@ -543,7 +563,11 @@ describe("ContactEstablishment", () => {
                   validInPerson1E1SRequest.potentialBeneficiaryFirstName,
                 lastName: validInPerson1E1SRequest.potentialBeneficiaryLastName,
                 email: validInPerson1E1SRequest.potentialBeneficiaryEmail,
+                phone: validInPerson1E1SRequest.potentialBeneficiaryPhone,
                 levelOfEducation: validInPerson1E1SRequest.levelOfEducation,
+                datePreferences: validInPerson1E1SRequest.datePreferences,
+                immersionObjective:
+                  "Découvrir un métier ou un secteur d'activité",
               },
             },
           ]);
@@ -757,6 +781,9 @@ describe("ContactEstablishment", () => {
               firstName: validEmailRequest.potentialBeneficiaryFirstName,
               lastName: validEmailRequest.potentialBeneficiaryLastName,
               email: validEmailRequest.potentialBeneficiaryEmail,
+              phone: validEmailRequest.potentialBeneficiaryPhone,
+              datePreferences: validEmailRequest.datePreferences,
+              immersionObjective: "Confirmer un projet professionnel",
             },
           },
         ]);
@@ -829,7 +856,7 @@ describe("ContactEstablishment", () => {
         establishment,
       ];
 
-      const params: ContactEstablishmentRequestDto = {
+      const params: CreateDiscussionDto = {
         ...validPhoneRequest,
         contactMode: "IN_PERSON",
       };
