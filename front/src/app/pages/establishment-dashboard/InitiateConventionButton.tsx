@@ -58,8 +58,8 @@ export const InitiateConventionButton = () => {
     currentUserEstablishments && currentUserEstablishments.length === 1
       ? {
           siret: currentUserEstablishments[0].siret,
-          appellation: undefined,
-          location: undefined,
+          appellation: "",
+          location: "",
         }
       : undefined;
   const {
@@ -92,7 +92,7 @@ export const InitiateConventionButton = () => {
     if (
       !isEstablishmentDefault &&
       establishment.appellations.length === 1 &&
-      values.appellation === undefined
+      values.appellation === ""
     ) {
       setValue("appellation", establishment.appellations[0].appellationCode, {
         shouldValidate: true,
@@ -104,7 +104,7 @@ export const InitiateConventionButton = () => {
     if (
       !isEstablishmentDefault &&
       establishment.businessAddresses.length === 1 &&
-      values.location === undefined
+      values.location === ""
     ) {
       setValue("location", establishment.businessAddresses[0].rawAddress, {
         shouldValidate: true,
@@ -213,13 +213,7 @@ export const InitiateConventionButton = () => {
                     }))
                   : []
               }
-              nativeSelectProps={{
-                ...register("appellation"),
-                value:
-                  establishment?.appellations.length === 1
-                    ? establishment?.appellations[0].appellationCode
-                    : values.appellation,
-              }}
+              nativeSelectProps={register("appellation")}
               state={errors.appellation ? "error" : "default"}
               stateRelatedMessage={errors.appellation?.message}
             />
@@ -237,13 +231,7 @@ export const InitiateConventionButton = () => {
                   label: location.rawAddress,
                 })) ?? []
               }
-              nativeSelectProps={{
-                ...register("location"),
-                value:
-                  establishment?.businessAddresses.length === 1
-                    ? establishment?.businessAddresses[0].rawAddress
-                    : values.location,
-              }}
+              nativeSelectProps={register("location")}
               state={errors.location ? "error" : "default"}
               stateRelatedMessage={errors.location?.message}
             />
