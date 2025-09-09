@@ -11,8 +11,10 @@ import {
   type ConventionReadDto,
   type ConventionSupportedJwt,
   type DashboardUrlAndName,
+  type DataWithPagination,
   type EditConventionCounsellorNameRequestDto,
   type FindSimilarConventionsParams,
+  type FlatGetConventionsForAgencyUserParams,
   type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
   type RenewMagicLinkRequestDto,
@@ -63,6 +65,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public editConventionCounsellorNameResult$ = new Subject<void>();
 
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
+
+  public getConventionsForUserResult$ = new Subject<
+    DataWithPagination<ConventionDto>
+  >();
 
   #agencies: { [id: string]: AgencyOption } = {};
 
@@ -205,5 +211,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: string,
   ): Observable<void> {
     return this.markPartnersErroredConventionAsHandledResult$;
+  }
+
+  public getConventionsForUser$(
+    _params: FlatGetConventionsForAgencyUserParams,
+    _jwt: string,
+  ): Observable<DataWithPagination<ConventionDto>> {
+    return this.getConventionsForUserResult$;
   }
 }

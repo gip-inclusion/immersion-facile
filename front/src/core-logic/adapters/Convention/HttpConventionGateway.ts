@@ -11,8 +11,10 @@ import type {
   ConventionReadDto,
   ConventionSupportedJwt,
   DashboardUrlAndName,
+  DataWithPagination,
   EditConventionCounsellorNameRequestDto,
   FindSimilarConventionsParams,
+  FlatGetConventionsForAgencyUserParams,
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
@@ -354,6 +356,26 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getConventionsForUser$(
+    params: FlatGetConventionsForAgencyUserParams,
+    jwt: string,
+  ): Observable<DataWithPagination<ConventionDto>> {
+    return from(
+      this.authenticatedHttpClient
+        .getConventionsForAgencyUser({
+          queryParams: params,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
