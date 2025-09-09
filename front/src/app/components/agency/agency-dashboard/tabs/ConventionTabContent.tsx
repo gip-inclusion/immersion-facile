@@ -72,7 +72,7 @@ export const ConventionTabContent = ({
   return (
     <HeadingSection
       titleAs="h2"
-      title="Piloter une convention"
+      title="Tableau de bord"
       className={fr.cx("fr-mt-0")}
       titleAction={
         <Button
@@ -85,8 +85,15 @@ export const ConventionTabContent = ({
         </Button>
       }
     >
-      <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
+      <HeadingSection
+        titleAs="h3"
+        title="Piloter une convention"
+        className={fr.cx("fr-mt-2w")}
+      >
+        <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
+      </HeadingSection>
       <MetabaseView
+        titleAs="h3"
         title="Tableau de bord agence"
         subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
         url={dashboards.agencies.agencyDashboardUrl}
