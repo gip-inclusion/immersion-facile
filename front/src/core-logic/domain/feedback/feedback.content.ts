@@ -9,6 +9,7 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
+import { connectedUserConventionsSlice } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
@@ -38,6 +39,7 @@ const topics = [
   "assessment",
   "auth-global",
   "broadcast-convention-again",
+  "connected-user-conventions",
   "convention-action-accept-by-counsellor",
   "convention-action-accept-by-validator",
   "convention-action-cancel",
@@ -638,6 +640,16 @@ export const feedbacks: Record<
       action: authSlice.actions.loginByEmailFailed,
       title: "Nous n’avons pas pu envoyer le lien de connexion",
       message: "",
+    },
+  },
+  "connected-user-conventions": {
+    "fetch.error": {
+      action:
+        connectedUserConventionsSlice.actions
+          .getConventionsForConnectedUserFailed,
+      title: "Problème lors de la récupération de vos conventions",
+      message:
+        "Une erreur est survenue lors de la récupération de vos conventions",
     },
   },
   unused: {},

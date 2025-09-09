@@ -8,9 +8,11 @@ import type {
   ConventionReadDto,
   ConventionSupportedJwt,
   DashboardUrlAndName,
+  DataWithPagination,
   DiscussionId,
   EditConventionCounsellorNameRequestDto,
   FindSimilarConventionsParams,
+  FlatGetConventionsForAgencyUserParams,
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
@@ -86,4 +88,8 @@ export interface ConventionGateway {
     params: MarkPartnersErroredConventionAsHandledRequest,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
+  getConventionsForUser$(
+    params: FlatGetConventionsForAgencyUserParams,
+    jwt: string,
+  ): Observable<DataWithPagination<ConventionDto>>;
 }
