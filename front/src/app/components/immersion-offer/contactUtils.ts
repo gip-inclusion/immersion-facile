@@ -1,7 +1,6 @@
 import type {
   AppellationCode,
   AppellationDto,
-  ContactEstablishmentByPhoneDto,
   CreateDiscussion1Eleve1StageDto,
   CreateDiscussionIFDto,
   DiscussionKind,
@@ -19,9 +18,7 @@ export const getDefaultAppellationCode = (
 };
 
 type ContactInputKeys = ExcludeFromExisting<
-  | keyof CreateDiscussionIFDto
-  | keyof CreateDiscussion1Eleve1StageDto
-  | keyof ContactEstablishmentByPhoneDto,
+  keyof CreateDiscussionIFDto | keyof CreateDiscussion1Eleve1StageDto,
   | "kind"
   | "siret"
   | "contactMode"

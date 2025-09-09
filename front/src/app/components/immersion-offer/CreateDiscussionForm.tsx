@@ -19,6 +19,7 @@ import {
   type AppellationCode,
   type AppellationDto,
   type ContactLevelOfEducation,
+  type ContactMode,
   type CreateDiscussionDto,
   contactLevelsOfEducation,
   conventionObjectiveOptions,
@@ -47,15 +48,17 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 import type { Route } from "type-route";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
-type ContactByEmailProps = {
+type CreateDiscussionFormProps = {
   appellations: AppellationDto[];
   onSubmitSuccess: () => void;
+  contactMode: ContactMode;
 };
 
-export const ContactByEmail = ({
+export const CreateDiscussionForm = ({
   appellations,
   onSubmitSuccess,
-}: ContactByEmailProps) => {
+  contactMode,
+}: CreateDiscussionFormProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<
     typeof routes.searchResult | typeof routes.searchResultForStudent
@@ -81,7 +84,7 @@ export const ContactByEmail = ({
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues = useMemo<CreateDiscussionDto>(
     () => ({
-      contactMode: "EMAIL",
+      contactMode,
       siret: route.params.siret,
       appellationCode: getDefaultAppellationCode(
         appellations,

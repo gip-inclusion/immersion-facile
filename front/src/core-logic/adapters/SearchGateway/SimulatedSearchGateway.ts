@@ -1,7 +1,7 @@
 import { filter as ramdaFilter } from "ramda";
 import { delay, map, type Observable, of } from "rxjs";
 import {
-  type ContactEstablishmentRequestDto,
+  type CreateDiscussionDto,
   type GroupSlug,
   type GroupWithResults,
   type SearchQueryParamsDto,
@@ -67,7 +67,7 @@ export class SimulatedSearchGateway implements SearchGateway {
   }
 
   public async contactEstablishment(
-    _params: ContactEstablishmentRequestDto,
+    _params: CreateDiscussionDto,
   ): Promise<void> {
     await sleep(this.#simulatedLatency);
     if (this.#error) throw this.#error;
