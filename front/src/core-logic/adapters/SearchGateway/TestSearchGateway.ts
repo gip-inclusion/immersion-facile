@@ -1,6 +1,6 @@
 import { type Observable, Subject } from "rxjs";
 import type {
-  ContactEstablishmentRequestDto,
+  CreateDiscussionDto,
   GroupSlug,
   GroupWithResults,
   SearchQueryParamsDto,
@@ -10,16 +10,12 @@ import type {
 import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
 
 export class TestSearchGateway implements SearchGateway {
-  public contactEstablishmentResponse$ = new Subject<
-    void | "alreadyContactedRecently"
-  >();
-
   public currentSearchResult$ = new Subject<SearchResultDto>();
 
   public searchResults$ = new Subject<SearchResultDto[]>();
 
   public contactEstablishment(
-    _params: ContactEstablishmentRequestDto,
+    _params: CreateDiscussionDto,
   ): Promise<void | "alreadyContactedRecently"> {
     throw new Error("Method not implemented.");
   }

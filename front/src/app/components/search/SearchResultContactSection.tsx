@@ -1,9 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { SearchResultDto } from "shared";
 import { match, P } from "ts-pattern";
-import { ContactByEmail } from "../immersion-offer/ContactByEmail";
-import { ContactByPhone } from "../immersion-offer/ContactByPhone";
-import { ContactInPerson } from "../immersion-offer/ContactInPerson";
+import { CreateDiscussionForm } from "../immersion-offer/CreateDiscussionForm";
 
 export const SearchResultContactSection = ({
   formContactRef,
@@ -26,22 +24,11 @@ export const SearchResultContactSection = ({
       </h2>
 
       {match(currentSearchResult.contactMode)
-        .with("EMAIL", () => (
-          <ContactByEmail
+        .with(P.union("EMAIL", "PHONE", "IN_PERSON"), (contactMode) => (
+          <CreateDiscussionForm
             appellations={currentSearchResult.appellations}
             onSubmitSuccess={onFormSubmitSuccess}
-          />
-        ))
-        .with("PHONE", () => (
-          <ContactByPhone
-            appellations={currentSearchResult.appellations}
-            onSubmitSuccess={onFormSubmitSuccess}
-          />
-        ))
-        .with("IN_PERSON", () => (
-          <ContactInPerson
-            appellations={currentSearchResult.appellations}
-            onSubmitSuccess={onFormSubmitSuccess}
+            contactMode={contactMode}
           />
         ))
         .with(P.nullish, () => (

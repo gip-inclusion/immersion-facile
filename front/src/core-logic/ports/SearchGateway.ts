@@ -1,6 +1,6 @@
 import type { Observable } from "rxjs";
 import type {
-  ContactEstablishmentRequestDto,
+  CreateDiscussionDto,
   GroupSlug,
   GroupWithResults,
   SearchQueryParamsDto,
@@ -13,7 +13,7 @@ export type ContactErrorKind = "alreadyContactedRecently";
 export interface SearchGateway {
   search$(searchParams: SearchQueryParamsDto): Observable<SearchResultDto[]>;
   contactEstablishment: (
-    params: ContactEstablishmentRequestDto,
+    params: CreateDiscussionDto,
   ) => Promise<void | ContactErrorKind>;
   getGroupBySlug(groupSlug: GroupSlug): Promise<GroupWithResults>;
   getSearchResult$(params: SiretAndAppellationDto): Observable<SearchResultDto>;

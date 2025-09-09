@@ -1,6 +1,6 @@
 import { from, type Observable } from "rxjs";
 import type {
-  ContactEstablishmentRequestDto,
+  CreateDiscussionDto,
   GroupSlug,
   GroupWithResults,
   SearchQueryParamsDto,
@@ -25,7 +25,7 @@ export class HttpSearchGateway implements SearchGateway {
   constructor(private readonly httpClient: HttpClient<SearchRoutes>) {}
 
   public async contactEstablishment(
-    params: ContactEstablishmentRequestDto,
+    params: CreateDiscussionDto,
   ): Promise<void | ContactErrorKind> {
     return this.httpClient
       .contactEstablishment({
