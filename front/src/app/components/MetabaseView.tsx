@@ -11,10 +11,12 @@ export const MetabaseView = ({
   title,
   subtitle,
   url,
+  titleAs,
 }: {
   url?: AbsoluteUrl;
   title: string;
   subtitle?: string;
+  titleAs?: "h1" | "h2" | "h3" | "h4";
 }) => {
   const consent = useConsent();
   if (!consent.finalityConsent?.statistics)
@@ -38,6 +40,7 @@ export const MetabaseView = ({
   return (
     <BackofficeDashboardTabContent
       title={title}
+      titleAs={titleAs}
       titleAction={<MetabaseFullScreenButton url={url} />}
       description={subtitle}
     >
