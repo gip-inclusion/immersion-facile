@@ -2,9 +2,6 @@ import {
   addressDtoToString,
   type ContactEstablishmentEventPayload,
   DiscussionBuilder,
-  type DiscussionDtoEmail,
-  type DiscussionDtoInPerson,
-  type DiscussionDtoPhone,
   type DiscussionKind,
   errors,
   expectPromiseToFailWithError,
@@ -200,7 +197,7 @@ describe("NotifyContactRequest", () => {
             .withContactMode("EMAIL")
             .withDiscussionKind(kind)
             .withAppellationCode(TEST_APPELLATION_CODE)
-            .build() as DiscussionDtoEmail;
+            .build();
 
           uow.discussionRepository.discussions = [discussion];
 
@@ -301,7 +298,7 @@ describe("NotifyContactRequest", () => {
             )
             .withContactMode("PHONE")
             .withAppellationCode(TEST_APPELLATION_CODE)
-            .build() as DiscussionDtoPhone;
+            .build();
 
           uow.discussionRepository.discussions = [discussion];
 
@@ -354,7 +351,7 @@ describe("NotifyContactRequest", () => {
             )
             .withContactMode("IN_PERSON")
             .withAppellationCode(TEST_APPELLATION_CODE)
-            .build() as DiscussionDtoInPerson;
+            .build();
 
           uow.discussionRepository.discussions = [discussion];
 

@@ -16,11 +16,6 @@ import {
   zStringMinLength1,
   zUuidLike,
 } from "../zodUtils";
-import {
-  preferEmailContactSchema,
-  preferInPersonContactSchema,
-  preferPhoneContactSchema,
-} from "./contactEstablishmentRequest.schema";
 import type {
   LegacyContactEstablishmentByMailDto,
   LegacyContactEstablishmentByPhoneDto,
@@ -45,7 +40,7 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
 export const legacyContactEstablishmentByMailSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentByMailDto> =
   z.object({
     ...commonFields,
-    contactMode: preferEmailContactSchema,
+    contactMode: z.literal("EMAIL"),
     message: zStringMinLength1,
     potentialBeneficiaryPhone: phoneNumberSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
@@ -55,13 +50,13 @@ export const legacyContactEstablishmentByMailSchema: ZodSchemaWithInputMatchingO
 export const legacyContactEstablishmentByPhoneSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentByPhoneDto> =
   z.object({
     ...commonFields,
-    contactMode: preferPhoneContactSchema,
+    contactMode: z.literal("PHONE"),
   });
 
 export const legacyContactEstablishmentInPersonSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentInPersonDto> =
   z.object({
     ...commonFields,
-    contactMode: preferInPersonContactSchema,
+    contactMode: z.literal("IN_PERSON"),
   });
 
 export const legacyContactEstablishmentRequestSchema: ZodSchemaWithInputMatchingOutput<LegacyContactEstablishmentRequestDto> =

@@ -120,11 +120,11 @@ interface Discussions extends WithAcquisition {
   potential_beneficiary_first_name: string;
   potential_beneficiary_last_name: string;
   potential_beneficiary_email: string;
-  potential_beneficiary_phone: string | null;
+  potential_beneficiary_phone: string;
   potential_beneficiary_resume_link: string | null;
   potential_beneficiary_has_working_experience: boolean | null;
   potential_beneficiary_experience_additional_information: string | null;
-  potential_beneficiary_date_preferences: string | null;
+  potential_beneficiary_date_preferences: string;
   potential_beneficiary_level_of_education: ContactLevelOfEducation | null;
   appellation_code: number;
   immersion_objective: ImmersionObjectives | null;

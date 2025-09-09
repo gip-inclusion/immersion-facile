@@ -3,7 +3,6 @@ import type {
   AssessmentDtoCompleted,
   AssessmentDtoPartiallyCompleted,
 } from "../assessment/assessment.dto";
-import type { ContactLevelOfEducation } from "../contactEstablishmentRequest/contactEstablishmentRequest.dto";
 import type {
   ConventionId,
   ImmersionObjective,
@@ -11,6 +10,7 @@ import type {
   Renewed,
 } from "../convention/convention.dto";
 import type {
+  ContactLevelOfEducation,
   DiscussionExchangeForbiddenParams,
   DiscussionKind,
 } from "../discussion/discussion.dto";

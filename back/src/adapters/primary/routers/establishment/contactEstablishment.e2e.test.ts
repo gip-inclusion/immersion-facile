@@ -1,5 +1,5 @@
 import {
-  type ContactEstablishmentRequestDto,
+  type CreateDiscussionDto,
   errors,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
@@ -35,7 +35,7 @@ describe("Contact establishment public v2 e2e", () => {
 
     const user = new UserBuilder().build();
 
-    const validRequest: ContactEstablishmentRequestDto = {
+    const validRequest: CreateDiscussionDto = {
       appellationCode: "19540",
       siret,
       contactMode: "EMAIL",

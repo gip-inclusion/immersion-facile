@@ -180,6 +180,11 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       firstName: contactRequest.potentialBeneficiaryFirstName,
       lastName: contactRequest.potentialBeneficiaryLastName,
       email: contactRequest.potentialBeneficiaryEmail,
+      datePreferences: "",
+      phone:
+        contactRequest.contactMode === "EMAIL"
+          ? contactRequest.potentialBeneficiaryPhone
+          : "+33600000000",
     };
 
     return {
@@ -192,22 +197,20 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       createdAt: now.toISOString(),
       address: matchingAddress.address,
       kind: "IF",
-      ...(contactRequest.contactMode === "EMAIL"
-        ? {
-            contactMode: contactRequest.contactMode,
-            potentialBeneficiary: {
-              ...potentialBeneficiary,
-              phone: contactRequest.potentialBeneficiaryPhone,
+      contactMode: contactRequest.contactMode,
+      potentialBeneficiary: {
+        ...potentialBeneficiary,
+        datePreferences: "",
+        hasWorkingExperience: false,
+        ...(contactRequest.contactMode === "EMAIL"
+          ? {
               immersionObjective: contactRequest.immersionObjective,
-              datePreferences: "",
-              hasWorkingExperience: false,
               resumeLink: contactRequest.potentialBeneficiaryResumeLink,
-            },
-          }
-        : {
-            contactMode: contactRequest.contactMode,
-            potentialBeneficiary,
-          }),
+            }
+          : {
+              immersionObjective: null,
+            }),
+      },
       exchanges:
         contactRequest.contactMode === "EMAIL"
           ? [

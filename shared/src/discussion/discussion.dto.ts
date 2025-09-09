@@ -1,16 +1,13 @@
-import type {
-  BusinessName,
-  discussionExchangeForbidenReasons,
-  Email,
-} from "..";
 import type { WithAcquisition } from "../acquisition.dto";
-import type { AddressDto } from "../address/address.dto";
-import type { ContactLevelOfEducation } from "../contactEstablishmentRequest/contactEstablishmentRequest.dto";
+import type { AddressDto, LocationId } from "../address/address.dto";
+import type { BusinessName } from "../business/business";
 import type {
   ConventionId,
   discoverObjective,
   ImmersionObjective,
+  LevelOfEducation,
 } from "../convention/convention.dto";
+import type { Email } from "../email/email.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
 import type {
@@ -20,13 +17,12 @@ import type {
 import type { SiretDto } from "../siret/siret";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
-import type {
-  EmptyObject,
-  ExtractFromExisting,
-  OmitFromExistingKeys,
-} from "../utils";
+import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
-import type { exchangeRoles } from "./discussion.schema";
+import type {
+  discussionExchangeForbidenReasons,
+  exchangeRoles,
+} from "./discussion.schema";
 
 export const candidateWarnedMethods = [
   "phone",
@@ -73,55 +69,90 @@ export type SendMessageToDiscussionFromDashboardRequestPayload = {
   jwt: ConnectedUserJwt;
 } & ExchangeFromDashboard;
 
-type WithContactByEmailProps<
-  D extends DiscussionKind,
-  C extends ContactMode,
-> = C extends "EMAIL"
+export const contactLevelsOfEducation = [
+  "3ème",
+  "2nde",
+] as const satisfies Extract<LevelOfEducation, "3ème" | "2nde">[];
+
+export type ContactLevelOfEducation = (typeof contactLevelsOfEducation)[number];
+
+export const labelsForContactLevelOfEducation: Record<
+  ContactLevelOfEducation,
+  string
+> = {
+  "3ème": "Troisième",
+  "2nde": "Seconde",
+};
+
+export type ContactInformations<D extends DiscussionKind> = {
+  appellationCode: AppellationCode;
+  siret: SiretDto;
+  potentialBeneficiaryFirstName: string;
+  potentialBeneficiaryLastName: string;
+  potentialBeneficiaryEmail: string;
+  contactMode: ContactMode;
+  kind: D;
+  locationId: LocationId;
+} & WithAcquisition &
+  (D extends "1_ELEVE_1_STAGE"
+    ? { levelOfEducation: ContactLevelOfEducation }
+    : // biome-ignore lint/complexity/noBannedTypes: we need {} here
+      {});
+
+type CreateDiscussionDtoCommon = {
+  potentialBeneficiaryPhone: string;
+  datePreferences: string;
+};
+
+export type CreateDiscussionIFDto = ContactInformations<"IF"> &
+  CreateDiscussionDtoCommon & {
+    immersionObjective: ImmersionObjective | null;
+    hasWorkingExperience: boolean;
+    experienceAdditionalInformation?: string;
+    potentialBeneficiaryResumeLink?: string;
+  };
+
+export type CreateDiscussion1Eleve1StageDto =
+  ContactInformations<"1_ELEVE_1_STAGE"> &
+    CreateDiscussionDtoCommon & {
+      immersionObjective: Extract<ImmersionObjective, typeof discoverObjective>;
+    };
+
+export type CreateDiscussionDto =
+  | CreateDiscussionIFDto
+  | CreateDiscussion1Eleve1StageDto;
+
+export type ContactEstablishmentEventPayload = {
+  discussionId: DiscussionId;
+  siret: SiretDto;
+  isLegacy?: boolean;
+};
+
+type WithDiscussionKindProps<D extends DiscussionKind> = D extends "IF"
   ? {
-      datePreferences: string;
-      phone: PhoneNumber;
-      immersionObjective: D extends "1_ELEVE_1_STAGE"
-        ? Extract<ImmersionObjective, typeof discoverObjective>
-        : ImmersionObjective | null;
+      // hasWorkingExperience
+      // undefined uniquement pour la retro compat des anciennes discussions
+      // non exploité dans le form
+      hasWorkingExperience?: boolean;
+      resumeLink?: string;
+      experienceAdditionalInformation?: string;
+      immersionObjective: ImmersionObjective | null;
     }
-  : EmptyObject;
-
-type WithContactByEmailAndIFProps<
-  D extends DiscussionKind,
-  C extends ContactMode,
-> = D extends "IF"
-  ? C extends "EMAIL"
-    ? {
-        // hasWorkingExperience
-        // undefined uniquement pour la retro compat des anciennes discussions
-        // non exploité dans le form
-        hasWorkingExperience?: boolean;
-        resumeLink?: string;
-        experienceAdditionalInformation?: string;
-      }
-    : EmptyObject
-  : EmptyObject;
-
-type With1Eleve1StageProps<D extends DiscussionKind> =
-  D extends "1_ELEVE_1_STAGE"
-    ? {
-        levelOfEducation: ContactLevelOfEducation;
-      }
-    : EmptyObject;
+  : {
+      levelOfEducation: ContactLevelOfEducation;
+      immersionObjective: Extract<ImmersionObjective, typeof discoverObjective>;
+    };
 
 export type PotentialBeneficiaryCommonProps = {
   email: string;
   firstName: string;
   lastName: string;
+  datePreferences: string;
+  phone: PhoneNumber;
 };
 
-export type DiscussionPotentialBeneficiary<
-  D extends DiscussionKind,
-  C extends ContactMode,
-> = PotentialBeneficiaryCommonProps &
-  WithContactByEmailProps<D, C> &
-  WithContactByEmailAndIFProps<D, C> &
-  With1Eleve1StageProps<D>;
+export type DiscussionPotentialBeneficiary<D extends DiscussionKind> =
+  PotentialBeneficiaryCommonProps & WithDiscussionKindProps<D>;
 
 export type CommonDiscussionDto = {
   address: AddressDto;
@@ -137,18 +168,15 @@ export type ExtraDiscussionDtoProperties = WithAcquisition & {
   exchanges: Exchange[];
 };
 
-type SpecificDiscussionDto<C extends ContactMode, D extends DiscussionKind> = {
-  contactMode: C;
+type SpecificDiscussionDto<D extends DiscussionKind> = {
+  contactMode: ContactMode;
   kind: D;
-  potentialBeneficiary: DiscussionPotentialBeneficiary<D, C>;
+  potentialBeneficiary: DiscussionPotentialBeneficiary<D>;
 };
 
-type GenericDiscussionDto<
-  D extends DiscussionKind,
-  C extends ContactMode,
-> = CommonDiscussionDto &
+type GenericDiscussionDto<D extends DiscussionKind> = CommonDiscussionDto &
   ExtraDiscussionDtoProperties &
-  SpecificDiscussionDto<C, D>;
+  SpecificDiscussionDto<D>;
 
 export type DiscussionStatus = DiscussionDto["status"];
 export type RejectionKind = WithDiscussionStatusRejected["rejectionKind"];
@@ -204,46 +232,21 @@ export type WithDiscussionDto = {
   discussion: DiscussionDto;
 };
 
-export type DiscussionDto = DiscussionDtoIF | DiscussionDto1Eleve1Stage; // TODO: DiscussionDto = ContactEstablishmentRequestDto ? pourquoi conserver les deux ?
+export type DiscussionDto = DiscussionDtoIF | DiscussionDto1Eleve1Stage;
 
-export type DiscussionDtoIF =
-  | GenericDiscussionDto<"IF", "EMAIL">
-  | GenericDiscussionDto<"IF", "IN_PERSON">
-  | GenericDiscussionDto<"IF", "PHONE">;
+export type DiscussionDtoIF = GenericDiscussionDto<"IF">;
+export type DiscussionDto1Eleve1Stage = GenericDiscussionDto<"1_ELEVE_1_STAGE">;
 
-export type DiscussionDto1Eleve1Stage =
-  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "EMAIL">
-  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "IN_PERSON">
-  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "PHONE">;
-
-export type DiscussionDtoEmail =
-  | GenericDiscussionDto<"IF", "EMAIL">
-  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "EMAIL">;
-
-export type DiscussionDtoPhone =
-  | GenericDiscussionDto<"IF", "PHONE">
-  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "PHONE">;
-
-export type DiscussionDtoInPerson =
-  | GenericDiscussionDto<"IF", "IN_PERSON">
-  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "IN_PERSON">;
-
-export type GenericDiscussionReadDto<
-  D extends DiscussionKind,
-  C extends ContactMode,
-> = CommonDiscussionDto &
-  SpecificDiscussionDto<C, D> & {
-    appellation: AppellationAndRomeDto;
-    exchanges: ExchangeRead[];
-  };
+export type GenericDiscussionReadDto<D extends DiscussionKind> =
+  CommonDiscussionDto &
+    SpecificDiscussionDto<D> & {
+      appellation: AppellationAndRomeDto;
+      exchanges: ExchangeRead[];
+    };
 
 export type DiscussionReadDto =
-  | GenericDiscussionReadDto<"IF", "EMAIL">
-  | GenericDiscussionReadDto<"IF", "IN_PERSON">
-  | GenericDiscussionReadDto<"IF", "PHONE">
-  | GenericDiscussionReadDto<"1_ELEVE_1_STAGE", "EMAIL">
-  | GenericDiscussionReadDto<"1_ELEVE_1_STAGE", "IN_PERSON">
-  | GenericDiscussionReadDto<"1_ELEVE_1_STAGE", "PHONE">;
+  | GenericDiscussionReadDto<"IF">
+  | GenericDiscussionReadDto<"1_ELEVE_1_STAGE">;
 
 export type Attachment = {
   name: string;

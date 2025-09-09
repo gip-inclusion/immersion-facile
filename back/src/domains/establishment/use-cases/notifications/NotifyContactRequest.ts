@@ -4,9 +4,7 @@ import {
   type ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
   createOpaqueEmail,
-  type DiscussionDtoEmail,
-  type DiscussionDtoInPerson,
-  type DiscussionDtoPhone,
+  type DiscussionDto,
   type Email,
   errors,
   getFormattedFirstnameAndLastname,
@@ -83,7 +81,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     isLegacy,
   }: {
     uow: UnitOfWork;
-    discussion: DiscussionDtoEmail;
+    discussion: DiscussionDto;
     establishment: EstablishmentAggregate;
     isLegacy: boolean | undefined;
   }): Promise<void> {
@@ -155,7 +153,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     establishment,
   }: {
     uow: UnitOfWork;
-    discussion: DiscussionDtoInPerson | DiscussionDtoPhone;
+    discussion: DiscussionDto;
     establishment: EstablishmentAggregate;
   }) {
     const establishmentUserRightToContact = establishment.userRights.find(
@@ -195,7 +193,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     establishmentUserToContact,
     establishmentUserRightToContact,
   }: {
-    discussion: DiscussionDtoInPerson | DiscussionDtoPhone;
+    discussion: DiscussionDto;
     establishmentUserToContact: UserWithAdminRights;
     establishmentUserRightToContact: EstablishmentUserRight;
   }) {
