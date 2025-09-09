@@ -1,4 +1,3 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import { useState } from "react";
 import {
   RSAutocomplete,
@@ -65,67 +64,65 @@ export const AddressAutocomplete = ({
   const inputValue = searchTerm ?? initialInputValue;
 
   return (
-    <div className={fr.cx("fr-mb-2w")}>
-      <RSAutocomplete
-        {...props}
-        selectProps={{
-          isDebouncing,
-          inputId: props.selectProps?.inputId ?? "im-select__input--address",
-          isLoading: isSearching,
-          loadingMessage: () => <>Recherche d'adresses en cours... 🔎</>,
-          inputValue,
-          placeholder: "Ex : 123 Rue de la Paix 75001 Paris",
-          value:
-            value && !Array.isArray(value)
-              ? {
-                  label: addressDtoToString(value?.address),
-                  value,
-                }
-              : undefined,
-          onChange: (searchResult, actionMeta) => {
-            if (
-              actionMeta.action === "clear" ||
-              actionMeta.action === "remove-value"
-            ) {
-              dispatch(
-                geocodingSlice.actions.clearLocatorDataRequested({
-                  locator: props.locator,
-                  multiple,
-                }),
-              );
-              onAddressClear();
-            }
-            if (searchResult && actionMeta.action === "select-option") {
-              onAddressSelected(searchResult.value);
-              dispatch(
-                geocodingSlice.actions.selectSuggestionRequested({
-                  item: searchResult.value,
-                  locator: props.locator,
-                }),
-              );
-              dispatch(
-                geocodingSlice.actions.emptyQueryRequested({
-                  locator: props.locator,
-                }),
-              );
-              setSearchTerm(searchResult.label);
-            }
-          },
-          options,
-          onInputChange: (newQuery, actionMeta) => {
-            if (actionMeta.action === "input-change") {
-              setSearchTerm(newQuery);
-              dispatch(
-                geocodingSlice.actions.changeQueryRequested({
-                  locator: props.locator,
-                  lookup: newQuery,
-                  countryCode,
-                }),
-              );
-            }
-          },
-        }}
-      />
-    </div>
+    <RSAutocomplete
+      {...props}
+      selectProps={{
+        isDebouncing,
+        inputId: props.selectProps?.inputId ?? "im-select__input--address",
+        isLoading: isSearching,
+        loadingMessage: () => <>Recherche d'adresses en cours... 🔎</>,
+        inputValue,
+        placeholder: "Ex : 123 Rue de la Paix 75001 Paris",
+        value:
+          value && !Array.isArray(value)
+            ? {
+                label: addressDtoToString(value?.address),
+                value,
+              }
+            : undefined,
+        onChange: (searchResult, actionMeta) => {
+          if (
+            actionMeta.action === "clear" ||
+            actionMeta.action === "remove-value"
+          ) {
+            dispatch(
+              geocodingSlice.actions.clearLocatorDataRequested({
+                locator: props.locator,
+                multiple,
+              }),
+            );
+            onAddressClear();
+          }
+          if (searchResult && actionMeta.action === "select-option") {
+            onAddressSelected(searchResult.value);
+            dispatch(
+              geocodingSlice.actions.selectSuggestionRequested({
+                item: searchResult.value,
+                locator: props.locator,
+              }),
+            );
+            dispatch(
+              geocodingSlice.actions.emptyQueryRequested({
+                locator: props.locator,
+              }),
+            );
+            setSearchTerm(searchResult.label);
+          }
+        },
+        options,
+        onInputChange: (newQuery, actionMeta) => {
+          if (actionMeta.action === "input-change") {
+            setSearchTerm(newQuery);
+            dispatch(
+              geocodingSlice.actions.changeQueryRequested({
+                locator: props.locator,
+                lookup: newQuery,
+                countryCode,
+              }),
+            );
+          }
+        },
+      }}
+    />
   );
 };

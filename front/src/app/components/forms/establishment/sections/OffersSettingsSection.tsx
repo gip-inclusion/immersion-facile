@@ -720,7 +720,7 @@ const UserToContact = ({ mode }: { mode: Mode }): React.ReactNode => {
     .map((userRight) => ({
       label:
         contactMode === "IN_PERSON"
-          ? `(${userRight.email})`
+          ? `${userRight.email}`
           : `${userRight.phone && toDisplayedPhoneNumber(userRight.phone)} - (${userRight.email}) `,
       value: userRight.email,
       selected: userRight.email === currentUserToContact?.email,
