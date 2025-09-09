@@ -169,8 +169,6 @@ describe("Contact establishment public v2 e2e", () => {
           'kind : Invalid input: expected "1_ELEVE_1_STAGE"',
           'immersionObjective : Invalid input: expected "Découvrir un métier ou un secteur d\'activité"',
           "levelOfEducation : Vous devez sélectionner une option parmi celles proposées",
-          'contactMode : Invalid input: expected "PHONE"',
-          'contactMode : Invalid input: expected "IN_PERSON"',
         ],
       });
     });

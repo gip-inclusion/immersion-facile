@@ -317,39 +317,46 @@ const makeDiscussionDto = async ({
         }),
   };
 
-  const [appellation] =
-    await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-      [discussion.appellationCode],
+  if (discussion.contactMode === "EMAIL") {
+    const [appellation] =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+        [discussion.appellationCode],
+      );
+
+    const emailContent = configureGenerateHtmlFromTemplate(
+      emailTemplatesByName,
+      {
+        header: undefined,
+        footer: undefined,
+      },
+    )(
+      "CONTACT_BY_EMAIL_REQUEST",
+      makeContactByEmailRequestParams({
+        discussion,
+        immersionFacileBaseUrl,
+        appellation,
+      }),
+      { showContentParts: true },
     );
 
-  const emailContent = configureGenerateHtmlFromTemplate(emailTemplatesByName, {
-    header: undefined,
-    footer: undefined,
-  })(
-    "CONTACT_BY_EMAIL_REQUEST",
-    makeContactByEmailRequestParams({
-      discussion,
-      immersionFacileBaseUrl,
-      appellation,
-    }),
-    { showContentParts: true },
-  );
+    if (!emailContent.contentParts)
+      throw errors.email.missingContentParts("CONTACT_BY_EMAIL_REQUEST");
 
-  if (!emailContent.contentParts)
-    throw errors.email.missingContentParts("CONTACT_BY_EMAIL_REQUEST");
-
-  return {
-    ...discussion,
-    exchanges: [
-      {
-        subject: emailContent.subject,
-        sentAt: now.toISOString(),
-        message: `${emailContent.contentParts.greetings}
+    return {
+      ...discussion,
+      exchanges: [
+        {
+          subject: emailContent.subject,
+          sentAt: now.toISOString(),
+          message: `${emailContent.contentParts.greetings}
               ${emailContent.contentParts.content}
               ${emailContent.contentParts.subContent}`,
-        sender: "potentialBeneficiary",
-        attachments: [],
-      },
-    ],
-  };
+          sender: "potentialBeneficiary",
+          attachments: [],
+        },
+      ],
+    };
+  }
+
+  return discussion;
 };
