@@ -329,7 +329,7 @@ const contactInformationsCommonSchema = z.object({
 const createDiscussionCommonSchema = contactInformationsCommonSchema.and(
   z.object({
     potentialBeneficiaryPhone: phoneNumberSchema,
-    datePreferences: zStringMinLength1,
+    datePreferences: zStringCanBeEmpty,
     contactMode: contactModeSchema,
   }),
 );
