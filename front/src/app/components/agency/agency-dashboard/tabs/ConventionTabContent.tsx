@@ -34,6 +34,9 @@ export const ConventionTabContent = ({
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const [selectedAgency, setSelectedAgency] = useState<AgencyId | null>(null);
+  const [seeAllConventions, setSeeAllConventions] = useState<boolean | null>(
+    null,
+  );
 
   const redirectToConventionPage = (
     agency: AgencyDtoForAgencyUsersAndAdmins,
@@ -71,6 +74,23 @@ export const ConventionTabContent = ({
     }
   };
 
+  if (seeAllConventions) {
+    return (
+      <>
+        <Button
+          priority="secondary"
+          iconId="fr-icon-arrow-left-line"
+          onClick={() => {
+            setSeeAllConventions(false);
+          }}
+        >
+          Retour
+        </Button>
+        <AgencyToDoList titleAs="h2" displayMode="paginated" />
+      </>
+    );
+  }
+
   return (
     <HeadingSection
       titleAs="h2"
@@ -87,7 +107,13 @@ export const ConventionTabContent = ({
         </Button>
       }
     >
-      <AgencyToDoList titleAs="h3" />
+      <AgencyToDoList
+        titleAs="h3"
+        displayMode="limited"
+        onSeeAllConventionsClick={() => {
+          setSeeAllConventions(true);
+        }}
+      />
       <HeadingSection titleAs="h3" title="Piloter une convention">
         <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
       </HeadingSection>
