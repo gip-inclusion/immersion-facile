@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
+import Button from "@codegouvfr/react-dsfr/Button";
 import Tile from "@codegouvfr/react-dsfr/Tile";
 import { addDays, differenceInCalendarDays, subMonths } from "date-fns";
 import { useEffect } from "react";
@@ -14,10 +15,16 @@ import { connectedUserConventionsSelectors } from "src/core-logic/domain/connect
 import { connectedUserConventionsSlice } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.slice";
 import { match, P } from "ts-pattern";
 
+const NUMBER_ITEM_TO_DISPLAY_IN_LIMITED_MODE = 3;
+
 export const AgencyToDoList = ({
   titleAs,
+  displayMode,
+  onSeeAllConventionsClick,
 }: {
   titleAs: "h1" | "h2" | "h3" | "h4";
+  displayMode: "limited" | "paginated";
+  onSeeAllConventionsClick?: () => void;
 }) => {
   const dispatch = useDispatch();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
@@ -48,15 +55,38 @@ export const AgencyToDoList = ({
       );
     }
   }, [dispatch, connectedUserJwt]);
+
   return (
     <HeadingSection
       title="Tâches à traiter"
-      titleAs="h3"
+      titleAs={titleAs}
       className={fr.cx("fr-mt-2w")}
     >
-      {currentUserConventions.map((convention) => (
-        <AgencyToDoItem key={convention.id} convention={convention} />
-      ))}
+      {currentUserConventions.length === 0 && (
+        <p>Aucune convention à traiter en urgence.</p>
+      )}
+      {currentUserConventions.length > 3 &&
+        displayMode === "limited" &&
+        onSeeAllConventionsClick && (
+          <Button
+            onClick={onSeeAllConventionsClick}
+            priority="secondary"
+            className={fr.cx("fr-mb-2w")}
+            iconId="fr-icon-arrow-right-line"
+          >
+            Voir tout ({currentUserConventions.length} conventions)
+          </Button>
+        )}
+      {currentUserConventions
+        .slice(
+          0,
+          displayMode === "limited"
+            ? NUMBER_ITEM_TO_DISPLAY_IN_LIMITED_MODE
+            : currentUserConventions.length,
+        )
+        .map((convention) => (
+          <AgencyToDoItem key={convention.id} convention={convention} />
+        ))}
     </HeadingSection>
   );
 };
