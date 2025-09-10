@@ -459,6 +459,11 @@ export type GetPaginatedConventionsFilters = {
   dateSubmission?: DateFilter;
 };
 
+export type GetPaginatedConventionsSort = {
+  sortBy?: GetPaginatedConventionsSortBy;
+  sortOrder?: "asc" | "desc";
+};
+
 export type GetPaginatedConventionsSortBy = keyof Pick<
   ConventionDto,
   "dateValidation" | "dateStart" | "dateSubmission"
@@ -466,7 +471,7 @@ export type GetPaginatedConventionsSortBy = keyof Pick<
 
 export type GetConventionsForAgencyUserParams = {
   filters?: GetPaginatedConventionsFilters;
-  sortBy?: GetPaginatedConventionsSortBy;
+  sort?: GetPaginatedConventionsSort;
   pagination?: PaginationQueryParams;
 };
 
@@ -477,6 +482,7 @@ export type FlatGetConventionsForAgencyUserParams = {
 
   // sort
   sortBy?: GetPaginatedConventionsSortBy;
+  sortOrder?: "asc" | "desc";
 
   // filters
   actorEmailContains?: string;

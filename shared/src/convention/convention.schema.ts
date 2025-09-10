@@ -828,6 +828,11 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
         error: localization.invalidEnum,
       })
       .optional(),
+    sortOrder: z
+      .enum(["asc", "desc"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
 
     // filters
     actorEmailContains: z.string().optional(),
@@ -861,9 +866,18 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
         dateSubmission: dateFilterSchema.optional(),
       })
       .optional(),
-    sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission"], {
-        error: localization.invalidEnum,
+    sort: z
+      .object({
+        sortBy: z
+          .enum(["dateValidation", "dateStart", "dateSubmission"], {
+            error: localization.invalidEnum,
+          })
+          .optional(),
+        sortOrder: z
+          .enum(["asc", "desc"], {
+            error: localization.invalidEnum,
+          })
+          .optional(),
       })
       .optional(),
     pagination: paginationQueryParamsSchema.optional(),
