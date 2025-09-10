@@ -87,7 +87,7 @@ export const ConventionTabContent = ({
         </Button>
       }
     >
-      <AgencyToDoList titleAs="h3" />
+      <AgencyToDoList titleAs="h3" displayMode="limited"/>
       <HeadingSection titleAs="h3" title="Piloter une convention">
         <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
       </HeadingSection>
