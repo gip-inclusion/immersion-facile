@@ -84,7 +84,7 @@ export const labelsForContactLevelOfEducation: Record<
   "2nde": "Seconde",
 };
 
-export type ContactInformations<D extends DiscussionKind> = {
+type ContactInformations<D extends DiscussionKind> = {
   appellationCode: AppellationCode;
   siret: SiretDto;
   potentialBeneficiaryFirstName: string;
@@ -151,7 +151,7 @@ export type PotentialBeneficiaryCommonProps = {
   phone: PhoneNumber;
 };
 
-export type DiscussionPotentialBeneficiary<D extends DiscussionKind> =
+type DiscussionPotentialBeneficiary<D extends DiscussionKind> =
   PotentialBeneficiaryCommonProps & WithDiscussionKindProps<D>;
 
 export type CommonDiscussionDto = {

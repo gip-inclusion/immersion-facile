@@ -24,6 +24,13 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   });
 }
 
-export async function down(): Promise<void> {
-  /* nothing to do */
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.alterColumn("discussions", "potential_beneficiary_phone", {
+    type: "text",
+    notNull: false,
+  });
+  pgm.alterColumn("discussions", "potential_beneficiary_date_preferences", {
+    type: "text",
+    notNull: false,
+  });
 }
