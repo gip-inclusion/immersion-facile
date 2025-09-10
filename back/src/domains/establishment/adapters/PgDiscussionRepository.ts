@@ -107,7 +107,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       this.transaction
         .selectFrom("establishments__users as eu")
         .innerJoin("discussions", "eu.siret", "discussions.siret")
-        .innerJoin("exchanges", "discussions.id", "exchanges.discussion_id")
+        .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
         .innerJoin(
           "public_appellations_data as pad",
           "discussions.appellation_code",
@@ -196,21 +196,26 @@ export class PgDiscussionRepository implements DiscussionRepository {
             phone: ref("potential_beneficiary_phone"),
           }).as("potentialBeneficiary"),
           fn
-            .jsonAgg(
-              jsonStripNulls(
-                jsonBuildObject({
-                  subject: ref("exchanges.subject"),
-                  message: ref("exchanges.message"),
-                  sentAt: sql<string>`TO_CHAR(${ref("exchanges.sent_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
-                  attachments: ref("exchanges.attachments"),
-                  sender: ref("exchanges.sender"),
-                  firstname: ref("exchanges.establishment_first_name"),
-                  lastname: ref("exchanges.establishment_last_name"),
-                  email: ref("exchanges.establishment_email"),
-                }),
-              ),
+            .coalesce(
+              fn
+                .jsonAgg(
+                  jsonStripNulls(
+                    jsonBuildObject({
+                      subject: ref("exchanges.subject"),
+                      message: ref("exchanges.message"),
+                      sentAt: sql<string>`TO_CHAR(${ref("exchanges.sent_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                      attachments: ref("exchanges.attachments"),
+                      sender: ref("exchanges.sender"),
+                      firstname: ref("exchanges.establishment_first_name"),
+                      lastname: ref("exchanges.establishment_last_name"),
+                      email: ref("exchanges.establishment_email"),
+                    }),
+                  ),
+                )
+                .filterWhere("exchanges.id", "is not", null)
+                .$castTo<Exchange[]>(),
+              sql`'[]'`,
             )
-            .$castTo<Exchange[]>()
             .as("exchanges"),
         ]);
 

@@ -605,16 +605,18 @@ describe("PgDiscussionRepository", () => {
     const discussion2Objective: ImmersionObjective =
       "Confirmer un projet professionnel";
 
-    const potentialBeneficiaryPhone = "0606060606";
+    const potentialBeneficiaryPhone = "+33606060606";
     const discussion2 = new DiscussionBuilder()
       .withId(uuid())
       .withSiret("00000000000002")
+      .withContactMode("PHONE")
+      .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
       .withPotentialBeneficiaryLastName("Smith")
       .withCreatedAt(new Date("2025-05-19"))
       .withAppellationCode(secretariat.appellationCode)
-      .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
       .withImmersionObjective(discussion2Objective)
       .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "phone" })
+      .withExchanges([])
       .build();
 
     const discussion3Objective: ImmersionObjective =
