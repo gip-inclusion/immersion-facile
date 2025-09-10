@@ -58,12 +58,17 @@ export const EstablishmentUsersList = () => {
     "Actions",
   ];
 
-  const data = formEstablishment.userRights.map((userRight, index) => {
+  const sortedUserRights = [...formEstablishment.userRights].sort((a, b) =>
+    a.email > b.email ? 1 : -1,
+  );
+
+  const data = sortedUserRights.map((userRight, index) => {
     const isLastAdmin =
       userRight.role === "establishment-admin" &&
       formEstablishment.userRights.filter(
         (userRight) => userRight.role === "establishment-admin",
       ).length === 1;
+
     return getEstablishmentUserRow({
       userRight,
       isLastAdmin,
@@ -71,6 +76,7 @@ export const EstablishmentUsersList = () => {
       setEditingUserRight,
     });
   });
+
   return (
     <div className="fr-mt-4w">
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
@@ -231,9 +237,12 @@ const EstablishmentUsersEditForm = ({
     shouldReceiveDiscussionNotifications: false,
     isMainContactByPhone: false,
   });
+
+  const defaultValues = { ...emptyValues.current, ...alreadyExistingUserRight };
+
   const methods = useForm<FormEstablishmentUserRight>({
     resolver: zodResolver(formEstablishmentUserRightSchema),
-    defaultValues: alreadyExistingUserRight ?? emptyValues.current,
+    defaultValues,
   });
 
   const {
@@ -276,7 +285,7 @@ const EstablishmentUsersEditForm = ({
   };
 
   useEffect(() => {
-    reset(alreadyExistingUserRight ?? emptyValues.current);
+    reset(defaultValues);
   }, [alreadyExistingUserRight, reset]);
 
   const values = watch();
