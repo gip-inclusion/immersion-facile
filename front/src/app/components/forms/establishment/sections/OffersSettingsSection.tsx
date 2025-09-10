@@ -567,10 +567,20 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
               value: "PHONE",
               onChange: (event) => {
                 contactModeRegister.onChange?.(event);
-                const newUserRights = allUserRights.map((userRight) => ({
+                const defaultUserRightToContact =
+                  allUserRights.find(
+                    ({ isMainContactByPhone }) => isMainContactByPhone,
+                  ) ??
+                  allUserRights.find(({ phone }) => !!phone) ??
+                  allUserRights[0];
+
+                const newUserRights = allUserRights.map((userRight, index) => ({
                   ...userRight,
                   isMainContactInPerson: false,
+                  isMainContactByPhone:
+                    userRight.email === defaultUserRightToContact.email,
                 }));
+
                 setValue("userRights", newUserRights);
               },
             },
