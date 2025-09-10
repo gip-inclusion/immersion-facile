@@ -76,7 +76,9 @@ export const ManageEstablishmentsTab = ({
             }}
           />
         )}
-        {route.params.siret && <EstablishmentForm mode="edit" />}
+        {route.params.siret && (
+          <EstablishmentForm mode="edit" key={route.params.siret} />
+        )}
       </div>
     </HeadingSection>
   );

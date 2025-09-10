@@ -574,7 +574,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
                   allUserRights.find(({ phone }) => !!phone) ??
                   allUserRights[0];
 
-                const newUserRights = allUserRights.map((userRight, index) => ({
+                const newUserRights = allUserRights.map((userRight) => ({
                   ...userRight,
                   isMainContactInPerson: false,
                   isMainContactByPhone:
