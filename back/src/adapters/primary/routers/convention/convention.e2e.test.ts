@@ -978,7 +978,9 @@ describe("convention e2e", () => {
             page: 1,
             perPage: 10,
           },
-          sortBy: "dateStart",
+          sort: {
+            sortBy: "dateStart",
+          },
         },
       ]);
     });

@@ -911,7 +911,10 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 2 },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(resultPage1.data.length).toBe(2);
@@ -922,7 +925,10 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 2, perPage: 2 },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(resultPage2.data.length).toBe(2);
@@ -935,7 +941,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           filters: { statuses: ["READY_TO_SIGN"] },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(result.data.length).toBe(2);
@@ -948,7 +957,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           filters: { beneficiaryNameContains: "John" },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(result.data.length).toBe(2);
@@ -960,7 +972,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           filters: { establishmentNameContains: "Business B" },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(result.data.length).toBe(1);
@@ -978,7 +993,10 @@ describe("Pg implementation of ConventionQueries", () => {
               to: "2023-03-31",
             },
           },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(result.data.length).toBe(2);
@@ -990,15 +1008,18 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
-          sortBy: "dateStart",
+          sort: {
+            sortBy: "dateStart",
+            sortOrder: "asc",
+          },
         });
 
       expect(result.data.length).toBe(4);
       expectToEqual(result.data, [
-        conventionD,
-        conventionC,
-        conventionB,
         conventionA,
+        conventionB,
+        conventionC,
+        conventionD,
       ]);
     });
 
@@ -1007,7 +1028,10 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 2 },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(result.data.length).toBe(2);
@@ -1027,7 +1051,10 @@ describe("Pg implementation of ConventionQueries", () => {
             },
             actorEmailContains: "@convention-a.com",
           },
-          sortBy: "dateStart",
+          sort: {
+            sortBy: "dateStart",
+            sortOrder: "desc",
+          },
         });
 
       expect(result.data.length).toBe(1);
@@ -1039,7 +1066,10 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: singleAgencyUser.id,
           pagination: { page: 1, perPage: 10 },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expectToEqual(result.data, [conventionC, conventionB, conventionA]);
@@ -1078,7 +1108,10 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: userWithoutProperRole.id,
           pagination: { page: 1, perPage: 10 },
-          sortBy: "dateSubmission",
+          sort: {
+            sortBy: "dateSubmission",
+            sortOrder: "desc",
+          },
         });
 
       expect(result.data.length).toBe(0);
