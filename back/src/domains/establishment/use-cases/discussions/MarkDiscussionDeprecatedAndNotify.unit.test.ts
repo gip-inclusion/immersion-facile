@@ -139,17 +139,6 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
       );
     });
 
-    it("should throw an error if establishment is not found", async () => {
-      uow.establishmentAggregateRepository.establishmentAggregates = [];
-
-      await expectPromiseToFailWithError(
-        markDiscussionDeprecatedAndNotify.execute({
-          discussionId: discussion.id,
-        }),
-        errors.establishment.notFound({ siret: discussion.siret }),
-      );
-    });
-
     it("should throw an error if users are not found", async () => {
       uow.userRepository.users = [];
 
@@ -194,6 +183,36 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
           establishmentSiret: discussion.siret,
         },
         id: expectedNotificationIds[1],
+        kind: "email",
+        templatedContent: {
+          kind: "DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY",
+          recipients: [discussion.potentialBeneficiary.email],
+          params: {
+            beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+            beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+            businessName: discussion.businessName,
+            searchPageUrl: "http://localhost/recherche",
+            discussionCreatedAt: discussion.createdAt,
+          },
+        },
+      },
+    ]);
+  });
+
+  it("should emit only beneficiary notification if establishment is not found", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [];
+
+    await markDiscussionDeprecatedAndNotify.execute({
+      discussionId: discussion.id,
+    });
+
+    expectToEqual(uow.notificationRepository.notifications, [
+      {
+        createdAt: "2021-09-01T10:10:00.000Z",
+        followedIds: {
+          establishmentSiret: discussion.siret,
+        },
+        id: expectedNotificationIds[0],
         kind: "email",
         templatedContent: {
           kind: "DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY",

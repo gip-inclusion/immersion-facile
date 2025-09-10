@@ -5,7 +5,10 @@ import {
   withDiscussionIdSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import type { SaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type {
+  NotificationContentAndFollowedIds,
+  SaveNotificationsBatchAndRelatedEvent,
+} from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { getNotifiedUsersFromEstablishmentUserRights } from "../../helpers/businessContact.helpers";
 
@@ -36,8 +39,31 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
         discussion.siret,
       );
 
-    if (!establishment)
-      throw errors.establishment.notFound({ siret: discussion.siret });
+    const establishmentNotification: NotificationContentAndFollowedIds | null =
+      establishment
+        ? {
+            kind: "email",
+            templatedContent: {
+              kind: "DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT",
+              recipients: (
+                await getNotifiedUsersFromEstablishmentUserRights(
+                  uow,
+                  establishment.userRights,
+                )
+              ).map(({ email }) => email),
+              params: {
+                beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+                beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+                businessName: discussion.businessName,
+                establishmentDashboardUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
+                discussionCreatedAt: discussion.createdAt,
+              },
+            },
+            followedIds: {
+              establishmentSiret: discussion.siret,
+            },
+          }
+        : null;
 
     await Promise.all([
       uow.discussionRepository.update({
@@ -46,28 +72,7 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
         rejectionKind: "DEPRECATED",
       }),
       deps.saveNotificationsBatchAndRelatedEvent(uow, [
-        {
-          kind: "email",
-          templatedContent: {
-            kind: "DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT",
-            recipients: (
-              await getNotifiedUsersFromEstablishmentUserRights(
-                uow,
-                establishment.userRights,
-              )
-            ).map(({ email }) => email),
-            params: {
-              beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-              beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-              businessName: discussion.businessName,
-              establishmentDashboardUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
-              discussionCreatedAt: discussion.createdAt,
-            },
-          },
-          followedIds: {
-            establishmentSiret: discussion.siret,
-          },
-        },
+        ...(establishmentNotification ? [establishmentNotification] : []),
         {
           kind: "email",
           templatedContent: {
