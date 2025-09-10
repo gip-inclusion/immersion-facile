@@ -14,6 +14,7 @@ import {
   errors,
   type FindSimilarConventionsParams,
   type GetPaginatedConventionsFilters,
+  type GetPaginatedConventionsSort,
   type GetPaginatedConventionsSortBy,
   type NotEmptyArray,
   type PaginationQueryParams,
@@ -173,13 +174,13 @@ export class PgConventionQueries implements ConventionQueries {
   public async getPaginatedConventionsForAgencyUser({
     filters = {},
     pagination,
-    sortBy,
+    sort,
     agencyUserId,
   }: {
     agencyUserId: UserId;
     pagination: Required<PaginationQueryParams>;
     filters?: GetPaginatedConventionsFilters;
-    sortBy: GetPaginatedConventionsSortBy;
+    sort: GetPaginatedConventionsSort;
   }): Promise<DataWithPagination<ConventionDto>> {
     const {
       actorEmailContains,
@@ -210,7 +211,7 @@ export class PgConventionQueries implements ConventionQueries {
       filterInList("status", statuses),
       filterInList("agency_id", agencyIds),
       filterByAgencyDepartmentCodes(agencyDepartmentCodes),
-      sortConventions(sortBy),
+      sortConventions(sort),
       applyPagination(pagination),
     ).execute();
 
@@ -237,9 +238,9 @@ const applyPagination =
 type ConventionQueryBuilder = ReturnType<typeof createConventionQueryBuilder>;
 
 const sortConventions =
-  (sortBy?: GetPaginatedConventionsSortBy) =>
+  (sort?: GetPaginatedConventionsSort) =>
   (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
-    const sortByByKey: Record<
+    const sortByKey: Record<
       GetPaginatedConventionsSortBy,
       keyof Database["conventions"]
     > = {
@@ -248,8 +249,9 @@ const sortConventions =
       dateValidation: "date_validation",
     };
 
-    if (!sortBy) return builder.orderBy(sortByByKey.dateStart, "desc");
-    return builder.orderBy(sortByByKey[sortBy], "desc");
+    if (!sort || !sort.sortBy)
+      return builder.orderBy(sortByKey.dateStart, "desc");
+    return builder.orderBy(sortByKey[sort.sortBy], sort.sortOrder ?? "desc");
   };
 
 const filterByAgencyDepartmentCodes =
