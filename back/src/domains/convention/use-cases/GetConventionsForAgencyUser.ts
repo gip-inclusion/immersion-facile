@@ -18,13 +18,13 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
   .withCurrentUser<ConnectedUser>()
 
   .build(async ({ inputParams, uow, currentUser }) => {
-    const { filters, sortBy } = inputParams;
+    const { filters, sort } = inputParams;
 
     const pagination = getPaginationParamsForWeb(inputParams.pagination);
 
     return uow.conventionQueries.getPaginatedConventionsForAgencyUser({
       filters,
-      sortBy,
+      sort,
       agencyUserId: currentUser.id,
       pagination,
     });
