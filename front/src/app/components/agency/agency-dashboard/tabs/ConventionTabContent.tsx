@@ -13,6 +13,7 @@ import {
   type WithAgencyDashboards,
   type WithEstablishmentDashboards,
 } from "shared";
+import { AgencyToDoList } from "src/app/components/agency/agency-dashboard/AgencyToDoList";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -69,6 +70,7 @@ export const ConventionTabContent = ({
       selectAgencyToInitiateConventionModal.open();
     }
   };
+
   return (
     <HeadingSection
       titleAs="h2"
@@ -85,11 +87,8 @@ export const ConventionTabContent = ({
         </Button>
       }
     >
-      <HeadingSection
-        titleAs="h3"
-        title="Piloter une convention"
-        className={fr.cx("fr-mt-2w")}
-      >
+      <AgencyToDoList titleAs="h3" />
+      <HeadingSection titleAs="h3" title="Piloter une convention">
         <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
       </HeadingSection>
       <MetabaseView
