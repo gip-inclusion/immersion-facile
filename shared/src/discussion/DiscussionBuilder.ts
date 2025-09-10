@@ -101,10 +101,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withDatePreference(datePreferences: string) {
-    if (
-      this.discussion.kind === "IF" &&
-      this.discussion.contactMode === "EMAIL"
-    )
+    if (this.discussion.kind === "IF")
       return new DiscussionBuilder({
         ...this.discussion,
         potentialBeneficiary: {
@@ -112,8 +109,9 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
           datePreferences,
         },
       });
+
     throw new Error(
-      `datePreference is not allowed for discussion kind ${this.discussion.kind} and contactMode ${this.discussion.contactMode}.`,
+      `datePreference is not allowed for discussion kind ${this.discussion.kind}.`,
     );
   }
 
@@ -231,28 +229,27 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withImmersionObjective(immersionObjective: ImmersionObjective | null) {
-    if (this.discussion.contactMode === "EMAIL") {
-      if (
-        this.discussion.kind === "1_ELEVE_1_STAGE" &&
-        immersionObjective === discoverObjective
-      ) {
-        return new DiscussionBuilder({
-          ...this.discussion,
-          potentialBeneficiary: {
-            ...this.discussion.potentialBeneficiary,
-            immersionObjective,
-          },
-        });
-      }
-      if (this.discussion.kind === "IF") {
-        return new DiscussionBuilder({
-          ...this.discussion,
-          potentialBeneficiary: {
-            ...this.discussion.potentialBeneficiary,
-            immersionObjective,
-          },
-        });
-      }
+    if (
+      this.discussion.kind === "1_ELEVE_1_STAGE" &&
+      immersionObjective === discoverObjective
+    ) {
+      return new DiscussionBuilder({
+        ...this.discussion,
+        potentialBeneficiary: {
+          ...this.discussion.potentialBeneficiary,
+          immersionObjective,
+        },
+      });
+    }
+
+    if (this.discussion.kind === "IF") {
+      return new DiscussionBuilder({
+        ...this.discussion,
+        potentialBeneficiary: {
+          ...this.discussion.potentialBeneficiary,
+          immersionObjective,
+        },
+      });
     }
 
     throw new Error(`Invalid immersion objective for ${this.discussion.kind}`);
@@ -289,12 +286,6 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withPotentialBeneficiaryPhone(phone: string) {
-    if (this.discussion.contactMode !== "EMAIL") {
-      throw new Error(
-        `Invalid potentialBeneficiary with phone ${phone} for contactMode ${this.discussion.contactMode}`,
-      );
-    }
-
     return new DiscussionBuilder({
       ...this.discussion,
       potentialBeneficiary: {
@@ -305,10 +296,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withPotentialBeneficiaryResumeLink(resumeLink?: string) {
-    if (
-      this.discussion.contactMode === "EMAIL" &&
-      this.discussion.kind === "IF"
-    ) {
+    if (this.discussion.kind === "IF") {
       return new DiscussionBuilder({
         ...this.discussion,
         potentialBeneficiary: {
@@ -317,18 +305,16 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
         },
       } as DiscussionDto);
     }
+
     throw new Error(
-      `Invalid potentialBeneficiary with resumeLink ${resumeLink} for contactMode ${this.discussion.contactMode} and discussionKind ${this.discussion.kind}`,
+      `Invalid potentialBeneficiary with resumeLink ${resumeLink} for discussionKind ${this.discussion.kind}`,
     );
   }
 
   public withPotentialBeneficiaryHasWorkingExperience(
     hasWorkingExperience?: boolean,
   ) {
-    if (
-      this.discussion.contactMode === "EMAIL" &&
-      this.discussion.kind === "IF"
-    ) {
+    if (this.discussion.kind === "IF") {
       return new DiscussionBuilder({
         ...this.discussion,
         potentialBeneficiary: {
@@ -337,8 +323,9 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
         },
       } as DiscussionDto);
     }
+
     throw new Error(
-      `Invalid potentialBeneficiary with hasWorkingExperience ${hasWorkingExperience} for contactMode ${this.discussion.contactMode} and discussionKind ${this.discussion.kind}`,
+      `Invalid potentialBeneficiary with hasWorkingExperience ${hasWorkingExperience} for discussionKind ${this.discussion.kind}`,
     );
   }
 
