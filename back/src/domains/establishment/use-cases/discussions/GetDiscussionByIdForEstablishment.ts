@@ -4,9 +4,12 @@ import {
   type DiscussionId,
   type DiscussionReadDto,
   discussionIdSchema,
+  discussionReadSchema,
   errors,
   type User,
 } from "shared";
+import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/validateAndParseZodSchema";
+import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
@@ -51,11 +54,17 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     ).at(0);
 
     if (!appellation) throw errors.rome.missingAppellation({ appellationCode });
-
-    return {
+    const discussionRead = {
       ...rest,
       appellation,
     };
+
+    return validateAndParseZodSchemaV2({
+      schemaName: "discussionReadSchema",
+      inputSchema: discussionReadSchema,
+      schemaParsingInput: discussionRead,
+      logger: createLogger(__filename),
+    });
   }
 
   async #hasUserRightToAccessDiscussion(

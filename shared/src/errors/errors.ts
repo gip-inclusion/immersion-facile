@@ -137,6 +137,16 @@ export const errors = {
       if (httpStatus) (error as any).httpStatus = httpStatus;
       return error;
     },
+    clearZodIssues: ({
+      schemaName,
+      issues,
+    }: {
+      issues: string[];
+      schemaName?: string;
+    }) =>
+      new BadRequestError(
+        `Il y a une erreur avec les données de cette ressource ${schemaName ? `(${schemaName}) ` : ""}: ${issues.join("\n")}`,
+      ),
     unsupportedStatus: ({
       body,
       status,

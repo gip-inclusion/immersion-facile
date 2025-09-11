@@ -42,7 +42,10 @@ import {
 import { DiscussionStatusBadge } from "src/app/components/establishment/establishment-dashboard/DiscussionStatusBadge";
 import type { CreateConventionPresentationInitialValues } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
-import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
+import {
+  useFeedbackEventCallback,
+  useFeedbackTopic,
+} from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
@@ -68,11 +71,18 @@ export const DiscussionManageContent = ({
 }: DiscussionManageContentProps): JSX.Element => {
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-  const { discussion, isLoading, fetchError } = useDiscussion(
+  const { discussion, isLoading } = useDiscussion(
     discussionId,
     connectedUserJwt,
   );
+  const feedback = useFeedbackTopic("dashboard-discussion");
   const dispatch = useDispatch();
+
+  const showFeedback = feedback?.level === "error" && !discussion;
+  const showNotFound =
+    !isLoading && !discussion && feedback?.level === "success";
+  const showDiscussion = !isLoading && discussion && currentUser;
+
   useFeedbackEventCallback(
     "dashboard-discussion-status-updated",
     "update.success",
@@ -96,27 +106,24 @@ export const DiscussionManageContent = ({
     [dispatch],
   );
 
-  if (isLoading) return <Loader />;
-  if (fetchError) throw new Error(fetchError);
-
-  return match(discussion)
-    .with(null, () => (
-      <Alert
-        severity="warning"
-        title={`La discussion ${discussionId} n'est pas trouvée.`}
-      />
-    ))
-    .with(P.not(null), (discussion) =>
-      currentUser ? (
+  return (
+    <>
+      {isLoading && <Loader />}
+      {showNotFound && (
+        <Alert
+          severity="warning"
+          title={`La discussion ${discussionId} n'est pas trouvée.`}
+        />
+      )}
+      {showFeedback && <Feedback topics={["dashboard-discussion"]} />}
+      {showDiscussion && (
         <DiscussionDetails
           discussion={discussion}
           connectedUser={currentUser}
         />
-      ) : (
-        <Alert severity="error" title={`Vous n'êtes pas connecté.`} />
-      ),
-    )
-    .exhaustive();
+      )}
+    </>
+  );
 };
 
 type DiscussionDetailsProps = {
@@ -311,11 +318,9 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         </div>
         <DiscussionMeta>
           <DiscussionStatusBadge discussion={discussion} />
-          {discussion.contactMode === "EMAIL" &&
-            discussion.potentialBeneficiary.immersionObjective}
+          {discussion.potentialBeneficiary.immersionObjective}
           {discussion.appellation.appellationLabel}
-          {discussion.contactMode === "EMAIL" &&
-            discussion.kind === "IF" &&
+          {discussion.kind === "IF" &&
             discussion.potentialBeneficiary.resumeLink && (
               <a
                 href={discussion.potentialBeneficiary.resumeLink}
