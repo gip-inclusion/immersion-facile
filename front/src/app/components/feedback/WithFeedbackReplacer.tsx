@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -15,8 +15,8 @@ type WithFeedbackReplacerProps = {
     level: FeedbackLevel;
     title?: string;
     message: string;
-  }) => JSX.Element;
-  children?: JSX.Element;
+  }) => ReactNode;
+  children?: ReactNode;
 };
 
 export const WithFeedbackReplacer = ({
@@ -27,7 +27,6 @@ export const WithFeedbackReplacer = ({
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
   const feedback = feedbacks[topic];
   const dispatch = useDispatch();
-
   useEffect(() => {
     return () => {
       if (feedback) {
@@ -35,7 +34,6 @@ export const WithFeedbackReplacer = ({
       }
     };
   }, [dispatch]);
-
   if (!feedback && children) return children;
   return renderFeedback && feedback ? (
     renderFeedback({
