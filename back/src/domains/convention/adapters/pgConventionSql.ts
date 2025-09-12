@@ -44,10 +44,16 @@ type ConventionQueryBuilderDb = Database & {
   vad: Database["view_appellations_dto"] | null;
 };
 
-type ConventionQueryBuilder = SelectQueryBuilder<
+export type ConventionQueryBuilder = SelectQueryBuilder<
   ConventionQueryBuilderDb,
   keyof ConventionQueryBuilderDb,
   { dto: ConventionDto }
+>;
+
+export type PaginatedConventionQueryBuilder = SelectQueryBuilder<
+  ConventionQueryBuilderDb,
+  keyof ConventionQueryBuilderDb,
+  { dto: ConventionDto; total_count: number }
 >;
 
 // Function to create the common selection part with proper return type
@@ -329,7 +335,7 @@ export const createConventionQueryBuilderForAgencyUser = ({
 }: {
   transaction: KyselyDb;
   agencyUserId: UserId;
-}): ConventionQueryBuilder => {
+}): PaginatedConventionQueryBuilder => {
   // biome-ignore format: reads better without formatting
   const builder = transaction
     .selectFrom("users__agencies")
@@ -344,7 +350,9 @@ export const createConventionQueryBuilderForAgencyUser = ({
     ]));
 
   const builderWithJoins = withActorsAndAppellationsAndPartnerPeJoin(builder);
-  return createConventionSelection(builderWithJoins);
+  return createConventionSelection(builderWithJoins).select(
+    sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"),
+  );
 };
 
 export const getConventionAgencyFieldsForAgencies = async (
