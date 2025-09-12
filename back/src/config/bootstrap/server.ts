@@ -6,6 +6,7 @@ import { createAddressRouter } from "../../adapters/primary/routers/address/crea
 import { createAdminRouter } from "../../adapters/primary/routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "../../adapters/primary/routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouterV2 } from "../../adapters/primary/routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
+import { createApiKeyAuthRouterV3 } from "../../adapters/primary/routers/apiKeyAuthRouter/createApiKeyAuthRouter.v3";
 import { createAuthRouter } from "../../adapters/primary/routers/auth/createAuthRouter";
 import { createConventionRouter } from "../../adapters/primary/routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "../../adapters/primary/routers/establishment/createEstablishmentRouter";
@@ -84,6 +85,7 @@ export const createApp = async (
   app.use(createMagicLinkRouter(deps));
   app.use(createAdminRouter(deps));
   app.use(createApiKeyAuthRouterV2(deps));
+  app.use(createApiKeyAuthRouterV3(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
   app.use(createNafRouter(deps));

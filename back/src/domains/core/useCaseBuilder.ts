@@ -5,7 +5,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
-import { validateAndParseZodSchemaV2 } from "../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../utils/logger";
 import type { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
@@ -63,7 +63,7 @@ export const useCaseBuilder = <
     useCaseName,
     execute: (async (inputParams: Input, currentUser: CurrentUser) => {
       const startDate = new Date();
-      const validParams = validateAndParseZodSchemaV2({
+      const validParams = validateAndParseZodSchema({
         useCaseName,
         inputSchema: options.inputSchema,
         schemaParsingInput: inputParams,

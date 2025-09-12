@@ -14,7 +14,7 @@ import {
   type SiretDto,
   type UserId,
 } from "shared";
-import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
@@ -94,7 +94,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         );
       })
       .map((convention) =>
-        validateAndParseZodSchemaV2({
+        validateAndParseZodSchema({
           schemaName: "conventionSchema",
           inputSchema: conventionSchema,
           schemaParsingInput: convention,

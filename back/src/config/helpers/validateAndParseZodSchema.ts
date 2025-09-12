@@ -4,7 +4,7 @@ import type { ZodError } from "zod";
 import type { $ZodIssue } from "zod/v4/core/errors.cjs";
 import type { OpacifiedLogger } from "../../utils/logger";
 
-export const validateAndParseZodSchemaV2 = <T>(
+export const validateAndParseZodSchema = <T>(
   props: {
     inputSchema: ZodSchemaWithInputMatchingOutput<T>;
     schemaParsingInput: unknown;
