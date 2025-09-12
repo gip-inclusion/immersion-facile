@@ -7,7 +7,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import type { z } from "zod";
-import { validateAndParseZodSchemaV2 } from "../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../utils/logger";
 import type { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
@@ -36,7 +36,7 @@ export abstract class UseCase<
     const startDate = new Date();
     const useCaseName = this.constructor.name;
 
-    const validParams = validateAndParseZodSchemaV2({
+    const validParams = validateAndParseZodSchema({
       useCaseName,
       inputSchema: this.inputSchema,
       schemaParsingInput: params,
@@ -90,7 +90,7 @@ export abstract class TransactionalUseCase<
   ): Promise<Output> {
     const startDate = new Date();
     const useCaseName = this.constructor.name;
-    const validParams = validateAndParseZodSchemaV2({
+    const validParams = validateAndParseZodSchema({
       useCaseName,
       inputSchema: this.inputSchema,
       schemaParsingInput: params,

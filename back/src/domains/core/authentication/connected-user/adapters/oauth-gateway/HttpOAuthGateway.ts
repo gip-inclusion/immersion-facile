@@ -6,7 +6,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
-import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../../../utils/logger";
 import {
   type ProConnectOAuthIdTokenPayload,
@@ -105,7 +105,7 @@ export class HttpOAuthGateway implements OAuthGateway {
         tokenWithPayload,
       );
 
-    const oAuthIdTokenPayload = validateAndParseZodSchemaV2({
+    const oAuthIdTokenPayload = validateAndParseZodSchema({
       schemaName: "proConnectAuthTokenPayloadSchema",
       inputSchema: proConnectAuthTokenPayloadSchema,
       schemaParsingInput: tokenPayload,

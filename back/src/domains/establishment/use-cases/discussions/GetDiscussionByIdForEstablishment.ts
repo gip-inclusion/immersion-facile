@@ -8,7 +8,7 @@ import {
   errors,
   type User,
 } from "shared";
-import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -59,7 +59,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
       appellation,
     };
 
-    return validateAndParseZodSchemaV2({
+    return validateAndParseZodSchema({
       schemaName: "discussionReadSchema",
       inputSchema: discussionReadSchema,
       schemaParsingInput: discussionRead,
