@@ -28,7 +28,6 @@ describe("Discussion slice", () => {
   const defaultStartingDiscussionState: DiscussionState = {
     isLoading: false,
     discussion: null,
-    fetchError: null,
     discussionsWithPagination: initialDiscussionsWithPagination,
   };
   const jwt = "my-jwt";
@@ -59,7 +58,6 @@ describe("Discussion slice", () => {
     expectDiscussionSelector({
       isLoading: false,
       discussion: null,
-      fetchError: null,
       discussionsWithPagination: initialDiscussionsWithPagination,
     });
   });

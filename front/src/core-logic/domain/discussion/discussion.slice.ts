@@ -42,7 +42,6 @@ export type UpdateDiscussionStatusRequestedPayload = {
 export type DiscussionState = {
   discussion: DiscussionReadDto | null;
   isLoading: boolean;
-  fetchError: string | null;
   discussionsWithPagination: DataWithPagination<DiscussionInList> & {
     filters: FlatGetPaginatedDiscussionsParamsWithStatusesAsArray;
   };
@@ -76,7 +75,6 @@ export const initialDiscussionsWithPagination: DataWithPagination<DiscussionInLi
 const initialDiscussionState: DiscussionState = {
   discussion: null,
   isLoading: false,
-  fetchError: null,
   discussionsWithPagination: initialDiscussionsWithPagination,
 };
 

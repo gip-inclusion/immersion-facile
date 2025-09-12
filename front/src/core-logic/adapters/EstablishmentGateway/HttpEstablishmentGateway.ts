@@ -169,9 +169,15 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
+            .with(
+              {
+                status: 400,
+              },
+              logBodyAndThrow,
+            )
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 403 }, logBodyAndThrow)
-            .with({ status: 404 }, () => undefined)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

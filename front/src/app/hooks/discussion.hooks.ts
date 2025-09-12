@@ -22,8 +22,7 @@ export const useDiscussion = (
   }, [dispatch, discussionId, connectedUserJwt]);
 
   const discussion = useAppSelector(discussionSelectors.discussion);
-  const fetchError = useAppSelector(discussionSelectors.fetchError);
   const isLoading = useAppSelector(discussionSelectors.isLoading);
 
-  return { discussion, fetchError, isLoading };
+  return { discussion, isLoading };
 };

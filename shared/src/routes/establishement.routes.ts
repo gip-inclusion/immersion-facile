@@ -90,6 +90,7 @@ export const establishmentRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: discussionReadSchema,
+      400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,

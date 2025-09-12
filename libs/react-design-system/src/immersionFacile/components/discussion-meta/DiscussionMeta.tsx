@@ -7,18 +7,20 @@ export const DiscussionMeta = ({ children }: { children: ReactNode[] }) => {
   const { cx } = useStyles();
   return (
     <ul className={cx(fr.cx("fr-mb-2w", "fr-pl-0"), Styles.root)}>
-      {children.map((child) => (
-        <li
-          className={cx(Styles.item)}
-          key={
-            child && typeof child === "object" && "key" in child
-              ? child.key
-              : child?.toString()
-          }
-        >
-          {child}
-        </li>
-      ))}
+      {children
+        .filter((child) => child)
+        .map((child) => (
+          <li
+            className={cx(Styles.item)}
+            key={
+              child && typeof child === "object" && "key" in child
+                ? child.key
+                : child?.toString()
+            }
+          >
+            {child}
+          </li>
+        ))}
     </ul>
   );
 };

@@ -60,6 +60,7 @@ import { discussionSlice } from "src/core-logic/domain/discussion/discussion.sli
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
+import { WithFeedbackReplacer } from "../../feedback/WithFeedbackReplacer";
 
 type DiscussionManageContentProps = WithDiscussionId;
 
@@ -68,11 +69,13 @@ export const DiscussionManageContent = ({
 }: DiscussionManageContentProps): JSX.Element => {
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-  const { discussion, isLoading, fetchError } = useDiscussion(
+  const { discussion, isLoading } = useDiscussion(
     discussionId,
     connectedUserJwt,
   );
   const dispatch = useDispatch();
+  const showDiscussion = !isLoading && discussion && currentUser;
+
   useFeedbackEventCallback(
     "dashboard-discussion-status-updated",
     "update.success",
@@ -96,27 +99,19 @@ export const DiscussionManageContent = ({
     [dispatch],
   );
 
-  if (isLoading) return <Loader />;
-  if (fetchError) throw new Error(fetchError);
-
-  return match(discussion)
-    .with(null, () => (
-      <Alert
-        severity="warning"
-        title={`La discussion ${discussionId} n'est pas trouvée.`}
-      />
-    ))
-    .with(P.not(null), (discussion) =>
-      currentUser ? (
-        <DiscussionDetails
-          discussion={discussion}
-          connectedUser={currentUser}
-        />
-      ) : (
-        <Alert severity="error" title={`Vous n'êtes pas connecté.`} />
-      ),
-    )
-    .exhaustive();
+  return (
+    <>
+      {isLoading && <Loader />}
+      <WithFeedbackReplacer topic="dashboard-discussion" level="error">
+        {showDiscussion && (
+          <DiscussionDetails
+            discussion={discussion}
+            connectedUser={currentUser}
+          />
+        )}
+      </WithFeedbackReplacer>
+    </>
+  );
 };
 
 type DiscussionDetailsProps = {
@@ -311,11 +306,9 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         </div>
         <DiscussionMeta>
           <DiscussionStatusBadge discussion={discussion} />
-          {discussion.contactMode === "EMAIL" &&
-            discussion.potentialBeneficiary.immersionObjective}
+          {discussion.potentialBeneficiary.immersionObjective}
           {discussion.appellation.appellationLabel}
-          {discussion.contactMode === "EMAIL" &&
-            discussion.kind === "IF" &&
+          {discussion.kind === "IF" &&
             discussion.potentialBeneficiary.resumeLink && (
               <a
                 href={discussion.potentialBeneficiary.resumeLink}

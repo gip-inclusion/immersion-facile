@@ -74,6 +74,7 @@ export const EstablishmentDashboardTabs = ({
     routes.establishmentDashboard().push();
     return;
   }
+
   return (
     <>
       {enableEstablishmentDashboardHighlight.isActive && (
