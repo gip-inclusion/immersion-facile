@@ -918,7 +918,12 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(resultPage1.data.length).toBe(2);
-      expect(resultPage1.pagination.totalRecords).toBe(2);
+      expect(resultPage1.pagination).toEqual({
+        currentPage: 1,
+        totalPages: 2,
+        numberPerPage: 2,
+        totalRecords: 4,
+      });
       expectToEqual(resultPage1.data, [conventionD, conventionC]);
 
       const resultPage2 =
@@ -933,6 +938,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(resultPage2.data.length).toBe(2);
       expectToEqual(resultPage2.data, [conventionB, conventionA]);
+      expectToEqual(resultPage2.pagination, {
+        currentPage: 2,
+        totalPages: 2,
+        numberPerPage: 2,
+        totalRecords: 4,
+      });
     });
 
     it("should filter conventions by status", async () => {

@@ -33,10 +33,12 @@ import type {
   GetConventionsSortBy,
 } from "../ports/ConventionQueries";
 import {
+  type ConventionQueryBuilder,
   createConventionQueryBuilder,
   createConventionQueryBuilderForAgencyUser,
   getConventionAgencyFieldsForAgencies,
   getReadConventionById,
+  type PaginatedConventionQueryBuilder,
 } from "./pgConventionSql";
 
 const logger = createLogger(__filename);
@@ -215,13 +217,15 @@ export class PgConventionQueries implements ConventionQueries {
       applyPagination(pagination),
     ).execute();
 
+    const totalRecords = data.at(0)?.total_count ?? 0;
+
     return {
       data: data.map(({ dto }) => dto),
       pagination: {
         currentPage: pagination.page,
-        totalPages: Math.ceil(data.length / pagination.perPage),
+        totalPages: Math.ceil(totalRecords / pagination.perPage),
         numberPerPage: pagination.perPage,
-        totalRecords: data.length,
+        totalRecords,
       },
     };
   }
@@ -229,17 +233,19 @@ export class PgConventionQueries implements ConventionQueries {
 
 const applyPagination =
   (pagination: Required<PaginationQueryParams>) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     const { page, perPage } = pagination;
     const offset = (page - 1) * perPage;
     return builder.limit(perPage).offset(offset);
   };
 
-type ConventionQueryBuilder = ReturnType<typeof createConventionQueryBuilder>;
-
 const sortConventions =
   (sort?: GetPaginatedConventionsSort) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     const sortByKey: Record<
       GetPaginatedConventionsSortBy,
       keyof Database["conventions"]
@@ -256,7 +262,9 @@ const sortConventions =
 
 const filterByAgencyDepartmentCodes =
   (agencyDepartmentCodes: NotEmptyArray<string> | undefined) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     if (!agencyDepartmentCodes) return builder;
     return builder.where(
       "agencies.department_code",
@@ -270,7 +278,9 @@ const filterDate =
     fieldName: keyof Database["conventions"],
     dateFilter: DateFilter | undefined,
   ) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     if (!dateFilter) return builder;
     if (dateFilter.from && dateFilter.to)
       return builder
@@ -284,7 +294,9 @@ const filterDate =
 
 const filterEmail =
   (emailContains: string | undefined) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     if (!emailContains) return builder;
     const pattern = `%${emailContains}%`;
 
@@ -304,14 +316,18 @@ const filterInList =
     fieldName: keyof Database["conventions"],
     list: T[] | undefined,
   ) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     if (!list) return builder;
     return builder.where(`conventions.${fieldName}`, "in", list);
   };
 
 const filterEstablishmentName =
   (establishmentNameContains: string | undefined) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     if (!establishmentNameContains) return builder;
     return builder.where(
       "business_name",
@@ -322,7 +338,9 @@ const filterEstablishmentName =
 
 const filterByBeneficiaryName =
   (beneficiaryNameContains: string | undefined) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
     if (!beneficiaryNameContains) return builder;
     const nameWords = beneficiaryNameContains.split(" ");
 
