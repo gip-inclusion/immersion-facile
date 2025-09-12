@@ -42,10 +42,7 @@ import {
 import { DiscussionStatusBadge } from "src/app/components/establishment/establishment-dashboard/DiscussionStatusBadge";
 import type { CreateConventionPresentationInitialValues } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
-import {
-  useFeedbackEventCallback,
-  useFeedbackTopic,
-} from "src/app/hooks/feedback.hooks";
+import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
@@ -63,6 +60,7 @@ import { discussionSlice } from "src/core-logic/domain/discussion/discussion.sli
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
+import { WithFeedbackReplacer } from "../../feedback/WithFeedbackReplacer";
 
 type DiscussionManageContentProps = WithDiscussionId;
 
@@ -75,12 +73,7 @@ export const DiscussionManageContent = ({
     discussionId,
     connectedUserJwt,
   );
-  const feedback = useFeedbackTopic("dashboard-discussion");
   const dispatch = useDispatch();
-
-  const showFeedback = feedback?.level === "error" && !discussion;
-  const showNotFound =
-    !isLoading && !discussion && feedback?.level === "success";
   const showDiscussion = !isLoading && discussion && currentUser;
 
   useFeedbackEventCallback(
@@ -109,19 +102,14 @@ export const DiscussionManageContent = ({
   return (
     <>
       {isLoading && <Loader />}
-      {showNotFound && (
-        <Alert
-          severity="warning"
-          title={`La discussion ${discussionId} n'est pas trouvée.`}
-        />
-      )}
-      {showFeedback && <Feedback topics={["dashboard-discussion"]} />}
-      {showDiscussion && (
-        <DiscussionDetails
-          discussion={discussion}
-          connectedUser={currentUser}
-        />
-      )}
+      <WithFeedbackReplacer topic="dashboard-discussion" level="error">
+        {showDiscussion && (
+          <DiscussionDetails
+            discussion={discussion}
+            connectedUser={currentUser}
+          />
+        )}
+      </WithFeedbackReplacer>
     </>
   );
 };

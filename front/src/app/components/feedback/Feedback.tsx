@@ -20,9 +20,15 @@ type FeedbackProps = {
 const formatFeedbackMessage = (message: string) => {
   const parsedMessage = safeParseJson(message);
   if (parsedMessage && "issues" in parsedMessage) {
-    return errors.generic.clearZodIssues({
+    return errors.generic.zodIssues({
       schemaName: parsedMessage.schemaName,
       issues: parsedMessage.issues,
+    }).message;
+  }
+  if (parsedMessage && "message" in parsedMessage) {
+    return errors.generic.httpStatus({
+      status: parsedMessage.status,
+      message: parsedMessage.message,
     }).message;
   }
   return message;

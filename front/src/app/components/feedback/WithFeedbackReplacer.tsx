@@ -11,6 +11,7 @@ import {
 
 type WithFeedbackReplacerProps = {
   topic: FeedbackTopic;
+  level?: FeedbackLevel;
   renderFeedback?: (props: {
     level: FeedbackLevel;
     title?: string;
@@ -21,6 +22,7 @@ type WithFeedbackReplacerProps = {
 
 export const WithFeedbackReplacer = ({
   topic,
+  level,
   children,
   renderFeedback,
 }: WithFeedbackReplacerProps) => {
@@ -33,8 +35,9 @@ export const WithFeedbackReplacer = ({
         dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
       }
     };
-  }, [dispatch]);
+  }, [dispatch, feedback]);
   if (!feedback && children) return children;
+  if (level && feedback && feedback.level !== level) return children;
   return renderFeedback && feedback ? (
     renderFeedback({
       level: feedback.level,

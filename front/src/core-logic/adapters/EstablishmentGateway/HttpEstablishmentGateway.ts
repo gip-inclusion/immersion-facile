@@ -177,7 +177,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             )
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 403 }, logBodyAndThrow)
-            .with({ status: 404 }, () => undefined)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
