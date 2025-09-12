@@ -22,7 +22,7 @@ import {
   type SiretDto,
   type UserId,
 } from "shared";
-import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import {
   cast,
   jsonBuildObject,
@@ -432,7 +432,7 @@ export const getReadConventionById = async (
     [pgConvention.dto.agencyId],
   );
 
-  return validateAndParseZodSchemaV2({
+  return validateAndParseZodSchema({
     schemaName: "conventionReadSchema",
     inputSchema: conventionReadSchema,
     schemaParsingInput: {

@@ -21,7 +21,7 @@ import {
   type SiretDto,
   type UserId,
 } from "shared";
-import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
@@ -158,7 +158,7 @@ export class PgConventionQueries implements ConventionQueries {
       if (!agencyFields)
         throw errors.agency.notFound({ agencyId: pgResult.dto.agencyId });
 
-      return validateAndParseZodSchemaV2({
+      return validateAndParseZodSchema({
         schemaName: "conventionReadSchema",
         inputSchema: conventionReadSchema,
         schemaParsingInput: {
@@ -395,7 +395,7 @@ export const validateConventionResults = (
   pgResults: { dto: unknown }[],
 ): ConventionDto[] =>
   pgResults.map((pgResult) =>
-    validateAndParseZodSchemaV2({
+    validateAndParseZodSchema({
       schemaName: "conventionSchema",
       inputSchema: conventionSchema,
       schemaParsingInput: pgResult.dto,
