@@ -16,7 +16,7 @@ import {
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
-import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../../../config/helpers/validateAndParseZodSchema";
 import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 import type { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../../../utils/logger";
@@ -123,7 +123,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         )
           throw errors.apiConsumer.forbidden();
         return pipeWithValue(
-          validateAndParseZodSchemaV2({
+          validateAndParseZodSchema({
             schemaName: "contactEstablishmentPublicV2Schema",
             inputSchema: contactEstablishmentPublicV2Schema,
             schemaParsingInput: req.body,

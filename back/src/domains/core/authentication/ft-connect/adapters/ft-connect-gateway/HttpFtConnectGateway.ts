@@ -3,7 +3,7 @@ import { errors, HTTP_STATUS, queryParamsAsString } from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
-import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchema } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { isAxiosError } from "../../../../../../utils/axiosUtils";
 import {
   createLogger,
@@ -128,7 +128,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalAccessToken = validateAndParseZodSchemaV2({
+      const externalAccessToken = validateAndParseZodSchema({
         schemaName: "externalAccessTokenSchema",
         inputSchema: externalAccessTokenSchema,
         schemaParsingInput: response.body,
@@ -200,7 +200,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return false;
       }
-      const externalFtConnectStatut = validateAndParseZodSchemaV2({
+      const externalFtConnectStatut = validateAndParseZodSchema({
         schemaName: "externalFtConnectUserStatutSchema",
         inputSchema: externalFtConnectUserStatutSchema,
         schemaParsingInput: response.body,
@@ -245,7 +245,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalFtConnectUser = validateAndParseZodSchemaV2({
+      const externalFtConnectUser = validateAndParseZodSchema({
         schemaName: "externalFtConnectUserSchema",
         inputSchema: externalFtConnectUserSchema,
         schemaParsingInput: response.body,
@@ -286,7 +286,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return [];
       }
-      const externalFtConnectAdvisors = validateAndParseZodSchemaV2({
+      const externalFtConnectAdvisors = validateAndParseZodSchema({
         schemaName: "externalFtConnectAdvisorsSchema",
         inputSchema: externalFtConnectAdvisorsSchema,
         schemaParsingInput: response.body,
