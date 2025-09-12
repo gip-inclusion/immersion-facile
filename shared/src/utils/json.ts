@@ -6,3 +6,6 @@ export const isStringJson = (string: string) => {
     return false;
   }
 };
+
+export const safeParseJson = (string: string) =>
+  isStringJson(string) ? JSON.parse(string) : null;

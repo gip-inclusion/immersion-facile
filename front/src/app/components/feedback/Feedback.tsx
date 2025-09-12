@@ -1,6 +1,6 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import type { ReactNode } from "react";
-import { errors } from "shared";
+import { errors, safeParseJson } from "shared";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import type { FeedbackLevel } from "src/core-logic/domain/feedback/feedback.slice";
@@ -18,7 +18,7 @@ type FeedbackProps = {
 };
 
 const formatFeedbackMessage = (message: string) => {
-  const parsedMessage = JSON.parse(message);
+  const parsedMessage = safeParseJson(message);
   if (parsedMessage && "issues" in parsedMessage) {
     return errors.generic.clearZodIssues({
       schemaName: parsedMessage.schemaName,
