@@ -137,7 +137,7 @@ export const errors = {
       if (httpStatus) (error as any).httpStatus = httpStatus;
       return error;
     },
-    clearZodIssues: ({
+    zodIssues: ({
       schemaName,
       issues,
     }: {
@@ -147,6 +147,8 @@ export const errors = {
       new BadRequestError(
         `Il y a une erreur avec les données de cette ressource ${schemaName ? `(${schemaName}) ` : ""}: ${issues.join("\n")}`,
       ),
+    httpStatus: ({ status, message }: { status?: number; message: string }) =>
+      new Error(`Erreur HTTP ${status ? `(${status}) ` : ""}: ${message}`),
     unsupportedStatus: ({
       body,
       status,
@@ -840,18 +842,18 @@ export const errors = {
         "Le filtre par SIRET est fourni mais il n'y a pas de SIRET dans le filtre.",
       ),
     notFound: ({ discussionId }: { discussionId: DiscussionId }) =>
-      new NotFoundError(`La discussion '${discussionId}' n'est pas trouvée.`),
+      new NotFoundError(`La candidature '${discussionId}' n'est pas trouvée.`),
     noExchanges: (discussionId: DiscussionId) =>
-      new Error(`La discussion '${discussionId}' n'a pas d'échanges.`),
+      new Error(`La candidature '${discussionId}' n'a pas d'échanges.`),
     missingHasWorkingExperience: (id: DiscussionId) =>
       new Error(
-        `Propriété hasWorkingExperience manquante pour la discussion de type email '${id}'.`,
+        `Propriété hasWorkingExperience manquante pour la candidature de type email '${id}'.`,
       ),
     missingPhone: (id: DiscussionId) =>
-      `Propriété phone manquante pour la discussion de type email '${id}'.`,
+      `Propriété phone manquante pour la candidature de type email '${id}'.`,
     missingDatePreferences: (id: DiscussionId) =>
       new Error(
-        `Propriété datePreferences manquante pour la discussion de type email '${id}'.`,
+        `Propriété datePreferences manquante pour la candidature de type email '${id}'.`,
       ),
     missingLevelOfEducation: ({
       id,
@@ -861,7 +863,7 @@ export const errors = {
       kind: DiscussionKind;
     }) =>
       new Error(
-        `Propriété levelOfEducation manquante pour la discussion de type ${kind} '${id}'.`,
+        `Propriété levelOfEducation manquante pour la candidature de type ${kind} '${id}'.`,
       ),
     unsupportedSource: ({ source }: { source: string }) =>
       new BadRequestError(`Le source '${source}' n'est pas supporté.`),
@@ -873,10 +875,10 @@ export const errors = {
       userId: UserId;
     }) =>
       new ForbiddenError(
-        `L'utilisateur '${userId}' n'a pas le droit de rejeter la discussion '${discussionId}'.`,
+        `L'utilisateur '${userId}' n'a pas le droit de rejeter la candidature '${discussionId}'.`,
       ),
     alreadyRejected: ({ discussionId }: { discussionId: DiscussionId }) =>
-      new BadRequestError(`La discussion '${discussionId}' est déjà rejetée.`),
+      new BadRequestError(`La candidature '${discussionId}' est déjà rejetée.`),
     accessForbidden: ({
       discussionId,
       userId,
@@ -885,7 +887,7 @@ export const errors = {
       userId: UserId;
     }) =>
       new ForbiddenError(
-        `L'utilisateur '${userId}' n'a pas accès à la discussion '${discussionId}'.`,
+        `L'utilisateur '${userId}' n'a pas accès à la candidature '${discussionId}'.`,
       ),
     badContactMode: () => new Error("Mode de contact invalide."),
     badImmersionObjective: (
@@ -894,7 +896,7 @@ export const errors = {
       discussionObjective?: ImmersionObjective,
     ) =>
       new Error(
-        `L'objectif d'immersion ${discussionObjective} est non supportée pour la discussion ${discussionId} de type ${discussionKind}`,
+        `L'objectif d'immersion ${discussionObjective} est non supportée pour la candidature ${discussionId} de type ${discussionKind}`,
       ),
     badEmailFormat: ({ email }: { email: Email }) =>
       new BadRequestError(`L'email n'a pas le bon format '${email}'.`),
@@ -914,7 +916,7 @@ export const errors = {
       expectedStatus: DiscussionStatus;
     }) =>
       new BadRequestError(
-        `La discussion '${discussionId}' n'a pas le statut '${expectedStatus}'.`,
+        `La candidature '${discussionId}' n'a pas le statut '${expectedStatus}'.`,
       ),
   },
   establishmentGroup: {
