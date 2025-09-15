@@ -16,17 +16,16 @@ export class GetSearchResultBySearchQuery extends TransactionalUseCase<
   protected inputSchema = searchResultQuerySchema;
 
   public async _execute(
-    siretAndAppellationDto: SearchResultQuery,
+    { siret, appellationCode, locationId }: SearchResultQuery,
     uow: UnitOfWork,
   ): Promise<SearchResultDto> {
-    const { siret, appellationCode, locationId } = siretAndAppellationDto;
-
     const searchResult =
       await uow.establishmentAggregateRepository.getSearchResultBySearchQuery(
         siret,
         appellationCode,
         locationId,
       );
+
     if (!searchResult)
       throw errors.establishment.offerMissing({
         appellationCode,

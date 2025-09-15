@@ -13,6 +13,7 @@ import { validateAndParseZodSchema } from "../../../../config/helpers/validateAn
 import { createLogger } from "../../../../utils/logger";
 import { contactEstablishmentPublicV3ToDomain } from "../DtoAndSchemas/v3/input/ContactEstablishmentPublicV3.dto";
 import { contactEstablishmentPublicV3Schema } from "../DtoAndSchemas/v3/input/ContactEstablishmentPublicV3.schema";
+import { domainToSearchImmersionResultPublicV3 } from "../DtoAndSchemas/v3/output/SearchImmersionResultPublicV3.dto";
 import { publicApiV3SearchEstablishmentRoutes } from "./publicApiV3.routes";
 
 const logger = createLogger(__filename);
@@ -52,6 +53,24 @@ export const createApiKeyAuthRouterV3 = (deps: AppDependencies) => {
         );
       }),
   );
+
+  searchEstablishmentV3Router.getOffer(deps.apiConsumerMiddleware, (req, res) =>
+    sendHttpResponse(req, res, () => {
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer: req.apiConsumer,
+          rightName: "searchEstablishment",
+          consumerKind: "READ",
+        })
+      )
+        throw errors.apiConsumer.forbidden();
+
+      return deps.useCases.getSearchResultBySearchQuery
+        .execute(req.params, req.apiConsumer)
+        .then(domainToSearchImmersionResultPublicV3);
+    }),
+  );
+
   return v3ExpressRouter;
 };
 

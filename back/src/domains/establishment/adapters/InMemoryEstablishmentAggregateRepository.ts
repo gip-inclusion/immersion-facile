@@ -5,6 +5,7 @@ import {
   conflictErrorSiret,
   errors,
   type GeoPositionDto,
+  type LocationId,
   path,
   pathEq,
   type RomeCode,
@@ -84,23 +85,24 @@ export class InMemoryEstablishmentAggregateRepository
   public async getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
+    locationId: LocationId,
   ): Promise<SearchResultDto | undefined> {
     const aggregate = this.establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );
     if (!aggregate) return;
+
     const offer = aggregate.offers.find(
       (offer) => offer.appellationCode === appellationCode,
     );
     if (!offer) return;
 
     const { isSearchable: _, ...rest } =
-      buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation(
-        {
-          establishmentAgg: aggregate,
-          searchedAppellationCode: offer.appellationCode,
-        },
-      );
+      buildSearchImmersionResultDtoForSiretRomeAndLocation({
+        establishmentAgg: aggregate,
+        searchedAppellationCode: offer.appellationCode,
+        locationId,
+      });
 
     return rest;
   }
@@ -191,20 +193,19 @@ export class InMemoryEstablishmentAggregateRepository
               searchMade.appellationCodes.includes(offer.appellationCode),
           )
           .map((offer) =>
-            buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation(
-              {
-                establishmentAgg: aggregate,
-                searchedAppellationCode: offer.appellationCode,
-                ...(hasSearchMadeGeoParams(searchMade)
-                  ? {
-                      position: {
-                        lat: searchMade.lat,
-                        lon: searchMade.lon,
-                      },
-                    }
-                  : {}),
-              },
-            ),
+            buildSearchImmersionResultDtoForSiretRomeAndLocation({
+              establishmentAgg: aggregate,
+              searchedAppellationCode: offer.appellationCode,
+              ...(hasSearchMadeGeoParams(searchMade)
+                ? {
+                    position: {
+                      lat: searchMade.lat,
+                      lon: searchMade.lon,
+                    },
+                  }
+                : {}),
+              locationId: aggregate.establishment.locations[0].id,
+            }),
           ),
       )
       .slice(0, maxResults);
@@ -255,59 +256,63 @@ export class InMemoryEstablishmentAggregateRepository
   }
 }
 
-const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation =
-  ({
-    establishmentAgg,
-    searchedAppellationCode,
-    position,
-  }: {
-    establishmentAgg: EstablishmentAggregate;
-    searchedAppellationCode: AppellationCode;
-    position?: GeoPositionDto;
-  }): SearchImmersionResult => {
-    const romeCode =
-      establishmentAgg.offers.find(
-        (offer) => offer.appellationCode === searchedAppellationCode,
-      )?.romeCode ?? "no-offer-matched";
+const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
+  establishmentAgg,
+  searchedAppellationCode,
+  locationId,
+  position,
+}: {
+  establishmentAgg: EstablishmentAggregate;
+  searchedAppellationCode: AppellationCode;
+  locationId: LocationId;
+  position?: GeoPositionDto;
+}): SearchImmersionResult => {
+  const romeCode =
+    establishmentAgg.offers.find(
+      (offer) => offer.appellationCode === searchedAppellationCode,
+    )?.romeCode ?? "no-offer-matched";
 
-    return {
-      address: establishmentAgg.establishment.locations[0].address,
-      naf: establishmentAgg.establishment.nafDto.code,
-      nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
-      name: establishmentAgg.establishment.name,
-      customizedName: establishmentAgg.establishment.customizedName,
-      rome: romeCode,
-      romeLabel: TEST_ROME_LABEL,
-      establishmentScore: establishmentAgg.establishment.score,
-      appellations: establishmentAgg.offers
-        .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
-        .map((immersionOffer) => ({
-          appellationLabel: immersionOffer.appellationLabel,
-          appellationCode: immersionOffer.appellationCode,
-        })),
-      siret: establishmentAgg.establishment.siret,
-      voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
-      contactMode: establishmentAgg.establishment.contactMode,
-      numberOfEmployeeRange:
-        establishmentAgg.establishment.numberEmployeesRange,
-      website: establishmentAgg.establishment?.website,
-      additionalInformation:
-        establishmentAgg.establishment?.additionalInformation,
-      distance_m: position
-        ? distanceBetweenCoordinatesInMeters(
-            establishmentAgg.establishment.locations[0].position,
-            position,
-          )
-        : undefined,
-      position: establishmentAgg.establishment.locations[0].position,
-      isSearchable:
-        !establishmentAgg.establishment.isMaxDiscussionsForPeriodReached,
-      nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
-      locationId: establishmentAgg.establishment.locations[0].id,
-      updatedAt: establishmentAgg.establishment.updatedAt?.toISOString(),
-      createdAt: establishmentAgg.establishment.createdAt.toISOString(),
-    };
+  const location = establishmentAgg.establishment.locations.find(
+    (loc) => loc.id === locationId,
+  );
+
+  if (!location)
+    throw new Error(`NO LOCATION MATCHING PROVIDED ID: ${locationId}`);
+
+  return {
+    address: location.address,
+    naf: establishmentAgg.establishment.nafDto.code,
+    nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+    name: establishmentAgg.establishment.name,
+    customizedName: establishmentAgg.establishment.customizedName,
+    rome: romeCode,
+    romeLabel: TEST_ROME_LABEL,
+    establishmentScore: establishmentAgg.establishment.score,
+    appellations: establishmentAgg.offers
+      .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
+      .map((immersionOffer) => ({
+        appellationLabel: immersionOffer.appellationLabel,
+        appellationCode: immersionOffer.appellationCode,
+      })),
+    siret: establishmentAgg.establishment.siret,
+    voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
+    contactMode: establishmentAgg.establishment.contactMode,
+    numberOfEmployeeRange: establishmentAgg.establishment.numberEmployeesRange,
+    website: establishmentAgg.establishment?.website,
+    additionalInformation:
+      establishmentAgg.establishment?.additionalInformation,
+    distance_m: position
+      ? distanceBetweenCoordinatesInMeters(location.position, position)
+      : undefined,
+    position: location.position,
+    isSearchable:
+      !establishmentAgg.establishment.isMaxDiscussionsForPeriodReached,
+    nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
+    locationId: location.id,
+    updatedAt: establishmentAgg.establishment.updatedAt?.toISOString(),
+    createdAt: establishmentAgg.establishment.createdAt.toISOString(),
   };
+};
 
 export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
   establishmentAggregate: EstablishmentAggregate,
