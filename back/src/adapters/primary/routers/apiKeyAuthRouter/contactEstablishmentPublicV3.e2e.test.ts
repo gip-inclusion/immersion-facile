@@ -134,6 +134,8 @@ describe("POST contact-establishment public V3 route", () => {
         "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v3/contact-establishment",
       issues: [
         "contactMode : Choisissez parmi les options proposées",
+        // Issues below are useless and thrown by our new discussion schema,
+        // we keep them as they are for now because otherwise we would have to change the schema to a less readable one
         'kind : Invalid input: expected "1_ELEVE_1_STAGE"',
         'immersionObjective : Invalid input: expected "Découvrir un métier ou un secteur d\'activité"',
         "levelOfEducation : Vous devez sélectionner une option parmi celles proposées",
