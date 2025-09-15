@@ -1,12 +1,16 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Badge from "@codegouvfr/react-dsfr/Badge";
+import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Tile from "@codegouvfr/react-dsfr/Tile";
+import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import { addDays, differenceInCalendarDays, subMonths } from "date-fns";
-import { useEffect } from "react";
-import { HeadingSection } from "react-design-system";
+import { useEffect, useMemo, useState } from "react";
+import { HeadingSection, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { type ConventionDto, convertLocaleDateToUtcTimezoneDate } from "shared";
+import {
+  type ConventionDto,
+  convertLocaleDateToUtcTimezoneDate,
+  getFormattedFirstnameAndLastname,
+} from "shared";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -16,6 +20,7 @@ import { connectedUserConventionsSlice } from "src/core-logic/domain/connected-u
 import { match, P } from "ts-pattern";
 
 const NUMBER_ITEM_TO_DISPLAY_IN_LIMITED_MODE = 3;
+const NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE = 10;
 
 export const AgencyToDoList = ({
   titleAs,
@@ -31,13 +36,23 @@ export const AgencyToDoList = ({
   const currentUserConventions = useAppSelector(
     connectedUserConventionsSelectors.conventions,
   );
+  const pagination = useAppSelector(
+    connectedUserConventionsSelectors.pagination,
+  );
+  const [conventionsDisplayed, setConventionsDisplayed] = useState<
+    ConventionDto[]
+  >([]);
+
+  const dateStartFrom1MonthAgoToIn5Days = useMemo(
+    () => ({
+      dateStartFrom: subMonths(new Date(), 1).toISOString(),
+      dateStartTo: addDays(new Date(), 5).toISOString(),
+    }),
+    [],
+  );
 
   useEffect(() => {
     if (connectedUserJwt) {
-      const dateStartFrom1MonthAgoToIn5Days = {
-        dateStartFrom: subMonths(new Date(), 1).toISOString(),
-        dateStartTo: addDays(new Date(), 5).toISOString(),
-      };
       dispatch(
         connectedUserConventionsSlice.actions.getConventionsForConnectedUserRequested(
           {
@@ -46,7 +61,7 @@ export const AgencyToDoList = ({
               sortBy: "dateStart",
               sortOrder: "asc",
               page: 1,
-              perPage: 10,
+              perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE,
             },
             jwt: connectedUserJwt,
             feedbackTopic: "connected-user-conventions",
@@ -54,39 +69,78 @@ export const AgencyToDoList = ({
         ),
       );
     }
-  }, [dispatch, connectedUserJwt]);
+  }, [dispatch, connectedUserJwt, dateStartFrom1MonthAgoToIn5Days]);
+
+  useEffect(() => {
+    setConventionsDisplayed(
+      currentUserConventions.slice(
+        0,
+        displayMode === "limited"
+          ? NUMBER_ITEM_TO_DISPLAY_IN_LIMITED_MODE
+          : currentUserConventions.length,
+      ),
+    );
+  }, [currentUserConventions, displayMode]);
+
+  const onPaginationClick = (page: number) => {
+    if (connectedUserJwt) {
+      dispatch(
+        connectedUserConventionsSlice.actions.getConventionsForConnectedUserRequested(
+          {
+            params: {
+              ...dateStartFrom1MonthAgoToIn5Days,
+              sortBy: "dateStart",
+              sortOrder: "asc",
+              page: page,
+              perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE,
+            },
+            jwt: connectedUserJwt,
+            feedbackTopic: "connected-user-conventions",
+          },
+        ),
+      );
+    }
+  };
 
   return (
     <HeadingSection
       title="Tâches à traiter"
       titleAs={titleAs}
-      className={fr.cx("fr-mt-2w")}
+      className={fr.cx("fr-mt-2w", "fr-mb-1w")}
     >
-      {currentUserConventions.length === 0 && (
+      {pagination?.totalRecords === 0 && (
         <p>Aucune convention à traiter en urgence.</p>
       )}
-      {currentUserConventions.length > 3 &&
+      {pagination?.totalRecords &&
+        pagination?.totalRecords > 3 &&
         displayMode === "limited" &&
         onSeeAllConventionsClick && (
           <Button
             onClick={onSeeAllConventionsClick}
             priority="secondary"
             className={fr.cx("fr-mb-2w")}
-            iconId="fr-icon-arrow-right-line"
           >
-            Voir tout ({currentUserConventions.length} conventions)
+            Voir tout ({pagination.totalRecords})
           </Button>
         )}
-      {currentUserConventions
-        .slice(
-          0,
-          displayMode === "limited"
-            ? NUMBER_ITEM_TO_DISPLAY_IN_LIMITED_MODE
-            : currentUserConventions.length,
-        )
-        .map((convention) => (
-          <AgencyToDoItem key={convention.id} convention={convention} />
-        ))}
+      {conventionsDisplayed.map((convention) => (
+        <AgencyToDoItem key={convention.id} convention={convention} />
+      ))}
+      {displayMode === "paginated" && (
+        <Pagination
+          count={pagination?.totalPages ?? 1}
+          defaultPage={pagination?.currentPage ?? 1}
+          getPageLinkProps={(pageNumber) => ({
+            title: `Résultats de recherche, page : ${pageNumber}`,
+            href: "#",
+            key: `page-${pageNumber}`,
+            onClick: (event) => {
+              event.preventDefault();
+              onPaginationClick(pageNumber);
+            },
+          })}
+        />
+      )}
     </HeadingSection>
   );
 };
@@ -101,6 +155,21 @@ const AgencyToDoItem = ({ convention }: { convention: ConventionDto }) => {
       </Badge>
     </>
   );
+  const footer = convention.signatories.beneficiary.federatedIdentity
+    ?.provider === "peConnect" &&
+    convention.signatories.beneficiary.federatedIdentity?.payload && (
+      <>
+        Conseiller :{" "}
+        {getFormattedFirstnameAndLastname({
+          firstname:
+            convention.signatories.beneficiary.federatedIdentity.payload.advisor
+              ?.firstName,
+          lastname:
+            convention.signatories.beneficiary.federatedIdentity.payload.advisor
+              ?.lastName,
+        })}
+      </>
+    );
   const immersionStartedSinceDays = differenceInCalendarDays(
     convertLocaleDateToUtcTimezoneDate(new Date()),
     convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)),
@@ -127,7 +196,8 @@ const AgencyToDoItem = ({ convention }: { convention: ConventionDto }) => {
     )
     .with({ immersionStartedSinceDays: P.when((days) => days === -1) }, () => (
       <>
-        <Badge className={fr.cx("fr-badge--error")}>J-1</Badge> Dans 1 jour
+        <Badge className={fr.cx("fr-badge--error")}>J-1</Badge> L'immersion
+        commence <strong>demain</strong>
       </>
     ))
     .with({ immersionStartedSinceDays: P.when((days) => days < -1) }, () => (
@@ -135,22 +205,28 @@ const AgencyToDoItem = ({ convention }: { convention: ConventionDto }) => {
         <Badge className={fr.cx("fr-badge--error")}>
           J-{immersionStartsInDays}
         </Badge>{" "}
-        Dans {immersionStartsInDays} jours
+        L'immersion commence <strong>dans {immersionStartsInDays} jours</strong>
       </>
     ))
     .run();
 
   return (
-    <Tile
-      className={fr.cx("fr-mb-2w", "fr-p-2w")}
+    <Task
       title={title}
       titleAs="h4"
-      orientation="horizontal"
-      desc={description}
-      linkProps={{
-        href: routes.manageConventionConnectedUser({
-          conventionId: convention.id,
-        }).link.href,
+      description={description}
+      footer={footer}
+      buttonProps={{
+        children: "Traiter",
+        priority: "secondary",
+        size: "medium",
+        linkProps: {
+          target: "_blank",
+          rel: "noreferrer",
+          href: routes.manageConventionConnectedUser({
+            conventionId: convention.id,
+          }).link.href,
+        },
       }}
     />
   );
