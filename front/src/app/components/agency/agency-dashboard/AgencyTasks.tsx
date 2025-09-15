@@ -22,7 +22,7 @@ import { match, P } from "ts-pattern";
 const NUMBER_ITEM_TO_DISPLAY_IN_LIMITED_MODE = 3;
 const NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE = 10;
 
-export const AgencyToDoList = ({
+export const AgencyTasks = ({
   titleAs,
   displayMode,
   onSeeAllConventionsClick,
@@ -124,7 +124,7 @@ export const AgencyToDoList = ({
           </Button>
         )}
       {conventionsDisplayed.map((convention) => (
-        <AgencyToDoItem key={convention.id} convention={convention} />
+        <AgencyTaskItem key={convention.id} convention={convention} />
       ))}
       {displayMode === "paginated" && (
         <Pagination
@@ -145,7 +145,7 @@ export const AgencyToDoList = ({
   );
 };
 
-const AgencyToDoItem = ({ convention }: { convention: ConventionDto }) => {
+const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
   const title = (
     <>
       {convention.signatories.beneficiary.firstName}{" "}

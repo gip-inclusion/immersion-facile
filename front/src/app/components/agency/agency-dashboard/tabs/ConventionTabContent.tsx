@@ -13,7 +13,7 @@ import {
   type WithAgencyDashboards,
   type WithEstablishmentDashboards,
 } from "shared";
-import { AgencyToDoList } from "src/app/components/agency/agency-dashboard/AgencyToDoList";
+import { AgencyTasks } from "src/app/components/agency/agency-dashboard/AgencyTasks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -86,7 +86,7 @@ export const ConventionTabContent = ({
         >
           Retour
         </Button>
-        <AgencyToDoList titleAs="h2" displayMode="paginated" />
+        <AgencyTasks titleAs="h2" displayMode="paginated" />
       </>
     );
   }
@@ -107,7 +107,7 @@ export const ConventionTabContent = ({
         </Button>
       }
     >
-      <AgencyToDoList
+      <AgencyTasks
         titleAs="h3"
         displayMode="limited"
         onSeeAllConventionsClick={() => {
