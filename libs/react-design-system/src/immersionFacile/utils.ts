@@ -1,3 +1,4 @@
+import type { FrClassName } from "@codegouvfr/react-dsfr";
 import { makeStyles } from "tss-react/dsfr";
 
 // Utility global styles, overriding DSFR styles
@@ -22,4 +23,14 @@ export const equals = (x: unknown, y: unknown): boolean => {
           equals(x[key as keyof typeof x], y[key as keyof typeof y]),
         )
     : x === y;
+};
+
+export const semanticTitleToClassName: Record<
+  "h1" | "h2" | "h3" | "h4",
+  FrClassName
+> = {
+  h1: "fr-h5",
+  h2: "fr-h5",
+  h3: "fr-h6",
+  h4: "fr-h6",
 };
