@@ -1,0 +1,38 @@
+@import "../../../config/responsive";
+
+.im-task__container {
+  padding: 1rem;
+  border: 1px solid var(--grey-900-175);
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+
+  @include for-screen-min($bp-md) {
+    flex-direction: row; 
+    justify-content: space-between;
+  }
+}
+
+.im-task-container__title {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  flex-direction: column;
+
+  @include for-screen-min($bp-md) {
+    flex-direction: row; 
+  }
+}
+
+.im-task-container__button {
+  margin-top: 1rem;
+
+  @include for-screen-min($bp-md) {
+    align-self: center;
+    margin-top: 0;
+  }
+}
+
+.im-task-container__footer {
+  color: var(--grey-425-625);
+}
