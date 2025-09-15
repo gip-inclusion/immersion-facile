@@ -877,67 +877,67 @@ describe("ContactEstablishment", () => {
         }),
       );
     });
-  });
 
-  it("throws NotFoundError when no establishments found with given siret", async () => {
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validPhoneRequest,
-        contactMode: "PHONE",
-      }),
-      errors.establishment.notFound({ siret: validPhoneRequest.siret }),
-    );
-  });
+    it("throws NotFoundError when no establishments found with given siret", async () => {
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validPhoneRequest,
+          contactMode: "PHONE",
+        }),
+        errors.establishment.notFound({ siret: validPhoneRequest.siret }),
+      );
+    });
 
-  it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder(establishmentEmailWithSiret)
-            .withContactMode("PHONE")
-            .build(),
-        )
-        .withUserRights(userRights)
-        .withOffers([
-          new OfferEntityBuilder().withAppellationCode("wrong").build(),
-        ])
-        .build(),
-    ];
+    it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder(establishmentEmailWithSiret)
+              .withContactMode("PHONE")
+              .build(),
+          )
+          .withUserRights(userRights)
+          .withOffers([
+            new OfferEntityBuilder().withAppellationCode("wrong").build(),
+          ])
+          .build(),
+      ];
 
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validPhoneRequest,
-        contactMode: "PHONE",
-      }),
-      errors.establishment.offerMissing({
-        appellationCode: validPhoneRequest.appellationCode,
-        siret: validPhoneRequest.siret,
-        mode: "bad request",
-      }),
-    );
-  });
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validPhoneRequest,
+          contactMode: "PHONE",
+        }),
+        errors.establishment.offerMissing({
+          appellationCode: validPhoneRequest.appellationCode,
+          siret: validPhoneRequest.siret,
+          mode: "bad request",
+        }),
+      );
+    });
 
-  it("throws ForbidenError when establishment is not currently available", async () => {
-    const establishmentAggregate = new EstablishmentAggregateBuilder(
-      establishmentAggregateWithEmail,
-    )
-      .withIsMaxDiscussionsForPeriodReached(false)
-      .withMaxContactsPerMonth(2)
-      .withEstablishmentNextAvailabilityDate(addHours(timeGateway.now(), 1))
-      .withOffers([immersionOffer])
-      .build();
+    it("throws ForbidenError when establishment is not currently available", async () => {
+      const establishmentAggregate = new EstablishmentAggregateBuilder(
+        establishmentAggregateWithEmail,
+      )
+        .withIsMaxDiscussionsForPeriodReached(false)
+        .withMaxContactsPerMonth(2)
+        .withEstablishmentNextAvailabilityDate(addHours(timeGateway.now(), 1))
+        .withOffers([immersionOffer])
+        .build();
 
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishmentAggregate,
-    ];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
 
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validEmailRequest,
-      }),
-      errors.establishment.forbiddenUnavailable({
-        siret: validEmailRequest.siret,
-      }),
-    );
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validEmailRequest,
+        }),
+        errors.establishment.forbiddenUnavailable({
+          siret: validEmailRequest.siret,
+        }),
+      );
+    });
   });
 });
