@@ -10,6 +10,11 @@ const conventions = createSelector(
   (state) => state.conventions,
 );
 
+const pagination = createSelector(
+  connectedUserConventionsState,
+  (state) => state.pagination,
+);
+
 const isLoading = createSelector(
   connectedUserConventionsState,
   (state) => state.isLoading,
@@ -18,4 +23,5 @@ const isLoading = createSelector(
 export const connectedUserConventionsSelectors = {
   conventions,
   isLoading,
+  pagination,
 };
