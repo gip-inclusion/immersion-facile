@@ -15,7 +15,7 @@ import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerato
 import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
-export class SearchImmersion extends TransactionalUseCase<
+export class LegacySearchImmersion extends TransactionalUseCase<
   SearchQueryParamsDto,
   SearchResultDto[],
   ApiConsumer
