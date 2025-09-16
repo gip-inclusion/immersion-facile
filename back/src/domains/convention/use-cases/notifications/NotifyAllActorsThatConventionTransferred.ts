@@ -1,4 +1,4 @@
-import { uniq } from "ramda";
+import { uniqBy } from "ramda";
 import {
   type AgencyDto,
   type ConventionDto,
@@ -60,36 +60,42 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
     }
 
     const signatoriesRecipientsRoleAndEmail: { role: Role; email: Email }[] =
-      uniq([
-        ...Object.values(convention.signatories).map((signatory) => ({
-          role: signatory.role,
-          email: signatory.email,
-        })),
-        ...(convention.signatories.establishmentRepresentative.email !==
-        convention.establishmentTutor.email
-          ? [
-              {
-                role: convention.establishmentTutor.role,
-                email: convention.establishmentTutor.email,
-              },
-            ]
-          : []),
-      ]);
+      uniqBy(
+        (recipient) => recipient.email,
+        [
+          ...Object.values(convention.signatories).map((signatory) => ({
+            role: signatory.role,
+            email: signatory.email,
+          })),
+          ...(convention.signatories.establishmentRepresentative.email !==
+          convention.establishmentTutor.email
+            ? [
+                {
+                  role: convention.establishmentTutor.role,
+                  email: convention.establishmentTutor.email,
+                },
+              ]
+            : []),
+        ],
+      );
 
-    const agencyRecipientsRoleAndEmail: { role: Role; email: Email }[] = uniq([
-      ...agency.counsellorEmails.map(
-        (counsellorEmail): { role: Role; email: Email } => ({
-          role: "counsellor",
-          email: counsellorEmail,
-        }),
-      ),
-      ...agency.validatorEmails.map(
-        (validatorEmail): { role: Role; email: Email } => ({
-          role: "validator",
-          email: validatorEmail,
-        }),
-      ),
-    ]);
+    const agencyRecipientsRoleAndEmail: { role: Role; email: Email }[] = uniqBy(
+      (recipient) => recipient.email,
+      [
+        ...agency.counsellorEmails.map(
+          (counsellorEmail): { role: Role; email: Email } => ({
+            role: "counsellor",
+            email: counsellorEmail,
+          }),
+        ),
+        ...agency.validatorEmails.map(
+          (validatorEmail): { role: Role; email: Email } => ({
+            role: "validator",
+            email: validatorEmail,
+          }),
+        ),
+      ],
+    );
 
     await Promise.all([
       ...sendAgencyEmails(
