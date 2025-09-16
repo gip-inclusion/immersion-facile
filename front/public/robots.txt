@@ -1,0 +1,22 @@
+User-agent: *
+
+# Disallow any URL containing JWT or token parameters
+Disallow: /*?*jwt=*
+Disallow: /*&jwt=*
+Disallow: /*?*token=*
+Disallow: /*&token=*
+Disallow: /*?*expiredJwt=*
+Disallow: /*&expiredJwt=*
+Disallow: /*?*idToken=*
+Disallow: /*&idToken=*
+
+# Disallow sensitive authenticated routes
+Disallow: /magic-link-renewal*
+Disallow: /convention-status-dashboard*
+Disallow: /convention-to-sign*
+Disallow: /assessment*
+Disallow: /manage-convention*
+Disallow: /unsubscribe-establishment-lead*
+Disallow: /tableau-de-bord-agence*
+Disallow: /tableau-de-bord-etablissement*
+Disallow: /admin*
