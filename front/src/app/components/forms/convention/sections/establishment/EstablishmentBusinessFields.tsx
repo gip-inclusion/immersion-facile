@@ -3,7 +3,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useRef } from "react";
 
 import { useFormContext, useWatch } from "react-hook-form";
-import type { ConventionDto } from "shared";
+import type { ConventionReadDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -15,7 +15,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 
 export const EstablishmentBusinessFields = (): JSX.Element => {
   const { getValues, register, control, setValue } =
-    useFormContext<ConventionDto>();
+    useFormContext<ConventionReadDto>();
   const values = getValues();
   const shouldUpdateImmersionAddress = useRef(
     values.status === "READY_TO_SIGN" && values.immersionAddress === "",
@@ -89,6 +89,19 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
           Mon entreprise n'a pas de SIRET
         </a>
       </p>
+      {values.agencyKind === "fonction-publique" && (
+        <p className={fr.cx("fr-mt-1w", "fr-mb-1w")}>
+          <a
+            href="https://pages.immersion-facile.beta.gouv.fr/ressources-candidats/pmsmp-agent-public-cdg60"
+            target="_blank"
+            rel="noreferrer"
+            className={fr.cx("fr-link")}
+          >
+            <i className={fr.cx("fr-icon-information-fill", "fr-icon--sm")} />
+            Pas à pas
+          </a>
+        </p>
+      )}
       <Input
         label={formContents.businessName.label}
         hintText={formContents.businessName.hintText}
