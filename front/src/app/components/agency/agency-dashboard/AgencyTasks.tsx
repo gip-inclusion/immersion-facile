@@ -4,7 +4,12 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import { addDays, differenceInCalendarDays, subMonths } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { HeadingSection, Loader, Task } from "react-design-system";
+import {
+  HeadingSection,
+  Loader,
+  Task,
+  type TitleLevel,
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
@@ -27,7 +32,7 @@ export const AgencyTasks = ({
   displayMode,
   onSeeAllConventionsClick,
 }: {
-  titleAs: "h1" | "h2" | "h3" | "h4";
+  titleAs: TitleLevel;
   displayMode: "limited" | "paginated";
   onSeeAllConventionsClick?: () => void;
 }) => {

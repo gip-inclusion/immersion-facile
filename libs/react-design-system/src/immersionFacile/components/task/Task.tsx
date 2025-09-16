@@ -2,13 +2,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
-import { semanticTitleToClassName } from "../../utils";
+import { semanticTitleToClassName, type TitleLevel } from "../../utils";
 import { taskStyles } from "./Task.styles";
 
 export type TaskProps = {
   className?: string;
   title: ReactNode;
-  titleAs: "h1" | "h2" | "h3" | "h4";
+  titleAs: TitleLevel;
   description: ReactNode;
   buttonProps?: ButtonProps;
   footer?: ReactNode;

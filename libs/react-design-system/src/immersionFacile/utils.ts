@@ -25,10 +25,9 @@ export const equals = (x: unknown, y: unknown): boolean => {
     : x === y;
 };
 
-export const semanticTitleToClassName: Record<
-  "h1" | "h2" | "h3" | "h4",
-  FrClassName
-> = {
+export type TitleLevel = "h1" | "h2" | "h3" | "h4";
+
+export const semanticTitleToClassName: Record<TitleLevel, FrClassName> = {
   h1: "fr-h5",
   h2: "fr-h5",
   h3: "fr-h6",

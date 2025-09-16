@@ -1,5 +1,6 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import type { TitleLevel } from "react-design-system";
 import type { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
@@ -16,7 +17,7 @@ export const MetabaseView = ({
   url?: AbsoluteUrl;
   title: string;
   subtitle?: string;
-  titleAs?: "h1" | "h2" | "h3" | "h4";
+  titleAs?: TitleLevel;
 }) => {
   const consent = useConsent();
   if (!consent.finalityConsent?.statistics)
