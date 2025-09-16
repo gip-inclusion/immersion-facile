@@ -98,16 +98,17 @@ export type AgencyKind = (typeof agencyKindList)[number];
 export const agencyKindList = [
   "pole-emploi", // TODO: remplacer l'agency kind PE par FT
   "mission-locale",
+  "operateur-cep",
   "cap-emploi",
   "conseil-departemental",
-  "prepa-apprentissage",
   "structure-IAE",
-  "autre",
-  "immersion-facile",
-  "operateur-cep",
+  "fonction-publique",
   "cci",
   "cma",
   "chambre-agriculture",
+  "autre",
+  "immersion-facile",
+  "prepa-apprentissage", // legacy kept only for backward compatibility
 ] as const;
 
 export type AllowedAgencyKindToAdd = Exclude<
@@ -116,12 +117,13 @@ export type AllowedAgencyKindToAdd = Exclude<
 >;
 
 export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
-  "mission-locale": "Mission Locale",
   "pole-emploi": "France Travail (anciennement Pôle emploi)",
+  "mission-locale": "Mission Locale",
+  "operateur-cep": "Opérateur du CEP",
   "cap-emploi": "Cap Emploi",
   "conseil-departemental": "Conseil Départemental",
   "structure-IAE": "Structure IAE",
-  "operateur-cep": "Opérateur du CEP",
+  "fonction-publique": "Fonction publique",
   cci: "Chambres de Commerce et d'Industrie",
   cma: "Chambre des métiers de l'Artisanat",
   "chambre-agriculture": "Chambre d'agriculture",
