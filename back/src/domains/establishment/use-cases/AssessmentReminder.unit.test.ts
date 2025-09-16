@@ -158,7 +158,10 @@ describe("AssessmentReminder", () => {
       uow.userRepository.save(validator);
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          [validator.id]: {
+            isNotifiedByEmail: true,
+            roles: ["validator", "counsellor"],
+          },
         }),
       ];
       shortLinkIdGeneratorGateway.addMoreShortLinkIds([
