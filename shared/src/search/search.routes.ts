@@ -20,7 +20,7 @@ export const searchImmersionRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  search: defineRoute({
+  legacySearch: defineRoute({
     method: "get",
     url: "/immersion-offers",
     queryParamsSchema: searchParamsSchema,
