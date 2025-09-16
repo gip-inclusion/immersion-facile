@@ -1,5 +1,5 @@
 import subDays from "date-fns/subDays";
-import { difference } from "ramda";
+import { difference, uniqBy } from "ramda";
 import {
   type AbsoluteUrl,
   type AgencyRole,
@@ -265,16 +265,19 @@ const sendAgencyAssessmentReminder = async ({
   const recipientsEmailAndRole: { email: Email; role: AgencyRole }[] =
     advisorEmail
       ? [{ email: advisorEmail, role: "validator" }]
-      : [
-          ...agency.validatorEmails.map((email) => ({
-            email,
-            role: "validator" as const,
-          })),
-          ...agency.counsellorEmails.map((email) => ({
-            email,
-            role: "counsellor" as const,
-          })),
-        ];
+      : uniqBy(
+          (recipient) => recipient.email,
+          [
+            ...agency.validatorEmails.map((email) => ({
+              email,
+              role: "validator" as const,
+            })),
+            ...agency.counsellorEmails.map((email) => ({
+              email,
+              role: "counsellor" as const,
+            })),
+          ],
+        );
 
   await Promise.all(
     recipientsEmailAndRole.map(async ({ email, role }) => {
