@@ -31,7 +31,7 @@ import {
   secretariatOffer,
   TEST_LOCATION,
 } from "../helpers/EstablishmentBuilders";
-import { SearchImmersion } from "./SearchImmersion";
+import { LegacySearchImmersion } from "./LegacySearchImmersion";
 
 const secretariatAppellationAndRome: AppellationAndRomeDto = {
   romeCode: "M1607",
@@ -110,7 +110,7 @@ const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
   .withOffers([secretariatOffer, boulangerOffer])
   .build();
 
-describe("SearchImmersionUseCase", () => {
+describe("LegacySearchImmersionUseCase", () => {
   const searchWithMinimalParams: SearchQueryParamsDto = {
     sortedBy: "date",
   };
@@ -129,7 +129,7 @@ describe("SearchImmersionUseCase", () => {
 
   let uow: InMemoryUnitOfWork;
   let uuidGenerator: TestUuidGenerator;
-  let searchImmersionUseCase: SearchImmersion;
+  let legacySearchImmersionUseCase: LegacySearchImmersion;
   let laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
   let timeGateway: CustomTimeGateway;
   const now = new Date("2024-04-10");
@@ -148,7 +148,7 @@ describe("SearchImmersionUseCase", () => {
       },
     ];
     timeGateway = new CustomTimeGateway(now);
-    searchImmersionUseCase = new SearchImmersion(
+    legacySearchImmersionUseCase = new LegacySearchImmersion(
       new InMemoryUowPerformer(uow),
       laBonneBoiteGateway,
       uuidGenerator,
@@ -170,7 +170,9 @@ describe("SearchImmersionUseCase", () => {
     };
 
     it("without nafCode", async () => {
-      await searchImmersionUseCase.execute(searchSecretariatInMetzRequestDto);
+      await legacySearchImmersionUseCase.execute(
+        searchSecretariatInMetzRequestDto,
+      );
 
       expectToEqual(uow.searchMadeRepository.searchesMade, [
         searchMadeWithoutNafCode,
@@ -179,7 +181,7 @@ describe("SearchImmersionUseCase", () => {
 
     it("with nafCodes", async () => {
       const nafCodes: NafCode[] = ["7510A", "8560C"];
-      await searchImmersionUseCase.execute({
+      await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         nafCodes,
       });
@@ -202,7 +204,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("gets results for search made without geo params and stores search made", async () => {
-      const response = await searchImmersionUseCase.execute(
+      const response = await legacySearchImmersionUseCase.execute(
         searchWithMinimalParams,
       );
       expectToEqual(response, [
@@ -243,7 +245,7 @@ describe("SearchImmersionUseCase", () => {
       ]);
     });
     it("gets results for search made with appellations but without geo params", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchWithMinimalParams,
         appellationCodes: [secretariatOffer.appellationCode],
       });
@@ -276,7 +278,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("gets all results for search made with appellations but no geo params", async () => {
-      const response = await searchImmersionUseCase.execute(
+      const response = await legacySearchImmersionUseCase.execute(
         searchWithMinimalParams,
       );
       expectToEqual(response, [
@@ -324,7 +326,8 @@ describe("SearchImmersionUseCase", () => {
     ];
     laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-    const response = await searchImmersionUseCase.execute(searchInMetzParams);
+    const response =
+      await legacySearchImmersionUseCase.execute(searchInMetzParams);
 
     expectToEqual(response, [
       establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -358,7 +361,7 @@ describe("SearchImmersionUseCase", () => {
     ];
     laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-    const response = await searchImmersionUseCase.execute({
+    const response = await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       sortedBy: "distance",
       appellationCodes: [
@@ -410,7 +413,7 @@ describe("SearchImmersionUseCase", () => {
     ];
     laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-    const response = await searchImmersionUseCase.execute({
+    const response = await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       sortedBy: "distance",
       appellationCodes: [secretariatOffer.appellationCode],
@@ -451,7 +454,7 @@ describe("SearchImmersionUseCase", () => {
     ];
     laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-    const response = await searchImmersionUseCase.execute({
+    const response = await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       voluntaryToImmersion: true,
       sortedBy: "distance",
@@ -490,7 +493,7 @@ describe("SearchImmersionUseCase", () => {
     laBonneBoiteGateway.setError(new Error("This is an LBB error"));
     const range = 10;
 
-    const response = await searchImmersionUseCase.execute({
+    const response = await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       appellationCodes: [secretariatOffer.appellationCode],
       sortedBy: "distance",
@@ -524,7 +527,7 @@ describe("SearchImmersionUseCase", () => {
 
     laBonneBoiteGateway.setNextResults(companiesInRangeFromLbb);
 
-    const response = await searchImmersionUseCase.execute({
+    const response = await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       appellationCodes: [secretariatOffer.appellationCode],
       sortedBy: "distance",
@@ -573,7 +576,7 @@ describe("SearchImmersionUseCase", () => {
         .build(),
     ]);
 
-    const response = await searchImmersionUseCase.execute({
+    const response = await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       appellationCodes: [secretariatOffer.appellationCode],
       sortedBy: "distance",
@@ -617,7 +620,7 @@ describe("SearchImmersionUseCase", () => {
         .build(),
     ]);
 
-    await searchImmersionUseCase.execute({
+    await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       appellationCodes: [secretariatOffer.appellationCode],
       sortedBy: "distance",
@@ -657,7 +660,7 @@ describe("SearchImmersionUseCase", () => {
         .build(),
     ]);
 
-    const response = await searchImmersionUseCase.execute({
+    const response = await legacySearchImmersionUseCase.execute({
       ...searchInMetzParams,
       appellationCodes: [secretariatOffer.appellationCode],
       sortedBy: "distance",
@@ -698,7 +701,7 @@ describe("SearchImmersionUseCase", () => {
         establishmentSearchableBy: "students",
       };
 
-      const response = await searchImmersionUseCase.execute(searchParams);
+      const response = await legacySearchImmersionUseCase.execute(searchParams);
 
       expectToEqual(response, [
         establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -750,7 +753,7 @@ describe("SearchImmersionUseCase", () => {
         establishmentSearchableBy: "jobSeekers",
       };
 
-      const response = await searchImmersionUseCase.execute(searchParams);
+      const response = await legacySearchImmersionUseCase.execute(searchParams);
 
       expectToEqual(response, [
         establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -801,7 +804,7 @@ describe("SearchImmersionUseCase", () => {
         ...searchInMetzParams,
       };
 
-      const response = await searchImmersionUseCase.execute(searchParams);
+      const response = await legacySearchImmersionUseCase.execute(searchParams);
 
       expectToEqual(response, [
         establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -873,7 +876,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("returns only a displayable establishment from repository, not from LBB", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchInMetzParams,
         appellationCodes: [secretariatOffer.appellationCode],
         sortedBy: "distance",
@@ -905,7 +908,7 @@ describe("SearchImmersionUseCase", () => {
         .withRome(boulangerOffer.romeCode)
         .build();
       laBonneBoiteGateway.setNextResults([lbbResultNotInRepo]);
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchInMetzParams,
         appellationCodes: [boulangerOffer.appellationCode],
         sortedBy: "distance",
@@ -944,7 +947,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("Without voluntary to immersion", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchInMetzParams,
         appellationCodes: [secretariatOffer.appellationCode],
         sortedBy: "distance",
@@ -953,7 +956,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("With voluntary to immersion false", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchInMetzParams,
         appellationCodes: [secretariatOffer.appellationCode],
         sortedBy: "distance",
@@ -963,7 +966,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("With voluntary to immersion true", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchInMetzParams,
         appellationCodes: [secretariatOffer.appellationCode],
         sortedBy: "distance",
@@ -981,10 +984,14 @@ describe("SearchImmersionUseCase", () => {
         ];
         laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-        const authenticatedResponse = await searchImmersionUseCase.execute(
-          { ...searchSecretariatInMetzRequestDto, voluntaryToImmersion: true },
-          authenticatedApiConsumerPayload,
-        );
+        const authenticatedResponse =
+          await legacySearchImmersionUseCase.execute(
+            {
+              ...searchSecretariatInMetzRequestDto,
+              voluntaryToImmersion: true,
+            },
+            authenticatedApiConsumerPayload,
+          );
 
         expectToEqual(authenticatedResponse, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -1003,10 +1010,11 @@ describe("SearchImmersionUseCase", () => {
         ];
         laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-        const unauthenticatedResponse = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          voluntaryToImmersion: true,
-        });
+        const unauthenticatedResponse =
+          await legacySearchImmersionUseCase.execute({
+            ...searchSecretariatInMetzRequestDto,
+            voluntaryToImmersion: true,
+          });
 
         expectToEqual(unauthenticatedResponse, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -1023,7 +1031,7 @@ describe("SearchImmersionUseCase", () => {
     it("does not call discussion & convention repositories when there is no search results", async () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [];
 
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         sortedBy: "score",
       });
@@ -1038,7 +1046,7 @@ describe("SearchImmersionUseCase", () => {
         establishment,
       ];
 
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         ...searchInMetzParams,
         sortedBy: "distance",
@@ -1074,7 +1082,7 @@ describe("SearchImmersionUseCase", () => {
         establishment2,
       ];
 
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         sortedBy: "score",
       });
@@ -1117,7 +1125,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("without filter all establisments", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
       });
 
@@ -1138,7 +1146,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("with filter false establishments with fitForDisabledWorkers false", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         fitForDisabledWorkers: false,
       });
@@ -1154,7 +1162,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("with filter true establishments with fitForDisabledWorkers true", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         fitForDisabledWorkers: true,
       });
@@ -1228,7 +1236,7 @@ describe("SearchImmersionUseCase", () => {
 
     it("bad request error when nafCodes provided but empty", async () => {
       await expectPromiseToFailWithError(
-        searchImmersionUseCase.execute({
+        legacySearchImmersionUseCase.execute({
           ...searchSecretariatInMetzRequestDto,
           nafCodes: [],
         }),
@@ -1242,7 +1250,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("all establishment when filter is not provided", async () => {
-      const response = await searchImmersionUseCase.execute(
+      const response = await legacySearchImmersionUseCase.execute(
         searchSecretariatInMetzRequestDto,
       );
 
@@ -1293,7 +1301,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("only establishments with a naf code when provided", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         nafCodes: [naf7201A],
       });
@@ -1317,7 +1325,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     it("only establishments with multiple naf codes when provided", async () => {
-      const response = await searchImmersionUseCase.execute({
+      const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         nafCodes: [naf7201A, naf6001B],
       });

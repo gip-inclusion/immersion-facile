@@ -138,6 +138,7 @@ import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetG
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
 import { LegacyContactEstablishment } from "../../domains/establishment/use-cases/LegacyContactEstablishment";
+import { LegacySearchImmersion } from "../../domains/establishment/use-cases/LegacySearchImmersion";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
@@ -145,7 +146,6 @@ import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishm
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
-import { SearchImmersion } from "../../domains/establishment/use-cases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import type { AppConfig } from "./appConfig";
@@ -359,7 +359,7 @@ export const createUseCases = ({
         ),
 
       // immersionOffer
-      searchImmersion: new SearchImmersion(
+      legacySearchImmersion: new LegacySearchImmersion(
         uowPerformer,
         gateways.laBonneBoiteGateway,
         uuidGenerator,
