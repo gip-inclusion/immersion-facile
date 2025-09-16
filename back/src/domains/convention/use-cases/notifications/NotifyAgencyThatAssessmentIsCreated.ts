@@ -1,3 +1,4 @@
+import { uniqBy } from "ramda";
 import {
   computeTotalHours,
   type Email,
@@ -56,20 +57,23 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
     const recipientsRoleAndEmail: { email: Email; role: Role }[] =
       conventionAdvisor?.advisor
         ? [{ email: conventionAdvisor?.advisor.email, role: "validator" }]
-        : [
-            ...validatorEmails.map(
-              (validatorEmail): { email: Email; role: Role } => ({
-                email: validatorEmail,
-                role: "validator",
-              }),
-            ),
-            ...counsellorEmails.map(
-              (counsellorEmail): { email: Email; role: Role } => ({
-                email: counsellorEmail,
-                role: "counsellor",
-              }),
-            ),
-          ];
+        : uniqBy(
+            (recipient) => recipient.email,
+            [
+              ...validatorEmails.map(
+                (validatorEmail): { email: Email; role: Role } => ({
+                  email: validatorEmail,
+                  role: "validator",
+                }),
+              ),
+              ...counsellorEmails.map(
+                (counsellorEmail): { email: Email; role: Role } => ({
+                  email: counsellorEmail,
+                  role: "counsellor",
+                }),
+              ),
+            ],
+          );
 
     if (assessment.status === "DID_NOT_SHOW") {
       await this.#saveNotificationAndRelatedEvent(uow, {

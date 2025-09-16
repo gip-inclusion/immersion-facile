@@ -110,7 +110,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     uow.userRepository.users = [validator, validator2];
     await uow.agencyRepository.insert(
       toAgencyWithRights(agency, {
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator.id]: {
+          isNotifiedByEmail: true,
+          roles: ["validator", "counsellor"],
+        },
         [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     );
@@ -207,7 +210,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     uow.userRepository.users = [validator, validator2];
     await uow.agencyRepository.insert(
       toAgencyWithRights(agency, {
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator.id]: {
+          isNotifiedByEmail: true,
+          roles: ["validator", "counsellor"],
+        },
         [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     );
