@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
-import { semanticTitleToClassName } from "../../utils";
+import { semanticTitleToClassName, type TitleLevel } from "../../utils";
 
 export type HeadingSectionProps = {
   title: ReactNode;
@@ -10,7 +10,7 @@ export type HeadingSectionProps = {
   children: React.ReactNode;
   className?: string;
   titleActionCols?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  titleAs?: "h1" | "h2" | "h3" | "h4";
+  titleAs?: TitleLevel;
 };
 
 export const HeadingSection = ({
