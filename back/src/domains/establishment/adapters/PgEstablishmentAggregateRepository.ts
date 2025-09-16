@@ -36,7 +36,7 @@ import type {
   SearchImmersionParams,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
-import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
+import { hasSearchGeoParams } from "../use-cases/LegacySearchImmersion";
 
 const logger = createLogger(__filename);
 const MAX_RESULTS_HARD_LIMIT = 100;
