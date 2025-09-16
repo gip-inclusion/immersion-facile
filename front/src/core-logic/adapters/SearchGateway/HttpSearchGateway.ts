@@ -84,7 +84,7 @@ export class HttpSearchGateway implements SearchGateway {
   ): Observable<SearchResultDto[]> {
     return from(
       this.httpClient
-        .search({
+        .legacySearch({
           queryParams: searchParams,
         })
         .then((result) =>

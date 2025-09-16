@@ -178,7 +178,7 @@ describe("search-immersion route", () => {
         );
 
         // Act and assert
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             appellationCodes: [immersionOffer.appellationCode],
             distanceKm: 30,
@@ -201,7 +201,7 @@ describe("search-immersion route", () => {
       });
 
       it("with no specified appellationCode", async () => {
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             distanceKm: 30,
             longitude: 2.34999,
@@ -216,7 +216,7 @@ describe("search-immersion route", () => {
       });
 
       it("with filter voluntaryToImmersion", async () => {
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             distanceKm: 30,
             longitude: 2.34999,
@@ -245,7 +245,7 @@ describe("search-immersion route", () => {
           establishmentAggregate2,
         );
 
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             appellationCodes: [immersionOffer.appellationCode],
             distanceKm: 30,
@@ -341,7 +341,7 @@ describe("search-immersion route", () => {
       });
 
       it("with filter establishmentSearchableBy defined to students", async () => {
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
@@ -365,7 +365,7 @@ describe("search-immersion route", () => {
       });
 
       it("with filter establishmentSearchableBy defined to jobSeekers", async () => {
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
@@ -389,7 +389,7 @@ describe("search-immersion route", () => {
       });
 
       it("with filter establishmentSearchableBy not defined", async () => {
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
@@ -414,7 +414,7 @@ describe("search-immersion route", () => {
     });
 
     it("rejects invalid requests with error code 400", async () => {
-      const result = await httpClient.search({
+      const result = await httpClient.legacySearch({
         queryParams: {
           distanceKm: 30,
           longitude: 2.34999,
@@ -504,7 +504,7 @@ describe("search-immersion route", () => {
         ];
       });
       it("should return 400 if distance is supplied but no lat/lon/distanceKm", async () => {
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             appellationCodes: ["14704"],
             sortedBy: "distance",
@@ -525,7 +525,7 @@ describe("search-immersion route", () => {
         });
       });
       it("should return 400 if distance is supplied but only lat", async () => {
-        const result = await httpClient.search({
+        const result = await httpClient.legacySearch({
           queryParams: {
             appellationCodes: ["14704"],
             sortedBy: "distance",
@@ -546,7 +546,7 @@ describe("search-immersion route", () => {
         });
       });
       it("should return results if no geo params are set and no appellations", async () => {
-        const results = await httpClient.search({
+        const results = await httpClient.legacySearch({
           queryParams: {
             sortedBy: "score",
           },
@@ -565,7 +565,7 @@ describe("search-immersion route", () => {
         });
       });
       it("should return results if no geo params are set but appellations are supplied", async () => {
-        const results = await httpClient.search({
+        const results = await httpClient.legacySearch({
           queryParams: {
             sortedBy: "date",
             appellationCodes: [offer1.appellationCode],

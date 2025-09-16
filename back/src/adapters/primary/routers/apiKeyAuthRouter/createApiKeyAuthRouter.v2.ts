@@ -70,7 +70,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         )
           throw errors.apiConsumer.forbidden();
         return pipeWithValue(
-          deps.useCases.searchImmersion.execute(
+          deps.useCases.legacySearchImmersion.execute(
             {
               ...req.query,
               sortedBy: req.query.sortedBy ?? "distance",
