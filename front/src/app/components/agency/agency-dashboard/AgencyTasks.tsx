@@ -66,7 +66,7 @@ export const AgencyTasks = ({
               params: {
                 ...dateStartFrom1MonthAgoToIn5Days,
                 sortBy: "dateStart",
-                sortOrder: "asc",
+                sortDirection: "asc",
                 page: page,
                 perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE,
               },
@@ -157,8 +157,10 @@ export const AgencyTasks = ({
 const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
   const title = (
     <>
-      {convention.signatories.beneficiary.firstName}{" "}
-      {convention.signatories.beneficiary.lastName}{" "}
+      <span className={fr.cx("fr-pr-2v")}>
+        {convention.signatories.beneficiary.firstName}{" "}
+        {convention.signatories.beneficiary.lastName}{" "}
+      </span>
       <Badge className={labelAndSeverityByStatus[convention.status].color}>
         {labelAndSeverityByStatus[convention.status].label}
       </Badge>

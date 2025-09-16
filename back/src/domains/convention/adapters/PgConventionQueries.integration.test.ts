@@ -912,8 +912,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 2 },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -931,8 +931,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 2, perPage: 2 },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -953,8 +953,8 @@ describe("Pg implementation of ConventionQueries", () => {
           pagination: { page: 1, perPage: 10 },
           filters: { statuses: ["READY_TO_SIGN"] },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -969,8 +969,8 @@ describe("Pg implementation of ConventionQueries", () => {
           pagination: { page: 1, perPage: 10 },
           filters: { beneficiaryNameContains: "John" },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -984,8 +984,8 @@ describe("Pg implementation of ConventionQueries", () => {
           pagination: { page: 1, perPage: 10 },
           filters: { establishmentNameContains: "Business B" },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -1005,8 +1005,8 @@ describe("Pg implementation of ConventionQueries", () => {
             },
           },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -1020,8 +1020,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           sort: {
-            sortBy: "dateStart",
-            sortOrder: "asc",
+            by: "dateStart",
+            direction: "asc",
           },
         });
 
@@ -1040,8 +1040,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 2 },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -1063,8 +1063,8 @@ describe("Pg implementation of ConventionQueries", () => {
             actorEmailContains: "@convention-a.com",
           },
           sort: {
-            sortBy: "dateStart",
-            sortOrder: "desc",
+            by: "dateStart",
+            direction: "desc",
           },
         });
 
@@ -1078,8 +1078,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: singleAgencyUser.id,
           pagination: { page: 1, perPage: 10 },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 
@@ -1120,8 +1120,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: userWithoutProperRole.id,
           pagination: { page: 1, perPage: 10 },
           sort: {
-            sortBy: "dateSubmission",
-            sortOrder: "desc",
+            by: "dateSubmission",
+            direction: "desc",
           },
         });
 

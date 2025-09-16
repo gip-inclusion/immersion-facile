@@ -13,6 +13,7 @@ import { dateFilterSchema } from "../filters";
 import {
   createPaginatedSchema,
   paginationQueryParamsSchema,
+  sortSchema,
 } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { allRoles } from "../role/role.dto";
@@ -828,7 +829,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
         error: localization.invalidEnum,
       })
       .optional(),
-    sortOrder: z
+    sortDirection: z
       .enum(["asc", "desc"], {
         error: localization.invalidEnum,
       })
@@ -851,6 +852,12 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
     dateSubmissionTo: makeDateStringSchema().optional(),
   });
 
+const sortedConventionsSchema = sortSchema(
+  z.enum(["dateValidation", "dateStart", "dateSubmission"], {
+    error: localization.invalidEnum,
+  }),
+);
+
 export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatchingOutput<GetConventionsForAgencyUserParams> =
   z.object({
     filters: z
@@ -866,20 +873,7 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
         dateSubmission: dateFilterSchema.optional(),
       })
       .optional(),
-    sort: z
-      .object({
-        sortBy: z
-          .enum(["dateValidation", "dateStart", "dateSubmission"], {
-            error: localization.invalidEnum,
-          })
-          .optional(),
-        sortOrder: z
-          .enum(["asc", "desc"], {
-            error: localization.invalidEnum,
-          })
-          .optional(),
-      })
-      .optional(),
+    sort: sortedConventionsSchema.optional(),
     pagination: paginationQueryParamsSchema.optional(),
   });
 

@@ -27,7 +27,7 @@ export const equals = (x: unknown, y: unknown): boolean => {
 
 export type TitleLevel = "h1" | "h2" | "h3" | "h4";
 
-export const semanticTitleToClassName: Record<TitleLevel, FrClassName> = {
+export const dashboardTitleToClassName: Record<TitleLevel, FrClassName> = {
   h1: "fr-h5",
   h2: "fr-h5",
   h3: "fr-h6",

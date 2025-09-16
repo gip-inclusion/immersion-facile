@@ -7,7 +7,7 @@ import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { DateFilter } from "../filters";
-import type { PaginationQueryParams } from "../pagination/pagination.dto";
+import type { PaginationQueryParams, Sort } from "../pagination/pagination.dto";
 import {
   type AgencyRole,
   allSignatoryRoles,
@@ -459,11 +459,6 @@ export type GetPaginatedConventionsFilters = {
   dateSubmission?: DateFilter;
 };
 
-export type GetPaginatedConventionsSort = {
-  sortBy?: GetPaginatedConventionsSortBy;
-  sortOrder?: "asc" | "desc";
-};
-
 export type GetPaginatedConventionsSortBy = keyof Pick<
   ConventionDto,
   "dateValidation" | "dateStart" | "dateSubmission"
@@ -471,7 +466,7 @@ export type GetPaginatedConventionsSortBy = keyof Pick<
 
 export type GetConventionsForAgencyUserParams = {
   filters?: GetPaginatedConventionsFilters;
-  sort?: GetPaginatedConventionsSort;
+  sort?: Sort<GetPaginatedConventionsSortBy>;
   pagination?: PaginationQueryParams;
 };
 
@@ -482,7 +477,7 @@ export type FlatGetConventionsForAgencyUserParams = {
 
   // sort
   sortBy?: GetPaginatedConventionsSortBy;
-  sortOrder?: "asc" | "desc";
+  sortDirection?: "asc" | "desc";
 
   // filters
   actorEmailContains?: string;

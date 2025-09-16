@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
-import { semanticTitleToClassName, type TitleLevel } from "../../utils";
+import { dashboardTitleToClassName, type TitleLevel } from "../../utils";
 import { taskStyles } from "./Task.styles";
 
 export type TaskProps = {
@@ -26,31 +26,39 @@ export const Task = ({
   const Title = titleAs;
 
   return (
-    <section
+    <article
       className={cx(
-        taskStyles.container,
-        "fr-mb-2v",
+        fr.cx("fr-card", "fr-container", "fr-mb-2v", "fr-p-4v"),
         className ? className : "",
       )}
     >
-      <div>
-        <Title
-          className={cx(
-            taskStyles.title,
-            fr.cx("fr-mb-1w"),
-            semanticTitleToClassName[titleAs],
+      <div className={fr.cx("fr-grid-row")}>
+        <div className={fr.cx("fr-col-12", "fr-col-md-10")}>
+          <Title
+            className={cx(
+              fr.cx("fr-grid-row", "fr-mb-1w"),
+              dashboardTitleToClassName[titleAs],
+            )}
+          >
+            {title}
+          </Title>
+          {description && <p className={fr.cx("fr-mb-2v")}>{description}</p>}
+          {footer && (
+            <footer
+              className={cx(taskStyles.footer, "fr-text--sm", "fr-mb-2v")}
+            >
+              {footer}
+            </footer>
           )}
+        </div>
+        <div
+          className={fr.cx("fr-col-md-2", "fr-grid-row", "fr-grid-row--right")}
         >
-          {title}
-        </Title>
-        {description && <p className={fr.cx("fr-mb-1w")}>{description}</p>}
-        {footer && (
-          <footer className={cx(taskStyles.footer, "fr-text--sm", "fr-mb-0")}>
-            {footer}
-          </footer>
-        )}
+          {buttonProps && (
+            <Button {...buttonProps} className={cx(taskStyles.button)} />
+          )}
+        </div>
       </div>
-      {buttonProps && <Button {...buttonProps} className={taskStyles.button} />}
-    </section>
+    </article>
   );
 };
