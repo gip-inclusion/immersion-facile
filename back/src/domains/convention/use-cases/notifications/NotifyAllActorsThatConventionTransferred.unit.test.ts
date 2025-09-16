@@ -149,7 +149,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
       toAgencyWithRights(previousAgency, {}),
       toAgencyWithRights(newAgency, {
         [connectedUser.id]: {
-          roles: ["validator"],
+          roles: ["validator", "counsellor"],
           isNotifiedByEmail: true,
         },
       }),
