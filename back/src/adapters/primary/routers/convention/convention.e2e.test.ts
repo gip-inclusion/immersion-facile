@@ -979,7 +979,7 @@ describe("convention e2e", () => {
             perPage: 10,
           },
           sort: {
-            sortBy: "dateStart",
+            by: "dateStart",
           },
         },
       ]);

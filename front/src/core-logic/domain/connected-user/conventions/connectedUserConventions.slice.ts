@@ -10,11 +10,11 @@ import type {
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
-export interface ConnectedUserConventionsState {
+type ConnectedUserConventionsState = {
   conventions: ConventionDto[];
   isLoading: boolean;
   pagination: Pagination | undefined;
-}
+};
 
 export const connectedUserConventionsInitialState: ConnectedUserConventionsState =
   {

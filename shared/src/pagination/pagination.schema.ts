@@ -1,9 +1,13 @@
 import { z } from "zod";
-import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
 import type {
   DataWithPagination,
   Pagination,
   PaginationQueryParams,
+  Sort,
 } from "./pagination.dto";
 
 const pageQueryParamSchema = z.coerce
@@ -46,4 +50,16 @@ export const createPaginatedSchema = <T>(
   z.object({
     data: z.array(schema),
     pagination: paginationSchema,
+  });
+
+export const sortSchema = <T>(
+  schema: ZodSchemaWithInputMatchingOutput<T>,
+): ZodSchemaWithInputMatchingOutput<Sort<T>> =>
+  z.object({
+    by: schema.optional(),
+    direction: z
+      .enum(["asc", "desc"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
   });

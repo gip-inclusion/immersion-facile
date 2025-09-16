@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
-import { semanticTitleToClassName, type TitleLevel } from "../../utils";
+import { dashboardTitleToClassName, type TitleLevel } from "../../utils";
 
 export type HeadingSectionProps = {
   title: ReactNode;
@@ -30,7 +30,7 @@ export const HeadingSection = ({
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
         <Title
           className={fr.cx(
-            titleAs && semanticTitleToClassName[titleAs],
+            titleAs && dashboardTitleToClassName[titleAs],
             !!description && "fr-mb-1w",
           )}
         >

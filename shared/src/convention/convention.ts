@@ -232,7 +232,7 @@ export const flatParamsToGetConventionsForAgencyUserParams = (
 ): GetConventionsForAgencyUserParams => {
   const {
     sortBy,
-    sortOrder,
+    sortDirection,
     page,
     perPage,
     actorEmailContains,
@@ -274,8 +274,8 @@ export const flatParamsToGetConventionsForAgencyUserParams = (
       },
     },
     sort: {
-      sortBy,
-      sortOrder,
+      by: sortBy,
+      direction: sortDirection,
     },
     pagination: {
       page,

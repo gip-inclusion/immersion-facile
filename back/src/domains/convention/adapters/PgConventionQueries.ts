@@ -14,12 +14,12 @@ import {
   errors,
   type FindSimilarConventionsParams,
   type GetPaginatedConventionsFilters,
-  type GetPaginatedConventionsSort,
   type GetPaginatedConventionsSortBy,
   type NotEmptyArray,
   type PaginationQueryParams,
   pipeWithValue,
   type SiretDto,
+  type Sort,
   type UserId,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
@@ -182,7 +182,7 @@ export class PgConventionQueries implements ConventionQueries {
     agencyUserId: UserId;
     pagination: Required<PaginationQueryParams>;
     filters?: GetPaginatedConventionsFilters;
-    sort: GetPaginatedConventionsSort;
+    sort: Sort<GetPaginatedConventionsSortBy>;
   }): Promise<DataWithPagination<ConventionDto>> {
     const {
       actorEmailContains,
@@ -242,7 +242,7 @@ const applyPagination =
   };
 
 const sortConventions =
-  (sort?: GetPaginatedConventionsSort) =>
+  (sort?: Sort<GetPaginatedConventionsSortBy>) =>
   (
     builder: PaginatedConventionQueryBuilder,
   ): PaginatedConventionQueryBuilder => {
@@ -255,9 +255,9 @@ const sortConventions =
       dateValidation: "date_validation",
     };
 
-    if (!sort || !sort.sortBy)
-      return builder.orderBy(sortByKey.dateStart, "desc");
-    return builder.orderBy(sortByKey[sort.sortBy], sort.sortOrder ?? "desc");
+    if (!sort || !sort.by) return builder.orderBy(sortByKey.dateStart, "desc");
+
+    return builder.orderBy(sortByKey[sort.by], sort.direction ?? "desc");
   };
 
 const filterByAgencyDepartmentCodes =
