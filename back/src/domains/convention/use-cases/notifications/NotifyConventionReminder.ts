@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { uniqBy } from "ramda";
 import {
   type AgencyDto,
   type AgencyWithUsersRights,
@@ -165,25 +166,30 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         kind: reminderKind,
       });
 
+    const emailWithRoles = uniqBy(
+      (emailWithRole) => emailWithRole.email,
+      [
+        ...agency.validatorEmails.map(
+          (email) =>
+            ({
+              role: "validator",
+              email,
+            }) satisfies EmailWithRole,
+        ),
+        ...agency.counsellorEmails.map(
+          (email) =>
+            ({
+              role: "counsellor",
+              email,
+            }) satisfies EmailWithRole,
+        ),
+      ],
+    );
+
     await this.#saveNotificationsBatchAndRelatedEvent(
       uow,
       await Promise.all(
-        [
-          ...agency.counsellorEmails.map(
-            (email) =>
-              ({
-                role: "counsellor",
-                email,
-              }) satisfies EmailWithRole,
-          ),
-          ...agency.validatorEmails.map(
-            (email) =>
-              ({
-                role: "validator",
-                email,
-              }) satisfies EmailWithRole,
-          ),
-        ].map((emailWithRole) =>
+        emailWithRoles.map((emailWithRole) =>
           this.#createAgencyReminderEmail(
             emailWithRole,
             conventionRead,

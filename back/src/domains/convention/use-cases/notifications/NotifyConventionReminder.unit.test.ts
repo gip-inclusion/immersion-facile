@@ -155,7 +155,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           isNotifiedByEmail: true,
           roles: ["counsellor"],
         },
-        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator1.id]: {
+          isNotifiedByEmail: true,
+          roles: ["validator", "counsellor"],
+        },
         [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       },
     );
@@ -193,30 +196,30 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           expectToEqual(uow.shortLinkQuery.getShortLinks(), {
             [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
               id: convention.id,
-              role: "counsellor",
-              targetRoute: frontRoutes.manageConvention,
-              email: councellor1.email,
-              now: timeGateway.now(),
-            }),
-            [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-              id: convention.id,
-              role: "counsellor",
-              targetRoute: frontRoutes.manageConvention,
-              email: councellor2.email,
-              now: timeGateway.now(),
-            }),
-            [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-              id: convention.id,
               role: "validator",
               targetRoute: frontRoutes.manageConvention,
               email: validator1.email,
               now: timeGateway.now(),
             }),
-            [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+            [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
               id: convention.id,
               role: "validator",
               targetRoute: frontRoutes.manageConvention,
               email: validator2.email,
+              now: timeGateway.now(),
+            }),
+            [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
+              id: convention.id,
+              role: "counsellor",
+              targetRoute: frontRoutes.manageConvention,
+              email: councellor1.email,
+              now: timeGateway.now(),
+            }),
+            [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+              id: convention.id,
+              role: "counsellor",
+              targetRoute: frontRoutes.manageConvention,
+              email: councellor2.email,
               now: timeGateway.now(),
             }),
           });
@@ -224,25 +227,25 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           expectSavedNotificationsBatchAndEvent({
             emails: [
               makeAgencyFirstReminderEmail({
-                email: councellor1.email,
+                email: validator1.email,
                 agency: agencyWithRight,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
               }),
               makeAgencyFirstReminderEmail({
-                email: councellor2.email,
+                email: validator2.email,
                 agency: agencyWithRight,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
               }),
               makeAgencyFirstReminderEmail({
-                email: validator1.email,
+                email: councellor1.email,
                 agency: agencyWithRight,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
               }),
               makeAgencyFirstReminderEmail({
-                email: validator2.email,
+                email: councellor2.email,
                 agency: agencyWithRight,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
@@ -299,30 +302,30 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           expectToEqual(uow.shortLinkQuery.getShortLinks(), {
             [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
               id: convention.id,
-              role: "counsellor",
-              targetRoute: frontRoutes.manageConvention,
-              email: councellor1.email,
-              now: timeGateway.now(),
-            }),
-            [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-              id: convention.id,
-              role: "counsellor",
-              targetRoute: frontRoutes.manageConvention,
-              email: councellor2.email,
-              now: timeGateway.now(),
-            }),
-            [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-              id: convention.id,
               role: "validator",
               targetRoute: frontRoutes.manageConvention,
               email: validator1.email,
               now: timeGateway.now(),
             }),
-            [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+            [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
               id: convention.id,
               role: "validator",
               targetRoute: frontRoutes.manageConvention,
               email: validator2.email,
+              now: timeGateway.now(),
+            }),
+            [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
+              id: convention.id,
+              role: "counsellor",
+              targetRoute: frontRoutes.manageConvention,
+              email: councellor1.email,
+              now: timeGateway.now(),
+            }),
+            [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+              id: convention.id,
+              role: "counsellor",
+              targetRoute: frontRoutes.manageConvention,
+              email: councellor2.email,
               now: timeGateway.now(),
             }),
           });
@@ -330,22 +333,22 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           expectSavedNotificationsBatchAndEvent({
             emails: [
               makeAgencyLastReminderEmail({
-                email: councellor1.email,
+                email: validator1.email,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
               }),
               makeAgencyLastReminderEmail({
-                email: councellor2.email,
+                email: validator2.email,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
               }),
               makeAgencyLastReminderEmail({
-                email: validator1.email,
+                email: councellor1.email,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
               }),
               makeAgencyLastReminderEmail({
-                email: validator2.email,
+                email: councellor2.email,
                 convention,
                 shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
               }),
