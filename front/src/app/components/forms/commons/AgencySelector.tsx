@@ -8,6 +8,7 @@ import {
   type AgencyKind,
   type AgencyOption,
   type AllowedAgencyKindToAdd,
+  agencyKindList,
   agencyKindToLabel,
   allAgencyKindsAllowedToAdd,
   type ConventionReadDto,
@@ -290,10 +291,16 @@ const makeAgencyKindOptions = (
       value: agencyKind,
     }));
 
+  const sortedKinds = [...availableKinds].sort(
+    (a, b) =>
+      agencyKindList.findIndex((kind) => kind === a.value) -
+      agencyKindList.findIndex((kind) => kind === b.value),
+  );
+
   const optionalAllKindOption: AgencyKindOptions =
     shouldLockToPeAgencies || shouldFilterDelegationPrescriptionAgencyKind
       ? []
       : [{ label: "Toutes", value: "all" }];
 
-  return [...optionalAllKindOption, ...availableKinds];
+  return [...optionalAllKindOption, ...sortedKinds];
 };
