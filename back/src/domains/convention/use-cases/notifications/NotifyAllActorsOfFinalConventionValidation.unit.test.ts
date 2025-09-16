@@ -128,7 +128,10 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {
         [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator.id]: {
+          isNotifiedByEmail: true,
+          roles: ["validator", "counsellor"],
+        },
       }),
     ];
     uow.userRepository.users = [counsellor, validator];
@@ -153,14 +156,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         },
 
         {
-          role: "counsellor",
-          email: counsellor.email,
+          role: "validator",
+          email: validator.email,
           conventionShortlinkId: "conventionShortlinkId_5",
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "validator",
-          email: validator.email,
+          role: "counsellor",
+          email: counsellor.email,
           conventionShortlinkId: "conventionShortlinkId_6",
           assessmentCreationLinkId: undefined,
         },
@@ -258,14 +261,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "counsellor",
-          email: counsellor.email,
+          role: "validator",
+          email: validator.email,
           conventionShortlinkId: "conventionShortlinkId_5",
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "validator",
-          email: validator.email,
+          role: "counsellor",
+          email: counsellor.email,
           conventionShortlinkId: "conventionShortlinkId_6",
           assessmentCreationLinkId: undefined,
         },
@@ -369,14 +372,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "counsellor",
-          email: counsellor.email,
+          role: "validator",
+          email: validator.email,
           conventionShortlinkId: "conventionShortlinkId_5",
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "validator",
-          email: validator.email,
+          role: "counsellor",
+          email: counsellor.email,
           conventionShortlinkId: "conventionShortlinkId_6",
           assessmentCreationLinkId: undefined,
         },
@@ -480,14 +483,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           assessmentCreationLinkId: "assessmentCreationLinkId_1",
         },
         {
-          role: "counsellor",
-          email: counsellor.email,
+          role: "validator",
+          email: validator.email,
           conventionShortlinkId: "conventionShortlinkId_5",
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "validator",
-          email: validator.email,
+          role: "counsellor",
+          email: counsellor.email,
           conventionShortlinkId: "conventionShortlinkId_6",
           assessmentCreationLinkId: undefined,
         },
@@ -585,14 +588,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           assessmentCreationLinkId: "assessmentCreationLinkId_1",
         },
         {
-          role: "counsellor",
-          email: counsellor.email,
+          role: "validator",
+          email: validator.email,
           conventionShortlinkId: "conventionShortlinkId_5",
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "validator",
-          email: validator.email,
+          role: "counsellor",
+          email: counsellor.email,
           conventionShortlinkId: "conventionShortlinkId_6",
           assessmentCreationLinkId: undefined,
         },
@@ -705,14 +708,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           assessmentCreationLinkId: "assessmentCreationLinkId_1",
         },
         {
-          role: "counsellor",
-          email: counsellor.email,
+          role: "validator",
+          email: validator.email,
           conventionShortlinkId: "conventionShortlinkId_5",
           assessmentCreationLinkId: undefined,
         },
         {
-          role: "validator",
-          email: validator.email,
+          role: "counsellor",
+          email: counsellor.email,
           conventionShortlinkId: "conventionShortlinkId_6",
           assessmentCreationLinkId: undefined,
         },

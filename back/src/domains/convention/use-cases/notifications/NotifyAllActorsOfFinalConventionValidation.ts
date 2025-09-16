@@ -1,5 +1,5 @@
 import { parseISO } from "date-fns";
-import { uniq } from "ramda";
+import { uniqBy } from "ramda";
 import {
   type AgencyDto,
   type ConventionDto,
@@ -70,38 +70,41 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
 
     const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
-    const recipientsRoleAndEmail: { role: Role; email: Email }[] = uniq([
-      ...Object.values(convention.signatories).map((signatory) => ({
-        role: signatory.role,
-        email: signatory.email,
-      })),
-      ...(convention.signatories.establishmentRepresentative.email !==
-      convention.establishmentTutor.email
-        ? [
-            {
-              role: convention.establishmentTutor.role,
-              email: convention.establishmentTutor.email,
-            },
-          ]
-        : []),
-      ...agency.counsellorEmails.map(
-        (counsellorEmail): { role: Role; email: Email } => ({
-          role: "counsellor",
-          email: counsellorEmail,
-        }),
-      ),
-      ...agency.validatorEmails.map(
-        (validatorEmail): { role: Role; email: Email } => ({
-          role: "validator",
-          email: validatorEmail,
-        }),
-      ),
-      ...getFtAdvisorEmailAndRoleIfExist(
-        await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
-          convention.id,
+    const recipientsRoleAndEmail: { role: Role; email: Email }[] = uniqBy(
+      (recipient) => recipient.email,
+      [
+        ...Object.values(convention.signatories).map((signatory) => ({
+          role: signatory.role,
+          email: signatory.email,
+        })),
+        ...(convention.signatories.establishmentRepresentative.email !==
+        convention.establishmentTutor.email
+          ? [
+              {
+                role: convention.establishmentTutor.role,
+                email: convention.establishmentTutor.email,
+              },
+            ]
+          : []),
+        ...agency.validatorEmails.map(
+          (validatorEmail): { role: Role; email: Email } => ({
+            role: "validator",
+            email: validatorEmail,
+          }),
         ),
-      ),
-    ]);
+        ...agency.counsellorEmails.map(
+          (counsellorEmail): { role: Role; email: Email } => ({
+            role: "counsellor",
+            email: counsellorEmail,
+          }),
+        ),
+        ...getFtAdvisorEmailAndRoleIfExist(
+          await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+            convention.id,
+          ),
+        ),
+      ],
+    );
     for (const emailAndRole of recipientsRoleAndEmail) {
       const { role, email: recipient } = emailAndRole;
       await this.#saveNotificationAndRelatedEvent(uow, {
