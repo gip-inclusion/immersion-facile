@@ -12,6 +12,7 @@ export const absoluteUrlSchema = z
     /^https?:\/\/.+?$/,
     "Le format de saisie est invalide. Exemple : https://www.exemple.fr/chemin-du-lien",
   ) as ZodSchemaWithInputMatchingOutput<AbsoluteUrl>;
+export const absoluteUrlCanBeEmpty = absoluteUrlSchema.or(z.literal(""));
 
 export const callbackUrlSchema: ZodSchemaWithInputMatchingOutput<AbsoluteUrl> =
   absoluteUrlSchema.refine(

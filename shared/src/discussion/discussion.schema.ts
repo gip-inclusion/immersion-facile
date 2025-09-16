@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { absoluteUrlCanBeEmpty } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressSchema } from "../address/address.schema";
 import { discoverObjective } from "../convention/convention.dto";
@@ -232,6 +233,8 @@ const discussionLevelOfEducationSchema = z.enum(["3ème", "2nde"], {
   error: localization.invalidEnum,
 });
 
+const resumeLinkSchema = absoluteUrlCanBeEmpty.optional();
+
 export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionReadDto> =
   commonDiscussionSchema
     .and(
@@ -247,7 +250,7 @@ export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionRe
           kind: discussionKindIfSchema,
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
             immersionObjective: immersionObjectiveSchema.or(z.null()),
-            resumeLink: zStringCanBeEmpty.optional(),
+            resumeLink: resumeLinkSchema,
             hasWorkingExperience: z.boolean().optional(),
             experienceAdditionalInformation: zStringMinLength1.optional(),
           }),
@@ -341,7 +344,7 @@ const createDiscussionIFSchema: ZodSchemaWithInputMatchingOutput<CreateDiscussio
       immersionObjective: immersionObjectiveSchema,
       hasWorkingExperience: z.boolean(),
       experienceAdditionalInformation: zStringMinLength1.optional(),
-      potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
+      potentialBeneficiaryResumeLink: resumeLinkSchema,
     }),
   );
 
