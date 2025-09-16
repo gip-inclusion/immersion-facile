@@ -3,8 +3,8 @@ import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import { addDays, differenceInCalendarDays, subMonths } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
-import { HeadingSection, Task } from "react-design-system";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { HeadingSection, Loader, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
@@ -33,6 +33,7 @@ export const AgencyTasks = ({
 }) => {
   const dispatch = useDispatch();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const isLoading = useAppSelector(connectedUserConventionsSelectors.isLoading);
   const currentUserConventions = useAppSelector(
     connectedUserConventionsSelectors.conventions,
   );
@@ -51,25 +52,39 @@ export const AgencyTasks = ({
     [],
   );
 
-  useEffect(() => {
-    if (connectedUserJwt) {
-      dispatch(
-        connectedUserConventionsSlice.actions.getConventionsForConnectedUserRequested(
-          {
-            params: {
-              ...dateStartFrom1MonthAgoToIn5Days,
-              sortBy: "dateStart",
-              sortOrder: "asc",
-              page: 1,
-              perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE,
+  const getConventionsForConnectedUserRequested = useCallback(
+    (page: number) => {
+      if (connectedUserJwt) {
+        dispatch(
+          connectedUserConventionsSlice.actions.getConventionsForConnectedUserRequested(
+            {
+              params: {
+                ...dateStartFrom1MonthAgoToIn5Days,
+                sortBy: "dateStart",
+                sortOrder: "asc",
+                page: page,
+                perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE,
+              },
+              jwt: connectedUserJwt,
+              feedbackTopic: "connected-user-conventions",
             },
-            jwt: connectedUserJwt,
-            feedbackTopic: "connected-user-conventions",
-          },
-        ),
-      );
-    }
-  }, [dispatch, connectedUserJwt, dateStartFrom1MonthAgoToIn5Days]);
+          ),
+        );
+      }
+    },
+    [connectedUserJwt, dateStartFrom1MonthAgoToIn5Days, dispatch],
+  );
+
+  const onPaginationClick = useCallback(
+    (pageNumber: number) => {
+      getConventionsForConnectedUserRequested(pageNumber);
+    },
+    [getConventionsForConnectedUserRequested],
+  );
+
+  useEffect(() => {
+    getConventionsForConnectedUserRequested(1);
+  }, [getConventionsForConnectedUserRequested]);
 
   useEffect(() => {
     setConventionsDisplayed(
@@ -82,26 +97,6 @@ export const AgencyTasks = ({
     );
   }, [currentUserConventions, displayMode]);
 
-  const onPaginationClick = (page: number) => {
-    if (connectedUserJwt) {
-      dispatch(
-        connectedUserConventionsSlice.actions.getConventionsForConnectedUserRequested(
-          {
-            params: {
-              ...dateStartFrom1MonthAgoToIn5Days,
-              sortBy: "dateStart",
-              sortOrder: "asc",
-              page: page,
-              perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE,
-            },
-            jwt: connectedUserJwt,
-            feedbackTopic: "connected-user-conventions",
-          },
-        ),
-      );
-    }
-  };
-
   return (
     <HeadingSection
       title="Tâches à traiter"
@@ -111,35 +106,44 @@ export const AgencyTasks = ({
       {pagination?.totalRecords === 0 && (
         <p>Aucune convention à traiter en urgence.</p>
       )}
-      {pagination?.totalRecords &&
-        pagination?.totalRecords > 3 &&
-        displayMode === "limited" &&
-        onSeeAllConventionsClick && (
-          <Button
-            onClick={onSeeAllConventionsClick}
-            priority="secondary"
-            className={fr.cx("fr-mb-2w")}
-          >
-            Voir tout ({pagination.totalRecords})
-          </Button>
-        )}
-      {conventionsDisplayed.map((convention) => (
-        <AgencyTaskItem key={convention.id} convention={convention} />
-      ))}
-      {displayMode === "paginated" && (
-        <Pagination
-          count={pagination?.totalPages ?? 1}
-          defaultPage={pagination?.currentPage ?? 1}
-          getPageLinkProps={(pageNumber) => ({
-            title: `Résultats de recherche, page : ${pageNumber}`,
-            href: "#",
-            key: `page-${pageNumber}`,
-            onClick: (event) => {
-              event.preventDefault();
-              onPaginationClick(pageNumber);
-            },
-          })}
-        />
+      {isLoading && <Loader />}
+      {!isLoading && (
+        <>
+          {pagination?.totalRecords &&
+            pagination?.totalRecords > 3 &&
+            displayMode === "limited" &&
+            onSeeAllConventionsClick && (
+              <Button
+                onClick={onSeeAllConventionsClick}
+                priority="secondary"
+                className={fr.cx("fr-mb-2w")}
+              >
+                Voir tout ({pagination.totalRecords})
+              </Button>
+            )}
+          {conventionsDisplayed.map((convention) => (
+            <AgencyTaskItem key={convention.id} convention={convention} />
+          ))}
+          {displayMode === "paginated" &&
+            pagination &&
+            pagination?.totalRecords >
+              NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE && (
+              <Pagination
+                className={fr.cx("fr-mt-3w")}
+                count={pagination.totalPages}
+                defaultPage={pagination.currentPage}
+                getPageLinkProps={(pageNumber) => ({
+                  title: `Résultats de recherche, page : ${pageNumber}`,
+                  href: "#",
+                  key: `page-${pageNumber}`,
+                  onClick: (event) => {
+                    event.preventDefault();
+                    onPaginationClick(pageNumber);
+                  },
+                })}
+              />
+            )}
+        </>
       )}
     </HeadingSection>
   );
