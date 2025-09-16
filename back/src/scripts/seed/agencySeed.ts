@@ -69,6 +69,15 @@ export const agencySeed = async (
         }),
       ),
     ),
+    "fonction-publique": await Promise.all(
+      [...Array(agenciesCountByKind).keys()].map(() =>
+        insertAgencySeed({
+          uow,
+          kind: "fonction-publique",
+          userId: seedUsers.adminUser.id,
+        }),
+      ),
+    ),
     cci: await Promise.all(
       [...Array(agenciesCountByKind).keys()].map(() =>
         insertAgencySeed({
