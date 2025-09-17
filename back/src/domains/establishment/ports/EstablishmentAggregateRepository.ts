@@ -1,6 +1,7 @@
 import type {
   AppellationAndRomeDto,
   AppellationCode,
+  DataWithPagination,
   DateTimeIsoString,
   LocationId,
   SearchResultDto,
@@ -23,7 +24,7 @@ export type SearchImmersionResult = SearchResultDto & {
   nextAvailabilityDate?: DateTimeIsoString;
 };
 
-export type SearchImmersionParams = {
+export type LegacySearchImmersionParams = {
   searchMade: SearchMade;
   fitForDisabledWorkers?: boolean;
   maxResults?: number;
@@ -67,10 +68,12 @@ export interface EstablishmentAggregateRepository {
     appellationCode: AppellationCode,
     locationId: LocationId,
   ): Promise<RepositorySearchResultDto | undefined>;
-  searchImmersionResults(
-    searchImmersionParams: SearchImmersionParams,
+  legacySearchImmersionResults(
+    searchImmersionParams: LegacySearchImmersionParams,
   ): Promise<RepositorySearchImmertionResult[]>;
-
+  getOffers(
+    searchImmersionParams: LegacySearchImmersionParams,
+  ): Promise<DataWithPagination<RepositorySearchImmertionResult>>;
   //Sirets
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;
   getSiretOfEstablishmentsToSuggestUpdate(before: Date): Promise<SiretDto[]>;

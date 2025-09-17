@@ -2,9 +2,9 @@ import {
   type ApiConsumer,
   type AppellationCode,
   errors,
-  type SearchQueryParamsDto,
+  type LegacySearchQueryParamsDto,
+  legacySearchParamsSchema,
   type SearchResultDto,
-  searchParamsSchema,
   type WithNafCodes,
 } from "shared";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -16,11 +16,11 @@ import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export class LegacySearchImmersion extends TransactionalUseCase<
-  SearchQueryParamsDto,
+  LegacySearchQueryParamsDto,
   SearchResultDto[],
   ApiConsumer
 > {
-  protected inputSchema = searchParamsSchema;
+  protected inputSchema = legacySearchParamsSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -46,7 +46,7 @@ export class LegacySearchImmersion extends TransactionalUseCase<
       acquisitionKeyword,
       fitForDisabledWorkers,
       nafCodes,
-    }: SearchQueryParamsDto,
+    }: LegacySearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchResultDto[]> {
@@ -66,19 +66,19 @@ export class LegacySearchImmersion extends TransactionalUseCase<
     };
     const geoParams = { lat, lon, distanceKm };
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
-      uow.establishmentAggregateRepository.searchImmersionResults({
+      uow.establishmentAggregateRepository.legacySearchImmersionResults({
         searchMade,
         fitForDisabledWorkers,
         maxResults: 100,
       }),
       shouldFetchLBB(appellationCodes, voluntaryToImmersion) &&
-      hasSearchGeoParams(geoParams)
+        hasSearchGeoParams(geoParams)
         ? this.#searchOnLbb({
-            uow,
-            appellationCodes: appellationCodes as AppellationCode[],
-            ...geoParams,
-            nafCodes,
-          })
+          uow,
+          appellationCodes: appellationCodes as AppellationCode[],
+          ...geoParams,
+          nafCodes,
+        })
         : [],
     ]);
 
