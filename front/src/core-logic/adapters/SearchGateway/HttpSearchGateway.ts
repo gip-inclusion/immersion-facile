@@ -3,7 +3,7 @@ import type {
   CreateDiscussionDto,
   GroupSlug,
   GroupWithResults,
-  SearchQueryParamsDto,
+  LegacySearchQueryParamsDto,
   SearchResultDto,
   SearchResultQuery,
   SearchRoutes,
@@ -80,7 +80,7 @@ export class HttpSearchGateway implements SearchGateway {
   }
 
   public search$(
-    searchParams: SearchQueryParamsDto,
+    searchParams: LegacySearchQueryParamsDto,
   ): Observable<SearchResultDto[]> {
     return from(
       this.httpClient

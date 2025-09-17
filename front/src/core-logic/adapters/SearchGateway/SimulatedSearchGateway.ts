@@ -4,7 +4,7 @@ import {
   type CreateDiscussionDto,
   type GroupSlug,
   type GroupWithResults,
-  type SearchQueryParamsDto,
+  type LegacySearchQueryParamsDto,
   type SearchResultDto,
   type SiretAndAppellationDto,
   sleep,
@@ -88,7 +88,7 @@ export class SimulatedSearchGateway implements SearchGateway {
   }
 
   public search$(
-    searchParams: SearchQueryParamsDto,
+    searchParams: LegacySearchQueryParamsDto,
   ): Observable<SearchResultDto[]> {
     if (this.#error) throw this.#error;
     return this.#simulateSearch(searchParams);
@@ -100,7 +100,7 @@ export class SimulatedSearchGateway implements SearchGateway {
     return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
   }
 
-  #simulateSearch(searchParams: SearchQueryParamsDto) {
+  #simulateSearch(searchParams: LegacySearchQueryParamsDto) {
     const results$ = of(this.#seedResults ?? seedSearchResults);
     if (searchParams.voluntaryToImmersion === undefined) return results$;
     return results$.pipe(

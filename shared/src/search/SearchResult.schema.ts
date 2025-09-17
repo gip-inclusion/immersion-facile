@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
+import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -56,3 +57,6 @@ export const searchResultSchema: ZodSchemaWithInputMatchingOutput<SearchResultDt
   });
 
 export const searchResultsSchema = z.array(searchResultSchema);
+
+export const paginatedSearchResultsSchema =
+  createPaginatedSchema(searchResultSchema);
