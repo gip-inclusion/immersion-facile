@@ -10,7 +10,7 @@ import {
   zToBoolean,
   zToNumber,
 } from "../zodUtils";
-import type { SearchQueryParamsDto } from "./SearchQueryParams.dto";
+import type { LegacySearchQueryParamsDto } from "./SearchQueryParams.dto";
 
 export const distanceKmSchema = z.coerce
   .number()
@@ -34,7 +34,7 @@ const geoParamsSchema = z.discriminatedUnion("sortedBy", [
   }),
 ]);
 
-export const searchParamsSchema: ZodSchemaWithInputMatchingOutput<SearchQueryParamsDto> =
+export const legacySearchParamsSchema: ZodSchemaWithInputMatchingOutput<LegacySearchQueryParamsDto> =
   z
     .object({
       appellationCodes: z.array(appellationCodeSchema).optional(),

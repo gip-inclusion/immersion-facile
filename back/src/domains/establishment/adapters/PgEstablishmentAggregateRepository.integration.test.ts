@@ -115,7 +115,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 1 closest establishment with `maxResults` at 1", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: searchMadeDistanceWithoutRome,
               maxResults: 1,
             }),
@@ -135,7 +135,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 2 closest establishments with `maxResults` at 2", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: searchMadeDistanceWithoutRome,
               maxResults: 2,
             }),
@@ -164,7 +164,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 2 closest establishments with `maxResults` at 3 without too far establishment", async () => {
           expectArraysToMatch(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: searchMadeDistanceWithoutRome,
               maxResults: 3,
             }),
@@ -250,7 +250,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           );
 
           const sortedByDateResults =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 ...searchMadeDistanceWithoutRome,
                 sortedBy: "date",
@@ -261,7 +261,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           expectArraysToEqual(sortedByDateResults, expectedResults);
 
           const sortedByScoreResults =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 ...searchMadeDistanceWithoutRome,
                 sortedBy: "score",
@@ -271,7 +271,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           expectArraysToEqual(sortedByScoreResults, expectedResults);
 
           const sortedByDistanceResults =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 ...searchMadeDistanceWithoutRome,
                 sortedBy: "distance",
@@ -298,7 +298,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it(`with "establishmentSearchableBy:'students'" return only establishments SearchImmersionResults searchable by student`, async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: {
                   ...cartographeSearchMade,
                   establishmentSearchableBy: "students",
@@ -329,7 +329,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it(`with "establishmentSearchableBy:'jobSeekers'" return only establishments SearchImmersionResults searchable by jobseekers`, async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: {
                   ...cartographeSearchMade,
                   establishmentSearchableBy: "jobSeekers",
@@ -360,7 +360,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it('with"establishmentSearchableBy" not defined return all establishment SearchImmersionResults', async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: cartographeSearchMade,
               });
 
@@ -414,7 +414,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
             // Act & Assert
             expectToEqual(
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: searchMadeDistanceWithoutRome,
               }),
               [
@@ -470,7 +470,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
             // Act
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: {
                   sortedBy: "date",
                   distanceKm: 100,
@@ -550,7 +550,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with all naf when naf filter is not provided", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: {},
               });
 
@@ -603,7 +603,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with all naf when naf filter is empty", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: { nafCodes: [] },
               });
 
@@ -656,7 +656,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with naf when naf filter is provided with one value", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: {
                   nafCodes: [establishment0145Z_A.establishment.nafDto.code],
                 },
@@ -686,7 +686,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with different naf when naf filter is provided with multiple values", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
                 searchMade: {
                   nafCodes: [
                     establishment0145Z_A.establishment.nafDto.code,
@@ -766,7 +766,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("without param", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 distanceKm: 10,
                 lat: fitForDisabledWorkers.establishment.locations[0].position
@@ -799,7 +799,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("with param false", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 distanceKm: 10,
                 lat: fitForDisabledWorkers.establishment.locations[0].position
@@ -824,7 +824,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("with param true", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 distanceKm: 10,
                 lat: fitForDisabledWorkers.establishment.locations[0].position
@@ -850,7 +850,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("returns empty list when repo is empty", async () => {
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: cartographeSearchMade,
           }),
           [],
@@ -863,7 +863,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: {
               lat: undefined,
               lon: undefined,
@@ -916,7 +916,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Assert
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: cartographeSearchMade,
           }),
           [
@@ -974,7 +974,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: cartographeSearchMade,
           }),
           [
@@ -991,7 +991,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
           }),
           [],
@@ -1011,7 +1011,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("search results with multiple locations and with matching rome code", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "date",
                 distanceKm: 50,
@@ -1044,7 +1044,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("no search results with multiple locations and without matching rome code", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "date",
                 distanceKm: 100,
@@ -1095,7 +1095,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
               maxResults: 2,
             });
@@ -1149,7 +1149,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: { ...cartographeSearchMade, sortedBy: "date" },
               maxResults: 2,
             });
@@ -1225,7 +1225,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: { ...cartographeSearchMade, sortedBy: "score" },
             });
           // Assert
@@ -1285,7 +1285,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Act
         const searchResult =
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: {
               ...cartographeSearchMade,
               sortedBy: "date",
@@ -1347,7 +1347,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         const searchResults =
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: {
               ...aggregateWithOptionalValues.establishment.locations[0]
                 .position,
@@ -1405,7 +1405,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Act
         const searchResults: SearchResultDto[] =
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
             searchMade: {
               sortedBy: "date",
             },
@@ -1420,7 +1420,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw on a search made with sortedBy distance and no geo params are provided", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
               },
@@ -1431,7 +1431,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if only one of the geo params is provided (lat/lon/distanceKm)", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 45,
@@ -1443,7 +1443,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if all geo params value is 0 and sorted by distance", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
@@ -1458,7 +1458,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if all geo params value is 0 but distanceKm > 0 and sorted by distance", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
@@ -1473,7 +1473,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if lat / lon are 0 but distanceKm is provided and not 0 and sorted by distance", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
@@ -1487,7 +1487,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if one of the geo params value is 0", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
