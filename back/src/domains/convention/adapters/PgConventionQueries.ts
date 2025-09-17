@@ -119,10 +119,8 @@ export class PgConventionQueries implements ConventionQueries {
 
   public async getConventionsMarketingData({
     siret,
-    status,
   }: {
     siret: SiretDto;
-    status: ConventionStatus;
   }): Promise<ConventionMarketingData[]> {
     const result = await this.transaction
       .selectFrom("conventions")
@@ -139,7 +137,7 @@ export class PgConventionQueries implements ConventionQueries {
       .select("er.last_name as establishment_representative_lastname")
       .select("conventions.establishment_number_employees")
       .where("conventions.siret", "=", siret)
-      .where("conventions.status", "=", status)
+      .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .orderBy("conventions.date_validation", "asc")
       .execute();
 

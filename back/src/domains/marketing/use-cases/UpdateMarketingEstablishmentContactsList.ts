@@ -46,7 +46,6 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
       const validatedConventionsData =
         await uow.conventionQueries.getConventionsMarketingData({
           siret: siret,
-          status: "ACCEPTED_BY_VALIDATOR",
         });
 
       return establishment
