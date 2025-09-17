@@ -64,22 +64,22 @@ type PartnerApiCall = {
   route: RouteMethodAndUrl;
   durationInMs: number;
   response:
-  | { kind: "cache-hit" }
-  | {
-    kind: "success";
-    status: number;
-  }
-  | {
-    kind: "failure";
-    status: number;
-    body: Record<string, unknown>;
-    headers?: unknown;
-    input?: {
-      body?: unknown;
-      queryParams?: unknown;
-      urlParams?: unknown;
-    };
-  };
+    | { kind: "cache-hit" }
+    | {
+        kind: "success";
+        status: number;
+      }
+    | {
+        kind: "failure";
+        status: number;
+        body: Record<string, unknown>;
+        headers?: unknown;
+        input?: {
+          body?: unknown;
+          queryParams?: unknown;
+          urlParams?: unknown;
+        };
+      };
 };
 
 type ApiConsumerCall = {
@@ -180,85 +180,85 @@ export const createLogger = (filename: string): OpacifiedLogger => {
 
   const makeLogFunction =
     (method: LogMethod): LoggerFunction =>
-      ({
-        partnerApiCall,
-        cacheKey,
+    ({
+      partnerApiCall,
+      cacheKey,
+      adapters,
+      agencyId,
+      conventionId,
+      crawlerInfo,
+      durationInSeconds,
+      error,
+      events,
+      message,
+      nodeProcessReport,
+      notificationId,
+      ftConnect,
+      reportContent,
+      request,
+      requestId,
+      sharedRouteResponse,
+      subscriberResponse,
+      axiosResponse,
+      searchMade,
+      searchLBB,
+      logStatus,
+      authorisationStatus,
+      franceTravailGatewayStatus,
+      subscriptionId,
+      topic,
+      useCaseName,
+      searchParams,
+      siret,
+      romeLabel,
+      apiConsumerCall,
+      crispTicket,
+      reportTitle,...rest
+    }) => {
+      const _noValuesForgotten: Record<string, never> = rest;
+      if (method === "level") return {};
+
+      const opacifiedLogContent = {
         adapters,
+        apiConsumerCall,
         agencyId,
         conventionId,
         crawlerInfo,
         durationInSeconds,
         error,
-        events,
-        message,
+        events: sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
         ftConnect,
         reportContent,
         request,
         requestId,
-        sharedRouteResponse,
+        sharedRouteResponse: sanitizeSharedRouteResponse(sharedRouteResponse),
         subscriberResponse,
         axiosResponse,
         searchMade,
         searchLBB,
-        logStatus,
+        status: logStatus ?? logMethodToLogStatus[method],
         authorisationStatus,
         franceTravailGatewayStatus,
         subscriptionId,
         topic,
         useCaseName,
         searchParams,
+        partnerApiCall,
         siret,
         romeLabel,
-        apiConsumerCall,
+        cacheKey,
         crispTicket,
-        reportTitle,...rest
-      }) => {
-        const _noValuesForgotten: Record<string, never> = rest;
-        if (method === "level") return {};
-
-        const opacifiedLogContent = {
-          adapters,
-          apiConsumerCall,
-          agencyId,
-          conventionId,
-          crawlerInfo,
-          durationInSeconds,
-          error,
-          events: sanitizeEvents(events),
-          nodeProcessReport,
-          notificationId,
-          ftConnect,
-          reportContent,
-          request,
-          requestId,
-          sharedRouteResponse: sanitizeSharedRouteResponse(sharedRouteResponse),
-          subscriberResponse,
-          axiosResponse,
-          searchMade,
-          searchLBB,
-          status: logStatus ?? logMethodToLogStatus[method],
-          authorisationStatus,
-          franceTravailGatewayStatus,
-          subscriptionId,
-          topic,
-          useCaseName,
-          searchParams,
-          partnerApiCall,
-          siret,
-          romeLabel,
-          cacheKey,
-          crispTicket,
-        };
-
-        const opacifiedWithoutNullOrUndefined = pickBy(
-          complement(isNil),
-          opacifiedLogContent,
-        );
-
-        logger[method](opacifiedWithoutNullOrUndefined, message);
       };
+
+      const opacifiedWithoutNullOrUndefined = pickBy(
+        complement(isNil),
+        opacifiedLogContent,
+      );
+
+      logger[method](opacifiedWithoutNullOrUndefined, message);
+    };
 
   return {
     debug: makeLogFunction("debug"),

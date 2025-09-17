@@ -72,13 +72,13 @@ export class LegacySearchImmersion extends TransactionalUseCase<
         maxResults: 100,
       }),
       shouldFetchLBB(appellationCodes, voluntaryToImmersion) &&
-        hasSearchGeoParams(geoParams)
+      hasSearchGeoParams(geoParams)
         ? this.#searchOnLbb({
-          uow,
-          appellationCodes: appellationCodes as AppellationCode[],
-          ...geoParams,
-          nafCodes,
-        })
+            uow,
+            appellationCodes: appellationCodes as AppellationCode[],
+            ...geoParams,
+            nafCodes,
+          })
         : [],
     ]);
 
