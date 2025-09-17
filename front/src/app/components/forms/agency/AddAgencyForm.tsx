@@ -26,7 +26,7 @@ import {
 } from "shared";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
-import { agencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
+import { agencyKindListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import {
   AgencySelector,
   departmentOptions,
@@ -169,12 +169,6 @@ const AgencyForm = ({
 
   const [hasDelegation, setHasDelegation] = useState<boolean | null>(null);
   const selectedKind = watch("kind");
-  const sortedAgencyOptions = agencyListOfOptions.sort((a, b) => {
-    if (typeof a.label === "string" && typeof b.label === "string") {
-      return a.label.localeCompare(b.label);
-    }
-    return 0;
-  });
 
   const onDepartmentCodeChangedMemoized = useCallback(
     (departmentCode: DepartmentCode) =>
@@ -248,7 +242,7 @@ const AgencyForm = ({
         <Select
           label={formContents.kind.label}
           hint={formContents.kind.hintText}
-          options={sortedAgencyOptions}
+          options={agencyKindListOfOptions}
           placeholder={formContents.kind.placeholder}
           nativeSelectProps={{
             ...formContents.kind,

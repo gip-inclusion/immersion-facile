@@ -18,7 +18,7 @@ import {
   conventionScopeKeys,
   domElementIds,
 } from "shared";
-import { allAgencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
+import { allAgencyKindListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
@@ -224,7 +224,7 @@ export const ApiConsumerForm = ({
                       id: domElementIds.admin.technicalOptionsTab
                         .apiConsumerConventionScopeAgencyKindsInput,
                     }}
-                    options={allAgencyListOfOptions}
+                    options={allAgencyKindListOfOptions}
                   />
                 )}
                 {isScopeKeyInConventionScope(

@@ -13,13 +13,13 @@ const allAgencyKindToLabel: Record<AgencyKind, string> = {
   "prepa-apprentissage": "Prépa Apprentissage",
 };
 
-export const agencyListOfOptions: SelectProps.Option<AllowedAgencyKindToAdd>[] =
+export const agencyKindListOfOptions: SelectProps.Option<AllowedAgencyKindToAdd>[] =
   allAgencyKindsAllowedToAdd.map((agencyKind) => ({
     value: agencyKind,
     label: agencyKindToLabel[agencyKind],
   }));
 
-export const allAgencyListOfOptions: SelectProps.Option<AgencyKind>[] =
+export const allAgencyKindListOfOptions: SelectProps.Option<AgencyKind>[] =
   orderedAgencyKindList.map((agencyKind) => ({
     value: agencyKind,
     label: allAgencyKindToLabel[agencyKind],
