@@ -10,9 +10,10 @@ import type {
   DiscussionStatus,
   Email,
   LocationId,
-  PaginationQueryParams,
   SiretDto,
   UserId,
+  WithRequiredPagination,
+  WithSort,
 } from "shared";
 
 export type HasDiscussionMatchingParams = {
@@ -35,18 +36,15 @@ export type GetDiscussionsParams = {
   limit: number;
 };
 
-export type GetPaginatedDiscussionsForUserParams = {
-  filters?: {
-    statuses?: DiscussionStatus[];
-    search?: string;
+export type GetPaginatedDiscussionsForUserParams =
+  WithRequiredPagination &
+  WithSort<DiscussionOrderKey> & {
+    filters?: {
+      statuses?: DiscussionStatus[];
+      search?: string;
+    };
+    userId: UserId;
   };
-  order: {
-    by: DiscussionOrderKey;
-    direction: "asc" | "desc";
-  };
-  pagination: Required<PaginationQueryParams>;
-  userId: UserId;
-};
 
 export interface DiscussionRepository {
   insert: (discussion: DiscussionDto) => Promise<void>;
