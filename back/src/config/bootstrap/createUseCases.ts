@@ -135,6 +135,7 @@ import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/esta
 import { makeGetEstablishmentNameAndAdmins } from "../../domains/establishment/use-cases/GetEstablishmentNameAndAdmins";
 import { makeGetExternalSearchResult } from "../../domains/establishment/use-cases/GetExternalSearchResult";
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
+import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
 import { LegacyContactEstablishment } from "../../domains/establishment/use-cases/LegacyContactEstablishment";
@@ -629,6 +630,13 @@ export const createUseCases = ({
           similarConventionIds:
             await uow.conventionQueries.findSimilarConventions(params),
         })),
+    }),
+
+    getOffers: makeGetOffers({
+      uowPerformer,
+      deps: {
+        uuidGenerator,
+      },
     }),
 
     addAgenciesAndUsers: makeAddAgenciesAndUsers({

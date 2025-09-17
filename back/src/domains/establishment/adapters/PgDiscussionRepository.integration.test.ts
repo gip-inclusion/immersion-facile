@@ -717,7 +717,7 @@ describe("PgDiscussionRepository", () => {
             page: 1,
             perPage: 10,
           },
-          order: { by: "createdAt", direction: "desc" },
+          sort: { by: "createdAt", order: "desc" },
           userId: user.id,
         });
 
@@ -737,7 +737,7 @@ describe("PgDiscussionRepository", () => {
             page: 1,
             perPage: 10,
           },
-          order: { by: "createdAt", direction: "asc" },
+          sort: { by: "createdAt", order: "asc" },
           userId: user.id,
         });
 
@@ -762,7 +762,7 @@ describe("PgDiscussionRepository", () => {
             page: 1,
             perPage: 10,
           },
-          order: { by: "createdAt", direction: "desc" },
+          sort: { by: "createdAt", order: "desc" },
           userId: user.id,
         });
 
@@ -788,7 +788,7 @@ describe("PgDiscussionRepository", () => {
               page: 1,
               perPage: 10,
             },
-            order: { by: "createdAt", direction: "desc" },
+            sort: { by: "createdAt", order: "desc" },
             userId: user.id,
           });
 
@@ -813,7 +813,7 @@ describe("PgDiscussionRepository", () => {
               page: 1,
               perPage: 10,
             },
-            order: { by: "createdAt", direction: "desc" },
+            sort: { by: "createdAt", order: "desc" },
             userId: user.id,
           });
 
@@ -838,7 +838,7 @@ describe("PgDiscussionRepository", () => {
               page: 1,
               perPage: 10,
             },
-            order: { by: "createdAt", direction: "desc" },
+            sort: { by: "createdAt", order: "desc" },
             userId: user.id,
           });
 
@@ -863,7 +863,7 @@ describe("PgDiscussionRepository", () => {
               page: 1,
               perPage: 10,
             },
-            order: { by: "createdAt", direction: "desc" },
+            sort: { by: "createdAt", order: "desc" },
             userId: user.id,
           });
 
@@ -888,7 +888,7 @@ describe("PgDiscussionRepository", () => {
               page: 1,
               perPage: 10,
             },
-            order: { by: "createdAt", direction: "desc" },
+            sort: { by: "createdAt", order: "desc" },
             userId: user.id,
           });
 
@@ -913,7 +913,7 @@ describe("PgDiscussionRepository", () => {
               page: 1,
               perPage: 10,
             },
-            order: { by: "createdAt", direction: "desc" },
+            sort: { by: "createdAt", order: "desc" },
             userId: user.id,
           });
 
@@ -937,7 +937,7 @@ describe("PgDiscussionRepository", () => {
             perPage: 1,
           },
           userId: user.id,
-          order: { by: "createdAt", direction: "desc" },
+          sort: { by: "createdAt", order: "desc" },
         });
 
       expectToEqual(resultPage1, {
@@ -957,7 +957,7 @@ describe("PgDiscussionRepository", () => {
             perPage: 1,
           },
           userId: user.id,
-          order: { by: "createdAt", direction: "desc" },
+          sort: { by: "createdAt", order: "desc" },
         });
 
       expectToEqual(resultPage2, {

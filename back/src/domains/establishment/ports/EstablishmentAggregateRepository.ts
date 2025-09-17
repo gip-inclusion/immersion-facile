@@ -38,12 +38,12 @@ export type LegacySearchImmersionParams = {
 
 type GetOffersFilters = {
   appellationCodes?: AppellationCode[];
-  fitForDisabledWorkers?: boolean; // returns all if not defined
+  fitForDisabledWorkers?: boolean; // if not defined -> return all
   geoParams?: GeoParams;
   locationIds?: LocationId[];
   nafCodes?: NafCode[];
   romeCodes?: RomeCode[];
-  searchableBy?: EstablishmentSearchableByValue; // returns all if not defined
+  searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
   sirets?: SiretDto[];
 };
 

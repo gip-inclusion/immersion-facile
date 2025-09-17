@@ -50,9 +50,9 @@ export const flatDiscussionQueryParamsToGetPaginatedDiscussionsParams = (
         ...(isSearchDefined && { search }),
       },
     }),
-    order: {
+    sort: {
       by: orderBy || "createdAt",
-      direction: orderDirection || "desc",
+      order: orderDirection || "desc",
     },
     pagination,
   };
