@@ -4,10 +4,10 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type LegacySearchQueryParamsDto,
+  type LegacySearchQueryParamsWithGeoParams,
   type NafCode,
   type RomeDto,
-  type SearchQueryParamsDto,
-  type SearchQueryParamsWithGeoParams,
   type SearchResultDto,
 } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -111,18 +111,18 @@ const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
   .build();
 
 describe("LegacySearchImmersionUseCase", () => {
-  const searchWithMinimalParams: SearchQueryParamsDto = {
+  const searchWithMinimalParams: LegacySearchQueryParamsDto = {
     sortedBy: "date",
   };
 
-  const searchInMetzParams: SearchQueryParamsWithGeoParams = {
+  const searchInMetzParams: LegacySearchQueryParamsWithGeoParams = {
     distanceKm: 30,
     longitude: 6.17602,
     latitude: 49.119146,
     sortedBy: "distance",
   };
 
-  const searchSecretariatInMetzRequestDto: SearchQueryParamsDto = {
+  const searchSecretariatInMetzRequestDto: LegacySearchQueryParamsDto = {
     ...searchInMetzParams,
     appellationCodes: [secretariatOffer.appellationCode],
   };
@@ -696,7 +696,7 @@ describe("LegacySearchImmersionUseCase", () => {
       ];
       laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-      const searchParams: SearchQueryParamsDto = {
+      const searchParams: LegacySearchQueryParamsDto = {
         ...searchInMetzParams,
         establishmentSearchableBy: "students",
       };
@@ -748,7 +748,7 @@ describe("LegacySearchImmersionUseCase", () => {
       ];
       laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-      const searchParams: SearchQueryParamsDto = {
+      const searchParams: LegacySearchQueryParamsDto = {
         ...searchInMetzParams,
         establishmentSearchableBy: "jobSeekers",
       };
@@ -800,7 +800,7 @@ describe("LegacySearchImmersionUseCase", () => {
       ];
       laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-      const searchParams: SearchQueryParamsDto = {
+      const searchParams: LegacySearchQueryParamsDto = {
         ...searchInMetzParams,
       };
 

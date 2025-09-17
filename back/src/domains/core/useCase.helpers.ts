@@ -1,10 +1,10 @@
-import type { SearchQueryParamsDto } from "shared";
+import type { LegacySearchQueryParamsDto } from "shared";
 
 export const getSearchParams = (
   useCaseName: string,
   params: unknown,
-): SearchQueryParamsDto | undefined => {
-  if (useCaseName === "SearchImmersion") return params as SearchQueryParamsDto;
+): LegacySearchQueryParamsDto | undefined => {
+  if (useCaseName === "SearchImmersion") return params as LegacySearchQueryParamsDto;
 };
 
 export const extractValue = (
