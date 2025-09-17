@@ -6,6 +6,7 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
+  type ConventionStatus,
   conventionSchema,
   type DataWithPagination,
   errors,
@@ -19,6 +20,7 @@ import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
 import type {
+  ConventionMarketingData,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -102,6 +104,42 @@ export class InMemoryConventionQueries implements ConventionQueries {
           logger,
         }),
       );
+  }
+
+  public async getConventionsMarketingData({
+    siret,
+    status,
+  }: {
+    siret: SiretDto;
+    status: ConventionStatus;
+  }): Promise<ConventionMarketingData[]> {
+    return this.conventionRepository.conventions
+      .filter(
+        (convention) =>
+          convention.siret === siret && convention.status === status,
+      )
+      .sort((a, b) => {
+        const aDate = a.dateValidation;
+        const bDate = b.dateValidation;
+
+        if (!aDate) return 1;
+        if (!bDate) return -1;
+
+        return new Date(aDate).getTime() - new Date(bDate).getTime();
+      })
+      .map((convention) => ({
+        siret: convention.siret,
+        dateValidation: convention.dateValidation || undefined,
+        dateEnd: convention.dateEnd,
+        establishmentRepresentative: {
+          email: convention.signatories.establishmentRepresentative.email,
+          firstName:
+            convention.signatories.establishmentRepresentative.firstName,
+          lastName: convention.signatories.establishmentRepresentative.lastName,
+        },
+        establishmentNumberEmployeesRange:
+          convention.establishmentNumberEmployeesRange || undefined,
+      }));
   }
 
   public async getPaginatedConventionsForAgencyUser(
