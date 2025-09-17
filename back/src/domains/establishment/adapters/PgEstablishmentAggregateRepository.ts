@@ -7,6 +7,7 @@ import {
   type AppellationCode,
   type AppellationDto,
   castError,
+  type DataWithPagination,
   type DateTimeIsoString,
   type EstablishmentSearchableByValue,
   errors,
@@ -30,6 +31,7 @@ import type { GeoParams } from "../entities/SearchMadeEntity";
 import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
+  GetOffersParams,
   LegacySearchImmersionParams,
   OfferWithSiret,
   RepositorySearchImmertionResult,
@@ -308,6 +310,16 @@ export class PgEstablishmentAggregateRepository
       .execute();
 
     return result.length;
+  }
+
+  public async getOffers({
+    pagination,
+    sort,
+    filters,
+  }: GetOffersParams): Promise<
+    DataWithPagination<RepositorySearchImmertionResult>
+  > {
+    throw new Error("Not implemented");
   }
 
   public async legacySearchImmersionResults({

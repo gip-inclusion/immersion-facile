@@ -35,6 +35,11 @@ export const paginationRequiredQueryParamsSchema: ZodSchemaWithInputMatchingOutp
   perPage: perPageQueryParamSchema,
 });
 
+export const sortOrderSchema: ZodSchemaWithInputMatchingOutput<SortOrder> =
+  z.enum(["asc", "desc"], {
+    error: localization.invalidEnum,
+  });
+
 const paginationSchema: ZodSchemaWithInputMatchingOutput<Pagination> = z.object(
   {
     totalRecords: z.number(),

@@ -1241,7 +1241,7 @@ describe("LegacySearchImmersionUseCase", () => {
           nafCodes: [],
         }),
         errors.inputs.badSchema({
-          useCaseName: "SearchImmersion",
+          useCaseName: "LegacySearchImmersion",
           flattenErrors: [
             "nafCodes : Too small: expected array to have >=1 items",
           ],

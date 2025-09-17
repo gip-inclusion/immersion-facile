@@ -3,6 +3,7 @@ import {
   type AppellationAndRomeDto,
   type AppellationCode,
   conflictErrorSiret,
+  type DataWithPagination,
   errors,
   type GeoPositionDto,
   type LocationId,
@@ -19,7 +20,9 @@ import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
 import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
+  GetOffersParams,
   LegacySearchImmersionParams,
+  RepositorySearchImmertionResult,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
@@ -161,7 +164,94 @@ export class InMemoryEstablishmentAggregateRepository
     throw new Error("NOT implemented");
   }
 
-  public async getOffers() {}
+  public async getOffers(
+    params: GetOffersParams,
+  ): Promise<DataWithPagination<RepositorySearchImmertionResult>> {
+    const { filters, pagination } = params;
+
+    const allOffers = this.establishmentAggregates
+      .filter((aggregate) => aggregate.establishment.isOpen)
+      .filter((aggregate) =>
+        filters.sirets?.length
+          ? filters.sirets.includes(aggregate.establishment.siret)
+          : true,
+      )
+      .filter((aggregate) =>
+        filters.fitForDisabledWorkers !== undefined
+          ? aggregate.establishment.fitForDisabledWorkers ===
+            filters.fitForDisabledWorkers
+          : true,
+      )
+      .filter((aggregate) =>
+        filters.nafCodes?.length
+          ? filters.nafCodes.includes(aggregate.establishment.nafDto.code)
+          : true,
+      )
+      .filter((aggregate) =>
+        filters.searchableBy
+          ? aggregate.establishment.searchableBy[filters.searchableBy]
+          : true,
+      )
+      .filter((aggregate) =>
+        filters.locationIds?.length
+          ? aggregate.establishment.locations.some((loc) =>
+              filters.locationIds?.includes(loc.id),
+            )
+          : true,
+      )
+      .flatMap((aggregate) =>
+        aggregate.offers
+          .filter((offer) =>
+            filters.appellationCodes?.length
+              ? filters.appellationCodes.includes(offer.appellationCode)
+              : true,
+          )
+          .filter((offer) =>
+            filters.romeCodes?.length
+              ? filters.romeCodes.includes(offer.romeCode)
+              : true,
+          )
+          .map((offer) => {
+            const searchResult =
+              establishmentAggregateToSearchResultByRomeForFirstLocation(
+                aggregate,
+                offer.romeCode,
+                filters.geoParams
+                  ? distanceBetweenCoordinatesInMeters(
+                      aggregate.establishment.locations[0].position,
+                      {
+                        lat: filters.geoParams.lat,
+                        lon: filters.geoParams.lon,
+                      },
+                    )
+                  : undefined,
+              );
+            // Add the isSearchable property required by RepositorySearchImmertionResult
+            return {
+              ...searchResult,
+              isSearchable:
+                !aggregate.establishment.isMaxDiscussionsForPeriodReached,
+            };
+          }),
+      );
+
+    // Apply pagination
+    const startIndex = (pagination.page - 1) * pagination.perPage;
+    const paginatedOffers = allOffers.slice(
+      startIndex,
+      startIndex + pagination.perPage,
+    );
+
+    return {
+      data: paginatedOffers,
+      pagination: {
+        currentPage: pagination.page,
+        numberPerPage: pagination.perPage,
+        totalPages: Math.ceil(allOffers.length / pagination.perPage),
+        totalRecords: allOffers.length,
+      },
+    };
+  }
 
   public async legacySearchImmersionResults({
     searchMade,

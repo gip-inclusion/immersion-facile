@@ -3,7 +3,7 @@ import type {
   CreateDiscussionDto,
   GroupSlug,
   GroupWithResults,
-  SearchQueryParamsDto,
+  LegacySearchQueryParamsDto,
   SearchResultDto,
   SiretAndAppellationDto,
 } from "shared";
@@ -30,7 +30,9 @@ export class TestSearchGateway implements SearchGateway {
     return this.currentSearchResult$;
   }
 
-  public search$(_params: SearchQueryParamsDto): Observable<SearchResultDto[]> {
+  public search$(
+    _params: LegacySearchQueryParamsDto,
+  ): Observable<SearchResultDto[]> {
     return this.searchResults$;
   }
 
