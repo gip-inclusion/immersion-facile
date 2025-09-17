@@ -4,7 +4,8 @@ export const getSearchParams = (
   useCaseName: string,
   params: unknown,
 ): LegacySearchQueryParamsDto | undefined => {
-  if (useCaseName === "SearchImmersion") return params as LegacySearchQueryParamsDto;
+  if (useCaseName === "SearchImmersion")
+    return params as LegacySearchQueryParamsDto;
 };
 
 export const extractValue = (

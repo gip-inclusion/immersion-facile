@@ -36,8 +36,7 @@ export type GetDiscussionsParams = {
   limit: number;
 };
 
-export type GetPaginatedDiscussionsForUserParams =
-  WithRequiredPagination &
+export type GetPaginatedDiscussionsForUserParams = WithRequiredPagination &
   WithSort<DiscussionOrderKey> & {
     filters?: {
       statuses?: DiscussionStatus[];

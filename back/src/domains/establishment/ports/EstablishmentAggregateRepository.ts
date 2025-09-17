@@ -3,15 +3,21 @@ import type {
   AppellationCode,
   DataWithPagination,
   DateTimeIsoString,
+  EstablishmentSearchableByValue,
   LocationId,
+  NafCode,
+  RomeCode,
   SearchResultDto,
+  SearchSortedBy,
   SiretDto,
   UserId,
+  WithRequiredPagination,
+  WithSort,
 } from "shared";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
-import type { SearchMade } from "../entities/SearchMadeEntity";
+import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 
 export type RepositorySearchResultDto = Omit<SearchResultDto, "urlOfPartner">;
 export type RepositorySearchImmertionResult = Omit<
@@ -29,6 +35,22 @@ export type LegacySearchImmersionParams = {
   fitForDisabledWorkers?: boolean;
   maxResults?: number;
 };
+
+type GetOffersFilters = {
+  appellationCodes?: AppellationCode[];
+  fitForDisabledWorkers?: boolean; // returns all if not defined
+  geoParams?: GeoParams;
+  locationIds?: LocationId[];
+  nafCodes?: NafCode[];
+  romeCodes?: RomeCode[];
+  searchableBy?: EstablishmentSearchableByValue; // returns all if not defined
+  sirets?: SiretDto[];
+};
+
+export type GetOffersParams = WithRequiredPagination &
+  WithSort<SearchSortedBy> & {
+    filters: GetOffersFilters;
+  };
 
 export type EstablishmentAggregateFilters = { userId: UserId };
 
@@ -72,7 +94,7 @@ export interface EstablishmentAggregateRepository {
     searchImmersionParams: LegacySearchImmersionParams,
   ): Promise<RepositorySearchImmertionResult[]>;
   getOffers(
-    searchImmersionParams: LegacySearchImmersionParams,
+    params: GetOffersParams,
   ): Promise<DataWithPagination<RepositorySearchImmertionResult>>;
   //Sirets
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;
