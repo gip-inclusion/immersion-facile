@@ -1,12 +1,12 @@
 import { equals } from "ramda";
 import {
-  type ConventionDto,
   errors,
   isSuperEstablishment,
   type SiretDto,
   type WithSiretDto,
   withSiretSchema,
 } from "shared";
+import type { ConventionMarketingData } from "../../convention/ports/ConventionQueries";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -43,13 +43,11 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
           siret,
         );
 
-      const validatedConventions = await uow.conventionQueries.getConventions({
-        filters: {
-          withSirets: [siret],
-          withStatuses: ["ACCEPTED_BY_VALIDATOR"],
-        },
-        sortBy: "dateValidation",
-      });
+      const validatedConventionsData =
+        await uow.conventionQueries.getConventionsMarketingData({
+          siret: siret,
+          status: "ACCEPTED_BY_VALIDATOR",
+        });
 
       return establishment
         ? onEstablishment(
@@ -57,13 +55,13 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
             establishmentMarketingGateway,
             timeGateway,
             establishment,
-            validatedConventions,
+            validatedConventionsData,
           )
         : onMissingEstablishment(
             uow,
             timeGateway,
             establishmentMarketingGateway,
-            validatedConventions,
+            validatedConventionsData,
             siret,
           );
     },
@@ -73,11 +71,11 @@ const onMissingEstablishment = async (
   uow: UnitOfWork,
   timeGateway: TimeGateway,
   establishmentMarketingGateway: EstablishmentMarketingGateway,
-  validatedConventions: ConventionDto[],
+  validatedConventionsData: ConventionMarketingData[],
   siret: SiretDto,
 ): Promise<void> => {
-  const firstValidatedConvention = validatedConventions.at(0);
-  const lastValidatedConvention = validatedConventions.at(-1);
+  const firstValidatedConvention = validatedConventionsData.at(0);
+  const lastValidatedConvention = validatedConventionsData.at(-1);
   if (!lastValidatedConvention) {
     return deleteMarketingContactEntity(
       siret,
@@ -88,12 +86,9 @@ const onMissingEstablishment = async (
 
   const marketingContact: MarketingContact = {
     createdAt: timeGateway.now(),
-    email:
-      lastValidatedConvention.signatories.establishmentRepresentative.email,
-    firstName:
-      lastValidatedConvention.signatories.establishmentRepresentative.firstName,
-    lastName:
-      lastValidatedConvention.signatories.establishmentRepresentative.lastName,
+    email: lastValidatedConvention.establishmentRepresentative.email,
+    firstName: lastValidatedConvention.establishmentRepresentative.firstName,
+    lastName: lastValidatedConvention.establishmentRepresentative.lastName,
   };
 
   await saveMarketingContactEntity(
@@ -108,7 +103,7 @@ const onMissingEstablishment = async (
     firstName: marketingContact.firstName,
     lastName: marketingContact.lastName,
     conventions: makeConventionInfos(
-      validatedConventions,
+      validatedConventionsData,
       firstValidatedConvention,
       lastValidatedConvention,
     ),
@@ -124,7 +119,7 @@ const onEstablishment = async (
   marketingGateway: EstablishmentMarketingGateway,
   timeGateway: TimeGateway,
   establishmentAggregate: EstablishmentAggregate,
-  validatedConventions: ConventionDto[],
+  validatedConventionsData: ConventionMarketingData[],
 ): Promise<void> => {
   const firstLocation = establishmentAggregate.establishment.locations.at(0);
   if (!firstLocation) throw new Error("Establishement has no location.");
@@ -159,8 +154,8 @@ const onEstablishment = async (
 
   const hasIcAccount = !!user?.proConnect;
 
-  const firstValidatedConvention = validatedConventions.at(0);
-  const lastValidatedConvention = validatedConventions.at(-1);
+  const firstValidatedConvention = validatedConventionsData.at(0);
+  const lastValidatedConvention = validatedConventionsData.at(-1);
 
   const discussions = await uow.discussionRepository.getDiscussions({
     filters: { sirets: [establishmentAggregate.establishment.siret] },
@@ -178,7 +173,7 @@ const onEstablishment = async (
     firstName: marketingContact.firstName,
     lastName: marketingContact.lastName,
     conventions: makeConventionInfos(
-      validatedConventions,
+      validatedConventionsData,
       firstValidatedConvention,
       lastValidatedConvention,
     ),
@@ -208,11 +203,11 @@ const onEstablishment = async (
 };
 
 const makeConventionInfos = (
-  validatedConventions: ConventionDto[],
-  firstValidatedConvention: ConventionDto | undefined,
-  lastValidatedConvention: ConventionDto | undefined,
+  validatedConventionsData: ConventionMarketingData[],
+  firstValidatedConvention: ConventionMarketingData | undefined,
+  lastValidatedConvention: ConventionMarketingData | undefined,
 ): ConventionInfos => ({
-  numberOfValidatedConvention: validatedConventions.length,
+  numberOfValidatedConvention: validatedConventionsData.length,
   ...(firstValidatedConvention?.dateValidation
     ? {
         firstConventionValidationDate: new Date(
