@@ -4,9 +4,9 @@ import {
   type AgencyOption,
   type AgencyWithUsersRights,
   activeAgencyStatuses,
-  agencyKindList,
   listAgencyOptionsRequestSchema,
   miniStageAgencyKinds,
+  orderedAgencyKindList,
   removeSpaces,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -58,7 +58,7 @@ const getAgencyKindsFromFilterKind = (
   if (filterKind === "immersionPeOnly") return ["pole-emploi"];
   if (filterKind === "miniStageOnly") return miniStageAgencyKinds;
   if (filterKind === "miniStageExcluded")
-    return agencyKindList.filter(
+    return orderedAgencyKindList.filter(
       (agencyKind) => !miniStageAgencyKinds.includes(agencyKind),
     );
   filterKind satisfies never;
