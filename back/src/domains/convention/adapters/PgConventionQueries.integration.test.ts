@@ -909,7 +909,6 @@ describe("Pg implementation of ConventionQueries", () => {
     it("should return only validated conventions for specified siret", async () => {
       const result = await conventionQueries.getConventionsMarketingData({
         siret: siret1,
-        status: "ACCEPTED_BY_VALIDATOR",
       });
 
       expectToEqual(result, [
@@ -938,40 +937,17 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
 
-    it("should return empty array when no conventions match the criteria", async () => {
+    it("should return empty array when no validated conventions exist for siret", async () => {
       const result = await conventionQueries.getConventionsMarketingData({
         siret: siret3,
-        status: "ACCEPTED_BY_VALIDATOR",
       });
 
       expectToEqual(result, []);
     });
 
-    it("should filter by different status", async () => {
-      const result = await conventionQueries.getConventionsMarketingData({
-        siret: siret1,
-        status: "READY_TO_SIGN",
-      });
-
-      expectToEqual(result, [
-        {
-          siret: siret1,
-          dateValidation: undefined,
-          dateEnd: "2024-04-20T08:00:00.000Z",
-          establishmentRepresentative: {
-            email: "est.rep.d@example.com",
-            firstName: "Bob",
-            lastName: "Brown",
-          },
-          establishmentNumberEmployeesRange: undefined,
-        },
-      ]);
-    });
-
     it("should sort by dateValidation in ascending order", async () => {
       const result = await conventionQueries.getConventionsMarketingData({
         siret: siret1,
-        status: "ACCEPTED_BY_VALIDATOR",
       });
 
       expect(result).toHaveLength(2);
@@ -1006,7 +982,6 @@ describe("Pg implementation of ConventionQueries", () => {
 
       const result = await conventionQueries.getConventionsMarketingData({
         siret: siret3,
-        status: "ACCEPTED_BY_VALIDATOR",
       });
 
       expectToEqual(result, [
@@ -1027,16 +1002,6 @@ describe("Pg implementation of ConventionQueries", () => {
     it("should return empty array when siret doesn't exist", async () => {
       const result = await conventionQueries.getConventionsMarketingData({
         siret: "99999999999999" as SiretDto,
-        status: "ACCEPTED_BY_VALIDATOR",
-      });
-
-      expectToEqual(result, []);
-    });
-
-    it("should return empty array when status doesn't match", async () => {
-      const result = await conventionQueries.getConventionsMarketingData({
-        siret: siret1,
-        status: "CANCELLED",
       });
 
       expectToEqual(result, []);
