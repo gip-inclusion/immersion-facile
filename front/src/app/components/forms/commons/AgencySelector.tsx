@@ -8,7 +8,6 @@ import {
   type AgencyKind,
   type AgencyOption,
   type AllowedAgencyKindToAdd,
-  agencyKindList,
   agencyKindToLabel,
   allAgencyKindsAllowedToAdd,
   type ConventionReadDto,
@@ -16,6 +15,7 @@ import {
   type DepartmentCode,
   departmentNameToDepartmentCode,
   fitForDelegationAgencyKind,
+  orderedAgencyKindList,
 } from "shared";
 import type { FormFieldAttributes } from "src/app/contents/forms/types";
 import { AgencyErrorText } from "../convention/sections/agency/AgencyErrorText";
@@ -293,8 +293,8 @@ const makeAgencyKindOptions = (
 
   const sortedKinds = [...availableKinds].sort(
     (a, b) =>
-      agencyKindList.findIndex((kind) => kind === a.value) -
-      agencyKindList.findIndex((kind) => kind === b.value),
+      orderedAgencyKindList.findIndex((kind) => kind === a.value) -
+      orderedAgencyKindList.findIndex((kind) => kind === b.value),
   );
 
   const optionalAllKindOption: AgencyKindOptions =

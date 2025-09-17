@@ -2,9 +2,9 @@ import type { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import {
   type AgencyKind,
   type AllowedAgencyKindToAdd,
-  agencyKindList,
   agencyKindToLabel,
   allAgencyKindsAllowedToAdd,
+  orderedAgencyKindList,
 } from "shared";
 
 const allAgencyKindToLabel: Record<AgencyKind, string> = {
@@ -20,7 +20,7 @@ export const agencyListOfOptions: SelectProps.Option<AllowedAgencyKindToAdd>[] =
   }));
 
 export const allAgencyListOfOptions: SelectProps.Option<AgencyKind>[] =
-  agencyKindList.map((agencyKind) => ({
+  orderedAgencyKindList.map((agencyKind) => ({
     value: agencyKind,
     label: allAgencyKindToLabel[agencyKind],
   }));

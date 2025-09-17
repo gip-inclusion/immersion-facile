@@ -93,9 +93,11 @@ export const miniStageAgencyKinds: AgencyKind[] = [
   "chambre-agriculture",
 ];
 
-export type AgencyKind = (typeof agencyKindList)[number];
+export type AgencyKind = (typeof orderedAgencyKindList)[number];
 
-export const agencyKindList = [
+export const orderedAgencyKindList = [
+  // ⚠️DO NOT EDIT ORDER ⚠️
+  // This is the preferred order for displaying the kinds in a select
   "pole-emploi", // TODO: remplacer l'agency kind PE par FT
   "mission-locale",
   "operateur-cep",

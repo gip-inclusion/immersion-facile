@@ -27,11 +27,11 @@ import {
   type AgencyKind,
   type AgencyOption,
   agencyKindFilters,
-  agencyKindList,
   allAgencyStatuses,
   type CreateAgencyDto,
   type CreateAgencyInitialValues,
   type ListAgencyOptionsRequestDto,
+  orderedAgencyKindList,
   type PrivateListAgenciesRequestDto,
   type WithAgencyDto,
   type WithAgencyId,
@@ -67,7 +67,10 @@ export const agencyIdResponseSchema: ZodSchemaWithInputMatchingOutput<AgencyIdRe
   agencyIdSchema.optional();
 
 export const agencyKindSchema: ZodSchemaWithInputMatchingOutput<AgencyKind> =
-  zEnumValidation(agencyKindList, "Ce type de structure n'est pas supporté");
+  zEnumValidation(
+    orderedAgencyKindList,
+    "Ce type de structure n'est pas supporté",
+  );
 const agencyStatusSchema = z.enum(allAgencyStatuses, {
   error: localization.invalidEnum,
 });
