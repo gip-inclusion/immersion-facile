@@ -115,10 +115,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 1 closest establishment with `maxResults` at 1", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: searchMadeDistanceWithoutRome,
-              maxResults: 1,
-            }),
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: searchMadeDistanceWithoutRome,
+                maxResults: 1,
+              },
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_AtPosition,
@@ -135,10 +137,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 2 closest establishments with `maxResults` at 2", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: searchMadeDistanceWithoutRome,
-              maxResults: 2,
-            }),
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: searchMadeDistanceWithoutRome,
+                maxResults: 2,
+              },
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_AtPosition,
@@ -164,10 +168,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 2 closest establishments with `maxResults` at 3 without too far establishment", async () => {
           expectArraysToMatch(
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: searchMadeDistanceWithoutRome,
-              maxResults: 3,
-            }),
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: searchMadeDistanceWithoutRome,
+                maxResults: 3,
+              },
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_AtPosition,
@@ -250,34 +256,40 @@ describe("PgEstablishmentAggregateRepository", () => {
           );
 
           const sortedByDateResults =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                ...searchMadeDistanceWithoutRome,
-                sortedBy: "date",
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  ...searchMadeDistanceWithoutRome,
+                  sortedBy: "date",
+                },
+                maxResults: 5,
               },
-              maxResults: 5,
-            });
+            );
 
           expectArraysToEqual(sortedByDateResults, expectedResults);
 
           const sortedByScoreResults =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                ...searchMadeDistanceWithoutRome,
-                sortedBy: "score",
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  ...searchMadeDistanceWithoutRome,
+                  sortedBy: "score",
+                },
+                maxResults: 5,
               },
-              maxResults: 5,
-            });
+            );
           expectArraysToEqual(sortedByScoreResults, expectedResults);
 
           const sortedByDistanceResults =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                ...searchMadeDistanceWithoutRome,
-                sortedBy: "distance",
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  ...searchMadeDistanceWithoutRome,
+                  sortedBy: "distance",
+                },
+                maxResults: 5,
               },
-              maxResults: 5,
-            });
+            );
           expectArraysToEqual(sortedByDistanceResults, expectedResults);
         });
       });
@@ -298,12 +310,14 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it(`with "establishmentSearchableBy:'students'" return only establishments SearchImmersionResults searchable by student`, async () => {
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: {
-                  ...cartographeSearchMade,
-                  establishmentSearchableBy: "students",
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    ...cartographeSearchMade,
+                    establishmentSearchableBy: "students",
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -329,12 +343,14 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it(`with "establishmentSearchableBy:'jobSeekers'" return only establishments SearchImmersionResults searchable by jobseekers`, async () => {
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: {
-                  ...cartographeSearchMade,
-                  establishmentSearchableBy: "jobSeekers",
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    ...cartographeSearchMade,
+                    establishmentSearchableBy: "jobSeekers",
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -360,9 +376,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it('with"establishmentSearchableBy" not defined return all establishment SearchImmersionResults', async () => {
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: cartographeSearchMade,
-              });
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: cartographeSearchMade,
+                },
+              );
 
             expectToEqual(
               results.sort(
@@ -414,9 +432,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
             // Act & Assert
             expectToEqual(
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: searchMadeDistanceWithoutRome,
-              }),
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: searchMadeDistanceWithoutRome,
+                },
+              ),
               [
                 makeExpectedSearchResult({
                   establishment: establishmentCloseWithA1101Offers,
@@ -470,13 +490,15 @@ describe("PgEstablishmentAggregateRepository", () => {
 
             // Act
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: {
-                  sortedBy: "date",
-                  distanceKm: 100,
-                  ...centerOfSaintesGeoPosition,
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    sortedBy: "date",
+                    distanceKm: 100,
+                    ...centerOfSaintesGeoPosition,
+                  },
                 },
-              });
+              );
 
             // Assert
             expectToEqual(
@@ -550,9 +572,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with all naf when naf filter is not provided", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: {},
-              });
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {},
+                },
+              );
 
             expectToEqual(
               results.sort(
@@ -603,9 +627,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with all naf when naf filter is empty", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: { nafCodes: [] },
-              });
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: { nafCodes: [] },
+                },
+              );
 
             expectToEqual(
               results.sort(
@@ -656,11 +682,13 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with naf when naf filter is provided with one value", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: {
-                  nafCodes: [establishment0145Z_A.establishment.nafDto.code],
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    nafCodes: [establishment0145Z_A.establishment.nafDto.code],
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -686,14 +714,16 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with different naf when naf filter is provided with multiple values", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-                searchMade: {
-                  nafCodes: [
-                    establishment0145Z_A.establishment.nafDto.code,
-                    establishment4741Z.establishment.nafDto.code,
-                  ],
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    nafCodes: [
+                      establishment0145Z_A.establishment.nafDto.code,
+                      establishment4741Z.establishment.nafDto.code,
+                    ],
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -766,15 +796,17 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("without param", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                distanceKm: 10,
-                lat: fitForDisabledWorkers.establishment.locations[0].position
-                  .lat,
-                lon: fitForDisabledWorkers.establishment.locations[0].position
-                  .lon,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  distanceKm: 10,
+                  lat: fitForDisabledWorkers.establishment.locations[0].position
+                    .lat,
+                  lon: fitForDisabledWorkers.establishment.locations[0].position
+                    .lon,
+                },
               },
-            });
+            );
           expectToEqual(results, [
             makeExpectedSearchResult({
               establishment: notFitForDisabledWorkers,
@@ -799,16 +831,18 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("with param false", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                distanceKm: 10,
-                lat: fitForDisabledWorkers.establishment.locations[0].position
-                  .lat,
-                lon: fitForDisabledWorkers.establishment.locations[0].position
-                  .lon,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  distanceKm: 10,
+                  lat: fitForDisabledWorkers.establishment.locations[0].position
+                    .lat,
+                  lon: fitForDisabledWorkers.establishment.locations[0].position
+                    .lon,
+                },
+                fitForDisabledWorkers: false,
               },
-              fitForDisabledWorkers: false,
-            });
+            );
           expectToEqual(results, [
             makeExpectedSearchResult({
               establishment: notFitForDisabledWorkers,
@@ -824,16 +858,18 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("with param true", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                distanceKm: 10,
-                lat: fitForDisabledWorkers.establishment.locations[0].position
-                  .lat,
-                lon: fitForDisabledWorkers.establishment.locations[0].position
-                  .lon,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  distanceKm: 10,
+                  lat: fitForDisabledWorkers.establishment.locations[0].position
+                    .lat,
+                  lon: fitForDisabledWorkers.establishment.locations[0].position
+                    .lon,
+                },
+                fitForDisabledWorkers: true,
               },
-              fitForDisabledWorkers: true,
-            });
+            );
           expectToEqual(results, [
             makeExpectedSearchResult({
               establishment: fitForDisabledWorkers,
@@ -850,9 +886,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("returns empty list when repo is empty", async () => {
         expectToEqual(
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: cartographeSearchMade,
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: cartographeSearchMade,
+            },
+          ),
           [],
         );
       });
@@ -863,21 +901,23 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: {
-              lat: undefined,
-              lon: undefined,
-              distanceKm: undefined,
-              sortedBy: "date",
-              voluntaryToImmersion: true,
-              place: undefined,
-              appellationCodes: undefined,
-              romeCode: undefined,
-              establishmentSearchableBy: "jobSeekers",
-              acquisitionCampaign: undefined,
-              acquisitionKeyword: undefined,
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                lat: undefined,
+                lon: undefined,
+                distanceKm: undefined,
+                sortedBy: "date",
+                voluntaryToImmersion: true,
+                place: undefined,
+                appellationCodes: undefined,
+                romeCode: undefined,
+                establishmentSearchableBy: "jobSeekers",
+                acquisitionCampaign: undefined,
+                acquisitionKeyword: undefined,
+              },
             },
-          }),
+          ),
           [
             makeExpectedSearchResult({
               establishment: establishmentWithOfferA1101_AtPosition,
@@ -916,9 +956,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Assert
         expectToEqual(
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: cartographeSearchMade,
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: cartographeSearchMade,
+            },
+          ),
           [
             makeExpectedSearchResult({
               establishment: openEstablishment,
@@ -974,9 +1016,11 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: cartographeSearchMade,
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: cartographeSearchMade,
+            },
+          ),
           [
             makeExpectedSearchResult({
               establishment: establishmentAtRangeWithRome,
@@ -991,9 +1035,11 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
+            },
+          ),
           [],
         );
       });
@@ -1011,14 +1057,16 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("search results with multiple locations and with matching rome code", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                sortedBy: "date",
-                distanceKm: 50,
-                ...centerOfSaintesGeoPosition,
-                romeCode: cuvisteOffer.romeCode,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  sortedBy: "date",
+                  distanceKm: 50,
+                  ...centerOfSaintesGeoPosition,
+                  romeCode: cuvisteOffer.romeCode,
+                },
               },
-            }),
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentCuvisteAtSaintesAndVeaux,
@@ -1044,14 +1092,16 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("no search results with multiple locations and without matching rome code", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: {
-                sortedBy: "date",
-                distanceKm: 100,
-                ...centerOfSaintesGeoPosition,
-                romeCode: groomChevauxOffer.romeCode,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  sortedBy: "date",
+                  distanceKm: 100,
+                  ...centerOfSaintesGeoPosition,
+                  romeCode: groomChevauxOffer.romeCode,
+                },
               },
-            }),
+            ),
             [],
           );
         });
@@ -1095,10 +1145,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
-              maxResults: 2,
-            });
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
+                maxResults: 2,
+              },
+            );
 
           // Assert
           expectToEqual(
@@ -1149,10 +1201,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: { ...cartographeSearchMade, sortedBy: "date" },
-              maxResults: 2,
-            });
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: { ...cartographeSearchMade, sortedBy: "date" },
+                maxResults: 2,
+              },
+            );
 
           // Assert
           expectToEqual(
@@ -1225,9 +1279,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-              searchMade: { ...cartographeSearchMade, sortedBy: "score" },
-            });
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: { ...cartographeSearchMade, sortedBy: "score" },
+              },
+            );
           // Assert
           expectToEqual(
             searchResult.map(({ siret }) => siret),
@@ -1285,16 +1341,18 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Act
         const searchResult =
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: {
-              ...cartographeSearchMade,
-              sortedBy: "date",
-              appellationCodes: [
-                cartographeImmersionOffer.appellationCode,
-                analysteEnGeomatiqueImmersionOffer.appellationCode,
-              ],
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                ...cartographeSearchMade,
+                sortedBy: "date",
+                appellationCodes: [
+                  cartographeImmersionOffer.appellationCode,
+                  analysteEnGeomatiqueImmersionOffer.appellationCode,
+                ],
+              },
             },
-          });
+          );
 
         // Assert
         expectToEqual(
@@ -1347,18 +1405,20 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         const searchResults =
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: {
-              ...aggregateWithOptionalValues.establishment.locations[0]
-                .position,
-              appellationCodes: [
-                aggregateWithOptionalValues.offers[0].appellationCode,
-              ],
-              distanceKm: 0,
-              sortedBy: "date",
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                ...aggregateWithOptionalValues.establishment.locations[0]
+                  .position,
+                appellationCodes: [
+                  aggregateWithOptionalValues.offers[0].appellationCode,
+                ],
+                distanceKm: 0,
+                sortedBy: "date",
+              },
+              maxResults: 2,
             },
-            maxResults: 2,
-          });
+          );
 
         expectToEqual(
           searchResults.map(
@@ -1405,11 +1465,13 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Act
         const searchResults: SearchResultDto[] =
-          await pgEstablishmentAggregateRepository.legacySearchImmersionResults({
-            searchMade: {
-              sortedBy: "date",
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                sortedBy: "date",
+              },
             },
-          });
+          );
         const readableResults = searchResults.map(toReadableSearchResult);
 
         // Assert
