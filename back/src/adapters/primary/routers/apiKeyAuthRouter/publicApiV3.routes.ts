@@ -1,5 +1,7 @@
 import {
+  getOffersFlatParamsSchema,
   httpErrorSchema,
+  paginatedSearchResultsSchema,
   searchResultSchema,
   withAuthorizationHeaders,
 } from "shared";
@@ -35,6 +37,19 @@ export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+      429: httpErrorSchema,
+    },
+  }),
+  getOffers: defineRoute({
+    method: "get",
+    url: "/v3/search",
+    ...withAuthorizationHeaders,
+    queryParamsSchema: getOffersFlatParamsSchema,
+    responses: {
+      200: paginatedSearchResultsSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
       429: httpErrorSchema,
     },
   }),
