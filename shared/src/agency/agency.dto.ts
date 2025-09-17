@@ -139,7 +139,11 @@ export const agencyKindToLabelIncludingIFAndPrepa: Record<AgencyKind, string> =
     "immersion-facile": "Immersion Facilitée",
   };
 
-export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel);
+export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel).sort(
+  (a, b) =>
+    orderedAgencyKindList.findIndex((kind) => kind === a) -
+    orderedAgencyKindList.findIndex((kind) => kind === b),
+);
 
 export const fitForDelegationAgencyKind = allAgencyKindsAllowedToAdd.filter(
   (kind) => !["autre", "cci", "operateur-cep"].includes(kind),
