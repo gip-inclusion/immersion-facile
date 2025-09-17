@@ -3,6 +3,8 @@ export type PaginationQueryParams = {
   perPage?: number;
 };
 
+export type WithRequiredPagination = { pagination: Required<PaginationQueryParams> };
+
 export type Pagination = {
   totalRecords: number;
   currentPage: number;
@@ -13,6 +15,15 @@ export type Pagination = {
 export type DataWithPagination<T> = {
   data: T[];
   pagination: Pagination;
+};
+
+type Sort<T> = {
+  by: T;
+  order: "asc" | "desc";
+};
+
+export type WithSort<T> = {
+  sort: Sort<T>;
 };
 
 export const defaultPageInPagination = 1;

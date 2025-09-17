@@ -7,7 +7,7 @@ import {
   siretAndAppellationSchema,
 } from "../siretAndAppellation/SiretAndAppellation.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import { searchParamsSchema } from "./SearchQueryParams.schema";
+import { legacySearchParamsSchema } from "./SearchQueryParams.schema";
 import { searchResultSchema, searchResultsSchema } from "./SearchResult.schema";
 
 export type SearchRoutes = typeof searchImmersionRoutes;
@@ -23,7 +23,7 @@ export const searchImmersionRoutes = defineRoutes({
   legacySearch: defineRoute({
     method: "get",
     url: "/immersion-offers",
-    queryParamsSchema: searchParamsSchema,
+    queryParamsSchema: legacySearchParamsSchema,
     responses: {
       200: searchResultsSchema,
       400: httpErrorSchema.or(httpErrorSchema),

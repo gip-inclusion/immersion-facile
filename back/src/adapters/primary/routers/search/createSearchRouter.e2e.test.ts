@@ -4,7 +4,7 @@ import {
   errors,
   expectHttpResponseToEqual,
   type Group,
-  type SearchQueryParamsWithGeoParams,
+  type LegacySearchQueryParamsWithGeoParams,
   type SearchResultDto,
   type SearchRoutes,
   type SiretDto,
@@ -508,7 +508,7 @@ describe("search-immersion route", () => {
           queryParams: {
             appellationCodes: ["14704"],
             sortedBy: "distance",
-          } as unknown as SearchQueryParamsWithGeoParams, // forcing the type to check the error
+          } as unknown as LegacySearchQueryParamsWithGeoParams, // forcing the type to check the error
         });
         expectHttpResponseToEqual(result, {
           status: 400,
@@ -530,7 +530,7 @@ describe("search-immersion route", () => {
             appellationCodes: ["14704"],
             sortedBy: "distance",
             latitude: 48.8531,
-          } as unknown as SearchQueryParamsWithGeoParams, // forcing the type to check the error
+          } as unknown as LegacySearchQueryParamsWithGeoParams, // forcing the type to check the error
         });
         expectHttpResponseToEqual(result, {
           status: 400,

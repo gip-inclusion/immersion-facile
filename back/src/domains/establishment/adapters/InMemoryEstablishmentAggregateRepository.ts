@@ -19,7 +19,7 @@ import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
 import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
-  SearchImmersionParams,
+  LegacySearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
@@ -27,8 +27,7 @@ import type {
 export const TEST_ROME_LABEL = "test_rome_label";
 
 export class InMemoryEstablishmentAggregateRepository
-  implements EstablishmentAggregateRepository
-{
+  implements EstablishmentAggregateRepository {
   #establishmentAggregates: EstablishmentAggregate[] = [];
 
   public async delete(siret: SiretDto): Promise<void> {
@@ -161,18 +160,18 @@ export class InMemoryEstablishmentAggregateRepository
     throw new Error("NOT implemented");
   }
 
-  public async searchImmersionResults({
+  public async legacySearchImmersionResults({
     searchMade,
     fitForDisabledWorkers,
     maxResults,
-  }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
+  }: LegacySearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this.#establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
       .filter((aggregate) =>
         searchMade.establishmentSearchableBy
           ? aggregate.establishment.searchableBy[
-              searchMade.establishmentSearchableBy
-            ]
+          searchMade.establishmentSearchableBy
+          ]
           : true,
       )
       .filter((agg) =>
@@ -198,11 +197,11 @@ export class InMemoryEstablishmentAggregateRepository
               searchedAppellationCode: offer.appellationCode,
               ...(hasSearchMadeGeoParams(searchMade)
                 ? {
-                    position: {
-                      lat: searchMade.lat,
-                      lon: searchMade.lon,
-                    },
-                  }
+                  position: {
+                    lat: searchMade.lat,
+                    lon: searchMade.lon,
+                  },
+                }
                 : {}),
               locationId: aggregate.establishment.locations[0].id,
             }),
@@ -235,13 +234,13 @@ export class InMemoryEstablishmentAggregateRepository
         const newValues = params[aggregate.establishment.siret];
         return newValues
           ? {
-              ...aggregate,
-              establishment: {
-                ...aggregate.establishment,
-                ...newValues,
-                lastInseeCheckDate: inseeCheckDate,
-              },
-            }
+            ...aggregate,
+            establishment: {
+              ...aggregate.establishment,
+              ...newValues,
+              lastInseeCheckDate: inseeCheckDate,
+            },
+          }
           : aggregate;
       },
     );
