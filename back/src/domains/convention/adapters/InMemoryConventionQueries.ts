@@ -6,7 +6,6 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
-  type ConventionStatus,
   conventionSchema,
   type DataWithPagination,
   errors,
@@ -108,15 +107,14 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public async getConventionsMarketingData({
     siret,
-    status,
   }: {
     siret: SiretDto;
-    status: ConventionStatus;
   }): Promise<ConventionMarketingData[]> {
     return this.conventionRepository.conventions
       .filter(
         (convention) =>
-          convention.siret === siret && convention.status === status,
+          convention.siret === siret &&
+          convention.status === "ACCEPTED_BY_VALIDATOR",
       )
       .sort((a, b) => {
         const aDate = a.dateValidation;

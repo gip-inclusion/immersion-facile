@@ -86,6 +86,5 @@ export interface ConventionQueries {
 
   getConventionsMarketingData(params: {
     siret: SiretDto;
-    status: ConventionStatus;
   }): Promise<ConventionMarketingData[]>;
 }
