@@ -71,6 +71,28 @@ export const createApiKeyAuthRouterV3 = (deps: AppDependencies) => {
     }),
   );
 
+  searchEstablishmentV3Router.getOffers(
+    deps.apiConsumerMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        if (
+          !isApiConsumerAllowed({
+            apiConsumer: req.apiConsumer,
+            rightName: "searchEstablishment",
+            consumerKind: "READ",
+          })
+        )
+          throw errors.apiConsumer.forbidden();
+
+        return deps.useCases.getOffers
+          .execute(req.query)
+          .then(({ data, pagination }) => ({
+            data: data.map(domainToSearchImmersionResultPublicV3),
+            pagination,
+          }));
+      }),
+  );
+
   return v3ExpressRouter;
 };
 
