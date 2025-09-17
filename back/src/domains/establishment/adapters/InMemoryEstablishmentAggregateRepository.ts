@@ -27,7 +27,8 @@ import type {
 export const TEST_ROME_LABEL = "test_rome_label";
 
 export class InMemoryEstablishmentAggregateRepository
-  implements EstablishmentAggregateRepository {
+  implements EstablishmentAggregateRepository
+{
   #establishmentAggregates: EstablishmentAggregate[] = [];
 
   public async delete(siret: SiretDto): Promise<void> {
@@ -160,6 +161,8 @@ export class InMemoryEstablishmentAggregateRepository
     throw new Error("NOT implemented");
   }
 
+  public async getOffers() {}
+
   public async legacySearchImmersionResults({
     searchMade,
     fitForDisabledWorkers,
@@ -170,8 +173,8 @@ export class InMemoryEstablishmentAggregateRepository
       .filter((aggregate) =>
         searchMade.establishmentSearchableBy
           ? aggregate.establishment.searchableBy[
-          searchMade.establishmentSearchableBy
-          ]
+              searchMade.establishmentSearchableBy
+            ]
           : true,
       )
       .filter((agg) =>
@@ -197,11 +200,11 @@ export class InMemoryEstablishmentAggregateRepository
               searchedAppellationCode: offer.appellationCode,
               ...(hasSearchMadeGeoParams(searchMade)
                 ? {
-                  position: {
-                    lat: searchMade.lat,
-                    lon: searchMade.lon,
-                  },
-                }
+                    position: {
+                      lat: searchMade.lat,
+                      lon: searchMade.lon,
+                    },
+                  }
                 : {}),
               locationId: aggregate.establishment.locations[0].id,
             }),
@@ -234,13 +237,13 @@ export class InMemoryEstablishmentAggregateRepository
         const newValues = params[aggregate.establishment.siret];
         return newValues
           ? {
-            ...aggregate,
-            establishment: {
-              ...aggregate.establishment,
-              ...newValues,
-              lastInseeCheckDate: inseeCheckDate,
-            },
-          }
+              ...aggregate,
+              establishment: {
+                ...aggregate.establishment,
+                ...newValues,
+                lastInseeCheckDate: inseeCheckDate,
+              },
+            }
           : aggregate;
       },
     );

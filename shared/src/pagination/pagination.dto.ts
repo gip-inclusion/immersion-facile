@@ -3,7 +3,9 @@ export type PaginationQueryParams = {
   perPage?: number;
 };
 
-export type WithRequiredPagination = { pagination: Required<PaginationQueryParams> };
+export type WithRequiredPagination = {
+  pagination: Required<PaginationQueryParams>;
+};
 
 export type Pagination = {
   totalRecords: number;
