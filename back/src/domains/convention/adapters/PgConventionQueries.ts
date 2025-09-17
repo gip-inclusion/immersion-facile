@@ -27,6 +27,7 @@ import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import type {
+  ConventionMarketingData,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -117,6 +118,46 @@ export class PgConventionQueries implements ConventionQueries {
           .execute(),
       andThen(validateConventionResults),
     );
+  }
+
+  public async getConventionsMarketingData({
+    siret,
+    status,
+  }: {
+    siret: SiretDto;
+    status: ConventionStatus;
+  }): Promise<ConventionMarketingData[]> {
+    const result = await this.transaction
+      .selectFrom("conventions")
+      .innerJoin(
+        "actors as er",
+        "er.id",
+        "conventions.establishment_representative_id",
+      )
+      .select("conventions.siret")
+      .select("conventions.date_validation")
+      .select("conventions.date_end")
+      .select("er.email as establishment_representative_email")
+      .select("er.first_name as establishment_representative_firstname")
+      .select("er.last_name as establishment_representative_lastname")
+      .select("conventions.establishment_number_employees")
+      .where("conventions.siret", "=", siret)
+      .where("conventions.status", "=", status)
+      .orderBy("conventions.date_validation", "asc")
+      .execute();
+
+    return result.map((row) => ({
+      siret: row.siret,
+      dateValidation: row.date_validation?.toISOString() || undefined,
+      dateEnd: row.date_end.toISOString(),
+      establishmentRepresentative: {
+        email: row.establishment_representative_email,
+        firstName: row.establishment_representative_firstname,
+        lastName: row.establishment_representative_lastname,
+      },
+      establishmentNumberEmployeesRange:
+        row.establishment_number_employees || undefined,
+    }));
   }
 
   public async getConventionsByScope(params: {

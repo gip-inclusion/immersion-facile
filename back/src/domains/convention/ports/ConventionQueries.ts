@@ -6,9 +6,11 @@ import type {
   ConventionStatus,
   DataWithPagination,
   DateRange,
+  DateString,
   ExtractFromExisting,
   FindSimilarConventionsParams,
   GetConventionsForAgencyUserParams,
+  NumberEmployeesRange,
   PaginationQueryParams,
   SiretDto,
   TemplatedEmail,
@@ -50,6 +52,18 @@ export type GetPaginatedConventionsForAgencyUserParams =
     pagination: Required<PaginationQueryParams>;
   };
 
+export type ConventionMarketingData = {
+  siret: SiretDto;
+  dateValidation?: DateString;
+  dateEnd: DateString;
+  establishmentRepresentative: {
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+  establishmentNumberEmployeesRange?: NumberEmployeesRange;
+};
+
 export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
@@ -69,4 +83,9 @@ export interface ConventionQueries {
     limit: number;
     filters: GetConventionsFilters;
   }): Promise<ConventionReadDto[]>;
+
+  getConventionsMarketingData(params: {
+    siret: SiretDto;
+    status: ConventionStatus;
+  }): Promise<ConventionMarketingData[]>;
 }
