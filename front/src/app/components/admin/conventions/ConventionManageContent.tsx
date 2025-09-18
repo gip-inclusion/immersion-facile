@@ -15,6 +15,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { match } from "ts-pattern";
 import { NpsSection } from "../../nps/NpsSection";
 import {
@@ -72,6 +73,19 @@ export const ConventionManageContent = ({
     },
     [dispatch],
   );
+
+  useEffect(() => {
+    if (convention && jwtParams.jwt) {
+      dispatch(
+        partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackRequested(
+          {
+            conventionId,
+            jwt: jwtParams.jwt,
+          },
+        ),
+      );
+    }
+  }, [convention, conventionId, jwtParams.jwt, dispatch]);
 
   if (fetchConventionError) {
     if (
