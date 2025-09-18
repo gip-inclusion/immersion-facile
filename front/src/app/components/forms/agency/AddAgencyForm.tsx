@@ -22,7 +22,6 @@ import {
   createAgencySchema,
   type DepartmentCode,
   domElementIds,
-  type SiretDto,
 } from "shared";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
@@ -40,8 +39,7 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useInitialSiret } from "src/app/hooks/siret.hooks";
-import { routes } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
@@ -50,9 +48,10 @@ import {
   agenciesSlice,
 } from "src/core-logic/domain/agencies/agencies.slice";
 import { match, P } from "ts-pattern";
+import type { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
-export const AddAgencyForm = ({ siret }: { siret?: string }) => {
+export const AddAgencyForm = () => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
     boolean | undefined
   >(undefined);
@@ -114,7 +113,6 @@ export const AddAgencyForm = ({ siret }: { siret?: string }) => {
       {match(refersToOtherAgency)
         .with(P.boolean, (refersToOtherAgency) => (
           <AgencyForm
-            siret={siret}
             refersToOtherAgency={refersToOtherAgency}
             key={`add-agency-form-${refersToOtherAgency}`}
             submitFeedback={feedback}
@@ -128,14 +126,12 @@ export const AddAgencyForm = ({ siret }: { siret?: string }) => {
 };
 
 type AgencyFormProps = {
-  siret?: SiretDto;
   refersToOtherAgency: boolean;
   submitFeedback: AgenciesSubmitFeedback;
   onFormValid: SubmitHandler<CreateAgencyInitialValues>;
 };
 
 const AgencyForm = ({
-  siret,
   refersToOtherAgency,
   submitFeedback,
   onFormValid,
@@ -143,6 +139,8 @@ const AgencyForm = ({
   const { getFormErrors, getFormFields } = getFormContents(
     formAgencyFieldsLabels,
   );
+  const { params } = useRoute() as Route<typeof routes.addAgency>;
+  const { siret } = params;
   const formContents = getFormFields();
   const acquisitionParams = useGetAcquisitionParams();
   const formInitialValues = useMemo(
@@ -184,11 +182,6 @@ const AgencyForm = ({
   useEffect(() => {
     reset(formInitialValues);
   }, [reset, formInitialValues]);
-
-  useInitialSiret({
-    siret,
-    addressAutocompleteLocator: "agency-address",
-  });
 
   return (
     <FormProvider {...methods}>
