@@ -20,6 +20,6 @@ export const AddAgencyPage = ({
     }
   >
     <Breadcrumbs />
-    <AddAgencyForm siret={route.params.siret} />
+    <AddAgencyForm />
   </ConnectedPrivateRoute>
 );

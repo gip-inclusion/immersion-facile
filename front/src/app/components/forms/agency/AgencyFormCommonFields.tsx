@@ -23,6 +23,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
+import { useExistingSiret } from "../../../hooks/siret.hooks";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
@@ -101,6 +102,11 @@ export const AgencyFormCommonFields = ({
     }
   }, [agencyAddress, onAddressSelected]);
 
+  useExistingSiret({
+    siret: formValues.agencySiret,
+    addressAutocompleteLocator: "agency-address",
+  });
+
   return (
     <>
       <Input
@@ -116,7 +122,7 @@ export const AgencyFormCommonFields = ({
           readOnly: isFetchingSiret,
         }}
         state={
-          siretErrorToDisplay && formState.touchedFields.agencySiret
+          formState.touchedFields.agencySiret && siretErrorToDisplay
             ? "error"
             : "default"
         }
