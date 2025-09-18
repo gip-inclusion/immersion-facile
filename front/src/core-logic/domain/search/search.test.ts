@@ -1,7 +1,7 @@
 import {
   expectToEqual,
+  type LegacySearchQueryParamsDto,
   type LocationId,
-  type SearchQueryParamsDto,
   type SearchResultDto,
 } from "shared";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
@@ -88,7 +88,7 @@ describe("search epic", () => {
       expectStatus("noSearchMade");
       expectSearchInfo("Veuillez sélectionner vos critères");
       expectIsLoading(false);
-      const searchParams: SearchQueryParamsDto = {
+      const searchParams: LegacySearchQueryParamsDto = {
         distanceKm: 10,
         longitude: 0,
         latitude: 0,
@@ -294,7 +294,7 @@ describe("search epic", () => {
     expect(searchSelectors.isLoading(store.getState())).toBe(isLoading);
 
   const expectedSearchParamsToEqual = (
-    expectedSearchParams: SearchQueryParamsDto,
+    expectedSearchParams: LegacySearchQueryParamsDto,
   ) =>
     expectToEqual(
       searchSelectors.searchParams(store.getState()),

@@ -7,6 +7,7 @@ import {
   type AppellationCode,
   type AppellationDto,
   castError,
+  type DataWithPagination,
   type DateTimeIsoString,
   type EstablishmentSearchableByValue,
   errors,
@@ -14,6 +15,7 @@ import {
   type NafCode,
   pipeWithValue,
   type RomeCode,
+  type SearchQueryParamsDto,
   type SearchSortedBy,
   type SiretDto,
 } from "shared";
@@ -30,13 +32,13 @@ import type { GeoParams } from "../entities/SearchMadeEntity";
 import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
+  LegacySearchImmersionParams,
   OfferWithSiret,
   RepositorySearchImmertionResult,
   RepositorySearchResultDto,
-  SearchImmersionParams,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
-import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
+import { hasSearchGeoParams } from "../use-cases/LegacySearchImmersion";
 
 const logger = createLogger(__filename);
 const MAX_RESULTS_HARD_LIMIT = 100;
@@ -310,11 +312,11 @@ export class PgEstablishmentAggregateRepository
     return result.length;
   }
 
-  public async searchImmersionResults({
+  public async legacySearchImmersionResults({
     searchMade,
     maxResults,
     fitForDisabledWorkers,
-  }: SearchImmersionParams): Promise<RepositorySearchImmertionResult[]> {
+  }: LegacySearchImmersionParams): Promise<RepositorySearchImmertionResult[]> {
     // exclure
     // - entreprises non cherchables
     // - entreprises pas dispo
@@ -448,6 +450,12 @@ export class PgEstablishmentAggregateRepository
       .execute();
 
     return results.map(({ siret }) => siret);
+  }
+
+  public async getOffers(
+    _searchImmersionParams: SearchQueryParamsDto,
+  ): Promise<DataWithPagination<RepositorySearchImmertionResult>> {
+    throw new Error("NOT implemented");
   }
 
   async #updateEstablishmentEntity(

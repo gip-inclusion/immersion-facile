@@ -3,6 +3,7 @@ import {
   type AppellationAndRomeDto,
   type AppellationCode,
   conflictErrorSiret,
+  type DataWithPagination,
   errors,
   type GeoPositionDto,
   type LocationId,
@@ -10,6 +11,7 @@ import {
   pathEq,
   type RomeCode,
   replaceArrayElement,
+  type SearchQueryParamsDto,
   type SearchResultDto,
   type SiretDto,
 } from "shared";
@@ -19,7 +21,7 @@ import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
 import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
-  SearchImmersionParams,
+  LegacySearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
@@ -161,11 +163,11 @@ export class InMemoryEstablishmentAggregateRepository
     throw new Error("NOT implemented");
   }
 
-  public async searchImmersionResults({
+  public async legacySearchImmersionResults({
     searchMade,
     fitForDisabledWorkers,
     maxResults,
-  }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
+  }: LegacySearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this.#establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
       .filter((aggregate) =>
@@ -253,6 +255,12 @@ export class InMemoryEstablishmentAggregateRepository
     return this.#establishmentAggregates
       .filter((aggregate) => sirets.includes(aggregate.establishment.siret))
       .map(({ establishment }) => establishment.siret);
+  }
+
+  public async getOffers(
+    _searchImmersionParams: SearchQueryParamsDto,
+  ): Promise<DataWithPagination<SearchImmersionResult>> {
+    throw new Error("NOT implemented");
   }
 }
 
