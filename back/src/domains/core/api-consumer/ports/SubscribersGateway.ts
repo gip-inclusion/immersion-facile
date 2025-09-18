@@ -3,6 +3,7 @@ import type {
   ConventionId,
   ConventionReadDto,
   ConventionStatus,
+  SubscriberErrorFeedback,
   SubscriptionParams,
 } from "shared";
 
@@ -31,10 +32,6 @@ type NotifyResponseSuccess = NotifyResponseCommon & {
 };
 
 export type SubscriberResponse = NotifyResponseError | NotifyResponseSuccess;
-export type SubscriberErrorFeedback = {
-  message: string;
-  error?: Error;
-};
 
 export interface SubscribersGateway {
   notify: (
