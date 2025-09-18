@@ -3,6 +3,7 @@ import {
   type AddConventionInput,
   type AgencyOption,
   type ApiConsumerName,
+  type BroadcastFeedback,
   type ConnectedUserJwt,
   type ConventionDto,
   ConventionDtoBuilder,
@@ -63,6 +64,9 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public editConventionCounsellorNameResult$ = new Subject<void>();
 
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
+
+  public getLastBroadcastFeedbackResult$ =
+    new Subject<BroadcastFeedback | null>();
 
   #agencies: { [id: string]: AgencyOption } = {};
 
@@ -205,5 +209,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: string,
   ): Observable<void> {
     return this.markPartnersErroredConventionAsHandledResult$;
+  }
+
+  public getLastBroadcastFeedback$(
+    _conventionId: ConventionId,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<BroadcastFeedback | null> {
+    return this.getLastBroadcastFeedbackResult$;
   }
 }

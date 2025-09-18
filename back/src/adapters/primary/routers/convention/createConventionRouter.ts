@@ -90,5 +90,16 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.getLastBroadcastFeedback(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getLastBroadcastFeedback.execute(
+          req.params.conventionId,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   return expressRouter;
 };

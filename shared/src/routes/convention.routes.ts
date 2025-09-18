@@ -4,6 +4,7 @@ import {
   assessmentDtoSchema,
   legacyAssessmentDtoSchema,
 } from "../assessment/assessment.schema";
+import { broadcastFeedbackSchema } from "../broadcastFeedback/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
 import {
   conventionReadSchema,
@@ -273,6 +274,19 @@ export const authenticatedConventionRoutes = defineRoutes({
       403: httpErrorSchema,
       404: httpErrorSchema,
       429: httpErrorSchema,
+    },
+  }),
+
+  getLastBroadcastFeedback: defineRoute({
+    url: "/conventions/:conventionId/last-broadcast-feedback",
+    method: "get",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: broadcastFeedbackSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });

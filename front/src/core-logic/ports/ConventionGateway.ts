@@ -1,6 +1,7 @@
 import type { Observable } from "rxjs";
 import type {
   ApiConsumerName,
+  BroadcastFeedback,
   ConnectedUserJwt,
   ConventionDto,
   ConventionId,
@@ -86,4 +87,8 @@ export interface ConventionGateway {
     params: MarkPartnersErroredConventionAsHandledRequest,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
+  getLastBroadcastFeedback$(
+    conventionId: ConventionId,
+    jwt: ConventionSupportedJwt,
+  ): Observable<BroadcastFeedback | null>;
 }
