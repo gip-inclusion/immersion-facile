@@ -1,6 +1,6 @@
 import { addDays, isBefore } from "date-fns";
 import subDays from "date-fns/subDays";
-import { propEq, toPairs } from "ramda";
+import { map, propEq, sort, toPairs } from "ramda";
 import {
   type ConventionDto,
   type ConventionId,
@@ -10,7 +10,9 @@ import {
   type DataWithPagination,
   errors,
   type FindSimilarConventionsParams,
+  filter,
   NotFoundError,
+  pipeWithValue,
   type SiretDto,
   type UserId,
 } from "shared";
@@ -110,13 +112,14 @@ export class InMemoryConventionQueries implements ConventionQueries {
   }: {
     siret: SiretDto;
   }): Promise<ConventionMarketingData[]> {
-    return this.conventionRepository.conventions
-      .filter(
+    return pipeWithValue(
+      this.conventionRepository.conventions,
+      filter(
         (convention) =>
           convention.siret === siret &&
           convention.status === "ACCEPTED_BY_VALIDATOR",
-      )
-      .sort((a, b) => {
+      ),
+      sort((a, b) => {
         const aDate = a.dateValidation;
         const bDate = b.dateValidation;
 
@@ -124,8 +127,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
         if (!bDate) return -1;
 
         return new Date(aDate).getTime() - new Date(bDate).getTime();
-      })
-      .map((convention) => ({
+      }),
+      map((convention) => ({
         siret: convention.siret,
         dateValidation: convention.dateValidation || undefined,
         dateEnd: convention.dateEnd,
@@ -137,7 +140,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
         },
         establishmentNumberEmployeesRange:
           convention.establishmentNumberEmployeesRange || undefined,
-      }));
+      })),
+    );
   }
 
   public async getPaginatedConventionsForAgencyUser(

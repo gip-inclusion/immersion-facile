@@ -1,5 +1,6 @@
 import { addDays, subDays } from "date-fns";
 import { sql } from "kysely";
+import { jsonBuildObject } from "kysely/helpers/postgres";
 import { andThen } from "ramda";
 import {
   type ConventionDto,
@@ -132,13 +133,17 @@ export class PgConventionQueries implements ConventionQueries {
         "er.id",
         "conventions.establishment_representative_id",
       )
-      .select("conventions.siret")
-      .select("conventions.date_validation")
-      .select("conventions.date_end")
-      .select("er.email as establishment_representative_email")
-      .select("er.first_name as establishment_representative_firstname")
-      .select("er.last_name as establishment_representative_lastname")
-      .select("conventions.establishment_number_employees")
+      .select((eb) => [
+        "conventions.siret as siret",
+        "conventions.date_validation as dateValidation",
+        "conventions.date_end as dateEnd",
+        jsonBuildObject({
+          email: eb.ref("er.email"),
+          firstName: eb.ref("er.first_name"),
+          lastName: eb.ref("er.last_name"),
+        }).as("establishmentRepresentative"),
+        "conventions.establishment_number_employees as establishmentNumberEmployeesRange",
+      ])
       .where("conventions.siret", "=", siret)
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .orderBy("conventions.date_validation", "asc")
@@ -146,15 +151,11 @@ export class PgConventionQueries implements ConventionQueries {
 
     return result.map((row) => ({
       siret: row.siret,
-      dateValidation: row.date_validation?.toISOString() || undefined,
-      dateEnd: row.date_end.toISOString(),
-      establishmentRepresentative: {
-        email: row.establishment_representative_email,
-        firstName: row.establishment_representative_firstname,
-        lastName: row.establishment_representative_lastname,
-      },
+      dateValidation: row.dateValidation?.toISOString() || undefined,
+      dateEnd: row.dateEnd.toISOString(),
+      establishmentRepresentative: row.establishmentRepresentative,
       establishmentNumberEmployeesRange:
-        row.establishment_number_employees || undefined,
+        row.establishmentNumberEmployeesRange || undefined,
     }));
   }
 
