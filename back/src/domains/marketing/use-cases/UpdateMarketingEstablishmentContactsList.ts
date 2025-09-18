@@ -48,19 +48,25 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
           siret: siret,
         });
 
+      const marketingConventionsData = {
+        firstConvention: validatedConventionsData.at(0),
+        lastConvention: validatedConventionsData.at(-1),
+        totalNumberOfConvention: validatedConventionsData.length,
+      };
+
       return establishment
         ? onEstablishment(
             uow,
             establishmentMarketingGateway,
             timeGateway,
             establishment,
-            validatedConventionsData,
+            marketingConventionsData,
           )
         : onMissingEstablishment(
             uow,
             timeGateway,
             establishmentMarketingGateway,
-            validatedConventionsData,
+            marketingConventionsData,
             siret,
           );
     },
@@ -70,12 +76,16 @@ const onMissingEstablishment = async (
   uow: UnitOfWork,
   timeGateway: TimeGateway,
   establishmentMarketingGateway: EstablishmentMarketingGateway,
-  validatedConventionsData: ConventionMarketingData[],
+  marketingConventionsData: {
+    firstConvention: ConventionMarketingData | undefined;
+    lastConvention: ConventionMarketingData | undefined;
+    totalNumberOfConvention: number;
+  },
   siret: SiretDto,
 ): Promise<void> => {
-  const firstValidatedConvention = validatedConventionsData.at(0);
-  const lastValidatedConvention = validatedConventionsData.at(-1);
-  if (!lastValidatedConvention) {
+  const { lastConvention } = marketingConventionsData;
+
+  if (!lastConvention) {
     return deleteMarketingContactEntity(
       siret,
       uow,
@@ -85,31 +95,22 @@ const onMissingEstablishment = async (
 
   const marketingContact: MarketingContact = {
     createdAt: timeGateway.now(),
-    email: lastValidatedConvention.establishmentRepresentative.email,
-    firstName: lastValidatedConvention.establishmentRepresentative.firstName,
-    lastName: lastValidatedConvention.establishmentRepresentative.lastName,
+    email: lastConvention.establishmentRepresentative.email,
+    firstName: lastConvention.establishmentRepresentative.firstName,
+    lastName: lastConvention.establishmentRepresentative.lastName,
   };
 
-  await saveMarketingContactEntity(
-    uow,
-    lastValidatedConvention.siret,
-    marketingContact,
-  );
+  await saveMarketingContactEntity(uow, lastConvention.siret, marketingContact);
 
   return establishmentMarketingGateway.save({
     isRegistered: false,
     email: marketingContact.email,
     firstName: marketingContact.firstName,
     lastName: marketingContact.lastName,
-    conventions: makeConventionInfos(
-      validatedConventionsData,
-      firstValidatedConvention,
-      lastValidatedConvention,
-    ),
+    conventions: makeConventionInfos(marketingConventionsData),
     hasIcAccount: false,
-    numberEmployeesRange:
-      lastValidatedConvention.establishmentNumberEmployeesRange,
-    siret: lastValidatedConvention.siret,
+    numberEmployeesRange: lastConvention.establishmentNumberEmployeesRange,
+    siret: lastConvention.siret,
   });
 };
 
@@ -118,7 +119,11 @@ const onEstablishment = async (
   marketingGateway: EstablishmentMarketingGateway,
   timeGateway: TimeGateway,
   establishmentAggregate: EstablishmentAggregate,
-  validatedConventionsData: ConventionMarketingData[],
+  marketingConventionsData: {
+    firstConvention: ConventionMarketingData | undefined;
+    lastConvention: ConventionMarketingData | undefined;
+    totalNumberOfConvention: number;
+  },
 ): Promise<void> => {
   const firstLocation = establishmentAggregate.establishment.locations.at(0);
   if (!firstLocation) throw new Error("Establishement has no location.");
@@ -153,9 +158,6 @@ const onEstablishment = async (
 
   const hasIcAccount = !!user?.proConnect;
 
-  const firstValidatedConvention = validatedConventionsData.at(0);
-  const lastValidatedConvention = validatedConventionsData.at(-1);
-
   const discussions = await uow.discussionRepository.getDiscussions({
     filters: { sirets: [establishmentAggregate.establishment.siret] },
     limit: 500,
@@ -171,11 +173,7 @@ const onEstablishment = async (
     email: marketingContact.email,
     firstName: marketingContact.firstName,
     lastName: marketingContact.lastName,
-    conventions: makeConventionInfos(
-      validatedConventionsData,
-      firstValidatedConvention,
-      lastValidatedConvention,
-    ),
+    conventions: makeConventionInfos(marketingConventionsData),
     departmentCode: firstLocation.address.departmentCode,
     hasIcAccount,
     isRegistered: true,
@@ -201,28 +199,33 @@ const onEstablishment = async (
   });
 };
 
-const makeConventionInfos = (
-  validatedConventionsData: ConventionMarketingData[],
-  firstValidatedConvention: ConventionMarketingData | undefined,
-  lastValidatedConvention: ConventionMarketingData | undefined,
-): ConventionInfos => ({
-  numberOfValidatedConvention: validatedConventionsData.length,
-  ...(firstValidatedConvention?.dateValidation
-    ? {
-        firstConventionValidationDate: new Date(
-          firstValidatedConvention.dateValidation,
-        ),
-      }
-    : {}),
-  ...(lastValidatedConvention?.dateValidation
-    ? {
-        lastConvention: {
-          endDate: new Date(lastValidatedConvention.dateEnd),
-          validationDate: new Date(lastValidatedConvention.dateValidation),
-        },
-      }
-    : {}),
-});
+const makeConventionInfos = (marketingConventionsData: {
+  firstConvention: ConventionMarketingData | undefined;
+  lastConvention: ConventionMarketingData | undefined;
+  totalNumberOfConvention: number;
+}): ConventionInfos => {
+  const { firstConvention, lastConvention, totalNumberOfConvention } =
+    marketingConventionsData;
+
+  return {
+    numberOfValidatedConvention: totalNumberOfConvention,
+    ...(firstConvention?.dateValidation
+      ? {
+          firstConventionValidationDate: new Date(
+            firstConvention.dateValidation,
+          ),
+        }
+      : {}),
+    ...(lastConvention?.dateValidation
+      ? {
+          lastConvention: {
+            endDate: new Date(lastConvention.dateEnd),
+            validationDate: new Date(lastConvention.dateValidation),
+          },
+        }
+      : {}),
+  };
+};
 
 const saveMarketingContactEntity = async (
   uow: UnitOfWork,
