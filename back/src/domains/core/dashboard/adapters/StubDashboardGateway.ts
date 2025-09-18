@@ -13,14 +13,14 @@ import type { DashboardGateway } from "../port/DashboardGateway";
 export class StubDashboardGateway implements DashboardGateway {
   getAgencyUserUrls(
     userId: UserId,
-    agencyKinds: AgencyKind[],
+    agencyKind: AgencyKind | undefined,
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
       agencyDashboardUrl: `http://stubAgencyUserDashboard/${userId}/${now}`,
       statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${now}`,
       statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${now}`,
-      statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${now}/${agencyKinds.join(",")}`,
+      statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${now}${agencyKind ? `/${agencyKind}` : ""}`,
     };
   }
   getAgencyForAdminUrl(

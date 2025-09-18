@@ -143,13 +143,18 @@ async function makeAgencyDashboards({
       ),
   );
 
-  const agencyKinds = uniq(user.agencyRights.map(({ agency }) => agency.kind));
+  const agencyKinds = uniq(
+    user.agencyRights
+      .filter(({ roles }) => agencyRoleIsNotToReview(roles))
+      .map(({ agency }) => agency.kind),
+  );
+  const agencyKind = agencyKinds.length === 1 ? agencyKinds[0] : undefined;
 
   return {
     ...(agencyIdsWithEnoughPrivileges.length > 0
       ? dashboardGateway.getAgencyUserUrls(
           user.id,
-          agencyKinds,
+          agencyKind,
           timeGateway.now(),
         )
       : {}),
