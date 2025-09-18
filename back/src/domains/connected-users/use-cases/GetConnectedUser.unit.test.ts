@@ -232,9 +232,15 @@ describe("GetConnectedUser", () => {
           .withId("1111")
           .withKind("pole-emploi")
           .build();
-        const agency2 = agencyBuilder.withId("2222").build();
-        const agency3 = agencyBuilder.withId("3333").build();
-        const agency4 = agencyBuilder.withId("4444").build();
+        const agency2 = agencyBuilder
+          .withId("2222")
+          .withKind("pole-emploi")
+          .build();
+        const agency3 = agencyBuilder.withId("3333").withKind("autre").build();
+        const agency4 = agencyBuilder
+          .withId("4444")
+          .withKind("pole-emploi")
+          .build();
 
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency1, {
@@ -300,7 +306,79 @@ describe("GetConnectedUser", () => {
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/pole-emploi,autre`,
+              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/pole-emploi`,
+              statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
+              statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
+            },
+            establishments: {},
+          },
+        });
+      });
+
+      it("should not include agency kind in dashboard URL when agencies have different kinds", async () => {
+        const agencyBuilder = new AgencyDtoBuilder();
+
+        const agency1 = agencyBuilder
+          .withId("1111")
+          .withKind("pole-emploi")
+          .build();
+        const agency2 = agencyBuilder.withId("2222").withKind("autre").build();
+        const agency3 = agencyBuilder.withId("3333").withKind("cci").build();
+
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency1, {
+            [notAdminUser.id]: {
+              roles: ["counsellor"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency2, {
+            [notAdminUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency3, {
+            [notAdminUser.id]: {
+              roles: ["agency-admin"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ];
+
+        const user = await getConnectedUser.execute({}, connectedNotAdminUser);
+
+        expectToEqual(user, {
+          ...notAdminUser,
+          proConnect: defaultProConnectInfos,
+          agencyRights: [
+            {
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+            {
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+            {
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency3, [
+                notAdminUser.email,
+              ]),
+              roles: ["agency-admin"],
+              isNotifiedByEmail: true,
+            },
+          ],
+          dashboards: {
+            agencies: {
+              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+                notAdminUser.id
+              }/${timeGateway.now()}`,
+              erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+                notAdminUser.id
+              }/${timeGateway.now()}`,
+              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}`,
               statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
               statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
             },

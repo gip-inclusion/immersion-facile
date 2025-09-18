@@ -80,7 +80,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
 
   public getAgencyUserUrls(
     userId: UserId,
-    agencyKinds: AgencyKind[],
+    agencyKind: AgencyKind | undefined,
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
@@ -101,7 +101,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
       statsAgenciesUrl: this.#makeDashboardUrlByDashboardName(
         "statsAgencies",
         now,
-        { type_de_structure: agencyKinds.join(",") },
+        agencyKind ? { type_de_structure: agencyKind } : undefined,
       ),
     };
   }

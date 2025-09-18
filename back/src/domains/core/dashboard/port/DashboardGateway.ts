@@ -16,7 +16,7 @@ export interface DashboardGateway {
   ): AbsoluteUrl;
   getAgencyUserUrls(
     userId: UserId,
-    agencyKinds: AgencyKind[],
+    agencyKind: AgencyKind | undefined,
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl">;
   getAgencyForAdminUrl(agencyId: AgencyId, now: Date): AbsoluteUrl;
