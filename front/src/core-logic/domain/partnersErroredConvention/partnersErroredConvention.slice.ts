@@ -1,5 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
+  BroadcastFeedback,
+  ConventionId,
   ConventionSupportedJwt,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
@@ -7,16 +9,23 @@ import type { PayloadActionWithFeedbackTopic } from "../feedback/feedback.slice"
 
 export interface PartnersErroredConventionState {
   isLoading: boolean;
+  lastBroadcastFeedback: BroadcastFeedback | null;
 }
 
 export const initialPartnersErroredConventionState: PartnersErroredConventionState =
   {
     isLoading: false,
+    lastBroadcastFeedback: null,
   };
 
 type MarkPartnersErroredConventionAsHandledRequestPayload = {
   jwt: ConventionSupportedJwt;
   markAsHandledParams: MarkPartnersErroredConventionAsHandledRequest;
+};
+
+type FetchConventionLastBroadcastFeedbackRequestPayload = {
+  conventionId: ConventionId;
+  jwt: ConventionSupportedJwt;
 };
 
 export const partnersErroredConventionSlice = createSlice({
@@ -38,6 +47,27 @@ export const partnersErroredConventionSlice = createSlice({
     markAsHandledFailed: (
       state: PartnersErroredConventionState,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isLoading = false;
+    },
+    fetchConventionLastBroadcastFeedbackRequested: (
+      state,
+      _action: PayloadAction<FetchConventionLastBroadcastFeedbackRequestPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    fetchConventionLastBroadcastFeedbackSucceeded: (
+      state,
+      action: PayloadAction<{
+        lastBroadcastFeedback: BroadcastFeedback | null;
+      }>,
+    ) => {
+      state.isLoading = false;
+      state.lastBroadcastFeedback = action.payload.lastBroadcastFeedback;
+    },
+    fetchConventionLastBroadcastFeedbackFailed: (
+      state: PartnersErroredConventionState,
+      _action: PayloadAction<{ errorMessage: string }>,
     ) => {
       state.isLoading = false;
     },
