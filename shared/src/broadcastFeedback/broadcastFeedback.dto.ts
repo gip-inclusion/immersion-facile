@@ -1,0 +1,33 @@
+import type {
+  ApiConsumerId,
+  ApiConsumerName,
+  ConventionId,
+  ConventionStatus,
+} from "..";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+
+export type ConventionBroadcastRequestParams = {
+  conventionId: ConventionId;
+  callbackUrl?: AbsoluteUrl;
+  conventionStatus?: ConventionStatus;
+};
+export type BroadcastFeedbackResponse = {
+  httpStatus: number;
+  body?: unknown;
+} | null;
+
+export type SubscriberErrorFeedback = {
+  message: string;
+  error?: unknown;
+};
+
+export type BroadcastFeedback = {
+  serviceName: string;
+  consumerId: ApiConsumerId | null;
+  consumerName: ApiConsumerName;
+  subscriberErrorFeedback?: SubscriberErrorFeedback;
+  requestParams: ConventionBroadcastRequestParams;
+  response?: BroadcastFeedbackResponse;
+  occurredAt: Date;
+  handledByAgency: boolean;
+};

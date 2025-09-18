@@ -1,11 +1,8 @@
 import { sql } from "kysely";
-import { type ConventionId, errors } from "shared";
+import { type BroadcastFeedback, type ConventionId, errors } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { isAxiosError } from "../../../../utils/axiosUtils";
-import type {
-  BroadcastFeedback,
-  BroadcastFeedbacksRepository,
-} from "../ports/BroadcastFeedbacksRepository";
+import type { BroadcastFeedbacksRepository } from "../ports/BroadcastFeedbacksRepository";
 
 export class PgBroadcastFeedbacksRepository
   implements BroadcastFeedbacksRepository
