@@ -3,6 +3,7 @@ import type {
   AddConventionInput,
   ApiConsumerName,
   AuthenticatedConventionRoutes,
+  BroadcastFeedback,
   ConnectedUserJwt,
   ConventionDto,
   ConventionId,
@@ -354,6 +355,26 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getLastBroadcastFeedback$(
+    conventionId: ConventionId,
+    jwt: ConventionSupportedJwt,
+  ): Observable<BroadcastFeedback | null> {
+    return from(
+      this.authenticatedHttpClient
+        .getLastBroadcastFeedback({
+          urlParams: { conventionId },
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
