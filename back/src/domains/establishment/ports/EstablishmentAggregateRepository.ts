@@ -4,6 +4,7 @@ import type {
   DataWithPagination,
   DateTimeIsoString,
   LocationId,
+  SearchQueryParamsDto,
   SearchResultDto,
   SiretDto,
   UserId,
@@ -72,7 +73,7 @@ export interface EstablishmentAggregateRepository {
     searchImmersionParams: LegacySearchImmersionParams,
   ): Promise<RepositorySearchImmertionResult[]>;
   getOffers(
-    searchImmersionParams: LegacySearchImmersionParams,
+    searchImmersionParams: SearchQueryParamsDto,
   ): Promise<DataWithPagination<RepositorySearchImmertionResult>>;
   //Sirets
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;

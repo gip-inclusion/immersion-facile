@@ -26,8 +26,8 @@ export type AcquisitionParams = Partial<{
   [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
-  ? T
-  : never;
+    ? T
+    : never;
 }>;
 
 type AcquisitionParamsKeys = keyof typeof acquisitionParams;

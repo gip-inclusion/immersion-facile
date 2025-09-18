@@ -7,6 +7,7 @@ import {
   type AppellationCode,
   type AppellationDto,
   castError,
+  type DataWithPagination,
   type DateTimeIsoString,
   type EstablishmentSearchableByValue,
   errors,
@@ -14,6 +15,7 @@ import {
   type NafCode,
   pipeWithValue,
   type RomeCode,
+  type SearchQueryParamsDto,
   type SearchSortedBy,
   type SiretDto,
 } from "shared";
@@ -42,8 +44,9 @@ const logger = createLogger(__filename);
 const MAX_RESULTS_HARD_LIMIT = 100;
 
 export class PgEstablishmentAggregateRepository
-  implements EstablishmentAggregateRepository {
-  constructor(private transaction: KyselyDb) { }
+  implements EstablishmentAggregateRepository
+{
+  constructor(private transaction: KyselyDb) {}
 
   public async getAllEstablishmentAggregatesForTest(): Promise<
     EstablishmentAggregate[]
@@ -335,8 +338,8 @@ export class PgEstablishmentAggregateRepository
         romeCodes: searchMade.romeCode
           ? [searchMade.romeCode]
           : await this.#getRomeCodeFromAppellationCodes(
-            searchMade.appellationCodes,
-          ),
+              searchMade.appellationCodes,
+            ),
       },
       sortedBy: searchMade.sortedBy ?? "date",
     });
@@ -413,9 +416,9 @@ export class PgEstablishmentAggregateRepository
       const nafDto =
         values?.nafDto !== undefined
           ? {
-            naf_code: values.nafDto.code,
-            naf_nomenclature: values.nafDto.nomenclature,
-          }
+              naf_code: values.nafDto.code,
+              naf_nomenclature: values.nafDto.nomenclature,
+            }
           : {};
       const numberEmployees =
         values?.numberEmployeesRange !== undefined
@@ -447,6 +450,12 @@ export class PgEstablishmentAggregateRepository
       .execute();
 
     return results.map(({ siret }) => siret);
+  }
+
+  public async getOffers(
+    _searchImmersionParams: SearchQueryParamsDto,
+  ): Promise<DataWithPagination<RepositorySearchImmertionResult>> {
+    throw new Error("NOT implemented");
   }
 
   async #updateEstablishmentEntity(
@@ -771,26 +780,26 @@ const makeEstablishmentAggregateFromDb = (
       potentialBeneficiaryWelcomeAddress: aggregate.establishment
         .potentialBeneficiaryWelcomeAddress
         ? {
-          address: {
-            streetNumberAndAddress:
-              aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                .address.streetNumberAndAddress,
-            postcode:
-              aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                .address.postcode,
-            city: aggregate.establishment.potentialBeneficiaryWelcomeAddress
-              .address.city,
-            departmentCode:
-              aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                .address.departmentCode,
-          },
-          position: {
-            lat: aggregate.establishment.potentialBeneficiaryWelcomeAddress
-              .position.lat,
-            lon: aggregate.establishment.potentialBeneficiaryWelcomeAddress
-              .position.lon,
-          },
-        }
+            address: {
+              streetNumberAndAddress:
+                aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                  .address.streetNumberAndAddress,
+              postcode:
+                aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                  .address.postcode,
+              city: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .address.city,
+              departmentCode:
+                aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                  .address.departmentCode,
+            },
+            position: {
+              lat: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .position.lat,
+              lon: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .position.lon,
+            },
+          }
         : undefined,
     },
     offers: aggregate.immersionOffers.map(
@@ -866,10 +875,10 @@ const searchImmersionResultsQuery = (
                 fitForDisabledWorkers === undefined
                   ? qb
                   : qb.where(
-                    "establishments.fit_for_disabled_workers",
-                    fitForDisabledWorkers ? "is" : "is not",
-                    true,
-                  ),
+                      "establishments.fit_for_disabled_workers",
+                      fitForDisabledWorkers ? "is" : "is not",
+                      true,
+                    ),
               (qb) =>
                 siret ? qb.where("establishments.siret", "=", siret) : qb,
               (qb) => {
@@ -920,22 +929,22 @@ const searchImmersionResultsQuery = (
                 (eb) =>
                   geoParams && hasSearchGeoParams(geoParams)
                     ? eb.where(({ fn }) =>
-                      fn("ST_DWithin", [
-                        "position",
-                        fn("ST_GeographyFromText", [
-                          sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                        fn("ST_DWithin", [
+                          "position",
+                          fn("ST_GeographyFromText", [
+                            sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                          ]),
+                          sql`${(1000 * geoParams.distanceKm).toString()}`,
                         ]),
-                        sql`${(1000 * geoParams.distanceKm).toString()}`,
-                      ]),
-                    )
+                      )
                     : eb,
                 (eb) =>
                   locationId
                     ? eb.where(
-                      "establishments_location_infos.id",
-                      "=",
-                      locationId,
-                    )
+                        "establishments_location_infos.id",
+                        "=",
+                        locationId,
+                      )
                     : eb,
               ).as("loc"),
             (join) => join.onRef("loc.siret", "=", "e.siret"),
@@ -959,18 +968,18 @@ const searchImmersionResultsQuery = (
                 (eb) =>
                   romeCodes
                     ? eb.where(
-                      "public_appellations_data.code_rome",
-                      "in",
-                      romeCodes,
-                    )
+                        "public_appellations_data.code_rome",
+                        "in",
+                        romeCodes,
+                      )
                     : eb,
                 (eb) =>
                   appellationCode
                     ? eb.where(
-                      "immersion_offers.appellation_code",
-                      "=",
-                      Number.parseInt(appellationCode),
-                    )
+                        "immersion_offers.appellation_code",
+                        "=",
+                        Number.parseInt(appellationCode),
+                      )
                     : eb,
               ).as("offer"),
             (join) => join.onRef("offer.siret", "=", "e.siret"),
@@ -1053,13 +1062,13 @@ const searchImmersionResultsQuery = (
           createdAt: sql<DateTimeIsoString>`date_to_iso(e.created_at)`,
           ...(geoParams && hasSearchGeoParams(geoParams)
             ? {
-              distance_m: fn("ST_Distance", [
-                ref("loc_pos.position"),
-                fn("ST_GeographyFromText", [
-                  sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                distance_m: fn("ST_Distance", [
+                  ref("loc_pos.position"),
+                  fn("ST_GeographyFromText", [
+                    sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                  ]),
                 ]),
-              ]),
-            }
+              }
             : {}),
           voluntaryToImmersion: sql`TRUE`,
           appellations: ref("r.appellations"),
@@ -1129,16 +1138,16 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
             numberEmployeesRange: ref("e.number_employees"),
             updatedAt: sql<string>`TO_CHAR
                 ( ${ref(
-              "e.update_date",
-            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                  "e.update_date",
+                )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
             createdAt: sql<string>`TO_CHAR
                 ( ${ref(
-              "e.created_at",
-            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                  "e.created_at",
+                )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
             lastInseeCheckDate: sql<string>`TO_CHAR
                 ( ${ref(
-              "e.last_insee_check_date",
-            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                  "e.last_insee_check_date",
+                )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
             isOpen: ref("e.is_open"),
             isMaxDiscussionsForPeriodReached: ref(
               "e.is_max_discussions_for_period_reached",
@@ -1197,8 +1206,8 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                   appellationLabel: ref("pad.libelle_appellation_long"),
                   createdAt: sql<string>`TO_CHAR
                       ( ${ref(
-                    "io.created_at",
-                  )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                        "io.created_at",
+                      )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
                 }).as("offer"),
               )
               .orderBy("io.appellation_code asc"),

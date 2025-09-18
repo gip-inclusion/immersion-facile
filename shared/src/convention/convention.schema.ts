@@ -12,8 +12,8 @@ import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentit
 import { dateFilterSchema } from "../filters";
 import {
   createPaginatedSchema,
+  makeOptionalSortSchema,
   paginationQueryParamsSchema,
-  sortSchema,
 } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { allRoles } from "../role/role.dto";
@@ -852,7 +852,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
     dateSubmissionTo: makeDateStringSchema().optional(),
   });
 
-const sortedConventionsSchema = sortSchema(
+const sortedConventionsSchema = makeOptionalSortSchema(
   z.enum(["dateValidation", "dateStart", "dateSubmission"], {
     error: localization.invalidEnum,
   }),

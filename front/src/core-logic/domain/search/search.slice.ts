@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AppellationAndRomeDto,
-  SearchQueryBaseWithoutAppellationsAndRomeDto,
-  SearchQueryParamsDto,
+  LegacySearchQueryBaseWithoutAppellationsAndRomeDto,
+  LegacySearchQueryParamsDto,
   SearchResultDto,
   SearchResultQuery,
   SiretAndAppellationDto,
@@ -15,11 +15,12 @@ import type {
 
 export type SearchResultPayload = SearchResultQuery | SearchResultDto;
 
-export type SearchPageParams = SearchQueryBaseWithoutAppellationsAndRomeDto & {
-  appellations?: AppellationAndRomeDto[];
-  fitForDisabledWorkers?: boolean | undefined;
-  currentPage: number;
-} & WithAcquisition;
+export type SearchPageParams =
+  LegacySearchQueryBaseWithoutAppellationsAndRomeDto & {
+    appellations?: AppellationAndRomeDto[];
+    fitForDisabledWorkers?: boolean | undefined;
+    currentPage: number;
+  } & WithAcquisition;
 
 export type SearchStatus =
   | "noSearchMade"
@@ -33,7 +34,7 @@ interface SearchState {
   searchResults: SearchResultDto[];
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
-  searchParams: SearchQueryParamsDto;
+  searchParams: LegacySearchQueryParamsDto;
 }
 
 export const initialState: SearchState = {
@@ -56,7 +57,10 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    searchRequested: (state, action: PayloadAction<SearchQueryParamsDto>) => {
+    searchRequested: (
+      state,
+      action: PayloadAction<LegacySearchQueryParamsDto>,
+    ) => {
       state.searchStatus = "initialFetch";
       state.searchResults = [];
       state.searchParams = action.payload;
@@ -66,7 +70,7 @@ export const searchSlice = createSlice({
       state,
       action: PayloadAction<{
         results: SearchResultDto[];
-        searchParams: SearchQueryParamsDto;
+        searchParams: LegacySearchQueryParamsDto;
       }>,
     ) => {
       state.searchResults = action.payload.results;
