@@ -47,7 +47,7 @@
     "@types/uuid": "^8.3.4",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.4",
-    "axios": "^1.11.0",
+    "axios": "^1.12.2",
     "babel-jest": "^29.7.0",
     "date-fns": "2.28.0",
     "html-templates": "workspace:*",
@@ -79,7 +79,7 @@
     "type-route": "^1.0.0",
     "typescript": "^5.8.3",
     "uuid": "^8.3.2",
-    "vite": "^5.4.19",
+    "vite": "^5.4.20",
     "vite-plugin-pwa": "^0.17.2",
     "workbox-window": "^7.0.0",
     "zod": "4.0.17"
