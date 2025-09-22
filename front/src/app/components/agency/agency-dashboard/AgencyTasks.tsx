@@ -114,8 +114,8 @@ export const AgencyTasks = ({
       {isLoading && <Loader />}
       {!isLoading && (
         <>
-          {pagination?.totalRecords &&
-            pagination?.totalRecords > 3 &&
+          {pagination &&
+            pagination.totalRecords > 3 &&
             displayMode === "limited" &&
             onSeeAllConventionsClick && (
               <Button
