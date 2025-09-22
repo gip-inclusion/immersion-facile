@@ -50,6 +50,10 @@ export const partnersErroredConventionSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
+    clearLastBroadcastFeedback: (state) => {
+      state.lastBroadcastFeedback =
+        initialPartnersErroredConventionState.lastBroadcastFeedback;
+    },
     fetchConventionLastBroadcastFeedbackRequested: (
       state,
       _action: PayloadAction<FetchConventionLastBroadcastFeedbackRequestPayload>,
