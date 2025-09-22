@@ -41,6 +41,7 @@ import { GetConvention } from "../../domains/convention/use-cases/GetConvention"
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
+import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
@@ -668,6 +669,10 @@ export const createUseCases = ({
     }),
 
     getConnectedUsers: makeGetConnectedUsers({
+      uowPerformer,
+    }),
+
+    getLastBroadcastFeedback: makeGetLastBroadcastFeedback({
       uowPerformer,
     }),
 
