@@ -172,6 +172,43 @@ describe("Broadcast feedback in store", () => {
     ).toBeNull();
   });
 
+  it("should clear lastBroadcastFeedback when clearLastBroadcastFeedback is dispatched", () => {
+    const broadcastFeedback: BroadcastFeedback = {
+      serviceName: "test-service",
+      consumerId: "consumer-1",
+      consumerName: "Test Consumer",
+      requestParams: {
+        conventionId: fakeConventionId,
+      },
+      occurredAt: new Date("2023-01-01"),
+      handledByAgency: false,
+    };
+
+    store.dispatch(
+      partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackRequested(
+        {
+          conventionId: fakeConventionId,
+          jwt: fakeJwt,
+        },
+      ),
+    );
+    dependencies.conventionGateway.getLastBroadcastFeedbackResult$.next(
+      broadcastFeedback,
+    );
+
+    expect(
+      store.getState().partnersErroredConvention.lastBroadcastFeedback,
+    ).toEqual(broadcastFeedback);
+
+    store.dispatch(
+      partnersErroredConventionSlice.actions.clearLastBroadcastFeedback(),
+    );
+
+    expect(
+      store.getState().partnersErroredConvention.lastBroadcastFeedback,
+    ).toBeNull();
+  });
+
   const expectIsLoadingToBe = (
     expected: PartnersErroredConventionState["isLoading"],
   ) =>
