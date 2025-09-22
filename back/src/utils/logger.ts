@@ -108,9 +108,9 @@ type LoggerParams = Partial<{
   agencyId: AgencyId;
   conventionId: ConventionId;
   crawlerInfo: {
+    typeOfEvents: TypeOfEvent;
     numberOfEventsBeforeAggregation?: number;
     numberOfEvents?: number;
-    typeOfEvents: TypeOfEvent;
     processEventsDurationInSeconds?: number;
     retrieveEventsDurationInSeconds?: number;
   };

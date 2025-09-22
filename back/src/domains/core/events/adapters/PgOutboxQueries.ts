@@ -39,10 +39,10 @@ export class PgOutboxQueries implements OutboxQueries {
     const numberOfEventsBeforeAggregation = results.length;
 
     if (numberOfEventsAgregated !== numberOfEventsBeforeAggregation) {
-      logger.debug({
+      logger.info({
         events,
         crawlerInfo: {
-          typeOfEvents: "unpublished",
+          typeOfEvents: "debug-unpublished",
           numberOfEvents: numberOfEventsAgregated,
           numberOfEventsBeforeAggregation,
         },
