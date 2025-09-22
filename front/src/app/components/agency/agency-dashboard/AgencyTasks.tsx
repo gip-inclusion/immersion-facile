@@ -67,6 +67,12 @@ export const AgencyTasks = ({
                 ...dateStartFrom1MonthAgoToIn5Days,
                 sortBy: "dateStart",
                 sortDirection: "asc",
+                statuses: [
+                  "READY_TO_SIGN",
+                  "PARTIALLY_SIGNED",
+                  "IN_REVIEW",
+                  "ACCEPTED_BY_COUNSELLOR",
+                ],
                 page: page,
                 perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_MODE,
               },
