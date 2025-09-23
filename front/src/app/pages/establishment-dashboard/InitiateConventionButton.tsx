@@ -116,7 +116,7 @@ export const InitiateConventionButton = () => {
     values,
     setValue,
   ]);
-  if (!currentUser) return null;
+  if (!currentUser || !connectedUserJwt) return null;
 
   return (
     <>

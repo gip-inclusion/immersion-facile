@@ -158,6 +158,14 @@ const checkEstablishment = async (
         `#${domElementIds.establishment.admin.appellations}-0-wrapper .im-select__single-value`,
       )
       .innerText(),
+  ).toContain("Lamineur écrouteur / Lamineuse écrouteuse");
+
+  await expect(
+    await page
+      .locator(
+        `#${domElementIds.establishment.admin.appellations}-1-wrapper .im-select__single-value`,
+      )
+      .innerText(),
   ).toContain("Bûcheron");
 
   await expect(

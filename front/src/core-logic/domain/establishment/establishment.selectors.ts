@@ -3,11 +3,6 @@ import type { RootState } from "src/core-logic/storeConfig/store";
 
 const establishmentState = (state: RootState) => state.establishment;
 
-const isReadyForRedirection = createSelector(
-  establishmentState,
-  (establishment) => establishment.isReadyForRedirection,
-);
-
 const isLoading = createSelector(
   establishmentState,
   (establishment) => establishment.isLoading,
@@ -26,6 +21,5 @@ const establishmentNameAndAdmins = createSelector(
 export const establishmentSelectors = {
   formEstablishment,
   isLoading,
-  isReadyForRedirection,
   establishmentNameAndAdmins,
 };

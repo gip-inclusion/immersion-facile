@@ -27,9 +27,7 @@ export type SiretAndJwtPayload = {
   jwt: ConnectedUserJwt;
 };
 
-export type EstablishmentRequestedPayload =
-  | Partial<FormEstablishmentDto>
-  | SiretAndJwtPayload;
+export type EstablishmentRequestedPayload = SiretAndJwtPayload;
 
 export const defaultFormEstablishmentValue = (
   siret?: SiretDto,
@@ -56,7 +54,6 @@ export const defaultFormEstablishmentValue = (
 
 export type EstablishmentState = {
   isLoading: boolean;
-  isReadyForRedirection: boolean;
   formEstablishment: FormEstablishmentDto;
   establishmentNameAndAdmins:
     | EstablishmentNameAndAdmins
@@ -66,7 +63,6 @@ export type EstablishmentState = {
 
 const initialState: EstablishmentState = {
   isLoading: false,
-  isReadyForRedirection: false,
   formEstablishment: defaultFormEstablishmentValue(),
   establishmentNameAndAdmins: null,
 };
@@ -75,12 +71,6 @@ export const establishmentSlice = createSlice({
   name: "establishment",
   initialState,
   reducers: {
-    gotReady: (state) => {
-      state.isReadyForRedirection = true;
-    },
-    backToIdle: (state) => {
-      state.isReadyForRedirection = false;
-    },
     fetchEstablishmentRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
