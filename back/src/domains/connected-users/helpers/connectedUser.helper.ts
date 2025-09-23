@@ -1,4 +1,4 @@
-import { toPairs, uniq, values } from "ramda";
+import {keys, toPairs, uniq, values} from "ramda";
 import {
   type AbsoluteUrl,
   type AgencyDashboards,
@@ -21,6 +21,7 @@ import type { DashboardGateway } from "../../core/dashboard/port/DashboardGatewa
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "./userRights.helper";
+import {RemoveUserFromAgency} from "../use-cases/RemoveUserFromAgency";
 
 export const getConnectedUserByUserId = async ({
   uow,
@@ -44,6 +45,7 @@ export const getConnectedUserByUserId = async ({
 export const getConnectedUsersByUserIds = async (
   uow: UnitOfWork,
   userIds: UserId[],
+  agencyId: AgencyId,
 ): Promise<ConnectedUser[]> => {
   const users = await uow.userRepository.getByIds(userIds);
 
@@ -64,7 +66,7 @@ export const getConnectedUsersByUserIds = async (
       uniq(
         values(userRightsByUser).flatMap((rights) =>
           rights.map((right) => right.agencyId),
-        ),
+        ).filter((userAgencyId) => agencyId === userAgencyId),
       ),
     )
   ).reduce<Record<AgencyId, AgencyWithUsersRights>>(
@@ -90,9 +92,10 @@ const makeAgencyRights = (
   userRights: AgencyRightOfUser[],
   agenciesRelatedToUsersByAgencyId: Record<AgencyId, AgencyWithUsersRights>,
   uow: UnitOfWork,
-): Promise<AgencyRight[]> =>
-  Promise.all(
-    userRights.map<Promise<AgencyRight>>(async ({ agencyId, ...rights }) => {
+): Promise<AgencyRight[]> => {
+  const agencyIds = keys(agenciesRelatedToUsersByAgencyId)
+  return Promise.all(
+    userRights.filter((userRight) => agencyIds.includes(userRight.agencyId)).map<Promise<AgencyRight>>(async ({ agencyId, ...rights }) => {
       const { usersRights, ...agency } =
         agenciesRelatedToUsersByAgencyId[agencyId];
 
@@ -111,6 +114,7 @@ const makeAgencyRights = (
       };
     }),
   );
+}
 
 async function makeAgencyDashboards({
   uow,
