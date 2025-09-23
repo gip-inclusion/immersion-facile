@@ -119,7 +119,7 @@ import type { TransactionalUseCase, UseCase } from "../../domains/core/UseCase";
 import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
-import { AddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
+import { makeAddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
@@ -301,11 +301,6 @@ export const createUseCases = ({
       // Address
       lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
       lookupLocation: new LookupLocation(gateways.addressApi),
-
-      addFormEstablishmentBatch: new AddFormEstablishmentBatch(
-        insertEstablishmentAggregateFromForm,
-        uowPerformer,
-      ),
 
       // Conventions
       addConvention,
@@ -819,6 +814,12 @@ export const createUseCases = ({
         timeGateway: gateways.timeGateway,
       },
       uowPerformer,
+    }),
+    addFormEstablishmentBatch: makeAddFormEstablishmentBatch({
+      deps: {
+        insertEstablishmentAggregateFromForm,
+        uowPerformer,
+      },
     }),
     getEstablishmentStats: makeGetEstablishmentStats({
       uowPerformer,

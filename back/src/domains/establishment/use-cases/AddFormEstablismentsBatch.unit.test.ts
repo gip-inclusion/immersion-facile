@@ -30,7 +30,10 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
+import {
+  type AddFormEstablishmentBatch,
+  makeAddFormEstablishmentBatch,
+} from "./AddFormEstablismentsBatch";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 describe("AddFormEstablishmentsBatch Use Case", () => {
@@ -81,20 +84,23 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     const addressGateway = new InMemoryAddressGateway();
     const uowPerformer = new InMemoryUowPerformer(uow);
 
-    addFormEstablishmentBatch = new AddFormEstablishmentBatch(
-      new InsertEstablishmentAggregateFromForm(
+    addFormEstablishmentBatch = makeAddFormEstablishmentBatch({
+      deps: {
+        insertEstablishmentAggregateFromForm:
+          new InsertEstablishmentAggregateFromForm(
+            uowPerformer,
+            siretGateway,
+            addressGateway,
+            uuidGenerator,
+            timeGateway,
+            makeCreateNewEvent({
+              timeGateway,
+              uuidGenerator,
+            }),
+          ),
         uowPerformer,
-        siretGateway,
-        addressGateway,
-        uuidGenerator,
-        timeGateway,
-        makeCreateNewEvent({
-          timeGateway,
-          uuidGenerator,
-        }),
-      ),
-      uowPerformer,
-    );
+      },
+    });
 
     addressGateway.setNextLookupStreetAndAddresses([
       [
@@ -119,13 +125,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     uow.romeRepository.appellations =
       defaultValidFormEstablishment.appellations;
-  });
-
-  it("throws Unauthorized if no currentUser is provided", async () => {
-    await expectPromiseToFailWithError(
-      addFormEstablishmentBatch.execute(formEstablishmentBatch),
-      errors.user.unauthorized(),
-    );
   });
 
   it("throws Forbidden if currentUser user is not admin", async () => {
