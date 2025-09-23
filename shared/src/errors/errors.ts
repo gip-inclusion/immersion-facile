@@ -976,6 +976,10 @@ export const errors = {
       new BadRequestError(
         `No Rome code matching appellation codes ${appellationCodes}`,
       ),
+    invalidGeoParams: () =>
+      new BadRequestError(
+        "Invalid geo params, needs latitude, longitude and distanceKm",
+      ),
   },
   shortLink: {
     notFound: ({ shortLinkId }: { shortLinkId: ShortLinkId }) =>
