@@ -4,7 +4,7 @@ import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader, useDebounce, useScrollToTop } from "react-design-system";
+import { Loader, useScrollToTop } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -29,15 +29,7 @@ import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import {
-  formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams,
-  formEstablishmentQueryParamsToFormEstablishmentDto,
-} from "src/app/routes/routeParams/formEstablishment";
-import { establishmentParams, routes, useRoute } from "src/app/routes/routes";
-import {
-  filterParamsForRoute,
-  getUrlParameters,
-} from "src/app/utils/url.utils";
+import { type routes, useRoute } from "src/app/routes/routes";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -97,7 +89,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
   const adminJwt = useAdminToken();
   const route = useRoute() as RouteByMode[Mode];
-  const initialUrlParams = useRef(getUrlParameters(window.location));
 
   const isEstablishmentCreation =
     route.name === "formEstablishment" ||
@@ -172,9 +163,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const initialCurrentRoute = useRef(route).current;
   const currentRoute = isEstablishmentDashboard ? route : initialCurrentRoute;
 
-  const shouldUpdateAvailability = Boolean(
-    initialUrlParams.current.shouldUpdateAvailability,
-  );
+  const shouldUpdateAvailability =
+    route.name === "establishmentDashboardFormEstablishment"
+      ? Boolean(route.params.shouldUpdateAvailability)
+      : undefined;
 
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: defaultFormValues,
@@ -182,15 +174,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     mode: "onTouched",
   });
   const { handleSubmit, getValues, reset, trigger } = methods;
-  const formValues = getValues();
-  const debouncedFormValues = useDebounce(formValues);
 
   useInitialSiret({
-    siret:
-      (isEstablishmentCreation || isEstablishmentDashboard) &&
-      route.params.siret
-        ? route.params.siret
-        : "",
+    siret: getValues("siret"),
     addressAutocompleteLocator: "multiple-address-0",
   });
   useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
@@ -207,17 +193,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             name: P.union("formEstablishment", "formEstablishmentForExternals"),
           },
         },
-        ({ route }) => {
-          dispatch(
-            establishmentSlice.actions.fetchEstablishmentRequested({
-              establishmentRequested:
-                formEstablishmentQueryParamsToFormEstablishmentDto(
-                  route.params,
-                ),
-              feedbackTopic: "form-establishment",
-            }),
-          );
-        },
+        () => {},
       )
       .with(
         { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
@@ -250,7 +226,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           dispatch(
             establishmentSlice.actions.fetchEstablishmentRequested({
               establishmentRequested: {
-                siret: route.params.siret,
+                siret: route.params.siret ?? "",
                 jwt: connectedUserJwt,
               },
               feedbackTopic: "form-establishment",
@@ -304,22 +280,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       });
     }
   }, [isEstablishmentCreation, initialFormEstablishment, dispatch]);
-  useEffect(() => {
-    if (isEstablishmentCreation) {
-      const filteredParams = filterParamsForRoute({
-        urlParams: initialUrlParams.current,
-        matchingParams: establishmentParams,
-      });
-      routes
-        .formEstablishment(
-          formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams({
-            ...filteredParams,
-            ...debouncedFormValues,
-          }),
-        )
-        .replace();
-    }
-  }, [debouncedFormValues, isEstablishmentCreation]);
 
   useEffect(() => {
     return () => {

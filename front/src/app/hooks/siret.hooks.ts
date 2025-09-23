@@ -98,14 +98,14 @@ export const useInitialSiret = ({
   siret,
   addressAutocompleteLocator,
 }: {
-  siret?: string;
+  siret: SiretDto;
   addressAutocompleteLocator: AddressAutocompleteLocator;
 }) => {
   const currentSiret = useAppSelector(siretSelectors.currentSiret);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (siret && siret !== currentSiret) {
+    if (siret.length > 0 && siret !== currentSiret) {
       dispatch(
         siretSlice.actions.siretModified({
           siret,

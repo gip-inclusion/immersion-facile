@@ -1,14 +1,10 @@
-import { filter, map, of, switchMap, tap } from "rxjs";
+import { filter, map, of, switchMap } from "rxjs";
 import { errors } from "shared";
 import {
   defaultFormEstablishmentValue,
   establishmentSlice,
   type SiretAndJwtPayload,
 } from "src/core-logic/domain/establishment/establishment.slice";
-import {
-  type SiretAction,
-  siretSlice,
-} from "src/core-logic/domain/siret/siret.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -16,36 +12,6 @@ import type {
 } from "src/core-logic/storeConfig/redux.helpers";
 
 type EstablishmentAction = ActionOfSlice<typeof establishmentSlice>;
-
-const redirectToEstablishmentFormPageEpic: AppEpic<
-  EstablishmentAction | SiretAction
-> = (action$, state$, { navigationGateway }) =>
-  action$.pipe(
-    filter(
-      (action) =>
-        siretSlice.actions.siretInfoSucceeded.match(action) ||
-        siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound.match(action),
-    ),
-    tap((action) => {
-      const payload = action.payload;
-      if (
-        payload &&
-        typeof payload === "object" &&
-        "siretEstablishment" in payload &&
-        state$.value.establishment.isReadyForRedirection
-      ) {
-        const { siretEstablishment } = payload;
-        return navigationGateway.navigateToEstablishmentForm({
-          siret: siretEstablishment.siret ?? "",
-          bName: siretEstablishment.businessName ?? undefined,
-          bAddresses: siretEstablishment.businessAddress
-            ? [siretEstablishment.businessAddress]
-            : undefined,
-        });
-      }
-    }),
-    map(siretSlice.actions.siretToEstablishmentRedirectionRequested),
-  );
 
 const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
   action$,
@@ -62,10 +28,7 @@ const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
             action.payload.establishmentRequested.siret ?? "",
             action.payload.establishmentRequested.jwt,
           )
-        : of({
-            ...defaultFormEstablishmentValue(),
-            ...action.payload.establishmentRequested,
-          });
+        : of(defaultFormEstablishmentValue());
 
       return establishment$.pipe(
         map(establishmentSlice.actions.fetchEstablishmentSucceeded),
@@ -209,7 +172,6 @@ const deleteFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
   );
 
 export const establishmentEpics = [
-  redirectToEstablishmentFormPageEpic,
   fetchEstablishmentEpic,
   fetchEstablishmentNameAndAdminEpic,
   createFormEstablishmentEpic,

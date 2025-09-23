@@ -19,7 +19,6 @@ import {
   conventionValuesFromUrl,
   nafCodeSerializer,
 } from "./routeParams/convention";
-import { formEstablishmentParamsInUrl } from "./routeParams/formEstablishment";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 
 export type AcquisitionParams = Partial<{
@@ -63,7 +62,6 @@ export const conventionForExternalParams = {
 };
 
 export const establishmentParams = {
-  ...formEstablishmentParamsInUrl,
   ...acquisitionParams,
 };
 

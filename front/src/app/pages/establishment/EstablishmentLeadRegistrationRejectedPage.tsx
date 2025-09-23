@@ -12,7 +12,6 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { establishmentLeadStatus } from "src/core-logic/domain/establishmentLead/establishmentLead.selectors";
 import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
@@ -27,7 +26,6 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
 }: EstablishmentFormForExternalsProps) => {
   const { params } = route;
   const dispatch = useDispatch();
-  const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const establishmentLeadUnsubcriptionStatus = useAppSelector(
     establishmentLeadStatus,
   );
@@ -97,23 +95,7 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
               className={fr.cx("fr-mt-4w", "fr-mb-5w")}
               iconId="fr-icon-arrow-right-line"
               linkProps={{
-                href: `${
-                  routes.formEstablishment({
-                    siret: fetchedConvention?.siret,
-                    bcEmail:
-                      fetchedConvention?.signatories.establishmentRepresentative
-                        .email,
-                    bcFirstName:
-                      fetchedConvention?.signatories.establishmentRepresentative
-                        .firstName,
-                    bcLastName:
-                      fetchedConvention?.signatories.establishmentRepresentative
-                        .lastName,
-                    bcPhone:
-                      fetchedConvention?.signatories.establishmentRepresentative
-                        .phone,
-                  }).href
-                }`,
+                href: `${routes.formEstablishment().href}`,
               }}
             >
               Je m'inscris en 2 minutes

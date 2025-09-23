@@ -100,15 +100,23 @@ const step2 = async (page: Page) => {
     value: "28 rue des mimosas",
     endpoint: addressRoutes.lookupStreetAddress.url,
   });
-
-  await page.click(
-    `#${domElementIds.establishment.create.appellations}-add-option-button`,
-  );
   await page.waitForTimeout(5000);
+
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.establishment.create.appellations}-0`,
     value: "boulang",
+    endpoint: formCompletionRoutes.appellation.url,
+  });
+
+  await page.click(
+    `#${domElementIds.establishment.create.appellations}-add-option-button`,
+  );
+
+  await fillAutocomplete({
+    page,
+    locator: `#${domElementIds.establishment.create.appellations}-1`,
+    value: "route",
     endpoint: formCompletionRoutes.appellation.url,
   });
 
@@ -161,9 +169,8 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
   const summaryAppellations = await page.locator(
     `#${domElementIds.establishment.create.summaryAppellations} li`,
   );
-  await expect(summaryAppellations).toHaveCount(1);
+  await expect(summaryAppellations).toHaveCount(2);
 
   await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
-  await expect(page.url()).toContain(`siret=${establishment.siret}`);
   await expect(page.locator(".fr-alert--success")).toBeVisible();
 };

@@ -1,18 +1,14 @@
 import {
   type ConnectedUserJwt,
-  defaultCountryCode,
   errors,
   expectObjectsToMatch,
   expectToEqual,
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   type SiretDto,
-  type SiretEstablishmentDto,
 } from "shared";
-import type { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import {
   createTestStore,
   type TestDependencies,
@@ -26,21 +22,6 @@ import {
 } from "./establishment.slice";
 
 describe("Establishment", () => {
-  const establishmentWithoutAddressFromSiretFetched: SiretEstablishmentDto = {
-    siret: "11110000111100",
-    businessName: "Existing open business on Sirene Corp.",
-    businessAddress: "",
-    isOpen: true,
-    numberEmployeesRange: "",
-  };
-  const establishmentWithAddressFromSiretFetched: SiretEstablishmentDto = {
-    siret: "11110000111100",
-    businessName: "Existing open business on Sirene Corp.",
-    businessAddress: "102 rue du fake, 75001 Paris",
-    isOpen: true,
-    numberEmployeesRange: "10-19",
-  };
-
   const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
 
   let store: ReduxStore;
@@ -51,120 +32,7 @@ describe("Establishment", () => {
     ({ store, dependencies } = storeAndDeps);
   });
 
-  it("reflects when user wants to input siret", () => {
-    store.dispatch(establishmentSlice.actions.gotReady());
-
-    expect(establishmentSelectors.isReadyForRedirection(store.getState())).toBe(
-      true,
-    );
-  });
-
-  it("does not trigger navigation when siret is requested if establishment is not ready for redirection", () => {
-    store.dispatch(
-      siretSlice.actions.siretInfoSucceeded({
-        siretEstablishment: {
-          siret: "123",
-        } as SiretEstablishmentDto,
-        feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "convention-immersion-address",
-        countryCode: defaultCountryCode,
-      }),
-    );
-    expectNavigationToEstablishmentFormPageToHaveBeenTriggered(null);
-  });
-
-  it("triggers navigation when siret is requested if establishment is ready for redirection but has no address provided", () => {
-    ({ store, dependencies } = createTestStore({
-      establishment: {
-        isLoading: false,
-        isReadyForRedirection: true,
-        formEstablishment: defaultFormEstablishmentValue(),
-        establishmentNameAndAdmins: null,
-      },
-    }));
-    store.dispatch(
-      siretSlice.actions.siretModified({
-        siret: "10002000300040",
-        feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "convention-immersion-address",
-      }),
-    );
-    dependencies.formCompletionGateway.siretInfo$.next(
-      establishmentWithoutAddressFromSiretFetched,
-    );
-    expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
-      siret: establishmentWithoutAddressFromSiretFetched.siret,
-      bName: establishmentWithoutAddressFromSiretFetched.businessName,
-    });
-  });
-
-  it("triggers navigation when siret is requested if establishment is ready for redirection with address provided", () => {
-    ({ store, dependencies } = createTestStore({
-      establishment: {
-        isLoading: false,
-        isReadyForRedirection: true,
-        formEstablishment: defaultFormEstablishmentValue(),
-        establishmentNameAndAdmins: null,
-      },
-    }));
-    store.dispatch(
-      siretSlice.actions.siretModified({
-        siret: "10002000300040",
-        feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "convention-immersion-address",
-      }),
-    );
-    dependencies.formCompletionGateway.siretInfo$.next(
-      establishmentWithAddressFromSiretFetched,
-    );
-    expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
-      siret: establishmentWithAddressFromSiretFetched.siret,
-      bName: establishmentWithAddressFromSiretFetched.businessName,
-      bAddresses: [establishmentWithAddressFromSiretFetched.businessAddress],
-    });
-  });
-
   describe("establishment fetch", () => {
-    it("fetches establishment on establishment creation (empty params)", () => {
-      expectStoreToMatchInitialState();
-      store.dispatch(
-        establishmentSlice.actions.fetchEstablishmentRequested({
-          establishmentRequested: {},
-          feedbackTopic: "form-establishment",
-        }),
-      );
-      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(
-        establishmentSelectors.formEstablishment(store.getState()),
-        defaultFormEstablishmentValue(),
-      );
-    });
-
-    it("fetches establishment on establishment creation (with params)", () => {
-      expectStoreToMatchInitialState();
-      const testedQueryParams = {
-        siret: "12345678901234",
-        fitForDisabledWorkers: true,
-      } satisfies EstablishmentRequestedPayload;
-      const expectedFormEstablishment: FormEstablishmentDto = {
-        ...defaultFormEstablishmentValue(),
-        siret: testedQueryParams.siret,
-        fitForDisabledWorkers: testedQueryParams.fitForDisabledWorkers,
-      };
-      store.dispatch(
-        establishmentSlice.actions.fetchEstablishmentRequested({
-          establishmentRequested: testedQueryParams,
-          feedbackTopic: "form-establishment",
-        }),
-      );
-
-      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(
-        establishmentSelectors.formEstablishment(store.getState()),
-        expectedFormEstablishment,
-      );
-    });
-
     it("fetches establishment on establishment edition (JWT query params)", () => {
       expectStoreToMatchInitialState();
       const testedQueryParams: EstablishmentRequestedPayload = {
@@ -224,7 +92,6 @@ describe("Establishment", () => {
     it("should clear establishment", () => {
       const initialEstablishmentState: EstablishmentState = {
         isLoading: true,
-        isReadyForRedirection: false,
         formEstablishment,
         establishmentNameAndAdmins: null,
       };
@@ -589,12 +456,4 @@ describe("Establishment", () => {
   const expectEstablishmentStateToMatch = (
     expected: Partial<EstablishmentState>,
   ) => expectObjectsToMatch(store.getState().establishment, expected);
-
-  const expectNavigationToEstablishmentFormPageToHaveBeenTriggered = (
-    formEstablishmentParamsInUrl: FormEstablishmentParamsInUrl | null,
-  ) => {
-    expect(dependencies.navigationGateway.navigatedToEstablishmentForm).toEqual(
-      formEstablishmentParamsInUrl,
-    );
-  };
 });
