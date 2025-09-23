@@ -36,8 +36,3 @@ export const maxPerPageInApiPagination = 500;
 
 export const defaultPerPageInWebPagination = 20;
 export const maxPerPageInWebPagination = 100;
-
-export type Sort<T> = {
-  by?: T;
-  direction?: "asc" | "desc";
-};
