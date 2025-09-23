@@ -231,6 +231,7 @@ export const OffersSettingsSection = ({
                 ? formContents.maxContactsPerMonth.label
                 : formContents.maxContactsPerMonthWhenAvailable.label
             }
+            hintText={formContents.maxContactsPerMonth.hintText}
             nativeInputProps={{
               ...formContents.maxContactsPerMonth,
               ...register("maxContactsPerMonth", {

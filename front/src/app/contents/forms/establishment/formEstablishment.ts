@@ -150,7 +150,7 @@ export const formEstablishmentFieldsLabels = (
     label:
       "Au maximum, combien de candidatures souhaitez-vous recevoir par mois ?",
     hintText:
-      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes ce mois, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'au mois prochain.",
+      "Ce chiffre correspond au nombre total de mises en relation reçues pour toutes vos offres. Exemple : si vous proposez 2 métiers et indiquez 8 mises en relation par mois, vous recevrez en tout 8 mises en relation (et non 16), réparties sur vos métiers.",
     id: domElementIds.establishment[mode].maxContactsPerMonth,
   },
   maxContactsPerMonthWhenAvailable: {
