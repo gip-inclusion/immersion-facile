@@ -1,7 +1,10 @@
+import { all, isNil, values } from "ramda";
 import {
   type DataWithPagination,
+  errors,
   getOffersFlatParamsSchema,
   getPaginationParamsForApiConsumer,
+  pipeWithValue,
   type SearchResultDto,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -29,11 +32,11 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       ...sortAndPositionParams
     } = inputParams;
 
-    const geoParams: Partial<GeoParams> = {
+    const validatedGeoParams = getValidatedGeoParams({
       lat: sortAndPositionParams.latitude,
       lon: sortAndPositionParams.longitude,
       distanceKm: sortAndPositionParams.distanceKm,
-    };
+    });
 
     const result = await uow.establishmentAggregateRepository.getOffers({
       pagination: getPaginationParamsForApiConsumer({
@@ -47,9 +50,9 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
         nafCodes,
         searchableBy,
         sirets,
-        ...(hasSearchGeoParams(geoParams) ? { geoParams } : {}),
+        ...validatedGeoParams,
       },
-      sort: { by: inputParams.sortBy, order: inputParams.sortOrder },
+      sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },
     });
 
     const searchMade: SearchMade = {
@@ -58,7 +61,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       establishmentSearchableBy: searchableBy,
       sortedBy: inputParams.sortBy,
       place,
-      ...geoParams,
+      ...validatedGeoParams,
     };
 
     await uow.searchMadeRepository.insertSearchMade({
@@ -70,3 +73,12 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
 
     return result;
   });
+
+const getValidatedGeoParams = (geoParams: Partial<GeoParams>) => {
+  const hasNoGeoParams = pipeWithValue(geoParams, values, all(isNil));
+
+  if (hasNoGeoParams) return {};
+  if (hasSearchGeoParams(geoParams)) return { geoParams };
+
+  throw errors.search.invalidGeoParams();
+};

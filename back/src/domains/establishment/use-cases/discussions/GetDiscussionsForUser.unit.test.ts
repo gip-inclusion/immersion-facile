@@ -17,7 +17,7 @@ describe("GetDiscussionsForUser", () => {
           search: "siret1",
           statuses: ["PENDING", "ACCEPTED"],
         },
-        sort: { by: "createdAt", order: "desc" },
+        sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
       });
     });
@@ -27,7 +27,7 @@ describe("GetDiscussionsForUser", () => {
         {},
       );
       expectToEqual(result, {
-        sort: { by: "createdAt", order: "desc" },
+        sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
       });
     });
@@ -40,7 +40,7 @@ describe("GetDiscussionsForUser", () => {
         filters: {
           statuses: ["PENDING"],
         },
-        sort: { by: "createdAt", order: "desc" },
+        sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
       });
     });
@@ -50,7 +50,7 @@ describe("GetDiscussionsForUser", () => {
         {},
       );
       expectToEqual(result, {
-        sort: { by: "createdAt", order: "desc" },
+        sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
       });
     });
@@ -61,7 +61,7 @@ describe("GetDiscussionsForUser", () => {
         orderDirection: "asc",
       });
       expectToEqual(result, {
-        sort: { by: "createdAt", order: "asc" },
+        sort: { by: "createdAt", direction: "asc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
       });
     });
@@ -72,7 +72,7 @@ describe("GetDiscussionsForUser", () => {
         perPage: 150,
       });
       expectToEqual(result, {
-        sort: { by: "createdAt", order: "desc" },
+        sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 2, perPage: maxPerPageInWebPagination },
       });
     });

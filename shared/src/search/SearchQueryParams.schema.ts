@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { nafCodesSchema, withNafCodesSchema } from "../naf/naf.schema";
-import type { SortOrder } from "../pagination/pagination.dto";
+import type { SortDirection } from "../pagination/pagination.dto";
 import { sortOrderSchema } from "../pagination/pagination.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
@@ -86,7 +86,7 @@ const geoParamsAndSortSchema = z.discriminatedUnion("sortBy", [
 export const getOffersFlatParamsSchema: z.ZodType<
   GetOffersFlatQueryParams,
   Omit<GetOffersFlatQueryParams, "sortOrder"> & {
-    sortOrder?: SortOrder | undefined;
+    sortOrder?: SortDirection | undefined;
   }
 > = z
   .object({

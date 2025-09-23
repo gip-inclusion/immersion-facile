@@ -19,11 +19,11 @@ export type DataWithPagination<T> = {
   pagination: Pagination;
 };
 
-export type SortOrder = "asc" | "desc";
+export type SortDirection = "asc" | "desc";
 
 type Sort<T> = {
   by: T;
-  order: SortOrder;
+  direction: SortDirection;
 };
 
 export type WithSort<T> = {
@@ -36,8 +36,3 @@ export const maxPerPageInApiPagination = 500;
 
 export const defaultPerPageInWebPagination = 20;
 export const maxPerPageInWebPagination = 100;
-
-export type Sort<T> = {
-  by?: T;
-  direction?: "asc" | "desc";
-};
