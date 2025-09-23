@@ -52,7 +52,7 @@ export const flatDiscussionQueryParamsToGetPaginatedDiscussionsParams = (
     }),
     sort: {
       by: orderBy || "createdAt",
-      order: orderDirection || "desc",
+      direction: orderDirection || "desc",
     },
     pagination,
   };

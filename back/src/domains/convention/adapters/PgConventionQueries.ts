@@ -20,8 +20,8 @@ import {
   type PaginationQueryParams,
   pipeWithValue,
   type SiretDto,
-  type Sort,
   type UserId,
+  type WithSort,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
@@ -218,11 +218,10 @@ export class PgConventionQueries implements ConventionQueries {
     pagination,
     sort,
     agencyUserId,
-  }: {
+  }: WithSort<GetPaginatedConventionsSortBy> & {
     agencyUserId: UserId;
     pagination: Required<PaginationQueryParams>;
     filters?: GetPaginatedConventionsFilters;
-    sort: Sort<GetPaginatedConventionsSortBy>;
   }): Promise<DataWithPagination<ConventionDto>> {
     const {
       actorEmailContains,

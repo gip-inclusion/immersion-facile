@@ -319,6 +319,8 @@ export class PgEstablishmentAggregateRepository
   }: GetOffersParams): Promise<
     DataWithPagination<RepositorySearchImmertionResult>
   > {
+    this.transaction.selectFrom("establishments").select(() => []);
+
     throw new Error("Not implemented");
   }
 
@@ -370,7 +372,7 @@ export class PgEstablishmentAggregateRepository
         appellationCode,
         locationId,
       },
-    });
+    }).execute();
 
     const searchResult = pgSearchResultsToSearchResults(results).at(0);
 
@@ -854,7 +856,7 @@ const searchImmersionResultsQuery = (
     siret,
   } = filters;
 
-  const query = transaction
+  return transaction
     .with("filtered_results", (qb) =>
       pipeWithValue(
         qb
@@ -1078,9 +1080,8 @@ const searchImmersionResultsQuery = (
           appellations: ref("r.appellations"),
         }),
       ).as("search_immersion_result"),
-    );
-
-  return query.execute();
+    )
+    .execute();
 };
 
 const makeOrderByClauses = (

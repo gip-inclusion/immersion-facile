@@ -1,7 +1,9 @@
-import type {
-  DataWithPagination,
-  GetOffersFlatQueryParams,
-  SearchResultDto,
+import {
+  BadRequestError,
+  type DataWithPagination,
+  expectPromiseToFailWithError,
+  type GetOffersFlatQueryParams,
+  type SearchResultDto,
 } from "shared";
 import {
   createInMemoryUow,
@@ -70,15 +72,14 @@ describe("GetOffers", () => {
       },
     });
     uuidGenerator.setNextUuid("search-made-uuid");
-  });
-
-  it("should return some results given the input (with pretty much all filters)", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment1,
       establishment2,
       establishment3,
     ];
+  });
 
+  it("should return some results given the input (with pretty much all filters)", async () => {
     const searchParams: GetOffersFlatQueryParams = {
       sortBy: "score",
       sortOrder: "desc",
@@ -105,12 +106,6 @@ describe("GetOffers", () => {
   });
 
   it("should return more results when no filters", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment1,
-      establishment2,
-      establishment3,
-    ];
-
     const resultWithoutFilters = await getOffers.execute({
       sortBy: "date",
       sortOrder: "desc",
@@ -124,5 +119,37 @@ describe("GetOffers", () => {
     expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(
       resultWithoutFilters.pagination.totalRecords,
     );
+  });
+
+  describe("wrong path", () => {
+    it("should throw when sort is distance but no location is provided", async () => {
+      await expectPromiseToFailWithError(
+        getOffers.execute({
+          sortBy: "distance",
+        } as any),
+        new BadRequestError(
+          "Schema validation failed in usecase GetOffers. See issues for details.",
+          [
+            "latitude : Invalid input: expected number, received NaN",
+            "longitude : Invalid input: expected number, received NaN",
+            "distanceKm : Invalid input: expected number, received NaN",
+          ],
+        ),
+      );
+    });
+
+    it("needs complete geoparams, not partial, throws otherwise", async () => {
+      await expectPromiseToFailWithError(
+        getOffers.execute({
+          sortBy: "date",
+          latitude: 48.856614,
+          // missing longitude
+          distanceKm: 80,
+        } as any),
+        new BadRequestError(
+          "Invalid geo params, needs latitude, longitude and distanceKm",
+        ),
+      );
+    });
   });
 });
