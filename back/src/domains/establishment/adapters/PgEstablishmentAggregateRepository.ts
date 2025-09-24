@@ -372,7 +372,7 @@ export class PgEstablishmentAggregateRepository
         appellationCode,
         locationId,
       },
-    }).execute();
+    });
 
     const searchResult = pgSearchResultsToSearchResults(results).at(0);
 

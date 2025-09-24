@@ -281,7 +281,7 @@ const applyPagination =
   };
 
 const sortConventions =
-  (sort?: Sort<GetPaginatedConventionsSortBy>) =>
+  (sort?: WithSort<GetPaginatedConventionsSortBy>["sort"]) =>
   (
     builder: PaginatedConventionQueryBuilder,
   ): PaginatedConventionQueryBuilder => {
