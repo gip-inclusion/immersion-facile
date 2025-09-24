@@ -4,6 +4,7 @@ import {
   defaultPerPageInWebPagination,
   maxPerPageInApiPagination,
   maxPerPageInWebPagination,
+  type Pagination,
   type PaginationQueryParams,
 } from "./pagination.dto";
 
@@ -31,4 +32,23 @@ export const getPaginationParamsForApiConsumer = ({
     perPage ?? defaultPerPageInApiPagination,
     maxPerPageInApiPagination,
   ),
+});
+
+export const calculateLimitAndOffsetFromPagination = ({
+  page,
+  perPage,
+}: Required<PaginationQueryParams>): { limit: number; offset: number } => ({
+  limit: perPage,
+  offset: (page - 1) * perPage,
+});
+
+export const calculatePaginationResult = ({
+  page,
+  perPage,
+  totalRecords,
+}: Required<PaginationQueryParams> & { totalRecords: number }): Pagination => ({
+  totalRecords,
+  currentPage: page,
+  totalPages: Math.ceil(totalRecords / perPage),
+  numberPerPage: perPage,
 });
