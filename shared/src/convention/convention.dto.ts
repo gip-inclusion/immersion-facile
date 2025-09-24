@@ -9,7 +9,7 @@ import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity
 import type { DateFilter } from "../filters";
 import type {
   PaginationQueryParams,
-  WithSort,
+  WithOptionalSort,
 } from "../pagination/pagination.dto";
 import {
   type AgencyRole,
@@ -468,9 +468,8 @@ export type GetPaginatedConventionsSortBy = keyof Pick<
 >;
 
 export type GetConventionsForAgencyUserParams =
-  WithSort<GetPaginatedConventionsSortBy> & {
+  WithOptionalSort<GetPaginatedConventionsSortBy> & {
     filters?: GetPaginatedConventionsFilters;
-    sort?: Sort<GetPaginatedConventionsSortBy>;
     pagination?: PaginationQueryParams;
   };
 

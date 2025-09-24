@@ -30,6 +30,10 @@ export type WithSort<T> = {
   sort: Sort<T>;
 };
 
+export type WithOptionalSort<T> = {
+  sort?: Partial<Sort<T>>;
+};
+
 export const defaultPageInPagination = 1;
 export const defaultPerPageInApiPagination = 100;
 export const maxPerPageInApiPagination = 500;
