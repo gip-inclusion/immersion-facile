@@ -19,11 +19,11 @@ export type DataWithPagination<T> = {
   pagination: Pagination;
 };
 
-export type SortOrder = "asc" | "desc";
+export type SortDirection = "asc" | "desc";
 
 type Sort<T> = {
   by: T;
-  order: SortOrder;
+  direction: SortDirection;
 };
 
 export type WithSort<T> = {

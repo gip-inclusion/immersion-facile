@@ -4,7 +4,7 @@ import type { EstablishmentSearchableByValue } from "../formEstablishment/FormEs
 import type { NafCode, WithNafCodes } from "../naf/naf.dto";
 import type {
   PaginationQueryParams,
-  SortOrder,
+  SortDirection,
 } from "../pagination/pagination.dto";
 import type {
   AppellationCode,
@@ -81,12 +81,12 @@ type GetOffersFlatParamsCommon = {
 
 export type GeoQueryParamsWithSortedBy<T extends SearchSortedBy> = {
   sortBy: T;
-  sortOrder: SortOrder;
+  sortOrder: SortDirection;
 } & LatLonDistance;
 
 export type GeoQueryOptionalParamsWithSortedBy<T extends SearchSortedBy> = {
   sortBy: T;
-  sortOrder: SortOrder;
+  sortOrder: SortDirection;
 } & Partial<LatLonDistance>;
 
 export type SearchQueryWithOptionalGeoParamsDto = GetOffersFlatParamsCommon &
