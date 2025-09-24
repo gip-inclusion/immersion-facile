@@ -2,7 +2,7 @@ import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { nafCodesSchema, withNafCodesSchema } from "../naf/naf.schema";
 import type { SortDirection } from "../pagination/pagination.dto";
-import { sortOrderSchema } from "../pagination/pagination.schema";
+import { sortDirectionSchema } from "../pagination/pagination.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -69,14 +69,14 @@ const geoParamsAndSortSchema = z.discriminatedUnion("sortBy", [
     sortBy: z.enum(["date", "score"], {
       error: localization.invalidEnum,
     }),
-    sortOrder: sortOrderSchema.default("desc"),
+    sortOrder: sortDirectionSchema.default("desc"),
     latitude: zToNumber.optional(),
     longitude: zToNumber.optional(),
     distanceKm: distanceKmSchema.optional(),
   }),
   z.object({
     sortBy: z.literal("distance"),
-    sortOrder: sortOrderSchema.default("asc"),
+    sortOrder: sortDirectionSchema.default("asc"),
     latitude: zToNumber,
     longitude: zToNumber,
     distanceKm: distanceKmSchema,

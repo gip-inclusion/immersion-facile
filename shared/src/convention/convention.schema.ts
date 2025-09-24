@@ -13,7 +13,7 @@ import { dateFilterSchema } from "../filters";
 import {
   createPaginatedSchema,
   paginationQueryParamsSchema,
-  sortSchema,
+  withOptionalSortSchema,
 } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { allRoles } from "../role/role.dto";
@@ -852,30 +852,31 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
     dateSubmissionTo: makeDateStringSchema().optional(),
   });
 
-const sortedConventionsSchema = sortSchema(
+const withSortedConventionsSchema = withOptionalSortSchema(
   z.enum(["dateValidation", "dateStart", "dateSubmission"], {
     error: localization.invalidEnum,
   }),
 );
 
 export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatchingOutput<GetConventionsForAgencyUserParams> =
-  z.object({
-    filters: z
-      .object({
-        actorEmailContains: z.string().optional(),
-        establishmentNameContains: z.string().optional(),
-        beneficiaryNameContains: z.string().optional(),
-        statuses: z.tuple([statusSchema], statusSchema).optional(),
-        agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
-        agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
-        dateStart: dateFilterSchema.optional(),
-        dateEnd: dateFilterSchema.optional(),
-        dateSubmission: dateFilterSchema.optional(),
-      })
-      .optional(),
-    sort: sortedConventionsSchema.optional(),
-    pagination: paginationQueryParamsSchema.optional(),
-  });
+  z
+    .object({
+      filters: z
+        .object({
+          actorEmailContains: z.string().optional(),
+          establishmentNameContains: z.string().optional(),
+          beneficiaryNameContains: z.string().optional(),
+          statuses: z.tuple([statusSchema], statusSchema).optional(),
+          agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
+          agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
+          dateStart: dateFilterSchema.optional(),
+          dateEnd: dateFilterSchema.optional(),
+          dateSubmission: dateFilterSchema.optional(),
+        })
+        .optional(),
+      pagination: paginationQueryParamsSchema.optional(),
+    })
+    .and(withSortedConventionsSchema);
 
 export const paginatedConventionsSchema =
   createPaginatedSchema(conventionSchema);
