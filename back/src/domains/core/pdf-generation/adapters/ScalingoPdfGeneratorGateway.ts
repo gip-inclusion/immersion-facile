@@ -70,8 +70,8 @@ export class ScalingoPdfGeneratorGateway implements PdfGeneratorGateway {
           throw errors.pdfGenerator.makeFailed({
             conventionId,
             requestId,
-            body: response.body,
             status: response.status,
+            body: JSON.stringify(response.body),
           });
 
         return response.body;
