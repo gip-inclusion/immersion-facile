@@ -7,7 +7,8 @@ import type {
   DataWithPagination,
   Pagination,
   PaginationQueryParams,
-  Sort,
+  SortDirection,
+  WithOptionalSort,
 } from "./pagination.dto";
 
 const pageQueryParamSchema = z.coerce
@@ -35,7 +36,7 @@ export const paginationRequiredQueryParamsSchema: ZodSchemaWithInputMatchingOutp
   perPage: perPageQueryParamSchema,
 });
 
-export const sortOrderSchema: ZodSchemaWithInputMatchingOutput<SortOrder> =
+export const sortDirectionSchema: ZodSchemaWithInputMatchingOutput<SortDirection> =
   z.enum(["asc", "desc"], {
     error: localization.invalidEnum,
   });
@@ -57,14 +58,18 @@ export const createPaginatedSchema = <T>(
     pagination: paginationSchema,
   });
 
-export const sortSchema = <T>(
+export const withOptionalSortSchema = <T>(
   schema: ZodSchemaWithInputMatchingOutput<T>,
-): ZodSchemaWithInputMatchingOutput<Sort<T>> =>
+): ZodSchemaWithInputMatchingOutput<WithOptionalSort<T>> =>
   z.object({
-    by: schema.optional(),
-    direction: z
-      .enum(["asc", "desc"], {
-        error: localization.invalidEnum,
+    sort: z
+      .object({
+        by: schema.optional(),
+        direction: z
+          .enum(["asc", "desc"], {
+            error: localization.invalidEnum,
+          })
+          .optional(),
       })
       .optional(),
   });
