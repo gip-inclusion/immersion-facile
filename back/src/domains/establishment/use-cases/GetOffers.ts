@@ -52,7 +52,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
         sirets,
         ...validatedGeoParams,
       },
-      sort: { by: inputParams.sortBy, order: inputParams.sortOrder },
+      sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },
     });
 
     const searchMade: SearchMade = {
