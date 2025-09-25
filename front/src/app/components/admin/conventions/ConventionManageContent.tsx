@@ -15,6 +15,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
+import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { match } from "ts-pattern";
 import { NpsSection } from "../../nps/NpsSection";
 import {
@@ -32,6 +34,9 @@ export const ConventionManageContent = ({
     connectedUserSelectors.userRolesForFetchedConvention,
   );
   const userRolesAreLoading = useAppSelector(connectedUserSelectors.isLoading);
+  const erroredFeedbackIsLoading = useAppSelector(
+    partnersErroredConventionSelectors.isLoading,
+  );
   const conventionFormFeedback = useFeedbackTopic("convention-form");
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
@@ -69,9 +74,25 @@ export const ConventionManageContent = ({
   useEffect(
     () => () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
+      dispatch(
+        partnersErroredConventionSlice.actions.clearLastBroadcastFeedback(),
+      );
     },
     [dispatch],
   );
+
+  useEffect(() => {
+    if (convention && jwtParams.jwt) {
+      dispatch(
+        partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackRequested(
+          {
+            conventionId,
+            jwt: jwtParams.jwt,
+          },
+        ),
+      );
+    }
+  }, [convention, conventionId, jwtParams.jwt, dispatch]);
 
   if (fetchConventionError) {
     if (
@@ -87,7 +108,8 @@ export const ConventionManageContent = ({
       .replace();
   }
 
-  if (isLoading || userRolesAreLoading) return <Loader />;
+  if (isLoading || userRolesAreLoading || erroredFeedbackIsLoading)
+    return <Loader />;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!roles.length)
     return <p>Vous n'êtes pas autorisé à accéder à cette convention</p>;
