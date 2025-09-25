@@ -1,11 +1,15 @@
 import axios, { isAxiosError } from "axios";
 import type { Pool } from "pg";
 import {
+  type BroadcastFeedback,
+  type BroadcastFeedbackResponse,
+  type ConventionBroadcastRequestParams,
   type ConventionId,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type SubscriberErrorFeedback,
 } from "shared";
 import {
   cast,
@@ -14,13 +18,8 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
-import type { SubscriberErrorFeedback } from "../../api-consumer/ports/SubscribersGateway";
-import {
-  type BroadcastFeedback,
-  type BroadcastFeedbackResponse,
-  broadcastToFtLegacyServiceName,
-  type ConventionBroadcastRequestParams,
-} from "../ports/BroadcastFeedbacksRepository";
+
+import { broadcastToFtLegacyServiceName } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
 
 describe("PgBroadcastFeedbacksRepository", () => {
