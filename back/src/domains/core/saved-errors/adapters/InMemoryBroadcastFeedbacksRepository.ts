@@ -1,9 +1,6 @@
-import { type ConventionId, errors } from "shared";
+import { type BroadcastFeedback, type ConventionId, errors } from "shared";
 
-import type {
-  BroadcastFeedback,
-  BroadcastFeedbacksRepository,
-} from "../ports/BroadcastFeedbacksRepository";
+import type { BroadcastFeedbacksRepository } from "../ports/BroadcastFeedbacksRepository";
 
 export class InMemoryBroadcastFeedbacksRepository
   implements BroadcastFeedbacksRepository

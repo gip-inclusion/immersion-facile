@@ -1,9 +1,12 @@
 import type { AxiosError, AxiosInstance } from "axios";
-import { castError, type SubscriptionParams } from "shared";
+import {
+  castError,
+  type SubscriberErrorFeedback,
+  type SubscriptionParams,
+} from "shared";
 import { isAxiosError } from "../../../../utils/axiosUtils";
 import type {
   ConventionUpdatedSubscriptionCallbackBody,
-  SubscriberErrorFeedback,
   SubscriberResponse,
   SubscribersGateway,
 } from "../ports/SubscribersGateway";

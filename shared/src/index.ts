@@ -26,7 +26,7 @@ export * from "./auth/auth.schema";
 export * from "./auth/proConnect/proConnect.dto";
 export * from "./auth/proConnect/proConnect.schema";
 export * from "./Builder";
-export * from "./broadcastFeedback/broadcastFeedback.dto";
+export * from "./broadcast/broadcastFeedback.dto";
 export * from "./business/business";
 export * from "./contactEstablishmentRequest/legacyContactEstablishmentRequest.dto";
 export * from "./contactEstablishmentRequest/legacyContactEstablishmentRequest.schema";

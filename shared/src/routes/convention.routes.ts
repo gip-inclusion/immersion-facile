@@ -4,7 +4,7 @@ import {
   assessmentDtoSchema,
   legacyAssessmentDtoSchema,
 } from "../assessment/assessment.schema";
-import { broadcastFeedbackSchema } from "../broadcastFeedback/broadcastFeedback.schema";
+import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
 import {
   conventionReadSchema,
