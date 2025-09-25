@@ -3,10 +3,12 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { HeadingSection } from "react-design-system";
+import { useDispatch } from "react-redux";
 import { domElementIds, type EstablishmentData } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes, useRoute } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import type { Route } from "type-route";
 
 type ManageEstablishmentTabProps = {
@@ -16,6 +18,7 @@ type ManageEstablishmentTabProps = {
 export const ManageEstablishmentsTab = ({
   establishments,
 }: ManageEstablishmentTabProps) => {
+  const dispatch = useDispatch();
   const route = useRoute() as Route<
     typeof routes.establishmentDashboardFormEstablishment
   >;
@@ -67,6 +70,9 @@ export const ManageEstablishmentsTab = ({
               id: domElementIds.establishmentDashboard.manageEstablishments
                 .selectEstablishmentInput,
               onChange: (event) => {
+                dispatch(
+                  establishmentSlice.actions.clearEstablishmentRequested(),
+                );
                 routes
                   .establishmentDashboardFormEstablishment({
                     siret: event.currentTarget.value,
