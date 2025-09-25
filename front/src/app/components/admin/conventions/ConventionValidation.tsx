@@ -1,8 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
-import { formatDistance } from "date-fns";
-import { fr as french } from "date-fns/locale";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import {
@@ -15,9 +13,11 @@ import {
   agencyModifierRoles,
   allSignatoryRoles,
   type ConventionReadDto,
+  getDaysBetween,
   isConventionRenewed,
   type PhoneNumber,
   type Role,
+  rtf,
   type SignatoryRole,
   toDisplayedDate,
 } from "shared";
@@ -48,13 +48,9 @@ import {
 } from "../../../contents/convention/conventionSummary.helpers";
 
 const beforeAfterString = (date: string) => {
-  const eventDate = new Date(date);
-  const currentDate = new Date();
+  const daysSince = getDaysBetween(new Date(), new Date(date));
 
-  return formatDistance(eventDate, currentDate, {
-    addSuffix: true,
-    locale: french,
-  });
+  return rtf.format(daysSince, "day");
 };
 
 export interface ConventionValidationProps {
