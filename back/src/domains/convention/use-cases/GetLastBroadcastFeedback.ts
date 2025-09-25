@@ -28,7 +28,8 @@ export const makeGetLastBroadcastFeedback = useCaseBuilder(
     const userAgencyRights = userWithRights.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === convention.agencyId,
     );
-    if (!userAgencyRights)
+
+    if (!userAgencyRights && !currentUser.isBackofficeAdmin)
       throw errors.user.noRightsOnAgency({
         userId: currentUser.id,
         agencyId: convention.agencyId,

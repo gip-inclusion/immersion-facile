@@ -433,6 +433,14 @@ export const domElementIds = {
       "im-edit-counsellor-name-modal__last-name-input",
     editCounsellorNameModalFirstNameInput:
       "im-edit-counsellor-name-modal__first-name-input",
+    openMarkConventionAsHandledModal:
+      "im-open-mark-convention-as-handled-modal",
+    openBroadcastConventionAgainModal:
+      "im-open-broadcast-convention-again-modal",
+    markConventionAsHandledButton: "im-mark-convention-as-handled-button",
+    broadcastConventionAgainButton: "im-broadcast-convention-again-button",
+    erroredConventionHandledModal: "im-errored-convention-handled-modal",
+    broadcastAgainModal: "im-broadcast-modal",
   },
 
   unsubscribeEstablishmentLead: {},
