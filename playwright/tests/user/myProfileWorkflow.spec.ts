@@ -179,12 +179,13 @@ test.describe("User workflow", () => {
         .locator(`#${domElementIds.agencyDashboard.registerAgencies.search}`)
         .fill("Cap emploi");
 
-      await page
+      const checkbox = await page
         .locator(
           `#${domElementIds.agencyDashboard.registerAgencies.table} table tbody tr .fr-checkbox-group`,
         )
-        .first()
-        .click();
+        .first();
+      await expect(checkbox).toBeVisible();
+      await checkbox.click();
 
       await page
         .locator(

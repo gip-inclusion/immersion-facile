@@ -264,7 +264,7 @@ export const countryCodesData: Record<
   ES: { name: "Espagne", flag: "🇪🇸" },
   EE: { name: "Estonie", flag: "🇪🇪" },
   FI: { name: "Finlande", flag: "🇫🇮" },
-  FR: { name: "France (incl. DOM/TOM)", flag: "🇫🇷" },
+  FR: { name: "France", flag: "🇫🇷" },
   GR: { name: "Grèce", flag: "🇬🇷" },
   HU: { name: "Hongrie", flag: "🇭🇺" },
   IE: { name: "Irlande", flag: "🇮🇪" },
