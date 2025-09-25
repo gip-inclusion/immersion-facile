@@ -23,6 +23,7 @@ import {
 } from "shared";
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { Feedback } from "src/app/components/feedback/Feedback";
+import { SubscriberErrorFeedbackComponent } from "src/app/components/SubscriberErrorFeedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -35,6 +36,7 @@ import {
   isConventionEndingInOneDayOrMore,
 } from "src/core-logic/domain/convention/convention.utils";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
+import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { useStyles } from "tss-react/dsfr";
 import {
   makeConventionSections,
@@ -67,6 +69,9 @@ export const ConventionValidation = ({
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
+  const lastBroadcastFeedback = useAppSelector(
+    partnersErroredConventionSelectors.lastBroadcastFeedback,
+  );
   const [isAssessmentLinkSent, setIsAssessmentLinkSent] =
     useState<boolean>(false);
 
@@ -125,6 +130,9 @@ export const ConventionValidation = ({
       "back-office",
     ]).length > 0;
 
+  const shouldShowLastBroadcastFeedbackErrorInfo =
+    lastBroadcastFeedback?.subscriberErrorFeedback &&
+    intersection(roles, [...agencyModifierRoles, "back-office"]).length > 0;
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
@@ -163,18 +171,36 @@ export const ConventionValidation = ({
 
   return (
     <>
-      <Badge
-        className={cx(
-          fr.cx("fr-mb-3w"),
-          labelAndSeverityByStatus[status].color,
+      <div className={fr.cx("fr-mb-3w")}>
+        <Badge
+          className={cx(
+            fr.cx("fr-mr-2w"),
+            labelAndSeverityByStatus[status].color,
+          )}
+        >
+          {labelAndSeverityByStatus[status].label}
+        </Badge>
+        {shouldShowLastBroadcastFeedbackErrorInfo && (
+          <Badge className={cx(fr.cx("fr-mr-2w", "fr-badge--error"))}>
+            ❌ Erreur de synchronisation
+          </Badge>
         )}
-      >
-        {labelAndSeverityByStatus[status].label}
-      </Badge>
+      </div>
       <h1 className={fr.cx("fr-h3")}>{title}</h1>
       {convention.statusJustification && (
         <p>Justification : {convention.statusJustification}</p>
       )}
+
+      {shouldShowLastBroadcastFeedbackErrorInfo &&
+        lastBroadcastFeedback.subscriberErrorFeedback && (
+          <SubscriberErrorFeedbackComponent
+            subscriberErrorFeedback={
+              lastBroadcastFeedback?.subscriberErrorFeedback
+            }
+            conventionStatus={convention.status}
+          />
+        )}
+
       <Feedback
         topics={[
           "send-signature-link",
