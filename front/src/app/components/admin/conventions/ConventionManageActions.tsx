@@ -1,14 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import { ButtonWithSubMenu } from "react-design-system";
 import { createPortal } from "react-dom";
+import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   allowedRolesToCreateAssessment,
+  type ConnectedUser,
   type ConnectedUserJwt,
   type ConventionJwt,
   type ConventionReadDto,
@@ -23,6 +27,8 @@ import {
   hasAllowedRoleOnAssessment,
   isConventionRenewed,
   isConventionValidated,
+  type MarkPartnersErroredConventionAsHandledRequest,
+  markPartnersErroredConventionAsHandledRequestSchema,
   type RenewConventionParams,
   type Role,
   type TransferConventionToAgencyRequestDto,
@@ -43,6 +49,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionReadToConventionRouteParams } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
+import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
+import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -50,7 +58,11 @@ import {
   canAssessmentBeFilled,
   isConventionEndingInOneDayOrMore,
 } from "src/core-logic/domain/convention/convention.utils";
+import { conventionActionSelectors } from "src/core-logic/domain/convention/convention-action/conventionAction.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
+import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
+import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 
 export type JwtKindProps =
   | {
@@ -80,6 +92,9 @@ export const ConventionManageActions = ({
   const dispatch = useDispatch();
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
+  const broadcastErrorFeedback = useAppSelector(
+    partnersErroredConventionSelectors.lastBroadcastFeedback,
+  )?.subscriberErrorFeedback;
   const renewFeedback = useFeedbackTopic("convention-action-renew");
   const conventionActionsFeedback = useFeedbackTopics([
     "convention-action-accept-by-counsellor",
@@ -345,6 +360,7 @@ export const ConventionManageActions = ({
           "convention-action-cancel",
           "convention-action-renew",
           "convention-action-edit-counsellor-name",
+          "partner-conventions",
         ]}
         className="fr-mb-2w"
         closable
@@ -816,7 +832,16 @@ export const ConventionManageActions = ({
           userHasEnoughRightsOnConvention(currentUser, convention, [
             "counsellor",
             "validator",
-          ]) && <BroadcastAgainButton conventionId={convention.id} />}
+          ]) &&
+          (broadcastErrorFeedback && !currentUser.isBackofficeAdmin ? (
+            <ErroredConventionActions
+              conventionId={convention.id}
+              jwt={jwtParams.jwt as ConnectedUserJwt}
+              currentUser={currentUser}
+            />
+          ) : (
+            <BroadcastAgainButton conventionId={convention.id} />
+          ))}
       </div>
     </div>
   );
@@ -876,6 +901,192 @@ const FillAssessmentButton = ({
         >
           {modalMessage}
         </notEnoughRightToFillAssessmentModal.Component>,
+        document.body,
+      )}
+    </>
+  );
+};
+
+const broadcastAgainModal = createModal({
+  isOpenedByDefault: false,
+  id: domElementIds.manageConvention.broadcastAgainModal,
+});
+
+const erroredConventionHandledConfirmationModal = createModal({
+  isOpenedByDefault: false,
+  id: domElementIds.manageConvention.erroredConventionHandledModal,
+});
+
+type ErroredConventionActionsProps = {
+  conventionId: string;
+  jwt: ConnectedUserJwt;
+  currentUser: ConnectedUser;
+};
+
+const ErroredConventionActions = ({
+  conventionId,
+  jwt,
+  currentUser,
+}: ErroredConventionActionsProps) => {
+  const dispatch = useDispatch();
+  const isPeUser = currentUser?.agencyRights.some(
+    (agencyRight) =>
+      agencyRight.agency.kind === "pole-emploi" &&
+      !agencyRight.roles.includes("to-review"),
+  );
+
+  const isBroadcasting = useAppSelector(
+    conventionActionSelectors.isBroadcasting,
+  );
+  const consumerNames = useAppSelector(apiConsumerSelectors.apiConsumerNames);
+  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
+  const hasErrorFeedback =
+    feedbacks["broadcast-convention-again"]?.level === "error";
+
+  const methods = useForm<MarkPartnersErroredConventionAsHandledRequest>({
+    resolver: zodResolver(markPartnersErroredConventionAsHandledRequestSchema),
+    mode: "onTouched",
+    defaultValues: {
+      conventionId,
+    },
+  });
+
+  const onSubmit = ({
+    conventionId,
+  }: MarkPartnersErroredConventionAsHandledRequest) => {
+    dispatch(
+      partnersErroredConventionSlice.actions.markAsHandledRequested({
+        jwt,
+        markAsHandledParams: { conventionId },
+        feedbackTopic: "partner-conventions",
+      }),
+    );
+    erroredConventionHandledConfirmationModal.close();
+  };
+
+  useEffect(() => {
+    if (jwt && conventionId) {
+      dispatch(
+        apiConsumerSlice.actions.fetchApiConsumerNamesRequested({
+          conventionId,
+          jwt: jwt,
+          feedbackTopic: "api-consumer-names",
+        }),
+      );
+    }
+    return () => {
+      dispatch(apiConsumerSlice.actions.clearFetchedApiConsumerNames());
+    };
+  }, [jwt, conventionId, dispatch]);
+
+  return (
+    <>
+      <ButtonWithSubMenu
+        buttonLabel="Gérer la synchronisation"
+        openedTop={true}
+        navItems={[
+          {
+            id: domElementIds.manageConvention.openMarkConventionAsHandledModal,
+            children: "Marquer la convention comme traitée",
+            onClick: () => erroredConventionHandledConfirmationModal.open(),
+          },
+          {
+            id: domElementIds.manageConvention
+              .openBroadcastConventionAgainModal,
+            children: "Resynchroniser dans votre applicatif",
+            onClick: () => broadcastAgainModal.open(),
+          },
+        ]}
+        priority="secondary"
+        buttonIconId="fr-icon-arrow-down-s-line"
+        iconPosition="right"
+        id="errored-convention-actions-button"
+      />
+
+      {createPortal(
+        <broadcastAgainModal.Component
+          title="Rediffuser dans votre SI ou système applicatif"
+          buttons={[
+            {
+              doClosesModal: true,
+              children: "Fermer",
+            },
+            {
+              id: domElementIds.manageConvention.broadcastConventionAgainButton,
+              doClosesModal: false,
+              children: "Rediffuser",
+              disabled: isBroadcasting || hasErrorFeedback,
+              onClick: () => {
+                dispatch(
+                  conventionActionSlice.actions.broadcastConventionToPartnerRequested(
+                    {
+                      conventionId: conventionId,
+                      feedbackTopic: "broadcast-convention-again",
+                    },
+                  ),
+                );
+              },
+            },
+          ]}
+        >
+          Vous allez rediffuser aux SI ou système applicatifs suivant :
+          <ul>
+            {consumerNames.map((consumerName) => (
+              <li key={consumerName}>{consumerName}</li>
+            ))}
+          </ul>
+          <Feedback topics={["broadcast-convention-again"]} />
+        </broadcastAgainModal.Component>,
+        document.body,
+      )}
+
+      {createPortal(
+        <erroredConventionHandledConfirmationModal.Component title="Confirmation de saisie">
+          <p>
+            Vous allez marquer une convention comme traitée l'avez vous saisie
+            manuellement ?
+          </p>
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <ButtonsGroup
+                className={fr.cx("fr-mt-4w", "fr-mb-2w")}
+                buttonsEquisized
+                alignment="center"
+                inlineLayoutWhen="always"
+                buttons={[
+                  {
+                    id: domElementIds.manageConvention
+                      .markConventionAsHandledButton,
+                    children: "Oui (Marquer la convention comme traitée)",
+                    priority: "primary",
+                    type: "submit",
+                  },
+                  {
+                    children:
+                      "Non (Ne pas marquer la convention comme traitée)",
+                    priority: "secondary",
+                    onClick: () =>
+                      erroredConventionHandledConfirmationModal.close(),
+                  },
+                ]}
+              />
+            </form>
+          </FormProvider>
+
+          {isPeUser && (
+            <p>
+              Si nécessaire, vous pouvez retrouver les instructions détaillées
+              pour la saisie d'une convention en cliquant sur le lien suivant:{" "}
+              <a
+                href="https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/Documents/Immersion_facilitee/Immersion_facilitee/Guide_de_gestion_des_conventions_en_erreur.pptx?d=w489a3c6b6e5148e6bea287ddfadba8c7&csf=1&web=1&e=i1GD5H"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Guide de gestion des conventions en erreur
+              </a>
+            </p>
+          )}
+        </erroredConventionHandledConfirmationModal.Component>,
         document.body,
       )}
     </>
