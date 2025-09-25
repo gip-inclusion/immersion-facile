@@ -53,6 +53,8 @@ export const AgencyDashboardPage = ({
             },
           },
           ({ currentUser }) => {
+            const fullName =
+              `${currentUser.firstName} ${currentUser.lastName}`.trim();
             if (new Date(currentUser.createdAt) > subMinutes(new Date(), 1))
               return (
                 <Alert
@@ -65,16 +67,16 @@ export const AgencyDashboardPage = ({
               <>
                 {currentUser.proConnect ? (
                   <strong className={fr.cx("fr-mt-4w", "fr-text--lead")}>
-                    Bonjour {currentUser.firstName} {currentUser.lastName}, vous
-                    avez sélectionné le SIRET {currentUser.proConnect.siret}{" "}
-                    lors de la création de votre compte sur ProConnect
+                    Bonjour{fullName ? ` ${fullName}` : ""}, vous avez
+                    sélectionné le SIRET {currentUser.proConnect.siret} lors de
+                    la création de votre compte sur ProConnect
                   </strong>
                 ) : (
                   <p>
-                    Bonjour {currentUser.firstName} {currentUser.lastName},
-                    recherchez un organisme afin d'accéder aux conventions et
-                    statistiques de ce dernier. Un administrateur vérifiera et
-                    validera votre demande.
+                    Bonjour{fullName ? ` ${fullName}` : ""}, recherchez un
+                    organisme afin d'accéder aux conventions et statistiques de
+                    ce dernier. Un administrateur vérifiera et validera votre
+                    demande.
                   </p>
                 )}
 

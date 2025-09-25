@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import {
   type AddressWithCountryCodeAndPosition,
   countryCodesData,
+  defaultCountryCode,
   getCountryCodeFromAddress,
   type SupportedCountryCode,
 } from "shared";
@@ -40,22 +41,25 @@ export const AddressAutocompleteWithCountrySelect = ({
     initialInputValue,
   );
 
-  const countryOptions = Object.entries(countryCodesData).map(
-    ([code, { name, flag }]) => ({
-      value: code as SupportedCountryCode,
-      label: `${flag} ${name}`,
-    }),
-  );
-
   const getSelectedCountryCode = () => {
     const countryCodeFromAddressValue = inputValue
       ? getCountryCodeFromAddress(inputValue)
-      : null;
+      : defaultCountryCode;
     if (countryCodeFromAddressValue) {
       return countryCodeFromAddressValue;
     }
     return selectedCountryCode ?? countryCode;
   };
+
+  const selectedCountryCodeValue = getSelectedCountryCode();
+
+  const countryOptions = Object.entries(countryCodesData).map(
+    ([code, { name, flag }]) => ({
+      value: code as SupportedCountryCode,
+      label: `${flag} ${name}`,
+      selected: code === selectedCountryCodeValue,
+    }),
+  );
 
   return (
     <div className={fr.cx("fr-mb-2w")}>
@@ -64,7 +68,7 @@ export const AddressAutocompleteWithCountrySelect = ({
           label="Pays où se déroulera l'immersion"
           options={countryOptions}
           nativeSelectProps={{
-            value: getSelectedCountryCode(),
+            value: selectedCountryCodeValue,
             onChange: (event) => {
               const newCountryCode = event.currentTarget
                 .value as SupportedCountryCode;
@@ -98,7 +102,7 @@ export const AddressAutocompleteWithCountrySelect = ({
         onAddressClear={onAddressClear}
         onAddressSelected={onAddressSelected}
         multiple={multiple}
-        countryCode={getSelectedCountryCode()}
+        countryCode={selectedCountryCodeValue}
         initialInputValue={inputValue}
       />
     </div>

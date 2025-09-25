@@ -36,13 +36,11 @@ export const RegisterAgenciesForm = ({
 
   const agencySearchBySiretOrNameInput = useRef<ElementRef<"input">>(null);
 
-  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [selectedAgencyIds, setSelectedAgencyIds] = useState<AgencyId[]>([]);
 
   const onAgencySearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.currentTarget.value);
     setSelectedAgencyIds([]);
-    setIsAllChecked(false);
     dispatch(
       agenciesSlice.actions.fetchAgencyOptionsRequested({
         [looksLikeSiret(event.currentTarget.value) ? "siret" : "nameIncludes"]:
@@ -124,8 +122,6 @@ export const RegisterAgenciesForm = ({
             <AgencyTable
               checkedAgencies={selectedAgencyIds}
               setCheckedAgencies={setSelectedAgencyIds}
-              isAllChecked={isAllChecked}
-              setIsAllChecked={setIsAllChecked}
               currentUser={currentUser}
             />
           </section>
@@ -151,30 +147,25 @@ export const RegisterAgenciesForm = ({
 };
 
 const AgencyTable = ({
-  isAllChecked,
-  setIsAllChecked,
   checkedAgencies,
   setCheckedAgencies,
   currentUser,
 }: {
-  isAllChecked: boolean;
-  setIsAllChecked: (isAllChecked: boolean) => void;
   checkedAgencies: AgencyId[];
   setCheckedAgencies: (agencies: AgencyId[]) => void;
   currentUser: ConnectedUser;
 }) => {
   const isFetching = useAppSelector(agenciesSelectors.isLoading);
+  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const userAgencyIds = currentUser.agencyRights.map(
     (agencyRight) => agencyRight.agency.id,
   );
   const agencies = useAppSelector(agenciesSelectors.options).filter(
     (agency) => !userAgencyIds.includes(agency.id),
   );
-
   if (isFetching) return <p>Chargement en cours...</p>;
   if (agencies.length === 0)
     return <p>Aucun organisme correspondant à votre recherche</p>;
-
   return (
     <Table
       fixed
@@ -184,17 +175,15 @@ const AgencyTable = ({
           key={`${isAllChecked}-checkbox`}
           options={[
             {
-              label: "",
+              label: "Sélectionner tous les organismes",
               nativeInputProps: {
                 checked: isAllChecked,
                 onChange: (event) => {
                   const checked = event.currentTarget.checked;
                   setIsAllChecked(checked);
-                  if (!checked) {
-                    setCheckedAgencies([]);
-                  } else {
-                    setCheckedAgencies(agencies.map(({ id }) => id));
-                  }
+                  setCheckedAgencies(
+                    checked ? agencies.map(({ id }) => id) : [],
+                  );
                 },
               },
             },
@@ -207,7 +196,7 @@ const AgencyTable = ({
           key={`${agency.id}-checkbox`}
           options={[
             {
-              label: "",
+              label: "Sélectionner cet organisme",
               nativeInputProps: {
                 checked: checkedAgencies.includes(agency.id),
                 onChange: (event) => {

@@ -74,7 +74,10 @@ export const PhoneInput = ({
               options={Object.entries(countryCodesData).map(
                 ([code, { name, flag }]) => ({
                   value: code,
-                  label: `${flag} ${name}`,
+                  label:
+                    name === "France"
+                      ? `${flag} ${name} (incl. DOM/TOM)`
+                      : `${flag} ${name}`,
                 }),
               )}
               nativeSelectProps={{
