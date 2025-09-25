@@ -1,16 +1,23 @@
 import type {
   AppellationAndRomeDto,
   AppellationCode,
+  DataWithPagination,
   DateTimeIsoString,
+  EstablishmentSearchableByValue,
   LocationId,
+  NafCode,
+  RomeCode,
   SearchResultDto,
+  SearchSortedBy,
   SiretDto,
   UserId,
+  WithRequiredPagination,
+  WithSort,
 } from "shared";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
-import type { SearchMade } from "../entities/SearchMadeEntity";
+import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 
 export type RepositorySearchResultDto = Omit<SearchResultDto, "urlOfPartner">;
 export type RepositorySearchImmertionResult = Omit<
@@ -23,11 +30,27 @@ export type SearchImmersionResult = SearchResultDto & {
   nextAvailabilityDate?: DateTimeIsoString;
 };
 
-export type SearchImmersionParams = {
+export type LegacySearchImmersionParams = {
   searchMade: SearchMade;
   fitForDisabledWorkers?: boolean;
   maxResults?: number;
 };
+
+type GetOffersFilters = {
+  appellationCodes?: AppellationCode[];
+  fitForDisabledWorkers?: boolean; // if not defined -> return all
+  geoParams?: GeoParams;
+  locationIds?: LocationId[];
+  nafCodes?: NafCode[];
+  romeCodes?: RomeCode[];
+  searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
+  sirets?: SiretDto[];
+};
+
+export type GetOffersParams = WithRequiredPagination &
+  WithSort<SearchSortedBy> & {
+    filters: GetOffersFilters;
+  };
 
 export type EstablishmentAggregateFilters = { userId: UserId };
 
@@ -67,10 +90,12 @@ export interface EstablishmentAggregateRepository {
     appellationCode: AppellationCode,
     locationId: LocationId,
   ): Promise<RepositorySearchResultDto | undefined>;
-  searchImmersionResults(
-    searchImmersionParams: SearchImmersionParams,
+  legacySearchImmersionResults(
+    searchImmersionParams: LegacySearchImmersionParams,
   ): Promise<RepositorySearchImmertionResult[]>;
-
+  getOffers(
+    params: GetOffersParams,
+  ): Promise<DataWithPagination<RepositorySearchImmertionResult>>;
   //Sirets
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;
   getSiretOfEstablishmentsToSuggestUpdate(before: Date): Promise<SiretDto[]>;

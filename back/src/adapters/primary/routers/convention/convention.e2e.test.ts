@@ -980,6 +980,7 @@ describe("convention e2e", () => {
           },
           sort: {
             by: "dateStart",
+            direction: "desc",
           },
         },
       ]);

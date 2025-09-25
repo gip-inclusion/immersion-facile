@@ -6,7 +6,7 @@ import type {
   WithAcquisition,
   WithNafCodes,
 } from "shared";
-import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
+import { hasSearchGeoParams } from "../use-cases/LegacySearchImmersion";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 

@@ -1339,6 +1339,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(0);
       expectToEqual(result.data, []);
+      expectToEqual(result.pagination, {
+        currentPage: 1,
+        totalPages: 0, // no results = no pages ?
+        numberPerPage: 10,
+        totalRecords: 0,
+      });
     });
   });
 });

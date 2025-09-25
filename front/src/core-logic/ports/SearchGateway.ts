@@ -3,7 +3,7 @@ import type {
   CreateDiscussionDto,
   GroupSlug,
   GroupWithResults,
-  SearchQueryParamsDto,
+  LegacySearchQueryParamsDto,
   SearchResultDto,
   SiretAndAppellationDto,
 } from "shared";
@@ -11,7 +11,9 @@ import type {
 export type ContactErrorKind = "alreadyContactedRecently";
 
 export interface SearchGateway {
-  search$(searchParams: SearchQueryParamsDto): Observable<SearchResultDto[]>;
+  search$(
+    searchParams: LegacySearchQueryParamsDto,
+  ): Observable<SearchResultDto[]>;
   contactEstablishment: (
     params: CreateDiscussionDto,
   ) => Promise<void | ContactErrorKind>;
