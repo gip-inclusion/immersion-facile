@@ -39,18 +39,21 @@ export const defaultLocation: Location = {
   },
 };
 
+export const defaultUpdatedAt = new Date("2024-08-10");
+export const defaultCreatedAt = new Date("2024-08-08");
+
 const validEstablishmentEntityV2: EstablishmentEntity = {
   siret: "78000403200019",
   name: "Company inside repository",
   locations: [defaultLocation],
   customizedName: undefined,
   isCommited: undefined,
-  createdAt: new Date("2024-08-08"),
+  createdAt: defaultCreatedAt,
   sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
   nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
-  updatedAt: new Date("2024-08-10"),
+  updatedAt: defaultUpdatedAt,
   contactMode: "EMAIL",
   isOpen: true,
   isMaxDiscussionsForPeriodReached: false,
