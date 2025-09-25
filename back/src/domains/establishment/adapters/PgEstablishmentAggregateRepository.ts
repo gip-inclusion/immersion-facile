@@ -391,9 +391,9 @@ export class PgEstablishmentAggregateRepository
       offset: 0,
       sortedBy: "date",
       filters: {
-        siret,
-        appellationCode,
-        locationId,
+        sirets: [siret],
+        appellationCodes: [appellationCode],
+        locationIds: [locationId],
       },
       shouldCountAll: false,
     });
@@ -850,9 +850,9 @@ type SearchImmersionFilters = {
   romeCodes?: RomeCode[];
   geoParams?: GeoParams;
   nafCodes?: NafCode[];
-  siret?: SiretDto;
-  appellationCode?: AppellationCode;
-  locationId?: LocationId;
+  sirets?: SiretDto[];
+  appellationCodes?: AppellationCode[];
+  locationIds?: LocationId[];
 };
 
 type SearchImmersionResultsParams = {
@@ -868,14 +868,14 @@ const makeGetFilteredResultsSubQueryBuilder = ({
   sortedBy,
 }: Pick<SearchImmersionResultsParams, "filters" | "sortedBy">) => {
   const {
-    appellationCode,
+    appellationCodes,
     fitForDisabledWorkers,
     geoParams,
-    locationId,
+    locationIds,
     nafCodes,
     romeCodes,
     searchableBy,
-    siret,
+    sirets,
   } = filters;
 
   return (qb: QueryCreator<Database>) =>
@@ -906,7 +906,10 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                     fitForDisabledWorkers ? "is" : "is not",
                     true,
                   ),
-            (qb) => (siret ? qb.where("establishments.siret", "=", siret) : qb),
+            (qb) =>
+              sirets?.length
+                ? qb.where("establishments.siret", "in", sirets)
+                : qb,
             (qb) => {
               if (searchableBy === "jobSeekers")
                 return qb.whereRef(
@@ -965,11 +968,11 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                     )
                   : eb,
               (eb) =>
-                locationId
+                locationIds?.length
                   ? eb.where(
                       "establishments_location_infos.id",
-                      "=",
-                      locationId,
+                      "in",
+                      locationIds,
                     )
                   : eb,
             ).as("loc"),
@@ -1000,11 +1003,11 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                     )
                   : eb,
               (eb) =>
-                appellationCode
+                appellationCodes?.length
                   ? eb.where(
                       "immersion_offers.appellation_code",
-                      "=",
-                      Number.parseInt(appellationCode),
+                      "in",
+                      appellationCodes.map((code) => Number.parseInt(code)),
                     )
                   : eb,
             ).as("offer"),
