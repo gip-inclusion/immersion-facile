@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type BroadcastFeedback,
   ConnectedUserBuilder,
   type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
@@ -14,10 +15,7 @@ import {
   type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/events/ports/EventBus";
-import {
-  type BroadcastFeedback,
-  broadcastToFtLegacyServiceName,
-} from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtLegacyServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
