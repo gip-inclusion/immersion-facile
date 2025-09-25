@@ -69,4 +69,51 @@ describe("useCaseBuilder", () => {
     const result = await otherAddTruc.execute();
     isExpectedType<"hey">(result);
   });
+
+  it("should work with notTransactional use cases", async () => {
+    const inputSchema = z.object({ name: z.string() });
+    type Input = z.infer<typeof inputSchema>;
+    type Output = string;
+    type Deps = { getGreeting: () => string };
+    type CurrentUser = { id: string; email: string };
+
+    const makeGreetUser = useCaseBuilder("GreetUser")
+      .withInput(inputSchema)
+      .withOutput<Output>()
+      .withDeps<Deps>()
+      .withCurrentUser<CurrentUser>()
+      .notTransactional()
+      .build(async ({ inputParams, currentUser, deps }) => {
+        isExpectedType<Input>(inputParams);
+        isExpectedType<CurrentUser>(currentUser);
+        isExpectedType<Deps>(deps);
+        // uow should not be available
+        return `${deps.getGreeting()} ${inputParams.name} from ${currentUser.email}`;
+      });
+
+    const greetUser = makeGreetUser({
+      deps: { getGreeting: () => "Hello" },
+      // uowPerformer should not be required
+    });
+
+    const result = await greetUser.execute(
+      { name: "World" },
+      { id: "123", email: "test@example.com" },
+    );
+
+    isExpectedType<Output>(result);
+    expect(result).toBe("Hello World from test@example.com");
+  });
+
+  it("should work with notTransactional use cases without deps", async () => {
+    const makeSimpleUseCase = useCaseBuilder("SimpleUseCase")
+      .withInput(z.object({ value: z.number() }))
+      .notTransactional()
+      .build(async ({ inputParams }) => inputParams.value * 2);
+
+    const simpleUseCase = makeSimpleUseCase({});
+
+    const result = await simpleUseCase.execute({ value: 5 });
+    expect(result).toBe(10);
+  });
 });
