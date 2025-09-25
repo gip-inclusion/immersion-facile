@@ -220,7 +220,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _params: FlatGetConventionsForAgencyUserParams,
     _jwt: string,
   ): Observable<DataWithPagination<ConventionDto>> {
-    return this.getConventionsForUserResult$;}
+    return this.getConventionsForUserResult$;
+  }
   public getLastBroadcastFeedback$(
     _conventionId: ConventionId,
     _jwt: ConventionSupportedJwt,
