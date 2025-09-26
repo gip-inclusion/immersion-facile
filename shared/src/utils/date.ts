@@ -1,5 +1,5 @@
 // Matches valid dates of the format 'yyyy-mm-dd'.
-import { addHours, isValid } from "date-fns";
+import { addHours, differenceInCalendarDays, isValid } from "date-fns";
 import { z } from "zod";
 import type { Flavor } from "../typeFlavors";
 import { localization } from "../zodUtils";
@@ -12,6 +12,8 @@ export type DateRange = {
   from: Date;
   to: Date;
 };
+
+export const rtf = new Intl.RelativeTimeFormat("fr", { numeric: "auto" });
 
 const hourDisplayedSeparator = "h";
 
@@ -85,3 +87,9 @@ export const hoursValueToHoursDisplayed = ({
     minutes < 10 ? `0${minutes}` : minutes
   }`;
 };
+
+export const getDaysBetween = (from: Date, to: Date) =>
+  differenceInCalendarDays(
+    convertLocaleDateToUtcTimezoneDate(to),
+    convertLocaleDateToUtcTimezoneDate(from),
+  );

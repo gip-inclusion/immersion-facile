@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
-import { addDays, differenceInCalendarDays, subMonths } from "date-fns";
+import { addDays, subMonths } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   HeadingSection,
@@ -13,8 +13,9 @@ import {
 import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
-  convertLocaleDateToUtcTimezoneDate,
+  getDaysBetween,
   getFormattedFirstnameAndLastname,
+  rtf,
 } from "shared";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -187,42 +188,34 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
         })}
       </>
     );
-  const immersionStartedSinceDays = differenceInCalendarDays(
-    convertLocaleDateToUtcTimezoneDate(new Date()),
-    convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)),
+  const immersionStartedSinceDays = getDaysBetween(
+    new Date(),
+    new Date(convention.dateStart),
   );
-  const immersionStartsInDays = Math.abs(immersionStartedSinceDays);
 
   const description = match({ immersionStartedSinceDays })
-    .with({ immersionStartedSinceDays: P.when((days) => days > 1) }, () => (
+    .with({ immersionStartedSinceDays: P.when((days) => days < -2) }, () => (
       <>
-        ⚠️ L'immersion a déjà commencé depuis{" "}
-        <strong>{immersionStartedSinceDays} jours</strong>
+        ⚠️ L'immersion a déjà commencé{" "}
+        <strong>{rtf.format(immersionStartedSinceDays, "day")}</strong>
       </>
     ))
     .with(
-      { immersionStartedSinceDays: P.when((days) => days === 1 || days === 0) },
+      { immersionStartedSinceDays: P.when((days) => days >= -2 && days <= 0) },
       () => (
         <>
           ⚠️ L'immersion a commencé{" "}
-          <strong>
-            {immersionStartedSinceDays === 1 ? "hier" : "aujourd'hui"}
-          </strong>
+          <strong>{rtf.format(immersionStartedSinceDays, "day")}</strong>
         </>
       ),
     )
-    .with({ immersionStartedSinceDays: P.when((days) => days === -1) }, () => (
-      <>
-        <Badge className={fr.cx("fr-badge--error")}>J-1</Badge> L'immersion
-        commence <strong>demain</strong>
-      </>
-    ))
-    .with({ immersionStartedSinceDays: P.when((days) => days < -1) }, () => (
+    .with({ immersionStartedSinceDays: P.when((days) => days > 0) }, () => (
       <>
         <Badge className={fr.cx("fr-badge--error")}>
-          J-{immersionStartsInDays}
+          J-{immersionStartedSinceDays}
         </Badge>{" "}
-        L'immersion commence <strong>dans {immersionStartsInDays} jours</strong>
+        L'immersion commence{" "}
+        <strong>{rtf.format(immersionStartedSinceDays, "day")}</strong>
       </>
     ))
     .run();
