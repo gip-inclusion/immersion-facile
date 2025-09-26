@@ -120,14 +120,16 @@ export const useInitialSiret = ({
 export const useExistingSiret = ({
   siret,
   addressAutocompleteLocator,
+  shouldFetch = true,
 }: {
   siret?: SiretDto | null;
   addressAutocompleteLocator: AddressAutocompleteLocator;
+  shouldFetch?: boolean;
 }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (siret) {
+    if (siret && shouldFetch) {
       dispatch(
         siretSlice.actions.siretModified({
           feedbackTopic: "siret-input",
@@ -136,5 +138,5 @@ export const useExistingSiret = ({
         }),
       );
     }
-  }, [siret, dispatch, addressAutocompleteLocator]);
+  }, [siret, dispatch, addressAutocompleteLocator, shouldFetch]);
 };

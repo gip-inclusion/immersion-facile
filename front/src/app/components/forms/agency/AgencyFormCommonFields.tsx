@@ -83,7 +83,7 @@ export const AgencyFormCommonFields = ({
   );
 
   useEffect(() => {
-    if (!isFetchingSiret && establishmentInfos) {
+    if (!isFetchingSiret && establishmentInfos && mode === "create") {
       setValue("name", establishmentInfos.businessName);
       dispatch(
         geocodingSlice.actions.fetchSuggestionsRequested({
@@ -94,7 +94,7 @@ export const AgencyFormCommonFields = ({
         }),
       );
     }
-  }, [establishmentInfos, isFetchingSiret, setValue, dispatch]);
+  }, [establishmentInfos, isFetchingSiret, setValue, dispatch, mode]);
 
   useEffect(() => {
     if (agencyAddress?.value) {
@@ -105,6 +105,7 @@ export const AgencyFormCommonFields = ({
   useExistingSiret({
     siret: formValues.agencySiret,
     addressAutocompleteLocator: "agency-address",
+    shouldFetch: mode === "create", // ugly, but we can't use hooks conditionally
   });
 
   return (
