@@ -342,7 +342,6 @@ const createDiscussionIFSchema: ZodSchemaWithInputMatchingOutput<CreateDiscussio
     z.object({
       kind: z.literal("IF"),
       immersionObjective: immersionObjectiveSchema,
-      hasWorkingExperience: z.boolean(),
       experienceAdditionalInformation: zStringMinLength1.optional(),
       potentialBeneficiaryResumeLink: resumeLinkSchema,
     }),

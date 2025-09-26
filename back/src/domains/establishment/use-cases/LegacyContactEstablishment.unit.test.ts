@@ -211,7 +211,6 @@ describe("LegacyContactEstablishment", () => {
         contactMode: "PHONE",
         kind: "IF",
         datePreferences: "",
-        hasWorkingExperience: false,
         potentialBeneficiaryPhone: "+33600000000",
         immersionObjective: null,
       };
@@ -268,7 +267,6 @@ describe("LegacyContactEstablishment", () => {
         kind: "IF",
         contactMode: "IN_PERSON",
         datePreferences: "",
-        hasWorkingExperience: false,
         potentialBeneficiaryPhone: "+33600000000",
         immersionObjective: null,
       };

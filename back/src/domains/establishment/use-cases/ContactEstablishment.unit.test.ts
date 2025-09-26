@@ -101,7 +101,6 @@ describe("ContactEstablishment", () => {
     contactMode: "PHONE",
     datePreferences: "fake date preferences",
     potentialBeneficiaryPhone: "+33654783402",
-    hasWorkingExperience: true,
     immersionObjective: "Confirmer un projet professionnel",
     kind: "IF",
     potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
@@ -115,7 +114,6 @@ describe("ContactEstablishment", () => {
     ...validPhoneRequest,
     contactMode: "EMAIL",
     datePreferences: "fake date preferences",
-    hasWorkingExperience: true,
     experienceAdditionalInformation: "fake experience additional information",
     immersionObjective: "Confirmer un projet professionnel",
     potentialBeneficiaryPhone: "+33654783402",
@@ -305,7 +303,6 @@ describe("ContactEstablishment", () => {
                 resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
                 experienceAdditionalInformation:
                   validEmailRequest.experienceAdditionalInformation,
-                hasWorkingExperience: validEmailRequest.hasWorkingExperience,
                 datePreferences: validEmailRequest.datePreferences,
                 immersionObjective: "Confirmer un projet professionnel",
               },
@@ -318,7 +315,7 @@ describe("ContactEstablishment", () => {
 <table width="600">
   <tr>
     <td>
-      <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : ${immersionOffer.appellationLabel}.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : Je compte me former à ce métier.<br/><br/>Profil du candidat :<br/><br/>• Expérience professionnelle : J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat.<br/>• Informations supplémentaires sur l'expérience du candidat : fake experience additional information.</p>
+      <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : ${immersionOffer.appellationLabel}.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : Je compte me former à ce métier.<br/><br/>Profil du candidat :<br/><br/>• Informations supplémentaires sur l'expérience du candidat : fake experience additional information.</p>
     </td>
   </tr>
 </table>
@@ -362,7 +359,6 @@ describe("ContactEstablishment", () => {
                 resumeLink: validPhoneRequest.potentialBeneficiaryResumeLink,
                 experienceAdditionalInformation:
                   validPhoneRequest.experienceAdditionalInformation,
-                hasWorkingExperience: validPhoneRequest.hasWorkingExperience,
                 datePreferences: validPhoneRequest.datePreferences,
                 immersionObjective: "Confirmer un projet professionnel",
               },
@@ -414,7 +410,6 @@ describe("ContactEstablishment", () => {
                 resumeLink: validPhoneRequest.potentialBeneficiaryResumeLink,
                 experienceAdditionalInformation:
                   validPhoneRequest.experienceAdditionalInformation,
-                hasWorkingExperience: validPhoneRequest.hasWorkingExperience,
                 datePreferences: validPhoneRequest.datePreferences,
                 immersionObjective: "Confirmer un projet professionnel",
               },
@@ -461,7 +456,7 @@ describe("ContactEstablishment", () => {
 <table width="600">
   <tr>
     <td>
-      <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : Styliste.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : J'en suis au premier stade de mon orientation et je veux en savoir plus sur ce métier.<br/><br/>Profil du candidat :<br/><br/><br/><br/>• Je suis en 2nde.</p>
+      <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : Styliste.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : J'en suis au premier stade de mon orientation et je veux en savoir plus sur ce métier.<br/><br/>Profil du candidat :<br/><br/><br/>• Je suis en 2nde.</p>
     </td>
   </tr>
 </table>
@@ -617,7 +612,6 @@ describe("ContactEstablishment", () => {
           potentialBeneficiaryPhone: "+33654783402",
           locationId: establishmentAggregate.establishment.locations[0].id,
           datePreferences: "fake date preferences",
-          hasWorkingExperience: true,
           experienceAdditionalInformation:
             "fake experience additional information",
           kind: "IF",
@@ -687,7 +681,6 @@ describe("ContactEstablishment", () => {
           potentialBeneficiaryPhone: "+33654783404",
           locationId: establishmentAggregate.establishment.locations[0].id,
           datePreferences: "fake date preferences",
-          hasWorkingExperience: true,
           experienceAdditionalInformation:
             "fake experience additional information",
           kind: "IF",
@@ -787,7 +780,6 @@ describe("ContactEstablishment", () => {
               immersionObjective: "Confirmer un projet professionnel",
               experienceAdditionalInformation:
                 validEmailRequest.experienceAdditionalInformation,
-              hasWorkingExperience: validEmailRequest.hasWorkingExperience,
               resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
             },
           },
