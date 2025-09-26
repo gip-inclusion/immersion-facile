@@ -266,7 +266,7 @@ describe("conventionDtoSchema", () => {
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
-        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention.signatories.beneficiary.phone}' n'est pas valide en France (incl. DOM/TOM).`,
+        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention.signatories.beneficiary.phone}' n'est pas valide en France.`,
       });
 
       const convention2 = new ConventionDtoBuilder()
@@ -274,7 +274,7 @@ describe("conventionDtoSchema", () => {
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention2, {
-        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention2.signatories.beneficiary.phone}' n'est pas valide en France (incl. DOM/TOM).`,
+        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention2.signatories.beneficiary.phone}' n'est pas valide en France.`,
       });
     });
 
@@ -284,7 +284,7 @@ describe("conventionDtoSchema", () => {
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
-        "establishmentTutor.phone": `Le numéro de téléphone '${convention.establishmentTutor.phone}' n'est pas valide en France (incl. DOM/TOM).`,
+        "establishmentTutor.phone": `Le numéro de téléphone '${convention.establishmentTutor.phone}' n'est pas valide en France.`,
       });
     });
 
