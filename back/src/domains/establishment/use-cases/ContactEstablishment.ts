@@ -294,7 +294,6 @@ const makeDiscussionDto = async ({
             firstName: contactRequest.potentialBeneficiaryFirstName,
             lastName: contactRequest.potentialBeneficiaryLastName,
             email: contactRequest.potentialBeneficiaryEmail,
-            hasWorkingExperience: contactRequest.hasWorkingExperience,
             experienceAdditionalInformation:
               contactRequest.experienceAdditionalInformation,
             datePreferences: contactRequest.datePreferences,

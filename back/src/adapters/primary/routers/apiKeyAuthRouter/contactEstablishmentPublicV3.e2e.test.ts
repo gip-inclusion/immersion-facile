@@ -41,7 +41,6 @@ describe("POST contact-establishment public V3 route", () => {
     potentialBeneficiaryPhone: "0654334567",
     locationId: TEST_LOCATION.id,
     datePreferences: "fake date preferences",
-    hasWorkingExperience: true,
     experienceAdditionalInformation: "experienceAdditionalInformation",
   };
 
