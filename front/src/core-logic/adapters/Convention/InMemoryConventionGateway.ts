@@ -3,6 +3,7 @@ import {
   type AddConventionInput,
   type AgencyOption,
   type ApiConsumerName,
+  type BroadcastFeedback,
   type ConnectedUserJwt,
   type ConventionDto,
   ConventionDtoBuilder,
@@ -69,6 +70,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public getConventionsForUserResult$ = new Subject<
     DataWithPagination<ConventionDto>
   >();
+  public getLastBroadcastFeedbackResult$ =
+    new Subject<BroadcastFeedback | null>();
 
   #agencies: { [id: string]: AgencyOption } = {};
 
@@ -218,5 +221,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: string,
   ): Observable<DataWithPagination<ConventionDto>> {
     return this.getConventionsForUserResult$;
+  }
+  public getLastBroadcastFeedback$(
+    _conventionId: ConventionId,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<BroadcastFeedback | null> {
+    return this.getLastBroadcastFeedbackResult$;
   }
 }

@@ -6,6 +6,7 @@ import {
 } from "date-fns";
 import fr from "date-fns/locale/fr";
 import {
+  type BroadcastFeedback,
   type ConnectedUser,
   errors,
   userHasEnoughRightsOnConvention,
@@ -13,7 +14,6 @@ import {
   withConventionIdSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
-import type { BroadcastFeedback } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { getOnlyAssessmentDto } from "../../entities/AssessmentEntity";

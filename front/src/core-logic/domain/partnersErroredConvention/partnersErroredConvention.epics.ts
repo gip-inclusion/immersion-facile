@@ -40,6 +40,36 @@ const markPartnersErroredConventionAsHandledEpic: PartnersErroredConventionEpic 
       ),
     );
 
+const fetchConventionLastBroadcastFeedbackEpic: PartnersErroredConventionEpic =
+  (action$, _, { conventionGateway }) =>
+    action$.pipe(
+      filter(
+        partnersErroredConventionSlice.actions
+          .fetchConventionLastBroadcastFeedbackRequested.match,
+      ),
+      switchMap(({ payload }) =>
+        conventionGateway
+          .getLastBroadcastFeedback$(payload.conventionId, payload.jwt)
+          .pipe(
+            map((lastBroadcastFeedback) =>
+              partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackSucceeded(
+                {
+                  lastBroadcastFeedback,
+                },
+              ),
+            ),
+          ),
+      ),
+      catchEpicError((error: Error) =>
+        partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackFailed(
+          {
+            errorMessage: error.message,
+          },
+        ),
+      ),
+    );
+
 export const partnersErroredConventionEpics = [
   markPartnersErroredConventionAsHandledEpic,
+  fetchConventionLastBroadcastFeedbackEpic,
 ];

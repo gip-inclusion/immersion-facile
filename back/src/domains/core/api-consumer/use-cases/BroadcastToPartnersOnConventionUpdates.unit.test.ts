@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type BroadcastFeedback,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   cartographeAppellationAndRome,
@@ -8,7 +9,6 @@ import {
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import type { BroadcastFeedback } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,

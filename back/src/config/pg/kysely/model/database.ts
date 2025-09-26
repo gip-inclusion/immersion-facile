@@ -2,19 +2,17 @@ import type { ColumnType, Generated, JSONColumnType } from "kysely";
 import type {
   AbsoluteUrl,
   Attachment,
+  BroadcastFeedbackResponse,
   ContactLevelOfEducation,
+  ConventionBroadcastRequestParams,
   ConventionId,
   DateTimeIsoString,
   DiscussionKind,
   DiscussionStatus,
   Email,
   SiretDto,
+  SubscriberErrorFeedback,
 } from "shared";
-import type { SubscriberErrorFeedback } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
-import type {
-  BroadcastFeedbackResponse,
-  ConventionBroadcastRequestParams,
-} from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 
 export interface Database {
   actors: Actors;

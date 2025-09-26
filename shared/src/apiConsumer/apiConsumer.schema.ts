@@ -134,9 +134,11 @@ const apiConsumerRightsSchema: ZodSchemaWithInputMatchingOutput<
   statistics: statisticsRightSchema,
 });
 
+export const apiConsumerNameSchema = stringWithMaxLength255;
+export const apiConsumerIdSchema = z.uuid(localization.invalidUuid);
 const commonApiConsumerShape = {
-  id: z.uuid(localization.invalidUuid),
-  name: stringWithMaxLength255,
+  id: apiConsumerIdSchema,
+  name: apiConsumerNameSchema,
   contact: apiConsumerContactSchema,
   rights: writeApiConsumerRightsSchema,
   description: z.string().max(255).optional(),
