@@ -251,8 +251,6 @@ describe("NotifyContactRequest", () => {
                         potentialBeneficiaryExperienceAdditionalInformation:
                           discussion.potentialBeneficiary
                             .experienceAdditionalInformation,
-                        potentialBeneficiaryHasWorkingExperience:
-                          discussion.potentialBeneficiary.hasWorkingExperience,
                         potentialBeneficiaryResumeLink:
                           discussion.potentialBeneficiary.resumeLink,
                       }

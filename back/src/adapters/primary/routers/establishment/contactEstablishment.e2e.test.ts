@@ -44,7 +44,6 @@ describe("Contact establishment public v2 e2e", () => {
       potentialBeneficiaryLastName: "potential_beneficiary_last_name",
       potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
       datePreferences: "fake date preferences",
-      hasWorkingExperience: true,
       experienceAdditionalInformation: "experienceAdditionalInformation",
       immersionObjective: "Confirmer un projet professionnel",
       potentialBeneficiaryPhone: "+33654783402",
