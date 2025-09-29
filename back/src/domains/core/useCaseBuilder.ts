@@ -169,31 +169,28 @@ export const useCaseBuilder = <
           });
       }
 
-      try {
-        const result = await Sentry.startSpan({ name: useCaseName }, () =>
-          cb({
-            inputParams: validParams,
-            currentUser,
-            deps: (config as any).deps,
-          } as any),
-        );
-
-        const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-        logger.info({
-          useCaseName,
-          durationInSeconds,
+      return Sentry.startSpan({ name: useCaseName }, () =>
+        cb({
+          inputParams: validParams,
+          currentUser,
+          deps: (config as any).deps,
+        } as any),
+      )
+        .then((result) => {
+          logger.info({
+            useCaseName,
+            durationInSeconds: calculateDurationInSecondsFrom(startDate),
+          });
+          return result;
+        })
+        .catch((error) => {
+          logger.error({
+            useCaseName,
+            durationInSeconds: calculateDurationInSecondsFrom(startDate),
+            message: castError(error)?.message,
+          });
+          throw error;
         });
-
-        return result;
-      } catch (error: any) {
-        const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-        logger.error({
-          useCaseName,
-          durationInSeconds,
-          message: castError(error)?.message,
-        });
-        throw error;
-      }
     }) as any,
   }),
 });

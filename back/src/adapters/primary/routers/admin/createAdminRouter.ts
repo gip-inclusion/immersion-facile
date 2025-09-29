@@ -66,13 +66,12 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.addFormEstablishmentBatch(
     deps.connectedUserAuthMiddleware,
     (req, res) => {
-      return sendHttpResponse(req, res, () => {
-        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
-        return deps.useCases.addFormEstablishmentBatch.execute(
+      return sendHttpResponse(req, res, () =>
+        deps.useCases.addFormEstablishmentBatch.execute(
           req.body,
-          req.payloads.currentUser,
-        );
-      });
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      );
     },
   );
 
