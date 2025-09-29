@@ -23,7 +23,9 @@ export const makeGetConnectedUsers = useCaseBuilder("GetConnectedUsers")
     const userIds =
       await uow.agencyRepository.getUserIdWithAgencyRightsByFilters(filters);
 
-    const users = await getConnectedUsersByUserIds(uow, userIds);
+    const agencyId = isWithAgencyId(filters) ? filters.agencyId : undefined;
+
+    const users = await getConnectedUsersByUserIds(uow, userIds, agencyId);
 
     return users.sort((a, b) =>
       a.lastName.toLowerCase() < b.lastName.toLowerCase() ? -1 : 1,

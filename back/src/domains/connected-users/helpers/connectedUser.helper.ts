@@ -1,4 +1,4 @@
-import { toPairs, uniq, values } from "ramda";
+import { keys, toPairs, uniq, values } from "ramda";
 import {
   type AbsoluteUrl,
   type AgencyDashboards,
@@ -44,6 +44,7 @@ export const getConnectedUserByUserId = async ({
 export const getConnectedUsersByUserIds = async (
   uow: UnitOfWork,
   userIds: UserId[],
+  agencyId?: AgencyId,
 ): Promise<ConnectedUser[]> => {
   const users = await uow.userRepository.getByIds(userIds);
 
@@ -62,9 +63,11 @@ export const getConnectedUsersByUserIds = async (
   const agenciesRelatedToUsersByAgencyId = (
     await uow.agencyRepository.getByIds(
       uniq(
-        values(userRightsByUser).flatMap((rights) =>
-          rights.map((right) => right.agencyId),
-        ),
+        values(userRightsByUser)
+          .flatMap((rights) => rights.map((right) => right.agencyId))
+          .filter((userAgencyId) =>
+            agencyId ? agencyId === userAgencyId : true,
+          ),
       ),
     )
   ).reduce<Record<AgencyId, AgencyWithUsersRights>>(
@@ -90,27 +93,33 @@ const makeAgencyRights = (
   userRights: AgencyRightOfUser[],
   agenciesRelatedToUsersByAgencyId: Record<AgencyId, AgencyWithUsersRights>,
   uow: UnitOfWork,
-): Promise<AgencyRight[]> =>
-  Promise.all(
-    userRights.map<Promise<AgencyRight>>(async ({ agencyId, ...rights }) => {
-      const { usersRights, ...agency } =
-        agenciesRelatedToUsersByAgencyId[agencyId];
+): Promise<AgencyRight[]> => {
+  const agencyIds = keys(agenciesRelatedToUsersByAgencyId);
+  return Promise.all(
+    userRights
+      .filter((userRight) => agencyIds.includes(userRight.agencyId))
+      .map<Promise<AgencyRight>>(async ({ agencyId, ...rights }) => {
+        const { usersRights, ...agency } =
+          agenciesRelatedToUsersByAgencyId[agencyId];
 
-      const adminUsers = await uow.userRepository.getByIds(
-        toPairs(usersRights)
-          .filter(([_, userRight]) => userRight?.roles.includes("agency-admin"))
-          .map(([id]) => id),
-      );
+        const adminUsers = await uow.userRepository.getByIds(
+          toPairs(usersRights)
+            .filter(([_, userRight]) =>
+              userRight?.roles.includes("agency-admin"),
+            )
+            .map(([id]) => id),
+        );
 
-      return {
-        ...rights,
-        agency: {
-          ...agency,
-          admins: adminUsers.map((user) => user.email),
-        },
-      };
-    }),
+        return {
+          ...rights,
+          agency: {
+            ...agency,
+            admins: adminUsers.map((user) => user.email),
+          },
+        };
+      }),
   );
+};
 
 async function makeAgencyDashboards({
   uow,
