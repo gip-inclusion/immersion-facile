@@ -27,6 +27,10 @@ export const htmlToPdfRequestSchema: ZodSchemaWithInputMatchingOutput<HtmlToPdfR
     conventionId: z.string(),
   });
 
+export type AvailableApiVersion = (typeof availableApiVersions)[number];
+const availableApiVersions = ["v2", "v3"] as const;
+const apiVersionSchema = z.enum(availableApiVersions).default("v2");
+
 // @TODO: This should be a proper OpenAPI schema
 const openApiSpecResponseSchema = z.any();
 
@@ -42,6 +46,9 @@ export const technicalRoutes = defineRoutes({
   }),
   openApiSpec: defineRoute({
     method: "get",
+    queryParamsSchema: z.object({
+      version: apiVersionSchema,
+    }),
     url: "/open-api-spec",
     responses: { 200: openApiSpecResponseSchema },
   }),
