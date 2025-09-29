@@ -3,11 +3,11 @@ import type {
   AddConventionInput,
   ApiConsumerName,
   AuthenticatedConventionRoutes,
-  BroadcastFeedback,
   ConnectedUserJwt,
   ConventionDto,
   ConventionId,
   ConventionJwt,
+  ConventionLastBroadcastFeedbackResponse,
   ConventionMagicLinkRoutes,
   ConventionReadDto,
   ConventionSupportedJwt,
@@ -382,13 +382,13 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public getLastBroadcastFeedback$(
+  public getConventionLastBroadcastFeedback$(
     conventionId: ConventionId,
     jwt: ConventionSupportedJwt,
-  ): Observable<BroadcastFeedback | null> {
+  ): Observable<ConventionLastBroadcastFeedbackResponse> {
     return from(
       this.authenticatedHttpClient
-        .getLastBroadcastFeedback({
+        .getConventionLastBroadcastFeedback({
           urlParams: { conventionId },
           headers: { authorization: jwt },
         })

@@ -1,11 +1,11 @@
 import type { Observable } from "rxjs";
 import type {
   ApiConsumerName,
-  BroadcastFeedback,
   ConnectedUserJwt,
   ConventionDto,
   ConventionId,
   ConventionJwt,
+  ConventionLastBroadcastFeedbackResponse,
   ConventionReadDto,
   ConventionSupportedJwt,
   DashboardUrlAndName,
@@ -93,8 +93,8 @@ export interface ConventionGateway {
     params: FlatGetConventionsForAgencyUserParams,
     jwt: string,
   ): Observable<DataWithPagination<ConventionDto>>;
-  getLastBroadcastFeedback$(
+  getConventionLastBroadcastFeedback$(
     conventionId: ConventionId,
     jwt: ConventionSupportedJwt,
-  ): Observable<BroadcastFeedback | null>;
+  ): Observable<ConventionLastBroadcastFeedbackResponse>;
 }

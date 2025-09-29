@@ -69,7 +69,7 @@ export const ConventionValidation = ({
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
-  const lastBroadcastFeedback = useAppSelector(
+  const conventionLastBroadcastFeedback = useAppSelector(
     partnersErroredConventionSelectors.lastBroadcastFeedback,
   );
   const [isAssessmentLinkSent, setIsAssessmentLinkSent] =
@@ -130,8 +130,8 @@ export const ConventionValidation = ({
       "back-office",
     ]).length > 0;
 
-  const shouldShowLastBroadcastFeedbackErrorInfo =
-    lastBroadcastFeedback?.subscriberErrorFeedback &&
+  const shouldShowConventionLastBroadcastFeedbackErrorInfo =
+    conventionLastBroadcastFeedback?.subscriberErrorFeedback &&
     intersection(roles, [...agencyModifierRoles, "back-office"]).length > 0;
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
@@ -180,7 +180,7 @@ export const ConventionValidation = ({
         >
           {labelAndSeverityByStatus[status].label}
         </Badge>
-        {shouldShowLastBroadcastFeedbackErrorInfo && (
+        {shouldShowConventionLastBroadcastFeedbackErrorInfo && (
           <Badge className={cx(fr.cx("fr-mr-2w", "fr-badge--error"))}>
             ❌ Erreur de synchronisation
           </Badge>
@@ -191,11 +191,11 @@ export const ConventionValidation = ({
         <p>Justification : {convention.statusJustification}</p>
       )}
 
-      {shouldShowLastBroadcastFeedbackErrorInfo &&
-        lastBroadcastFeedback.subscriberErrorFeedback && (
+      {shouldShowConventionLastBroadcastFeedbackErrorInfo &&
+        conventionLastBroadcastFeedback.subscriberErrorFeedback && (
           <SubscriberErrorFeedbackComponent
             subscriberErrorFeedback={
-              lastBroadcastFeedback?.subscriberErrorFeedback
+              conventionLastBroadcastFeedback?.subscriberErrorFeedback
             }
             conventionStatus={convention.status}
           />

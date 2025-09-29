@@ -1,7 +1,7 @@
 import {
-  type BroadcastFeedback,
   type ConnectedUser,
   type ConventionId,
+  type ConventionLastBroadcastFeedbackResponse,
   conventionIdSchema,
   errors,
 } from "shared";
@@ -15,7 +15,7 @@ export const makeGetLastBroadcastFeedback = useCaseBuilder(
   "GetLastBroadcastFeedback",
 )
   .withInput<ConventionId>(conventionIdSchema)
-  .withOutput<BroadcastFeedback | null>()
+  .withOutput<ConventionLastBroadcastFeedbackResponse>()
   .withCurrentUser<ConnectedUser>()
   .build(async ({ uow, currentUser, inputParams }) => {
     const convention = await uow.conventionRepository.getById(inputParams);
@@ -29,13 +29,11 @@ export const makeGetLastBroadcastFeedback = useCaseBuilder(
       (agencyRight) => agencyRight.agency.id === convention.agencyId,
     );
 
-    if (!userAgencyRights && !currentUser.isBackofficeAdmin)
-      throw errors.user.noRightsOnAgency({
-        userId: currentUser.id,
-        agencyId: convention.agencyId,
-      });
-
-    return await uow.broadcastFeedbacksRepository.getLastBroadcastFeedback(
-      inputParams,
-    );
+    if (userAgencyRights || currentUser.isBackofficeAdmin)
+      return uow.broadcastFeedbacksRepository.getLastBroadcastFeedback(
+        inputParams,
+      );
+    throw errors.user.forbidden({
+      userId: currentUser.id,
+    });
   });

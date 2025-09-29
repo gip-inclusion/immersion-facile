@@ -1,5 +1,10 @@
 import { sql } from "kysely";
-import { type BroadcastFeedback, type ConventionId, errors } from "shared";
+import {
+  type BroadcastFeedback,
+  type ConventionId,
+  type ConventionLastBroadcastFeedbackResponse,
+  errors,
+} from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { isAxiosError } from "../../../../utils/axiosUtils";
 import type { BroadcastFeedbacksRepository } from "../ports/BroadcastFeedbacksRepository";
@@ -11,7 +16,7 @@ export class PgBroadcastFeedbacksRepository
 
   public async getLastBroadcastFeedback(
     id: ConventionId,
-  ): Promise<BroadcastFeedback | null> {
+  ): Promise<ConventionLastBroadcastFeedbackResponse> {
     const result = await this.transaction
       .with("latest_feedback", (qb) =>
         qb

@@ -6,8 +6,8 @@ import {
 } from "date-fns";
 import fr from "date-fns/locale/fr";
 import {
-  type BroadcastFeedback,
   type ConnectedUser,
+  type ConventionLastBroadcastFeedbackResponse,
   errors,
   userHasEnoughRightsOnConvention,
   type WithConventionId,
@@ -94,7 +94,7 @@ export const makeBroadcastConventionAgain = useCaseBuilder(
   });
 
 const throwErrorIfTooManyRequests = (params: {
-  lastBroadcastFeedback: BroadcastFeedback | null;
+  lastBroadcastFeedback: ConventionLastBroadcastFeedbackResponse;
   now: Date;
 }) => {
   if (!params.lastBroadcastFeedback) return;
