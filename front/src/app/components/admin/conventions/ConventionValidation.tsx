@@ -17,7 +17,7 @@ import {
   isConventionRenewed,
   type PhoneNumber,
   type Role,
-  rtf,
+  relativeTimeFormat,
   type SignatoryRole,
   toDisplayedDate,
 } from "shared";
@@ -50,7 +50,7 @@ import {
 const beforeAfterString = (date: string) => {
   const daysSince = getDaysBetween(new Date(), new Date(date));
 
-  return rtf.format(daysSince, "day");
+  return relativeTimeFormat.format(daysSince, "day");
 };
 
 export interface ConventionValidationProps {

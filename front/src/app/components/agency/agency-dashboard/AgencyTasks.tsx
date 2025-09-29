@@ -15,7 +15,7 @@ import {
   type ConventionDto,
   getDaysBetween,
   getFormattedFirstnameAndLastname,
-  rtf,
+  relativeTimeFormat,
 } from "shared";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -197,7 +197,9 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
     .with({ immersionStartedSinceDays: P.when((days) => days < -2) }, () => (
       <>
         ⚠️ L'immersion a déjà commencé{" "}
-        <strong>{rtf.format(immersionStartedSinceDays, "day")}</strong>
+        <strong>
+          {relativeTimeFormat.format(immersionStartedSinceDays, "day")}
+        </strong>
       </>
     ))
     .with(
@@ -205,7 +207,9 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
       () => (
         <>
           ⚠️ L'immersion a commencé{" "}
-          <strong>{rtf.format(immersionStartedSinceDays, "day")}</strong>
+          <strong>
+            {relativeTimeFormat.format(immersionStartedSinceDays, "day")}
+          </strong>
         </>
       ),
     )
@@ -215,7 +219,9 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
           J-{immersionStartedSinceDays}
         </Badge>{" "}
         L'immersion commence{" "}
-        <strong>{rtf.format(immersionStartedSinceDays, "day")}</strong>
+        <strong>
+          {relativeTimeFormat.format(immersionStartedSinceDays, "day")}
+        </strong>
       </>
     ))
     .run();
