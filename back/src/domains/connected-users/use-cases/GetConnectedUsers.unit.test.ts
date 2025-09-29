@@ -207,11 +207,6 @@ describe("GetConnectedUsers", () => {
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
-            isNotifiedByEmail: true,
-            roles: ["validator"],
-          },
         ],
       },
       {
@@ -221,11 +216,6 @@ describe("GetConnectedUsers", () => {
             agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["counsellor"],
-          },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
-            isNotifiedByEmail: true,
-            roles: ["validator"],
           },
         ],
       },
@@ -329,11 +319,6 @@ describe("GetConnectedUsers", () => {
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
-            isNotifiedByEmail: true,
-            roles: ["validator"],
-          },
         ],
       },
       {
@@ -344,11 +329,6 @@ describe("GetConnectedUsers", () => {
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
-            isNotifiedByEmail: true,
-            roles: ["validator"],
-          },
         ],
       },
       {
@@ -358,11 +338,6 @@ describe("GetConnectedUsers", () => {
             agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["counsellor"],
-          },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
-            isNotifiedByEmail: true,
-            roles: ["validator"],
           },
         ],
       },
