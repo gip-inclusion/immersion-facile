@@ -277,7 +277,7 @@ export const authenticatedConventionRoutes = defineRoutes({
     },
   }),
 
-  getLastBroadcastFeedback: defineRoute({
+  getConventionLastBroadcastFeedback: defineRoute({
     url: "/conventions/:conventionId/last-broadcast-feedback",
     method: "get",
     ...withAuthorizationHeaders,

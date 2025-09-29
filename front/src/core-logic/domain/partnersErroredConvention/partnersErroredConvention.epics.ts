@@ -49,7 +49,10 @@ const fetchConventionLastBroadcastFeedbackEpic: PartnersErroredConventionEpic =
       ),
       switchMap(({ payload }) =>
         conventionGateway
-          .getLastBroadcastFeedback$(payload.conventionId, payload.jwt)
+          .getConventionLastBroadcastFeedback$(
+            payload.conventionId,
+            payload.jwt,
+          )
           .pipe(
             map((lastBroadcastFeedback) =>
               partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackSucceeded(

@@ -34,7 +34,7 @@ export const ConventionManageContent = ({
     connectedUserSelectors.userRolesForFetchedConvention,
   );
   const userRolesAreLoading = useAppSelector(connectedUserSelectors.isLoading);
-  const erroredFeedbackIsLoading = useAppSelector(
+  const conventionLastBroadcastFeedbackIsLoading = useAppSelector(
     partnersErroredConventionSelectors.isLoading,
   );
   const conventionFormFeedback = useFeedbackTopic("convention-form");
@@ -75,7 +75,7 @@ export const ConventionManageContent = ({
     () => () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
       dispatch(
-        partnersErroredConventionSlice.actions.clearLastBroadcastFeedback(),
+        partnersErroredConventionSlice.actions.clearConventionLastBroadcastFeedback(),
       );
     },
     [dispatch],
@@ -108,7 +108,11 @@ export const ConventionManageContent = ({
       .replace();
   }
 
-  if (isLoading || userRolesAreLoading || erroredFeedbackIsLoading)
+  if (
+    isLoading ||
+    userRolesAreLoading ||
+    conventionLastBroadcastFeedbackIsLoading
+  )
     return <Loader />;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!roles.length)

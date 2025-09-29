@@ -90,7 +90,7 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
-  authenticatedConventionSharedRouter.getLastBroadcastFeedback(
+  authenticatedConventionSharedRouter.getConventionLastBroadcastFeedback(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>

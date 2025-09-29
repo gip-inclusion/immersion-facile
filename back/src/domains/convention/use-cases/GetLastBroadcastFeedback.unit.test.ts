@@ -57,7 +57,7 @@ describe("GetLastBroadcastFeedback", () => {
 
   describe("right paths", () => {
     beforeEach(async () => {
-      await uow.userRepository.save(connectedUser);
+      uow.userRepository.users = [connectedUser];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [connectedUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
@@ -67,7 +67,9 @@ describe("GetLastBroadcastFeedback", () => {
     });
 
     it("should return the last broadcast feedback when it exists", async () => {
-      await uow.broadcastFeedbacksRepository.save(sampleBroadcastFeedback);
+      uow.broadcastFeedbacksRepository.broadcastFeedbacks = [
+        sampleBroadcastFeedback,
+      ];
 
       const result = await getLastBroadcastFeedback.execute(
         convention.id,
@@ -99,8 +101,10 @@ describe("GetLastBroadcastFeedback", () => {
         serviceName: "newer-service",
       };
 
-      await uow.broadcastFeedbacksRepository.save(olderFeedback);
-      await uow.broadcastFeedbacksRepository.save(newerFeedback);
+      uow.broadcastFeedbacksRepository.broadcastFeedbacks = [
+        olderFeedback,
+        newerFeedback,
+      ];
 
       const result = await getLastBroadcastFeedback.execute(
         convention.id,
@@ -131,7 +135,7 @@ describe("GetLastBroadcastFeedback", () => {
         handledByAgency: false,
       };
 
-      await uow.broadcastFeedbacksRepository.save(errorFeedback);
+      uow.broadcastFeedbacksRepository.broadcastFeedbacks = [errorFeedback];
 
       const result = await getLastBroadcastFeedback.execute(
         convention.id,
@@ -156,9 +160,8 @@ describe("GetLastBroadcastFeedback", () => {
       uow.userRepository.users = [connectedUser];
       await expectPromiseToFailWithError(
         getLastBroadcastFeedback.execute(convention.id, connectedUser),
-        errors.user.noRightsOnAgency({
+        errors.user.forbidden({
           userId: connectedUser.id,
-          agencyId: convention.agencyId,
         }),
       );
     });

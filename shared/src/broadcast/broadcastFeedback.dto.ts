@@ -31,3 +31,5 @@ export type BroadcastFeedback = {
   occurredAt: Date;
   handledByAgency: boolean;
 };
+
+export type ConventionLastBroadcastFeedbackResponse = BroadcastFeedback | null;

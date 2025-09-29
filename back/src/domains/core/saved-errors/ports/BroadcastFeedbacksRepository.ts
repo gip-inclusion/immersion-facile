@@ -1,4 +1,8 @@
-import type { BroadcastFeedback, ConventionId } from "shared";
+import type {
+  BroadcastFeedback,
+  ConventionId,
+  ConventionLastBroadcastFeedbackResponse,
+} from "shared";
 
 export const broadcastToPartnersServiceName =
   "BroadcastToPartnersOnConventionUpdates";
@@ -14,5 +18,5 @@ export interface BroadcastFeedbacksRepository {
   markPartnersErroredConventionAsHandled: (id: ConventionId) => Promise<void>;
   getLastBroadcastFeedback: (
     id: ConventionId,
-  ) => Promise<BroadcastFeedback | null>;
+  ) => Promise<ConventionLastBroadcastFeedbackResponse>;
 }
