@@ -251,7 +251,6 @@ export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionRe
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
             immersionObjective: immersionObjectiveSchema.or(z.null()),
             resumeLink: resumeLinkSchema,
-            hasWorkingExperience: z.boolean().optional(),
             experienceAdditionalInformation: zStringMinLength1.optional(),
           }),
         }),
@@ -342,7 +341,6 @@ const createDiscussionIFSchema: ZodSchemaWithInputMatchingOutput<CreateDiscussio
     z.object({
       kind: z.literal("IF"),
       immersionObjective: immersionObjectiveSchema,
-      hasWorkingExperience: z.boolean(),
       experienceAdditionalInformation: zStringMinLength1.optional(),
       potentialBeneficiaryResumeLink: resumeLinkSchema,
     }),

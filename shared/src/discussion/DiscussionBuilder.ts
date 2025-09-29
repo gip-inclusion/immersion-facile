@@ -46,7 +46,6 @@ const defaultDiscussion = {
     email: "ali-baba@gmail.com",
     phone: "+33654533456",
     resumeLink: undefined,
-    hasWorkingExperience: true,
     experienceAdditionalInformation: "my super experience",
     datePreferences: "my fake date preferences",
     immersionObjective: "Confirmer un projet professionnel",
@@ -308,24 +307,6 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
 
     throw new Error(
       `Invalid potentialBeneficiary with resumeLink ${resumeLink} for discussionKind ${this.discussion.kind}`,
-    );
-  }
-
-  public withPotentialBeneficiaryHasWorkingExperience(
-    hasWorkingExperience?: boolean,
-  ) {
-    if (this.discussion.kind === "IF") {
-      return new DiscussionBuilder({
-        ...this.discussion,
-        potentialBeneficiary: {
-          ...this.discussion.potentialBeneficiary,
-          hasWorkingExperience,
-        },
-      } as DiscussionDto);
-    }
-
-    throw new Error(
-      `Invalid potentialBeneficiary with hasWorkingExperience ${hasWorkingExperience} for discussionKind ${this.discussion.kind}`,
     );
   }
 

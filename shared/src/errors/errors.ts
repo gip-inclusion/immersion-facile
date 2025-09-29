@@ -845,10 +845,6 @@ export const errors = {
       new NotFoundError(`La candidature '${discussionId}' n'est pas trouvée.`),
     noExchanges: (discussionId: DiscussionId) =>
       new Error(`La candidature '${discussionId}' n'a pas d'échanges.`),
-    missingHasWorkingExperience: (id: DiscussionId) =>
-      new Error(
-        `Propriété hasWorkingExperience manquante pour la candidature de type email '${id}'.`,
-      ),
     missingPhone: (id: DiscussionId) =>
       `Propriété phone manquante pour la candidature de type email '${id}'.`,
     missingDatePreferences: (id: DiscussionId) =>

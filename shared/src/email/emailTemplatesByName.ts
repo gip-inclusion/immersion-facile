@@ -1678,7 +1678,6 @@ Immersion souhaitée :
 
 Profil du candidat :
 
-    ${params.kind === "IF" ? hasWorkingExperienceWording(params.potentialBeneficiaryHasWorkingExperience) : ""}
     ${
       params.kind === "IF" &&
       params.potentialBeneficiaryExperienceAdditionalInformation
@@ -2130,16 +2129,6 @@ const generateUserInfo = (
       <li><a href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" target="_blank">Espace personnel</a></li></ul>
   `;
 };
-
-function hasWorkingExperienceWording(
-  potentialBeneficiaryHasWorkingExperience?: boolean,
-): string {
-  if (potentialBeneficiaryHasWorkingExperience === true)
-    return "• Expérience professionnelle : J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat.";
-  if (potentialBeneficiaryHasWorkingExperience === false)
-    return "• Expérience professionnelle : je n’ai jamais travaillé.";
-  return "• Expérience professionnelle : non communiqué.";
-}
 
 export const discussionExchangeForbidenContents: Record<
   ExchangeRole,
