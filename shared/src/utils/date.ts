@@ -13,7 +13,9 @@ export type DateRange = {
   to: Date;
 };
 
-export const rtf = new Intl.RelativeTimeFormat("fr", { numeric: "auto" });
+export const relativeTimeFormat = new Intl.RelativeTimeFormat("fr", {
+  numeric: "auto",
+});
 
 const hourDisplayedSeparator = "h";
 
