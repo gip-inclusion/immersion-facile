@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
@@ -43,6 +44,7 @@ import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { type routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { match } from "ts-pattern";
 import type { Route } from "type-route";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
@@ -158,6 +160,9 @@ export const CreateDiscussionForm = ({
 
   return (
     <FormProvider {...methods}>
+      <h2 className={fr.cx("fr-h3", "fr-mb-2w")}>
+        Contacter l'entreprise <p {...contactModeToBadgeOptions[contactMode]} />
+      </h2>
       <form
         // biome-ignore lint/suspicious/noConsole: debug purpose
         onSubmit={handleSubmit(onFormValid, console.error)}
@@ -179,10 +184,39 @@ export const CreateDiscussionForm = ({
           mode="form-overlay"
           parentRef={formRef}
         />
-        <p>
-          Cette entreprise a choisi d'être contactée par mail. Veuillez
-          compléter ce formulaire qui sera transmis à l'entreprise.
-        </p>
+        {match(contactMode)
+          .with("EMAIL", () => (
+            <p>
+              Cette entreprise a choisi d'être contactée par mail. Veuillez
+              compléter ce formulaire qui sera transmis à l'entreprise.
+            </p>
+          ))
+          .with("PHONE", () => (
+            <>
+              <p>
+                Cette entreprise souhaite que vous vous présentiez directement.
+              </p>
+              <p>
+                Vous recevrez par mail le nom de la personne à contacter ainsi
+                que des conseils pour présenter votre demande d’immersion. Ces
+                informations sont personnelles et confidentielles. Elles ne
+                peuvent pas être communiquées à d’autres personnes.
+              </p>
+            </>
+          ))
+          .with("IN_PERSON", () => (
+            <>
+              <p>Cette entreprise souhaite être contactée par téléphone.</p>
+              <p>
+                Vous recevrez par mail le nom de la personne à contacter, son
+                numéro de téléphone ainsi que des conseils pour présenter votre
+                demande d’immersion. Ces informations sont personnelles et
+                confidentielles. Elles ne peuvent pas être communiquées à
+                d’autres personnes. Merci !
+              </p>
+            </>
+          ))
+          .exhaustive()}
         <h2 className={fr.cx("fr-h6")}>Vos informations de contact</h2>
         <p className={fr.cx("fr-hint-text")}>
           Pour permettre à l’entreprise de vous recontacter.
@@ -244,6 +278,7 @@ export const CreateDiscussionForm = ({
             {...getFieldError("immersionObjective")}
           />
         )}
+
         <Select
           disabled={appellations.length === 1}
           label={inputsLabelsByKey.appellationCode}
@@ -359,3 +394,35 @@ const appellationListOfOptions = (
     value: appellation.appellationCode,
     label: appellation.appellationLabel,
   }));
+
+const contactModeToBadgeOptions: Record<ContactMode, BadgeProps> = {
+  EMAIL: {
+    children: "Mise en relation par mail",
+    className: fr.cx(
+      "fr-badge",
+      "fr-badge--icon-left",
+      "fr-badge--green-archipel",
+      "fr-badge--icon-left",
+      "fr-icon-mail-line",
+    ),
+  },
+  PHONE: {
+    children: "Mise en relation par téléphone",
+    className: fr.cx(
+      "fr-badge",
+      "fr-badge--icon-left",
+      "fr-badge--green-archipel",
+      "fr-badge--icon-left",
+      "fr-icon-phone-line",
+    ),
+  },
+  IN_PERSON: {
+    children: "Rendez-vous sur place",
+    className: fr.cx(
+      "fr-badge",
+      "fr-badge--icon-left",
+      "fr-badge--green-archipel",
+      "fr-icon-map-pin-2-line",
+    ),
+  },
+};

@@ -9,6 +9,7 @@ type FullPageFeedbackProps = {
   illustration: string;
   content: React.ReactNode;
   buttonProps: ButtonProps;
+  includeWrapper?: boolean;
 };
 
 export const FullPageFeedback = ({
@@ -16,17 +17,27 @@ export const FullPageFeedback = ({
   illustration,
   content,
   buttonProps,
-}: FullPageFeedbackProps) => (
-  <HeaderFooterLayout>
-    <MainWrapper layout="default" vSpacing={0} className={fr.cx("fr-mb-4w")}>
-      <PageHeader
-        title={title}
-        illustration={illustration}
-        breadcrumbs={<Breadcrumbs />}
-      >
-        {content}
+  includeWrapper = true,
+}: FullPageFeedbackProps) => {
+  const feedbackContent = (
+    <PageHeader
+      title={title}
+      illustration={illustration}
+      breadcrumbs={<Breadcrumbs />}
+    >
+      {content}
+      <div>
         <Button {...buttonProps} className={fr.cx("fr-mt-2w")} />
-      </PageHeader>
-    </MainWrapper>
-  </HeaderFooterLayout>
-);
+      </div>
+    </PageHeader>
+  );
+  return includeWrapper ? (
+    <HeaderFooterLayout>
+      <MainWrapper layout="default" vSpacing={0} className={fr.cx("fr-mb-4w")}>
+        {feedbackContent}
+      </MainWrapper>
+    </HeaderFooterLayout>
+  ) : (
+    feedbackContent
+  );
+};
