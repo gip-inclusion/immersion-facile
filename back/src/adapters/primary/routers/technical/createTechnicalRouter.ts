@@ -10,6 +10,7 @@ import {
   uploadFileRoute,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
+import { match } from "ts-pattern";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
@@ -20,6 +21,7 @@ import {
 } from "../../../../domains/establishment/use-cases/discussions/discussion.utils";
 import { createLogger } from "../../../../utils/logger";
 import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
+import { createOpenApiSpecV3 } from "../apiKeyAuthRouter/createOpenApiV3";
 
 const logger = createLogger(__filename);
 
@@ -112,8 +114,11 @@ export const createTechnicalRouter = (
   );
 
   technicalSharedRouter.openApiSpec(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      Promise.resolve(createOpenApiSpecV2(deps.config.envType)),
+    sendHttpResponse(req, res, async () =>
+      match(req.query.version)
+        .with("v2", () => createOpenApiSpecV2(deps.config.envType))
+        .with("v3", () => createOpenApiSpecV3(deps.config.envType))
+        .exhaustive(),
     ),
   );
 
