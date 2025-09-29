@@ -771,6 +771,7 @@ const UserToContact = ({ mode }: { mode: Mode }): React.ReactNode => {
         options={usersToContactOptions}
         nativeSelectProps={{
           defaultValue: currentUserToContact?.email,
+          value: currentUserToContact?.email,
           onChange: (event) => {
             const newUserToContact = establishment.userRights.find(
               (userRight) => userRight.email === event.target.value,
