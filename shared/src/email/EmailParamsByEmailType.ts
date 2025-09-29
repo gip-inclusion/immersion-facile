@@ -180,7 +180,6 @@ export type EmailParamsByEmailType = {
   } & (
     | {
         kind: "IF";
-        potentialBeneficiaryHasWorkingExperience?: boolean;
         potentialBeneficiaryExperienceAdditionalInformation?: string;
         potentialBeneficiaryResumeLink?: string;
       }

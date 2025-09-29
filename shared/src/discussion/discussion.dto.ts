@@ -107,7 +107,6 @@ type CreateDiscussionDtoCommon = {
 export type CreateDiscussionIFDto = ContactInformations<"IF"> &
   CreateDiscussionDtoCommon & {
     immersionObjective: ImmersionObjective | null;
-    hasWorkingExperience: boolean;
     experienceAdditionalInformation?: string;
     potentialBeneficiaryResumeLink?: string;
   };
@@ -130,10 +129,6 @@ export type ContactEstablishmentEventPayload = {
 
 type WithDiscussionKindProps<D extends DiscussionKind> = D extends "IF"
   ? {
-      // hasWorkingExperience
-      // undefined uniquement pour la retro compat des anciennes discussions
-      // non exploité dans le form
-      hasWorkingExperience?: boolean;
       resumeLink?: string;
       experienceAdditionalInformation?: string;
       immersionObjective: ImmersionObjective | null;
