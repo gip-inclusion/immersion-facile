@@ -22,6 +22,7 @@ import {
   type SearchResultDto,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
+import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import {
   getIconMarker,
@@ -32,21 +33,10 @@ import { SearchResultLabels } from "src/app/components/search/SearchResultLabels
 import { defaultPageMetaContents } from "src/app/contents/meta/metaContents";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import type { Route } from "type-route";
-
-const getFeedBackMessage = (contactMode?: ContactMode) => {
-  switch (contactMode) {
-    case "EMAIL":
-      return "L'entreprise a été contactée avec succès.";
-    case "PHONE":
-    case "IN_PERSON":
-      return "Un email vient de vous être envoyé.";
-    default:
-      return null;
-  }
-};
 
 const SearchResultSection = ({
   title,
@@ -110,9 +100,8 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
     isLocationMissing ||
     !("appellationCode" in params && "siret" in params) ||
     (!isLoading && !currentSearchResult);
-  const [showConfirmationMessage, setShowConfirmationMessage] = useState<
-    string | null
-  >(null);
+  const [showConfirmationMessage, setShowConfirmationMessage] =
+    useState<ReactNode | null>(null);
 
   useEffect(() => {
     if (!isExternal && "location" in params && params.location) {
@@ -148,7 +137,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
       behavior: "smooth",
     });
     setShowConfirmationMessage(
-      getFeedBackMessage(currentSearchResult?.contactMode),
+      getFeedBackContent(currentSearchResult?.contactMode)?.content,
     );
   };
   const scrollToContactForm = () => {
@@ -380,29 +369,62 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
             />
           </>
         )}
-        {showConfirmationMessage && (
-          <>
-            <Alert
-              title="Bravo !"
-              description={
-                <p>{getFeedBackMessage(currentSearchResult?.contactMode)}</p>
-              }
-              severity="success"
-              className={fr.cx("fr-my-4w")}
-            />
-            <Button
-              type="button"
-              onClick={onGoBackClick}
-              priority="tertiary"
-              iconId="fr-icon-arrow-left-line"
-              iconPosition="left"
-              className={fr.cx("fr-mt-1w")}
-            >
-              Retour à la recherche
-            </Button>
-          </>
+        {currentSearchResult?.contactMode && showConfirmationMessage && (
+          <FullPageFeedback
+            {...feedbackMessageByContactMode[currentSearchResult.contactMode]}
+            buttonProps={{
+              children: "Retour à la recherche",
+              onClick: onGoBackClick,
+            }}
+            includeWrapper={false}
+          />
         )}
       </MainWrapper>
     </HeaderFooterLayout>
   );
+};
+
+const getFeedBackContent = (contactMode?: ContactMode) => {
+  return contactMode ? feedbackMessageByContactMode[contactMode] : null;
+};
+
+const feedbackMessageByContactMode: Record<
+  ContactMode,
+  {
+    content: ReactNode;
+    illustration: string;
+    title: string;
+  }
+> = {
+  EMAIL: {
+    content: (
+      <>
+        L’entreprise a bien <strong>reçu votre email</strong>. Laissez-lui un
+        peu de temps pour vous répondre avant de la relancer.
+      </>
+    ),
+    illustration: commonIllustrations.contact,
+    title: "Bravo !",
+  },
+  PHONE: {
+    content: (
+      <>
+        Cette entreprise souhaite être contactée <strong>par téléphone</strong>.
+        Ses coordonnées vous ont été envoyées par email.
+      </>
+    ),
+    illustration: commonIllustrations.inscription,
+    title: "Merci pour votre intérêt !",
+  },
+  IN_PERSON: {
+    content: (
+      <>
+        Cette entreprise souhaite que vous vous{" "}
+        <strong>rendiez sur place</strong>. Ses coordonnées vous ont été
+        envoyées par email.
+      </>
+    ),
+    illustration: commonIllustrations.annuaireDesEntreprises,
+    title: "Merci pour votre intérêt !",
+  },
 };

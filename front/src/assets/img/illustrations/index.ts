@@ -26,6 +26,7 @@ export const commonIllustrations = {
   inscription,
   monCompte,
   documentsAdministratifs,
+  contact,
 };
 export const searchIllustrations = [search1, search2, search3, search4];
 export const loginIllustration = login;
