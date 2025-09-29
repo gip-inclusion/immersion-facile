@@ -116,7 +116,6 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
     const discussion = await this.#createDiscussion({
       contactRequest,
       establishment: establishmentAggregate,
-      uow,
       now,
     });
 
@@ -150,12 +149,10 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
   }
 
   async #createDiscussion({
-    uow,
     contactRequest,
     establishment,
     now,
   }: {
-    uow: UnitOfWork;
     contactRequest: LegacyContactEstablishmentRequestDto;
     establishment: EstablishmentAggregate;
     now: Date;
@@ -201,7 +198,6 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       potentialBeneficiary: {
         ...potentialBeneficiary,
         datePreferences: "",
-        hasWorkingExperience: false,
         ...(contactRequest.contactMode === "EMAIL"
           ? {
               immersionObjective: contactRequest.immersionObjective,

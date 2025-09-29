@@ -39,8 +39,6 @@ export const makeContactByEmailRequestParams = ({
           discussion.potentialBeneficiary.resumeLink,
         potentialBeneficiaryExperienceAdditionalInformation:
           discussion.potentialBeneficiary.experienceAdditionalInformation,
-        potentialBeneficiaryHasWorkingExperience:
-          discussion.potentialBeneficiary.hasWorkingExperience,
       }
     : {
         kind: discussion.kind,
