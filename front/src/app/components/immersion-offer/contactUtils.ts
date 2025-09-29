@@ -42,7 +42,6 @@ export const makeContactInputsLabelsByKey = (
   potentialBeneficiaryPhone: "Téléphone *",
   potentialBeneficiaryResumeLink: "Page LinkedIn ou CV en ligne (optionnel)",
   levelOfEducation: "Je suis en classe de ... *",
-  hasWorkingExperience: "Expérience professionnelle",
   experienceAdditionalInformation:
-    "Détaillez en quelques lignes vos expériences et compétences *",
+    "Détaillez en quelques lignes vos expériences et compétences (optionnel)",
 });

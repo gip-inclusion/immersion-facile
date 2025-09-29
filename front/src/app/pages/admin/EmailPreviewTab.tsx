@@ -358,7 +358,6 @@ export const defaultEmailValueByEmailKind: {
       "POTENTIAL_BENEFICIARY_DATE_PREFERENCES",
     potentialBeneficiaryExperienceAdditionalInformation:
       "POTENTIAL_BENEFICIARY_EXPERIENCE_ADDITIONAL_INFORMATION",
-    potentialBeneficiaryHasWorkingExperience: true,
     discussionUrl: "https://immersion-facile.beta.gouv.fr",
     kind: "IF",
   },
