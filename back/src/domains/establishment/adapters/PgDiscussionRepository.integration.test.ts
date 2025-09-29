@@ -92,7 +92,6 @@ describe("PgDiscussionRepository", () => {
           .withId(uuid())
           .withCreatedAt(new Date("2024-01-01"))
           .withSiret("00000000000001")
-          .withPotentialBeneficiaryHasWorkingExperience(false)
           .build();
         const discussionWithSiret2 = new DiscussionBuilder(discussionWithSiret1)
           .withId(uuid())
@@ -1132,12 +1131,6 @@ describe("PgDiscussionRepository", () => {
     describe("insert", () => {
       const tests: { discussion: DiscussionDto; title: string }[] = [
         {
-          title: "insert with no hasWorkingExperience",
-          discussion: new DiscussionBuilder()
-            .withPotentialBeneficiaryHasWorkingExperience(false)
-            .build(),
-        },
-        {
           title: "insert with acquisitionCampaign and acquisitionKeyword",
           discussion: new DiscussionBuilder()
             .withAcquisition({
@@ -1220,15 +1213,6 @@ describe("PgDiscussionRepository", () => {
                 sentAt: subDays(new Date(), 6).toISOString(),
               },
             ])
-            .build(),
-        },
-        {
-          title:
-            "insert with kind IF and contact mode EMAIL and with hasWorkingExperience 'non communiqué' (old discussions)",
-          discussion: new DiscussionBuilder()
-            .withDiscussionKind("IF")
-            .withContactMode("EMAIL")
-            .withPotentialBeneficiaryHasWorkingExperience(undefined)
             .build(),
         },
         {

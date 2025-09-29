@@ -380,10 +380,6 @@ const discussionToPg = (
           discussion.potentialBeneficiary.resumeLink,
         potential_beneficiary_experience_additional_information:
           discussion.potentialBeneficiary.experienceAdditionalInformation,
-        potential_beneficiary_has_working_experience:
-          discussion.potentialBeneficiary.hasWorkingExperience === undefined
-            ? null
-            : discussion.potentialBeneficiary.hasWorkingExperience,
       }
     : {}),
   potential_beneficiary_level_of_education:
@@ -514,8 +510,6 @@ const makeDiscussionDtoFromPgDiscussion = (
         potentialBeneficiary: {
           ...commonPotentialBeneficiary,
           immersionObjective: discussion.immersionObjective ?? null,
-          hasWorkingExperience:
-            discussion.potentialBeneficiary.hasWorkingExperience,
           resumeLink: discussion.potentialBeneficiary.resumeLink,
           experienceAdditionalInformation:
             discussion.potentialBeneficiary.experienceAdditionalInformation,
@@ -690,9 +684,6 @@ const executeGetDiscussions = (
             email: ref("d.potential_beneficiary_email"),
             phone: ref("d.potential_beneficiary_phone"),
             resumeLink: ref("d.potential_beneficiary_resume_link"),
-            hasWorkingExperience: ref(
-              "potential_beneficiary_has_working_experience",
-            ),
             experienceAdditionalInformation: ref(
               "potential_beneficiary_experience_additional_information",
             ),
