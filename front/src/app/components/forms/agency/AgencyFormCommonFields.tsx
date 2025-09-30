@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import {
   type AddressAndPosition,
   type AddressDto,
+  type AddressWithCountryCodeAndPosition,
+  addressDtoToString,
   type CreateAgencyDto,
   defaultCountryCode,
   domElementIds,
@@ -58,6 +60,15 @@ export const AgencyFormCommonFields = ({
     shouldFetchEvenIfAlreadySaved: true,
     addressAutocompleteLocator: "agency-address",
   });
+
+  const agencyAddressWithDefaultCountryCodeAndPosition: AddressWithCountryCodeAndPosition =
+    {
+      address: {
+        ...getValues("address"),
+        countryCode: defaultCountryCode,
+      },
+      position: getValues("position"),
+    };
 
   const formValues = getValues();
   const [validationSteps, setValidationSteps] = useState<ValidationSteps>(
@@ -150,6 +161,12 @@ export const AgencyFormCommonFields = ({
         selectProps={{
           inputId: domElementIds.addAgency.addressAutocomplete,
           inputValue: establishmentInfos?.businessAddress,
+          defaultValue: {
+            value: agencyAddressWithDefaultCountryCodeAndPosition,
+            label: addressDtoToString(
+              agencyAddressWithDefaultCountryCodeAndPosition.address,
+            ),
+          },
         }}
         onAddressSelected={onAddressSelected}
         onAddressClear={() => {
