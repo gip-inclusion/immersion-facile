@@ -9,6 +9,7 @@ import { EstablishmentForm } from "src/app/components/forms/establishment/Establ
 import { routes, useRoute } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import type { Route } from "type-route";
 
 type ManageEstablishmentTabProps = {
@@ -73,6 +74,7 @@ export const ManageEstablishmentsTab = ({
                 dispatch(
                   establishmentSlice.actions.clearEstablishmentRequested(),
                 );
+                dispatch(siretSlice.actions.siretInfoClearRequested());
                 routes
                   .establishmentDashboardFormEstablishment({
                     siret: event.currentTarget.value,
