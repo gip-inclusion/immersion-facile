@@ -2,10 +2,7 @@ import { useLayoutEffect } from "react";
 import { CrispChat } from "react-design-system";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch } from "react-redux";
-import {
-  ConsentBannerAndConsentManagement,
-  useConsent,
-} from "src/app/components/ConsentManager";
+import { ConsentManager, useConsent } from "src/app/components/ConsentManager";
 import { useSetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFetchFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { MatomoTagManager } from "src/app/MatomoTagManager";
@@ -48,7 +45,7 @@ export const App = () => {
         dispatch(rootAppSlice.actions.appResetRequested());
       }}
     >
-      <ConsentBannerAndConsentManagement />
+      <ConsentManager />
       <Router />
       {ENV.crispWebSiteId && ENV.envType !== "local" && (
         <CrispChat

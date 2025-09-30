@@ -100,3 +100,9 @@ export const getConsentModal = () => {
       : null,
   };
 };
+
+export const ConsentManager = () => (
+  <section aria-label="Gestion des cookies">
+    <ConsentBannerAndConsentManagement />
+  </section>
+);
