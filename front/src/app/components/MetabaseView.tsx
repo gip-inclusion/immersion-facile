@@ -30,7 +30,7 @@ export const MetabaseView = ({
         <Button
           type="button"
           onClick={() => {
-            consent.assumeConsent("statistics");
+            consent.assumeConsent("statistics.metabase");
           }}
         >
           Autoriser les cookies d'affichage de données
