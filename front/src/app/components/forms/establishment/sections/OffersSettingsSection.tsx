@@ -478,9 +478,15 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
   const { register, formState, getValues, setValue, watch } =
     useFormContext<FormEstablishmentDto>();
   const getFieldError = makeFieldError(formState);
-  const defaultEstablishmentAddress = useAppSelector(
+  const establishmentAddressFromSiret = useAppSelector(
     siretSelectors.establishmentInfos,
   )?.businessAddress;
+  const defaultEstablishmentAddressFromFormValues =
+    getValues("businessAddresses")[0]?.rawAddress;
+  const defaultEstablishmentAddress =
+    mode === "create"
+      ? establishmentAddressFromSiret
+      : defaultEstablishmentAddressFromFormValues;
   const inPersonAddress = useAppSelector(
     makeGeocodingLocatorSelector("create-establishment-in-person-address"),
   );
