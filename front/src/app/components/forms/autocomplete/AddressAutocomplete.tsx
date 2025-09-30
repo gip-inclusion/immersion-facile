@@ -68,6 +68,7 @@ export const AddressAutocomplete = ({
       {...props}
       selectProps={{
         isDebouncing,
+        defaultValue: props.selectProps?.defaultValue,
         inputId: props.selectProps?.inputId ?? "im-select__input--address",
         isLoading: isSearching,
         loadingMessage: () => <>Recherche d'adresses en cours... 🔎</>,
