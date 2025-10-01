@@ -61,14 +61,14 @@ const fetchConventionLastBroadcastFeedbackEpic: PartnersErroredConventionEpic =
                 },
               ),
             ),
+            catchEpicError((error: Error) =>
+              partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackFailed(
+                {
+                  errorMessage: error.message,
+                },
+              ),
+            ),
           ),
-      ),
-      catchEpicError((error: Error) =>
-        partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackFailed(
-          {
-            errorMessage: error.message,
-          },
-        ),
       ),
     );
 
