@@ -8,7 +8,7 @@ import RadioButtons, {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { equals } from "ramda";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -45,6 +45,7 @@ import { useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { match, P } from "ts-pattern";
@@ -487,12 +488,42 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
       ? establishmentAddressFromSiret
       : defaultEstablishmentAddressFromFormValues;
 
+  const inPersonAddress = useAppSelector(
+    makeGeocodingLocatorSelector("create-establishment-in-person-address"),
+  );
+
   const contactMode = getValues("contactMode");
   const contactModeRegister = register("contactMode");
   const potentialBeneficiaryWelcomeAddress = getValues(
     "potentialBeneficiaryWelcomeAddress",
   );
   const allUserRights = watch("userRights");
+
+  useEffect(() => {
+    if (
+      contactMode === "IN_PERSON" &&
+      inPersonAddress &&
+      inPersonAddress.value &&
+      !potentialBeneficiaryWelcomeAddress
+    ) {
+      setValue("potentialBeneficiaryWelcomeAddress", inPersonAddress.value);
+    }
+  }, [
+    contactMode,
+    inPersonAddress,
+    potentialBeneficiaryWelcomeAddress,
+    setValue,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(
+        geocodingSlice.actions.clearLocatorDataRequested({
+          locator: "create-establishment-in-person-address",
+        }),
+      );
+    };
+  }, [dispatch]);
 
   const currentUserToContact =
     allUserRights.length === 1
