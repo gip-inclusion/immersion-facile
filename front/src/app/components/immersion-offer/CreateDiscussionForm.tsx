@@ -1,4 +1,4 @@
-import { fr } from "@codegouvfr/react-dsfr";
+import { type FrCxArg, fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
@@ -193,6 +193,18 @@ export const CreateDiscussionForm = ({
           ))
           .with("PHONE", () => (
             <>
+              <p>Cette entreprise souhaite être contactée par téléphone.</p>
+              <p>
+                Vous recevrez par mail le nom de la personne à contacter, son
+                numéro de téléphone ainsi que des conseils pour présenter votre
+                demande d’immersion. Ces informations sont personnelles et
+                confidentielles. Elles ne peuvent pas être communiquées à
+                d’autres personnes. Merci !
+              </p>
+            </>
+          ))
+          .with("IN_PERSON", () => (
+            <>
               <p>
                 Cette entreprise souhaite que vous vous présentiez directement.
               </p>
@@ -201,18 +213,6 @@ export const CreateDiscussionForm = ({
                 que des conseils pour présenter votre demande d’immersion. Ces
                 informations sont personnelles et confidentielles. Elles ne
                 peuvent pas être communiquées à d’autres personnes.
-              </p>
-            </>
-          ))
-          .with("IN_PERSON", () => (
-            <>
-              <p>Cette entreprise souhaite être contactée par téléphone.</p>
-              <p>
-                Vous recevrez par mail le nom de la personne à contacter, son
-                numéro de téléphone ainsi que des conseils pour présenter votre
-                demande d’immersion. Ces informations sont personnelles et
-                confidentielles. Elles ne peuvent pas être communiquées à
-                d’autres personnes. Merci !
               </p>
             </>
           ))
@@ -395,34 +395,22 @@ const appellationListOfOptions = (
     label: appellation.appellationLabel,
   }));
 
+const commonBadgeClassName: FrCxArg = [
+  "fr-badge",
+  "fr-badge--icon-left",
+  "fr-badge--green-archipel",
+];
 const contactModeToBadgeOptions: Record<ContactMode, BadgeProps> = {
   EMAIL: {
     children: "Mise en relation par mail",
-    className: fr.cx(
-      "fr-badge",
-      "fr-badge--icon-left",
-      "fr-badge--green-archipel",
-      "fr-badge--icon-left",
-      "fr-icon-mail-line",
-    ),
+    className: fr.cx(...commonBadgeClassName, "fr-icon-mail-line"),
   },
   PHONE: {
     children: "Mise en relation par téléphone",
-    className: fr.cx(
-      "fr-badge",
-      "fr-badge--icon-left",
-      "fr-badge--green-archipel",
-      "fr-badge--icon-left",
-      "fr-icon-phone-line",
-    ),
+    className: fr.cx(...commonBadgeClassName, "fr-icon-phone-line"),
   },
   IN_PERSON: {
     children: "Rendez-vous sur place",
-    className: fr.cx(
-      "fr-badge",
-      "fr-badge--icon-left",
-      "fr-badge--green-archipel",
-      "fr-icon-map-pin-2-line",
-    ),
+    className: fr.cx(...commonBadgeClassName, "fr-icon-map-pin-2-line"),
   },
 };

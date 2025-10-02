@@ -384,17 +384,21 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
   );
 };
 
-const getFeedBackContent = (contactMode?: ContactMode) => {
+type CreateDiscussionFeedbackContent = {
+  content: ReactNode;
+  illustration: string;
+  title: string;
+};
+
+const getFeedBackContent = (
+  contactMode?: ContactMode,
+): CreateDiscussionFeedbackContent | null => {
   return contactMode ? feedbackMessageByContactMode[contactMode] : null;
 };
 
 const feedbackMessageByContactMode: Record<
   ContactMode,
-  {
-    content: ReactNode;
-    illustration: string;
-    title: string;
-  }
+  CreateDiscussionFeedbackContent
 > = {
   EMAIL: {
     content: (
