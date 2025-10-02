@@ -13,7 +13,6 @@ import {
   type GeoPositionDto,
   isTruthy,
   isWithAgencyRole,
-  type PartialAgencyDto,
   type SiretDto,
   type UserId,
   type WithGeoPosition,
@@ -24,6 +23,7 @@ import type {
   AgencyRepository,
   AgencyRightOfUser,
   GetAgenciesFilters,
+  PartialAgencyWithUsersRights,
 } from "../ports/AgencyRepository";
 
 type AgencyById = Partial<Record<AgencyId, AgencyWithUsersRights>>;
@@ -59,7 +59,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     this.#agencies[agency.id] = agency;
   }
 
-  public async update(agency: PartialAgencyDto) {
+  public async update(agency: PartialAgencyWithUsersRights) {
     const agencyToUdpate = this.#agencies[agency.id];
     if (!agencyToUdpate) {
       throw errors.agency.notFound({ agencyId: agency.id });

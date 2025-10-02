@@ -71,6 +71,10 @@
     {
       "command": "30 08 * * * pnpm back run trigger-contact-request-reminder-7d",
       "size": "M"
+    },
+    {
+      "command": "0 13 * * 6 pnpm back run trigger-assign-agency-viewer-role-to-users",
+      "size": "M"
     }
   ]
 }
