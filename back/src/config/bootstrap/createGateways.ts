@@ -1,10 +1,5 @@
 import type { AxiosInstance } from "axios";
-import { Pool } from "pg";
-import {
-  errors,
-  exhaustiveCheck,
-  immersionFacileNoReplyEmailSender,
-} from "shared";
+import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
@@ -90,31 +85,6 @@ import {
 import { partnerNames } from "./partnerNames";
 
 const logger = createLogger(__filename);
-
-export type GetPgPoolFn = () => Pool;
-export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
-  let pgPool: Pool;
-  return () => {
-    if (config.repositories !== "PG" && config.romeRepository !== "PG")
-      throw errors.config.badConfig(`Unexpected pg pool creation: REPOSITORIES=${config.repositories},
-       ROME_GATEWAY=${config.romeRepository}`);
-    if (!pgPool) {
-      const { host, pathname } = new URL(config.pgImmersionDbUrl);
-      logger.info({
-        message: `creating postgresql connection pool from host=${host} and pathname=${pathname}`,
-      });
-      pgPool = new Pool({
-        connectionString: config.pgImmersionDbUrl,
-        application_name: "Immersion Backend",
-        max: 25,
-        statement_timeout: 30_000,
-        // statement_timeout is important as it avoids never ending queries.
-        // We have had problems with eventBus not triggered due to never ending PG queries
-      });
-    }
-    return pgPool;
-  };
-};
 
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
   infer T

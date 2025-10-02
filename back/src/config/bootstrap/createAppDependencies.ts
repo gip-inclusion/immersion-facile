@@ -21,6 +21,7 @@ import {
   makeHandleManagedRedirectResponseError,
   makeHandleRawRedirectResponseError,
 } from "../helpers/handleRedirectResponseError";
+import { createMakeProductionPgPool } from "../pg/pgPool";
 import type { AppConfig } from "./appConfig";
 import {
   makeConsumerMiddleware,
@@ -28,7 +29,7 @@ import {
 } from "./authMiddleware";
 import { makeConnectedUserAuthMiddleware } from "./connectedUserAuthMiddleware";
 import { createEventCrawler } from "./createEventCrawler";
-import { createGateways, createGetPgPoolFn } from "./createGateways";
+import { createGateways } from "./createGateways";
 import { createUseCases } from "./createUseCases";
 
 const uuidGenerator = new UuidV4Generator();
@@ -40,7 +41,7 @@ export type AppDependencies = ReturnType<
   : never;
 
 export const createAppDependencies = async (config: AppConfig) => {
-  const getPgPoolFn = createGetPgPoolFn(config);
+  const getPgPoolFn = createMakeProductionPgPool(config);
   const gateways = await createGateways(config, uuidGenerator);
 
   const { uowPerformer, inMemoryUow } = createUowPerformer(config, getPgPoolFn);

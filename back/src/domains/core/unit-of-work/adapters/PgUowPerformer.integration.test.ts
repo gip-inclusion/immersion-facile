@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import {
   type CreateNewEvent,
   makeCreateNewEvent,
@@ -27,7 +27,7 @@ describe("PgUowPerformer", () => {
   });
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     pgUowPerformer = new PgUowPerformer(db, createPgUow);
   });
