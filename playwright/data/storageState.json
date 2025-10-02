@@ -5,8 +5,8 @@
       "origin": "http://localhost:3000",
       "localStorage": [
         {
-          "name": "@codegouvfr/react-dsfr finalityConsent statistics-support",
-          "value": "{\"statistics\":true,\"support\":true,\"isFullConsent\":true}"
+          "name": "@codegouvfr/react-dsfr finalityConsent statistics.matomo-statistics.metabase-support.crisp",
+          "value": "{\"statistics\":{\"matomo\":true,\"metabase\":true,\"isFullConsent\":true},\"support\":{\"crisp\":true,\"isFullConsent\":true},\"isFullConsent\":true}"
         }
       ]
     }
