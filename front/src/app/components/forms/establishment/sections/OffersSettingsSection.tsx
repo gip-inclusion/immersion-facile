@@ -515,16 +515,6 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
     setValue,
   ]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(
-        geocodingSlice.actions.clearLocatorDataRequested({
-          locator: "create-establishment-in-person-address",
-        }),
-      );
-    };
-  }, [dispatch]);
-
   const currentUserToContact =
     allUserRights.length === 1
       ? allUserRights[0]
