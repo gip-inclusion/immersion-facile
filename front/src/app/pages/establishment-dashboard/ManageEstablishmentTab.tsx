@@ -9,6 +9,7 @@ import { EstablishmentForm } from "src/app/components/forms/establishment/Establ
 import { routes, useRoute } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import type { Route } from "type-route";
 
@@ -75,6 +76,11 @@ export const ManageEstablishmentsTab = ({
                   establishmentSlice.actions.clearEstablishmentRequested(),
                 );
                 dispatch(siretSlice.actions.siretInfoClearRequested());
+                dispatch(
+                  geocodingSlice.actions.clearLocatorDataRequested({
+                    locator: "create-establishment-in-person-address",
+                  }),
+                );
                 routes
                   .establishmentDashboardFormEstablishment({
                     siret: event.currentTarget.value,
