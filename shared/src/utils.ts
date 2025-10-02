@@ -213,3 +213,6 @@ export type RangeOfPosition<
       | RangeOfPosition<N, [unknown, ...Result]>;
 export const populatePropIfDefined = <T>(prop: keyof T, value: ValueOf<T>) =>
   value !== undefined ? { [prop]: value } : {};
+
+export const optional = <T>(v: T | null): NonNullable<T> | undefined =>
+  v ?? undefined;
