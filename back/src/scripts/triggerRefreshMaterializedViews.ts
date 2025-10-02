@@ -1,5 +1,5 @@
-import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { createMakeScriptPgPool } from "../config/pg/pgPool";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -9,11 +9,8 @@ const config = AppConfig.createFromEnv();
 const triggerRefreshMaterializedViews = async () => {
   logger.info({ message: "Starting to refresh materialized views" });
 
-  const dbUrl = config.pgImmersionDbUrl;
+  const pool = createMakeScriptPgPool(config)();
 
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
   const client = await pool.connect();
 
   const materializedViews = [

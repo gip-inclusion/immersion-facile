@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
@@ -17,7 +17,7 @@ describe("PgOngoingOAuthRepository", () => {
   let db: KyselyDb;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     pgOngoingOAuthRepository = new PgOngoingOAuthRepository(db);
     pgUserRepository = new PgUserRepository(db);

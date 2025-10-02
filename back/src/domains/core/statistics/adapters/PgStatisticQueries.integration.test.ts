@@ -13,7 +13,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../../utils/user";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
@@ -34,7 +34,7 @@ describe("PgStatisticQueries", () => {
   let pool: Pool;
 
   beforeAll(() => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
   });
 
   beforeEach(async () => {

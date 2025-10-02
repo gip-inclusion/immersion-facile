@@ -18,7 +18,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
@@ -65,7 +65,7 @@ describe("PgDiscussionRepository", () => {
   const user = new UserBuilder().withId(new UuidV4Generator().new()).build();
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
   });
 
   beforeEach(async () => {

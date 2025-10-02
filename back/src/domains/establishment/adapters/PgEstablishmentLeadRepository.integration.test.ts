@@ -5,7 +5,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";
 
@@ -15,7 +15,7 @@ describe("PgEstablishmentLeadRepository", () => {
   let establishmentLeadRepository: PgEstablishmentLeadRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     establishmentLeadRepository = new PgEstablishmentLeadRepository(db);
   });

@@ -1,7 +1,7 @@
 import { subMonths } from "date-fns";
-import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { createMakeScriptPgPool } from "../config/pg/pgPool";
 import { PgDiscussionRepository } from "../domains/establishment/adapters/PgDiscussionRepository";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -11,12 +11,7 @@ const config = AppConfig.createFromEnv();
 const numberOfMonthBeforeDeletion = 6;
 
 const triggerDeleteOldDiscussionMessages = async () => {
-  const dbUrl = config.pgImmersionDbUrl;
-
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
-
+  const pool = createMakeScriptPgPool(config)();
   const transaction = makeKyselyDb(pool);
   const pgDiscussionRepository = new PgDiscussionRepository(transaction);
   const deleteAllDiscussionMessagesBefore = subMonths(

@@ -1,10 +1,15 @@
 import type { Pool } from "pg";
-import { type AppellationCode, expectToEqual, type NafCode } from "shared";
+import {
+  type AppellationCode,
+  expectToEqual,
+  type NafCode,
+  optional,
+} from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool, optional } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import type { GeoParams, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 
@@ -24,7 +29,7 @@ describe("PgSearchesMadeRepository", () => {
   let pgSearchesMadeRepository: PgSearchMadeRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
   });
 

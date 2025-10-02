@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import type { ConventionToSync } from "../ports/ConventionsToSyncRepository";
 import { PgConventionsToSyncRepository } from "./PgConventionsToSyncRepository";
 
@@ -38,7 +38,7 @@ describe("PgConventionsToSyncRepository", () => {
   let conventionsToSyncRepository: PgConventionsToSyncRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
   });
 

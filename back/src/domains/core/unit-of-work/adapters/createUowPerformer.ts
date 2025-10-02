@@ -1,6 +1,6 @@
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import type { GetPgPoolFn } from "../../../../config/bootstrap/createGateways";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { MakePgPool } from "../../../../config/pg/pgPool";
 import type { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
 import {
   createInMemoryUow,
@@ -12,7 +12,7 @@ import { PgUowPerformer } from "./PgUowPerformer";
 
 export const createUowPerformer = (
   config: AppConfig,
-  getPgPoolFn: GetPgPoolFn,
+  getPgPoolFn: MakePgPool,
 ): { uowPerformer: UnitOfWorkPerformer; inMemoryUow?: InMemoryUnitOfWork } =>
   config.repositories === "PG"
     ? {

@@ -3,7 +3,7 @@ import {
   type AccessTokenResponse,
   AppConfig,
 } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
@@ -39,7 +39,7 @@ const executeUsecase = async () => {
 
   const { uowPerformer } = createUowPerformer(
     config,
-    createGetPgPoolFn(config),
+    createMakeProductionPgPool(config),
   );
 
   const resyncOldConventionsToFtUsecase = new ResyncOldConventionsToFt(

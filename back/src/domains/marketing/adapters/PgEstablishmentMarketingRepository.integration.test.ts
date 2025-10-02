@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import type { MarketingContact } from "../entities/MarketingContact";
 import type { EstablishmentMarketingContactEntity } from "../ports/EstablishmentMarketingRepository";
 import { PgEstablishmentMarketingRepository } from "./PgEstablishmentMarketingRepository";
@@ -15,7 +15,7 @@ describe("PgAgencyRepository", () => {
   let establishmentMarketingRepository: PgEstablishmentMarketingRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
   });
 

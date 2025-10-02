@@ -1,7 +1,7 @@
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { PgAssessmentRepository } from "../domains/convention/adapters/PgAssessmentRepository";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { PgNotificationRepository } from "../domains/core/notifications/adapters/PgNotificationRepository";
@@ -26,7 +26,7 @@ const triggerAssessmentReminder = async () => {
     3600 * 24 * 30,
   );
 
-  const pgPool = createGetPgPoolFn(config)();
+  const pgPool = createMakeProductionPgPool(config)();
   const kyselyDb = makeKyselyDb(pgPool);
 
   const outOfTrx = {
@@ -36,8 +36,10 @@ const triggerAssessmentReminder = async () => {
 
   const { numberOfConventionsReminded: numberOfConventionsReminded3DaysAfter } =
     await makeAssessmentReminder({
-      uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
-        .uowPerformer,
+      uowPerformer: createUowPerformer(
+        config,
+        createMakeProductionPgPool(config),
+      ).uowPerformer,
       deps: {
         outOfTrx,
         timeGateway,
@@ -57,7 +59,7 @@ const triggerAssessmentReminder = async () => {
   const {
     numberOfConventionsReminded: numberOfConventionsReminded10DaysAfter,
   } = await makeAssessmentReminder({
-    uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+    uowPerformer: createUowPerformer(config, createMakeProductionPgPool(config))
       .uowPerformer,
     deps: {
       outOfTrx,

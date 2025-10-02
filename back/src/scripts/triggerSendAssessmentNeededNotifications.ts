@@ -3,9 +3,9 @@ import subDays from "date-fns/subDays";
 import { keys } from "ramda";
 import type { DateRange } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { PgAssessmentRepository } from "../domains/convention/adapters/PgAssessmentRepository";
 import { PgConventionQueries } from "../domains/convention/adapters/PgConventionQueries";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
@@ -50,7 +50,7 @@ const sendAssessmentNeededNotificationsScript = async () => {
     throw new Error(message);
   }
 
-  const getPgPool = createGetPgPoolFn(config);
+  const getPgPool = createMakeProductionPgPool(config);
 
   const { uowPerformer } = createUowPerformer(config, getPgPool);
 

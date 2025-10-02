@@ -1,6 +1,6 @@
-import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { createMakeScriptPgPool } from "../config/pg/pgPool";
 import { deactivateUnresponsiveEstablishmentsQuery } from "../domains/establishment/adapters/PgEstablishmentAggregateRepository.sql";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -13,7 +13,7 @@ type Report =
   | { status: "error"; message: string };
 
 const deactivateUnresponsiveEstablishments = async (): Promise<Report> => {
-  const pool = new Pool({ connectionString: config.pgImmersionDbUrl });
+  const pool = createMakeScriptPgPool(config)();
   const db = makeKyselyDb(pool);
 
   return deactivateUnresponsiveEstablishmentsQuery(db)

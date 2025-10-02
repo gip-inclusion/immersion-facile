@@ -1,13 +1,12 @@
-import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   type AccessTokenResponse,
   AppConfig,
 } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { logPartnerResponses } from "../config/bootstrap/logPartnerResponses";
 import { partnerNames } from "../config/bootstrap/partnerNames";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   defaultMaxBackoffPeriodMs,
@@ -61,14 +60,9 @@ const main = async () => {
     new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
   );
 
-  const dbUrl = config.pgImmersionDbUrl;
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
-
   const { uowPerformer } = createUowPerformer(
     config,
-    createGetPgPoolFn(config),
+    createMakeProductionPgPool(config),
   );
 
   const updateEstablishmentsFromSirenAPI =
@@ -83,7 +77,6 @@ const main = async () => {
     );
 
   const report = await updateEstablishmentsFromSirenAPI.execute();
-  await pool.end();
 
   return report;
 };

@@ -2,8 +2,8 @@ import { subDays } from "date-fns";
 import { keys } from "ramda";
 import type { SiretDto } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
@@ -26,7 +26,7 @@ const triggerEstablishmentLeadReminders = async () => {
   const timeGateway = new RealTimeGateway();
   const { uowPerformer } = createUowPerformer(
     config,
-    createGetPgPoolFn(config),
+    createMakeProductionPgPool(config),
   );
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,

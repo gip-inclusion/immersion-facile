@@ -11,7 +11,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 import { PgUserRepository } from "./PgUserRepository";
 
@@ -59,7 +59,7 @@ describe("PgAuthenticatedUserRepository", () => {
   let userRepository: PgUserRepository;
 
   beforeAll(() => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
   });
 

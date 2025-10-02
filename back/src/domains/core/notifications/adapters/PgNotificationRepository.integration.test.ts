@@ -17,7 +17,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
 const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";
@@ -149,7 +149,7 @@ describe("PgNotificationRepository", () => {
   let pgNotificationRepository: PgNotificationRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
   });
 

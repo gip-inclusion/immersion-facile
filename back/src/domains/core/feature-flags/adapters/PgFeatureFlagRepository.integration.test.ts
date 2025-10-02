@@ -11,7 +11,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import type { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
@@ -21,7 +21,7 @@ describe("PG getFeatureFlags", () => {
   let featureFlagRepository: FeatureFlagRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     featureFlagRepository = new PgFeatureFlagRepository(db);
   });

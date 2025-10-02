@@ -1,5 +1,5 @@
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
@@ -26,7 +26,7 @@ const executeContactRequestReminder = () => {
       ),
       timeGateway: timeGateway,
     },
-    uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+    uowPerformer: createUowPerformer(config, createMakeProductionPgPool(config))
       .uowPerformer,
   }).execute("7days");
 };

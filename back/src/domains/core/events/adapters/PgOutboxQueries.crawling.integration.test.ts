@@ -5,7 +5,7 @@ import {
   expectToEqual,
 } from "shared";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { DomainEvent, DomainTopic } from "../events";
@@ -190,7 +190,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
   });
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
   });
 
   afterAll(async () => {

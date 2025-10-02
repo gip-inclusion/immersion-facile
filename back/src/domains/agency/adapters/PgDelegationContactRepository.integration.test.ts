@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { PgDelegationContactRepository } from "./PgDelegationContactRepository";
 
 describe("PgDelegationContact", () => {
@@ -17,7 +17,7 @@ describe("PgDelegationContact", () => {
   });
 
   beforeEach(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     await db.deleteFrom("delegation_contacts").execute();
 

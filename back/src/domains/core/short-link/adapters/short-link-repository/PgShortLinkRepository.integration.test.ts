@@ -9,7 +9,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { deleteShortLinkById, getAllShortLinks } from "../PgShortLinkHelpers";
 import { PgShortLinkRepository } from "./PgShortLinkRepository";
 
@@ -23,7 +23,7 @@ describe("PgShortLinkRepository", () => {
     "https://dev.immersion-facile.beta.gouv.fr/verylonglink?queryParams=dfmklghdrfsmgldkrfjhfgdfmkljfghjdfsmfghedrlmkfghdsrflkfghdflkjghdflkjghdfglskjghdlskfghdfgovilèdfsèuyvhberfgvlqermçiufgyeriftuyhrelifgrhdfklwjghdfkljgbndflkjghrdfkljghdfliughdqsfilugheqrtrhrjfkhnskljxbchQSDGFROZERUIGTHERTGHBFS5H455GH23SDF4GD4GDF5G4DF54G2D4GDF4HFYHJ544NX4CFFGDFTG4SETU4YFTGGB54DGWF54TSERD5YH74DFYHGHN4QSD54T7RDFG";
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     pgShortLinkRepository = new PgShortLinkRepository(db);
     await db.deleteFrom("short_links").execute();

@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { PgNafRepository } from "./PgNafRepository";
 
 describe("Pg implementation of NafRepository", () => {
@@ -13,7 +13,7 @@ describe("Pg implementation of NafRepository", () => {
   let nafRepository: PgNafRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
   });
 

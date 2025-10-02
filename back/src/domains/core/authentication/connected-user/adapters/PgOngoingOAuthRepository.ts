@@ -1,7 +1,6 @@
 import { sql } from "kysely";
-import type { IdentityProvider, OAuthState } from "shared";
+import { type IdentityProvider, type OAuthState, optional } from "shared";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
-import { optional } from "../../../../../config/pg/pgUtils";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 

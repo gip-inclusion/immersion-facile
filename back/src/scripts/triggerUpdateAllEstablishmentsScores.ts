@@ -1,6 +1,6 @@
-import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { createMakeScriptPgPool } from "../config/pg/pgPool";
 import { updateAllEstablishmentScoresQuery } from "../domains/establishment/adapters/PgEstablishmentAggregateRepository.sql";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -11,7 +11,7 @@ const config = AppConfig.createFromEnv();
 type Report = { status: "success" } | { status: "error"; message: string };
 
 const updateScores = async (): Promise<Report> => {
-  const pool = new Pool({ connectionString: config.pgImmersionDbUrl });
+  const pool = createMakeScriptPgPool(config)();
   const db = makeKyselyDb(pool);
 
   return updateAllEstablishmentScoresQuery(db)

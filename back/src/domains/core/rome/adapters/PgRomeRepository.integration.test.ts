@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { PgRomeRepository } from "./PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {
@@ -14,7 +14,7 @@ describe("Postgres implementation of Rome Gateway", () => {
 
   beforeAll(async () => {
     //We do not empty the data because the table data is static as it public data
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     pgRomeRepository = new PgRomeRepository(db);
   });

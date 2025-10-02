@@ -9,7 +9,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { createPgUow } from "../../unit-of-work/adapters/createPgUow";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -55,7 +55,7 @@ describe("when simulating that an event has failed to force re-run it only for o
   let outboxRepository: PgOutboxRepository;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     timeGateway = new CustomTimeGateway();
     eventBus = new InMemoryEventBus(

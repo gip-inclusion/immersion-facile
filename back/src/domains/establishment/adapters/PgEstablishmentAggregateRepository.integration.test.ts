@@ -21,7 +21,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import {
   rueBitcheDto,
   rueGuillaumeTellDto,
@@ -72,7 +72,7 @@ describe("PgEstablishmentAggregateRepository", () => {
   let pgUserRepository: PgUserRepository;
 
   beforeAll(() => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     kyselyDb = makeKyselyDb(pool);
   });
 
