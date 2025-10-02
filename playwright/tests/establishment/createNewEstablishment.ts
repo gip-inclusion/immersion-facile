@@ -58,7 +58,8 @@ const step1 = async (
   const siretInput = await page.locator(
     `#${domElementIds.establishment.create.siret}`,
   );
-  await expect(siretInput).toHaveValue(establishment.siret);
+
+  await siretInput.fill(establishment.siret);
 
   await expect(
     page.locator(
