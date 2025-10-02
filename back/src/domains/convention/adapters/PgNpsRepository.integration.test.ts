@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import type { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
 import { PgNpsRepository } from "./PgNpsRepository";
 
@@ -14,7 +14,7 @@ describe("PgNpsRepository", () => {
   let db: KyselyDb;
 
   beforeAll(() => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
   });
 

@@ -10,7 +10,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { DomainEvent, DomainTopic } from "../events";
@@ -32,7 +32,7 @@ describe("PgOutboxRepository", () => {
   });
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
   });
 
   afterAll(async () => {

@@ -1,5 +1,4 @@
 import { sql } from "kysely";
-import { Pool } from "pg";
 import { map, splitEvery } from "ramda";
 import { type AppellationCode, pipeWithValue, type RomeCode } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
@@ -12,6 +11,7 @@ import {
   makeKyselyDb,
   values,
 } from "../config/pg/kysely/kyselyUtils";
+import { createMakeScriptPgPool } from "../config/pg/pgPool";
 import {
   HttpRome3Gateway,
   makeRome3Routes,
@@ -29,16 +29,8 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const main = async () => {
-  const dbUrl = config.pgImmersionDbUrl;
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
+  const pool = createMakeScriptPgPool(config)();
   const db = makeKyselyDb(pool, { skipErrorLog: true });
-
-  const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
-    new RealTimeGateway(),
-    "expires_in",
-  );
 
   const franceTravailGateway = new HttpFranceTravailGateway(
     createAxiosSharedClient(
@@ -48,7 +40,10 @@ const main = async () => {
       }),
       makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
     ),
-    cachingGateway,
+    new InMemoryCachingGateway<AccessTokenResponse>(
+      new RealTimeGateway(),
+      "expires_in",
+    ),
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,
     noRetries,

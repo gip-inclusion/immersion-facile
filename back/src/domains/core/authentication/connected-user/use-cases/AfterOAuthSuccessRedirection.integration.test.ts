@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { generateES256KeyPair } from "../../../../../utils/jwt";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { makeVerifyJwtES256 } from "../../../jwt";
@@ -41,7 +41,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
   let afterOAuthSuccessRedirection: AfterOAuthSuccessRedirection;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     uow = createPgUow(db);
     const uuidGenerator = new UuidV4Generator();

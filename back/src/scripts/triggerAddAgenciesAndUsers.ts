@@ -2,11 +2,9 @@ import { readFile } from "node:fs/promises";
 import Papa from "papaparse";
 import { keys } from "ramda";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import {
-  createFetchHttpClientForExternalAPIs,
-  createGetPgPoolFn,
-} from "../config/bootstrap/createGateways";
+import { createFetchHttpClientForExternalAPIs } from "../config/bootstrap/createGateways";
 import { partnerNames } from "../config/bootstrap/partnerNames";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import {
   type ImportedAgencyAndUserRow,
   importedAgencyAndUserRowSchema,
@@ -66,7 +64,7 @@ const triggerAddAgenciesAndUsers = async () => {
     usersAlreadyInIFCount,
     usecaseErrors,
   } = await makeAddAgenciesAndUsers({
-    uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+    uowPerformer: createUowPerformer(config, createMakeProductionPgPool(config))
       .uowPerformer,
     deps: {
       timeGateway: new RealTimeGateway(),

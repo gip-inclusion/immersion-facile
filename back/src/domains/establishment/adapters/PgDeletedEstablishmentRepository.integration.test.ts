@@ -4,7 +4,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import type { DeletedEstablishmentDto } from "../ports/DeletedEstablishmentRepository";
 import { PgDeletedEstablishmentRepository } from "./PgDeletedEstablishmentRepository";
@@ -15,7 +15,7 @@ describe("PgDeletedEstablishmentRepository", () => {
   let db: KyselyDb;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     pgDeletedEstablishmentRepository = new PgDeletedEstablishmentRepository(db);
   });

@@ -17,7 +17,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../config/pg/pgPool";
 
 import { broadcastToFtLegacyServiceName } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
@@ -28,7 +28,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
   let kyselyDb: KyselyDb;
 
   beforeAll(() => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
   });
 
   beforeEach(async () => {

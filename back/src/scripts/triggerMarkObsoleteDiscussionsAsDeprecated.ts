@@ -1,5 +1,5 @@
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -16,7 +16,7 @@ const config = AppConfig.createFromEnv();
 const triggerMarkObsoleteDiscussionsAsDeprecated = async () => {
   const { uowPerformer } = createUowPerformer(
     config,
-    createGetPgPoolFn(config),
+    createMakeProductionPgPool(config),
   );
 
   const uuidGenerator = new UuidV4Generator();

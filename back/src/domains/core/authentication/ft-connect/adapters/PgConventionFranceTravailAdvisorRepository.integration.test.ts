@@ -11,7 +11,7 @@ import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
@@ -72,7 +72,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
   let db: KyselyDb;
 
   beforeAll(async () => {
-    pool = getTestPgPool();
+    pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     await db.deleteFrom("conventions__ft_connect_users").execute();
     await db.deleteFrom("ft_connect_users").execute();

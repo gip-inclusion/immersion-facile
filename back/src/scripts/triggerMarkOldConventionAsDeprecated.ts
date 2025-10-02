@@ -1,6 +1,6 @@
 import { subMonths } from "date-fns";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { makeMarkOldConventionAsDeprecated } from "../domains/convention/MarkOldConventionAsDeprecated";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -18,8 +18,10 @@ const triggerMarkOldConventionAsDeprecated = async () => {
 
   const { numberOfUpdatedConventions } =
     await makeMarkOldConventionAsDeprecated({
-      uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
-        .uowPerformer,
+      uowPerformer: createUowPerformer(
+        config,
+        createMakeProductionPgPool(config),
+      ).uowPerformer,
       deps: {
         createNewEvent: makeCreateNewEvent({
           timeGateway: new RealTimeGateway(),
