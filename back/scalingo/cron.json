@@ -57,11 +57,11 @@
       "size": "M"
     },
     {
-      "command": "00 07 * * * pnpm back run trigger-assessment-reminders",
+      "command": "00 06 * * * pnpm back run trigger-assessment-reminders",
       "size": "M"
     },
     {
-      "command": "15 07 * * * pnpm back run trigger-convention-reminder",
+      "command": "15 06 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     },
     {
