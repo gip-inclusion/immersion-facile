@@ -60,11 +60,6 @@ export const defaultPageMetaContents: Partial<
     description:
       "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
   },
-  formEstablishmentForExternals: {
-    title: "Formulaire de référencement entreprise",
-    description:
-      "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
-  },
   home: {
     title: "Accueil Immersion Facilitée",
     description:

@@ -233,13 +233,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.establishment}`,
   ),
-  formEstablishmentForExternals: defineRoute(
-    {
-      ...establishmentParams,
-      consumer: param.path.string,
-    },
-    (params) => `/etablissement/${params.consumer}`,
-  ),
   unregisterEstablishmentLead: defineRoute(
     {
       jwt: param.query.string,
