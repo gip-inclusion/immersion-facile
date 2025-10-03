@@ -19,6 +19,7 @@ import {
   type RomeCode,
   type SearchSortedBy,
   type SiretDto,
+  type WithSort,
 } from "shared";
 import {
   jsonBuildObject,
@@ -328,7 +329,7 @@ export class PgEstablishmentAggregateRepository
       this.transaction,
       {
         filters,
-        sortedBy: sort.by,
+        sort,
         limit,
         offset,
         shouldCountAll: true,
@@ -374,7 +375,9 @@ export class PgEstablishmentAggregateRepository
               searchMade.appellationCodes,
             ),
       },
-      sortedBy: searchMade.sortedBy ?? "date",
+      sort: searchMade.sortedBy
+        ? { by: searchMade.sortedBy, direction: "desc" }
+        : { by: "date", direction: "desc" },
       shouldCountAll: false,
     });
 
@@ -389,7 +392,7 @@ export class PgEstablishmentAggregateRepository
     const { data } = await searchImmersionResultsQuery(this.transaction, {
       limit: 1,
       offset: 0,
-      sortedBy: "date",
+      sort: { by: "date", direction: "desc" },
       filters: {
         sirets: [siret],
         appellationCodes: [appellationCode],
@@ -857,16 +860,15 @@ type SearchImmersionFilters = {
 
 type SearchImmersionResultsParams = {
   filters: SearchImmersionFilters;
-  sortedBy: SearchSortedBy;
   limit: number;
   offset: number;
   shouldCountAll: boolean;
-};
+} & WithSort<SearchSortedBy>;
 
 const makeGetFilteredResultsSubQueryBuilder = ({
   filters,
-  sortedBy,
-}: Pick<SearchImmersionResultsParams, "filters" | "sortedBy">) => {
+  sort,
+}: Pick<SearchImmersionResultsParams, "filters" | "sort">) => {
   const {
     appellationCodes,
     fitForDisabledWorkers,
@@ -925,14 +927,14 @@ const makeGetFilteredResultsSubQueryBuilder = ({
               if (
                 !hasSearchGeoParams(filters?.geoParams ?? {}) &&
                 !romeCodes &&
-                (sortedBy === "date" || sortedBy === "score")
+                (sort.by === "date" || sort.by === "score")
               ) {
                 // this is in the case when NO filters are provided, to avoid doing the joins on the whole table when we will only keep 100 results in the end
                 // still doing a limit of 5000 because they will be aggregated by ROME and siret
                 return qb
                   .orderBy(
-                    sortedBy === "date" ? "update_date" : "score",
-                    "desc",
+                    sort.by === "date" ? "update_date" : "score",
+                    sort.direction,
                   )
                   .limit(5000);
               }
@@ -1029,7 +1031,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                   'appellationLabel', a.libelle_appellation_long
                   ) ORDER BY a.ogr_appellation)`.as("appellations"),
           sql<number>`ROW_NUMBER() OVER (ORDER BY ${makeOrderByClauses(
-            sortedBy,
+            sort,
             filters,
           )})`.as("rank"),
         ])
@@ -1041,7 +1043,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
           "loc.position",
           "loc.id",
         ])
-        .orderBy(makeOrderByClauses(sortedBy, filters)),
+        .orderBy(makeOrderByClauses(sort, filters)),
     );
 };
 
@@ -1049,7 +1051,7 @@ const searchImmersionResultsQuery = async (
   transaction: KyselyDb,
   {
     filters,
-    sortedBy,
+    sort,
     limit,
     offset,
     shouldCountAll,
@@ -1062,7 +1064,7 @@ const searchImmersionResultsQuery = async (
       .with("filtered_results", (qb) =>
         makeGetFilteredResultsSubQueryBuilder({
           filters,
-          sortedBy,
+          sort,
         })(qb),
       )
       .selectFrom("filtered_results as r")
@@ -1077,7 +1079,7 @@ const searchImmersionResultsQuery = async (
     .with("filtered_results", (qb) =>
       makeGetFilteredResultsSubQueryBuilder({
         filters,
-        sortedBy,
+        sort,
       })(qb)
         .limit(limit)
         .offset(offset),
@@ -1181,15 +1183,19 @@ const searchImmersionResultsQuery = async (
 };
 
 const makeOrderByClauses = (
-  sortedBy: SearchSortedBy,
+  sort: WithSort<SearchSortedBy>["sort"],
   filters?: {
     searchableBy?: EstablishmentSearchableByValue;
     romeCodes?: RomeCode[];
     geoParams?: GeoParams;
   },
 ) => {
-  if (sortedBy === "date") return sql`e.update_date DESC`;
-  if (sortedBy === "score") return sql`e.score DESC`;
+  if (sort.by === "date")
+    return sort.direction === "desc"
+      ? sql`e.update_date DESC`
+      : sql`e.update_date ASC`;
+  if (sort.by === "score")
+    return sort.direction === "desc" ? sql`e.score DESC` : sql`e.score ASC`;
   const geoParams = filters?.geoParams;
   if (geoParams && hasSearchGeoParams(geoParams))
     return sql`ST_Distance(loc.position,ST_GeographyFromText(${sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`})) ASC`;

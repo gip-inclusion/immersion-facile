@@ -50,6 +50,7 @@ import {
   establishment9900Z,
   establishmentCuvisteAtChaniersAndLaRochelle,
   establishmentCuvisteAtSaintesAndVeaux,
+  establishmentWithFitForDisabledWorkersFalse,
   establishmentWithOfferA1101_AtPosition,
   establishmentWithOfferA1101_close,
   establishmentWithOfferA1101_outOfDistanceRange,
@@ -74,6 +75,12 @@ import {
   veauxLocation,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
+const randomizeTestEstablishmentAggregates = (
+  a: EstablishmentAggregate,
+  b: EstablishmentAggregate,
+) =>
+  a.establishment.updatedAt.getTime() * Math.random() -
+  b.establishment.updatedAt.getTime() * Math.random();
 describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let kyselyDb: KyselyDb;
@@ -133,15 +140,6 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
 
       describe("no filters provided", () => {
-        const allEstablishmentAggregates: EstablishmentAggregate[] = [
-          establishmentWithOfferA1101_AtPosition,
-          establishmentWithOfferA1101_close,
-          establishmentWithOfferA1101_outOfDistanceRange,
-          searchableByAllEstablishment,
-          searchableByStudentsEstablishment,
-          searchableByJobSeekerEstablishment,
-        ];
-
         it("returns all results when no filters are provided", async () => {
           await Promise.all(
             baseTestEstablishmentAggregates.map((establishmentAggregate) =>
@@ -156,8 +154,15 @@ describe("PgEstablishmentAggregateRepository", () => {
             filters: {},
           });
 
-          expect(result.data).toEqual(
-            allEstablishmentAggregates.map((establishmentAggregate) =>
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 20,
+            totalRecords: 6,
+          });
+          expectToEqual(
+            result.data,
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
               makeExpectedSearchResult({
                 establishment: establishmentAggregate,
                 withOffers: establishmentAggregate.offers,
@@ -167,12 +172,6 @@ describe("PgEstablishmentAggregateRepository", () => {
               }),
             ),
           );
-          expectToEqual(result.pagination, {
-            currentPage: 1,
-            totalPages: 1,
-            numberPerPage: 20,
-            totalRecords: 6,
-          });
         });
       });
 
@@ -195,6 +194,12 @@ describe("PgEstablishmentAggregateRepository", () => {
             },
           });
 
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 5,
+          });
           expectArraysToEqual(
             result.data,
             [
@@ -213,13 +218,6 @@ describe("PgEstablishmentAggregateRepository", () => {
               }),
             ),
           );
-
-          expectToEqual(result.pagination, {
-            currentPage: 1,
-            totalPages: 1,
-            numberPerPage: 10,
-            totalRecords: 5,
-          });
         });
 
         it("returns only establishments searchable by jobSeekers when searchableBy='jobSeekers'", async () => {
@@ -230,7 +228,12 @@ describe("PgEstablishmentAggregateRepository", () => {
               searchableBy: "jobSeekers",
             },
           });
-
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 5,
+          });
           expectArraysToEqual(
             result.data,
             [
@@ -249,23 +252,41 @@ describe("PgEstablishmentAggregateRepository", () => {
               }),
             ),
           );
-
-          expectToEqual(result.pagination, {
-            currentPage: 1,
-            totalPages: 1,
-            numberPerPage: 10,
-            totalRecords: 5,
-          });
         });
       });
 
-      describe("filters.sirets and filters.locationIds", () => {
+      describe("filters.sirets", () => {
         beforeEach(async () => {
           await Promise.all(
             baseTestEstablishmentAggregates.map((establishmentAggregate) =>
               pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
                 establishmentAggregate,
               ),
+            ),
+          );
+        });
+        it("doesn't filter by sirets when no sirets are provided (empty array)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { sirets: [] },
+          });
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 6,
+          });
+          expectToEqual(
+            result.data,
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              makeExpectedSearchResult({
+                establishment: establishmentAggregate,
+                withOffers: establishmentAggregate.offers,
+                withLocationAndDistance:
+                  establishmentAggregate.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
             ),
           );
         });
@@ -293,8 +314,44 @@ describe("PgEstablishmentAggregateRepository", () => {
             totalRecords: 1,
           });
         });
+      });
+      describe("filters.locationIds", () => {
+        beforeEach(async () => {
+          await Promise.all(
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
 
-        it("filters by locationIds list", async () => {
+        it("doesn't filter by locationIds when no locationIds are provided (empty array)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { locationIds: [] },
+          });
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 6,
+          });
+          expectToEqual(
+            result.data,
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              makeExpectedSearchResult({
+                establishment: establishmentAggregate,
+                withOffers: establishmentAggregate.offers,
+                withLocationAndDistance:
+                  establishmentAggregate.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          );
+        });
+        it("filters by locationIds", async () => {
           const locId =
             searchableByAllEstablishment.establishment.locations[0].id;
           const result = await pgEstablishmentAggregateRepository.getOffers({
@@ -303,6 +360,12 @@ describe("PgEstablishmentAggregateRepository", () => {
             filters: { locationIds: [locId] },
           });
 
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          });
           expectToEqual(result.data, [
             makeExpectedSearchResult({
               establishment: searchableByAllEstablishment,
@@ -312,16 +375,84 @@ describe("PgEstablishmentAggregateRepository", () => {
               nafLabel: "Activités des agences de travail temporaire",
             }),
           ]);
-          expectToEqual(result.pagination, {
-            currentPage: 1,
-            totalPages: 1,
-            numberPerPage: 10,
-            totalRecords: 1,
+        });
+      });
+      describe("filters.fitForDisabledWorkers", () => {
+        const testEstablishmentAggregates: EstablishmentAggregate[] = [
+          ...baseTestEstablishmentAggregates,
+          establishmentWithFitForDisabledWorkersFalse,
+        ];
+
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("filter on fitForDisabledWorkers with value true", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { fitForDisabledWorkers: true },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .filter(
+                (establishmentAggregate) =>
+                  establishmentAggregate.establishment.fitForDisabledWorkers,
+              )
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+        it("filter on fitForDisabledWorkers with value false", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { fitForDisabledWorkers: false },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 1,
+            },
+            data: testEstablishmentAggregates
+              .filter(
+                (establishmentAggregate) =>
+                  !establishmentAggregate.establishment.fitForDisabledWorkers,
+              )
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
           });
         });
       });
 
-      describe("filters.appellationCodes, filters.romeCodes, filters.nafCodes", () => {
+      describe("filters.appellationCodes, filters.nafCodes", () => {
         describe("nafCodes", () => {
           const testEstablishmentAggregates: EstablishmentAggregate[] = [
             ...baseTestEstablishmentAggregates,
@@ -337,6 +468,31 @@ describe("PgEstablishmentAggregateRepository", () => {
               ),
             );
           });
+          it("doesn't filter by nafCodes when no nafCodes are provided (empty array)", async () => {
+            const result = await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 1, perPage: 10 },
+              sort: defaultSort,
+              filters: { nafCodes: [] },
+            });
+            expectToEqual(result.pagination, {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 8,
+            });
+            expectToEqual(
+              result.data,
+              baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+            );
+          });
           it("filters by nafCodes", async () => {
             const result = await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 10 },
@@ -349,9 +505,14 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishment0145Z_B,
             ];
 
-            expectToEqual(
-              result.data,
-              expectedEstablishments.map((establishment) =>
+            expectToEqual(result, {
+              pagination: {
+                currentPage: 1,
+                totalPages: 1,
+                numberPerPage: 10,
+                totalRecords: 2,
+              },
+              data: expectedEstablishments.map((establishment) =>
                 makeExpectedSearchResult({
                   establishment,
                   withOffers: establishment.offers,
@@ -360,8 +521,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   nafLabel: "Élevage d'ovins et de caprins",
                 }),
               ),
-            );
-            expectToEqual(result.pagination.totalRecords, 2);
+            });
           });
         });
 
@@ -379,6 +539,31 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ),
               ),
             );
+          });
+
+          it("doesn't filter by appellationCodes when no appellationCodes are provided (empty array)", async () => {
+            const result = await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 1, perPage: 10 },
+              sort: defaultSort,
+              filters: { appellationCodes: [] },
+            });
+            expectToEqual(result, {
+              pagination: {
+                currentPage: 1,
+                totalPages: 1,
+                numberPerPage: 10,
+                totalRecords: 10,
+              },
+              data: testEstablishmentAggregates.map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+            });
           });
           it("filters by appellationCodes", async () => {
             const result = await pgEstablishmentAggregateRepository.getOffers({
@@ -429,15 +614,12 @@ describe("PgEstablishmentAggregateRepository", () => {
             ]);
           });
         });
-        describe("romeCodes", () => {
-          it.skip("no more filter by romeCodes", () => {});
-        });
       });
 
       describe("sorting and pagination", () => {
         const testEstablishmentAggregates: EstablishmentAggregate[] = [
-          establishmentWithOfferA1101_AtPosition,
           establishmentWithOfferA1101_close,
+          establishmentWithOfferA1101_AtPosition,
           establishmentWithOfferA1101_outOfDistanceRange,
         ];
         beforeEach(async () => {
@@ -484,13 +666,16 @@ describe("PgEstablishmentAggregateRepository", () => {
               },
             },
           );
-          expectToEqual(allResults.pagination, {
-            currentPage: 1,
-            totalPages: 1,
-            numberPerPage: 10,
-            totalRecords: 2,
+          expectToEqual(allResults, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 2,
+            },
+            data: expectedResults,
           });
-          expectArraysToEqual(allResults.data, expectedResults);
+
           const resultPage1 =
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 1 },
@@ -504,6 +689,16 @@ describe("PgEstablishmentAggregateRepository", () => {
               },
             });
 
+          expectToEqual(resultPage1, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 2,
+              numberPerPage: 1,
+              totalRecords: 2,
+            },
+            data: [expectedResults[0]],
+          });
+
           const resultPage2 =
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 2, perPage: 1 },
@@ -516,21 +711,16 @@ describe("PgEstablishmentAggregateRepository", () => {
                 },
               },
             });
-          expectToEqual(resultPage1.pagination, {
-            currentPage: 1,
-            totalPages: 2,
-            numberPerPage: 1,
-            totalRecords: 2,
-          });
-          expectArraysToEqual(resultPage1.data, [expectedResults[0]]);
-          expectToEqual(resultPage2.pagination, {
-            currentPage: 2,
-            totalPages: 2,
-            numberPerPage: 1,
-            totalRecords: 2,
-          });
 
-          expectArraysToEqual(resultPage2.data, [expectedResults[1]]);
+          expectToEqual(resultPage2, {
+            pagination: {
+              currentPage: 2,
+              totalPages: 2,
+              numberPerPage: 1,
+              totalRecords: 2,
+            },
+            data: [expectedResults[1]],
+          });
         });
 
         it("provides totalPages=1 when there are zero results", async () => {
@@ -540,12 +730,196 @@ describe("PgEstablishmentAggregateRepository", () => {
             filters: { sirets: ["NO_SUCH_SIRET"] },
           });
 
-          expectToEqual(result.data, []);
-          expectToEqual(result.pagination, {
-            currentPage: 1,
-            totalPages: 1,
-            numberPerPage: 5,
-            totalRecords: 0,
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 5,
+              totalRecords: 0,
+            },
+            data: [],
+          });
+        });
+      });
+
+      describe("sorting.date", () => {
+        const testEstablishmentAggregates: EstablishmentAggregate[] =
+          baseTestEstablishmentAggregates
+            .map((establishmentAggregate, index) => {
+              return {
+                ...establishmentAggregate,
+                establishment: {
+                  ...establishmentAggregate.establishment,
+                  updatedAt: subDays(new Date(), index),
+                },
+              };
+            })
+            .sort(randomizeTestEstablishmentAggregates);
+
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("sorts by date:asc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "date", direction: "asc" },
+            filters: {},
+          });
+          const expectedSortedResults = [
+            ...testEstablishmentAggregates.sort(
+              (a, b) =>
+                a.establishment.updatedAt.getTime() -
+                b.establishment.updatedAt.getTime(),
+            ),
+          ];
+
+          const expectedResultsSiretsAndDate = expectedSortedResults.map(
+            (establishmentAggregate) => {
+              return {
+                siret: establishmentAggregate.establishment.siret,
+                updatedAt:
+                  establishmentAggregate.establishment.updatedAt.toISOString(),
+              };
+            },
+          );
+
+          expectArraysToEqual(
+            result.data.map((result) => ({
+              siret: result.siret,
+              updatedAt: result.updatedAt,
+            })),
+            expectedResultsSiretsAndDate,
+          );
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: expectedSortedResults.map((establishmentAggregate) =>
+              makeExpectedSearchResult({
+                establishment: establishmentAggregate,
+                withOffers: establishmentAggregate.offers,
+                withLocationAndDistance:
+                  establishmentAggregate.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          });
+        });
+        it("sorts by date:desc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "date", direction: "desc" },
+            filters: {},
+          });
+
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .sort(
+                (a, b) =>
+                  b.establishment.updatedAt.getTime() -
+                  a.establishment.updatedAt.getTime(),
+              )
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+      });
+      describe("sorting.score", () => {
+        const testEstablishmentAggregates: EstablishmentAggregate[] =
+          baseTestEstablishmentAggregates
+            .map((establishmentAggregate, index) => {
+              return {
+                ...establishmentAggregate,
+                establishment: {
+                  ...establishmentAggregate.establishment,
+                  score: index,
+                },
+              };
+            })
+            .sort(randomizeTestEstablishmentAggregates);
+
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("sorts by score:asc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "score", direction: "asc" },
+            filters: {},
+          });
+
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .sort((a, b) => a.establishment.score - b.establishment.score)
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+        it("sorts by score:desc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "score", direction: "desc" },
+            filters: {},
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .sort((a, b) => b.establishment.score - a.establishment.score)
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
           });
         });
       });

@@ -381,3 +381,10 @@ export const establishment9900Z = new EstablishmentAggregateBuilder()
     nomenclature: "Activités des organisations et organismes extraterritoriaux",
   })
   .build();
+
+export const establishmentWithFitForDisabledWorkersFalse =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000024")
+    .withFitForDisabledWorkers(false)
+    .withUserRights([osefUserRight])
+    .build();
