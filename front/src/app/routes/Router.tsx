@@ -28,7 +28,6 @@ import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage"
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
 import { StatsPage } from "src/app/pages/StatsPage";
@@ -223,9 +222,6 @@ const getPageByRouteName: {
     </DashboardPrivateRoute>
   ),
   formEstablishment: (route) => <EstablishmentCreationFormPage route={route} />,
-  formEstablishmentForExternals: (route) => (
-    <EstablishmentFormPageForExternals route={route} />
-  ),
   group: (route) => <GroupPage route={route} />,
   home: () => <HomePage type="default" />,
   homeAgencies: () => <HomePage type="agency" />,

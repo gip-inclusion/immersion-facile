@@ -41,9 +41,7 @@ import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 
 export type RouteByMode = {
-  create:
-    | Route<typeof routes.formEstablishment>
-    | Route<typeof routes.formEstablishmentForExternals>;
+  create: Route<typeof routes.formEstablishment>;
   edit: Route<typeof routes.establishmentDashboardFormEstablishment>;
   admin: Route<typeof routes.manageEstablishmentAdmin>;
 };
@@ -90,9 +88,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const adminJwt = useAdminToken();
   const route = useRoute() as RouteByMode[Mode];
 
-  const isEstablishmentCreation =
-    route.name === "formEstablishment" ||
-    route.name === "formEstablishmentForExternals";
+  const isEstablishmentCreation = route.name === "formEstablishment";
   const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
   const isEstablishmentDashboard =
     route.name === "establishmentDashboardFormEstablishment";
@@ -190,7 +186,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: {
-            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+            name: "formEstablishment",
           },
         },
         () => {},
@@ -292,7 +288,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: {
-            name: P.union("formEstablishment", "formEstablishmentForExternals"), // TODO : formEstablishmentForExternals ???
+            name: "formEstablishment",
           },
           connectedUserJwt: P.not(P.nullish),
         },
@@ -340,7 +336,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: {
-            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+            name: "formEstablishment",
           },
           connectedUserJwt: P.nullish,
         },
