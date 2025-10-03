@@ -47,15 +47,17 @@ export const toDisplayedPhoneNumber = (
   return parsePhoneNumber(phoneNumber, countryCode).format("E.164");
 };
 
-export const formatWithPhoneNumberPrefix = (
+export const toInternationalPhoneNumber = (
   phoneNumber: string,
   countryCode: SupportedCountryCode,
-): string | undefined => {
-  const nationalNumber =
-    parsePhoneNumberFromString(phoneNumber)?.nationalNumber;
-  return nationalNumber
-    ? parsePhoneNumber(nationalNumber, countryCode).format("E.164")
-    : parsePhoneNumber(phoneNumber, countryCode).format("E.164");
+) => {
+  const validCountryCode = getSupportedCountryCodesForCountry(countryCode).find(
+    (countryCode) => isValidPhoneNumber(phoneNumber, countryCode),
+  );
+  if (!validCountryCode) {
+    return;
+  }
+  return parsePhoneNumber(phoneNumber, validCountryCode).format("E.164");
 };
 
 export const getCountryCodeFromPhoneNumber = (
