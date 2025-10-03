@@ -1,4 +1,9 @@
-import { isValidMobilePhone, phoneNumberSchema } from "./phone.schema";
+import type { SupportedCountryCode } from "../address/address.dto";
+import {
+  isValidMobilePhone,
+  phoneNumberSchema,
+  toInternationalPhoneNumber,
+} from "./phone.schema";
 
 describe("phonesShema", () => {
   it.each<string>([
@@ -72,6 +77,37 @@ describe("phonesShema", () => {
     "should be a valid mobile phone number (FR and other countries) %s",
     async (phone) => {
       expect(isValidMobilePhone(phone)).toBe(true);
+    },
+  );
+  it.each<string>([
+    "+41000123456", // CH
+    "+390012345678", // IT
+    // "+3221234567", // BE not valid, but libphonenumber-js/min sees it as valid
+    // "+34598765432", // ES not valid, but libphonenumber-js/min sees it as valid
+  ])(
+    "invalid phone number (due to local number assignation) should not be considered as a valid phone number %s",
+    async (phone) => {
+      expect(() => phoneNumberSchema.parse(phone)).toThrow();
+    },
+  );
+});
+
+describe("toInternationalPhoneNumber", () => {
+  it.each<[string, SupportedCountryCode, string]>([
+    ["0693011313", "FR", "+262693011313"], // RE
+    ["0697011313", "FR", "+596697011313"], // MQ
+    ["0628862346", "DE", "+49628862346"], // DE
+    ["0628862346", "FR", "+33628862346"], // FR
+    ["0549901591", "FR", "+33549901591"], // FR
+    ["912345678", "ES", "+34912345678"], // ES
+    ["071234567", "BE", "+3271234567"], // BE
+    ["0441234567", "CH", "+41441234567"], // CH
+    ["0612345678", "IT", "+390612345678"], // IT
+  ])(
+    "should assign the right prefix to the phone number %s",
+    async (phone, countryCode, expected) => {
+      const result = toInternationalPhoneNumber(phone, countryCode);
+      expect(result).toBe(expected);
     },
   );
 });
