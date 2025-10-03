@@ -70,7 +70,6 @@ type LegacySearchCommonParamsDto = {
 
 type GetOffersFlatParamsCommon = {
   place?: string; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
-  romeCodes?: RomeCode[];
   appellationCodes?: AppellationCode[];
   fitForDisabledWorkers?: boolean;
   locationIds?: LocationId[];
