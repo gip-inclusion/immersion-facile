@@ -7,7 +7,10 @@ import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { DateFilter } from "../filters";
-import type { PaginationQueryParams, Sort } from "../pagination/pagination.dto";
+import type {
+  PaginationQueryParams,
+  WithOptionalSort,
+} from "../pagination/pagination.dto";
 import {
   type AgencyRole,
   allSignatoryRoles,
@@ -464,11 +467,11 @@ export type GetPaginatedConventionsSortBy = keyof Pick<
   "dateValidation" | "dateStart" | "dateSubmission"
 >;
 
-export type GetConventionsForAgencyUserParams = {
-  filters?: GetPaginatedConventionsFilters;
-  sort?: Sort<GetPaginatedConventionsSortBy>;
-  pagination?: PaginationQueryParams;
-};
+export type GetConventionsForAgencyUserParams =
+  WithOptionalSort<GetPaginatedConventionsSortBy> & {
+    filters?: GetPaginatedConventionsFilters;
+    pagination?: PaginationQueryParams;
+  };
 
 export type FlatGetConventionsForAgencyUserParams = {
   // pagination

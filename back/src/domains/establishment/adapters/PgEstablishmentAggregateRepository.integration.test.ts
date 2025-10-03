@@ -9,12 +9,12 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  type GeoPositionDto,
-  type Location,
   LocationBuilder,
   type SearchResultDto,
+  type SearchSortedBy,
   UserBuilder,
   type WithAcquisition,
+  type WithSort,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -28,11 +28,7 @@ import {
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
-import type {
-  EstablishmentAggregate,
-  EstablishmentUserRight,
-} from "../entities/EstablishmentAggregate";
-import type { SearchMade } from "../entities/SearchMadeEntity";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -43,27 +39,48 @@ import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRe
 import {
   analysteEnGeomatiqueImmersionOffer,
   artisteCirqueOffer,
+  bassompierreSaintesLocation,
   cartographeImmersionOffer,
+  cartographeSearchMade,
+  centerOfSaintesGeoPosition,
   cuvisteOffer,
+  establishment0145Z_A,
+  establishment0145Z_B,
+  establishment4741Z,
+  establishment9900Z,
+  establishmentCuvisteAtChaniersAndLaRochelle,
+  establishmentCuvisteAtSaintesAndVeaux,
+  establishmentWithFitForDisabledWorkersFalse,
+  establishmentWithOfferA1101_AtPosition,
+  establishmentWithOfferA1101_close,
+  establishmentWithOfferA1101_outOfDistanceRange,
   groomChevauxOffer,
+  locationOfCloseSearchPosition,
+  locationOfSearchPosition,
+  locationOutOfAnySearchedPosition,
   makeExpectedSearchResult,
   offer_A1101_11987,
   offer_A1101_12862,
   offer_A1101_17751,
   offer_A1101_20404,
+  osefUser,
+  osefUserRight,
+  portHubleChaniersLocation,
+  searchableByAllEstablishment,
+  searchableByJobSeekerEstablishment,
+  searchableByStudentsEstablishment,
+  searchMadeDistanceWithoutRome,
   sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
+  tourDeLaChaineLaRochelleLocation,
+  veauxLocation,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
-const osefUser = new UserBuilder().withId(uuid()).build();
-const osefUserRight: EstablishmentUserRight = {
-  role: "establishment-admin",
-  job: "osef",
-  phone: "3615-OSEF",
-  userId: osefUser.id,
-  shouldReceiveDiscussionNotifications: true,
-  isMainContactByPhone: false,
-};
-
+const randomizeTestEstablishmentAggregates = (
+  a: EstablishmentAggregate,
+  b: EstablishmentAggregate,
+) =>
+  a.establishment.updatedAt.getTime() * Math.random() -
+  b.establishment.updatedAt.getTime() * Math.random();
 describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let kyselyDb: KyselyDb;
@@ -99,7 +116,815 @@ describe("PgEstablishmentAggregateRepository", () => {
   });
 
   describe("Offers", () => {
-    describe("searchImmersionResults", () => {
+    const defaultSort: WithSort<SearchSortedBy>["sort"] = {
+      by: "date",
+      direction: "desc",
+    };
+    describe("getOffers", () => {
+      const baseTestEstablishmentAggregates: EstablishmentAggregate[] = [
+        establishmentWithOfferA1101_AtPosition,
+        establishmentWithOfferA1101_close,
+        establishmentWithOfferA1101_outOfDistanceRange,
+        searchableByAllEstablishment,
+        searchableByStudentsEstablishment,
+        searchableByJobSeekerEstablishment,
+      ];
+      beforeEach(async () => {
+        await kyselyDb.deleteFrom("establishments__users").execute();
+        await kyselyDb.deleteFrom("immersion_offers").execute();
+        await kyselyDb.deleteFrom("establishments_location_infos").execute();
+        await kyselyDb
+          .deleteFrom("establishments_location_positions")
+          .execute();
+        await kyselyDb.deleteFrom("establishments").execute();
+      });
+
+      describe("no filters provided", () => {
+        it("returns all results when no filters are provided", async () => {
+          await Promise.all(
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: defaultSort,
+            filters: {},
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 20,
+            totalRecords: 6,
+          });
+          expectToEqual(
+            result.data,
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              makeExpectedSearchResult({
+                establishment: establishmentAggregate,
+                withOffers: establishmentAggregate.offers,
+                withLocationAndDistance:
+                  establishmentAggregate.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          );
+        });
+      });
+
+      describe("filters.searchableBy", () => {
+        beforeEach(async () => {
+          await Promise.all(
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("returns only establishments searchable by students when searchableBy='students'", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: {
+              searchableBy: "students",
+            },
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 5,
+          });
+          expectArraysToEqual(
+            result.data,
+            [
+              establishmentWithOfferA1101_AtPosition,
+              establishmentWithOfferA1101_close,
+              establishmentWithOfferA1101_outOfDistanceRange,
+              searchableByAllEstablishment,
+              searchableByStudentsEstablishment,
+            ].map((establishment) =>
+              makeExpectedSearchResult({
+                establishment,
+                withLocationAndDistance:
+                  establishment.establishment.locations[0],
+                withOffers: establishment.offers,
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          );
+        });
+
+        it("returns only establishments searchable by jobSeekers when searchableBy='jobSeekers'", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: {
+              searchableBy: "jobSeekers",
+            },
+          });
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 5,
+          });
+          expectArraysToEqual(
+            result.data,
+            [
+              establishmentWithOfferA1101_AtPosition,
+              establishmentWithOfferA1101_close,
+              establishmentWithOfferA1101_outOfDistanceRange,
+              searchableByAllEstablishment,
+              searchableByJobSeekerEstablishment,
+            ].map((establishment) =>
+              makeExpectedSearchResult({
+                establishment,
+                withLocationAndDistance:
+                  establishment.establishment.locations[0],
+                withOffers: establishment.offers,
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          );
+        });
+      });
+
+      describe("filters.sirets", () => {
+        beforeEach(async () => {
+          await Promise.all(
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("doesn't filter by sirets when no sirets are provided (empty array)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { sirets: [] },
+          });
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 6,
+          });
+          expectToEqual(
+            result.data,
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              makeExpectedSearchResult({
+                establishment: establishmentAggregate,
+                withOffers: establishmentAggregate.offers,
+                withLocationAndDistance:
+                  establishmentAggregate.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          );
+        });
+        it("filters by sirets list", async () => {
+          const siret = searchableByAllEstablishment.establishment.siret;
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { sirets: [siret] },
+          });
+
+          expectToEqual(result.data, [
+            makeExpectedSearchResult({
+              establishment: searchableByAllEstablishment,
+              withOffers: searchableByAllEstablishment.offers,
+              withLocationAndDistance:
+                searchableByAllEstablishment.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+          ]);
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          });
+        });
+      });
+      describe("filters.locationIds", () => {
+        beforeEach(async () => {
+          await Promise.all(
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+
+        it("doesn't filter by locationIds when no locationIds are provided (empty array)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { locationIds: [] },
+          });
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 6,
+          });
+          expectToEqual(
+            result.data,
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              makeExpectedSearchResult({
+                establishment: establishmentAggregate,
+                withOffers: establishmentAggregate.offers,
+                withLocationAndDistance:
+                  establishmentAggregate.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          );
+        });
+        it("filters by locationIds", async () => {
+          const locId =
+            searchableByAllEstablishment.establishment.locations[0].id;
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { locationIds: [locId] },
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          });
+          expectToEqual(result.data, [
+            makeExpectedSearchResult({
+              establishment: searchableByAllEstablishment,
+              withOffers: searchableByAllEstablishment.offers,
+              withLocationAndDistance:
+                searchableByAllEstablishment.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+          ]);
+        });
+      });
+      describe("filters.fitForDisabledWorkers", () => {
+        const testEstablishmentAggregates: EstablishmentAggregate[] = [
+          ...baseTestEstablishmentAggregates,
+          establishmentWithFitForDisabledWorkersFalse,
+        ];
+
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("filter on fitForDisabledWorkers with value true", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { fitForDisabledWorkers: true },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .filter(
+                (establishmentAggregate) =>
+                  establishmentAggregate.establishment.fitForDisabledWorkers,
+              )
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+        it("filter on fitForDisabledWorkers with value false", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { fitForDisabledWorkers: false },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 1,
+            },
+            data: testEstablishmentAggregates
+              .filter(
+                (establishmentAggregate) =>
+                  !establishmentAggregate.establishment.fitForDisabledWorkers,
+              )
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+      });
+
+      describe("filters.appellationCodes, filters.nafCodes", () => {
+        describe("nafCodes", () => {
+          const testEstablishmentAggregates: EstablishmentAggregate[] = [
+            ...baseTestEstablishmentAggregates,
+            establishment0145Z_A,
+            establishment0145Z_B,
+          ];
+          beforeEach(async () => {
+            await Promise.all(
+              testEstablishmentAggregates.map((establishmentAggregate) =>
+                pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                  establishmentAggregate,
+                ),
+              ),
+            );
+          });
+          it("doesn't filter by nafCodes when no nafCodes are provided (empty array)", async () => {
+            const result = await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 1, perPage: 10 },
+              sort: defaultSort,
+              filters: { nafCodes: [] },
+            });
+            expectToEqual(result.pagination, {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 8,
+            });
+            expectToEqual(
+              result.data,
+              baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+            );
+          });
+          it("filters by nafCodes", async () => {
+            const result = await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 1, perPage: 10 },
+              sort: defaultSort,
+              filters: { nafCodes: ["0145Z"] },
+            });
+
+            const expectedEstablishments = [
+              establishment0145Z_A,
+              establishment0145Z_B,
+            ];
+
+            expectToEqual(result, {
+              pagination: {
+                currentPage: 1,
+                totalPages: 1,
+                numberPerPage: 10,
+                totalRecords: 2,
+              },
+              data: expectedEstablishments.map((establishment) =>
+                makeExpectedSearchResult({
+                  establishment,
+                  withOffers: establishment.offers,
+                  withLocationAndDistance:
+                    establishment.establishment.locations[0],
+                  nafLabel: "Élevage d'ovins et de caprins",
+                }),
+              ),
+            });
+          });
+        });
+
+        describe("appellationCodes", () => {
+          const testEstablishmentAggregates: EstablishmentAggregate[] = [
+            ...baseTestEstablishmentAggregates,
+            establishmentCuvisteAtSaintesAndVeaux,
+            establishmentCuvisteAtChaniersAndLaRochelle,
+          ];
+          beforeEach(async () => {
+            await Promise.all(
+              testEstablishmentAggregates.map((establishmentAggregate) =>
+                pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                  establishmentAggregate,
+                ),
+              ),
+            );
+          });
+
+          it("doesn't filter by appellationCodes when no appellationCodes are provided (empty array)", async () => {
+            const result = await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 1, perPage: 10 },
+              sort: defaultSort,
+              filters: { appellationCodes: [] },
+            });
+            expectToEqual(result, {
+              pagination: {
+                currentPage: 1,
+                totalPages: 1,
+                numberPerPage: 10,
+                totalRecords: 10,
+              },
+              data: testEstablishmentAggregates.map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+            });
+          });
+          it("filters by appellationCodes", async () => {
+            const result = await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 1, perPage: 10 },
+              sort: defaultSort,
+              filters: { appellationCodes: [cuvisteOffer.appellationCode] },
+            });
+
+            expectToEqual(result.pagination, {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 4, // 2 establishments carry the cuviste offer; with 2 locations each
+            });
+            expectToEqual(result.data, [
+              makeExpectedSearchResult({
+                establishment: establishmentCuvisteAtSaintesAndVeaux,
+                withOffers: establishmentCuvisteAtSaintesAndVeaux.offers,
+                withLocationAndDistance:
+                  establishmentCuvisteAtSaintesAndVeaux.establishment
+                    .locations[1],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+              makeExpectedSearchResult({
+                establishment: establishmentCuvisteAtSaintesAndVeaux,
+                withOffers: establishmentCuvisteAtSaintesAndVeaux.offers,
+                withLocationAndDistance:
+                  establishmentCuvisteAtSaintesAndVeaux.establishment
+                    .locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+              makeExpectedSearchResult({
+                establishment: establishmentCuvisteAtChaniersAndLaRochelle,
+                withOffers: establishmentCuvisteAtChaniersAndLaRochelle.offers,
+                withLocationAndDistance:
+                  establishmentCuvisteAtChaniersAndLaRochelle.establishment
+                    .locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+              makeExpectedSearchResult({
+                establishment: establishmentCuvisteAtChaniersAndLaRochelle,
+                withOffers: establishmentCuvisteAtChaniersAndLaRochelle.offers,
+                withLocationAndDistance:
+                  establishmentCuvisteAtChaniersAndLaRochelle.establishment
+                    .locations[1],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ]);
+          });
+        });
+      });
+
+      describe("sorting and pagination", () => {
+        const testEstablishmentAggregates: EstablishmentAggregate[] = [
+          establishmentWithOfferA1101_close,
+          establishmentWithOfferA1101_AtPosition,
+          establishmentWithOfferA1101_outOfDistanceRange,
+        ];
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+
+        it("sorts by distance and paginates results", async () => {
+          const expectedResults = [
+            makeExpectedSearchResult({
+              establishment: establishmentWithOfferA1101_AtPosition,
+              withOffers: [offer_A1101_11987],
+              withLocationAndDistance: {
+                ...locationOfSearchPosition,
+                distance: 0,
+              },
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+            makeExpectedSearchResult({
+              establishment: establishmentWithOfferA1101_close,
+              withOffers: [offer_A1101_11987],
+              withLocationAndDistance: {
+                ...locationOfCloseSearchPosition,
+                distance: 133.12254555,
+              },
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+          ];
+          const allResults = await pgEstablishmentAggregateRepository.getOffers(
+            {
+              pagination: { page: 1, perPage: 10 },
+              sort: { by: "distance", direction: "asc" },
+              filters: {
+                geoParams: {
+                  lat: locationOfSearchPosition.position.lat,
+                  lon: locationOfSearchPosition.position.lon,
+                  distanceKm: 20,
+                },
+              },
+            },
+          );
+          expectToEqual(allResults, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 2,
+            },
+            data: expectedResults,
+          });
+
+          const resultPage1 =
+            await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 1, perPage: 1 },
+              sort: { by: "distance", direction: "asc" },
+              filters: {
+                geoParams: {
+                  lat: locationOfSearchPosition.position.lat,
+                  lon: locationOfSearchPosition.position.lon,
+                  distanceKm: 20,
+                },
+              },
+            });
+
+          expectToEqual(resultPage1, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 2,
+              numberPerPage: 1,
+              totalRecords: 2,
+            },
+            data: [expectedResults[0]],
+          });
+
+          const resultPage2 =
+            await pgEstablishmentAggregateRepository.getOffers({
+              pagination: { page: 2, perPage: 1 },
+              sort: { by: "distance", direction: "asc" },
+              filters: {
+                geoParams: {
+                  lat: locationOfSearchPosition.position.lat,
+                  lon: locationOfSearchPosition.position.lon,
+                  distanceKm: 20,
+                },
+              },
+            });
+
+          expectToEqual(resultPage2, {
+            pagination: {
+              currentPage: 2,
+              totalPages: 2,
+              numberPerPage: 1,
+              totalRecords: 2,
+            },
+            data: [expectedResults[1]],
+          });
+        });
+
+        it("provides totalPages=1 when there are zero results", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 5 },
+            sort: { by: "date", direction: "desc" },
+            filters: { sirets: ["NO_SUCH_SIRET"] },
+          });
+
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 5,
+              totalRecords: 0,
+            },
+            data: [],
+          });
+        });
+      });
+
+      describe("sorting.date", () => {
+        const testEstablishmentAggregates: EstablishmentAggregate[] =
+          baseTestEstablishmentAggregates
+            .map((establishmentAggregate, index) => {
+              return {
+                ...establishmentAggregate,
+                establishment: {
+                  ...establishmentAggregate.establishment,
+                  updatedAt: subDays(new Date(), index),
+                },
+              };
+            })
+            .sort(randomizeTestEstablishmentAggregates);
+
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("sorts by date:asc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "date", direction: "asc" },
+            filters: {},
+          });
+          const expectedSortedResults = [
+            ...testEstablishmentAggregates.sort(
+              (a, b) =>
+                a.establishment.updatedAt.getTime() -
+                b.establishment.updatedAt.getTime(),
+            ),
+          ];
+
+          const expectedResultsSiretsAndDate = expectedSortedResults.map(
+            (establishmentAggregate) => {
+              return {
+                siret: establishmentAggregate.establishment.siret,
+                updatedAt:
+                  establishmentAggregate.establishment.updatedAt.toISOString(),
+              };
+            },
+          );
+
+          expectArraysToEqual(
+            result.data.map((result) => ({
+              siret: result.siret,
+              updatedAt: result.updatedAt,
+            })),
+            expectedResultsSiretsAndDate,
+          );
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: expectedSortedResults.map((establishmentAggregate) =>
+              makeExpectedSearchResult({
+                establishment: establishmentAggregate,
+                withOffers: establishmentAggregate.offers,
+                withLocationAndDistance:
+                  establishmentAggregate.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ),
+          });
+        });
+        it("sorts by date:desc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "date", direction: "desc" },
+            filters: {},
+          });
+
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .sort(
+                (a, b) =>
+                  b.establishment.updatedAt.getTime() -
+                  a.establishment.updatedAt.getTime(),
+              )
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+      });
+      describe("sorting.score", () => {
+        const testEstablishmentAggregates: EstablishmentAggregate[] =
+          baseTestEstablishmentAggregates
+            .map((establishmentAggregate, index) => {
+              return {
+                ...establishmentAggregate,
+                establishment: {
+                  ...establishmentAggregate.establishment,
+                  score: index,
+                },
+              };
+            })
+            .sort(randomizeTestEstablishmentAggregates);
+
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+        it("sorts by score:asc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "score", direction: "asc" },
+            filters: {},
+          });
+
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .sort((a, b) => a.establishment.score - b.establishment.score)
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+        it("sorts by score:desc", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: { by: "score", direction: "desc" },
+            filters: {},
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: testEstablishmentAggregates
+              .sort((a, b) => b.establishment.score - a.establishment.score)
+              .map((establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+              ),
+          });
+        });
+      });
+    });
+    describe("legacySearchImmersionResults", () => {
       describe("with `maxResults` parameter", () => {
         beforeEach(async () => {
           await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -109,16 +934,18 @@ describe("PgEstablishmentAggregateRepository", () => {
             establishmentWithOfferA1101_close,
           );
           await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-            establishmentWithOfferA1101_far,
+            establishmentWithOfferA1101_outOfDistanceRange,
           );
         });
 
         it("returns 1 closest establishment with `maxResults` at 1", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: searchMadeDistanceWithoutRome,
-              maxResults: 1,
-            }),
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: searchMadeDistanceWithoutRome,
+                maxResults: 1,
+              },
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_AtPosition,
@@ -135,10 +962,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 2 closest establishments with `maxResults` at 2", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: searchMadeDistanceWithoutRome,
-              maxResults: 2,
-            }),
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: searchMadeDistanceWithoutRome,
+                maxResults: 2,
+              },
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_AtPosition,
@@ -164,10 +993,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("returns 2 closest establishments with `maxResults` at 3 without too far establishment", async () => {
           expectArraysToMatch(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: searchMadeDistanceWithoutRome,
-              maxResults: 3,
-            }),
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: searchMadeDistanceWithoutRome,
+                maxResults: 3,
+              },
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_AtPosition,
@@ -250,34 +1081,40 @@ describe("PgEstablishmentAggregateRepository", () => {
           );
 
           const sortedByDateResults =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                ...searchMadeDistanceWithoutRome,
-                sortedBy: "date",
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  ...searchMadeDistanceWithoutRome,
+                  sortedBy: "date",
+                },
+                maxResults: 5,
               },
-              maxResults: 5,
-            });
+            );
 
           expectArraysToEqual(sortedByDateResults, expectedResults);
 
           const sortedByScoreResults =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                ...searchMadeDistanceWithoutRome,
-                sortedBy: "score",
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  ...searchMadeDistanceWithoutRome,
+                  sortedBy: "score",
+                },
+                maxResults: 5,
               },
-              maxResults: 5,
-            });
+            );
           expectArraysToEqual(sortedByScoreResults, expectedResults);
 
           const sortedByDistanceResults =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                ...searchMadeDistanceWithoutRome,
-                sortedBy: "distance",
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  ...searchMadeDistanceWithoutRome,
+                  sortedBy: "distance",
+                },
+                maxResults: 5,
               },
-              maxResults: 5,
-            });
+            );
           expectArraysToEqual(sortedByDistanceResults, expectedResults);
         });
       });
@@ -298,12 +1135,14 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it(`with "establishmentSearchableBy:'students'" return only establishments SearchImmersionResults searchable by student`, async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: {
-                  ...cartographeSearchMade,
-                  establishmentSearchableBy: "students",
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    ...cartographeSearchMade,
+                    establishmentSearchableBy: "students",
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -329,12 +1168,14 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it(`with "establishmentSearchableBy:'jobSeekers'" return only establishments SearchImmersionResults searchable by jobseekers`, async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: {
-                  ...cartographeSearchMade,
-                  establishmentSearchableBy: "jobSeekers",
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    ...cartographeSearchMade,
+                    establishmentSearchableBy: "jobSeekers",
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -360,9 +1201,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it('with"establishmentSearchableBy" not defined return all establishment SearchImmersionResults', async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: cartographeSearchMade,
-              });
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: cartographeSearchMade,
+                },
+              );
 
             expectToEqual(
               results.sort(
@@ -401,7 +1244,9 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withOffers([offer_A1101_20404, offer_A1101_17751])
                 .build();
             const establishmentFarWithA1101Offers =
-              new EstablishmentAggregateBuilder(establishmentWithOfferA1101_far)
+              new EstablishmentAggregateBuilder(
+                establishmentWithOfferA1101_outOfDistanceRange,
+              )
                 .withOffers([offer_A1101_12862])
                 .build();
 
@@ -414,9 +1259,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
             // Act & Assert
             expectToEqual(
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: searchMadeDistanceWithoutRome,
-              }),
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: searchMadeDistanceWithoutRome,
+                },
+              ),
               [
                 makeExpectedSearchResult({
                   establishment: establishmentCloseWithA1101Offers,
@@ -470,13 +1317,15 @@ describe("PgEstablishmentAggregateRepository", () => {
 
             // Act
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: {
-                  sortedBy: "date",
-                  distanceKm: 100,
-                  ...centerOfSaintesGeoPosition,
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    sortedBy: "date",
+                    distanceKm: 100,
+                    ...centerOfSaintesGeoPosition,
+                  },
                 },
-              });
+              );
 
             // Assert
             expectToEqual(
@@ -550,9 +1399,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with all naf when naf filter is not provided", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: {},
-              });
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {},
+                },
+              );
 
             expectToEqual(
               results.sort(
@@ -603,9 +1454,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with all naf when naf filter is empty", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: { nafCodes: [] },
-              });
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: { nafCodes: [] },
+                },
+              );
 
             expectToEqual(
               results.sort(
@@ -656,11 +1509,13 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with naf when naf filter is provided with one value", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: {
-                  nafCodes: [establishment0145Z_A.establishment.nafDto.code],
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    nafCodes: [establishment0145Z_A.establishment.nafDto.code],
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -686,14 +1541,16 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           it("establishments with different naf when naf filter is provided with multiple values", async () => {
             const results =
-              await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: {
-                  nafCodes: [
-                    establishment0145Z_A.establishment.nafDto.code,
-                    establishment4741Z.establishment.nafDto.code,
-                  ],
+              await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+                {
+                  searchMade: {
+                    nafCodes: [
+                      establishment0145Z_A.establishment.nafDto.code,
+                      establishment4741Z.establishment.nafDto.code,
+                    ],
+                  },
                 },
-              });
+              );
 
             expectToEqual(
               results.sort(
@@ -766,15 +1623,17 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("without param", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                distanceKm: 10,
-                lat: fitForDisabledWorkers.establishment.locations[0].position
-                  .lat,
-                lon: fitForDisabledWorkers.establishment.locations[0].position
-                  .lon,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  distanceKm: 10,
+                  lat: fitForDisabledWorkers.establishment.locations[0].position
+                    .lat,
+                  lon: fitForDisabledWorkers.establishment.locations[0].position
+                    .lon,
+                },
               },
-            });
+            );
           expectToEqual(results, [
             makeExpectedSearchResult({
               establishment: notFitForDisabledWorkers,
@@ -799,16 +1658,18 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("with param false", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                distanceKm: 10,
-                lat: fitForDisabledWorkers.establishment.locations[0].position
-                  .lat,
-                lon: fitForDisabledWorkers.establishment.locations[0].position
-                  .lon,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  distanceKm: 10,
+                  lat: fitForDisabledWorkers.establishment.locations[0].position
+                    .lat,
+                  lon: fitForDisabledWorkers.establishment.locations[0].position
+                    .lon,
+                },
+                fitForDisabledWorkers: false,
               },
-              fitForDisabledWorkers: false,
-            });
+            );
           expectToEqual(results, [
             makeExpectedSearchResult({
               establishment: notFitForDisabledWorkers,
@@ -824,16 +1685,18 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("with param true", async () => {
           const results =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                distanceKm: 10,
-                lat: fitForDisabledWorkers.establishment.locations[0].position
-                  .lat,
-                lon: fitForDisabledWorkers.establishment.locations[0].position
-                  .lon,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  distanceKm: 10,
+                  lat: fitForDisabledWorkers.establishment.locations[0].position
+                    .lat,
+                  lon: fitForDisabledWorkers.establishment.locations[0].position
+                    .lon,
+                },
+                fitForDisabledWorkers: true,
               },
-              fitForDisabledWorkers: true,
-            });
+            );
           expectToEqual(results, [
             makeExpectedSearchResult({
               establishment: fitForDisabledWorkers,
@@ -850,9 +1713,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("returns empty list when repo is empty", async () => {
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: cartographeSearchMade,
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: cartographeSearchMade,
+            },
+          ),
           [],
         );
       });
@@ -863,21 +1728,23 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: {
-              lat: undefined,
-              lon: undefined,
-              distanceKm: undefined,
-              sortedBy: "date",
-              voluntaryToImmersion: true,
-              place: undefined,
-              appellationCodes: undefined,
-              romeCode: undefined,
-              establishmentSearchableBy: "jobSeekers",
-              acquisitionCampaign: undefined,
-              acquisitionKeyword: undefined,
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                lat: undefined,
+                lon: undefined,
+                distanceKm: undefined,
+                sortedBy: "date",
+                voluntaryToImmersion: true,
+                place: undefined,
+                appellationCodes: undefined,
+                romeCode: undefined,
+                establishmentSearchableBy: "jobSeekers",
+                acquisitionCampaign: undefined,
+                acquisitionKeyword: undefined,
+              },
             },
-          }),
+          ),
           [
             makeExpectedSearchResult({
               establishment: establishmentWithOfferA1101_AtPosition,
@@ -916,9 +1783,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Assert
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: cartographeSearchMade,
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: cartographeSearchMade,
+            },
+          ),
           [
             makeExpectedSearchResult({
               establishment: openEstablishment,
@@ -959,7 +1828,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               cartographeImmersionOffer,
               analysteEnGeomatiqueImmersionOffer,
             ])
-            .withLocations([locationOfFarFromSearchedPosition])
+            .withLocations([locationOutOfAnySearchedPosition])
             .withUserRights([osefUserRight])
             .build();
 
@@ -974,9 +1843,11 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: cartographeSearchMade,
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: cartographeSearchMade,
+            },
+          ),
           [
             makeExpectedSearchResult({
               establishment: establishmentAtRangeWithRome,
@@ -991,9 +1862,11 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
-          }),
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
+            },
+          ),
           [],
         );
       });
@@ -1011,14 +1884,16 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("search results with multiple locations and with matching rome code", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                sortedBy: "date",
-                distanceKm: 50,
-                ...centerOfSaintesGeoPosition,
-                romeCode: cuvisteOffer.romeCode,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  sortedBy: "date",
+                  distanceKm: 50,
+                  ...centerOfSaintesGeoPosition,
+                  romeCode: cuvisteOffer.romeCode,
+                },
               },
-            }),
+            ),
             [
               makeExpectedSearchResult({
                 establishment: establishmentCuvisteAtSaintesAndVeaux,
@@ -1044,14 +1919,16 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         it("no search results with multiple locations and without matching rome code", async () => {
           expectToEqual(
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                sortedBy: "date",
-                distanceKm: 100,
-                ...centerOfSaintesGeoPosition,
-                romeCode: groomChevauxOffer.romeCode,
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {
+                  sortedBy: "date",
+                  distanceKm: 100,
+                  ...centerOfSaintesGeoPosition,
+                  romeCode: groomChevauxOffer.romeCode,
+                },
               },
-            }),
+            ),
             [],
           );
         });
@@ -1095,10 +1972,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
-              maxResults: 2,
-            });
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
+                maxResults: 2,
+              },
+            );
 
           // Assert
           expectToEqual(
@@ -1149,10 +2028,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: { ...cartographeSearchMade, sortedBy: "date" },
-              maxResults: 2,
-            });
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: { ...cartographeSearchMade, sortedBy: "date" },
+                maxResults: 2,
+              },
+            );
 
           // Assert
           expectToEqual(
@@ -1225,9 +2106,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
           // Act
           const searchResult =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: { ...cartographeSearchMade, sortedBy: "score" },
-            });
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: { ...cartographeSearchMade, sortedBy: "score" },
+              },
+            );
           // Assert
           expectToEqual(
             searchResult.map(({ siret }) => siret),
@@ -1285,16 +2168,18 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Act
         const searchResult =
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: {
-              ...cartographeSearchMade,
-              sortedBy: "date",
-              appellationCodes: [
-                cartographeImmersionOffer.appellationCode,
-                analysteEnGeomatiqueImmersionOffer.appellationCode,
-              ],
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                ...cartographeSearchMade,
+                sortedBy: "date",
+                appellationCodes: [
+                  cartographeImmersionOffer.appellationCode,
+                  analysteEnGeomatiqueImmersionOffer.appellationCode,
+                ],
+              },
             },
-          });
+          );
 
         // Assert
         expectToEqual(
@@ -1347,18 +2232,20 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         const searchResults =
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: {
-              ...aggregateWithOptionalValues.establishment.locations[0]
-                .position,
-              appellationCodes: [
-                aggregateWithOptionalValues.offers[0].appellationCode,
-              ],
-              distanceKm: 0,
-              sortedBy: "date",
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                ...aggregateWithOptionalValues.establishment.locations[0]
+                  .position,
+                appellationCodes: [
+                  aggregateWithOptionalValues.offers[0].appellationCode,
+                ],
+                distanceKm: 0,
+                sortedBy: "date",
+              },
+              maxResults: 2,
             },
-            maxResults: 2,
-          });
+          );
 
         expectToEqual(
           searchResults.map(
@@ -1405,11 +2292,13 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Act
         const searchResults: SearchResultDto[] =
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: {
-              sortedBy: "date",
+          await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+            {
+              searchMade: {
+                sortedBy: "date",
+              },
             },
-          });
+          );
         const readableResults = searchResults.map(toReadableSearchResult);
 
         // Assert
@@ -1420,7 +2309,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw on a search made with sortedBy distance and no geo params are provided", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
               },
@@ -1431,7 +2320,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if only one of the geo params is provided (lat/lon/distanceKm)", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 45,
@@ -1443,7 +2332,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if all geo params value is 0 and sorted by distance", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
@@ -1458,7 +2347,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if all geo params value is 0 but distanceKm > 0 and sorted by distance", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
@@ -1473,7 +2362,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if lat / lon are 0 but distanceKm is provided and not 0 and sorted by distance", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
@@ -1487,7 +2376,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("should throw if one of the geo params value is 0", async () => {
           // Assert
           await expectPromiseToFailWithError(
-            pgEstablishmentAggregateRepository.searchImmersionResults({
+            pgEstablishmentAggregateRepository.legacySearchImmersionResults({
               searchMade: {
                 sortedBy: "distance",
                 lat: 0,
@@ -2702,224 +3591,3 @@ const toReadableSearchResult = ({
   rome,
   distance_m,
 });
-
-const centerOfSaintesGeoPosition: GeoPositionDto = {
-  lat: 45.7461575,
-  lon: -0.728166,
-};
-
-const bassompierreSaintesLocation: Location = {
-  id: "22222222-ee70-4c90-b3f4-668d492f7395",
-  address: {
-    city: "Saintes",
-    postcode: "17100",
-    streetNumberAndAddress: "8 Place bassompierre",
-    departmentCode: "17",
-  },
-  position: {
-    lat: 45.7424192,
-    lon: -0.6293045,
-  },
-};
-
-const portHubleChaniersLocation: Location = {
-  id: "22222222-ee70-4c90-b3f4-668d492f7396",
-  address: {
-    city: "Chaniers",
-    postcode: "17610",
-    streetNumberAndAddress: "Le Port Hublé, 2 Chem. des Métrelles",
-    departmentCode: "17",
-  },
-  position: {
-    lat: 45.7285766,
-    lon: -0.5878595,
-  },
-};
-
-const tourDeLaChaineLaRochelleLocation: Location = {
-  id: "33333333-ee70-4c90-b3f4-668d492f7354",
-  address: {
-    streetNumberAndAddress: "Tour de la chaîne",
-    postcode: "17000",
-    city: "La Rochelle",
-    departmentCode: "17",
-  },
-  position: {
-    lat: 46.1556411,
-    lon: -1.153885,
-  },
-};
-
-const veauxLocation: Location = {
-  id: "33333333-ee70-4c90-b3f4-668d492f7395",
-  address: rueJacquardDto,
-  position: {
-    lat: 45.7636093,
-    lon: 4.9209047,
-  },
-};
-
-const locationOfSearchPosition = new LocationBuilder()
-  .withId(uuid())
-  .withPosition({ lat: 49, lon: 6 })
-  .build();
-const locationOfCloseSearchPosition = new LocationBuilder()
-  .withId(uuid())
-  .withPosition({ lat: 49.001, lon: 6.001 })
-  .build();
-const locationOfFarFromSearchedPosition = new LocationBuilder()
-  .withId(uuid())
-  .withPosition({ lat: 32, lon: 89 })
-  .build();
-
-const searchMadeDistanceWithoutRome: SearchMade = {
-  ...locationOfSearchPosition.position,
-  distanceKm: 30,
-  sortedBy: "distance",
-};
-const cartographeSearchMade: SearchMade = {
-  ...searchMadeDistanceWithoutRome,
-  appellationCodes: [cartographeImmersionOffer.appellationCode],
-};
-
-const establishmentWithOfferA1101_AtPosition =
-  new EstablishmentAggregateBuilder()
-    .withEstablishmentSiret("00000000000001")
-    .withLocations([locationOfSearchPosition])
-    .withOffers([offer_A1101_11987])
-    .withUserRights([osefUserRight])
-    .build();
-
-const establishmentWithOfferA1101_close = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000002")
-  .withLocations([locationOfCloseSearchPosition])
-  .withOffers([offer_A1101_11987])
-  .withUserRights([osefUserRight])
-  .build();
-
-const establishmentWithOfferA1101_far = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000003")
-  .withLocations([locationOfFarFromSearchedPosition])
-  .withOffers([offer_A1101_11987])
-  .withUserRights([osefUserRight])
-  .build();
-
-const searchableByAllEstablishment = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000010")
-  .withSearchableBy({ jobSeekers: true, students: true })
-  .withOffers([cartographeImmersionOffer])
-  .withLocations([
-    new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
-  ])
-  .withUserRights([osefUserRight])
-  .build();
-const searchableByStudentsEstablishment = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000011")
-  .withSearchableBy({ jobSeekers: false, students: true })
-  .withOffers([cartographeImmersionOffer])
-  .withLocations([
-    new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
-  ])
-  .withUserRights([osefUserRight])
-  .build();
-const searchableByJobSeekerEstablishment = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000012")
-  .withSearchableBy({ jobSeekers: true, students: false })
-  .withOffers([cartographeImmersionOffer])
-  .withLocations([
-    new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
-  ])
-  .withUserRights([osefUserRight])
-  .build();
-
-const establishmentCuvisteAtSaintesAndVeaux =
-  new EstablishmentAggregateBuilder()
-    .withEstablishmentSiret("78000403200029")
-    .withOffers([
-      new OfferEntityBuilder(cuvisteOffer).withCreatedAt(new Date()).build(),
-    ])
-    .withLocations([
-      bassompierreSaintesLocation,
-      veauxLocation, // outside geographical area
-    ])
-    .withUserRights([osefUserRight])
-    .build();
-
-const establishmentCuvisteAtChaniersAndLaRochelle =
-  new EstablishmentAggregateBuilder()
-    .withEstablishmentSiret("78000403200030")
-    .withOffers([
-      new OfferEntityBuilder(cuvisteOffer)
-        .withCreatedAt(subDays(new Date(), 1))
-        .build(),
-    ])
-    .withLocations([
-      portHubleChaniersLocation,
-      tourDeLaChaineLaRochelleLocation, // outside geographical area (52km)
-    ])
-    .withUserRights([osefUserRight])
-    .build();
-
-const establishment0145Z_A = new EstablishmentAggregateBuilder()
-  .withUserRights([osefUserRight])
-  .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000020")
-  .withLocations([
-    {
-      ...bassompierreSaintesLocation,
-      id: uuid(),
-    },
-  ])
-  .withEstablishmentNaf({
-    code: "0145Z",
-    nomenclature: "Élevage d'ovins et de caprins",
-  })
-  .build();
-const establishment0145Z_B = new EstablishmentAggregateBuilder()
-  .withUserRights([osefUserRight])
-  .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000021")
-  .withLocations([
-    {
-      ...portHubleChaniersLocation,
-      id: uuid(),
-    },
-  ])
-  .withEstablishmentNaf({
-    code: "0145Z",
-    nomenclature: "Élevage d'ovins et de caprins",
-  })
-  .build();
-
-const establishment4741Z = new EstablishmentAggregateBuilder()
-  .withUserRights([osefUserRight])
-  .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000022")
-  .withLocations([
-    {
-      ...veauxLocation,
-      id: uuid(),
-    },
-  ])
-  .withEstablishmentNaf({
-    code: "4741Z",
-    nomenclature:
-      "Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé",
-  })
-  .build();
-
-const establishment9900Z = new EstablishmentAggregateBuilder()
-  .withUserRights([osefUserRight])
-  .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000023")
-  .withLocations([
-    {
-      ...tourDeLaChaineLaRochelleLocation,
-      id: uuid(),
-    },
-  ])
-  .withEstablishmentNaf({
-    code: "9900Z",
-    nomenclature: "Activités des organisations et organismes extraterritoriaux",
-  })
-  .build();
