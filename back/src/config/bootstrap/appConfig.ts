@@ -445,6 +445,12 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("DATABASE_URL");
   }
 
+  public get pgTransactionIdleTimeoutMs() {
+    return Number.parseInt(
+      this.#throwIfNotDefinedOrDefault("PG_TRANSACTION_IDLE_TIMEOUT_MS", "0"),
+    );
+  }
+
   public get franceTravailAccessTokenConfig(): FTAccessTokenConfig {
     return {
       immersionFacileBaseUrl: this.immersionFacileBaseUrl,
