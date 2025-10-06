@@ -388,3 +388,35 @@ export const establishmentWithFitForDisabledWorkersFalse =
     .withFitForDisabledWorkers(false)
     .withUserRights([osefUserRight])
     .build();
+
+export const establishmentWithFitForDisabledWorkersTrue =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000025")
+    .withFitForDisabledWorkers(true)
+    .withUserRights([osefUserRight])
+    .withLocations([
+      {
+        ...locationOfCloseSearchPosition,
+        id: uuid(),
+      },
+    ])
+    .build();
+
+export const closedEstablishment = new EstablishmentAggregateBuilder()
+  .withOffers([cartographeImmersionOffer])
+  .withLocations([
+    {
+      ...locationOfCloseSearchPosition,
+      id: uuid(),
+    },
+  ])
+  .withEstablishmentOpen(false)
+  .withUserRights([osefUserRight])
+  .build();
+
+export const randomizeTestEstablishmentAggregates = (
+  a: EstablishmentAggregate,
+  b: EstablishmentAggregate,
+) =>
+  a.establishment.updatedAt.getTime() * Math.random() -
+  b.establishment.updatedAt.getTime() * Math.random();
