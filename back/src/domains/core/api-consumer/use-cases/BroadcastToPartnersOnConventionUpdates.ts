@@ -11,7 +11,6 @@ import {
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
-import { isConventionInScope } from "../../../convention/entities/Convention";
 import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../UseCase";
@@ -82,16 +81,27 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     };
 
     const apiConsumers = pipeWithValue(
-      await uow.apiConsumerRepository.getAll(),
+      await uow.apiConsumerRepository.getByFilters({
+        agencyIds: [
+          conventionRead.agencyId,
+          ...(conventionRead.agencyRefersTo
+            ? [conventionRead.agencyRefersTo.id]
+            : []),
+        ],
+        agencyKinds: [
+          conventionRead.agencyKind,
+          ...(conventionRead.agencyRefersTo
+            ? [conventionRead.agencyRefersTo.kind]
+            : []),
+        ],
+      }),
       filter<ApiConsumer>(
         (apiConsumer) =>
           isApiConsumerAllowed({
             apiConsumer,
             rightName: "convention",
             consumerKind: "SUBSCRIPTION",
-          }) &&
-          isConventionInScope(conventionRead, apiConsumer) &&
-          isConsumerSubscribedToConventionUpdated(apiConsumer),
+          }) && isConsumerSubscribedToConventionUpdated(apiConsumer),
       ),
     );
 
