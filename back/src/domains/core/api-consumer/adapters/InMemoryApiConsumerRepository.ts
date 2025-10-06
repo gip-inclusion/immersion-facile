@@ -1,5 +1,5 @@
 import { addYears, subYears } from "date-fns";
-import { values } from "ramda";
+import { intersection, values } from "ramda";
 import type {
   ApiConsumer,
   ApiConsumerId,
@@ -8,7 +8,10 @@ import type {
   Flavor,
 } from "shared";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
-import type { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
+import type {
+  ApiConsumerRepository,
+  GetApiConsumerFilters,
+} from "../ports/ApiConsumerRepository";
 
 const uuidGenerator = new UuidV4Generator();
 
@@ -157,6 +160,22 @@ export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
 
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
     return this.#consumers[id];
+  }
+
+  public async getByFilters(
+    filters: GetApiConsumerFilters,
+  ): Promise<ApiConsumer[]> {
+    return values(this.#consumers).filter(
+      (consumer) =>
+        intersection(
+          filters.agencyIds ?? [],
+          consumer.rights.convention.scope.agencyIds ?? [],
+        ).length > 0 ||
+        intersection(
+          filters.agencyKinds ?? [],
+          consumer.rights.convention.scope.agencyKinds ?? [],
+        ).length > 0,
+    );
   }
 
   public async save(apiConsumer: ApiConsumer): Promise<void> {

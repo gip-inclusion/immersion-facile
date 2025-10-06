@@ -132,31 +132,30 @@ async function makeAgencyDashboards({
   timeGateway: TimeGateway;
   user: UserWithRights;
 }): Promise<AgencyDashboards> {
-  const apiConsumers = await uow.apiConsumerRepository.getAll();
-
   const agencyIdsWithEnoughPrivileges = user.agencyRights
     .filter(({ roles }) => agencyRoleIsNotToReview(roles))
     .map(({ agency }) => agency.id);
-
-  const isSynchronisationEnableForAgency = user.agencyRights.some(
-    (agencyRight) =>
-      agencyRight.agency.kind === "pole-emploi" ||
-      apiConsumers.some(
-        (apiconsumer) =>
-          apiconsumer.rights.convention.scope.agencyIds?.includes(
-            agencyRight.agency.id,
-          ) ||
-          apiconsumer.rights.convention.scope.agencyKinds?.includes(
-            agencyRight.agency.kind,
-          ),
-      ),
-  );
 
   const agencyKinds = uniq(
     user.agencyRights
       .filter(({ roles }) => agencyRoleIsNotToReview(roles))
       .map(({ agency }) => agency.kind),
   );
+  const agencyIds = uniq(
+    user.agencyRights
+      .filter(({ roles }) => agencyRoleIsNotToReview(roles))
+      .map(({ agency }) => agency.id),
+  );
+
+  const isSynchronisationEnableForAgency =
+    agencyKinds.includes("pole-emploi") ||
+    (
+      await uow.apiConsumerRepository.getByFilters({
+        agencyIds,
+        agencyKinds,
+      })
+    ).length > 0;
+
   const agencyKind = agencyKinds.length === 1 ? agencyKinds[0] : undefined;
 
   return {
