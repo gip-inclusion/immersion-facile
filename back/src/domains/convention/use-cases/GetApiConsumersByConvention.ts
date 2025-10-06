@@ -1,7 +1,5 @@
 import {
   type AgencyKind,
-  type AgencyWithUsersRights,
-  type ApiConsumer,
   type ApiConsumerName,
   type ConnectedUser,
   errors,
@@ -52,12 +50,13 @@ export const makeGetApiConsumersByConvention = useCaseBuilder(
     )
       return [];
 
-    const apiConsumers = await uow.apiConsumerRepository.getAll();
-
-    const conventionApiConsurmers = apiConsumers.filter(
-      (apiConsumer) =>
-        apiConsumer.rights.convention.subscriptions.length !== 0 &&
-        isConventionInScope(apiConsumer, agency),
+    const conventionApiConsurmers = (
+      await uow.apiConsumerRepository.getByFilters({
+        agencyIds: [agency.id],
+        agencyKinds: [agency.kind],
+      })
+    ).filter(
+      (apiConsumer) => apiConsumer.rights.convention.subscriptions.length !== 0,
     );
 
     const agencyKindsAllowedToBroadcastToFT: AgencyKind[] = [
@@ -72,15 +71,3 @@ export const makeGetApiConsumersByConvention = useCaseBuilder(
         : []),
     ];
   });
-
-const isConventionInScope = (
-  apiConsumer: ApiConsumer,
-  conventionAgency: AgencyWithUsersRights,
-) => {
-  return (
-    apiConsumer.rights.convention.scope.agencyKinds?.includes(
-      conventionAgency.kind,
-    ) ||
-    apiConsumer.rights.convention.scope.agencyIds?.includes(conventionAgency.id)
-  );
-};
