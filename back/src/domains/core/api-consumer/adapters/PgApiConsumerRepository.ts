@@ -1,4 +1,4 @@
-import { sql } from "kysely";
+import { type SelectQueryBuilder, sql } from "kysely";
 import type { InsertObjectOrList } from "kysely/dist/cjs/parser/insert-values-parser";
 import { keys, mapObjIndexed } from "ramda";
 import {
@@ -20,7 +20,10 @@ import {
 } from "../../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";
-import type { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
+import type {
+  ApiConsumerRepository,
+  GetApiConsumerFilters,
+} from "../ports/ApiConsumerRepository";
 
 const logger = createLogger(__filename);
 
@@ -48,6 +51,71 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       .executeTakeFirst();
 
     return result && this.#rawPgToApiConsumer(result.raw_api_consumer);
+  }
+
+  public async getByFilters(
+    filters: GetApiConsumerFilters,
+  ): Promise<ApiConsumer[]> {
+    const applyFilters = <QB extends SelectQueryBuilder<any, any, any>>(
+      b: QB,
+    ) => {
+      const { agencyIds, agencyKinds } = filters;
+      const hasNoFilters =
+        (!agencyIds || agencyIds.length === 0) &&
+        (!agencyKinds || agencyKinds.length === 0);
+      const shouldApplyAgencyIdsFilters =
+        agencyIds &&
+        agencyIds.length > 0 &&
+        (!agencyKinds || agencyKinds.length === 0);
+      const shouldApplyAgencyKindsFilters =
+        agencyKinds &&
+        agencyKinds.length > 0 &&
+        (!agencyIds || agencyIds.length === 0);
+
+      if (hasNoFilters) {
+        return b;
+      }
+
+      if (shouldApplyAgencyIdsFilters) {
+        return b.where(
+          sql`c.rights #> '{convention,scope,agencyIds}'`,
+          "?|",
+          sql`${sql.val(agencyIds)}::text[]`,
+        );
+      }
+
+      if (shouldApplyAgencyKindsFilters) {
+        return b.where(
+          sql`c.rights #> '{convention,scope,agencyKinds}'`,
+          "?|",
+          sql`${sql.val(agencyKinds)}::text[]`,
+        );
+      }
+
+      // apply both filters
+      return b.where((eb) =>
+        eb.or([
+          eb(
+            sql`c.rights #> '{convention,scope,agencyIds}'`,
+            "?|",
+            sql`${sql.val(agencyIds)}::text[]`,
+          ),
+          eb(
+            sql`c.rights #> '{convention,scope,agencyKinds}'`,
+            "?|",
+            sql`${sql.val(agencyKinds)}::text[]`,
+          ),
+        ]),
+      );
+    };
+
+    const results = await applyFilters(
+      this.#pgApiConsumerQueryBuild(),
+    ).execute();
+
+    return results.map((result) =>
+      this.#rawPgToApiConsumer(result.raw_api_consumer),
+    );
   }
 
   public async save(apiConsumer: ApiConsumer): Promise<void> {

@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import {
   type ApiConsumer,
+  expectArraysToEqualIgnoringOrder,
   expectToEqual,
   type WebhookSubscription,
 } from "shared";
@@ -115,6 +116,131 @@ describe("PgApiConsumerRepository", () => {
       await apiConsumerRepository.getById(apiConsumer.id),
       updatedApiConsumer,
     );
+  });
+
+  describe("getByFilters", () => {
+    const agencyId = new UuidV4Generator().new();
+    const apiConsumerWithAgencyIdRight: ApiConsumer = {
+      ...apiConsumer,
+      id: new UuidV4Generator().new(),
+      name: "passeEmploiWithAgencyIdRight",
+      rights: {
+        ...apiConsumer.rights,
+        convention: {
+          kinds: ["READ"],
+          scope: {
+            agencyIds: [agencyId],
+          },
+          subscriptions: [],
+        },
+      },
+    };
+    const apiConsumerWithAgencyKindRight: ApiConsumer = {
+      ...apiConsumer,
+      id: new UuidV4Generator().new(),
+      name: "passeEmploiWithAgencyIdRight",
+      rights: {
+        ...apiConsumer.rights,
+        convention: {
+          kinds: ["READ"],
+          scope: {
+            agencyKinds: ["cci"],
+          },
+          subscriptions: [],
+        },
+      },
+    };
+
+    beforeEach(async () => {
+      await apiConsumerRepository.save(apiConsumer);
+      await apiConsumerRepository.save(apiConsumerWithAgencyIdRight);
+      await apiConsumerRepository.save(apiConsumerWithAgencyKindRight);
+    });
+
+    it("returns all api consumers when no filters are provided", async () => {
+      await apiConsumerRepository.save(apiConsumer);
+
+      expectArraysToEqualIgnoringOrder(
+        await apiConsumerRepository.getByFilters({}),
+        [
+          apiConsumerWithAgencyKindRight,
+          apiConsumerWithAgencyIdRight,
+          apiConsumer,
+        ],
+      );
+    });
+
+    describe("with agencyIds filters", () => {
+      beforeEach(async () => {
+        await apiConsumerRepository.save(apiConsumer);
+        await apiConsumerRepository.save(apiConsumerWithAgencyIdRight);
+      });
+
+      it("returns api consumers matching agencyIds filter", async () => {
+        expectToEqual(
+          await apiConsumerRepository.getByFilters({
+            agencyIds: [agencyId],
+          }),
+          [apiConsumerWithAgencyIdRight],
+        );
+      });
+
+      it("returns empty array when no api consumers matching agencyIds filter", async () => {
+        expectToEqual(
+          await apiConsumerRepository.getByFilters({
+            agencyIds: [new UuidV4Generator().new()],
+          }),
+          [],
+        );
+      });
+    });
+
+    describe("with agencyKinds filters", () => {
+      beforeEach(async () => {
+        await apiConsumerRepository.save(apiConsumer);
+        await apiConsumerRepository.save(apiConsumerWithAgencyKindRight);
+      });
+
+      it("returns api consumers matching agencyKinds filter", async () => {
+        expectToEqual(
+          await apiConsumerRepository.getByFilters({
+            agencyKinds: ["cci"],
+          }),
+          [apiConsumerWithAgencyKindRight],
+        );
+      });
+
+      it("returns empty array when no api consumers matching agencyKinds filter", async () => {
+        expectToEqual(
+          await apiConsumerRepository.getByFilters({
+            agencyKinds: ["pole-emploi"],
+          }),
+          [],
+        );
+      });
+    });
+
+    describe("with multiple filters", () => {
+      it("returns api consumers matching agencyIds and agencyKinds filters", async () => {
+        expectArraysToEqualIgnoringOrder(
+          await apiConsumerRepository.getByFilters({
+            agencyIds: [agencyId],
+            agencyKinds: ["cci"],
+          }),
+          [apiConsumerWithAgencyIdRight, apiConsumerWithAgencyKindRight],
+        );
+      });
+
+      it("returns empty array when no api consumers matching agencyIds filter", async () => {
+        expectToEqual(
+          await apiConsumerRepository.getByFilters({
+            agencyIds: [new UuidV4Generator().new()],
+            agencyKinds: ["pole-emploi"],
+          }),
+          [],
+        );
+      });
+    });
   });
 
   describe("getAll", () => {
