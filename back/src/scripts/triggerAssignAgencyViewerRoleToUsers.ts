@@ -1,6 +1,6 @@
 import type { UserId } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { AssignAgencyViewerRole } from "../domains/agency/use-cases/AssignAgencyViewerRoleToUsers";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { createLogger } from "../utils/logger";
@@ -9,10 +9,14 @@ import { handleCRONScript } from "./handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const TARGET_USER_IDS: UserId[] = [
-  "4551456d-16ae-4666-a715-48571e7463a2",
-  "ecfbb271-98a4-4734-8f0b-abaaefc508e6",
-];
+const TARGET_USER_IDS: UserId[] =
+  config.ftUserIdsAssociatedToAllFtAgencies &&
+  config.ftUserIdsAssociatedToAllFtAgencies.trim().length > 0
+    ? config.ftUserIdsAssociatedToAllFtAgencies
+        .split(",")
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0)
+    : [];
 
 const TARGET_AGENCY_KINDS: (
   | "pole-emploi"
@@ -21,13 +25,25 @@ const TARGET_AGENCY_KINDS: (
 )[] = ["pole-emploi", "cap-emploi", "conseil-departemental"];
 
 const executeAssignAgencyViewerRole = async () => {
+  if (TARGET_USER_IDS.length === 0) {
+    logger.warn({
+      message:
+        "No user IDs configured. Set FT_USER_IDS_ASSOCIATED_TO_ALL_FT_AGENCIES environment variable.",
+    });
+    return {
+      agenciesSuccessfullyUpdated: 0,
+      agencyUpdatesFailed: 0,
+      agenciesSkipped: 0,
+    };
+  }
+
   logger.info({
     message: "Starting agency viewer role assignment on FT users script",
   });
 
   const { uowPerformer } = createUowPerformer(
     config,
-    createGetPgPoolFn(config),
+    createMakeProductionPgPool(config),
   );
 
   const assignAgencyViewerRoleUseCase = new AssignAgencyViewerRole(
