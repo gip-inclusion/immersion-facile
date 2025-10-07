@@ -101,7 +101,8 @@ const main = async () => {
     return appellations.length;
   });
 
-  pool.end();
+  await pool.end();
+  await redisClient.disconnect();
 
   return {
     numberOfRomes,
