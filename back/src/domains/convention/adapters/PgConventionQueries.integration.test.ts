@@ -1075,7 +1075,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .buildUser();
 
     const conventionA = new ConventionDtoBuilder()
-      .withId("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+      .withId("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
       .withAgencyId(agencyId)
       .withBeneficiaryEmail("beneficiary@convention-a.com")
       .withStatus("READY_TO_SIGN")
@@ -1089,7 +1089,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     const conventionB = new ConventionDtoBuilder()
-      .withId("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+      .withId("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
       .withAgencyId(agencyId)
       .withStatus("IN_REVIEW")
       .withDateStart(new Date("2023-02-15").toISOString())
@@ -1102,7 +1102,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     const conventionC = new ConventionDtoBuilder()
-      .withId("cccccccc-cccc-cccc-cccc-cccccccccccc")
+      .withId("cccccccc-cccc-4ccc-8ccc-cccccccccccc")
       .withAgencyId(agencyId)
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withDateStart(new Date("2023-03-15").toISOString())
@@ -1115,7 +1115,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     const conventionD = new ConventionDtoBuilder()
-      .withId("dddddddd-dddd-dddd-dddd-dddddddddddd")
+      .withId("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
       .withAgencyId(differentAgencyId)
       .withStatus("READY_TO_SIGN")
       .withDateStart(new Date("2023-04-15").toISOString())
@@ -1126,6 +1126,26 @@ describe("Pg implementation of ConventionQueries", () => {
       .withBusinessName("Business D")
       .withUpdatedAt(anyConventionUpdatedAt)
       .build();
+
+    const agencyFields = {
+      agencyName: agency.name,
+      agencyDepartment: agency.address.departmentCode,
+      agencyKind: agency.kind,
+      agencySiret: agency.agencySiret,
+      agencyCounsellorEmails: [],
+      agencyValidatorEmails: [singleAgencyUser.email, validator.email],
+      agencyRefersTo: undefined,
+    };
+
+    const differentAgencyFields = {
+      agencyName: differentAgency.name,
+      agencyDepartment: differentAgency.address.departmentCode,
+      agencyKind: differentAgency.kind,
+      agencySiret: differentAgency.agencySiret,
+      agencyCounsellorEmails: [],
+      agencyValidatorEmails: [validator.email],
+      agencyRefersTo: undefined,
+    };
 
     beforeEach(async () => {
       await new PgUserRepository(db).save(singleAgencyUser);
@@ -1172,7 +1192,10 @@ describe("Pg implementation of ConventionQueries", () => {
         numberPerPage: 2,
         totalRecords: 4,
       });
-      expectToEqual(resultPage1.data, [conventionD, conventionC]);
+      expectToEqual(resultPage1.data, [
+        { ...conventionD, ...differentAgencyFields },
+        { ...conventionC, ...agencyFields },
+      ]);
 
       const resultPage2 =
         await conventionQueries.getPaginatedConventionsForAgencyUser({
@@ -1185,7 +1208,10 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(resultPage2.data.length).toBe(2);
-      expectToEqual(resultPage2.data, [conventionB, conventionA]);
+      expectToEqual(resultPage2.data, [
+        { ...conventionB, ...agencyFields },
+        { ...conventionA, ...agencyFields },
+      ]);
       expectToEqual(resultPage2.pagination, {
         currentPage: 2,
         totalPages: 2,
@@ -1207,7 +1233,10 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(2);
-      expectToEqual(result.data, [conventionD, conventionA]);
+      expectToEqual(result.data, [
+        { ...conventionD, ...differentAgencyFields },
+        { ...conventionA, ...agencyFields },
+      ]);
     });
 
     it("should filter conventions by beneficiary name", async () => {
@@ -1238,7 +1267,7 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [conventionB]);
+      expectToEqual(result.data, [{ ...conventionB, ...agencyFields }]);
     });
 
     it("should filter conventions by date range", async () => {
@@ -1259,7 +1288,10 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(2);
-      expectToEqual(result.data, [conventionC, conventionB]);
+      expectToEqual(result.data, [
+        { ...conventionC, ...agencyFields },
+        { ...conventionB, ...agencyFields },
+      ]);
     });
 
     it("should sort conventions by dateStart", async () => {
@@ -1275,10 +1307,10 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(4);
       expectToEqual(result.data, [
-        conventionA,
-        conventionB,
-        conventionC,
-        conventionD,
+        { ...conventionA, ...agencyFields },
+        { ...conventionB, ...agencyFields },
+        { ...conventionC, ...agencyFields },
+        { ...conventionD, ...differentAgencyFields },
       ]);
     });
 
@@ -1294,7 +1326,10 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(2);
-      expectToEqual(result.data, [conventionD, conventionC]);
+      expectToEqual(result.data, [
+        { ...conventionD, ...differentAgencyFields },
+        { ...conventionC, ...agencyFields },
+      ]);
     });
 
     it("should filter by multiple criteria", async () => {
@@ -1317,7 +1352,7 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [conventionA]);
+      expectToEqual(result.data, [{ ...conventionA, ...agencyFields }]);
     });
 
     it("should only return conventions from agencies the user belongs to", async () => {
@@ -1331,7 +1366,11 @@ describe("Pg implementation of ConventionQueries", () => {
           },
         });
 
-      expectToEqual(result.data, [conventionC, conventionB, conventionA]);
+      expectToEqual(result.data, [
+        { ...conventionC, ...agencyFields },
+        { ...conventionB, ...agencyFields },
+        { ...conventionA, ...agencyFields },
+      ]);
 
       const allConventionsBelongToUsersAgency = result.data.every(
         (convention) => convention.agencyId === agencyId,

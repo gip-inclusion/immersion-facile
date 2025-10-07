@@ -68,7 +68,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
   public getConventionsForUserResult$ = new Subject<
-    DataWithPagination<ConventionDto>
+    DataWithPagination<ConventionReadDto>
   >();
   public getConventionLastBroadcastFeedbackResult$ =
     new Subject<ConventionLastBroadcastFeedbackResponse>();
@@ -220,7 +220,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public getConventionsForUser$(
     _params: FlatGetConventionsForAgencyUserParams,
     _jwt: string,
-  ): Observable<DataWithPagination<ConventionDto>> {
+  ): Observable<DataWithPagination<ConventionReadDto>> {
     return this.getConventionsForUserResult$;
   }
   public getConventionLastBroadcastFeedback$(

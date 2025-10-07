@@ -92,7 +92,7 @@ export interface ConventionGateway {
   getConventionsForUser$(
     params: FlatGetConventionsForAgencyUserParams,
     jwt: string,
-  ): Observable<DataWithPagination<ConventionDto>>;
+  ): Observable<DataWithPagination<ConventionReadDto>>;
   getConventionLastBroadcastFeedback$(
     conventionId: ConventionId,
     jwt: ConventionSupportedJwt,
