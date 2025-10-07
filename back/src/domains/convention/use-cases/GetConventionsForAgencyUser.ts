@@ -1,6 +1,6 @@
 import {
   type ConnectedUser,
-  type ConventionDto,
+  type ConventionReadDto,
   type DataWithPagination,
   type GetConventionsForAgencyUserParams,
   type GetPaginatedConventionsSortBy,
@@ -16,7 +16,7 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
   .withInput<GetConventionsForAgencyUserParams>(
     getConventionsForAgencyUserParamsSchema,
   )
-  .withOutput<DataWithPagination<ConventionDto>>()
+  .withOutput<DataWithPagination<ConventionReadDto>>()
   .withCurrentUser<ConnectedUser>()
 
   .build(async ({ inputParams, uow, currentUser }) => {

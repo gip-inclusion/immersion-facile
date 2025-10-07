@@ -149,7 +149,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public async getPaginatedConventionsForAgencyUser(
     params: GetPaginatedConventionsForAgencyUserParams,
-  ): Promise<DataWithPagination<ConventionDto>> {
+  ): Promise<DataWithPagination<ConventionReadDto>> {
     // Store the params for later inspection in tests
     this.paginatedConventionsParams.push(params);
 
@@ -162,8 +162,15 @@ export class InMemoryConventionQueries implements ConventionQueries {
     const endIndex = Math.min(startIndex + perPage, conventions.length);
     const paginatedData = conventions.slice(startIndex, endIndex);
 
+    // Transform ConventionDto to ConventionReadDto
+    const conventionsRead = await Promise.all(
+      paginatedData.map((convention) =>
+        this.#addAgencyDataToConvention(convention),
+      ),
+    );
+
     return {
-      data: paginatedData,
+      data: conventionsRead,
       pagination: {
         totalRecords: conventions.length,
         currentPage: page,

@@ -900,5 +900,5 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
     })
     .and(withSortedConventionsSchema);
 
-export const paginatedConventionsSchema =
-  createPaginatedSchema(conventionSchema);
+export const paginatedConventionReadSchema =
+  createPaginatedSchema(conventionReadSchema);
