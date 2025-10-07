@@ -56,7 +56,10 @@ const executeUsecase = async () => {
     config.maxConventionsToSyncWithPe,
   );
 
-  return resyncOldConventionsToFtUsecase.execute();
+  const result = await resyncOldConventionsToFtUsecase.execute();
+  await redisClient.disconnect();
+
+  return result;
 };
 
 handleCRONScript(
