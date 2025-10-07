@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import Bottleneck from "bottleneck";
 import type { RomeDto, SearchResultDto, SiretDto } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -37,79 +38,84 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   public async searchCompanies(
     searchCompaniesParams: SearchCompaniesParams,
   ): Promise<SearchResultDto[]> {
-    const cachedGetLbbResults = this.withCache<
-      SearchResultDto[],
-      SearchCompaniesParams
-    >({
-      logParams: {
-        partner: "laBonneBoite",
-        route: this.lbbRoute.getCompanies,
-      },
-      getCacheKey: (query) =>
-        `lbb_${query.romeCode}_${query.lat.toFixed(3)}_${query.lon.toFixed(3)}${
-          query.nafCodes ? `_${query.nafCodes.join("_")}` : ""
-        }`,
-      cb: async ({
-        lon,
-        lat,
-        romeCode,
-        nafCodes,
-      }): Promise<SearchResultDto[]> => {
-        return this.httpClient
-          .getCompanies({
-            headers: {
-              authorization: await this.#makeAutorization(),
-            },
-            queryParams: {
-              distance: MAX_DISTANCE_IN_KM,
-              longitude: lon,
-              latitude: lat,
-              page: 1,
-              page_size: MAX_PAGE_SIZE,
-              rome: [romeCode],
-              ...(nafCodes ? { naf: nafCodes } : {}),
-            },
-          })
-          .then((response) => {
-            if (response.status !== 200)
-              throw new Error(JSON.stringify(response));
-            return response.body?.items ?? [];
-          })
-          .then((results) =>
-            results
-              .map(
-                (props: LaBonneBoiteApiResultV2Props) =>
-                  new LaBonneBoiteCompanyDto(props),
-              )
-              .filter((result) => result.isCompanyRelevant())
-              .map((result) =>
-                result.toSearchResult(
-                  {
-                    romeCode: searchCompaniesParams.romeCode,
-                    romeLabel: searchCompaniesParams.romeLabel,
-                  },
-                  {
-                    lat: searchCompaniesParams.lat,
-                    lon: searchCompaniesParams.lon,
-                  },
-                ),
-              ),
-          );
-      },
-    });
+    return Sentry.startSpan(
+      { name: "LaBonneBoiteGateway.searchCompanies" },
+      async () => {
+        const cachedGetLbbResults = this.withCache<
+          SearchResultDto[],
+          SearchCompaniesParams
+        >({
+          logParams: {
+            partner: "laBonneBoite",
+            route: this.lbbRoute.getCompanies,
+          },
+          getCacheKey: (query) =>
+            `lbb_${query.romeCode}_${query.lat.toFixed(3)}_${query.lon.toFixed(3)}${
+              query.nafCodes ? `_${query.nafCodes.join("_")}` : ""
+            }`,
+          cb: async ({
+            lon,
+            lat,
+            romeCode,
+            nafCodes,
+          }): Promise<SearchResultDto[]> => {
+            return this.httpClient
+              .getCompanies({
+                headers: {
+                  authorization: await this.#makeAutorization(),
+                },
+                queryParams: {
+                  distance: MAX_DISTANCE_IN_KM,
+                  longitude: lon,
+                  latitude: lat,
+                  page: 1,
+                  page_size: MAX_PAGE_SIZE,
+                  rome: [romeCode],
+                  ...(nafCodes ? { naf: nafCodes } : {}),
+                },
+              })
+              .then((response) => {
+                if (response.status !== 200)
+                  throw new Error(JSON.stringify(response));
+                return response.body?.items ?? [];
+              })
+              .then((results) =>
+                results
+                  .map(
+                    (props: LaBonneBoiteApiResultV2Props) =>
+                      new LaBonneBoiteCompanyDto(props),
+                  )
+                  .filter((result) => result.isCompanyRelevant())
+                  .map((result) =>
+                    result.toSearchResult(
+                      {
+                        romeCode: searchCompaniesParams.romeCode,
+                        romeLabel: searchCompaniesParams.romeLabel,
+                      },
+                      {
+                        lat: searchCompaniesParams.lat,
+                        lon: searchCompaniesParams.lon,
+                      },
+                    ),
+                  ),
+              );
+          },
+        });
 
-    return this.#limiter.schedule(() =>
-      cachedGetLbbResults(searchCompaniesParams)
-        .then((results) =>
-          results.filter((result) =>
-            result.distance_m
-              ? result.distance_m <= searchCompaniesParams.distanceKm * 1000
-              : true,
-          ),
-        )
-        .catch(() => {
-          return [];
-        }),
+        return this.#limiter.schedule(() =>
+          cachedGetLbbResults(searchCompaniesParams)
+            .then((results) =>
+              results.filter((result) =>
+                result.distance_m
+                  ? result.distance_m <= searchCompaniesParams.distanceKm * 1000
+                  : true,
+              ),
+            )
+            .catch(() => {
+              return [];
+            }),
+        );
+      },
     );
   }
 
