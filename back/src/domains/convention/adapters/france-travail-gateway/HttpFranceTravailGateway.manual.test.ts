@@ -22,6 +22,8 @@ import {
 import { createFranceTravailRoutes } from "./FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "./HttpFranceTravailGateway";
 
+const config = AppConfig.createFromEnv();
+
 describe("HttpFranceTravailGateway", () => {
   const franceTravailRoutes = createFranceTravailRoutes({
     ftApiUrl: config.ftApiUrl,
@@ -41,9 +43,12 @@ describe("HttpFranceTravailGateway", () => {
         noRetries,
         franceTravailRoutes,
       );
+
       await expectPromiseToFailWithError(
         httpFranceTravailGateway.getAccessToken("api_referentielagencesv1"),
-        new Error("[FT access token]: Client authentication failed"),
+        new Error(
+          "[FranceTravailGateway.getAccessToken] : Client authentication failed",
+        ),
       );
     });
 
@@ -58,7 +63,7 @@ describe("HttpFranceTravailGateway", () => {
       );
       await expectPromiseToFailWithError(
         httpFranceTravailGateway.getAccessToken("whatever"),
-        new Error("[FT access token]: Invalid scope"),
+        new Error("[FranceTravailGateway.getAccessToken] : Invalid scope"),
       );
     });
 
@@ -331,8 +336,6 @@ describe("HttpFranceTravailGateway", () => {
     expect(response.status).toBe(200);
   });
 });
-
-const config = AppConfig.createFromEnv();
 
 const ftConvention: FranceTravailConvention = {
   activitesObservees: "Tenir une conversation client",

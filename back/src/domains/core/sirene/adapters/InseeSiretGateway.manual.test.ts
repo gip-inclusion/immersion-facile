@@ -33,21 +33,6 @@ describe("InseeSiretGateway", () => {
       createAxiosSharedClient(
         inseeExternalRoutes,
         makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
-        {
-          onResponseSideEffect: ({ response, input }) =>
-            // biome-ignore lint/suspicious/noConsole: debug purpose
-            console.info(
-              JSON.stringify(
-                {
-                  input: input,
-                  responseStatus: response.status,
-                  responseBody: response.body,
-                },
-                null,
-                2,
-              ),
-            ),
-        },
       ),
       new RealTimeGateway(),
       noRetries,

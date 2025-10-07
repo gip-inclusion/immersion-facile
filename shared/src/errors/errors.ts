@@ -84,7 +84,7 @@ export const errors = {
     }: {
       serviceName: string;
       message: string;
-    }) => `[${serviceName}] : ${message}`,
+    }) => new Error(`[${serviceName}] : ${message}`),
   },
   event: {
     saveNewPublicationFailed: (eventId: string) =>
