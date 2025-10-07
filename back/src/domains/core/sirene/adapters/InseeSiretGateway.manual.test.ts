@@ -1,4 +1,5 @@
 import { subMonths } from "date-fns";
+import type { RedisClientType } from "redis";
 import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -6,8 +7,10 @@ import {
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
-import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
+import { makeRedisWithCache } from "../../caching-gateway/adapters/makeRedisWithCache";
+import type { WithCache } from "../../caching-gateway/port/WithCache";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import { InseeSiretGateway } from "./InseeSiretGateway";
@@ -25,9 +28,23 @@ import { inseeExternalRoutes } from "./InseeSiretGateway.routes";
 // - SIRENE_INSEE_PASSWORD
 describe("InseeSiretGateway", () => {
   let siretGateway: InseeSiretGateway;
+  const config = AppConfig.createFromEnv();
+  let redisClient: RedisClientType<any, any, any>;
+  let withCache: WithCache;
+
+  beforeAll(async () => {
+    redisClient = await makeConnectedRedisClient(config);
+    withCache = makeRedisWithCache({
+      defaultCacheDurationInHours: 1,
+      redisClient,
+    });
+  });
+
+  afterAll(async () => {
+    await redisClient.disconnect();
+  });
 
   beforeEach(() => {
-    const config = AppConfig.createFromEnv();
     siretGateway = new InseeSiretGateway(
       config.inseeHttpConfig,
       createAxiosSharedClient(
@@ -36,7 +53,7 @@ describe("InseeSiretGateway", () => {
       ),
       new RealTimeGateway(),
       noRetries,
-      withNoCache,
+      withCache,
     );
   });
 

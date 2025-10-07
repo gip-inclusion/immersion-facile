@@ -1,3 +1,4 @@
+import type { RedisClientType } from "redis";
 import {
   expectToEqual,
   type GeoPositionDto,
@@ -6,10 +7,13 @@ import {
 } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
 import { createFtFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
+import { makeRedisWithCache } from "../../../core/caching-gateway/adapters/makeRedisWithCache";
 import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
+import type { WithCache } from "../../../core/caching-gateway/port/WithCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import type { SearchCompaniesParams } from "../../ports/LaBonneBoiteGateway";
 import { HttpLaBonneBoiteGateway } from "./HttpLaBonneBoiteGateway";
@@ -22,16 +26,30 @@ describe("HttpLaBonneBoiteGateway", () => {
     romeCode: "D1102",
     romeLabel: "Boulangerie - viennoiserie",
   };
+  const config = AppConfig.createFromEnv();
 
   let laBonneBoiteGateway: HttpLaBonneBoiteGateway;
+  let redisClient: RedisClientType<any, any, any>;
+  let withCache: WithCache;
+
+  beforeAll(async () => {
+    redisClient = await makeConnectedRedisClient(config);
+    withCache = makeRedisWithCache({
+      defaultCacheDurationInHours: 1,
+      redisClient,
+    });
+  });
+
+  afterAll(async () => {
+    await redisClient.disconnect();
+  });
 
   beforeEach(() => {
-    const config = AppConfig.createFromEnv();
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
       createFetchSharedClient(createLbbRoutes(config.ftApiUrl), fetch),
       new HttpFranceTravailGateway(
         createFtFetchSharedClient(config),
-        withNoCache,
+        withCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,

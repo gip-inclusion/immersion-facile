@@ -1,37 +1,54 @@
+import type { RedisClientType } from "redis";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
 import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
-import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
+import { makeRedisWithCache } from "../../../core/caching-gateway/adapters/makeRedisWithCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { HttpRome4Gateway, makeRome4Routes } from "./HttpRome4Gateway";
 
 describe("HttpRome4Gateway", () => {
   const config = AppConfig.createFromEnv();
+  let redisClient: RedisClientType<any, any, any>;
+  let httpRome4Gateway: HttpRome4Gateway;
 
-  const franceTravailGateway = new HttpFranceTravailGateway(
-    createFtAxiosHttpClientForTest(config),
-    withNoCache,
-    config.ftApiUrl,
-    config.franceTravailAccessTokenConfig,
-    noRetries,
-    createFranceTravailRoutes({
-      ftApiUrl: config.ftApiUrl,
-      ftEnterpriseUrl: config.ftEnterpriseUrl,
-    }),
-  );
+  beforeAll(async () => {
+    redisClient = await makeConnectedRedisClient(config);
 
-  const httpRome4Gateway = new HttpRome4Gateway(
-    createAxiosSharedClient(
-      makeRome4Routes(config.ftApiUrl),
-      makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
-    ),
-    franceTravailGateway,
-    config.franceTravailClientId,
-  );
+    const withCache = makeRedisWithCache({
+      defaultCacheDurationInHours: 1,
+      redisClient,
+    });
+
+    const franceTravailGateway = new HttpFranceTravailGateway(
+      createFtAxiosHttpClientForTest(config),
+      withCache,
+      config.ftApiUrl,
+      config.franceTravailAccessTokenConfig,
+      noRetries,
+      createFranceTravailRoutes({
+        ftApiUrl: config.ftApiUrl,
+        ftEnterpriseUrl: config.ftEnterpriseUrl,
+      }),
+    );
+
+    httpRome4Gateway = new HttpRome4Gateway(
+      createAxiosSharedClient(
+        makeRome4Routes(config.ftApiUrl),
+        makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
+      ),
+      franceTravailGateway,
+      config.franceTravailClientId,
+    );
+  });
+
+  afterAll(async () => {
+    await redisClient.disconnect();
+  });
 
   it("fetches the updated list of romes", async () => {
     const response = await httpRome4Gateway.getAllRomes();
