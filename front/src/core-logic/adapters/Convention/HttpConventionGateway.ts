@@ -365,7 +365,7 @@ export class HttpConventionGateway implements ConventionGateway {
   public getConventionsForUser$(
     params: FlatGetConventionsForAgencyUserParams,
     jwt: string,
-  ): Observable<DataWithPagination<ConventionDto>> {
+  ): Observable<DataWithPagination<ConventionReadDto>> {
     return from(
       this.authenticatedHttpClient
         .getConventionsForAgencyUser({
