@@ -1,4 +1,5 @@
 import querystring from "node:querystring";
+import * as Sentry from "@sentry/node";
 import Bottleneck from "bottleneck";
 import { type AbsoluteUrl, type ConventionId, errors } from "shared";
 import type { HttpClient, HttpResponse } from "shared-routes";
@@ -80,51 +81,56 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
   }
 
   public async getAccessToken(scope: string): Promise<AccessTokenResponse> {
-    return this.#caching.caching(scope, () =>
-      this.#retryStrategy.apply(() =>
-        this.#commonlimiter.schedule(async () => {
-          const response = await this.#httpClient.getAccessToken({
-            body: querystring.stringify({
-              grant_type: "client_credentials",
-              client_id: this.#accessTokenConfig.clientId,
-              client_secret: this.#accessTokenConfig.clientSecret,
-              scope,
+    return Sentry.startSpan(
+      { name: "FranceTravailGateway.getAccessToken" },
+      async () =>
+        this.#caching.caching(scope, () =>
+          this.#retryStrategy.apply(() =>
+            this.#commonlimiter.schedule(async () => {
+              const response = await this.#httpClient.getAccessToken({
+                body: querystring.stringify({
+                  grant_type: "client_credentials",
+                  client_id: this.#accessTokenConfig.clientId,
+                  client_secret: this.#accessTokenConfig.clientSecret,
+                  scope,
+                }),
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+              });
+
+              if (response.status === 200) return response.body;
+
+              const ftAccessTokenRelated =
+                "FranceTravailGateway.getAccessToken";
+
+              if (response.body.error.includes("invalid_client"))
+                throw errors.partner.failure({
+                  serviceName: ftAccessTokenRelated,
+                  message: "Client authentication failed",
+                });
+
+              if (response.body.error.includes("invalid_grant"))
+                throw errors.partner.failure({
+                  serviceName: ftAccessTokenRelated,
+                  message:
+                    "The provided access grant is invalid, expired, or revoked.",
+                });
+
+              if (response.body.error.includes("invalid_scope"))
+                throw errors.partner.failure({
+                  serviceName: ftAccessTokenRelated,
+                  message: "Invalid scope",
+                });
+
+              const error = new Error(JSON.stringify(response.body, null, 2));
+
+              if (isRetryable(response)) throw new RetryableError(error);
+
+              throw error;
             }),
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          });
-
-          if (response.status === 200) return response.body;
-
-          const ftAccessTokenRelated = "FranceTravailGateway.getAccessToken";
-
-          if (response.body.error.includes("invalid_client"))
-            throw errors.partner.failure({
-              serviceName: ftAccessTokenRelated,
-              message: "Client authentication failed",
-            });
-
-          if (response.body.error.includes("invalid_grant"))
-            throw errors.partner.failure({
-              serviceName: ftAccessTokenRelated,
-              message:
-                "The provided access grant is invalid, expired, or revoked.",
-            });
-
-          if (response.body.error.includes("invalid_scope"))
-            throw errors.partner.failure({
-              serviceName: ftAccessTokenRelated,
-              message: "Invalid scope",
-            });
-
-          const error = new Error(JSON.stringify(response.body, null, 2));
-
-          if (isRetryable(response)) throw new RetryableError(error);
-
-          throw error;
-        }),
-      ),
+          ),
+        ),
     );
   }
 
