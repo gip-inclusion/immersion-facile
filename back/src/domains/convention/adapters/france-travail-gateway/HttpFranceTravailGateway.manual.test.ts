@@ -7,15 +7,13 @@ import {
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
-  type AccessTokenResponse,
   AppConfig,
   type FTAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
-import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
+import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import {
   type FranceTravailBroadcastResponse,
   type FranceTravailConvention,
@@ -25,17 +23,23 @@ import { createFranceTravailRoutes } from "./FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "./HttpFranceTravailGateway";
 
 describe("HttpFranceTravailGateway", () => {
+  const franceTravailRoutes = createFranceTravailRoutes({
+    ftApiUrl: config.ftApiUrl,
+    ftEnterpriseUrl: config.ftEnterpriseUrl,
+  });
+
   describe("getAccessToken", () => {
     it("fails when client is not allowed", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        createCachingGateway(),
+        withNoCache,
         config.ftApiUrl,
         {
           ...config.franceTravailAccessTokenConfig,
           clientSecret: "wrong-secret",
         },
         noRetries,
+        franceTravailRoutes,
       );
       await expectPromiseToFailWithError(
         httpFranceTravailGateway.getAccessToken("api_referentielagencesv1"),
@@ -46,10 +50,11 @@ describe("HttpFranceTravailGateway", () => {
     it("fails when scope is not valid", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        cachingGateway,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
+        franceTravailRoutes,
       );
       await expectPromiseToFailWithError(
         httpFranceTravailGateway.getAccessToken("whatever"),
@@ -60,10 +65,11 @@ describe("HttpFranceTravailGateway", () => {
     it("gets the token when all is good", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        cachingGateway,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
+        franceTravailRoutes,
       );
       const result = await httpFranceTravailGateway.getAccessToken(
         "api_referentielagencesv1",
@@ -116,10 +122,11 @@ describe("HttpFranceTravailGateway", () => {
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        cachingGateway,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
+        franceTravailRoutes,
       );
 
       const response =
@@ -169,10 +176,11 @@ describe("HttpFranceTravailGateway", () => {
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        cachingGateway,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
+        franceTravailRoutes,
       );
 
       const response =
@@ -199,11 +207,6 @@ describe("HttpFranceTravailGateway", () => {
       },
     );
 
-    const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
-      new RealTimeGateway(),
-      "expires_in",
-    );
-
     const accessTokenConfig: FTAccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
       ftApiUrl: fakeFtApiUrl,
@@ -215,10 +218,11 @@ describe("HttpFranceTravailGateway", () => {
 
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
-      cachingGateway,
+      withNoCache,
       fakeFtApiUrl,
       accessTokenConfig,
       noRetries,
+      franceTravailRoutes,
     );
 
     const mock = new MockAdapter(axiosInstance);
@@ -255,11 +259,6 @@ describe("HttpFranceTravailGateway", () => {
       },
     );
 
-    const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
-      new RealTimeGateway(),
-      "expires_in",
-    );
-
     const accessTokenConfig: FTAccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
       ftApiUrl: fakeFtApiUrl,
@@ -271,10 +270,11 @@ describe("HttpFranceTravailGateway", () => {
 
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
-      cachingGateway,
+      withNoCache,
       fakeFtApiUrl,
       accessTokenConfig,
       noRetries,
+      franceTravailRoutes,
     );
 
     const mock = new MockAdapter(axiosWithoutValidateStatus);
@@ -307,10 +307,11 @@ describe("HttpFranceTravailGateway", () => {
   it("send convention to FT api V3", async () => {
     const httpFranceTravailGateway = new HttpFranceTravailGateway(
       createFtAxiosHttpClientForTest(config),
-      cachingGateway,
+      withNoCache,
       config.ftApiUrl,
       config.franceTravailAccessTokenConfig,
       noRetries,
+      franceTravailRoutes,
     );
 
     const response = await httpFranceTravailGateway.notifyOnConventionUpdated({
@@ -332,12 +333,6 @@ describe("HttpFranceTravailGateway", () => {
 });
 
 const config = AppConfig.createFromEnv();
-const createCachingGateway = () =>
-  new InMemoryCachingGateway<AccessTokenResponse>(
-    new RealTimeGateway(),
-    "expires_in",
-  );
-const cachingGateway = createCachingGateway();
 
 const ftConvention: FranceTravailConvention = {
   activitesObservees: "Tenir une conversation client",
