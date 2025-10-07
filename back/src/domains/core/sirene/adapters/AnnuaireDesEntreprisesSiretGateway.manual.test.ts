@@ -1,9 +1,12 @@
+import type { RedisClientType } from "redis";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
-import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
+import { makeRedisWithCache } from "../../caching-gateway/adapters/makeRedisWithCache";
+import type { WithCache } from "../../caching-gateway/port/WithCache";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import {
@@ -19,6 +22,8 @@ import { inseeExternalRoutes } from "./InseeSiretGateway.routes";
 // errors.
 describe("AnnuaireDesEntreprisesSiretGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
+  let redisClient: RedisClientType<any, any, any>;
+  let withCache: WithCache;
   const config = AppConfig.createFromEnv();
   const inseeHttpClient = createAxiosSharedClient(
     inseeExternalRoutes,
@@ -35,6 +40,19 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
     },
   );
 
+  beforeAll(async () => {
+    redisClient = await makeConnectedRedisClient(config);
+
+    withCache = makeRedisWithCache({
+      defaultCacheDurationInHours: 1,
+      redisClient,
+    });
+  });
+
+  afterAll(async () => {
+    await redisClient.disconnect();
+  });
+
   beforeEach(() => {
     siretGateway = new AnnuaireDesEntreprisesSiretGateway(
       createFetchSharedClient(annuaireDesEntreprisesSiretRoutes, fetch),
@@ -43,7 +61,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
         inseeHttpClient,
         new RealTimeGateway(),
         noRetries,
-        withNoCache,
+        withCache,
       ),
     );
   });
