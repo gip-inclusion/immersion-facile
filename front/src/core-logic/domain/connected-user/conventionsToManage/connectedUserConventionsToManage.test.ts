@@ -1,6 +1,6 @@
 import {
-  type ConventionDto,
   ConventionDtoBuilder,
+  type ConventionReadDto,
   type DataWithPagination,
   expectToEqual,
 } from "shared";
@@ -40,8 +40,22 @@ describe("ConnectedUserConventionsToManage", () => {
       connectedUserConventionsToManageSelectors.isLoading(store.getState()),
       true,
     );
-    const result: DataWithPagination<ConventionDto> = {
-      data: [new ConventionDtoBuilder().build()],
+    const agencyFields = {
+      agencyName: "Agency Name",
+      agencyDepartment: "75",
+      agencyKind: "pole-emploi" as const,
+      agencySiret: "11112222000033",
+      agencyCounsellorEmails: [],
+      agencyValidatorEmails: [],
+    };
+
+    const convention: ConventionReadDto = {
+      ...new ConventionDtoBuilder().build(),
+      ...agencyFields,
+    };
+
+    const result: DataWithPagination<ConventionReadDto> = {
+      data: [convention],
       pagination: {
         totalRecords: 10,
         currentPage: 1,
