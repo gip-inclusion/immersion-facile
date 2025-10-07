@@ -4,15 +4,15 @@ import {
   type DataWithPagination,
   expectToEqual,
 } from "shared";
-import { connectedUserConventionsSelectors } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.selectors";
-import { connectedUserConventionsSlice } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.slice";
+import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
+import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import {
   createTestStore,
   type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
-describe("ConnectedUserConventions", () => {
+describe("ConnectedUserConventionsToManage", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
@@ -22,12 +22,12 @@ describe("ConnectedUserConventions", () => {
 
   it("get the conventions for the connected user", () => {
     expectToEqual(
-      connectedUserConventionsSelectors.isLoading(store.getState()),
+      connectedUserConventionsToManageSelectors.isLoading(store.getState()),
       false,
     );
 
     store.dispatch(
-      connectedUserConventionsSlice.actions.getConventionsForConnectedUserRequested(
+      connectedUserConventionsToManageSlice.actions.getConventionsForConnectedUserRequested(
         {
           params: {},
           jwt: "my-jwt",
@@ -37,7 +37,7 @@ describe("ConnectedUserConventions", () => {
     );
 
     expectToEqual(
-      connectedUserConventionsSelectors.isLoading(store.getState()),
+      connectedUserConventionsToManageSelectors.isLoading(store.getState()),
       true,
     );
     const result: DataWithPagination<ConventionDto> = {
@@ -50,7 +50,7 @@ describe("ConnectedUserConventions", () => {
       },
     };
     dependencies.conventionGateway.getConventionsForUserResult$.next(result);
-    expectToEqual(store.getState().connectedUserConventions, {
+    expectToEqual(store.getState().connectedUserConventionsToManage, {
       isLoading: false,
       conventions: result.data,
       pagination: result.pagination,
