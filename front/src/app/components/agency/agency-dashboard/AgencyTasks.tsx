@@ -39,7 +39,9 @@ export const AgencyTasks = ({
 }) => {
   const dispatch = useDispatch();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const isLoading = useAppSelector(connectedUserConventionsToManageSelectors.isLoading);
+  const isLoading = useAppSelector(
+    connectedUserConventionsToManageSelectors.isLoading,
+  );
   const currentUserConventions = useAppSelector(
     connectedUserConventionsToManageSelectors.conventions,
   );
