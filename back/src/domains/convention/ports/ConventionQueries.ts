@@ -65,7 +65,7 @@ export interface ConventionQueries {
 
   getPaginatedConventionsForAgencyUser(
     params: GetPaginatedConventionsForAgencyUserParams,
-  ): Promise<DataWithPagination<ConventionDto>>;
+  ): Promise<DataWithPagination<ConventionReadDto>>;
 
   // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;

@@ -245,7 +245,7 @@ export class PgConventionQueries implements ConventionQueries {
     agencyUserId: UserId;
     pagination: Required<PaginationQueryParams>;
     filters?: GetPaginatedConventionsFilters;
-  }): Promise<DataWithPagination<ConventionDto>> {
+  }): Promise<DataWithPagination<ConventionReadDto>> {
     const {
       actorEmailContains,
       beneficiaryNameContains,
@@ -281,8 +281,44 @@ export class PgConventionQueries implements ConventionQueries {
 
     const totalRecords = data.at(0)?.total_count ?? 0;
 
+    if (data.length === 0) {
+      return {
+        data: [],
+        pagination: {
+          currentPage: pagination.page,
+          totalPages: 0,
+          numberPerPage: pagination.perPage,
+          totalRecords: 0,
+        },
+      };
+    }
+
+    const agencyIdsInResult = data.map(({ dto }) => dto.agencyId);
+    const uniqAgencyIds = [...new Set(agencyIdsInResult)];
+
+    const agencyFieldsByAgencyIds = await getConventionAgencyFieldsForAgencies(
+      this.transaction,
+      uniqAgencyIds,
+    );
+
+    const conventionsReadDto = data.map(({ dto }) => {
+      const agencyFields = agencyFieldsByAgencyIds[dto.agencyId];
+      if (!agencyFields)
+        throw errors.agency.notFound({ agencyId: dto.agencyId });
+
+      return validateAndParseZodSchema({
+        schemaName: "conventionReadSchema",
+        inputSchema: conventionReadSchema,
+        schemaParsingInput: {
+          ...dto,
+          ...agencyFields,
+        },
+        logger,
+      });
+    });
+
     return {
-      data: data.map(({ dto }) => dto),
+      data: conventionsReadDto,
       pagination: calculatePaginationResult({ ...pagination, totalRecords }),
     };
   }

@@ -970,10 +970,30 @@ describe("convention e2e", () => {
         },
       });
 
+      const agencyFields = {
+        agencyName: peAgency.name,
+        agencyDepartment: peAgency.address.departmentCode,
+        agencyKind: peAgency.kind,
+        agencySiret: peAgency.agencySiret,
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: [validator.email],
+        agencyRefersTo: undefined,
+      };
+
+      const conventionRead1 = {
+        ...convention1,
+        ...agencyFields,
+      };
+
+      const conventionRead2 = {
+        ...convention2,
+        ...agencyFields,
+      };
+
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          data: [convention1, convention2],
+          data: [conventionRead1, conventionRead2],
           pagination: {
             currentPage: 1,
             totalPages: 1,
