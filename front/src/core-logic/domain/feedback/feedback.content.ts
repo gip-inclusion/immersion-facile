@@ -9,6 +9,7 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
+import { conventionListSlice } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
@@ -40,6 +41,7 @@ const topics = [
   "auth-global",
   "broadcast-convention-again",
   "connected-user-conventions",
+  "connected-user-conventionList",
   "convention-action-accept-by-counsellor",
   "convention-action-accept-by-validator",
   "convention-action-cancel",
@@ -650,6 +652,14 @@ export const feedbacks: Record<
       title: "Problème lors de la récupération de vos conventions",
       message:
         "Une erreur est survenue lors de la récupération de vos conventions",
+    },
+  },
+  "connected-user-conventionList": {
+    "fetch.error": {
+      action: conventionListSlice.actions.fetchConventionListFailed,
+      title: "Problème lors de la récupération des conventions",
+      message:
+        "Une erreur est survenue lors de la récupération des conventions",
     },
   },
   unused: {},
