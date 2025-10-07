@@ -2,10 +2,7 @@ import { sql } from "kysely";
 import { map, splitEvery } from "ramda";
 import { type AppellationCode, pipeWithValue, type RomeCode } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import {
-  type AccessTokenResponse,
-  AppConfig,
-} from "../config/bootstrap/appConfig";
+import { AppConfig } from "../config/bootstrap/appConfig";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -18,9 +15,8 @@ import {
 } from "../domains/agency/adapters/ft-agencies-referential/HttpRome3Gateway";
 import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
-import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
+import { withNoCache } from "../domains/core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -32,21 +28,21 @@ const main = async () => {
   const pool = createMakeScriptPgPool(config)();
   const db = makeKyselyDb(pool, { skipErrorLog: true });
 
+  const franceTravailRoutes = createFranceTravailRoutes({
+    ftApiUrl: config.ftApiUrl,
+    ftEnterpriseUrl: config.ftEnterpriseUrl,
+  });
+
   const franceTravailGateway = new HttpFranceTravailGateway(
     createAxiosSharedClient(
-      createFranceTravailRoutes({
-        ftApiUrl: config.ftApiUrl,
-        ftEnterpriseUrl: config.ftEnterpriseUrl,
-      }),
+      franceTravailRoutes,
       makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
     ),
-    new InMemoryCachingGateway<AccessTokenResponse>(
-      new RealTimeGateway(),
-      "expires_in",
-    ),
+    withNoCache,
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,
     noRetries,
+    franceTravailRoutes,
   );
 
   const httpRome3Gateway = new HttpRome3Gateway(

@@ -1,31 +1,27 @@
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import {
-  type AccessTokenResponse,
-  AppConfig,
-} from "../../../../config/bootstrap/appConfig";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
+import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
-import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
+import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import { HttpRome4Gateway, makeRome4Routes } from "./HttpRome4Gateway";
 
 describe("HttpRome4Gateway", () => {
   const config = AppConfig.createFromEnv();
 
-  const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
-    new RealTimeGateway(),
-    "expires_in",
-  );
-
   const franceTravailGateway = new HttpFranceTravailGateway(
     createFtAxiosHttpClientForTest(config),
-    cachingGateway,
+    withNoCache,
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,
     noRetries,
+    createFranceTravailRoutes({
+      ftApiUrl: config.ftApiUrl,
+      ftEnterpriseUrl: config.ftEnterpriseUrl,
+    }),
   );
 
   const httpRome4Gateway = new HttpRome4Gateway(
