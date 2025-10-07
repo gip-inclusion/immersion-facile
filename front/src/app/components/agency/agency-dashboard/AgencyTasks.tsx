@@ -21,8 +21,8 @@ import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSe
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { connectedUserConventionsSelectors } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.selectors";
-import { connectedUserConventionsSlice } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.slice";
+import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
+import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { match, P } from "ts-pattern";
 
 const NUMBER_ITEM_TO_DISPLAY_IN_LIMITED_MODE = 3;
@@ -39,12 +39,12 @@ export const AgencyTasks = ({
 }) => {
   const dispatch = useDispatch();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const isLoading = useAppSelector(connectedUserConventionsSelectors.isLoading);
+  const isLoading = useAppSelector(connectedUserConventionsToManageSelectors.isLoading);
   const currentUserConventions = useAppSelector(
-    connectedUserConventionsSelectors.conventions,
+    connectedUserConventionsToManageSelectors.conventions,
   );
   const pagination = useAppSelector(
-    connectedUserConventionsSelectors.pagination,
+    connectedUserConventionsToManageSelectors.pagination,
   );
   const [conventionsDisplayed, setConventionsDisplayed] = useState<
     ConventionDto[]
@@ -62,7 +62,7 @@ export const AgencyTasks = ({
     (page: number) => {
       if (connectedUserJwt) {
         dispatch(
-          connectedUserConventionsSlice.actions.getConventionsForConnectedUserRequested(
+          connectedUserConventionsToManageSlice.actions.getConventionsForConnectedUserRequested(
             {
               params: {
                 ...dateStartFrom1MonthAgoToIn5Days,
