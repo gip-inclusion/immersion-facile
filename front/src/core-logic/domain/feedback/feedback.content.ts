@@ -9,7 +9,7 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
-import { connectedUserConventionsSlice } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.slice";
+import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
@@ -645,7 +645,7 @@ export const feedbacks: Record<
   "connected-user-conventions": {
     "fetch.error": {
       action:
-        connectedUserConventionsSlice.actions
+        connectedUserConventionsToManageSlice.actions
           .getConventionsForConnectedUserFailed,
       title: "Problème lors de la récupération de vos conventions",
       message:

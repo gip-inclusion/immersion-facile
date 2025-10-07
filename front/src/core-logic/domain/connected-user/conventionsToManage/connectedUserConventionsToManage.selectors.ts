@@ -1,26 +1,26 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const connectedUserConventionsState = createRootSelector(
-  (state) => state.connectedUserConventions,
+const connectedUserConventionsToManageState = createRootSelector(
+  (state) => state.connectedUserConventionsToManage,
 );
 
 const conventions = createSelector(
-  connectedUserConventionsState,
+  connectedUserConventionsToManageState,
   (state) => state.conventions,
 );
 
 const pagination = createSelector(
-  connectedUserConventionsState,
+  connectedUserConventionsToManageState,
   (state) => state.pagination,
 );
 
 const isLoading = createSelector(
-  connectedUserConventionsState,
+  connectedUserConventionsToManageState,
   (state) => state.isLoading,
 );
 
-export const connectedUserConventionsSelectors = {
+export const connectedUserConventionsToManageSelectors = {
   conventions,
   isLoading,
   pagination,
