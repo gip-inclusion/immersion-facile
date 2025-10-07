@@ -1,6 +1,9 @@
 import { addSeconds } from "date-fns";
 import isAfter from "date-fns/isAfter";
+import { createLogger } from "../../../../utils/logger";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+
+const logger = createLogger(__filename);
 
 export class InMemoryCachingGateway<T> {
   readonly #cache: Partial<Record<string, Promise<CacheEntry<T>>>> = {};
@@ -17,6 +20,10 @@ export class InMemoryCachingGateway<T> {
     onCacheMiss: () => Promise<T>,
   ): Promise<T> {
     const cache = this.#cache[value];
+    logger.info({
+      message: `Caching InMemoryCachingGateway - ${cache}`,
+      cacheKey: value,
+    });
     return cache === undefined || this.#isExpired(await cache)
       ? this.#onBadCache(value, onCacheMiss)
       : (await cache).response;

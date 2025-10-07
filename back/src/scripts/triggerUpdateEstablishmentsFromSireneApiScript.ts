@@ -1,20 +1,17 @@
 import { random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import {
-  type AccessTokenResponse,
-  AppConfig,
-} from "../config/bootstrap/appConfig";
+import { AppConfig } from "../config/bootstrap/appConfig";
 import { logPartnerResponses } from "../config/bootstrap/logPartnerResponses";
 import { partnerNames } from "../config/bootstrap/partnerNames";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";
-import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
+import { withNoCache } from "../domains/core/caching-gateway/adapters/withNoCache";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
 import { InseeSiretGateway } from "../domains/core/sirene/adapters/InseeSiretGateway";
-import { makeInseeExternalRoutes } from "../domains/core/sirene/adapters/InseeSiretGateway.routes";
+import { inseeExternalRoutes } from "../domains/core/sirene/adapters/InseeSiretGateway.routes";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UpdateEstablishmentsFromSirenApiScript } from "../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
@@ -42,7 +39,7 @@ const main = async () => {
   );
 
   const httpClient = createAxiosSharedClient(
-    makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
+    inseeExternalRoutes,
     makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
     {
       skipResponseValidation: true,
@@ -57,7 +54,7 @@ const main = async () => {
     httpClient,
     timeGateway,
     retryStrategy,
-    new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
+    withNoCache,
   );
 
   const { uowPerformer } = createUowPerformer(
