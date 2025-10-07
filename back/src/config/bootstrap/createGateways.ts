@@ -72,11 +72,7 @@ import { BrevoEstablishmentMarketingGateway } from "../../domains/marketing/adap
 import { InMemoryEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { makeAxiosInstances } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
-import {
-  type AccessTokenResponse,
-  type AppConfig,
-  makeEmailAllowListPredicate,
-} from "./appConfig";
+import { type AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 import { getWithCache } from "./cache";
 import {
   type LogInputCbOnSuccess,
@@ -161,6 +157,8 @@ export const createGateways = async (
   const { axiosWithValidateStatus: axiosWithValidateStatusForFranceTravail } =
     makeAxiosInstances(config.externalAxiosTimeoutForFranceTravail);
 
+  const { withCache, disconnectCache } = await getWithCache(config);
+
   const franceTravailGateway =
     config.franceTravailGateway === "HTTPS"
       ? new HttpFranceTravailGateway(
@@ -172,18 +170,17 @@ export const createGateways = async (
             }),
             axiosInstance: axiosWithValidateStatusForFranceTravail,
           }),
-          new InMemoryCachingGateway<AccessTokenResponse>(
-            timeGateway,
-            "expires_in",
-          ),
+          withCache,
           config.ftApiUrl,
           config.franceTravailAccessTokenConfig,
           noRetries,
+          createFranceTravailRoutes({
+            ftApiUrl: config.ftApiUrl,
+            ftEnterpriseUrl: config.ftEnterpriseUrl,
+          }),
           config.envType === "dev",
         )
       : new InMemoryFranceTravailGateway();
-
-  const { withCache, disconnectCache } = await getWithCache(config);
 
   const ftConnectGateway: FtConnectGateway =
     config.ftConnectGateway === "HTTPS"

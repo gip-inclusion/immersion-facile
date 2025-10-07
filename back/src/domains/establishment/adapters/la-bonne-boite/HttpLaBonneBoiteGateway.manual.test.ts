@@ -5,16 +5,12 @@ import {
   type RomeDto,
 } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
-import {
-  type AccessTokenResponse,
-  AppConfig,
-} from "../../../../config/bootstrap/appConfig";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { createFtFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
+import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
-import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import type { SearchCompaniesParams } from "../../ports/LaBonneBoiteGateway";
 import { HttpLaBonneBoiteGateway } from "./HttpLaBonneBoiteGateway";
 import { createLbbRoutes } from "./LaBonneBoite.routes";
@@ -35,13 +31,14 @@ describe("HttpLaBonneBoiteGateway", () => {
       createFetchSharedClient(createLbbRoutes(config.ftApiUrl), fetch),
       new HttpFranceTravailGateway(
         createFtFetchSharedClient(config),
-        new InMemoryCachingGateway<AccessTokenResponse>(
-          new RealTimeGateway(),
-          "expires_in",
-        ),
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
+        createFranceTravailRoutes({
+          ftApiUrl: config.ftApiUrl,
+          ftEnterpriseUrl: config.ftEnterpriseUrl,
+        }),
       ),
       config.franceTravailClientId,
       withNoCache,

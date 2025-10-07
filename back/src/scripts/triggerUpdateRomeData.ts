@@ -3,10 +3,8 @@ import { Pool } from "pg";
 import { map, splitEvery } from "ramda";
 import { pipeWithValue, removeDiacritics, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import {
-  type AccessTokenResponse,
-  AppConfig,
-} from "../config/bootstrap/appConfig";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { makeConnectedRedisClient } from "../config/bootstrap/cache";
 import { type KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import {
   type AppellationWithShortLabel,
@@ -15,9 +13,8 @@ import {
 } from "../domains/agency/adapters/ft-agencies-referential/HttpRome4Gateway";
 import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
-import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
+import { makeRedisWithCache } from "../domains/core/caching-gateway/adapters/makeRedisWithCache";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -29,29 +26,33 @@ const removeAccentsAndParenthesis = (str: string) =>
   removeDiacritics(str).replace(/[()[\]]/g, "");
 
 const main = async () => {
+  const redisClient = await makeConnectedRedisClient(config);
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
     connectionString: dbUrl,
   });
   const db = makeKyselyDb(pool, { skipErrorLog: true });
 
-  const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
-    new RealTimeGateway(),
-    "expires_in",
-  );
+  const withCache = makeRedisWithCache({
+    defaultCacheDurationInHours: 1,
+    redisClient,
+  });
+
+  const franceTravailRoutes = createFranceTravailRoutes({
+    ftApiUrl: config.ftApiUrl,
+    ftEnterpriseUrl: config.ftEnterpriseUrl,
+  });
 
   const franceTravailGateway = new HttpFranceTravailGateway(
     createAxiosSharedClient(
-      createFranceTravailRoutes({
-        ftApiUrl: config.ftApiUrl,
-        ftEnterpriseUrl: config.ftEnterpriseUrl,
-      }),
+      franceTravailRoutes,
       makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
     ),
-    cachingGateway,
+    withCache,
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,
     noRetries,
+    franceTravailRoutes,
   );
 
   const httpRome4Gateway = new HttpRome4Gateway(

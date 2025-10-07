@@ -17,7 +17,10 @@ import type { WithCache } from "../../caching-gateway/port/WithCache";
 import type { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { SiretGateway } from "../ports/SiretGateway";
-import { inseeExternalRoutes, type InseeExternalRoutes } from "./InseeSiretGateway.routes";
+import {
+  type InseeExternalRoutes,
+  inseeExternalRoutes,
+} from "./InseeSiretGateway.routes";
 import { getNumberEmployeesRangeByTefenCode } from "./SiretGateway.common";
 
 const logger = createLogger(__filename);
