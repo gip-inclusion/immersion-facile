@@ -1,12 +1,9 @@
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
-import {
-  type AccessTokenResponse,
-  AppConfig,
-} from "../../../../config/bootstrap/appConfig";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
-import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
+import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import {
@@ -15,7 +12,7 @@ import {
 } from "./AnnuaireDesEntreprisesSiretGateway";
 import { annuaireDesEntreprisesSiretRoutes } from "./AnnuaireDesEntreprisesSiretGateway.routes";
 import { InseeSiretGateway } from "./InseeSiretGateway";
-import { makeInseeExternalRoutes } from "./InseeSiretGateway.routes";
+import { inseeExternalRoutes } from "./InseeSiretGateway.routes";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -24,7 +21,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
   const config = AppConfig.createFromEnv();
   const inseeHttpClient = createAxiosSharedClient(
-    makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
+    inseeExternalRoutes,
     makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
     {
       skipResponseValidation: true,
@@ -46,10 +43,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
         inseeHttpClient,
         new RealTimeGateway(),
         noRetries,
-        new InMemoryCachingGateway<AccessTokenResponse>(
-          new RealTimeGateway(),
-          "expires_in",
-        ),
+        withNoCache,
       ),
     );
   });
