@@ -38,7 +38,7 @@ import type {
 
 const logger = createLogger(__filename);
 
-const MAX_AGENCIES_RETURNED = 600;
+const MAX_AGENCIES_RETURNED = 1500;
 
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
