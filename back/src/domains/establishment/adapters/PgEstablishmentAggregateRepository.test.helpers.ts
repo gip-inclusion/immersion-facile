@@ -1,7 +1,22 @@
-import type { Location } from "shared";
-import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import { subDays } from "date-fns";
+import {
+  type GeoPositionDto,
+  type Location,
+  LocationBuilder,
+  UserBuilder,
+} from "shared";
+import { v4 as uuid } from "uuid";
+import { rueJacquardDto } from "../../core/address/adapters/InMemoryAddressGateway";
+import type {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentAggregate";
 import type { OfferEntity } from "../entities/OfferEntity";
-import { OfferEntityBuilder } from "../helpers/EstablishmentBuilders";
+import type { SearchMade } from "../entities/SearchMadeEntity";
+import {
+  EstablishmentAggregateBuilder,
+  OfferEntityBuilder,
+} from "../helpers/EstablishmentBuilders";
 import type { RepositorySearchResultDto } from "../ports/EstablishmentAggregateRepository";
 
 export const makeExpectedSearchResult = ({
@@ -131,3 +146,277 @@ export const offer_A1101_20404 = new OfferEntityBuilder(offer_A1101)
   .withAppellationCode("20404")
   .withAppellationLabel("Tractoriste agricole")
   .build();
+
+export const osefUser = new UserBuilder().withId(uuid()).build();
+export const osefUserRight: EstablishmentUserRight = {
+  role: "establishment-admin",
+  job: "osef",
+  phone: "3615-OSEF",
+  userId: osefUser.id,
+  shouldReceiveDiscussionNotifications: true,
+  isMainContactByPhone: false,
+};
+
+export const centerOfSaintesGeoPosition: GeoPositionDto = {
+  lat: 45.7461575,
+  lon: -0.728166,
+};
+
+export const bassompierreSaintesLocation: Location = {
+  id: "22222222-ee70-4c90-b3f4-668d492f7395",
+  address: {
+    city: "Saintes",
+    postcode: "17100",
+    streetNumberAndAddress: "8 Place bassompierre",
+    departmentCode: "17",
+  },
+  position: {
+    lat: 45.7424192,
+    lon: -0.6293045,
+  },
+};
+
+export const portHubleChaniersLocation: Location = {
+  id: "22222222-ee70-4c90-b3f4-668d492f7396",
+  address: {
+    city: "Chaniers",
+    postcode: "17610",
+    streetNumberAndAddress: "Le Port Hublé, 2 Chem. des Métrelles",
+    departmentCode: "17",
+  },
+  position: {
+    lat: 45.7285766,
+    lon: -0.5878595,
+  },
+};
+
+export const tourDeLaChaineLaRochelleLocation: Location = {
+  id: "33333333-ee70-4c90-b3f4-668d492f7354",
+  address: {
+    streetNumberAndAddress: "Tour de la chaîne",
+    postcode: "17000",
+    city: "La Rochelle",
+    departmentCode: "17",
+  },
+  position: {
+    lat: 46.1556411,
+    lon: -1.153885,
+  },
+};
+
+export const veauxLocation: Location = {
+  id: "33333333-ee70-4c90-b3f4-668d492f7395",
+  address: rueJacquardDto,
+  position: {
+    lat: 45.7636093,
+    lon: 4.9209047,
+  },
+};
+
+export const locationOfSearchPosition = new LocationBuilder()
+  .withId(uuid())
+  .withPosition({ lat: 49, lon: 6 })
+  .build();
+export const locationOfCloseSearchPosition = new LocationBuilder()
+  .withId(uuid())
+  .withPosition({ lat: 49.001, lon: 6.001 })
+  .build();
+export const locationOutOfAnySearchedPosition = new LocationBuilder()
+  .withId(uuid())
+  .withPosition({ lat: 32, lon: 89 })
+  .build();
+
+export const searchMadeDistanceWithoutRome: SearchMade = {
+  ...locationOfSearchPosition.position,
+  distanceKm: 30,
+  sortedBy: "distance",
+};
+export const cartographeSearchMade: SearchMade = {
+  ...searchMadeDistanceWithoutRome,
+  appellationCodes: [cartographeImmersionOffer.appellationCode],
+};
+
+export const establishmentWithOfferA1101_AtPosition =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000001")
+    .withLocations([locationOfSearchPosition])
+    .withOffers([offer_A1101_11987])
+    .withUserRights([osefUserRight])
+    .build();
+
+export const establishmentWithOfferA1101_close =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000002")
+    .withLocations([locationOfCloseSearchPosition])
+    .withOffers([offer_A1101_11987])
+    .withUserRights([osefUserRight])
+    .build();
+
+export const establishmentWithOfferA1101_outOfDistanceRange =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000003")
+    .withLocations([locationOutOfAnySearchedPosition])
+    .withOffers([offer_A1101_11987])
+    .withUserRights([osefUserRight])
+    .build();
+
+export const searchableByAllEstablishment = new EstablishmentAggregateBuilder()
+  .withEstablishmentSiret("00000000000010")
+  .withSearchableBy({ jobSeekers: true, students: true })
+  .withOffers([cartographeImmersionOffer])
+  .withLocations([
+    new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
+  ])
+  .withUserRights([osefUserRight])
+  .build();
+export const searchableByStudentsEstablishment =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000011")
+    .withSearchableBy({ jobSeekers: false, students: true })
+    .withOffers([cartographeImmersionOffer])
+    .withLocations([
+      new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
+    ])
+    .withUserRights([osefUserRight])
+    .build();
+export const searchableByJobSeekerEstablishment =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000012")
+    .withSearchableBy({ jobSeekers: true, students: false })
+    .withOffers([cartographeImmersionOffer])
+    .withLocations([
+      new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
+    ])
+    .withUserRights([osefUserRight])
+    .build();
+
+export const establishmentCuvisteAtSaintesAndVeaux =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("78000403200029")
+    .withOffers([
+      new OfferEntityBuilder(cuvisteOffer).withCreatedAt(new Date()).build(),
+    ])
+    .withLocations([
+      bassompierreSaintesLocation,
+      veauxLocation, // outside geographical area
+    ])
+    .withUserRights([osefUserRight])
+    .build();
+
+export const establishmentCuvisteAtChaniersAndLaRochelle =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("78000403200030")
+    .withOffers([
+      new OfferEntityBuilder(cuvisteOffer)
+        .withCreatedAt(subDays(new Date(), 1))
+        .build(),
+    ])
+    .withLocations([
+      portHubleChaniersLocation,
+      tourDeLaChaineLaRochelleLocation, // outside geographical area (52km)
+    ])
+    .withUserRights([osefUserRight])
+    .build();
+
+export const establishment0145Z_A = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000020")
+  .withLocations([
+    {
+      ...bassompierreSaintesLocation,
+      id: uuid(),
+    },
+  ])
+  .withEstablishmentNaf({
+    code: "0145Z",
+    nomenclature: "Élevage d'ovins et de caprins",
+  })
+  .build();
+export const establishment0145Z_B = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000021")
+  .withLocations([
+    {
+      ...portHubleChaniersLocation,
+      id: uuid(),
+    },
+  ])
+  .withEstablishmentNaf({
+    code: "0145Z",
+    nomenclature: "Élevage d'ovins et de caprins",
+  })
+  .build();
+
+export const establishment4741Z = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000022")
+  .withLocations([
+    {
+      ...veauxLocation,
+      id: uuid(),
+    },
+  ])
+  .withEstablishmentNaf({
+    code: "4741Z",
+    nomenclature:
+      "Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé",
+  })
+  .build();
+
+export const establishment9900Z = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000023")
+  .withLocations([
+    {
+      ...tourDeLaChaineLaRochelleLocation,
+      id: uuid(),
+    },
+  ])
+  .withEstablishmentNaf({
+    code: "9900Z",
+    nomenclature: "Activités des organisations et organismes extraterritoriaux",
+  })
+  .build();
+
+export const establishmentWithFitForDisabledWorkersFalse =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000024")
+    .withFitForDisabledWorkers(false)
+    .withUserRights([osefUserRight])
+    .build();
+
+export const establishmentWithFitForDisabledWorkersTrue =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000025")
+    .withFitForDisabledWorkers(true)
+    .withUserRights([osefUserRight])
+    .withLocations([
+      {
+        ...locationOfCloseSearchPosition,
+        id: uuid(),
+      },
+    ])
+    .build();
+
+export const closedEstablishment = new EstablishmentAggregateBuilder()
+  .withOffers([cartographeImmersionOffer])
+  .withLocations([
+    {
+      ...locationOfCloseSearchPosition,
+      id: uuid(),
+    },
+  ])
+  .withEstablishmentOpen(false)
+  .withUserRights([osefUserRight])
+  .build();
+
+export const randomizeTestEstablishmentAggregates = (
+  a: EstablishmentAggregate,
+  b: EstablishmentAggregate,
+) =>
+  a.establishment.updatedAt.getTime() * Math.random() -
+  b.establishment.updatedAt.getTime() * Math.random();

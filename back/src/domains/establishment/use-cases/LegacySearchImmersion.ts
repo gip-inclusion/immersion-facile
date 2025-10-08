@@ -2,9 +2,9 @@ import {
   type ApiConsumer,
   type AppellationCode,
   errors,
-  type SearchQueryParamsDto,
+  type LegacySearchQueryParamsDto,
+  legacySearchParamsSchema,
   type SearchResultDto,
-  searchParamsSchema,
   type WithNafCodes,
 } from "shared";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -15,12 +15,12 @@ import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerato
 import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
-export class SearchImmersion extends TransactionalUseCase<
-  SearchQueryParamsDto,
+export class LegacySearchImmersion extends TransactionalUseCase<
+  LegacySearchQueryParamsDto,
   SearchResultDto[],
   ApiConsumer
 > {
-  protected inputSchema = searchParamsSchema;
+  protected inputSchema = legacySearchParamsSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -46,7 +46,7 @@ export class SearchImmersion extends TransactionalUseCase<
       acquisitionKeyword,
       fitForDisabledWorkers,
       nafCodes,
-    }: SearchQueryParamsDto,
+    }: LegacySearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchResultDto[]> {
@@ -66,7 +66,7 @@ export class SearchImmersion extends TransactionalUseCase<
     };
     const geoParams = { lat, lon, distanceKm };
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
-      uow.establishmentAggregateRepository.searchImmersionResults({
+      uow.establishmentAggregateRepository.legacySearchImmersionResults({
         searchMade,
         fitForDisabledWorkers,
         maxResults: 100,

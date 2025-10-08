@@ -95,7 +95,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     pagination,
     filters,
     userId,
-    order,
+    sort,
   }: GetPaginatedDiscussionsForUserParams): Promise<
     DataWithPagination<DiscussionInList>
   > {
@@ -153,7 +153,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
     const addPagination = (b: typeof builder) => b.limit(limit).offset(offset);
     const addOrder = (b: typeof builder) =>
-      b.orderBy(orderColumnByOrderKey[order.by], order.direction);
+      b.orderBy(orderColumnByOrderKey[sort.by], sort.direction);
 
     const groupByAndSelectAttributes = (b: typeof builder) =>
       b

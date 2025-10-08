@@ -8,7 +8,7 @@ import type {
   AgencyId,
   ConventionId,
   FtExternalId,
-  SearchQueryParamsDto,
+  LegacySearchQueryParamsDto,
   SiretDto,
 } from "shared";
 import type { HttpResponse } from "shared-routes";
@@ -133,7 +133,7 @@ type LoggerParams = Partial<{
   subscriberResponse: SubscriberResponse;
   searchLBB: SearchCompaniesParams;
   searchMade: SearchMadeEntity;
-  searchParams: SearchQueryParamsDto | undefined;
+  searchParams: LegacySearchQueryParamsDto | undefined;
   siret: SiretDto;
   romeLabel: string;
   franceTravailGatewayStatus: "success" | "total" | "error";
