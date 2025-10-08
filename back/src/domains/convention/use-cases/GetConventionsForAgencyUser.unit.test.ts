@@ -1,9 +1,11 @@
 import {
+  AgencyDtoBuilder,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   type GetConventionsForAgencyUserParams,
   maxPerPageInWebPagination,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -20,9 +22,21 @@ describe("GetConventionsForAgencyUser", () => {
     .withLastName("Doe")
     .build();
 
+  const agency = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+      .withName("Test Agency")
+      .withKind("pole-emploi")
+      .build(),
+    {
+      [agencyUserId]: { isNotifiedByEmail: true, roles: ["validator"] },
+    },
+  );
+
   const conventions = Array.from({ length: 30 }, (_, i) =>
     new ConventionDtoBuilder()
       .withId(`convention-id-${i + 1}`)
+      .withAgencyId(agency.id)
       .withStatus(i % 2 === 0 ? "ACCEPTED_BY_VALIDATOR" : "READY_TO_SIGN")
       .build(),
   );
@@ -39,6 +53,8 @@ describe("GetConventionsForAgencyUser", () => {
       uowPerformer,
     });
 
+    uow.agencyRepository.agencies = [agency];
+    uow.userRepository.users = [currentUser];
     uow.conventionRepository.setConventions(conventions);
   });
 

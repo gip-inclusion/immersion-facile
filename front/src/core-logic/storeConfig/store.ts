@@ -36,8 +36,10 @@ import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-a
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserEpics } from "src/core-logic/domain/connected-user/connectedUser.epics";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
-import { connectedUserConventionsEpics } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.epics";
-import { connectedUserConventionsSlice } from "src/core-logic/domain/connected-user/conventions/connectedUserConventions.slice";
+import { connectedUserConventionListEpics } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.epics";
+import { conventionListSlice } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
+import { connectedUserConventionsEpics } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.epics";
+import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { conventionActionEpics } from "src/core-logic/domain/convention/convention-action/conventionAction.epics";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
@@ -88,6 +90,7 @@ const allEpics: AppEpic<any>[] = [
   ...conventionActionEpics,
   ...conventionEpics,
   ...connectedUserConventionsEpics,
+  ...connectedUserConventionListEpics,
   ...createUserOnAgencyEpics,
   ...dashboardUrlsEpics,
   ...discussionEpics,
@@ -146,7 +149,9 @@ const appReducer = combineReducers({
   [geosearchSlice.name]: geosearchSlice.reducer,
   [geocodingSlice.name]: geocodingSlice.reducer,
   [connectedUserSlice.name]: connectedUserSlice.reducer,
-  [connectedUserConventionsSlice.name]: connectedUserConventionsSlice.reducer,
+  [connectedUserConventionsToManageSlice.name]:
+    connectedUserConventionsToManageSlice.reducer,
+  [conventionListSlice.name]: conventionListSlice.reducer,
   [feedbackSlice.name]: feedbackSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
   [sendSignatureLinkSlice.name]: sendSignatureLinkSlice.reducer,
