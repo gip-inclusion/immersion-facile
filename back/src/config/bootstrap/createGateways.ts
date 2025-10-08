@@ -53,7 +53,7 @@ import { AnnuaireDesEntreprisesSiretGateway } from "../../domains/core/sirene/ad
 import { annuaireDesEntreprisesSiretRoutes } from "../../domains/core/sirene/adapters/AnnuaireDesEntreprisesSiretGateway.routes";
 import { InMemorySiretGateway } from "../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../domains/core/sirene/adapters/InseeSiretGateway";
-import { inseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
+import { makeInseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
 import { crispRoutes } from "../../domains/core/support/adapters/crispRoutes";
 import { HttpCrispGateway } from "../../domains/core/support/adapters/HttpCrispGateway";
 import { InMemoryCrispApi } from "../../domains/core/support/adapters/InMemoryCrispApi";
@@ -324,13 +324,16 @@ export const createGateways = async (
         config.inseeHttpConfig,
         createLegacyAxiosHttpClientForExternalAPIs({
           partnerName: partnerNames.inseeSiret,
-          routes: inseeExternalRoutes,
+          routes: makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
           logInputCbOnSuccess: logQwhenExists,
           axiosInstance: axiosWithValidateStatus,
         }),
         timeGateway,
         noRetries,
-        withCache,
+        new InMemoryCachingGateway<AccessTokenResponse>(
+          timeGateway,
+          "expires_in",
+        ),
       );
 
     const gatewayByProvider = {
