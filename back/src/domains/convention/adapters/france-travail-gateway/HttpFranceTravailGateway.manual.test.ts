@@ -1,5 +1,4 @@
 import MockAdapter from "axios-mock-adapter";
-import type { RedisClientType } from "redis";
 import {
   ConventionDtoBuilder,
   errors,
@@ -11,11 +10,9 @@ import {
   AppConfig,
   type FTAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
 import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
-import { makeRedisWithCache } from "../../../core/caching-gateway/adapters/makeRedisWithCache";
-import type { WithCache } from "../../../core/caching-gateway/port/WithCache";
+import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import {
   type FranceTravailBroadcastResponse,
@@ -33,27 +30,11 @@ describe("HttpFranceTravailGateway", () => {
     ftEnterpriseUrl: config.ftEnterpriseUrl,
   });
 
-  let redisClient: RedisClientType<any, any, any>;
-  let withCache: WithCache;
-
-  beforeAll(async () => {
-    redisClient = await makeConnectedRedisClient(config);
-
-    withCache = makeRedisWithCache({
-      defaultCacheDurationInHours: 1,
-      redisClient,
-    });
-  });
-
-  afterAll(async () => {
-    await redisClient.disconnect();
-  });
-
   describe("getAccessToken", () => {
     it("fails when client is not allowed", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        withCache,
+        withNoCache,
         config.ftApiUrl,
         {
           ...config.franceTravailAccessTokenConfig,
@@ -74,7 +55,7 @@ describe("HttpFranceTravailGateway", () => {
     it("fails when scope is not valid", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        withCache,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
@@ -89,7 +70,7 @@ describe("HttpFranceTravailGateway", () => {
     it("gets the token when all is good", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        withCache,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
@@ -146,7 +127,7 @@ describe("HttpFranceTravailGateway", () => {
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        withCache,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
@@ -200,7 +181,7 @@ describe("HttpFranceTravailGateway", () => {
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createFtAxiosHttpClientForTest(config),
-        withCache,
+        withNoCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
         noRetries,
@@ -242,7 +223,7 @@ describe("HttpFranceTravailGateway", () => {
 
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
-      withCache,
+      withNoCache,
       fakeFtApiUrl,
       accessTokenConfig,
       noRetries,
@@ -294,7 +275,7 @@ describe("HttpFranceTravailGateway", () => {
 
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
-      withCache,
+      withNoCache,
       fakeFtApiUrl,
       accessTokenConfig,
       noRetries,
@@ -331,7 +312,7 @@ describe("HttpFranceTravailGateway", () => {
   it("send convention to FT api V3", async () => {
     const httpFranceTravailGateway = new HttpFranceTravailGateway(
       createFtAxiosHttpClientForTest(config),
-      withCache,
+      withNoCache,
       config.ftApiUrl,
       config.franceTravailAccessTokenConfig,
       noRetries,
