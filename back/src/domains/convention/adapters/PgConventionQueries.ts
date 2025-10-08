@@ -329,6 +329,7 @@ const sortConventions =
       dateSubmission: "date_submission",
       dateStart: "date_start",
       dateValidation: "date_validation",
+      dateEnd: "date_end",
     };
 
     if (!sort || !sort.by) return builder.orderBy(sortByKey.dateStart, "desc");

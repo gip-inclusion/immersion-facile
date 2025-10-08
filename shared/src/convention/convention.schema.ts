@@ -825,7 +825,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
 
     // sort
     sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission"], {
+      .enum(["dateValidation", "dateStart", "dateSubmission", "dateEnd"], {
         error: localization.invalidEnum,
       })
       .optional(),
@@ -853,7 +853,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
   });
 
 const sortedConventionsSchema = sortSchema(
-  z.enum(["dateValidation", "dateStart", "dateSubmission"], {
+  z.enum(["dateValidation", "dateStart", "dateSubmission", "dateEnd"], {
     error: localization.invalidEnum,
   }),
 );

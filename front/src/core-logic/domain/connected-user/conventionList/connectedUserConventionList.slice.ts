@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   type ConnectedUserJwt,
   type ConventionReadDto,
+  type ConventionStatus,
   type DataWithPagination,
   defaultPerPageInWebPagination,
   type FlatGetConventionsForAgencyUserParams,
@@ -12,20 +13,27 @@ import type {
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
+export type FlatGetConventionsForAgencyUserParamsWithStatusesAsArray = Omit<
+  FlatGetConventionsForAgencyUserParams,
+  "statuses"
+> & {
+  statuses?: ConventionStatus[];
+};
+
 export type FetchConventionListRequestedPayload = {
   jwt: ConnectedUserJwt;
-  filters: FlatGetConventionsForAgencyUserParams;
+  filters: FlatGetConventionsForAgencyUserParamsWithStatusesAsArray;
 };
 
 export type ConventionListState = {
   isLoading: boolean;
   conventionsWithPagination: DataWithPagination<ConventionReadDto> & {
-    filters: FlatGetConventionsForAgencyUserParams;
+    filters: FlatGetConventionsForAgencyUserParamsWithStatusesAsArray;
   };
 };
 
 export const initialConventionWithPagination: DataWithPagination<ConventionReadDto> & {
-  filters: FlatGetConventionsForAgencyUserParams;
+  filters: FlatGetConventionsForAgencyUserParamsWithStatusesAsArray;
 } = {
   data: [],
   pagination: {
