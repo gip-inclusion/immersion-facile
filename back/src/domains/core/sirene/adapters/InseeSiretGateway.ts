@@ -10,14 +10,17 @@ import {
   type SiretEstablishmentDto,
 } from "shared";
 import type { HttpClient } from "shared-routes";
-import type { InseeAccessTokenConfig } from "../../../../config/bootstrap/appConfig";
+import type {
+  AccessTokenResponse,
+  InseeAccessTokenConfig,
+} from "../../../../config/bootstrap/appConfig";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
-import type { WithCache } from "../../caching-gateway/port/WithCache";
+import type { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import type { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { SiretGateway } from "../ports/SiretGateway";
-import { inseeExternalRoutes, type InseeExternalRoutes } from "./InseeSiretGateway.routes";
+import type { InseeExternalRoutes } from "./InseeSiretGateway.routes";
 import { getNumberEmployeesRangeByTefenCode } from "./SiretGateway.common";
 
 const logger = createLogger(__filename);
@@ -54,20 +57,20 @@ export class InseeSiretGateway implements SiretGateway {
 
   readonly #timeGateway: TimeGateway;
 
-  #withCache: WithCache;
+  readonly #caching: InMemoryCachingGateway<AccessTokenResponse>;
 
   constructor(
     config: InseeAccessTokenConfig,
     httpClient: HttpClient<InseeExternalRoutes>,
     timeGateway: TimeGateway,
     retryStrategy: RetryStrategy,
-    withCache: WithCache,
+    caching: InMemoryCachingGateway<AccessTokenResponse>,
   ) {
     this.#config = config;
     this.#retryStrategy = retryStrategy;
     this.#timeGateway = timeGateway;
+    this.#caching = caching;
     this.#httpClient = httpClient;
-    this.#withCache = withCache;
   }
 
   public async getEstablishmentBySiret(
@@ -189,40 +192,33 @@ export class InseeSiretGateway implements SiretGateway {
   }
 
   async #getAccessToken() {
-    return this.#withCache({
-      overrideCacheDurationInHours: 5 / 60, //5 minutes
-      getCacheKey: () => "insee_access_token",
-      logParams: {
-        partner: "inseeSiret",
-        route: inseeExternalRoutes.getAccessToken,
-      },
-      cb: () =>
-        this.#retryStrategy.apply(() =>
-          this.#tokenLimiter.schedule(() => {
-            return this.#httpClient
-              .getAccessToken({
-                headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                  grant_type: "password",
-                  client_id: this.#config.clientId,
-                  client_secret: this.#config.clientSecret,
-                  username: this.#config.username,
-                  password: this.#config.password,
-                }).toString(),
-              })
-              .then((response) => {
-                if (response?.status === 200) return response.body;
-                throw new Error(
-                  `Could not access INSEE SIREN API. Status: ${
-                    response?.status
-                  }. Body: ${JSON.stringify(response?.body)}`,
-                );
-              });
-          }),
-        ),
-    })(this.#config.clientId);
+    return this.#caching.caching(this.#config.clientId, () =>
+      this.#retryStrategy.apply(() =>
+        this.#tokenLimiter.schedule(() => {
+          return this.#httpClient
+            .getAccessToken({
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({
+                grant_type: "password",
+                client_id: this.#config.clientId,
+                client_secret: this.#config.clientSecret,
+                username: this.#config.username,
+                password: this.#config.password,
+              }).toString(),
+            })
+            .then((response) => {
+              if (response?.status === 200) return response.body;
+              throw new Error(
+                `Could not access INSEE SIREN API. Status: ${
+                  response?.status
+                }. Body: ${JSON.stringify(response?.body)}`,
+              );
+            });
+        }),
+      ),
+    );
   }
 
   #createSiretQueryParams(

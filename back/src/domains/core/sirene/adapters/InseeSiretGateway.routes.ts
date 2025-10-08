@@ -1,4 +1,4 @@
-import type { ZodSchemaWithInputMatchingOutput } from "shared";
+import type { AbsoluteUrl, ZodSchemaWithInputMatchingOutput } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import type { SirenGatewayAnswer } from "./InseeSiretGateway";
@@ -18,60 +18,60 @@ const errorInGetAccessTokenError = z.object({
   error_description: z.string(),
 });
 
+export type InseeExternalRoutes = ReturnType<typeof makeInseeExternalRoutes>;
+export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
+  defineRoutes({
+    getAccessToken: defineRoute({
+      method: "post",
+      url: "https://auth.insee.net/auth/realms/apim-gravitee/protocol/openid-connect/token",
+      headersSchema: z.object({
+        "Content-Type": z.literal("application/x-www-form-urlencoded"),
+      }),
+      requestBodySchema: z.string(),
+      responses: {
+        200: z.any(),
+        400: errorInGetAccessTokenError,
+        401: errorInGetAccessTokenError,
+      },
+    }),
+    getEstablishmentUpdatedBetween: defineRoute({
+      method: "post",
+      url: `${endpoint}/siret`,
+      headersSchema: z.object({
+        "Content-Type": z.literal("application/x-www-form-urlencoded"),
+        Accept: z.literal("application/json"),
+        Authorization: z.string(),
+      }),
+      requestBodySchema: z.string(),
+      responses: {
+        200: siretGatewayAnswerSchema,
+        400: inseeErrorSchema,
+        404: inseeErrorSchema,
+        429: inseeErrorSchema,
+        503: z.string(),
+      },
+    }),
+    getEstablishmentBySiret: defineRoute({
+      method: "get",
+      url: `${endpoint}/siret`,
+      headersSchema: z.object({
+        "Content-Type": z.literal("application/x-www-form-urlencoded"),
+        Accept: z.literal("application/json"),
+        Authorization: z.string(),
+      }),
+      queryParamsSchema: z.object({
+        q: z.string(),
+        date: z.string().optional(),
+      }),
+      responses: {
+        200: siretGatewayAnswerSchema,
+        400: inseeErrorSchema,
+        404: inseeErrorSchema,
+        429: inseeErrorSchema,
+        503: z.any(),
+      },
+    }),
+  });
+
 const siretGatewayAnswerSchema: ZodSchemaWithInputMatchingOutput<SirenGatewayAnswer> =
   z.any();
-
-export type InseeExternalRoutes = typeof inseeExternalRoutes;
-
-export const inseeExternalRoutes = defineRoutes({
-  getAccessToken: defineRoute({
-    method: "post",
-    url: "https://auth.insee.net/auth/realms/apim-gravitee/protocol/openid-connect/token",
-    headersSchema: z.object({
-      "Content-Type": z.literal("application/x-www-form-urlencoded"),
-    }),
-    requestBodySchema: z.string(),
-    responses: {
-      200: z.any(),
-      400: errorInGetAccessTokenError,
-      401: errorInGetAccessTokenError,
-    },
-  }),
-  getEstablishmentUpdatedBetween: defineRoute({
-    method: "post",
-    url: "https://api.insee.fr/api-sirene/prive/3.11/siret",
-    headersSchema: z.object({
-      "Content-Type": z.literal("application/x-www-form-urlencoded"),
-      Accept: z.literal("application/json"),
-      Authorization: z.string(),
-    }),
-    requestBodySchema: z.string(),
-    responses: {
-      200: siretGatewayAnswerSchema,
-      400: inseeErrorSchema,
-      404: inseeErrorSchema,
-      429: inseeErrorSchema,
-      503: z.string(),
-    },
-  }),
-  getEstablishmentBySiret: defineRoute({
-    method: "get",
-    url: "https://api.insee.fr/api-sirene/prive/3.11/siret",
-    headersSchema: z.object({
-      "Content-Type": z.literal("application/x-www-form-urlencoded"),
-      Accept: z.literal("application/json"),
-      Authorization: z.string(),
-    }),
-    queryParamsSchema: z.object({
-      q: z.string(),
-      date: z.string().optional(),
-    }),
-    responses: {
-      200: siretGatewayAnswerSchema,
-      400: inseeErrorSchema,
-      404: inseeErrorSchema,
-      429: inseeErrorSchema,
-      503: z.any(),
-    },
-  }),
-});

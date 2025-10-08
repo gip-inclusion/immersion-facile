@@ -5,13 +5,16 @@ import {
   expectToEqual,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  type AccessTokenResponse,
+  AppConfig,
+} from "../../../../config/bootstrap/appConfig";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
-import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
+import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import { InseeSiretGateway } from "./InseeSiretGateway";
-import { inseeExternalRoutes } from "./InseeSiretGateway.routes";
+import { makeInseeExternalRoutes } from "./InseeSiretGateway.routes";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -28,6 +31,9 @@ describe("InseeSiretGateway", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
+    const inseeExternalRoutes = makeInseeExternalRoutes(
+      config.inseeHttpConfig.endpoint,
+    );
     siretGateway = new InseeSiretGateway(
       config.inseeHttpConfig,
       createAxiosSharedClient(
@@ -51,7 +57,10 @@ describe("InseeSiretGateway", () => {
       ),
       new RealTimeGateway(),
       noRetries,
-      withNoCache,
+      new InMemoryCachingGateway<AccessTokenResponse>(
+        new RealTimeGateway(),
+        "expires_in",
+      ),
     );
   });
 
