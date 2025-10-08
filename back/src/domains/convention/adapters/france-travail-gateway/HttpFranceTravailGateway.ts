@@ -12,7 +12,7 @@ import {
   type LoggerParamsWithMessage,
 } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
-import type { WithCache } from "../../../core/caching-gateway/port/WithCache";
+import type { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   RetryableError,
   type RetryStrategy,
@@ -58,29 +58,25 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
 
   readonly #httpClient: HttpClient<FrancetTravailRoutes>;
 
+  readonly #caching: InMemoryCachingGateway<AccessTokenResponse>;
+
   readonly #accessTokenConfig: FTAccessTokenConfig;
 
   readonly #retryStrategy: RetryStrategy;
 
-  #withCache: WithCache;
-
-  #franceTravailRoutes: FrancetTravailRoutes;
-
   constructor(
     httpClient: HttpClient<FrancetTravailRoutes>,
-    withCache: WithCache,
+    caching: InMemoryCachingGateway<AccessTokenResponse>,
     ftApiUrl: AbsoluteUrl,
     accessTokenConfig: FTAccessTokenConfig,
     retryStrategy: RetryStrategy,
-    franceTravailRoutes: FrancetTravailRoutes,
     isDev = false,
   ) {
-    this.#httpClient = httpClient;
-    this.#withCache = withCache;
     this.#ftTestPrefix = getFtTestPrefix(ftApiUrl);
     this.#accessTokenConfig = accessTokenConfig;
+    this.#caching = caching;
+    this.#httpClient = httpClient;
     this.#retryStrategy = retryStrategy;
-    this.#franceTravailRoutes = franceTravailRoutes;
     this.#isDev = isDev;
   }
 
@@ -88,60 +84,53 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
     return Sentry.startSpan(
       { name: "FranceTravailGateway.getAccessToken" },
       async () =>
-        this.#withCache({
-          overrideCacheDurationInHours: 15 / 60, // 15 minutes
-          getCacheKey: () => "ft_access_token",
-          logParams: {
-            partner: "franceTravailApi",
-            route: this.#franceTravailRoutes.getAccessToken,
-          },
-          cb: () =>
-            this.#retryStrategy.apply(() =>
-              this.#commonlimiter.schedule(async () => {
-                const response = await this.#httpClient.getAccessToken({
-                  body: querystring.stringify({
-                    grant_type: "client_credentials",
-                    client_id: this.#accessTokenConfig.clientId,
-                    client_secret: this.#accessTokenConfig.clientSecret,
-                    scope,
-                  }),
-                  headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                  },
+        this.#caching.caching(scope, () =>
+          this.#retryStrategy.apply(() =>
+            this.#commonlimiter.schedule(async () => {
+              const response = await this.#httpClient.getAccessToken({
+                body: querystring.stringify({
+                  grant_type: "client_credentials",
+                  client_id: this.#accessTokenConfig.clientId,
+                  client_secret: this.#accessTokenConfig.clientSecret,
+                  scope,
+                }),
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+              });
+
+              if (response.status === 200) return response.body;
+
+              const ftAccessTokenRelated =
+                "FranceTravailGateway.getAccessToken";
+
+              if (response.body.error.includes("invalid_client"))
+                throw errors.partner.failure({
+                  serviceName: ftAccessTokenRelated,
+                  message: "Client authentication failed",
                 });
 
-                if (response.status === 200) return response.body;
+              if (response.body.error.includes("invalid_grant"))
+                throw errors.partner.failure({
+                  serviceName: ftAccessTokenRelated,
+                  message:
+                    "The provided access grant is invalid, expired, or revoked.",
+                });
 
-                const ftAccessTokenRelated =
-                  "FranceTravailGateway.getAccessToken";
+              if (response.body.error.includes("invalid_scope"))
+                throw errors.partner.failure({
+                  serviceName: ftAccessTokenRelated,
+                  message: "Invalid scope",
+                });
 
-                if (response.body.error.includes("invalid_client"))
-                  throw errors.partner.failure({
-                    serviceName: ftAccessTokenRelated,
-                    message: "Client authentication failed",
-                  });
+              const error = new Error(JSON.stringify(response.body, null, 2));
 
-                if (response.body.error.includes("invalid_grant"))
-                  throw errors.partner.failure({
-                    serviceName: ftAccessTokenRelated,
-                    message:
-                      "The provided access grant is invalid, expired, or revoked.",
-                  });
+              if (isRetryable(response)) throw new RetryableError(error);
 
-                if (response.body.error.includes("invalid_scope"))
-                  throw errors.partner.failure({
-                    serviceName: ftAccessTokenRelated,
-                    message: "Invalid scope",
-                  });
-
-                const error = new Error(JSON.stringify(response.body, null, 2));
-
-                if (isRetryable(response)) throw new RetryableError(error);
-
-                throw error;
-              }),
-            ),
-        })(scope),
+              throw error;
+            }),
+          ),
+        ),
     );
   }
 
