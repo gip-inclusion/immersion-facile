@@ -1,20 +1,33 @@
 import { expectObjectsToMatch, sleep } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
+import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import {
   DiagorienteAppellationsGateway,
   requestMinTime,
 } from "./DiagorienteAppellationsGateway";
-import { diagorienteAppellationsRoutes } from "./DiagorienteAppellationsGateway.routes";
+import {
+  type DiagorienteAccessTokenResponse,
+  diagorienteAppellationsRoutes,
+  diagorienteTokenScope,
+} from "./DiagorienteAppellationsGateway.routes";
 
 describe("DiagorienteAppellationsGateway", () => {
+  const cachingGateway =
+    new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
+      new RealTimeGateway(),
+      diagorienteTokenScope,
+    );
+
   let appellationsGateway: DiagorienteAppellationsGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     appellationsGateway = new DiagorienteAppellationsGateway(
       createFetchSharedClient(diagorienteAppellationsRoutes, fetch),
+      cachingGateway,
       {
         clientId: config.diagorienteApiClientId,
         clientSecret: config.diagorienteApiClientSecret,
@@ -194,6 +207,7 @@ describe("DiagorienteAppellationsGateway", () => {
       const appellationsGatewayWithLowMaxDuration =
         new DiagorienteAppellationsGateway(
           createFetchSharedClient(diagorienteAppellationsRoutes, fetch),
+          cachingGateway,
           {
             clientId: config.diagorienteApiClientId,
             clientSecret: config.diagorienteApiClientSecret,

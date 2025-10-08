@@ -8,6 +8,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
+import type { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import type { WithCache } from "../../caching-gateway/port/WithCache";
 import type { AppellationsGateway } from "../ports/AppellationsGateway";
 import {
@@ -42,6 +43,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
 
   constructor(
     private readonly httpClient: HttpClient<DiagorienteAppellationsRoutes>,
+    private caching: InMemoryCachingGateway<DiagorienteAccessTokenResponse>,
     private readonly diagorienteCredentials: {
       clientId: string;
       clientSecret: string;
@@ -115,38 +117,31 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
   }
 
   public getAccessToken(): Promise<DiagorienteAccessTokenResponse> {
-    return this.#withCache({
-      overrideCacheDurationInHours: 10 / 60,
-      getCacheKey: () => "diagoriente_access_token",
-      logParams: {
-        partner: "diagoriente",
-        route: diagorienteAppellationsRoutes.getAccessToken,
-      },
-      cb: () =>
-        this.#limiter.schedule(() =>
-          this.httpClient
-            .getAccessToken({
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: {
-                client_id: this.diagorienteCredentials.clientId,
-                client_secret: this.diagorienteCredentials.clientSecret,
-                grant_type: "client_credentials",
-              },
-            })
-            .then(({ status, body }) => {
-              if (status !== 200)
-                throw errors.generic.unsupportedStatus({
-                  body,
-                  status,
-                  serviceName: "Diagoriente",
-                });
+    return this.caching.caching(diagorienteTokenScope, () =>
+      this.#limiter.schedule(() =>
+        this.httpClient
+          .getAccessToken({
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: {
+              client_id: this.diagorienteCredentials.clientId,
+              client_secret: this.diagorienteCredentials.clientSecret,
+              grant_type: "client_credentials",
+            },
+          })
+          .then(({ status, body }) => {
+            if (status !== 200)
+              throw errors.generic.unsupportedStatus({
+                body,
+                status,
+                serviceName: "Diagoriente",
+              });
 
-              return body;
-            }),
-        ),
-    })(diagorienteTokenScope);
+            return body;
+          }),
+      ),
+    );
   }
 }
 

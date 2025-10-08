@@ -19,6 +19,7 @@ import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/f
 import { HttpFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/HttpFtConnectGateway";
 import { InMemoryFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import type { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
+import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { MetabaseDashboardGateway } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../domains/core/dashboard/adapters/StubDashboardGateway";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
@@ -40,7 +41,11 @@ import {
 import type { PdfGeneratorGateway } from "../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
 import { noRetries } from "../../domains/core/retry-strategy/ports/RetryStrategy";
 import { DiagorienteAppellationsGateway } from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway";
-import { diagorienteAppellationsRoutes } from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway.routes";
+import {
+  type DiagorienteAccessTokenResponse,
+  diagorienteAppellationsRoutes,
+  diagorienteTokenScope,
+} from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway.routes";
 import { InMemoryAppellationsGateway } from "../../domains/core/rome/adapters/InMemoryAppellationsGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
@@ -235,6 +240,10 @@ export const createGateways = async (
             routes: diagorienteAppellationsRoutes,
             config,
           }),
+          new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
+            timeGateway,
+            diagorienteTokenScope,
+          ),
           {
             clientId: config.diagorienteApiClientId,
             clientSecret: config.diagorienteApiClientSecret,
