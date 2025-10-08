@@ -90,7 +90,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
       async () =>
         this.#withCache({
           overrideCacheDurationInHours: 15 / 60, // 15 minutes
-          getCacheKey: () => "ft_access_token",
+          getCacheKey: () => `ft_access_token_${scope}`,
           logParams: {
             partner: "franceTravailApi",
             route: this.#franceTravailRoutes.getAccessToken,
