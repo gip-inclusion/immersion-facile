@@ -26,7 +26,7 @@ export const getWithCache = async (
   return config.cache satisfies never;
 };
 
-export const makeConnectedRedisClient = async (config: AppConfig) => {
+const makeConnectedRedisClient = async (config: AppConfig) => {
   const redisClient = await createRedisClient({
     url: config.redisUrl,
   }).connect();

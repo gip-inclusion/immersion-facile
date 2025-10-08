@@ -1,11 +1,13 @@
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../config/bootstrap/appConfig";
-import { makeConnectedRedisClient } from "../config/bootstrap/cache";
+import {
+  type AccessTokenResponse,
+  AppConfig,
+} from "../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
-import { makeRedisWithCache } from "../domains/core/caching-gateway/adapters/makeRedisWithCache";
+import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
@@ -18,30 +20,21 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const executeUsecase = async () => {
-  const redisClient = await makeConnectedRedisClient(config);
   const timeGateway = new RealTimeGateway();
-
-  const withCache = makeRedisWithCache({
-    defaultCacheDurationInHours: 1,
-    redisClient,
-  });
-
-  const franceTravailRoutes = createFranceTravailRoutes({
-    ftApiUrl: config.ftApiUrl,
-    ftEnterpriseUrl: config.ftEnterpriseUrl,
-  });
 
   const httpFranceTravailGateway = new HttpFranceTravailGateway(
     createAxiosSharedClient(
-      franceTravailRoutes,
+      createFranceTravailRoutes({
+        ftApiUrl: config.ftApiUrl,
+        ftEnterpriseUrl: config.ftEnterpriseUrl,
+      }),
       makeAxiosInstances(config.externalAxiosTimeoutForFranceTravail)
         .axiosWithValidateStatus,
     ),
-    withCache,
+    new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,
     noRetries,
-    franceTravailRoutes,
   );
 
   const { uowPerformer } = createUowPerformer(
