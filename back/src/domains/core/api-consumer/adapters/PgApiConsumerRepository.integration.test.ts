@@ -171,11 +171,6 @@ describe("PgApiConsumerRepository", () => {
     });
 
     describe("with agencyIds filters", () => {
-      beforeEach(async () => {
-        await apiConsumerRepository.save(apiConsumer);
-        await apiConsumerRepository.save(apiConsumerWithAgencyIdRight);
-      });
-
       it("returns api consumers matching agencyIds filter", async () => {
         expectToEqual(
           await apiConsumerRepository.getByFilters({
@@ -193,14 +188,22 @@ describe("PgApiConsumerRepository", () => {
           [],
         );
       });
+
+      it("returns all api consumers when agencyIds filter is empty", async () => {
+        expectArraysToEqualIgnoringOrder(
+          await apiConsumerRepository.getByFilters({
+            agencyIds: [],
+          }),
+          [
+            apiConsumer,
+            apiConsumerWithAgencyIdRight,
+            apiConsumerWithAgencyKindRight,
+          ],
+        );
+      });
     });
 
     describe("with agencyKinds filters", () => {
-      beforeEach(async () => {
-        await apiConsumerRepository.save(apiConsumer);
-        await apiConsumerRepository.save(apiConsumerWithAgencyKindRight);
-      });
-
       it("returns api consumers matching agencyKinds filter", async () => {
         expectToEqual(
           await apiConsumerRepository.getByFilters({
@@ -216,6 +219,19 @@ describe("PgApiConsumerRepository", () => {
             agencyKinds: ["pole-emploi"],
           }),
           [],
+        );
+      });
+
+      it("returns all api consumers when agencyKinds filter is empty", async () => {
+        expectArraysToEqualIgnoringOrder(
+          await apiConsumerRepository.getByFilters({
+            agencyKinds: [],
+          }),
+          [
+            apiConsumer,
+            apiConsumerWithAgencyIdRight,
+            apiConsumerWithAgencyKindRight,
+          ],
         );
       });
     });
