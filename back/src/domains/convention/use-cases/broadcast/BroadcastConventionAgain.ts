@@ -43,6 +43,7 @@ export const makeBroadcastConventionAgain = useCaseBuilder(
       !userHasEnoughRightsOnConvention(currentUser, convention, [
         "counsellor",
         "validator",
+        "agency-viewer",
       ])
     )
       throw errors.user.forbidden({ userId: currentUser.id });

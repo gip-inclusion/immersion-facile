@@ -46,6 +46,17 @@ describe("BroadcastConventionAgain", () => {
     ])
     .build();
 
+  const userWithAgencyViewerRight = new ConnectedUserBuilder()
+    .withIsAdmin(false)
+    .withAgencyRights([
+      {
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
+        roles: ["agency-viewer"],
+        isNotifiedByEmail: true,
+      },
+    ])
+    .build();
+
   let broadcastConventionAgain: BroadcastConventionAgain;
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
@@ -94,7 +105,7 @@ describe("BroadcastConventionAgain", () => {
 
   describe("Right paths", () => {
     describe("when there is no previous broadcast", () => {
-      it.each([adminUser, userWithEnoughRights])(
+      it.each([adminUser, userWithEnoughRights, userWithAgencyViewerRight])(
         "trigger ConventionBroadcastAgain event with the whole convention in payload",
         async (user) => {
           await broadcastConventionAgain.execute(
@@ -117,7 +128,7 @@ describe("BroadcastConventionAgain", () => {
     });
 
     describe("when there is a previous broadcast", () => {
-      it.each([adminUser, userWithEnoughRights])(
+      it.each([adminUser, userWithEnoughRights, userWithAgencyViewerRight])(
         "trigger ConventionBroadcastAgain event with the whole convention in payload",
         async (user) => {
           uow.broadcastFeedbacksRepository.save({
@@ -184,7 +195,7 @@ describe("BroadcastConventionAgain", () => {
     });
 
     describe("when assessment if present", () => {
-      it.each([adminUser, userWithEnoughRights])(
+      it.each([adminUser, userWithEnoughRights, userWithAgencyViewerRight])(
         "trigger ConventionBroadcastAgain event with the convention + assessment in payload",
         async (user) => {
           const assessment: AssessmentDto = {
