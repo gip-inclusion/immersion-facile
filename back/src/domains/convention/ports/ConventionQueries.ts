@@ -7,13 +7,11 @@ import type {
   DataWithPagination,
   DateRange,
   DateString,
-  ExtractFromExisting,
   FindSimilarConventionsParams,
   GetConventionsForAgencyUserParams,
   NumberEmployeesRange,
   PaginationQueryParams,
   SiretDto,
-  TemplatedEmail,
   UserId,
 } from "shared";
 
@@ -28,13 +26,6 @@ export type GetConventionsFilters = {
   withStatuses?: ConventionStatus[];
   withSirets?: SiretDto[];
 };
-
-export type AssessmentEmailKind = ExtractFromExisting<
-  TemplatedEmail["kind"],
-  | "ASSESSMENT_ESTABLISHMENT_NOTIFICATION"
-  | "ASSESSMENT_BENEFICIARY_NOTIFICATION"
-  | "ASSESSMENT_AGENCY_NOTIFICATION"
->;
 
 export type GetConventionsSortBy = keyof Pick<
   ConventionDto,
