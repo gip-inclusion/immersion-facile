@@ -832,6 +832,7 @@ export const ConventionManageActions = ({
           userHasEnoughRightsOnConvention(currentUser, convention, [
             "counsellor",
             "validator",
+            "agency-viewer",
           ]) &&
           (broadcastErrorFeedback && !currentUser.isBackofficeAdmin ? (
             <ErroredConventionActions
