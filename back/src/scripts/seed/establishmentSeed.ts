@@ -71,7 +71,7 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
   ])
   .build();
 
-export const decathlon = new EstablishmentAggregateBuilder()
+const decathlon = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
       .withSiret("50056940501696")
