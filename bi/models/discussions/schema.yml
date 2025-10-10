@@ -27,8 +27,6 @@ models:
         description: "Phone of potential beneficiary"
       - name: potential_beneficiary_resume_link
         description: "Link to beneficiary's resume"
-      - name: potential_beneficiary_has_working_experience
-        description: "Whether beneficiary has working experience"
       - name: potential_beneficiary_experience_additional_information
         description: "Additional information about experience"
       - name: potential_beneficiary_date_preferences
