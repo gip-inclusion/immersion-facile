@@ -1,15 +1,12 @@
 import { groupBy, isNil, map, prop, reject, values } from "ramda";
 import { pipeWithValue } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { createLogger } from "../../../../utils/logger";
-import type { DomainEvent } from "../events";
+import type { DomainEvent, EventStatus } from "../events";
 import type { OutboxQueries } from "../ports/OutboxQueries";
 import {
   type StoredEventRow,
   storedEventRowsToDomainEvent,
 } from "./PgOutboxRepository";
-
-const logger = createLogger(__filename);
 
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private transaction: KyselyDb) {}
@@ -17,9 +14,15 @@ export class PgOutboxQueries implements OutboxQueries {
   public async getFailedEvents(params: {
     limit: number;
   }): Promise<DomainEvent[]> {
+    const eventIds = await this.#getEventIdsByStatus({
+      statuses: ["failed-but-will-retry"],
+      limit: params.limit,
+    });
+
+    if (eventIds.length === 0) return [];
+
     const results = await this.#getEventsQueryBuilder()
-      .where("status", "=", "failed-but-will-retry")
-      .limit(params.limit)
+      .where("outbox.id", "in", eventIds)
       .execute();
 
     return convertRowsToDomainEvents(results as StoredEventRow[]);
@@ -28,28 +31,38 @@ export class PgOutboxQueries implements OutboxQueries {
   public async getEventsToPublish(params: {
     limit: number;
   }): Promise<DomainEvent[]> {
+    const eventIds = await this.#getEventIdsByStatus({
+      statuses: ["never-published", "to-republish"],
+      limit: params.limit,
+    });
+
+    if (eventIds.length === 0) return [];
+
     const results = await this.#getEventsQueryBuilder()
-      .where("status", "in", ["never-published", "to-republish"])
-      .limit(params.limit)
+      .where("outbox.id", "in", eventIds)
       .execute();
 
-    const events = convertRowsToDomainEvents(results as StoredEventRow[]);
+    return convertRowsToDomainEvents(results as StoredEventRow[]);
+  }
 
-    const numberOfEventsAgregated = events.length;
-    const numberOfEventsBeforeAggregation = results.length;
+  async #getEventIdsByStatus(params: {
+    statuses: EventStatus[];
+    limit: number;
+  }): Promise<string[]> {
+    if (params.statuses.length === 0) return [];
 
-    if (numberOfEventsAgregated !== numberOfEventsBeforeAggregation) {
-      logger.info({
-        events,
-        crawlerInfo: {
-          typeOfEvents: "debug-unpublished",
-          numberOfEvents: numberOfEventsAgregated,
-          numberOfEventsBeforeAggregation,
-        },
-      });
-    }
+    const query = this.transaction
+      .selectFrom("outbox")
+      .select("id")
+      .where("was_quarantined", "=", false)
+      .orderBy("priority asc")
+      .orderBy("occurred_at asc")
+      .limit(params.limit);
 
-    return events;
+    const results = await query
+      .where("status", "in", params.statuses)
+      .execute();
+    return results.map((e) => e.id);
   }
 
   #getEventsQueryBuilder() {

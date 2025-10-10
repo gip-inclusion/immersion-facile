@@ -315,17 +315,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       const eventsToRerun = await outboxQueries.getFailedEvents({ limit: 1 });
 
       // assert
-      expectToEqual(eventsToRerun, [
-        {
-          ...eventFailedToRerun,
-          publications: [
-            {
-              ...eventFailedToRerun.publications[0],
-              failures: [eventFailedToRerun.publications[0].failures[0]],
-            },
-          ],
-        },
-      ]);
+      expectToEqual(eventsToRerun, [eventFailedToRerun]);
     });
   });
 

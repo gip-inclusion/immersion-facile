@@ -17,13 +17,9 @@ const logger = createLogger(__filename);
 
 const maxEventsProcessedInParallel = 5;
 const neverPublishedOutboxLimit = 1500;
-const crawlerMaxBatchSize = 300;
+const crawlerMaxBatchSize = 50;
 
-export type TypeOfEvent =
-  | "unpublished"
-  | "failed"
-  | "debug-unpublished"
-  | "debug-failed";
+export type TypeOfEvent = "unpublished" | "failed";
 
 export class BasicEventCrawler implements EventCrawler {
   constructor(
