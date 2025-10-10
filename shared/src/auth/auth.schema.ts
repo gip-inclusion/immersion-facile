@@ -1,16 +1,32 @@
 import { z } from "zod";
 import { emailSchema } from "../email/email.schema";
+import { frontRoutes } from "../routes/route.utils";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
-import type {
-  InitiateLoginByEmailParams,
-  OAuthSuccessLoginParams,
-  WithIdToken,
-  WithRedirectUri,
+import {
+  allowedLoginSources,
+  type InitiateLoginByEmailParams,
+  type OAuthSuccessLoginParams,
+  type WithIdToken,
+  type WithRedirectUri,
 } from "./auth.dto";
+
+export const allowedLoginUris = allowedLoginSources.map(
+  (source) => frontRoutes[source],
+) as [string, ...string[]];
 
 export const withRedirectUriSchema: ZodSchemaWithInputMatchingOutput<WithRedirectUri> =
   z.object({
-    redirectUri: z.string(),
+    redirectUri: z
+      .string()
+      .refine(
+        (uri) =>
+          allowedLoginUris.some((allowedUri) =>
+            uri.startsWith(`/${allowedUri}`),
+          ),
+        {
+          message: "redirectUri is not allowed",
+        },
+      ),
   });
 
 export const initiateLoginByEmailParamsSchema: ZodSchemaWithInputMatchingOutput<InitiateLoginByEmailParams> =

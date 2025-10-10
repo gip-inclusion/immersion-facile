@@ -1,8 +1,10 @@
 import type { Email } from "../email/email.dto";
+import type { frontRoutes } from "../routes/route.utils";
 import type { EmailAuthCodeJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 
 export type AllowedLoginSource = (typeof allowedLoginSources)[number];
+export type AllowedRedirectUri = (typeof frontRoutes)[AllowedLoginSource];
 
 export const allowedLoginSources = [
   "admin",
@@ -30,7 +32,7 @@ export type AlreadyAuthenticatedUserQueryParams = {
 };
 
 export type WithRedirectUri = {
-  redirectUri: string;
+  redirectUri: AllowedRedirectUri;
 };
 
 export type InitiateLoginByEmailParams = WithRedirectUri & {
