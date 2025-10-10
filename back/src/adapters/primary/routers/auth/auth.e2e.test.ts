@@ -2,7 +2,7 @@ import {
   type AbsoluteUrl,
   AgencyDtoBuilder,
   type AuthRoutes,
-  allowedLoginSources,
+  allowedLoginUris,
   authExpiredMessage,
   authRoutes,
   ConventionDtoBuilder,
@@ -83,7 +83,7 @@ describe("user connexion flow", () => {
 
   describe("Right path with Proconnect", () => {
     describe("handle all allowed user connection pages", () => {
-      it.each(allowedLoginSources)(
+      it.each(allowedLoginUris)(
         `${displayRouteName(
           authRoutes.initiateLoginByOAuth,
         )} 302 > [ProConnect]/login-pro-connect - 302 > ${displayRouteName(
@@ -175,11 +175,11 @@ describe("user connexion flow", () => {
       const uuids = [nonce, state, generatedUserId];
       uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
-      const redirectUri: AbsoluteUrl = `${appConfig.immersionFacileBaseUrl}/agencyDashboard?discussionId=discussion0`;
-
       expectHttpResponseToEqual(
         await httpClient.initiateLoginByOAuth({
-          queryParams: { redirectUri },
+          queryParams: {
+            redirectUri: "/tableau-de-bord-agence/agences/agencyId",
+          },
         }),
         {
           body: {},
@@ -245,13 +245,13 @@ describe("user connexion flow", () => {
 
   describe("Right path with email", () => {
     describe("handle all allowed user connection pages", () => {
-      it.each(allowedLoginSources)(
+      it.each(allowedLoginUris)(
         `${displayRouteName(
           authRoutes.initiateLoginByEmail,
         )} 200 | EMAIL with connexion link > ${displayRouteName(
           authRoutes.afterOAuthSuccessRedirection,
         )} 302 > page %s with required connected user params`,
-        async (page) => {
+        async (uri) => {
           const email: Email = "mail@email.com";
           const generatedUserId = "my-user-id";
           const uuids = [
@@ -263,11 +263,9 @@ describe("user connexion flow", () => {
           ];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
-          const redirectUrl: AbsoluteUrl = `${appConfig.immersionFacileBaseUrl}/${page}`;
-
           expectHttpResponseToEqual(
             await httpClient.initiateLoginByEmail({
-              body: { email, redirectUri: redirectUrl },
+              body: { email, redirectUri: `/${uri}` },
             }),
             {
               body: "",
@@ -306,6 +304,7 @@ describe("user connexion flow", () => {
             status: 302,
           });
           const locationHeader = response.headers.location as AbsoluteUrl;
+          const redirectUrl: AbsoluteUrl = `${appConfig.immersionFacileBaseUrl}/${uri}`;
           const locationPrefix = `${redirectUrl}?token=`;
 
           expect(locationHeader).toContain(locationPrefix);
@@ -340,7 +339,7 @@ describe("user connexion flow", () => {
               state,
               usedAt: gateways.timeGateway.now(),
               email,
-              fromUri: redirectUrl,
+              fromUri: `/${uri}`,
             },
           ]);
         },

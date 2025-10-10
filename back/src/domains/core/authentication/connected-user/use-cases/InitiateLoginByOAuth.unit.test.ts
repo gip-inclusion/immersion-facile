@@ -1,5 +1,5 @@
 import {
-  allowedLoginSources,
+  allowedLoginUris,
   expectToEqual,
   queryParamsAsString,
   type WithRedirectUri,
@@ -15,9 +15,9 @@ import { InitiateLoginByOAuth } from "./InitiateLoginByOAuth";
 
 describe("InitiateLoginByOAuth usecase", () => {
   describe("With OAuthGateway mode 'proConnect'", () => {
-    it.each(allowedLoginSources)(
+    it.each(allowedLoginUris)(
       "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
-      async (page) => {
+      async (uri) => {
         const state = "my-state";
         const nonce = "my-nonce";
         const uow = createInMemoryUow();
@@ -31,7 +31,7 @@ describe("InitiateLoginByOAuth usecase", () => {
         uuidGenerator.setNextUuids([nonce, state]);
 
         const sourcePage: WithRedirectUri = {
-          redirectUri: `/${page}?discussionId=discussion0`,
+          redirectUri: `/${uri}?discussionId=discussion0`,
         };
         const redirectUrl = await useCase.execute(sourcePage);
         const loginEndpoint = "login-pro-connect";

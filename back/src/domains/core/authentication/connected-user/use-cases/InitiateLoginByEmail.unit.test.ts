@@ -35,7 +35,8 @@ describe("RequestLoginByEmail usecase", () => {
   const fakeGenerateEmailAuthCode: GenerateEmailAuthCodeJwt = () => fakeJwt;
 
   const baseUrl = "http://after-login.com";
-  const redirectUri = "/dashboard/discussions?discussionId=discussion0";
+  const redirectUri =
+    "/establishment-dashboard/discussions?discussionId=discussion0";
 
   const user: UserWithAdminRights = {
     id: "user-id",
