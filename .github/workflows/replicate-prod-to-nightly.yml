@@ -42,7 +42,7 @@ jobs:
                   scalingo --region osc-secnum-fr1 --app if-prod-back --addon=\$ADDON_ID backups-download --output=dump.tar.gz &&
                   tar --to-stdout -xzf dump.tar.gz > dump.pgsql &&
                 echo \"> \$(date) - Create a Table of content for restore, ignore postgis related schemas and tables:\" &&
-                  pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology | grep -v outbox | grep -v notifications | grep -v short_links | grep -v metabase | grep -v __to_delete__form_establishments > list.txt &&
+                  pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology | grep -v outbox | grep -v notifications | grep -v short_links | grep -v metabase > list.txt &&
                 echo \"> \$(date) - Dropping data and schema owned by current user\" &&
                   psql \$SCALINGO_POSTGRESQL_URL -c 'DROP OWNED BY CURRENT_USER CASCADE;' &&
                 echo \"> \$(date) - Add Postgis extension if not exists\" &&
