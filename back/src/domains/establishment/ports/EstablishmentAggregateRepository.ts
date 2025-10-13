@@ -6,7 +6,6 @@ import type {
   EstablishmentSearchableByValue,
   LocationId,
   NafCode,
-  RomeCode,
   SearchResultDto,
   SearchSortedBy,
   SiretDto,
@@ -42,7 +41,6 @@ type GetOffersFilters = {
   geoParams?: GeoParams;
   locationIds?: LocationId[];
   nafCodes?: NafCode[];
-  romeCodes?: RomeCode[];
   searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
   sirets?: SiretDto[];
 };

@@ -49,6 +49,6 @@ export const calculatePaginationResult = ({
 }: Required<PaginationQueryParams> & { totalRecords: number }): Pagination => ({
   totalRecords,
   currentPage: page,
-  totalPages: Math.ceil(totalRecords / perPage),
+  totalPages: Math.max(1, Math.ceil(totalRecords / perPage)), // show at least 1 page if there are no results
   numberPerPage: perPage,
 });
