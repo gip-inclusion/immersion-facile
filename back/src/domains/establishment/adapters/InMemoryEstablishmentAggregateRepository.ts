@@ -206,11 +206,6 @@ export class InMemoryEstablishmentAggregateRepository
               ? filters.appellationCodes.includes(offer.appellationCode)
               : true,
           )
-          .filter((offer) =>
-            filters.romeCodes?.length
-              ? filters.romeCodes.includes(offer.romeCode)
-              : true,
-          )
           .map((offer) => {
             const searchResult =
               establishmentAggregateToSearchResultByRomeForFirstLocation(
