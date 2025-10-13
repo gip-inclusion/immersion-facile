@@ -170,6 +170,24 @@ describe("user connexion flow", () => {
       );
     });
 
+    it("throws an error if the redirect uri is not allowed", async () => {
+      const response = await httpClient.initiateLoginByOAuth({
+        queryParams: {
+          redirectUri: "@example.com",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          status: 400,
+          issues: ["redirectUri : redirectUri is not allowed"],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /login/oauth",
+        },
+        status: 400,
+      });
+    });
+
     it("should link the agency if a code safir matches an agency with ProConnect", async () => {
       const generatedUserId = "my-user-id";
       const uuids = [nonce, state, generatedUserId];

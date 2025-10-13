@@ -25,6 +25,7 @@ export const authRoutes = defineRoutes({
     queryParamsSchema: withRedirectUriSchema,
     responses: {
       302: emptyObjectSchema,
+      400: httpErrorSchema,
     },
   }),
   initiateLoginByEmail: defineRoute({
