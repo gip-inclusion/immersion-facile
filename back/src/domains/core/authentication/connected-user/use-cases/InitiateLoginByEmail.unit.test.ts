@@ -1,5 +1,7 @@
 import {
+  BadRequestError,
   expectArraysToMatch,
+  expectPromiseToFailWithError,
   expectToEqual,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
@@ -76,6 +78,19 @@ describe("RequestLoginByEmail usecase", () => {
         },
       },
     });
+  });
+
+  it("throws an error if the redirect uri is not allowed", async () => {
+    expectPromiseToFailWithError(
+      initiateLoginByEmail.execute({
+        email: user.email,
+        redirectUri: "@example.com",
+      }),
+      new BadRequestError(
+        "Schema validation failed in usecase InitiateLoginByEmail. See issues for details.",
+        ["redirectUri : redirectUri is not allowed"],
+      ),
+    );
   });
 
   it("When user exist by email", async () => {
