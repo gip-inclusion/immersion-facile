@@ -326,6 +326,43 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty7d, { numberOfNotifications: 0 });
       expectToEqual(uow.outboxRepository.events, []);
     });
+
+    it("when establishment does not have users to contact", async () => {
+      const establishmentWithNoUsersToContact =
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("12345678901234")
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: establishmentAdmin.id,
+              job: "boss",
+              phone: "0677889944",
+              shouldReceiveDiscussionNotifications: false,
+              isMainContactByPhone: false,
+            },
+            {
+              role: "establishment-contact",
+              userId: establishmentContact.id,
+              shouldReceiveDiscussionNotifications: false,
+            },
+          ])
+          .build();
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentWithNoUsersToContact,
+      ];
+      uow.discussionRepository.discussions = [
+        new DiscussionBuilder(discussionWith4DaysSinceBeneficiaryExchange)
+          .withSiret(establishmentWithNoUsersToContact.establishment.siret)
+          .build(),
+      ];
+
+      const reminderQty = await contactRequestReminder.execute(
+        "3days",
+        undefined,
+      );
+
+      expectToEqual(reminderQty, { numberOfNotifications: 0 });
+    });
   });
 
   describe("send reminder notification", () => {

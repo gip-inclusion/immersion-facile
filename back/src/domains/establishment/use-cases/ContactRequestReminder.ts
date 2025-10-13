@@ -112,36 +112,36 @@ const makeNotification = async ({
     establishment.userRights,
   );
 
-  return appellation
-    ? ({
-        followedIds: { establishmentSiret: discussion.siret },
-        kind: "email",
-        templatedContent: {
-          kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
-          sender: immersionFacileNoReplyEmailSender,
-          recipients: usersToContact.map(({ email }) => email),
-          replyTo: {
-            email: replyTo,
-            name: getFormattedFirstnameAndLastname({
-              firstname: discussion.potentialBeneficiary.firstName,
-              lastname: discussion.potentialBeneficiary.lastName,
-            }),
-          },
-          params: {
-            appellationLabel: appellation.appellationLabel,
-            beneficiaryFirstName: getFormattedFirstnameAndLastname({
-              firstname: discussion.potentialBeneficiary.firstName,
-            }),
-            beneficiaryLastName: getFormattedFirstnameAndLastname({
-              lastname: discussion.potentialBeneficiary.lastName,
-            }),
-            beneficiaryReplyToEmail: replyTo,
-            domain,
-            mode,
-          },
-        },
-      } satisfies NotificationContentAndFollowedIds)
-    : null;
+  if (!appellation || usersToContact.length === 0) return null;
+
+  return {
+    followedIds: { establishmentSiret: discussion.siret },
+    kind: "email",
+    templatedContent: {
+      kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
+      sender: immersionFacileNoReplyEmailSender,
+      recipients: usersToContact.map(({ email }) => email),
+      replyTo: {
+        email: replyTo,
+        name: getFormattedFirstnameAndLastname({
+          firstname: discussion.potentialBeneficiary.firstName,
+          lastname: discussion.potentialBeneficiary.lastName,
+        }),
+      },
+      params: {
+        appellationLabel: appellation.appellationLabel,
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: discussion.potentialBeneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: discussion.potentialBeneficiary.lastName,
+        }),
+        beneficiaryReplyToEmail: replyTo,
+        domain,
+        mode,
+      },
+    },
+  } satisfies NotificationContentAndFollowedIds;
 };
 
 const makeCreatedBetweenDateRange = (
