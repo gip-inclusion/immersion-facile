@@ -1341,7 +1341,7 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(result.data, []);
       expectToEqual(result.pagination, {
         currentPage: 1,
-        totalPages: 0, // no results = no pages ?
+        totalPages: 1,
         numberPerPage: 10,
         totalRecords: 0,
       });

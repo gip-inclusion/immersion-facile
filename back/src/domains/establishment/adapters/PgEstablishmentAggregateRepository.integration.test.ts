@@ -120,7 +120,6 @@ describe("PgEstablishmentAggregateRepository", () => {
       direction: "desc",
     };
     describe("getOffers", () => {
-      // - wrong paths lié à la distance
       const baseTestEstablishmentAggregates: EstablishmentAggregate[] = [
         establishmentWithOfferA1101_AtPosition,
         establishmentWithOfferA1101_close,
