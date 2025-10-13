@@ -213,7 +213,8 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       romeLabel,
       apiConsumerCall,
       crispTicket,
-      reportTitle,...rest
+      reportTitle,
+      ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
       if (method === "level") return {};

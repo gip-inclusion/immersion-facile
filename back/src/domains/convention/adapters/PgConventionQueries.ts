@@ -8,6 +8,7 @@ import {
   type ConventionReadDto,
   type ConventionScope,
   type ConventionStatus,
+  calculatePaginationResult,
   conventionReadSchema,
   conventionSchema,
   type DataWithPagination,
@@ -260,12 +261,7 @@ export class PgConventionQueries implements ConventionQueries {
 
     return {
       data: data.map(({ dto }) => dto),
-      pagination: {
-        currentPage: pagination.page,
-        totalPages: Math.ceil(totalRecords / pagination.perPage),
-        numberPerPage: pagination.perPage,
-        totalRecords,
-      },
+      pagination: calculatePaginationResult({ ...pagination, totalRecords }),
     };
   }
 }
