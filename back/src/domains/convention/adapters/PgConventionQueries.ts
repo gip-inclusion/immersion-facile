@@ -247,9 +247,7 @@ export class PgConventionQueries implements ConventionQueries {
     filters?: GetPaginatedConventionsFilters;
   }): Promise<DataWithPagination<ConventionReadDto>> {
     const {
-      actorEmailContains,
-      beneficiaryNameContains,
-      establishmentNameContains,
+      search,
       statuses,
       agencyIds,
       agencyDepartmentCodes,
@@ -266,9 +264,7 @@ export class PgConventionQueries implements ConventionQueries {
         transaction: this.transaction,
         agencyUserId,
       }),
-      filterEmail(actorEmailContains?.trim()),
-      filterByBeneficiaryName(beneficiaryNameContains?.trim()),
-      filterEstablishmentName(establishmentNameContains?.trim()),
+      filterSearch(search?.trim()),
       filterDate("date_start", dateStart),
       filterDate("date_end", dateEnd),
       filterDate("date_submission", dateSubmission),
@@ -346,6 +342,7 @@ const sortConventions =
       dateSubmission: "date_submission",
       dateStart: "date_start",
       dateValidation: "date_validation",
+      dateEnd: "date_end",
     };
 
     if (!sort || !sort.by) return builder.orderBy(sortByKey.dateStart, "desc");
@@ -385,25 +382,6 @@ const filterDate =
     return builder;
   };
 
-const filterEmail =
-  (emailContains: string | undefined) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
-    if (!emailContains) return builder;
-    const pattern = `%${emailContains}%`;
-
-    return builder.where((eb) => {
-      return eb.or([
-        sql<any>`${eb.ref("b.email")} ILIKE ${pattern}`,
-        sql<any>`${eb.ref("er.email")} ILIKE ${pattern}`,
-        sql<any>`${eb.ref("et.email")} ILIKE ${pattern}`,
-        sql<any>`br.email IS NOT NULL AND br.email ILIKE ${pattern}`,
-        sql<any>`bce.email IS NOT NULL AND bce.email ILIKE ${pattern}`,
-      ]);
-    });
-  };
-
 const filterInList =
   <T extends string>(
     fieldName: keyof Database["conventions"],
@@ -416,37 +394,30 @@ const filterInList =
     return builder.where(`conventions.${fieldName}`, "in", list);
   };
 
-const filterEstablishmentName =
-  (establishmentNameContains: string | undefined) =>
+const filterSearch =
+  (search: string | undefined) =>
   (
     builder: PaginatedConventionQueryBuilder,
   ): PaginatedConventionQueryBuilder => {
-    if (!establishmentNameContains) return builder;
-    return builder.where(
-      "business_name",
-      "ilike",
-      `%${establishmentNameContains}%`,
-    );
-  };
-
-const filterByBeneficiaryName =
-  (beneficiaryNameContains: string | undefined) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
-    if (!beneficiaryNameContains) return builder;
-    const nameWords = beneficiaryNameContains.split(" ");
+    if (!search) return builder;
+    const pattern = `%${search}%`;
 
     return builder.where((eb) =>
-      eb.or(
-        nameWords.flatMap((nameWord) => {
-          const pattern = `%${nameWord}%`;
-          return [
-            sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
-            sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
-          ];
-        }),
-      ),
+      eb.or([
+        // Search in convention ID (cast UUID to text for pattern matching)
+        sql<any>`CAST(${eb.ref("conventions.id")} AS text) ILIKE ${pattern}`,
+        // Search in beneficiary names
+        sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
+        // Search in establishment business name
+        sql<any>`${eb.ref("business_name")} ILIKE ${pattern}`,
+        // Search in actor emails
+        sql<any>`${eb.ref("b.email")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("er.email")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("et.email")} ILIKE ${pattern}`,
+        sql<any>`br.email IS NOT NULL AND br.email ILIKE ${pattern}`,
+        sql<any>`bce.email IS NOT NULL AND bce.email ILIKE ${pattern}`,
+      ]),
     );
   };
 
