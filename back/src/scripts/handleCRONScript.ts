@@ -118,6 +118,7 @@ const onScriptSuccess =
 
     logger.info({
       message: `${name} - ${reportTitle}`,
+      reportTitle: `cron ${name}`,
       reportContent,
       durationInSeconds,
     });
@@ -143,17 +144,18 @@ const onScriptError =
   }: ScriptContextParams & { slackErrorChannelName: string }) =>
   async (error: any): Promise<void> => {
     const durationInSeconds = calculateDurationInSecondsFrom(start);
-    const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context} - ${
+    const reportMessage = `❌ Failure at ${new Date().toISOString()} - ${context} - ${
       error.message
     }`;
 
     logger.error({
       durationInSeconds,
-      message: `${name} - ${reportTitle}`,
+      reportTitle: `cron ${name}`,
+      message: `${name} - ${reportMessage}`,
       error,
     });
     const report = [
-      reportTitle,
+      reportMessage,
       `Script [${name}]`,
       `Script duration : ${durationInSeconds} seconds`,
       `Error message :${error.message}`,
@@ -163,7 +165,7 @@ const onScriptError =
     await notifyTeam({ rawContent: report, isError: true });
     await notifyTeam({
       rawContent: [
-        reportTitle,
+        reportMessage,
         `Script [${name}]`,
         `See error channel ${slackErrorChannelName} for more details`,
       ].join("\n"),

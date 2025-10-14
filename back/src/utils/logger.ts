@@ -125,6 +125,7 @@ type LoggerParams = Partial<{
     peExternalId: FtExternalId;
     isJobSeeker: boolean;
   }>;
+  reportTitle: string;
   reportContent: string;
   request: Pick<Request, "path" | "method">;
   requestId: string;
@@ -212,6 +213,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       romeLabel,
       apiConsumerCall,
       crispTicket,
+      reportTitle,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
