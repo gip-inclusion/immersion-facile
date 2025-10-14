@@ -165,7 +165,10 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         discussion.siret,
       );
 
-    if (establishment && discussion.status === "PENDING")
+    if (
+      establishment &&
+      (discussion.status === "PENDING" || discussion.status === "ACCEPTED")
+    )
       return this.#addExchangeAndSendEvent(
         uow,
         discussion,
