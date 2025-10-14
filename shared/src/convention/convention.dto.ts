@@ -470,9 +470,7 @@ export const getExactAge = ({
 };
 
 export type GetPaginatedConventionsFilters = {
-  actorEmailContains?: string;
-  establishmentNameContains?: string;
-  beneficiaryNameContains?: string;
+  search?: string;
   statuses?: NotEmptyArray<ConventionStatus>;
   agencyIds?: NotEmptyArray<string>;
   agencyDepartmentCodes?: NotEmptyArray<string>;
@@ -483,7 +481,7 @@ export type GetPaginatedConventionsFilters = {
 
 export type GetPaginatedConventionsSortBy = keyof Pick<
   ConventionDto,
-  "dateValidation" | "dateStart" | "dateSubmission"
+  "dateValidation" | "dateStart" | "dateSubmission" | "dateEnd"
 >;
 
 export type GetConventionsForAgencyUserParams =
@@ -499,12 +497,10 @@ export type FlatGetConventionsForAgencyUserParams = {
 
   // sort
   sortBy?: GetPaginatedConventionsSortBy;
-  sortDirection?: "asc" | "desc";
+  sortDirection?: ConventionSortDirection;
 
   // filters
-  actorEmailContains?: string;
-  establishmentNameContains?: string;
-  beneficiaryNameContains?: string;
+  search?: string;
   statuses?: NotEmptyArray<ConventionStatus>;
   agencyIds?: NotEmptyArray<string>;
   agencyDepartmentCodes?: NotEmptyArray<string>;
