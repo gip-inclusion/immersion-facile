@@ -44,6 +44,9 @@ export type TypeFromTuple<T extends unknown[]> = T[number];
 
 export type NotEmptyArray<T> = [T, ...T[]];
 
+export const isNotEmptyArray = <T>(array: T[]): array is NotEmptyArray<T> =>
+  array.length > 0;
+
 export type ExcludeFromExisting<T extends string, K extends T> = Exclude<T, K>;
 
 export type ExtractFromExisting<T, K extends T> = Extract<T, K>;
