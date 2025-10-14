@@ -28,7 +28,7 @@ export const handleCRONScript = async <
   handleResults,
   logger = createLogger(__filename),
   monitorConfig = defaultMonitorConfig,
-  exitOnSuccess = true,
+  exitOnFinish = true,
 }: {
   name: string;
   config: AppConfig;
@@ -36,7 +36,7 @@ export const handleCRONScript = async <
   handleResults: (results: T) => string;
   logger?: OpacifiedLogger;
   monitorConfig?: MonitorConfig;
-  exitOnSuccess?: boolean;
+  exitOnFinish?: boolean;
 }) => {
   const sanitizedName = pipeWithValue(name, camelToKebab, slugify);
   const sentry = configureSentry(config.envType);
@@ -88,7 +88,7 @@ export const handleCRONScript = async <
     }
   } finally {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (exitOnSuccess) {
+    if (exitOnFinish) {
       process.exit(0);
     }
   }

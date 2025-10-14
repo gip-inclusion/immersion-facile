@@ -33,5 +33,4 @@ export const triggerRefreshMaterializedViews = () =>
     config,
     script: refreshMaterializedViews,
     handleResults: () => "Materialized views refreshed successfully",
-    exitOnSuccess: false,
   });
