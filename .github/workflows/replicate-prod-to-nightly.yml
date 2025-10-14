@@ -9,14 +9,14 @@ jobs:
   duplicate-prod-db-to-nightly:
     runs-on: ubuntu-latest
     name: Dump and restore the remote database data.
-
+    environment: prod
     steps:
       - uses: actions/checkout@v4
       - name: Install scalingo CLI
         uses: ./.github/actions/install-scalingo-cli
 
       - name: Login with api-token
-        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN_SECNUM }}
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
 
       - name: Dump the remote database data and restore it to the local database.
         run: >-
@@ -24,11 +24,11 @@ jobs:
                 echo \"> \$(date) - activate Scalingo CLI, PG then login\" &&
                   install-scalingo-cli &&
                   dbclient-fetcher pgsql &&
-                  scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_SECNUM }} &&
+                  scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }} &&
                 echo \"> \$(date) - Getting Bearer token\" &&
                   BEARER_TOKEN=\$(curl -s -H \"Accept: application/json\" \
                     -H \"Content-Type: application/json\" \
-                    -u \":${{ secrets.SCALINGO_API_TOKEN_SECNUM }}\" \
+                    -u \":${{ secrets.SCALINGO_API_TOKEN }}\" \
                     -X POST https://auth.scalingo.com/v1/tokens/exchange\
                      | jq -r '.token') &&
                 echo \"> \$(date) - Getting PG Addon ID\" &&
