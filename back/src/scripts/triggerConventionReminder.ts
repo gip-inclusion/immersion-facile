@@ -26,11 +26,11 @@ const executeConventionReminder = () => {
   ).execute();
 };
 
-handleCRONScript(
-  "conventionReminderScript",
+handleCRONScript({
+  name: "conventionReminderScript",
   config,
-  executeConventionReminder,
-  ({ success, failures }) => {
+  script: executeConventionReminder,
+  handleResults: ({ success, failures }) => {
     const reportLines = [
       `Total of reminders : ${success + failures.length}`,
       `Number of successfully reminders : ${success}`,
@@ -46,4 +46,4 @@ handleCRONScript(
     return reportLines.filter(filterNotFalsy).join("\n");
   },
   logger,
-);
+});

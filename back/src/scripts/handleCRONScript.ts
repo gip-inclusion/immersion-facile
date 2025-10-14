@@ -21,14 +21,23 @@ const defaultMonitorConfig: MonitorConfig = {
 
 export const handleCRONScript = async <
   T extends Record<string, unknown> | void,
->(
-  name: string,
-  config: AppConfig,
-  script: () => Promise<T>,
-  handleResults: (results: T) => string,
-  logger: OpacifiedLogger = createLogger(__filename),
-  monitorConfig: MonitorConfig = defaultMonitorConfig,
-) => {
+>({
+  name,
+  config,
+  script,
+  handleResults,
+  logger = createLogger(__filename),
+  monitorConfig = defaultMonitorConfig,
+  exitOnSuccess = true,
+}: {
+  name: string;
+  config: AppConfig;
+  script: () => Promise<T>;
+  handleResults: (results: T) => string;
+  logger?: OpacifiedLogger;
+  monitorConfig?: MonitorConfig;
+  exitOnSuccess?: boolean;
+}) => {
   const sanitizedName = pipeWithValue(name, camelToKebab, slugify);
   const sentry = configureSentry(config.envType);
 
@@ -79,7 +88,9 @@ export const handleCRONScript = async <
     }
   } finally {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    process.exit(0);
+    if (exitOnSuccess) {
+      process.exit(0);
+    }
   }
 };
 

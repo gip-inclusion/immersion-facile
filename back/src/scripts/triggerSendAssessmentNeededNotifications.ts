@@ -94,11 +94,11 @@ const sendAssessmentNeededNotificationsScript = async () => {
   return result;
 };
 
-handleCRONScript(
-  "sendAssessmentNeededNotificationsScript",
+handleCRONScript({
+  name: "sendAssessmentNeededNotificationsScript",
   config,
-  sendAssessmentNeededNotificationsScript,
-  ({
+  script: sendAssessmentNeededNotificationsScript,
+  handleResults: ({
     conventionsQtyWithImmersionEnding,
     conventionsQtyWithAlreadyExistingAssessment,
     conventionsQtyWithAssessmentSentSuccessfully,
@@ -124,4 +124,4 @@ handleCRONScript(
     ].join("\n");
   },
   logger,
-);
+});

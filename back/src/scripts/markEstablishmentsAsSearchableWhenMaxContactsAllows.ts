@@ -24,10 +24,10 @@ const startScript = async () => {
   return { numberOfEstablishmentsUpdated };
 };
 
-handleCRONScript(
-  "markEstablishmentsAsSearchableWhenMaxContactsAllows",
+handleCRONScript({
+  name: "markEstablishmentsAsSearchableWhenMaxContactsAllows",
   config,
-  startScript,
-  ({ numberOfEstablishmentsUpdated }) =>
+  script: startScript,
+  handleResults: ({ numberOfEstablishmentsUpdated }) =>
     `${numberOfEstablishmentsUpdated} establishments have been marked as searchable again`,
-);
+});

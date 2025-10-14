@@ -6,7 +6,7 @@ import { handleCRONScript } from "./handleCRONScript";
 const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
-const triggerRefreshMaterializedViews = async () => {
+const refreshMaterializedViews = async () => {
   logger.info({ message: "Starting to refresh materialized views" });
 
   const pool = createMakeScriptPgPool(config)();
@@ -27,9 +27,11 @@ const triggerRefreshMaterializedViews = async () => {
   await pool.end();
 };
 
-handleCRONScript(
-  "refresh materialized views",
-  config,
-  triggerRefreshMaterializedViews,
-  () => "Materialized views refreshed successfully",
-);
+export const triggerRefreshMaterializedViews = () =>
+  handleCRONScript({
+    name: "refresh materialized views",
+    config,
+    script: refreshMaterializedViews,
+    handleResults: () => "Materialized views refreshed successfully",
+    exitOnSuccess: false,
+  });

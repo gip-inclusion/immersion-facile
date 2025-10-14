@@ -32,13 +32,15 @@ const deactivateUnresponsiveEstablishments = async (): Promise<Report> => {
     .finally(() => pool.end());
 };
 
-handleCRONScript(
-  "deactivateUnresponsiveEstablishments",
-  config,
-  deactivateUnresponsiveEstablishments,
-  (report) =>
-    report.status === "success"
-      ? `${report.updatedCount} unresponsive establishments deactivated successfully`
-      : `Error deactivating unresponsive establishments: ${report.message}`,
-  logger,
-);
+export const triggerDeactivateUnresponsiveEstablishments = () =>
+  handleCRONScript({
+    name: "deactivateUnresponsiveEstablishments",
+    config,
+    script: deactivateUnresponsiveEstablishments,
+    handleResults: (report) =>
+      report.status === "success"
+        ? `${report.updatedCount} unresponsive establishments deactivated successfully`
+        : `Error deactivating unresponsive establishments: ${report.message}`,
+    logger,
+    exitOnSuccess: false,
+  });

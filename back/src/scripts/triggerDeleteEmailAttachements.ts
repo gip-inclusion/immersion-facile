@@ -24,11 +24,11 @@ const executeTriggerDeleteEmailAttachements = async () => {
   };
 };
 
-handleCRONScript(
-  "deleteEmailAttachements",
+handleCRONScript({
+  name: "deleteEmailAttachements",
   config,
-  executeTriggerDeleteEmailAttachements,
-  ({ numberOfDeletedAttachements }) =>
+  script: executeTriggerDeleteEmailAttachements,
+  handleResults: ({ numberOfDeletedAttachements }) =>
     `Deleted : ${numberOfDeletedAttachements} attachements`,
   logger,
-);
+});

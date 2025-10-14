@@ -42,11 +42,11 @@ const triggerMarkObsoleteDiscussionsAsDeprecated = async () => {
   return getObsoleteDiscussionsAndEmitDeprecatedEvent.execute();
 };
 
-handleCRONScript(
-  "triggerMarkObsoleteDiscussionsAsDeprecated",
+handleCRONScript({
+  name: "triggerMarkObsoleteDiscussionsAsDeprecated",
   config,
-  triggerMarkObsoleteDiscussionsAsDeprecated,
-  ({ numberOfObsoleteDiscussions }) =>
+  script: triggerMarkObsoleteDiscussionsAsDeprecated,
+  handleResults: ({ numberOfObsoleteDiscussions }) =>
     `Marked ${numberOfObsoleteDiscussions} discussions as deprecated`,
   logger,
-);
+});

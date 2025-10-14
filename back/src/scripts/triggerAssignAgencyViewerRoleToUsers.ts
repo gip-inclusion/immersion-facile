@@ -56,11 +56,15 @@ const executeAssignAgencyViewerRole = async () => {
   });
 };
 
-handleCRONScript(
-  "assignAgencyViewerRoleToFTUsers",
+handleCRONScript({
+  name: "assignAgencyViewerRoleToFTUsers",
   config,
-  executeAssignAgencyViewerRole,
-  ({ agenciesSuccessfullyUpdated, agencyUpdatesFailed, agenciesSkipped }) => {
+  script: executeAssignAgencyViewerRole,
+  handleResults: ({
+    agenciesSuccessfullyUpdated,
+    agencyUpdatesFailed,
+    agenciesSkipped,
+  }) => {
     return [
       `Agencies successfully updated: ${agenciesSuccessfullyUpdated}`,
       `Agencies failed to update: ${agencyUpdatesFailed}`,
@@ -70,4 +74,4 @@ handleCRONScript(
     ].join("\n");
   },
   logger,
-);
+});

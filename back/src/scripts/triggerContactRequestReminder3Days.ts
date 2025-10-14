@@ -31,11 +31,11 @@ const executeContactRequestReminder = () => {
   }).execute("3days");
 };
 
-handleCRONScript(
-  "contactRequestReminderScript3Days",
+handleCRONScript({
+  name: "contactRequestReminderScript3Days",
   config,
-  executeContactRequestReminder,
-  ({ numberOfNotifications }) =>
+  script: executeContactRequestReminder,
+  handleResults: ({ numberOfNotifications }) =>
     `Total of reminders : ${numberOfNotifications}`,
   logger,
-);
+});

@@ -62,11 +62,11 @@ const executeUsecase = async () => {
   return result;
 };
 
-handleCRONScript(
-  "resyncOldConventionToFT",
+handleCRONScript({
+  name: "resyncOldConventionToFT",
   config,
-  executeUsecase,
-  (report) => {
+  script: executeUsecase,
+  handleResults: (report) => {
     const errors = Object.entries(report.errors).map(
       ([key, error]) => `${key}: ${error.message} `,
     );
@@ -76,9 +76,7 @@ handleCRONScript(
     );
 
     return [
-      `Total of convention to sync : ${
-        report.success + errors.length + skips.length
-      }`,
+      `Total of convention to sync : ${report.success + errors.length + skips.length}`,
       `Number of successfully sync convention : ${report.success}`,
       `Number of failures : ${errors.length}`,
       `Number of skips : ${skips.length}`,
@@ -87,4 +85,4 @@ handleCRONScript(
     ].join("\n");
   },
   logger,
-);
+});
