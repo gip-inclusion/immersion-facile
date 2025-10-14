@@ -105,7 +105,7 @@ const establishmentStatSchema: ZodSchemaWithInputMatchingOutput<EstablishmentSta
     isReferenced: z.boolean(),
   });
 
-export const paginatedEstablishmentStatsSchema = createPaginatedSchema(
+const paginatedEstablishmentStatsSchema = createPaginatedSchema(
   establishmentStatSchema,
 );
 

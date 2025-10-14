@@ -105,7 +105,7 @@ export const artisteCirqueOffer = new OfferEntityBuilder()
   .withAppellationLabel("Artiste de cirque")
   .build();
 
-export const offer_A1101 = new OfferEntityBuilder()
+const offer_A1101 = new OfferEntityBuilder()
   .withRomeCode("A1101")
   .withRomeLabel("Conduite d'engins agricoles et forestiers")
   .withAppellationCode("0")

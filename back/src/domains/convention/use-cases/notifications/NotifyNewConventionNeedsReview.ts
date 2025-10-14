@@ -155,7 +155,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
   }
 }
 
-export type Recipient = {
+type Recipient = {
   role: Role;
   email: string;
   peAdvisor:

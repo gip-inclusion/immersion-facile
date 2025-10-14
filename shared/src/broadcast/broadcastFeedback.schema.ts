@@ -13,21 +13,20 @@ import type {
   SubscriberErrorFeedback,
 } from "./broadcastFeedback.dto";
 
-export const broadcastFeedbackResponseSchema: z.Schema<BroadcastFeedbackResponse> =
-  z
-    .object({
-      httpStatus: z.number(),
-      body: z.unknown().optional(),
-    })
-    .nullable();
+const broadcastFeedbackResponseSchema: z.Schema<BroadcastFeedbackResponse> = z
+  .object({
+    httpStatus: z.number(),
+    body: z.unknown().optional(),
+  })
+  .nullable();
 
-export const subscriberErrorFeedbackSchema: z.Schema<SubscriberErrorFeedback> =
+const subscriberErrorFeedbackSchema: z.Schema<SubscriberErrorFeedback> =
   z.object({
     message: z.string(),
     error: z.unknown().optional(),
   });
 
-export const conventionBroadcastRequestParamsSchema: z.Schema<ConventionBroadcastRequestParams> =
+const conventionBroadcastRequestParamsSchema: z.Schema<ConventionBroadcastRequestParams> =
   z.object({
     conventionId: conventionIdSchema,
     callbackUrl: absoluteUrlSchema.optional(),

@@ -10,7 +10,7 @@ import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
-export type SearchMadeWithoutGeoParams = {
+type SearchMadeWithoutGeoParams = {
   appellationCodes?: string[];
   romeCode?: string;
   sortedBy?: SearchSortedBy;
@@ -20,7 +20,7 @@ export type SearchMadeWithoutGeoParams = {
 } & WithAcquisition &
   WithNafCodes;
 
-export type SearchMadeWithGeoParams = GeoParams & SearchMadeWithoutGeoParams;
+type SearchMadeWithGeoParams = GeoParams & SearchMadeWithoutGeoParams;
 
 export type SearchMade = SearchMadeWithGeoParams | SearchMadeWithoutGeoParams;
 

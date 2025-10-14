@@ -11,7 +11,7 @@ export type CrispConfig = {
   websiteId: string;
 };
 
-export const crispError = (params: {
+const crispError = (params: {
   status: number;
   body: { reason: string; data: Record<string, any> };
 }) =>

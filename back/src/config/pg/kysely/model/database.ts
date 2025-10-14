@@ -193,7 +193,7 @@ interface Agencies extends WithAcquisition {
   phone_number: string;
 }
 
-export interface BroadcastFeedbacks {
+interface BroadcastFeedbacks {
   id: Generated<number>;
   consumer_id: string | null;
   consumer_name: string;

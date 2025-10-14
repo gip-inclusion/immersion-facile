@@ -26,12 +26,12 @@ type CommonEstablishmentMarketingGatewayDto = {
   siret: SiretDto;
 };
 
-export type LeadEstablishmentMarketingGatewayDto =
+type LeadEstablishmentMarketingGatewayDto =
   CommonEstablishmentMarketingGatewayDto & {
     isRegistered: false; //ENT_REFERENCE_SITE
   };
 
-export type SpecificRegistered = {
+type SpecificRegistered = {
   departmentCode: DepartmentCode; //ENT_CODE_DEPARTEMENT
   isCommited?: boolean; //ENT_LES_ENTREPRISES_SENGAGENT
   isRegistered: true; //ENT_REFERENCE_SITE
@@ -45,7 +45,7 @@ export type SpecificRegistered = {
   romes: RomeCode[]; // ENT_ROMES
 };
 
-export type RegisteredEstablishmentMarketingGatewayDto =
+type RegisteredEstablishmentMarketingGatewayDto =
   CommonEstablishmentMarketingGatewayDto & SpecificRegistered;
 
 export type EstablishmentMarketingGatewayDto =

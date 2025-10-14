@@ -46,14 +46,14 @@ export type DiagorienteRawResponse = {
   search_results: DiagorienteSearchResult[];
 };
 
-export type DiagorienteSearchResult = {
+type DiagorienteSearchResult = {
   text: string;
   similarity: number;
   data: DiagorienteResultData;
 };
 
 // Use only useful props since diagoriente API props are not stable
-export type DiagorienteResultData = {
+type DiagorienteResultData = {
   // _key: string;
   // _id: string;
   // _rev: string;
