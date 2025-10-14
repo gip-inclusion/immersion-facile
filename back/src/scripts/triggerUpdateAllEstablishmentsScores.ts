@@ -25,13 +25,13 @@ const updateScores = async (): Promise<Report> => {
     .finally(() => pool.end());
 };
 
-handleCRONScript(
-  "updateAllEstablishmentsScores",
+handleCRONScript({
+  name: "updateAllEstablishmentsScores",
   config,
-  updateScores,
-  (report) =>
+  script: updateScores,
+  handleResults: (report) =>
     report.status === "success"
       ? "Establishment score updated successfully"
       : `Error updating establishment scores : ${report.message}`,
   logger,
-);
+});

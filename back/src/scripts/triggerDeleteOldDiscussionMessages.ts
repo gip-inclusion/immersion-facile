@@ -25,11 +25,11 @@ const triggerDeleteOldDiscussionMessages = async () => {
   return { numberOfMessagesDeleted };
 };
 
-handleCRONScript(
-  "triggerDeleteOldDiscussionMessages",
+handleCRONScript({
+  name: "triggerDeleteOldDiscussionMessages",
   config,
-  triggerDeleteOldDiscussionMessages,
-  ({ numberOfMessagesDeleted }) =>
+  script: triggerDeleteOldDiscussionMessages,
+  handleResults: ({ numberOfMessagesDeleted }) =>
     `${numberOfMessagesDeleted} messages in discussion were deleted, because they were more than ${numberOfMonthBeforeDeletion} months old`,
   logger,
-);
+});

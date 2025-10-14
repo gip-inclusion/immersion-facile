@@ -78,14 +78,17 @@ const main = async () => {
   return report;
 };
 
-handleCRONScript(
-  "update-establishments-from-insee-api",
+handleCRONScript({
+  name: "update-establishments-from-insee-api",
   config,
-  main,
-  ({ numberOfEstablishmentsToUpdate, establishmentWithNewData }) =>
+  script: main,
+  handleResults: ({
+    numberOfEstablishmentsToUpdate,
+    establishmentWithNewData,
+  }) =>
     [
       `Updating ${numberOfEstablishmentsToUpdate} establishments for Insee Api`,
       `Of which ${establishmentWithNewData} had new data`,
     ].join("\n"),
   logger,
-);
+});

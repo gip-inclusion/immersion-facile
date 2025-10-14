@@ -174,24 +174,16 @@ const validateRowsAndReplaceInvalidPhoneNumber = (
 };
 
 handleCRONScript(
-  "addAgenciesAndUsers",
-  config,
-  triggerAddAgenciesAndUsers,
-  ({
-    siretAlreadyInIFCount,
-    createdAgenciesCount,
-    usersAlreadyInIFCount,
-    createdUsersCount,
-    parsingErrorsCount,
-    usecaseErrorsCount,
-  }) =>
-    [
+  {
+    name: "addAgenciesAndUsers", config, script: triggerAddAgenciesAndUsers, handleResults: ({
+      siretAlreadyInIFCount, createdAgenciesCount, usersAlreadyInIFCount, createdUsersCount, parsingErrorsCount, usecaseErrorsCount,
+    }) => [
       `Already existing agencies: ${siretAlreadyInIFCount}`,
       `Created agencies: ${createdAgenciesCount}`,
       `Already existing users: ${usersAlreadyInIFCount}`,
       `Created users: ${createdUsersCount}`,
       `Parsing errors count: ${parsingErrorsCount}`,
       `Usecase errors count: ${usecaseErrorsCount}`,
-    ].join("\n"),
-  logger,
+    ].join("\n"), logger
+  },
 );

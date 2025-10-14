@@ -151,19 +151,19 @@ const insertAppellations =
       )
       .execute();
 
-handleCRONScript(
-  "update-rome-data-from-france-travail-ROME-4-api",
+handleCRONScript({
+  name: "update-rome-data-from-france-travail-ROME-4-api",
   config,
-  main,
-  ({ numberOfAppellations, numberOfRomes }) =>
+  script: main,
+  handleResults: ({ numberOfAppellations, numberOfRomes }) =>
     [
       "Updated successfully rome and appellations data from ROME-4 API",
       `Number of romes: ${numberOfRomes}`,
       `Number of appellations: ${numberOfAppellations}`,
     ].join("\n"),
   logger,
-  {
+  monitorConfig: {
     schedule: { type: "interval", unit: "month", value: 1 },
-    checkinMargin: 2 * 24 * 60, // 2 days margin
+    checkinMargin: 2 * 24 * 60,
   },
-);
+});

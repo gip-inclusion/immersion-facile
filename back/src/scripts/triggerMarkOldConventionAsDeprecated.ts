@@ -35,11 +35,11 @@ const triggerMarkOldConventionAsDeprecated = async () => {
   return { numberOfUpdatedConventions };
 };
 
-handleCRONScript(
-  "triggerMarkOldConventionAsDeprecated",
+handleCRONScript({
+  name: "triggerMarkOldConventionAsDeprecated",
   config,
-  triggerMarkOldConventionAsDeprecated,
-  ({ numberOfUpdatedConventions }) =>
+  script: triggerMarkOldConventionAsDeprecated,
+  handleResults: ({ numberOfUpdatedConventions }) =>
     `Marked ${numberOfUpdatedConventions} as deprecated`,
   logger,
-);
+});

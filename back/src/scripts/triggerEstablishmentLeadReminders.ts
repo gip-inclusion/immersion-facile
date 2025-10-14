@@ -67,11 +67,11 @@ const triggerEstablishmentLeadReminders = async () => {
   return { firstReminderResult, secondReminderResult };
 };
 
-handleCRONScript(
-  "sendEstablishmentLeadFirstReminderScript",
+handleCRONScript({
+  name: "sendEstablishmentLeadFirstReminderScript",
   config,
-  triggerEstablishmentLeadReminders,
-  ({ firstReminderResult, secondReminderResult }) =>
+  script: triggerEstablishmentLeadReminders,
+  handleResults: ({ firstReminderResult, secondReminderResult }) =>
     [
       "First reminder:",
       reminderReport(firstReminderResult),
@@ -80,7 +80,7 @@ handleCRONScript(
       reminderReport(secondReminderResult),
     ].join("\n"),
   logger,
-);
+});
 
 const reminderReport = ({
   establishmentsReminded,

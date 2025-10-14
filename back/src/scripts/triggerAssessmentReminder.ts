@@ -85,11 +85,11 @@ const triggerAssessmentReminder = async () => {
   };
 };
 
-handleCRONScript(
-  "assessmentReminder",
+handleCRONScript({
+  name: "assessmentReminder",
   config,
-  triggerAssessmentReminder,
-  ({
+  script: triggerAssessmentReminder,
+  handleResults: ({
     numberOfConventionsReminded3DaysAfter,
     numberOfConventionsReminded10DaysAfter,
   }) =>
@@ -98,4 +98,4 @@ handleCRONScript(
       `Total of reminders D+10 : ${numberOfConventionsReminded10DaysAfter}`,
     ].join("\n"),
   logger,
-);
+});

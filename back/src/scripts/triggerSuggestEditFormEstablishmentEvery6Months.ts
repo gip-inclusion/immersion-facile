@@ -36,11 +36,11 @@ const startScript = async (): Promise<Report> => {
   return suggestEditEstablishmentsScript.execute();
 };
 
-handleCRONScript(
-  "triggerSuggestEditFormEstablishmentEvery6Months",
+handleCRONScript({
+  name: "triggerSuggestEditFormEstablishmentEvery6Months",
   config,
-  startScript,
-  ({ numberOfEstablishmentsToContact, errors = {} }) => {
+  script: startScript,
+  handleResults: ({ numberOfEstablishmentsToContact, errors = {} }) => {
     const nSiretFailed = Object.keys(errors).length;
     const nSiretSuccess = numberOfEstablishmentsToContact - nSiretFailed;
     const errorsAsString = Object.keys(errors)
@@ -53,4 +53,4 @@ handleCRONScript(
       ...(nSiretFailed > 0 ? [`Errors were: ${errorsAsString}`] : []),
     ].join("\n");
   },
-);
+});

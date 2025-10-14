@@ -92,14 +92,14 @@ const updateAppellations =
       )
       .execute();
 
-handleCRONScript(
-  "update-rome-legacy-rome-v3-data-from-france-travail-API",
+handleCRONScript({
+  name: "update-rome-legacy-rome-v3-data-from-france-travail-API",
   config,
-  main,
-  ({ numberOfAppellations }) =>
+  script: main,
+  handleResults: ({ numberOfAppellations }) =>
     [
       "Updated successfully rome and appellations data from ROME-3 API",
       `Number of appellations: ${numberOfAppellations}`,
     ].join("\n"),
   logger,
-);
+});
