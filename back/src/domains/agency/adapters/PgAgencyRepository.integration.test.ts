@@ -231,7 +231,13 @@ describe("PgAgencyRepository", () => {
             departmentCode: "64",
             city: "Bayonne",
           })
+          .withPhoneNumber("0610101010")
+          .withKind("pole-emploi")
           .withRejectionJustification("justification du rejet")
+          .withSignature("new signature")
+          .withLogoUrl("http://new-logo-url.fr")
+          .withAgencySiret("11110000111100")
+          .withCodeSafir("CODE_123")
           .build(),
         {
           [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
@@ -251,6 +257,7 @@ describe("PgAgencyRepository", () => {
       const updatedFields: Partial<AgencyWithoutRights> = {
         status: "rejected",
         rejectionJustification: "justification du rejet",
+        phoneNumber: "0610101010",
       };
       await agencyRepository.update({
         id: agency1.id,

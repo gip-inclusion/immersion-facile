@@ -111,6 +111,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
         rejection_justification: agency.rejectionJustification,
+        phone_number: agency.phoneNumber,
       }))
       .where("id", "=", agency.id)
       .execute();
