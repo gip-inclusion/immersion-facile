@@ -41,7 +41,7 @@ type MessageInputFromDashboard = MessageInputCommonFields & {
   attachments: never[];
 };
 
-export type MessageInputFromInboundParsing = MessageInputCommonFields & {
+type MessageInputFromInboundParsing = MessageInputCommonFields & {
   senderEmail: Email;
   recipientRole: ExchangeRole;
   attachments: Attachment[];
@@ -51,7 +51,7 @@ export type MessageInputFromInboundParsing = MessageInputCommonFields & {
 
 type InputSource = (typeof inputSources)[number];
 
-export type AddExchangeToDiscussionInput =
+type AddExchangeToDiscussionInput =
   | {
       source: ExtractFromExisting<InputSource, "dashboard">;
       messageInputs: MessageInputFromDashboard[];
@@ -61,8 +61,7 @@ export type AddExchangeToDiscussionInput =
       messageInputs: MessageInputFromInboundParsing[];
     };
 
-export type MessageInput =
-  AddExchangeToDiscussionInput["messageInputs"][number];
+type MessageInput = AddExchangeToDiscussionInput["messageInputs"][number];
 
 const messageInputCommonFieldsSchema = z.object({
   message: zStringMinLength1,
@@ -94,7 +93,7 @@ const inputFromInboundParsingSchema = z.object({
   messageInputs: z.array(fullMessageInputSchema),
 });
 
-export const messageInputSchema = z.discriminatedUnion("source", [
+const messageInputSchema = z.discriminatedUnion("source", [
   inputFromInboundParsingSchema,
   inputFromDashboardSchema,
 ]);

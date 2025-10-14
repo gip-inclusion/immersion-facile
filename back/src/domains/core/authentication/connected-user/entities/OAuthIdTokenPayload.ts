@@ -15,11 +15,6 @@ type ProviderTokenPayloadBase = {
   structure_pe?: string;
 };
 
-export type IcOAuthIdTokenPayload = ProviderTokenPayloadBase & {
-  nonce: string;
-  family_name: string;
-};
-
 export type ProConnectOAuthIdTokenPayload = ProviderTokenPayloadBase & {
   usual_name: string;
   siret: SiretDto;

@@ -14,7 +14,7 @@ import type { DocumentGateway } from "../port/DocumentGateway";
 
 export type FileInput = Omit<StoredFile, "id">;
 
-export type UploadFileInput = {
+type UploadFileInput = {
   file: FileInput;
 };
 

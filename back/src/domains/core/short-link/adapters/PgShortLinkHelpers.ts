@@ -6,7 +6,7 @@ import type {
 import { z } from "zod";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 
-export type PgShortLinkRepositoryDto = {
+type PgShortLinkRepositoryDto = {
   short_link_id: string;
   url: string;
   created_at: Date;

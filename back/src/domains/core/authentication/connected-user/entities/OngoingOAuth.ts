@@ -8,7 +8,7 @@ import type {
 } from "shared";
 
 export type OAuthJwt = Flavor<string, "OAuthJwt">;
-export type OAuthNonce = Flavor<string, "OAuthNonce">;
+type OAuthNonce = Flavor<string, "OAuthNonce">;
 
 type OngoingAuthCommon = {
   userId?: string;

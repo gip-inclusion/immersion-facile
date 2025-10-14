@@ -21,7 +21,7 @@ import type {
 } from "../../port/OAuthGateway";
 import type { ProConnectRoutes } from "./proConnect.routes";
 
-export type OAuthLogoutQueryParams = {
+type OAuthLogoutQueryParams = {
   post_logout_redirect_uri: AbsoluteUrl;
   id_token_hint: string;
   state: string;

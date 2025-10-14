@@ -44,7 +44,7 @@ const rootLogger = pino({
 export const legacyCreateLogger = (filename: string): Logger =>
   rootLogger.child({ name: path.basename(filename) });
 
-export type LoggedAxiosResponse = Partial<
+type LoggedAxiosResponse = Partial<
   Pick<AxiosResponse, "status" | "headers" | "data">
 >;
 
@@ -59,7 +59,7 @@ type RouteMethodAndUrl = {
   url: string;
 };
 
-export type PartnerApiCall = {
+type PartnerApiCall = {
   partnerName: string;
   route: RouteMethodAndUrl;
   durationInMs: number;

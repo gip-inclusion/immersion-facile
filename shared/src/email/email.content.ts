@@ -9,8 +9,3 @@ export const emailAttachements = {
 
 export const emailReplySeparator =
   "##- Veuillez répondre au-dessus de cette ligne -##";
-
-export const emailExchangeSplitters = [
-  /<br>\s*(De(?:&nbsp;|\u00A0|\s)*:|Le&nbsp;.*?,)?\s*Immersion Facilitée\s*(?:<|&lt;)ne-pas-ecrire-a-cet-email@immersion-facile\.beta\.gouv\.fr(?:>|&gt;)[^<]*<br>/i,
-  emailReplySeparator,
-];

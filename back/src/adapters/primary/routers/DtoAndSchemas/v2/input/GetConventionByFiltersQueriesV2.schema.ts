@@ -7,7 +7,7 @@ import {
 import { z } from "zod";
 import type { GetConventionsFilters } from "../../../../../../domains/convention/ports/ConventionQueries";
 
-export type GetConventionsByFiltersQueryParamsV2 = {
+type GetConventionsByFiltersQueryParamsV2 = {
   startDateGreater?: Date;
   startDateLessOrEqual?: Date;
   withStatuses?: ConventionStatus[];

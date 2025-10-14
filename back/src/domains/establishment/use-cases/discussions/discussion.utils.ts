@@ -43,7 +43,7 @@ export const getDiscussionParamsFromEmail = (
   };
 };
 
-export const cleanContactEmailFromMessage = (message: string) =>
+const cleanContactEmailFromMessage = (message: string) =>
   message
     .replaceAll(`<${immersionFacileContactEmail}>`, "")
     .replaceAll(

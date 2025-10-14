@@ -4,12 +4,12 @@ import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
-export type AssignAgencyViewerRoleInput = {
+type AssignAgencyViewerRoleInput = {
   userIds: UserId[];
   agencyKinds: AgencyKind[];
 };
 
-export type AssignAgencyViewerRoleOutput = {
+type AssignAgencyViewerRoleOutput = {
   agenciesSuccessfullyUpdated: number;
   agencyUpdatesFailed: number;
   agenciesSkipped: number;

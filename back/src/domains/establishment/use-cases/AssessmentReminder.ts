@@ -47,8 +47,8 @@ const allAssessmentReminderModes = [
   "3daysAfterInitialAssessmentEmail",
   "10daysAfterInitialAssessmentEmail",
 ] as const;
-export type AssessmentReminderMode =
-  (typeof allAssessmentReminderModes)[number];
+
+type AssessmentReminderMode = (typeof allAssessmentReminderModes)[number];
 
 type OutOfTrxDependencies = {
   assessmentRepository: AssessmentRepository;
