@@ -82,6 +82,7 @@ export const AgencyDashboard = ({
       )}
       <Tabs
         className={fr.cx("fr-mt-4w")}
+        style={{ overflow: "visible" }}
         tabs={agencyTabs.map((tab) => ({
           ...tab,
           isDefault: currentTab === tab.tabId,
