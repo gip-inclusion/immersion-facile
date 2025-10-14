@@ -1244,7 +1244,7 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
-          filters: { beneficiaryNameContains: "John" },
+          filters: { search: "John" },
           sort: {
             by: "dateSubmission",
             direction: "desc",
@@ -1259,7 +1259,7 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
-          filters: { establishmentNameContains: "Business B" },
+          filters: { search: "Business B" },
           sort: {
             by: "dateSubmission",
             direction: "desc",
@@ -1268,6 +1268,38 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(1);
       expectToEqual(result.data, [{ ...conventionB, ...agencyFields }]);
+    });
+
+    it("should filter conventions by convention ID", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { search: conventionA.id },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expect(result.data.length).toBe(1);
+      expectToEqual(result.data, [{ ...conventionA, ...agencyFields }]);
+    });
+
+    it("should return no results for non-existent convention ID", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { search: "00000000-0000-0000-0000-000000000000" },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expect(result.data.length).toBe(0);
+      expectToEqual(result.data, []);
     });
 
     it("should filter conventions by date range", async () => {
@@ -1343,7 +1375,7 @@ describe("Pg implementation of ConventionQueries", () => {
               from: "2023-01-01",
               to: "2023-02-15",
             },
-            actorEmailContains: "@convention-a.com",
+            search: "@convention-a.com",
           },
           sort: {
             by: "dateStart",
