@@ -125,6 +125,13 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
+  public withPhoneNumber(phoneNumber: string) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      phoneNumber,
+    });
+  }
+
   public withPosition(lat: number, lon: number) {
     return new AgencyDtoBuilder({
       ...this.#agency,
