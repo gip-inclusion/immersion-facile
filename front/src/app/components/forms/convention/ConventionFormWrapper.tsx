@@ -206,6 +206,13 @@ export const ConventionFormWrapper = ({
           ),
         fetchedConvention,
         hasConventionUpdateConflict,
+        conventionCantBeEditedAfterAcceptanceByCounsellor:
+          mode === "edit" &&
+          route.params.jwt &&
+          fetchedConvention &&
+          fetchedConvention?.status === "ACCEPTED_BY_COUNSELLOR" &&
+          fetchedConvention?.agencyRefersTo &&
+          !userRolesOnConvention.includes("counsellor"),
       })
         .with({ hasConventionUpdateConflict: true }, () => (
           <section className={fr.cx("fr-col-12")}>
@@ -226,17 +233,33 @@ export const ConventionFormWrapper = ({
             )}
           </section>
         ))
+
         .with(
           {
             conventionCantBeEdited: true,
             formSuccessfullySubmitted: false,
             shouldRedirectToError: false,
+            conventionCantBeEditedAfterAcceptanceByCounsellor: false,
           },
           () => (
             <Alert
               severity="error"
               title="Cette convention ne peut plus être modifiée"
               description="Cette convention ne peut plus être modifiée car elle a déjà été validée, annulée ou refusée."
+              className={fr.cx("fr-mb-4w")}
+            />
+          ),
+        )
+        .with(
+          {
+            conventionCantBeEditedAfterAcceptanceByCounsellor: true,
+            conventionCantBeEdited: false,
+          },
+          () => (
+            <Alert
+              severity="error"
+              title="Cette convention ne peut plus être modifiée"
+              description="Cette convention ne peut plus être modifiée car elle a déjà été validée par le conseiller."
               className={fr.cx("fr-mb-4w")}
             />
           ),

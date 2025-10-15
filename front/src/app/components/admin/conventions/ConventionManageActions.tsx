@@ -279,6 +279,16 @@ export const ConventionManageActions = ({
     return false;
   };
 
+  const shouldShowModifyConventionButton = () => {
+    if (
+      convention.status === "ACCEPTED_BY_COUNSELLOR" &&
+      convention.agencyRefersTo &&
+      !roles.includes("counsellor")
+    )
+      return false;
+    return isAllowedConventionTransition(convention, "READY_TO_SIGN", roles);
+  };
+
   const modificationItems: (ButtonProps & { id: string })[] = [
     ...(shouldShowTransferButton()
       ? [
@@ -459,44 +469,45 @@ export const ConventionManageActions = ({
           </>
         )}
 
-        {isAllowedConventionTransition(convention, "READY_TO_SIGN", roles) && (
-          <>
-            <ButtonWithSubMenu
-              buttonLabel={t.verification.modifyConvention}
-              openedTop={true}
-              navItems={modificationItems}
-              priority={"secondary"}
-              buttonIconId="fr-icon-arrow-down-s-line"
-              iconPosition="right"
-              id={domElementIds.manageConvention.editActionsButton}
-            />
+        {isAllowedConventionTransition(convention, "READY_TO_SIGN", roles) &&
+          shouldShowModifyConventionButton() && (
+            <>
+              <ButtonWithSubMenu
+                buttonLabel={t.verification.modifyConvention}
+                openedTop={true}
+                navItems={modificationItems}
+                priority={"secondary"}
+                buttonIconId="fr-icon-arrow-down-s-line"
+                iconPosition="right"
+                id={domElementIds.manageConvention.editActionsButton}
+              />
 
-            <ModalWrapper
-              {...getVerificationActionProps({
-                initialStatus: convention.status,
-                children: t.verification.modifyConventionAgency,
-                modalTitle: t.verification.modifyConventionAgencyTitle,
-                verificationAction: "TRANSFER",
-                convention,
-                disabled,
-                currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind,
-              }).modalWrapperProps}
-            />
-            <ModalWrapper
-              {...getVerificationActionProps({
-                initialStatus: convention.status,
-                children: t.verification.modifyCounsellorName,
-                modalTitle: t.verification.modifyCounsellorNameTitle,
-                verificationAction: "EDIT_COUNSELLOR_NAME",
-                convention,
-                disabled,
-                currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind,
-              }).modalWrapperProps}
-            />
-          </>
-        )}
+              <ModalWrapper
+                {...getVerificationActionProps({
+                  initialStatus: convention.status,
+                  children: t.verification.modifyConventionAgency,
+                  modalTitle: t.verification.modifyConventionAgencyTitle,
+                  verificationAction: "TRANSFER",
+                  convention,
+                  disabled,
+                  currentSignatoryRoles: requesterRoles,
+                  onSubmit: createOnSubmitWithFeedbackKind,
+                }).modalWrapperProps}
+              />
+              <ModalWrapper
+                {...getVerificationActionProps({
+                  initialStatus: convention.status,
+                  children: t.verification.modifyCounsellorName,
+                  modalTitle: t.verification.modifyCounsellorNameTitle,
+                  verificationAction: "EDIT_COUNSELLOR_NAME",
+                  convention,
+                  disabled,
+                  currentSignatoryRoles: requesterRoles,
+                  onSubmit: createOnSubmitWithFeedbackKind,
+                }).modalWrapperProps}
+              />
+            </>
+          )}
 
         {isAllowedConventionTransition(
           convention,
