@@ -1,26 +1,32 @@
 import { createLogger } from "../utils/logger";
 import { triggerDeactivateUnresponsiveEstablishments } from "./scheduledScripts/deactivateUnresponsiveEstablishments";
+import { triggerDeleteEmailAttachements } from "./scheduledScripts/deleteEmailAttachements";
 import { triggerDeleteOldDiscussionMessages } from "./scheduledScripts/deleteOldDiscussionMessages";
 import { triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows } from "./scheduledScripts/markEstablishmentsAsSearchableWhenMaxContactsAllows copy";
 import { triggerMarkObsoleteDiscussionsAsDeprecated } from "./scheduledScripts/markObsoleteDiscussionsAsDeprecated";
 import { triggerMarkOldConventionAsDeprecated } from "./scheduledScripts/markOldConventionAsDeprecated";
 import { triggerSuggestEditFormEstablishmentEvery6Months } from "./scheduledScripts/suggestEditFormEstablishmentEvery6Months";
 import { triggerUpdateAllEstablishmentsScores } from "./scheduledScripts/updateAllEstablishmentsScores";
+import { triggerRefreshMaterializedViews } from "./triggerRefreshMaterializedViews";
 
 const logger = createLogger(__filename);
 
+// les jobs à jouer seuls : triggerSendAssessmentNeededNotifications,triggerEstablishmentLeadReminders
+
 const main = async () => {
-  await triggerDeactivateUnresponsiveEstablishments({ exitOnFinish: false });
-  await triggerUpdateAllEstablishmentsScores({ exitOnFinish: false });
-  await triggerDeleteOldDiscussionMessages({ exitOnFinish: false });
+  await triggerDeleteEmailAttachements({ exitOnFinish: false });
   await triggerMarkOldConventionAsDeprecated({ exitOnFinish: false });
-  await triggerMarkObsoleteDiscussionsAsDeprecated({ exitOnFinish: false });
+  await triggerDeleteOldDiscussionMessages({ exitOnFinish: false });
+  await triggerUpdateAllEstablishmentsScores({ exitOnFinish: false });
+  await triggerDeactivateUnresponsiveEstablishments({ exitOnFinish: false });
   await triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows({
     exitOnFinish: false,
   });
+  await triggerMarkObsoleteDiscussionsAsDeprecated({ exitOnFinish: false });
   await triggerSuggestEditFormEstablishmentEvery6Months({
     exitOnFinish: false,
   });
+  await triggerRefreshMaterializedViews({ exitOnFinish: false });
 };
 
 main()

@@ -27,10 +27,9 @@ const refreshMaterializedViews = async () => {
   await pool.end();
 };
 
-export const triggerRefreshMaterializedViews = () =>
-  handleCRONScript({
-    name: "refresh materialized views",
-    config,
-    script: refreshMaterializedViews,
-    handleResults: () => "Materialized views refreshed successfully",
-  });
+handleCRONScript({
+  name: "refresh materialized views",
+  config,
+  script: refreshMaterializedViews,
+  handleResults: () => "Materialized views refreshed successfully",
+});
