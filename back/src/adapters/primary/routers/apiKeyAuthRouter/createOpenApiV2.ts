@@ -116,7 +116,8 @@ const generateOpenApi = (envType: string) =>
     {
       info: {
         title: "Les API Immersion facilitée",
-        description: `Ceci est la documentation pour consommer l’api d’immersion facilitée.
+        description: `Une nouvelle version de l'API concernant les entreprises est en cours de développement: <a href="/doc-api?version=v3" id='doc-api-link-from-v2-to-v3'>Consulter la v3</a>.
+        Ceci est la documentation pour consommer l’api d’immersion facilitée.
       Une clé API est nécessaire pour utiliser l’api. Veuillez vous mettre en contact avec l’équipe d’immersion facilitée pour l’obtenir.
       Vous aurez à préciser ce dont vous avez besoin :
       <ul>
@@ -124,6 +125,7 @@ const generateOpenApi = (envType: string) =>
       <li>la partie accès aux conventions (dans ce cas il nous faudra connaître les agences qui vous concernent)</li>
       </ul>
      La clé API est à fournir en authorization header de toutes les requêtes.
+     
       `,
         version: "v2",
       },
@@ -222,8 +224,10 @@ export const createOpenApiSpecV2 = (envType: string) =>
   generateOpenApi(envType)({
     [searchSection]: {
       searchImmersion: {
+        deprecated: true,
         summary: "Recherche",
         description:
+          "⚠️ **DEPRECATED** - Cette route est obsolète. Veuillez utiliser [la version V3](/doc-api?version=v3)" +
           "Retourne un tableau d'offres d'immersion correspondant à la recherche",
         extraDocs: {
           headerParams: withAuthorizationHeader,
@@ -311,8 +315,10 @@ export const createOpenApiSpecV2 = (envType: string) =>
         },
       },
       getOfferBySiretAndAppellationCode: {
-        summary: "Récupération d’un résultat de recherche d'immersion connu",
+        deprecated: true,
+        summary: "Récupération d'un résultat de recherche d'immersion connu",
         description:
+          "⚠️ **DEPRECATED** - Cette route est obsolète. Veuillez utiliser [la version V3](/doc-api?version=v3)" +
           "Renvoie l'offre d'immersion correspondante. N'est possible que dans le case d'une immersion référencée par Immersion Facilitée (c'est à dire avec `volontaryToImmersion` à `true`). " +
           "Les établissements peuvent également être supprimés et les métiers peuvent évoluer. Dans ce cas il y aura un retour 404.",
         extraDocs: {
@@ -365,8 +371,10 @@ export const createOpenApiSpecV2 = (envType: string) =>
       },
 
       contactEstablishment: {
+        deprecated: true,
         summary: "Mise en contact",
-        description: `!Vous devez fournir le mode de contact qui a été renseigné par l’entreprise (dans les résultats de recherche) !. Ce qui se passe:
+        description: `⚠️ **DEPRECATED** - Cette route est obsolète. Veuillez utiliser [la version V3](/doc-api?version=v3)
+        ⚠️ Vous devez fournir le mode de contact qui a été renseigné par l’entreprise (dans les résultats de recherche) ⚠️. Ce qui se passe:
       
       EMAIL : L’entreprise va recevoir le message du candidat par email et c’est la responsabilité de l’entreprise de recontacter le candidat (le mail du candidat est fourni à l’entreprise).
       

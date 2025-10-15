@@ -55,8 +55,12 @@ import {
 } from "./routeParams/standardPage";
 import { routes, useRoute } from "./routes";
 
-const OpenApiDocPage = lazy(
-  () => import("src/app/pages/open-api-doc/OpenApiDocPage"),
+const OpenApiDocV2Page = lazy(
+  () => import("src/app/pages/open-api-doc/OpenApiDocV2Page"),
+);
+
+const OpenApiDocV3Page = lazy(
+  () => import("src/app/pages/open-api-doc/OpenApiDocV3Page"),
 );
 
 type Routes = typeof routes;
@@ -246,7 +250,10 @@ const getPageByRouteName: {
     </ConnectedPrivateRoute>
   ),
   myProfileAgencyRegistration: () => <RequestAgencyRegistrationPage />,
-  openApiDoc: () => <OpenApiDocPage />,
+  openApiDoc: (route: Route<typeof routes.openApiDoc>) => {
+    if (route.params.version === "v3") return <OpenApiDocV3Page />;
+    return <OpenApiDocV2Page />;
+  },
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => (

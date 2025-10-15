@@ -302,7 +302,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { siret: param.query.string },
     () => `/${frontRoutes.manageEstablishmentAdmin}`,
   ),
-  openApiDoc: defineRoute("/doc-api"),
+  openApiDoc: defineRoute(
+    { version: param.query.optional.string },
+    () => "/doc-api",
+  ),
   renewConventionMagicLink: defineRoute(
     { expiredJwt: param.query.string, originalUrl: param.query.string },
     () => `/${frontRoutes.magicLinkRenewal}`,
