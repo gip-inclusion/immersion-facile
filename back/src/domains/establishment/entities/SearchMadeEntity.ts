@@ -6,7 +6,6 @@ import type {
   WithAcquisition,
   WithNafCodes,
 } from "shared";
-import { hasSearchGeoParams } from "../use-cases/LegacySearchImmersion";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
@@ -43,3 +42,11 @@ export const hasSearchMadeGeoParams = (
   const searchMadeWithGeoParams = searchMade as SearchMadeWithGeoParams;
   return hasSearchGeoParams(searchMadeWithGeoParams);
 };
+
+export const hasSearchGeoParams = (
+  geoParams: Partial<GeoParams>,
+): geoParams is GeoParams =>
+  !!geoParams.lat &&
+  !!geoParams.lon &&
+  !!geoParams.distanceKm &&
+  geoParams.distanceKm > 0;

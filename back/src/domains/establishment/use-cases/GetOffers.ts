@@ -9,8 +9,11 @@ import {
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
-import { hasSearchGeoParams } from "./LegacySearchImmersion";
+import {
+  type GeoParams,
+  hasSearchGeoParams,
+  type SearchMade,
+} from "../entities/SearchMadeEntity";
 
 export const makeGetOffers = useCaseBuilder("GetOffers")
   .withInput(getOffersFlatParamsSchema)
