@@ -1,6 +1,7 @@
 import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
+  type AgencyId,
   type AgencyRole,
   ConnectedUserBuilder,
   type ConnectedUserDomainJwtPayload,
@@ -50,6 +51,15 @@ describe("Update Convention", () => {
     .withEmail("counsellor@email.com")
     .buildUser();
   const agency = new AgencyDtoBuilder().build();
+  const agencyWithRefersTo = new AgencyDtoBuilder(agency)
+    .withRefersToAgencyInfo({
+      refersToAgencyId: "another-agency-id" as AgencyId,
+      refersToAgencyName: "Another Agency",
+    })
+    .build();
+  const agencyWithoutRefersTo = new AgencyDtoBuilder(agency)
+    .withRefersToAgencyInfo(null)
+    .build();
   const convention = new ConventionDtoBuilder()
     .withStatus("READY_TO_SIGN")
     .withBeneficiaryCurrentEmployer({
@@ -72,6 +82,10 @@ describe("Update Convention", () => {
     })
     .withAgencyId(agency.id)
     .notSigned()
+    .build();
+
+  const acceptedByCounsellorConvention = new ConventionDtoBuilder(convention)
+    .withStatus("ACCEPTED_BY_COUNSELLOR")
     .build();
 
   const connectedUser = new ConnectedUserBuilder()
@@ -177,6 +191,37 @@ describe("Update Convention", () => {
             );
           },
         );
+
+        it("throws unauthorized if validator tries to edit ACCEPTED_BY_COUNSELLOR convention with agency that has refersToAgencyId", async () => {
+          const conventionToUpdate = new ConventionDtoBuilder(
+            acceptedByCounsellorConvention,
+          )
+            .withStatus("READY_TO_SIGN")
+            .build();
+
+          uow.conventionRepository.setConventions([
+            acceptedByCounsellorConvention,
+          ]);
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agencyWithRefersTo, {
+              [connectedUser.id]: {
+                roles: ["validator"],
+                isNotifiedByEmail: false,
+              },
+            }),
+          ];
+          uow.userRepository.users = [connectedUser];
+
+          await expectPromiseToFailWithError(
+            updateConvention.execute(
+              {
+                convention: conventionToUpdate,
+              },
+              { userId: connectedUser.id },
+            ),
+            errors.convention.validatorOfAgencyRefersToNotAllowed(),
+          );
+        });
       });
 
       describe("with convention jwt payload", () => {
@@ -569,5 +614,87 @@ describe("Update Convention", () => {
         ]);
       },
     );
+
+    describe("when convention status is ACCEPTED_BY_COUNSELLOR", () => {
+      const conventionToUpdate = new ConventionDtoBuilder(
+        acceptedByCounsellorConvention,
+      )
+        .withStatus("READY_TO_SIGN")
+        .withBeneficiaryEmail("new@email.fr")
+        .withStatusJustification("justif")
+        .build();
+
+      beforeEach(() => {
+        uow.conventionRepository.setConventions([
+          acceptedByCounsellorConvention,
+        ]);
+        uow.userRepository.users = [connectedUser];
+      });
+      it("allows counsellor to edit convention with agency that has refersToAgencyId", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyWithRefersTo, {
+            [connectedUser.id]: {
+              roles: ["counsellor"],
+              isNotifiedByEmail: false,
+            },
+          }),
+        ];
+
+        await updateConvention.execute(
+          {
+            convention: conventionToUpdate,
+          },
+          { userId: connectedUser.id },
+        );
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToUpdate,
+        ]);
+      });
+
+      it("allows validator to edit convention with agency that has no refersToAgencyId", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyWithoutRefersTo, {
+            [connectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: false,
+            },
+          }),
+        ];
+
+        await updateConvention.execute(
+          {
+            convention: conventionToUpdate,
+          },
+          { userId: connectedUser.id },
+        );
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToUpdate,
+        ]);
+      });
+
+      it("allows counsellor to edit convention with agency that has no refersToAgencyId", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyWithoutRefersTo, {
+            [connectedUser.id]: {
+              roles: ["counsellor"],
+              isNotifiedByEmail: false,
+            },
+          }),
+        ];
+
+        await updateConvention.execute(
+          {
+            convention: conventionToUpdate,
+          },
+          { userId: connectedUser.id },
+        );
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToUpdate,
+        ]);
+      });
+    });
   });
 });
