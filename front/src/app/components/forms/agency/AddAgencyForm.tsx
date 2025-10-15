@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
@@ -141,6 +142,26 @@ export const AddAgencyForm = () => {
         legend={"Quel est votre rôle dans le parcours d’immersion ?"}
         options={refersToOtherAgencyOptions}
       />
+      <Highlight className={fr.cx("fr-ml-0", "fr-pl-3w")} size="sm">
+        <p className={fr.cx("fr-mb-1w")}>
+          <strong>Vous ne savez encore quel est votre rôle ?</strong> Pas
+          d'inquiétude ! Notre équipe peut vous aider à l'identifier en fonction
+          de vos missions et obligations.
+        </p>
+        <p>
+          <a
+            className={fr.cx("fr-link", "fr-text--sm")}
+            href={
+              "https://meet.brevo.com/immersion-facilit-e/referencer-mon-organisme"
+            }
+            target="_blank"
+            rel="noreferrer"
+          >
+            Prendre rendez-vous
+          </a>
+        </p>
+      </Highlight>
+
       {match(refersToOtherAgency)
         .with(P.boolean, (refersToOtherAgency) => (
           <AgencyForm
