@@ -5,11 +5,7 @@
       "size": "M"
     },
     {
-      "command": "03 2 * * * pnpm back trigger-update-establishments-from-sirene",
-      "size": "M"
-    },
-    {
-      "command": "30 05 * * * pnpm back run trigger-sending-assessment-needed-notifications",
+      "command": "53 0 * * * pnpm back run trigger-refresh-materialized-views",
       "size": "M"
     },
     {

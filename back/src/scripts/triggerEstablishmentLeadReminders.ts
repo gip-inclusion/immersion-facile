@@ -21,7 +21,7 @@ import { handleCRONScript } from "./handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const triggerEstablishmentLeadReminders = async () => {
+const establishmentLeadReminders = async () => {
   logger.info({ message: "Starting to send Emails to establishment leads" });
   const timeGateway = new RealTimeGateway();
   const { uowPerformer } = createUowPerformer(
@@ -70,7 +70,7 @@ const triggerEstablishmentLeadReminders = async () => {
 handleCRONScript({
   name: "sendEstablishmentLeadFirstReminderScript",
   config,
-  script: triggerEstablishmentLeadReminders,
+  script: establishmentLeadReminders,
   handleResults: ({ firstReminderResult, secondReminderResult }) =>
     [
       "First reminder:",
