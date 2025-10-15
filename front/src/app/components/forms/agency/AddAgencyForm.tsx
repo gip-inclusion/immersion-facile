@@ -50,10 +50,16 @@ import {
 import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
+import mushroomSvg from "../../../../assets/img/mushroom.svg";
+import roundSquareSvg from "../../../../assets/img/round-square.svg";
+import shurikenSvg from "../../../../assets/img/shuriken.svg";
 
 export const AddAgencyForm = () => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
     boolean | undefined
+  >(undefined);
+  const [preSelectedKind, setPreSelectedKind] = useState<
+    AllowedAgencyKindToAdd | undefined
   >(undefined);
 
   const dispatch = useDispatch();
@@ -78,17 +84,42 @@ export const AddAgencyForm = () => {
 
   const refersToOtherAgencyOptions: RadioButtonsProps["options"] = [
     {
-      label: "Prescripteur",
+      illustration: <img src={shurikenSvg} alt="" />,
+      label: "Prescripteur de droit commun",
+      hintText:
+        "Valide les conventions et assure la couverture du risque d'accident du travail et de maladie professionnelle (AT/MP). Exemples : Mission Locale, Cap Emploi, France Travail, Conseil Départemental, Structure IAE (hors ETTI), CEP.",
       nativeInputProps: {
-        onClick: () => {
+        value: 0,
+        onChange: () => {
+          setPreSelectedKind(undefined);
           setRefersToOtherAgency(false);
         },
       },
     },
     {
-      label: "Structure d'accompagnement",
+      illustration: <img src={roundSquareSvg} alt="" />,
+      label: "Prescripteur par délégation",
+      hintText:
+        "Dispose, ou souhaite disposer, d'une convention signée avec un prescripteur de droit commun. Valide les conventions et assure la couverture du risque d'accident du travail et de maladie professionnelle (AT/MP).",
       nativeInputProps: {
-        onClick: () => setRefersToOtherAgency(true),
+        value: 1,
+        onChange: () => {
+          setPreSelectedKind("autre");
+          setRefersToOtherAgency(false);
+        },
+      },
+    },
+    {
+      illustration: <img src={mushroomSvg} alt="" />,
+      label: "Structure d'accompagnement",
+      hintText:
+        "Accompagne la personne tout au long de son immersion et pré-valide la convention avant la validation finale par le prescripteur. Ne cotise pas au risque AT/MP. Exemples : associations d'insertion, organismes d'accompagnement sans délégation, etc.",
+      nativeInputProps: {
+        value: 2,
+        onChange: () => {
+          setPreSelectedKind(undefined);
+          setRefersToOtherAgency(true);
+        },
       },
     },
   ];
@@ -107,13 +138,14 @@ export const AddAgencyForm = () => {
     <>
       <RadioButtons
         id={domElementIds.addAgency.agencyRefersToInput}
-        legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
+        legend={"Quel est votre rôle dans le parcours d’immersion ?"}
         options={refersToOtherAgencyOptions}
       />
       {match(refersToOtherAgency)
         .with(P.boolean, (refersToOtherAgency) => (
           <AgencyForm
             refersToOtherAgency={refersToOtherAgency}
+            preSelectedKind={preSelectedKind}
             key={`add-agency-form-${refersToOtherAgency}`}
             submitFeedback={feedback}
             onFormValid={onFormValid}
@@ -127,12 +159,14 @@ export const AddAgencyForm = () => {
 
 type AgencyFormProps = {
   refersToOtherAgency: boolean;
+  preSelectedKind?: AllowedAgencyKindToAdd;
   submitFeedback: AgenciesSubmitFeedback;
   onFormValid: SubmitHandler<CreateAgencyInitialValues>;
 };
 
 const AgencyForm = ({
   refersToOtherAgency,
+  preSelectedKind,
   submitFeedback,
   onFormValid,
 }: AgencyFormProps) => {
@@ -149,8 +183,9 @@ const AgencyForm = ({
       ...acquisitionParams,
       validatorEmails: refersToOtherAgency ? ["temp@temp.com"] : [],
       agencySiret: siret,
+      ...(preSelectedKind ? { kind: preSelectedKind } : {}),
     }),
-    [refersToOtherAgency, acquisitionParams, siret],
+    [refersToOtherAgency, preSelectedKind, acquisitionParams, siret],
   );
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: zodResolver(createAgencySchema),
@@ -158,7 +193,7 @@ const AgencyForm = ({
     defaultValues: formInitialValues,
   });
 
-  const { handleSubmit, formState, reset, watch, setValue } = methods;
+  const { handleSubmit, formState, reset, watch, setValue, register } = methods;
 
   const dispatch = useDispatch();
   const agencyOptions = useAppSelector(agenciesSelectors.options);
@@ -248,6 +283,7 @@ const AgencyForm = ({
           stateRelatedMessage={
             selectedKind === "pole-emploi" ? agencyErrorMessage : undefined
           }
+          {...register("kind")}
         />
 
         {selectedKind === "autre" && !refersToOtherAgency && (
