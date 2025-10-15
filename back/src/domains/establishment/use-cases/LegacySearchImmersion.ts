@@ -12,7 +12,11 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
+import {
+  type GeoParams,
+  hasSearchGeoParams,
+  type SearchMade,
+} from "../entities/SearchMadeEntity";
 import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export class LegacySearchImmersion extends TransactionalUseCase<
@@ -148,14 +152,6 @@ export class LegacySearchImmersion extends TransactionalUseCase<
     return lbbResults;
   }
 }
-
-export const hasSearchGeoParams = (
-  geoParams: Partial<GeoParams>,
-): geoParams is GeoParams =>
-  !!geoParams.lat &&
-  !!geoParams.lon &&
-  !!geoParams.distanceKm &&
-  geoParams.distanceKm > 0;
 
 const shouldFetchLBB = (
   appellationCodes: AppellationCode[] | undefined,

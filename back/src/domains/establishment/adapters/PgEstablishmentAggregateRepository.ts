@@ -31,7 +31,10 @@ import { createLogger } from "../../../utils/logger";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
-import type { GeoParams } from "../entities/SearchMadeEntity";
+import {
+  type GeoParams,
+  hasSearchGeoParams,
+} from "../entities/SearchMadeEntity";
 import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
@@ -42,7 +45,6 @@ import type {
   RepositorySearchResultDto,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
-import { hasSearchGeoParams } from "../use-cases/LegacySearchImmersion";
 
 const logger = createLogger(__filename);
 const MAX_RESULTS_HARD_LIMIT = 100;
