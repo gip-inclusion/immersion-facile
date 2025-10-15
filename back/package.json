@@ -33,6 +33,8 @@
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
     "test": "NODE_OPTIONS='--max_old_space_size=4096' jest --testRegex='^((?!(integration|manual)).)*.test.ts$'",
     "trigger-evening-jobs": "ts-node src/scripts/triggerEveningJobs.ts",
+    "trigger-early-morning-jobs": "ts-node src/scripts/triggerEarlyMorningJobs.ts",
+    "trigger-morning-jobs": "ts-node src/scripts/triggerMorningJobs.ts",
     "trigger-add-agencies-and-users": "ts-node src/scripts/triggerAddAgenciesAndUsers.ts",
     "trigger-convention-reminder": "ts-node src/scripts/triggerConventionReminder.ts",
     "trigger-contact-request-reminder-3d": "ts-node src/scripts/triggerContactRequestReminder3Days.ts",

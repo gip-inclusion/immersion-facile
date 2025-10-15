@@ -1,6 +1,10 @@
 {
   "jobs": [
     {
+      "command": "0 21 * * * pnpm back trigger-evening-jobs",
+      "size": "M"
+    },
+    {
       "command": "45 23 * * * pnpm back run trigger-contact-request-beneficiary-reminder-15-days",
       "size": "M"
     },
@@ -9,7 +13,15 @@
       "size": "M"
     },
     {
+      "command": "0 3 * * * pnpm back run trigger-early-morning-jobs",
+      "size": "M"
+    },
+    {
       "command": "00 6 * * * pnpm back run trigger-establishment-leads-reminders",
+      "size": "M"
+    },
+    {
+      "command": "30 5 * * * pnpm back run trigger-morning-jobs",
       "size": "M"
     },
     {
