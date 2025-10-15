@@ -43,7 +43,9 @@ export interface AgencyRepository {
   update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
 
   getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
-  getBySafir(safirCode: string): Promise<AgencyWithUsersRights | undefined>;
+  getBySafirAndActiveStatus(
+    safirCode: string,
+  ): Promise<AgencyWithUsersRights | undefined>;
   getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]>;
   getAgencies(props: {
     filters?: GetAgenciesFilters;

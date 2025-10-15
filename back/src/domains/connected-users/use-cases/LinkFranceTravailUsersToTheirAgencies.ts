@@ -46,11 +46,10 @@ export const makeLinkFranceTravailUsersToTheirAgencies = useCaseBuilder(
     const user = await getUserWithRights(uow, userId);
     if (isIcUserAlreadyHasValidRight(user, codeSafir)) return;
 
-    const agencyWithSafir = await uow.agencyRepository.getBySafir(codeSafir);
-    if (
-      agencyWithSafir &&
-      activeAgencyStatuses.includes(agencyWithSafir.status)
-    )
+    const agencyWithSafir =
+      await uow.agencyRepository.getBySafirAndActiveStatus(codeSafir);
+
+    if (agencyWithSafir)
       return updateActiveAgencyWithSafir(
         uow,
         agencyWithSafir,
