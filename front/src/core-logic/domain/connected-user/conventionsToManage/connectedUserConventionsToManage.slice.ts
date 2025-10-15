@@ -10,22 +10,22 @@ import type {
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
-type ConnectedUserConventionsState = {
+type ConnectedUserConventionsToManageState = {
   conventions: ConventionDto[];
   isLoading: boolean;
   pagination: Pagination | undefined;
 };
 
-export const connectedUserConventionsInitialState: ConnectedUserConventionsState =
+export const connectedUserConventionsToManageInitialState: ConnectedUserConventionsToManageState =
   {
     conventions: [],
     isLoading: false,
     pagination: undefined,
   };
 
-export const connectedUserConventionsSlice = createSlice({
-  name: "connectedUserConventions",
-  initialState: connectedUserConventionsInitialState,
+export const connectedUserConventionsToManageSlice = createSlice({
+  name: "connectedUserConventionsToManage",
+  initialState: connectedUserConventionsToManageInitialState,
   reducers: {
     getConventionsForConnectedUserRequested: (
       state,

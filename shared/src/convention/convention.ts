@@ -235,9 +235,7 @@ export const flatParamsToGetConventionsForAgencyUserParams = (
     sortDirection,
     page,
     perPage,
-    actorEmailContains,
-    establishmentNameContains,
-    beneficiaryNameContains,
+    search,
     statuses,
     agencyIds,
     agencyDepartmentCodes,
@@ -254,9 +252,7 @@ export const flatParamsToGetConventionsForAgencyUserParams = (
 
   return {
     filters: {
-      actorEmailContains,
-      establishmentNameContains,
-      beneficiaryNameContains,
+      search,
       statuses,
       agencyIds,
       agencyDepartmentCodes,

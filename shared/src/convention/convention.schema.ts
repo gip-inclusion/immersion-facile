@@ -825,7 +825,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
 
     // sort
     sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission"], {
+      .enum(["dateValidation", "dateStart", "dateSubmission", "dateEnd"], {
         error: localization.invalidEnum,
       })
       .optional(),
@@ -836,9 +836,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
       .optional(),
 
     // filters
-    actorEmailContains: z.string().optional(),
-    establishmentNameContains: z.string().optional(),
-    beneficiaryNameContains: z.string().optional(),
+    search: z.string().optional(),
     statuses: z.tuple([statusSchema], statusSchema).optional(),
     agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
     agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
@@ -853,7 +851,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
   });
 
 const sortedConventionsSchema = sortSchema(
-  z.enum(["dateValidation", "dateStart", "dateSubmission"], {
+  z.enum(["dateValidation", "dateStart", "dateSubmission", "dateEnd"], {
     error: localization.invalidEnum,
   }),
 );
@@ -862,9 +860,7 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
   z.object({
     filters: z
       .object({
-        actorEmailContains: z.string().optional(),
-        establishmentNameContains: z.string().optional(),
-        beneficiaryNameContains: z.string().optional(),
+        search: z.string().optional(),
         statuses: z.tuple([statusSchema], statusSchema).optional(),
         agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
         agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
@@ -877,5 +873,5 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
     pagination: paginationQueryParamsSchema.optional(),
   });
 
-export const paginatedConventionsSchema =
-  createPaginatedSchema(conventionSchema);
+export const paginatedConventionReadSchema =
+  createPaginatedSchema(conventionReadSchema);
