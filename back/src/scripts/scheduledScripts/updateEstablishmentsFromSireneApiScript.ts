@@ -1,0 +1,100 @@
+import { random, sleep } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
+import { AppConfig } from "../../config/bootstrap/appConfig";
+import { logPartnerResponses } from "../../config/bootstrap/logPartnerResponses";
+import { partnerNames } from "../../config/bootstrap/partnerNames";
+import { createMakeProductionPgPool } from "../../config/pg/pgPool";
+import { withNoCache } from "../../domains/core/caching-gateway/adapters/withNoCache";
+import {
+  defaultMaxBackoffPeriodMs,
+  defaultRetryDeadlineMs,
+  ExponentialBackoffRetryStrategy,
+} from "../../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
+import { InseeSiretGateway } from "../../domains/core/sirene/adapters/InseeSiretGateway";
+import { inseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
+import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { UpdateEstablishmentsFromSirenApiScript } from "../../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
+import { makeAxiosInstances } from "../../utils/axiosUtils";
+import { createLogger } from "../../utils/logger";
+import { handleCRONScript } from "../handleCRONScript";
+
+const logger = createLogger(__filename);
+
+const config = AppConfig.createFromEnv();
+
+const updateEstablishmentsFromSireneApi = async () => {
+  logger.info({
+    message: "Executing pipeline: update-establishments-from-sirene",
+  });
+
+  const timeGateway = new RealTimeGateway();
+
+  const retryStrategy = new ExponentialBackoffRetryStrategy(
+    defaultMaxBackoffPeriodMs,
+    defaultRetryDeadlineMs,
+    timeGateway,
+    sleep,
+    random,
+  );
+
+  const httpClient = createAxiosSharedClient(
+    inseeExternalRoutes,
+    makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
+    {
+      skipResponseValidation: true,
+      onResponseSideEffect: logPartnerResponses({
+        partnerName: partnerNames.inseeSiret,
+      }),
+    },
+  );
+
+  const siretGateway = new InseeSiretGateway(
+    config.inseeHttpConfig,
+    httpClient,
+    timeGateway,
+    retryStrategy,
+    withNoCache,
+  );
+
+  const { uowPerformer } = createUowPerformer(
+    config,
+    createMakeProductionPgPool(config),
+  );
+
+  const updateEstablishmentsFromSirenAPI =
+    new UpdateEstablishmentsFromSirenApiScript(
+      uowPerformer,
+      siretGateway,
+      new RealTimeGateway(),
+      config.updateEstablishmentFromInseeConfig
+        .numberOfDaysAgoToCheckForInseeUpdates,
+      config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerBatch,
+      config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerFullRun,
+    );
+
+  const report = await updateEstablishmentsFromSirenAPI.execute();
+
+  return report;
+};
+
+export const triggerUpdateEstablishmentsFromSireneApiScript = ({
+  exitOnFinish,
+}: {
+  exitOnFinish: boolean;
+}) =>
+  handleCRONScript({
+    name: "update-establishments-from-insee-api",
+    config,
+    script: updateEstablishmentsFromSireneApi,
+    handleResults: ({
+      numberOfEstablishmentsToUpdate,
+      establishmentWithNewData,
+    }) =>
+      [
+        `Updating ${numberOfEstablishmentsToUpdate} establishments for Insee Api`,
+        `Of which ${establishmentWithNewData} had new data`,
+      ].join("\n"),
+    logger,
+    exitOnFinish,
+  });

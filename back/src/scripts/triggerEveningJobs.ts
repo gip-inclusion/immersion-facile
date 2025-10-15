@@ -7,11 +7,8 @@ import { triggerMarkObsoleteDiscussionsAsDeprecated } from "./scheduledScripts/m
 import { triggerMarkOldConventionAsDeprecated } from "./scheduledScripts/markOldConventionAsDeprecated";
 import { triggerSuggestEditFormEstablishmentEvery6Months } from "./scheduledScripts/suggestEditFormEstablishmentEvery6Months";
 import { triggerUpdateAllEstablishmentsScores } from "./scheduledScripts/updateAllEstablishmentsScores";
-import { triggerRefreshMaterializedViews } from "./triggerRefreshMaterializedViews";
 
 const logger = createLogger(__filename);
-
-// les jobs à jouer seuls : triggerSendAssessmentNeededNotifications,triggerEstablishmentLeadReminders
 
 const main = async () => {
   await triggerDeleteEmailAttachements({ exitOnFinish: false });
@@ -26,7 +23,6 @@ const main = async () => {
   await triggerSuggestEditFormEstablishmentEvery6Months({
     exitOnFinish: false,
   });
-  await triggerRefreshMaterializedViews({ exitOnFinish: false });
 };
 
 main()
