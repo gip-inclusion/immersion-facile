@@ -72,7 +72,8 @@ export class UpdateConvention extends TransactionalUseCase<
       errorToThrow: errors.convention.updateForbidden({ id: convention.id }),
       jwtPayload,
       isPeAdvisorAllowed: true,
-      isValidatorOfAgencyRefersToAllowed: true,
+      isValidatorOfAgencyRefersToAllowed:
+        conventionFromRepo.status !== "ACCEPTED_BY_COUNSELLOR",
     });
 
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
