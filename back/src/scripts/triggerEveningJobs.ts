@@ -2,7 +2,7 @@ import { createLogger } from "../utils/logger";
 import { triggerDeactivateUnresponsiveEstablishments } from "./scheduledScripts/deactivateUnresponsiveEstablishments";
 import { triggerDeleteEmailAttachements } from "./scheduledScripts/deleteEmailAttachements";
 import { triggerDeleteOldDiscussionMessages } from "./scheduledScripts/deleteOldDiscussionMessages";
-import { triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows } from "./scheduledScripts/markEstablishmentsAsSearchableWhenMaxContactsAllows copy";
+import { triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows } from "./scheduledScripts/markEstablishmentsAsSearchableWhenMaxContactsAllows";
 import { triggerMarkObsoleteDiscussionsAsDeprecated } from "./scheduledScripts/markObsoleteDiscussionsAsDeprecated";
 import { triggerMarkOldConventionAsDeprecated } from "./scheduledScripts/markOldConventionAsDeprecated";
 import { triggerSuggestEditFormEstablishmentEvery6Months } from "./scheduledScripts/suggestEditFormEstablishmentEvery6Months";

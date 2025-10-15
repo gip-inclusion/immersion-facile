@@ -1,4 +1,4 @@
-import { triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows } from "./scheduledScripts/markEstablishmentsAsSearchableWhenMaxContactsAllows copy";
+import { triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows } from "./scheduledScripts/markEstablishmentsAsSearchableWhenMaxContactsAllows";
 
 triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows({
   exitOnFinish: true,
