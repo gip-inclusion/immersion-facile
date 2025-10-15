@@ -130,11 +130,12 @@ export class PgAgencyRepository implements AgencyRepository {
     return this.#pgAgencyToAgencyWithRights(result?.agency);
   }
 
-  public async getBySafir(
+  public async getBySafirAndActiveStatus(
     safirCode: string,
   ): Promise<AgencyWithUsersRights | undefined> {
     const results = await this.#getAgencyWithJsonBuiltQueryBuilder()
       .where("agencies.code_safir", "=", safirCode)
+      .where("agencies.status", "in", activeAgencyStatuses)
       .execute();
 
     //TODO: On ne fait pas de unique sur le code safir en base

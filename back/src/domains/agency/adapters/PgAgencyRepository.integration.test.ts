@@ -341,7 +341,7 @@ describe("PgAgencyRepository", () => {
     });
   });
 
-  describe("getBySafir()", () => {
+  describe("getBySafirAndActiveStatus()", () => {
     const agency1WithSafir = toAgencyWithRights(
       agency1builder.withCodeSafir(safirCode).build(),
       {
@@ -350,14 +350,27 @@ describe("PgAgencyRepository", () => {
     );
 
     it("returns undefined when no agency found", async () => {
-      expect(await agencyRepository.getBySafir(safirCode)).toBeUndefined();
+      expect(
+        await agencyRepository.getBySafirAndActiveStatus(safirCode),
+      ).toBeUndefined();
     });
 
     it("returns existing agency", async () => {
       await agencyRepository.insert(agency1WithSafir);
       expectToEqual(
-        await agencyRepository.getBySafir(safirCode),
+        await agencyRepository.getBySafirAndActiveStatus(safirCode),
         agency1WithSafir,
+      );
+    });
+
+    it("returns undefined when agency is not active", async () => {
+      await agencyRepository.insert({
+        ...agency1WithSafir,
+        status: "closed",
+      });
+      expectToEqual(
+        await agencyRepository.getBySafirAndActiveStatus(safirCode),
+        undefined,
       );
     });
 
@@ -373,7 +386,7 @@ describe("PgAgencyRepository", () => {
       await agencyRepository.insert(agency2WithSafir);
 
       await expectPromiseToFailWithError(
-        agencyRepository.getBySafir(safirCode),
+        agencyRepository.getBySafirAndActiveStatus(safirCode),
         new ConflictError(
           safirConflictErrorMessage(safirCode, [
             agency1WithSafir,

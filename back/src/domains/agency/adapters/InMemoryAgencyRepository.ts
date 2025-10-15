@@ -73,12 +73,16 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return this.#agencies[id];
   }
 
-  public async getBySafir(
+  public async getBySafirAndActiveStatus(
     safirCode: string,
   ): Promise<AgencyWithUsersRights | undefined> {
     return values(this.#agencies)
       .filter(isTruthy)
-      .find((agency) => agency.codeSafir === safirCode);
+      .find(
+        (agency) =>
+          agency.codeSafir === safirCode &&
+          activeAgencyStatuses.includes(agency.status),
+      );
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]> {
