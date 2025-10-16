@@ -2,7 +2,6 @@ import { addHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   type AppellationAndRomeDto,
-  type CreateDiscussionDto,
   DiscussionBuilder,
   errors,
   expectArraysToEqual,
@@ -206,18 +205,12 @@ describe("LegacyContactEstablishment", () => {
       const now = new Date("2021-12-08T15:00");
       timeGateway.setNextDates([now, now]);
 
-      const validPhoneRequest: CreateDiscussionDto = {
+      const validPhoneRequest: LegacyContactEstablishmentByPhoneDto = {
         ...legacyValidRequest,
         contactMode: "PHONE",
-        kind: "IF",
-        datePreferences: "",
-        potentialBeneficiaryPhone: "+33600000000",
-        immersionObjective: null,
       };
 
-      await contactEstablishment.execute(
-        validPhoneRequest as LegacyContactEstablishmentByPhoneDto,
-      );
+      await contactEstablishment.execute(validPhoneRequest);
 
       expectArraysToEqual(uow.outboxRepository.events, [
         {
@@ -262,17 +255,11 @@ describe("LegacyContactEstablishment", () => {
       const now = new Date("2021-12-08T15:00");
       timeGateway.setNextDates([now, now]);
 
-      const validInPersonRequest: CreateDiscussionDto = {
+      const validInPersonRequest: LegacyContactEstablishmentInPersonDto = {
         ...legacyValidRequest,
-        kind: "IF",
         contactMode: "IN_PERSON",
-        datePreferences: "",
-        potentialBeneficiaryPhone: "+33600000000",
-        immersionObjective: null,
       };
-      await contactEstablishment.execute(
-        validInPersonRequest as LegacyContactEstablishmentInPersonDto,
-      );
+      await contactEstablishment.execute(validInPersonRequest);
 
       expectArraysToEqual(uow.outboxRepository.events, [
         {
