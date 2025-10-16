@@ -104,7 +104,7 @@ export const CreateDiscussionForm = ({
       ...(route.name === "searchResult"
         ? {
             kind: "IF",
-            immersionObjective: null,
+            immersionObjective: null as any as ImmersionObjective,
           }
         : {
             kind: "1_ELEVE_1_STAGE",

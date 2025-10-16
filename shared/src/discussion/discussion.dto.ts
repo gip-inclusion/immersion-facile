@@ -106,7 +106,7 @@ type CreateDiscussionDtoCommon = {
 
 export type CreateDiscussionIFDto = ContactInformations<"IF"> &
   CreateDiscussionDtoCommon & {
-    immersionObjective: ImmersionObjective | null;
+    immersionObjective: ImmersionObjective;
     experienceAdditionalInformation?: string;
     potentialBeneficiaryResumeLink?: string;
   };
