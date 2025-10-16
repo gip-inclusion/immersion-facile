@@ -37,8 +37,8 @@ describe("RequestLoginByEmail usecase", () => {
   const fakeGenerateEmailAuthCode: GenerateEmailAuthCodeJwt = () => fakeJwt;
 
   const baseUrl = "http://after-login.com";
-  const redirectUri =
-    "/establishment-dashboard/discussions?discussionId=discussion0";
+  const redirectUri = // must be allowed by the schema
+    "/tableau-de-bord-etablissement/discussions?discussionId=any-discussion-id";
 
   const user: UserWithAdminRights = {
     id: "user-id",
@@ -80,11 +80,23 @@ describe("RequestLoginByEmail usecase", () => {
     });
   });
 
-  it("throws an error if the redirect uri is not allowed", async () => {
+  it("throws an error if the redirect uri is not allowed (simple open redirect)", async () => {
     expectPromiseToFailWithError(
       initiateLoginByEmail.execute({
         email: user.email,
         redirectUri: "@example.com",
+      }),
+      new BadRequestError(
+        "Schema validation failed in usecase InitiateLoginByEmail. See issues for details.",
+        ["redirectUri : redirectUri is not allowed"],
+      ),
+    );
+  });
+  it("throws an error if the redirect uri is not allowed (path containing open redirect)", async () => {
+    expectPromiseToFailWithError(
+      initiateLoginByEmail.execute({
+        email: user.email,
+        redirectUri: "/establishment@example.com",
       }),
       new BadRequestError(
         "Schema validation failed in usecase InitiateLoginByEmail. See issues for details.",
@@ -166,6 +178,34 @@ describe("RequestLoginByEmail usecase", () => {
           params: {
             loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
             fullname: "",
+          },
+          recipients: [user.email],
+          sender: immersionFacileNoReplyEmailSender,
+        },
+      ],
+    });
+  });
+  it("should pass with deep nested redirect url", async () => {
+    const state = "state1";
+    uuidGenerator.setNextUuids(["nonce1", state]);
+    uow.userRepository.users = [user];
+
+    await initiateLoginByEmail.execute({
+      email: user.email,
+      redirectUri:
+        "/tableau-de-bord-agence/dashboard/etablissement/1234567890/discussions/1234567890",
+    });
+
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "LOGIN_BY_EMAIL_REQUESTED",
+          params: {
+            loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
+            fullname: getFormattedFirstnameAndLastname({
+              firstname: user.firstName,
+              lastname: user.lastName,
+            }),
           },
           recipients: [user.email],
           sender: immersionFacileNoReplyEmailSender,
