@@ -46,9 +46,12 @@ export const makeGetApiConsumersByConvention = useCaseBuilder(
       !userHasEnoughRightsOnConvention(user, convention, [
         "counsellor",
         "validator",
+        "agency-viewer",
       ])
     )
-      return [];
+      throw errors.user.forbidden({
+        userId: currentUser.id,
+      });
 
     const conventionApiConsurmers = (
       await uow.apiConsumerRepository.getByFilters({
