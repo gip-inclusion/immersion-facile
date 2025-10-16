@@ -88,17 +88,25 @@ describe("GetApiConsumersByConvention", () => {
     );
   });
 
-  it("return empty array if user doesn't have enough rights on convention", async () => {
+  it("throw forbidden error if user doesn't have enough rights on convention", async () => {
     uow.conventionRepository.setConventions([conventionWithFtAgency]);
-    uow.agencyRepository.agencies = [toAgencyWithRights(ftAgency)];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(ftAgency),
+      toAgencyWithRights(ftAgency, {
+        [user.id]: {
+          isNotifiedByEmail: true,
+          roles: ["agency-admin", "to-review"],
+        },
+      }),
+    ];
     uow.userRepository.users = [user];
 
-    expectToEqual(
-      await getApiConsumersByConvention.execute(
+    await expectPromiseToFailWithError(
+      getApiConsumersByConvention.execute(
         { conventionId: conventionWithFtAgency.id },
         connectedUser,
       ),
-      [],
+      errors.user.forbidden({ userId: user.id }),
     );
   });
   it.each([
