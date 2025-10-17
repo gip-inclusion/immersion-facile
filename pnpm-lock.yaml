@@ -678,8 +678,8 @@ importers:
         specifier: ^3.7.3
         version: 3.7.4
       libphonenumber-js:
-        specifier: ^1.11.1
-        version: 1.11.1
+        specifier: ^1.12.24
+        version: 1.12.24
       pino:
         specifier: ^7.9.1
         version: 7.11.0
@@ -6605,6 +6605,9 @@ packages:
 
   libphonenumber-js@1.11.1:
     resolution: {integrity: sha512-Wze1LPwcnzvcKGcRHFGFECTaLzxOtujwpf924difr5zniyYv1C2PiW0419qDR7m8lKDxsImu5mwxFuXhXpjmvw==}
+
+  libphonenumber-js@1.12.24:
+    resolution: {integrity: sha512-l5IlyL9AONj4voSd7q9xkuQOL4u8Ty44puTic7J88CmdXkxfGsRfoVLXHCxppwehgpb/Chdb80FFehHqjN3ItQ==}
 
   lie@3.1.1:
     resolution: {integrity: sha512-RiNhHysUjhrDQntfYSfY4MU24coXXdEOgw9WGcKHNeEwffDYbF//u87M1EWaMGzuFoSbqW0C9C6lEEhDOAswfw==}
@@ -17803,6 +17806,8 @@ snapshots:
   leven@3.1.0: {}
 
   libphonenumber-js@1.11.1: {}
+
+  libphonenumber-js@1.12.24: {}
 
   lie@3.1.1:
     dependencies:
