@@ -1109,6 +1109,87 @@ describe("AddExchangeToDiscussion", () => {
         }),
       );
     });
+    it("throws an error if the user is not allowed to send message to the discussion (dashboard)", async () => {
+      const connectedUserWithNoRightsOnDiscussion = new ConnectedUserBuilder()
+        .withId("no-rights-user")
+        .withFirstName("No")
+        .withLastName("Rights")
+        .withEmail("no.rights@establishment.com")
+        .build();
+      uow.userRepository.users = [connectedUserWithNoRightsOnDiscussion];
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(
+          {
+            source: "dashboard",
+            messageInputs: [
+              {
+                message: "Hello",
+                discussionId: pendingDiscussion1.id,
+                recipientRole: "potentialBeneficiary",
+                attachments: [],
+              },
+            ],
+          },
+          connectedUserWithNoRightsOnDiscussion,
+        ),
+        errors.establishment.notAdminOrContactRight({
+          userId: connectedUserWithNoRightsOnDiscussion.id,
+          siret: establishment1.establishment.siret,
+        }),
+      );
+    });
+    it("throws an error if the user is not allowed to send message to the discussion (inbound parsing)", async () => {
+      const connectedUserWithNoRightsOnDiscussion = new ConnectedUserBuilder()
+        .withId("no-rights-user")
+        .withFirstName("No")
+        .withLastName("Rights")
+        .withEmail("no.rights@establishment.com")
+        .build();
+      uow.userRepository.users = [connectedUserWithNoRightsOnDiscussion];
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute({
+          source: "inbound-parsing",
+          messageInputs: [
+            {
+              senderEmail: connectedUserWithNoRightsOnDiscussion.email,
+              attachments: [],
+              discussionId: pendingDiscussion1.id,
+              message: "Hello",
+              recipientRole: "potentialBeneficiary",
+              sentAt: new Date().toISOString(),
+              subject: "OSEF",
+            },
+          ],
+        }),
+        errors.establishment.notAdminOrContactRight({
+          userId: connectedUserWithNoRightsOnDiscussion.id,
+          siret: establishment1.establishment.siret,
+        }),
+      );
+    });
+    it("throws an error if sender email is not discussion potential beneficiary (or establishment) email", async () => {
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute({
+          source: "inbound-parsing",
+          messageInputs: [
+            {
+              senderEmail: "unknown-sender@example.com",
+              attachments: [],
+              discussionId: pendingDiscussion1.id,
+              message: "Hello",
+              recipientRole: "establishment",
+              sentAt: new Date().toISOString(),
+              subject: "OSEF",
+            },
+          ],
+        }),
+        errors.user.notFoundByEmail({
+          email: "unknown-sender@example.com",
+        }),
+      );
+    });
   });
 
   const createInboundParsingResponse = (
