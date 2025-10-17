@@ -1,5 +1,5 @@
 import type { ConventionId } from "../convention/convention.dto";
-import type { Role } from "../role/role.dto";
+import type { ConventionRole } from "../role/role.dto";
 import type { Flavor } from "../typeFlavors";
 import type { ConnectedUser, UserId } from "../user/user.dto";
 
@@ -24,7 +24,7 @@ export type EmailHash = Flavor<string, "EmailHash">;
 
 export type ConventionDomainPayload = {
   applicationId: ConventionId;
-  role: Role; // TODO: restrict to only allowed convention roles instead of all roles (avoid unnecessary test cases)
+  role: ConventionRole;
   emailHash: EmailHash; //< md5 of email
   sub?: string;
 };
@@ -36,7 +36,7 @@ export type ConventionRelatedJwtPayload =
 
 export type CreateConventionMagicLinkPayloadProperties = {
   id: ConventionId;
-  role: Role;
+  role: ConventionRole;
   email: string;
   now: Date;
   durationDays?: number;

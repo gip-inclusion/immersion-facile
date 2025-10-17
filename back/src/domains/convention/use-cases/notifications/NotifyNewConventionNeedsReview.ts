@@ -1,9 +1,9 @@
 import {
   type AgencyDto,
+  type ConventionRole,
   type ConventionStatus,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  type Role,
   type TemplatedEmail,
   type WithConventionDto,
   withConventionSchema,
@@ -156,7 +156,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
 }
 
 type Recipient = {
-  role: Role;
+  role: ConventionRole;
   email: string;
   peAdvisor:
     | {

@@ -7,12 +7,12 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionRelatedJwtPayload,
+  type ConventionRole,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   ForbiddenError,
   type RenewConventionParams,
-  type Role,
   ScheduleDtoBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -105,7 +105,7 @@ describe("RenewConvention", () => {
     role,
   }: {
     conventionId: ConventionId;
-    role: Role;
+    role: ConventionRole;
   }): ConventionDomainPayload => ({
     applicationId: conventionId,
     role,

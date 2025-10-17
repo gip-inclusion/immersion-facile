@@ -3,12 +3,12 @@ import {
   type AppSupportedJwt,
   type ConventionId,
   type ConventionJwtPayload,
+  type ConventionRole,
   errors,
   ForbiddenError,
   frontRoutes,
   type InternshipKind,
   type RenewMagicLinkRequestDto,
-  type Role,
   renewMagicLinkRequestSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -100,7 +100,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     emails: string[],
     emailHash: string | undefined,
     conventionId: ConventionId,
-    role: Role,
+    role: ConventionRole,
     route: string,
     uow: UnitOfWork,
     internshipKind: InternshipKind,
@@ -172,7 +172,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
 
 // Extracts the data necessary for link renewal from any version of magic link payload.
 type LinkRenewData = {
-  role: Role;
+  role: ConventionRole;
   applicationId: ConventionId;
   emailHash?: string;
 };

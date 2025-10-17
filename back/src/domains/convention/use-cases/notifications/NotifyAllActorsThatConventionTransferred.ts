@@ -2,11 +2,11 @@ import { uniqBy } from "ramda";
 import {
   type AgencyDto,
   type ConventionDto,
+  type ConventionRole,
   type Email,
   errors,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  type Role,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -59,37 +59,42 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
       throw errors.convention.notFound({ conventionId });
     }
 
-    const signatoriesRecipientsRoleAndEmail: { role: Role; email: Email }[] =
-      uniqBy(
-        (recipient) => recipient.email,
-        [
-          ...Object.values(convention.signatories).map((signatory) => ({
-            role: signatory.role,
-            email: signatory.email,
-          })),
-          ...(convention.signatories.establishmentRepresentative.email !==
-          convention.establishmentTutor.email
-            ? [
-                {
-                  role: convention.establishmentTutor.role,
-                  email: convention.establishmentTutor.email,
-                },
-              ]
-            : []),
-        ],
-      );
+    const signatoriesRecipientsRoleAndEmail: {
+      role: ConventionRole;
+      email: Email;
+    }[] = uniqBy(
+      (recipient) => recipient.email,
+      [
+        ...Object.values(convention.signatories).map((signatory) => ({
+          role: signatory.role,
+          email: signatory.email,
+        })),
+        ...(convention.signatories.establishmentRepresentative.email !==
+        convention.establishmentTutor.email
+          ? [
+              {
+                role: convention.establishmentTutor.role,
+                email: convention.establishmentTutor.email,
+              },
+            ]
+          : []),
+      ],
+    );
 
-    const agencyRecipientsRoleAndEmail: { role: Role; email: Email }[] = uniqBy(
+    const agencyRecipientsRoleAndEmail: {
+      role: ConventionRole;
+      email: Email;
+    }[] = uniqBy(
       (recipient) => recipient.email,
       [
         ...agency.counsellorEmails.map(
-          (counsellorEmail): { role: Role; email: Email } => ({
+          (counsellorEmail): { role: ConventionRole; email: Email } => ({
             role: "counsellor",
             email: counsellorEmail,
           }),
         ),
         ...agency.validatorEmails.map(
-          (validatorEmail): { role: Role; email: Email } => ({
+          (validatorEmail): { role: ConventionRole; email: Email } => ({
             role: "validator",
             email: validatorEmail,
           }),
@@ -131,7 +136,7 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
   });
 
 const sendAgencyEmails = (
-  agencyRecipientsRoleAndEmail: { role: Role; email: Email }[],
+  agencyRecipientsRoleAndEmail: { role: ConventionRole; email: Email }[],
   convention: ConventionDto,
   uow: UnitOfWork,
   justification: string,
@@ -195,7 +200,7 @@ const sendAgencyEmails = (
 };
 
 const sendSignatoriesEmail = (
-  signatoriesRecipientsRoleAndEmail: { role: Role; email: Email }[],
+  signatoriesRecipientsRoleAndEmail: { role: ConventionRole; email: Email }[],
   convention: ConventionDto,
   uow: UnitOfWork,
   justification: string,

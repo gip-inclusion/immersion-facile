@@ -6,6 +6,7 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionMagicLinkRoutes,
+  type ConventionRole,
   conventionMagicLinkRoutes,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -14,7 +15,6 @@ import {
   expectObjectsToMatch,
   expectToEqual,
   type RenewConventionParams,
-  type Role,
   ScheduleDtoBuilder,
   type User,
 } from "shared";
@@ -253,7 +253,7 @@ describe("Magic link router", () => {
       role,
       conventionId,
     }: {
-      role: Role;
+      role: ConventionRole;
       conventionId: ConventionId;
     }) =>
       generateConventionJwt({

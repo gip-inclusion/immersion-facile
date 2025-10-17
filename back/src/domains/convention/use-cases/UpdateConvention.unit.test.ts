@@ -8,6 +8,7 @@ import {
   type ConventionDomainPayload,
   type ConventionDto,
   ConventionDtoBuilder,
+  type ConventionRole,
   type ConventionStatus,
   conventionSignatoryRoleBySignatoryKey,
   conventionStatuses,
@@ -248,14 +249,14 @@ describe("Update Convention", () => {
           "agency-viewer",
           "agency-admin",
           "establishment-tutor",
-        ] as Role[])(
+        ] satisfies Role[])(
           "throws forbiden if user role is not allowed",
           async (role) => {
             uow.conventionRepository.setConventions([convention]);
 
             const jwtPayload = createConventionMagicLinkPayload({
               id: convention.id,
-              role,
+              role: role as ConventionRole,
               email: notConnectedUser.email,
               now: new Date(),
             });

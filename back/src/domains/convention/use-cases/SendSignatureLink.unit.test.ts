@@ -5,6 +5,7 @@ import {
   ConnectedUserBuilder,
   type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
+  type ConventionRole,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
   errors,
@@ -58,7 +59,7 @@ const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
 
 const viewerJwtPayload = createConventionMagicLinkPayload({
   id: conventionId,
-  role: "agency-viewer",
+  role: "agency-viewer" as ConventionRole,
   email: "agency-viewer@mail.com",
   now: new Date(),
 });
@@ -307,7 +308,7 @@ describe("Send signature link", () => {
       it("throws unauthorized if user has not enough rights on agency", async () => {
         const agencyViewerJwtPayload = createConventionMagicLinkPayload({
           id: conventionId,
-          role: "agency-viewer",
+          role: "agency-viewer" as ConventionRole,
           email: notConnectedUser.email,
           now: new Date(),
         });

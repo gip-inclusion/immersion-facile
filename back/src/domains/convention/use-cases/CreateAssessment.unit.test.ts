@@ -5,6 +5,7 @@ import {
   ConnectedUserBuilder,
   type ConventionDomainPayload,
   ConventionDtoBuilder,
+  type ConventionRole,
   conventionStatuses,
   errors,
   expectArraysToEqual,
@@ -183,7 +184,7 @@ describe("CreateAssessment", () => {
               counsellor,
               validator,
             )[role],
-            role,
+            role: role as ConventionRole,
           }),
           errors.assessment.forbidden("CreateAssessment"),
         );

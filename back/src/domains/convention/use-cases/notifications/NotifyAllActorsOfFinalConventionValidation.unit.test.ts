@@ -4,12 +4,12 @@ import {
   type BeneficiaryRepresentative,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
+  type ConventionRole,
   type EmailNotification,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   expectToEqual,
   frontRoutes,
-  type Role,
   type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -32,9 +32,9 @@ import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemo
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
-describe("NotifyAllActorsOfFinalApplicationValidation", () => {
+describe("NotifyAllActorsOfFinalConventionValidation", () => {
   type ActorForNotification = {
-    role: Role;
+    role: ConventionRole;
     email: string;
     conventionShortlinkId: ShortLinkId;
     assessmentCreationLinkId: ShortLinkId | undefined;

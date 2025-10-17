@@ -1,10 +1,10 @@
 import {
   type AgencyDto,
   type ConventionDto,
+  type ConventionRole,
   errors,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  type Role,
   type WithConventionDto,
   withConventionSchema,
 } from "shared";
@@ -83,7 +83,7 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
 
     const recipients: {
       recipients: string[];
-      role: Role;
+      role: ConventionRole;
     } = hasCounsellors
       ? {
           recipients: agency.counsellorEmails,
@@ -117,7 +117,7 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
     recipients: string[];
     agency: AgencyDto;
     convention: ConventionDto;
-    role: Role;
+    role: ConventionRole;
     warning?: string;
     uow: UnitOfWork;
   }) {
