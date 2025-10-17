@@ -1,3 +1,15 @@
+# --- CRLF protection and header injection protection (cf. https://blog.devsecopsguides.com/p/attacking-nginx) ---
+if ($request_uri ~* "%0d|%0a|\r|\n") {
+  return 400 "Bad Request - CRLF detected in URI";
+}
+if ($query_string ~* "%0d|%0a|\r|\n") {
+  return 400 "Bad Request - CRLF detected in query string";
+}
+
+if ($http_user_agent ~* "%0d|%0a|\r|\n") {
+  return 400 "Bad Request - Invalid header";
+}
+
 location / {
   root /app/dist;
   add_header Content-Security-Policy "default-src 'self' https://user-images.githubusercontent.com https://tally.so https://px.ads.linkedin.com https://snap.licdn.com https://metabase.immersion-facile.beta.gouv.fr https://matomo.inclusion.beta.gouv.fr https://sentry.gip-inclusion.cloud-ed.fr wss://client.relay.crisp.chat/w/9d/  https://client.crisp.chat data: blob: https://immersion.cellar-c2.services.clever-cloud.com https://immersion-dev.cellar-c2.services.clever-cloud.com https://immersion-staging.cellar-c2.services.clever-cloud.com *.openstreetmap.org 'unsafe-inline' 'unsafe-eval'";
