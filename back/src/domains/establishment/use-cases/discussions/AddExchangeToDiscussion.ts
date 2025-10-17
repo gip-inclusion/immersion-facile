@@ -9,7 +9,6 @@ import {
   type DiscussionId,
   discussionIdSchema,
   type Email,
-  type EstablishmentExchange,
   type Exchange,
   type ExchangeRole,
   type ExtractFromExisting,
@@ -17,7 +16,9 @@ import {
   errors,
   exchangeRoleSchema,
   localization,
+  type User,
   type UserId,
+  type UserWithAdminRights,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -132,29 +133,34 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
     uow: UnitOfWork,
     connectedUser: ConnectedUser | null,
   ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
-    return await Promise.all(
+    return Promise.all(
       messageInputs.map((messageInput) =>
-        this.#processSendMessage(
+        this.#processSendMessage({
           uow,
           source,
-          isMessageInputFromEmail(messageInput)
+          messageInput: isMessageInputFromEmail(messageInput)
             ? messageInput
             : makeDashboardMessageWithUserId(messageInput, connectedUser),
-        ),
+        }),
       ),
     ).then((exchanges) => exchanges[0]);
   }
 
-  async #processSendMessage(
-    uow: UnitOfWork,
-    source: InputSource,
+  async #processSendMessage({
+    uow,
+    source,
+    messageInput,
+  }: {
+    uow: UnitOfWork;
+    source: InputSource;
     messageInput:
       | MessageInputFromDashboardWithUserId
-      | MessageInputFromInboundParsing,
-  ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
+      | MessageInputFromInboundParsing;
+  }): Promise<Exchange | DiscussionExchangeForbiddenParams> {
     const discussion = await uow.discussionRepository.getById(
       messageInput.discussionId,
     );
+
     if (!discussion)
       throw errors.discussion.notFound({
         discussionId: messageInput.discussionId,
@@ -165,36 +171,80 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         discussion.siret,
       );
 
+    if (!establishment || discussion.status === "REJECTED")
+      return this.#notifyForbidden({
+        uow,
+        discussion,
+        source,
+        messageInput,
+        establishment,
+      });
+
     if (
-      establishment &&
-      (discussion.status === "PENDING" || discussion.status === "ACCEPTED")
-    )
-      return this.#addExchangeAndSendEvent(
+      this.#isUserPotentialBeneficiaryOnDiscussion({
+        messageInput,
+        discussion,
+      })
+    ) {
+      return this.#addExchangeAndSendEvent({
         uow,
         discussion,
         messageInput,
-        establishment,
+        userOnDiscussion: {
+          firstName: discussion.potentialBeneficiary.firstName,
+          lastName: discussion.potentialBeneficiary.lastName,
+          email: discussion.potentialBeneficiary.email,
+        },
         source,
+      });
+    }
+
+    const connectedUserOnDiscussion =
+      await this.#getEstablishmentUserInfosByEmailOrId(
+        uow,
+        messageInput,
+        establishment,
       );
 
-    return this.#notifyForbidden({
+    return this.#addExchangeAndSendEvent({
       uow,
       discussion,
-      source,
       messageInput,
-      establishment,
+      userOnDiscussion: connectedUserOnDiscussion,
+      source,
     });
   }
 
-  async #addExchangeAndSendEvent(
-    uow: UnitOfWork,
-    discussion: DiscussionDto,
+  #isUserPotentialBeneficiaryOnDiscussion({
+    messageInput,
+    discussion,
+  }: {
     messageInput:
       | MessageInputFromDashboardWithUserId
-      | MessageInputFromInboundParsing,
-    establishment: EstablishmentAggregate,
-    source: InputSource,
-  ): Promise<Exchange> {
+      | MessageInputFromInboundParsing;
+    discussion: DiscussionDto;
+  }): boolean {
+    if (isMessageInputFromEmail(messageInput)) {
+      return messageInput.senderEmail === discussion.potentialBeneficiary.email;
+    }
+    return false;
+  }
+
+  async #addExchangeAndSendEvent({
+    uow,
+    discussion,
+    messageInput,
+    userOnDiscussion,
+    source,
+  }: {
+    uow: UnitOfWork;
+    discussion: DiscussionDto;
+    messageInput:
+      | MessageInputFromDashboardWithUserId
+      | MessageInputFromInboundParsing;
+    userOnDiscussion: Pick<User, "firstName" | "lastName" | "email">;
+    source: InputSource;
+  }): Promise<Exchange> {
     const exchange: Exchange = {
       subject: makeFormattedSubject({
         subject: isMessageInputFromEmail(messageInput)
@@ -211,11 +261,9 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
       ...(messageInput.recipientRole === "potentialBeneficiary"
         ? {
             sender: "establishment",
-            ...(await this.#getEstablishmentUserInfosByEmailOrId(
-              uow,
-              messageInput,
-              establishment,
-            )),
+            firstname: userOnDiscussion.firstName,
+            lastname: userOnDiscussion.lastName,
+            email: userOnDiscussion.email,
           }
         : { sender: "potentialBeneficiary" }),
     };
@@ -242,34 +290,31 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
       | MessageInputFromDashboardWithUserId
       | MessageInputFromInboundParsing,
     establishment: EstablishmentAggregate,
-  ): Promise<Pick<EstablishmentExchange, "firstname" | "lastname" | "email">> {
+  ): Promise<UserWithAdminRights> {
     const user = isMessageInputFromEmail(messageInput)
       ? await uow.userRepository.findByEmail(messageInput.senderEmail)
       : await uow.userRepository.getById(messageInput.userId);
 
-    if (!user)
+    if (!user) {
       throw isMessageInputFromEmail(messageInput)
         ? errors.user.notFoundByEmail({ email: messageInput.senderEmail })
         : errors.user.notFound({ userId: messageInput.userId });
+    }
 
     if (
       !establishment.userRights.some(
         (userRight) =>
-          (userRight.userId === user.id &&
-            userRight.role === "establishment-admin") ||
-          userRight.role === "establishment-contact",
+          userRight.userId === user.id &&
+          (userRight.role === "establishment-admin" ||
+            userRight.role === "establishment-contact"),
       )
-    )
+    ) {
       throw errors.establishment.notAdminOrContactRight({
         siret: establishment.establishment.siret,
         userId: user.id,
       });
-
-    return {
-      firstname: user.firstName,
-      lastname: user.lastName,
-      email: user.email,
-    };
+    }
+    return user;
   }
 
   async #notifyForbidden({
