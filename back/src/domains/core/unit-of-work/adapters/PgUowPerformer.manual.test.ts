@@ -1,11 +1,10 @@
-import type { Pool } from "pg";
-import { expectPromiseToFailWithError } from "shared";
+import { Pool } from "pg";
 import { v4 as uuid } from "uuid";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import {
   type CreateNewEvent,
   makeCreateNewEvent,
@@ -19,19 +18,27 @@ import {
   useCaseUnderTest,
 } from "./PgUowPerformer.test.helpers";
 
-describe("PgUowPerformer", () => {
+describe("PgUowPerformer stress test", () => {
   let pool: Pool;
   let db: KyselyDb;
   let pgUowPerformer: PgUowPerformer;
-
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
 
+  const numberOfParallelTransactions = 10000;
+  const timeoutInMs = 10_000;
+
   beforeAll(async () => {
-    pool = pool = makeTestPgPool();
+    uuidGenerator = new TestUuidGenerator();
+    const config = AppConfig.createFromEnv();
+    pool = new Pool({
+      connectionString: config.pgImmersionDbUrl,
+      idle_in_transaction_session_timeout: 3_000,
+      min: 2,
+      max: 25,
+    });
     db = makeKyselyDb(pool);
     pgUowPerformer = new PgUowPerformer(db, createPgUow);
-    uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({
       uuidGenerator,
       timeGateway: new CustomTimeGateway(),
@@ -51,32 +58,26 @@ describe("PgUowPerformer", () => {
     await pool.end();
   });
 
-  it("saves everything when all goes fine", async () => {
-    uuidGenerator.setNextUuids([...Array(2)].map(() => uuid()));
+  it(
+    `try ${numberOfParallelTransactions} parallel transactions through max ${timeoutInMs}ms.`,
+    async () => {
+      uuidGenerator.setNextUuids(
+        [...Array(2 * numberOfParallelTransactions)].map(() => uuid()),
+      );
+      await Promise.all(
+        [...Array(numberOfParallelTransactions)].map(() =>
+          pgUowPerformer.perform(
+            useCaseUnderTest(createNewEvent, uuidGenerator),
+          ),
+        ),
+      );
 
-    await pgUowPerformer.perform(
-      useCaseUnderTest(createNewEvent, uuidGenerator),
-    );
-    await expectLengthOfRepos({
-      notificationLength: 1,
-      outboxLength: 1,
-      db,
-    });
-  });
-
-  it("keeps modifications atomic when something goes wrong", async () => {
-    const id = "a failing uuid";
-    uuidGenerator.setNextUuid(id);
-
-    expectPromiseToFailWithError(
-      pgUowPerformer.perform(useCaseUnderTest(createNewEvent, uuidGenerator)),
-      new Error(`invalid input syntax for type uuid: "${id}"`),
-    );
-
-    await expectLengthOfRepos({
-      notificationLength: 0,
-      outboxLength: 0,
-      db,
-    });
-  });
+      await expectLengthOfRepos({
+        notificationLength: numberOfParallelTransactions,
+        outboxLength: numberOfParallelTransactions,
+        db,
+      });
+    },
+    timeoutInMs,
+  );
 });
