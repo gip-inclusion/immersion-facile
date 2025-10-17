@@ -14,6 +14,7 @@ import type {
 import {
   type AgencyRole,
   allSignatoryRoles,
+  type ConventionActorRole,
   type Role,
   type SignatoryRole,
 } from "../role/role.dto";
@@ -233,7 +234,7 @@ export const isSignatoryRole = (role: Role): role is SignatoryRole =>
 
 export type Signatory = GenericSignatory<SignatoryRole>;
 
-export type GenericActor<R extends Role> = {
+export type GenericActor<R extends ConventionActorRole> = {
   role: R;
   email: string;
   phone: string;
@@ -241,9 +242,10 @@ export type GenericActor<R extends Role> = {
   lastName: string;
 };
 
-export type GenericSignatory<R extends Role> = GenericActor<R> & {
-  signedAt?: string; // Date iso string
-};
+export type GenericSignatory<R extends ConventionActorRole> =
+  GenericActor<R> & {
+    signedAt?: string; // Date iso string
+  };
 
 type StudentProperties = {
   levelOfEducation: LevelOfEducation;

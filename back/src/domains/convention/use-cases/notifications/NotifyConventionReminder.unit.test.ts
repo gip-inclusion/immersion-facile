@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   type AgencyWithUsersRights,
   ConnectedUserBuilder,
+  type ConventionActorRole,
   type ConventionDto,
   ConventionDtoBuilder,
   conventionStatuses,
@@ -14,7 +15,6 @@ import {
   type GenericActor,
   getFormattedFirstnameAndLastname,
   type ReminderKind,
-  type Role,
   splitCasesBetweenPassingAndFailing,
   type TemplatedEmail,
 } from "shared";
@@ -815,7 +815,7 @@ const makeSignatoriesLastReminderEmail = ({
   convention,
   shortlinkUrl,
 }: {
-  actor: GenericActor<Role>;
+  actor: GenericActor<ConventionActorRole>;
   convention: ConventionDto;
   shortlinkUrl: AbsoluteUrl | undefined;
 }): TemplatedEmail => ({

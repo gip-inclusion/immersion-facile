@@ -1,4 +1,4 @@
-import { partition } from "ramda";
+import { uniq } from "ramda";
 import type { HttpResponse, UnknownSharedRoute } from "shared-routes";
 import type { EmailType, TemplatedEmail } from "./email/email";
 import { BadRequestError } from "./errors/httpErrors";
@@ -60,13 +60,23 @@ export const expectArraysToEqualIgnoringOrder = <T>(
 };
 
 export const splitCasesBetweenPassingAndFailing = <
-  T extends string,
-  P extends T,
+  A extends string,
+  P extends A,
 >(
-  cases: readonly T[],
-  passing: readonly P[],
-): [T[], T[]] =>
-  partition((someCase: T) => passing.includes(someCase as P), cases);
+  allValues: readonly A[],
+  passingValues: readonly P[],
+): [P[], Exclude<A, P>[]] => {
+  const passingSet = new Set(passingValues);
+  const passingCases: P[] = [];
+  const failingCases: Exclude<A, P>[] = [];
+
+  for (const value of allValues)
+    passingSet.has(value as P)
+      ? passingCases.push(value as P)
+      : failingCases.push(value as Exclude<A, P>);
+
+  return [uniq(passingCases), uniq(failingCases)];
+};
 
 export const expectEmailOfType = <
   T extends EmailType,

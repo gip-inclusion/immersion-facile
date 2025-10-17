@@ -1,11 +1,11 @@
 import { uniqBy } from "ramda";
 import {
+  type ConventionRole,
   computeTotalHours,
   type Email,
   executeInSequence,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  type Role,
   type WithAssessmentDto,
   withAssessmentSchema,
 } from "shared";
@@ -54,20 +54,20 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         convention.id,
       );
 
-    const recipientsRoleAndEmail: { email: Email; role: Role }[] =
+    const recipientsRoleAndEmail: { email: Email; role: ConventionRole }[] =
       conventionAdvisor?.advisor
         ? [{ email: conventionAdvisor?.advisor.email, role: "validator" }]
         : uniqBy(
             (recipient) => recipient.email,
             [
               ...validatorEmails.map(
-                (validatorEmail): { email: Email; role: Role } => ({
+                (validatorEmail): { email: Email; role: ConventionRole } => ({
                   email: validatorEmail,
                   role: "validator",
                 }),
               ),
               ...counsellorEmails.map(
-                (counsellorEmail): { email: Email; role: Role } => ({
+                (counsellorEmail): { email: Email; role: ConventionRole } => ({
                   email: counsellorEmail,
                   role: "counsellor",
                 }),

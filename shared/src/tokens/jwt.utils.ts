@@ -21,7 +21,7 @@ export const decodeJwtWithoutSignatureCheck = <T>(jwtToken: string): T => {
 };
 
 export const decodeMagicLinkJwtWithoutSignatureCheck = <
-  T extends ConventionJwtPayload,
+  T extends ConventionJwtPayload | ConnectedUserJwtPayload,
 >(
   jwtToken: string,
 ): T => decodeJwtWithoutSignatureCheck<T>(jwtToken);

@@ -325,8 +325,7 @@ export const ConventionManageActions = ({
   ];
 
   const payload = decodeMagicLinkJwtWithoutSignatureCheck(jwtParams.jwt);
-  const isConventionMagicLinkJwt =
-    "role" in payload && payload.role !== "back-office";
+  const isConventionMagicLinkJwt = "role" in payload;
 
   return (
     <div

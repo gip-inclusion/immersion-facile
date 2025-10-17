@@ -2,7 +2,9 @@ import {
   type AgencyId,
   backOfficeEmail,
   type ConventionDto,
+  type ConventionId,
   type ConventionRelatedJwtPayload,
+  type ConventionRole,
   type ConventionStatus,
   type DateString,
   errors,
@@ -76,7 +78,12 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         agencyId: conventionRead.agencyId,
       });
 
-    const roleOrUser = await this.#getRoleInPayloadOrUser(uow, payload);
+    const roleOrUser = await this.#getRoleInPayloadOrUser(
+      uow,
+      payload,
+      params.status,
+      conventionRead.id,
+    );
 
     const roles =
       "roleInPayload" in roleOrUser
@@ -188,8 +195,18 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   async #getRoleInPayloadOrUser(
     uow: UnitOfWork,
     payload: UpdateConventionStatusSupportedJwtPayload,
+    targetStatus: ConventionStatus,
+    conventionId: ConventionId,
   ): Promise<{ userWithRights: UserWithRights } | { roleInPayload: Role }> {
-    if ("role" in payload) return { roleInPayload: payload.role };
+    if ("role" in payload) {
+      if (payload.role === ("back-office" as ConventionRole))
+        throw errors.convention.badRoleStatusChange({
+          roles: ["back-office"],
+          status: targetStatus,
+          conventionId,
+        });
+      return { roleInPayload: payload.role };
+    }
 
     const userWithRights = await getUserWithRights(uow, payload.userId);
     if (!userWithRights)

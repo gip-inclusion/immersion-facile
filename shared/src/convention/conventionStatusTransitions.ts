@@ -1,4 +1,4 @@
-import type { Role } from "../role/role.dto";
+import type { Role, SignatoryRole } from "../role/role.dto";
 import type { ConventionReadDto, ConventionStatus } from "./convention.dto";
 
 export type StatusTransitionConfig = {
@@ -10,7 +10,7 @@ export type StatusTransitionConfig = {
   };
 };
 
-export const validSignatoryRoles: Role[] = [
+export const validSignatoryRoles: SignatoryRole[] = [
   "beneficiary",
   "beneficiary-representative",
   "beneficiary-current-employer",

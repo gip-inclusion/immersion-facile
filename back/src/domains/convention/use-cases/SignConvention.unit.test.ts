@@ -7,6 +7,7 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
+  type ConventionRole,
   type ConventionStatus,
   conventionStatuses,
   type EstablishmentRepresentative,
@@ -105,7 +106,7 @@ describe("Sign convention", () => {
             signConvention.execute(
               { conventionId },
               {
-                role,
+                role: role as ConventionRole,
                 applicationId: conventionId,
                 emailHash: "toto",
               },
@@ -437,7 +438,11 @@ describe("Sign convention", () => {
   };
 
   const expectAllowedInitialStatus = (status: ConventionStatus) =>
-    expect(allowedInitialStatuses.includes(status)).toBeTruthy();
+    expect(
+      allowedInitialStatuses.includes(
+        status as "READY_TO_SIGN" | "PARTIALLY_SIGNED",
+      ),
+    ).toBeTruthy();
 
   const expectEventsInOutbox = (events: Partial<DomainEvent>[]) => {
     expect(uow.outboxRepository.events).toMatchObject(events);

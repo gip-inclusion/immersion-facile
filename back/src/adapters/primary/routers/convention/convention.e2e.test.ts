@@ -10,6 +10,7 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionMagicLinkRoutes,
+  type ConventionRole,
   conventionMagicLinkRoutes,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -846,7 +847,7 @@ describe("convention e2e", () => {
           expiredJwt: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: convention.id,
-              role: unsupportedRole,
+              role: unsupportedRole as ConventionRole,
               email: convention.establishmentTutor.email,
               now: gateways.timeGateway.now(),
             }),
@@ -1077,7 +1078,7 @@ describe("convention e2e", () => {
       const jwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: conventionWithValidStatus.id,
-          role: "agency-viewer",
+          role: "agency-viewer" as ConventionRole,
           email: conventionWithValidStatus.establishmentTutor.email,
           now: gateways.timeGateway.now(),
         }),

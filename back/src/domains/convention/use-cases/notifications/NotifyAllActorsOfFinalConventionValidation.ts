@@ -3,6 +3,7 @@ import { uniqBy } from "ramda";
 import {
   type AgencyDto,
   type ConventionDto,
+  type ConventionRole,
   type CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   type Email,
@@ -10,7 +11,6 @@ import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
-  type Role,
   type TemplatedEmail,
   type WithConventionDto,
   withConventionSchema,
@@ -70,41 +70,42 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
 
     const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
-    const recipientsRoleAndEmail: { role: Role; email: Email }[] = uniqBy(
-      (recipient) => recipient.email,
-      [
-        ...Object.values(convention.signatories).map((signatory) => ({
-          role: signatory.role,
-          email: signatory.email,
-        })),
-        ...(convention.signatories.establishmentRepresentative.email !==
-        convention.establishmentTutor.email
-          ? [
-              {
-                role: convention.establishmentTutor.role,
-                email: convention.establishmentTutor.email,
-              },
-            ]
-          : []),
-        ...agency.validatorEmails.map(
-          (validatorEmail): { role: Role; email: Email } => ({
-            role: "validator",
-            email: validatorEmail,
-          }),
-        ),
-        ...agency.counsellorEmails.map(
-          (counsellorEmail): { role: Role; email: Email } => ({
-            role: "counsellor",
-            email: counsellorEmail,
-          }),
-        ),
-        ...getFtAdvisorEmailAndRoleIfExist(
-          await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
-            convention.id,
+    const recipientsRoleAndEmail: { role: ConventionRole; email: Email }[] =
+      uniqBy(
+        (recipient) => recipient.email,
+        [
+          ...Object.values(convention.signatories).map((signatory) => ({
+            role: signatory.role,
+            email: signatory.email,
+          })),
+          ...(convention.signatories.establishmentRepresentative.email !==
+          convention.establishmentTutor.email
+            ? [
+                {
+                  role: convention.establishmentTutor.role,
+                  email: convention.establishmentTutor.email,
+                },
+              ]
+            : []),
+          ...agency.validatorEmails.map(
+            (validatorEmail): { role: ConventionRole; email: Email } => ({
+              role: "validator",
+              email: validatorEmail,
+            }),
           ),
-        ),
-      ],
-    );
+          ...agency.counsellorEmails.map(
+            (counsellorEmail): { role: ConventionRole; email: Email } => ({
+              role: "counsellor",
+              email: counsellorEmail,
+            }),
+          ),
+          ...getFtAdvisorEmailAndRoleIfExist(
+            await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+              convention.id,
+            ),
+          ),
+        ],
+      );
     for (const emailAndRole of recipientsRoleAndEmail) {
       const { role, email: recipient } = emailAndRole;
       await this.#saveNotificationAndRelatedEvent(uow, {
@@ -127,7 +128,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
 
   async #prepareEmail(
     convention: ConventionDto,
-    role: Role,
+    role: ConventionRole,
     recipient: string,
     uow: UnitOfWork,
     agency: AgencyDto,
@@ -139,8 +140,6 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         email: recipient,
         now: this.#timeGateway.now(),
         exp: this.#timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
-        // UGLY : need to rework, handling of JWT payloads
-        ...(role === "back-office" ? { sub: "admin" } : {}),
       };
     const shouldHaveAssessmentMagicLink =
       (isEstablishmentTutorIsEstablishmentRepresentative(convention) &&
@@ -207,7 +206,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
 
 const getFtAdvisorEmailAndRoleIfExist = (
   conventionFtUserAdvisor: ConventionFtUserAdvisorEntity | undefined,
-): [{ role: Role; email: Email }] | [] =>
+): [{ role: ConventionRole; email: Email }] | [] =>
   conventionFtUserAdvisor?.advisor?.email
     ? [{ role: "validator", email: conventionFtUserAdvisor.advisor.email }]
     : [];
