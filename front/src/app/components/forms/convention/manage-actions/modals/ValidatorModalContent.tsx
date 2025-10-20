@@ -63,6 +63,12 @@ export const ValidatorModalContent = ({
   const getFieldError = makeFieldError(formState);
   return (
     <form onSubmit={handleSubmit(onFormSubmit)}>
+      <p>
+        Pour {newStatus === "ACCEPTED_BY_VALIDATOR" ? "valider" : "pré-valider"}{" "}
+        la convention, veuillez saisir les informations de la personne qui
+        valide la demande. Ces informations apparaitrons sur la convention
+        finale au format PDF.
+      </p>
       <Input
         label={
           newStatus === "ACCEPTED_BY_VALIDATOR"
