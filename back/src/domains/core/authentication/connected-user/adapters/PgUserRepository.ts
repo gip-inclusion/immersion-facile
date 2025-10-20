@@ -135,6 +135,7 @@ export class PgUserRepository implements UserRepository {
     if (filters.emailContains === "") return [];
     const usersInDb = await this.#getUserQueryBuilder()
       .where("users.email", "like", `%${filters.emailContains.toLowerCase()}%`)
+      .limit(50)
       .execute();
     return usersInDb
       .map((userInDb) => this.#toAuthenticatedUser(userInDb))
