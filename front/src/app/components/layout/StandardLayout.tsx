@@ -17,18 +17,22 @@ export const StandardLayout = ({ route }: StandardLayoutProps) => {
     route.params.pagePath as StandardPageSlugs,
     route.params.version,
   );
-  const { title, content, layout } = page;
+  const { title, content, options } = page;
 
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout={layout ?? "boxed"}>
+      <MainWrapper layout={options?.layout ?? "boxed"}>
         <h1 className={fr.cx("fr-h2")}>
           {title} (
           {version === "latest" ? "dernière version" : `version du ${version}`})
         </h1>
         <div
           dangerouslySetInnerHTML={{
-            __html: renderContent(content, { wrapInTable: false }) || "",
+            __html:
+              renderContent(content, {
+                wrapInTable: false,
+                replaceNewLines: options?.replaceNewLines ?? true,
+              }) || "",
           }}
         />
         {allVersions.length > 1 ? (

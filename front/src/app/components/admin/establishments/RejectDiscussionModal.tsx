@@ -162,7 +162,10 @@ export const RejectDiscussionModal = ({
             <div
               dangerouslySetInnerHTML={{
                 __html:
-                  renderContent(htmlContent, { wrapInTable: false }) ?? "",
+                  renderContent(htmlContent, {
+                    wrapInTable: false,
+                    replaceNewLines: true,
+                  }) ?? "",
               }}
             />
           }
