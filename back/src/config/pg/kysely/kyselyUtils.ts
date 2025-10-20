@@ -38,6 +38,7 @@ export const jsonStripNulls = <T>(
 
 type KyselyOptions = {
   skipErrorLog?: boolean;
+  isDev?: boolean;
 };
 
 const ONE_SECOND_IN_MILLISECONDS = 1_000;
@@ -67,17 +68,20 @@ export const makeKyselyDb = (pool: Pool, options?: KyselyOptions): KyselyDb => {
         logger.error(params);
         return;
       }
-      event.queryDurationMillis > ONE_SECOND_IN_MILLISECONDS
-        ? logger.warn({
-            message: `${messagePrefix}too long`,
-            durationInSeconds,
-            sqlQuery,
-          })
-        : logger.info({
-            message: `${messagePrefix}done`,
-            durationInSeconds,
-            sqlQuery,
-          });
+      if (event.queryDurationMillis > ONE_SECOND_IN_MILLISECONDS) {
+        logger.warn({
+          message: `${messagePrefix}too long`,
+          durationInSeconds,
+          sqlQuery,
+        });
+        return;
+      }
+      if (!options?.isDev)
+        logger.info({
+          message: `${messagePrefix}done`,
+          durationInSeconds,
+          sqlQuery,
+        });
     },
   });
 };

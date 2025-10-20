@@ -17,7 +17,7 @@ export const createUowPerformer = (
   config.repositories === "PG"
     ? {
         uowPerformer: new PgUowPerformer(
-          makeKyselyDb(getPgPoolFn()),
+          makeKyselyDb(getPgPoolFn(), { isDev: config.nodeEnv === "local" }),
           createPgUow,
         ),
       }
