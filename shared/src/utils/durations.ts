@@ -5,6 +5,7 @@ export const oneMinuteInSeconds = 60;
 export const oneHourInSeconds = 60 * oneMinuteInSeconds;
 export const oneDayInSecond = oneHourInSeconds * 24;
 export const fiveMinutesInSeconds = 5 * oneMinuteInSeconds;
+export const ONE_SECOND_MS = 1_000;
 
 type DurationFormat = "minutes" | "hours" | "days";
 

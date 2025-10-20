@@ -40,32 +40,44 @@ type KyselyOptions = {
   skipErrorLog?: boolean;
 };
 
+const ONE_SECOND_IN_MILLISECONDS = 1_000;
+const messagePrefix = "sql-query - ";
+
 export const makeKyselyDb = (pool: Pool, options?: KyselyOptions): KyselyDb => {
   const logger = createLogger(__filename);
   return new Kysely<Database>({
     dialect: new PostgresDialect({ pool }),
     log(event): void {
       if (options?.skipErrorLog) return;
+      const durationInSeconds =
+        event.queryDurationMillis / ONE_SECOND_IN_MILLISECONDS;
+      const sqlQuery = event.query.sql;
       if (event.level === "error") {
         const error: any = event.error;
         const params = {
-          message: "SQL ERROR",
-          durationInSeconds: event.queryDurationMillis / 1000,
+          message: `${messagePrefix}error`,
+          durationInSeconds,
+          sqlQuery,
           error: {
             error: "message" in error ? error.message : error,
-            query: event.query.sql,
             params: event.query.parameters,
           },
         };
         notifyErrorObjectToTeam(params);
         logger.error(params);
-      } else if (event.queryDurationMillis > 1_000) {
-        logger.warn({
-          message: "SQL QUERY TOO LONG",
-          durationInSeconds: event.queryDurationMillis / 1000,
-          error: { query: event.query.sql },
-        });
+        return;
       }
+      event.queryDurationMillis > ONE_SECOND_IN_MILLISECONDS
+        ? logger.warn({
+            message: `${messagePrefix}too long`,
+            durationInSeconds,
+            sqlQuery,
+          })
+        : logger.info({
+            message: `${messagePrefix}done`,
+            durationInSeconds,
+            sqlQuery,
+          });
     },
   });
 };

@@ -9,6 +9,7 @@ import {
   emailTemplatesByName,
   errors,
   type NotificationId,
+  ONE_SECOND_MS,
   smsTemplatesByName,
   type TemplatedEmail,
   type TemplatedSms,
@@ -34,8 +35,6 @@ const logger = createLogger(__filename);
 
 const brevoMaxEmailRequestsPerSeconds = 2_000;
 const brevoMaxSmsRequestsPerSeconds = 200;
-
-const ONE_SECOND_MS = 1_000;
 
 // documentation https://developers.brevo.com/reference/sendtransacemail
 export class BrevoNotificationGateway implements NotificationGateway {

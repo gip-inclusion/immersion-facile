@@ -115,6 +115,7 @@ type LoggerParams = Partial<{
     retrieveEventsDurationInSeconds?: number;
   };
   durationInSeconds: number;
+  sqlQuery: string;
   error: Error | Partial<SQLError>;
   events: DomainEvent[];
   nodeProcessReport: NodeProcessReport;
@@ -214,6 +215,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       apiConsumerCall,
       crispTicket,
       reportTitle,
+      sqlQuery,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
@@ -226,6 +228,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         conventionId,
         crawlerInfo,
         durationInSeconds,
+        sqlQuery,
         error,
         events: sanitizeEvents(events),
         nodeProcessReport,

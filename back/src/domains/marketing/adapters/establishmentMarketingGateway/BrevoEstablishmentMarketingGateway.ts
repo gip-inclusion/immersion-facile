@@ -1,5 +1,9 @@
 import Bottleneck from "bottleneck";
-import { type Email, numberOfEmployeesRangeSchema } from "shared";
+import {
+  type Email,
+  numberOfEmployeesRangeSchema,
+  ONE_SECOND_MS,
+} from "shared";
 import type { HttpClient } from "shared-routes";
 import type { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import type {
@@ -21,7 +25,6 @@ type BrevoEstablishmentMarketingGatewayParams = {
 };
 
 const brevoMaxContactRequestsPerSeconds = 5;
-const ONE_SECOND_MS = 1_000;
 
 export type BrevoContact = {
   contact: EstablishmentMarketingGatewayDto;
