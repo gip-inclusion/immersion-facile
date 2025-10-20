@@ -114,7 +114,7 @@ export const AddAgencyForm = () => {
       illustration: <img src={mushroomSvg} alt="" />,
       label: "Structure d'accompagnement",
       hintText:
-        "Accompagne la personne tout au long de son immersion et pré-valide la convention avant la validation finale par le prescripteur. Ne cotise pas au risque AT/MP. Exemples : associations d'insertion, organismes d'accompagnement sans délégation, etc.",
+        "Accompagne la personne tout au long de son immersion et pré-valide la convention avant la validation finale par le prescripteur. Ne cotise pas au risque AT/MP. Exemples : club sportif, organismes d'accompagnement sans délégation, etc.",
       nativeInputProps: {
         value: 2,
         onChange: () => {
