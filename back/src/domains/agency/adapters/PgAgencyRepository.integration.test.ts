@@ -4,7 +4,6 @@ import {
   type AgencyStatus,
   type AgencyWithUsersRights,
   activeAgencyStatuses,
-  ConflictError,
   ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
@@ -20,10 +19,7 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type { AgencyWithoutRights } from "../ports/AgencyRepository";
-import {
-  PgAgencyRepository,
-  safirConflictErrorMessage,
-} from "./PgAgencyRepository";
+import { PgAgencyRepository } from "./PgAgencyRepository";
 
 describe("PgAgencyRepository", () => {
   const counsellor1 = new ConnectedUserBuilder()
@@ -349,33 +345,33 @@ describe("PgAgencyRepository", () => {
       },
     );
 
-    it("returns undefined when no agency found", async () => {
-      expect(
-        await agencyRepository.getBySafirAndActiveStatus(safirCode),
-      ).toBeUndefined();
-    });
-
-    it("returns existing agency", async () => {
-      await agencyRepository.insert(agency1WithSafir);
+    it("returns empty array when no agency found", async () => {
       expectToEqual(
         await agencyRepository.getBySafirAndActiveStatus(safirCode),
-        agency1WithSafir,
+        [],
       );
     });
 
-    it("returns undefined when agency is not active", async () => {
+    it("returns existing active agencies with provided safir code", async () => {
+      await agencyRepository.insert(agency1WithSafir);
+      expectToEqual(
+        await agencyRepository.getBySafirAndActiveStatus(safirCode),
+        [agency1WithSafir],
+      );
+    });
+
+    it("returns empty array when agency is not active", async () => {
       await agencyRepository.insert({
         ...agency1WithSafir,
         status: "closed",
       });
       expectToEqual(
         await agencyRepository.getBySafirAndActiveStatus(safirCode),
-        undefined,
+        [],
       );
     });
 
-    it("throw conflict error on multiple agencies with same safir code", async () => {
-      // TODO pourquoi on a pas une contrainte d'unicité sur le code SAFIR en base?
+    it("returns all active agencies when multiple share the same safir code", async () => {
       const agency2WithSafir = toAgencyWithRights(
         agency2builder.withCodeSafir(safirCode).build(),
         {
@@ -385,14 +381,9 @@ describe("PgAgencyRepository", () => {
       await agencyRepository.insert(agency1WithSafir);
       await agencyRepository.insert(agency2WithSafir);
 
-      await expectPromiseToFailWithError(
-        agencyRepository.getBySafirAndActiveStatus(safirCode),
-        new ConflictError(
-          safirConflictErrorMessage(safirCode, [
-            agency1WithSafir,
-            agency2WithSafir,
-          ]),
-        ),
+      expectToEqual(
+        await agencyRepository.getBySafirAndActiveStatus(safirCode),
+        [agency1WithSafir, agency2WithSafir],
       );
     });
   });

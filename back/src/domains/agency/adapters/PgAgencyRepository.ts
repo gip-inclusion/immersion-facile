@@ -11,7 +11,6 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   activeAgencyStatuses,
-  ConflictError,
   type DepartmentCode,
   errors,
   isTruthy,
@@ -132,23 +131,15 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getBySafirAndActiveStatus(
     safirCode: string,
-  ): Promise<AgencyWithUsersRights | undefined> {
+  ): Promise<AgencyWithUsersRights[]> {
     const results = await this.#getAgencyWithJsonBuiltQueryBuilder()
       .where("agencies.code_safir", "=", safirCode)
       .where("agencies.status", "in", activeAgencyStatuses)
       .execute();
 
-    //TODO: On ne fait pas de unique sur le code safir en base
-    if (results.length > 1)
-      throw new ConflictError(
-        safirConflictErrorMessage(
-          safirCode,
-          results.map(({ agency }) => agency),
-        ),
-      );
-
-    const result = results.at(0);
-    return result && this.#pgAgencyToAgencyWithRights(result.agency);
+    return results
+      .map((result) => this.#pgAgencyToAgencyWithRights(result.agency))
+      .filter(isTruthy);
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]> {
@@ -470,12 +461,3 @@ export class PgAgencyRepository implements AgencyRepository {
     return results.map(({ agency_siret }) => agency_siret);
   }
 }
-
-export const safirConflictErrorMessage = (
-  safirCode: string,
-  agencies: Pick<AgencyDto, "id">[],
-): any =>
-  `Multiple agencies were found with safir code "${safirCode}": ${agencies
-    .map(({ id }) => id)
-    .sort()
-    .join(",")}`;
