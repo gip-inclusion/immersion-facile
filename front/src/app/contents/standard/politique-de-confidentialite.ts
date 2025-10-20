@@ -15,9 +15,8 @@ export default {
 <p>Immersion Facilitée a pour objectif de faciliter les immersions professionnelles, celles-ci étant un levier puissant d’accompagnement à l’emploi.</p>
 <p>Elle peut traiter des données à caractère personnel pour les finalités suivantes :
   <ul>
-    <li>Dématérialiser le procédures de conventionnement de la mise en situation en milieu professionnel, immersion, stage ou période d’observation professionnelle, ainsi que l’amélioration et la facilitation du parcours d’accès à l’immersion professionnelle</li>
+    <li>Dématérialiser le procédures de conventionnement de la mise en situation en milieu professionnel, immersion, stage ou période d'observation professionnelle, ainsi que l'amélioration et la facilitation du parcours d'accès ;</li>
     <li>Construire et développer une base entreprises immersions contenant les entreprises volontaires pour accueillir les personnes</li>
-    <li>Aider et faciliter la tâche des prescripteurs dans la décision et le suivi des personnes</li>
     <li>Faciliter des tâches des prescripteurs dans la décision et le suivi des bénéficiaires de la période de mise en situation en milieu professionnel </li>
     <li>Suivre et analyser l’analyse des données de pilotage lors des mises en relation et la réalisation de statistiques partagées avec les acteurs de l’insertion</li>
   </ul>
@@ -25,7 +24,7 @@ export default {
 
 <h5>Quelles sont les données que nous traitons ?</h5>
 
-<p>La plateforme Immersion Facilitée peut traiter les données à caractère personnel suivantes :</p> t
+<p>La plateforme Immersion Facilitée peut traiter les données à caractère personnel suivantes :</p>
 
 <h6>Données relatives au candidat à la période de mise en situation professionnelle ou de mini-stage :</h6>
 <p>
@@ -53,12 +52,12 @@ export default {
   </ul>
 </p>
 
-<h6>Données relatives aux agents prescripteurs et des organismes d’accompagnement (Conseils départementaux, France Travail, missions locales, SIAE et autres organismes liés par les prescripteurs de « droit commun » dont la mission consiste à fournir un service à caractère social, socio-professionnel ou professionnel au titre de l'accompagnement dont bénéficie la personne engagée ou éligible dans un parcours de PMSMP ou conseillers d’une chambre consulaire pour un mini-stage) :</h6> 
+<h6>Données relatives aux agents prescripteurs et des organismes d'accompagnement (Conseils départementaux, France Travail, missions locales, SIAE et autres organismes liés par les prescripteurs de « droit commun » dont la mission consiste à fournir un service à caractère social, socio-professionnel ou professionnel au titre de l'accompagnement dont bénéficie la personne engagée ou éligible dans un parcours de PMSMP ou conseillers d'une chambre consulaire pour un mini-stage) :</h6>
 <p>
   <ul>
     <li>Etat civil : Nom, prénom,</li>
-    <li>Fonctions ;</li>
-    <li>Contact : adresse électronique, téléphone professionnel du tuteur et/ou du représentant</li>
+    <li>Agence ;</li>
+    <li>Contact : adresse électronique.</li>
   </ul>
 </p>
 
@@ -176,7 +175,7 @@ Outre les cas autorisés par la loi, les personnes et agents habilités à accé
     <li>Stockage des mots de passe en base sont hachés</li>
     <li>Cloisonnement des données</li>
     <li>Mesures de traçabilité</li>
-    <li>Gestion des habilitations entre mesures de traçabilité et surveillance</li>
+    <li>Gestion des habilitations</li>
     <li>Surveillance</li>
     <li>Protection contre les virus, malwares et logiciels espions</li>
     <li>Protection des réseaux</li>
@@ -253,11 +252,11 @@ Aucun transfert de données au sens de l'article 44 du RGPD n'est réalisé.
 
 <p>En application de l’article 5(3) de la directive 2002/58/CE modifiée concernant le traitement des données à caractère personnel et la protection de la vie privée dans le secteur des communications électroniques, transposée à l’article 82 de la loi n°78-17 du 6 janvier 1978 relative à l’informatique, aux fichiers et aux libertés, les traceurs ou cookies suivent deux régimes distincts.</p>
 
-<p>Les cookies strictement nécessaires au service ou ayant pour finalité exclusive de faciliter la communication par voie électronique sont dispensés de consentement préalable au titre de l’article 82 de la loi n°78-17 du 6 janvier 1978.</p>
+<p>D’une part, les cookies strictement nécessaires au service ou ayant pour finalité exclusive de faciliter la communication par voie électronique sont dispensés de consentement préalable au titre de l’article 82 de la loi n°78-17 du 6 janvier 1978.</p>
 
-<p>Les cookies n’étant pas strictement nécessaires au service ou n’ayant pas pour finalité exclusive de faciliter la communication par voie électronique doivent être consenti par l’utilisateur.</p>
+<p>D’autre part, les cookies n’étant pas strictement nécessaires au service ou n’ayant pas pour finalité exclusive de faciliter la communication par voie électronique doivent être consenti par l'utilisateur.</p>
 
-<p>Ce consentement de la personne concernée pour une ou plusieurs finalités spécifiques constitue une base légale au sens du RGPD et doit être entendu au sens de l'article 6-a.</p>
+<p>Ce consentement de la personne concernée pour une ou plusieurs finalités spécifiques constitue une base légale au sens du RGPD et doit être entendu au sens de l’article 6-1 a).</p>
 
 La plateforme dépose des cookies tiers, notamment pour la mesure d’audience et le support utilisateur. À tout moment, ces cookies peuvent être activés ou désactivés :
 <ul>
