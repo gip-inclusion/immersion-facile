@@ -4,7 +4,10 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { Environment } from "shared";
 import { version } from "./version";
 
-export const configureSentry = (envType: Environment) => {
+export const configureSentry = (
+  envType: Environment,
+  options?: { traceRate?: number },
+) => {
   if (envType === "local") {
     return;
   }
@@ -17,7 +20,7 @@ export const configureSentry = (envType: Environment) => {
     ],
     environment: envType,
     release: version,
-    tracesSampleRate: 0.01,
+    tracesSampleRate: options?.traceRate ?? 0.01,
     profilesSampleRate: 0.01,
   });
 
