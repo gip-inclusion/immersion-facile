@@ -1,4 +1,4 @@
-import { expectPromiseToFailWithError } from "shared";
+import { expectPromiseToFailWithError, ONE_SECOND_MS } from "shared";
 import { RetryableError } from "../ports/RetryStrategy";
 import { ExponentialBackoffRetryStrategy } from "./ExponentialBackoffRetryStrategy";
 
@@ -112,7 +112,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
 
     mockNow
       .mockReturnValueOnce(0) // start time
-      .mockReturnValueOnce(1_000)
+      .mockReturnValueOnce(ONE_SECOND_MS)
       .mockReturnValueOnce(10_000)
       .mockReturnValueOnce(100_000); // timeout exceeded
 

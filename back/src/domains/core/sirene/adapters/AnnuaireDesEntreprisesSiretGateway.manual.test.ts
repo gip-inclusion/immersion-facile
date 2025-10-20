@@ -1,5 +1,5 @@
 import type { RedisClientType } from "redis";
-import { expectToEqual } from "shared";
+import { expectToEqual, ONE_SECOND_MS } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -144,7 +144,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
       );
       expect(results).toHaveLength(siretsPromises.length);
     },
-    1_000 * parallelCallQty * 1.2,
+    ONE_SECOND_MS * parallelCallQty * 1.2,
   );
 
   it("Should return a non diffusible establishment using fallback API", async () => {

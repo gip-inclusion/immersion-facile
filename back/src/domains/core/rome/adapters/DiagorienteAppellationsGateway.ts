@@ -4,6 +4,7 @@ import {
   appellationCodeSchema,
   cancellableSleep,
   errors,
+  ONE_SECOND_MS,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
@@ -18,7 +19,6 @@ import {
   diagorienteTokenScope,
 } from "./DiagorienteAppellationsGateway.routes";
 
-const ONE_SECOND_MS = 1_000;
 const maxResults = 5;
 const diagorienteMaxCallRatePerSeconds = 25;
 
