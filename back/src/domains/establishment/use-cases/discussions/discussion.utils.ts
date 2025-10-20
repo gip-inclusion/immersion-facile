@@ -59,7 +59,10 @@ export const processInboundParsingEmailMessage = (item: BrevoEmailItem) => {
   const emailContent =
     item.RawHtmlBody ||
     (item.RawTextBody &&
-      renderContent(item.RawTextBody, { wrapInTable: false })) ||
+      renderContent(item.RawTextBody, {
+        wrapInTable: false,
+        replaceNewLines: true,
+      })) ||
     "Pas de contenu";
   return cleanContactEmailFromMessage(emailContent);
 };

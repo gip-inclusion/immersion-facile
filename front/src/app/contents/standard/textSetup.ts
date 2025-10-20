@@ -11,7 +11,10 @@ import siteMapContent from "./siteMap";
 export type StandardPageContent = {
   title: string;
   content: string;
-  layout?: MainWrapperProps["layout"];
+  options?: {
+    layout?: MainWrapperProps["layout"];
+    replaceNewLines?: boolean;
+  };
 };
 
 export type VersionnedStandardContent = {
