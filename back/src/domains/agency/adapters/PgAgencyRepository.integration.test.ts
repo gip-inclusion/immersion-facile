@@ -6,6 +6,7 @@ import {
   activeAgencyStatuses,
   ConnectedUserBuilder,
   errors,
+  expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
   type GeoPositionDto,
@@ -381,10 +382,12 @@ describe("PgAgencyRepository", () => {
       await agencyRepository.insert(agency1WithSafir);
       await agencyRepository.insert(agency2WithSafir);
 
-      expectToEqual(
-        await agencyRepository.getBySafirAndActiveStatus(safirCode),
-        [agency1WithSafir, agency2WithSafir],
-      );
+      const agencies =
+        await agencyRepository.getBySafirAndActiveStatus(safirCode);
+      expectArraysToEqualIgnoringOrder(agencies, [
+        agency1WithSafir,
+        agency2WithSafir,
+      ]);
     });
   });
 
