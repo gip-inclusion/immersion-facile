@@ -119,6 +119,11 @@ export class HttpAddressGateway implements AddressGateway {
             return lookupSearchResultsSchema.parse(
               toLookupSearchResults(response.body),
             );
+          })
+          .catch(() => {
+            // just like for !200 codes: do nothing. We don't need noisy errors.
+            // Errors are logged in data dog anyway. We can configure alert there.
+            return [];
           }),
     })(sanitizedQuery);
   }
@@ -153,6 +158,11 @@ export class HttpAddressGateway implements AddressGateway {
         return response.body.features
           .map((feature) => this.#toAddressAndPosition(feature))
           .filter(filterNotFalsy);
+      })
+      .catch(() => {
+        // just like for !200 codes: do nothing. We don't need noisy errors.
+        // Errors are logged in data dog anyway. We can configure alert there.
+        return [];
       });
   }
 
