@@ -21,6 +21,7 @@ import { InMemoryUserRepository } from "../../authentication/connected-user/adap
 import { InMemoryConventionFranceTravailAdvisorRepository } from "../../authentication/ft-connect/adapters/InMemoryConventionFranceTravailAdvisorRepository";
 import { InMemoryOutboxQueries } from "../../events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRepository";
+import { InMemoryFeatureFlagQueries } from "../../feature-flags/adapters/InMemoryFeatureFlagQueries";
 import { InMemoryFeatureFlagRepository } from "../../feature-flags/adapters/InMemoryFeatureFlagRepository";
 import { InMemoryNafRepository } from "../../naf/adapters/InMemoryNafRepository";
 import { InMemoryNotificationRepository } from "../../notifications/adapters/InMemoryNotificationRepository";
@@ -28,7 +29,7 @@ import { InMemoryRomeRepository } from "../../rome/adapters/InMemoryRomeReposito
 import { InMemoryBroadcastFeedbacksRepository } from "../../saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
 import { InMemoryShortLinkRepository } from "../../short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
 import { InMemoryStatisticQueries } from "../../statistics/adapters/InMemoryStatisticQueries";
-import type { UnitOfWork } from "../ports/UnitOfWork";
+import type { OutOfTransactionQueries, UnitOfWork } from "../ports/UnitOfWork";
 
 export const createInMemoryUow = () => {
   const outboxRepository = new InMemoryOutboxRepository();
@@ -44,6 +45,7 @@ export const createInMemoryUow = () => {
     userRepository,
     assessmentRepository,
   );
+  const featureFlagRepository = new InMemoryFeatureFlagRepository();
 
   const shortLinkRepository = new InMemoryShortLinkRepository();
   const establishmentLeadRepository = new InMemoryEstablishmentLeadRepository();
@@ -64,7 +66,8 @@ export const createInMemoryUow = () => {
       new InMemoryEstablishmentAggregateRepository(),
     groupRepository: new InMemoryGroupRepository(),
     broadcastFeedbacksRepository: new InMemoryBroadcastFeedbacksRepository(),
-    featureFlagRepository: new InMemoryFeatureFlagRepository(),
+    featureFlagRepository: featureFlagRepository,
+    featureFlagQueries: new InMemoryFeatureFlagQueries(featureFlagRepository),
     assessmentRepository,
     establishmentLeadRepository,
     establishmentLeadQueries: new InMemoryEstablishmentLeadQueries(
@@ -92,3 +95,13 @@ export const createInMemoryUow = () => {
 };
 
 export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
+
+export const createInMemoryOutOfTransactionQueries = (
+  uow: InMemoryUnitOfWork,
+): OutOfTransactionQueries => ({
+  convention: uow.conventionQueries,
+  establishmentLead: uow.establishmentLeadQueries,
+  shortLink: uow.shortLinkQuery,
+  featureFlag: uow.featureFlagQueries,
+  statistic: uow.statisticQueries,
+});

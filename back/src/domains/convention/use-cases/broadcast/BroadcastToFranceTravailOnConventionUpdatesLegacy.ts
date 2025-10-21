@@ -42,7 +42,7 @@ export const makeBroadcastToFranceTravailOnConventionUpdatesLegacy =
         uow,
         convention,
       );
-      const featureFlags = await uow.featureFlagRepository.getAll();
+      const featureFlags = await uow.featureFlagQueries.getAll();
 
       if (
         !shouldBroadcastToFranceTravail({

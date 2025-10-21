@@ -92,7 +92,7 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
   ) {
     try {
       const { enableStandardFormatBroadcastToFranceTravail } =
-        await uow.featureFlagRepository.getAll();
+        await uow.featureFlagQueries.getAll();
       await this.#resync({
         uow: uow,
         conventionToSyncId: conventionToSyncId,
