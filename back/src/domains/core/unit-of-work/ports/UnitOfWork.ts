@@ -21,6 +21,7 @@ import type { UserRepository } from "../../authentication/connected-user/port/Us
 import type { ConventionFranceTravailAdvisorRepository } from "../../authentication/ft-connect/port/ConventionFranceTravailAdvisorRepository";
 import type { OutboxQueries } from "../../events/ports/OutboxQueries";
 import type { OutboxRepository } from "../../events/ports/OutboxRepository";
+import type { FeatureFlagQueries } from "../../feature-flags/ports/FeatureFlagQueries";
 import type { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
 import type { NafRepository } from "../../naf/port/NafRepository";
 import type { NotificationRepository } from "../../notifications/ports/NotificationRepository";
@@ -49,6 +50,7 @@ export type UnitOfWork = {
   establishmentLeadRepository: EstablishmentLeadRepository;
   establishmentMarketingRepository: EstablishmentMarketingRepository;
   featureFlagRepository: FeatureFlagRepository;
+  featureFlagQueries: FeatureFlagQueries;
   groupRepository: GroupRepository;
   nafRepository: NafRepository;
   notificationRepository: NotificationRepository;
@@ -62,4 +64,12 @@ export type UnitOfWork = {
   shortLinkRepository: ShortLinkRepository;
   statisticQueries: StatisticQueries;
   userRepository: UserRepository;
+};
+
+export type OutOfTransactionQueries = {
+  convention: ConventionQueries;
+  establishmentLead: EstablishmentLeadQueries;
+  shortLink: ShortLinkQuery;
+  featureFlag: FeatureFlagQueries;
+  statistic: StatisticQueries;
 };

@@ -34,7 +34,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
     useCaseName: "BroadcastToFranceTravailOrchestrator",
     execute: async (params) => {
       const featureFlags = await uowPerformer.perform(async (uow) =>
-        uow.featureFlagRepository.getAll(),
+        uow.featureFlagQueries.getAll(),
       );
 
       if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive) {
