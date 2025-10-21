@@ -35,7 +35,6 @@ describe("UpdateConventionStatus", () => {
       expectedDomainTopic: null,
       allowedMagicLinkRoles: [
         ...validSignatoryRoles,
-        "back-office",
         "validator",
         "counsellor",
       ],
@@ -59,7 +58,6 @@ describe("UpdateConventionStatus", () => {
       },
       allowedMagicLinkRoles: [
         ...validSignatoryRoles,
-        "back-office",
         "validator",
         "counsellor",
       ],
@@ -284,7 +282,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
-      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["validator", "counsellor"],
       allowedConnectedUsers: [
         "userWithRoleValidator",
         "userWithRoleBackofficeAdmin",
@@ -305,7 +303,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
-      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["validator", "counsellor"],
       allowedConnectedUsers: [
         "userWithRoleCounsellor",
         "userWithRoleValidator",
@@ -328,7 +326,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
-      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["validator", "counsellor"],
       allowedConnectedUsers: [
         "userWithRoleValidator",
         "userWithRoleCounsellor",
@@ -348,7 +346,7 @@ describe("UpdateConventionStatus", () => {
         statusJustification: "my rejection justification",
         conventionId: conventionWithAgencyOneStepValidationId,
       },
-      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["validator", "counsellor"],
       allowedConnectedUsers: [
         "userWithRoleValidator",
         "userWithRoleCounsellor",
@@ -373,7 +371,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionCancelled",
       updatedFields: { statusJustification: "Cancelled justification" },
-      allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
+      allowedMagicLinkRoles: ["validator", "counsellor"],
       allowedConnectedUsers: [
         "userWithRoleValidator",
         "userWithRoleBackofficeAdmin",
@@ -388,7 +386,7 @@ describe("UpdateConventionStatus", () => {
         statusJustification: "Cancelled justification",
         conventionId: conventionWithAgencyTwoStepsValidationId,
       },
-      allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
+      allowedMagicLinkRoles: ["validator", "counsellor"],
       allowedConnectedUsers: [
         "userWithRoleValidator",
         "userWithRoleBackofficeAdmin",
@@ -439,7 +437,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionDeprecated",
       updatedFields: { statusJustification: "my deprecation justification" },
-      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["validator", "counsellor"],
       allowedConnectedUsers: [
         "userWithRoleCounsellor",
         "userWithRoleValidator",

@@ -6,8 +6,10 @@ import {
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  type ConventionActorRole,
   type ConventionDto,
   type ConventionReadDto,
+  type ConventionRole,
   type EstablishmentRepresentative,
   type ExtractFromExisting,
   errors,
@@ -18,7 +20,6 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
   type ReminderKind,
-  type Role,
   smsRecipientPhoneSchema,
   type TemplatedEmail,
   type TemplatedSms,
@@ -41,7 +42,7 @@ import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitO
 
 type EmailWithRole = {
   email: string;
-  role: Role;
+  role: ConventionRole;
 };
 
 type SignatoriesReminderKind = ExtractFromExisting<
@@ -109,7 +110,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   }
 
   async #makeSignatoryReminderEmail(
-    { role, email, firstName, lastName }: GenericActor<Role>,
+    { role, email, firstName, lastName }: GenericActor<ConventionActorRole>,
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<TemplatedEmail> {
@@ -265,7 +266,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   }
 
   async #prepareSmsReminderParams(
-    { role, email, phone }: GenericActor<Role>,
+    { role, email, phone }: GenericActor<ConventionActorRole>,
     convention: ConventionReadDto,
     uow: UnitOfWork,
     kind: SignatoriesReminderKind,

@@ -1,4 +1,5 @@
 import type { Signatories } from "../convention/convention.dto";
+import type { ExtractFromExisting } from "../utils";
 
 export type Role = (typeof allRoles)[number];
 export type SignatoryRole = (typeof allSignatoryRoles)[number];
@@ -22,6 +23,26 @@ export const allRoles = [
   "establishment-admin",
   "establishment-contact",
 ] as const;
+
+export type ConventionRole = ExtractFromExisting<
+  Role,
+  | "beneficiary"
+  | "beneficiary-current-employer"
+  | "beneficiary-representative"
+  | "establishment-representative"
+  | "establishment-tutor"
+  | "counsellor"
+  | "validator"
+>;
+
+export type ConventionActorRole = ExtractFromExisting<
+  ConventionRole,
+  | "beneficiary"
+  | "beneficiary-current-employer"
+  | "beneficiary-representative"
+  | "establishment-representative"
+  | "establishment-tutor"
+>;
 
 export const allSignatoryRoles = [
   "beneficiary",

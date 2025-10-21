@@ -5,6 +5,7 @@ import {
   ConnectedUserBuilder,
   type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
+  type ConventionRole,
   type EstablishmentRole,
   errors,
   expectObjectInArrayToMatch,
@@ -363,7 +364,7 @@ describe("SendAssessmentLink", () => {
 
           const notConnectedUserJwtPayload = createConventionMagicLinkPayload({
             id: convention.id,
-            role,
+            role: role as ConventionRole,
             email: notConnectedUser.email,
             now: new Date(),
           });

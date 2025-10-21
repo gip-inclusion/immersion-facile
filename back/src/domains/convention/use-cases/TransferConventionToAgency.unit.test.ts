@@ -3,6 +3,7 @@ import type {
   AgencyRole,
   ConnectedUser,
   ConnectedUserDomainJwtPayload,
+  ConventionRole,
   ConventionStatus,
   Role,
 } from "shared";
@@ -324,7 +325,7 @@ describe("TransferConventionToAgency", () => {
           ];
           const jwtPayload = createConventionMagicLinkPayload({
             id: conventionId,
-            role,
+            role: role as ConventionRole,
             email: notConnectedUser.email,
             now: new Date(),
           });
@@ -751,7 +752,7 @@ describe("TransferConventionToAgency", () => {
     });
 
     describe("with convention jwt payload", () => {
-      it.each(["validator", "counsellor"] as Role[])(
+      it.each(["validator", "counsellor"] as ConventionRole[])(
         "triggered by jwt role %s",
         async (role) => {
           uow.conventionRepository.setConventions([convention]);

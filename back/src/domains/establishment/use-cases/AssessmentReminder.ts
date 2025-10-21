@@ -6,6 +6,7 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type Email,
+  type ExtractFromExisting,
   errors,
   executeInSequence,
   frontRoutes,
@@ -262,22 +263,24 @@ const sendAgencyAssessmentReminder = async ({
   const advisorEmail = conventionAdvisorEntity?.advisor?.email;
   const agency = await agencyWithRightToAgencyDto(uow, agencyWithUserRights);
 
-  const recipientsEmailAndRole: { email: Email; role: AgencyRole }[] =
-    advisorEmail
-      ? [{ email: advisorEmail, role: "validator" }]
-      : uniqBy(
-          (recipient) => recipient.email,
-          [
-            ...agency.validatorEmails.map((email) => ({
-              email,
-              role: "validator" as const,
-            })),
-            ...agency.counsellorEmails.map((email) => ({
-              email,
-              role: "counsellor" as const,
-            })),
-          ],
-        );
+  const recipientsEmailAndRole: {
+    email: Email;
+    role: ExtractFromExisting<AgencyRole, "validator" | "counsellor">;
+  }[] = advisorEmail
+    ? [{ email: advisorEmail, role: "validator" }]
+    : uniqBy(
+        (recipient) => recipient.email,
+        [
+          ...agency.validatorEmails.map((email) => ({
+            email,
+            role: "validator" as const,
+          })),
+          ...agency.counsellorEmails.map((email) => ({
+            email,
+            role: "counsellor" as const,
+          })),
+        ],
+      );
 
   await Promise.all(
     recipientsEmailAndRole.map(async ({ email, role }) => {
