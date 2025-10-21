@@ -29,7 +29,7 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
   .build(async ({ inputParams, uow, deps }): Promise<void> => {
     const { convention } = inputParams;
     const { agency, refersToAgency } = await getLinkedAgencies(uow, convention);
-    const featureFlags = await uow.featureFlagRepository.getAll();
+    const featureFlags = await uow.featureFlagQueries.getAll();
 
     if (
       !shouldBroadcastToFranceTravail({

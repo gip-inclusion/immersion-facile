@@ -22,6 +22,7 @@ import { PgUserRepository } from "../../authentication/connected-user/adapters/P
 import { PgConventionFranceTravailAdvisorRepository } from "../../authentication/ft-connect/adapters/PgConventionFranceTravailAdvisorRepository";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
+import { PgFeatureFlagQueries } from "../../feature-flags/adapters/PgFeatureFlagQueries";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
 import { PgNafRepository } from "../../naf/adapters/PgNafRepository";
 import { PgNotificationRepository } from "../../notifications/adapters/PgNotificationRepository";
@@ -29,7 +30,7 @@ import { PgRomeRepository } from "../../rome/adapters/PgRomeRepository";
 import { PgBroadcastFeedbacksRepository } from "../../saved-errors/adapters/PgBroadcastFeedbacksRepository";
 import { PgShortLinkRepository } from "../../short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { PgStatisticQueries } from "../../statistics/adapters/PgStatisticQueries";
-import type { UnitOfWork } from "../ports/UnitOfWork";
+import type { OutOfTransactionQueries, UnitOfWork } from "../ports/UnitOfWork";
 
 export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);
@@ -60,6 +61,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     establishmentLeadRepository: new PgEstablishmentLeadRepository(transaction),
     establishmentLeadQueries: new PgEstablishmentLeadQueries(transaction),
     groupRepository: new PgGroupRepository(transaction),
+    featureFlagQueries: new PgFeatureFlagQueries(transaction),
     featureFlagRepository: new PgFeatureFlagRepository(transaction),
     assessmentRepository: new PgAssessmentRepository(transaction),
     npsRepository: new PgNpsRepository(transaction),
@@ -78,3 +80,11 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     nafRepository: new PgNafRepository(transaction),
   };
 };
+
+export const createPgQueries = (kysely: KyselyDb): OutOfTransactionQueries => ({
+  convention: new PgConventionQueries(kysely),
+  establishmentLead: new PgEstablishmentLeadQueries(kysely),
+  shortLink: new PgShortLinkRepository(kysely),
+  statistic: new PgStatisticQueries(kysely),
+  featureFlag: new PgFeatureFlagQueries(kysely),
+});

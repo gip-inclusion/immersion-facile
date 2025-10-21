@@ -12,18 +12,22 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
+import type { FeatureFlagQueries } from "../ports/FeatureFlagQueries";
 import type { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
+import { PgFeatureFlagQueries } from "./PgFeatureFlagQueries";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
 describe("PG getFeatureFlags", () => {
   let pool: Pool;
   let db: KyselyDb;
   let featureFlagRepository: FeatureFlagRepository;
+  let featureFlagQueries: FeatureFlagQueries;
 
   beforeAll(async () => {
     pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     featureFlagRepository = new PgFeatureFlagRepository(db);
+    featureFlagQueries = new PgFeatureFlagQueries(db);
   });
 
   beforeEach(async () => {
@@ -70,7 +74,7 @@ describe("PG getFeatureFlags", () => {
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
 
-    expectToEqual(await featureFlagRepository.getAll(), {
+    expectToEqual(await featureFlagQueries.getAll(), {
       enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
         imageAlt: "Alt",
         imageUrl: "http://image",
@@ -140,7 +144,7 @@ describe("PG getFeatureFlags", () => {
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
 
-    expectToEqual(await featureFlagRepository.getAll(), initialFeatureFlags);
+    expectToEqual(await featureFlagQueries.getAll(), initialFeatureFlags);
 
     await featureFlagRepository.update({
       flagName: "enableTemporaryOperation",
@@ -169,7 +173,7 @@ describe("PG getFeatureFlags", () => {
       featureFlag: makeBooleanFeatureFlag(true),
     });
 
-    expectToEqual(await featureFlagRepository.getAll(), {
+    expectToEqual(await featureFlagQueries.getAll(), {
       enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
         imageAlt: "updatedAlt",
         imageUrl: "http://updatedImage",

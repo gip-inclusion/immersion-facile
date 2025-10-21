@@ -116,6 +116,7 @@ import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cas
 import { makeSendSupportTicketToCrisp } from "../../domains/core/support/use-cases/SendSupportTicketToCrisp";
 import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import type { TransactionalUseCase, UseCase } from "../../domains/core/UseCase";
+import type { OutOfTransactionQueries } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
@@ -159,6 +160,7 @@ type CreateUsecasesParams = {
   deps: {
     uowPerformer: UnitOfWorkPerformer;
     uuidGenerator: UuidGenerator;
+    queries: OutOfTransactionQueries;
   };
   jwt: {
     generateConventionJwt: GenerateConventionJwt;
@@ -171,7 +173,7 @@ type CreateUsecasesParams = {
 
 export const createUseCases = ({
   config,
-  deps: { uowPerformer, uuidGenerator },
+  deps: { uowPerformer, uuidGenerator, queries },
   gateways,
   jwt: {
     generateApiConsumerJwt,
@@ -587,10 +589,9 @@ export const createUseCases = ({
       ),
     }),
     ...instantiatedUseCasesFromFunctions({
-      getFeatureFlags: (_: void) =>
-        uowPerformer.perform((uow) => uow.featureFlagRepository.getAll()),
+      getFeatureFlags: (_: void) => queries.featureFlag.getAll(),
       getLink: (shortLinkId: ShortLinkId) =>
-        uowPerformer.perform((uow) => uow.shortLinkQuery.getById(shortLinkId)),
+        queries.shortLink.getById(shortLinkId),
       getApiConsumerById: (id: ApiConsumerId) =>
         uowPerformer.perform((uow) => uow.apiConsumerRepository.getById(id)),
       getAllApiConsumers: (currentUser: ConnectedUser) => {
@@ -626,10 +627,9 @@ export const createUseCases = ({
       findSimilarConventions: (
         params: FindSimilarConventionsParams,
       ): Promise<FindSimilarConventionsResponseDto> =>
-        uowPerformer.perform(async (uow) => ({
-          similarConventionIds:
-            await uow.conventionQueries.findSimilarConventions(params),
-        })),
+        queries.convention
+          .findSimilarConventions(params)
+          .then((similarConventionIds) => ({ similarConventionIds })),
     }),
 
     getOffers: makeGetOffers({
