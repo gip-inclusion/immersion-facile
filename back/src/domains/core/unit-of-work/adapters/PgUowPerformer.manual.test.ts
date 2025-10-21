@@ -1,10 +1,9 @@
-import type { Pool } from "pg";
-import { expectPromiseToFailWithError } from "shared";
+import { Pool } from "pg";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import {
   type CreateNewEvent,
   makeCreateNewEvent,
@@ -18,18 +17,27 @@ import {
   useCaseUnderTest,
 } from "./PgUowPerformer.test.helpers";
 
-describe("PgUowPerformer", () => {
+describe("PgUowPerformer stress test", () => {
   let pool: Pool;
   let db: KyselyDb;
   let pgUowPerformer: PgUowPerformer;
   let uuidGenerator: UuidV4Generator;
   let createNewEvent: CreateNewEvent;
 
+  const numberOfParallelTransactions = 10_000;
+  const timeoutInMs = 10_000;
+
   beforeAll(async () => {
-    pool = makeTestPgPool();
+    uuidGenerator = new UuidV4Generator();
+    const config = AppConfig.createFromEnv();
+    pool = new Pool({
+      connectionString: config.pgImmersionDbUrl,
+      idle_in_transaction_session_timeout: 3_000,
+      min: 2,
+      max: 25,
+    });
     db = makeKyselyDb(pool);
     pgUowPerformer = new PgUowPerformer(db, createPgUow);
-    uuidGenerator = new UuidV4Generator();
     createNewEvent = makeCreateNewEvent({
       uuidGenerator,
       timeGateway: new CustomTimeGateway(),
@@ -49,29 +57,23 @@ describe("PgUowPerformer", () => {
     await pool.end();
   });
 
-  it("saves everything when all goes fine", async () => {
-    await pgUowPerformer.perform(
-      useCaseUnderTest(createNewEvent, uuidGenerator),
-    );
-    await expectLengthOfRepos({
-      expectedNotificationLength: 1,
-      expectedOutboxLength: 1,
-      db,
-    });
-  });
+  it(
+    `try ${numberOfParallelTransactions} parallel transactions through max ${timeoutInMs}ms.`,
+    async () => {
+      await Promise.all(
+        [...Array(numberOfParallelTransactions)].map(() =>
+          pgUowPerformer.perform(
+            useCaseUnderTest(createNewEvent, uuidGenerator),
+          ),
+        ),
+      );
 
-  it("keeps modifications atomic when something goes wrong", async () => {
-    expectPromiseToFailWithError(
-      pgUowPerformer.perform(
-        useCaseUnderTest(createNewEvent, uuidGenerator, true),
-      ),
-      new Error("Usecase failed"),
-    );
-
-    await expectLengthOfRepos({
-      expectedNotificationLength: 0,
-      expectedOutboxLength: 0,
-      db,
-    });
-  });
+      await expectLengthOfRepos({
+        expectedNotificationLength: numberOfParallelTransactions,
+        expectedOutboxLength: numberOfParallelTransactions,
+        db,
+      });
+    },
+    timeoutInMs,
+  );
 });
