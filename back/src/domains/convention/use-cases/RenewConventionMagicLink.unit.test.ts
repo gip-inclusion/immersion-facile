@@ -5,12 +5,12 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
+  type ConventionRole,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
   type RenewMagicLinkRequestDto,
-  type Role,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -91,16 +91,16 @@ describe("RenewConventionMagicLink use case", () => {
   });
 
   describe("Right paths", () => {
-    it.each<[Role, string]>([
+    it.each<[ConventionRole, string]>([
       ["beneficiary", validConvention.signatories.beneficiary.email],
       [
         "beneficiary-current-employer",
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        // biome-ignore lint/style/noNonNullAssertion: provided
         validConvention.signatories.beneficiaryCurrentEmployer!.email,
       ],
       [
         "beneficiary-representative",
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        // biome-ignore lint/style/noNonNullAssertion: provided
         validConvention.signatories.beneficiaryRepresentative!.email,
       ],
       [
@@ -109,12 +109,17 @@ describe("RenewConventionMagicLink use case", () => {
       ],
       ["establishment-tutor", validConvention.establishmentTutor.email],
       ...defaultAgency.counsellorEmails.map(
-        (counsellorEmail): [Role, string] => ["counsellor", counsellorEmail],
+        (counsellorEmail): [ConventionRole, string] => [
+          "counsellor",
+          counsellorEmail,
+        ],
       ),
-      ...defaultAgency.validatorEmails.map((validatorEmail): [Role, string] => [
-        "validator",
-        validatorEmail,
-      ]),
+      ...defaultAgency.validatorEmails.map(
+        (validatorEmail): [ConventionRole, string] => [
+          "validator",
+          validatorEmail,
+        ],
+      ),
     ])(
       "Posts an event to deliver a correct JWT for correct responses for role %s",
       async (expectedRole, expectedEmails) => {
@@ -249,7 +254,7 @@ describe("RenewConventionMagicLink use case", () => {
         expiredJwt: generateConventionJwt(
           createConventionMagicLinkPayload({
             id: validConvention.id,
-            role: "back-office",
+            role: "back-office" as ConventionRole,
             email,
             now: timeGateway.now(),
           }),

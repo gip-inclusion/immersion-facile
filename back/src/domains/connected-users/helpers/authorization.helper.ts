@@ -118,9 +118,7 @@ const onMagicLink = async ({
     throw errorToThrow;
   }
 
-  const emailsOrError = conventionEmailsByRole(convention)[role];
-
-  if (emailsOrError instanceof Error) throw emailsOrError;
+  const emailsOrError = conventionEmailsByRole(convention)(role);
 
   if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
     throw errors.convention.emailNotLinkedToConvention(role);

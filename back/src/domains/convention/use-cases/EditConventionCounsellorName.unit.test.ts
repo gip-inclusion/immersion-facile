@@ -2,6 +2,7 @@ import type {
   AgencyRole,
   ConnectedUser,
   ConnectedUserDomainJwtPayload,
+  ConventionRole,
   ConventionStatus,
   Role,
 } from "shared";
@@ -298,7 +299,7 @@ describe("EditCounsellorName", () => {
           ];
           const jwtPayload = createConventionMagicLinkPayload({
             id: conventionId,
-            role,
+            role: role as ConventionRole,
             email: notConnectedUser.email,
             now: new Date(),
           });

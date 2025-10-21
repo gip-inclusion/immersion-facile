@@ -5,6 +5,7 @@ import {
   type Beneficiary,
   type ConventionDto,
   type ConventionReadDto,
+  type ConventionRole,
   type Email,
   type EmailHash,
   errors,
@@ -69,13 +70,10 @@ export const isHashMatchConventionEmails = async ({
   role,
 }: {
   convention: ConventionReadDto;
-
   emailHash: EmailHash;
-  role: Role;
+  role: ConventionRole;
 }) => {
-  const emailsByRole = conventionEmailsByRole(convention)[role];
-
-  if (emailsByRole instanceof Error) throw emailsByRole;
+  const emailsByRole = conventionEmailsByRole(convention)(role);
   return isSomeEmailMatchingEmailHash(emailsByRole, emailHash);
 };
 

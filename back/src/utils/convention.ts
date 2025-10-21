@@ -1,52 +1,46 @@
 import {
   type ConventionDto,
   type ConventionReadDto,
+  type ConventionRole,
   type ConventionStatus,
   type Email,
   errors,
-  type Role,
 } from "shared";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { agencyWithRightToAgencyDto } from "./agency";
 
-export const conventionEmailsByRole = (
-  convention: ConventionReadDto,
-): Record<Role, Email[] | Error> => ({
-  "back-office": errors.convention.roleHasNoMagicLink({ role: "back-office" }),
-  "to-review": errors.convention.roleHasNoMagicLink({ role: "to-review" }),
-  "agency-viewer": errors.convention.roleHasNoMagicLink({
-    role: "agency-viewer",
-  }),
-  beneficiary: [convention.signatories.beneficiary.email],
-  "beneficiary-current-employer": convention.signatories
-    .beneficiaryCurrentEmployer
-    ? [convention.signatories.beneficiaryCurrentEmployer.email]
-    : errors.convention.missingActor({
-        conventionId: convention.id,
-        role: "beneficiary-current-employer",
-      }),
-  "beneficiary-representative": convention.signatories.beneficiaryRepresentative
-    ? [convention.signatories.beneficiaryRepresentative.email]
-    : errors.convention.missingActor({
-        conventionId: convention.id,
-        role: "beneficiary-representative",
-      }),
-  counsellor: convention.agencyCounsellorEmails,
-  validator: convention.agencyValidatorEmails,
-  "agency-admin": errors.convention.roleHasNoMagicLink({
-    role: "agency-admin",
-  }),
-  "establishment-representative": [
-    convention.signatories.establishmentRepresentative.email,
-  ],
-  "establishment-tutor": [convention.establishmentTutor.email],
-  "establishment-admin": errors.convention.roleHasNoMagicLink({
-    role: "establishment-admin",
-  }),
-  "establishment-contact": errors.convention.roleHasNoMagicLink({
-    role: "establishment-contact",
-  }),
-});
+export const conventionEmailsByRole =
+  (convention: ConventionReadDto) =>
+  (role: ConventionRole): Email[] => {
+    const emailsByRole: Record<ConventionRole, Email[] | Error | undefined> = {
+      beneficiary: [convention.signatories.beneficiary.email],
+      "beneficiary-current-employer": convention.signatories
+        .beneficiaryCurrentEmployer
+        ? [convention.signatories.beneficiaryCurrentEmployer.email]
+        : errors.convention.missingActor({
+            conventionId: convention.id,
+            role: "beneficiary-current-employer",
+          }),
+      "beneficiary-representative": convention.signatories
+        .beneficiaryRepresentative
+        ? [convention.signatories.beneficiaryRepresentative.email]
+        : errors.convention.missingActor({
+            conventionId: convention.id,
+            role: "beneficiary-representative",
+          }),
+      counsellor: convention.agencyCounsellorEmails,
+      validator: convention.agencyValidatorEmails,
+      "establishment-representative": [
+        convention.signatories.establishmentRepresentative.email,
+      ],
+      "establishment-tutor": [convention.establishmentTutor.email],
+    };
+    const emails = emailsByRole[role as ConventionRole];
+
+    if (!emails) throw errors.convention.roleHasNoMagicLink({ role });
+    if (emails instanceof Error) throw emails;
+    return emails;
+  };
 
 export const conventionDtoToConventionReadDto = async (
   conventionDto: ConventionDto,

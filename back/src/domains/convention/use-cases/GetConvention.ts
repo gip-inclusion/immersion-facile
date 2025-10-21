@@ -2,10 +2,10 @@ import {
   type AgencyWithUsersRights,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
+  type ConventionRole,
   type EmailHash,
   errors,
   getConventionManageAllowedRoles,
-  type Role,
   type UserId,
   type WithConventionId,
   withConventionIdSchema,
@@ -57,7 +57,7 @@ export class GetConvention extends TransactionalUseCase<
     convention,
     uow,
   }: {
-    role: Role;
+    role: ConventionRole;
     emailHash: EmailHash;
     convention: ConventionReadDto;
     uow: UnitOfWork;
@@ -121,7 +121,7 @@ export class GetConvention extends TransactionalUseCase<
     uow,
   }: {
     emailHash: EmailHash;
-    role: Role;
+    role: ConventionRole;
     convention: ConventionReadDto;
     agency: AgencyWithUsersRights;
     uow: UnitOfWork;

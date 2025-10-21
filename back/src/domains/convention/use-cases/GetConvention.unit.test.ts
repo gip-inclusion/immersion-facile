@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
+  type ConventionRole,
   defaultProConnectInfos,
   errors,
   establishmentsRoles,
@@ -466,9 +467,9 @@ describe("Get Convention", () => {
           role: "beneficiary",
           email: convention.signatories.beneficiary.email,
         },
-      ] satisfies { role: Role; email: string }[])(
+      ] satisfies { role: ConventionRole; email: string }[])(
         "email hash match email hash for role '$role' in convention",
-        async ({ role, email }: { role: Role; email: string }) => {
+        async ({ role, email }: { role: ConventionRole; email: string }) => {
           expectToEqual(
             await getConvention.execute(
               { conventionId: convention.id },
@@ -500,9 +501,9 @@ describe("Get Convention", () => {
           role: "validator",
           email: validator.email,
         },
-      ] satisfies { role: Role; email: string }[])(
+      ] satisfies { role: ConventionRole; email: string }[])(
         "email hash match user email hash and has '$role' agency right",
-        async ({ role, email }: { role: Role; email: string }) => {
+        async ({ role, email }: { role: ConventionRole; email: string }) => {
           uow.userRepository.users = [counsellor, validator];
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency, {

@@ -7,6 +7,7 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionRelatedJwtPayload,
+  type ConventionRole,
   type ConventionStatus,
   conventionStatuses,
   type Email,
@@ -336,7 +337,7 @@ const expectNewEvent = async <T extends DomainTopic>(
 
 type TestAcceptNewStatusParams = {
   initialStatus: ConventionStatus;
-} & ({ role: Role } | { userId: ConnectedTestUser });
+} & ({ role: ConventionRole } | { userId: ConnectedTestUser });
 
 type UpdatedFields = Partial<
   ConventionDto & {
@@ -459,7 +460,7 @@ type TestRejectsNewStatusParams = {
   expectedError: UnauthorizedError | BadRequestError;
 } & (
   | {
-      role: Role;
+      role: ConventionRole;
     }
   | {
       userId: ConnectedTestUser;
@@ -510,18 +511,22 @@ export const rejectStatusTransitionTests = ({
   allowedConnectedUsers,
   updateStatusParams,
 }: {
-  allowedMagicLinkRoles: Role[];
+  allowedMagicLinkRoles: ConventionRole[];
   allowedInitialStatuses: ConventionStatus[];
   allowedConnectedUsers: ConnectedTestUser[];
   updateStatusParams: UpdateConventionStatusRequestDto;
 }) => {
   const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
     splitCasesBetweenPassingAndFailing(allRoles, allowedMagicLinkRoles);
-  const [_allowedConnectedUsersToUpdate, notAllowedConnectedUsersToUpdate] =
+  const [_allowedConnectedUsers, notAllowedConnectedUsers] =
     splitCasesBetweenPassingAndFailing(
       allConnectedTestUsers,
       allowedConnectedUsers,
     );
+
+  const notAllowedConnectedUsersToUpdate = [
+    ...notAllowedConnectedUsers,
+  ] as ConnectedTestUser[];
 
   const [authorizedInitialStatuses, forbiddenInitalStatuses] =
     splitCasesBetweenPassingAndFailing(
@@ -544,7 +549,7 @@ export const rejectStatusTransitionTests = ({
           const userId = "userWithRoleEstablishmentRepresentative";
           return testRejectsStatusUpdate({
             userId,
-            role,
+            role: role as ConventionRole,
             initialStatus: someValidInitialStatus,
             expectedError: errors.convention.badRoleStatusChange({
               roles: [role],
@@ -629,7 +634,7 @@ export const acceptStatusTransitionTests = ({
   nextDate,
   updateStatusParams,
 }: {
-  allowedMagicLinkRoles: Role[];
+  allowedMagicLinkRoles: ConventionRole[];
   expectedDomainTopic: ConventionDomainTopic;
   updatedFields?: UpdatedFields;
   allowedInitialStatuses: ConventionStatus[];
