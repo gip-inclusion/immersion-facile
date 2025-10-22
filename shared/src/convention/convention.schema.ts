@@ -493,6 +493,18 @@ export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
       path: [getConventionFieldName("signatories.beneficiary.address")],
     });
 
+export const conventionAssessmentFieldsSchema = z
+  .union([
+    z.object({
+      status: z.enum(assessmentStatuses),
+      endedWithAJob: z.boolean(),
+    }),
+    z.object({
+      status: z.enum(legacyAssessmentStatuses),
+    }),
+  ])
+  .nullable();
+
 export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionReadDto> =
   conventionSchema.and(
     z.object({
@@ -509,17 +521,7 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
           kind: agencyKindSchema,
         })
         .optional(),
-      assessment: z
-        .union([
-          z.object({
-            status: z.enum(assessmentStatuses),
-            endedWithAJob: z.boolean(),
-          }),
-          z.object({
-            status: z.enum(legacyAssessmentStatuses),
-          }),
-        ])
-        .nullable(),
+      assessment: conventionAssessmentFieldsSchema,
     }),
   );
 
