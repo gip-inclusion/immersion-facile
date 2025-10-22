@@ -829,6 +829,9 @@ export const createUseCases = ({
     }),
     markDiscussionLinkedToConvention: makeMarkDiscussionLinkedToConvention({
       uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+      },
     }),
     contactRequestReminder: makeContactRequestReminder({
       deps: {
