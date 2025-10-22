@@ -33,6 +33,7 @@ const defaultDiscussion = {
   appellationCode: "11704",
   siret: "12345671234567",
   createdAt,
+  updatedAt: new Date("2024-07-12T01:00:00.000").toISOString(),
   businessName: "My default business name",
   address: {
     streetNumberAndAddress: "1 rue de la Paix",
@@ -72,6 +73,12 @@ export const cartographeAppellationAndRome: AppellationAndRomeDto = {
 };
 
 export class DiscussionBuilder implements Builder<DiscussionDto> {
+  withUpdateDate(updatedAt: Date) {
+    return new DiscussionBuilder({
+      ...this.discussion,
+      updatedAt: updatedAt.toISOString(),
+    });
+  }
   constructor(private readonly discussion: DiscussionDto = defaultDiscussion) {}
 
   public buildRead(
