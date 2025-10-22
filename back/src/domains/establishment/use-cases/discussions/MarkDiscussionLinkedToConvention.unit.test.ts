@@ -6,6 +6,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -21,13 +22,15 @@ const convention = new ConventionDtoBuilder().build();
 describe("MarkDiscussionLinkedToConvention", () => {
   let markDiscussionLinkedToConvention: MarkDiscussionLinkedToConvention;
   let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-
+    timeGateway = new CustomTimeGateway();
     const uowPerformer = new InMemoryUowPerformer(uow);
     markDiscussionLinkedToConvention = makeMarkDiscussionLinkedToConvention({
       uowPerformer,
+      deps: { timeGateway },
     });
   });
 
@@ -59,6 +62,7 @@ describe("MarkDiscussionLinkedToConvention", () => {
       .build();
     const expectedUpdatedDiscussion: DiscussionDto = {
       ...discussion,
+      updatedAt: timeGateway.now().toISOString(),
       status: "ACCEPTED",
       candidateWarnedMethod: null,
       conventionId: convention.id,
