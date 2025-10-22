@@ -271,6 +271,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
     await Promise.all([
       uow.discussionRepository.update({
         ...discussion,
+        updatedAt: this.#timeGateway.now().toISOString(),
         exchanges: [...discussion.exchanges, exchange],
       }),
       uow.outboxRepository.save(
