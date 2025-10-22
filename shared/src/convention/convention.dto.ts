@@ -3,6 +3,10 @@ import { keys } from "ramda";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, Postcode } from "../address/address.dto";
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
+import type {
+  AssessmentStatus,
+  LegacyAssessmentDto,
+} from "../assessment/assessment.dto";
 import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
@@ -319,7 +323,16 @@ export type ConventionAgencyFields = {
   agencyRefersTo?: AgencyRefersToInConvention;
 };
 
-export type ConventionReadDto = ConventionDto & ConventionAgencyFields;
+export type ConventionAssessmentFields = {
+  assessment:
+    | { status: AssessmentStatus; endedWithAJob: boolean }
+    | { status: LegacyAssessmentDto["status"] }
+    | null;
+};
+
+export type ConventionReadDto = ConventionDto &
+  ConventionAgencyFields &
+  ConventionAssessmentFields;
 
 export type WithConventionIdLegacy = {
   id: ConventionId;

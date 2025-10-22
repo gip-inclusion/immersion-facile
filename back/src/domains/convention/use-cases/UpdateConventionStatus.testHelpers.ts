@@ -277,7 +277,7 @@ export const setupInitialState = ({
   conventionRepository.setConventions(values(conventionsToTest));
   uow.userRepository.users = values(makeUserIdMapConnectedUser);
   if (hasAssessment) {
-    assessmentRepository.setAssessments([
+    assessmentRepository.assessments = [
       {
         conventionId,
         status: "COMPLETED",
@@ -287,7 +287,7 @@ export const setupInitialState = ({
         establishmentAdvices: "pas de conseil",
         _entityName: "Assessment",
       },
-    ]);
+    ];
   }
 
   return {

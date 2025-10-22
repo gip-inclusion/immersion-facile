@@ -17,6 +17,7 @@ import {
   agencyWithRightToAgencyDto,
 } from "../../../utils/agency";
 import {
+  assesmentEntityToConventionAssessmentFields,
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
@@ -127,6 +128,11 @@ export class UpdateConvention extends TransactionalUseCase<
       const agencyWithRights = await uow.agencyRepository.getById(
         convention.agencyId,
       );
+      const assessment = await uow.assessmentRepository.getByConventionId(
+        convention.id,
+      );
+      const assessmentFields =
+        assesmentEntityToConventionAssessmentFields(assessment);
 
       if (!agencyWithRights)
         throw errors.agency.notFound({ agencyId: convention.agencyId });
@@ -138,6 +144,7 @@ export class UpdateConvention extends TransactionalUseCase<
         convention: {
           ...conventionWithSignatoriesSignedAtCleared,
           ...agencyDtoToConventionAgencyFields(agency),
+          ...assessmentFields,
         },
         jwtPayload,
         now: this.timeGateway.now().toISOString(),

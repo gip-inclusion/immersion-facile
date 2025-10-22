@@ -31,6 +31,7 @@ describe("Convention slice", () => {
     agencySiret: "11112222000033",
     agencyCounsellorEmails: [],
     agencyValidatorEmails: ["validator@mail.com"],
+    assessment: null,
   };
   const convention = new ConventionDtoBuilder()
     .withStatus("READY_TO_SIGN")
@@ -206,6 +207,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000033",
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
+            assessment: null,
           },
         }),
       );
@@ -262,6 +264,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000033",
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
+        assessment: null,
       };
       // tester l'état initiale
       expectConventionState({
@@ -313,6 +316,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000033",
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
+        assessment: null,
       };
       expectConventionState({
         isLoading: false,
@@ -376,6 +380,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000044",
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
+            assessment: null,
           };
           expectConventionState({
             isLoading: false,
@@ -431,6 +436,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
+            assessment: null,
           };
           expectConventionState({
             isLoading: false,
@@ -480,6 +486,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
+            assessment: null,
           };
           expectConventionState({
             isLoading: false,
@@ -521,6 +528,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
+            assessment: null,
           };
           expectConventionState({
             isLoading: false,
@@ -564,6 +572,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
+            assessment: null,
           };
           expectConventionState({
             isLoading: false,
@@ -615,6 +624,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
+            assessment: null,
           };
           expectConventionState({
             isLoading: false,
@@ -665,6 +675,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000055",
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
+        assessment: null,
       };
       ({ store, dependencies } = createTestStore({
         convention: {
@@ -710,6 +721,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000066",
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
+        assessment: null,
       };
 
       ({ store, dependencies } = createTestStore({
@@ -932,6 +944,7 @@ describe("Convention slice", () => {
       agencySiret: "11112222000077",
       agencyCounsellorEmails: [],
       agencyValidatorEmails: ["validator@mail.com"],
+      assessment: null,
     };
     ({ store } = createTestStore({
       convention: {

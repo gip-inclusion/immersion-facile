@@ -27,9 +27,12 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { assesmentEntityToConventionAssessmentFields } from "../../../utils/convention";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import type { GetConventionsParams } from "../ports/ConventionQueries";
+import { PgAssessmentRepository } from "./PgAssessmentRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -48,7 +51,7 @@ describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
   let conventionQueries: PgConventionQueries;
   let agencyRepo: PgAgencyRepository;
-
+  let assessmentRepo: PgAssessmentRepository;
   let conventionRepository: PgConventionRepository;
   let db: KyselyDb;
 
@@ -67,9 +70,11 @@ describe("Pg implementation of ConventionQueries", () => {
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("notifications_email_recipients").execute();
     await db.deleteFrom("notifications_email").execute();
+    await db.deleteFrom("immersion_assessments").execute();
 
     conventionQueries = new PgConventionQueries(db);
     agencyRepo = new PgAgencyRepository(db);
+    assessmentRepo = new PgAssessmentRepository(db);
     conventionRepository = new PgConventionRepository(db);
 
     await new PgUserRepository(db).save(validator);
@@ -123,6 +128,32 @@ describe("Pg implementation of ConventionQueries", () => {
         withRefersToAgency: referringAgency,
         conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
+      });
+
+      const result = await conventionQueries.getConventionById(conventionIdA);
+      expectToEqual(result, expectedConventionRead);
+    });
+
+    it("Retrieves a convention by id exists with assessment", async () => {
+      const expectedConventionRead = await insertAgencyAndConvention({
+        conventionId: conventionIdA,
+        agencyId: conventionIdA,
+        agencyName: "agency A",
+        agencyDepartment: "75",
+        agencyKind: "autre",
+        agencySiret: "11112222000033",
+        conventionUpdatedAt: anyConventionUpdatedAt,
+        validatorUser: validator,
+        conventionStatus: "ACCEPTED_BY_VALIDATOR",
+        assessment: {
+          _entityName: "Assessment",
+          conventionId: conventionIdA,
+          status: "COMPLETED",
+          endedWithAJob: false,
+          establishmentFeedback: "Great experience",
+          establishmentAdvices: "Keep up the good work",
+          numberOfHoursActuallyMade: 100,
+        },
       });
 
       const result = await conventionQueries.getConventionById(conventionIdA);
@@ -679,6 +710,7 @@ describe("Pg implementation of ConventionQueries", () => {
     conventionStatus = "READY_TO_SIGN",
     conventionUpdatedAt,
     validatorUser,
+    assessment,
   }: {
     conventionId: ConventionId;
     agencyId: string;
@@ -691,6 +723,7 @@ describe("Pg implementation of ConventionQueries", () => {
     conventionStatus?: ConventionStatus;
     conventionUpdatedAt: DateString;
     validatorUser: UserWithAdminRights;
+    assessment?: AssessmentEntity;
   }): Promise<ConventionReadDto> => {
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
@@ -779,6 +812,8 @@ describe("Pg implementation of ConventionQueries", () => {
 
     await conventionRepository.save(convention, conventionUpdatedAt);
 
+    if (assessment) await assessmentRepo.save(assessment);
+
     return {
       ...convention,
       agencyName,
@@ -793,6 +828,7 @@ describe("Pg implementation of ConventionQueries", () => {
       agencyValidatorEmails: [validatorUser.email],
       agencyCounsellorEmails: [],
       updatedAt: conventionUpdatedAt,
+      ...assesmentEntityToConventionAssessmentFields(assessment),
     } satisfies ConventionReadDto;
   };
 

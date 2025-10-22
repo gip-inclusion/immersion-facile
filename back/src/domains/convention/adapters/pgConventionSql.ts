@@ -6,8 +6,10 @@ import {
   type AgencyRole,
   type AppellationCode,
   type AppellationLabel,
+  type AssessmentStatus,
   type Beneficiary,
   type ConventionAgencyFields,
+  type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
@@ -440,12 +442,18 @@ export const getReadConventionById = async (
     [pgConvention.dto.agencyId],
   );
 
+  const assessmentFields = await getAssessmentFieldsByConventionId(
+    transaction,
+    pgConvention.dto.id,
+  );
+
   return validateAndParseZodSchema({
     schemaName: "conventionReadSchema",
     inputSchema: conventionReadSchema,
     schemaParsingInput: {
       ...pgConvention.dto,
       ...agencyFieldsByAgencyIds[pgConvention.dto.agencyId],
+      ...assessmentFields,
     },
     id:
       pgConvention.dto &&
@@ -526,4 +534,36 @@ const getEmailsFromUsersWithAgencyRoles = (
         user.agencyId === agencyIdToMatch && user.roles.includes(roleToMatch),
     )
     .map((user) => user.email);
+};
+
+export const getAssessmentFieldsByConventionId = async (
+  transaction: KyselyDb,
+  conventionId: ConventionId,
+): Promise<ConventionAssessmentFields> => {
+  const result = await transaction
+    .selectFrom("immersion_assessments")
+    .select((eb) => [
+      jsonBuildObject({
+        status: eb.ref("status").$castTo<AssessmentStatus>(),
+        endedWithAJob: eb.ref("ended_with_a_job"),
+      }).as("assessment"),
+    ])
+    .where("convention_id", "=", conventionId)
+    .executeTakeFirst();
+
+  if (!result) return { assessment: null };
+
+  return {
+    assessment:
+      result.assessment?.status === "COMPLETED" ||
+      result.assessment?.status === "PARTIALLY_COMPLETED" ||
+      result.assessment?.status === "DID_NOT_SHOW"
+        ? {
+            status: result.assessment.status,
+            endedWithAJob: result.assessment.endedWithAJob ?? false,
+          }
+        : {
+            status: result.assessment.status,
+          },
+  };
 };

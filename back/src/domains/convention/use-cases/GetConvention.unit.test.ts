@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  AssessmentDtoBuilder,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   type ConventionRole,
@@ -20,6 +21,7 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
+import { createAssessmentEntity } from "../entities/AssessmentEntity";
 import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
@@ -91,6 +93,7 @@ describe("Get Convention", () => {
       job: "",
       role: "beneficiary-current-employer",
     })
+    .withStatus("ACCEPTED_BY_VALIDATOR")
     .withEstablishmentRepresentativeEmail(establishmentRep.email)
     .withAgencyReferent({ firstname: "Fredy", lastname: "L'ACCOMPAGNATEUR" })
     .build();
@@ -137,6 +140,10 @@ describe("Get Convention", () => {
     })
     .build();
 
+  const assessment = new AssessmentDtoBuilder()
+    .withConventionId(convention.id)
+    .build();
+
   let getConvention: GetConvention;
   let uow: InMemoryUnitOfWork;
 
@@ -157,6 +164,9 @@ describe("Get Convention", () => {
       establishmentRep,
       tutor,
       backofficeAdminUser,
+    ];
+    uow.assessmentRepository.assessments = [
+      createAssessmentEntity(assessment, convention),
     ];
   });
 
@@ -333,6 +343,10 @@ describe("Get Convention", () => {
             agencySiret: agency.agencySiret,
             agencyCounsellorEmails: [],
             agencyValidatorEmails: [johnDoe.email],
+            assessment: {
+              status: assessment.status,
+              endedWithAJob: assessment.endedWithAJob,
+            },
           },
         );
       });
@@ -354,6 +368,10 @@ describe("Get Convention", () => {
               agencySiret: agency.agencySiret,
               agencyCounsellorEmails: agency.counsellorEmails,
               agencyValidatorEmails: agency.validatorEmails,
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob,
+              },
             },
           );
         });
@@ -374,6 +392,7 @@ describe("Get Convention", () => {
               agencySiret: agency.agencySiret,
               agencyCounsellorEmails: agency.counsellorEmails,
               agencyValidatorEmails: agency.validatorEmails,
+              assessment: null,
             },
           );
         });
@@ -415,6 +434,10 @@ describe("Get Convention", () => {
                 agencySiret: agency.agencySiret,
                 agencyCounsellorEmails: agency.counsellorEmails,
                 agencyValidatorEmails: agency.validatorEmails,
+                assessment: {
+                  status: assessment.status,
+                  endedWithAJob: assessment.endedWithAJob,
+                },
               },
             );
           },
@@ -437,6 +460,10 @@ describe("Get Convention", () => {
             agencySiret: agency.agencySiret,
             agencyCounsellorEmails: agency.counsellorEmails,
             agencyValidatorEmails: agency.validatorEmails,
+            assessment: {
+              status: assessment.status,
+              endedWithAJob: assessment.endedWithAJob,
+            },
           },
         );
       });
@@ -487,6 +514,10 @@ describe("Get Convention", () => {
               agencySiret: agency.agencySiret,
               agencyCounsellorEmails: [counsellor.email],
               agencyValidatorEmails: [validator.email],
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob,
+              },
             },
           );
         },
@@ -535,6 +566,10 @@ describe("Get Convention", () => {
               agencySiret: agency.agencySiret,
               agencyCounsellorEmails: [counsellor.email],
               agencyValidatorEmails: [validator.email],
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob,
+              },
             },
           );
         },
@@ -558,6 +593,7 @@ describe("Get Convention", () => {
             agencySiret: agency.agencySiret,
             agencyCounsellorEmails: [counsellor.email],
             agencyValidatorEmails: [validator.email],
+            assessment: null,
           },
         );
       });

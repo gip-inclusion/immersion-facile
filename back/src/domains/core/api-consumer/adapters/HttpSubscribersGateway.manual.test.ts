@@ -25,6 +25,7 @@ describe("HttpSubscribersGateway", () => {
     agencyCounsellorEmails: [],
     agencyValidatorEmails: ["validator@mail.com"],
     agencyRefersTo: undefined,
+    assessment: null,
   };
 
   const subscriptionBody: ConventionUpdatedSubscriptionCallbackBody = {

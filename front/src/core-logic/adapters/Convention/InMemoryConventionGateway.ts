@@ -206,6 +206,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
       agencySiret: "22220000222200",
       agencyCounsellorEmails: [],
       agencyValidatorEmails: ["validator@mail.com"],
+      assessment: null,
     };
   }
 

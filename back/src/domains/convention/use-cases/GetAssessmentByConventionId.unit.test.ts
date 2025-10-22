@@ -92,13 +92,13 @@ describe("GetAssessmentByConventionId", () => {
       userWithoutRoleOnConvention,
       backOfficeAdmin,
     ];
-    uow.assessmentRepository.setAssessments([
+    uow.assessmentRepository.assessments = [
       {
         _entityName: "Assessment",
         numberOfHoursActuallyMade: convention.schedule.totalHours,
         ...assessment,
       },
-    ]);
+    ];
   });
 
   describe("Wrong paths", () => {
@@ -189,7 +189,7 @@ describe("GetAssessmentByConventionId", () => {
     );
 
     it("throw not found error when no assessment exist", async () => {
-      uow.assessmentRepository.setAssessments([]);
+      uow.assessmentRepository.assessments = [];
 
       await expectPromiseToFailWithError(
         getAssessment.execute(
@@ -280,7 +280,7 @@ describe("GetAssessmentByConventionId", () => {
         ...legacyAssessment,
         numberOfHoursActuallyMade: 0,
       };
-      uow.assessmentRepository.setAssessments([assessmentEntity]);
+      uow.assessmentRepository.assessments = [assessmentEntity];
 
       const assessment = await getAssessment.execute(
         { conventionId: convention.id },

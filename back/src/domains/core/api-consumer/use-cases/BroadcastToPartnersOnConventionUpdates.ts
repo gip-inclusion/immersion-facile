@@ -10,6 +10,7 @@ import {
   withConventionSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
+import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
 import { createLogger } from "../../../../utils/logger";
 import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
@@ -67,6 +68,13 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
       ...conventionWithoutAcquisitionParams
     } = convention;
 
+    const assessment = await uow.assessmentRepository.getByConventionId(
+      convention.id,
+    );
+
+    const assessmentFields =
+      assesmentEntityToConventionAssessmentFields(assessment);
+
     const conventionRead: ConventionReadDto = {
       ...conventionWithoutAcquisitionParams,
       agencyName: agencyWithRights.name,
@@ -78,6 +86,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         : undefined,
       agencyCounsellorEmails: agency.counsellorEmails,
       agencyValidatorEmails: agency.validatorEmails,
+      ...assessmentFields,
     };
 
     const apiConsumers = pipeWithValue(

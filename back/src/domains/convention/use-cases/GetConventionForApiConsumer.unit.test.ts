@@ -145,6 +145,7 @@ describe("Get Convention for ApiConsumer", () => {
         agencySiret: agency.agencySiret,
         agencyCounsellorEmails: agency.counsellorEmails,
         agencyValidatorEmails: agency.validatorEmails,
+        assessment: null,
       });
     });
 
@@ -166,6 +167,7 @@ describe("Get Convention for ApiConsumer", () => {
         agencySiret: agency.agencySiret,
         agencyCounsellorEmails: agency.counsellorEmails,
         agencyValidatorEmails: agency.validatorEmails,
+        assessment: null,
       });
     });
   });

@@ -14,6 +14,7 @@ const convention: ConventionReadDto = {
   agencyValidatorEmails: ["validator@mail.com"],
   agencyName: "Agence de cap emploi",
   agencyDepartment: "75",
+  assessment: null,
 };
 
 type TestCase = {

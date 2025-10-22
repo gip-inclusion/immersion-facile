@@ -252,6 +252,7 @@ export const ConventionForm = ({
       agencyName: selectedAgency.name,
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
+      assessment: null,
     };
 
     dispatch(

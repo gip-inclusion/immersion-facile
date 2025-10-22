@@ -2,6 +2,8 @@ import {
   type AgencyDto,
   AgencyDtoBuilder,
   type AgencyKind,
+  type AssessmentDto,
+  AssessmentDtoBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -31,10 +33,12 @@ const conventionReadDtoFrom = ({
   convention,
   agency,
   referredAgency,
+  assessment,
 }: {
   convention: ConventionDto;
   agency: AgencyDto;
   referredAgency?: AgencyDto;
+  assessment?: AssessmentDto;
 }): ConventionReadDto => ({
   ...convention,
   agencyName: agency.name,
@@ -48,6 +52,9 @@ const conventionReadDtoFrom = ({
   },
   agencyCounsellorEmails: agency.counsellorEmails,
   agencyValidatorEmails: agency.validatorEmails,
+  assessment: assessment
+    ? { status: assessment.status, endedWithAJob: assessment.endedWithAJob }
+    : null,
 });
 
 describe("Broadcasts events to France Travail", () => {
@@ -338,6 +345,9 @@ describe("Broadcasts events to France Travail", () => {
     ];
 
     const externalId = "00000000001";
+    const assessment = new AssessmentDtoBuilder()
+      .withConventionId(conventionLinkedToAgencyReferingToOther.id)
+      .build();
     uow.conventionExternalIdRepository.externalIdsByConventionId = {
       [conventionLinkedToAgencyReferingToOther.id]: externalId,
     };
@@ -352,6 +362,7 @@ describe("Broadcasts events to France Travail", () => {
           counsellorEmails: [],
         },
         referredAgency: peAgencyWithoutCounsellorsAndValidators,
+        assessment: assessment,
       }),
     });
 
@@ -367,6 +378,7 @@ describe("Broadcasts events to France Travail", () => {
           counsellorEmails: [],
         },
         referredAgency: peAgencyWithoutCounsellorsAndValidators,
+        assessment: assessment,
       }),
     });
   });

@@ -316,6 +316,7 @@ describe("InclusionConnected", () => {
       agencySiret: "11112222000033",
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
+      assessment: null,
     };
 
     const adminUser: ConnectedUser = {

@@ -226,12 +226,12 @@ describe("Assessment routes", () => {
 
       await inMemoryUow.conventionRepository.setConventions([convention]);
 
-      await inMemoryUow.assessmentRepository.setAssessments([
+      inMemoryUow.assessmentRepository.assessments = [
         {
           _entityName: "Assessment",
           ...legacyAssessment,
         } as AssessmentEntity, // force type to AssessmentEntity to simulate a legacy assessment in DB
-      ]);
+      ];
 
       const response = await httpClient.getAssessmentByConventionId({
         headers: { authorization: jwt },

@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type AssessmentDto,
   ConventionDtoBuilder,
   displayRouteName,
   expectHttpResponseToEqual,
@@ -31,6 +32,14 @@ describe("Convention routes", () => {
       subscriptions: [],
     })
     .build();
+
+  const assessment: AssessmentDto = {
+    conventionId: convention.id,
+    status: "COMPLETED",
+    endedWithAJob: false,
+    establishmentFeedback: "Ca c'est bien passé",
+    establishmentAdvices: "mon conseil",
+  };
 
   const conventionReadConsumerWithNoScope = new ApiConsumerBuilder()
     .withId("convention-read-with-no-scope-id")
@@ -131,6 +140,13 @@ describe("Convention routes", () => {
     it("returns 200 with the convention", async () => {
       inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.assessmentRepository.assessments = [
+        {
+          ...assessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: 35,
+        },
+      ];
 
       expect(
         displayRouteName(publicApiV2ConventionRoutes.getConventionById),
@@ -151,6 +167,10 @@ describe("Convention routes", () => {
           agencySiret: agency.agencySiret,
           agencyCounsellorEmails: agency.counsellorEmails,
           agencyValidatorEmails: agency.validatorEmails,
+          assessment: {
+            status: assessment.status,
+            endedWithAJob: assessment.endedWithAJob,
+          },
         },
         status: 200,
       });
@@ -210,6 +230,13 @@ describe("Convention routes", () => {
     it("200 - returns the conventions matching agencyIds in scope", async () => {
       inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.assessmentRepository.assessments = [
+        {
+          ...assessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: 35,
+        },
+      ];
 
       expect(displayRouteName(publicApiV2ConventionRoutes.getConventions)).toBe(
         "GET /v2/conventions -",
@@ -234,6 +261,10 @@ describe("Convention routes", () => {
             agencySiret: agency.agencySiret,
             agencyCounsellorEmails: agency.counsellorEmails,
             agencyValidatorEmails: agency.validatorEmails,
+            assessment: {
+              status: assessment.status,
+              endedWithAJob: assessment.endedWithAJob,
+            },
           },
         ],
         status: 200,
@@ -265,6 +296,7 @@ describe("Convention routes", () => {
               agencySiret: agency.agencySiret,
               agencyCounsellorEmails: agency.counsellorEmails,
               agencyValidatorEmails: agency.validatorEmails,
+              assessment: null,
             },
           ],
           status: 200,

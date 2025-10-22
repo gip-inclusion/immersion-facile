@@ -644,13 +644,13 @@ describe("SendAssessmentNeededNotifications", () => {
         const assessmentDto = new AssessmentDtoBuilder()
           .withConventionId(conventionEndingYesterday.id)
           .build();
-        uow.assessmentRepository.setAssessments([
+        uow.assessmentRepository.assessments = [
           {
             _entityName: "Assessment",
             numberOfHoursActuallyMade: 10,
             ...assessmentDto,
           },
-        ]);
+        ];
 
         expectToEqual(uow.outboxRepository.events, []);
 
@@ -686,13 +686,13 @@ describe("SendAssessmentNeededNotifications", () => {
           .withConventionId(conventionEndingYesterday.id)
           .build();
 
-        uow.assessmentRepository.setAssessments([
+        uow.assessmentRepository.assessments = [
           {
             _entityName: "Assessment",
             numberOfHoursActuallyMade: 10,
             ...assessmentDto,
           },
-        ]);
+        ];
 
         expectToEqual(uow.outboxRepository.events, []);
 

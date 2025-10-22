@@ -6,6 +6,10 @@ import {
   agencyKindSchema,
   refersToAgencyIdSchema,
 } from "../agency/agency.schema";
+import {
+  assessmentStatuses,
+  legacyAssessmentStatuses,
+} from "../assessment/assessment.dto";
 import { businessNameSchema } from "../business/business";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
@@ -505,6 +509,17 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
           kind: agencyKindSchema,
         })
         .optional(),
+      assessment: z
+        .union([
+          z.object({
+            status: z.enum(assessmentStatuses),
+            endedWithAJob: z.boolean(),
+          }),
+          z.object({
+            status: z.enum(legacyAssessmentStatuses),
+          }),
+        ])
+        .nullable(),
     }),
   );
 

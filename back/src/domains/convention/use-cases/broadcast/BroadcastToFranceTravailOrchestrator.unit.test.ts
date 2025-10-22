@@ -15,6 +15,7 @@ import {
   type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createAssessmentEntity } from "../../entities/AssessmentEntity";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import {
@@ -41,7 +42,13 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       refersToAgencyName: referredAgency.name,
     })
     .build();
-  const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
+  const convention = new ConventionDtoBuilder()
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .withAgencyId(agency.id)
+    .build();
+  const assessment = new AssessmentDtoBuilder()
+    .withConventionId(convention.id)
+    .build();
   const conventionReadDto: ConventionReadDto = {
     ...convention,
     agencyName: agency.name,
@@ -55,10 +62,11 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     agencyDepartment: agency.address.departmentCode,
     agencyValidatorEmails: [validator.email],
     agencyCounsellorEmails: [],
+    assessment: {
+      status: assessment.status,
+      endedWithAJob: assessment.endedWithAJob,
+    },
   };
-  const assessment = new AssessmentDtoBuilder()
-    .withConventionId(conventionReadDto.id)
-    .build();
 
   beforeEach(() => {
     ({ standardBroadcastCalls, standardBroadcastToFT } =
@@ -75,6 +83,9 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       });
 
     uow.conventionRepository.setConventions([convention]);
+    uow.assessmentRepository.assessments = [
+      createAssessmentEntity(assessment, convention),
+    ];
     uow.userRepository.users = [validator];
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agency, {
