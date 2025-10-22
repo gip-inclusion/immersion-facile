@@ -13,6 +13,10 @@
       "size": "M"
     },
     {
+      "command": "0 1 * * * pnpm back run trigger-delete-old-discussions",
+      "size": "M"
+    },
+    {
       "command": "0 3 * * * pnpm back run trigger-early-morning-jobs",
       "size": "M"
     },
@@ -38,6 +42,7 @@
     },
     {
       "command": "0 13 1-7 * 0 pnpm back run trigger-delete-old-users-ongoing-oauths",
+
       "size": "M"
     }
   ]
