@@ -18,7 +18,7 @@ import {
   getDiscussionParamsFromEmail,
   getSubjectFromEmail,
   processInboundParsingEmailMessage,
-} from "../../../../domains/establishment/use-cases/discussions/discussion.utils";
+} from "../../../../domains/establishment/helpers/discussion.utils";
 import { createLogger } from "../../../../utils/logger";
 import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
 import { createOpenApiSpecV3 } from "../apiKeyAuthRouter/createOpenApiV3";
