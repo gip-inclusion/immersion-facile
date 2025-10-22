@@ -883,6 +883,7 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
     .object({
       filters: z
         .object({
+          search: z.string().optional(),
           actorEmailContains: z.string().optional(),
           establishmentNameContains: z.string().optional(),
           beneficiaryNameContains: z.string().optional(),
