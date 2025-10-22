@@ -223,6 +223,7 @@ describe("conventionDtoSchema", () => {
         agencyKind: "pole-emploi",
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
+        assessment: { status: "COMPLETED", endedWithAJob: false },
       };
       expect(() =>
         conventionReadSchema.parse(validConventionRead),
@@ -239,6 +240,7 @@ describe("conventionDtoSchema", () => {
         agencyKind: "pole-emploi",
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
+        assessment: { status: "COMPLETED", endedWithAJob: false },
       };
       expectConventionInvalidWithIssueMessages(
         conventionReadSchema,

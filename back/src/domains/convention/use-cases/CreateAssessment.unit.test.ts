@@ -145,13 +145,13 @@ describe("CreateAssessment", () => {
     });
 
     it("throws ConflictError if the assessment already exists for the Convention", async () => {
-      uow.assessmentRepository.setAssessments([
+      uow.assessmentRepository.assessments = [
         {
           ...assessment,
           _entityName: "Assessment",
           numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
         },
-      ]);
+      ];
       await expectPromiseToFailWithError(
         createAssessment.execute(assessment, tutorPayload),
         errors.assessment.alreadyExist(assessment.conventionId),

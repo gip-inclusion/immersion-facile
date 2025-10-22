@@ -17,6 +17,7 @@ import {
   type UserId,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
+import { assesmentEntityToConventionAssessmentFields } from "../../../utils/convention";
 import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
@@ -27,6 +28,7 @@ import type {
   GetConventionsParams,
   GetPaginatedConventionsForAgencyUserParams,
 } from "../ports/ConventionQueries";
+import type { InMemoryAssessmentRepository } from "./InMemoryAssessmentRepository";
 import type { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 const logger = createLogger(__filename);
@@ -39,6 +41,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
     private readonly userRepository: InMemoryUserRepository,
+    private readonly assessmentRepository: InMemoryAssessmentRepository,
   ) {}
 
   public async findSimilarConventions(
@@ -72,7 +75,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     );
     if (!convention) return;
 
-    return this.#addAgencyDataToConvention(convention);
+    return this.#addAgencyAndAssessmentDataToConvention(convention);
   }
 
   public getConventionsByFiltersCalled = 0;
@@ -191,7 +194,9 @@ export class InMemoryConventionQueries implements ConventionQueries {
           );
         })
         .filter(makeApplyFiltersToConventions(params.filters))
-        .map((convention) => this.#addAgencyDataToConvention(convention)),
+        .map((convention) =>
+          this.#addAgencyAndAssessmentDataToConvention(convention),
+        ),
     );
   }
 
@@ -205,7 +210,9 @@ export class InMemoryConventionQueries implements ConventionQueries {
             sirets?.includes(conventionDto.siret) &&
             !!conventionDto.dateValidation,
         )
-        .map((conventionDto) => this.#addAgencyDataToConvention(conventionDto)),
+        .map((conventionDto) =>
+          this.#addAgencyAndAssessmentDataToConvention(conventionDto),
+        ),
     );
 
     const latestConventionsBySiret = conventionReadDtos.reduce(
@@ -236,7 +243,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     return Object.values(latestConventionsBySiret);
   }
 
-  #addAgencyDataToConvention = async (
+  #addAgencyAndAssessmentDataToConvention = async (
     convention: ConventionDto,
   ): Promise<ConventionReadDto> => {
     const agency = this.agencyRepository.agencies.find(
@@ -276,6 +283,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
     const counsellors = await this.userRepository.getByIds(counsellorIds);
     const validators = await this.userRepository.getByIds(validatorIds);
 
+    const assessment = this.assessmentRepository.assessments.find(
+      (assessment) => assessment.conventionId === convention.id,
+    );
+
     return {
       ...convention,
       agencyName: agency.name,
@@ -291,6 +302,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
             kind: referedAgency.kind,
           }
         : undefined,
+      ...assesmentEntityToConventionAssessmentFields(assessment),
     };
   };
 }

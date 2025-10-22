@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { jsonBuildObject } from "kysely/helpers/postgres";
 import { andThen } from "ramda";
 import {
+  type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
@@ -39,6 +40,7 @@ import {
   type ConventionQueryBuilder,
   createConventionQueryBuilder,
   createConventionQueryBuilderForAgencyUser,
+  getAssessmentFieldsByConventionId,
   getConventionAgencyFieldsForAgencies,
   getReadConventionById,
   type PaginatedConventionQueryBuilder,
@@ -197,10 +199,29 @@ export class PgConventionQueries implements ConventionQueries {
       uniqAgencyIds,
     );
 
+    const assessmentPromises = conventions.map(async (pgResult) => {
+      const assessment = await getAssessmentFieldsByConventionId(
+        this.transaction,
+        pgResult.dto.id,
+      );
+      return { conventionId: pgResult.dto.id, assessment };
+    });
+
+    const assessmentResults = await Promise.all(assessmentPromises);
+    const assessmentByConventionId = assessmentResults.reduce(
+      (acc, { conventionId, assessment }) => {
+        acc[conventionId] = assessment;
+        return acc;
+      },
+      {} as Record<ConventionId, ConventionAssessmentFields>,
+    );
+
     return conventions.map((pgResult) => {
       const agencyFields = agencyFieldsByAgencyIds[pgResult.dto.agencyId];
       if (!agencyFields)
         throw errors.agency.notFound({ agencyId: pgResult.dto.agencyId });
+
+      const assessmentFields = assessmentByConventionId[pgResult.dto.id];
 
       return validateAndParseZodSchema({
         schemaName: "conventionReadSchema",
@@ -208,6 +229,7 @@ export class PgConventionQueries implements ConventionQueries {
         schemaParsingInput: {
           ...pgResult.dto,
           ...agencyFields,
+          ...assessmentFields,
         },
         logger,
       });

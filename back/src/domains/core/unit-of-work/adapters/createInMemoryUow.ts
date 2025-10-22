@@ -37,10 +37,12 @@ export const createInMemoryUow = () => {
   const conventionRepository = new InMemoryConventionRepository();
   const notificationRepository = new InMemoryNotificationRepository();
   const userRepository = new InMemoryUserRepository();
+  const assessmentRepository = new InMemoryAssessmentRepository();
   const conventionQueries = new InMemoryConventionQueries(
     conventionRepository,
     agencyRepository,
     userRepository,
+    assessmentRepository,
   );
 
   const shortLinkRepository = new InMemoryShortLinkRepository();
@@ -63,7 +65,7 @@ export const createInMemoryUow = () => {
     groupRepository: new InMemoryGroupRepository(),
     broadcastFeedbacksRepository: new InMemoryBroadcastFeedbacksRepository(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
-    assessmentRepository: new InMemoryAssessmentRepository(),
+    assessmentRepository,
     establishmentLeadRepository,
     establishmentLeadQueries: new InMemoryEstablishmentLeadQueries(
       establishmentLeadRepository,

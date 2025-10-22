@@ -7,6 +7,8 @@ export const assessmentStatuses: AssessmentStatus[] = [
   "PARTIALLY_COMPLETED",
   "DID_NOT_SHOW",
 ] as const;
+export type LegacyAssessmentStatus = (typeof legacyAssessmentStatuses)[number];
+export const legacyAssessmentStatuses = ["FINISHED", "ABANDONED"] as const;
 export const typeOfContracts = [
   "CDI",
   "CDD > ou = 6 mois",
@@ -62,7 +64,7 @@ export type WithAssessmentDto = {
 export type AssessmentMode = "CreateAssessment" | "GetAssessment";
 
 export type LegacyAssessmentDto = {
-  status: "FINISHED" | "ABANDONED";
+  status: LegacyAssessmentStatus;
   conventionId: ConventionId;
   establishmentFeedback: string;
 };

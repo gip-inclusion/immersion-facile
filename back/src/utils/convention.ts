@@ -1,4 +1,5 @@
 import {
+  type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionReadDto,
   type ConventionRole,
@@ -6,6 +7,7 @@ import {
   type Email,
   errors,
 } from "shared";
+import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { agencyWithRightToAgencyDto } from "./agency";
 
@@ -58,6 +60,10 @@ export const conventionDtoToConventionReadDto = async (
     ? await uow.agencyRepository.getById(agency.refersToAgencyId)
     : undefined;
 
+  const assessment = await uow.assessmentRepository.getByConventionId(
+    conventionDto.id,
+  );
+
   return {
     ...conventionDto,
     agencyCounsellorEmails: agency.counsellorEmails,
@@ -67,7 +73,29 @@ export const conventionDtoToConventionReadDto = async (
     agencySiret: agency.agencySiret,
     agencyKind: agency.kind,
     ...(agencyRefersTo ? { agencyRefersTo } : {}),
+    ...assesmentEntityToConventionAssessmentFields(assessment),
   };
+};
+
+export const assesmentEntityToConventionAssessmentFields = (
+  assessmentEntity: AssessmentEntity | undefined,
+): ConventionAssessmentFields => {
+  if (!assessmentEntity) return { assessment: null };
+
+  return assessmentEntity.status === "COMPLETED" ||
+    assessmentEntity.status === "PARTIALLY_COMPLETED" ||
+    assessmentEntity.status === "DID_NOT_SHOW"
+    ? {
+        assessment: {
+          status: assessmentEntity.status,
+          endedWithAJob: assessmentEntity.endedWithAJob,
+        },
+      }
+    : {
+        assessment: {
+          status: assessmentEntity.status,
+        },
+      };
 };
 
 export const throwErrorIfConventionStatusNotAllowed = (

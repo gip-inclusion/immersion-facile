@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  AssessmentDtoBuilder,
   type BroadcastFeedback,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
@@ -9,6 +10,7 @@ import {
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../../utils/agency";
+import { createAssessmentEntity } from "../../../convention/entities/AssessmentEntity";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -203,6 +205,7 @@ describe("Broadcast to partners on updated convention", () => {
               agencySiret: agency1.agencySiret,
               agencyCounsellorEmails: [counsellor1.email],
               agencyValidatorEmails: [validator1.email],
+              assessment: null,
             },
           },
         },
@@ -228,6 +231,7 @@ describe("Broadcast to partners on updated convention", () => {
               agencySiret: agency2.agencySiret,
               agencyCounsellorEmails: [counsellor2.email],
               agencyValidatorEmails: [validator2.email],
+              assessment: null,
             },
           },
         },
@@ -246,9 +250,17 @@ describe("Broadcast to partners on updated convention", () => {
       .withId("22222222-ee70-4c90-b3f4-668d492f7395")
       .withAgencyId(agency2.id)
       .withImmersionAppellation(cartographeAppellationAndRome)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .build();
+
+    const assessment = new AssessmentDtoBuilder()
+      .withConventionId(convention.id)
       .build();
 
     uow.conventionRepository.setConventions([convention]);
+    uow.assessmentRepository.assessments = [
+      createAssessmentEntity(assessment, convention),
+    ];
     uow.apiConsumerRepository.consumers = [apiConsumer2];
 
     await broadcastUpdatedConvention.execute({ convention });
@@ -270,6 +282,10 @@ describe("Broadcast to partners on updated convention", () => {
                 ...cartographeAppellationAndRome,
                 romeCode: "V3008",
                 romeLabel: "Label V3 - Cartographe",
+              },
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob,
               },
             },
           },
@@ -386,6 +402,11 @@ describe("Broadcast to partners on updated convention", () => {
     const conventionFromAgencyWithRefersTo = new ConventionDtoBuilder()
       .withId("11111111-ee70-4c90-b3f4-668d492f7397")
       .withAgencyId(agencyWithRefersTo.id)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .build();
+
+    const assessment = new AssessmentDtoBuilder()
+      .withConventionId(conventionFromAgencyWithRefersTo.id)
       .build();
 
     const apiConsumerWithSubscriptionOnAgencyWithReferesTo =
@@ -406,6 +427,9 @@ describe("Broadcast to partners on updated convention", () => {
         .build();
 
     uow.conventionRepository.setConventions([conventionFromAgencyWithRefersTo]);
+    uow.assessmentRepository.assessments = [
+      createAssessmentEntity(assessment, conventionFromAgencyWithRefersTo),
+    ];
     uow.apiConsumerRepository.consumers = [
       apiConsumer1,
       apiConsumerWithSubscriptionOnAgencyWithReferesTo,
@@ -435,6 +459,10 @@ describe("Broadcast to partners on updated convention", () => {
                 kind: agency1.kind,
                 name: agency1.name,
               },
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob,
+              },
             },
           },
         },
@@ -456,6 +484,10 @@ describe("Broadcast to partners on updated convention", () => {
                 id: agency1.id,
                 kind: agency1.kind,
                 name: agency1.name,
+              },
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob,
               },
             },
           },

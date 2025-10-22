@@ -109,6 +109,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencySiret: agencyFranceTravail.agencySiret,
             agencyCounsellorEmails: agencyFranceTravail.counsellorEmails,
             agencyValidatorEmails: agencyFranceTravail.validatorEmails,
+            assessment: null,
           },
         ]);
       });
@@ -140,6 +141,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencySiret: agencyFranceTravail.agencySiret,
             agencyCounsellorEmails: agencyFranceTravail.counsellorEmails,
             agencyValidatorEmails: agencyFranceTravail.validatorEmails,
+            assessment: null,
           },
         ]);
       });
@@ -190,6 +192,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencySiret: agencyMissionLocale.agencySiret,
             agencyCounsellorEmails: agencyMissionLocale.counsellorEmails,
             agencyValidatorEmails: agencyMissionLocale.validatorEmails,
+            assessment: null,
           },
         ]);
       });

@@ -1,7 +1,9 @@
 import {
   agencyKindSchema,
+  assessmentStatuses,
   conventionSchema,
   emailSchema,
+  legacyAssessmentStatuses,
   siretSchema,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
@@ -24,6 +26,17 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
           kind: z.string(),
         })
         .optional(),
+      assessment: z
+        .union([
+          z.object({
+            status: z.enum(assessmentStatuses),
+            endedWithAJob: z.boolean(),
+          }),
+          z.object({
+            status: z.enum(legacyAssessmentStatuses),
+          }),
+        ])
+        .nullable(),
     }),
   );
 

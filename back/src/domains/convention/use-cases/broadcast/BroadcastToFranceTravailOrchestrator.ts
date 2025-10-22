@@ -6,6 +6,7 @@ import {
 } from "shared";
 import type { InstantiatedUseCase } from "../../../../config/bootstrap/createUseCases";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
+import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
 import { getReferedAgency } from "../../../core/api-consumer/helpers/agency";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
@@ -63,6 +64,13 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
             };
           });
 
+        const assessment = await uowPerformer.perform(async (uow) =>
+          uow.assessmentRepository.getByConventionId(params.convention.id),
+        );
+
+        const assessmentFields =
+          assesmentEntityToConventionAssessmentFields(assessment);
+
         const conventionRead: ConventionReadDto = {
           ...params.convention,
           agencyName: agencyWithRights.name,
@@ -72,6 +80,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
           agencyRefersTo: referredAgency,
           agencyCounsellorEmails: agency.counsellorEmails,
           agencyValidatorEmails: agency.validatorEmails,
+          ...assessmentFields,
         };
 
         if (eventType === "ASSESSMENT_CREATED") {

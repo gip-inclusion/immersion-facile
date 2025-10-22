@@ -288,6 +288,17 @@ describe("convention e2e", () => {
       "200 - succeeds with JWT %s",
       async (scenario) => {
         inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
+        inMemoryUow.assessmentRepository.assessments = [
+          {
+            conventionId: convention.id,
+            status: "COMPLETED",
+            endedWithAJob: false,
+            establishmentFeedback: "Ca c'est bien passé",
+            establishmentAdvices: "mon conseil",
+            numberOfHoursActuallyMade: 35,
+            _entityName: "Assessment",
+          },
+        ];
 
         const jwt = match(scenario)
           .with("ConventionJwt", () =>
@@ -331,6 +342,10 @@ describe("convention e2e", () => {
             agencySiret: peAgency.agencySiret,
             agencyCounsellorEmails: peAgency.counsellorEmails,
             agencyValidatorEmails: [validator.email],
+            assessment: {
+              status: "COMPLETED",
+              endedWithAJob: false,
+            },
           },
         });
       },

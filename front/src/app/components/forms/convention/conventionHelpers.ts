@@ -52,6 +52,7 @@ export type ConventionPresentation = OmitFromExistingKeys<
   | "agencyCounsellorEmails"
   | "agencyValidatorEmails"
   | "agencySiret"
+  | "assessment"
 > &
   WithSignatures &
   WithFromPeConnectedUser;

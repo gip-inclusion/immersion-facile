@@ -428,6 +428,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
+              assessment: null,
             },
           },
           {
@@ -440,6 +441,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
+              assessment: null,
             },
           },
         ]);
@@ -577,6 +579,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
+              assessment: null,
             },
           },
           {
@@ -589,6 +592,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
+              assessment: null,
             },
           },
         ]);
@@ -650,6 +654,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
+              assessment: null,
             },
           },
         ]);
@@ -670,13 +675,13 @@ describe("ResyncOldConventionsToFt use case", () => {
         };
         uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
         uow.conventionRepository.setConventions([conventionToSync1]);
-        uow.assessmentRepository.setAssessments([
+        uow.assessmentRepository.assessments = [
           {
             _entityName: "Assessment",
             numberOfHoursActuallyMade: null,
             ...assessment,
           },
-        ]);
+        ];
         uow.conventionsToSyncRepository.setForTesting([
           {
             id: conventionToSync1.id,
@@ -706,6 +711,10 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob,
+              },
             },
           },
         ]);
@@ -719,7 +728,7 @@ describe("ResyncOldConventionsToFt use case", () => {
       it("should not broadcast assessment if it is LegacyAssessmentDto", async () => {
         uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
         uow.conventionRepository.setConventions([conventionToSync1]);
-        uow.assessmentRepository.setAssessments([
+        uow.assessmentRepository.assessments = [
           {
             _entityName: "Assessment",
             status: "FINISHED",
@@ -727,7 +736,7 @@ describe("ResyncOldConventionsToFt use case", () => {
             establishmentFeedback: "commentaire",
             numberOfHoursActuallyMade: null,
           },
-        ]);
+        ];
         uow.conventionsToSyncRepository.setForTesting([
           {
             id: conventionToSync1.id,
@@ -756,6 +765,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
+              assessment: { status: "FINISHED" },
             },
           },
         ]);

@@ -523,6 +523,10 @@ const fieldsToExclude = {
     required: undefined,
     autoComplete: undefined,
   },
+  assessment: {
+    label: "",
+    id: "",
+  },
   "establishmentTutor.role": {
     // to exclude
     label: "",

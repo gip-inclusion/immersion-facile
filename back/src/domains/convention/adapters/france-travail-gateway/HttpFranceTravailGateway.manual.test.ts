@@ -349,6 +349,7 @@ describe("HttpFranceTravailGateway", () => {
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
         agencyRefersTo: undefined,
+        assessment: null,
       },
     });
 

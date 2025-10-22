@@ -10,6 +10,10 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
     return this.#assessments;
   }
 
+  public set assessments(assessments: AssessmentEntity[]) {
+    this.#assessments = assessments;
+  }
+
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<AssessmentEntity | undefined> {

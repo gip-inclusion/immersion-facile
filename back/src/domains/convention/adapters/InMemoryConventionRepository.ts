@@ -118,6 +118,7 @@ const dropConventionReadFields = (
     agencyName: _5,
     agencySiret: _6,
     agencyRefersTo: _7,
+    assessment: _8,
     ...conventionWithoutReadFields
   } = convention as ConventionReadDto;
   return conventionWithoutReadFields;

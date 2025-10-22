@@ -36,6 +36,7 @@ const agencyFields = {
 const convention: ConventionReadDto = {
   ...agencyFields,
   ...new ConventionDtoBuilder().notSigned().build(),
+  assessment: null,
 };
 
 describe("convention action slice", () => {
@@ -102,6 +103,7 @@ describe("convention action slice", () => {
           ...new ConventionDtoBuilder(convention)
             .withStatus("CANCELLED")
             .build(),
+          assessment: null,
         };
 
         feedGatewayWithConvention(conventionwithStatusChanged);
@@ -202,6 +204,7 @@ describe("convention action slice", () => {
           ...new ConventionDtoBuilder(convention)
             .withStatus("DEPRECATED")
             .build(),
+          assessment: null,
         };
 
         feedGatewayWithConvention(conventionwithStatusChanged);
@@ -301,6 +304,7 @@ describe("convention action slice", () => {
           ...new ConventionDtoBuilder(convention)
             .withStatus("REJECTED")
             .build(),
+          assessment: null,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
 
@@ -400,6 +404,7 @@ describe("convention action slice", () => {
           ...new ConventionDtoBuilder(convention)
             .withStatus("ACCEPTED_BY_VALIDATOR")
             .build(),
+          assessment: null,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
 
@@ -500,6 +505,7 @@ describe("convention action slice", () => {
           ...new ConventionDtoBuilder(convention)
             .withStatus("ACCEPTED_BY_COUNSELLOR")
             .build(),
+          assessment: null,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
 
@@ -613,6 +619,7 @@ describe("convention action slice", () => {
         ...new ConventionDtoBuilder(convention)
           .withAgencyId("agency-transferred-id")
           .build(),
+        assessment: null,
       };
       feedGatewayWithConvention(conventionWithAgencyChanged);
 
@@ -719,6 +726,7 @@ describe("convention action slice", () => {
         ...new ConventionDtoBuilder(convention)
           .withAgencyReferent({ firstname: "jean", lastname: "pierre" })
           .build(),
+        assessment: null,
       };
 
       feedGatewayWithConvention(conventionWithCounsellorNameChanged);
@@ -967,6 +975,7 @@ describe("convention action slice", () => {
         ...new ConventionDtoBuilder(convention)
           .signedByEstablishmentRepresentative(new Date().toISOString())
           .build(),
+        assessment: null,
       };
 
       feedGatewayWithConvention(signedConvention);
