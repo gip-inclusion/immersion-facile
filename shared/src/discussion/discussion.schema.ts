@@ -41,6 +41,7 @@ import {
   type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
+  type DiscussionStatus,
   type ExchangeFromDashboard,
   type ExchangeRead,
   type ExchangeRole,
@@ -165,11 +166,15 @@ export const discussionRejectionSchema: ZodSchemaWithInputMatchingOutput<WithDis
 const discussionAcceptedStatusSchema = z.literal("ACCEPTED");
 const discussionRejectedStatusSchema = z.literal("REJECTED");
 const discussionPendingStatusSchema = z.literal("PENDING");
-const discussionStatusSchema = z.union([
-  discussionAcceptedStatusSchema,
-  discussionRejectedStatusSchema,
-  discussionPendingStatusSchema,
-]);
+const discussionStatusSchema: ZodSchemaWithInputMatchingOutput<DiscussionStatus> =
+  z.union([
+    discussionAcceptedStatusSchema,
+    discussionRejectedStatusSchema,
+    discussionPendingStatusSchema,
+  ]);
+export const discussionStatusesSchema: ZodSchemaWithInputMatchingOutput<
+  DiscussionStatus[]
+> = z.array(discussionStatusSchema).min(1);
 
 export const discussionAcceptedSchema: ZodSchemaWithInputMatchingOutput<WithDiscussionStatusAccepted> =
   z.object({
@@ -219,6 +224,7 @@ const commonDiscussionSchema: ZodSchemaWithInputMatchingOutput<CommonDiscussionD
     .object({
       id: discussionIdSchema,
       createdAt: makeDateStringSchema(),
+      updatedAt: makeDateStringSchema(),
       siret: siretSchema,
       businessName: zStringMinLength1,
       address: addressSchema,

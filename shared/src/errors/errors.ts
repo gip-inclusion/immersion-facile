@@ -134,6 +134,10 @@ export const errors = {
       ),
   },
   generic: {
+    badDateRange: ({ from, to }: Partial<DateRange>) =>
+      new Error(
+        `L'intervale de temps n'est pas supporté. From: ${from} To:${to}`,
+      ),
     notAnError: () => new Error("Not an error class"),
     testError: (message: string) => new Error(message),
     fakeError: (message: string, httpStatus?: number) => {
@@ -153,6 +157,8 @@ export const errors = {
       ),
     httpStatus: ({ status, message }: { status?: number; message: string }) =>
       new Error(`Erreur HTTP ${status ? `(${status}) ` : ""}: ${message}`),
+    unsupportedLimit: (limit: number) =>
+      new Error(`The limit ${limit} is not supported`),
     unsupportedStatus: ({
       body,
       status,
@@ -841,6 +847,10 @@ export const errors = {
       ),
   },
   discussion: {
+    missingNotDeleted: (discussionIds: DiscussionId[]) =>
+      new NotFoundError(
+        `Discussions cannot be delete because missing : ${discussionIds}`,
+      ),
     badSiretFilter: () =>
       new BadRequestError(
         "Le filtre par SIRET est fourni mais il n'y a pas de SIRET dans le filtre.",
