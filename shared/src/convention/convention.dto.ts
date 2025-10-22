@@ -487,6 +487,8 @@ export type GetConventionsForAgencyUserParams =
     pagination?: PaginationQueryParams;
   };
 
+export type ConventionSortDirection = "asc" | "desc";
+
 export type FlatGetConventionsForAgencyUserParams = {
   // pagination
   page?: number;
