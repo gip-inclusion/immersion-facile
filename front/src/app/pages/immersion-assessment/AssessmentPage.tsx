@@ -1,9 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
-import { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
-import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
@@ -22,8 +20,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
-import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { Route } from "type-route";
 
@@ -34,16 +30,11 @@ interface AssessmentPageProps {
 }
 
 export const AssessmentPage = ({ route }: AssessmentPageProps) => {
-  const dispatch = useDispatch();
   const conventionFormFeedback = useFeedbackTopic("convention-form");
-  const currentAssessment = useAppSelector(
-    assessmentSelectors.currentAssessment,
-  );
   const userRolesForFetchedConvention = useAppSelector(
     connectedUserSelectors.userRolesForFetchedConvention,
   );
 
-  const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
@@ -66,25 +57,13 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   });
   const assessmentFormFeedback = useFeedbackTopic("assessment");
 
-  const isLoading = isConventionLoading || isAssessmentLoading;
+  const isLoading = isConventionLoading;
 
   const isConventionValidated = convention?.status === "ACCEPTED_BY_VALIDATOR";
 
   const isAssessmentSuccessfullySubmitted =
     assessmentFormFeedback?.level === "success" &&
     assessmentFormFeedback?.on === "create";
-
-  useEffect(() => {
-    if (convention) {
-      dispatch(
-        assessmentSlice.actions.getAssessmentRequested({
-          conventionId: convention.id,
-          jwt: route.params.jwt,
-          feedbackTopic: "assessment",
-        }),
-      );
-    }
-  }, [dispatch, convention, route.params.jwt]);
 
   if (fetchConventionError)
     return (
@@ -170,14 +149,14 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
                 description="Seule une convention entièrement validée peut recevoir un bilan"
               />
             )}
-            {currentAssessment && (
+            {convention.assessment && (
               <Alert
                 severity="error"
                 title="Erreur"
                 description="Le bilan a déjà été rempli et ne peut être modifié."
               />
             )}
-            {convention && isConventionValidated && !currentAssessment && (
+            {convention && isConventionValidated && !convention.assessment && (
               <AssessmentForm
                 convention={convention}
                 jwt={route.params.jwt}
