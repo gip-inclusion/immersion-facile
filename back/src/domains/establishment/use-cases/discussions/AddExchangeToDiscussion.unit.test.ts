@@ -209,6 +209,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...pendingDiscussion1,
+              updatedAt: timeGateway.now().toISOString(),
               exchanges: [
                 ...pendingDiscussion1.exchanges,
                 {
@@ -229,6 +230,7 @@ describe("AddExchangeToDiscussion", () => {
             },
             {
               ...pendingDiscussion2,
+              updatedAt: timeGateway.now().toISOString(),
               exchanges: [
                 ...pendingDiscussion2.exchanges,
                 {
@@ -283,6 +285,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...pendingDiscussion1,
+              updatedAt: timeGateway.now().toISOString(),
               exchanges: [
                 ...pendingDiscussion1.exchanges,
                 {
@@ -353,6 +356,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...pendingDiscussion1,
+              updatedAt: timeGateway.now().toISOString(),
               exchanges: [
                 ...pendingDiscussion1.exchanges,
                 {
@@ -375,6 +379,7 @@ describe("AddExchangeToDiscussion", () => {
             },
             {
               ...pendingDiscussion2,
+              updatedAt: timeGateway.now().toISOString(),
               exchanges: [
                 ...pendingDiscussion2.exchanges,
                 {
@@ -508,6 +513,7 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(uow.discussionRepository.discussions, [
               {
                 ...discussionAccepted,
+                updatedAt: timeGateway.now().toISOString(),
                 exchanges: [
                   ...discussionAccepted.exchanges,
                   expectedNewExchange,
@@ -561,6 +567,7 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(uow.discussionRepository.discussions, [
               {
                 ...discussionAccepted,
+                updatedAt: timeGateway.now().toISOString(),
                 exchanges: [
                   ...discussionAccepted.exchanges,
                   expectedNewExchange,
@@ -631,6 +638,7 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(uow.discussionRepository.discussions, [
               {
                 ...discussionAccepted,
+                updatedAt: timeGateway.now().toISOString(),
                 exchanges: [
                   ...discussionAccepted.exchanges,
                   expectedNewMessage,
