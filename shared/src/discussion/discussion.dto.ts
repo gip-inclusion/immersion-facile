@@ -154,6 +154,7 @@ export type CommonDiscussionDto = {
   businessName: BusinessName;
   conventionId?: ConventionId;
   createdAt: DateString;
+  updatedAt: DateString;
   id: DiscussionId;
   siret: SiretDto;
 } & WithDiscussionStatus;
