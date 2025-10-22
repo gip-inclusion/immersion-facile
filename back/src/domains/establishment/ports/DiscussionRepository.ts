@@ -24,6 +24,15 @@ export type HasDiscussionMatchingParams = {
   addressId: LocationId;
 };
 
+export type GetDiscussionIdsParams = {
+  filters: {
+    updatedBetween?: Partial<DateRange>;
+    statuses?: DiscussionStatus[];
+  };
+  orderBy: "updatedAt";
+  limit: number;
+};
+
 export type GetDiscussionsParams = {
   filters: {
     answeredByEstablishment?: boolean;
@@ -48,7 +57,9 @@ export type GetPaginatedDiscussionsForUserParams = WithRequiredPagination &
 export interface DiscussionRepository {
   insert: (discussion: DiscussionDto) => Promise<void>;
   update: (discussion: DiscussionDto) => Promise<void>;
+  deleteDiscussions: (discussionIds: DiscussionId[]) => Promise<void>;
   getById: (discussionId: DiscussionId) => Promise<DiscussionDto | undefined>;
+  getDiscussionIds(params: GetDiscussionIdsParams): Promise<DiscussionId[]>;
   getDiscussions(params: GetDiscussionsParams): Promise<DiscussionDto[]>;
   getPaginatedDiscussionsForUser: (
     params: GetPaginatedDiscussionsForUserParams,
