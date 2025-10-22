@@ -9,6 +9,7 @@ import type {
   NotificationContentAndFollowedIds,
   SaveNotificationsBatchAndRelatedEvent,
 } from "../../../core/notifications/helpers/Notification";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { getNotifiedUsersFromEstablishmentUserRights } from "../../helpers/businessContact.helpers";
 
@@ -23,6 +24,7 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
   .withDeps<{
     saveNotificationsBatchAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent;
     config: AppConfig;
+    timeGateway: TimeGateway;
   }>()
   .build(async ({ inputParams: { discussionId }, uow, deps }) => {
     const discussion = await uow.discussionRepository.getById(discussionId);
@@ -68,6 +70,7 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
     await Promise.all([
       uow.discussionRepository.update({
         ...discussion,
+        updatedAt: deps.timeGateway.now().toISOString(),
         status: "REJECTED",
         rejectionKind: "DEPRECATED",
       }),
