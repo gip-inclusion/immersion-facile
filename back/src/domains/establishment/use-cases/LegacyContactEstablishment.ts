@@ -192,6 +192,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
         establishment.establishment.customizedName ??
         establishment.establishment.name,
       createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
       address: matchingAddress.address,
       kind: "IF",
       contactMode: contactRequest.contactMode,
