@@ -38,19 +38,19 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
 
   let uow: InMemoryUnitOfWork;
   let markDiscussionDeprecatedAndNotify: MarkDiscussionDeprecatedAndNotify;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     const uuidGenerator = new TestUuidGenerator();
 
     uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
     markDiscussionDeprecatedAndNotify = makeMarkDiscussionDeprecatedAndNotify({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
         saveNotificationsBatchAndRelatedEvent:
-          makeSaveNotificationsBatchAndRelatedEvent(
-            uuidGenerator,
-            new CustomTimeGateway(),
-          ),
+          makeSaveNotificationsBatchAndRelatedEvent(uuidGenerator, timeGateway),
+        timeGateway,
         config: new AppConfigBuilder().build(),
       },
     });
