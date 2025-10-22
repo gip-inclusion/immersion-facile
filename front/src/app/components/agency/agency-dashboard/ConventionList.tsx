@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Checkbox, type CheckboxProps } from "@codegouvfr/react-dsfr/Checkbox";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
@@ -11,13 +12,11 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { HeadingSection, RichTable } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  type ConventionSortDirection,
   type ConventionStatus,
   conventionStatuses,
   defaultPerPageInWebPagination,
   domElementIds,
   type FlatGetConventionsForAgencyUserParams,
-  type GetPaginatedConventionsSortBy,
   getFormattedFirstnameAndLastname,
   isNotEmptyArray,
   toDisplayedDate,
@@ -36,6 +35,21 @@ import {
 } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
 import { match, P } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
+
+type DateFilterType = keyof Pick<
+  FlatGetConventionsForAgencyUserParams,
+  "dateStartFrom" | "dateStartTo" | "dateEndFrom" | "dateEndTo"
+>;
+
+type DateFilterState = {
+  type: DateFilterType;
+  value: string;
+};
+
+type DateFilterStates = {
+  dateStart: DateFilterState;
+  dateEnd: DateFilterState;
+};
 
 export const ConventionList = () => {
   const dispatch = useDispatch();
@@ -57,7 +71,13 @@ export const ConventionList = () => {
   const defaultFilters = useMemo(
     () =>
       pick(
-        ["sortBy", "sortDirection", "statuses"],
+        [
+          "statuses",
+          "dateStartFrom",
+          "dateStartTo",
+          "dateEndFrom",
+          "dateEndTo",
+        ],
         initialConventionWithPagination.filters,
       ),
     [],
@@ -66,9 +86,24 @@ export const ConventionList = () => {
     useState<
       Pick<
         FlatGetConventionsForAgencyUserParams,
-        "statuses" | "sortBy" | "sortDirection"
+        | "statuses"
+        | "dateStartFrom"
+        | "dateStartTo"
+        | "dateEndFrom"
+        | "dateEndTo"
       >
     >(defaultFilters);
+
+  const [dateFilterStates, setDateFilterStates] = useState<DateFilterStates>({
+    dateStart: {
+      type: "dateStartFrom",
+      value: "",
+    },
+    dateEnd: {
+      type: "dateEndFrom",
+      value: "",
+    },
+  });
 
   const statusOptions: CheckboxProps["options"] = useMemo(() => {
     return conventionStatuses.map((status) => ({
@@ -94,24 +129,27 @@ export const ConventionList = () => {
     }));
   }, [tempFilters]);
 
-  const dateOptions: RadioButtonsProps["options"] = useMemo(() => {
-    return dateSortOptions.map((option) => ({
-      label: option.label,
-      nativeInputProps: {
-        value: `${option.sortBy}-${option.sortDirection}`,
-        defaultChecked:
-          filters.sortBy === option.sortBy &&
-          filters.sortDirection === option.sortDirection,
-        onChange: () => {
-          setTempFilters({
-            ...tempFilters,
-            sortBy: option.sortBy,
-            sortDirection: option.sortDirection,
-          });
-        },
-      },
-    }));
-  }, [tempFilters, filters]);
+  const startDateOptions: RadioButtonsProps["options"] = useMemo(
+    () =>
+      createDateOptions(
+        "dateStart",
+        dateFilterStates.dateStart,
+        tempFilters,
+        setDateFilterStates,
+      ),
+    [dateFilterStates.dateStart, tempFilters],
+  );
+
+  const endDateOptions: RadioButtonsProps["options"] = useMemo(
+    () =>
+      createDateOptions(
+        "dateEnd",
+        dateFilterStates.dateEnd,
+        tempFilters,
+        setDateFilterStates,
+      ),
+    [dateFilterStates.dateEnd, tempFilters],
+  );
 
   useEffect(() => {
     if (connectedUserJwt) {
@@ -271,27 +309,105 @@ export const ConventionList = () => {
                     },
                   },
                   {
-                    id: "date",
-                    iconId: "fr-icon-arrow-down-line" as const,
-                    defaultValue: "Date de début décroissante",
+                    id: "dateStart",
+                    iconId: "fr-icon-calendar-line" as const,
+                    defaultValue: "Date de début",
                     values: [
                       (() => {
-                        const currentOption = dateSortOptions.find(
-                          (option) =>
-                            option.sortBy === (filters.sortBy ?? "dateStart") &&
-                            option.sortDirection ===
-                              (filters.sortDirection ?? "desc"),
-                        );
-                        return (
-                          currentOption?.label ?? "Date de début décroissante"
-                        );
+                        if (filters.dateStartFrom) {
+                          return `Démarrant après le ${filters.dateStartFrom}`;
+                        }
+                        if (filters.dateStartTo) {
+                          return `Démarrant avant le ${filters.dateStartTo}`;
+                        }
+                        return "Date de début";
                       })(),
                     ],
                     submenu: {
-                      title: "Trier par date",
+                      title: "Filtrer par date de début",
                       content: (
                         <>
-                          <RadioButtons options={dateOptions} />
+                          <RadioButtons options={startDateOptions} />
+                          <div className={cx("fr-mt-2")}>
+                            <Input
+                              label="Date"
+                              nativeInputProps={{
+                                type: "date",
+                                value: dateFilterStates.dateStart.value,
+                                onChange: (event) => {
+                                  setDateFilterStates((prev) => ({
+                                    ...prev,
+                                    dateStart: {
+                                      ...prev.dateStart,
+                                      value: event.target.value,
+                                    },
+                                  }));
+                                  const newFilters = {
+                                    ...tempFilters,
+                                    [dateFilterStates.dateStart.type]:
+                                      event.target.value || undefined,
+                                    ...(dateFilterStates.dateStart.type ===
+                                    "dateStartFrom"
+                                      ? { dateStartTo: undefined }
+                                      : { dateStartFrom: undefined }),
+                                  };
+                                  setTempFilters(newFilters);
+                                },
+                              }}
+                            />
+                          </div>
+                        </>
+                      ),
+                    },
+                  },
+                  {
+                    id: "dateEnd",
+                    iconId: "fr-icon-calendar-line" as const,
+                    defaultValue: "Date de fin",
+                    values: [
+                      (() => {
+                        if (filters.dateEndFrom) {
+                          return `Se terminant après le ${filters.dateEndFrom}`;
+                        }
+                        if (filters.dateEndTo) {
+                          return `Se terminant avant le ${filters.dateEndTo}`;
+                        }
+                        return "Date de fin";
+                      })(),
+                    ],
+                    submenu: {
+                      title: "Filtrer par date de fin",
+                      content: (
+                        <>
+                          <RadioButtons options={endDateOptions} />
+                          <div className={cx("fr-mt-2")}>
+                            <Input
+                              label="Date"
+                              nativeInputProps={{
+                                type: "date",
+                                value: dateFilterStates.dateEnd.value,
+                                onChange: (event) => {
+                                  setDateFilterStates((prev) => ({
+                                    ...prev,
+                                    dateEnd: {
+                                      ...prev.dateEnd,
+                                      value: event.target.value,
+                                    },
+                                  }));
+                                  const newFilters = {
+                                    ...tempFilters,
+                                    [dateFilterStates.dateEnd.type]:
+                                      event.target.value || undefined,
+                                    ...(dateFilterStates.dateEnd.type ===
+                                    "dateEndFrom"
+                                      ? { dateEndTo: undefined }
+                                      : { dateEndFrom: undefined }),
+                                  };
+                                  setTempFilters(newFilters);
+                                },
+                              }}
+                            />
+                          </div>
                         </>
                       ),
                     },
@@ -358,35 +474,80 @@ export const ConventionList = () => {
   );
 };
 
-type DateSortOption = {
-  sortBy: Extract<GetPaginatedConventionsSortBy, "dateStart" | "dateEnd">;
-  sortDirection: ConventionSortDirection;
-  label: string;
-};
-
-const dateSortOptions: readonly DateSortOption[] = [
-  {
-    sortBy: "dateStart",
-    sortDirection: "desc",
-    label: "Date de début décroissante",
-  },
-  {
-    sortBy: "dateStart",
-    sortDirection: "asc",
-    label: "Date de début croissante",
-  },
-  {
-    sortBy: "dateEnd",
-    sortDirection: "desc",
-    label: "Date de fin décroissante",
-  },
-  {
-    sortBy: "dateEnd",
-    sortDirection: "asc",
-    label: "Date de fin croissante",
-  },
-] as const;
-
 const isStringConventionStatus = (value: string): value is ConventionStatus => {
   return conventionStatuses.includes(value as ConventionStatus);
+};
+
+const createDateOptions = (
+  filterType: "dateStart" | "dateEnd",
+  currentState: DateFilterState,
+  tempFilters: Pick<
+    FlatGetConventionsForAgencyUserParams,
+    "dateStartFrom" | "dateStartTo" | "dateEndFrom" | "dateEndTo"
+  >,
+  setDateFilterStates: React.Dispatch<React.SetStateAction<DateFilterStates>>,
+): RadioButtonsProps["options"] => {
+  const config: {
+    dateStart: {
+      labels: { before: string; after: string };
+      types: { to: "dateStartTo"; from: "dateStartFrom" };
+      values: { to: string | undefined; from: string | undefined };
+    };
+    dateEnd: {
+      labels: { before: string; after: string };
+      types: { to: "dateEndTo"; from: "dateEndFrom" };
+      values: { to: string | undefined; from: string | undefined };
+    };
+  } = {
+    dateStart: {
+      labels: { before: "Démarrant avant le", after: "Démarrant après le" },
+      types: { to: "dateStartTo", from: "dateStartFrom" },
+      values: { to: tempFilters.dateStartTo, from: tempFilters.dateStartFrom },
+    },
+    dateEnd: {
+      labels: {
+        before: "Se terminant avant le",
+        after: "Se terminant après le",
+      },
+      types: { to: "dateEndTo", from: "dateEndFrom" },
+      values: { to: tempFilters.dateEndTo, from: tempFilters.dateEndFrom },
+    },
+  };
+
+  const { labels, types, values } = config[filterType];
+
+  return [
+    {
+      label: labels.before,
+      nativeInputProps: {
+        value: types.to,
+        defaultChecked: currentState.type === types.to,
+        onChange: () => {
+          setDateFilterStates((prev) => ({
+            ...prev,
+            [filterType]: {
+              type: types.to,
+              value: values.to || "",
+            },
+          }));
+        },
+      },
+    },
+    {
+      label: labels.after,
+      nativeInputProps: {
+        value: types.from,
+        defaultChecked: currentState.type === types.from,
+        onChange: () => {
+          setDateFilterStates((prev) => ({
+            ...prev,
+            [filterType]: {
+              type: types.from,
+              value: values.from || "",
+            },
+          }));
+        },
+      },
+    },
+  ];
 };
