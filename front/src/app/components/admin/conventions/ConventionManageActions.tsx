@@ -51,8 +51,6 @@ import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
-import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
-import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import {
   canAssessmentBeFilled,
@@ -91,7 +89,6 @@ export const ConventionManageActions = ({
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-  const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const broadcastErrorFeedback = useAppSelector(
     partnersErroredConventionSelectors.lastBroadcastFeedback,
   )?.subscriberErrorFeedback;
@@ -104,19 +101,6 @@ export const ConventionManageActions = ({
     "convention-action-cancel",
     "convention-action-renew",
   ]);
-
-  useEffect(() => {
-    dispatch(
-      assessmentSlice.actions.getAssessmentRequested({
-        conventionId: convention.id,
-        jwt: jwtParams.jwt,
-        feedbackTopic: "assessment",
-      }),
-    );
-    return () => {
-      dispatch(assessmentSlice.actions.clearFetchedAssessment());
-    };
-  }, [dispatch, convention.id, jwtParams.jwt]);
 
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
@@ -233,11 +217,11 @@ export const ConventionManageActions = ({
   const shouldShowConventionDocumentButton =
     convention.status === "ACCEPTED_BY_VALIDATOR";
   const shouldShowAssessmentAbandonAction =
-    canAssessmentBeFilled(convention, assessment) &&
+    canAssessmentBeFilled(convention) &&
     isConventionEndingInOneDayOrMore(convention);
 
   const shouldShowAssessmentFullFillAction =
-    canAssessmentBeFilled(convention, assessment) &&
+    canAssessmentBeFilled(convention) &&
     !isConventionEndingInOneDayOrMore(convention) &&
     intersection(roles, [
       ...allowedRolesToCreateAssessment,
@@ -246,7 +230,7 @@ export const ConventionManageActions = ({
     ]).length > 0;
 
   const shouldShowAssessmentDocumentAction =
-    !!assessment &&
+    !!convention.assessment &&
     hasAllowedRoleOnAssessment(roles, "GetAssessment", convention);
 
   const requesterRoles = roles.filter(
@@ -613,7 +597,7 @@ export const ConventionManageActions = ({
         )}
 
         {isAllowedConventionTransition(convention, "CANCELLED", roles) &&
-          !assessment && (
+          !convention.assessment && (
             <>
               {shouldShowAssessmentAbandonAction &&
               hasAllowedRoleOnAssessment(
