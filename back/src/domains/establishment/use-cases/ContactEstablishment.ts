@@ -171,6 +171,7 @@ export class ContactEstablishment extends TransactionalUseCase<CreateDiscussionD
         establishment.establishment.customizedName ??
         establishment.establishment.name,
       createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
       address: matchingAddress.address,
       status: "PENDING",
     };
