@@ -28,8 +28,6 @@ import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSe
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
-import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import {
   canAssessmentBeFilled,
@@ -68,7 +66,6 @@ export const ConventionValidation = ({
 }: ConventionValidationProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
-  const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const conventionLastBroadcastFeedback = useAppSelector(
     partnersErroredConventionSelectors.lastBroadcastFeedback,
   );
@@ -103,16 +100,6 @@ export const ConventionValidation = ({
     if (!isSignatureModalOpen) setSignatoryToSendSignatureLink(null);
   }, [isSignatureModalOpen]);
 
-  useEffect(() => {
-    dispatch(
-      assessmentSlice.actions.getAssessmentRequested({
-        conventionId: convention.id,
-        jwt: jwtParams.jwt,
-        feedbackTopic: "assessment",
-      }),
-    );
-  }, [dispatch, convention.id, jwtParams.jwt]);
-
   const {
     status,
     signatories: { beneficiary },
@@ -122,7 +109,7 @@ export const ConventionValidation = ({
   } = convention;
 
   const shouldShowAssessmentReminderButton =
-    canAssessmentBeFilled(convention, assessment) &&
+    canAssessmentBeFilled(convention) &&
     !isConventionEndingInOneDayOrMore(convention) &&
     intersection(roles, [
       ...agencyModifierRoles,
