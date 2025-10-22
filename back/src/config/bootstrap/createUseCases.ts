@@ -927,6 +927,7 @@ export const createUseCases = ({
       deps: {
         saveNotificationsBatchAndRelatedEvent,
         config,
+        timeGateway: gateways.timeGateway,
       },
     }),
     notifyBeneficiaryToFollowUpContactRequest:
