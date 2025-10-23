@@ -579,11 +579,7 @@ export const SearchPage = ({
                 defaultValue="Toutes les entreprises"
                 iconId="fr-icon-equalizer-fill"
                 id={domElementIds[route.name].fitForDisableWorkersFilterTag}
-                values={
-                  formValues.fitForDisabledWorkers
-                    ? ["Acceptant les personnes en situation de handicap"]
-                    : []
-                }
+                values={formValues.fitForDisabledWorkers ? [rqthLabel] : []}
                 onReset={() => {
                   const updatedValues = {
                     ...tempValue,
@@ -595,12 +591,14 @@ export const SearchPage = ({
                   title: "Plus de critères",
                   content: (
                     <>
-                      <p>Afficher uniquement les entreprises&nbsp;:</p>
+                      <p className={fr.cx("fr-mb-1w")}>
+                        Afficher uniquement les entreprises&nbsp;:
+                      </p>
                       <Checkbox
+                        className={fr.cx("fr-mb-1w")}
                         options={[
                           {
-                            label:
-                              "Personnes en situation de handicap bienvenues",
+                            label: rqthLabel,
                             nativeInputProps: {
                               checked: tempValue.fitForDisabledWorkers,
                               onChange: (event) => {
@@ -820,3 +818,5 @@ const sortedByOptionsLabel = {
 
 const isSearchSortedBy = (value: string): value is SearchSortedBy =>
   searchSortedByOptions.includes(value as SearchSortedBy);
+
+const rqthLabel = "Personnes en situation de handicap bienvenues";
