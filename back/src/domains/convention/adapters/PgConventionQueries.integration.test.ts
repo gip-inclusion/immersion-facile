@@ -7,6 +7,7 @@ import {
   type AgencyId,
   type AgencyKind,
   type AppellationCode,
+  AssessmentDtoBuilder,
   ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
@@ -30,7 +31,10 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../utils/convention";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
-import type { AssessmentEntity } from "../entities/AssessmentEntity";
+import {
+  type AssessmentEntity,
+  createAssessmentEntity,
+} from "../entities/AssessmentEntity";
 import type { GetConventionsParams } from "../ports/ConventionQueries";
 import { PgAssessmentRepository } from "./PgAssessmentRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
@@ -1127,6 +1131,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
+    const assessment = new AssessmentDtoBuilder()
+      .withConventionId(conventionC.id)
+      .build();
+
     const agencyFields = {
       agencyName: agency.name,
       agencyDepartment: agency.address.departmentCode,
@@ -1172,6 +1180,10 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionRepository.save(conventionC, anyConventionUpdatedAt),
         conventionRepository.save(conventionD, anyConventionUpdatedAt),
       ]);
+
+      await assessmentRepo.save(
+        createAssessmentEntity(assessment, conventionC),
+      );
     });
 
     it("should return conventions for the agency user with pagination", async () => {
@@ -1193,8 +1205,12 @@ describe("Pg implementation of ConventionQueries", () => {
         totalRecords: 4,
       });
       expectToEqual(resultPage1.data, [
-        { ...conventionD, ...differentAgencyFields },
-        { ...conventionC, ...agencyFields },
+        { ...conventionD, ...differentAgencyFields, assessment: null },
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
       ]);
 
       const resultPage2 =
@@ -1209,8 +1225,8 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(resultPage2.data.length).toBe(2);
       expectToEqual(resultPage2.data, [
-        { ...conventionB, ...agencyFields },
-        { ...conventionA, ...agencyFields },
+        { ...conventionB, ...agencyFields, assessment: null },
+        { ...conventionA, ...agencyFields, assessment: null },
       ]);
       expectToEqual(resultPage2.pagination, {
         currentPage: 2,
@@ -1234,8 +1250,8 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(2);
       expectToEqual(result.data, [
-        { ...conventionD, ...differentAgencyFields },
-        { ...conventionA, ...agencyFields },
+        { ...conventionD, ...differentAgencyFields, assessment: null },
+        { ...conventionA, ...agencyFields, assessment: null },
       ]);
     });
 
@@ -1267,7 +1283,9 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [{ ...conventionB, ...agencyFields }]);
+      expectToEqual(result.data, [
+        { ...conventionB, ...agencyFields, assessment: null },
+      ]);
     });
 
     it("should filter conventions by convention ID", async () => {
@@ -1283,7 +1301,9 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [{ ...conventionA, ...agencyFields }]);
+      expectToEqual(result.data, [
+        { ...conventionA, ...agencyFields, assessment: null },
+      ]);
     });
 
     it("should return no results for non-existent convention ID", async () => {
@@ -1321,8 +1341,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(2);
       expectToEqual(result.data, [
-        { ...conventionC, ...agencyFields },
-        { ...conventionB, ...agencyFields },
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
+        { ...conventionB, ...agencyFields, assessment: null },
       ]);
     });
 
@@ -1339,10 +1363,14 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(4);
       expectToEqual(result.data, [
-        { ...conventionA, ...agencyFields },
-        { ...conventionB, ...agencyFields },
-        { ...conventionC, ...agencyFields },
-        { ...conventionD, ...differentAgencyFields },
+        { ...conventionA, ...agencyFields, assessment: null },
+        { ...conventionB, ...agencyFields, assessment: null },
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
+        { ...conventionD, ...differentAgencyFields, assessment: null },
       ]);
     });
 
@@ -1359,8 +1387,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(2);
       expectToEqual(result.data, [
-        { ...conventionD, ...differentAgencyFields },
-        { ...conventionC, ...agencyFields },
+        { ...conventionD, ...differentAgencyFields, assessment: null },
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
       ]);
     });
 
@@ -1384,7 +1416,9 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [{ ...conventionA, ...agencyFields }]);
+      expectToEqual(result.data, [
+        { ...conventionA, ...agencyFields, assessment: null },
+      ]);
     });
 
     it("should only return conventions from agencies the user belongs to", async () => {
@@ -1399,9 +1433,13 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expectToEqual(result.data, [
-        { ...conventionC, ...agencyFields },
-        { ...conventionB, ...agencyFields },
-        { ...conventionA, ...agencyFields },
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
+        { ...conventionB, ...agencyFields, assessment: null },
+        { ...conventionA, ...agencyFields, assessment: null },
       ]);
 
       const allConventionsBelongToUsersAgency = result.data.every(
