@@ -165,7 +165,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     // Transform ConventionDto to ConventionReadDto
     const conventionsRead = await Promise.all(
       paginatedData.map((convention) =>
-        this.#addAgencyDataToConvention(convention),
+        this.#addAgencyAndAssessmentDataToConvention(convention),
       ),
     );
 

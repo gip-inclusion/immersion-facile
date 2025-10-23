@@ -280,12 +280,10 @@ export class PgConventionQueries implements ConventionQueries {
     if (data.length === 0) {
       return {
         data: [],
-        pagination: {
-          currentPage: pagination.page,
-          totalPages: 0,
-          numberPerPage: pagination.perPage,
-          totalRecords: 0,
-        },
+        pagination: calculatePaginationResult({
+          ...pagination,
+          totalRecords,
+        }),
       };
     }
 
@@ -297,10 +295,29 @@ export class PgConventionQueries implements ConventionQueries {
       uniqAgencyIds,
     );
 
+    const assessmentPromises = data.map(async ({ dto }) => {
+      const assessment = await getAssessmentFieldsByConventionId(
+        this.transaction,
+        dto.id,
+      );
+      return { conventionId: dto.id, assessment };
+    });
+
+    const assessmentResults = await Promise.all(assessmentPromises);
+    const assessmentByConventionId = assessmentResults.reduce(
+      (acc, { conventionId, assessment }) => {
+        acc[conventionId] = assessment;
+        return acc;
+      },
+      {} as Record<string, ConventionAssessmentFields>,
+    );
+
     const conventionsReadDto = data.map(({ dto }) => {
       const agencyFields = agencyFieldsByAgencyIds[dto.agencyId];
       if (!agencyFields)
         throw errors.agency.notFound({ agencyId: dto.agencyId });
+
+      const assessmentFields = assessmentByConventionId[dto.id];
 
       return validateAndParseZodSchema({
         schemaName: "conventionReadSchema",
@@ -308,6 +325,7 @@ export class PgConventionQueries implements ConventionQueries {
         schemaParsingInput: {
           ...dto,
           ...agencyFields,
+          ...assessmentFields,
         },
         logger,
       });

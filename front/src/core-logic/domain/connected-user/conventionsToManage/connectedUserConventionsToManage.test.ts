@@ -52,6 +52,7 @@ describe("ConnectedUserConventionsToManage", () => {
     const convention: ConventionReadDto = {
       ...new ConventionDtoBuilder().build(),
       ...agencyFields,
+      assessment: null,
     };
 
     const result: DataWithPagination<ConventionReadDto> = {
