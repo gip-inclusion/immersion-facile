@@ -934,6 +934,17 @@ describe("convention e2e", () => {
         convention1,
         convention2,
       ]);
+      inMemoryUow.assessmentRepository.assessments = [
+        {
+          conventionId: convention1.id,
+          status: "COMPLETED",
+          endedWithAJob: false,
+          establishmentFeedback: "Ca c'est bien passé",
+          establishmentAdvices: "mon conseil",
+          numberOfHoursActuallyMade: 35,
+          _entityName: "Assessment",
+        },
+      ];
     });
 
     it("401 - Unauthorized when not correctly authenticated", async () => {
@@ -983,11 +994,16 @@ describe("convention e2e", () => {
       const conventionRead1 = {
         ...convention1,
         ...agencyFields,
+        assessment: {
+          status: "COMPLETED" as const,
+          endedWithAJob: false,
+        },
       };
 
       const conventionRead2 = {
         ...convention2,
         ...agencyFields,
+        assessment: null,
       };
 
       expectHttpResponseToEqual(response, {

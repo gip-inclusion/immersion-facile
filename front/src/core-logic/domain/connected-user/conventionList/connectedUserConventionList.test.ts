@@ -46,6 +46,7 @@ describe("ConnectedUserConventionList", () => {
       .withDateStart("2024-01-15")
       .build(),
     ...agencyFields,
+    assessment: null,
   };
 
   const convention2: ConventionReadDto = {
@@ -54,6 +55,7 @@ describe("ConnectedUserConventionList", () => {
       .withDateStart("2024-02-20")
       .build(),
     ...agencyFields,
+    assessment: null,
   };
 
   const conventionsWithPagination: DataWithPagination<ConventionReadDto> = {
