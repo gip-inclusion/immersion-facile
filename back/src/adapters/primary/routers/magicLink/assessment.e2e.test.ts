@@ -150,7 +150,7 @@ describe("Assessment routes", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          issues: ["establishmentFeedback : Obligatoire"],
+          issues: ["establishmentFeedback : Ce champ est obligatoire"],
           message:
             "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /auth/assessment",
           status: 400,

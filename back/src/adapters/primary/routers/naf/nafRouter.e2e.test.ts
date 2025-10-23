@@ -81,7 +81,7 @@ describe("naf Router", () => {
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /naf/section",
           status: 400,
-          issues: ["searchText : Obligatoire"],
+          issues: ["searchText : Ce champ est obligatoire"],
         },
         status: 400,
       });

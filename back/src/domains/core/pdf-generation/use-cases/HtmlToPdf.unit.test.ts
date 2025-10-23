@@ -39,7 +39,7 @@ describe("HtmlToPdf", () => {
       htmlToPdf.execute({ htmlContent: "", conventionId }, jwtPayload),
       errors.inputs.badSchema({
         useCaseName: "HtmlToPdf",
-        flattenErrors: ["htmlContent : Obligatoire"],
+        flattenErrors: ["htmlContent : Ce champ est obligatoire"],
       }),
     );
   });
