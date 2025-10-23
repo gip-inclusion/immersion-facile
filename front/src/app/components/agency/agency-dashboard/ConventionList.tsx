@@ -151,6 +151,24 @@ export const ConventionList = () => {
     [dateFilterStates.dateEnd, tempFilters],
   );
 
+  const onSubmit = (filtersToUse = tempFilters, searchQuery?: string) => {
+    if (!connectedUserJwt) return;
+
+    dispatch(
+      conventionListSlice.actions.fetchConventionListRequested({
+        jwt: connectedUserJwt,
+        filters: {
+          ...filters,
+          ...filtersToUse,
+          ...(searchQuery && { search: searchQuery }),
+          page: 1,
+          perPage: defaultPerPageInWebPagination,
+        },
+        feedbackTopic: "connected-user-conventionList",
+      }),
+    );
+  };
+
   useEffect(() => {
     if (connectedUserJwt) {
       dispatch(
@@ -359,6 +377,22 @@ export const ConventionList = () => {
                         </>
                       ),
                     },
+                    onReset: () => {
+                      setDateFilterStates((prev) => ({
+                        ...prev,
+                        dateStart: {
+                          type: "dateStartFrom",
+                          value: "",
+                        },
+                      }));
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        dateStartFrom: undefined,
+                        dateStartTo: undefined,
+                      }));
+
+                      onSubmit();
+                    },
                   },
                   {
                     id: "dateEnd",
@@ -411,38 +445,31 @@ export const ConventionList = () => {
                         </>
                       ),
                     },
+                    onReset: () => {
+                      setDateFilterStates((prev) => ({
+                        ...prev,
+                        dateEnd: {
+                          type: "dateEndFrom",
+                          value: "",
+                        },
+                      }));
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        dateEndFrom: undefined,
+                        dateEndTo: undefined,
+                      }));
+
+                      onSubmit();
+                    },
                   },
                 ],
-                onSubmit: () => {
-                  dispatch(
-                    conventionListSlice.actions.fetchConventionListRequested({
-                      jwt: connectedUserJwt,
-                      filters: {
-                        ...filters,
-                        ...tempFilters,
-                        page: 1,
-                        perPage: defaultPerPageInWebPagination,
-                      },
-                      feedbackTopic: "connected-user-conventionList",
-                    }),
-                  );
-                },
+                onSubmit: () => onSubmit(),
               }}
               searchBar={{
                 label: "Rechercher",
                 placeholder: "Rechercher",
                 onSubmit: (query: string) => {
-                  dispatch(
-                    conventionListSlice.actions.fetchConventionListRequested({
-                      jwt: connectedUserJwt,
-                      filters: {
-                        ...filters,
-                        search: query,
-                        page: 1,
-                      },
-                      feedbackTopic: "connected-user-conventionList",
-                    }),
-                  );
+                  onSubmit(tempFilters, query);
                 },
               }}
               pagination={{
