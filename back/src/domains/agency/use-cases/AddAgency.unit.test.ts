@@ -349,9 +349,9 @@ describe("AddAgency use case", () => {
         new BadRequestError(
           `Schema validation failed in usecase AddAgency for element with id ${agencyWithBadAddress.id}. See issues for details.`,
           [
-            "address.postcode : Obligatoire",
-            "address.departmentCode : Obligatoire",
-            "address.city : Obligatoire",
+            "address.postcode : Ce champ est obligatoire",
+            "address.departmentCode : Ce champ est obligatoire",
+            "address.city : Ce champ est obligatoire",
           ],
         ),
       );

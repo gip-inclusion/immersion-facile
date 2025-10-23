@@ -25,7 +25,7 @@ export const localization = {
   invalidApprovalFormatDate: "Le format de la date d'approbation est invalide",
   maxCharacters: (max: number) => `Le maximum est de ${max} caractères`,
   mustBeSignedByEveryone: "La confirmation de votre accord est obligatoire.",
-  required: "Obligatoire",
+  required: "Ce champ est obligatoire",
   signatoriesDistinctEmails:
     "Les emails des signataires doivent être différents.",
   signatoriesDistinctPhoneNumbers:

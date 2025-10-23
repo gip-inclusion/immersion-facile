@@ -163,8 +163,8 @@ describe("Contact establishment public v2 e2e", () => {
         message:
           "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /contact-establishment",
         issues: [
-          "appellationCode : Obligatoire",
-          "siret : Obligatoire",
+          "appellationCode : Ce champ est obligatoire",
+          "siret : Ce champ est obligatoire",
           'kind : Invalid input: expected "1_ELEVE_1_STAGE"',
           'immersionObjective : Invalid input: expected "Découvrir un métier ou un secteur d\'activité"',
           "levelOfEducation : Vous devez sélectionner une option parmi celles proposées",

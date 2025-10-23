@@ -361,7 +361,7 @@ describe("conventionDtoSchema", () => {
       .build();
 
     expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
-      "establishmentTutor.job": "Obligatoire",
+      "establishmentTutor.job": "Ce champ est obligatoire",
     });
   });
 
@@ -961,8 +961,8 @@ describe("conventionDtoSchema", () => {
       const expectedErrorMessages = {
         "signatories.beneficiary.levelOfEducation":
           "Votre niveau d'étude est obligatoire.",
-        "signatories.beneficiary.schoolName": "Obligatoire",
-        "signatories.beneficiary.schoolPostcode": "Obligatoire",
+        "signatories.beneficiary.schoolName": "Ce champ est obligatoire",
+        "signatories.beneficiary.schoolPostcode": "Ce champ est obligatoire",
       };
 
       expectConventionInvalidWithIssueMessages(
