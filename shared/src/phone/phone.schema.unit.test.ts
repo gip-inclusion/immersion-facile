@@ -104,6 +104,7 @@ describe("toInternationalPhoneNumber", () => {
     ["0441234567", "CH", "+41441234567"], // CH
     ["0612345678", "IT", "+390612345678"], // IT
     ["0986185807", "FR", "+33986185807"], // FR
+    ["0699160058", "FR", "+33699160058"], // FR actuellement converti en +596699160058 alors que ce n'est pas un numéro martiniquais
   ])(
     "should assign the right prefix to the phone number %s",
     async (phone, countryCode, expected) => {
