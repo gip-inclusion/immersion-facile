@@ -245,7 +245,7 @@ describe("convention e2e", () => {
             status: 400,
             message:
               "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /share-immersion-demand",
-            issues: ["conventionLink : Obligatoire"],
+            issues: ["conventionLink : Ce champ est obligatoire"],
           },
         });
       });
