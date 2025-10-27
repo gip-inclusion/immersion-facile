@@ -12,7 +12,7 @@ import { createPgQueries, createPgUow } from "./createPgUow";
 import { InMemoryUowPerformer } from "./InMemoryUowPerformer";
 import { PgUowPerformer } from "./PgUowPerformer";
 
-export const createUowPerformer = (
+export const createDbRelatedSystems = (
   config: AppConfig,
   getPgPoolFn: MakePgPool,
 ): {
@@ -30,10 +30,10 @@ export const createUowPerformer = (
     };
   }
 
-  return makeInMemoryUowPerformer(createInMemoryUow());
+  return makeInMemoryDbRelatedSystems(createInMemoryUow());
 };
 
-const makeInMemoryUowPerformer = (inMemoryUow: InMemoryUnitOfWork) => ({
+const makeInMemoryDbRelatedSystems = (inMemoryUow: InMemoryUnitOfWork) => ({
   inMemoryUow,
   uowPerformer: new InMemoryUowPerformer(inMemoryUow),
   queries: createInMemoryOutOfTransactionQueries(inMemoryUow),

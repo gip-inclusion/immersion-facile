@@ -8,7 +8,7 @@ import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/Resync
 import { makeRedisWithCache } from "../domains/core/caching-gateway/adapters/makeRedisWithCache";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -44,7 +44,7 @@ const executeUsecase = async () => {
     franceTravailRoutes,
   );
 
-  const { uowPerformer } = createUowPerformer(
+  const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );

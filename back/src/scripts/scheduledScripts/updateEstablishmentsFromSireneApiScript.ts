@@ -13,7 +13,7 @@ import {
 import { InseeSiretGateway } from "../../domains/core/sirene/adapters/InseeSiretGateway";
 import { inseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UpdateEstablishmentsFromSirenApiScript } from "../../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
 import { makeAxiosInstances } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
@@ -57,7 +57,7 @@ const updateEstablishmentsFromSireneApi = async () => {
     withNoCache,
   );
 
-  const { uowPerformer } = createUowPerformer(
+  const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );

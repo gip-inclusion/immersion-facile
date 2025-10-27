@@ -4,7 +4,7 @@ import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { makeMarkOldConventionAsDeprecated } from "../../domains/convention/MarkOldConventionAsDeprecated";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
@@ -18,7 +18,7 @@ const markOldConventionAsDeprecated = async () => {
 
   const { numberOfUpdatedConventions } =
     await makeMarkOldConventionAsDeprecated({
-      uowPerformer: createUowPerformer(
+      uowPerformer: createDbRelatedSystems(
         config,
         createMakeProductionPgPool(config),
       ).uowPerformer,

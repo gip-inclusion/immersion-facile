@@ -2,7 +2,7 @@ import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { createLogger } from "../../utils/logger";
@@ -26,8 +26,10 @@ const executeContactRequestReminder = () => {
       ),
       timeGateway: timeGateway,
     },
-    uowPerformer: createUowPerformer(config, createMakeProductionPgPool(config))
-      .uowPerformer,
+    uowPerformer: createDbRelatedSystems(
+      config,
+      createMakeProductionPgPool(config),
+    ).uowPerformer,
   }).execute("7days");
 };
 

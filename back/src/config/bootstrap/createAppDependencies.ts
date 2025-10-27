@@ -15,7 +15,7 @@ import {
   makeVerifyJwtES256,
   type VerifyJwtFn,
 } from "../../domains/core/jwt";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   makeHandleManagedRedirectResponseError,
@@ -44,7 +44,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createMakeProductionPgPool(config);
   const gateways = await createGateways(config, uuidGenerator);
 
-  const { uowPerformer, inMemoryUow, queries } = createUowPerformer(
+  const { uowPerformer, inMemoryUow, queries } = createDbRelatedSystems(
     config,
     getPgPoolFn,
   );
