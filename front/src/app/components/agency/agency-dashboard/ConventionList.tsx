@@ -397,6 +397,14 @@ export const ConventionList = () => {
                         </>
                       ),
                     },
+                    onReset: () => {
+                      const newFilters = {
+                        ...tempFilters,
+                        statuses: undefined,
+                      };
+                      setTempFilters(newFilters);
+                      onSubmit(newFilters);
+                    },
                   },
                   {
                     id: "dateStart",
