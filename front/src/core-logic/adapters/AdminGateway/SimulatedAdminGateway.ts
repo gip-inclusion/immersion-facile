@@ -16,7 +16,7 @@ import {
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserId,
   type UserParamsForAgency,
-  type UserWithNumberOfAgencies,
+  type UserWithNumberOfAgenciesAndEstablishments,
   type WithAgencyIdAndUserId,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -221,7 +221,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   public listUsers$(
     { emailContains }: GetUsersFilters,
     _token: string,
-  ): Observable<UserWithNumberOfAgencies[]> {
+  ): Observable<UserWithNumberOfAgenciesAndEstablishments[]> {
     return of(
       simulatedUsers.filter((user) => user.email.includes(emailContains)),
     );
@@ -252,7 +252,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 }
 
-const simulatedUsers: UserWithNumberOfAgencies[] = [
+const simulatedUsers: UserWithNumberOfAgenciesAndEstablishments[] = [
   {
     id: "fake-user-id-1",
     email: "jerome@mail.com",
@@ -260,6 +260,7 @@ const simulatedUsers: UserWithNumberOfAgencies[] = [
     lastName: "Yolo",
     createdAt: new Date().toISOString(),
     numberOfAgencies: 10,
+    numberOfEstablishments: 5,
     proConnect: {
       externalId: "external-id-1",
       siret: "00000000001111",
@@ -272,6 +273,7 @@ const simulatedUsers: UserWithNumberOfAgencies[] = [
     lastName: "Lala",
     createdAt: new Date().toISOString(),
     numberOfAgencies: 3,
+    numberOfEstablishments: 2,
     proConnect: {
       externalId: "external-id-2",
       siret: "00000000002222",

@@ -12,7 +12,7 @@ import type {
   RejectConnectedUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserParamsForAgency,
-  UserWithNumberOfAgencies,
+  UserWithNumberOfAgenciesAndEstablishments,
   WithAgencyIdAndUserId,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -48,7 +48,9 @@ export class TestAdminGateway implements AdminGateway {
 
   public createUserForAgencyResponse$ = new Subject<ConnectedUser>();
 
-  public listUsersResponse$ = new Subject<UserWithNumberOfAgencies[]>();
+  public listUsersResponse$ = new Subject<
+    UserWithNumberOfAgenciesAndEstablishments[]
+  >();
 
   public getIcUserResponse$ = new Subject<ConnectedUser>();
 
@@ -119,7 +121,7 @@ export class TestAdminGateway implements AdminGateway {
   public listUsers$(
     _params: GetUsersFilters,
     _token: string,
-  ): Observable<UserWithNumberOfAgencies[]> {
+  ): Observable<UserWithNumberOfAgenciesAndEstablishments[]> {
     return this.listUsersResponse$;
   }
 
