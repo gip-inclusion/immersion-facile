@@ -259,10 +259,10 @@ export const ConventionList = () => {
       return [
         "Conseiller",
         "Statut",
+        "Bilan",
         "Personne en immersion",
         "Établissement",
         "Dates",
-        "Bilan",
         "Actions",
       ];
     }
@@ -320,6 +320,12 @@ export const ConventionList = () => {
                     {labelAndSeverityByStatus[convention.status].label}
                   </Badge>
                 </Fragment>,
+                <Fragment key={convention.id}>
+                  <strong>
+                    {convention.status === "ACCEPTED_BY_VALIDATOR" &&
+                      (convention.assessment ? "✅ oui" : "❌ non")}
+                  </strong>
+                </Fragment>,
 
                 <Fragment key={convention.id}>
                   <strong>
@@ -345,12 +351,7 @@ export const ConventionList = () => {
                     withHours: false,
                   })}
                 </Fragment>,
-                <Fragment key={convention.id}>
-                  <strong>
-                    {convention.status === "ACCEPTED_BY_VALIDATOR" &&
-                      (convention.assessment ? "✅ oui" : "❌ non")}
-                  </strong>
-                </Fragment>,
+
                 <Button
                   key={convention.id}
                   id={`${domElementIds.agencyDashboard.dashboard.goToConventionButton}--${convention.id}`}
