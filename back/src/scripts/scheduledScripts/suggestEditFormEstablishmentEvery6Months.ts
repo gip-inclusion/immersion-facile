@@ -3,7 +3,7 @@ import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SuggestEditEstablishment } from "../../domains/establishment/use-cases/SuggestEditEstablishment";
 import { SuggestEditEstablishmentsScript } from "../../domains/establishment/use-cases/SuggestEditEstablishmentsScript";
@@ -19,7 +19,7 @@ type Report = {
 const startScript = async (): Promise<Report> => {
   const timeGateway = new RealTimeGateway();
   const uuidGenerator = new UuidV4Generator();
-  const { uowPerformer } = createUowPerformer(
+  const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );

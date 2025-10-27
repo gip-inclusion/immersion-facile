@@ -14,7 +14,7 @@ import { HttpAddressGateway } from "../domains/core/address/adapters/HttpAddress
 import { addressesExternalRoutes } from "../domains/core/address/adapters/HttpAddressGateway.routes";
 import { withNoCache } from "../domains/core/caching-gateway/adapters/withNoCache";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -64,8 +64,10 @@ const triggerAddAgenciesAndUsers = async () => {
     usersAlreadyInIFCount,
     usecaseErrors,
   } = await makeAddAgenciesAndUsers({
-    uowPerformer: createUowPerformer(config, createMakeProductionPgPool(config))
-      .uowPerformer,
+    uowPerformer: createDbRelatedSystems(
+      config,
+      createMakeProductionPgPool(config),
+    ).uowPerformer,
     deps: {
       timeGateway: new RealTimeGateway(),
       uuidGenerator: new UuidV4Generator(),
