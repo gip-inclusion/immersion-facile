@@ -37,7 +37,7 @@ export const AgencyTab = () => {
   );
 };
 
-const AgencyDashboard = ({ agency }: { agency: AgencyDto }) => {
+export const AgencyDashboard = ({ agency }: { agency: AgencyDto }) => {
   const { url, error } = useAdminDashboard({
     name: "adminAgencyDetails",
     agencyId: agency.id,

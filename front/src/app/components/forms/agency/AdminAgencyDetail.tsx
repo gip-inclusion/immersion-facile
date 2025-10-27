@@ -3,6 +3,7 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { AgencyOverview } from "src/app/components/forms/agency/AgencyOverview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { AgencyDashboard } from "src/app/pages/admin/AgencyTab";
 import type { routes } from "src/app/routes/routes";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -39,10 +40,13 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
   if (!agency) return <Loader />;
 
   return (
-    <AgencyOverview
-      agency={agency}
-      agencyUsers={agencyUsersById}
-      routeName={route.name}
-    />
+    <>
+      <AgencyOverview
+        agency={agency}
+        agencyUsers={agencyUsersById}
+        routeName={route.name}
+      />
+      <AgencyDashboard agency={agency} />
+    </>
   );
 };
