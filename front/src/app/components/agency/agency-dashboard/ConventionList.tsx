@@ -62,6 +62,7 @@ export const ConventionList = () => {
     filters,
   } = useAppSelector(conventionListSelectors.conventionsWithPagination);
   const hasConventions = conventions.length > 0;
+  const hasManyAgencies = (currentUser?.agencyRights?.length ?? 0) > 1;
   const filtersAreEmpty = equals(
     filters,
     initialConventionWithPagination.filters,
@@ -78,6 +79,7 @@ export const ConventionList = () => {
           "dateEndFrom",
           "dateEndTo",
           "assessmentCompletionStatus",
+          "agencyIds",
         ],
         initialConventionWithPagination.filters,
       ),
@@ -93,6 +95,7 @@ export const ConventionList = () => {
         | "dateEndFrom"
         | "dateEndTo"
         | "assessmentCompletionStatus"
+        | "agencyIds"
       >
     >(defaultFilters);
 
@@ -144,6 +147,7 @@ export const ConventionList = () => {
       label: labelAndSeverityByStatus[status].label,
       nativeInputProps: {
         value: status,
+        checked: tempFilters.statuses?.includes(status) ?? false,
         onChange: (event) => {
           const existingStatuses = tempFilters.statuses ?? [];
           const newStatuses =
@@ -162,6 +166,32 @@ export const ConventionList = () => {
       },
     }));
   }, [tempFilters]);
+
+  const agencyOptions: CheckboxProps["options"] = useMemo(() => {
+    if (!hasManyAgencies || !currentUser?.agencyRights) return [];
+
+    return currentUser.agencyRights.map((agencyRight) => ({
+      label: agencyRight.agency.name,
+      nativeInputProps: {
+        value: agencyRight.agency.id,
+        checked:
+          tempFilters.agencyIds?.includes(agencyRight.agency.id) ?? false,
+        onChange: (event) => {
+          const existingAgencyIds = tempFilters.agencyIds ?? [];
+          const newAgencyIds = event.currentTarget.checked
+            ? [...existingAgencyIds, event.currentTarget.value]
+            : existingAgencyIds.filter(
+                (id) => id !== event.currentTarget.value,
+              );
+
+          setTempFilters({
+            ...tempFilters,
+            agencyIds: isNotEmptyArray(newAgencyIds) ? newAgencyIds : undefined,
+          });
+        },
+      },
+    }));
+  }, [hasManyAgencies, currentUser?.agencyRights, tempFilters]);
 
   const startDateOptions: RadioButtonsProps["options"] = useMemo(
     () =>
@@ -541,6 +571,58 @@ export const ConventionList = () => {
                       onSubmit(newFilters);
                     },
                   },
+                  ...(hasManyAgencies
+                    ? [
+                        {
+                          id: "agencies",
+                          iconId: "fr-icon-checkbox-line" as const,
+                          defaultValue: "Toutes les agences",
+                          values: [
+                            (() => {
+                              if (filters.agencyIds?.length) {
+                                const selectedAgencies =
+                                  currentUser?.agencyRights
+                                    ?.filter((agencyRight) =>
+                                      filters.agencyIds?.includes(
+                                        agencyRight.agency.id,
+                                      ),
+                                    )
+                                    .map(
+                                      (agencyRight) => agencyRight.agency.name,
+                                    );
+
+                                if (selectedAgencies?.length === 1) {
+                                  return selectedAgencies[0];
+                                }
+                                if (
+                                  selectedAgencies &&
+                                  selectedAgencies.length > 1
+                                ) {
+                                  return `Agences (${selectedAgencies.length})`;
+                                }
+                              }
+                              return "Toutes les agences";
+                            })(),
+                          ],
+                          submenu: {
+                            title: "Filtrer par agence",
+                            content: (
+                              <>
+                                <Checkbox options={agencyOptions} />
+                              </>
+                            ),
+                          },
+                          onReset: () => {
+                            const newFilters = {
+                              ...tempFilters,
+                              agencyIds: undefined,
+                            };
+                            setTempFilters(newFilters);
+                            onSubmit(newFilters);
+                          },
+                        },
+                      ]
+                    : []),
                 ],
                 onSubmit: () => onSubmit(),
               }}

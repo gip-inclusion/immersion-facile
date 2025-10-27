@@ -1529,5 +1529,81 @@ describe("Pg implementation of ConventionQueries", () => {
         totalRecords: 0,
       });
     });
+
+    it("should filter conventions by agencyIds", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { agencyIds: [agencyId] },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expect(result.data.length).toBe(3);
+      expectToEqual(result.data, [
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
+        { ...conventionB, ...agencyFields, assessment: null },
+        { ...conventionA, ...agencyFields, assessment: null },
+      ]);
+
+      // Verify all returned conventions belong to the specified agency
+      const allConventionsBelongToSpecifiedAgency = result.data.every(
+        (convention) => convention.agencyId === agencyId,
+      );
+      expect(allConventionsBelongToSpecifiedAgency).toBe(true);
+    });
+
+    it("should filter conventions by multiple agencyIds", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { agencyIds: [agencyId, differentAgencyId] },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expect(result.data.length).toBe(4);
+      expectToEqual(result.data, [
+        { ...conventionD, ...differentAgencyFields, assessment: null },
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
+        { ...conventionB, ...agencyFields, assessment: null },
+        { ...conventionA, ...agencyFields, assessment: null },
+      ]);
+    });
+
+    it("should filter conventions by agencyIds combined with other filters", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: {
+            agencyIds: [agencyId],
+            statuses: ["READY_TO_SIGN"],
+          },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expect(result.data.length).toBe(1);
+      expectToEqual(result.data, [
+        { ...conventionA, ...agencyFields, assessment: null },
+      ]);
+    });
   });
 });
