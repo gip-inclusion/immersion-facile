@@ -52,16 +52,16 @@ jobs:
           key: ${{ runner.os }}-pnpm-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-node-modules-
 
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+
       - name: Cache Playwright Browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-playwright-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+          restore-keys: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install Playwright browsers if not cached
         if: ${{ matrix.command == 'pnpm typecheck' && steps.playwright-cache.outputs.cache-hit != 'true' }}
@@ -209,16 +209,22 @@ jobs:
           key: ${{ runner.os }}-pnpm-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-node-modules-
 
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+
+      - name: Get Playwright version
+        id: playwright-version
+        run: |
+          version=$(pnpm ls @playwright/test --depth -1 -r | grep '@playwright/test' | awk '{print $2}')
+          echo "version=$version" >> $GITHUB_OUTPUT
+
       - name: Cache Playwright Browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('playwright/package.json') }}
-          restore-keys: ${{ runner.os }}-playwright-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
 
       - name: Install Playwright browsers if not cached
         if: steps.playwright-cache.outputs.cache-hit != 'true'
