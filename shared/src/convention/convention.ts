@@ -245,6 +245,7 @@ export const flatParamsToGetConventionsForAgencyUserParams = (
     dateEndTo,
     dateSubmissionFrom,
     dateSubmissionTo,
+    assessmentCompletionStatus,
     ...rest
   } = flatParams;
 
@@ -268,6 +269,7 @@ export const flatParamsToGetConventionsForAgencyUserParams = (
         from: dateSubmissionFrom,
         to: dateSubmissionTo,
       },
+      assessmentCompletionStatus,
     },
     sort: {
       by: sortBy,
