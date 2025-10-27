@@ -57,16 +57,11 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('playwright/package.json') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
-
-      - name: Debug hash
-        run: |
-          echo "Lock hash: ${{ hashFiles('**/pnpm-lock.yaml') }}"
-          echo "Pkg hash:  ${{ hashFiles('playwright/package.json') }}"
 
       - name: Install Playwright browsers if not cached
         if: ${{ matrix.command == 'pnpm typecheck' && steps.playwright-cache.outputs.cache-hit != 'true' }}
@@ -219,7 +214,7 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('playwright/package.json') }}
           restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install dependencies
