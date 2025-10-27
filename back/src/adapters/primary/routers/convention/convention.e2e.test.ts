@@ -1037,6 +1037,123 @@ describe("convention e2e", () => {
         },
       ]);
     });
+
+    it("200 - Successfully gets conventions with assessment completion status filter - completed", async () => {
+      gateways.timeGateway.setNextDate(new Date());
+      const jwt = generateConnectedUserJwt({
+        userId: validator.id,
+        version: currentJwtVersions.connectedUser,
+        iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+      });
+
+      const response = await authenticatedRequest.getConventionsForAgencyUser({
+        headers: { authorization: jwt },
+        queryParams: {
+          assessmentCompletionStatus: "completed",
+          sortBy: "dateStart",
+          page: 1,
+          perPage: 10,
+        },
+      });
+
+      const agencyFields = {
+        agencyName: peAgency.name,
+        agencyDepartment: peAgency.address.departmentCode,
+        agencyKind: peAgency.kind,
+        agencySiret: peAgency.agencySiret,
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: [validator.email],
+        agencyRefersTo: undefined,
+      };
+
+      const conventionRead1 = {
+        ...convention1,
+        ...agencyFields,
+        assessment: {
+          status: "COMPLETED" as const,
+          endedWithAJob: false,
+        },
+      };
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          data: [conventionRead1],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        },
+      });
+
+      expectToEqual(inMemoryUow.conventionQueries.paginatedConventionsParams, [
+        {
+          agencyUserId: validator.id,
+          filters: {
+            assessmentCompletionStatus: "completed",
+          },
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          sort: {
+            by: "dateStart",
+            direction: "desc",
+          },
+        },
+      ]);
+    });
+
+    it("200 - Successfully gets conventions with assessment completion status filter - to-be-completed", async () => {
+      gateways.timeGateway.setNextDate(new Date());
+      const jwt = generateConnectedUserJwt({
+        userId: validator.id,
+        version: currentJwtVersions.connectedUser,
+        iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+      });
+
+      const response = await authenticatedRequest.getConventionsForAgencyUser({
+        headers: { authorization: jwt },
+        queryParams: {
+          assessmentCompletionStatus: "to-be-completed",
+          sortBy: "dateStart",
+          page: 1,
+          perPage: 10,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 0,
+            numberPerPage: 10,
+            totalRecords: 0,
+          },
+        },
+      });
+
+      expectToEqual(inMemoryUow.conventionQueries.paginatedConventionsParams, [
+        {
+          agencyUserId: validator.id,
+          filters: {
+            assessmentCompletionStatus: "to-be-completed",
+          },
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          sort: {
+            by: "dateStart",
+            direction: "desc",
+          },
+        },
+      ]);
+    });
   });
 
   describe(`${displayRouteName(
