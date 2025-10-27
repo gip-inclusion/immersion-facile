@@ -14,7 +14,7 @@ import type {
   SetFeatureFlagParam,
   UserId,
   UserParamsForAgency,
-  UserWithNumberOfAgencies,
+  UserWithNumberOfAgenciesAndEstablishments,
   WithAgencyIdAndUserId,
   WithUserFilters,
 } from "shared";
@@ -73,7 +73,7 @@ export interface AdminGateway {
   listUsers$(
     params: GetUsersFilters,
     token: ConnectedUserJwt,
-  ): Observable<UserWithNumberOfAgencies[]>;
+  ): Observable<UserWithNumberOfAgenciesAndEstablishments[]>;
 
   getIcUser$(
     params: { userId: UserId },

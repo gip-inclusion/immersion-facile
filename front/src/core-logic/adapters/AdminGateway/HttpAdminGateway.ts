@@ -15,7 +15,7 @@ import {
   type SetFeatureFlagParam,
   type UserId,
   type UserParamsForAgency,
-  type UserWithNumberOfAgencies,
+  type UserWithNumberOfAgenciesAndEstablishments,
   type WithAgencyIdAndUserId,
   type WithUserFilters,
 } from "shared";
@@ -250,7 +250,7 @@ export class HttpAdminGateway implements AdminGateway {
   public listUsers$(
     filters: GetUsersFilters,
     token: ConnectedUserJwt,
-  ): Observable<UserWithNumberOfAgencies[]> {
+  ): Observable<UserWithNumberOfAgenciesAndEstablishments[]> {
     return from(
       this.httpClient
         .getUsers({ headers: { authorization: token }, queryParams: filters })

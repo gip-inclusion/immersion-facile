@@ -1,4 +1,7 @@
-import { expectToEqual, type UserWithNumberOfAgencies } from "shared";
+import {
+  expectToEqual,
+  type UserWithNumberOfAgenciesAndEstablishments,
+} from "shared";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import {
@@ -7,7 +10,7 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
-const someUser: UserWithNumberOfAgencies = {
+const someUser: UserWithNumberOfAgenciesAndEstablishments = {
   id: "some-user-id",
   email: "yolo@mail.com",
   firstName: "Yo",
@@ -18,6 +21,7 @@ const someUser: UserWithNumberOfAgencies = {
   },
   createdAt: new Date().toISOString(),
   numberOfAgencies: 2,
+  numberOfEstablishments: 1,
 };
 
 describe("Admin Users slice", () => {
@@ -62,7 +66,9 @@ describe("Admin Users slice", () => {
     expectToEqual(listUsersSelectors.users(store.getState()), [someUser]);
   });
 
-  const feedWithUsers = (users: UserWithNumberOfAgencies[]) => {
+  const feedWithUsers = (
+    users: UserWithNumberOfAgenciesAndEstablishments[],
+  ) => {
     dependencies.adminGateway.listUsersResponse$.next(users);
   };
 

@@ -1,5 +1,6 @@
 import type { Pool } from "pg";
 import {
+  AgencyDtoBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -12,6 +13,10 @@ import {
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../../config/pg/pgPool";
+import { toAgencyWithRights } from "../../../../../utils/agency";
+import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
+import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 import { PgUserRepository } from "./PgUserRepository";
 
@@ -227,7 +232,7 @@ describe("PgAuthenticatedUserRepository", () => {
         expectToEqual(users, []);
       });
 
-      it("returns all the users with email matching filter", async () => {
+      it("returns all the users with email matching filter, with no agencies and establishment match", async () => {
         const userNotIcConnected: User = {
           ...user,
           firstName: "",
@@ -239,10 +244,65 @@ describe("PgAuthenticatedUserRepository", () => {
         await insertUser(db, user2, false);
         await insertUser(db, userNotIcConnected, false);
 
+        const withNoAgenciesOrEstablishements = {
+          numberOfAgencies: 0,
+          numberOfEstablishments: 0,
+        };
+
         expectToEqual(await userRepository.getUsers({ emailContains: "j" }), [
-          { ...user2, proConnect: null },
-          userNotIcConnected,
-          user1,
+          { ...user2, proConnect: null, ...withNoAgenciesOrEstablishements },
+          { ...userNotIcConnected, ...withNoAgenciesOrEstablishements },
+          { ...user1, ...withNoAgenciesOrEstablishements },
+        ]);
+      });
+
+      it("returns user with 1 agency and 1 establishment", async () => {
+        await insertUser(db, user1, true);
+
+        await db.deleteFrom("conventions").execute();
+        await db.deleteFrom("agencies").execute();
+        await db.deleteFrom("establishments").execute();
+
+        const agencyRepository = new PgAgencyRepository(db);
+        const agency = new AgencyDtoBuilder().build();
+
+        await agencyRepository.insert(
+          toAgencyWithRights(agency, {
+            [user1.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        );
+
+        const establishmentRepository = new PgEstablishmentAggregateRepository(
+          db,
+        );
+        const establishmentAggregate = new EstablishmentAggregateBuilder()
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              job: "Chef",
+              userId: user1.id,
+              shouldReceiveDiscussionNotifications: true,
+              phone: "+33611223344",
+              isMainContactByPhone: false,
+              isMainContactInPerson: false,
+            },
+          ])
+          .build();
+        await establishmentRepository.insertEstablishmentAggregate(
+          establishmentAggregate,
+        );
+
+        const users = await userRepository.getUsers({ emailContains: "john" });
+
+        expectToEqual(users, [
+          {
+            ...user1,
+            numberOfAgencies: 1,
+            numberOfEstablishments: 1,
+          },
         ]);
       });
     });

@@ -3,6 +3,7 @@ import type {
   GetUsersFilters,
   UserId,
   UserWithAdminRights,
+  UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
 
 export interface UserRepository {
@@ -11,7 +12,9 @@ export interface UserRepository {
   delete(id: UserId): Promise<void>;
   getById(userId: UserId): Promise<UserWithAdminRights | undefined>;
   getByIds(userIds: UserId[]): Promise<UserWithAdminRights[]>;
-  getUsers(filters: GetUsersFilters): Promise<UserWithAdminRights[]>;
+  getUsers(
+    filters: GetUsersFilters,
+  ): Promise<UserWithNumberOfAgenciesAndEstablishments[]>;
   findByExternalId(
     externalId: string,
   ): Promise<UserWithAdminRights | undefined>;

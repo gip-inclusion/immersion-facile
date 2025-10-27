@@ -5,6 +5,7 @@ import {
   type GetUsersFilters,
   type UserId,
   type UserWithAdminRights,
+  type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
 import type { UserRepository } from "../port/UserRepository";
 
@@ -90,10 +91,16 @@ export class InMemoryUserRepository implements UserRepository {
 
   public async getUsers(
     filters: GetUsersFilters,
-  ): Promise<UserWithAdminRights[]> {
-    return this.users.filter((user) =>
-      user.email.toLowerCase().includes(filters.emailContains.toLowerCase()),
-    );
+  ): Promise<UserWithNumberOfAgenciesAndEstablishments[]> {
+    return this.users
+      .filter((user) =>
+        user.email.toLowerCase().includes(filters.emailContains.toLowerCase()),
+      )
+      .map((u) => ({
+        ...u,
+        numberOfAgencies: 404, // no need to implement this
+        numberOfEstablishments: 404, // no need to implement this
+      }));
   }
 
   public async updateEmail(userId: UserId, email: string): Promise<void> {
