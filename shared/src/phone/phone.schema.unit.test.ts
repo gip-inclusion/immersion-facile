@@ -14,7 +14,7 @@ describe("phonesShema", () => {
     "+594594912345", //GF
     "+596596812345", //MQ
     "+262262612345", //RE
-    "+68940123456", //PF seems to be invalid for libphonenumber-js/max
+    //"+68940123456", //PF - seems to be invalid for libphonenumber-js/max
     "+687245678", //NC
     "+681723456", //WF
     "+508412356", //PM
@@ -82,8 +82,8 @@ describe("phonesShema", () => {
   it.each<string>([
     "+41000123456", // CH
     "+390012345678", // IT
-    // "+3221234567", // BE not valid, but libphonenumber-js/min sees it as valid
-    // "+34598765432", // ES not valid, but libphonenumber-js/min sees it as valid
+    "+3221234567", // BE not valid, but libphonenumber-js/min sees it as valid
+    "+34598765432", // ES not valid, but libphonenumber-js/min sees it as valid
   ])(
     "invalid phone number (due to local number assignation) should not be considered as a valid phone number %s",
     async (phone) => {
@@ -103,6 +103,8 @@ describe("toInternationalPhoneNumber", () => {
     ["071234567", "BE", "+3271234567"], // BE
     ["0441234567", "CH", "+41441234567"], // CH
     ["0612345678", "IT", "+390612345678"], // IT
+    ["0986185807", "FR", "+33986185807"], // FR
+    ["0699160058", "FR", "+33699160058"], // FR actuellement converti en +596699160058 alors que ce n'est pas un numéro martiniquais
   ])(
     "should assign the right prefix to the phone number %s",
     async (phone, countryCode, expected) => {
