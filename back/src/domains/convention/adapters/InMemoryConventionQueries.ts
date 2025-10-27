@@ -11,6 +11,7 @@ import {
   errors,
   type FindSimilarConventionsParams,
   filter,
+  type GetPaginatedConventionsFilters,
   NotFoundError,
   pipeWithValue,
   type SiretDto,
@@ -167,14 +168,22 @@ export class InMemoryConventionQueries implements ConventionQueries {
       paginatedData.map((convention) =>
         this.#addAgencyAndAssessmentDataToConvention(convention),
       ),
+    ).then((conventionsRead) =>
+      params.filters?.assessmentCompletionStatus
+        ? conventionsRead.filter(
+            makeApplyAssessmentCompletionStatusFilterConventionsRead(
+              params.filters,
+            ),
+          )
+        : conventionsRead,
     );
 
     return {
       data: conventionsRead,
       pagination: {
-        totalRecords: conventions.length,
+        totalRecords: conventionsRead.length,
         currentPage: page,
-        totalPages: Math.ceil(conventions.length / perPage),
+        totalPages: Math.ceil(conventionsRead.length / perPage),
         numberPerPage: perPage,
       },
     };
@@ -368,3 +377,16 @@ const makeApplyFiltersToConventions =
             : true,
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
+
+const makeApplyAssessmentCompletionStatusFilterConventionsRead =
+  ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
+  (convention: ConventionReadDto) => {
+    if (!assessmentCompletionStatus) return true;
+
+    return (
+      convention.status === "ACCEPTED_BY_VALIDATOR" &&
+      (assessmentCompletionStatus === "completed"
+        ? convention.assessment !== null
+        : convention.assessment === null)
+    );
+  };

@@ -61,6 +61,7 @@ import {
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
+  assessmentCompletionStatusFilters,
   BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
@@ -870,6 +871,11 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
     dateEndTo: makeDateStringSchema().optional(),
     dateSubmissionFrom: makeDateStringSchema().optional(),
     dateSubmissionTo: makeDateStringSchema().optional(),
+
+    // assessment filter
+    assessmentCompletionStatus: z
+      .enum(assessmentCompletionStatusFilters)
+      .optional(),
   });
 
 const withSortedConventionsSchema = withOptionalSortSchema(
@@ -893,6 +899,9 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
           dateStart: dateFilterSchema.optional(),
           dateEnd: dateFilterSchema.optional(),
           dateSubmission: dateFilterSchema.optional(),
+          assessmentCompletionStatus: z
+            .enum(assessmentCompletionStatusFilters)
+            .optional(),
         })
         .optional(),
       pagination: paginationQueryParamsSchema.optional(),

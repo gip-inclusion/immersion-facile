@@ -1350,6 +1350,27 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
 
+    it("should filter conventions by assessment completion status - completed", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { assessmentCompletionStatus: "completed" },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expectToEqual(result.data, [
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: { status: "COMPLETED", endedWithAJob: false },
+        },
+      ]);
+    });
+
     it("should sort conventions by dateStart", async () => {
       const result =
         await conventionQueries.getPaginatedConventionsForAgencyUser({

@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { jsonBuildObject } from "kysely/helpers/postgres";
 import { andThen } from "ramda";
 import {
+  type AssessmentCompletionStatusFilter,
   type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
@@ -254,6 +255,7 @@ export class PgConventionQueries implements ConventionQueries {
       dateStart,
       dateEnd,
       dateSubmission,
+      assessmentCompletionStatus,
       ...rest
     } = filters;
 
@@ -271,6 +273,7 @@ export class PgConventionQueries implements ConventionQueries {
       filterInList("status", statuses),
       filterInList("agency_id", agencyIds),
       filterByAgencyDepartmentCodes(agencyDepartmentCodes),
+      filterAssessmentCompletionStatus(assessmentCompletionStatus),
       sortConventions(sort),
       applyPagination(pagination),
     ).execute();
@@ -379,6 +382,46 @@ const filterByAgencyDepartmentCodes =
       "in",
       agencyDepartmentCodes,
     );
+  };
+
+const filterAssessmentCompletionStatus =
+  (assessmentCompletionStatus: AssessmentCompletionStatusFilter | undefined) =>
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
+    if (!assessmentCompletionStatus) {
+      return builder;
+    }
+
+    if (assessmentCompletionStatus === "completed") {
+      return builder
+        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+        .where((eb) =>
+          eb.exists(
+            eb
+              .selectFrom("immersion_assessments")
+              .select("convention_id")
+              .where("convention_id", "=", eb.ref("conventions.id")),
+          ),
+        );
+    }
+
+    if (assessmentCompletionStatus === "to-be-completed") {
+      return builder
+        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+        .where((eb) =>
+          eb.not(
+            eb.exists(
+              eb
+                .selectFrom("immersion_assessments")
+                .select("convention_id")
+                .where("convention_id", "=", eb.ref("conventions.id")),
+            ),
+          ),
+        );
+    }
+
+    return builder;
   };
 
 const filterDate =
