@@ -48,6 +48,7 @@ export const UserProfile = ({
     />
     <EstablishmentsTablesSection
       withEstablishmentData={userWithRights.establishments}
+      isBackofficeAdmin={currentUser.isBackofficeAdmin}
     />
   </div>
 );
