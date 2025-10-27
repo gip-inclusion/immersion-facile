@@ -1080,6 +1080,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     const conventionA = new ConventionDtoBuilder()
       .withId("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+      .withSiret("12345678901235")
       .withAgencyId(agencyId)
       .withBeneficiaryEmail("beneficiary@convention-a.com")
       .withStatus("READY_TO_SIGN")
@@ -1285,6 +1286,22 @@ describe("Pg implementation of ConventionQueries", () => {
       expect(result.data.length).toBe(1);
       expectToEqual(result.data, [
         { ...conventionB, ...agencyFields, assessment: null },
+      ]);
+    });
+
+    it("should filter conventions by establishment SIRET", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { search: conventionA.siret },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+      expectToEqual(result.data, [
+        { ...conventionA, ...agencyFields, assessment: null },
       ]);
     });
 
