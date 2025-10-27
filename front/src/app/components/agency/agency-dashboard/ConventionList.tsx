@@ -229,10 +229,10 @@ export const ConventionList = () => {
       return [
         "Conseiller",
         "Statut",
-        "Bilan",
         "Personne en immersion",
         "Établissement",
         "Dates",
+        "Bilan",
         "Actions",
       ];
     }
@@ -290,12 +290,7 @@ export const ConventionList = () => {
                     {labelAndSeverityByStatus[convention.status].label}
                   </Badge>
                 </Fragment>,
-                <Fragment key={convention.id}>
-                  <strong>
-                    {convention.status === "ACCEPTED_BY_VALIDATOR" &&
-                      (convention.assessment ? "✅ oui" : "❌ non")}
-                  </strong>
-                </Fragment>,
+
                 <Fragment key={convention.id}>
                   <strong>
                     {getFormattedFirstnameAndLastname({
@@ -308,17 +303,23 @@ export const ConventionList = () => {
                   <strong>{convention.businessName}</strong>
                 </Fragment>,
                 <Fragment key={convention.id}>
-                  Du{" "}
+                  Du&nbsp;
                   {toDisplayedDate({
                     date: new Date(convention.dateStart),
                     withHours: false,
                   })}
                   <br />
-                  Au{" "}
+                  Au&nbsp;
                   {toDisplayedDate({
                     date: new Date(convention.dateEnd),
                     withHours: false,
                   })}
+                </Fragment>,
+                <Fragment key={convention.id}>
+                  <strong>
+                    {convention.status === "ACCEPTED_BY_VALIDATOR" &&
+                      (convention.assessment ? "✅ oui" : "❌ non")}
+                  </strong>
                 </Fragment>,
                 <Button
                   key={convention.id}
