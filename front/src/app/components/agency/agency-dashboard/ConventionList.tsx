@@ -209,7 +209,7 @@ export const ConventionList = () => {
         conventionListSlice.actions.fetchConventionListRequested({
           filters: {
             sortBy: "dateStart",
-            sortDirection: "asc",
+            sortDirection: "desc",
             page: 1,
             perPage: 10,
           },
@@ -293,7 +293,7 @@ export const ConventionList = () => {
                 <Fragment key={convention.id}>
                   <strong>
                     {convention.status === "ACCEPTED_BY_VALIDATOR" &&
-                      (convention.assessment ? "✅" : "❌")}
+                      (convention.assessment ? "✅ oui" : "❌ non")}
                   </strong>
                 </Fragment>,
                 <Fragment key={convention.id}>
