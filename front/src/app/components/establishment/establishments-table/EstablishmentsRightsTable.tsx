@@ -9,8 +9,10 @@ import { EstablishmentLineBusinessName } from "./establishment-line/Establishmen
 
 export const EstablishmentsRightsTable = ({
   withEstablishmentData,
+  isBackofficeAdmin,
 }: {
   withEstablishmentData: EstablishmentData[];
+  isBackofficeAdmin?: boolean;
 }) => (
   <>
     <h2 className={fr.cx("fr-h4")}>
@@ -24,18 +26,22 @@ export const EstablishmentsRightsTable = ({
       headers={["Établissement", "Administrateurs", "Rôle"]}
       data={[...withEstablishmentData]
         .sort((a, b) => a.businessName.localeCompare(b.businessName))
-        .map(makeEstablishmentRightLine)}
+        .map((data) => makeEstablishmentRightLine({ data, isBackofficeAdmin }))}
     />
   </>
 );
 
-const makeEstablishmentRightLine = (
-  withEstablishmentData: EstablishmentData,
-): ReactNode[] => {
-  const roleDisplay = establishmentRoleToDisplay[withEstablishmentData.role];
+const makeEstablishmentRightLine = ({
+  data,
+  isBackofficeAdmin,
+}: {
+  data: EstablishmentData;
+  isBackofficeAdmin?: boolean;
+}): ReactNode[] => {
+  const roleDisplay = establishmentRoleToDisplay[data.role];
   return [
-    EstablishmentLineBusinessName({ data: withEstablishmentData }),
-    EstablishmentLineAdminsInfos({ data: withEstablishmentData }),
+    EstablishmentLineBusinessName({ data, isBackofficeAdmin }),
+    EstablishmentLineAdminsInfos({ data }),
     <Badge
       small
       className={fr.cx(roleDisplay.className, "fr-mr-1w")}
