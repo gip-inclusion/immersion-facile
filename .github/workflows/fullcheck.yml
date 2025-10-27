@@ -63,6 +63,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
 
+      - name: Debug hash
+        run: |
+          echo "Lock hash: ${{ hashFiles('**/pnpm-lock.yaml') }}"
+          echo "Pkg hash:  ${{ hashFiles('playwright/package.json') }}"
+
       - name: Install Playwright browsers if not cached
         if: ${{ matrix.command == 'pnpm typecheck' && steps.playwright-cache.outputs.cache-hit != 'true' }}
         run: pnpm playwright install
