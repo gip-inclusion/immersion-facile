@@ -469,6 +469,14 @@ export const getExactAge = ({
   return differenceInYears(startOfDay(referenceDate), startOfDay(birthDate));
 };
 
+export const assessmentCompletionStatusFilters = [
+  "completed",
+  "to-be-completed",
+] as const;
+
+export type AssessmentCompletionStatusFilter =
+  (typeof assessmentCompletionStatusFilters)[number];
+
 export type GetPaginatedConventionsFilters = {
   search?: string;
   statuses?: NotEmptyArray<ConventionStatus>;
@@ -477,6 +485,7 @@ export type GetPaginatedConventionsFilters = {
   dateStart?: DateFilter;
   dateEnd?: DateFilter;
   dateSubmission?: DateFilter;
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
 };
 
 export type GetPaginatedConventionsSortBy = keyof Pick<
@@ -514,4 +523,7 @@ export type FlatGetConventionsForAgencyUserParams = {
   dateEndTo?: DateString;
   dateSubmissionFrom?: DateString;
   dateSubmissionTo?: DateString;
+
+  // assessment filter
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
 };

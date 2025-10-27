@@ -77,6 +77,7 @@ export const ConventionList = () => {
           "dateStartTo",
           "dateEndFrom",
           "dateEndTo",
+          "assessmentCompletionStatus",
         ],
         initialConventionWithPagination.filters,
       ),
@@ -91,6 +92,7 @@ export const ConventionList = () => {
         | "dateStartTo"
         | "dateEndFrom"
         | "dateEndTo"
+        | "assessmentCompletionStatus"
       >
     >(defaultFilters);
 
@@ -104,6 +106,38 @@ export const ConventionList = () => {
       value: "",
     },
   });
+
+  const assessmentOptions: RadioButtonsProps["options"] = useMemo(
+    () => [
+      {
+        label: "Bilans complétés",
+        nativeInputProps: {
+          value: "completed",
+          checked: tempFilters.assessmentCompletionStatus === "completed",
+          onChange: () => {
+            setTempFilters((prev) => ({
+              ...prev,
+              assessmentCompletionStatus: "completed",
+            }));
+          },
+        },
+      },
+      {
+        label: "Bilans non complétés",
+        nativeInputProps: {
+          value: "to-be-completed",
+          checked: tempFilters.assessmentCompletionStatus === "to-be-completed",
+          onChange: () => {
+            setTempFilters((prev) => ({
+              ...prev,
+              assessmentCompletionStatus: "to-be-completed",
+            }));
+          },
+        },
+      },
+    ],
+    [tempFilters.assessmentCompletionStatus],
+  );
 
   const statusOptions: CheckboxProps["options"] = useMemo(() => {
     return conventionStatuses.map((status) => ({
@@ -195,6 +229,7 @@ export const ConventionList = () => {
       return [
         "Conseiller",
         "Statut",
+        "Bilan",
         "Personne en immersion",
         "Établissement",
         "Dates",
@@ -257,6 +292,12 @@ export const ConventionList = () => {
                 </Fragment>,
                 <Fragment key={convention.id}>
                   <strong>
+                    {convention.status === "ACCEPTED_BY_VALIDATOR" &&
+                      (convention.assessment ? "✅" : "❌")}
+                  </strong>
+                </Fragment>,
+                <Fragment key={convention.id}>
+                  <strong>
                     {getFormattedFirstnameAndLastname({
                       firstname: convention.signatories.beneficiary.firstName,
                       lastname: convention.signatories.beneficiary.lastName,
@@ -299,7 +340,7 @@ export const ConventionList = () => {
                 items: [
                   {
                     id: "status",
-                    iconId: "fr-icon-equalizer-line" as const,
+                    iconId: "fr-icon-equalizer-line",
                     defaultValue: "Tous les statuts",
                     values:
                       filters.statuses?.length &&
@@ -328,7 +369,7 @@ export const ConventionList = () => {
                   },
                   {
                     id: "dateStart",
-                    iconId: "fr-icon-calendar-line" as const,
+                    iconId: "fr-icon-calendar-line",
                     defaultValue: "Date de début",
                     values: [
                       (() => {
@@ -396,7 +437,7 @@ export const ConventionList = () => {
                   },
                   {
                     id: "dateEnd",
-                    iconId: "fr-icon-calendar-line" as const,
+                    iconId: "fr-icon-calendar-line",
                     defaultValue: "Date de fin",
                     values: [
                       (() => {
@@ -460,6 +501,43 @@ export const ConventionList = () => {
                       }));
 
                       onSubmit();
+                    },
+                  },
+                  {
+                    id: "assessment",
+                    iconId: "fr-icon-checkbox-line",
+                    defaultValue: "Tous les bilans",
+                    values: [
+                      (() => {
+                        if (
+                          tempFilters.assessmentCompletionStatus === "completed"
+                        ) {
+                          return "Bilans complétés";
+                        }
+                        if (
+                          tempFilters.assessmentCompletionStatus ===
+                          "to-be-completed"
+                        ) {
+                          return "Bilans non complétés";
+                        }
+                        return "Tous les bilans";
+                      })(),
+                    ],
+                    submenu: {
+                      title: "Filtrer par statut du bilan",
+                      content: (
+                        <>
+                          <RadioButtons options={assessmentOptions} />
+                        </>
+                      ),
+                    },
+                    onReset: () => {
+                      const newFilters = {
+                        ...tempFilters,
+                        assessmentCompletionStatus: undefined,
+                      };
+                      setTempFilters(newFilters);
+                      onSubmit(newFilters);
                     },
                   },
                 ],
