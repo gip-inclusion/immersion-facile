@@ -472,6 +472,8 @@ const filterSearch =
         sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
         // Search in establishment business name
         sql<any>`${eb.ref("business_name")} ILIKE ${pattern}`,
+        // Search in establishment SIRET
+        sql<any>`${eb.ref("conventions.siret")} ILIKE ${pattern}`,
         // Search in actor emails
         sql<any>`${eb.ref("b.email")} ILIKE ${pattern}`,
         sql<any>`${eb.ref("er.email")} ILIKE ${pattern}`,
