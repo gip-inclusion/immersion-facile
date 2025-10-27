@@ -25,7 +25,7 @@ import type {
   ConnectedUser,
   User,
   UserId,
-  UserWithNumberOfAgencies,
+  UserWithNumberOfAgenciesAndEstablishments,
   WithOptionalUserId,
 } from "./user.dto";
 
@@ -46,10 +46,11 @@ const userSchema: ZodSchemaWithInputMatchingOutput<User> = z.object({
   proConnect: proConnectInfoSchema.or(z.null()),
 });
 
-export const userInListSchema: ZodSchemaWithInputMatchingOutput<UserWithNumberOfAgencies> =
+export const userInListSchema: ZodSchemaWithInputMatchingOutput<UserWithNumberOfAgenciesAndEstablishments> =
   userSchema.and(
     z.object({
       numberOfAgencies: z.number(),
+      numberOfEstablishments: z.number(),
     }),
   );
 

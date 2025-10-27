@@ -29,8 +29,9 @@ export type User = {
 };
 
 export type UserWithAdminRights = User & WithIsBackOfficeAdmin;
-export type UserWithNumberOfAgencies = User & {
+export type UserWithNumberOfAgenciesAndEstablishments = User & {
   numberOfAgencies: number;
+  numberOfEstablishments: number;
 };
 
 export type WithDashboards = {

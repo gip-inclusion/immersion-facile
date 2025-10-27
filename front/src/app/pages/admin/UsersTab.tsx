@@ -70,7 +70,12 @@ const UsersTable = () => {
     <Table
       fixed
       id={domElementIds.admin.usersTab.usersTable}
-      headers={["Utilisateur", "Nombre d'agences liées", "Actions"]}
+      headers={[
+        "Utilisateur",
+        "Nombre d'agences liées",
+        "Nombre d'établissements liés",
+        "Actions",
+      ]}
       data={users.map((user) => [
         <NameAndEmailInTable
           key={`${user.id}-name-and-email`}
@@ -79,6 +84,7 @@ const UsersTable = () => {
           email={user.email}
         />,
         user.numberOfAgencies,
+        user.numberOfEstablishments,
         <a
           key={`${user.id}-details-link`}
           {...routes.adminUserDetail({ userId: user.id })}

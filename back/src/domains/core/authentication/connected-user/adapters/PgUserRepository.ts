@@ -8,6 +8,7 @@ import {
   type User,
   type UserId,
   type UserWithAdminRights,
+  type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import type { UserRepository } from "../port/UserRepository";
@@ -131,15 +132,42 @@ export class PgUserRepository implements UserRepository {
 
   public async getUsers(
     filters: GetUsersFilters,
-  ): Promise<UserWithAdminRights[]> {
+  ): Promise<UserWithNumberOfAgenciesAndEstablishments[]> {
     if (filters.emailContains === "") return [];
-    const usersInDb = await this.#getUserQueryBuilder()
+    const usersInDb = await this.transaction
+      .selectFrom("users")
+      .leftJoin("users__agencies", "users.id", "users__agencies.user_id")
+      .leftJoin(
+        "establishments__users",
+        "users.id",
+        "establishments__users.user_id",
+      )
+      .select((eb) => [
+        "users.id as id",
+        "users.email as email",
+        sql<string>`${eb.ref("users.first_name")}`.as("firstName"),
+        sql<string>`${eb.ref("users.last_name")}`.as("lastName"),
+        sql<string>`date_to_iso(${eb.ref("users.created_at")})`.as("createdAt"),
+        sql<{ externalId: string; siret: SiretDto } | null>`
+          CASE
+            WHEN ${eb.ref("pro_connect_sub")} IS NOT NULL AND ${eb.ref("pro_connect_siret")} IS NOT NULL
+            THEN jsonb_build_object('externalId', ${eb.ref("pro_connect_sub")}, 'siret', ${eb.ref("pro_connect_siret")})
+            ELSE NULL
+          END
+        `.as("proConnect"),
+        sql<number>`COUNT(DISTINCT ${eb.ref("users__agencies.agency_id")})::int`.as(
+          "numberOfAgencies",
+        ),
+        sql<number>`COUNT(DISTINCT ${eb.ref("establishments__users.siret")})::int`.as(
+          "numberOfEstablishments",
+        ),
+      ])
       .where("users.email", "like", `%${filters.emailContains.toLowerCase()}%`)
+      .groupBy("users.id")
+      .orderBy("users.email")
       .limit(50)
       .execute();
-    return usersInDb
-      .map((userInDb) => this.#toAuthenticatedUser(userInDb))
-      .filter(isTruthy);
+    return usersInDb;
   }
 
   public async findByExternalId(
