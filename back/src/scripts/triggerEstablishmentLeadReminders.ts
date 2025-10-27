@@ -9,7 +9,7 @@ import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { NanoIdShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type SendEstablishmentLeadReminderOutput,
@@ -24,7 +24,7 @@ const config = AppConfig.createFromEnv();
 const establishmentLeadReminders = async () => {
   logger.info({ message: "Starting to send Emails to establishment leads" });
   const timeGateway = new RealTimeGateway();
-  const { uowPerformer } = createUowPerformer(
+  const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );

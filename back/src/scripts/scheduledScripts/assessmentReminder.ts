@@ -8,7 +8,7 @@ import { PgNotificationRepository } from "../../domains/core/notifications/adapt
 import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeAssessmentReminder } from "../../domains/establishment/use-cases/AssessmentReminder";
 import { createLogger } from "../../utils/logger";
@@ -36,7 +36,7 @@ const executeAssessmentReminder = async () => {
 
   const { numberOfConventionsReminded: numberOfConventionsReminded3DaysAfter } =
     await makeAssessmentReminder({
-      uowPerformer: createUowPerformer(
+      uowPerformer: createDbRelatedSystems(
         config,
         createMakeProductionPgPool(config),
       ).uowPerformer,
@@ -59,8 +59,10 @@ const executeAssessmentReminder = async () => {
   const {
     numberOfConventionsReminded: numberOfConventionsReminded10DaysAfter,
   } = await makeAssessmentReminder({
-    uowPerformer: createUowPerformer(config, createMakeProductionPgPool(config))
-      .uowPerformer,
+    uowPerformer: createDbRelatedSystems(
+      config,
+      createMakeProductionPgPool(config),
+    ).uowPerformer,
     deps: {
       outOfTrx,
       timeGateway,

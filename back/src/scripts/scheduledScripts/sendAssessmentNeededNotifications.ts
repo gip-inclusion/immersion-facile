@@ -13,7 +13,7 @@ import { makeGenerateJwtES256 } from "../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SendAssessmentNeededNotifications } from "../../domains/establishment/use-cases/SendAssessmentNeededNotifications";
 import { createLogger } from "../../utils/logger";
@@ -52,7 +52,7 @@ const sendAssessmentNeededNotificationsScript = async () => {
 
   const getPgPool = createMakeProductionPgPool(config);
 
-  const { uowPerformer } = createUowPerformer(config, getPgPool);
+  const { uowPerformer } = createDbRelatedSystems(config, getPgPool);
 
   const pgPool = getPgPool();
   const kyselyDb = makeKyselyDb(pgPool);

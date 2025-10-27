@@ -3,7 +3,7 @@ import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeGetObsoleteDiscussionsAndEmitDeprecatedEvent } from "../../domains/establishment/use-cases/discussions/GetObsoleteDiscussionsAndEmitDeprecatedEvents";
 import { createLogger } from "../../utils/logger";
@@ -14,7 +14,7 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const markObsoleteDiscussionsAsDeprecated = async () => {
-  const { uowPerformer } = createUowPerformer(
+  const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );

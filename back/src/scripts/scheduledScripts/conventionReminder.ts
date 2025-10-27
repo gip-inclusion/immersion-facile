@@ -4,7 +4,7 @@ import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { ConventionsReminder } from "../../domains/convention/use-cases/ConventionsReminder";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
 import { configureSentry } from "../configureSentry";
@@ -20,7 +20,8 @@ const executeConventionReminder = () => {
   const timeGateway = new RealTimeGateway();
 
   return new ConventionsReminder(
-    createUowPerformer(config, createMakeProductionPgPool(config)).uowPerformer,
+    createDbRelatedSystems(config, createMakeProductionPgPool(config))
+      .uowPerformer,
     timeGateway,
     makeCreateNewEvent({
       timeGateway,

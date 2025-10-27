@@ -2,7 +2,7 @@ import type { UserId } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { AssignAgencyViewerRole } from "../domains/agency/use-cases/AssignAgencyViewerRoleToUsers";
-import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createDbRelatedSystems } from "../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -41,7 +41,7 @@ const executeAssignAgencyViewerRole = async () => {
     message: "Starting agency viewer role assignment on FT users script",
   });
 
-  const { uowPerformer } = createUowPerformer(
+  const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );
