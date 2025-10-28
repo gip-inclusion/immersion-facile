@@ -1,6 +1,9 @@
 import type { WithAcquisition } from "../acquisition.dto";
 import type { LocationId } from "../address/address.dto";
-import type { EstablishmentSearchableByValue } from "../formEstablishment/FormEstablishment.dto";
+import type {
+  EstablishmentSearchableByValue,
+  FitForDisableWorkerOption,
+} from "../formEstablishment/FormEstablishment.dto";
 import type { NafCode, WithNafCodes } from "../naf/naf.dto";
 import type {
   PaginationQueryParams,
@@ -71,7 +74,7 @@ type LegacySearchCommonParamsDto = {
 type GetOffersFlatParamsCommon = {
   place?: string; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
   appellationCodes?: AppellationCode[];
-  fitForDisabledWorkers?: boolean;
+  fitForDisabledWorkers?: FitForDisableWorkerOption[];
   locationIds?: LocationId[];
   nafCodes?: NafCode[];
   searchableBy?: EstablishmentSearchableByValue;

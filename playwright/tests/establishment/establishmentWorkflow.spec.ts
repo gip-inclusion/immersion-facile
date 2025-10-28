@@ -106,7 +106,7 @@ test.describe("Establishment creation and modification workflow", () => {
         },
       ])
       .withWebsite("https://new.website.com")
-      .withFitForDisabledWorkers(true)
+      .withFitForDisabledWorkers("yes-ft-certified")
       .withIsEngagedEnterprise(true)
       .build();
 

@@ -4,6 +4,7 @@ import type {
   DataWithPagination,
   DateTimeIsoString,
   EstablishmentSearchableByValue,
+  FitForDisableWorkerOption,
   LocationId,
   NafCode,
   SearchResultDto,
@@ -37,7 +38,7 @@ export type LegacySearchImmersionParams = {
 
 type GetOffersFilters = {
   appellationCodes?: AppellationCode[];
-  fitForDisabledWorkers?: boolean; // if not defined -> return all
+  fitForDisabledWorkers?: FitForDisableWorkerOption[]; // if not defined -> return all
   geoParams?: GeoParams;
   locationIds?: LocationId[];
   nafCodes?: NafCode[];

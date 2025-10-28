@@ -1,11 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 
-import type { ContactMode } from "shared";
+import type { ContactMode, FitForDisableWorkerOption } from "shared";
 import { useStyles } from "tss-react/dsfr";
 
 type ImmersionOfferLabelsProps = {
   voluntaryToImmersion?: boolean;
-  fitForDisabledWorkers?: boolean;
+  fitForDisabledWorkers?: FitForDisableWorkerOption | null;
   contactMode?: ContactMode;
   className?: string;
 };
@@ -22,10 +22,17 @@ export const SearchResultLabels = ({
         voluntaryToImmersion={voluntaryToImmersion}
       />
     </li>
-    {fitForDisabledWorkers && (
+    {fitForDisabledWorkers === "yes-declared-only" && (
       <li>
         <Label className={fr.cx("fr-badge--yellow-moutarde")}>
           Personnes en situation de handicap bienvenues
+        </Label>
+      </li>
+    )}
+    {fitForDisabledWorkers === "yes-ft-certified" && (
+      <li>
+        <Label className={fr.cx("fr-badge--yellow-moutarde")}>
+          Certifié pour l'accueil personnes en situation de handicap
         </Label>
       </li>
     )}

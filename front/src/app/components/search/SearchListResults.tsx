@@ -136,9 +136,10 @@ export const SearchListResults = ({
                             {isSuperEstablishment(
                               searchResult.establishmentScore,
                             ) && <ImTag theme="superEnterprise" />}
-                            {searchResult.fitForDisabledWorkers && (
-                              <ImTag theme="rqth" />
-                            )}
+                            {searchResult.fitForDisabledWorkers ===
+                              "yes-ft-certified" && <ImTag theme="rqth" />}
+                            {searchResult.fitForDisabledWorkers ===
+                              "yes-declared-only" && <ImTag theme="rqth" />}
                             {!searchResult.voluntaryToImmersion && (
                               <ImTag theme="lbb" />
                             )}

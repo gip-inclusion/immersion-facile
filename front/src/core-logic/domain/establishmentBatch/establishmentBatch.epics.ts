@@ -9,6 +9,7 @@ import {
   type EstablishmentRole,
   establishmentAppellationsFromCSVToDto,
   establishmentCSVRowSchema,
+  type FitForDisableWorkerOption,
   type FormEstablishmentDto,
   type FormEstablishmentSource,
   type FormEstablishmentUserRight,
@@ -79,8 +80,17 @@ export const candidateEstablishmentMapper = (
 ): FormEstablishmentDtoWithErrors => {
   let errors: z.ZodIssue[] = [];
   let mappedEstablishment: FormEstablishmentDto | null = null;
+
   try {
     const establishmentRow = establishmentCSVRowSchema.parse(csvRow);
+
+    const getFitForDisabledWorkers = (): FitForDisableWorkerOption => {
+      if (establishmentRow.fitForDisabledWorkers === undefined) return "no";
+      if (csvBooleanToBoolean(establishmentRow.fitForDisabledWorkers) === true)
+        return "yes-declared-only";
+      return "no";
+    };
+
     mappedEstablishment = {
       businessAddresses: [
         {
@@ -102,9 +112,7 @@ export const candidateEstablishmentMapper = (
         establishmentRow.appellations_code,
       ),
       userRights: makeUserRightsFromCSV(establishmentRow),
-      fitForDisabledWorkers: establishmentRow.fitForDisabledWorkers
-        ? csvBooleanToBoolean(establishmentRow.fitForDisabledWorkers)
-        : false,
+      fitForDisabledWorkers: getFitForDisabledWorkers(),
       isEngagedEnterprise: csvBooleanToBoolean(
         establishmentRow.isEngagedEnterprise,
       ),

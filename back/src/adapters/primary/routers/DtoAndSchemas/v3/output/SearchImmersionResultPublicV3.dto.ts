@@ -3,6 +3,7 @@ import type {
   AppellationDto,
   ContactMode,
   DateTimeIsoString,
+  FitForDisableWorkerOption,
   GeoPositionDto,
   LocationId,
   RomeCode,
@@ -21,7 +22,7 @@ export type SearchImmersionResultPublicV3 = {
   name: string;
   customizedName?: string;
   voluntaryToImmersion: boolean;
-  fitForDisabledWorkers?: boolean;
+  fitForDisabledWorkers: FitForDisableWorkerOption | null;
   locationId: LocationId | null;
   position: GeoPositionDto;
   address: AddressDto;
