@@ -6,8 +6,6 @@ import {
   httpErrorSchema,
   localization,
   paginationQueryParamsSchema,
-  searchResultSchema,
-  searchResultsSchema,
   withAuthorizationHeaders,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
@@ -21,6 +19,7 @@ import {
 } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
 import { getConventionsByFiltersQueryParamsV2Schema } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
 import { searchParamsPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.schema";
+import { serachResultPublicV2Schema } from "../DtoAndSchemas/v2/output/searchImmersionResultPublicV2.schema";
 
 export type PublicApiV2SearchEstablishmentRoutes =
   typeof publicApiV2SearchEstablishmentRoutes;
@@ -30,7 +29,7 @@ export const publicApiV2SearchEstablishmentRoutes = defineRoutes({
     url: "/v2/search/:siret/:appellationCode",
     ...withAuthorizationHeaders,
     responses: {
-      200: searchResultSchema,
+      200: serachResultPublicV2Schema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
@@ -44,7 +43,7 @@ export const publicApiV2SearchEstablishmentRoutes = defineRoutes({
     queryParamsSchema: searchParamsPublicV2Schema,
     ...withAuthorizationHeaders,
     responses: {
-      200: searchResultsSchema,
+      200: z.array(serachResultPublicV2Schema),
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

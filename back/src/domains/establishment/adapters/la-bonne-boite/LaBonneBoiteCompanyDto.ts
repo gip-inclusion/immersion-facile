@@ -105,6 +105,7 @@ export class LaBonneBoiteCompanyDto {
       siret: this.props.siret,
       urlOfPartner: `https://labonneboite.francetravail.fr/entreprise/${this.props.siret}`,
       voluntaryToImmersion: false,
+      fitForDisabledWorkers: null,
     };
   }
 }

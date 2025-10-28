@@ -53,8 +53,8 @@ import {
   establishment9900Z,
   establishmentCuvisteAtChaniersAndLaRochelle,
   establishmentCuvisteAtSaintesAndVeaux,
-  establishmentWithFitForDisabledWorkersFalse,
-  establishmentWithFitForDisabledWorkersTrue,
+  establishmentWithFitForDisabledWorkersNo,
+  establishmentWithFitForDisabledWorkersYesCertified,
   establishmentWithOfferA1101_AtPosition,
   establishmentWithOfferA1101_close,
   establishmentWithOfferA1101_outOfDistanceRange,
@@ -519,8 +519,8 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
       describe("filters.fitForDisabledWorkers", () => {
         const testEstablishmentAggregates: EstablishmentAggregate[] = [
-          establishmentWithFitForDisabledWorkersTrue,
-          establishmentWithFitForDisabledWorkersFalse,
+          establishmentWithFitForDisabledWorkersYesCertified,
+          establishmentWithFitForDisabledWorkersNo,
         ];
 
         beforeEach(async () => {
@@ -532,11 +532,11 @@ describe("PgEstablishmentAggregateRepository", () => {
             ),
           );
         });
-        it("filter on fitForDisabledWorkers with value true", async () => {
+        it("filter on fitForDisabledWorkers with value 'yes-ft-certified'", async () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { fitForDisabledWorkers: true },
+            filters: { fitForDisabledWorkers: ["yes-ft-certified"] },
           });
           expectToEqual(result, {
             pagination: {
@@ -547,21 +547,23 @@ describe("PgEstablishmentAggregateRepository", () => {
             },
             data: [
               makeExpectedSearchResult({
-                establishment: establishmentWithFitForDisabledWorkersTrue,
-                withOffers: establishmentWithFitForDisabledWorkersTrue.offers,
+                establishment:
+                  establishmentWithFitForDisabledWorkersYesCertified,
+                withOffers:
+                  establishmentWithFitForDisabledWorkersYesCertified.offers,
                 withLocationAndDistance:
-                  establishmentWithFitForDisabledWorkersTrue.establishment
-                    .locations[0],
+                  establishmentWithFitForDisabledWorkersYesCertified
+                    .establishment.locations[0],
                 nafLabel: "Activités des agences de travail temporaire",
               }),
             ],
           });
         });
-        it("filter on fitForDisabledWorkers with value false", async () => {
+        it("filter on fitForDisabledWorkers with value 'no'", async () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { fitForDisabledWorkers: false },
+            filters: { fitForDisabledWorkers: ["no"] },
           });
           expectToEqual(result, {
             pagination: {
@@ -572,10 +574,10 @@ describe("PgEstablishmentAggregateRepository", () => {
             },
             data: [
               makeExpectedSearchResult({
-                establishment: establishmentWithFitForDisabledWorkersFalse,
-                withOffers: establishmentWithFitForDisabledWorkersFalse.offers,
+                establishment: establishmentWithFitForDisabledWorkersNo,
+                withOffers: establishmentWithFitForDisabledWorkersNo.offers,
                 withLocationAndDistance:
-                  establishmentWithFitForDisabledWorkersFalse.establishment
+                  establishmentWithFitForDisabledWorkersNo.establishment
                     .locations[0],
                 nafLabel: "Activités des agences de travail temporaire",
               }),
@@ -2200,7 +2202,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         const notFitForDisabledWorkers = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("00000000000001")
-          .withFitForDisabledWorkers(false)
+          .withFitForDisabledWorkers("no")
           .withLocationId(uuid())
           .withOffers([offer])
           .withUserRights([osefUserRight])
@@ -2208,7 +2210,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         const fitForDisabledWorkers = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("00000000000002")
-          .withFitForDisabledWorkers(true)
+          .withFitForDisabledWorkers("yes-ft-certified")
           .withLocationId(uuid())
           .withOffers([offer])
           .withUserRights([osefUserRight])
@@ -3468,7 +3470,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withAdditionalInformation("my additionnal info")
                 .withCustomizedName("my customize name")
                 .withContactMode("IN_PERSON")
-                .withFitForDisabledWorkers(true)
+                .withFitForDisabledWorkers("yes-ft-certified")
                 .withIsCommited(true)
                 .withLastInseeCheck(new Date())
                 .withNextAvailabilityDate(new Date())
@@ -3495,7 +3497,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 new EstablishmentEntityBuilder()
                   .withAdditionalInformation("my additionnal info")
                   .withCustomizedName("my customize name")
-                  .withFitForDisabledWorkers(true)
+                  .withFitForDisabledWorkers("yes-ft-certified")
                   .withIsCommited(true)
                   .withContactMode("EMAIL")
                   .withLastInseeCheck(new Date())
@@ -3892,7 +3894,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentIsNotSearchableAndMaxContactPerMonth8,
             )
               .withIsMaxDiscussionsForPeriodReached(false)
-              .withFitForDisabledWorkers(false)
+              .withFitForDisabledWorkers("no")
               .build(),
           ],
         );
@@ -3917,7 +3919,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentIsNotSearchableAndMaxContactPerMonth2,
             )
               .withIsMaxDiscussionsForPeriodReached(false)
-              .withFitForDisabledWorkers(false)
+              .withFitForDisabledWorkers("no")
               .build(),
           ],
         );
@@ -3943,7 +3945,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentIsNotSearchableAndMaxContactPerMonth1,
             )
               .withIsMaxDiscussionsForPeriodReached(false)
-              .withFitForDisabledWorkers(false)
+              .withFitForDisabledWorkers("no")
               .build(),
           ],
         );
@@ -4012,7 +4014,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentIsNotSearchableAndMaxContactPerMonth8,
             )
               .withIsMaxDiscussionsForPeriodReached(false)
-              .withFitForDisabledWorkers(false)
+              .withFitForDisabledWorkers("no")
               .build(),
           ],
         );

@@ -34,7 +34,7 @@ describe("GetOffers", () => {
   const establishment1 = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("78000403200019")
     .withEstablishmentNaf({ code: "8560C", nomenclature: "naf nomenclature" })
-    .withFitForDisabledWorkers(false)
+    .withFitForDisabledWorkers("no")
     .withScore(100)
     .withOffers([secretariatOffer, boulangerOffer])
     .withUserRights(userRights)
@@ -43,7 +43,7 @@ describe("GetOffers", () => {
   const establishment2 = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("12345678901234")
     .withEstablishmentNaf({ code: "7510A", nomenclature: "naf nomenclature" })
-    .withFitForDisabledWorkers(true)
+    .withFitForDisabledWorkers("yes-ft-certified")
     .withScore(80)
     .withOffers([secretariatOffer])
     .withUserRights(userRights)
@@ -52,7 +52,7 @@ describe("GetOffers", () => {
   const establishment3 = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("98765432109876")
     .withEstablishmentNaf({ code: "6201Z", nomenclature: "naf nomenclature" })
-    .withFitForDisabledWorkers(false)
+    .withFitForDisabledWorkers("yes-declared-only")
     .withScore(120)
     .withOffers([boulangerOffer])
     .withUserRights(userRights)
@@ -84,7 +84,7 @@ describe("GetOffers", () => {
       sortBy: "score",
       sortOrder: "desc",
       appellationCodes: [secretariatOffer.appellationCode],
-      fitForDisabledWorkers: true,
+      fitForDisabledWorkers: ["yes-ft-certified"],
       nafCodes: ["7510A"],
       searchableBy: "jobSeekers",
       sirets: [establishment2.establishment.siret],

@@ -27,7 +27,7 @@ export const createInMemoryDependencies = (): Dependencies => ({
   establishmentGateway: new SimulatedEstablishmentGateway([
     FormEstablishmentDtoBuilder.valid()
       .withSiret("12345678901236")
-      .withFitForDisabledWorkers(false)
+      .withFitForDisabledWorkers("no")
       .build(),
   ]),
   establishmentLeadGateway: new SimulatedEstablishmentLeadGateway(),

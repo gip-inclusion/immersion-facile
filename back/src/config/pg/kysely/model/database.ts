@@ -374,12 +374,14 @@ interface OngoingOauths {
 
 type EstablishmentStatus = "DEACTIVATED_FOR_LACK_OF_RESPONSES";
 
+type FitForDisabledWorkers = "yes-ft-certified" | "yes-declared-only" | "no";
+
 interface Establishments extends WithAcquisition {
   additional_information: Generated<string | null>;
   is_max_discussions_for_period_reached: Generated<boolean>;
   created_at: Timestamp;
   customized_name: string | null;
-  fit_for_disabled_workers: boolean;
+  fit_for_disabled_workers: FitForDisabledWorkers;
   is_commited: boolean | null;
   is_open: Generated<boolean>;
   last_insee_check_date: Timestamp | null;

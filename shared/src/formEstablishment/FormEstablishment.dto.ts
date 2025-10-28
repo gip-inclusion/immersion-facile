@@ -81,6 +81,14 @@ export type FormEstablishmentAddress = {
 
 export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
 
+export type FitForDisableWorkerOption =
+  (typeof fitForDisabledWorkersOptions)[number];
+export const fitForDisabledWorkersOptions = [
+  "yes-ft-certified",
+  "yes-declared-only",
+  "no",
+] as const;
+
 export type CommonFormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
@@ -88,7 +96,7 @@ export type CommonFormEstablishmentDto = {
   userRights: FormEstablishmentUserRight[];
   businessName: BusinessName;
   businessNameCustomized?: string;
-  fitForDisabledWorkers: boolean;
+  fitForDisabledWorkers: FitForDisableWorkerOption;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
   naf?: NafDto; // { code: string, nomenclature: string }

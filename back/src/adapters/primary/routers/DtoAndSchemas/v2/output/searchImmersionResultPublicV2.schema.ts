@@ -1,22 +1,20 @@
-import { z } from "zod";
-import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
-import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { createPaginatedSchema } from "../pagination/pagination.schema";
-import { romeCodeSchema } from "../rome";
-import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { siretSchema } from "../siret/siret.schema";
-import { dateTimeIsoStringSchema } from "../utils/date";
 import {
+  absoluteUrlSchema,
+  appellationCodeSchema,
+  dateTimeIsoStringSchema,
+  geoPositionSchema,
   localization,
+  romeCodeSchema,
+  siretSchema,
   type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
   zStringMinLength1,
   zUuidLike,
-} from "../zodUtils";
-import type { SearchResultDto } from "./SearchResult.dto";
+} from "shared";
+import { z } from "zod";
+import type { SearchImmersionResultPublicV2 } from "./SearchImmersionResultPublicV2.dto";
 
-export const searchResultSchema: ZodSchemaWithInputMatchingOutput<SearchResultDto> =
+export const serachResultPublicV2Schema: ZodSchemaWithInputMatchingOutput<SearchImmersionResultPublicV2> =
   z.object({
     rome: romeCodeSchema,
     romeLabel: z.string(),
@@ -43,7 +41,7 @@ export const searchResultSchema: ZodSchemaWithInputMatchingOutput<SearchResultDt
     numberOfEmployeeRange: z.string().optional(),
     website: absoluteUrlSchema.or(z.literal("")).optional(),
     additionalInformation: zStringCanBeEmpty.optional(),
-    fitForDisabledWorkers: fitForDisabledWorkersSchema,
+    fitForDisabledWorkers: z.boolean().optional(),
     urlOfPartner: z.string().optional(),
     appellations: z.array(
       z.object({
@@ -56,8 +54,3 @@ export const searchResultSchema: ZodSchemaWithInputMatchingOutput<SearchResultDt
     // locationId: zUuidLike,
     locationId: zUuidLike.or(z.null()),
   });
-
-export const searchResultsSchema = z.array(searchResultSchema);
-
-export const paginatedSearchResultsSchema =
-  createPaginatedSchema(searchResultSchema);

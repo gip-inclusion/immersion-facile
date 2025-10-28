@@ -382,17 +382,17 @@ export const establishment9900Z = new EstablishmentAggregateBuilder()
   })
   .build();
 
-export const establishmentWithFitForDisabledWorkersFalse =
+export const establishmentWithFitForDisabledWorkersNo =
   new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("00000000000024")
-    .withFitForDisabledWorkers(false)
+    .withFitForDisabledWorkers("no")
     .withUserRights([osefUserRight])
     .build();
 
-export const establishmentWithFitForDisabledWorkersTrue =
+export const establishmentWithFitForDisabledWorkersYesCertified =
   new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("00000000000025")
-    .withFitForDisabledWorkers(true)
+    .withFitForDisabledWorkers("yes-ft-certified")
     .withUserRights([osefUserRight])
     .withLocations([
       {

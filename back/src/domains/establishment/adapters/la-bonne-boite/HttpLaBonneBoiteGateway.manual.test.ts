@@ -109,6 +109,7 @@ describe("HttpLaBonneBoiteGateway", () => {
           numberOfEmployeeRange: "50-99",
           urlOfPartner:
             "https://labonneboite.francetravail.fr/entreprise/34916617300014",
+          fitForDisabledWorkers: null,
         },
       ]);
     });
@@ -248,6 +249,7 @@ describe("HttpLaBonneBoiteGateway", () => {
           urlOfPartner:
             "https://labonneboite.francetravail.fr/entreprise/38929074300027",
           voluntaryToImmersion: false,
+          fitForDisabledWorkers: null,
         },
       ]);
     });

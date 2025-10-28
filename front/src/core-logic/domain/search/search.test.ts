@@ -53,7 +53,7 @@ const immersionOffer: SearchResultDto = {
   siret: "12345678901234",
   name: "EARL DE LA FERME",
   voluntaryToImmersion: true,
-  fitForDisabledWorkers: true,
+  fitForDisabledWorkers: "yes-ft-certified",
   position: {
     lat: 48.8566969,
     lon: 2.3514616,

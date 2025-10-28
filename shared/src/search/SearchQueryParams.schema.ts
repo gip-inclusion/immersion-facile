@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
+import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { nafCodesSchema, withNafCodesSchema } from "../naf/naf.schema";
 import type { SortDirection } from "../pagination/pagination.dto";
 import { sortDirectionSchema } from "../pagination/pagination.schema";
@@ -13,7 +14,6 @@ import {
   zToNumber,
   zUuidLike,
 } from "../zodUtils";
-
 import type {
   GetOffersFlatQueryParams,
   LegacySearchQueryParamsDto,
@@ -91,7 +91,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
 > = z
   .object({
     appellationCodes: z.array(appellationCodeSchema).optional(),
-    fitForDisabledWorkers: z.undefined().or(zToBoolean.optional()).optional(),
+    fitForDisabledWorkers: z.array(fitForDisabledWorkersSchema).optional(),
     locationIds: z.array(zUuidLike).optional(),
     nafCodes: nafCodesSchema.optional(),
     sirets: z.array(siretSchema).optional(),
