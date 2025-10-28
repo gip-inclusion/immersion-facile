@@ -408,6 +408,43 @@ export const ConventionList = () => {
                     },
                   },
                   {
+                    id: "assessment",
+                    iconId: "fr-icon-checkbox-line",
+                    defaultValue: "Tous les bilans",
+                    values: [
+                      (() => {
+                        if (
+                          tempFilters.assessmentCompletionStatus === "completed"
+                        ) {
+                          return "Bilans complétés";
+                        }
+                        if (
+                          tempFilters.assessmentCompletionStatus ===
+                          "to-be-completed"
+                        ) {
+                          return "Bilans non complétés";
+                        }
+                        return "Tous les bilans";
+                      })(),
+                    ],
+                    submenu: {
+                      title: "Filtrer par statut du bilan",
+                      content: (
+                        <>
+                          <RadioButtons options={assessmentOptions} />
+                        </>
+                      ),
+                    },
+                    onReset: () => {
+                      const newFilters = {
+                        ...tempFilters,
+                        assessmentCompletionStatus: undefined,
+                      };
+                      setTempFilters(newFilters);
+                      onSubmit(newFilters);
+                    },
+                  },
+                  {
                     id: "dateStart",
                     iconId: "fr-icon-calendar-line",
                     defaultValue: "Date de début",
@@ -543,43 +580,6 @@ export const ConventionList = () => {
                       onSubmit();
                     },
                   },
-                  {
-                    id: "assessment",
-                    iconId: "fr-icon-checkbox-line",
-                    defaultValue: "Tous les bilans",
-                    values: [
-                      (() => {
-                        if (
-                          tempFilters.assessmentCompletionStatus === "completed"
-                        ) {
-                          return "Bilans complétés";
-                        }
-                        if (
-                          tempFilters.assessmentCompletionStatus ===
-                          "to-be-completed"
-                        ) {
-                          return "Bilans non complétés";
-                        }
-                        return "Tous les bilans";
-                      })(),
-                    ],
-                    submenu: {
-                      title: "Filtrer par statut du bilan",
-                      content: (
-                        <>
-                          <RadioButtons options={assessmentOptions} />
-                        </>
-                      ),
-                    },
-                    onReset: () => {
-                      const newFilters = {
-                        ...tempFilters,
-                        assessmentCompletionStatus: undefined,
-                      };
-                      setTempFilters(newFilters);
-                      onSubmit(newFilters);
-                    },
-                  },
                   ...(hasManyAgencies
                     ? [
                         {
@@ -637,7 +637,8 @@ export const ConventionList = () => {
               }}
               searchBar={{
                 label: "Rechercher",
-                placeholder: "Rechercher",
+                placeholder:
+                  "Rechercher une convention (ID de convention, nom, prénom, email, SIRET, ... )",
                 onSubmit: (query: string) => {
                   onSubmit(tempFilters, query);
                 },
