@@ -420,6 +420,7 @@ const filterAssessmentCompletionStatus =
           ),
         );
     }
+    assessmentCompletionStatus satisfies never;
 
     return builder;
   };
@@ -461,25 +462,25 @@ const filterSearch =
     builder: PaginatedConventionQueryBuilder,
   ): PaginatedConventionQueryBuilder => {
     if (!search) return builder;
-    const pattern = `%${search}%`;
+    const pattern = `%${search.toLowerCase()}%`;
 
     return builder.where((eb) =>
       eb.or([
         // Search in convention ID (cast UUID to text for pattern matching)
-        sql<any>`CAST(${eb.ref("conventions.id")} AS text) ILIKE ${pattern}`,
+        sql<any>`CAST(${eb.ref("conventions.id")} AS text) LIKE ${pattern}`,
         // Search in beneficiary names
-        sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
-        sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("b.first_name")} LIKE ${pattern}`,
+        sql<any>`${eb.ref("b.last_name")} LIKE ${pattern}`,
         // Search in establishment business name
-        sql<any>`${eb.ref("business_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("business_name")} LIKE ${pattern}`,
         // Search in establishment SIRET
-        sql<any>`${eb.ref("conventions.siret")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("conventions.siret")} LIKE ${pattern}`,
         // Search in actor emails
-        sql<any>`${eb.ref("b.email")} ILIKE ${pattern}`,
-        sql<any>`${eb.ref("er.email")} ILIKE ${pattern}`,
-        sql<any>`${eb.ref("et.email")} ILIKE ${pattern}`,
-        sql<any>`br.email IS NOT NULL AND br.email ILIKE ${pattern}`,
-        sql<any>`bce.email IS NOT NULL AND bce.email ILIKE ${pattern}`,
+        sql<any>`${eb.ref("b.email")} LIKE ${pattern}`,
+        sql<any>`${eb.ref("er.email")} LIKE ${pattern}`,
+        sql<any>`${eb.ref("et.email")} LIKE ${pattern}`,
+        sql<any>`br.email IS NOT NULL AND br.email LIKE ${pattern}`,
+        sql<any>`bce.email IS NOT NULL AND bce.email LIKE ${pattern}`,
       ]),
     );
   };
