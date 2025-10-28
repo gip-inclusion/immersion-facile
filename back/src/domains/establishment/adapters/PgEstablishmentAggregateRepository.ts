@@ -13,6 +13,7 @@ import {
   type DateTimeIsoString,
   type EstablishmentSearchableByValue,
   errors,
+  type FitForDisableWorkerOption,
   type LocationId,
   type NafCode,
   pipeWithValue,
@@ -350,13 +351,24 @@ export class PgEstablishmentAggregateRepository
   public async legacySearchImmersionResults({
     searchMade,
     maxResults,
-    fitForDisabledWorkers,
+    fitForDisabledWorkers: fitForDisabledWorkersBoolean,
   }: LegacySearchImmersionParams): Promise<RepositorySearchImmertionResult[]> {
     // exclure
     // - entreprises non cherchables
     // - entreprises pas dispo
     // - entreprises qui ne sont pas supprimées
     // (query à)
+
+    const getFitForDisabledWorkers = ():
+      | FitForDisableWorkerOption[]
+      | undefined => {
+      if (fitForDisabledWorkersBoolean === undefined) return undefined;
+      if (fitForDisabledWorkersBoolean === true)
+        return ["yes-declared-only", "yes-ft-certified"];
+      if (fitForDisabledWorkersBoolean === false) return ["no"];
+      fitForDisabledWorkersBoolean satisfies never;
+    };
+
     const { data } = await searchImmersionResultsQuery(this.transaction, {
       limit:
         maxResults && maxResults < MAX_RESULTS_HARD_LIMIT
@@ -369,7 +381,7 @@ export class PgEstablishmentAggregateRepository
             ? pick(["lat", "lon", "distanceKm"], searchMade)
             : undefined,
         searchableBy: searchMade.establishmentSearchableBy,
-        fitForDisabledWorkers,
+        fitForDisabledWorkers: getFitForDisabledWorkers(),
         nafCodes: searchMade.nafCodes,
         romeCodes: searchMade.romeCode
           ? [searchMade.romeCode]
@@ -850,7 +862,7 @@ const makeEstablishmentAggregateFromDb = (
 };
 
 type SearchImmersionFilters = {
-  fitForDisabledWorkers?: boolean;
+  fitForDisabledWorkers?: FitForDisableWorkerOption[];
   searchableBy?: EstablishmentSearchableByValue;
   romeCodes?: RomeCode[];
   geoParams?: GeoParams;
@@ -902,14 +914,21 @@ const makeGetFilteredResultsSubQueryBuilder = ({
               nafCodes?.length
                 ? qb.where("establishments.naf_code", "in", nafCodes)
                 : qb,
-            (qb) =>
-              fitForDisabledWorkers === undefined
-                ? qb
-                : qb.where(
-                    "establishments.fit_for_disabled_workers",
-                    fitForDisabledWorkers ? "is" : "is not",
-                    true,
-                  ),
+            (qb) => {
+              if (fitForDisabledWorkers === undefined) return qb;
+              if (fitForDisabledWorkers.length === 0)
+                return qb.where(
+                  "establishments.fit_for_disabled_workers",
+                  "is",
+                  null, // this is not possible so this will return no results
+                );
+
+              return qb.where(
+                "establishments.fit_for_disabled_workers",
+                "in",
+                fitForDisabledWorkers,
+              );
+            },
             (qb) =>
               sirets?.length
                 ? qb.where("establishments.siret", "in", sirets)

@@ -44,7 +44,7 @@ export const defaultFormEstablishmentValue = (
   maxContactsPerMonth: defaultMaxContactsPerMonth,
   naf: undefined,
   isEngagedEnterprise: undefined,
-  fitForDisabledWorkers: false,
+  fitForDisabledWorkers: "no",
   businessNameCustomized: undefined,
   searchableBy: {
     jobSeekers: true,

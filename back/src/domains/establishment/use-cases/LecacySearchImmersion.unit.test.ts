@@ -1105,22 +1105,29 @@ describe("LegacySearchImmersionUseCase", () => {
   });
 
   describe("filter FitForDisabledWorkers", () => {
-    const establishmentWithFitForDisabledWorkersFalse =
+    const establishmentWithFitForDisabledWorkersNo =
       new EstablishmentAggregateBuilder(establishment)
         .withEstablishmentSiret("11111111111111")
-        .withFitForDisabledWorkers(false)
+        .withFitForDisabledWorkers("no")
         .build();
 
-    const establishmentWithFitForDisabledWorkersTrue =
+    const establishmentWithFitForDisabledWorkersYesCertified =
       new EstablishmentAggregateBuilder(establishment)
         .withEstablishmentSiret("11111111111112")
-        .withFitForDisabledWorkers(true)
+        .withFitForDisabledWorkers("yes-ft-certified")
+        .build();
+
+    const establishmentWithFitForDisabledWorkersYesDeclaredOnly =
+      new EstablishmentAggregateBuilder(establishment)
+        .withEstablishmentSiret("11111111111113")
+        .withFitForDisabledWorkers("yes-declared-only")
         .build();
 
     beforeEach(() => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
-        establishmentWithFitForDisabledWorkersFalse,
-        establishmentWithFitForDisabledWorkersTrue,
+        establishmentWithFitForDisabledWorkersNo,
+        establishmentWithFitForDisabledWorkersYesCertified,
+        establishmentWithFitForDisabledWorkersYesDeclaredOnly,
       ];
     });
 
@@ -1131,21 +1138,29 @@ describe("LegacySearchImmersionUseCase", () => {
 
       expectToEqual(response, [
         establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersFalse,
+          establishmentWithFitForDisabledWorkersNo,
           secretariatOffer.romeCode,
           606885,
-          establishmentWithFitForDisabledWorkersFalse.establishment.score,
+          establishmentWithFitForDisabledWorkersNo.establishment.score,
         ),
         establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersTrue,
+          establishmentWithFitForDisabledWorkersYesCertified,
           secretariatOffer.romeCode,
           606885,
-          establishmentWithFitForDisabledWorkersTrue.establishment.score,
+          establishmentWithFitForDisabledWorkersYesCertified.establishment
+            .score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithFitForDisabledWorkersYesDeclaredOnly,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
+            .score,
         ),
       ]);
     });
 
-    it("with filter false establishments with fitForDisabledWorkers false", async () => {
+    it("with filter false establishments with fitForDisabledWorkers false (legacy has no literals)", async () => {
       const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         fitForDisabledWorkers: false,
@@ -1153,15 +1168,22 @@ describe("LegacySearchImmersionUseCase", () => {
 
       expectToEqual(response, [
         establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersFalse,
+          establishmentWithFitForDisabledWorkersNo,
           secretariatOffer.romeCode,
           606885,
-          establishmentWithFitForDisabledWorkersFalse.establishment.score,
+          establishmentWithFitForDisabledWorkersNo.establishment.score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithFitForDisabledWorkersYesDeclaredOnly,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
+            .score,
         ),
       ]);
     });
 
-    it("with filter true establishments with fitForDisabledWorkers true", async () => {
+    it("with filter true establishments with fitForDisabledWorkers true (legacy has no literals)", async () => {
       const response = await legacySearchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
         fitForDisabledWorkers: true,
@@ -1169,10 +1191,11 @@ describe("LegacySearchImmersionUseCase", () => {
 
       expectToEqual(response, [
         establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersTrue,
+          establishmentWithFitForDisabledWorkersYesCertified,
           secretariatOffer.romeCode,
           606885,
-          establishmentWithFitForDisabledWorkersTrue.establishment.score,
+          establishmentWithFitForDisabledWorkersYesCertified.establishment
+            .score,
         ),
       ]);
     });
@@ -1427,4 +1450,5 @@ const lbbToSearchResult = (
   siret: lbb.siret,
   urlOfPartner: `https://labonneboite.francetravail.fr/entreprise/${lbb.siret}`,
   voluntaryToImmersion: false,
+  fitForDisabledWorkers: null,
 });

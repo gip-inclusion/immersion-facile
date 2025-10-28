@@ -6,6 +6,7 @@ import {
   defaultMaxContactsPerMonth,
   type EstablishmentSearchableBy,
   errors,
+  type FitForDisableWorkerOption,
   type FormEstablishmentSource,
   type Location,
   type NafDto,
@@ -63,7 +64,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
     students: true,
   },
   additionalInformation: "",
-  fitForDisabledWorkers: false,
+  fitForDisabledWorkers: "no",
   website: "",
   score: 10,
 };
@@ -98,7 +99,9 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
   }
 
-  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+  public withFitForDisabledWorkers(
+    fitForDisabledWorkers: FitForDisableWorkerOption,
+  ) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       fitForDisabledWorkers,
@@ -398,7 +401,9 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+  public withFitForDisabledWorkers(
+    fitForDisabledWorkers: FitForDisableWorkerOption,
+  ) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(

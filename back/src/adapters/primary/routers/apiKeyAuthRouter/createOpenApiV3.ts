@@ -68,6 +68,7 @@ const searchImmersionResult: SearchImmersionResultPublicV3 = {
   voluntaryToImmersion: true,
   website: "www.masuperboite.com",
   locationId: "123",
+  fitForDisabledWorkers: "no",
 };
 
 const withAuthorizationHeader = {

@@ -176,12 +176,12 @@ export class InMemoryEstablishmentAggregateRepository
           ? filters.sirets.includes(aggregate.establishment.siret)
           : true,
       )
-      .filter((aggregate) =>
-        filters.fitForDisabledWorkers !== undefined
-          ? aggregate.establishment.fitForDisabledWorkers ===
-            filters.fitForDisabledWorkers
-          : true,
-      )
+      .filter((aggregate) => {
+        if (filters.fitForDisabledWorkers === undefined) return true;
+        return filters.fitForDisabledWorkers.includes(
+          aggregate.establishment.fitForDisabledWorkers,
+        );
+      })
       .filter((aggregate) =>
         filters.nafCodes?.length
           ? filters.nafCodes.includes(aggregate.establishment.nafDto.code)
@@ -262,11 +262,21 @@ export class InMemoryEstablishmentAggregateRepository
             ]
           : true,
       )
-      .filter((agg) =>
-        fitForDisabledWorkers !== undefined
-          ? agg.establishment.fitForDisabledWorkers === fitForDisabledWorkers
-          : true,
-      )
+      .filter((agg) => {
+        if (fitForDisabledWorkers === undefined) return true;
+        if (fitForDisabledWorkers === true) {
+          return agg.establishment.fitForDisabledWorkers === "yes-ft-certified";
+        }
+
+        if (fitForDisabledWorkers === false) {
+          return ["no", "yes-declared-only"].includes(
+            agg.establishment.fitForDisabledWorkers,
+          );
+        }
+
+        fitForDisabledWorkers satisfies never;
+        return false;
+      })
       .filter((aggregate) =>
         searchMade.nafCodes?.length
           ? searchMade.nafCodes.includes(aggregate.establishment.nafDto.code)
@@ -398,6 +408,7 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
     locationId: location.id,
     updatedAt: establishmentAgg.establishment.updatedAt?.toISOString(),
     createdAt: establishmentAgg.establishment.createdAt.toISOString(),
+    fitForDisabledWorkers: "no",
   };
 };
 
@@ -434,4 +445,5 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
     })),
   updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
   createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
+  fitForDisabledWorkers: "no",
 });

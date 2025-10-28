@@ -4,6 +4,7 @@ import type {
   ContactMode,
   DateTimeIsoString,
   EstablishmentSearchableBy,
+  FitForDisableWorkerOption,
   FormEstablishmentSource,
   Location,
   NafDto,
@@ -19,7 +20,7 @@ export type EstablishmentEntity = {
   additionalInformation?: string;
   createdAt: Date;
   customizedName?: string;
-  fitForDisabledWorkers: boolean;
+  fitForDisabledWorkers: FitForDisableWorkerOption;
   isCommited?: boolean;
   isOpen: boolean;
   isMaxDiscussionsForPeriodReached: boolean;

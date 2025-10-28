@@ -9,6 +9,7 @@ import type {
   ContactMode,
   EstablishmentCSVRow,
   EstablishmentSearchableBy,
+  FitForDisableWorkerOption,
   FormEstablishmentAddress,
   FormEstablishmentDto,
   FormEstablishmentSource,
@@ -109,7 +110,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
   isEngagedEnterprise: false,
-  fitForDisabledWorkers: false,
+  fitForDisabledWorkers: "no",
   siret: "01234567890123",
   website: "https://www@super.com/jobs",
   additionalInformation: "",
@@ -186,7 +187,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
     students: true,
   },
   businessNameCustomized: "Updated Business Name",
-  fitForDisabledWorkers: false,
+  fitForDisabledWorkers: "no",
   isEngagedEnterprise: false,
   nextAvailabilityDate: new Date("2025-02-01").toISOString(),
 };
@@ -208,7 +209,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   appellations: [],
   website: "",
   additionalInformation: "",
-  fitForDisabledWorkers: false,
+  fitForDisabledWorkers: "no",
   maxContactsPerMonth: defaultMaxContactsPerMonth,
   searchableBy: {
     jobSeekers: true,
@@ -271,7 +272,9 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({ ...this.#dto, businessName });
   }
 
-  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+  public withFitForDisabledWorkers(
+    fitForDisabledWorkers: FitForDisableWorkerOption,
+  ) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       fitForDisabledWorkers,

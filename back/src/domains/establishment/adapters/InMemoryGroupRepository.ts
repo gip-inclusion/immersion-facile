@@ -38,6 +38,7 @@ export const stubSearchResult: SearchResultDto = {
   locationId: "123",
   updatedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
+  fitForDisabledWorkers: null,
 };
 
 export class InMemoryGroupRepository implements GroupRepository {

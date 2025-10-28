@@ -155,7 +155,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       const nextAvailabilityDate = new Date();
 
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFitForDisabledWorkers(true)
+        .withFitForDisabledWorkers("yes-declared-only")
         .withSiret("90040893100013")
         .withAppellations(appellations)
         .withNextAvailabilityDate(nextAvailabilityDate)
@@ -211,7 +211,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 .withScore(0)
                 .build(),
             )
-            .withFitForDisabledWorkers(true)
+            .withFitForDisabledWorkers("yes-declared-only")
             .withUserRights([
               {
                 role: "establishment-admin",
@@ -261,7 +261,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       ];
       const nextAvailabilityDate = new Date();
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFitForDisabledWorkers(true)
+        .withFitForDisabledWorkers("yes-declared-only")
         .withSiret("90040893100013")
         .withAppellations(professions)
         .withNextAvailabilityDate(nextAvailabilityDate)
@@ -316,7 +316,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 .withScore(0)
                 .build(),
             )
-            .withFitForDisabledWorkers(true)
+            .withFitForDisabledWorkers("yes-declared-only")
             .withUserRights([
               {
                 role: "establishment-admin",
@@ -718,7 +718,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
   describe("Behaviors from old AddFromEstablishment", () => {
     it("saves an establishment in the repository and publish event", async () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFitForDisabledWorkers(true)
+        .withFitForDisabledWorkers("yes-declared-only")
         .withBusinessAddresses([defaultAddress.formAddress])
         .withMaxContactsPerMonth(9)
         .withNextAvailabilityDate(new Date())

@@ -35,6 +35,7 @@ import type {
   SiretAdditionFailure,
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
+import { fitForDisabledWorkersOptions } from "./FormEstablishment.dto";
 
 export const defaultMaxContactsPerMonth = 6;
 export const noContactPerMonth = 0;
@@ -120,6 +121,8 @@ export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources, {
   error: localization.invalidEnum,
 });
 
+export const fitForDisabledWorkersSchema = z.enum(fitForDisabledWorkersOptions);
+
 const formEstablishmentCommonShape = {
   source: formEstablishmentSourceSchema,
   siret: siretSchema,
@@ -141,7 +144,7 @@ const formEstablishmentCommonShape = {
     )
     .min(1),
   isEngagedEnterprise: zBoolean.optional(),
-  fitForDisabledWorkers: zBoolean,
+  fitForDisabledWorkers: fitForDisabledWorkersSchema,
   naf: nafSchema.optional(),
   appellations: z
     .array(appellationDtoSchema)

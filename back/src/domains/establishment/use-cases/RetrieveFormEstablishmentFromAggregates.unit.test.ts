@@ -402,7 +402,7 @@ const makeExpectedFormEstablishment = ({
   additionalInformation:
     establishmentAggregate.establishment.additionalInformation,
   maxContactsPerMonth: establishmentAggregate.establishment.maxContactsPerMonth,
-  fitForDisabledWorkers: false,
+  fitForDisabledWorkers: "no",
   searchableBy: {
     jobSeekers: true,
     students: false,

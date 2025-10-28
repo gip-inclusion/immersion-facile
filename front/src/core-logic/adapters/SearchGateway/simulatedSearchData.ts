@@ -19,7 +19,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "B'T WIN VILLAGE",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: 3.0858455, lat: 50.6210299 },
     romeLabel: "Design industriel",
     appellations: [
@@ -53,7 +53,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "DECATHLON MORLAIX",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: -3.8558397, lat: 48.5777403 },
     romeLabel: "Éducation en activités sportives",
     appellations: [
@@ -86,7 +86,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "DECATHLON France",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: 2.5984269, lat: 48.7758459 },
     romeLabel: "Vente en articles de sport et loisirs",
     appellations: [
@@ -119,7 +119,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "DECATHLON MACON",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: 4.800488, lat: 46.274576 },
     romeLabel: "Vente en articles de sport et loisirs",
     appellations: [
@@ -152,7 +152,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "DECATHLON FRANCE",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: -1.1882893, lat: 47.3735584 },
     romeLabel: "Vente en articles de sport et loisirs",
     appellations: [
@@ -185,7 +185,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "DECATHLON FRANCE",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: -1.1882893, lat: 47.3735584 },
     romeLabel: "Personnel de caisse",
     appellations: [
@@ -218,7 +218,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "DECATHLON OLONNE SUR MER",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: -1.78808797973392, lat: 46.51365235 },
     romeLabel: "Vente en articles de sport et loisirs",
     appellations: [
@@ -252,7 +252,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Chez DECATHLON, les équipes sont engagées pour le sport. Notre entreprise aime valoriser les initiatives, elle permet à tous de s’investir et d’évoluer. “Jouer collectif” fait partie de notre ADN, nous gagnons ensemble uniquement si nous sommes une équipe unie et engagée. Nous portons un sens fort : Être utile aux gens et à leur planète. Le sport n'a de sens que dans un environnement préservé. Nous développons nos activités sans dégrader nos terrains de jeux en proposant des services liés à l'économie circulaire, en proposant des produits éco-conçus en sourçant des énergies renouvelables... Decathlon est engagé dans l'inclusion et la non-discrimination, et agit ainsi quotidiennement en faveur du handicap, des séniors, de la mixité sociale, de l'égalité entre les femmes et les hommes. Chez Decathlon, nous recrutons avant tout des personnalités. Viens vivre une journée d'immersion et de découverte du métier, le mardi 28 mars!",
     customizedName: "DECATHLON EVRY 2",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: 2.427141, lat: 48.630773 },
     romeLabel: "Vente en articles de sport et loisirs",
     appellations: [
@@ -285,7 +285,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       "Viens découvrir les métiers de la logistique ! Rien n'est impossible. Tout sera fait pour te permettre d'intégrer nos équipes même si tu te penses en difficulté.",
     customizedName: "Decathlon Logistique",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: false,
+    fitForDisabledWorkers: "no",
     position: { lon: 7.3079948, lat: 47.8053861 },
     romeLabel: "Magasinage et préparation de commandes",
     appellations: [
@@ -348,7 +348,7 @@ export const seedSearchResults: SearchResultDto[] = [
     siret: "12345678901234",
     name: "Super Corp",
     voluntaryToImmersion: true,
-    fitForDisabledWorkers: true,
+    fitForDisabledWorkers: "yes-ft-certified",
     position: { lat: 48.8666, lon: 2.3333 },
     address: defaultAddress,
     contactMode: "PHONE",
@@ -398,6 +398,7 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 7000,
     locationId: "123",
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     rome: "A0003",
@@ -434,6 +435,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     rome: "A0002",
@@ -462,6 +464,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     rome: "A0003",
@@ -485,6 +488,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -516,6 +520,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -548,6 +553,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -580,6 +586,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -612,6 +619,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -643,6 +651,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "5610C",
@@ -675,6 +684,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -706,6 +716,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -738,6 +749,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -770,6 +782,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -801,6 +814,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -832,6 +846,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -864,6 +879,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -896,6 +912,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -928,6 +945,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: null,
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -959,6 +977,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -990,6 +1009,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "4724Z",
@@ -1022,6 +1042,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1054,6 +1075,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1086,6 +1108,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1117,6 +1140,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1148,6 +1172,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1180,6 +1205,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1212,6 +1238,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1244,6 +1271,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1275,6 +1303,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1306,6 +1335,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1338,6 +1368,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1370,6 +1401,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1402,6 +1434,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1433,6 +1466,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1464,6 +1498,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1496,6 +1531,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1527,6 +1563,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1563,6 +1600,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1594,6 +1632,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1626,6 +1665,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1657,6 +1697,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1689,6 +1730,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1721,6 +1763,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "5610C",
@@ -1753,6 +1796,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1785,6 +1829,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1817,6 +1862,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1849,6 +1895,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1881,6 +1928,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1912,6 +1960,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1944,6 +1993,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -1976,6 +2026,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2008,6 +2059,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2039,6 +2091,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "4724Z",
@@ -2071,6 +2124,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2102,6 +2156,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2134,6 +2189,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2166,6 +2222,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "4724Z",
@@ -2198,6 +2255,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2230,6 +2288,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2261,6 +2320,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2291,6 +2351,7 @@ export const seedSearchResults: SearchResultDto[] = [
     numberOfEmployeeRange: "1-2",
     locationId: "123",
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2323,6 +2384,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "5610A",
@@ -2353,6 +2415,7 @@ export const seedSearchResults: SearchResultDto[] = [
     numberOfEmployeeRange: "20-49",
     locationId: "123",
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "4724Z",
@@ -2385,6 +2448,7 @@ export const seedSearchResults: SearchResultDto[] = [
     numberOfEmployeeRange: "6-9",
     locationId: "123",
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "1071C",
@@ -2416,6 +2480,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
   {
     naf: "6820B",
@@ -2448,5 +2513,6 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    fitForDisabledWorkers: null,
   },
 ];

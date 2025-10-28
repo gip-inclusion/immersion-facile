@@ -354,12 +354,18 @@ export const OffersSettingsSection = ({
             nativeInputProps: {
               ...option.nativeInputProps,
               checked:
-                Boolean(option.nativeInputProps.value) ===
-                formValues.fitForDisabledWorkers,
+                (Boolean(option.nativeInputProps.value) === true &&
+                  ["yes-declared-only", "yes-ft-certified"].includes(
+                    formValues.fitForDisabledWorkers,
+                  )) ||
+                (Boolean(option.nativeInputProps.value) === false &&
+                  formValues.fitForDisabledWorkers === "no"),
               onChange: () => {
                 setValue(
                   "fitForDisabledWorkers",
-                  option.nativeInputProps.value === 1,
+                  option.nativeInputProps.value === 1
+                    ? "yes-declared-only"
+                    : "no",
                 );
               },
             },
