@@ -469,10 +469,10 @@ const filterSearch =
         // Search in convention ID (cast UUID to text for pattern matching)
         sql<any>`CAST(${eb.ref("conventions.id")} AS text) LIKE ${pattern}`,
         // Search in beneficiary names
-        sql<any>`${eb.ref("b.first_name")} LIKE ${pattern}`,
-        sql<any>`${eb.ref("b.last_name")} LIKE ${pattern}`,
+        sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
         // Search in establishment business name
-        sql<any>`${eb.ref("business_name")} LIKE ${pattern}`,
+        sql<any>`${eb.ref("business_name")} ILIKE ${pattern}`,
         // Search in establishment SIRET
         sql<any>`${eb.ref("conventions.siret")} LIKE ${pattern}`,
         // Search in actor emails
@@ -481,6 +481,9 @@ const filterSearch =
         sql<any>`${eb.ref("et.email")} LIKE ${pattern}`,
         sql<any>`br.email IS NOT NULL AND br.email LIKE ${pattern}`,
         sql<any>`bce.email IS NOT NULL AND bce.email LIKE ${pattern}`,
+        // Search agency referent names
+        sql<any>`${eb.ref("agency_referent_first_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("agency_referent_last_name")} ILIKE ${pattern}`,
       ]),
     );
   };
