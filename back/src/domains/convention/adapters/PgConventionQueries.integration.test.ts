@@ -1090,6 +1090,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBusinessName("Business A")
+      .withAgencyReferent({
+        firstname: "Marie",
+        lastname: "Dupont",
+      })
       .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
@@ -1103,6 +1107,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withBeneficiaryFirstName("Jane")
       .withBeneficiaryLastName("Smith")
       .withBusinessName("Business B")
+      .withAgencyReferent({
+        firstname: "Pierre",
+        lastname: "Martin",
+      })
       .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
@@ -1339,6 +1347,39 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(result.data, []);
     });
 
+    it("should filter conventions by agency referent first name", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { search: "Marie" },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expectToEqual(result.data, [
+        { ...conventionA, ...agencyFields, assessment: null },
+      ]);
+    });
+
+    it("should filter conventions by agency referent last name", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { search: "Martin" },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expectToEqual(result.data, [
+        { ...conventionB, ...agencyFields, assessment: null },
+      ]);
+    });
     it("should filter conventions by date range", async () => {
       const result =
         await conventionQueries.getPaginatedConventionsForAgencyUser({
