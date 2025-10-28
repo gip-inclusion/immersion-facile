@@ -137,7 +137,12 @@ export const SearchListResults = ({
                               searchResult.establishmentScore,
                             ) && <ImTag theme="superEnterprise" />}
                             {searchResult.fitForDisabledWorkers ===
-                              "yes-ft-certified" && <ImTag theme="rqth" />}
+                              "yes-ft-certified" && (
+                              <ImTag
+                                theme="rqth"
+                                label="Reconnu handi-engagé"
+                              />
+                            )}
                             {searchResult.fitForDisabledWorkers ===
                               "yes-declared-only" && <ImTag theme="rqth" />}
                             {!searchResult.voluntaryToImmersion && (
