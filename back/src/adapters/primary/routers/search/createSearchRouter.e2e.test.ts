@@ -71,7 +71,7 @@ const toSearchImmersionResults = (
     ...(withDistance !== false ? { distance_m: withDistance } : {}),
     updatedAt: defaultUpdatedAt.toISOString(),
     createdAt: establishment.createdAt.toISOString(),
-    fitForDisabledWorkers: null,
+    fitForDisabledWorkers: "no",
   }));
 
 const offer1 = new OfferEntityBuilder()
@@ -680,7 +680,7 @@ describe("search-immersion route", () => {
           locationId: defaultLocation.id,
           updatedAt: defaultUpdatedAt.toISOString(),
           createdAt: new Date("2024-08-08").toISOString(),
-          fitForDisabledWorkers: null,
+          fitForDisabledWorkers: "no",
         },
       });
     });
