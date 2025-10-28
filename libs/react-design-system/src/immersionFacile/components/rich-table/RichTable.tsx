@@ -107,7 +107,7 @@ export const RichTable = ({
                 setSearchValue(event.target.value);
               },
             }}
-            className={fr.cx("fr-mb-0", "fr-col-lg-4")}
+            className={fr.cx("fr-mb-0", "fr-col-lg-7")}
           />
           <Button type="submit">Rechercher</Button>
         </form>
