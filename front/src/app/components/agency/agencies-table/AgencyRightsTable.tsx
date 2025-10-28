@@ -73,7 +73,17 @@ export const AgencyRightsTable = ({
           "Mes Rôles & préférences",
         ]}
         data={agencyRights
-          .sort((a, b) => a.agency.name.localeCompare(b.agency.name))
+          .sort((a, b) => {
+            const aIsClosedOrRejected =
+              a.agency.status === "closed" || a.agency.status === "rejected";
+            const bIsClosedOrRejected =
+              b.agency.status === "closed" || b.agency.status === "rejected";
+
+            if (aIsClosedOrRejected && !bIsClosedOrRejected) return 1;
+            if (!aIsClosedOrRejected && bIsClosedOrRejected) return -1;
+
+            return a.agency.name.localeCompare(b.agency.name);
+          })
           .map((agencyRight) =>
             AgencyRightLine(
               agencyRight,
