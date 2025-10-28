@@ -301,7 +301,7 @@ export const ConventionList = () => {
               headers={getTableHeaders()}
               isLoading={isLoading}
               data={conventions.map((convention) => [
-                <Fragment key={convention.id}>
+                <Fragment key={`${convention.id}-counsellor`}>
                   <strong>
                     {getFormattedFirstnameAndLastname({
                       firstname: convention.agencyReferent?.firstname,
@@ -310,7 +310,7 @@ export const ConventionList = () => {
                   </strong>{" "}
                   <Tooltip kind="hover" title={convention.agencyName} />
                 </Fragment>,
-                <Fragment key={convention.id}>
+                <Fragment key={`${convention.id}-status`}>
                   <Badge
                     className={cx(
                       labelAndSeverityByStatus[convention.status].color,
@@ -320,14 +320,14 @@ export const ConventionList = () => {
                     {labelAndSeverityByStatus[convention.status].label}
                   </Badge>
                 </Fragment>,
-                <Fragment key={convention.id}>
+                <Fragment key={`${convention.id}-assessment`}>
                   <strong>
                     {convention.status === "ACCEPTED_BY_VALIDATOR" &&
                       (convention.assessment ? "✅ oui" : "❌ non")}
                   </strong>
                 </Fragment>,
 
-                <Fragment key={convention.id}>
+                <Fragment key={`${convention.id}-beneficiary`}>
                   <strong>
                     {getFormattedFirstnameAndLastname({
                       firstname: convention.signatories.beneficiary.firstName,
@@ -335,10 +335,10 @@ export const ConventionList = () => {
                     })}
                   </strong>
                 </Fragment>,
-                <Fragment key={convention.id}>
+                <Fragment key={`${convention.id}-establishment`}>
                   <strong>{convention.businessName}</strong>
                 </Fragment>,
-                <Fragment key={convention.id}>
+                <Fragment key={`${convention.id}-dates`}>
                   Du&nbsp;
                   {toDisplayedDate({
                     date: new Date(convention.dateStart),
@@ -353,7 +353,7 @@ export const ConventionList = () => {
                 </Fragment>,
 
                 <Button
-                  key={convention.id}
+                  key={`${convention.id}-actions`}
                   id={`${domElementIds.agencyDashboard.dashboard.goToConventionButton}--${convention.id}`}
                   size="small"
                   iconId="fr-icon-external-link-line"
