@@ -265,13 +265,13 @@ export class InMemoryEstablishmentAggregateRepository
       .filter((agg) => {
         if (fitForDisabledWorkers === undefined) return true;
         if (fitForDisabledWorkers === true) {
-          return agg.establishment.fitForDisabledWorkers === "yes-ft-certified";
+          return ["yes-declared-only", "yes-ft-certified"].includes(
+            agg.establishment.fitForDisabledWorkers,
+          );
         }
 
         if (fitForDisabledWorkers === false) {
-          return ["no", "yes-declared-only"].includes(
-            agg.establishment.fitForDisabledWorkers,
-          );
+          return ["no"].includes(agg.establishment.fitForDisabledWorkers);
         }
 
         fitForDisabledWorkers satisfies never;

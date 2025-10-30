@@ -140,7 +140,7 @@ export const SearchListResults = ({
                               "yes-ft-certified" && (
                               <ImTag
                                 theme="rqth"
-                                label="Reconnu handi-engagé"
+                                label="Reconnue handi-engagée"
                               />
                             )}
                             {searchResult.fitForDisabledWorkers ===
