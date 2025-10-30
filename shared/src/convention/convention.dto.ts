@@ -31,6 +31,7 @@ import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
 import type {
   AppSupportedJwt,
   expiredMagicLinkErrorMessage,
+  unsupportedMagicLinkErrorMessage,
 } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 import type {
@@ -400,7 +401,9 @@ export type RenewMagicLinkRequestDto = {
 };
 
 export type RenewMagicLinkResponse = {
-  message: typeof expiredMagicLinkErrorMessage;
+  message:
+    | typeof expiredMagicLinkErrorMessage
+    | typeof unsupportedMagicLinkErrorMessage;
   needsNewMagicLink: boolean;
 };
 
