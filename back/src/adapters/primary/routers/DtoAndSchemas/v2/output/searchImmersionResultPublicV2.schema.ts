@@ -14,7 +14,7 @@ import {
 import { z } from "zod";
 import type { SearchImmersionResultPublicV2 } from "./SearchImmersionResultPublicV2.dto";
 
-export const serachResultPublicV2Schema: ZodSchemaWithInputMatchingOutput<SearchImmersionResultPublicV2> =
+export const searchResultPublicV2Schema: ZodSchemaWithInputMatchingOutput<SearchImmersionResultPublicV2> =
   z.object({
     rome: romeCodeSchema,
     romeLabel: z.string(),
@@ -51,6 +51,5 @@ export const serachResultPublicV2Schema: ZodSchemaWithInputMatchingOutput<Search
     ),
     updatedAt: dateTimeIsoStringSchema.optional(),
     createdAt: dateTimeIsoStringSchema.optional(),
-    // locationId: zUuidLike,
     locationId: zUuidLike.or(z.null()),
   });

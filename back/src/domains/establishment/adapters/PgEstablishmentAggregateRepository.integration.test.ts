@@ -55,6 +55,7 @@ import {
   establishmentCuvisteAtSaintesAndVeaux,
   establishmentWithFitForDisabledWorkersNo,
   establishmentWithFitForDisabledWorkersYesCertified,
+  establishmentWithFitForDisabledWorkersYesDeclaredOnly,
   establishmentWithOfferA1101_AtPosition,
   establishmentWithOfferA1101_close,
   establishmentWithOfferA1101_outOfDistanceRange,
@@ -520,6 +521,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       describe("filters.fitForDisabledWorkers", () => {
         const testEstablishmentAggregates: EstablishmentAggregate[] = [
           establishmentWithFitForDisabledWorkersYesCertified,
+          establishmentWithFitForDisabledWorkersYesDeclaredOnly,
           establishmentWithFitForDisabledWorkersNo,
         ];
 
@@ -553,6 +555,33 @@ describe("PgEstablishmentAggregateRepository", () => {
                   establishmentWithFitForDisabledWorkersYesCertified.offers,
                 withLocationAndDistance:
                   establishmentWithFitForDisabledWorkersYesCertified
+                    .establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ],
+          });
+        });
+        it("filter on fitForDisabledWorkers with value 'yes-declared-only'", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { fitForDisabledWorkers: ["yes-declared-only"] },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 1,
+            },
+            data: [
+              makeExpectedSearchResult({
+                establishment:
+                  establishmentWithFitForDisabledWorkersYesDeclaredOnly,
+                withOffers:
+                  establishmentWithFitForDisabledWorkersYesDeclaredOnly.offers,
+                withLocationAndDistance:
+                  establishmentWithFitForDisabledWorkersYesDeclaredOnly
                     .establishment.locations[0],
                 nafLabel: "Activités des agences de travail temporaire",
               }),

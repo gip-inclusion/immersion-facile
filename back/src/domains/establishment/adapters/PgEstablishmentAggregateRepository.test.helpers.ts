@@ -402,6 +402,19 @@ export const establishmentWithFitForDisabledWorkersYesCertified =
     ])
     .build();
 
+export const establishmentWithFitForDisabledWorkersYesDeclaredOnly =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000026")
+    .withFitForDisabledWorkers("yes-declared-only")
+    .withUserRights([osefUserRight])
+    .withLocations([
+      {
+        ...locationOfCloseSearchPosition,
+        id: uuid(),
+      },
+    ])
+    .build();
+
 export const closedEstablishment = new EstablishmentAggregateBuilder()
   .withOffers([cartographeImmersionOffer])
   .withLocations([
