@@ -28,7 +28,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
     illustration: heroHeaderDefaultIllustration,
     icon: "",
     subtitle:
-      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en un temps record !",
   },
   candidate: {
     title:

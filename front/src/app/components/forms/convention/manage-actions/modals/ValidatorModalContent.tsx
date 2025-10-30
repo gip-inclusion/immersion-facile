@@ -66,7 +66,7 @@ export const ValidatorModalContent = ({
       <p>
         Pour {newStatus === "ACCEPTED_BY_VALIDATOR" ? "valider" : "pré-valider"}{" "}
         la convention, veuillez saisir les informations de la personne qui
-        valide la demande. Ces informations apparaitrons sur la convention
+        valide la demande. Ces informations apparaitront sur la convention
         finale au format PDF.
       </p>
       <Input
