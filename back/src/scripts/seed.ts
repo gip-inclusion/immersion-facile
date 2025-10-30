@@ -59,9 +59,12 @@ const resetDb = async (db: KyselyDb) => {
 };
 
 const seed = async () => {
-  const deps = await createAppDependencies(AppConfig.createFromEnv());
+  const config = AppConfig.createFromEnv();
+  const deps = await createAppDependencies(config);
   const pool = deps.getPgPoolFn();
-  const db = makeKyselyDb(pool);
+  const db = makeKyselyDb(pool, {
+    isDev: config.envType !== "production",
+  });
 
   await resetDb(db);
   await executeSeedTasks(db, deps);
