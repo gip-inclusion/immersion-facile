@@ -9,6 +9,7 @@ import {
   errors,
   expiredMagicLinkErrorMessage,
   type PayloadKind,
+  unsupportedMagicLinkErrorMessage,
 } from "shared";
 import type { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
 import { type JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
@@ -128,7 +129,7 @@ const sendNeedsRenewedLinkError = (res: Response, error: Error) => {
         message:
           error.message === "jwt expired"
             ? expiredMagicLinkErrorMessage
-            : error.message,
+            : unsupportedMagicLinkErrorMessage,
         needsNewMagicLink: true,
       })
     : res.json({ message: JSON.stringify(error), needsNewMagicLink: true });

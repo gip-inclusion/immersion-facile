@@ -40,7 +40,10 @@ import {
   numberOfEmployeesRangeSchema,
   siretSchema,
 } from "../siret/siret.schema";
-import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
+import {
+  expiredMagicLinkErrorMessage,
+  unsupportedMagicLinkErrorMessage,
+} from "../tokens/jwt.dto";
 import type { OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
@@ -633,7 +636,9 @@ export const renewMagicLinkRequestSchema: ZodSchemaWithInputMatchingOutput<Renew
 
 export const renewMagicLinkResponseSchema: ZodSchemaWithInputMatchingOutput<RenewMagicLinkResponse> =
   z.object({
-    message: z.literal(expiredMagicLinkErrorMessage),
+    message: z
+      .literal(expiredMagicLinkErrorMessage)
+      .or(z.literal(unsupportedMagicLinkErrorMessage)),
     needsNewMagicLink: z.boolean(),
   });
 
