@@ -1173,13 +1173,6 @@ describe("LegacySearchImmersionUseCase", () => {
           606885,
           establishmentWithFitForDisabledWorkersNo.establishment.score,
         ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersYesDeclaredOnly,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
-            .score,
-        ),
       ]);
     });
 
@@ -1195,6 +1188,13 @@ describe("LegacySearchImmersionUseCase", () => {
           secretariatOffer.romeCode,
           606885,
           establishmentWithFitForDisabledWorkersYesCertified.establishment
+            .score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithFitForDisabledWorkersYesDeclaredOnly,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
             .score,
         ),
       ]);

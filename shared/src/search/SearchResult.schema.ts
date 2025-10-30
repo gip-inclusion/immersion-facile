@@ -43,7 +43,7 @@ export const searchResultSchema: ZodSchemaWithInputMatchingOutput<SearchResultDt
     numberOfEmployeeRange: z.string().optional(),
     website: absoluteUrlSchema.or(z.literal("")).optional(),
     additionalInformation: zStringCanBeEmpty.optional(),
-    fitForDisabledWorkers: fitForDisabledWorkersSchema,
+    fitForDisabledWorkers: fitForDisabledWorkersSchema.nullable(),
     urlOfPartner: z.string().optional(),
     appellations: z.array(
       z.object({
