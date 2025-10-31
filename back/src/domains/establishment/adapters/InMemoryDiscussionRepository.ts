@@ -9,6 +9,7 @@ import type {
 } from "shared";
 import type {
   DiscussionRepository,
+  GetDiscussionIdsParams,
   GetDiscussionsParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
@@ -19,11 +20,28 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
   constructor(private _discussions: DiscussionsById = {}) {}
 
   public discussionCallsCount = 0;
+  public archivedDiscussionIds: DiscussionId[] = [];
 
   public async getPaginatedDiscussionsForUser(): Promise<
     DataWithPagination<DiscussionInList>
   > {
     throw new Error("Not implemented");
+  }
+
+  public async archiveDiscussions(
+    discussionIds: DiscussionId[],
+  ): Promise<void> {
+    this.discussions = this.discussions.reduce<DiscussionDto[]>(
+      (acc, discussion) => [
+        ...acc,
+        ...(discussionIds.includes(discussion.id) ? [] : [discussion]),
+      ],
+      [],
+    );
+    this.archivedDiscussionIds = [
+      ...this.archivedDiscussionIds,
+      ...discussionIds,
+    ];
   }
 
   public async getDiscussions({
@@ -63,6 +81,38 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
       .slice(0, limit);
 
     return discussions;
+  }
+
+  public async getDiscussionIds({
+    filters,
+    limit,
+    orderBy,
+  }: GetDiscussionIdsParams): Promise<DiscussionId[]> {
+    const discussionFilters: Array<(discussion: DiscussionDto) => boolean> = [
+      ({ status }) =>
+        filters.statuses && filters.statuses.length > 0
+          ? filters.statuses.includes(status)
+          : true,
+      ({ updatedAt }) =>
+        filters.updatedBetween?.from
+          ? new Date(updatedAt) >= filters.updatedBetween.from
+          : true,
+      ({ updatedAt }) =>
+        filters.updatedBetween?.to
+          ? new Date(updatedAt) <= filters.updatedBetween.to
+          : true,
+    ];
+
+    return this.discussions
+      .filter((discussion) =>
+        discussionFilters.every((filter) => filter(discussion)),
+      )
+      .sort((a, b) => {
+        if (orderBy === "updatedAt") return a.updatedAt >= b.updatedAt ? 1 : -1;
+        return 0;
+      })
+      .map(({ id }) => id)
+      .slice(0, limit);
   }
 
   public async countDiscussionsForSiretSince(siret: SiretDto, since: Date) {
