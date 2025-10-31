@@ -14,11 +14,11 @@ import {
   type WithEstablishmentDashboards,
 } from "shared";
 import { AgencyTasks } from "src/app/components/agency/agency-dashboard/AgencyTasks";
+import { ConventionList } from "src/app/components/agency/agency-dashboard/ConventionList";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { MetabaseView } from "../../../MetabaseView";
-import { SelectConventionFromIdForm } from "../../../SelectConventionFromIdForm";
 
 const selectAgencyToInitiateConventionModal = createModal({
   isOpenedByDefault: false,
@@ -114,9 +114,7 @@ export const ConventionTabContent = ({
           setSeeAllConventions(true);
         }}
       />
-      <HeadingSection titleAs="h3" title="Piloter une convention">
-        <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
-      </HeadingSection>
+      <ConventionList />
       <MetabaseView
         titleAs="h3"
         title="Tableau de bord agence"

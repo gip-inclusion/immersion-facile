@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { jsonBuildObject } from "kysely/helpers/postgres";
 import { andThen } from "ramda";
 import {
+  type AssessmentCompletionStatusFilter,
   type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
@@ -245,17 +246,16 @@ export class PgConventionQueries implements ConventionQueries {
     agencyUserId: UserId;
     pagination: Required<PaginationQueryParams>;
     filters?: GetPaginatedConventionsFilters;
-  }): Promise<DataWithPagination<ConventionDto>> {
+  }): Promise<DataWithPagination<ConventionReadDto>> {
     const {
-      actorEmailContains,
-      beneficiaryNameContains,
-      establishmentNameContains,
+      search,
       statuses,
       agencyIds,
       agencyDepartmentCodes,
       dateStart,
       dateEnd,
       dateSubmission,
+      assessmentCompletionStatus,
       ...rest
     } = filters;
 
@@ -266,23 +266,76 @@ export class PgConventionQueries implements ConventionQueries {
         transaction: this.transaction,
         agencyUserId,
       }),
-      filterEmail(actorEmailContains?.trim()),
-      filterByBeneficiaryName(beneficiaryNameContains?.trim()),
-      filterEstablishmentName(establishmentNameContains?.trim()),
+      filterSearch(search?.trim()),
       filterDate("date_start", dateStart),
       filterDate("date_end", dateEnd),
       filterDate("date_submission", dateSubmission),
       filterInList("status", statuses),
       filterInList("agency_id", agencyIds),
       filterByAgencyDepartmentCodes(agencyDepartmentCodes),
+      filterAssessmentCompletionStatus(assessmentCompletionStatus),
       sortConventions(sort),
       applyPagination(pagination),
     ).execute();
 
     const totalRecords = data.at(0)?.total_count ?? 0;
 
+    if (data.length === 0) {
+      return {
+        data: [],
+        pagination: calculatePaginationResult({
+          ...pagination,
+          totalRecords,
+        }),
+      };
+    }
+
+    const agencyIdsInResult = data.map(({ dto }) => dto.agencyId);
+    const uniqAgencyIds = [...new Set(agencyIdsInResult)];
+
+    const agencyFieldsByAgencyIds = await getConventionAgencyFieldsForAgencies(
+      this.transaction,
+      uniqAgencyIds,
+    );
+
+    const assessmentPromises = data.map(async ({ dto }) => {
+      const assessment = await getAssessmentFieldsByConventionId(
+        this.transaction,
+        dto.id,
+      );
+      return { conventionId: dto.id, assessment };
+    });
+
+    const assessmentResults = await Promise.all(assessmentPromises);
+    const assessmentByConventionId = assessmentResults.reduce(
+      (acc, { conventionId, assessment }) => {
+        acc[conventionId] = assessment;
+        return acc;
+      },
+      {} as Record<string, ConventionAssessmentFields>,
+    );
+
+    const conventionsReadDto = data.map(({ dto }) => {
+      const agencyFields = agencyFieldsByAgencyIds[dto.agencyId];
+      if (!agencyFields)
+        throw errors.agency.notFound({ agencyId: dto.agencyId });
+
+      const assessmentFields = assessmentByConventionId[dto.id];
+
+      return validateAndParseZodSchema({
+        schemaName: "conventionReadSchema",
+        inputSchema: conventionReadSchema,
+        schemaParsingInput: {
+          ...dto,
+          ...agencyFields,
+          ...assessmentFields,
+        },
+        logger,
+      });
+    });
+
     return {
-      data: data.map(({ dto }) => dto),
+      data: conventionsReadDto,
       pagination: calculatePaginationResult({ ...pagination, totalRecords }),
     };
   }
@@ -310,6 +363,7 @@ const sortConventions =
       dateSubmission: "date_submission",
       dateStart: "date_start",
       dateValidation: "date_validation",
+      dateEnd: "date_end",
     };
 
     if (!sort || !sort.by) return builder.orderBy(sortByKey.dateStart, "desc");
@@ -328,6 +382,47 @@ const filterByAgencyDepartmentCodes =
       "in",
       agencyDepartmentCodes,
     );
+  };
+
+const filterAssessmentCompletionStatus =
+  (assessmentCompletionStatus: AssessmentCompletionStatusFilter | undefined) =>
+  (
+    builder: PaginatedConventionQueryBuilder,
+  ): PaginatedConventionQueryBuilder => {
+    if (!assessmentCompletionStatus) {
+      return builder;
+    }
+
+    if (assessmentCompletionStatus === "completed") {
+      return builder
+        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+        .where((eb) =>
+          eb.exists(
+            eb
+              .selectFrom("immersion_assessments")
+              .select("convention_id")
+              .where("convention_id", "=", eb.ref("conventions.id")),
+          ),
+        );
+    }
+
+    if (assessmentCompletionStatus === "to-be-completed") {
+      return builder
+        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+        .where((eb) =>
+          eb.not(
+            eb.exists(
+              eb
+                .selectFrom("immersion_assessments")
+                .select("convention_id")
+                .where("convention_id", "=", eb.ref("conventions.id")),
+            ),
+          ),
+        );
+    }
+    assessmentCompletionStatus satisfies never;
+
+    return builder;
   };
 
 const filterDate =
@@ -349,25 +444,6 @@ const filterDate =
     return builder;
   };
 
-const filterEmail =
-  (emailContains: string | undefined) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
-    if (!emailContains) return builder;
-    const pattern = `%${emailContains}%`;
-
-    return builder.where((eb) => {
-      return eb.or([
-        sql<any>`${eb.ref("b.email")} ILIKE ${pattern}`,
-        sql<any>`${eb.ref("er.email")} ILIKE ${pattern}`,
-        sql<any>`${eb.ref("et.email")} ILIKE ${pattern}`,
-        sql<any>`br.email IS NOT NULL AND br.email ILIKE ${pattern}`,
-        sql<any>`bce.email IS NOT NULL AND bce.email ILIKE ${pattern}`,
-      ]);
-    });
-  };
-
 const filterInList =
   <T extends string>(
     fieldName: keyof Database["conventions"],
@@ -380,37 +456,35 @@ const filterInList =
     return builder.where(`conventions.${fieldName}`, "in", list);
   };
 
-const filterEstablishmentName =
-  (establishmentNameContains: string | undefined) =>
+const filterSearch =
+  (search: string | undefined) =>
   (
     builder: PaginatedConventionQueryBuilder,
   ): PaginatedConventionQueryBuilder => {
-    if (!establishmentNameContains) return builder;
-    return builder.where(
-      "business_name",
-      "ilike",
-      `%${establishmentNameContains}%`,
-    );
-  };
-
-const filterByBeneficiaryName =
-  (beneficiaryNameContains: string | undefined) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
-    if (!beneficiaryNameContains) return builder;
-    const nameWords = beneficiaryNameContains.split(" ");
+    if (!search) return builder;
+    const pattern = `%${search.toLowerCase()}%`;
 
     return builder.where((eb) =>
-      eb.or(
-        nameWords.flatMap((nameWord) => {
-          const pattern = `%${nameWord}%`;
-          return [
-            sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
-            sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
-          ];
-        }),
-      ),
+      eb.or([
+        // Search in convention ID (cast UUID to text for pattern matching)
+        sql<any>`CAST(${eb.ref("conventions.id")} AS text) LIKE ${pattern}`,
+        // Search in beneficiary names
+        sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
+        // Search in establishment business name
+        sql<any>`${eb.ref("business_name")} ILIKE ${pattern}`,
+        // Search in establishment SIRET
+        sql<any>`${eb.ref("conventions.siret")} LIKE ${pattern}`,
+        // Search in actor emails
+        sql<any>`${eb.ref("b.email")} LIKE ${pattern}`,
+        sql<any>`${eb.ref("er.email")} LIKE ${pattern}`,
+        sql<any>`${eb.ref("et.email")} LIKE ${pattern}`,
+        sql<any>`br.email IS NOT NULL AND br.email LIKE ${pattern}`,
+        sql<any>`bce.email IS NOT NULL AND bce.email LIKE ${pattern}`,
+        // Search agency referent names
+        sql<any>`${eb.ref("agency_referent_first_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("agency_referent_last_name")} ILIKE ${pattern}`,
+      ]),
     );
   };
 

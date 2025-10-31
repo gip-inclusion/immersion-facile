@@ -61,6 +61,7 @@ import {
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
+  assessmentCompletionStatusFilters,
   BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
@@ -847,7 +848,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
 
     // sort
     sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission"], {
+      .enum(["dateValidation", "dateStart", "dateSubmission", "dateEnd"], {
         error: localization.invalidEnum,
       })
       .optional(),
@@ -858,9 +859,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
       .optional(),
 
     // filters
-    actorEmailContains: z.string().optional(),
-    establishmentNameContains: z.string().optional(),
-    beneficiaryNameContains: z.string().optional(),
+    search: z.string().optional(),
     statuses: z.tuple([statusSchema], statusSchema).optional(),
     agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
     agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
@@ -872,6 +871,11 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
     dateEndTo: makeDateStringSchema().optional(),
     dateSubmissionFrom: makeDateStringSchema().optional(),
     dateSubmissionTo: makeDateStringSchema().optional(),
+
+    // assessment filter
+    assessmentCompletionStatus: z
+      .enum(assessmentCompletionStatusFilters)
+      .optional(),
   });
 
 const withSortedConventionsSchema = withOptionalSortSchema(
@@ -885,6 +889,7 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
     .object({
       filters: z
         .object({
+          search: z.string().optional(),
           actorEmailContains: z.string().optional(),
           establishmentNameContains: z.string().optional(),
           beneficiaryNameContains: z.string().optional(),
@@ -894,11 +899,14 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
           dateStart: dateFilterSchema.optional(),
           dateEnd: dateFilterSchema.optional(),
           dateSubmission: dateFilterSchema.optional(),
+          assessmentCompletionStatus: z
+            .enum(assessmentCompletionStatusFilters)
+            .optional(),
         })
         .optional(),
       pagination: paginationQueryParamsSchema.optional(),
     })
     .and(withSortedConventionsSchema);
 
-export const paginatedConventionsSchema =
-  createPaginatedSchema(conventionSchema);
+export const paginatedConventionReadSchema =
+  createPaginatedSchema(conventionReadSchema);

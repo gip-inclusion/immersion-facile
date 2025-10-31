@@ -469,21 +469,28 @@ export const getExactAge = ({
   return differenceInYears(startOfDay(referenceDate), startOfDay(birthDate));
 };
 
+export const assessmentCompletionStatusFilters = [
+  "completed",
+  "to-be-completed",
+] as const;
+
+export type AssessmentCompletionStatusFilter =
+  (typeof assessmentCompletionStatusFilters)[number];
+
 export type GetPaginatedConventionsFilters = {
-  actorEmailContains?: string;
-  establishmentNameContains?: string;
-  beneficiaryNameContains?: string;
+  search?: string;
   statuses?: NotEmptyArray<ConventionStatus>;
   agencyIds?: NotEmptyArray<string>;
   agencyDepartmentCodes?: NotEmptyArray<string>;
   dateStart?: DateFilter;
   dateEnd?: DateFilter;
   dateSubmission?: DateFilter;
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
 };
 
 export type GetPaginatedConventionsSortBy = keyof Pick<
   ConventionDto,
-  "dateValidation" | "dateStart" | "dateSubmission"
+  "dateValidation" | "dateStart" | "dateSubmission" | "dateEnd"
 >;
 
 export type GetConventionsForAgencyUserParams =
@@ -492,6 +499,8 @@ export type GetConventionsForAgencyUserParams =
     pagination?: PaginationQueryParams;
   };
 
+export type ConventionSortDirection = "asc" | "desc";
+
 export type FlatGetConventionsForAgencyUserParams = {
   // pagination
   page?: number;
@@ -499,12 +508,10 @@ export type FlatGetConventionsForAgencyUserParams = {
 
   // sort
   sortBy?: GetPaginatedConventionsSortBy;
-  sortDirection?: "asc" | "desc";
+  sortDirection?: ConventionSortDirection;
 
   // filters
-  actorEmailContains?: string;
-  establishmentNameContains?: string;
-  beneficiaryNameContains?: string;
+  search?: string;
   statuses?: NotEmptyArray<ConventionStatus>;
   agencyIds?: NotEmptyArray<string>;
   agencyDepartmentCodes?: NotEmptyArray<string>;
@@ -516,4 +523,7 @@ export type FlatGetConventionsForAgencyUserParams = {
   dateEndTo?: DateString;
   dateSubmissionFrom?: DateString;
   dateSubmissionTo?: DateString;
+
+  // assessment filter
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
 };

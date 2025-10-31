@@ -11,6 +11,7 @@ import {
   errors,
   type FindSimilarConventionsParams,
   filter,
+  type GetPaginatedConventionsFilters,
   NotFoundError,
   pipeWithValue,
   type SiretDto,
@@ -149,7 +150,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public async getPaginatedConventionsForAgencyUser(
     params: GetPaginatedConventionsForAgencyUserParams,
-  ): Promise<DataWithPagination<ConventionDto>> {
+  ): Promise<DataWithPagination<ConventionReadDto>> {
     // Store the params for later inspection in tests
     this.paginatedConventionsParams.push(params);
 
@@ -162,12 +163,27 @@ export class InMemoryConventionQueries implements ConventionQueries {
     const endIndex = Math.min(startIndex + perPage, conventions.length);
     const paginatedData = conventions.slice(startIndex, endIndex);
 
+    // Transform ConventionDto to ConventionReadDto
+    const conventionsRead = await Promise.all(
+      paginatedData.map((convention) =>
+        this.#addAgencyAndAssessmentDataToConvention(convention),
+      ),
+    ).then((conventionsRead) =>
+      params.filters?.assessmentCompletionStatus
+        ? conventionsRead.filter(
+            makeApplyAssessmentCompletionStatusFilterConventionsRead(
+              params.filters,
+            ),
+          )
+        : conventionsRead,
+    );
+
     return {
-      data: paginatedData,
+      data: conventionsRead,
       pagination: {
-        totalRecords: conventions.length,
+        totalRecords: conventionsRead.length,
         currentPage: page,
-        totalPages: Math.ceil(conventions.length / perPage),
+        totalPages: Math.ceil(conventionsRead.length / perPage),
         numberPerPage: perPage,
       },
     };
@@ -361,3 +377,16 @@ const makeApplyFiltersToConventions =
             : true,
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
+
+const makeApplyAssessmentCompletionStatusFilterConventionsRead =
+  ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
+  (convention: ConventionReadDto) => {
+    if (!assessmentCompletionStatus) return true;
+
+    return (
+      convention.status === "ACCEPTED_BY_VALIDATOR" &&
+      (assessmentCompletionStatus === "completed"
+        ? convention.assessment !== null
+        : convention.assessment === null)
+    );
+  };
