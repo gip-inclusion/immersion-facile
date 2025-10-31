@@ -43,4 +43,11 @@ export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   public set ongoingOAuths(ongoingOAuths: OngoingOAuth[]) {
     this.#ongoingOAuths = ongoingOAuths.map(({ ...params }) => ({ ...params }));
   }
+
+  public async deleteOldOngoingOauths(date: Date): Promise<number> {
+    this.#ongoingOAuths = this.#ongoingOAuths.filter(
+      (ongoingOAuth) => ongoingOAuth.updatedAt && ongoingOAuth.updatedAt > date,
+    );
+    return this.#ongoingOAuths.length;
+  }
 }
