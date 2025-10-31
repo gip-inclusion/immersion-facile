@@ -1,4 +1,5 @@
 import { DiscussionBuilder } from "shared";
+import { v4 as uuid } from "uuid";
 import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
@@ -152,6 +153,38 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
           attachments: [],
         },
       ])
+      .build(),
+  );
+  await uow.discussionRepository.insert(
+    new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret(franceMerguez.establishment.siret)
+      .withPotentialBeneficiaryResumeLink(
+        "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
+      )
+      .withPotentialBeneficiaryFirstname("Billy")
+      .withPotentialBeneficiaryLastName("Idol")
+      .withPotentialBeneficiaryEmail("billy.idol@mail.com")
+      .withExchanges([
+        {
+          sender: "potentialBeneficiary",
+          sentAt: new Date("2024-02-02").toISOString(),
+          subject: "Présentation",
+          message: "Bonjour, je me présente!",
+          attachments: [],
+        },
+        {
+          sender: "establishment",
+          email: seedUsers.franceMerguezUser.email,
+          firstname: seedUsers.franceMerguezUser.firstName,
+          lastname: seedUsers.franceMerguezUser.lastName,
+          sentAt: new Date("2024-06-03").toISOString(),
+          subject: "Réponse entreprise",
+          message: "Allez viens on est bien.",
+          attachments: [],
+        },
+      ])
+      .withStatus({ status: "REJECTED", rejectionKind: "DEPRECATED" })
       .build(),
   );
 

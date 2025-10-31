@@ -316,6 +316,7 @@ describe("LegacyContactEstablishment", () => {
             immersionObjective: "Confirmer un projet professionnel",
           },
           createdAt: connectionDateStr,
+          updatedAt: connectionDateStr,
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
@@ -370,6 +371,7 @@ describe("LegacyContactEstablishment", () => {
             immersionObjective: "Confirmer un projet professionnel",
           },
           createdAt: discussionToOldDate,
+          updatedAt: discussionToOldDate,
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
@@ -385,6 +387,7 @@ describe("LegacyContactEstablishment", () => {
           id: "discussion1",
           appellationCode: appellationAndRome.appellationCode,
           createdAt: discussion1Date,
+          updatedAt: discussion1Date,
           siret: establishmentAggregate.establishment.siret,
           businessName: "Entreprise 2",
           address: establishmentAggregate.establishment.locations[0].address,

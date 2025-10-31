@@ -42,7 +42,7 @@ import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellati
 import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
 import type { UserId } from "../user/user.dto";
-import { toDisplayedDate } from "../utils/date";
+import { type DateRange, toDisplayedDate } from "../utils/date";
 import { ManagedFTConnectError } from "./ftConnectErrors";
 import {
   BadRequestError,
@@ -130,6 +130,10 @@ export const errors = {
       ),
   },
   generic: {
+    badDateRange: ({ from, to }: Partial<DateRange>) =>
+      new Error(
+        `L'intervale de temps n'est pas supporté. From: ${from} To:${to}`,
+      ),
     notAnError: () => new Error("Not an error class"),
     testError: (message: string) => new Error(message),
     fakeError: (message: string, httpStatus?: number) => {
@@ -149,6 +153,8 @@ export const errors = {
       ),
     httpStatus: ({ status, message }: { status?: number; message: string }) =>
       new Error(`Erreur HTTP ${status ? `(${status}) ` : ""}: ${message}`),
+    unsupportedLimit: (limit: number) =>
+      new Error(`The limit ${limit} is not supported`),
     unsupportedStatus: ({
       body,
       status,

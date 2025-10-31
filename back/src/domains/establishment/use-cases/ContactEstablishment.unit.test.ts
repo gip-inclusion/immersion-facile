@@ -278,6 +278,7 @@ describe("ContactEstablishment", () => {
         address:
           establishmentAggregateWithEmail.establishment.locations[0].address,
         createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
         status: "PENDING",
       });
 
@@ -765,6 +766,7 @@ describe("ContactEstablishment", () => {
             siret: establishment.establishment.siret,
             businessName: establishment.establishment.name,
             createdAt: timeGateway.now().toISOString(),
+            updatedAt: timeGateway.now().toISOString(),
             address:
               // biome-ignore lint/style/noNonNullAssertion: testing purpose
               establishment.establishment.potentialBeneficiaryWelcomeAddress

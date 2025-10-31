@@ -63,9 +63,9 @@ describe("UpdateDiscussionStatus", () => {
   let updateDiscussionStatus: UpdateDiscussionStatus;
 
   beforeEach(() => {
-    uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
+    uow = createInMemoryUow();
 
     updateDiscussionStatus = makeUpdateDiscussionStatus({
       uowPerformer: new InMemoryUowPerformer(uow),
@@ -194,6 +194,7 @@ describe("UpdateDiscussionStatus", () => {
           ...discussion,
           status: "ACCEPTED",
           candidateWarnedMethod: "inPerson",
+          updatedAt: timeGateway.now().toISOString(),
         },
         skipSendingEmail: true,
       });
@@ -241,6 +242,7 @@ describe("UpdateDiscussionStatus", () => {
             status: "ACCEPTED",
             candidateWarnedMethod: null,
             conventionId: convention.id,
+            updatedAt: timeGateway.now().toISOString(),
           },
           skipSendingEmail: true,
         });
@@ -268,6 +270,7 @@ describe("UpdateDiscussionStatus", () => {
           },
           expectedDiscussion: {
             ...discussion,
+            updatedAt: timeGateway.now().toISOString(),
             status: "REJECTED",
             rejectionKind: "CANDIDATE_ALREADY_WARNED",
             candidateWarnedMethod: "inPerson",
@@ -333,6 +336,7 @@ describe("UpdateDiscussionStatus", () => {
             expectedDiscussion: {
               ...discussion,
               ...rest,
+              updatedAt: timeGateway.now().toISOString(),
               exchanges: [
                 ...discussion.exchanges,
                 {
@@ -377,6 +381,7 @@ describe("UpdateDiscussionStatus", () => {
             ...discussion,
             status: "REJECTED",
             rejectionKind: params.rejectionKind,
+            updatedAt: timeGateway.now().toISOString(),
             exchanges: [
               ...discussion.exchanges,
               {
@@ -440,6 +445,7 @@ describe("UpdateDiscussionStatus", () => {
             ...discussion,
             status: "REJECTED",
             rejectionKind: params.rejectionKind,
+            updatedAt: timeGateway.now().toISOString(),
             exchanges: [
               ...discussion.exchanges,
               {

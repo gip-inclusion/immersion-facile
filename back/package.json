@@ -34,6 +34,7 @@
     "trigger-early-morning-jobs": "ts-node src/scripts/triggerEarlyMorningJobs.ts",
     "trigger-morning-jobs": "ts-node src/scripts/triggerMorningJobs.ts",
     "trigger-add-agencies-and-users": "ts-node src/scripts/triggerAddAgenciesAndUsers.ts",
+    "trigger-archive-discussions": "ts-node src/scripts/triggerArchiveDiscussions.ts",
     "trigger-convention-reminder": "ts-node src/scripts/triggerConventionReminder.ts",
     "trigger-contact-request-reminder-3d": "ts-node src/scripts/triggerContactRequestReminder3Days.ts",
     "trigger-contact-request-reminder-7d": "ts-node src/scripts/triggerContactRequestReminder7Days.ts",

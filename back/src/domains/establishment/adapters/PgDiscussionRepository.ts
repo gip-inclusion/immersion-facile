@@ -29,6 +29,7 @@ import {
 import type { Database } from "../../../config/pg/kysely/model/database";
 import type {
   DiscussionRepository,
+  GetDiscussionIdsParams,
   GetDiscussionsParams,
   GetPaginatedDiscussionsForUserParams,
   HasDiscussionMatchingParams,
@@ -43,6 +44,44 @@ const orderColumnByOrderKey: Record<
 
 export class PgDiscussionRepository implements DiscussionRepository {
   constructor(private transaction: KyselyDb) {}
+
+  async archiveDiscussions(discussionIds: DiscussionId[]): Promise<void> {
+    throw new Error("Not Implemented");
+  }
+
+  async getDiscussionIds({
+    filters: { statuses, updatedBetween },
+    orderBy,
+    limit,
+  }: GetDiscussionIdsParams): Promise<DiscussionId[]> {
+    if (
+      updatedBetween?.from &&
+      updatedBetween?.to &&
+      updatedBetween.from > updatedBetween.to
+    )
+      throw errors.generic.badDateRange(updatedBetween);
+    if (limit <= 0 || limit > 10_000 || !Number.isInteger(limit))
+      throw errors.generic.unsupportedLimit(limit);
+
+    const results = await pipeWithValue(
+      this.transaction.selectFrom("discussions").select("id").limit(limit),
+      (builder) =>
+        statuses && statuses.length > 0
+          ? builder.where("status", "in", statuses)
+          : builder,
+      (builder) =>
+        updatedBetween?.from
+          ? builder.where("updated_at", ">=", updatedBetween.from)
+          : builder,
+      (builder) =>
+        updatedBetween?.to
+          ? builder.where("updated_at", "<=", updatedBetween.to)
+          : builder,
+      (builder) =>
+        orderBy === "updatedAt" ? builder.orderBy("updated_at asc") : builder,
+    ).execute();
+    return results.map(({ id }) => id as DiscussionId);
+  }
 
   public async countDiscussionsForSiretSince(
     siret: SiretDto,
@@ -365,6 +404,7 @@ const discussionToPg = (
   business_name: discussion.businessName,
   city: discussion.address.city,
   created_at: discussion.createdAt,
+  updated_at: discussion.updatedAt,
   department_code: discussion.address.departmentCode,
   postcode: discussion.address.postcode,
   potential_beneficiary_email: discussion.potentialBeneficiary.email,
@@ -481,6 +521,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       address: discussion.address,
       businessName: discussion.businessName,
       createdAt: new Date(discussion.createdAt).toISOString(),
+      updatedAt: new Date(discussion.updatedAt).toISOString(),
       siret: discussion.siret,
       conventionId: discussion.conventionId,
       id: discussion.id,
@@ -671,6 +712,7 @@ const executeGetDiscussions = (
         jsonBuildObject({
           id: ref("d.id"),
           createdAt: ref("d.created_at"),
+          updatedAt: ref("d.updated_at"),
           siret: ref("d.siret"),
           businessName: ref("d.business_name"),
           appellationCode: sql<string>`CAST(${ref(

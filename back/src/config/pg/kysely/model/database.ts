@@ -115,6 +115,7 @@ interface Discussions extends WithAcquisition {
   contact_method: string;
   kind: DiscussionKind;
   created_at: Timestamp;
+  updated_at: Timestamp;
   potential_beneficiary_first_name: string;
   potential_beneficiary_last_name: string;
   potential_beneficiary_email: string;
