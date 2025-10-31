@@ -62,75 +62,13 @@ export const makeUpdateDiscussionStatus = useCaseBuilder(
         discussionId: discussion.id,
       });
 
-    const updatedDiscussion = await match<
-      UpdateDiscussionStatusParams,
-      Promise<DiscussionDto>
-    >(inputParams)
-      .with({ status: "REJECTED" }, async (params) => {
-        if (params.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
-          return {
-            ...discussion,
-            status: "REJECTED",
-            rejectionKind: "CANDIDATE_ALREADY_WARNED",
-            candidateWarnedMethod: params.candidateWarnedMethod,
-          };
-        }
-
-        const { htmlContent, subject } = rejectDiscussionEmailParams(
-          params,
-          discussion,
-          currentUser,
-        );
-
-        return {
-          ...discussion,
-          status: "REJECTED",
-          ...(params.rejectionKind === "OTHER"
-            ? {
-                rejectionKind: params.rejectionKind,
-                rejectionReason: params.rejectionReason,
-              }
-            : {
-                rejectionKind: params.rejectionKind,
-              }),
-          exchanges: [
-            ...discussion.exchanges,
-            {
-              subject,
-              message: htmlContent,
-              sender: "establishment",
-              email: currentUser.email,
-              firstname: currentUser.firstName,
-              lastname: currentUser.lastName,
-              sentAt: deps.timeGateway.now().toISOString(),
-              attachments: [],
-            },
-          ],
-        };
-      })
-      .with({ status: "ACCEPTED" }, async (params) => {
-        if (params.conventionId) {
-          const convention = await uow.conventionRepository.getById(
-            params.conventionId,
-          );
-          if (!convention)
-            throw errors.convention.notFound({
-              conventionId: params.conventionId,
-            });
-        }
-        return {
-          ...discussion,
-          status: "ACCEPTED",
-          candidateWarnedMethod: params.candidateWarnedMethod,
-          conventionId: params.conventionId,
-        };
-      })
-      .with({ status: "PENDING" }, () => {
-        throw new Error(
-          `Le passage d'une discussion à l'état PENDING n'est pas supporté. (DiscussionID : ${discussion.id})`,
-        );
-      })
-      .exhaustive();
+    const updatedDiscussion = await updateDiscussion({
+      inputParams,
+      discussion,
+      currentUser,
+      timeGateway: deps.timeGateway,
+      uow,
+    });
 
     const shouldSkipSendingEmail = () => {
       if (updatedDiscussion.status === "ACCEPTED") return true;
@@ -187,3 +125,92 @@ const allowedEstablishmentRolesForRejection: EstablishmentRole[] = [
   "establishment-admin",
   "establishment-contact",
 ];
+
+const updateDiscussion = async ({
+  inputParams,
+  discussion,
+  currentUser,
+  timeGateway,
+  uow,
+}: {
+  inputParams: UpdateDiscussionStatusParams;
+  discussion: DiscussionDto;
+  currentUser: ConnectedUser;
+  timeGateway: TimeGateway;
+  uow: UnitOfWork;
+}): Promise<DiscussionDto> => {
+  const updatedDiscussionByStatus = await match<
+    UpdateDiscussionStatusParams,
+    Promise<DiscussionDto>
+  >(inputParams)
+    .with({ status: "REJECTED" }, async (params) => {
+      if (params.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
+        return {
+          ...discussion,
+          status: "REJECTED",
+          rejectionKind: "CANDIDATE_ALREADY_WARNED",
+          candidateWarnedMethod: params.candidateWarnedMethod,
+        };
+      }
+
+      const { htmlContent, subject } = rejectDiscussionEmailParams(
+        params,
+        discussion,
+        currentUser,
+      );
+
+      return {
+        ...discussion,
+        status: "REJECTED",
+        ...(params.rejectionKind === "OTHER"
+          ? {
+              rejectionKind: params.rejectionKind,
+              rejectionReason: params.rejectionReason,
+            }
+          : {
+              rejectionKind: params.rejectionKind,
+            }),
+        exchanges: [
+          ...discussion.exchanges,
+          {
+            subject,
+            message: htmlContent,
+            sender: "establishment",
+            email: currentUser.email,
+            firstname: currentUser.firstName,
+            lastname: currentUser.lastName,
+            sentAt: timeGateway.now().toISOString(),
+            attachments: [],
+          },
+        ],
+      };
+    })
+    .with({ status: "ACCEPTED" }, async (params) => {
+      if (params.conventionId) {
+        const convention = await uow.conventionRepository.getById(
+          params.conventionId,
+        );
+        if (!convention)
+          throw errors.convention.notFound({
+            conventionId: params.conventionId,
+          });
+      }
+      return {
+        ...discussion,
+        status: "ACCEPTED",
+        candidateWarnedMethod: params.candidateWarnedMethod,
+        conventionId: params.conventionId,
+      };
+    })
+    .with({ status: "PENDING" }, () => {
+      throw new Error(
+        `Le passage d'une discussion à l'état PENDING n'est pas supporté. (DiscussionID : ${discussion.id})`,
+      );
+    })
+    .exhaustive();
+
+  return {
+    ...updatedDiscussionByStatus,
+    updatedAt: timeGateway.now().toISOString(),
+  };
+};
