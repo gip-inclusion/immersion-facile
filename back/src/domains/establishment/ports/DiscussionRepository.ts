@@ -57,7 +57,7 @@ export type GetPaginatedDiscussionsForUserParams = WithRequiredPagination &
 export interface DiscussionRepository {
   insert: (discussion: DiscussionDto) => Promise<void>;
   update: (discussion: DiscussionDto) => Promise<void>;
-  deleteDiscussions: (discussionIds: DiscussionId[]) => Promise<void>;
+  archiveDiscussions: (discussionIds: DiscussionId[]) => Promise<void>;
   getById: (discussionId: DiscussionId) => Promise<DiscussionDto | undefined>;
   getDiscussionIds(params: GetDiscussionIdsParams): Promise<DiscussionId[]>;
   getDiscussions(params: GetDiscussionsParams): Promise<DiscussionDto[]>;
