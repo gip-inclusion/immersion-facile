@@ -113,4 +113,41 @@ describe("PgOngoingOAuthRepository", () => {
       });
     });
   });
+
+  describe("deleteOldOngoingOauths", () => {
+    it("deletes old ongoing oauths", async () => {
+      await pgUserRepository.save(user);
+      const oldOngoingOAuth: OngoingOAuth = {
+        ...ongoingOAuth,
+        userId: user.id,
+        externalId: user.proConnect?.externalId,
+        accessToken: "some-token",
+        updatedAt: new Date("2024-01-01"),
+      };
+      const recentOngoingOAuth: OngoingOAuth = {
+        ...ongoingOAuth,
+        state: "22222222-2222-2222-2222-222222222222",
+        userId: user.id,
+        externalId: user.proConnect?.externalId,
+        accessToken: "some-token",
+        updatedAt: new Date("2025-10-01"),
+      };
+      await pgOngoingOAuthRepository.save(oldOngoingOAuth);
+      await pgOngoingOAuthRepository.save(recentOngoingOAuth);
+
+      const numberOfOngoingOauthsDeleted =
+        await pgOngoingOAuthRepository.deleteOldOngoingOauths(
+          new Date("2025-05-01"),
+        );
+
+      expectToEqual(numberOfOngoingOauthsDeleted, 1);
+      const fetchedFromUserId = await pgOngoingOAuthRepository.findByUserId(
+        user.id,
+      );
+      expectToEqual(fetchedFromUserId, {
+        ...recentOngoingOAuth,
+        updatedAt: undefined,
+      });
+    });
+  });
 });

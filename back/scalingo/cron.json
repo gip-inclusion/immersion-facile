@@ -31,6 +31,10 @@
     {
       "command": "0 13 * * 6 pnpm back run trigger-assign-agency-viewer-role-to-users",
       "size": "M"
+    },
+    {
+      "command": "0 13 1-7 * 0 pnpm back run trigger-delete-old-users-ongoing-oauths",
+      "size": "M"
     }
   ]
 }

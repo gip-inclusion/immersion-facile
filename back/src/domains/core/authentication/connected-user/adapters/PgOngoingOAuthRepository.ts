@@ -45,7 +45,8 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   }
 
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
-    const { provider, nonce, state, userId, usedAt, fromUri } = ongoingOAuth;
+    const { provider, nonce, state, userId, usedAt, fromUri, updatedAt } =
+      ongoingOAuth;
     if (await this.findByState(state)) {
       await this.transaction
         .updateTable("users_ongoing_oauths")
@@ -63,7 +64,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
           ...(ongoingOAuth.provider === "email"
             ? { email: ongoingOAuth.email }
             : {}),
-          updated_at: sql`now()`,
+          updated_at: updatedAt ? sql`${updatedAt}` : sql`now()`,
         })
         .where("state", "=", state)
         .execute();
@@ -120,5 +121,14 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
       email: raw.email,
       usedAt,
     };
+  }
+
+  public async deleteOldOngoingOauths(date: Date): Promise<number> {
+    const response = await this.transaction
+      .deleteFrom("users_ongoing_oauths")
+      .where(sql<boolean>`updated_at < ${date}`)
+      .returning("state")
+      .execute();
+    return response.length;
   }
 }
