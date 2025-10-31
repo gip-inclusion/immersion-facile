@@ -5,4 +5,5 @@ export interface OngoingOAuthRepository {
   save(onGoingOAuth: OngoingOAuth): Promise<void>;
   findByState(state: OAuthState): Promise<OngoingOAuth | undefined>;
   findByUserId(userId: string): Promise<OngoingOAuth | undefined>;
+  deleteOldOngoingOauths(date: Date): Promise<number>;
 }
