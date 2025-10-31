@@ -16,6 +16,8 @@ type PersistenceOngoingOAuth = {
   used_at: Date | null;
 };
 
+const MAX_DELETE_BATCH_SIZE = 20_000;
+
 export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   constructor(private transaction: KyselyDb) {}
 
@@ -124,9 +126,20 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   }
 
   public async deleteOldOngoingOauths(date: Date): Promise<number> {
+    const ongoingOauthsToDelete = await this.transaction
+      .selectFrom("users_ongoing_oauths")
+      .select("state")
+      .where(sql<boolean>`updated_at < ${date}`)
+      .orderBy("updated_at", "asc")
+      .limit(MAX_DELETE_BATCH_SIZE)
+      .execute();
     const response = await this.transaction
       .deleteFrom("users_ongoing_oauths")
-      .where(sql<boolean>`updated_at < ${date}`)
+      .where(
+        "state",
+        "in",
+        ongoingOauthsToDelete.map((ongoingOAuth) => ongoingOAuth.state),
+      )
       .returning("state")
       .execute();
     return response.length;
