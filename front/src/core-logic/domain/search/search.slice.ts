@@ -1,10 +1,12 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
+  AppellationAndRomeDto,
   DataWithPagination,
   GetOffersFlatQueryParams,
   SearchResultDto,
   SearchResultQuery,
   SiretAndAppellationDto,
+  WithAcquisition,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -12,6 +14,11 @@ import type {
 } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type SearchResultPayload = SearchResultQuery | SearchResultDto;
+
+export type SearchPageParams = GetOffersFlatQueryParams & {
+  appellations?: AppellationAndRomeDto[];
+  nafLabel?: string;
+} & WithAcquisition;
 
 export type SearchStatus =
   | "noSearchMade"
@@ -25,7 +32,7 @@ interface SearchState {
   searchResultWithPagination: DataWithPagination<SearchResultDto>;
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
-  searchParams: GetOffersFlatQueryParams;
+  searchParams: SearchPageParams;
 }
 
 const emptySearchResult: DataWithPagination<SearchResultDto> = {
@@ -60,10 +67,7 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    getOffersRequested: (
-      state,
-      action: PayloadAction<GetOffersFlatQueryParams>,
-    ) => {
+    getOffersRequested: (state, action: PayloadAction<SearchPageParams>) => {
       state.searchStatus = "initialFetch";
       state.searchResultWithPagination = emptySearchResult;
       state.searchParams = action.payload;

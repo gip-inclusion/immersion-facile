@@ -22,7 +22,6 @@ import type {
   EstablishmentAggregateRepository,
   GetOffersParams,
   LegacySearchImmersionParams,
-  RepositorySearchImmertionResult,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
