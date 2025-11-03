@@ -1,12 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
-  AppellationAndRomeDto,
-  LegacySearchQueryBaseWithoutAppellationsAndRomeDto,
-  LegacySearchQueryParamsDto,
+  DataWithPagination,
+  GetOffersFlatQueryParams,
   SearchResultDto,
   SearchResultQuery,
   SiretAndAppellationDto,
-  WithAcquisition,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -14,13 +12,6 @@ import type {
 } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type SearchResultPayload = SearchResultQuery | SearchResultDto;
-
-export type SearchPageParams =
-  LegacySearchQueryBaseWithoutAppellationsAndRomeDto & {
-    appellations?: AppellationAndRomeDto[];
-    fitForDisabledWorkers?: boolean | undefined;
-    currentPage: number;
-  } & WithAcquisition;
 
 export type SearchStatus =
   | "noSearchMade"
@@ -31,25 +22,37 @@ export type SearchStatus =
 
 interface SearchState {
   searchStatus: SearchStatus;
-  searchResults: SearchResultDto[];
+  searchResultWithPagination: DataWithPagination<SearchResultDto>;
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
-  searchParams: LegacySearchQueryParamsDto;
+  searchParams: GetOffersFlatQueryParams;
 }
+
+const emptySearchResult: DataWithPagination<SearchResultDto> = {
+  data: [],
+  pagination: {
+    totalPages: 1,
+    currentPage: 1,
+    numberPerPage: 12,
+    totalRecords: 0,
+  },
+};
 
 export const initialState: SearchState = {
   searchStatus: "noSearchMade",
-  searchResults: [],
+  searchResultWithPagination: emptySearchResult,
   currentSearchResult: null,
   isLoading: false,
   searchParams: {
     appellationCodes: [],
-    rome: "",
     distanceKm: 10,
     latitude: 0,
     longitude: 0,
-    sortedBy: "score",
     fitForDisabledWorkers: undefined,
+    sortBy: "score",
+    sortOrder: "desc",
+    page: 1,
+    perPage: 12,
   },
 };
 
@@ -57,32 +60,24 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    searchRequested: (
+    getOffersRequested: (
       state,
-      action: PayloadAction<LegacySearchQueryParamsDto>,
+      action: PayloadAction<GetOffersFlatQueryParams>,
     ) => {
       state.searchStatus = "initialFetch";
-      state.searchResults = [];
+      state.searchResultWithPagination = emptySearchResult;
       state.searchParams = action.payload;
       state.isLoading = true;
     },
-    initialSearchSucceeded: (
+    getOffersSucceeded: (
       state,
       action: PayloadAction<{
-        results: SearchResultDto[];
-        searchParams: LegacySearchQueryParamsDto;
+        searchResultWithPagination: DataWithPagination<SearchResultDto>;
+        searchParams: GetOffersFlatQueryParams;
       }>,
     ) => {
-      state.searchResults = action.payload.results;
-      state.searchStatus = "ok";
-      state.isLoading = false;
-    },
-    extraFetchRequested: (state) => {
-      state.searchStatus = "extraFetch";
-      state.isLoading = true;
-    },
-    extraFetchSucceeded: (state, action: PayloadAction<SearchResultDto[]>) => {
-      state.searchResults.push(...action.payload);
+      state.searchResultWithPagination =
+        action.payload.searchResultWithPagination;
       state.searchStatus = "ok";
       state.isLoading = false;
     },

@@ -41,7 +41,7 @@ export const SearchListResults = ({
   currentPage: number;
   setCurrentPageValue: (newPageValue: number) => void;
 }) => {
-  const searchResults = useAppSelector(searchSelectors.searchResults);
+  const {data: searchResults} = useAppSelector(searchSelectors.searchResultsWithPagination);
   const searchParams = useAppSelector(searchSelectors.searchParams);
   const [displayedResults, setDisplayedResults] =
     useState<SearchResultDto[]>(searchResults);

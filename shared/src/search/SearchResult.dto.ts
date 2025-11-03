@@ -35,3 +35,6 @@ export type SearchResultDto = {
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
 };
+
+export type GetOffersPerPageOption = (typeof getOffersPerPageOptions)[number];
+export const getOffersPerPageOptions = [6, 12, 24, 48] as const;

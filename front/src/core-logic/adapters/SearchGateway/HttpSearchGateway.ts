@@ -1,9 +1,10 @@
 import { from, type Observable } from "rxjs";
 import type {
   CreateDiscussionDto,
+  DataWithPagination,
+  GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
-  LegacySearchQueryParamsDto,
   SearchResultDto,
   SearchResultQuery,
   SearchRoutes,
@@ -79,13 +80,13 @@ export class HttpSearchGateway implements SearchGateway {
     );
   }
 
-  public search$(
-    searchParams: LegacySearchQueryParamsDto,
-  ): Observable<SearchResultDto[]> {
+  public getOffers$(
+    params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
     return from(
       this.httpClient
-        .legacySearch({
-          queryParams: searchParams,
+        .getOffers({
+          queryParams: params,
         })
         .then((result) =>
           match(result)
