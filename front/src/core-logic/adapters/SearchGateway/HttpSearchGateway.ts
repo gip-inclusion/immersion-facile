@@ -79,7 +79,7 @@ export class HttpSearchGateway implements SearchGateway {
     );
   }
 
-  public search$(
+  public getOffers$(
     searchParams: LegacySearchQueryParamsDto,
   ): Observable<SearchResultDto[]> {
     return from(

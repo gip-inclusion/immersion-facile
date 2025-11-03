@@ -19,7 +19,7 @@ const initialSearchEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
     filter(searchSlice.actions.searchRequested.match),
     switchMap((action) =>
       searchGateway
-        .search$({
+        .getOffers$({
           ...action.payload,
           voluntaryToImmersion: true,
         })
@@ -50,7 +50,7 @@ const extraFetchEpic: SearchEpic = (
       of(searchSlice.actions.extraFetchRequested()).pipe(
         concatWith(
           searchGateway
-            .search$({
+            .getOffers$({
               ...action.payload.searchParams,
               voluntaryToImmersion: false,
             })

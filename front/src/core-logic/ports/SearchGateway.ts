@@ -1,9 +1,9 @@
 import type { Observable } from "rxjs";
 import type {
-  CreateDiscussionDto,
+  CreateDiscussionDto, DataWithPagination,
+  GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
-  LegacySearchQueryParamsDto,
   SearchResultDto,
   SiretAndAppellationDto,
 } from "shared";
@@ -11,9 +11,9 @@ import type {
 export type ContactErrorKind = "alreadyContactedRecently";
 
 export interface SearchGateway {
-  search$(
-    searchParams: LegacySearchQueryParamsDto,
-  ): Observable<SearchResultDto[]>;
+  getOffers$(
+    searchParams: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>>;
   contactEstablishment: (
     params: CreateDiscussionDto,
   ) => Promise<void | ContactErrorKind>;

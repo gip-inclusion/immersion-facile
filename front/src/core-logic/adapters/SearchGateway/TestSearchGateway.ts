@@ -30,7 +30,7 @@ export class TestSearchGateway implements SearchGateway {
     return this.currentSearchResult$;
   }
 
-  public search$(
+  public getOffers$(
     _params: LegacySearchQueryParamsDto,
   ): Observable<SearchResultDto[]> {
     return this.searchResults$;

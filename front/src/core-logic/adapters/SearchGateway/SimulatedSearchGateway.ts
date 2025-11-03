@@ -87,7 +87,7 @@ export class SimulatedSearchGateway implements SearchGateway {
     return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
   }
 
-  public search$(
+  public getOffers$(
     searchParams: LegacySearchQueryParamsDto,
   ): Observable<SearchResultDto[]> {
     if (this.#error) throw this.#error;

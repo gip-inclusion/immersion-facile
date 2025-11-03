@@ -8,18 +8,21 @@ import {
   type PaginationQueryParams,
 } from "./pagination.dto";
 
-export const getPaginationParamsForWeb = ({
-  page,
-  perPage,
-}:
-  | PaginationQueryParams
-  | undefined = {}): Required<PaginationQueryParams> => ({
-  page: page ?? defaultPageInPagination,
-  perPage: Math.min(
-    perPage ?? defaultPerPageInWebPagination,
-    maxPerPageInWebPagination,
-  ),
-});
+export const getPaginationParamsForWeb = (
+  params: PaginationQueryParams | undefined,
+  options?: { overrideDefaultPerPage?: number },
+): Required<PaginationQueryParams> => {
+  const { page, perPage } = params ?? {};
+  return {
+    page: page ?? defaultPageInPagination,
+    perPage: Math.min(
+      perPage ??
+        options?.overrideDefaultPerPage ??
+        defaultPerPageInWebPagination,
+      maxPerPageInWebPagination,
+    ),
+  };
+};
 
 export const getPaginationParamsForApiConsumer = ({
   page,
