@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 import {
-  personNameSchema,
+  makePersonNameSchema,
   zStringCanBeEmpty,
   zStringMinLength1,
   zStringPossiblyEmptyWithMax,
@@ -248,7 +248,7 @@ describe("zodUtils", () => {
     });
   });
 
-  describe("personNameSchema", () => {
+  describe("makePersonNameSchema basic validation", () => {
     it.each([
       { name: "julien", expectedName: "julien" },
       { name: "Julien", expectedName: "Julien" },
@@ -262,14 +262,14 @@ describe("zodUtils", () => {
     ])(
       "accepts valid name '%s' and transforms to '%s'",
       ({ name, expectedName }) => {
-        expect(personNameSchema.parse(name)).toBe(expectedName);
+        expect(makePersonNameSchema("lastname").parse(name)).toBe(expectedName);
       },
     );
 
     it.each(["123", "John@Doe", "John.Doe"])(
       "rejects invalid name '%s'",
       (name) => {
-        expect(() => personNameSchema.parse(name)).toThrow(
+        expect(() => makePersonNameSchema("lastname").parse(name)).toThrow(
           "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
         );
       },

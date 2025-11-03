@@ -70,11 +70,7 @@ export const ValidatorModalContent = ({
         finale au format PDF.
       </p>
       <Input
-        label={
-          newStatus === "ACCEPTED_BY_VALIDATOR"
-            ? "Prénom de la personne qui valide la demande *"
-            : "Prénom de la personne qui pré-valide la demande *"
-        }
+        label={"Prénom *"}
         nativeInputProps={{
           ...register("firstname"),
           required: true,
@@ -83,11 +79,7 @@ export const ValidatorModalContent = ({
         {...getFieldError("firstname")}
       />
       <Input
-        label={
-          newStatus === "ACCEPTED_BY_VALIDATOR"
-            ? "Nom de la personne qui valide la demande *"
-            : "Nom de la personne qui pré-valide la demande *"
-        }
+        label={"Nom *"}
         nativeInputProps={{
           ...register("lastname"),
           required: true,
@@ -96,7 +88,7 @@ export const ValidatorModalContent = ({
         {...getFieldError("lastname")}
       />
       <ButtonsGroup
-        alignment="center"
+        alignment="right"
         inlineLayoutWhen="always"
         buttons={[
           {
@@ -120,7 +112,7 @@ export const ValidatorModalContent = ({
             nativeButtonProps: {
               id: domElementIds.manageConvention.validatorModalSubmitButton,
             },
-            children: "Terminer",
+            children: "Valider la demande",
           },
         ]}
       />
