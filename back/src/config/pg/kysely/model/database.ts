@@ -356,6 +356,7 @@ interface Users {
   updated_at: Generated<Timestamp>;
   pro_connect_sub: string | null;
   pro_connect_siret: SiretDto | null;
+  last_login_at: Timestamp | null;
 }
 
 interface OngoingOauths {

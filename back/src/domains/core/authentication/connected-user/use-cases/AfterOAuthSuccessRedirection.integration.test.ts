@@ -39,6 +39,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
   let uow: UnitOfWork;
   let oAuthGateway: InMemoryOAuthGateway;
   let afterOAuthSuccessRedirection: AfterOAuthSuccessRedirection;
+  let timeGateway: CustomTimeGateway;
 
   beforeAll(async () => {
     pool = makeTestPgPool();
@@ -46,10 +47,11 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     uow = createPgUow(db);
     const uuidGenerator = new UuidV4Generator();
     oAuthGateway = new InMemoryOAuthGateway(fakeProviderConfig);
+    timeGateway = new CustomTimeGateway();
     afterOAuthSuccessRedirection = new AfterOAuthSuccessRedirection(
       new PgUowPerformer(db, createPgUow),
       makeCreateNewEvent({
-        timeGateway: new CustomTimeGateway(),
+        timeGateway,
         uuidGenerator,
       }),
       oAuthGateway,
@@ -57,7 +59,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       () => correctToken,
       makeVerifyJwtES256<"emailAuthCode">(generateES256KeyPair().publicKey),
       immersionBaseUrl,
-      new CustomTimeGateway(),
+      timeGateway,
     );
   });
 
@@ -108,8 +110,55 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             externalId: defaultExpectedIcIdTokenPayload.sub,
             siret: defaultExpectedIcIdTokenPayload.siret,
           },
+          lastLoginAt: expect.any(String),
         },
       );
+    });
+  });
+
+  describe("when user connected before", () => {
+    beforeEach(async () => {
+      await db.deleteFrom("feature_flags").execute();
+      await db.deleteFrom("users_ongoing_oauths").execute();
+      await db.deleteFrom("users").execute();
+    });
+
+    it("updates the user as Authenticated user", async () => {
+      const firstDay = new Date("2025-11-01T10:00:00Z");
+      const secondDay = new Date("2025-11-03T10:00:00Z");
+      timeGateway.setNextDates([firstDay, firstDay, firstDay, firstDay]);
+      const { initialOngoingOAuth } =
+        await makeSuccessfulAuthenticationConditions(
+          `${immersionBaseUrl}/agencyDashboard`,
+          defaultExpectedIcIdTokenPayload,
+        );
+      await afterOAuthSuccessRedirection.execute({
+        code: "my-code",
+        state: initialOngoingOAuth.state,
+      });
+      const firstLoginDate = (
+        await uow.userRepository.findByExternalId(
+          defaultExpectedIcIdTokenPayload.sub,
+        )
+      )?.lastLoginAt;
+
+      timeGateway.setNextDates([secondDay, secondDay, secondDay, secondDay]);
+      await makeSuccessfulAuthenticationConditions(
+        `${immersionBaseUrl}/agencyDashboard`,
+        defaultExpectedIcIdTokenPayload,
+      );
+      await afterOAuthSuccessRedirection.execute({
+        code: "my-code",
+        state: initialOngoingOAuth.state,
+      });
+
+      const secondLoginDate = (
+        await uow.userRepository.findByExternalId(
+          defaultExpectedIcIdTokenPayload.sub,
+        )
+      )?.lastLoginAt;
+      expect(firstLoginDate).toBe(firstDay.toISOString());
+      expect(secondLoginDate).toBe(secondDay.toISOString());
     });
   });
 
