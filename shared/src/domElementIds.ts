@@ -891,6 +891,7 @@ export const domElementIds = {
   },
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
+    tabContainer: "im-establishment-dashboard__tab-container",
     initiateConventionModal:
       "im-manage-establishment__initiate-convention-modal",
     initiateConventionModalButton:
