@@ -15,7 +15,7 @@ export type PublicApiV3SearchEstablishmentRoutes =
 export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
   contactEstablishment: defineRoute({
     method: "post",
-    url: "/v3/contact-establishment",
+    url: "/v3/apply-to-offer",
     requestBodySchema: contactEstablishmentPublicV3Schema,
     ...withAuthorizationHeaders,
     responses: {
@@ -29,7 +29,7 @@ export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
   }),
   getOffer: defineRoute({
     method: "get",
-    url: "/v3/search/:siret/:appellationCode/:locationId",
+    url: "/v3/offers/:siret/:appellationCode/:locationId",
     ...withAuthorizationHeaders,
     responses: {
       200: searchResultSchema,
@@ -42,7 +42,7 @@ export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
   }),
   getOffers: defineRoute({
     method: "get",
-    url: "/v3/search",
+    url: "/v3/offers",
     ...withAuthorizationHeaders,
     queryParamsSchema: getOffersFlatParamsSchema,
     responses: {

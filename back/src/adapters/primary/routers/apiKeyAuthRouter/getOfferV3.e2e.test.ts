@@ -130,7 +130,7 @@ describe("Route to get ImmersionSearchResultDto by siret, appellation code and l
   it("accepts valid authenticated requests", async () => {
     const response = await request
       .get(
-        `/v3/search/${immersionOfferSiret}/${styliste.appellationCode}/${otherLocation.id}`,
+        `/v3/offers/${immersionOfferSiret}/${styliste.appellationCode}/${otherLocation.id}`,
       )
       .set("Authorization", authToken);
 
