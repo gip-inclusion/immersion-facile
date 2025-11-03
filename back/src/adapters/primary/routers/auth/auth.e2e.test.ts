@@ -346,6 +346,7 @@ describe("user connexion flow", () => {
               firstName: "",
               lastName: "",
               proConnect: null,
+              lastLoginAt: gateways.timeGateway.now().toISOString(),
             },
           ]);
 
