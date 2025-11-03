@@ -120,10 +120,7 @@ const rawAgencyDashboardTabs = ({
             tabId: "agencyDashboardMain" satisfies AgencyDashboardRouteName,
             label: "Tableau de bord",
             content: (
-              <ConventionTabContent
-                dashboards={dashboards}
-                activeAgencies={agenciesWithActiveStatus}
-              />
+              <ConventionTabContent activeAgencies={agenciesWithActiveStatus} />
             ),
           },
         ]

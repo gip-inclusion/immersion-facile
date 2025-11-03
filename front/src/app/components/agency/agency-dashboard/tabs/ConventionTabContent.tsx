@@ -10,15 +10,12 @@ import {
   type AgencyId,
   domElementIds,
   miniStageAgencyKinds,
-  type WithAgencyDashboards,
-  type WithEstablishmentDashboards,
 } from "shared";
 import { AgencyTasks } from "src/app/components/agency/agency-dashboard/AgencyTasks";
 import { ConventionList } from "src/app/components/agency/agency-dashboard/ConventionList";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
-import { MetabaseView } from "../../../MetabaseView";
 
 const selectAgencyToInitiateConventionModal = createModal({
   isOpenedByDefault: false,
@@ -26,10 +23,8 @@ const selectAgencyToInitiateConventionModal = createModal({
     .selectAgencyToInitiateConventionModal,
 });
 export const ConventionTabContent = ({
-  dashboards,
   activeAgencies,
 }: {
-  dashboards: WithAgencyDashboards & WithEstablishmentDashboards;
   activeAgencies: AgencyDtoForAgencyUsersAndAdmins[];
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
@@ -115,12 +110,7 @@ export const ConventionTabContent = ({
         }}
       />
       <ConventionList />
-      <MetabaseView
-        titleAs="h3"
-        title="Tableau de bord agence"
-        subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
-        url={dashboards.agencies.agencyDashboardUrl}
-      />
+
       {createPortal(
         <selectAgencyToInitiateConventionModal.Component
           title="Initier une convention"
