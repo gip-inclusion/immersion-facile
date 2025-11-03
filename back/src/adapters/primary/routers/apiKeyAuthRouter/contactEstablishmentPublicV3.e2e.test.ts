@@ -27,7 +27,7 @@ import {
   publicApiV3SearchEstablishmentRoutes,
 } from "./publicApiV3.routes";
 
-describe("POST contact-establishment public V3 route", () => {
+describe("POST /v3/apply-to-offers public V3 route", () => {
   const user = new UserBuilder().build();
   const contactEstablishment: ContactEstablishmentPublicV3Dto = {
     contactMode: "EMAIL",
@@ -130,7 +130,7 @@ describe("POST contact-establishment public V3 route", () => {
     expectToEqual(body, {
       status: 400,
       message:
-        "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v3/contact-establishment",
+        "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v3/apply-to-offer",
       issues: [
         "contactMode : Choisissez parmi les options proposées",
         // Issues below are useless and thrown by our new discussion schema,
@@ -271,7 +271,7 @@ describe("POST contact-establishment public V3 route", () => {
     ];
 
     const { body, status } = await request
-      .post("/v3/contact-establishment")
+      .post("/v3/apply-to-offer")
       .set(
         "Authorization",
         generateApiConsumerJwt({
@@ -321,7 +321,7 @@ describe("POST contact-establishment public V3 route", () => {
     ];
 
     const { body, status } = await request
-      .post("/v3/contact-establishment")
+      .post("/v3/apply-to-offer")
       .set(
         "Authorization",
         generateApiConsumerJwt({
