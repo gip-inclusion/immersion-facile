@@ -25,6 +25,7 @@ export type User = {
   firstName: string;
   lastName: string;
   createdAt: DateTimeIsoString;
+  lastLoginAt?: DateTimeIsoString;
   proConnect: ProConnectInfos | null;
 };
 

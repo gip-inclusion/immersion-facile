@@ -123,7 +123,10 @@ export class AfterOAuthSuccessRedirection extends TransactionalUseCase<
     };
 
     await Promise.all([
-      uow.userRepository.save(newOrUpdatedUser),
+      uow.userRepository.save({
+        ...newOrUpdatedUser,
+        lastLoginAt: this.#timeGateway.now().toISOString(),
+      }),
       uow.ongoingOAuthRepository.save(updatedOnGoingAuth),
       uow.outboxRepository.save(
         this.#createNewEvent({

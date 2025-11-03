@@ -22,6 +22,7 @@ type PersistenceAuthenticatedUser = {
   siret: SiretDto | null;
   created_at: string;
   isBackofficeAdmin: SqlBool;
+  last_login_at: string | null;
 };
 
 export class PgUserRepository implements UserRepository {
@@ -49,7 +50,15 @@ export class PgUserRepository implements UserRepository {
   }
 
   public async save(user: UserWithAdminRights): Promise<void> {
-    const { id, email, firstName, lastName, createdAt, proConnect } = user;
+    const {
+      id,
+      email,
+      firstName,
+      lastName,
+      createdAt,
+      proConnect,
+      lastLoginAt,
+    } = user;
 
     const existingUser = await this.#findById(id);
 
@@ -64,6 +73,7 @@ export class PgUserRepository implements UserRepository {
           pro_connect_sub: proConnect?.externalId,
           pro_connect_siret: proConnect?.siret,
           created_at: createdAt,
+          last_login_at: lastLoginAt ? sql`${lastLoginAt}` : sql`NULL`,
         })
         .execute();
       return;
@@ -75,8 +85,16 @@ export class PgUserRepository implements UserRepository {
       existingUser.email === email &&
       existingUser.proConnect?.externalId === proConnect?.externalId &&
       existingUser.proConnect?.siret === proConnect?.siret
-    )
+    ) {
+      if (lastLoginAt) {
+        await this.transaction
+          .updateTable("users")
+          .set({ last_login_at: sql`${lastLoginAt}` })
+          .where("id", "=", id)
+          .execute();
+      }
       return;
+    }
 
     await this.transaction
       .updateTable("users")
@@ -87,6 +105,7 @@ export class PgUserRepository implements UserRepository {
         pro_connect_sub: proConnect?.externalId,
         pro_connect_siret: proConnect?.siret,
         updated_at: sql`now()`,
+        ...(lastLoginAt ? { last_login_at: sql`${lastLoginAt}` } : {}),
       })
       .where("id", "=", id)
       .execute();
@@ -211,6 +230,10 @@ export class PgUserRepository implements UserRepository {
         sql<SqlBool>`BOOL_OR(users_admins.user_id IS NOT NULL)`.as(
           "isBackofficeAdmin",
         ),
+        (qb) =>
+          sql<string>`date_to_iso(${qb.ref("users.last_login_at")})`.as(
+            "last_login_at",
+          ),
       ])
       .groupBy("users.id")
       .orderBy("users.email");
@@ -234,6 +257,9 @@ export class PgUserRepository implements UserRepository {
             : null,
         ...(raw.isBackofficeAdmin === true ? { isBackofficeAdmin: true } : {}),
         createdAt: new Date(raw.created_at).toISOString(),
+        lastLoginAt: raw.last_login_at
+          ? new Date(raw.last_login_at).toISOString()
+          : undefined,
       }
     );
   }

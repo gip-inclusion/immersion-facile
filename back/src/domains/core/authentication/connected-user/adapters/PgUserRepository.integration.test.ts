@@ -119,6 +119,32 @@ describe("PgAuthenticatedUserRepository", () => {
 
         expectToEqual(await userRepository.getAllUsers(), [user]);
       });
+
+      it("updates the last_login_at column", async () => {
+        await userRepository.save(user);
+        expect(
+          (await userRepository.getById(user.id))?.lastLoginAt,
+        ).toBeUndefined();
+
+        const lastLoginAt = new Date("2025-11-03T10:00:00Z").toISOString();
+        await userRepository.save({ ...user, lastLoginAt });
+        expectToEqual(await userRepository.getById(user.id), {
+          ...user,
+          lastLoginAt,
+        });
+      });
+
+      it("do not update the last_login_at column if not specified", async () => {
+        await userRepository.save(user); // creation
+        expect(
+          (await userRepository.getById(user.id))?.lastLoginAt,
+        ).toBeUndefined();
+
+        await userRepository.save(user); // update
+        expect(
+          (await userRepository.getById(user.id))?.lastLoginAt,
+        ).toBeUndefined();
+      });
     });
 
     describe("updateEmail()", () => {

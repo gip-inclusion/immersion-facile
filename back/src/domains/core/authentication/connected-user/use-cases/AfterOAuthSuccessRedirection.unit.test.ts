@@ -104,6 +104,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 siret: defaultExpectedIcIdTokenPayload.siret,
               },
               createdAt: timeGateway.now().toISOString(),
+              lastLoginAt: timeGateway.now().toISOString(),
             },
           ]);
         });
@@ -173,6 +174,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
               email: defaultExpectedIcIdTokenPayload.email,
               firstName: defaultExpectedIcIdTokenPayload.firstName,
               lastName: defaultExpectedIcIdTokenPayload.lastName,
+              lastLoginAt: timeGateway.now().toISOString(),
             },
           ]);
         });
@@ -209,6 +211,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 siret: defaultExpectedIcIdTokenPayload.siret,
               },
               createdAt: alreadyExistingUser.createdAt,
+              lastLoginAt: timeGateway.now().toISOString(),
             },
           ]);
         });
@@ -277,6 +280,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
               siret: defaultExpectedIcIdTokenPayload.siret,
             },
             createdAt: initialUser.createdAt,
+            lastLoginAt: timeGateway.now().toISOString(),
           };
 
           await afterOAuthSuccessRedirection.execute({
@@ -348,6 +352,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 externalId,
                 siret: proConnectSiret,
               },
+              lastLoginAt: timeGateway.now().toISOString(),
             },
           ]);
         });
@@ -530,6 +535,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
               firstName: "",
               lastName: "",
               proConnect: null,
+              lastLoginAt: timeGateway.now().toISOString(),
             },
           ]);
 
