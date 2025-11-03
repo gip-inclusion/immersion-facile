@@ -12,9 +12,9 @@ export const createSearchRouter = (deps: AppDependencies) => {
     searchImmersionRouter,
   );
 
-  expressSharedRouter.legacySearch(async (req, res) =>
+  expressSharedRouter.getOffers(async (req, res) =>
     sendHttpResponse(req, res, async () =>
-      deps.useCases.legacySearchImmersion.execute(req.query, req.apiConsumer),
+      deps.useCases.getOffers.execute(req.query, undefined),
     ),
   );
 

@@ -1,9 +1,12 @@
 import { all, isNil, values } from "ramda";
 import {
+  type ApiConsumer,
   type DataWithPagination,
   errors,
+  type GetOffersPerPageOption,
   getOffersFlatParamsSchema,
   getPaginationParamsForApiConsumer,
+  getPaginationParamsForWeb,
   pipeWithValue,
   type SearchResultDto,
 } from "shared";
@@ -15,13 +18,16 @@ import {
   type SearchMade,
 } from "../entities/SearchMadeEntity";
 
+const defaultPerPage: GetOffersPerPageOption = 12;
+
 export const makeGetOffers = useCaseBuilder("GetOffers")
+  .withCurrentUser<ApiConsumer | undefined>()
   .withInput(getOffersFlatParamsSchema)
   .withOutput<DataWithPagination<SearchResultDto>>()
   .withDeps<{
     uuidGenerator: UuidGenerator;
   }>()
-  .build(async ({ inputParams, uow, deps }) => {
+  .build(async ({ inputParams, uow, deps, currentUser: apiConsumer }) => {
     const {
       page,
       perPage,
@@ -42,10 +48,15 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
     });
 
     const result = await uow.establishmentAggregateRepository.getOffers({
-      pagination: getPaginationParamsForApiConsumer({
-        page,
-        perPage,
-      }),
+      pagination: apiConsumer
+        ? getPaginationParamsForApiConsumer({
+            page,
+            perPage,
+          })
+        : getPaginationParamsForWeb(
+            { page, perPage },
+            { overrideDefaultPerPage: defaultPerPage },
+          ),
       filters: {
         appellationCodes,
         fitForDisabledWorkers,
