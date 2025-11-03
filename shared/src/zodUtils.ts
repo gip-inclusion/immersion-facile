@@ -87,15 +87,18 @@ export const emptyObjectSchema: ZodSchemaWithInputMatchingOutput<
   Record<string, never>
 > = z.object({}).strict();
 
-export const personNameSchema = z
-  .string()
-  .trim()
-  .regex(
-    /^[A-Za-zÀ-ÿ\s'-]*$/,
-    "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
-  )
-  .max(50, "Le nom ne doit pas dépasser 50 caractères")
-  .transform((val) => val.replace(/\s+/g, " "));
+export const makePersonNameSchema = (fieldName: "firstname" | "lastname") => {
+  const label = fieldName === "firstname" ? "prénom" : "nom";
+  return z
+    .string()
+    .trim()
+    .regex(
+      /^[A-Za-zÀ-ÿ\s'-]*$/,
+      `Le ${label} ne peut contenir que des lettres, espaces, tirets et apostrophes`,
+    )
+    .max(50, `Le ${label} ne doit pas dépasser 50 caractères`)
+    .transform((val) => val.replace(/\s+/g, " "));
+};
 
 export const expressEmptyResponseBody = z.void().or(z.literal(""));
 
