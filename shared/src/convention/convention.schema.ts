@@ -49,7 +49,7 @@ import type { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
-  personNameSchema,
+  makePersonNameSchema,
   type ZodSchemaWithInputMatchingOutput,
   zBoolean,
   zEnumValidation,
@@ -226,8 +226,8 @@ export const immersionObjectiveSchema: ZodSchemaWithInputMatchingOutput<Immersio
 
 export const withOptionalFirstnameAndLastnameSchema: ZodSchemaWithInputMatchingOutput<WithOptionalFirstnameAndLastname> =
   z.object({
-    firstname: personNameSchema.optional(),
-    lastname: personNameSchema.optional(),
+    firstname: makePersonNameSchema("firstname").optional(),
+    lastname: makePersonNameSchema("lastname").optional(),
   });
 
 //todo: to remove that when data in db is cleaned up and put a more strict schema (personNameSchema)
@@ -575,8 +575,8 @@ export type WithFirstnameAndLastname = OmitFromExistingKeys<
 
 export const withFirstnameAndLastnameSchema: ZodSchemaWithInputMatchingOutput<WithFirstnameAndLastname> =
   z.object({
-    firstname: personNameSchema,
-    lastname: personNameSchema,
+    firstname: makePersonNameSchema("firstname"),
+    lastname: makePersonNameSchema("lastname"),
   });
 
 const updateConventionStatusWithValidatorSchema: ZodSchemaWithInputMatchingOutput<UpdateConventionStatusWithValidator> =
