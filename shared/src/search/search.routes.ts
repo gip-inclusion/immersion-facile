@@ -7,8 +7,11 @@ import {
   siretAndAppellationSchema,
 } from "../siretAndAppellation/SiretAndAppellation.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import { legacySearchParamsSchema } from "./SearchQueryParams.schema";
-import { searchResultSchema, searchResultsSchema } from "./SearchResult.schema";
+import { getOffersFlatParamsSchema } from "./SearchQueryParams.schema";
+import {
+  paginatedSearchResultsSchema,
+  searchResultSchema,
+} from "./SearchResult.schema";
 
 export type SearchRoutes = typeof searchImmersionRoutes;
 export const searchImmersionRoutes = defineRoutes({
@@ -20,12 +23,12 @@ export const searchImmersionRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  legacySearch: defineRoute({
+  getOffers: defineRoute({
     method: "get",
-    url: "/immersion-offers",
-    queryParamsSchema: legacySearchParamsSchema,
+    url: "/offers",
+    queryParamsSchema: getOffersFlatParamsSchema,
     responses: {
-      200: searchResultsSchema,
+      200: paginatedSearchResultsSchema,
       400: httpErrorSchema.or(httpErrorSchema),
     },
   }),

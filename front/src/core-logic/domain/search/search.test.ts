@@ -1,6 +1,6 @@
 import {
+  type DataWithPagination,
   expectToEqual,
-  type LegacySearchQueryParamsDto,
   type LocationId,
   type SearchResultDto,
 } from "shared";
@@ -84,47 +84,18 @@ describe("search epic", () => {
   });
 
   describe("retrieves a list of search results", () => {
-    it("with extra fetch if less than minimum results", () => {
-      expectStatus("noSearchMade");
-      expectSearchInfo("Veuillez sélectionner vos critères");
-      expectIsLoading(false);
-      const searchParams: LegacySearchQueryParamsDto = {
-        distanceKm: 10,
-        longitude: 0,
-        latitude: 0,
-        appellationCodes: ["11000"],
-        sortedBy: "distance",
-        place: "23 rue lunaire, 44000 Nantes",
-        fitForDisabledWorkers: undefined,
-      };
-      store.dispatch(searchSlice.actions.searchRequested(searchParams));
-      expectIsLoading(true);
-      expectStatus("initialFetch");
-      expectedSearchParamsToEqual(searchParams);
-
-      feedWithSearchResults([formSearchResult1]);
-      expectSearchResults([formSearchResult1]);
-      expectStatus("extraFetch");
-      expectIsLoading(true);
-      expectSearchInfo("Nous cherchons à compléter les résultats...");
-
-      feedWithSearchResults([lbbSearchResult]);
-      expectSearchResults([formSearchResult1, lbbSearchResult]);
-      expectStatus("ok");
-      expectIsLoading(false);
-    });
-
-    it("without extra fetch if enough results in initial fetch", () => {
+    it("gets the results from the API", () => {
       expectIsLoading(false);
       store.dispatch(
-        searchSlice.actions.searchRequested({
+        searchSlice.actions.getOffersRequested({
           distanceKm: 10,
           longitude: 0,
           latitude: 0,
           appellationCodes: ["11000"],
-          sortedBy: "distance",
           place: "4 rue dessange, 44000 Nantes",
           fitForDisabledWorkers: undefined,
+          sortBy: "distance",
+          sortOrder: "desc",
         }),
       );
       expectStatus("initialFetch");
@@ -133,20 +104,29 @@ describe("search epic", () => {
       feedWithSearchResults([formSearchResult1, formSearchResult2]);
       expectStatus("ok");
       expectIsLoading(false);
-      expectSearchResults([formSearchResult1, formSearchResult2]);
+      expectSearchResults({
+        data: [formSearchResult1, formSearchResult2],
+        pagination: {
+          totalRecords: 2,
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 12,
+        },
+      });
     });
 
     it("displays message when there are no results", () => {
       expectIsLoading(false);
       store.dispatch(
-        searchSlice.actions.searchRequested({
+        searchSlice.actions.getOffersRequested({
           distanceKm: 10,
           longitude: 0,
           latitude: 0,
           appellationCodes: ["11000"],
-          sortedBy: "distance",
           place: "9 rue pruneaux, 44000 Nantes",
           fitForDisabledWorkers: undefined,
+          sortBy: "distance",
+          sortOrder: "desc",
         }),
       );
 
@@ -223,12 +203,13 @@ describe("search epic", () => {
   it("should reset search status when clicking on an offer", () => {
     expectStatus("noSearchMade");
     store.dispatch(
-      searchSlice.actions.searchRequested({
-        sortedBy: "distance",
+      searchSlice.actions.getOffersRequested({
         distanceKm: 10,
         latitude: immersionOffer.position.lat,
         longitude: immersionOffer.position.lon,
         fitForDisabledWorkers: undefined,
+        sortBy: "distance",
+        sortOrder: "desc",
       }),
     );
     feedWithSearchResults([]);
@@ -284,23 +265,25 @@ describe("search epic", () => {
     expectToEqual(searchSelectors.searchInfo(store.getState()), searchInfo);
   };
 
-  const expectSearchResults = (searchResults: SearchResultDto[]) =>
+  const expectSearchResults = (
+    searchResults: DataWithPagination<SearchResultDto>,
+  ) =>
     expectToEqual(
-      searchSelectors.searchResults(store.getState()),
+      searchSelectors.searchResultsWithPagination(store.getState()),
       searchResults,
     );
 
   const expectIsLoading = (isLoading: boolean) =>
     expect(searchSelectors.isLoading(store.getState())).toBe(isLoading);
 
-  const expectedSearchParamsToEqual = (
-    expectedSearchParams: LegacySearchQueryParamsDto,
-  ) =>
-    expectToEqual(
-      searchSelectors.searchParams(store.getState()),
-      expectedSearchParams,
-    );
-
   const feedWithSearchResults = (results: SearchResultDto[]) =>
-    dependencies.searchGateway.searchResults$.next(results);
+    dependencies.searchGateway.searchResults$.next({
+      data: results,
+      pagination: {
+        totalRecords: results.length,
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: 12,
+      },
+    });
 });

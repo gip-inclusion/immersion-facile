@@ -166,7 +166,7 @@ export class InMemoryEstablishmentAggregateRepository
 
   public async getOffers(
     params: GetOffersParams,
-  ): Promise<DataWithPagination<RepositorySearchImmertionResult>> {
+  ): Promise<DataWithPagination<SearchResultDto>> {
     const { filters, pagination } = params;
 
     const allOffers = this.establishmentAggregates
@@ -206,28 +206,21 @@ export class InMemoryEstablishmentAggregateRepository
               ? filters.appellationCodes.includes(offer.appellationCode)
               : true,
           )
-          .map((offer) => {
-            const searchResult =
-              establishmentAggregateToSearchResultByRomeForFirstLocation(
-                aggregate,
-                offer.romeCode,
-                filters.geoParams
-                  ? distanceBetweenCoordinatesInMeters(
-                      aggregate.establishment.locations[0].position,
-                      {
-                        lat: filters.geoParams.lat,
-                        lon: filters.geoParams.lon,
-                      },
-                    )
-                  : undefined,
-              );
-            // Add the isSearchable property required by RepositorySearchImmertionResult
-            return {
-              ...searchResult,
-              isSearchable:
-                !aggregate.establishment.isMaxDiscussionsForPeriodReached,
-            };
-          }),
+          .map((offer) =>
+            establishmentAggregateToSearchResultByRomeForFirstLocation(
+              aggregate,
+              offer.romeCode,
+              filters.geoParams
+                ? distanceBetweenCoordinatesInMeters(
+                    aggregate.establishment.locations[0].position,
+                    {
+                      lat: filters.geoParams.lat,
+                      lon: filters.geoParams.lon,
+                    },
+                  )
+                : undefined,
+            ),
+          ),
       );
 
     // Apply pagination
@@ -242,7 +235,10 @@ export class InMemoryEstablishmentAggregateRepository
       pagination: {
         currentPage: pagination.page,
         numberPerPage: pagination.perPage,
-        totalPages: Math.ceil(allOffers.length / pagination.perPage),
+        totalPages: Math.max(
+          1,
+          Math.ceil(allOffers.length / pagination.perPage),
+        ),
         totalRecords: allOffers.length,
       },
     };

@@ -1,9 +1,10 @@
 import { type Observable, Subject } from "rxjs";
 import type {
   CreateDiscussionDto,
+  DataWithPagination,
+  GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
-  LegacySearchQueryParamsDto,
   SearchResultDto,
   SiretAndAppellationDto,
 } from "shared";
@@ -12,7 +13,7 @@ import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
 export class TestSearchGateway implements SearchGateway {
   public currentSearchResult$ = new Subject<SearchResultDto>();
 
-  public searchResults$ = new Subject<SearchResultDto[]>();
+  public searchResults$ = new Subject<DataWithPagination<SearchResultDto>>();
 
   public contactEstablishment(
     _params: CreateDiscussionDto,
@@ -30,9 +31,9 @@ export class TestSearchGateway implements SearchGateway {
     return this.currentSearchResult$;
   }
 
-  public search$(
-    _params: LegacySearchQueryParamsDto,
-  ): Observable<SearchResultDto[]> {
+  public getOffers$(
+    _params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
     return this.searchResults$;
   }
 

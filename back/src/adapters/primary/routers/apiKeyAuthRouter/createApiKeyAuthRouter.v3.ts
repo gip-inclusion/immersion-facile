@@ -85,7 +85,7 @@ export const createApiKeyAuthRouterV3 = (deps: AppDependencies) => {
           throw errors.apiConsumer.forbidden();
 
         return deps.useCases.getOffers
-          .execute(req.query)
+          .execute(req.query, req.apiConsumer)
           .then(({ data, pagination }) => ({
             data: data.map(domainToSearchImmersionResultPublicV3),
             pagination,

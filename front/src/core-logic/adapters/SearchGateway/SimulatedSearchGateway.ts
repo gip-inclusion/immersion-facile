@@ -1,10 +1,10 @@
-import { filter as ramdaFilter } from "ramda";
-import { delay, map, type Observable, of } from "rxjs";
+import { delay, type Observable, of } from "rxjs";
 import {
   type CreateDiscussionDto,
+  type DataWithPagination,
+  type GetOffersFlatQueryParams,
   type GroupSlug,
   type GroupWithResults,
-  type LegacySearchQueryParamsDto,
   type SearchResultDto,
   type SiretAndAppellationDto,
   sleep,
@@ -17,7 +17,7 @@ export class SimulatedSearchGateway implements SearchGateway {
 
   #simulatedLatency: number;
 
-  #seedResults?: SearchResultDto[];
+  #seedResultsWithPagination: DataWithPagination<SearchResultDto>;
 
   #simulatedResponse: SearchResultDto = {
     rome: "A1201",
@@ -61,9 +61,20 @@ export class SimulatedSearchGateway implements SearchGateway {
     createdAt: new Date().toISOString(),
   };
 
-  constructor(seedResults?: SearchResultDto[], simulatedLatency = 0) {
+  constructor(
+    seedResults: SearchResultDto[] = seedSearchResults,
+    simulatedLatency = 0,
+  ) {
     this.#simulatedLatency = simulatedLatency;
-    this.#seedResults = seedResults;
+    this.#seedResultsWithPagination = {
+      data: seedResults,
+      pagination: {
+        totalRecords: seedResults.length,
+        numberPerPage: 48,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    };
   }
 
   public async contactEstablishment(
@@ -87,11 +98,11 @@ export class SimulatedSearchGateway implements SearchGateway {
     return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
   }
 
-  public search$(
-    searchParams: LegacySearchQueryParamsDto,
-  ): Observable<SearchResultDto[]> {
+  public getOffers$(
+    _params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
     if (this.#error) throw this.#error;
-    return this.#simulateSearch(searchParams);
+    return this.#simulateSearch();
   }
 
   public getExternalSearchResult$(
@@ -100,17 +111,9 @@ export class SimulatedSearchGateway implements SearchGateway {
     return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
   }
 
-  #simulateSearch(searchParams: LegacySearchQueryParamsDto) {
-    const results$ = of(this.#seedResults ?? seedSearchResults);
-    if (searchParams.voluntaryToImmersion === undefined) return results$;
-    return results$.pipe(
+  #simulateSearch() {
+    return of(this.#seedResultsWithPagination).pipe(
       delay(this.#simulatedLatency),
-      map(
-        ramdaFilter<SearchResultDto>(
-          (result) =>
-            result.voluntaryToImmersion === searchParams.voluntaryToImmersion,
-        ),
-      ),
     );
   }
 }
