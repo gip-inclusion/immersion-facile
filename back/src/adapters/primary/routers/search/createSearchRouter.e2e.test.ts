@@ -3,12 +3,13 @@ import {
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
+  type GetOffersFlatQueryParams,
   type Group,
   type Pagination,
   type SearchResultDto,
   type SearchRoutes,
   type SiretDto,
-  searchImmersionRoutes, GetOffersFlatQueryParams,
+  searchImmersionRoutes,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -347,15 +348,15 @@ describe("/offers route", () => {
         expectHttpResponseToEqual(result, {
           status: 200,
           body: {
-            pagination: getBasicPagination({totalRecords: 2}),
+            pagination: getBasicPagination({ totalRecords: 2 }),
             data: toSearchImmersionResults(
               [
-                {siret: siret1, offer: offer1, establishment},
-                {siret: siret2, offer: offer2, establishment},
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret2, offer: offer2, establishment },
               ],
-            0,
-        )
-      },
+              0,
+            ),
+          },
         });
       });
 
@@ -374,15 +375,15 @@ describe("/offers route", () => {
         expectHttpResponseToEqual(result, {
           status: 200,
           body: {
-            pagination: getBasicPagination({totalRecords: 2}),
+            pagination: getBasicPagination({ totalRecords: 2 }),
             data: toSearchImmersionResults(
               [
-                {siret: siret1, offer: offer1, establishment},
-                {siret: siret3, offer: offer1, establishment},
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret3, offer: offer1, establishment },
               ],
-            0,
-        )
-      },
+              0,
+            ),
+          },
         });
       });
 
@@ -400,7 +401,7 @@ describe("/offers route", () => {
         expectHttpResponseToEqual(result, {
           status: 200,
           body: {
-            pagination: getBasicPagination({totalRecords: 3}),
+            pagination: getBasicPagination({ totalRecords: 3 }),
             data: toSearchImmersionResults(
               [
                 { siret: siret1, offer: offer1, establishment },
@@ -408,7 +409,7 @@ describe("/offers route", () => {
                 { siret: siret3, offer: offer1, establishment },
               ],
               0,
-            )
+            ),
           },
         });
       });
@@ -556,16 +557,16 @@ describe("/offers route", () => {
         expectHttpResponseToEqual(results, {
           status: 200,
           body: {
-            pagination: getBasicPagination({totalRecords: 3}),
+            pagination: getBasicPagination({ totalRecords: 3 }),
             data: toSearchImmersionResults(
               [
-                {siret: siret1, offer: offer1, establishment},
-                {siret: siret2, offer: offer2, establishment},
-                {siret: siret3, offer: offer1, establishment},
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret2, offer: offer2, establishment },
+                { siret: siret3, offer: offer1, establishment },
               ],
-            false,
-        )
-      },
+              false,
+            ),
+          },
         });
       });
       it("should return results if no geo params are set but appellations are supplied", async () => {
@@ -579,14 +580,14 @@ describe("/offers route", () => {
         expectHttpResponseToEqual(results, {
           status: 200,
           body: {
-            pagination: getBasicPagination({totalRecords: 2}),
+            pagination: getBasicPagination({ totalRecords: 2 }),
             data: toSearchImmersionResults(
               [
                 { siret: siret1, offer: offer1, establishment },
                 { siret: siret3, offer: offer1, establishment },
               ],
               false,
-            )
+            ),
           },
         });
       });

@@ -7,9 +7,7 @@ import {
   siretAndAppellationSchema,
 } from "../siretAndAppellation/SiretAndAppellation.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import {
-  getOffersFlatParamsSchema,
-} from "./SearchQueryParams.schema";
+import { getOffersFlatParamsSchema } from "./SearchQueryParams.schema";
 import {
   paginatedSearchResultsSchema,
   searchResultSchema,

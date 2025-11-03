@@ -71,7 +71,7 @@ type LegacySearchCommonParamsDto = {
 
 // NEW MODEL (from v3)
 
-type GetOffersFlatParamsCommon = {
+type GetOffersFlatParamsCommon = WithAcquisition & {
   place?: string; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
   appellationCodes?: AppellationCode[];
   fitForDisabledWorkers?: FitForDisableWorkerOption[];

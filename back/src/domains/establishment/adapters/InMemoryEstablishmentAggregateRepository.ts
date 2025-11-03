@@ -212,14 +212,15 @@ export class InMemoryEstablishmentAggregateRepository
               offer.romeCode,
               filters.geoParams
                 ? distanceBetweenCoordinatesInMeters(
-                  aggregate.establishment.locations[0].position,
-                  {
-                    lat: filters.geoParams.lat,
-                    lon: filters.geoParams.lon,
-                  },
-                )
+                    aggregate.establishment.locations[0].position,
+                    {
+                      lat: filters.geoParams.lat,
+                      lon: filters.geoParams.lon,
+                    },
+                  )
                 : undefined,
-            )),
+            ),
+          ),
       );
 
     // Apply pagination
@@ -234,7 +235,10 @@ export class InMemoryEstablishmentAggregateRepository
       pagination: {
         currentPage: pagination.page,
         numberPerPage: pagination.perPage,
-        totalPages: Math.max(1, Math.ceil(allOffers.length / pagination.perPage)),
+        totalPages: Math.max(
+          1,
+          Math.ceil(allOffers.length / pagination.perPage),
+        ),
         totalRecords: allOffers.length,
       },
     };
