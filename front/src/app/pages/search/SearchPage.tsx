@@ -17,7 +17,7 @@ import {
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  domElementIds, GetOffersFlatQueryParams,
+  domElementIds,
   type LatLonDistance,
   type SearchResultDto,
   type SearchSortedBy,
@@ -43,6 +43,7 @@ import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice"
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   initialState,
+  type SearchPageParams,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
@@ -55,12 +56,11 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
     value: distance,
   }),
 );
-const nafLabelMaxLength = 30;
 const DEFAULT_DISTANCE_KM = 10;
 
 const getSearchRouteParam = (
-  currentKey: keyof GetOffersFlatQueryParams,
-  routeParam: ValueOf<GetOffersFlatQueryParams>,
+  currentKey: keyof SearchPageParams,
+  routeParam: ValueOf<SearchPageParams>,
   defaultValue: unknown,
 ) => {
   if (!routeParam) {
@@ -82,10 +82,12 @@ export const SearchPage = ({
   const dispatch = useDispatch();
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
-  const {data: searchResults} = useAppSelector(searchSelectors.searchResultsWithPagination);
+  const { data: searchResults, pagination } = useAppSelector(
+    searchSelectors.searchResultsWithPagination,
+  );
   const isLoading = useAppSelector(searchSelectors.isLoading);
-  const { triggerSearch, changeCurrentPage } = useSearch(route);
-  const [searchMade, setSearchMade] = useState<GetOffersFlatQueryParams | null>(null);
+  const { triggerSearch } = useSearch(route);
+  const [searchMade, setSearchMade] = useState<SearchPageParams | null>(null);
   const searchResultsWrapper = useRef<ElementRef<"div">>(null);
   const innerSearchResultWrapper = useRef<ElementRef<"div">>(null);
   const acquisitionParams = useGetAcquisitionParams();
@@ -93,31 +95,31 @@ export const SearchPage = ({
     featureFlagSelectors.featureFlagState,
   );
 
-  const initialValues: GetOffersFlatQueryParams = {
+  const initialValues: SearchPageParams = {
     place: "",
     sortBy: enableSearchByScore ? "score" : "date",
     sortOrder: "desc",
-    appellations: undefined,
+    appellationCodes: undefined,
     distanceKm: undefined,
     latitude: undefined,
     longitude: undefined,
     fitForDisabledWorkers: undefined,
-    currentPage: 1,
     nafCodes: undefined,
     nafLabel: undefined,
+    appellations: undefined,
     ...acquisitionParams,
   };
-  const [tempValue, setTempValue] = useState<GetOffersFlatQueryParams>(initialValues);
-  const filterFormValues = (values: GetOffersFlatQueryParams) =>
+  const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
+  const filterFormValues = (values: SearchPageParams) =>
     keys(values).reduce(
       (acc, key) => ({
         ...acc,
         ...(values[key] ? { [key]: values[key] } : {}),
       }),
-      {} as GetOffersFlatQueryParams,
+      {} as SearchPageParams,
     );
-  const routeParams = route.params as Partial<GetOffersFlatQueryParams>;
-  const methods = useForm<GetOffersFlatQueryParams>({
+  const routeParams = route.params as Partial<SearchPageParams>;
+  const methods = useForm<SearchPageParams>({
     defaultValues: keys(initialValues).reduce(
       (acc, currentKey) => ({
         ...acc,
@@ -167,20 +169,20 @@ export const SearchPage = ({
     };
   };
 
-  const setTempValuesAsFormValues = (values: Partial<GetOffersFlatQueryParams>) => {
+  const setTempValuesAsFormValues = (values: Partial<SearchPageParams>) => {
     keys(values).forEach((key) => {
       setValue(key, values[key]);
     });
   };
 
-  const onSearchFormSubmit = (updatedValues: GetOffersFlatQueryParams) => {
+  const onSearchFormSubmit = (updatedValues: SearchPageParams) => {
     setTempValue(updatedValues);
     setTempValuesAsFormValues(updatedValues);
     setSearchMade(updatedValues);
     triggerSearch(filterFormValues(updatedValues));
   };
 
-  useScrollToTop(formValues.currentPage);
+  useScrollToTop(pagination?.currentPage ?? 1);
 
   useEffect(() => {
     if (availableForInitialSearchRequest) {
@@ -225,15 +227,8 @@ export const SearchPage = ({
           (appellation) => appellation.appellationLabel,
         )
       : [];
-    const nafDisplayed = formValues.nafLabel
-      ? [
-          formValues.nafLabel.length > nafLabelMaxLength
-            ? `${formValues.nafLabel.substring(0, nafLabelMaxLength)}...`
-            : formValues.nafLabel,
-        ]
-      : [];
-    return appellationDisplayed.length || nafDisplayed.length
-      ? [...appellationDisplayed, ...nafDisplayed].join(" - ")
+    return appellationDisplayed.length
+      ? appellationDisplayed.join(" - ")
       : "Tous les métiers";
   };
   const searchResultsData = getSearchResultsData(searchResults);
@@ -302,8 +297,8 @@ export const SearchPage = ({
                       setValue("latitude", initialValues.latitude);
                       setValue("longitude", initialValues.latitude);
                       setValue("place", initialValues.place);
-                      if (formValues.sortedBy === "distance") {
-                        setValue("sortedBy", "date");
+                      if (formValues.sortBy === "distance") {
+                        setValue("sortBy", "date");
                       }
                       setValue("distanceKm", initialValues.distanceKm);
                     }}
@@ -327,7 +322,7 @@ export const SearchPage = ({
                         );
                         setValue("distanceKm", value);
                         if (!value) {
-                          setValue("sortedBy", "date");
+                          setValue("sortBy", "date");
                         }
                       },
                     }}
@@ -366,7 +361,7 @@ export const SearchPage = ({
             <form
               onSubmit={handleSubmit((value) => {
                 if (tempValue !== null) {
-                  const updatedValues: GetOffersFlatQueryParams = {
+                  const updatedValues: SearchPageParams = {
                     ...value,
                     ...tempValue,
                   };
@@ -470,8 +465,8 @@ export const SearchPage = ({
                 iconId="fr-icon-map-pin-2-fill"
                 values={place ? [`${place} (${distanceKm}km)`] : []}
                 onReset={() => {
-                  const updatedValues: GetOffersFlatQueryParams =
-                    tempValue.sortedBy === "distance"
+                  const updatedValues: SearchPageParams =
+                    tempValue.sortBy === "distance"
                       ? {
                           ...tempValue,
                           place: initialValues.place,
@@ -510,8 +505,8 @@ export const SearchPage = ({
                           });
                         }}
                         onPlaceClear={() => {
-                          const updatedInitialValues: GetOffersFlatQueryParams =
-                            tempValue.sortedBy === "distance"
+                          const updatedInitialValues: SearchPageParams =
+                            tempValue.sortBy === "distance"
                               ? {
                                   ...tempValue,
                                   place: initialValues.place,
@@ -527,10 +522,10 @@ export const SearchPage = ({
                                 };
                           setTempValue(updatedInitialValues);
 
-                          if (formValues.sortedBy === "distance") {
+                          if (formValues.sortBy === "distance") {
                             setTempValue({
                               ...tempValue,
-                              sortedBy: "date",
+                              sortBy: "date",
                             });
                           }
                         }}
@@ -600,12 +595,20 @@ export const SearchPage = ({
                           {
                             label: rqthLabel,
                             nativeInputProps: {
-                              checked: tempValue.fitForDisabledWorkers,
+                              checked:
+                                tempValue.fitForDisabledWorkers?.some(
+                                  (fitForDisabledWorker) =>
+                                    fitForDisabledWorker ===
+                                      "yes-declared-only" ||
+                                    fitForDisabledWorker === "yes-ft-certified",
+                                ) ?? false,
                               onChange: (event) => {
                                 setTempValue({
                                   ...tempValue,
-                                  fitForDisabledWorkers:
-                                    event.currentTarget.checked ?? undefined,
+                                  fitForDisabledWorkers: event.currentTarget
+                                    .checked
+                                    ? ["yes-declared-only", "yes-ft-certified"]
+                                    : ["no"],
                                 });
                               },
                             },
@@ -621,8 +624,8 @@ export const SearchPage = ({
                 iconId="fr-icon-arrow-down-line"
                 id={domElementIds[route.name].sortFilterTag}
                 values={
-                  formValues.sortedBy
-                    ? [sortedByOptionsLabel[formValues.sortedBy]]
+                  formValues.sortBy
+                    ? [sortedByOptionsLabel[formValues.sortBy]]
                     : []
                 }
                 submenu={{
@@ -633,11 +636,11 @@ export const SearchPage = ({
                       options={filteredSortOptions.map((option) => ({
                         ...option,
                         nativeInputProps: {
-                          name: register("sortedBy").name,
+                          name: register("sortBy").name,
                           value: option.value,
                           disabled: option.disabled,
                           checked: tempValue
-                            ? option.value === tempValue.sortedBy
+                            ? option.value === tempValue.sortBy
                             : false,
                           onClick: (event) => {
                             const updatedSortedBy = isSearchSortedBy(
@@ -651,13 +654,13 @@ export const SearchPage = ({
                             ) {
                               setTempValue({
                                 ...tempValue,
-                                sortedBy: "distance",
+                                sortBy: "distance",
                               });
                             }
                             if (updatedSortedBy !== "distance") {
                               setTempValue({
                                 ...tempValue,
-                                sortedBy: updatedSortedBy,
+                                sortBy: updatedSortedBy,
                               });
                             }
                           },
@@ -737,15 +740,8 @@ export const SearchPage = ({
                   </div>
                   <SearchListResults
                     route={route}
-                    currentPage={formValues.currentPage}
+                    currentPage={pagination?.currentPage ?? 1}
                     showDistance={areValidGeoParams(searchMade)}
-                    setCurrentPageValue={(newPageValue: number) => {
-                      setValue("currentPage", newPageValue);
-                      changeCurrentPage({
-                        ...formValues,
-                        currentPage: newPageValue,
-                      });
-                    }}
                   />
                 </div>
               )}
@@ -778,7 +774,7 @@ const areEmptyGeoParams = (
   );
 };
 
-const canSubmitSearch = (values: GetOffersFlatQueryParams) => {
+const canSubmitSearch = (values: SearchPageParams) => {
   const geoParams = {
     latitude: values.latitude,
     longitude: values.longitude,
