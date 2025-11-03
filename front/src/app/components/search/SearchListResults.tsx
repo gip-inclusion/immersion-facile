@@ -33,15 +33,15 @@ const isResultPerPageOption = (value: string): value is ResultsPerPageOptions =>
 export const SearchListResults = ({
   showDistance,
   currentPage,
-  setCurrentPageValue,
   route,
 }: {
   route: SearchRoute;
   showDistance: boolean;
   currentPage: number;
-  setCurrentPageValue: (newPageValue: number) => void;
 }) => {
-  const {data: searchResults} = useAppSelector(searchSelectors.searchResultsWithPagination);
+  const { data: searchResults } = useAppSelector(
+    searchSelectors.searchResultsWithPagination,
+  );
   const searchParams = useAppSelector(searchSelectors.searchParams);
   const [displayedResults, setDisplayedResults] =
     useState<SearchResultDto[]>(searchResults);
@@ -62,13 +62,6 @@ export const SearchListResults = ({
       return searchResults.slice(start, end);
     },
     [searchResults, resultsPerPageValue],
-  );
-
-  const onCurrentPageChange = useCallback(
-    (newPage: number) => {
-      setCurrentPageValue(newPage);
-    },
-    [setCurrentPageValue],
   );
 
   useEffect(() => {
@@ -186,7 +179,7 @@ export const SearchListResults = ({
                   title: `Résultats de recherche, page : ${pageNumber}`,
                   onClick: (event) => {
                     event.preventDefault();
-                    onCurrentPageChange(pageNumber);
+                    // change current page with href or onClick?
                   },
                   href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
                   key: `pagination-link-${pageNumber}`,

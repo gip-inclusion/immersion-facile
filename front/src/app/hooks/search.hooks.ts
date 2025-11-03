@@ -10,7 +10,10 @@ import {
   filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
-import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import {
+  type SearchPageParams,
+  searchSlice,
+} from "src/core-logic/domain/search/search.slice";
 import type { Route } from "type-route";
 
 export const encodedSearchUriParams = [
@@ -26,13 +29,11 @@ const filterUrlsParamsAndUpdateUrl = ({
   urlParams,
   routeName,
 }: {
-  values: GetOffersFlatQueryParams;
+  values: SearchPageParams;
   urlParams: Record<string, string>;
   routeName: SearchRoute["name"];
 }) => {
-  const filteredUrlParams = filterParamsForRoute<
-    Partial<GetOffersFlatQueryParams>
-  >({
+  const filteredUrlParams = filterParamsForRoute<Partial<SearchPageParams>>({
     urlParams: {
       ...Object.fromEntries(
         Object.entries(urlParams).filter(([key]) =>
@@ -59,7 +60,7 @@ const filterUrlsParamsAndUpdateUrl = ({
 export const useSearch = ({ name }: SearchRoute) => {
   const dispatch = useDispatch();
   return {
-    triggerSearch: (params: GetOffersFlatQueryParams) => {
+    triggerSearch: (params: SearchPageParams) => {
       dispatch(searchSlice.actions.getOffersRequested(params));
       filterUrlsParamsAndUpdateUrl({
         values: params,
@@ -67,7 +68,7 @@ export const useSearch = ({ name }: SearchRoute) => {
         routeName: name,
       });
     },
-    changeCurrentPage: (values: GetOffersFlatQueryParams) => {
+    changeCurrentPage: (values: SearchPageParams) => {
       filterUrlsParamsAndUpdateUrl({
         values,
         urlParams: getUrlParameters(window.location),
