@@ -6,6 +6,7 @@ import { type ReactNode, useMemo } from "react";
 import { HeadingSection, SectionHighlight } from "react-design-system";
 import {
   type ConnectedUser,
+  domElementIds,
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
 } from "shared";
@@ -99,6 +100,7 @@ export const EstablishmentDashboardTabs = ({
       )}
       <Tabs
         tabs={tabs}
+        id={domElementIds.establishmentDashboard.tabContainer}
         className={fr.cx("fr-mt-4w")}
         selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
         onTabChange={(tab) => {
