@@ -60,6 +60,7 @@ export class PgStatisticQueries implements StatisticQueries {
           .else(true)
           .end()
           .as("isReferenced"),
+        sql<string>`CAST(e.created_at AS TEXT)`.as("referencedAt"),
       ])
       .limit(perPage)
       .offset((page - 1) * perPage)

@@ -5,6 +5,7 @@ import {
   expressEmptyResponseBody,
   httpErrorSchema,
   localization,
+  makeDateStringSchema,
   paginationQueryParamsSchema,
   withAuthorizationHeaders,
   type ZodSchemaWithInputMatchingOutput,
@@ -102,6 +103,7 @@ const establishmentStatSchema: ZodSchemaWithInputMatchingOutput<EstablishmentSta
     name: z.string(),
     numberOfConventions: z.number(),
     isReferenced: z.boolean(),
+    referencedAt: makeDateStringSchema(),
   });
 
 const paginatedEstablishmentStatsSchema = createPaginatedSchema(

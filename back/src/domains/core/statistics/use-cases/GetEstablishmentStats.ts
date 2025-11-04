@@ -1,6 +1,7 @@
 import {
   type ApiConsumer,
   type DataWithPagination,
+  type DateString,
   errors,
   type PaginationQueryParams,
   paginationRequiredQueryParamsSchema,
@@ -12,6 +13,7 @@ export type EstablishmentStat = {
   name: string;
   numberOfConventions: number;
   isReferenced: boolean;
+  referencedAt: DateString | null;
 };
 
 export type GetEstablishmentStats = ReturnType<

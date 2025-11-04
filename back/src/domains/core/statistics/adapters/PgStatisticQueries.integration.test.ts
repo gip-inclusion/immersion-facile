@@ -174,12 +174,14 @@ describe("PgStatisticQueries", () => {
               name: conventionSiret1A.businessName,
               numberOfConventions: 2,
               isReferenced: false,
+              referencedAt: null,
             },
             {
               siret: convention2.siret,
               name: convention2.businessName,
               numberOfConventions: 1,
               isReferenced: false,
+              referencedAt: null,
             },
           ],
           pagination: {
@@ -202,6 +204,7 @@ describe("PgStatisticQueries", () => {
               name: convention3.businessName,
               numberOfConventions: 1,
               isReferenced: true,
+              referencedAt: expect.any(String),
             },
             {
               siret:
@@ -210,6 +213,7 @@ describe("PgStatisticQueries", () => {
                 .name,
               numberOfConventions: 0,
               isReferenced: true,
+              referencedAt: expect.any(String),
             },
           ],
           pagination: {
