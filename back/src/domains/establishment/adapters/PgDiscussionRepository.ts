@@ -5,15 +5,19 @@ import {
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
   type ContactMode,
+  type ConventionId,
   type DataWithPagination,
   type DiscussionDto,
   type DiscussionId,
   type DiscussionInList,
+  type DiscussionKind,
   type DiscussionOrderKey,
   type DiscussionStatus,
   type EstablishmentRole,
   type Exchange,
+  type ExchangeRole,
   errors,
+  type ImmersionObjective,
   type PotentialBeneficiaryCommonProps,
   pipeWithValue,
   type RejectionKind,
@@ -29,6 +33,7 @@ import {
 import type { Database } from "../../../config/pg/kysely/model/database";
 import type {
   DiscussionRepository,
+  GetDiscussionIdsParams,
   GetDiscussionsParams,
   GetPaginatedDiscussionsForUserParams,
   HasDiscussionMatchingParams,
@@ -41,8 +46,249 @@ const orderColumnByOrderKey: Record<
   createdAt: "discussions.created_at",
 };
 
+type DeleteDiscussionResultPayload = {
+  deletedDiscussionsValues: {
+    created_at: string;
+    id: string;
+    siret: string;
+    kind: DiscussionKind;
+    status: DiscussionStatus;
+    convention_id: ConventionId | null;
+    potential_beneficiary_first_name: string;
+    department_code: string;
+    immersion_objective: ImmersionObjective | null;
+    contact_method: string;
+    appellation_code: number;
+  }[];
+  deletedExchanges: {
+    discussion_id: DiscussionId;
+    sender: ExchangeRole;
+  }[];
+};
+
 export class PgDiscussionRepository implements DiscussionRepository {
   constructor(private transaction: KyselyDb) {}
+
+  async __test_getAllDiscussions(): Promise<DiscussionDto[]> {
+    return executeGetDiscussions(this.transaction, {
+      filters: {},
+      limit: 5000,
+    }).then((results) => makeDiscussionDtoFromPgDiscussion(results));
+  }
+
+  async __test_setDiscussionsStats(stats: DiscussionsStat[]) {
+    await this.transaction
+      .insertInto("discussions__stats")
+      .values(stats)
+      .execute();
+  }
+
+  async __test_getDiscussionsStats() {
+    return executeGetDiscussionsStatus(this.transaction);
+  }
+
+  async archiveDiscussions(discussionIds: DiscussionId[]): Promise<void> {
+    if (discussionIds.length === 0) return;
+
+    return this.insertOrUpdateDiscussionsStats(
+      await this.deleteDiscussions(discussionIds),
+    );
+  }
+
+  private async deleteDiscussions(
+    discussionIds: DiscussionId[],
+  ): Promise<DeleteDiscussionResultPayload> {
+    const deletedExchanges = await this.transaction
+      .deleteFrom("exchanges")
+      .where("discussion_id", "in", discussionIds)
+      .returning(["discussion_id", "sender"])
+      .execute();
+
+    const deletedDiscussionsValues = await this.transaction
+      .deleteFrom("discussions")
+      .where("id", "in", discussionIds)
+      .returning([
+        "id",
+        "status",
+        "appellation_code",
+        "potential_beneficiary_first_name",
+        "contact_method",
+        "department_code",
+        "kind",
+        "immersion_objective",
+        "siret",
+        "created_at",
+        "convention_id",
+      ])
+      .execute()
+      .then((results) =>
+        results.map((result) => ({
+          ...result,
+          potential_beneficiary_first_name:
+            result.potential_beneficiary_first_name.toLocaleLowerCase(),
+          created_at: new Date(
+            result.created_at.getTime() -
+              result.created_at.getTimezoneOffset() * 60 * 1_000,
+          )
+            .toISOString()
+            .split("T")[0],
+        })),
+      );
+
+    const deletedDiscussionsIds = deletedDiscussionsValues.map(
+      (values) => values.id,
+    );
+    const missingDiscussions = discussionIds.filter(
+      (d) => !deletedDiscussionsIds.includes(d),
+    );
+
+    if (missingDiscussions.length > 0)
+      throw errors.discussion.missingNotDeleted(missingDiscussions);
+    return { deletedDiscussionsValues, deletedExchanges };
+  }
+
+  private async insertOrUpdateDiscussionsStats({
+    deletedDiscussionsValues,
+    deletedExchanges,
+  }: DeleteDiscussionResultPayload): Promise<void> {
+    const statsToAdd = deletedDiscussionsValues.reduce<DiscussionsStat[]>(
+      (acc, deletedDiscussionValues) => {
+        const existingInAcc = acc.findIndex(
+          (value) =>
+            value.status === deletedDiscussionValues.status &&
+            value.appellation_code ===
+              deletedDiscussionValues.appellation_code &&
+            value.candidate_firstname ===
+              deletedDiscussionValues.potential_beneficiary_first_name &&
+            value.contact_method === deletedDiscussionValues.contact_method &&
+            value.department_code === deletedDiscussionValues.department_code &&
+            value.kind === deletedDiscussionValues.kind &&
+            value.immersion_objective ===
+              deletedDiscussionValues.immersion_objective &&
+            value.siret === deletedDiscussionValues.siret &&
+            value.creation_date === deletedDiscussionValues.created_at,
+        );
+        const isDiscussionHasBeenAnsweredByEstablishment =
+          deletedExchanges.some(
+            (exchange) =>
+              exchange.discussion_id === deletedDiscussionValues.id &&
+              exchange.sender === "establishment",
+          );
+        const isDiscussionWithConvention =
+          deletedDiscussionValues.convention_id !== null;
+
+        return existingInAcc >= 0
+          ? acc.map((accValue, i) =>
+              existingInAcc === i
+                ? {
+                    ...accValue,
+                    discussions_total: accValue.discussions_total + 1,
+                    discussions_answered_by_establishment:
+                      accValue.discussions_answered_by_establishment +
+                      (isDiscussionHasBeenAnsweredByEstablishment ? 1 : 0),
+                    discussions_with_convention:
+                      accValue.discussions_with_convention +
+                      (isDiscussionWithConvention ? 1 : 0),
+                  }
+                : accValue,
+            )
+          : [
+              ...acc,
+              {
+                status: deletedDiscussionValues.status,
+                appellation_code: deletedDiscussionValues.appellation_code,
+                candidate_firstname:
+                  deletedDiscussionValues.potential_beneficiary_first_name,
+                contact_method: deletedDiscussionValues.contact_method,
+                department_code: deletedDiscussionValues.department_code,
+                kind: deletedDiscussionValues.kind,
+                immersion_objective:
+                  deletedDiscussionValues.immersion_objective,
+                siret: deletedDiscussionValues.siret,
+                creation_date: deletedDiscussionValues.created_at,
+                discussions_total: 1,
+                discussions_answered_by_establishment:
+                  isDiscussionHasBeenAnsweredByEstablishment ? 1 : 0,
+                discussions_with_convention: isDiscussionWithConvention ? 1 : 0,
+              } satisfies DiscussionsStat,
+            ];
+      },
+      [],
+    );
+
+    await this.transaction
+      .insertInto("discussions__stats")
+      .values(statsToAdd)
+      .onConflict((oc) =>
+        oc
+          .columns([
+            "appellation_code",
+            "candidate_firstname",
+            "contact_method",
+            "creation_date",
+            "department_code",
+            "immersion_objective",
+            "kind",
+            "siret",
+            "status",
+          ])
+          .doUpdateSet({
+            discussions_total: (eb) =>
+              eb(
+                "discussions__stats.discussions_total",
+                "+",
+                eb.ref("excluded.discussions_total"),
+              ),
+            discussions_answered_by_establishment: (eb) =>
+              eb(
+                "discussions__stats.discussions_answered_by_establishment",
+                "+",
+                eb.ref("excluded.discussions_answered_by_establishment"),
+              ),
+            discussions_with_convention: (eb) =>
+              eb(
+                "discussions__stats.discussions_with_convention",
+                "+",
+                eb.ref("excluded.discussions_with_convention"),
+              ),
+          }),
+      )
+      .execute();
+  }
+
+  async getDiscussionIds({
+    filters: { statuses, updatedBetween },
+    orderBy,
+    limit,
+  }: GetDiscussionIdsParams): Promise<DiscussionId[]> {
+    if (
+      updatedBetween?.from &&
+      updatedBetween?.to &&
+      updatedBetween.from > updatedBetween.to
+    )
+      throw errors.generic.badDateRange(updatedBetween);
+    if (limit <= 0 || limit > 10_000 || !Number.isInteger(limit))
+      throw errors.generic.unsupportedLimit(limit);
+
+    const results = await pipeWithValue(
+      this.transaction.selectFrom("discussions").select("id").limit(limit),
+      (builder) =>
+        statuses && statuses.length > 0
+          ? builder.where("status", "in", statuses)
+          : builder,
+      (builder) =>
+        updatedBetween?.from
+          ? builder.where("updated_at", ">=", updatedBetween.from)
+          : builder,
+      (builder) =>
+        updatedBetween?.to
+          ? builder.where("updated_at", "<=", updatedBetween.to)
+          : builder,
+      (builder) =>
+        orderBy === "updatedAt" ? builder.orderBy("updated_at asc") : builder,
+    ).execute();
+    return results.map(({ id }) => id as DiscussionId);
+  }
 
   public async countDiscussionsForSiretSince(
     siret: SiretDto,
@@ -365,6 +611,7 @@ const discussionToPg = (
   business_name: discussion.businessName,
   city: discussion.address.city,
   created_at: discussion.createdAt,
+  updated_at: discussion.updatedAt,
   department_code: discussion.address.departmentCode,
   postcode: discussion.address.postcode,
   potential_beneficiary_email: discussion.potentialBeneficiary.email,
@@ -481,6 +728,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       address: discussion.address,
       businessName: discussion.businessName,
       createdAt: new Date(discussion.createdAt).toISOString(),
+      updatedAt: new Date(discussion.updatedAt).toISOString(),
       siret: discussion.siret,
       conventionId: discussion.conventionId,
       id: discussion.id,
@@ -666,11 +914,13 @@ const executeGetDiscussions = (
     .groupBy(["d.id", "d.created_at", "d.siret"])
     .orderBy("d.created_at", "desc")
     .orderBy("d.siret", "asc")
+    .orderBy("d.updated_at", "desc")
     .select(({ ref, fn }) =>
       jsonStripNulls(
         jsonBuildObject({
           id: ref("d.id"),
           createdAt: ref("d.created_at"),
+          updatedAt: ref("d.updated_at"),
           siret: ref("d.siret"),
           businessName: ref("d.business_name"),
           appellationCode: sql<string>`CAST(${ref(
@@ -727,3 +977,45 @@ const executeGetDiscussions = (
       ).as("discussion"),
     )
     .execute();
+
+export type DiscussionsStat = {
+  siret: string;
+  kind: DiscussionKind;
+  status: DiscussionStatus;
+  contact_method: string;
+  immersion_objective: ImmersionObjective | null;
+  department_code: string;
+  candidate_firstname: string;
+  creation_date: string;
+  appellation_code: number;
+  discussions_total: number;
+  discussions_answered_by_establishment: number;
+  discussions_with_convention: number;
+};
+const executeGetDiscussionsStatus = (
+  transaction: KyselyDb,
+): Promise<DiscussionsStat[]> =>
+  transaction
+    .selectFrom("discussions__stats")
+    .select(({ ref }) => [
+      ref("siret").as("siret"),
+      ref("kind").as("kind"),
+      ref("status").as("status"),
+      ref("contact_method").as("contact_method"),
+      ref("immersion_objective").as("immersion_objective"),
+      ref("department_code").as("department_code"),
+      ref("candidate_firstname").as("candidate_firstname"),
+      sql<string>`TO_CHAR(${ref("creation_date")}, 'YYYY-MM-DD')`.as(
+        "creation_date",
+      ),
+      ref("appellation_code").as("appellation_code"),
+      ref("discussions_total").as("discussions_total"),
+      ref("discussions_answered_by_establishment").as(
+        "discussions_answered_by_establishment",
+      ),
+      ref("discussions_with_convention").as("discussions_with_convention"),
+    ])
+    .execute()
+    .then((results) =>
+      results.map((r) => ({ ...r, creation_date: r.creation_date })),
+    );
