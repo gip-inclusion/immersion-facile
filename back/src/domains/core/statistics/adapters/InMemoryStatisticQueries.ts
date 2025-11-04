@@ -10,6 +10,7 @@ export const fakeEstablishmentStatsResponse: DataWithPagination<EstablishmentSta
         name: "My fake establishment",
         numberOfConventions: 3,
         isReferenced: true,
+        referencedAt: "2023-01-01T00:00:00.000Z",
       },
     ],
     pagination: {
