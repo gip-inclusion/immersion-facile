@@ -28,6 +28,7 @@ export interface Database {
   conventions__ft_connect_users: ConventionsFtConnectUsers;
   delegation_contacts: DelegationContacts;
   discussions: Discussions;
+  discussions__stats: DiscussionStats;
   establishment_lead_events: EstablishmentLeadEvents;
   establishments__users: EstablishmentsUsers;
   establishments_deleted: EstablishmentsDeleted;
@@ -115,6 +116,7 @@ interface Discussions extends WithAcquisition {
   contact_method: string;
   kind: DiscussionKind;
   created_at: Timestamp;
+  updated_at: Timestamp;
   potential_beneficiary_first_name: string;
   potential_beneficiary_last_name: string;
   potential_beneficiary_email: string;
@@ -135,6 +137,21 @@ interface Discussions extends WithAcquisition {
   rejection_kind: string | null;
   rejection_reason: string | null;
   candidate_warned_method: "phone" | "email" | "inPerson" | "other" | null;
+}
+
+interface DiscussionStats {
+  siret: string;
+  kind: DiscussionKind;
+  status: DiscussionStatus;
+  contact_method: string;
+  immersion_objective: ImmersionObjectives | null;
+  department_code: string;
+  candidate_firstname: string;
+  creation_date: unknown;
+  appellation_code: number;
+  discussions_total: number;
+  discussions_answered_by_establishment: number;
+  discussions_with_convention: number;
 }
 
 type ExchangeRole = "establishment" | "potentialBeneficiary";
