@@ -42,13 +42,13 @@ export const AddressAutocompleteWithCountrySelect = ({
   );
 
   const getSelectedCountryCode = () => {
-    const countryCodeFromAddressValue = inputValue
-      ? getCountryCodeFromAddress(inputValue)
-      : defaultCountryCode;
-    if (countryCodeFromAddressValue) {
-      return countryCodeFromAddressValue;
+    if (selectedCountryCode) {
+      return selectedCountryCode;
     }
-    return selectedCountryCode ?? countryCode;
+    if (inputValue) {
+      return getCountryCodeFromAddress(inputValue);
+    }
+    return countryCode ?? defaultCountryCode;
   };
 
   const selectedCountryCodeValue = getSelectedCountryCode();
