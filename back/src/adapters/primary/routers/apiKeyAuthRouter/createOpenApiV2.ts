@@ -539,12 +539,14 @@ export const createOpenApiSpecV2 = (envType: string) =>
                     name: "Entreprise 1",
                     numberOfConventions: 4,
                     isReferenced: true,
+                    referencedAt: new Date("2025-11-04").toISOString(),
                   },
                   {
                     siret: "22220000222200",
                     name: "Entreprise 2",
                     numberOfConventions: 1,
                     isReferenced: false,
+                    referencedAt: null,
                   },
                 ],
                 pagination: {
