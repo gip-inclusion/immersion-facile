@@ -33,7 +33,7 @@ type CreateEventDependencies = {
   quarantinedTopics?: DomainTopic[];
 };
 
-type CreateNewEventParams<T extends DomainTopic> = {
+export type CreateNewEventParams<T extends DomainTopic> = {
   topic: T;
   payload: NarrowEvent<T>["payload"];
   occurredAt?: DateString;
@@ -53,11 +53,12 @@ export const makeCreateNewEvent =
     timeGateway,
     quarantinedTopics = [],
   }: CreateEventDependencies): CreateNewEvent =>
-  (params: any) => ({
-    id: uuidGenerator.new(),
-    occurredAt: timeGateway.now().toISOString(),
-    wasQuarantined: new Set(quarantinedTopics).has(params.topic),
-    publications: [],
-    status: "never-published",
-    ...params,
-  });
+  (params) =>
+    ({
+      id: uuidGenerator.new(),
+      occurredAt: timeGateway.now().toISOString(),
+      wasQuarantined: new Set(quarantinedTopics).has(params.topic),
+      publications: [],
+      status: "never-published",
+      ...params,
+    }) as any;
