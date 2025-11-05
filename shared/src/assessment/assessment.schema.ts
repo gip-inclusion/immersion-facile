@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
-import type { DateRange } from "../utils/date";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -80,17 +79,6 @@ export const withAssessmentSchema: z.ZodType<
 > = z.object({
   assessment: assessmentDtoSchema,
 });
-
-export const withDateRangeSchema: ZodSchemaWithInputMatchingOutput<DateRange> =
-  z
-    .object({
-      from: z.date(),
-      to: z.date(),
-    })
-    .refine(
-      ({ from, to }) => from < to,
-      "La date de fin doit être après la date de début.",
-    );
 
 export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyAssessmentDto> =
   z.object({
