@@ -232,6 +232,41 @@ describe("ConnectedUserConventionList", () => {
     });
   });
 
+  it("clears convention list filters", () => {
+    expectConventionListSelector(defaultConventionListState);
+
+    const customFilters: FlatGetConventionsForAgencyUserParams = {
+      sortBy: "dateStart",
+      sortDirection: "asc",
+      page: 2,
+      perPage: 20,
+      statuses: ["PARTIALLY_SIGNED"],
+      dateStartFrom: "2024-01-01",
+    };
+
+    store.dispatch(
+      conventionListSlice.actions.fetchConventionListRequested({
+        jwt,
+        filters: customFilters,
+        feedbackTopic: "connected-user-conventionList",
+      }),
+    );
+
+    feedGatewayWithConventionListOrError(conventionsWithPagination);
+
+    expectConventionListSelector({
+      ...defaultConventionListState,
+      conventionsWithPagination: {
+        ...conventionsWithPagination,
+        filters: customFilters,
+      },
+    });
+
+    store.dispatch(conventionListSlice.actions.clearConventionListFilters());
+
+    expectConventionListSelector(defaultConventionListState);
+  });
+
   const feedGatewayWithConventionListOrError = (
     conventionListOrError?: DataWithPagination<ConventionReadDto> | Error,
   ) => {
