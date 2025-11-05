@@ -32,7 +32,7 @@ export const handleCRONScript = async <
 }: {
   name: string;
   config: AppConfig;
-  script: () => Promise<T>;
+  script: () => Promise<T>; // TODO : give config to script through param (config:AppConfig) => Promise<T>
   handleResults: (results: T) => string;
   logger?: OpacifiedLogger;
   monitorConfig?: MonitorConfig;
