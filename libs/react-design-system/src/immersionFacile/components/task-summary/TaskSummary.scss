@@ -1,0 +1,25 @@
+@import "../../../config/responsive";
+
+.im-task-summary {
+  &__count {
+    background-color: var(--blue-france-925-125);
+    color: var(--blue-france-sun-113-625);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    color: var(--blue-france-sun-113-625);
+  }
+
+  &__button {
+    font-weight: 400;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:after {
+      content: "\00a0→";
+    }
+  }
+}
