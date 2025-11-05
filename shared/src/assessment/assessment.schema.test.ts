@@ -1,8 +1,8 @@
 import { ZodError } from "zod";
 import { expectToEqual } from "../test.helpers";
-import type { DateRange } from "../utils/date";
+import { type DateRange, withDateRangeSchema } from "../utils/date";
 import type { AssessmentDto } from "./assessment.dto";
-import { assessmentDtoSchema, withDateRangeSchema } from "./assessment.schema";
+import { assessmentDtoSchema } from "./assessment.schema";
 
 describe("Assessment schema date range", () => {
   it("accepts valid date range", () => {

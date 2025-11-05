@@ -42,7 +42,7 @@ import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellati
 import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
 import type { UserId } from "../user/user.dto";
-import { toDisplayedDate } from "../utils/date";
+import { type DateRange, toDisplayedDate } from "../utils/date";
 import { ManagedFTConnectError } from "./ftConnectErrors";
 import {
   BadRequestError,
@@ -87,6 +87,10 @@ export const errors = {
     }) => new Error(`[${serviceName}] : ${message}`),
   },
   event: {
+    deleteWithBadOccuredAtRange: ({ from, to }: DateRange) =>
+      new ForbiddenError(
+        `Deleting events - range not supported :  from > ${from} - to > ${to}`,
+      ),
     saveNewPublicationFailed: (eventId: string) =>
       new Error(`saveNewPublication of event ${eventId} failed`),
     subscriptionFailed: ({
