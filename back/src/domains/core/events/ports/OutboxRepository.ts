@@ -1,6 +1,15 @@
 import type { DomainEvent, EventStatus } from "../events";
 
+export type DeleteOldestEventsParams = {
+  limit: number;
+  occuredAt: {
+    from?: Date;
+    to: Date;
+  };
+};
+
 export interface OutboxRepository {
+  deleteOldestEvents(params: DeleteOldestEventsParams): Promise<number>;
   countAllEvents(params: { status: EventStatus }): Promise<number>;
   save: (event: DomainEvent) => Promise<void>;
 
