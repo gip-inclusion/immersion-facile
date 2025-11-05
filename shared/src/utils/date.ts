@@ -2,7 +2,10 @@
 import { addHours, differenceInCalendarDays, isValid } from "date-fns";
 import { z } from "zod";
 import type { Flavor } from "../typeFlavors";
-import { localization } from "../zodUtils";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+} from "../zodUtils";
 
 export type DateString = Flavor<string, "DateString">;
 
@@ -12,6 +15,17 @@ export type DateRange = {
   from: Date;
   to: Date;
 };
+
+export const withDateRangeSchema: ZodSchemaWithInputMatchingOutput<DateRange> =
+  z
+    .object({
+      from: z.date(),
+      to: z.date(),
+    })
+    .refine(
+      ({ from, to }) => from < to,
+      "La date de fin doit être après la date de début.",
+    );
 
 export const relativeTimeFormat = new Intl.RelativeTimeFormat("fr", {
   numeric: "auto",
