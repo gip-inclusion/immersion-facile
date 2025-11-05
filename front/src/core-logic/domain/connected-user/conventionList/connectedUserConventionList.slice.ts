@@ -79,5 +79,9 @@ export const conventionListSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
+
+    clearConventionListFilters: (state) => {
+      state.conventionsWithPagination = initialConventionWithPagination;
+    },
   },
 });

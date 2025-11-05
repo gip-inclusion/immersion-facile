@@ -94,7 +94,7 @@ export const RichDropdown = ({
     {
       children: "Annuler",
       type: "button",
-      priority: "tertiary",
+      priority: "secondary",
       onClick: () => setIsOpened(false),
       className: fr.cx("fr-mb-0"),
       id: `${id}-cancel-button`,

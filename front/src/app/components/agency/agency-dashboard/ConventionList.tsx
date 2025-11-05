@@ -85,6 +85,7 @@ export const ConventionList = () => {
       ),
     [],
   );
+
   const [tempFilters, setTempFilters] =
     useState<
       Pick<
@@ -248,6 +249,10 @@ export const ConventionList = () => {
         }),
       );
     }
+
+    return () => {
+      dispatch(conventionListSlice.actions.clearConventionListFilters());
+    };
   }, [dispatch, connectedUserJwt]);
 
   if (!connectedUserJwt) {
@@ -278,7 +283,7 @@ export const ConventionList = () => {
     <HeadingSection
       title="Conventions"
       titleAs="h3"
-      className={fr.cx("fr-mt-0")}
+      className={fr.cx("fr-mt-4w")}
       titleAction={
         currentUser?.dashboards.agencies.agencyDashboardUrl ? (
           <MetabaseFullScreenButton
@@ -363,6 +368,7 @@ export const ConventionList = () => {
                     ...routes.manageConventionConnectedUser({
                       conventionId: convention.id,
                     }).link,
+                    target: "_blank",
                   }}
                 >
                   Piloter
@@ -416,13 +422,13 @@ export const ConventionList = () => {
                         if (
                           tempFilters.assessmentCompletionStatus === "completed"
                         ) {
-                          return "Bilans complétés";
+                          return "Bilan : Bilans complétés";
                         }
                         if (
                           tempFilters.assessmentCompletionStatus ===
                           "to-be-completed"
                         ) {
-                          return "Bilans non complétés";
+                          return "Bilan : Bilans non complétés";
                         }
                         return "Tous les bilans";
                       })(),
@@ -464,7 +470,7 @@ export const ConventionList = () => {
                       content: (
                         <>
                           <RadioButtons options={startDateOptions} />
-                          <div className={cx("fr-mt-2")}>
+                          <div className={cx("fr-mb-2w")}>
                             <Input
                               label="Date"
                               nativeInputProps={{
@@ -503,13 +509,13 @@ export const ConventionList = () => {
                           value: "",
                         },
                       }));
-                      setTempFilters((prev) => ({
-                        ...prev,
+                      const newFilters = {
+                        ...tempFilters,
                         dateStartFrom: undefined,
                         dateStartTo: undefined,
-                      }));
-
-                      onSubmit();
+                      };
+                      setTempFilters(newFilters);
+                      onSubmit(newFilters);
                     },
                   },
                   {
@@ -532,7 +538,7 @@ export const ConventionList = () => {
                       content: (
                         <>
                           <RadioButtons options={endDateOptions} />
-                          <div className={cx("fr-mt-2")}>
+                          <div className={cx("fr-mb-2w")}>
                             <Input
                               label="Date"
                               nativeInputProps={{
@@ -571,13 +577,13 @@ export const ConventionList = () => {
                           value: "",
                         },
                       }));
-                      setTempFilters((prev) => ({
-                        ...prev,
+                      const newFilters = {
+                        ...tempFilters,
                         dateEndFrom: undefined,
                         dateEndTo: undefined,
-                      }));
-
-                      onSubmit();
+                      };
+                      setTempFilters(newFilters);
+                      onSubmit(newFilters);
                     },
                   },
                   ...(hasManyAgencies
