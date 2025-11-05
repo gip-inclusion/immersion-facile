@@ -48,5 +48,6 @@ export * from "./skip-links";
 export * from "./submit-confirmation-section";
 export * from "./tag";
 export * from "./task";
+export * from "./task-summary";
 export * from "./toastr";
 export * from "./tooltip";
