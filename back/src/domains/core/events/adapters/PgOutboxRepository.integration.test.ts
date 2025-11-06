@@ -1,11 +1,14 @@
-import { subHours } from "date-fns";
+import { addMilliseconds, subHours, subMilliseconds, subYears } from "date-fns";
 import { CompiledQuery } from "kysely";
 import type { Pool } from "pg";
 import {
   ConventionDtoBuilder,
+  errors,
   expectArraysToEqualIgnoringOrder,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -14,7 +17,10 @@ import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { DomainEvent, DomainTopic } from "../events";
-import { makeCreateNewEvent } from "../ports/EventBus";
+import {
+  type CreateNewEventParams,
+  makeCreateNewEvent,
+} from "../ports/EventBus";
 import { PgOutboxRepository, type StoredEventRow } from "./PgOutboxRepository";
 
 describe("PgOutboxRepository", () => {
@@ -436,6 +442,187 @@ describe("PgOutboxRepository", () => {
           { id: newEvent.id, status: "in-process" },
         ],
       );
+    });
+  });
+
+  describe("deleteOldestEvents", () => {
+    uuidGenerator.setNextUuids([uuid(), uuid(), uuid(), uuid()]);
+    const now = new Date();
+    const oneYearAgo = subYears(now, 1);
+    const twoYearsAgo = subYears(now, 2);
+
+    const commonParams: CreateNewEventParams<"ApiConsumerSaved"> = {
+      topic: "ApiConsumerSaved",
+      payload: {
+        consumerId: "consumerId",
+        triggeredBy: { kind: "connected-user", userId: "Bob" },
+      },
+    };
+
+    const eventOccuredOneYearMinusOneMSAgo = createNewEvent({
+      ...commonParams,
+      occurredAt: addMilliseconds(oneYearAgo, 1).toISOString(),
+    });
+    const eventOccuredOneYearAgo = createNewEvent({
+      ...commonParams,
+      occurredAt: oneYearAgo.toISOString(),
+    });
+    const eventOccuredTwoYearsAgo = createNewEvent({
+      ...commonParams,
+      occurredAt: twoYearsAgo.toISOString(),
+    });
+    const eventOccuredTwoYearsAndOneMSAgo = createNewEvent({
+      ...commonParams,
+      occurredAt: subMilliseconds(twoYearsAgo, 1).toISOString(),
+    });
+
+    beforeEach(async () => {
+      await storeInOutbox([
+        eventOccuredOneYearMinusOneMSAgo,
+        eventOccuredOneYearAgo,
+        eventOccuredTwoYearsAgo,
+        eventOccuredTwoYearsAndOneMSAgo,
+      ]);
+    });
+
+    describe("occuredAt Param", () => {
+      it("with from and to range param, delete events that are only in occured at range", async () => {
+        expectToEqual(
+          await outboxRepository.deleteOldestEvents({
+            limit: 10,
+            occuredAt: {
+              from: twoYearsAgo,
+              to: oneYearAgo,
+            },
+          }),
+          2,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await getAllEventsStored()).map(({ id }) => ({
+            id,
+          })),
+          [
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredTwoYearsAndOneMSAgo.id },
+          ],
+        );
+      });
+
+      it("with to range param only set to one year ago, delete events that have only occured up to one year ago", async () => {
+        expectToEqual(
+          await outboxRepository.deleteOldestEvents({
+            limit: 10,
+            occuredAt: {
+              to: oneYearAgo,
+            },
+          }),
+          3,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await getAllEventsStored()).map(({ id }) => ({
+            id,
+          })),
+          [{ id: eventOccuredOneYearMinusOneMSAgo.id }],
+        );
+      });
+
+      it("with to range param only set to now, delete all events ", async () => {
+        expectToEqual(
+          await outboxRepository.deleteOldestEvents({
+            limit: 10,
+            occuredAt: {
+              to: now,
+            },
+          }),
+          4,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await getAllEventsStored()).map(({ id }) => ({
+            id,
+          })),
+          [],
+        );
+      });
+
+      it("with to range param from superior of to, throw an error ", async () => {
+        await expectPromiseToFailWithError(
+          outboxRepository.deleteOldestEvents({
+            limit: 10,
+            occuredAt: {
+              from: now,
+              to: oneYearAgo,
+            },
+          }),
+          errors.event.deleteWithBadOccuredAtRange({
+            from: now,
+            to: oneYearAgo,
+          }),
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await getAllEventsStored()).map(({ id }) => ({
+            id,
+          })),
+          [
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredTwoYearsAndOneMSAgo.id },
+            { id: eventOccuredOneYearAgo.id },
+            { id: eventOccuredTwoYearsAgo.id },
+          ],
+        );
+      });
+    });
+
+    describe("limit Param", () => {
+      it("apply limit and delete oldest events with limit 1", async () => {
+        const limit = 1;
+        expectToEqual(
+          await outboxRepository.deleteOldestEvents({
+            limit: limit,
+            occuredAt: {
+              to: now,
+            },
+          }),
+          limit,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await getAllEventsStored()).map(({ id }) => ({
+            id,
+          })),
+          [
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearAgo.id },
+            { id: eventOccuredTwoYearsAgo.id },
+          ],
+        );
+      });
+
+      it("apply limit and delete oldest events with limit 2", async () => {
+        const limit = 2;
+        expectToEqual(
+          await outboxRepository.deleteOldestEvents({
+            limit: limit,
+            occuredAt: {
+              to: now,
+            },
+          }),
+          limit,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await getAllEventsStored()).map(({ id }) => ({
+            id,
+          })),
+          [
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearAgo.id },
+          ],
+        );
+      });
     });
   });
 
