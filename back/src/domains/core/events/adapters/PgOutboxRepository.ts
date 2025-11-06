@@ -1,5 +1,10 @@
 import { differenceWith, propEq } from "ramda";
-import { type DateString, errors, replaceArrayElement } from "shared";
+import {
+  type DateString,
+  errors,
+  pipeWithValue,
+  replaceArrayElement,
+} from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
 import type {
@@ -9,7 +14,10 @@ import type {
   EventPublication,
   EventStatus,
 } from "../events";
-import type { OutboxRepository } from "../ports/OutboxRepository";
+import type {
+  DeleteOldestEventsParams,
+  OutboxRepository,
+} from "../ports/OutboxRepository";
 
 export type StoredEventRow = {
   id: string;
@@ -28,6 +36,41 @@ const logger = createLogger(__filename);
 
 export class PgOutboxRepository implements OutboxRepository {
   constructor(private transaction: KyselyDb) {}
+  async deleteOldestEvents({
+    limit,
+    occuredAt,
+  }: DeleteOldestEventsParams): Promise<number> {
+    if (occuredAt.from && occuredAt.to < occuredAt.from)
+      throw errors.event.deleteWithBadOccuredAtRange({
+        from: occuredAt.from,
+        to: occuredAt.to,
+      });
+
+    return this.transaction
+      .with("to_delete", (qb) =>
+        pipeWithValue(
+          qb
+            .selectFrom("outbox")
+            .select("id")
+            .where("occurred_at", "<=", occuredAt.to)
+            .orderBy("occurred_at asc")
+            .limit(limit),
+          (qb) =>
+            occuredAt.from ? qb.where("occurred_at", ">=", occuredAt.from) : qb,
+        ),
+      )
+      .with("deleted", (qb) =>
+        qb
+          .deleteFrom("outbox")
+          .using("to_delete")
+          .whereRef("outbox.id", "=", "to_delete.id")
+          .returning("outbox.id"),
+      )
+      .selectFrom("deleted")
+      .select(({ fn }) => fn.count("id").as("deleted_events"))
+      .executeTakeFirst()
+      .then((result) => (result ? Number(result.deleted_events) : 0));
+  }
 
   public async countAllEvents({
     status,
