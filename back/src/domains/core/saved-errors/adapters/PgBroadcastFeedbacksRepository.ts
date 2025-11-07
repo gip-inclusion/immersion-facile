@@ -3,6 +3,7 @@ import {
   type BroadcastFeedback,
   type ConventionId,
   type ConventionLastBroadcastFeedbackResponse,
+  type DateString,
   errors,
 } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
@@ -28,7 +29,7 @@ export class PgBroadcastFeedbacksRepository
             "bf.service_name as serviceName",
             "bf.subscriber_error_feedback as subscriberErrorFeedback",
             "bf.request_params as requestParams",
-            "bf.occurred_at as occurredAt",
+            sql<DateString>`date_to_iso(bf.occurred_at)`.as("occurredAt"),
             "bf.handled_by_agency as handledByAgency",
             "bf.response as response",
             sql<number>`

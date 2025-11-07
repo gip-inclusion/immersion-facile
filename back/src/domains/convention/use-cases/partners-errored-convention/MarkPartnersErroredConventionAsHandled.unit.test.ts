@@ -89,7 +89,7 @@ describe("mark partners errored convention as handled", () => {
       },
       response: { httpStatus: 404 },
       subscriberErrorFeedback: { message: "Ops, something is bad" },
-      occurredAt: timeGateway.now(),
+      occurredAt: timeGateway.now().toISOString(),
       handledByAgency: false,
     };
 
@@ -163,7 +163,7 @@ describe("mark partners errored convention as handled", () => {
       },
       response: { httpStatus: 404 },
       subscriberErrorFeedback: { message: "Ops, something is bad" },
-      occurredAt: timeGateway.now(),
+      occurredAt: timeGateway.now().toISOString(),
       handledByAgency: true,
     };
 

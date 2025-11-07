@@ -200,7 +200,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
           consumerName: apiConsumer.name,
           handledByAgency: false,
           subscriberErrorFeedback: response.subscriberErrorFeedback,
-          occurredAt: this.#timeGateway.now(),
+          occurredAt: this.#timeGateway.now().toISOString(),
           requestParams: {
             callbackUrl: response.callbackUrl,
             conventionId: response.conventionId,
@@ -219,7 +219,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         consumerId: apiConsumer.id,
         consumerName: apiConsumer.name,
         handledByAgency: false,
-        occurredAt: this.#timeGateway.now(),
+        occurredAt: this.#timeGateway.now().toISOString(),
         requestParams: {
           callbackUrl: response.callbackUrl,
           conventionId: response.conventionId,

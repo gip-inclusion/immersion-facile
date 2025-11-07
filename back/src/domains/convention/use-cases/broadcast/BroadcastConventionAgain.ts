@@ -100,7 +100,7 @@ const throwErrorIfTooManyRequests = (params: {
 }) => {
   if (!params.lastBroadcastFeedback) return;
 
-  const lastBroadcastDate = params.lastBroadcastFeedback.occurredAt;
+  const lastBroadcastDate = new Date(params.lastBroadcastFeedback.occurredAt);
   const broadcastPossibleDate = addHours(
     lastBroadcastDate,
     BROADCAST_FEEDBACK_DEBOUNCE_HOUR,

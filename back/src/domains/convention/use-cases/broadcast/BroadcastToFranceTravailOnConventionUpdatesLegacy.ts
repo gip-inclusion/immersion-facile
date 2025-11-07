@@ -139,7 +139,7 @@ export const makeBroadcastToFranceTravailOnConventionUpdatesLegacy =
           conventionStatus: convention.status,
         },
         response: { httpStatus: response.status, body: response.body },
-        occurredAt: deps.timeGateway.now(),
+        occurredAt: deps.timeGateway.now().toISOString(),
         handledByAgency: false,
         ...(!isBroadcastResponseOk(response)
           ? { subscriberErrorFeedback: response.subscriberErrorFeedback }
