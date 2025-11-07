@@ -2,6 +2,7 @@ import { type Observable, Subject } from "rxjs";
 import type {
   CreateDiscussionDto,
   DataWithPagination,
+  GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
@@ -36,7 +37,7 @@ export class TestSearchGateway implements SearchGateway {
   }
 
   public getExternalOffers$(
-    _params: GetOffersFlatQueryParams,
+    _params: GetExternalOffersFlatQueryParams,
   ): Observable<DataWithPagination<SearchResultDto>> {
     return this.externalSearchResults$;
   }

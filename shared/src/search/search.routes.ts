@@ -43,7 +43,6 @@ export const searchImmersionRoutes = defineRoutes({
     responses: {
       200: searchResultsSchema,
       400: httpErrorSchema,
-      404: httpErrorSchema,
     },
   }),
   contactEstablishment: defineRoute({

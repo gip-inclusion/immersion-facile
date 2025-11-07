@@ -45,7 +45,6 @@ export const SearchListResults = ({
     searchSelectors.searchResultsWithPagination,
   );
   const searchParams = useAppSelector(searchSelectors.searchParams);
-
   const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
   const { cx, classes } = useStyleUtils();
   const { totalPages, currentPage, numberPerPage } = pagination;
@@ -53,8 +52,8 @@ export const SearchListResults = ({
   const shouldShowExternalResultsPush =
     !isExternal &&
     hasSearchGeoParams(searchParams) &&
-    searchParams.appellationCodes &&
-    searchParams.appellationCodes.length > 0;
+    searchParams.appellations &&
+    searchParams.appellations.length > 0;
   return (
     <div className={fr.cx("fr-container")}>
       <div
@@ -151,66 +150,77 @@ export const SearchListResults = ({
             kind="list"
             activeMarkerKey={activeMarkerKey}
             setActiveMarkerKey={setActiveMarkerKey}
+            isExternal={isExternal}
           />
           {shouldShowExternalResultsPush && <ExternalResultsPush />}
         </div>
-        <div className={fr.cx("fr-container", "fr-mb-10w")}>
-          <div
-            className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mt-4w")}
-          >
-            <div className={fr.cx("fr-col-10", "fr-grid-row")}>
-              <Pagination
-                showFirstLast
-                count={totalPages}
-                defaultPage={currentPage}
-                getPageLinkProps={(pageNumber) => ({
-                  title: `Résultats de recherche, page : ${pageNumber}`,
-                  onClick: (event) => {
-                    event.preventDefault();
-                    triggerSearch(
-                      {
-                        ...searchParams,
-                        page: pageNumber,
-                      },
-                      isExternal,
-                    );
-                  },
-                  href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
-                  key: `pagination-link-${pageNumber}`,
-                })}
-                className={fr.cx("fr-mt-1w")}
-              />
-            </div>
+        {!isExternal && (
+          <div className={fr.cx("fr-container", "fr-mb-10w")}>
             <div
-              className={fr.cx("fr-col-2", "fr-grid-row", "fr-grid-row--right")}
+              className={fr.cx(
+                "fr-grid-row",
+                "fr-grid-row--middle",
+                "fr-mt-4w",
+              )}
             >
-              <Select
-                label=""
-                options={[
-                  ...resultsPerPageOptions.map((numberAsString) => ({
-                    label: `${numberAsString} résultats / page`,
-                    value: numberAsString,
-                  })),
-                ]}
-                nativeSelectProps={{
-                  id: domElementIds.search.resultPerPageDropdown,
-                  onChange: (event) => {
-                    const value = event.currentTarget.value;
-                    triggerSearch(
-                      {
-                        ...searchParams,
-                        perPage: Number.parseInt(value),
-                      },
-                      isExternal,
-                    );
-                  },
-                  value: numberPerPage.toString() as ResultsPerPageOption,
-                  "aria-label": "Nombre de résultats par page",
-                }}
-              />
+              <div className={fr.cx("fr-col-10", "fr-grid-row")}>
+                <Pagination
+                  showFirstLast
+                  count={totalPages}
+                  defaultPage={currentPage}
+                  getPageLinkProps={(pageNumber) => ({
+                    title: `Résultats de recherche, page : ${pageNumber}`,
+                    onClick: (event) => {
+                      event.preventDefault();
+                      triggerSearch(
+                        {
+                          ...searchParams,
+                          page: pageNumber,
+                        },
+                        isExternal,
+                      );
+                    },
+                    href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
+                    key: `pagination-link-${pageNumber}`,
+                  })}
+                  className={fr.cx("fr-mt-1w")}
+                />
+              </div>
+              <div
+                className={fr.cx(
+                  "fr-col-2",
+                  "fr-grid-row",
+                  "fr-grid-row--right",
+                )}
+              >
+                <Select
+                  label=""
+                  options={[
+                    ...resultsPerPageOptions.map((numberAsString) => ({
+                      label: `${numberAsString} résultats / page`,
+                      value: numberAsString,
+                    })),
+                  ]}
+                  nativeSelectProps={{
+                    id: domElementIds.search.resultPerPageDropdown,
+                    onChange: (event) => {
+                      const value = event.currentTarget.value;
+                      triggerSearch(
+                        {
+                          ...searchParams,
+                          perPage: Number.parseInt(value),
+                        },
+                        isExternal,
+                      );
+                    },
+                    value: numberPerPage.toString() as ResultsPerPageOption,
+                    "aria-label": "Nombre de résultats par page",
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -225,16 +235,16 @@ const makeOfferLink = (
   if (!voluntaryToImmersion)
     return routes.searchResultExternal({
       siret,
-      appellationCode: definedAppellationCode,
+      appellationCode: [definedAppellationCode],
     }).link;
 
   const searchParams = {
-    appellationCode: definedAppellationCode,
+    appellationCode: [definedAppellationCode],
     siret,
     ...(locationId ? { location: locationId } : {}),
   };
 
-  return route.name === "search"
+  return route.name === "search" || route.name === "externalSearch"
     ? routes.searchResult(searchParams).link
     : routes.searchResultForStudent(searchParams).link;
 };
@@ -245,7 +255,14 @@ const ExternalResultsPush = () => {
   const filtereddSearchParams = filterParamsForRoute({
     urlParams: searchParams,
     matchingParams: {
-      isExternal: undefined,
+      distanceKm: undefined,
+      latitude: undefined,
+      longitude: undefined,
+      place: undefined,
+      appellations: undefined,
+      nafCodes: undefined,
+      nafLabel: undefined,
+      appellationCodes: undefined,
     },
   });
   return (

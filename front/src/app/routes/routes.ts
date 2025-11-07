@@ -7,7 +7,6 @@ import {
   frontRoutes,
   type ValueOf,
 } from "shared";
-import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import {
   createRouter,
   defineRoute,
@@ -26,8 +25,8 @@ export type AcquisitionParams = Partial<{
   [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
-    ? T
-    : never;
+  ? T
+  : never;
 }>;
 
 type AcquisitionParamsKeys = keyof typeof acquisitionParams;
@@ -66,13 +65,14 @@ export const establishmentParams = {
   ...acquisitionParams,
 };
 
-export const searchParams: Partial<Record<keyof SearchPageParams, unknown>> = {
+export const searchParams = {
   distanceKm: param.query.optional.number,
   latitude: param.query.optional.number,
   longitude: param.query.optional.number,
   appellations: param.query.optional.ofType(
     appellationAndRomeDtoArraySerializer,
   ),
+  appellationCodes: param.query.optional.ofType(appellationStringSerializer),
   sortBy: param.query.optional.string,
   sortOrder: param.query.optional.string,
   place: param.query.optional.string,
@@ -81,7 +81,6 @@ export const searchParams: Partial<Record<keyof SearchPageParams, unknown>> = {
   perPage: param.query.optional.number,
   nafCodes: param.query.optional.ofType(nafCodeSerializer),
   nafLabel: param.query.optional.string,
-  appellationCodes: param.query.optional.ofType(appellationStringSerializer),
   ...acquisitionParams,
 };
 
