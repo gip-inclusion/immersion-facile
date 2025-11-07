@@ -133,7 +133,7 @@ describe("Broadcasts events to France Travail (LEGACY Version)", () => {
         subscriberErrorFeedback: {
           message: "Ops, something is bad",
         },
-        occurredAt: now,
+        occurredAt: now.toISOString(),
         handledByAgency: false,
       },
     ]);
@@ -168,7 +168,7 @@ describe("Broadcasts events to France Travail (LEGACY Version)", () => {
             success: true,
           },
         },
-        occurredAt: now,
+        occurredAt: now.toISOString(),
         handledByAgency: false,
       },
     ]);

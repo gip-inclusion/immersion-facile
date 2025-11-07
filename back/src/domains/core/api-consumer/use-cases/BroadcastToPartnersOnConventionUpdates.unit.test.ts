@@ -321,7 +321,7 @@ describe("Broadcast to partners on updated convention", () => {
       consumerName: apiConsumer1.name,
       handledByAgency: false,
       subscriberErrorFeedback: errorResponse.subscriberErrorFeedback,
-      occurredAt: now,
+      occurredAt: now.toISOString(),
       requestParams: {
         callbackUrl: errorResponse.callbackUrl,
         conventionId: errorResponse.conventionId,
@@ -367,7 +367,7 @@ describe("Broadcast to partners on updated convention", () => {
       consumerId: apiConsumer1.id,
       consumerName: apiConsumer1.name,
       handledByAgency: false,
-      occurredAt: now,
+      occurredAt: now.toISOString(),
       requestParams: {
         callbackUrl: successResponse.callbackUrl,
         conventionId: successResponse.conventionId,

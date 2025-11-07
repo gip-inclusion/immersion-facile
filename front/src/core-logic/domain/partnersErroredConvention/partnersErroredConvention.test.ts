@@ -111,7 +111,7 @@ describe("Broadcast feedback in store", () => {
       requestParams: {
         conventionId: fakeConventionId,
       },
-      occurredAt: new Date("2023-01-01"),
+      occurredAt: new Date("2023-01-01").toDateString(),
       handledByAgency: false,
     };
 
@@ -182,7 +182,7 @@ describe("Broadcast feedback in store", () => {
       requestParams: {
         conventionId: fakeConventionId,
       },
-      occurredAt: new Date("2023-01-01"),
+      occurredAt: new Date("2023-01-01").toDateString(),
       handledByAgency: false,
     };
 

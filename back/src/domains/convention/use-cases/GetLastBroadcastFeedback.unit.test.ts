@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   type BroadcastFeedback,
+  broadcastFeedbackSchema,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   errors,
@@ -27,7 +28,7 @@ describe("GetLastBroadcastFeedback", () => {
 
   const sampleBroadcastFeedback: BroadcastFeedback = {
     serviceName: "test-service",
-    consumerId: "consumer-123",
+    consumerId: "cccccc99-9c0b-1bbb-bb6d-6bb9bd38bbbb",
     consumerName: "Test Consumer",
     subscriberErrorFeedback: {
       message: "Test error message",
@@ -41,7 +42,7 @@ describe("GetLastBroadcastFeedback", () => {
       httpStatus: 200,
       body: { success: true },
     },
-    occurredAt: new Date("2024-01-16T10:00:00.000Z"),
+    occurredAt: "2024-01-16T10:00:00.000Z",
     handledByAgency: true,
   };
 
@@ -76,6 +77,8 @@ describe("GetLastBroadcastFeedback", () => {
         connectedUser,
       );
 
+      const parseResult = broadcastFeedbackSchema.safeParse(result);
+      expect(parseResult.success).toBeTruthy();
       expectToEqual(result, sampleBroadcastFeedback);
     });
 
@@ -91,13 +94,13 @@ describe("GetLastBroadcastFeedback", () => {
     it("should return the most recent broadcast feedback when multiple exist", async () => {
       const olderFeedback: BroadcastFeedback = {
         ...sampleBroadcastFeedback,
-        occurredAt: new Date("2024-01-15T10:00:00.000Z"),
+        occurredAt: "2024-01-15T10:00:00.000Z",
         serviceName: "older-service",
       };
 
       const newerFeedback: BroadcastFeedback = {
         ...sampleBroadcastFeedback,
-        occurredAt: new Date("2024-01-17T10:00:00.000Z"),
+        occurredAt: "2024-01-17T10:00:00.000Z",
         serviceName: "newer-service",
       };
 
@@ -131,7 +134,7 @@ describe("GetLastBroadcastFeedback", () => {
           httpStatus: 500,
           body: { error: "Internal server error" },
         },
-        occurredAt: new Date("2024-01-16T10:00:00.000Z"),
+        occurredAt: new Date("2024-01-16T10:00:00.000Z").toISOString(),
         handledByAgency: false,
       };
 
