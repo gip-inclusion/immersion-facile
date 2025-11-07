@@ -249,7 +249,7 @@ describe("/offers route", () => {
         expectHttpResponseToEqual(result, {
           status: 200,
           body: {
-            pagination: getBasicPagination(),
+            pagination: getBasicPagination({}),
             data: [
               establishmentAggregateToSearchResultByRomeForFirstLocation(
                 establishmentAggregate2,
@@ -825,10 +825,138 @@ describe("/offers route", () => {
   });
 });
 
+describe(`${displayRouteName(searchImmersionRoutes.getExternalOffers)}`, () => {
+  let inMemoryUow: InMemoryUnitOfWork;
+  let httpClient: HttpClient<SearchRoutes>;
+  let gateways: InMemoryGateways;
+  beforeEach(async () => {
+    const testAppAndDeps = await buildTestApp();
+    inMemoryUow = testAppAndDeps.inMemoryUow;
+    httpClient = createSupertestSharedClient(
+      searchImmersionRoutes,
+      testAppAndDeps.request,
+    );
+    gateways = testAppAndDeps.gateways;
+  });
+
+  describe("wrong paths", () => {
+    it("400 - no geo params", async () => {
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["14704"],
+          sortBy: "distance",
+          distanceKm: 10,
+        } as any,
+      });
+      inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate2,
+        establishmentAggregate1,
+      ];
+      gateways.laBonneBoiteGateway.setNextResults([{} as any]);
+      expectHttpResponseToEqual(result, {
+        status: 400,
+        body: {
+          status: 400,
+          issues: [
+            "latitude : Invalid input: expected number, received NaN",
+            "longitude : Invalid input: expected number, received NaN",
+          ],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /external-offers",
+        },
+      });
+    });
+    it("400 - invalid geo params (distanceKm 0)", async () => {
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["14704"],
+          distanceKm: 0,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate2,
+        establishmentAggregate1,
+      ];
+      gateways.laBonneBoiteGateway.setNextResults([{} as any]);
+      expectHttpResponseToEqual(result, {
+        status: 400,
+        body: {
+          status: 400,
+          issues: ["distanceKm : Cette valeur doit être positive"],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /external-offers",
+        },
+      });
+    });
+    it("400 - appellation code not found", async () => {
+      const appellationCodeNotFound = "99999";
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: [appellationCodeNotFound],
+          distanceKm: 10,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      expectHttpResponseToEqual(result, {
+        status: 400,
+        body: {
+          status: 400,
+          message: "No Rome code matching appellation codes 99999",
+        },
+      });
+    });
+  });
+  describe("valid paths", () => {
+    it("200 - route with mandatory params", async () => {
+      const lbbResult: LaBonneBoiteCompanyDto =
+        new LaBonneBoiteCompanyDtoBuilder().withRome("A1409").build();
+      gateways.laBonneBoiteGateway.setNextResults([lbbResult]);
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["14704"],
+          distanceKm: 10,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      expectHttpResponseToEqual(result, {
+        status: 200,
+        body: [
+          {
+            ...lbbResult.toSearchResult({
+              romeCode: expect.any(String),
+              romeLabel: expect.any(String),
+            }),
+            distance_m: 276612,
+          },
+        ],
+      });
+    });
+    it("200 - empty results", async () => {
+      gateways.laBonneBoiteGateway.setNextResults([]);
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["19540"],
+          distanceKm: 10,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      expectHttpResponseToEqual(result, {
+        status: 200,
+        body: [],
+      });
+    });
+  });
+});
+
 const getBasicPagination = (params: Partial<Pagination> = {}) => ({
   totalRecords: 1,
   currentPage: 1,
   totalPages: 1,
-  numberPerPage: 24,
+  numberPerPage: 12,
   ...params,
 });

@@ -18,6 +18,12 @@ export const createSearchRouter = (deps: AppDependencies) => {
     ),
   );
 
+  expressSharedRouter.getExternalOffers(async (req, res) =>
+    sendHttpResponse(req, res, async () =>
+      deps.useCases.getExternalOffers.execute(req.query, undefined),
+    ),
+  );
+
   expressSharedRouter.contactEstablishment(async (req, res) =>
     sendHttpResponse(req, res.status(201), () =>
       deps.useCases.contactEstablishment.execute(req.body),
