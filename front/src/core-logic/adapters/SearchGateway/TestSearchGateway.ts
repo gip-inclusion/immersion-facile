@@ -2,6 +2,7 @@ import { type Observable, Subject } from "rxjs";
 import type {
   CreateDiscussionDto,
   DataWithPagination,
+  GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
@@ -14,6 +15,10 @@ export class TestSearchGateway implements SearchGateway {
   public currentSearchResult$ = new Subject<SearchResultDto>();
 
   public searchResults$ = new Subject<DataWithPagination<SearchResultDto>>();
+
+  public externalSearchResults$ = new Subject<
+    DataWithPagination<SearchResultDto>
+  >();
 
   public contactEstablishment(
     _params: CreateDiscussionDto,
@@ -29,6 +34,12 @@ export class TestSearchGateway implements SearchGateway {
     _params: SiretAndAppellationDto,
   ): Observable<SearchResultDto> {
     return this.currentSearchResult$;
+  }
+
+  public getExternalOffers$(
+    _params: GetExternalOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
+    return this.externalSearchResults$;
   }
 
   public getOffers$(

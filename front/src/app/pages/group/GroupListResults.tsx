@@ -68,7 +68,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                   establishment={searchResult}
                   linkProps={
                     routes.searchResult({
-                      appellationCode,
+                      appellationCode: [appellationCode],
                       siret: searchResult.siret,
                       location: searchResult.locationId ?? undefined,
                     }).link
