@@ -135,6 +135,7 @@ import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/d
 import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
 import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import { makeGetEstablishmentNameAndAdmins } from "../../domains/establishment/use-cases/GetEstablishmentNameAndAdmins";
+import { makeGetExternalOffers } from "../../domains/establishment/use-cases/GetExternalOffers";
 import { makeGetExternalSearchResult } from "../../domains/establishment/use-cases/GetExternalSearchResult";
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
@@ -676,6 +677,13 @@ export const createUseCases = ({
       },
     }),
 
+    getExternalOffers: makeGetExternalOffers({
+      uowPerformer,
+      deps: {
+        uuidGenerator,
+        laBonneBoiteGateway: gateways.laBonneBoiteGateway,
+      },
+    }),
     addAgenciesAndUsers: makeAddAgenciesAndUsers({
       uowPerformer,
       deps: {

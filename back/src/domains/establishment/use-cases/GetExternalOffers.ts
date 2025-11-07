@@ -3,7 +3,6 @@ import {
   getExternalOffersFlatParamsSchema,
   type SearchResultDto,
 } from "shared";
-import type { RomeRepository } from "../../core/rome/ports/RomeRepository";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
@@ -19,15 +18,14 @@ export const makeGetExternalOffers = useCaseBuilder("GetExternalOffers")
   .withDeps<{
     uuidGenerator: UuidGenerator;
     laBonneBoiteGateway: LaBonneBoiteGateway;
-    romeRepository: RomeRepository;
   }>()
-  .build(async ({ inputParams, deps }) => {
+  .build(async ({ inputParams, deps, uow }) => {
     const { appellationCodes, distanceKm, latitude, longitude, nafCodes } =
       inputParams;
 
     // Get ROME
     const [rome] =
-      await deps.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
         appellationCodes,
       );
     if (!rome) throw errors.search.noRomeForAppellations(appellationCodes);
