@@ -1,6 +1,4 @@
 import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
-import { InMemoryRomeRepository } from "../../core/rome/adapters/InMemoryRomeRepository";
-import type { RomeRepository } from "../../core/rome/ports/RomeRepository";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -16,20 +14,17 @@ describe("GetExternalOffers", () => {
   let uuidGenerator: TestUuidGenerator;
   let getExternalOffers: GetExternalOffers;
   let laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
-  let romeRepository: RomeRepository;
   let uowPerformer: UnitOfWorkPerformer;
 
   beforeEach(() => {
     uowPerformer = new InMemoryUowPerformer(createInMemoryUow());
     uuidGenerator = new TestUuidGenerator();
     laBonneBoiteGateway = new InMemoryLaBonneBoiteGateway();
-    romeRepository = new InMemoryRomeRepository();
     getExternalOffers = makeGetExternalOffers({
       uowPerformer,
       deps: {
         uuidGenerator,
         laBonneBoiteGateway,
-        romeRepository,
       },
     });
     uuidGenerator.setNextUuid("search-made-uuid");
@@ -45,8 +40,6 @@ describe("GetExternalOffers", () => {
           distanceKm: 30,
           latitude: 48.8531,
           longitude: 2.34999,
-          sortBy: "distance",
-          sortOrder: "asc",
         },
         undefined,
       );
@@ -79,8 +72,6 @@ describe("GetExternalOffers", () => {
           distanceKm: 30,
           latitude: 48.8531,
           longitude: 2.34999,
-          sortBy: "distance",
-          sortOrder: "asc",
         },
         undefined,
       );
@@ -104,8 +95,6 @@ describe("GetExternalOffers", () => {
         getExternalOffers.execute(
           {
             appellationCodes: ["14704"],
-            sortBy: "distance",
-            sortOrder: "asc",
             latitude: 10,
             longitude: 10,
             distanceKm: 0,
@@ -127,8 +116,6 @@ describe("GetExternalOffers", () => {
             distanceKm: 30,
             latitude: 48.8531,
             longitude: 2.34999,
-            sortBy: "distance",
-            sortOrder: "asc",
           },
           undefined,
         ),

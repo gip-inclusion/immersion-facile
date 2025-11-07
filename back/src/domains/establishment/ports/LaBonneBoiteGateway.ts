@@ -1,7 +1,16 @@
-import type { RomeDto, SearchResultDto, SiretDto, WithNafCodes } from "shared";
+import type {
+  PaginationQueryParams,
+  RomeDto,
+  SearchResultDto,
+  SiretDto,
+  WithNafCodes,
+} from "shared";
 import type { GeoParams } from "../entities/SearchMadeEntity";
 
-export type SearchCompaniesParams = RomeDto & GeoParams & WithNafCodes;
+export type SearchCompaniesParams = RomeDto &
+  GeoParams &
+  WithNafCodes &
+  PaginationQueryParams;
 
 export interface LaBonneBoiteGateway {
   searchCompanies(

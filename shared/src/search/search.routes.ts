@@ -7,10 +7,14 @@ import {
   siretAndAppellationSchema,
 } from "../siretAndAppellation/SiretAndAppellation.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import { getOffersFlatParamsSchema } from "./SearchQueryParams.schema";
+import {
+  getExternalOffersFlatParamsSchema,
+  getOffersFlatParamsSchema,
+} from "./SearchQueryParams.schema";
 import {
   paginatedSearchResultsSchema,
   searchResultSchema,
+  searchResultsSchema,
 } from "./SearchResult.schema";
 
 export type SearchRoutes = typeof searchImmersionRoutes;
@@ -29,7 +33,17 @@ export const searchImmersionRoutes = defineRoutes({
     queryParamsSchema: getOffersFlatParamsSchema,
     responses: {
       200: paginatedSearchResultsSchema,
-      400: httpErrorSchema.or(httpErrorSchema),
+      400: httpErrorSchema,
+    },
+  }),
+  getExternalOffers: defineRoute({
+    method: "get",
+    url: "/external-offers",
+    queryParamsSchema: getExternalOffersFlatParamsSchema,
+    responses: {
+      200: searchResultsSchema,
+      400: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   contactEstablishment: defineRoute({
