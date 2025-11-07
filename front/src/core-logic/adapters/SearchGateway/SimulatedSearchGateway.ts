@@ -2,6 +2,7 @@ import { delay, type Observable, of } from "rxjs";
 import {
   type CreateDiscussionDto,
   type DataWithPagination,
+  type GetExternalOffersFlatQueryParams,
   type GetOffersFlatQueryParams,
   type GroupSlug,
   type GroupWithResults,
@@ -18,7 +19,6 @@ export class SimulatedSearchGateway implements SearchGateway {
   #simulatedLatency: number;
 
   #seedResultsWithPagination: DataWithPagination<SearchResultDto>;
-
   #simulatedResponse: SearchResultDto = {
     rome: "A1201",
     romeLabel: "Aide agricole de production fruitière ou viticole",
@@ -105,6 +105,13 @@ export class SimulatedSearchGateway implements SearchGateway {
     return this.#simulateSearch();
   }
 
+  public getExternalOffers$(
+    _params: GetExternalOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
+    if (this.#error) throw this.#error;
+    return this.#simulateSearchExternal();
+  }
+
   public getExternalSearchResult$(
     _params: SiretAndAppellationDto,
   ): Observable<SearchResultDto> {
@@ -112,6 +119,11 @@ export class SimulatedSearchGateway implements SearchGateway {
   }
 
   #simulateSearch() {
+    return of(this.#seedResultsWithPagination).pipe(
+      delay(this.#simulatedLatency),
+    );
+  }
+  #simulateSearchExternal() {
     return of(this.#seedResultsWithPagination).pipe(
       delay(this.#simulatedLatency),
     );

@@ -5,7 +5,7 @@ const searchState = createRootSelector((state) => state.search);
 
 const searchResultsWithPagination = createSelector(
   searchState,
-  (state) => state.searchResultWithPagination,
+  (state) => state.searchResultsWithPagination,
 );
 
 const searchStatus = createSelector(searchState, (state) => state.searchStatus);

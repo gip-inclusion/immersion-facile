@@ -44,11 +44,11 @@ type LegacySearchQueryCommonParamsDto = {
 
 export type LegacySearchQueryWithOptionalGeoParamsDto =
   LegacySearchQueryCommonParamsDto &
-    LegacyGeoQueryOptionalParamsWithSortedBy<"date" | "score">;
+  LegacyGeoQueryOptionalParamsWithSortedBy<"date" | "score">;
 
 export type LegacySearchQueryParamsWithGeoParams =
   LegacySearchQueryCommonParamsDto &
-    LegacyGeoQueryParamsWithSortedBy<"distance">;
+  LegacyGeoQueryParamsWithSortedBy<"distance">;
 
 export type LegacySearchQueryBaseWithoutAppellationsAndRomeDto =
   | LegacySearchQueryParamsWithGeoParams
@@ -56,7 +56,7 @@ export type LegacySearchQueryBaseWithoutAppellationsAndRomeDto =
 
 export type LegacySearchQueryParamsDto =
   LegacySearchQueryBaseWithoutAppellationsAndRomeDto &
-    LegacySearchQueryParamsAppellationsAndRome;
+  LegacySearchQueryParamsAppellationsAndRome;
 
 type LegacySearchQueryParamsAppellationsAndRome = {
   appellationCodes?: AppellationCode[];
@@ -77,7 +77,6 @@ type WithAppellationCodes = {
 
 type GetOffersFlatParamsCommon = WithAcquisition & {
   place?: string; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
-  appellationCodes?: AppellationCode[];
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
   locationIds?: LocationId[];
   nafCodes?: NafCode[];

@@ -15,6 +15,8 @@ import type {
 
 export type SearchResultPayload = SearchResultQuery | SearchResultDto;
 
+export type GetOffersPayload = SearchPageParams & { isExternal?: boolean };
+
 export type SearchPageParams = GetOffersFlatQueryParams & {
   appellations?: AppellationAndRomeDto[];
   nafLabel?: string;
@@ -29,7 +31,7 @@ export type SearchStatus =
 
 interface SearchState {
   searchStatus: SearchStatus;
-  searchResultWithPagination: DataWithPagination<SearchResultDto>;
+  searchResultsWithPagination: DataWithPagination<SearchResultDto>;
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
   searchParams: SearchPageParams;
@@ -47,7 +49,7 @@ const emptySearchResult: DataWithPagination<SearchResultDto> = {
 
 export const initialState: SearchState = {
   searchStatus: "noSearchMade",
-  searchResultWithPagination: emptySearchResult,
+  searchResultsWithPagination: emptySearchResult,
   currentSearchResult: null,
   isLoading: false,
   searchParams: {
@@ -67,21 +69,25 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    getOffersRequested: (state, action: PayloadAction<SearchPageParams>) => {
+    getOffersRequested: (
+      state,
+      action: PayloadAction<GetOffersPayload>,
+    ) => {
       state.searchStatus = "initialFetch";
-      state.searchResultWithPagination = emptySearchResult;
+      state.searchResultsWithPagination = emptySearchResult;
+      console.log("action.payload", action.payload);
       state.searchParams = action.payload;
       state.isLoading = true;
     },
     getOffersSucceeded: (
       state,
       action: PayloadAction<{
-        searchResultWithPagination: DataWithPagination<SearchResultDto>;
+        searchResultsWithPagination: DataWithPagination<SearchResultDto>;
         searchParams: GetOffersFlatQueryParams;
       }>,
     ) => {
-      state.searchResultWithPagination =
-        action.payload.searchResultWithPagination;
+      state.searchResultsWithPagination =
+        action.payload.searchResultsWithPagination;
       state.searchStatus = "ok";
       state.isLoading = false;
     },

@@ -115,6 +115,35 @@ describe("search epic", () => {
       });
     });
 
+    it("gets the results from the API for external search", () => {
+      expectIsLoading(false);
+      store.dispatch(
+        searchSlice.actions.getOffersRequested({
+          distanceKm: 10,
+          longitude: 0,
+          latitude: 0,
+          isExternal: true,
+          sortBy: "score",
+          sortOrder: "asc",
+        }),
+      );
+      expectStatus("initialFetch");
+      expectIsLoading(true);
+
+      feedWithExternalSearchResults([formSearchResult1, formSearchResult2]);
+      expectStatus("ok");
+      expectIsLoading(false);
+      expectSearchResults({
+        data: [formSearchResult1, formSearchResult2],
+        pagination: {
+          totalRecords: 2,
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 50,
+        },
+      });
+    });
+
     it("displays message when there are no results", () => {
       expectIsLoading(false);
       store.dispatch(
@@ -129,10 +158,6 @@ describe("search epic", () => {
           sortOrder: "desc",
         }),
       );
-
-      feedWithSearchResults([]);
-      expectStatus("extraFetch");
-      expectIsLoading(true);
 
       feedWithSearchResults([]);
       expectStatus("ok");
@@ -284,6 +309,16 @@ describe("search epic", () => {
         currentPage: 1,
         totalPages: 1,
         numberPerPage: 12,
+      },
+    });
+  const feedWithExternalSearchResults = (results: SearchResultDto[]) =>
+    dependencies.searchGateway.externalSearchResults$.next({
+      data: results,
+      pagination: {
+        totalRecords: results.length,
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: 50,
       },
     });
 });

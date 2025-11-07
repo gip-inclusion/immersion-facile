@@ -1,4 +1,5 @@
 import { values } from "ramda";
+import { errors } from "../errors/errors";
 
 export const capitalize = (str: string): string =>
   str && str.length > 0 ? str[0].toUpperCase() + str.slice(1) : str;
@@ -97,4 +98,15 @@ export const splitTextOnFirstSeparator = (
   return separator
     ? [text.split(separator)[0], text.split(separator)[1]]
     : [text];
+};
+
+export const parseStringToJsonOrThrow = <T, P extends string>(
+  raw: string,
+  paramName: P,
+): T => {
+  try {
+    return JSON.parse(raw);
+  } catch (_error) {
+    throw errors.routeParams.malformedJson({ paramName });
+  }
 };

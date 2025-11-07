@@ -1,6 +1,11 @@
 import { filter, map, of, switchMap, take } from "rxjs";
-import { type SearchResultDto, searchResultSchema } from "shared";
 import {
+  type GetExternalOffersFlatQueryParams,
+  type SearchResultDto,
+  searchResultSchema,
+} from "shared";
+import {
+  type GetOffersPayload,
   type SearchResultPayload,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
@@ -17,16 +22,20 @@ type SearchEpic = AppEpic<SearchAction>;
 const getOffersEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   action$.pipe(
     filter(searchSlice.actions.getOffersRequested.match),
-    switchMap((action) =>
-      searchGateway.getOffers$(action.payload).pipe(
+    switchMap((action) => {
+      console.log("getOffersEpic", action.payload);
+      return (isGetExternalOffersPayload(action.payload)
+        ? searchGateway.getExternalOffers$(action.payload)
+        : searchGateway.getOffers$(action.payload)
+      ).pipe(
         take(1),
-        map((searchResultWithPagination) =>
-          searchSlice.actions.getOffersSucceeded({
-            searchResultWithPagination,
-            searchParams: action.payload,
-          }),
-        ),
-      ),
+        map((searchResultWithPagination) => searchSlice.actions.getOffersSucceeded({
+          searchResultsWithPagination: searchResultWithPagination,
+          searchParams: action.payload,
+        })
+        )
+      );
+    },
     ),
   );
 
@@ -82,3 +91,10 @@ export const searchEpics = [
   fetchSearchResultEpic,
   searchResultExternalProvidedEpic,
 ];
+
+const isGetExternalOffersPayload = (
+  payload: Pick<GetOffersPayload, "isExternal" | "appellationCodes">,
+): payload is GetExternalOffersFlatQueryParams =>
+  payload.isExternal === true &&
+  Array.isArray(payload.appellationCodes) &&
+  (payload.appellationCodes?.length ?? 0) > 0;
