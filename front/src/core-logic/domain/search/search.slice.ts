@@ -67,7 +67,10 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    getOffersRequested: (state, action: PayloadAction<SearchPageParams>) => {
+    getOffersRequested: (
+      state,
+      action: PayloadAction<SearchPageParams & { isExternal: boolean }>,
+    ) => {
       state.searchStatus = "initialFetch";
       state.searchResultWithPagination = emptySearchResult;
       state.searchParams = action.payload;

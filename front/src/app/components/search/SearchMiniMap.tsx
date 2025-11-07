@@ -85,7 +85,9 @@ export const SearchMiniMap = ({
   markerProps,
 }: SearchMiniMapProps) => {
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
-  const {data: searchResults} = useAppSelector(searchSelectors.searchResultsWithPagination);
+  const { data: searchResults } = useAppSelector(
+    searchSelectors.searchResultsWithPagination,
+  );
   const searchParams = useAppSelector(searchSelectors.searchParams);
   const mapRef = useRef<L.Map | null>(null);
   const { cx } = useStyles();

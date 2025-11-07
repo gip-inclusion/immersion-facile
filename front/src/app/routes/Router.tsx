@@ -257,10 +257,21 @@ const getPageByRouteName: {
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => (
-    <SearchPage route={route} useNaturalLanguageForAppellations />
+    <SearchPage
+      route={route}
+      useNaturalLanguageForAppellations
+      isExternal={false}
+    />
+  ),
+  externalSearch: (route) => (
+    <SearchPage route={route} useNaturalLanguageForAppellations isExternal />
   ),
   searchForStudent: (route) => (
-    <SearchPage route={route} useNaturalLanguageForAppellations />
+    <SearchPage
+      route={route}
+      useNaturalLanguageForAppellations
+      isExternal={false}
+    />
   ),
   standard: (route) =>
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (

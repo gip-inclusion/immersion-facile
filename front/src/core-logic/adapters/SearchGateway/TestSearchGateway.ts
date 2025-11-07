@@ -15,6 +15,10 @@ export class TestSearchGateway implements SearchGateway {
 
   public searchResults$ = new Subject<DataWithPagination<SearchResultDto>>();
 
+  public externalSearchResults$ = new Subject<
+    DataWithPagination<SearchResultDto>
+  >();
+
   public contactEstablishment(
     _params: CreateDiscussionDto,
   ): Promise<void | "alreadyContactedRecently"> {
@@ -29,6 +33,12 @@ export class TestSearchGateway implements SearchGateway {
     _params: SiretAndAppellationDto,
   ): Observable<SearchResultDto> {
     return this.currentSearchResult$;
+  }
+
+  public getExternalOffers$(
+    _params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
+    return this.externalSearchResults$;
   }
 
   public getOffers$(

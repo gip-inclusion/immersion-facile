@@ -146,7 +146,9 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
     });
   };
   const onGoBackClick = () => {
-    window.history.length > 2 ? window.history.back() : routes.search().push();
+    window.history.length > 2
+      ? window.history.back()
+      : routes.search({}).push();
   };
 
   const miniMapMarkerKey = "single-result-mini-map-marker";
@@ -204,8 +206,6 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
               </Button>
             </div>
             <SearchResultLabels
-              voluntaryToImmersion={currentSearchResult.voluntaryToImmersion}
-              contactMode={currentSearchResult.contactMode}
               fitForDisabledWorkers={currentSearchResult.fitForDisabledWorkers}
             />
             <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>

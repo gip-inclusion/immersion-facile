@@ -97,6 +97,31 @@ export class HttpSearchGateway implements SearchGateway {
     );
   }
 
+  public getExternalOffers$(
+    params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
+    return from(
+      this.httpClient
+        .getExternalOffers({
+          queryParams: {
+            ...params,
+            sortOrder: params.sortOrder ?? "asc",
+            appellationCodes: params.appellationCodes ?? [],
+            latitude: params.latitude ?? 0,
+            longitude: params.longitude ?? 0,
+            distanceKm: params.distanceKm ?? 0,
+            sortBy: "distance",
+          },
+        })
+        .then((result) =>
+          match(result)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
   public getExternalSearchResult$(
     params: SiretAndAppellationDto,
   ): Observable<SearchResultDto> {

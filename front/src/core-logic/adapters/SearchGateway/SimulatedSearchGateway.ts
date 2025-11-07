@@ -105,6 +105,13 @@ export class SimulatedSearchGateway implements SearchGateway {
     return this.#simulateSearch();
   }
 
+  public getExternalOffers$(
+    _params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
+    if (this.#error) throw this.#error;
+    return this.#simulateSearch();
+  }
+
   public getExternalSearchResult$(
     _params: SiretAndAppellationDto,
   ): Observable<SearchResultDto> {

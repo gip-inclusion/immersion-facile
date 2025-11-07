@@ -21,7 +21,9 @@ export const encodedSearchUriParams = [
 ] satisfies (keyof GetOffersFlatQueryParams)[];
 
 export type SearchRoute = Route<
-  typeof routes.search | typeof routes.searchForStudent
+  | typeof routes.search
+  | typeof routes.searchForStudent
+  | typeof routes.externalSearch
 >;
 
 const filterUrlsParamsAndUpdateUrl = ({
@@ -60,8 +62,13 @@ const filterUrlsParamsAndUpdateUrl = ({
 export const useSearch = ({ name }: SearchRoute) => {
   const dispatch = useDispatch();
   return {
-    triggerSearch: (params: SearchPageParams) => {
-      dispatch(searchSlice.actions.getOffersRequested(params));
+    triggerSearch: (params: SearchPageParams, isExternal: boolean) => {
+      dispatch(
+        searchSlice.actions.getOffersRequested({
+          ...params,
+          isExternal,
+        }),
+      );
       filterUrlsParamsAndUpdateUrl({
         values: params,
         urlParams: getUrlParameters(window.location),

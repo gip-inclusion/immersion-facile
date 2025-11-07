@@ -12,6 +12,9 @@ import type {
 export type ContactErrorKind = "alreadyContactedRecently";
 
 export interface SearchGateway {
+  getExternalOffers$(
+    params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>>;
   getOffers$(
     params: GetOffersFlatQueryParams,
   ): Observable<DataWithPagination<SearchResultDto>>;

@@ -7,6 +7,7 @@ import {
   frontRoutes,
   type ValueOf,
 } from "shared";
+import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import {
   createRouter,
   defineRoute,
@@ -65,19 +66,22 @@ export const establishmentParams = {
   ...acquisitionParams,
 };
 
-export const searchParams = {
+export const searchParams: Partial<Record<keyof SearchPageParams, unknown>> = {
   distanceKm: param.query.optional.number,
   latitude: param.query.optional.number,
   longitude: param.query.optional.number,
   appellations: param.query.optional.ofType(
     appellationAndRomeDtoArraySerializer,
   ),
-  sortedBy: param.query.optional.string,
+  sortBy: param.query.optional.string,
+  sortOrder: param.query.optional.string,
   place: param.query.optional.string,
   fitForDisabledWorkers: param.query.optional.boolean,
-  currentPage: param.query.optional.number,
+  page: param.query.optional.number,
+  perPage: param.query.optional.number,
   nafCodes: param.query.optional.ofType(nafCodeSerializer),
   nafLabel: param.query.optional.string,
+  appellationCodes: param.query.optional.ofType(appellationStringSerializer),
   ...acquisitionParams,
 };
 
@@ -311,6 +315,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
   search: defineRoute(searchParams, () => `/${frontRoutes.search}`),
+  externalSearch: defineRoute(
+    searchParams,
+    () => `/${frontRoutes.externalSearch}`,
+  ),
   searchForStudent: defineRoute(
     searchParams,
     () => `/${frontRoutes.searchForStudent}`,

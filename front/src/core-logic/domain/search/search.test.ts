@@ -131,10 +131,6 @@ describe("search epic", () => {
       );
 
       feedWithSearchResults([]);
-      expectStatus("extraFetch");
-      expectIsLoading(true);
-
-      feedWithSearchResults([]);
       expectStatus("ok");
       expectIsLoading(false);
       expectSearchInfo(

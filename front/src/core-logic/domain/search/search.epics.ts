@@ -18,7 +18,10 @@ const getOffersEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   action$.pipe(
     filter(searchSlice.actions.getOffersRequested.match),
     switchMap((action) =>
-      searchGateway.getOffers$(action.payload).pipe(
+      (action.payload.isExternal
+        ? searchGateway.getExternalOffers$(action.payload)
+        : searchGateway.getOffers$(action.payload)
+      ).pipe(
         take(1),
         map((searchResultWithPagination) =>
           searchSlice.actions.getOffersSucceeded({

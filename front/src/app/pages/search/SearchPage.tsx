@@ -4,7 +4,13 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
-import { type ElementRef, useEffect, useRef, useState } from "react";
+import {
+  type ElementRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Loader,
   MainWrapper,
@@ -19,7 +25,6 @@ import { useDispatch } from "react-redux";
 import {
   domElementIds,
   type LatLonDistance,
-  type SearchResultDto,
   type SearchSortedBy,
   searchSortedByOptions,
   type ValueOf,
@@ -74,15 +79,17 @@ const getSearchRouteParam = (
 export const SearchPage = ({
   route,
   useNaturalLanguageForAppellations,
+  isExternal,
 }: {
   route: SearchRoute;
   useNaturalLanguageForAppellations?: boolean;
+  isExternal: boolean;
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
-  const { data: searchResults, pagination } = useAppSelector(
+  const { pagination } = useAppSelector(
     searchSelectors.searchResultsWithPagination,
   );
   const isLoading = useAppSelector(searchSelectors.isLoading);
@@ -110,14 +117,15 @@ export const SearchPage = ({
     ...acquisitionParams,
   };
   const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
-  const filterFormValues = (values: SearchPageParams) =>
-    keys(values).reduce(
+  const filterFormValues = useCallback((values: SearchPageParams) => {
+    return keys(values).reduce(
       (acc, key) => ({
         ...acc,
         ...(values[key] ? { [key]: values[key] } : {}),
       }),
       {} as SearchPageParams,
     );
+  }, []);
   const routeParams = route.params as Partial<SearchPageParams>;
   const methods = useForm<SearchPageParams>({
     defaultValues: keys(initialValues).reduce(
@@ -146,41 +154,24 @@ export const SearchPage = ({
     lat !== 0 &&
     lon !== 0;
 
-  const getSearchResultsData = (
-    results: SearchResultDto[],
-  ): {
-    internalResultsNumber: number;
-    externalResultsNumber: number;
-    pluralInternalResults: string;
-    pluralExternalResults: string;
-  } => {
-    const externalResults = results.filter(
-      (result) =>
-        result.urlOfPartner !== undefined && result.urlOfPartner !== "",
-    );
-    const internalResultsNumber = results.length - externalResults.length;
-    const pluralInternalResults = internalResultsNumber > 1 ? "s" : "";
-    const pluralExternalResults = externalResults.length > 1 ? "s" : "";
-    return {
-      internalResultsNumber,
-      externalResultsNumber: externalResults.length,
-      pluralInternalResults,
-      pluralExternalResults,
-    };
-  };
+  const setTempValuesAsFormValues = useCallback(
+    (values: Partial<SearchPageParams>) => {
+      keys(values).forEach((key) => {
+        setValue(key, values[key]);
+      });
+    },
+    [setValue],
+  );
 
-  const setTempValuesAsFormValues = (values: Partial<SearchPageParams>) => {
-    keys(values).forEach((key) => {
-      setValue(key, values[key]);
-    });
-  };
-
-  const onSearchFormSubmit = (updatedValues: SearchPageParams) => {
-    setTempValue(updatedValues);
-    setTempValuesAsFormValues(updatedValues);
-    setSearchMade(updatedValues);
-    triggerSearch(filterFormValues(updatedValues));
-  };
+  const onSearchFormSubmit = useCallback(
+    (updatedValues: SearchPageParams) => {
+      setTempValue(updatedValues);
+      setTempValuesAsFormValues(updatedValues);
+      setSearchMade(updatedValues);
+      triggerSearch(filterFormValues(updatedValues), isExternal);
+    },
+    [setTempValuesAsFormValues, triggerSearch, filterFormValues, isExternal],
+  );
 
   useScrollToTop(pagination?.currentPage ?? 1);
 
@@ -231,7 +222,6 @@ export const SearchPage = ({
       ? appellationDisplayed.join(" - ")
       : "Tous les métiers";
   };
-  const searchResultsData = getSearchResultsData(searchResults);
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -685,11 +675,9 @@ export const SearchPage = ({
                       {searchStatus === "ok" && (
                         <>
                           <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                            <strong>
-                              {searchResultsData.internalResultsNumber}
-                            </strong>{" "}
-                            résultat{searchResultsData.pluralInternalResults}{" "}
-                            trouvé{searchResultsData.pluralInternalResults}
+                            <strong>{pagination.totalRecords}</strong> résultat
+                            {pagination.totalRecords > 1 ? "s" : ""} trouvé
+                            {pagination.totalRecords > 1 ? "s" : ""}
                           </h2>
                           {routeParams.appellations &&
                             routeParams.appellations.length > 0 && (
@@ -709,39 +697,14 @@ export const SearchPage = ({
                                 </a>
                               </span>
                             )}
-                          {searchResultsData.externalResultsNumber > 0 && (
-                            <p
-                              className={fr.cx(
-                                "fr-mt-0",
-                                "fr-mb-0",
-                                "fr-text--xs",
-                              )}
-                            >
-                              enrichi{searchResultsData.pluralExternalResults}{" "}
-                              par{" "}
-                              <strong>
-                                {searchResultsData.externalResultsNumber}{" "}
-                                résultat
-                                {searchResultsData.pluralExternalResults}
-                              </strong>{" "}
-                              provenant de{" "}
-                              <a
-                                href="https://labonneboite.francetravail.fr/?mtm_campain=immersion-facilitée-recherche-immersion"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                LaBonneBoite
-                              </a>
-                            </p>
-                          )}
                         </>
                       )}
                     </div>
                   </div>
                   <SearchListResults
                     route={route}
-                    currentPage={pagination?.currentPage ?? 1}
                     showDistance={areValidGeoParams(searchMade)}
+                    isExternal={route.name === "externalSearch"}
                   />
                 </div>
               )}
