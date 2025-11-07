@@ -174,6 +174,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   useInitialSiret({
     siret: getValues("siret"),
     addressAutocompleteLocator: "multiple-address-0",
+    shouldFetch: mode === "create",
   });
   useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
 

@@ -97,15 +97,17 @@ export const useSiretFetcher = ({
 export const useInitialSiret = ({
   siret,
   addressAutocompleteLocator,
+  shouldFetch,
 }: {
   siret: SiretDto;
   addressAutocompleteLocator: AddressAutocompleteLocator;
+  shouldFetch: boolean;
 }) => {
   const currentSiret = useAppSelector(siretSelectors.currentSiret);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (siret.length > 0 && siret !== currentSiret) {
+    if (shouldFetch && siret.length > 0 && siret !== currentSiret) {
       dispatch(
         siretSlice.actions.siretModified({
           siret,
@@ -114,7 +116,7 @@ export const useInitialSiret = ({
         }),
       );
     }
-  }, [siret, currentSiret, addressAutocompleteLocator, dispatch]);
+  }, [siret, currentSiret, addressAutocompleteLocator, dispatch, shouldFetch]);
 };
 
 export const useExistingSiret = ({
