@@ -50,6 +50,12 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
       search: {
         label: "Recherche",
         route: routes.search(),
+        children: {
+          externalSearch: {
+            label: "Résultats LaBonneBoite",
+            route: routes.externalSearch(),
+          },
+        },
       },
       searchForStudent: {
         label: "Recherche scolaire",

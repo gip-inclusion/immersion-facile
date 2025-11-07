@@ -172,6 +172,26 @@ export const domElementIds = {
     sortFilterTag: "im-search-page__sort-filter-tag",
     sortRadioButtons: "im-search-page__sort-radio-buttons",
   },
+  externalSearch: {
+    // TODO: add external search specific ids
+    appellationAutocomplete: "im-search-page__appellation-autocomplete",
+    appellationFilterTag: "im-search-page__appellation-filter-tag",
+    distanceSelect: "im-search-page__distance-dropdown",
+    fitForDisableWorkersFilterTag:
+      "im-search-page__fit-for-disabled-workers-filter-tag",
+    lbbSearchResultButton: "im-search-result__lbb-contact-button",
+    locationFilterTag: "im-search-page__location-filter-tag",
+    nafAutocomplete: "im-search-page__naf-autocomplete",
+    placeAutocompleteInput: "im-search-page__address-autocomplete",
+    resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
+    searchForm: "im-search-page__search-form",
+    searchResultButton: "im-search-result__contact-button",
+    searchSortOptionBase: "im-search__search-sort-option-",
+    searchSubmitButton: "im-search__submit-search",
+    sortFilter: "im-search-page__sort-filter-select",
+    sortFilterTag: "im-search-page__sort-filter-tag",
+    sortRadioButtons: "im-search-page__sort-radio-buttons",
+  },
   searchForStudent: {
     appellationAutocomplete:
       "im-search-page__appellation-autocomplete--students",

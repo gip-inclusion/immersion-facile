@@ -25,8 +25,8 @@ export type AcquisitionParams = Partial<{
   [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
-    ? T
-    : never;
+  ? T
+  : never;
 }>;
 
 type AcquisitionParamsKeys = keyof typeof acquisitionParams;
@@ -72,10 +72,13 @@ export const searchParams = {
   appellations: param.query.optional.ofType(
     appellationAndRomeDtoArraySerializer,
   ),
-  sortedBy: param.query.optional.string,
+  appellationCodes: param.query.optional.ofType(appellationStringSerializer),
+  sortBy: param.query.optional.string,
+  sortOrder: param.query.optional.string,
   place: param.query.optional.string,
   fitForDisabledWorkers: param.query.optional.boolean,
-  currentPage: param.query.optional.number,
+  page: param.query.optional.number,
+  perPage: param.query.optional.number,
   nafCodes: param.query.optional.ofType(nafCodeSerializer),
   nafLabel: param.query.optional.string,
   ...acquisitionParams,
@@ -325,6 +328,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
   search: defineRoute(searchParams, () => `/${frontRoutes.search}`),
+  externalSearch: defineRoute(
+    searchParams,
+    () => `/${frontRoutes.externalSearch}`,
+  ),
   searchForStudent: defineRoute(
     searchParams,
     () => `/${frontRoutes.searchForStudent}`,
