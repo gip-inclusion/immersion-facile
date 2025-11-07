@@ -4,11 +4,13 @@ import {
   type GeoPositionDto,
   type NafCode,
   type RomeDto,
+  type SearchResultDto,
 } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
-import { createFtFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
+import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { makeRedisWithCache } from "../../../core/caching-gateway/adapters/makeRedisWithCache";
@@ -22,6 +24,7 @@ import { LaBonneBoiteCompanyDtoBuilder } from "./LaBonneBoiteCompanyDtoBuilder";
 
 describe("HttpLaBonneBoiteGateway", () => {
   const benodetLonLat: GeoPositionDto = { lat: 47.8667, lon: -4.1167 };
+  const parisLonLat: GeoPositionDto = { lat: 48.8566, lon: 2.3522 };
   const boulangerRomeData: RomeDto = {
     romeCode: "D1102",
     romeLabel: "Boulangerie - viennoiserie",
@@ -48,7 +51,14 @@ describe("HttpLaBonneBoiteGateway", () => {
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
       createFetchSharedClient(createLbbRoutes(config.ftApiUrl), fetch),
       new HttpFranceTravailGateway(
-        createFtFetchSharedClient(config),
+        createAxiosSharedClient(
+          createFranceTravailRoutes({
+            ftApiUrl: config.ftApiUrl,
+            ftEnterpriseUrl: config.ftEnterpriseUrl,
+          }),
+          makeAxiosInstances(config.externalAxiosTimeout)
+            .axiosWithValidateStatus,
+        ),
         withCache,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
@@ -65,7 +75,7 @@ describe("HttpLaBonneBoiteGateway", () => {
   });
 
   describe("searchCompanies", () => {
-    it("Should return the closest 90 `companies` susceptible to offer immersion of given rome located within the geographical area at 100km distance", async () => {
+    it("Should return the closest `companies` susceptible to offer immersion of given rome located within the geographical area at 100km distance (default page size is 50)", async () => {
       const actualSearchedCompanies = await laBonneBoiteGateway.searchCompanies(
         {
           lon: benodetLonLat.lon,
@@ -74,7 +84,7 @@ describe("HttpLaBonneBoiteGateway", () => {
           ...boulangerRomeData,
         },
       );
-      expect(actualSearchedCompanies).toHaveLength(100);
+      expect(actualSearchedCompanies).toHaveLength(50);
     });
 
     it("Should return the closest 1 `company` susceptible to offer immersion of given rome located within the geographical area at 1km distance", async () => {
@@ -83,6 +93,7 @@ describe("HttpLaBonneBoiteGateway", () => {
           ...benodetLonLat,
           ...boulangerRomeData,
           distanceKm: 5,
+          perPage: 1,
         },
       );
 
@@ -252,6 +263,140 @@ describe("HttpLaBonneBoiteGateway", () => {
           fitForDisabledWorkers: null,
         },
       ]);
+    });
+    it("should get results with pagination parameters and results are not the same on each page", async () => {
+      const actualResultsOnPage1 = await laBonneBoiteGateway.searchCompanies({
+        lon: parisLonLat.lon,
+        lat: parisLonLat.lat,
+        distanceKm: 1,
+        ...boulangerRomeData,
+        page: 1,
+        perPage: 2,
+      });
+      const actualResultsOnPage2 = await laBonneBoiteGateway.searchCompanies({
+        lon: parisLonLat.lon,
+        lat: parisLonLat.lat,
+        distanceKm: 1,
+        ...boulangerRomeData,
+        page: 2,
+        perPage: 2,
+      });
+      const expectedResultsOnPage1: SearchResultDto[] = [
+        {
+          address: {
+            city: "Paris",
+            departmentCode: "75",
+            postcode: "75003",
+            streetNumberAndAddress: "",
+          },
+          appellations: [],
+          distance_m: 885,
+          establishmentScore: 0,
+          fitForDisabledWorkers: null,
+          locationId: null,
+          naf: "1071C",
+          nafLabel: "Boulangerie et boulangerie-pâtisserie",
+          name: "AUX DELICES DE LEA",
+          numberOfEmployeeRange: "0-0",
+          position: {
+            lat: 48.8635,
+            lon: 2.35824,
+          },
+          rome: "D1102",
+          romeLabel: "Boulangerie - viennoiserie",
+          siret: "85036650100011",
+          urlOfPartner:
+            "https://labonneboite.francetravail.fr/entreprise/85036650100011",
+          voluntaryToImmersion: false,
+        },
+        {
+          address: {
+            city: "Paris",
+            departmentCode: "75",
+            postcode: "75001",
+            streetNumberAndAddress: "",
+          },
+          appellations: [],
+          distance_m: 941,
+          establishmentScore: 0,
+          fitForDisabledWorkers: null,
+          locationId: null,
+          naf: "1071C",
+          nafLabel: "Boulangerie et boulangerie-pâtisserie",
+          name: "LNB EVOLUTION",
+          numberOfEmployeeRange: "50-99",
+          position: {
+            lat: 48.8607,
+            lon: 2.34094,
+          },
+          rome: "D1102",
+          romeLabel: "Boulangerie - viennoiserie",
+          siret: "88443942300010",
+          urlOfPartner:
+            "https://labonneboite.francetravail.fr/entreprise/88443942300010",
+          voluntaryToImmersion: false,
+        },
+      ];
+      const expectedResultsOnPage2: SearchResultDto[] = [
+        {
+          address: {
+            city: "Paris",
+            departmentCode: "75",
+            postcode: "75001",
+            streetNumberAndAddress: "",
+          },
+          appellations: [],
+          distance_m: 855,
+          establishmentScore: 0,
+          fitForDisabledWorkers: null,
+          locationId: null,
+          naf: "1071C",
+          nafLabel: "Boulangerie et boulangerie-pâtisserie",
+          name: "DE BELLES MANIERES",
+          numberOfEmployeeRange: "10-19",
+          position: {
+            lat: 48.8637,
+            lon: 2.3477,
+          },
+          rome: "D1102",
+          romeLabel: "Boulangerie - viennoiserie",
+          siret: "50843100400037",
+          urlOfPartner:
+            "https://labonneboite.francetravail.fr/entreprise/50843100400037",
+          voluntaryToImmersion: false,
+        },
+        {
+          address: {
+            city: "Paris",
+            departmentCode: "75",
+            postcode: "75001",
+            streetNumberAndAddress: "",
+          },
+          appellations: [],
+          distance_m: 644,
+          establishmentScore: 0,
+          fitForDisabledWorkers: null,
+          locationId: null,
+          naf: "1071C",
+          nafLabel: "Boulangerie et boulangerie-pâtisserie",
+          name: "SARL LPB",
+          numberOfEmployeeRange: "20-49",
+          position: {
+            lat: 48.8605,
+            lon: 2.34569,
+          },
+          rome: "D1102",
+          romeLabel: "Boulangerie - viennoiserie",
+          siret: "81254993900013",
+          urlOfPartner:
+            "https://labonneboite.francetravail.fr/entreprise/81254993900013",
+          voluntaryToImmersion: false,
+        },
+      ];
+      expect(actualResultsOnPage1).toHaveLength(2);
+      expectToEqual(actualResultsOnPage1, expectedResultsOnPage1);
+      expect(actualResultsOnPage2).toHaveLength(2);
+      expectToEqual(actualResultsOnPage2, expectedResultsOnPage2);
     });
   });
 
