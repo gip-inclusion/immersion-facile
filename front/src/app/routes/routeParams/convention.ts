@@ -5,12 +5,10 @@ import {
   type AppellationCode,
   addressDtoToString,
   addressStringToDto,
-  appellationCodeSchema,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionReadDto,
-  errors,
   type FtConnectIdentity,
   type ImmersionObjective,
   type InternshipKind,
@@ -19,6 +17,7 @@ import {
   type LevelOfEducation,
   mergeObjectsExceptFalsyValues,
   type NafCode,
+  parseStringToJsonOrThrow,
   reasonableSchedule,
   type ScheduleDto,
   toDateUTCString,
@@ -27,7 +26,6 @@ import type { CreateConventionPresentationInitialValues } from "src/app/componen
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import type { searchParams } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { param, type ValueSerializer } from "type-route";
@@ -52,13 +50,13 @@ export const getConventionInitialValuesFromUrl = ({
     route.params satisfies ConventionParamsInUrl,
   );
   const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
-    {
-      ...conventionPresentationFromParams(params),
-      id: uuidV4(),
-      status: "READY_TO_SIGN",
-      dateSubmission: toDateUTCString(new Date()),
-      internshipKind,
-    };
+  {
+    ...conventionPresentationFromParams(params),
+    id: uuidV4(),
+    status: "READY_TO_SIGN",
+    dateSubmission: toDateUTCString(new Date()),
+    internshipKind,
+  };
 
   return ENV.prefilledForms
     ? withDevPrefilledValues(initialFormWithStoredAndUrlParams)
@@ -169,11 +167,11 @@ const conventionToConventionInUrl = (
   } = convention;
   const beneficiarySchoolInformations = isBeneficiaryStudent(beneficiary)
     ? {
-        led: beneficiary.levelOfEducation,
-        schoolName: beneficiary.schoolName,
-        schoolPostcode: beneficiary.schoolPostcode,
-        address: beneficiary.address && addressDtoToString(beneficiary.address),
-      }
+      led: beneficiary.levelOfEducation,
+      schoolName: beneficiary.schoolName,
+      schoolPostcode: beneficiary.schoolPostcode,
+      address: beneficiary.address && addressDtoToString(beneficiary.address),
+    }
     : undefined;
 
   return {
@@ -343,42 +341,45 @@ export const makeValuesToWatchInUrl = (
   );
 };
 
-const parseStringToJsonOrThrow = <T>(
-  raw: string,
-  paramName: ConventionFormKeysInUrl | keyof typeof searchParams,
-): T => {
-  try {
-    return JSON.parse(raw);
-  } catch (_error) {
-    throw errors.routeParams.malformedJson({ paramName });
-  }
-};
-
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {
-  parse: (raw) => parseStringToJsonOrThrow(raw, "schedule"),
+  parse: (raw) =>
+    parseStringToJsonOrThrow<ScheduleDto, "schedule">(raw, "schedule"),
   stringify: (schedule) => JSON.stringify(schedule),
 };
 
 export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRomeDto> =
-  {
-    parse: (raw) => parseStringToJsonOrThrow(raw, "immersionAppellation"),
-    stringify: (appellationDto) => JSON.stringify(appellationDto),
-  };
+{
+  parse: (raw) =>
+    parseStringToJsonOrThrow<AppellationAndRomeDto, "immersionAppellation">(
+      raw,
+      "immersionAppellation",
+    ),
+  stringify: (appellationDto) => JSON.stringify(appellationDto),
+};
 
 export const appellationAndRomeDtoArraySerializer: ValueSerializer<
   AppellationAndRomeDto[]
 > = {
-  parse: (raw) => parseStringToJsonOrThrow(raw, "appellations"),
+  parse: (raw) =>
+    parseStringToJsonOrThrow<AppellationAndRomeDto[], "appellations">(
+      raw,
+      "appellations",
+    ),
   stringify: (appellationDto) => JSON.stringify(appellationDto),
 };
 
-export const appellationStringSerializer: ValueSerializer<AppellationCode> = {
-  parse: (raw) => appellationCodeSchema.parse(raw),
-  stringify: (appellation) => appellation,
+export const appellationStringSerializer: ValueSerializer<AppellationCode[]> = {
+  parse: (raw) =>
+    parseStringToJsonOrThrow<AppellationCode[], "appellationCodes">(
+      raw,
+      "appellationCodes",
+    ),
+  stringify: (appellationCodes) => JSON.stringify(appellationCodes),
 };
 
 export const nafCodeSerializer: ValueSerializer<NafCode[]> = {
-  parse: (raw) => parseStringToJsonOrThrow(raw, "nafCodes"),
+  parse: (raw) =>
+    parseStringToJsonOrThrow<NafCode[], "nafCodes">(raw, "nafCodes"),
   stringify: (nafCode) => JSON.stringify(nafCode),
 };
 
@@ -459,8 +460,8 @@ export type ConventionParamsInUrl = Partial<{
   [K in keyof ConventionQueryParams]: ConventionQueryParams[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
-    ? T
-    : never;
+  ? T
+  : never;
 }>;
 
 const beneficiaryRepresentativeFromParams = (
@@ -468,36 +469,36 @@ const beneficiaryRepresentativeFromParams = (
 ): BeneficiaryRepresentative | undefined =>
   params.brEmail || params.brPhone || params.brFirstName || params.brLastName
     ? {
-        role: "beneficiary-representative",
-        firstName: params.brFirstName ?? "",
-        lastName: params.brLastName ?? "",
-        email: params.brEmail ?? "",
-        phone: params.brPhone ?? "",
-      }
+      role: "beneficiary-representative",
+      firstName: params.brFirstName ?? "",
+      lastName: params.brLastName ?? "",
+      email: params.brEmail ?? "",
+      phone: params.brPhone ?? "",
+    }
     : undefined;
 
 const beneficiaryCurrentEmployerFromParams = (
   params: ConventionParamsInUrl,
 ): BeneficiaryCurrentEmployer | undefined =>
   params.bceBusinessName ||
-  params.bceSiret ||
-  params.bceFirstName ||
-  params.bceLastName ||
-  params.bceEmail ||
-  params.bcePhone ||
-  params.bceJob ||
-  params.bceBusinessAddress
+    params.bceSiret ||
+    params.bceFirstName ||
+    params.bceLastName ||
+    params.bceEmail ||
+    params.bcePhone ||
+    params.bceJob ||
+    params.bceBusinessAddress
     ? {
-        businessSiret: params.bceSiret ?? "",
-        businessName: params.bceBusinessName ?? "",
-        firstName: params.bceFirstName ?? "",
-        lastName: params.bceLastName ?? "",
-        email: params.bceEmail ?? "",
-        phone: params.bcePhone ?? "",
-        job: params.bceJob ?? "",
-        role: "beneficiary-current-employer",
-        businessAddress: params.bceBusinessAddress ?? "",
-      }
+      businessSiret: params.bceSiret ?? "",
+      businessName: params.bceBusinessName ?? "",
+      firstName: params.bceFirstName ?? "",
+      lastName: params.bceLastName ?? "",
+      email: params.bceEmail ?? "",
+      phone: params.bcePhone ?? "",
+      job: params.bceJob ?? "",
+      role: "beneficiary-current-employer",
+      businessAddress: params.bceBusinessAddress ?? "",
+    }
     : undefined;
 
 const scheduleFromParams = (
@@ -562,11 +563,11 @@ const conventionPresentationFromParams = (
       isRqth: params.isRqth ?? false,
       ...(params.fedId && params.fedIdProvider
         ? {
-            federatedIdentity: {
-              provider: params.fedIdProvider as FtConnectIdentity["provider"],
-              token: params.fedId,
-            },
-          }
+          federatedIdentity: {
+            provider: params.fedIdProvider as FtConnectIdentity["provider"],
+            token: params.fedId,
+          },
+        }
         : {}),
     },
     establishmentRepresentative: {

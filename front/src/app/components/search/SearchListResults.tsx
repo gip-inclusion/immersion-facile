@@ -1,7 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Card from "@codegouvfr/react-dsfr/Card";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Tag as ImTag,
   SearchResultIllustration,
@@ -10,64 +11,49 @@ import {
 import {
   type AppellationCode,
   domElementIds,
+  hasSearchGeoParams,
   isSuperEstablishment,
   type SearchResultDto,
 } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { SearchRoute } from "src/app/hooks/search.hooks";
+import { type SearchRoute, useSearch } from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
+import { filterParamsForRoute } from "src/app/utils/url.utils";
 import { searchIllustrations } from "src/assets/img/illustrations";
+import labonneboiteLogoUrl from "src/assets/img/logo-lbb-on-left.png";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import { useStyles } from "tss-react/dsfr";
 import type { Link } from "type-route";
 import { SearchResult } from "./SearchResult";
 
-type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
+type ResultsPerPageOption = (typeof resultsPerPageOptions)[number];
 
-const resultsPerPageOptions = ["6", "12", "24", "48"] as const;
-const defaultResultsPerPage: ResultsPerPageOptions = "12";
-
-const isResultPerPageOption = (value: string): value is ResultsPerPageOptions =>
-  resultsPerPageOptions.includes(value as ResultsPerPageOptions);
+const resultsPerPageOptions = ["1", "6", "12", "24", "48"] as const;
 
 export const SearchListResults = ({
   showDistance,
-  currentPage,
   route,
+  isExternal,
 }: {
   route: SearchRoute;
   showDistance: boolean;
-  currentPage: number;
+  isExternal: boolean;
 }) => {
-  const { data: searchResults } = useAppSelector(
+  const { triggerSearch } = useSearch(route);
+  const { data: searchResults, pagination } = useAppSelector(
     searchSelectors.searchResultsWithPagination,
   );
   const searchParams = useAppSelector(searchSelectors.searchParams);
-  const [displayedResults, setDisplayedResults] =
-    useState<SearchResultDto[]>(searchResults);
-  const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
-    defaultResultsPerPage,
-  );
   const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
   const { cx, classes } = useStyleUtils();
-  const resultsPerPageValue = Number.parseInt(resultsPerPage);
-  const totalPages = Math.ceil(searchResults.length / resultsPerPageValue);
-  const hasResults = displayedResults.length > 0;
-
-  const getSearchResultsForPage = useCallback(
-    (currentPage: number) => {
-      const currentPageIndex = currentPage - 1;
-      const start = currentPageIndex * resultsPerPageValue;
-      const end = start + resultsPerPageValue;
-      return searchResults.slice(start, end);
-    },
-    [searchResults, resultsPerPageValue],
-  );
-
-  useEffect(() => {
-    setDisplayedResults(getSearchResultsForPage(currentPage));
-  }, [currentPage, getSearchResultsForPage]);
-
+  const { totalPages, currentPage, numberPerPage } = pagination;
+  const hasResults = searchResults.length > 0;
+  const shouldShowExternalResultsPush =
+    !isExternal &&
+    hasSearchGeoParams(searchParams) &&
+    searchParams.appellations &&
+    searchParams.appellations.length > 0;
   return (
     <div className={fr.cx("fr-container")}>
       <div
@@ -102,7 +88,7 @@ export const SearchListResults = ({
               </div>
             )}
             {hasResults &&
-              displayedResults.map((searchResult, index) => {
+              searchResults.map((searchResult, index) => {
                 const appellations = searchResult.appellations;
                 const searchResultAppellationCode = appellations?.length
                   ? appellations[0].appellationCode
@@ -164,55 +150,77 @@ export const SearchListResults = ({
             kind="list"
             activeMarkerKey={activeMarkerKey}
             setActiveMarkerKey={setActiveMarkerKey}
+            isExternal={isExternal}
           />
+          {shouldShowExternalResultsPush && <ExternalResultsPush />}
         </div>
-        <div className={fr.cx("fr-container", "fr-mb-10w")}>
-          <div
-            className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mt-4w")}
-          >
-            <div className={fr.cx("fr-col-10", "fr-grid-row")}>
-              <Pagination
-                showFirstLast
-                count={totalPages}
-                defaultPage={currentPage}
-                getPageLinkProps={(pageNumber) => ({
-                  title: `Résultats de recherche, page : ${pageNumber}`,
-                  onClick: (event) => {
-                    event.preventDefault();
-                    // change current page with href or onClick?
-                  },
-                  href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
-                  key: `pagination-link-${pageNumber}`,
-                })}
-                className={fr.cx("fr-mt-1w")}
-              />
-            </div>
+        {!isExternal && (
+          <div className={fr.cx("fr-container", "fr-mb-10w")}>
             <div
-              className={fr.cx("fr-col-2", "fr-grid-row", "fr-grid-row--right")}
+              className={fr.cx(
+                "fr-grid-row",
+                "fr-grid-row--middle",
+                "fr-mt-4w",
+              )}
             >
-              <Select
-                label=""
-                options={[
-                  ...resultsPerPageOptions.map((numberAsString) => ({
-                    label: `${numberAsString} résultats / page`,
-                    value: numberAsString,
-                  })),
-                ]}
-                nativeSelectProps={{
-                  id: domElementIds.search.resultPerPageDropdown,
-                  onChange: (event) => {
-                    const value = event.currentTarget.value;
-                    if (isResultPerPageOption(value)) {
-                      setResultsPerPage(value);
-                    }
-                  },
-                  value: resultsPerPage,
-                  "aria-label": "Nombre de résultats par page",
-                }}
-              />
+              <div className={fr.cx("fr-col-10", "fr-grid-row")}>
+                <Pagination
+                  showFirstLast
+                  count={totalPages}
+                  defaultPage={currentPage}
+                  getPageLinkProps={(pageNumber) => ({
+                    title: `Résultats de recherche, page : ${pageNumber}`,
+                    onClick: (event) => {
+                      event.preventDefault();
+                      triggerSearch(
+                        {
+                          ...searchParams,
+                          page: pageNumber,
+                        },
+                        isExternal,
+                      );
+                    },
+                    href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
+                    key: `pagination-link-${pageNumber}`,
+                  })}
+                  className={fr.cx("fr-mt-1w")}
+                />
+              </div>
+              <div
+                className={fr.cx(
+                  "fr-col-2",
+                  "fr-grid-row",
+                  "fr-grid-row--right",
+                )}
+              >
+                <Select
+                  label=""
+                  options={[
+                    ...resultsPerPageOptions.map((numberAsString) => ({
+                      label: `${numberAsString} résultats / page`,
+                      value: numberAsString,
+                    })),
+                  ]}
+                  nativeSelectProps={{
+                    id: domElementIds.search.resultPerPageDropdown,
+                    onChange: (event) => {
+                      const value = event.currentTarget.value;
+                      triggerSearch(
+                        {
+                          ...searchParams,
+                          perPage: Number.parseInt(value),
+                        },
+                        isExternal,
+                      );
+                    },
+                    value: numberPerPage.toString() as ResultsPerPageOption,
+                    "aria-label": "Nombre de résultats par page",
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -227,16 +235,48 @@ const makeOfferLink = (
   if (!voluntaryToImmersion)
     return routes.searchResultExternal({
       siret,
-      appellationCode: definedAppellationCode,
+      appellationCode: [definedAppellationCode],
     }).link;
 
   const searchParams = {
-    appellationCode: definedAppellationCode,
+    appellationCode: [definedAppellationCode],
     siret,
     ...(locationId ? { location: locationId } : {}),
   };
 
-  return route.name === "search"
+  return route.name === "search" || route.name === "externalSearch"
     ? routes.searchResult(searchParams).link
     : routes.searchResultForStudent(searchParams).link;
+};
+
+const ExternalResultsPush = () => {
+  const { cx } = useStyles();
+  const searchParams = useAppSelector(searchSelectors.searchParams);
+  const filtereddSearchParams = filterParamsForRoute({
+    urlParams: searchParams,
+    matchingParams: {
+      distanceKm: undefined,
+      latitude: undefined,
+      longitude: undefined,
+      place: undefined,
+      appellations: undefined,
+      nafCodes: undefined,
+      nafLabel: undefined,
+      appellationCodes: undefined,
+    },
+  });
+  return (
+    <aside className={fr.cx("fr-mt-4w")}>
+      <Card
+        imageUrl={labonneboiteLogoUrl}
+        imageAlt="Logo de LaBonneBoite"
+        title="Et si vous élargissiez votre recherche ?"
+        desc="Des entreprises à fort potentiel d'embauche peuvent être suggérées grâce
+        à notre partenaire LaBonneBoite."
+        className={cx("over-footer")}
+        linkProps={routes.externalSearch(filtereddSearchParams).link}
+        enlargeLink
+      />
+    </aside>
+  );
 };

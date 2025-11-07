@@ -8,7 +8,6 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import type { SearchResultDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -22,6 +21,7 @@ type SearchMiniMapListProps = {
   activeMarkerKey: string | null;
   setActiveMarkerKey: (key: string | null) => void;
   markerProps?: never;
+  isExternal: boolean;
 };
 
 type SearchMiniMapSingleProps = {
@@ -29,6 +29,7 @@ type SearchMiniMapSingleProps = {
   markerProps: MarkerProps;
   activeMarkerKey?: never;
   setActiveMarkerKey?: never;
+  isExternal: boolean;
 };
 
 type SearchMiniMapProps = SearchMiniMapListProps | SearchMiniMapSingleProps;
@@ -59,13 +60,13 @@ const activeMarkerIcon = L.icon({
 
 export const getIconMarker = (
   activeMarkerKey: string | undefined | null,
-  searchResult: SearchResultDto,
+  isExternal: boolean,
   key: string,
 ) => {
   if (activeMarkerKey === key) {
     return activeMarkerIcon;
   }
-  return searchResult.voluntaryToImmersion ? defaultMarkerIcon : lbbMarkerIcon;
+  return isExternal ? lbbMarkerIcon : defaultMarkerIcon;
 };
 
 const getDefaultZoomLevel = (
@@ -83,9 +84,12 @@ export const SearchMiniMap = ({
   activeMarkerKey,
   setActiveMarkerKey,
   markerProps,
+  isExternal,
 }: SearchMiniMapProps) => {
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
-  const {data: searchResults} = useAppSelector(searchSelectors.searchResultsWithPagination);
+  const { data: searchResults } = useAppSelector(
+    searchSelectors.searchResultsWithPagination,
+  );
   const searchParams = useAppSelector(searchSelectors.searchParams);
   const mapRef = useRef<L.Map | null>(null);
   const { cx } = useStyles();
@@ -147,7 +151,7 @@ export const SearchMiniMap = ({
                     searchResult.position.lat,
                     searchResult.position.lon,
                   ]}
-                  icon={getIconMarker(activeMarkerKey, searchResult, key)}
+                  icon={getIconMarker(activeMarkerKey, isExternal, key)}
                   eventHandlers={{
                     click: () => {
                       if (setActiveMarkerKey) {
@@ -163,7 +167,7 @@ export const SearchMiniMap = ({
                       linkProps={
                         searchResult.voluntaryToImmersion
                           ? routes.searchResult({
-                              appellationCode: appellationCode ?? "",
+                              appellationCode: [appellationCode ?? ""],
                               siret: searchResult.siret,
                               ...(searchResult.locationId
                                 ? { location: searchResult.locationId }
@@ -171,7 +175,7 @@ export const SearchMiniMap = ({
                             }).link
                           : routes.searchResultExternal({
                               siret: searchResult.siret,
-                              appellationCode: appellationCode ?? "",
+                              appellationCode: [appellationCode ?? ""],
                             }).link
                       }
                     />

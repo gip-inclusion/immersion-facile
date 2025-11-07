@@ -4,7 +4,13 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
-import { type ElementRef, useEffect, useRef, useState } from "react";
+import {
+  type ElementRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Loader,
   MainWrapper,
@@ -19,7 +25,6 @@ import { useDispatch } from "react-redux";
 import {
   domElementIds,
   type LatLonDistance,
-  type SearchResultDto,
   type SearchSortedBy,
   searchSortedByOptions,
   type ValueOf,
@@ -71,18 +76,43 @@ const getSearchRouteParam = (
     : routeParam;
 };
 
+const parisLatLon = {
+  latitude: 48.8566,
+  longitude: 2.3522,
+};
+const parisDistanceKm = 10;
+const defaultValuesForExternalSearch: Pick<
+  SearchPageParams,
+  "latitude" | "longitude" | "distanceKm" | "place" | "appellations"
+> = {
+  latitude: parisLatLon.latitude,
+  longitude: parisLatLon.longitude,
+  distanceKm: parisDistanceKm,
+  place: "Paris, France",
+  appellations: [
+    {
+      romeCode: "J1501",
+      appellationCode: "10891",
+      romeLabel: "Aide-soignant / Aide-soignante",
+      appellationLabel: "Aide-soignant / Aide-soignante",
+    },
+  ],
+};
+
 export const SearchPage = ({
   route,
   useNaturalLanguageForAppellations,
+  isExternal,
 }: {
   route: SearchRoute;
   useNaturalLanguageForAppellations?: boolean;
+  isExternal: boolean;
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
-  const { data: searchResults, pagination } = useAppSelector(
+  const { pagination } = useAppSelector(
     searchSelectors.searchResultsWithPagination,
   );
   const isLoading = useAppSelector(searchSelectors.isLoading);
@@ -94,30 +124,36 @@ export const SearchPage = ({
   const { enableSearchByScore } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
-
   const initialValues: SearchPageParams = {
-    place: "",
     sortBy: enableSearchByScore ? "score" : "date",
     sortOrder: "desc",
-    appellationCodes: undefined,
-    distanceKm: undefined,
-    latitude: undefined,
-    longitude: undefined,
+    distanceKm: isExternal
+      ? defaultValuesForExternalSearch.distanceKm
+      : undefined,
+    latitude: isExternal ? defaultValuesForExternalSearch.latitude : undefined,
+    longitude: isExternal
+      ? defaultValuesForExternalSearch.longitude
+      : undefined,
     fitForDisabledWorkers: undefined,
     nafCodes: undefined,
     nafLabel: undefined,
-    appellations: undefined,
+    appellations: isExternal
+      ? defaultValuesForExternalSearch.appellations
+      : undefined,
+    place: isExternal ? defaultValuesForExternalSearch.place : undefined,
     ...acquisitionParams,
   };
+
   const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
-  const filterFormValues = (values: SearchPageParams) =>
-    keys(values).reduce(
+  const filterFormValues = useCallback((values: SearchPageParams) => {
+    return keys(values).reduce(
       (acc, key) => ({
         ...acc,
         ...(values[key] ? { [key]: values[key] } : {}),
       }),
       {} as SearchPageParams,
     );
+  }, []);
   const routeParams = route.params as Partial<SearchPageParams>;
   const methods = useForm<SearchPageParams>({
     defaultValues: keys(initialValues).reduce(
@@ -141,46 +177,30 @@ export const SearchPage = ({
   });
 
   const availableForInitialSearchRequest =
+    !isExternal &&
     keys(routeParams).length &&
     searchStatus === initialSearchSliceState.searchStatus &&
     lat !== 0 &&
     lon !== 0;
 
-  const getSearchResultsData = (
-    results: SearchResultDto[],
-  ): {
-    internalResultsNumber: number;
-    externalResultsNumber: number;
-    pluralInternalResults: string;
-    pluralExternalResults: string;
-  } => {
-    const externalResults = results.filter(
-      (result) =>
-        result.urlOfPartner !== undefined && result.urlOfPartner !== "",
-    );
-    const internalResultsNumber = results.length - externalResults.length;
-    const pluralInternalResults = internalResultsNumber > 1 ? "s" : "";
-    const pluralExternalResults = externalResults.length > 1 ? "s" : "";
-    return {
-      internalResultsNumber,
-      externalResultsNumber: externalResults.length,
-      pluralInternalResults,
-      pluralExternalResults,
-    };
-  };
+  const setTempValuesAsFormValues = useCallback(
+    (values: Partial<SearchPageParams>) => {
+      keys(values).forEach((key) => {
+        setValue(key, values[key]);
+      });
+    },
+    [setValue],
+  );
 
-  const setTempValuesAsFormValues = (values: Partial<SearchPageParams>) => {
-    keys(values).forEach((key) => {
-      setValue(key, values[key]);
-    });
-  };
-
-  const onSearchFormSubmit = (updatedValues: SearchPageParams) => {
-    setTempValue(updatedValues);
-    setTempValuesAsFormValues(updatedValues);
-    setSearchMade(updatedValues);
-    triggerSearch(filterFormValues(updatedValues));
-  };
+  const onSearchFormSubmit = useCallback(
+    (updatedValues: SearchPageParams) => {
+      setTempValue(updatedValues);
+      setTempValuesAsFormValues(updatedValues);
+      setSearchMade(updatedValues);
+      triggerSearch(filterFormValues(updatedValues), isExternal);
+    },
+    [setTempValuesAsFormValues, triggerSearch, filterFormValues, isExternal],
+  );
 
   useScrollToTop(pagination?.currentPage ?? 1);
 
@@ -220,7 +240,8 @@ export const SearchPage = ({
   );
 
   const placeInputLabel = <>...dans la ville</>;
-  const shouldShowInitialScreen = searchStatus === "noSearchMade";
+  const shouldShowInitialScreen =
+    searchStatus === "noSearchMade" && !isExternal;
   const displayAppellationsOrNaf = () => {
     const appellationDisplayed = formValues.appellations?.length
       ? formValues.appellations.map(
@@ -231,7 +252,6 @@ export const SearchPage = ({
       ? appellationDisplayed.join(" - ")
       : "Tous les métiers";
   };
-  const searchResultsData = getSearchResultsData(searchResults);
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -263,9 +283,13 @@ export const SearchPage = ({
                     label={appellationInputLabel}
                     onAppellationSelected={(appellationMatch) => {
                       setValue("appellations", [appellationMatch.appellation]);
+                      setValue("appellationCodes", [
+                        appellationMatch.appellation.appellationCode,
+                      ]);
                     }}
                     onAppellationClear={() => {
                       setValue("appellations", undefined);
+                      setValue("appellationCodes", undefined);
                     }}
                     selectProps={{
                       inputId:
@@ -398,12 +422,16 @@ export const SearchPage = ({
                           setTempValue({
                             ...tempValue,
                             appellations: [appellationMatch.appellation],
+                            appellationCodes: [
+                              appellationMatch.appellation.appellationCode,
+                            ],
                           });
                         }}
                         onAppellationClear={() => {
                           setTempValue({
                             ...tempValue,
                             appellations: undefined,
+                            appellationCodes: undefined,
                           });
                         }}
                         selectProps={{
@@ -570,106 +598,115 @@ export const SearchPage = ({
                   ),
                 }}
               />
-              <RichDropdown
-                defaultValue="Toutes les entreprises"
-                iconId="fr-icon-equalizer-fill"
-                id={domElementIds[route.name].fitForDisableWorkersFilterTag}
-                values={formValues.fitForDisabledWorkers ? [rqthLabel] : []}
-                onReset={() => {
-                  const updatedValues = {
-                    ...tempValue,
-                    fitForDisabledWorkers: undefined,
-                  };
-                  onSearchFormSubmit(updatedValues);
-                }}
-                submenu={{
-                  title: "Plus de critères",
-                  content: (
-                    <>
-                      <p className={fr.cx("fr-mb-1w")}>
-                        Afficher uniquement les entreprises&nbsp;:
-                      </p>
-                      <Checkbox
-                        className={fr.cx("fr-mb-1w")}
-                        options={[
-                          {
-                            label: rqthLabel,
+              {!isExternal && (
+                <>
+                  <RichDropdown
+                    defaultValue="Toutes les entreprises"
+                    iconId="fr-icon-equalizer-fill"
+                    id={domElementIds[route.name].fitForDisableWorkersFilterTag}
+                    values={formValues.fitForDisabledWorkers ? [rqthLabel] : []}
+                    onReset={() => {
+                      const updatedValues = {
+                        ...tempValue,
+                        fitForDisabledWorkers: undefined,
+                      };
+                      onSearchFormSubmit(updatedValues);
+                    }}
+                    submenu={{
+                      title: "Plus de critères",
+                      content: (
+                        <>
+                          <p className={fr.cx("fr-mb-1w")}>
+                            Afficher uniquement les entreprises&nbsp;:
+                          </p>
+                          <Checkbox
+                            className={fr.cx("fr-mb-1w")}
+                            options={[
+                              {
+                                label: rqthLabel,
+                                nativeInputProps: {
+                                  checked:
+                                    tempValue.fitForDisabledWorkers?.some(
+                                      (fitForDisabledWorker) =>
+                                        fitForDisabledWorker ===
+                                          "yes-declared-only" ||
+                                        fitForDisabledWorker ===
+                                          "yes-ft-certified",
+                                    ) ?? false,
+                                  onChange: (event) => {
+                                    setTempValue({
+                                      ...tempValue,
+                                      fitForDisabledWorkers: event.currentTarget
+                                        .checked
+                                        ? [
+                                            "yes-declared-only",
+                                            "yes-ft-certified",
+                                          ]
+                                        : ["no"],
+                                    });
+                                  },
+                                },
+                              },
+                            ]}
+                          />
+                        </>
+                      ),
+                    }}
+                  />
+
+                  <RichDropdown
+                    defaultValue="Trier par pertinence"
+                    iconId="fr-icon-arrow-down-line"
+                    id={domElementIds[route.name].sortFilterTag}
+                    values={
+                      formValues.sortBy
+                        ? [sortedByOptionsLabel[formValues.sortBy]]
+                        : []
+                    }
+                    submenu={{
+                      title: "Ordre d’affichage",
+                      content: (
+                        <RadioButtons
+                          id={domElementIds[route.name].sortRadioButtons}
+                          options={filteredSortOptions.map((option) => ({
+                            ...option,
                             nativeInputProps: {
-                              checked:
-                                tempValue.fitForDisabledWorkers?.some(
-                                  (fitForDisabledWorker) =>
-                                    fitForDisabledWorker ===
-                                      "yes-declared-only" ||
-                                    fitForDisabledWorker === "yes-ft-certified",
-                                ) ?? false,
-                              onChange: (event) => {
-                                setTempValue({
-                                  ...tempValue,
-                                  fitForDisabledWorkers: event.currentTarget
-                                    .checked
-                                    ? ["yes-declared-only", "yes-ft-certified"]
-                                    : ["no"],
-                                });
+                              name: register("sortBy").name,
+                              value: option.value,
+                              disabled: option.disabled,
+                              checked: tempValue
+                                ? option.value === tempValue.sortBy
+                                : false,
+                              onClick: (event) => {
+                                const updatedSortedBy = isSearchSortedBy(
+                                  event.currentTarget.value,
+                                )
+                                  ? event.currentTarget.value
+                                  : "score";
+                                if (
+                                  updatedSortedBy === "distance" &&
+                                  areValidGeoParams(tempValue)
+                                ) {
+                                  setTempValue({
+                                    ...tempValue,
+                                    sortBy: "distance",
+                                  });
+                                }
+                                if (updatedSortedBy !== "distance") {
+                                  setTempValue({
+                                    ...tempValue,
+                                    sortBy: updatedSortedBy,
+                                  });
+                                }
                               },
                             },
-                          },
-                        ]}
-                      />
-                    </>
-                  ),
-                }}
-              />
-              <RichDropdown
-                defaultValue="Trier par pertinence"
-                iconId="fr-icon-arrow-down-line"
-                id={domElementIds[route.name].sortFilterTag}
-                values={
-                  formValues.sortBy
-                    ? [sortedByOptionsLabel[formValues.sortBy]]
-                    : []
-                }
-                submenu={{
-                  title: "Ordre d’affichage",
-                  content: (
-                    <RadioButtons
-                      id={domElementIds[route.name].sortRadioButtons}
-                      options={filteredSortOptions.map((option) => ({
-                        ...option,
-                        nativeInputProps: {
-                          name: register("sortBy").name,
-                          value: option.value,
-                          disabled: option.disabled,
-                          checked: tempValue
-                            ? option.value === tempValue.sortBy
-                            : false,
-                          onClick: (event) => {
-                            const updatedSortedBy = isSearchSortedBy(
-                              event.currentTarget.value,
-                            )
-                              ? event.currentTarget.value
-                              : "score";
-                            if (
-                              updatedSortedBy === "distance" &&
-                              areValidGeoParams(tempValue)
-                            ) {
-                              setTempValue({
-                                ...tempValue,
-                                sortBy: "distance",
-                              });
-                            }
-                            if (updatedSortedBy !== "distance") {
-                              setTempValue({
-                                ...tempValue,
-                                sortBy: updatedSortedBy,
-                              });
-                            }
-                          },
-                        },
-                      }))}
-                    />
-                  ),
-                }}
-              />
+                          }))}
+                        />
+                      ),
+                    }}
+                  />
+                </>
+              )}
             </form>
 
             <div ref={searchResultsWrapper}>
@@ -685,11 +722,9 @@ export const SearchPage = ({
                       {searchStatus === "ok" && (
                         <>
                           <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                            <strong>
-                              {searchResultsData.internalResultsNumber}
-                            </strong>{" "}
-                            résultat{searchResultsData.pluralInternalResults}{" "}
-                            trouvé{searchResultsData.pluralInternalResults}
+                            <strong>{pagination.totalRecords}</strong> résultat
+                            {pagination.totalRecords > 1 ? "s" : ""} trouvé
+                            {pagination.totalRecords > 1 ? "s" : ""}
                           </h2>
                           {routeParams.appellations &&
                             routeParams.appellations.length > 0 && (
@@ -709,39 +744,14 @@ export const SearchPage = ({
                                 </a>
                               </span>
                             )}
-                          {searchResultsData.externalResultsNumber > 0 && (
-                            <p
-                              className={fr.cx(
-                                "fr-mt-0",
-                                "fr-mb-0",
-                                "fr-text--xs",
-                              )}
-                            >
-                              enrichi{searchResultsData.pluralExternalResults}{" "}
-                              par{" "}
-                              <strong>
-                                {searchResultsData.externalResultsNumber}{" "}
-                                résultat
-                                {searchResultsData.pluralExternalResults}
-                              </strong>{" "}
-                              provenant de{" "}
-                              <a
-                                href="https://labonneboite.francetravail.fr/?mtm_campain=immersion-facilitée-recherche-immersion"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                LaBonneBoite
-                              </a>
-                            </p>
-                          )}
                         </>
                       )}
                     </div>
                   </div>
                   <SearchListResults
                     route={route}
-                    currentPage={pagination?.currentPage ?? 1}
                     showDistance={areValidGeoParams(searchMade)}
+                    isExternal={route.name === "externalSearch"}
                   />
                 </div>
               )}
