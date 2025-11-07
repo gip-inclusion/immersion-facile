@@ -6,6 +6,7 @@ import {
 } from "../apiConsumer/apiConsumer.schema";
 import { conventionStatuses } from "../convention/convention.dto";
 import { conventionIdSchema } from "../convention/convention.schema";
+import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type {
   BroadcastFeedbackResponse,
   ConventionBroadcastRequestParams,
@@ -42,7 +43,7 @@ export const broadcastFeedbackSchema: z.Schema<ConventionLastBroadcastFeedbackRe
       subscriberErrorFeedback: subscriberErrorFeedbackSchema.optional(),
       requestParams: conventionBroadcastRequestParamsSchema,
       response: broadcastFeedbackResponseSchema.optional(),
-      occurredAt: z.date(),
+      occurredAt: makeDateStringSchema(),
       handledByAgency: z.boolean(),
     })
     .nullable();
