@@ -68,6 +68,17 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getConventionsWithErroredBroadcastFeedbackForAgencyUser.execute(
+          req.query,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   authenticatedConventionSharedRouter.markPartnersErroredConventionAsHandled(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
