@@ -37,6 +37,8 @@ export * from "./convention/convention";
 export * from "./convention/convention.dto";
 export * from "./convention/convention.schema";
 export * from "./convention/conventionStatusTransitions";
+export * from "./convention/conventionWithBroadcastFeedback.dto";
+export * from "./convention/conventionWithBroadcastFeedback.schema";
 export * from "./dashboard/dashboard.dto";
 export * from "./dashboard/dashboard.schema";
 export * from "./dashboard/establishmentDashboardTabs";

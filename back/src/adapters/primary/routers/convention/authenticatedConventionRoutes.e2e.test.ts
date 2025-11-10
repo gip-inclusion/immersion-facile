@@ -592,4 +592,96 @@ describe("authenticatedConventionRoutes", () => {
       ]);
     });
   });
+
+  describe("GetErroredConventionsForAgencyUser", () => {
+    it("200 - Successfully gets empty array oferrored conventions for agency user", async () => {
+      const response =
+        await httpClient.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+          {
+            headers: { authorization: validToken },
+            queryParams: {
+              page: 1,
+              perPage: 10,
+            },
+          },
+        );
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 0,
+            numberPerPage: 10,
+            totalRecords: 0,
+          },
+        },
+      });
+    });
+
+    it("400 - Bad request when missing query params", async () => {
+      const response =
+        await httpClient.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+          {
+            headers: { authorization: validToken },
+            queryParams: {} as any,
+          },
+        );
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          issues: [
+            "page : Invalid input: expected number, received NaN",
+            "perPage : Invalid input: expected number, received NaN",
+          ],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /inclusion-connected/conventions-with-errored-broadcast-feedback",
+          status: 400,
+        },
+      });
+    });
+
+    it("401 - Unauthorized with bad token", async () => {
+      const response =
+        await httpClient.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+          {
+            headers: { authorization: "wrong-token" },
+            queryParams: {
+              page: 1,
+              perPage: 10,
+            },
+          },
+        );
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: {
+          status: 401,
+          message: "Provided token is invalid",
+        },
+      });
+    });
+
+    it("401 - Unauthorized with expired token", async () => {
+      const userId = "123";
+      const token = generateConnectedUserJwt(
+        { userId, version: currentJwtVersions.connectedUser },
+        0,
+      );
+      const response =
+        await httpClient.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+          {
+            headers: { authorization: token },
+            queryParams: {
+              page: 1,
+              perPage: 10,
+            },
+          },
+        );
+      expectHttpResponseToEqual(response, {
+        body: { message: authExpiredMessage, status: 401 },
+        status: 401,
+      });
+    });
+  });
 });
