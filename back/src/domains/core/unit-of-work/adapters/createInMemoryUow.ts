@@ -39,11 +39,14 @@ export const createInMemoryUow = () => {
   const notificationRepository = new InMemoryNotificationRepository();
   const userRepository = new InMemoryUserRepository();
   const assessmentRepository = new InMemoryAssessmentRepository();
+  const broadcastFeedbacksRepository =
+    new InMemoryBroadcastFeedbacksRepository();
   const conventionQueries = new InMemoryConventionQueries(
     conventionRepository,
     agencyRepository,
     userRepository,
     assessmentRepository,
+    broadcastFeedbacksRepository,
   );
   const featureFlagRepository = new InMemoryFeatureFlagRepository();
 
@@ -55,6 +58,7 @@ export const createInMemoryUow = () => {
     agencyGroupRepository: new InMemoryAgencyGroupRepository(),
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
     userRepository,
+    broadcastFeedbacksRepository,
     conventionQueries,
     conventionRepository,
     conventionFranceTravailAdvisorRepository:
@@ -65,7 +69,6 @@ export const createInMemoryUow = () => {
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
     groupRepository: new InMemoryGroupRepository(),
-    broadcastFeedbacksRepository: new InMemoryBroadcastFeedbacksRepository(),
     featureFlagRepository: featureFlagRepository,
     featureFlagQueries: new InMemoryFeatureFlagQueries(featureFlagRepository),
     assessmentRepository,
