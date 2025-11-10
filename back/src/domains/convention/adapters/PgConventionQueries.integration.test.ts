@@ -8,6 +8,7 @@ import {
   type AgencyKind,
   type AppellationCode,
   AssessmentDtoBuilder,
+  type BroadcastFeedback,
   ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
@@ -31,6 +32,7 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../utils/convention";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgBroadcastFeedbacksRepository } from "../../core/saved-errors/adapters/PgBroadcastFeedbacksRepository";
 import {
   type AssessmentEntity,
   createAssessmentEntity,
@@ -57,6 +59,7 @@ describe("Pg implementation of ConventionQueries", () => {
   let agencyRepo: PgAgencyRepository;
   let assessmentRepo: PgAssessmentRepository;
   let conventionRepository: PgConventionRepository;
+  let broadcastFeedbacksRepository: PgBroadcastFeedbacksRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -71,6 +74,7 @@ describe("Pg implementation of ConventionQueries", () => {
     );
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("broadcast_feedbacks").execute();
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("notifications_email_recipients").execute();
     await db.deleteFrom("notifications_email").execute();
@@ -80,6 +84,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyRepo = new PgAgencyRepository(db);
     assessmentRepo = new PgAssessmentRepository(db);
     conventionRepository = new PgConventionRepository(db);
+    broadcastFeedbacksRepository = new PgBroadcastFeedbacksRepository(db);
 
     await new PgUserRepository(db).save(validator);
   });
@@ -1645,6 +1650,222 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(result.data, [
         { ...conventionA, ...agencyFields, assessment: null },
       ]);
+    });
+  });
+
+  describe("getConventionsWithErroredBroadcastFeedbackForAgencyUser", () => {
+    describe("when no conventions with errored broadcast feedback for the agency user", () => {
+      it("should return empty array with pagination info", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 0,
+          },
+        });
+      });
+    });
+
+    describe("when there are conventions with multiple errored broadcast feedbacks for the agency user", () => {
+      it("should return conventions with the last errored broadcast feedback for the agency user with pagination", async () => {
+        const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
+        const convention = new ConventionDtoBuilder()
+          .withId(conventionIdA)
+          .withAgencyId(agencyIdA)
+          .build();
+        const firstBroadcast: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-01T00:00:00.000Z",
+          handledByAgency: true,
+          requestParams: {
+            conventionId: conventionIdA,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          subscriberErrorFeedback: {
+            message: "any-error-message-1",
+            error: { code: "ANY_ERROR_CODE_1" },
+          },
+          response: {
+            httpStatus: 500,
+            body: { error: "ANY_ERROR_CODE_1" },
+          },
+        };
+        const lastBroadcast: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-30T00:00:00.000Z",
+          handledByAgency: true,
+          requestParams: {
+            conventionId: convention.id,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          subscriberErrorFeedback: {
+            message: "any-error-message-2",
+            error: { code: "ANY_ERROR_CODE_2" },
+          },
+          response: {
+            httpStatus: 500,
+            body: { error: "ANY_ERROR_CODE_2" },
+          },
+        };
+        await agencyRepo.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
+        await conventionRepository.save(convention);
+        await broadcastFeedbacksRepository.save(firstBroadcast);
+        await broadcastFeedbacksRepository.save(lastBroadcast);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: convention.id,
+              beneficiary: {
+                firstname: convention.signatories.beneficiary.firstName,
+                lastname: convention.signatories.beneficiary.lastName,
+              },
+              broadcastFeedback: {
+                ...lastBroadcast,
+                subscriberErrorFeedback: {
+                  message: lastBroadcast.subscriberErrorFeedback?.message ?? "",
+                  error: JSON.stringify(
+                    lastBroadcast.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+    });
+
+    it("results are ordered by occurredtAt desc and paginated", async () => {
+      const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
+      const convention1 = new ConventionDtoBuilder()
+        .withId(conventionIdA)
+        .withAgencyId(agencyIdA)
+        .build();
+      const convention2 = new ConventionDtoBuilder()
+        .withId(conventionIdB)
+        .withAgencyId(agencyIdA)
+        .build();
+      const convention3 = new ConventionDtoBuilder()
+        .withId("cccccccc-cccc-4ccc-8ccc-cccccccccccc")
+        .withAgencyId(agencyIdA)
+        .build();
+      const broadcast1: BroadcastFeedback = {
+        consumerId: null,
+        consumerName: "any-consumer-name",
+        serviceName:
+          "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+        occurredAt: "2024-07-01T00:00:00.000Z",
+        handledByAgency: true,
+        requestParams: {
+          conventionId: convention1.id,
+          conventionStatus: "READY_TO_SIGN",
+        },
+        subscriberErrorFeedback: {
+          message: "any-error-message-1",
+          error: { code: "ANY_ERROR_CODE_1" },
+        },
+        response: {
+          httpStatus: 500,
+          body: { error: "ANY_ERROR_CODE_1" },
+        },
+      };
+      const broadcast2: BroadcastFeedback = {
+        ...broadcast1,
+        occurredAt: "2024-07-02T00:00:00.000Z",
+        requestParams: {
+          conventionId: convention2.id,
+          conventionStatus: "READY_TO_SIGN",
+        },
+      };
+      const broadcast3: BroadcastFeedback = {
+        ...broadcast1,
+        occurredAt: "2024-07-03T00:00:00.000Z",
+        requestParams: {
+          conventionId: convention3.id,
+          conventionStatus: "READY_TO_SIGN",
+        },
+      };
+
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+      await conventionRepository.save(convention1);
+      await conventionRepository.save(convention2);
+      await conventionRepository.save(convention3);
+      await broadcastFeedbacksRepository.save(broadcast2);
+      await broadcastFeedbacksRepository.save(broadcast1);
+      await broadcastFeedbacksRepository.save(broadcast3);
+
+      const result =
+        await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+          {
+            userId: validator.id,
+            pagination: { page: 3, perPage: 1 },
+          },
+        );
+
+      expectToEqual(result, {
+        data: [
+          {
+            id: convention3.id,
+            beneficiary: {
+              firstname: convention3.signatories.beneficiary.firstName,
+              lastname: convention3.signatories.beneficiary.lastName,
+            },
+            broadcastFeedback: {
+              ...broadcast3,
+              subscriberErrorFeedback: {
+                message: broadcast3.subscriberErrorFeedback?.message ?? "",
+                error: JSON.stringify(
+                  broadcast3.subscriberErrorFeedback?.error,
+                ),
+              },
+            },
+          },
+        ],
+        pagination: {
+          currentPage: 3,
+          totalPages: 3,
+          numberPerPage: 1,
+          totalRecords: 3,
+        },
+      });
     });
   });
 });

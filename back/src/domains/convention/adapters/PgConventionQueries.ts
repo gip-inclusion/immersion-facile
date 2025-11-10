@@ -10,11 +10,13 @@ import {
   type ConventionReadDto,
   type ConventionScope,
   type ConventionStatus,
+  type ConventionWithBroadcastFeedback,
   calculatePaginationResult,
   conventionReadSchema,
   conventionSchema,
   type DataWithPagination,
   type DateFilter,
+  type DateString,
   errors,
   type FindSimilarConventionsParams,
   type GetPaginatedConventionsFilters,
@@ -336,6 +338,92 @@ export class PgConventionQueries implements ConventionQueries {
 
     return {
       data: conventionsReadDto,
+      pagination: calculatePaginationResult({ ...pagination, totalRecords }),
+    };
+  }
+
+  public async getConventionsWithErroredBroadcastFeedbackForAgencyUser({
+    userId,
+    pagination,
+  }: {
+    userId: UserId;
+    pagination: Required<PaginationQueryParams>;
+  }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>> {
+    const { page, perPage } = pagination;
+    const offset = (page - 1) * perPage;
+    const result = await this.transaction
+      .with("conventions_with_latest_feedback", (qb) =>
+        qb
+          .selectFrom("users__agencies as ua")
+          .selectAll()
+          .innerJoin("conventions as c", "c.agency_id", "ua.agency_id")
+          .innerJoin(
+            "actors as beneficiary",
+            "beneficiary.id",
+            "c.beneficiary_id",
+          )
+          .innerJoin("broadcast_feedbacks as bf", (join) =>
+            join.on((eb) =>
+              eb(
+                sql`(bf.request_params ->> 'conventionId')::uuid`,
+                "=",
+                eb.ref("c.id"),
+              ),
+            ),
+          )
+          .select((eb) => [
+            eb.ref("c.id").as("conventionId"),
+            eb.ref("beneficiary.first_name").as("bFirstName"),
+            eb.ref("beneficiary.last_name").as("bLastName"),
+            eb.ref("bf.consumer_id").as("consumerId"),
+            eb.ref("bf.consumer_name").as("consumerName"),
+            eb.ref("bf.service_name").as("serviceName"),
+            eb.ref("subscriber_error_feedback").as("subscriberErrorFeedback"),
+            eb.ref("bf.request_params").as("requestParams"),
+            sql<DateString>`date_to_iso(bf.occurred_at)`.as("occurredAt"),
+            eb.ref("bf.handled_by_agency").as("handledByAgency"),
+            eb.ref("bf.response").as("response"),
+          ])
+          .where("ua.user_id", "=", userId)
+          .distinctOn("c.id")
+          .orderBy("c.id")
+          .orderBy("bf.occurred_at", "desc"),
+      )
+      .selectFrom("conventions_with_latest_feedback as cf")
+      .selectAll()
+      .select(sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"))
+      .where("cf.subscriberErrorFeedback", "is not", null)
+      .limit(pagination.perPage)
+      .offset(offset)
+      .execute();
+
+    const totalRecords = result.at(0)?.total_count ?? 0;
+
+    const conventionsWithErroredBroadcastFeedback: ConventionWithBroadcastFeedback[] =
+      result.map((row) => {
+        return {
+          id: row.conventionId,
+          beneficiary: {
+            firstname: row.bFirstName,
+            lastname: row.bLastName,
+          },
+          broadcastFeedback: {
+            consumerId: row.consumerId,
+            consumerName: row.consumerName,
+            handledByAgency: row.handledByAgency,
+            occurredAt: row.occurredAt,
+            requestParams: row.requestParams,
+            serviceName: row.serviceName,
+            response: row.response,
+            subscriberErrorFeedback: row.subscriberErrorFeedback
+              ? row.subscriberErrorFeedback
+              : undefined,
+          },
+        } satisfies ConventionWithBroadcastFeedback;
+      });
+
+    return {
+      data: conventionsWithErroredBroadcastFeedback,
       pagination: calculatePaginationResult({ ...pagination, totalRecords }),
     };
   }
