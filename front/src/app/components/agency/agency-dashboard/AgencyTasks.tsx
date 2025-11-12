@@ -8,14 +8,15 @@ import {
   type TitleLevel,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import {
-  AgencyTaskList,
-  NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
-} from "src/app/components/agency/agency-dashboard/AgencyTaskList";
+import { NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE } from "shared";
+import { ConventionsToManageList } from "src/app/components/agency/agency-dashboard/ConventionsToManageList";
+import { ConventionsWithBroadcastErrorList } from "src/app/components/agency/agency-dashboard/ConventionsWithBroadcastErrorList";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
+import { conventionsWithBroadcastFeedbackSelectors } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.selectors";
+import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.slice";
 
 export const AgencyTasks = ({
   titleAs,
@@ -29,8 +30,14 @@ export const AgencyTasks = ({
   const isLoadingConventionsToManage = useAppSelector(
     connectedUserConventionsToManageSelectors.isLoading,
   );
-  const pagination = useAppSelector(
+  const isLoadingConventionsWithBroadcastError = useAppSelector(
+    conventionsWithBroadcastFeedbackSelectors.isLoading,
+  );
+  const conventionsToManagePagination = useAppSelector(
     connectedUserConventionsToManageSelectors.pagination,
+  );
+  const conventionsWithErroredBroadcastFeedbackPagination = useAppSelector(
+    conventionsWithBroadcastFeedbackSelectors.pagination,
   );
   const dateStartFrom1MonthAgoToIn5Days = useMemo(
     () => ({
@@ -63,6 +70,18 @@ export const AgencyTasks = ({
           },
         ),
       );
+      dispatch(
+        conventionsWithBroadcastFeedbackSlice.actions.getConventionsWithErroredBroadcastFeedbackRequested(
+          {
+            params: {
+              page: 1,
+              perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
+            },
+            jwt: connectedUserJwt,
+            feedbackTopic: "conventions-with-broadcast-feedback",
+          },
+        ),
+      );
     }
   }, [connectedUserJwt, dateStartFrom1MonthAgoToIn5Days, dispatch]);
 
@@ -72,32 +91,58 @@ export const AgencyTasks = ({
       titleAs={titleAs}
       className={fr.cx("fr-mt-2w", "fr-mb-4w")}
     >
-      {isLoadingConventionsToManage && <Loader />}
-      {!isLoadingConventionsToManage && pagination && (
-        <div className={fr.cx("fr-grid-row")}>
-          <div className={fr.cx("fr-col-4")}>
-            <TaskSummary
-              count={pagination?.totalRecords}
-              countLabel="Action urgentes"
-              icon="fr-icon-edit-line"
-              {...(pagination?.totalRecords > 0
-                ? {
-                    buttonProps: {
-                      children: "Traiter cette liste",
-                      onClick: () =>
-                        onSeeAllConventionsClick(
-                          <AgencyTaskList
-                            title="Action urgentes"
-                            dateRange={dateStartFrom1MonthAgoToIn5Days}
-                          />,
-                        ),
-                    },
-                  }
-                : {})}
-            />
-          </div>
-        </div>
-      )}
+      {(isLoadingConventionsToManage ||
+        isLoadingConventionsWithBroadcastError) && <Loader />}
+      <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+        {!isLoadingConventionsToManage &&
+          conventionsToManagePagination?.totalRecords && (
+            <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+              <TaskSummary
+                count={conventionsToManagePagination?.totalRecords}
+                countLabel="Actions urgentes"
+                icon="fr-icon-edit-line"
+                {...(conventionsToManagePagination?.totalRecords > 0
+                  ? {
+                      buttonProps: {
+                        children: "Traiter cette liste",
+                        onClick: () =>
+                          onSeeAllConventionsClick(
+                            <ConventionsToManageList
+                              title="Actions urgentes"
+                              dateRange={dateStartFrom1MonthAgoToIn5Days}
+                            />,
+                          ),
+                      },
+                    }
+                  : {})}
+              />
+            </div>
+          )}
+        {!isLoadingConventionsWithBroadcastError &&
+          conventionsWithErroredBroadcastFeedbackPagination?.totalRecords && (
+            <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+              <TaskSummary
+                count={
+                  conventionsWithErroredBroadcastFeedbackPagination?.totalRecords
+                }
+                countLabel="Conventions à vérifier"
+                icon="fr-icon-link-unlink"
+                {...(conventionsWithErroredBroadcastFeedbackPagination?.totalRecords >
+                0
+                  ? {
+                      buttonProps: {
+                        children: "Traiter cette liste",
+                        onClick: () =>
+                          onSeeAllConventionsClick(
+                            <ConventionsWithBroadcastErrorList title="Conventions à vérifier" />,
+                          ),
+                      },
+                    }
+                  : {})}
+              />
+            </div>
+          )}
+      </div>
     </HeadingSection>
   );
 };
