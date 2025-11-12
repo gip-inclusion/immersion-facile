@@ -40,6 +40,8 @@ import { connectedUserConventionListEpics } from "src/core-logic/domain/connecte
 import { conventionListSlice } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
 import { connectedUserConventionsEpics } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.epics";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
+import { conventionsWithBroadcastFeedbackEpics } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.epics";
+import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.slice";
 import { conventionActionEpics } from "src/core-logic/domain/convention/convention-action/conventionAction.epics";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
@@ -91,6 +93,7 @@ const allEpics: AppEpic<any>[] = [
   ...conventionEpics,
   ...connectedUserConventionsEpics,
   ...connectedUserConventionListEpics,
+  ...conventionsWithBroadcastFeedbackEpics,
   ...createUserOnAgencyEpics,
   ...dashboardUrlsEpics,
   ...discussionEpics,
@@ -151,6 +154,8 @@ const appReducer = combineReducers({
   [connectedUserSlice.name]: connectedUserSlice.reducer,
   [connectedUserConventionsToManageSlice.name]:
     connectedUserConventionsToManageSlice.reducer,
+  [conventionsWithBroadcastFeedbackSlice.name]:
+    conventionsWithBroadcastFeedbackSlice.reducer,
   [conventionListSlice.name]: conventionListSlice.reducer,
   [feedbackSlice.name]: feedbackSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,

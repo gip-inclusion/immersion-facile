@@ -17,6 +17,7 @@ import type {
   FindSimilarConventionsParams,
   FlatGetConventionsForAgencyUserParams,
   MarkPartnersErroredConventionAsHandledRequest,
+  PaginationQueryParams,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
@@ -37,6 +38,7 @@ import {
 import type { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { match, P } from "ts-pattern";
+import type { ConventionWithBroadcastFeedback } from "../../../../../shared/src/convention/conventionWithBroadcastFeedback.dto";
 
 export class HttpConventionGateway implements ConventionGateway {
   constructor(
@@ -397,6 +399,26 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getConventionsWithErroredBroadcastFeedback$(
+    params: Required<PaginationQueryParams>,
+    jwt: string,
+  ): Observable<DataWithPagination<ConventionWithBroadcastFeedback>> {
+    return from(
+      this.authenticatedHttpClient
+        .getConventionsWithErroredBroadcastFeedbackForAgencyUser({
+          queryParams: params,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
