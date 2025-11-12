@@ -14,17 +14,16 @@ export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
 export const immersionFacileDelegationEmail =
   "delegation@immersion-facile.beta.gouv.fr";
 
-export const immersionFacileMiseEnRelationEmail =
-  "mise-en-relation@immersion-facile.beta.gouv.fr";
+export const discussionEmail = "mise-en-relation@immersion-facile.beta.gouv.fr";
 
-export const immersionFacileMiseEnRelationEmailSender = {
+export const discussionEmailSender = {
   name: "Immersion Facilitée",
-  email: immersionFacileMiseEnRelationEmail,
+  email: discussionEmail,
 };
 
-export const immersionFacileBilanEmail = "bilan@immersion-facile.beta.gouv.fr";
+export const assesmentEmail = "bilan@immersion-facile.beta.gouv.fr";
 
-export const immersionFacileBilanEmailSender = {
+export const assessmentEmailSender = {
   name: "Immersion Facilitée",
-  email: immersionFacileBilanEmail,
+  email: assesmentEmail,
 };
