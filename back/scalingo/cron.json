@@ -17,7 +17,7 @@
       "size": "M"
     },
     {
-      "command": "0 3 * * * pnpm back run trigger-delete-old-events",
+      "command": "0 4 * * * pnpm back run trigger-delete-old-events",
       "size": "M"
     },
     {
