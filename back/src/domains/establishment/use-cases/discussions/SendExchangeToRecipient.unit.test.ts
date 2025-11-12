@@ -3,12 +3,12 @@ import {
   type Attachment,
   ConnectedUserBuilder,
   DiscussionBuilder,
+  discussionEmailSender,
   type EstablishmentExchange,
   type Exchange,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  immersionFacileNoReplyEmailSender,
   type PotentialBeneficiaryExchange,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -177,7 +177,7 @@ describe("SendExchangeToRecipient", () => {
                 email: `${lastEstablishmentExchange.firstname.toLocaleLowerCase()}_${lastEstablishmentExchange.lastname.toLocaleLowerCase()}__${discussion.id}_e@reply.my-domain.com`,
                 name: `${lastEstablishmentExchange.firstname} ${lastEstablishmentExchange.lastname} - ${discussion.businessName}`,
               },
-              sender: immersionFacileNoReplyEmailSender,
+              sender: discussionEmailSender,
               attachments: [
                 {
                   name: lastEstablishmentExchange.attachments[0].name,
@@ -258,7 +258,7 @@ describe("SendExchangeToRecipient", () => {
                 email: `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply.my-domain.com`,
                 name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
               },
-              sender: immersionFacileNoReplyEmailSender,
+              sender: discussionEmailSender,
               attachments: [
                 {
                   name: lastBeneficiaryExchange.attachments[0].name,
@@ -325,7 +325,7 @@ describe("SendExchangeToRecipient", () => {
                 email: `${lastEstablishmentExchange.firstname.toLocaleLowerCase()}_${lastEstablishmentExchange.lastname.toLocaleLowerCase()}__${discussion.id}_e@reply.my-domain.com`,
                 name: `${lastEstablishmentExchange.firstname} ${lastEstablishmentExchange.lastname} - ${discussion.businessName}`,
               },
-              sender: immersionFacileNoReplyEmailSender,
+              sender: discussionEmailSender,
               attachments: [
                 {
                   name: lastEstablishmentExchange.attachments[0].name,
@@ -376,7 +376,7 @@ describe("SendExchangeToRecipient", () => {
                 email: `${lastExchange.firstname.toLocaleLowerCase()}_${lastExchange.lastname.toLocaleLowerCase()}__${discussion.id}_e@reply.my-domain.com`,
                 name: `${lastExchange.firstname} ${lastExchange.lastname} - ${discussion.businessName}`,
               },
-              sender: immersionFacileNoReplyEmailSender,
+              sender: discussionEmailSender,
               attachments: [],
             },
           ],
@@ -417,7 +417,7 @@ describe("SendExchangeToRecipient", () => {
                 email: `e-ric_el-ah-e-tru__${discussion.id}_b@reply.my-domain.com`,
                 name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
               },
-              sender: immersionFacileNoReplyEmailSender,
+              sender: discussionEmailSender,
               attachments: [],
             },
           ],

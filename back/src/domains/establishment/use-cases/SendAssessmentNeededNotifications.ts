@@ -2,6 +2,7 @@ import { partition, uniqBy } from "ramda";
 import {
   type AbsoluteUrl,
   type AgencyWithUsersRights,
+  assessmentEmailSender,
   type ConventionDto,
   type ConventionId,
   calculateDurationInSecondsFrom,
@@ -11,7 +12,6 @@ import {
   executeInSequence,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  immersionFacileBilanEmailSender,
   immersionFacileNoReplyEmailSender,
   validatedConventionStatuses,
   withDateRangeSchema,
@@ -341,7 +341,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
       templatedContent: {
         kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         recipients: [convention.establishmentTutor.email],
-        sender: immersionFacileBilanEmailSender,
+        sender: assessmentEmailSender,
         params: {
           agencyLogoUrl: agency.logoUrl ?? undefined,
           beneficiaryFirstName: getFormattedFirstnameAndLastname({
