@@ -30,7 +30,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
           return {
             eventsToKeep: {
               ...eventsToKeep,
-              ...(isDeleted ? {} : { currentEvent: event }),
+              ...(isDeleted ? {} : { [event.id]: event }),
             },
             deleted: deleted + (isDeleted ? 1 : 0),
           };
