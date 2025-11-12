@@ -320,6 +320,18 @@ export const CreateDiscussionForm = ({
             <Input
               label={inputsLabelsByKey.experienceAdditionalInformation}
               hintText="Exemple : “travail en équipe”, “mise en rayon”, “babysitting”, etc."
+              state="info"
+              stateRelatedMessage={
+                <span>
+                  <strong>Protection de vos données personnelles :</strong> Nous
+                  vous invitons à partager uniquement les informations utiles à
+                  la compréhension de votre parcours. Évitez d'inclure des
+                  informations trop personnelles (comme vos opinions
+                  philosophiques, syndicales, politiques ou des éléments liés à
+                  votre vie sexuelle). Ces données sensibles ne sont pas
+                  nécessaires et nous souhaitons les protéger.
+                </span>
+              }
               nativeTextAreaProps={{
                 ...register("experienceAdditionalInformation", {
                   setValueAs: (value) => (value.length > 0 ? value : undefined),
