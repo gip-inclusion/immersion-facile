@@ -8,6 +8,7 @@ import {
   type ConventionDto,
   getDaysBetween,
   getFormattedFirstnameAndLastname,
+  NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
   relativeTimeFormat,
 } from "shared";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
@@ -18,9 +19,7 @@ import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { match, P } from "ts-pattern";
 
-export const NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE = 10;
-
-export const AgencyTaskList = ({
+export const ConventionsToManageList = ({
   title,
   dateRange,
 }: {
@@ -178,7 +177,7 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
       description={description}
       footer={footer}
       buttonProps={{
-        children: "Traiter",
+        children: "Piloter",
         priority: "secondary",
         size: "medium",
         linkProps: {
