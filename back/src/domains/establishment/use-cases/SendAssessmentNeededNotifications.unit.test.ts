@@ -2,6 +2,7 @@ import { addDays, subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
+  assessmentEmailSender,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   errors,
@@ -9,6 +10,7 @@ import {
   expectObjectInArrayToMatch,
   expectToEqual,
   getFormattedFirstnameAndLastname,
+  immersionFacileNoReplyEmailSender,
   type Notification,
   type TemplatedEmail,
 } from "shared";
@@ -186,10 +188,7 @@ describe("SendAssessmentNeededNotifications", () => {
               internshipKind: conventionEndingTomorrow.internshipKind,
             },
             recipients: [conventionEndingTomorrow.establishmentTutor.email],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: assessmentEmailSender,
           },
           {
             kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
@@ -211,10 +210,7 @@ describe("SendAssessmentNeededNotifications", () => {
             recipients: [
               conventionEndingTomorrow.signatories.beneficiary.email,
             ],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: immersionFacileNoReplyEmailSender,
           },
         ],
       });
@@ -301,10 +297,7 @@ describe("SendAssessmentNeededNotifications", () => {
               internshipKind: conventionCCIEndingTomorrow.internshipKind,
             },
             recipients: [conventionCCIEndingTomorrow.establishmentTutor.email],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: assessmentEmailSender,
           },
           {
             kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
@@ -326,10 +319,7 @@ describe("SendAssessmentNeededNotifications", () => {
             recipients: [
               conventionCCIEndingTomorrow.signatories.beneficiary.email,
             ],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: immersionFacileNoReplyEmailSender,
           },
         ],
       });
@@ -370,10 +360,7 @@ describe("SendAssessmentNeededNotifications", () => {
             conventionEndingTomorrow.establishmentTutor.email,
         },
         recipients: [conventionEndingTomorrow.signatories.beneficiary.email],
-        sender: {
-          email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-          name: "Immersion Facilitée",
-        },
+        sender: immersionFacileNoReplyEmailSender,
       };
 
       uow.conventionRepository.setConventions([conventionEndingTomorrow]);
@@ -458,10 +445,7 @@ describe("SendAssessmentNeededNotifications", () => {
               internshipKind: conventionEndingTomorrow.internshipKind,
             },
             recipients: [conventionEndingTomorrow.establishmentTutor.email],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: assessmentEmailSender,
           },
         ],
       });
@@ -514,10 +498,7 @@ describe("SendAssessmentNeededNotifications", () => {
           agencyLogoUrl: undefined,
         },
         recipients: [conventionEndingYesterday.establishmentTutor.email],
-        sender: {
-          email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-          name: "Immersion Facilitée",
-        },
+        sender: assessmentEmailSender,
       };
       // Arrange
 
@@ -611,10 +592,7 @@ describe("SendAssessmentNeededNotifications", () => {
             recipients: [
               conventionEndingYesterday.signatories.beneficiary.email,
             ],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: immersionFacileNoReplyEmailSender,
           },
         ],
       });

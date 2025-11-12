@@ -1,10 +1,10 @@
 import {
   createOpaqueEmail,
+  discussionEmailSender,
   type Email,
   type EmailAttachment,
   type Exchange,
   errors,
-  immersionFacileMiseEnRelationEmailSender,
   type SiretDto,
   type WithDiscussionId,
   withDiscussionIdSchema,
@@ -98,7 +98,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
       kind: "email",
       templatedContent: {
         kind: "DISCUSSION_EXCHANGE",
-        sender: immersionFacileMiseEnRelationEmailSender,
+        sender: discussionEmailSender,
         params: {
           subject: lastExchange.subject,
           htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
