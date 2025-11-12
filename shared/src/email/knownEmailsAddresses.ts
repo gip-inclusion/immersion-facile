@@ -13,3 +13,11 @@ export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
 
 export const immersionFacileDelegationEmail =
   "delegation@immersion-facile.beta.gouv.fr";
+
+export const immersionFacileMiseEnRelationEmail =
+  "mise-en-relation@immersion-facile.beta.gouv.fr";
+
+export const immersionFacileMiseEnRelationEmailSender = {
+  name: "Immersion Facilitée",
+  email: immersionFacileMiseEnRelationEmail,
+};
