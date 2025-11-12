@@ -78,6 +78,7 @@ export const createTechnicalRouter = (
     IpFilter(inboundEmailAllowIps, {
       mode: "allow",
       logLevel: "deny",
+      logF: (message) => logger.error({ message: `IpFilter - ${message}` }),
       detectIp: (req) => {
         const rawHeaders = req.headers["x-forwarded-for"];
         if (!rawHeaders) return "";
