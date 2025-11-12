@@ -56,6 +56,7 @@ export type AddressWithCountryCodeAndPosition = OmitFromExistingKeys<
   address: AddressDtoWithCountryCode;
 };
 
+// order is important here ! do NOT order alphabetically
 export const departmentNameToDepartmentCode: Record<
   DepartmentName,
   DepartmentCode
@@ -79,6 +80,8 @@ export const departmentNameToDepartmentCode: Record<
   "Charente-Maritime": "17",
   Cher: "18",
   Corrèze: "19",
+  "Corse-du-Sud": "2A",
+  "Haute-Corse": "2B",
   "Côte-d'Or": "21",
   "Côtes-d'Armor": "22",
   Creuse: "23",
@@ -88,8 +91,6 @@ export const departmentNameToDepartmentCode: Record<
   Eure: "27",
   "Eure-et-Loir": "28",
   Finistère: "29",
-  "Corse-du-Sud": "2A",
-  "Haute-Corse": "2B",
   Gard: "30",
   "Haute-Garonne": "31",
   Gers: "32",
