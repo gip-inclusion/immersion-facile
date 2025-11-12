@@ -186,7 +186,7 @@ export const ConventionDocumentPage = ({
         printButtonLabel={"Imprimer la convention"}
         title={
           internshipKind === "immersion"
-            ? `${title} relative à la mise en œuvre d’une période de mise en situation en milieu professionnel`
+            ? `${title} relative à la mise en œuvre d’une période de mise en situation en milieu professionnel`
             : `${title} de mini-stage`
         }
         customActions={[
