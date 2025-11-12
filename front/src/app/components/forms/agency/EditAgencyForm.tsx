@@ -103,7 +103,7 @@ export const EditAgencyForm = ({
             addressInitialValue={agency.address}
             refersToOtherAgency={refersToOtherAgency}
             mode="edit"
-            disableAgencyName={!isRouteAdmin}
+            disableAgencyKeyFields={!isRouteAdmin}
           />
 
           {isRouteAdmin && (
