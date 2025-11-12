@@ -15,6 +15,7 @@ import type {
   FindSimilarConventionsParams,
   FlatGetConventionsForAgencyUserParams,
   MarkPartnersErroredConventionAsHandledRequest,
+  PaginationQueryParams,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
@@ -23,6 +24,7 @@ import type {
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
+import type { ConventionWithBroadcastFeedback } from "../../../../shared/src/convention/conventionWithBroadcastFeedback.dto";
 import type { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
 
 export interface ConventionGateway {
@@ -97,4 +99,8 @@ export interface ConventionGateway {
     conventionId: ConventionId,
     jwt: ConventionSupportedJwt,
   ): Observable<ConventionLastBroadcastFeedbackResponse>;
+  getConventionsWithErroredBroadcastFeedback$(
+    params: Required<PaginationQueryParams>,
+    jwt: string,
+  ): Observable<DataWithPagination<ConventionWithBroadcastFeedback>>;
 }

@@ -11,6 +11,7 @@ import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-a
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
 import { conventionListSlice } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
+import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
@@ -53,6 +54,7 @@ const topics = [
   "convention-action-sign",
   "convention-form",
   "convention-status-dashboard",
+  "conventions-with-broadcast-feedback",
   "dashboard-agency-register-user",
   "dashboard-discussion-status-updated",
   "dashboard-discussion",
@@ -660,6 +662,17 @@ export const feedbacks: Record<
       title: "Problème lors de la récupération des conventions",
       message:
         "Une erreur est survenue lors de la récupération des conventions",
+    },
+  },
+  "conventions-with-broadcast-feedback": {
+    "fetch.error": {
+      action:
+        conventionsWithBroadcastFeedbackSlice.actions
+          .getConventionsWithErroredBroadcastFeedbackFailed,
+      title:
+        "Problème lors de la récupération de vos conventions qui ont eu des erreurs de diffusion",
+      message:
+        "Une erreur est survenue lors de la récupération de vos conventions qui ont eu des erreurs de diffusion",
     },
   },
   unused: {},
