@@ -21,3 +21,10 @@ export const immersionFacileMiseEnRelationEmailSender = {
   name: "Immersion Facilitée",
   email: immersionFacileMiseEnRelationEmail,
 };
+
+export const immersionFacileBilanEmail = "bilan@immersion-facile.beta.gouv.fr";
+
+export const immersionFacileBilanEmailSender = {
+  name: "Immersion Facilitée",
+  email: immersionFacileBilanEmail,
+};
