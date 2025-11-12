@@ -11,6 +11,7 @@ import {
   executeInSequence,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  immersionFacileBilanEmailSender,
   immersionFacileNoReplyEmailSender,
   validatedConventionStatuses,
   withDateRangeSchema,
@@ -340,7 +341,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
       templatedContent: {
         kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         recipients: [convention.establishmentTutor.email],
-        sender: immersionFacileNoReplyEmailSender,
+        sender: immersionFacileBilanEmailSender,
         params: {
           agencyLogoUrl: agency.logoUrl ?? undefined,
           beneficiaryFirstName: getFormattedFirstnameAndLastname({
