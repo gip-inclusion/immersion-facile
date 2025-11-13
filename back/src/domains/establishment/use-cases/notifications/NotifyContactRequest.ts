@@ -5,6 +5,7 @@ import {
   contactEstablishmentEventPayloadSchema,
   createOpaqueEmail,
   type DiscussionDto,
+  discussionEmailSender,
   type Email,
   errors,
   getFormattedFirstnameAndLastname,
@@ -113,7 +114,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     ).map((user) => user.email);
 
     const templatedContent: TemplatedEmail = {
-      sender: immersionFacileNoReplyEmailSender,
+      sender: discussionEmailSender,
       recipients: notifiedRecipients,
       replyTo: {
         email: opaqueEmail,
