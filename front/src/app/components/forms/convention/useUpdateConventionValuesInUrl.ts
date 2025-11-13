@@ -8,6 +8,16 @@ import {
   getUrlParameters,
 } from "src/app/utils/url.utils";
 
+const replaceNewLineBySlash = (value: string) => value.replace(/\n/g, " / ");
+
+const cleanParamsValues = (obj: Record<string, unknown>) =>
+  Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [
+      key,
+      typeof value === "string" ? replaceNewLineBySlash(value) : value,
+    ]),
+  ) as typeof obj;
+
 export const useUpdateConventionValuesInUrl = (
   watchedValues: ConventionParamsInUrl,
 ) => {
@@ -24,36 +34,35 @@ export const useUpdateConventionValuesInUrl = (
       )
         return;
 
+      const filteredAndCleanedParams = cleanParamsValues(
+        filterParamsForRoute({
+          urlParams,
+          matchingParams: conventionParams,
+          forceExcludeParams: ["fedId", "fedIdProvider"],
+        }),
+      );
+
       if (
         route.name === "conventionImmersion" ||
         route.name === "conventionMiniStage"
       ) {
-        const filteredParams = filterParamsForRoute({
-          urlParams,
-          matchingParams: conventionParams,
-          forceExcludeParams: ["fedId", "fedIdProvider"],
-        });
         const {
           fedId: _,
           fedIdProvider: __,
           ...watchedValuesWithoutFederatedIdentity
         } = watchedValues;
+
         routes[route.name]({
-          ...filteredParams,
-          ...watchedValuesWithoutFederatedIdentity,
+          ...filteredAndCleanedParams,
+          ...cleanParamsValues(watchedValuesWithoutFederatedIdentity),
         }).replace();
       }
 
       if (route.name === "conventionImmersionForExternals") {
-        const filteredParams = filterParamsForRoute({
-          urlParams,
-          matchingParams: conventionParams,
-          forceExcludeParams: ["fedId", "fedIdProvider"],
-        });
         routes
           .conventionImmersionForExternals({
-            ...filteredParams,
-            ...watchedValues,
+            ...filteredAndCleanedParams,
+            ...cleanParamsValues(watchedValues),
             consumer: route.params.consumer,
           })
           .replace();
