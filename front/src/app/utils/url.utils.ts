@@ -1,3 +1,5 @@
+import { mapObjIndexed } from "ramda";
+
 export const getUrlParameters: (location: Location) => {
   [k: string]: string;
 } = (location) =>
@@ -18,3 +20,9 @@ export const filterParamsForRoute = <T>({
         key in matchingParams && value && !forceExcludeParams?.includes(key),
     ),
   );
+
+const replaceNewLineInValueBySlash = (value: unknown) =>
+  typeof value === "string" ? value.replace(/(?:\r?\n|\r)+/g, " / ") : value;
+
+export const cleanParamsValues = (obj: Record<string, unknown>) =>
+  mapObjIndexed(replaceNewLineInValueBySlash, obj);
