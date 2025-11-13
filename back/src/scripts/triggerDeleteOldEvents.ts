@@ -9,7 +9,7 @@ import { handleCRONScript } from "./handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const deleteOldDiscussionMessages = async () => {
+const deleteOldEvents = async () => {
   const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
@@ -23,16 +23,10 @@ const deleteOldDiscussionMessages = async () => {
   });
 };
 
-export const triggerDeleteOldDiscussionMessages = ({
-  exitOnFinish,
-}: {
-  exitOnFinish: boolean;
-}) =>
-  handleCRONScript({
-    name: "triggerDeleteOldEvents",
-    config,
-    script: deleteOldDiscussionMessages,
-    handleResults: ({ deletedEvents }) => `${deletedEvents} events deleted.`,
-    logger,
-    exitOnFinish,
-  });
+handleCRONScript({
+  name: "triggerDeleteOldEvents",
+  config,
+  script: deleteOldEvents,
+  handleResults: ({ deletedEvents }) => `${deletedEvents} events deleted.`,
+  logger,
+});
