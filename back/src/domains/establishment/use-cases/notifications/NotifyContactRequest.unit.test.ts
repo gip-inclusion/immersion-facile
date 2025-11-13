@@ -3,6 +3,7 @@ import {
   type ContactEstablishmentEventPayload,
   DiscussionBuilder,
   type DiscussionKind,
+  discussionEmailSender,
   errors,
   expectPromiseToFailWithError,
   frontRoutes,
@@ -218,7 +219,7 @@ describe("NotifyContactRequest", () => {
                   establishmentAdmin.email,
                   establishmentContact.email,
                 ],
-                sender: immersionFacileNoReplyEmailSender,
+                sender: discussionEmailSender,
                 replyTo: {
                   email: expectedReplyToEmail,
                   name: `${getFormattedFirstnameAndLastname({ firstname: discussion.potentialBeneficiary.firstName, lastname: discussion.potentialBeneficiary.lastName })} - via Immersion Facilitée`,
