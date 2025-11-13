@@ -418,10 +418,10 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns all agencies matching ids", async () => {
-      expectToEqual(await agencyRepository.getByIds([agency1.id, agency3.id]), [
-        agency3,
-        agency1,
-      ]);
+      expectArraysToEqualIgnoringOrder(
+        await agencyRepository.getByIds([agency1.id, agency3.id]),
+        [agency3, agency1],
+      );
     });
 
     it("throws when at least one agency is not found", async () => {
