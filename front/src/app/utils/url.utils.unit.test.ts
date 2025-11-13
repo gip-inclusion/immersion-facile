@@ -1,4 +1,5 @@
 import {
+  cleanParamsValues,
   filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
@@ -29,6 +30,25 @@ describe("url.utils", () => {
       const result = filterParamsForRoute({ urlParams, matchingParams });
       expect(result).toEqual({
         param1: "value1",
+      });
+    });
+  });
+
+  describe("cleanParamsValues", () => {
+    it("should return an object with the parameters", () => {
+      const obj = {
+        param1: "value1",
+        param2: "value2\rvalue3",
+        param3: "value2\n\nvalue3",
+        param4: "value2\r\nvalue3\r\nvalue4",
+      };
+      const result = cleanParamsValues(obj);
+
+      expect(result).toEqual({
+        param1: "value1",
+        param2: "value2 / value3",
+        param3: "value2 / value3",
+        param4: "value2 / value3 / value4",
       });
     });
   });
