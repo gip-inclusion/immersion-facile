@@ -4,6 +4,7 @@ import { objectToDependencyList } from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { conventionParams, routes, useRoute } from "src/app/routes/routes";
 import {
+  cleanParamsValues,
   filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
@@ -24,36 +25,35 @@ export const useUpdateConventionValuesInUrl = (
       )
         return;
 
+      const filteredAndCleanedParams = cleanParamsValues(
+        filterParamsForRoute({
+          urlParams,
+          matchingParams: conventionParams,
+          forceExcludeParams: ["fedId", "fedIdProvider"],
+        }),
+      );
+
       if (
         route.name === "conventionImmersion" ||
         route.name === "conventionMiniStage"
       ) {
-        const filteredParams = filterParamsForRoute({
-          urlParams,
-          matchingParams: conventionParams,
-          forceExcludeParams: ["fedId", "fedIdProvider"],
-        });
         const {
           fedId: _,
           fedIdProvider: __,
           ...watchedValuesWithoutFederatedIdentity
         } = watchedValues;
+
         routes[route.name]({
-          ...filteredParams,
-          ...watchedValuesWithoutFederatedIdentity,
+          ...filteredAndCleanedParams,
+          ...cleanParamsValues(watchedValuesWithoutFederatedIdentity),
         }).replace();
       }
 
       if (route.name === "conventionImmersionForExternals") {
-        const filteredParams = filterParamsForRoute({
-          urlParams,
-          matchingParams: conventionParams,
-          forceExcludeParams: ["fedId", "fedIdProvider"],
-        });
         routes
           .conventionImmersionForExternals({
-            ...filteredParams,
-            ...watchedValues,
+            ...filteredAndCleanedParams,
+            ...cleanParamsValues(watchedValues),
             consumer: route.params.consumer,
           })
           .replace();
