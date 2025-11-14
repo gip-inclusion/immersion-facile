@@ -204,7 +204,7 @@ describe("Broadcasts events to France Travail", () => {
         subscriberErrorFeedback: {
           message: "Ops, something is bad",
         },
-        occurredAt: now,
+        occurredAt: now.toISOString(),
         handledByAgency: false,
       },
     ]);
@@ -247,7 +247,7 @@ describe("Broadcasts events to France Travail", () => {
             success: true,
           },
         },
-        occurredAt: now,
+        occurredAt: now.toISOString(),
         handledByAgency: false,
       },
     ]);

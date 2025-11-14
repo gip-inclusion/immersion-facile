@@ -140,7 +140,7 @@ describe("BroadcastConventionAgain", () => {
             },
             response: { httpStatus: 404 },
             subscriberErrorFeedback: { message: "Ops, something is bad" },
-            occurredAt: subDays(timeGateway.now(), 1),
+            occurredAt: subDays(timeGateway.now(), 1).toISOString(),
             handledByAgency: true,
           });
 
@@ -177,7 +177,7 @@ describe("BroadcastConventionAgain", () => {
           },
           response: { httpStatus: 404 },
           subscriberErrorFeedback: { message: "Ops, something is bad" },
-          occurredAt: lastBroadcastDate,
+          occurredAt: lastBroadcastDate.toISOString(),
           handledByAgency: true,
         });
 

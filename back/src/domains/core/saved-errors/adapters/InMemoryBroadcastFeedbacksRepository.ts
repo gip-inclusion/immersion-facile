@@ -56,7 +56,10 @@ export class InMemoryBroadcastFeedbacksRepository
         .filter(
           (broadcast) => broadcast.requestParams.conventionId === conventionId,
         )
-        .sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime())
+        .sort(
+          (a, b) =>
+            new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime(),
+        )
         .at(-1) || null
     );
   }

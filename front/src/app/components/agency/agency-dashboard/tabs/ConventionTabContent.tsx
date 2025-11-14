@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { HeadingSection } from "react-design-system";
 import { createPortal } from "react-dom";
 import {
@@ -29,9 +29,8 @@ export const ConventionTabContent = ({
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const [selectedAgency, setSelectedAgency] = useState<AgencyId | null>(null);
-  const [seeAllConventions, setSeeAllConventions] = useState<boolean | null>(
-    null,
-  );
+  const [agencyTaskListElement, setAgencyTaskListElement] =
+    useState<ReactNode | null>(null);
 
   const redirectToConventionPage = (
     agency: AgencyDtoForAgencyUsersAndAdmins,
@@ -69,19 +68,20 @@ export const ConventionTabContent = ({
     }
   };
 
-  if (seeAllConventions) {
+  if (agencyTaskListElement) {
     return (
       <>
         <Button
           priority="secondary"
           iconId="fr-icon-arrow-left-line"
+          className={fr.cx("fr-mb-3w")}
           onClick={() => {
-            setSeeAllConventions(false);
+            setAgencyTaskListElement(null);
           }}
         >
           Retour
         </Button>
-        <AgencyTasks titleAs="h2" displayMode="paginated" />
+        {agencyTaskListElement}
       </>
     );
   }
@@ -104,9 +104,8 @@ export const ConventionTabContent = ({
     >
       <AgencyTasks
         titleAs="h3"
-        displayMode="limited"
-        onSeeAllConventionsClick={() => {
-          setSeeAllConventions(true);
+        onSeeAllConventionsClick={(element) => {
+          setAgencyTaskListElement(element);
         }}
       />
       <ConventionList />

@@ -6,6 +6,7 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
+  type ConventionWithBroadcastFeedback,
   conventionSchema,
   type DataWithPagination,
   errors,
@@ -13,6 +14,7 @@ import {
   filter,
   type GetPaginatedConventionsFilters,
   NotFoundError,
+  type PaginationQueryParams,
   pipeWithValue,
   type SiretDto,
   type UserId,
@@ -22,6 +24,7 @@ import { assesmentEntityToConventionAssessmentFields } from "../../../utils/conv
 import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
+import type { InMemoryBroadcastFeedbacksRepository } from "../../core/saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
 import type {
   ConventionMarketingData,
   ConventionQueries,
@@ -43,6 +46,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly agencyRepository: InMemoryAgencyRepository,
     private readonly userRepository: InMemoryUserRepository,
     private readonly assessmentRepository: InMemoryAssessmentRepository,
+    private readonly broadcastFeedbacksRepository: InMemoryBroadcastFeedbacksRepository,
   ) {}
 
   public async findSimilarConventions(
@@ -321,6 +325,47 @@ export class InMemoryConventionQueries implements ConventionQueries {
       ...assesmentEntityToConventionAssessmentFields(assessment),
     };
   };
+
+  public async getConventionsWithErroredBroadcastFeedbackForAgencyUser({
+    userId,
+    pagination,
+  }: {
+    userId: UserId;
+    pagination: Required<PaginationQueryParams>;
+  }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>> {
+    const userAgenciesIds = this.agencyRepository.agencies
+      .filter((agency) => !!agency.usersRights[userId])
+      .map((agency) => agency.id);
+    const userConventions = this.conventionRepository.conventions.filter(
+      (convention) => userAgenciesIds.includes(convention.agencyId),
+    );
+    const results: ConventionWithBroadcastFeedback[] = await Promise.all(
+      userConventions.map(async (convention) => {
+        const broadcastFeedback =
+          await this.broadcastFeedbacksRepository.getLastBroadcastFeedback(
+            convention.id,
+          );
+        return {
+          id: convention.id,
+          beneficiary: {
+            firstname: convention.signatories.beneficiary.firstName,
+            lastname: convention.signatories.beneficiary.lastName,
+          },
+          broadcastFeedback,
+        };
+      }),
+    );
+
+    return {
+      data: results.filter((result) => result.broadcastFeedback !== null),
+      pagination: {
+        totalRecords: results.length,
+        currentPage: pagination.page,
+        totalPages: Math.ceil(results.length / pagination.perPage),
+        numberPerPage: pagination.perPage,
+      },
+    };
+  }
 }
 
 const makeApplyFiltersToConventions =
@@ -377,6 +422,19 @@ const makeApplyFiltersToConventions =
             : true,
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
+
+const _makeApplyAssessmentCompletionStatusFilterConventionsReadd =
+  ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
+  (convention: ConventionReadDto) => {
+    if (!assessmentCompletionStatus) return true;
+
+    return (
+      convention.status === "ACCEPTED_BY_VALIDATOR" &&
+      (assessmentCompletionStatus === "completed"
+        ? convention.assessment !== null
+        : convention.assessment === null)
+    );
+  };
 
 const makeApplyAssessmentCompletionStatusFilterConventionsRead =
   ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>

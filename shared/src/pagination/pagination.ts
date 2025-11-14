@@ -8,6 +8,8 @@ import {
   type PaginationQueryParams,
 } from "./pagination.dto";
 
+export const NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE = 10;
+
 export const getPaginationParamsForWeb = ({
   page,
   perPage,

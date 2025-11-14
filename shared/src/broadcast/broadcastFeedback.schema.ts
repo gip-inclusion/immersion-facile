@@ -6,6 +6,8 @@ import {
 } from "../apiConsumer/apiConsumer.schema";
 import { conventionStatuses } from "../convention/convention.dto";
 import { conventionIdSchema } from "../convention/convention.schema";
+import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type {
   BroadcastFeedbackResponse,
   ConventionBroadcastRequestParams,
@@ -13,27 +15,28 @@ import type {
   SubscriberErrorFeedback,
 } from "./broadcastFeedback.dto";
 
-const broadcastFeedbackResponseSchema: z.Schema<BroadcastFeedbackResponse> = z
-  .object({
-    httpStatus: z.number(),
-    body: z.unknown().optional(),
-  })
-  .nullable();
+const broadcastFeedbackResponseSchema: ZodSchemaWithInputMatchingOutput<BroadcastFeedbackResponse> =
+  z
+    .object({
+      httpStatus: z.number(),
+      body: z.unknown().optional(),
+    })
+    .nullable();
 
-const subscriberErrorFeedbackSchema: z.Schema<SubscriberErrorFeedback> =
+const subscriberErrorFeedbackSchema: ZodSchemaWithInputMatchingOutput<SubscriberErrorFeedback> =
   z.object({
     message: z.string(),
     error: z.unknown().optional(),
   });
 
-const conventionBroadcastRequestParamsSchema: z.Schema<ConventionBroadcastRequestParams> =
+const conventionBroadcastRequestParamsSchema: ZodSchemaWithInputMatchingOutput<ConventionBroadcastRequestParams> =
   z.object({
     conventionId: conventionIdSchema,
     callbackUrl: absoluteUrlSchema.optional(),
     conventionStatus: z.enum(conventionStatuses).optional(),
   });
 
-export const broadcastFeedbackSchema: z.Schema<ConventionLastBroadcastFeedbackResponse> =
+export const broadcastFeedbackSchema: ZodSchemaWithInputMatchingOutput<ConventionLastBroadcastFeedbackResponse> =
   z
     .object({
       serviceName: z.string(),
@@ -42,7 +45,7 @@ export const broadcastFeedbackSchema: z.Schema<ConventionLastBroadcastFeedbackRe
       subscriberErrorFeedback: subscriberErrorFeedbackSchema.optional(),
       requestParams: conventionBroadcastRequestParamsSchema,
       response: broadcastFeedbackResponseSchema.optional(),
-      occurredAt: z.date(),
+      occurredAt: makeDateStringSchema(),
       handledByAgency: z.boolean(),
     })
     .nullable();

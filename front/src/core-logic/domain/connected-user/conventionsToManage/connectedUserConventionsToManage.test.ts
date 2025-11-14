@@ -6,6 +6,7 @@ import {
 } from "shared";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   createTestStore,
   type TestDependencies,
@@ -69,6 +70,41 @@ describe("ConnectedUserConventionsToManage", () => {
       isLoading: false,
       conventions: result.data,
       pagination: result.pagination,
+    });
+  });
+
+  it("failed to get the conventions for the connected user", () => {
+    expectToEqual(
+      connectedUserConventionsToManageSelectors.isLoading(store.getState()),
+      false,
+    );
+    store.dispatch(
+      connectedUserConventionsToManageSlice.actions.getConventionsForConnectedUserRequested(
+        {
+          params: {},
+          jwt: "my-jwt",
+          feedbackTopic: "connected-user-conventions",
+        },
+      ),
+    );
+    expectToEqual(
+      connectedUserConventionsToManageSelectors.isLoading(store.getState()),
+      true,
+    );
+    dependencies.conventionGateway.getConventionsForUserResult$.error(
+      new Error("any-error-message"),
+    );
+    expectToEqual(
+      connectedUserConventionsToManageSelectors.isLoading(store.getState()),
+      false,
+    );
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+      "connected-user-conventions": {
+        on: "fetch",
+        level: "error",
+        title: "Problème lors de la récupération de vos conventions",
+        message: "any-error-message",
+      },
     });
   });
 });

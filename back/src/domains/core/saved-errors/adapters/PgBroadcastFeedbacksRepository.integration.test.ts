@@ -3,6 +3,7 @@ import type { Pool } from "pg";
 import {
   type BroadcastFeedback,
   type BroadcastFeedbackResponse,
+  broadcastFeedbackSchema,
   type ConventionBroadcastRequestParams,
   type ConventionId,
   errors,
@@ -18,7 +19,6 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
-
 import { broadcastToFtLegacyServiceName } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
 
@@ -73,7 +73,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
               },
             }
           : {}),
-        occurred_at: broadcastFeedback.occurredAt,
+        occurred_at: new Date(broadcastFeedback.occurredAt),
         request_params: broadcastFeedback.requestParams,
         ...(broadcastFeedback.response
           ? { response: { httpStatus: broadcastFeedback.response.httpStatus } }
@@ -100,7 +100,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
     expectObjectInArrayToMatch(response, [
       {
         handled_by_agency: broadcastFeedback.handledByAgency,
-        occurred_at: broadcastFeedback.occurredAt,
+        occurred_at: new Date(broadcastFeedback.occurredAt),
         request_params: broadcastFeedback.requestParams,
         ...(broadcastFeedback.response
           ? {
@@ -147,7 +147,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
               },
             }
           : {}),
-        occurred_at: broadcastFeedback.occurredAt,
+        occurred_at: new Date(broadcastFeedback.occurredAt),
         request_params: broadcastFeedback.requestParams,
         ...(broadcastFeedback.response
           ? {
@@ -192,7 +192,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
               },
             }
           : {}),
-        occurred_at: broadcastFeedback.occurredAt,
+        occurred_at: new Date(broadcastFeedback.occurredAt),
         request_params: broadcastFeedback.requestParams,
         ...(broadcastFeedback.response
           ? { response: { httpStatus: broadcastFeedback.response.httpStatus } }
@@ -272,7 +272,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
             response: pgBroadcastFeedback.broacastFeedback.response,
             occurredAt: new Date(
               pgBroadcastFeedback.broacastFeedback.occurredAt,
-            ),
+            ).toISOString(),
             handledByAgency:
               pgBroadcastFeedback.broacastFeedback.handledByAgency,
             consumerName: pgBroadcastFeedback.broacastFeedback.consumerName,
@@ -365,6 +365,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
           conventionId,
         );
 
+      expect(broadcastFeedbackSchema.safeParse(result).success).toBeTruthy();
       expectToEqual(result, {
         ...lastBroadcast,
         ...(result?.subscriberErrorFeedback
@@ -418,7 +419,9 @@ const makeBroadcastFeedback = async (params: {
       },
       requestParams: { conventionId: params.conventionId },
       response: { httpStatus: 500 },
-      occurredAt: params.occurredAt ? params.occurredAt : new Date(),
+      occurredAt: params.occurredAt
+        ? params.occurredAt.toISOString()
+        : new Date().toISOString(),
       handledByAgency: params.handledByAgency ? params.handledByAgency : false,
     };
   }
@@ -429,7 +432,9 @@ const makeBroadcastFeedback = async (params: {
     serviceName: params.serviceName,
     requestParams: { conventionId: params.conventionId },
     response: { httpStatus: 200, body: { status: 200, title: "blabla" } },
-    occurredAt: params.occurredAt ? params.occurredAt : new Date(),
-    handledByAgency: params.handledByAgency ? params.handledByAgency : false,
+    occurredAt: params.occurredAt
+      ? params.occurredAt.toISOString()
+      : new Date().toISOString(),
+    handledByAgency: params.handledByAgency ?? false,
   };
 };

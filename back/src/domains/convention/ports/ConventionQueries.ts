@@ -4,6 +4,7 @@ import type {
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
+  ConventionWithBroadcastFeedback,
   DataWithPagination,
   DateRange,
   DateString,
@@ -78,4 +79,9 @@ export interface ConventionQueries {
   getConventionsMarketingData(params: {
     siret: SiretDto;
   }): Promise<ConventionMarketingData[]>;
+
+  getConventionsWithErroredBroadcastFeedbackForAgencyUser(params: {
+    userId: UserId;
+    pagination: PaginationQueryParams;
+  }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>>;
 }

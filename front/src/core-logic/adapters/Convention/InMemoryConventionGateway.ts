@@ -17,6 +17,7 @@ import {
   type FindSimilarConventionsParams,
   type FlatGetConventionsForAgencyUserParams,
   type MarkPartnersErroredConventionAsHandledRequest,
+  type PaginationQueryParams,
   type RenewConventionParams,
   type RenewMagicLinkRequestDto,
   type SendSignatureLinkRequestDto,
@@ -28,6 +29,7 @@ import {
 } from "shared";
 import type { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
+import type { ConventionWithBroadcastFeedback } from "../../../../../shared/src/convention/conventionWithBroadcastFeedback.dto";
 
 const CONVENTION_VALIDATED_TEST = new ConventionDtoBuilder()
   .withStatus("ACCEPTED_BY_VALIDATOR")
@@ -72,6 +74,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
   >();
   public getConventionLastBroadcastFeedbackResult$ =
     new Subject<ConventionLastBroadcastFeedbackResponse>();
+
+  public getConventionsWithErroredBroadcastFeedbackResult$ = new Subject<
+    DataWithPagination<ConventionWithBroadcastFeedback>
+  >();
 
   #agencies: { [id: string]: AgencyOption } = {};
 
@@ -228,5 +234,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: ConventionSupportedJwt,
   ): Observable<ConventionLastBroadcastFeedbackResponse> {
     return this.getConventionLastBroadcastFeedbackResult$;
+  }
+
+  public getConventionsWithErroredBroadcastFeedback$(
+    _params: Required<PaginationQueryParams>,
+    _jwt: string,
+  ): Observable<DataWithPagination<ConventionWithBroadcastFeedback>> {
+    return this.getConventionsWithErroredBroadcastFeedbackResult$;
   }
 }

@@ -24,6 +24,7 @@ import {
   withConventionIdLegacySchema,
   withConventionIdSchema,
 } from "../convention/convention.schema";
+import { paginatedConventionWithBroadcastFeedbackSchema } from "../convention/conventionWithBroadcastFeedback.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -244,6 +245,18 @@ export const authenticatedConventionRoutes = defineRoutes({
     queryParamsSchema: flatGetConventionsForAgencyUserParamsSchema,
     responses: {
       200: paginatedConventionReadSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+    },
+  }),
+
+  getConventionsWithErroredBroadcastFeedbackForAgencyUser: defineRoute({
+    method: "get",
+    url: "/inclusion-connected/conventions-with-errored-broadcast-feedback",
+    ...withAuthorizationHeaders,
+    queryParamsSchema: flatGetConventionsForAgencyUserParamsSchema,
+    responses: {
+      200: paginatedConventionWithBroadcastFeedbackSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
     },
