@@ -814,6 +814,9 @@ export const createUseCases = ({
     }),
     markDiscussionLinkedToConvention: makeMarkDiscussionLinkedToConvention({
       uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+      },
     }),
     contactRequestReminder: makeContactRequestReminder({
       deps: {
@@ -924,6 +927,7 @@ export const createUseCases = ({
       deps: {
         saveNotificationsBatchAndRelatedEvent,
         config,
+        timeGateway: gateways.timeGateway,
       },
     }),
     notifyBeneficiaryToFollowUpContactRequest:

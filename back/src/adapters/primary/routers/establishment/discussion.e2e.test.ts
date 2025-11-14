@@ -286,6 +286,7 @@ describe("discussion e2e", () => {
                 status: "REJECTED",
                 rejectionKind: "OTHER",
                 rejectionReason: "No reason",
+                updatedAt: gateways.timeGateway.now().toISOString(),
                 exchanges: [
                   ...discussion.exchanges,
                   {
@@ -295,7 +296,7 @@ describe("discussion e2e", () => {
                     firstname: establishmentAdminConnectedUser.firstName,
                     lastname: establishmentAdminConnectedUser.lastName,
                     email: establishmentAdminConnectedUser.email,
-                    sentAt: expect.any(String),
+                    sentAt: gateways.timeGateway.now().toISOString(),
                     attachments: [],
                   },
                 ],
@@ -395,6 +396,7 @@ describe("discussion e2e", () => {
       expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
         new DiscussionBuilder(discussion)
           .withExchanges([...discussion.exchanges, expectedExchange])
+          .withUpdateDate(gateways.timeGateway.now())
           .build(),
       ]);
     });
