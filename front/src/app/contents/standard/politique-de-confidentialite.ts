@@ -31,16 +31,16 @@ La plateforme Immersion Facilitée peut traiter les données à caractère perso
 
 <strong>Qu’est-ce qui nous autorise à traiter ces données ?</strong>
 
-L’exécution d’une mission d’intérêt public ou relevant de l’exercice de l’autorité publique dont est investi le Responsable de traitement au sens de l’article 6-1 e) du RGPD. 
+L’exécution d’une mission d’intérêt public ou relevant de l’exercice de l’autorité publique dont est investi le responsable de traitement au sens de l’article 6-1 e) du RGPD.
 
-Cette mission d’intérêt public ou relevant de l’exercice de l’autorité publique est mise en œuvre par : 
-• L’arrêté du 19 avril 2022 portant approbation de la convention constitutive du groupement d’intérêt public « Plateforme de l’inclusion ».
+Cette mission d’intérêt public ou relevant de l’exercice de l’autorité publique est précisée par l’arrêté du 13 novembre 2024 modifié, en application des textes relatifs à la PMSMP (articles D.5135-2 et suivants du code du travail) et des textes relatifs aux mini stages de découverte professionnelle (article D.123-4 du code de l’éducation).
+
 
 <strong>Pendant combien de temps conservons-nous ces données ?</strong>
 
 Données relatives au formulaire de demande d’immersion professionnelle:
 
-• Si la personne concernée a signé une convention d’immersion professionnelle, <strong>dans un délai de 5 ans (durée de conservation)</strong> à compter de la signature de la convention ou de l’accord d’immersion professionnelle avec l’entreprise partenaire.
+• Si la personne concernée a signé une convention d’immersion professionnelle, <strong>dans un délai de 5 ans (durée de conservation)</strong> à compter de la signature de la convention ou de l’accord d’immersion professionnelle avec l’entreprise partenaire. La durée consiste en 2 ans en base active puis 3 en base d’archivage intermédiaire
 
 • Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse positive du prescripteur, durant toute la durée de la recherche d’immersion professionnelle, et <strong>dans un délai de 2 ans après la dernière recherche (durée de conservation)</strong>
 
