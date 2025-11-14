@@ -59,15 +59,32 @@ export class PgOutboxRepository implements OutboxRepository {
             occuredAt.from ? qb.where("occurred_at", ">=", occuredAt.from) : qb,
         ),
       )
-      .with("deleted", (qb) =>
+      .with("deleted_publications_failures", (qb) =>
+        qb
+          .deleteFrom("outbox_failures")
+          .using(["to_delete", "outbox_publications"])
+          .whereRef(
+            "outbox_failures.publication_id",
+            "=",
+            "outbox_publications.id",
+          )
+          .whereRef("outbox_publications.event_id", "=", "to_delete.id"),
+      )
+      .with("deleted_publications", (qb) =>
+        qb
+          .deleteFrom("outbox_publications")
+          .using("to_delete")
+          .whereRef("outbox_publications.event_id", "=", "to_delete.id"),
+      )
+      .with("deleted_events", (qb) =>
         qb
           .deleteFrom("outbox")
           .using("to_delete")
           .whereRef("outbox.id", "=", "to_delete.id")
           .returning("outbox.id"),
       )
-      .selectFrom("deleted")
-      .select(({ fn }) => fn.count("id").as("deleted_events"))
+      .selectFrom("deleted_events")
+      .select(({ fn }) => fn.count("deleted_events.id").as("deleted_events"))
       .executeTakeFirst()
       .then((result) => (result ? Number(result.deleted_events) : 0));
   }

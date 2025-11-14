@@ -462,18 +462,52 @@ describe("PgOutboxRepository", () => {
     const eventOccuredOneYearMinusOneMSAgo = createNewEvent({
       ...commonParams,
       occurredAt: addMilliseconds(oneYearAgo, 1).toISOString(),
+      publications: [
+        {
+          publishedAt: addMilliseconds(oneYearAgo, 1).toISOString(),
+          failures: [
+            { errorMessage: "error", subscriptionId: "feature" },
+            { errorMessage: "error", subscriptionId: "feature" },
+          ],
+        },
+        {
+          publishedAt: addMilliseconds(oneYearAgo, 2).toISOString(),
+          failures: [
+            { errorMessage: "error", subscriptionId: "feature" },
+            { errorMessage: "error", subscriptionId: "feature" },
+          ],
+        },
+      ],
     });
     const eventOccuredOneYearAgo = createNewEvent({
       ...commonParams,
       occurredAt: oneYearAgo.toISOString(),
+      publications: [
+        {
+          publishedAt: oneYearAgo.toISOString(),
+          failures: [{ errorMessage: "error", subscriptionId: "feature" }],
+        },
+      ],
     });
     const eventOccuredTwoYearsAgo = createNewEvent({
       ...commonParams,
       occurredAt: twoYearsAgo.toISOString(),
+      publications: [
+        {
+          publishedAt: twoYearsAgo.toISOString(),
+          failures: [{ errorMessage: "error", subscriptionId: "feature" }],
+        },
+      ],
     });
     const eventOccuredTwoYearsAndOneMSAgo = createNewEvent({
       ...commonParams,
       occurredAt: subMilliseconds(twoYearsAgo, 1).toISOString(),
+      publications: [
+        {
+          publishedAt: subMilliseconds(twoYearsAgo, 1).toISOString(),
+          failures: [{ errorMessage: "error", subscriptionId: "feature" }],
+        },
+      ],
     });
 
     beforeEach(async () => {
@@ -504,6 +538,9 @@ describe("PgOutboxRepository", () => {
           })),
           [
             { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
             { id: eventOccuredTwoYearsAndOneMSAgo.id },
           ],
         );
@@ -524,7 +561,12 @@ describe("PgOutboxRepository", () => {
           (await getAllEventsStored()).map(({ id }) => ({
             id,
           })),
-          [{ id: eventOccuredOneYearMinusOneMSAgo.id }],
+          [
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+          ],
         );
       });
 
@@ -568,6 +610,9 @@ describe("PgOutboxRepository", () => {
           })),
           [
             { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
             { id: eventOccuredTwoYearsAndOneMSAgo.id },
             { id: eventOccuredOneYearAgo.id },
             { id: eventOccuredTwoYearsAgo.id },
@@ -597,6 +642,9 @@ describe("PgOutboxRepository", () => {
             { id: eventOccuredOneYearMinusOneMSAgo.id },
             { id: eventOccuredOneYearAgo.id },
             { id: eventOccuredTwoYearsAgo.id },
+            { id: eventOccuredTwoYearsAgo.id },
+            { id: eventOccuredTwoYearsAgo.id },
+            { id: eventOccuredTwoYearsAgo.id },
           ],
         );
       });
@@ -619,6 +667,9 @@ describe("PgOutboxRepository", () => {
           })),
           [
             { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
+            { id: eventOccuredOneYearMinusOneMSAgo.id },
             { id: eventOccuredOneYearAgo.id },
           ],
         );
@@ -634,6 +685,7 @@ describe("PgOutboxRepository", () => {
     // TODO: kysely query builder hard to make here
     db
       .executeQuery<StoredEventRow>(
+        // 😥
         CompiledQuery.raw(`
         SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status, published_at, subscription_id, error_message, priority
         FROM outbox
