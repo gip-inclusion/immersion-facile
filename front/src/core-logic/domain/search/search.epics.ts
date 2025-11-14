@@ -1,6 +1,11 @@
-import { concatWith, filter, map, of, switchMap, take } from "rxjs";
-import { type SearchResultDto, searchResultSchema } from "shared";
+import { filter, map, of, switchMap, take } from "rxjs";
 import {
+  type GetExternalOffersFlatQueryParams,
+  type SearchResultDto,
+  searchResultSchema,
+} from "shared";
+import {
+  type GetOffersPayload,
   type SearchResultPayload,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
@@ -14,49 +19,23 @@ type SearchAction = ActionOfSlice<typeof searchSlice>;
 
 type SearchEpic = AppEpic<SearchAction>;
 
-const initialSearchEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
+const getOffersEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   action$.pipe(
-    filter(searchSlice.actions.searchRequested.match),
-    switchMap((action) =>
-      searchGateway
-        .search$({
-          ...action.payload,
-          voluntaryToImmersion: true,
+    filter(searchSlice.actions.getOffersRequested.match),
+    switchMap((action) => {
+      console.log("getOffersEpic", action.payload);
+      return (isGetExternalOffersPayload(action.payload)
+        ? searchGateway.getExternalOffers$(action.payload)
+        : searchGateway.getOffers$(action.payload)
+      ).pipe(
+        take(1),
+        map((searchResultWithPagination) => searchSlice.actions.getOffersSucceeded({
+          searchResultsWithPagination: searchResultWithPagination,
+          searchParams: action.payload,
         })
-        .pipe(
-          take(1),
-          map((results) =>
-            searchSlice.actions.initialSearchSucceeded({
-              results,
-              searchParams: action.payload,
-            }),
-          ),
-        ),
-    ),
-  );
-
-const extraFetchEpic: SearchEpic = (
-  action$,
-  _state$,
-  { searchGateway, minSearchResultsToPreventRefetch },
-) =>
-  action$.pipe(
-    filter(searchSlice.actions.initialSearchSucceeded.match),
-    filter(
-      (action) =>
-        action.payload.results.length < minSearchResultsToPreventRefetch,
-    ),
-    switchMap((action) =>
-      of(searchSlice.actions.extraFetchRequested()).pipe(
-        concatWith(
-          searchGateway
-            .search$({
-              ...action.payload.searchParams,
-              voluntaryToImmersion: false,
-            })
-            .pipe(map(searchSlice.actions.extraFetchSucceeded)),
-        ),
-      ),
+        )
+      );
+    },
     ),
   );
 
@@ -108,8 +87,14 @@ const searchResultExternalProvidedEpic: SearchEpic = (
   );
 
 export const searchEpics = [
-  initialSearchEpic,
-  extraFetchEpic,
+  getOffersEpic,
   fetchSearchResultEpic,
   searchResultExternalProvidedEpic,
 ];
+
+const isGetExternalOffersPayload = (
+  payload: Pick<GetOffersPayload, "isExternal" | "appellationCodes">,
+): payload is GetExternalOffersFlatQueryParams =>
+  payload.isExternal === true &&
+  Array.isArray(payload.appellationCodes) &&
+  (payload.appellationCodes?.length ?? 0) > 0;

@@ -45,6 +45,7 @@ export const frontRoutes = {
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
   profile: "mon-profil",
   search: "recherche",
+  externalSearch: "recherche-partenaires",
   searchForStudent: "recherche-scolaire",
   searchDiagoriente: "recherche-diagoriente",
   standard: "pages",

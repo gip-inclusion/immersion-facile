@@ -1,9 +1,11 @@
 import { from, type Observable } from "rxjs";
 import type {
   CreateDiscussionDto,
+  DataWithPagination,
+  GetExternalOffersFlatQueryParams,
+  GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
-  LegacySearchQueryParamsDto,
   SearchResultDto,
   SearchResultQuery,
   SearchRoutes,
@@ -22,7 +24,7 @@ import type {
 import { match, P } from "ts-pattern";
 
 export class HttpSearchGateway implements SearchGateway {
-  constructor(private readonly httpClient: HttpClient<SearchRoutes>) {}
+  constructor(private readonly httpClient: HttpClient<SearchRoutes>) { }
 
   public async contactEstablishment(
     params: CreateDiscussionDto,
@@ -79,17 +81,48 @@ export class HttpSearchGateway implements SearchGateway {
     );
   }
 
-  public search$(
-    searchParams: LegacySearchQueryParamsDto,
-  ): Observable<SearchResultDto[]> {
+  public getOffers$(
+    params: GetOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
     return from(
       this.httpClient
-        .legacySearch({
-          queryParams: searchParams,
+        .getOffers({
+          queryParams: params,
         })
         .then((result) =>
           match(result)
             .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getExternalOffers$(
+    params: GetExternalOffersFlatQueryParams,
+  ): Observable<DataWithPagination<SearchResultDto>> {
+    return from(
+      this.httpClient
+        .getExternalOffers({
+          queryParams: {
+            ...params,
+            appellationCodes: params.appellationCodes ?? [],
+            latitude: params.latitude ?? 0,
+            longitude: params.longitude ?? 0,
+            distanceKm: params.distanceKm ?? 0,
+          },
+        })
+        .then((result) =>
+          match(result)
+            .with({ status: 200 }, ({ body }) => ({
+              data: body,
+              pagination: {
+                totalPages: 1,
+                currentPage: 1,
+                numberPerPage: 50,
+                totalRecords: body.length,
+              },
+            }))
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),

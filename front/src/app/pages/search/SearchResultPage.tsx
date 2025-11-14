@@ -79,7 +79,7 @@ const getMetaForSearchResult = (
   };
 };
 
-export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
+export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
   const route = useRoute() as Route<
     | typeof routes.searchResult
     | typeof routes.searchResultExternal
@@ -109,7 +109,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
         searchSlice.actions.fetchSearchResultRequested({
           searchResult: {
             siret: params.siret,
-            appellationCode: params.appellationCode,
+            appellationCode: params.appellationCode[0],
             locationId: params.location,
           },
           feedbackTopic: "search-result",
@@ -120,7 +120,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
       dispatch(
         searchSlice.actions.externalSearchResultRequested({
           siretAndAppellation: {
-            appellationCode: params.appellationCode,
+            appellationCode: params.appellationCode[0],
             siret: params.siret,
           },
           feedbackTopic: "search-result",
@@ -146,7 +146,9 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
     });
   };
   const onGoBackClick = () => {
-    window.history.length > 2 ? window.history.back() : routes.search().push();
+    window.history.length > 2
+      ? window.history.back()
+      : routes.search({}).push();
   };
 
   const miniMapMarkerKey = "single-result-mini-map-marker";
@@ -204,8 +206,6 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
               </Button>
             </div>
             <SearchResultLabels
-              voluntaryToImmersion={currentSearchResult.voluntaryToImmersion}
-              contactMode={currentSearchResult.contactMode}
               fitForDisabledWorkers={currentSearchResult.fitForDisabledWorkers}
             />
             <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
@@ -348,6 +348,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
               <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
                 <SearchMiniMap
                   kind="single"
+                  isExternal={isExternal}
                   markerProps={{
                     position: [
                       currentSearchResult.position.lat,
@@ -355,7 +356,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
                     ],
                     icon: getIconMarker(
                       miniMapMarkerKey,
-                      currentSearchResult,
+                      isExternal,
                       miniMapMarkerKey,
                     ),
                   }}

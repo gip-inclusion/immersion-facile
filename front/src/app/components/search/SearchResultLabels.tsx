@@ -1,27 +1,17 @@
 import { fr } from "@codegouvfr/react-dsfr";
 
-import type { ContactMode, FitForDisableWorkerOption } from "shared";
+import type { FitForDisableWorkerOption } from "shared";
 import { useStyles } from "tss-react/dsfr";
 
 type ImmersionOfferLabelsProps = {
-  voluntaryToImmersion?: boolean;
   fitForDisabledWorkers?: FitForDisableWorkerOption | null;
-  contactMode?: ContactMode;
   className?: string;
 };
 
 export const SearchResultLabels = ({
-  voluntaryToImmersion,
   fitForDisabledWorkers,
-  contactMode,
 }: ImmersionOfferLabelsProps) => (
   <ul className={fr.cx("fr-card__desc", "fr-badges-group")}>
-    <li>
-      <InfoLabel
-        contactMode={contactMode}
-        voluntaryToImmersion={voluntaryToImmersion}
-      />
-    </li>
     {fitForDisabledWorkers === "yes-declared-only" && (
       <li>
         <Label className={fr.cx("fr-badge--yellow-moutarde")}>
@@ -38,26 +28,6 @@ export const SearchResultLabels = ({
     )}
   </ul>
 );
-
-const InfoLabel = ({
-  contactMode,
-  voluntaryToImmersion,
-}: ImmersionOfferLabelsProps) => {
-  const { cx } = useStyles();
-  const luckyGuess = typeof contactMode === "undefined";
-  const className = [
-    ...(voluntaryToImmersion ? [fr.cx("fr-badge--blue-cumulus")] : []),
-    ...(luckyGuess ? [fr.cx("fr-badge--purple-glycine")] : []),
-  ].join(" ");
-
-  const label = voluntaryToImmersion
-    ? "Entreprise accueillante"
-    : "Tentez votre chance";
-
-  return voluntaryToImmersion || luckyGuess ? (
-    <Label className={cx(className)}>{label}</Label>
-  ) : null;
-};
 
 const Label = ({
   children,
