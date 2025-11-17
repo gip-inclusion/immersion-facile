@@ -16,7 +16,7 @@ export type ArchiveDiscussions = ReturnType<typeof makeArchiveDiscussions>;
 
 const archiveDiscussionsInputParamSchema: ZodSchemaWithInputMatchingOutput<ArchiveDiscussionsInputParams> =
   z.object({
-    limit: z.int(),
+    limit: z.int().positive(),
     lastUpdated: z.date(),
     statuses: discussionStatusesSchema,
   });

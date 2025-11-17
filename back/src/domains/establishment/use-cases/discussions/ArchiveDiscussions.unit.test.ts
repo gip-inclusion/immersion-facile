@@ -11,7 +11,7 @@ import {
   makeArchiveDiscussions,
 } from "./ArchiveDiscussions";
 
-describe("DeleteOldDiscussions", () => {
+describe("ArchiveDiscussions", () => {
   const now = new Date();
   const oneYearAgo = subYears(now, 1);
   const oneYearMinusOneMillisecondAgo = addMilliseconds(oneYearAgo, 1);
@@ -21,13 +21,13 @@ describe("DeleteOldDiscussions", () => {
   const twoYearsMinusOneMillisecondAgo = addMilliseconds(twoYearsAgo, 1);
   const thirtyYearsAgo = subYears(now, 30);
 
-  let deleteOldDiscussions: ArchiveDiscussions;
+  let archiveDiscussions: ArchiveDiscussions;
   let uow: InMemoryUnitOfWork;
 
   const discussionRejectedOneYearAgo = new DiscussionBuilder()
     .withId("discussionRejectedOneYearAgo")
     .withStatus({ status: "REJECTED", rejectionKind: "UNABLE_TO_HELP" })
-    .withUpdateDate(oneYearAgo)
+    .withUpdatedAt(oneYearAgo)
     .build();
   const discussionRejectedOneYearAndOneSecondAgo = new DiscussionBuilder()
     .withId("discussionRejectedOneYearAndOneSecondAgo")
@@ -36,73 +36,73 @@ describe("DeleteOldDiscussions", () => {
       rejectionKind: "CANDIDATE_ALREADY_WARNED",
       candidateWarnedMethod: "email",
     })
-    .withUpdateDate(oneYearAndOneSecondAgo)
+    .withUpdatedAt(oneYearAndOneSecondAgo)
     .build();
   const discussionRejectedThirthyYearsAgo = new DiscussionBuilder()
     .withId("discussionRejectedThirthyYearsAgo")
     .withStatus({ status: "REJECTED", rejectionKind: "UNABLE_TO_HELP" })
-    .withUpdateDate(thirtyYearsAgo)
+    .withUpdatedAt(thirtyYearsAgo)
     .build();
   const discussionPendingThirthyYearsAgo = new DiscussionBuilder()
     .withId("discussionPendingThirthyYearsAgo")
     .withStatus({ status: "PENDING" })
-    .withUpdateDate(thirtyYearsAgo)
+    .withUpdatedAt(thirtyYearsAgo)
     .build();
   const discussionPendingOneYearAgo = new DiscussionBuilder()
     .withId("discussionPendingOneYearAgo")
     .withStatus({ status: "PENDING" })
-    .withUpdateDate(oneYearAgo)
+    .withUpdatedAt(oneYearAgo)
     .build();
   const discussionPendingTwoYearsAndOneSecondAgo = new DiscussionBuilder()
     .withId("discussionPendingTwoYearsAndOneSecondAgo")
     .withStatus({ status: "PENDING" })
-    .withUpdateDate(twoYearsAndOneSecondAgo)
+    .withUpdatedAt(twoYearsAndOneSecondAgo)
     .build();
   const discussionAcceptedOneYearAgo = new DiscussionBuilder()
     .withId("discussionAcceptedOneYearAgo")
     .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
-    .withUpdateDate(oneYearAgo)
+    .withUpdatedAt(oneYearAgo)
     .build();
   const discussionAcceptedTwoYearsAgo = new DiscussionBuilder()
     .withId("discussionAcceptedTwoYearsAgo")
     .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
-    .withUpdateDate(twoYearsAgo)
+    .withUpdatedAt(twoYearsAgo)
     .build();
   const discussionRejectedOneYearMinusOneMillisecondAgo =
     new DiscussionBuilder()
       .withId("discussionRejectedOneYearMinusOneMillisecondAgo")
       .withStatus({ status: "REJECTED", rejectionKind: "UNABLE_TO_HELP" })
-      .withUpdateDate(oneYearMinusOneMillisecondAgo)
+      .withUpdatedAt(oneYearMinusOneMillisecondAgo)
       .build();
 
   const discussionAcceptedTwoYearsMinusOneMillisecondAgo =
     new DiscussionBuilder()
       .withId("discussionAcceptedTwoYearsMinusOneMillisecondAgo")
       .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
-      .withUpdateDate(twoYearsMinusOneMillisecondAgo)
+      .withUpdatedAt(twoYearsMinusOneMillisecondAgo)
       .build();
 
   const discussionPendingTwoYearsMinusOneMillisecondAgo =
     new DiscussionBuilder()
       .withId("discussionPendingTwoYearsMinusOneMillisecondAgo")
       .withStatus({ status: "PENDING" })
-      .withUpdateDate(twoYearsMinusOneMillisecondAgo)
+      .withUpdatedAt(twoYearsMinusOneMillisecondAgo)
       .build();
 
   const discussionAcceptedThirtyYearsAgo = new DiscussionBuilder()
     .withId("discussionAcceptedThirtyYearsAgo")
     .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
-    .withUpdateDate(thirtyYearsAgo)
+    .withUpdatedAt(thirtyYearsAgo)
     .build();
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    deleteOldDiscussions = makeArchiveDiscussions({
+    archiveDiscussions = makeArchiveDiscussions({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
   });
 
-  describe("Delete discussions with rejected status and updated at least one year ago", () => {
+  describe("Archive discussions with rejected status and updated at least one year ago", () => {
     const with10RejectedDiscussionsUpdatedOneYearAgo: ArchiveDiscussionsInputParams =
       {
         limit: 10,
@@ -110,11 +110,11 @@ describe("DeleteOldDiscussions", () => {
         lastUpdated: oneYearAgo,
       };
 
-    it("0 discussion deleted - no discussion on repository", async () => {
+    it("0 discussion archived - no discussion on repository", async () => {
       uow.discussionRepository.discussions = [];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10RejectedDiscussionsUpdatedOneYearAgo,
         ),
         {
@@ -126,13 +126,13 @@ describe("DeleteOldDiscussions", () => {
       expectToEqual(uow.discussionRepository.archivedDiscussionIds, []);
     });
 
-    it("0 discussion deleted - when discussions are out of update date range", async () => {
+    it("0 discussion archived - when discussions are out of update date range", async () => {
       uow.discussionRepository.discussions = [
         discussionRejectedOneYearMinusOneMillisecondAgo,
       ];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10RejectedDiscussionsUpdatedOneYearAgo,
         ),
         {
@@ -146,14 +146,14 @@ describe("DeleteOldDiscussions", () => {
       expectToEqual(uow.discussionRepository.archivedDiscussionIds, []);
     });
 
-    it("0 discussion deleted - when discussions are in update date range and without rejected status", async () => {
+    it("0 discussion archived - when discussions are in update date range and without rejected status", async () => {
       uow.discussionRepository.discussions = [
         discussionPendingOneYearAgo,
         discussionAcceptedOneYearAgo,
       ];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10RejectedDiscussionsUpdatedOneYearAgo,
         ),
         {
@@ -168,11 +168,11 @@ describe("DeleteOldDiscussions", () => {
       expectToEqual(uow.discussionRepository.archivedDiscussionIds, []);
     });
 
-    it("1 discussion deleted - when discussion is status rejected and in update date range", async () => {
+    it("1 discussion archived - when discussion is status rejected and in update date range", async () => {
       uow.discussionRepository.discussions = [discussionRejectedOneYearAgo];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10RejectedDiscussionsUpdatedOneYearAgo,
         ),
         {
@@ -186,7 +186,7 @@ describe("DeleteOldDiscussions", () => {
       ]);
     });
 
-    it("2 oldest discussions deleted with limit at 2 - but 3 discussion are rejected and in range ", async () => {
+    it("2 oldest discussions archived with limit at 2 - but 3 discussion are rejected and in range ", async () => {
       uow.discussionRepository.discussions = [
         discussionRejectedOneYearAgo,
         discussionRejectedOneYearAndOneSecondAgo,
@@ -199,7 +199,7 @@ describe("DeleteOldDiscussions", () => {
       const limit = 2;
 
       expectToEqual(
-        await deleteOldDiscussions.execute({
+        await archiveDiscussions.execute({
           ...with10RejectedDiscussionsUpdatedOneYearAgo,
           limit,
         }),
@@ -221,7 +221,7 @@ describe("DeleteOldDiscussions", () => {
     });
   });
 
-  describe("Delete discussions with accepted/pending statuses and updated at least two years ago", () => {
+  describe("Archive discussions with accepted/pending statuses and updated at least two years ago", () => {
     const with10AcceptedAndPendingDiscussionsUpdatedTwoYearsAgo: ArchiveDiscussionsInputParams =
       {
         limit: 10,
@@ -229,11 +229,11 @@ describe("DeleteOldDiscussions", () => {
         lastUpdated: twoYearsAgo,
       };
 
-    it("0 discussion deleted - no discussion on repository", async () => {
+    it("0 discussion archived - no discussion on repository", async () => {
       uow.discussionRepository.discussions = [];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10AcceptedAndPendingDiscussionsUpdatedTwoYearsAgo,
         ),
         {
@@ -245,14 +245,14 @@ describe("DeleteOldDiscussions", () => {
       expectToEqual(uow.discussionRepository.archivedDiscussionIds, []);
     });
 
-    it("0 discussion deleted - when discussions are out of update date range", async () => {
+    it("0 discussion archived - when discussions are out of update date range", async () => {
       uow.discussionRepository.discussions = [
         discussionAcceptedTwoYearsMinusOneMillisecondAgo,
         discussionPendingTwoYearsMinusOneMillisecondAgo,
       ];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10AcceptedAndPendingDiscussionsUpdatedTwoYearsAgo,
         ),
         {
@@ -267,13 +267,13 @@ describe("DeleteOldDiscussions", () => {
       expectToEqual(uow.discussionRepository.archivedDiscussionIds, []);
     });
 
-    it("0 discussion deleted - when discussions are in update date range and without accepted/pending status", async () => {
+    it("0 discussion archived - when discussions are in update date range and without accepted/pending status", async () => {
       uow.discussionRepository.discussions = [
         discussionRejectedThirthyYearsAgo,
       ];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10AcceptedAndPendingDiscussionsUpdatedTwoYearsAgo,
         ),
         {
@@ -287,7 +287,7 @@ describe("DeleteOldDiscussions", () => {
       expectToEqual(uow.discussionRepository.archivedDiscussionIds, []);
     });
 
-    it("3 discussion deleted - when discussion status is accepted/pending and in update date range", async () => {
+    it("3 discussion archived - when discussion status is accepted/pending and in update date range", async () => {
       uow.discussionRepository.discussions = [
         discussionAcceptedOneYearAgo,
         discussionAcceptedTwoYearsAgo,
@@ -296,7 +296,7 @@ describe("DeleteOldDiscussions", () => {
       ];
 
       expectToEqual(
-        await deleteOldDiscussions.execute(
+        await archiveDiscussions.execute(
           with10AcceptedAndPendingDiscussionsUpdatedTwoYearsAgo,
         ),
         {
@@ -314,7 +314,7 @@ describe("DeleteOldDiscussions", () => {
       ]);
     });
 
-    it("3 oldest discussions deleted with limit at 3 - but 4 discussion are accepted/pending and in range ", async () => {
+    it("3 oldest discussions archived with limit at 3 - but 4 discussion are accepted/pending and in range ", async () => {
       uow.discussionRepository.discussions = [
         discussionRejectedOneYearAgo,
         discussionRejectedOneYearAndOneSecondAgo,
@@ -331,7 +331,7 @@ describe("DeleteOldDiscussions", () => {
       const limit = 3;
 
       expectToEqual(
-        await deleteOldDiscussions.execute({
+        await archiveDiscussions.execute({
           ...with10AcceptedAndPendingDiscussionsUpdatedTwoYearsAgo,
           limit,
         }),

@@ -396,7 +396,7 @@ describe("discussion e2e", () => {
       expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
         new DiscussionBuilder(discussion)
           .withExchanges([...discussion.exchanges, expectedExchange])
-          .withUpdateDate(gateways.timeGateway.now())
+          .withUpdatedAt(gateways.timeGateway.now())
           .build(),
       ]);
     });

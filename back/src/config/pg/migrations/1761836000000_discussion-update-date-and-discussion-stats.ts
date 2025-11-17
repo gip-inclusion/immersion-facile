@@ -13,20 +13,26 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
   pgm.sql(`
     UPDATE discussions
-    SET updated_at = (
-      SELECT MAX(exchanges.sent_at) + interval '3 months'
-      FROM exchanges
-      WHERE exchanges.discussion_id = discussions.id
-    )
+    SET updated_at = COALESCE (
+      (
+        SELECT MAX(exchanges.sent_at)
+        FROM exchanges
+        WHERE exchanges.discussion_id = discussions.id
+      ),
+      created_at
+    ) + interval '3 months'
     WHERE discussions.rejection_kind = 'DEPRECATED'
   `);
 
   pgm.sql(`
     UPDATE discussions
-    SET updated_at = (
-      SELECT MAX(exchanges.sent_at)
-      FROM exchanges
-      WHERE exchanges.discussion_id = discussions.id
+    SET updated_at = COALESCE (
+      (
+        SELECT MAX(ex.sent_at)
+        FROM exchanges ex
+        WHERE ex.discussion_id = discussions.id
+      ),
+      created_at
     )
     WHERE discussions.rejection_kind != 'DEPRECATED'
     OR discussions.rejection_kind IS NULL
@@ -42,7 +48,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createIndex("discussions", "status");
   pgm.createIndex("discussions", "updated_at");
 
-  pgm.createTable("discussions__stats", {
+  pgm.createTable("discussions_archives", {
     siret: { type: "char(14)", notNull: true },
     kind: { type: "text", notNull: true },
     status: { type: "discussion_status", notNull: true },
@@ -57,7 +63,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     discussions_with_convention: { type: "int", notNull: true },
   });
   pgm.addConstraint(
-    "discussions__stats",
+    "discussions_archives",
     "fk_ogr_appellation_public_appellations_data",
     {
       foreignKeys: {
@@ -67,7 +73,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     },
   );
   pgm.addConstraint(
-    "discussions__stats",
+    "discussions_archives",
     "unique_siret_kind_status_contact_method_immersion_objective_department_code_candidate_firstname_creation_date_appellation_code",
     {
       unique: [
@@ -89,5 +95,5 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropIndex("discussions", "updated_at");
   pgm.dropIndex("discussions", "status");
   pgm.dropColumn("discussions", "updated_at");
-  pgm.dropTable("discussions__stats");
+  pgm.dropTable("discussions_archives");
 }
