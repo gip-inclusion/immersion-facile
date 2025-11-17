@@ -78,13 +78,13 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
   async __test_setDiscussionsStats(stats: DiscussionsStat[]) {
     await this.transaction
-      .insertInto("discussions__stats")
+      .insertInto("discussions_archives")
       .values(stats)
       .execute();
   }
 
   async __test_getDiscussionsStats() {
-    return executeGetDiscussionsStatus(this.transaction);
+    return executeGetDiscussionsStats(this.transaction);
   }
 
   async archiveDiscussions(discussionIds: DiscussionId[]): Promise<void> {
@@ -217,7 +217,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     );
 
     await this.transaction
-      .insertInto("discussions__stats")
+      .insertInto("discussions_archives")
       .values(statsToAdd)
       .onConflict((oc) =>
         oc
@@ -235,19 +235,19 @@ export class PgDiscussionRepository implements DiscussionRepository {
           .doUpdateSet({
             discussions_total: (eb) =>
               eb(
-                "discussions__stats.discussions_total",
+                "discussions_archives.discussions_total",
                 "+",
                 eb.ref("excluded.discussions_total"),
               ),
             discussions_answered_by_establishment: (eb) =>
               eb(
-                "discussions__stats.discussions_answered_by_establishment",
+                "discussions_archives.discussions_answered_by_establishment",
                 "+",
                 eb.ref("excluded.discussions_answered_by_establishment"),
               ),
             discussions_with_convention: (eb) =>
               eb(
-                "discussions__stats.discussions_with_convention",
+                "discussions_archives.discussions_with_convention",
                 "+",
                 eb.ref("excluded.discussions_with_convention"),
               ),
@@ -992,11 +992,12 @@ export type DiscussionsStat = {
   discussions_answered_by_establishment: number;
   discussions_with_convention: number;
 };
-const executeGetDiscussionsStatus = (
+
+const executeGetDiscussionsStats = (
   transaction: KyselyDb,
 ): Promise<DiscussionsStat[]> =>
   transaction
-    .selectFrom("discussions__stats")
+    .selectFrom("discussions_archives")
     .select(({ ref }) => [
       ref("siret").as("siret"),
       ref("kind").as("kind"),

@@ -73,7 +73,7 @@ export const cartographeAppellationAndRome: AppellationAndRomeDto = {
 };
 
 export class DiscussionBuilder implements Builder<DiscussionDto> {
-  withUpdateDate(updatedAt: Date) {
+  withUpdatedAt(updatedAt: Date) {
     return new DiscussionBuilder({
       ...this.discussion,
       updatedAt: updatedAt.toISOString(),

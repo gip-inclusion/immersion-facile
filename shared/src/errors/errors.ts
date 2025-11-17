@@ -135,9 +135,7 @@ export const errors = {
   },
   generic: {
     badDateRange: ({ from, to }: Partial<DateRange>) =>
-      new Error(
-        `L'intervale de temps n'est pas supporté. From: ${from} To:${to}`,
-      ),
+      new Error(`L'intervale de temps n'est pas supporté. De: ${from} À:${to}`),
     notAnError: () => new Error("Not an error class"),
     testError: (message: string) => new Error(message),
     fakeError: (message: string, httpStatus?: number) => {
@@ -158,7 +156,7 @@ export const errors = {
     httpStatus: ({ status, message }: { status?: number; message: string }) =>
       new Error(`Erreur HTTP ${status ? `(${status}) ` : ""}: ${message}`),
     unsupportedLimit: (limit: number) =>
-      new Error(`The limit ${limit} is not supported`),
+      new Error(`La limite ${limit} n'est pas supportée.`),
     unsupportedStatus: ({
       body,
       status,
@@ -849,7 +847,7 @@ export const errors = {
   discussion: {
     missingNotDeleted: (discussionIds: DiscussionId[]) =>
       new NotFoundError(
-        `Discussions cannot be delete because missing : ${discussionIds}`,
+        `Les discussions ne peuvent pas être supprimées car manquantes : ${discussionIds}.`,
       ),
     badSiretFilter: () =>
       new BadRequestError(
