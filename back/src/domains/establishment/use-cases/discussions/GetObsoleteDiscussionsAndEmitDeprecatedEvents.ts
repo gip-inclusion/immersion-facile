@@ -21,6 +21,7 @@ export const makeGetObsoleteDiscussionsAndEmitDeprecatedEvent = useCaseBuilder(
     const now = deps.timeGateway.now();
     const threeMonthsAgo = subMonths(now, 3);
 
+    // TODO utiliser getDiscussionIds
     const obsoleteDiscussions =
       await uow.discussionRepository.getObsoleteDiscussions({
         olderThan: threeMonthsAgo,

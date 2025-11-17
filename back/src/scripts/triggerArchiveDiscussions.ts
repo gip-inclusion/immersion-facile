@@ -10,7 +10,7 @@ import { handleCRONScript } from "./handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const deleteOldDiscussions = async () => {
+const archiveOldDiscussions = async () => {
   const uowPerformer = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
@@ -47,9 +47,9 @@ const deleteOldDiscussions = async () => {
 };
 
 handleCRONScript({
-  name: "deleteOldDiscussions",
+  name: "archiveOldDiscussions",
   config,
-  script: deleteOldDiscussions,
+  script: archiveOldDiscussions,
   handleResults: ({
     archivedAcceptedOrPendingTwoYearsAgoDiscussionsQty,
     archivedRejectedOneYearAgoDiscussionsQty,

@@ -42,7 +42,6 @@
     },
     {
       "command": "0 13 1-7 * 0 pnpm back run trigger-delete-old-users-ongoing-oauths",
-
       "size": "M"
     }
   ]

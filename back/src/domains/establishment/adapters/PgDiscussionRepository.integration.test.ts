@@ -6,7 +6,6 @@ import {
   DiscussionBuilder,
   type DiscussionDto,
   type DiscussionInList,
-  type DiscussionKind,
   type Exchange,
   errors,
   expectPromiseToFailWithError,
@@ -78,7 +77,7 @@ describe("PgDiscussionRepository", () => {
     await db.deleteFrom("establishments__users").execute();
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("discussions").execute();
-    await db.deleteFrom("discussions__stats").execute();
+    await db.deleteFrom("discussions_archives").execute();
     await db.deleteFrom("exchanges").execute();
     await db.deleteFrom("users").execute();
     pgDiscussionRepository = new PgDiscussionRepository(db);
@@ -453,13 +452,13 @@ describe("PgDiscussionRepository", () => {
         .withId(uuid())
         .withCreatedAt(createdAt)
         .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
-        .withUpdateDate(new Date("2025-01-01"))
+        .withUpdatedAt(new Date("2025-01-01"))
         .build();
       const pendingDiscussion = new DiscussionBuilder()
         .withId(uuid())
         .withCreatedAt(createdAt)
         .withStatus({ status: "PENDING" })
-        .withUpdateDate(new Date("2025-01-02"))
+        .withUpdatedAt(new Date("2025-01-02"))
         .build();
       const rejectedDiscussion = new DiscussionBuilder()
         .withId(uuid())
@@ -469,7 +468,7 @@ describe("PgDiscussionRepository", () => {
           candidateWarnedMethod: "email",
           rejectionKind: "CANDIDATE_ALREADY_WARNED",
         })
-        .withUpdateDate(new Date("2025-01-03"))
+        .withUpdatedAt(new Date("2025-01-03"))
         .build();
 
       it("when no discussion ids, do nothing", async () => {
@@ -479,7 +478,7 @@ describe("PgDiscussionRepository", () => {
           rejectedDiscussion,
         ]);
 
-        const unitialStats: DiscussionsStat[] = [
+        const initialStats: DiscussionsStat[] = [
           {
             appellation_code: 10245,
             candidate_firstname: "billy",
@@ -495,7 +494,7 @@ describe("PgDiscussionRepository", () => {
             status: "ACCEPTED",
           },
         ];
-        await pgDiscussionRepository.__test_setDiscussionsStats(unitialStats);
+        await pgDiscussionRepository.__test_setDiscussionsStats(initialStats);
 
         await pgDiscussionRepository.archiveDiscussions([]);
 
@@ -507,7 +506,7 @@ describe("PgDiscussionRepository", () => {
 
         expectToEqual(
           await pgDiscussionRepository.__test_getDiscussionsStats(),
-          unitialStats,
+          initialStats,
         );
       });
 
@@ -528,7 +527,7 @@ describe("PgDiscussionRepository", () => {
           );
         });
 
-        it("when ids provided and discussions exist, discussions does not exist anymore", async () => {
+        it("when ids provided and discussions exist, discussions do not exist anymore", async () => {
           await insertDiscussions(pgDiscussionRepository, [
             acceptedDiscussion,
             pendingDiscussion,
@@ -546,21 +545,25 @@ describe("PgDiscussionRepository", () => {
         });
 
         it("when ids provided and discussions not exist, throw an error", async () => {
+          const missingDiscussionId = acceptedDiscussion.id;
+
           await expectPromiseToFailWithError(
-            pgDiscussionRepository.archiveDiscussions([acceptedDiscussion.id]),
-            errors.discussion.missingNotDeleted([acceptedDiscussion.id]),
+            pgDiscussionRepository.archiveDiscussions([missingDiscussionId]),
+            errors.discussion.missingNotDeleted([missingDiscussionId]),
           );
         });
 
         it("when ids provided and one discussion doesn't exist, throw an error", async () => {
+          const missingDiscussionId = acceptedDiscussion.id;
+
           await insertDiscussions(pgDiscussionRepository, [rejectedDiscussion]);
 
           await expectPromiseToFailWithError(
             pgDiscussionRepository.archiveDiscussions([
-              acceptedDiscussion.id,
+              missingDiscussionId,
               rejectedDiscussion.id,
             ]),
-            errors.discussion.missingNotDeleted([acceptedDiscussion.id]),
+            errors.discussion.missingNotDeleted([missingDiscussionId]),
           );
         });
       });
@@ -643,30 +646,6 @@ describe("PgDiscussionRepository", () => {
             await pgDiscussionRepository.__test_getDiscussionsStats(),
             [
               {
-                status: acceptedDiscussion.status,
-                discussions_total: 4,
-                discussions_answered_by_establishment: 2,
-                discussions_with_convention: 2,
-              },
-              {
-                status: pendingDiscussion.status,
-                discussions_total: 2,
-                discussions_answered_by_establishment: 1,
-                discussions_with_convention: 1,
-              },
-              {
-                status: rejectedDiscussion.status,
-                discussions_total: 3,
-                discussions_answered_by_establishment: 2,
-                discussions_with_convention: 2,
-              },
-            ].map(
-              ({
-                status,
-                discussions_total,
-                discussions_answered_by_establishment,
-                discussions_with_convention,
-              }) => ({
                 appellation_code: Number(acceptedDiscussion.appellationCode),
                 candidate_firstname:
                   acceptedDiscussion.potentialBeneficiary.firstName,
@@ -677,12 +656,44 @@ describe("PgDiscussionRepository", () => {
                   acceptedDiscussion.potentialBeneficiary.immersionObjective,
                 kind: acceptedDiscussion.kind,
                 siret: acceptedDiscussion.siret,
-                discussions_total,
-                discussions_answered_by_establishment,
-                discussions_with_convention,
-                status,
-              }),
-            ),
+                discussions_total: 4,
+                discussions_answered_by_establishment: 2,
+                discussions_with_convention: 2,
+                status: "ACCEPTED",
+              },
+              {
+                appellation_code: Number(acceptedDiscussion.appellationCode),
+                candidate_firstname:
+                  acceptedDiscussion.potentialBeneficiary.firstName,
+                contact_method: acceptedDiscussion.contactMode,
+                creation_date: createDate,
+                department_code: acceptedDiscussion.address.departmentCode,
+                immersion_objective:
+                  acceptedDiscussion.potentialBeneficiary.immersionObjective,
+                kind: acceptedDiscussion.kind,
+                siret: acceptedDiscussion.siret,
+                discussions_total: 2,
+                discussions_answered_by_establishment: 1,
+                discussions_with_convention: 1,
+                status: "PENDING",
+              },
+              {
+                appellation_code: Number(acceptedDiscussion.appellationCode),
+                candidate_firstname:
+                  acceptedDiscussion.potentialBeneficiary.firstName,
+                contact_method: acceptedDiscussion.contactMode,
+                creation_date: createDate,
+                department_code: acceptedDiscussion.address.departmentCode,
+                immersion_objective:
+                  acceptedDiscussion.potentialBeneficiary.immersionObjective,
+                kind: acceptedDiscussion.kind,
+                siret: acceptedDiscussion.siret,
+                discussions_total: 3,
+                discussions_answered_by_establishment: 2,
+                discussions_with_convention: 2,
+                status: "REJECTED",
+              },
+            ],
           );
         });
 
@@ -1363,40 +1374,7 @@ describe("PgDiscussionRepository", () => {
             await pgDiscussionRepository.__test_getDiscussionsStats(),
             [
               {
-                immersion_objective:
-                  "Confirmer un projet professionnel" as ImmersionObjective,
-                discussions_total: 3,
-                discussions_answered_by_establishment: 2,
-                discussions_with_convention: 2,
-              },
-              {
-                immersion_objective:
-                  "Découvrir un métier ou un secteur d'activité" as ImmersionObjective,
-                discussions_total: 1,
-                discussions_answered_by_establishment: 1,
-                discussions_with_convention: 1,
-              },
-              {
-                immersion_objective:
-                  "Initier une démarche de recrutement" as ImmersionObjective,
-                discussions_total: 1,
-                discussions_answered_by_establishment: 1,
-                discussions_with_convention: 0,
-              },
-              {
-                immersion_objective: null,
-                discussions_total: 1,
-                discussions_answered_by_establishment: 1,
-                discussions_with_convention: 0,
-              },
-            ].map(
-              ({
-                immersion_objective,
-                discussions_total,
-                discussions_answered_by_establishment,
-                discussions_with_convention,
-              }) => ({
-                immersion_objective,
+                immersion_objective: "Confirmer un projet professionnel",
                 creation_date: createDate,
                 department_code: acceptedDiscussion.address.departmentCode,
                 contact_method: acceptedDiscussion.contactMode,
@@ -1406,11 +1384,57 @@ describe("PgDiscussionRepository", () => {
                   acceptedDiscussion.potentialBeneficiary.firstName,
                 kind: acceptedDiscussion.kind,
                 status: acceptedDiscussion.status,
-                discussions_total,
-                discussions_answered_by_establishment,
-                discussions_with_convention,
-              }),
-            ),
+                discussions_total: 3,
+                discussions_answered_by_establishment: 2,
+                discussions_with_convention: 2,
+              },
+              {
+                immersion_objective:
+                  "Découvrir un métier ou un secteur d'activité",
+                creation_date: createDate,
+                department_code: acceptedDiscussion.address.departmentCode,
+                contact_method: acceptedDiscussion.contactMode,
+                siret: acceptedDiscussion.siret,
+                appellation_code: Number(acceptedDiscussion.appellationCode),
+                candidate_firstname:
+                  acceptedDiscussion.potentialBeneficiary.firstName,
+                kind: acceptedDiscussion.kind,
+                status: acceptedDiscussion.status,
+                discussions_total: 1,
+                discussions_answered_by_establishment: 1,
+                discussions_with_convention: 1,
+              },
+              {
+                immersion_objective: "Initier une démarche de recrutement",
+                creation_date: createDate,
+                department_code: acceptedDiscussion.address.departmentCode,
+                contact_method: acceptedDiscussion.contactMode,
+                siret: acceptedDiscussion.siret,
+                appellation_code: Number(acceptedDiscussion.appellationCode),
+                candidate_firstname:
+                  acceptedDiscussion.potentialBeneficiary.firstName,
+                kind: acceptedDiscussion.kind,
+                status: acceptedDiscussion.status,
+                discussions_total: 1,
+                discussions_answered_by_establishment: 1,
+                discussions_with_convention: 0,
+              },
+              {
+                immersion_objective: null,
+                creation_date: createDate,
+                department_code: acceptedDiscussion.address.departmentCode,
+                contact_method: acceptedDiscussion.contactMode,
+                siret: acceptedDiscussion.siret,
+                appellation_code: Number(acceptedDiscussion.appellationCode),
+                candidate_firstname:
+                  acceptedDiscussion.potentialBeneficiary.firstName,
+                kind: acceptedDiscussion.kind,
+                status: acceptedDiscussion.status,
+                discussions_total: 1,
+                discussions_answered_by_establishment: 1,
+                discussions_with_convention: 0,
+              },
+            ],
           );
         });
 
@@ -1467,26 +1491,8 @@ describe("PgDiscussionRepository", () => {
             await pgDiscussionRepository.__test_getDiscussionsStats(),
             [
               {
-                kind: "IF" as DiscussionKind,
-                discussions_total: 3,
-                discussions_answered_by_establishment: 2,
-                discussions_with_convention: 2,
-              },
-              {
-                kind: "1_ELEVE_1_STAGE" as DiscussionKind,
-                discussions_total: 1,
-                discussions_answered_by_establishment: 1,
-                discussions_with_convention: 1,
-              },
-            ].map(
-              ({
-                kind,
-                discussions_total,
-                discussions_answered_by_establishment,
-                discussions_with_convention,
-              }) => ({
                 immersion_objective:
-                  "Découvrir un métier ou un secteur d'activité" as ImmersionObjective,
+                  "Découvrir un métier ou un secteur d'activité",
                 creation_date: createDate,
                 department_code: acceptedDiscussion.address.departmentCode,
                 contact_method: acceptedDiscussion.contactMode,
@@ -1494,13 +1500,29 @@ describe("PgDiscussionRepository", () => {
                 appellation_code: Number(acceptedDiscussion.appellationCode),
                 candidate_firstname:
                   acceptedDiscussion.potentialBeneficiary.firstName,
-                kind,
+                kind: "IF",
                 status: acceptedDiscussion.status,
-                discussions_total,
-                discussions_answered_by_establishment,
-                discussions_with_convention,
-              }),
-            ),
+                discussions_total: 3,
+                discussions_answered_by_establishment: 2,
+                discussions_with_convention: 2,
+              },
+              {
+                immersion_objective:
+                  "Découvrir un métier ou un secteur d'activité",
+                creation_date: createDate,
+                department_code: acceptedDiscussion.address.departmentCode,
+                contact_method: acceptedDiscussion.contactMode,
+                siret: acceptedDiscussion.siret,
+                appellation_code: Number(acceptedDiscussion.appellationCode),
+                candidate_firstname:
+                  acceptedDiscussion.potentialBeneficiary.firstName,
+                kind: "1_ELEVE_1_STAGE",
+                status: acceptedDiscussion.status,
+                discussions_total: 1,
+                discussions_answered_by_establishment: 1,
+                discussions_with_convention: 1,
+              },
+            ],
           );
         });
       });
@@ -1512,22 +1534,22 @@ describe("PgDiscussionRepository", () => {
       const pendingDiscussionUpdated20230101 = new DiscussionBuilder()
         .withId(uuid())
         .withStatus({ status: "PENDING" })
-        .withUpdateDate(new Date("2023-01-01"))
+        .withUpdatedAt(new Date("2023-01-01"))
         .build();
       const acceptedDiscussionUpdated20230102 = new DiscussionBuilder()
         .withId(uuid())
         .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
-        .withUpdateDate(new Date("2023-01-02"))
+        .withUpdatedAt(new Date("2023-01-02"))
         .build();
       const acceptedDiscussionUpdated20240101 = new DiscussionBuilder()
         .withId(uuid())
         .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
-        .withUpdateDate(new Date("2024-01-01"))
+        .withUpdatedAt(new Date("2024-01-01"))
         .build();
       const rejectedDiscussionUpdated20250101 = new DiscussionBuilder()
         .withId(uuid())
         .withStatus({ status: "REJECTED", rejectionKind: "DEPRECATED" })
-        .withUpdateDate(new Date("2025-01-01"))
+        .withUpdatedAt(new Date("2025-01-01"))
         .build();
 
       beforeEach(async () => {
@@ -1607,7 +1629,7 @@ describe("PgDiscussionRepository", () => {
             );
           });
 
-          it("when updatedBetween filter with to 2023-31-12, get only discussions with updateDate bellow 2023-12-31", async () => {
+          it("when updatedBetween filter with to 2023-12-31, get only discussions with updateDate before 2023-12-31", async () => {
             expectToEqual(
               await pgDiscussionRepository.getDiscussionIds({
                 filters: {
@@ -1623,7 +1645,7 @@ describe("PgDiscussionRepository", () => {
             );
           });
 
-          it("when updatedBetween filter with from 2024-01-01, get only discussions with updateDate from 2024-01-01", async () => {
+          it("when updatedBetween filter with from 2024-01-01, get only discussions with updateDate after 2024-01-01", async () => {
             expectToEqual(
               await pgDiscussionRepository.getDiscussionIds({
                 filters: {
@@ -1671,7 +1693,7 @@ describe("PgDiscussionRepository", () => {
             );
           });
 
-          it("when updatedBetween filter with to 2023-12-31 and from 2025-01-01, get other discussions and exclude discussions with updateDate in 2024", async () => {
+          it("when updatedBetween filter with to 2023-12-31 and from 2025-01-01, throw badDateRange error", async () => {
             const range = {
               to: new Date("2023-12-31"),
               from: new Date("2025-01-01"),

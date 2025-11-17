@@ -28,7 +28,7 @@ export interface Database {
   conventions__ft_connect_users: ConventionsFtConnectUsers;
   delegation_contacts: DelegationContacts;
   discussions: Discussions;
-  discussions__stats: DiscussionStats;
+  discussions_archives: DiscussionsArchives;
   establishment_lead_events: EstablishmentLeadEvents;
   establishments__users: EstablishmentsUsers;
   establishments_deleted: EstablishmentsDeleted;
@@ -139,7 +139,7 @@ interface Discussions extends WithAcquisition {
   candidate_warned_method: "phone" | "email" | "inPerson" | "other" | null;
 }
 
-interface DiscussionStats {
+interface DiscussionsArchives {
   siret: string;
   kind: DiscussionKind;
   status: DiscussionStatus;
