@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: discussion_exchanges
+  - name: discussion_with_number_of_exchanges
     description: "Discussions enriched with the count of exchanges"
     columns:
       - name: id
