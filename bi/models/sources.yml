@@ -434,19 +434,105 @@ sources:
           - name: updated_at
             description: "Timestamp when updated"
 
-      - name: immersion_offers
-        description: "Immersion offers"
+      - name: establishments
+        description: "Establishments offering immersion opportunities"
         columns:
           - name: siret
-            description: "SIRET number of the business"
+            description: "Primary key - SIRET number"
+          - name: name
+            description: "Official business name"
+          - name: customized_name
+            description: "Customized/brand name"
           - name: created_at
             description: "Timestamp when created"
           - name: update_date
-            description: "Timestamp when updated"
+            description: "Timestamp when last updated"
+          - name: naf_code
+            description: "NAF/APE code"
+          - name: naf_nomenclature
+            description: "NAF nomenclature version"
+          - name: contact_mode
+            description: "Preferred contact method"
+          - name: is_open
+            description: "Whether open for immersions"
+          - name: source_provider
+            description: "Origin of the data"
+          - name: number_employees
+            description: "Number of employees"
+          - name: is_commited
+            description: "Whether committed to hiring"
+          - name: fit_for_disabled_workers
+            description: "Accessibility for disabled workers"
+          - name: website
+            description: "Website URL"
+          - name: additional_information
+            description: "Additional information"
+          - name: searchable_by_students
+            description: "Whether searchable by students"
+          - name: searchable_by_job_seekers
+            description: "Whether searchable by job seekers"
+          - name: max_contacts_per_month
+            description: "Maximum contacts per month"
+          - name: next_availability_date
+            description: "Next availability date"
+          - name: is_max_discussions_for_period_reached
+            description: "Whether max discussions reached"
+          - name: last_insee_check_date
+            description: "Last INSEE data check date"
+          - name: acquisition_campaign
+            description: "Marketing campaign"
+          - name: acquisition_keyword
+            description: "Marketing keyword"
           - name: score
-            description: "Score of the offer"
+            description: "Establishment score"
+          - name: status
+            description: "Establishment status"
+          - name: status_updated_at
+            description: "Status last updated"
+          - name: welcome_address_street_number_and_address
+            description: "Welcome address street"
+          - name: welcome_address_postcode
+            description: "Welcome address postcode"
+          - name: welcome_address_city
+            description: "Welcome address city"
+          - name: welcome_address_department_code
+            description: "Welcome address department"
+          - name: welcome_address_lat
+            description: "Welcome address latitude"
+          - name: welcome_address_lon
+            description: "Welcome address longitude"
+
+      - name: establishments_location_infos
+        description: "Location information for establishments"
+        columns:
+          - name: id
+            description: "Primary key"
+          - name: establishment_siret
+            description: "Foreign key to establishments"
+          - name: street_number_and_address
+            description: "Full street address"
+          - name: post_code
+            description: "Postal code"
+          - name: city
+            description: "City name"
+          - name: department_code
+            description: "Department code"
+          - name: lat
+            description: "Latitude"
+          - name: lon
+            description: "Longitude"
+
+      - name: immersion_offers
+        description: "Immersion offers - unique on (siret, appellation_code)"
+        columns:
+          - name: siret
+            description: "SIRET number of the business (FK to establishments)"
           - name: appellation_code
-            description: "Foreign key to public_appellations_data table"
+            description: "Appellation code (FK to public_appellations_data)"
+          - name: created_at
+            description: "Timestamp when offer was created"
+          - name: update_date
+            description: "Timestamp when offer was updated"
 
       - name: marketing_establishment_contacts
         description: "Marketing contacts for establishments"

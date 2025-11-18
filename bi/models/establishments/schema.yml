@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: establishments
+    description: "Base establishments table - one row per SIRET"
+    columns:
+      - name: siret
+        description: "Primary key - SIRET number"
+        tests:
+          - not_null
+          - unique
+      - name: name
+        description: "Official business name"
+      - name: customized_name
+        description: "Customized/brand name"
+      - name: is_open
+        description: "Whether open for immersions"
+      - name: searchable_by_students
+        description: "Whether searchable by students"
+      - name: searchable_by_job_seekers
+        description: "Whether searchable by job seekers"
+      - name: score
+        description: "Establishment score"
+      - name: status
+        description: "Establishment status"
+
+  - name: establishment_locations
+    description: "Location information for establishments - one row per location (can be multiple per SIRET)"
+    columns:
+      - name: id
+        description: "Primary key - location ID"
+        tests:
+          - not_null
+          - unique
+      - name: establishment_siret
+        description: "Foreign key to establishments table"
+        tests:
+          - not_null
+      - name: street_number_and_address
+        description: "Full street address"
+      - name: post_code
+        description: "Postal code"
+      - name: city
+        description: "City name"
+      - name: department_code
+        description: "Department code"
+      - name: lat
+        description: "Latitude"
+      - name: lon
+        description: "Longitude"
+
+  - name: establishment_offers
+    description: "Establishment offers with job details - one row per (SIRET, appellation_code)"
+    columns:
+      - name: siret
+        description: "Foreign key to establishments table"
+        tests:
+          - not_null
+      - name: appellation_code
+        description: "Foreign key to appellations table"
+        tests:
+          - not_null
+      - name: code_rome
+        description: "ROME job category code"
+      - name: appellation_label
+        description: "Full job title"
+      - name: rome_label
+        description: "ROME category label"
+    tests:
+      - unique:
+          column_name: "(siret || '-' || appellation_code)"
