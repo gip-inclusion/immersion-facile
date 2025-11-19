@@ -15,7 +15,7 @@ export default {
 <p>Immersion Facilitée a pour objectif de faciliter les immersions professionnelles, celles-ci étant un levier puissant d’accompagnement à l’emploi.</p>
 <p>Elle peut traiter des données à caractère personnel pour les finalités suivantes :
   <ul>
-    <li>Dématérialiser les procédures de conventionnement de la mise en situation en milieu professionnel, immersion, stage ou période d'observation professionnelle, ainsi que l'amélioration et la facilitation du parcours d'accès ;</li>
+    <li>Dématérialiser les procédures de conventionnement de la mise en situation en milieu professionnel, immersion, stage ou période d'observation professionnelle, ainsi que l'amélioration et la facilitation du parcours d'accès à l'immersion professionnelle ;</li>
     <li>Construire et développer une base entreprises immersions contenant les entreprises volontaires pour accueillir les personnes</li>
     <li>Faciliter des tâches des prescripteurs dans la décision et le suivi des bénéficiaires de la période de mise en situation en milieu professionnel </li>
     <li>Suivre et analyser l’analyse des données de pilotage lors des mises en relation et la réalisation de statistiques partagées avec les acteurs de l’insertion</li>
@@ -250,7 +250,7 @@ Aucun transfert de données au sens de l'article 44 du RGPD n'est réalisé.
 
 <p>Un cookie est un fichier déposé sur votre terminal lors de la visite d’un site. Il a pour but de collecter des informations relatives à votre navigation et de vous adresser des services adaptés à votre terminal (ordinateur, mobile ou tablette).</p>
 
-<p>En application de l’article 5(3) de la directive 2002/58/CE modifiée concernant le traitement des données à caractère personnel et la protection de la vie privée dans le secteur des communications électroniques, transposée à l’article 82 de la loi n°78-17 du 6 janvier 1978 relative à l’informatique, aux fichiers et aux libertés, les traceurs ou cookies suivent deux régimes distincts.</p>
+<p>En application de l’article 5-3 de la directive 2002/58/CE modifiée concernant le traitement des données à caractère personnel et la protection de la vie privée dans le secteur des communications électroniques, transposée à l’article 82 de la loi n°78-17 du 6 janvier 1978 relative à l’informatique, aux fichiers et aux libertés, les traceurs ou cookies suivent deux régimes distincts.</p>
 
 <p>D’une part, les cookies strictement nécessaires au service ou ayant pour finalité exclusive de faciliter la communication par voie électronique sont dispensés de consentement préalable au titre de l’article 82 de la loi n°78-17 du 6 janvier 1978.</p>
 
