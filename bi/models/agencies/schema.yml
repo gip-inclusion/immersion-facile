@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: agencies
+    description: |
+      Agencies managing immersion applications, enriched with department and region information.
+      Kind field normalizes 'pole-emploi' to 'france-travail'.
+    columns:
+      - name: id
+        description: Primary key - UUID of the agency
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: Name of the agency
+      - name: kind
+        description: Type of agency (normalized - pole-emploi becomes france-travail)
+      - name: department_code
+        description: Department code where the agency is located
+      - name: department_name
+        description: Full name of the department
+      - name: region_name
+        description: Full name of the region
+      - name: refers_to_agency_id
+        description: Reference to parent agency if applicable
+      - name: status
+        description: Current status of the agency
+
+  - name: agency_users
+    description: |
+      Users associated with agencies, including their roles and notification preferences.
+      Grain: 1 row per (agency_id, user_id) pair.
+    columns:
+      - name: agency_id
+        description: Foreign key to agencies
+        tests:
+          - not_null
+      - name: user_id
+        description: Foreign key to users
+        tests:
+          - not_null
+      - name: user_email
+        description: User's email address
+      - name: user_first_name
+        description: User's first name
+      - name: user_last_name
+        description: User's last name
+      - name: user_full_name
+        description: User's full name (first + last)
+      - name: roles
+        description: User roles at this agency (JSON)
+      - name: is_notified_by_email
+        description: Whether user receives email notifications
