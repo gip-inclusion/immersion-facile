@@ -32,7 +32,7 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
             firstname: "John",
             lastname: "Doe",
           },
-          broadcastFeedback: {
+          lastBroadcastFeedback: {
             serviceName: "any-service-name",
             consumerId: null,
             consumerName: "any-consumer-name",

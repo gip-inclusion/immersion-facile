@@ -1659,7 +1659,7 @@ describe("Pg implementation of ConventionQueries", () => {
         const result =
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
-              userId: validator.id,
+              userAgencyIds: ["aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"],
               pagination: { page: 1, perPage: 10 },
             },
           );
@@ -1735,7 +1735,7 @@ describe("Pg implementation of ConventionQueries", () => {
         const result =
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
-              userId: validator.id,
+              userAgencyIds: [agencyIdA],
               pagination: { page: 1, perPage: 10 },
             },
           );
@@ -1748,7 +1748,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 firstname: convention.signatories.beneficiary.firstName,
                 lastname: convention.signatories.beneficiary.lastName,
               },
-              broadcastFeedback: {
+              lastBroadcastFeedback: {
                 ...lastBroadcast,
                 subscriberErrorFeedback: {
                   message: lastBroadcast.subscriberErrorFeedback?.message ?? "",
@@ -1769,7 +1769,7 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
-    it("results are ordered by occurredtAt desc and paginated", async () => {
+    describe("when there are several conventions with errored broadcast feedback", () => {
       const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
       const convention1 = new ConventionDtoBuilder()
         .withId(conventionIdA)
@@ -1820,52 +1820,154 @@ describe("Pg implementation of ConventionQueries", () => {
         },
       };
 
-      await agencyRepo.insert(
-        toAgencyWithRights(agency, {
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
-      );
-      await conventionRepository.save(convention1);
-      await conventionRepository.save(convention2);
-      await conventionRepository.save(convention3);
-      await broadcastFeedbacksRepository.save(broadcast2);
-      await broadcastFeedbacksRepository.save(broadcast1);
-      await broadcastFeedbacksRepository.save(broadcast3);
-
-      const result =
-        await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
-          {
-            userId: validator.id,
-            pagination: { page: 3, perPage: 1 },
-          },
+      beforeEach(async () => {
+        await agencyRepo.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
         );
+        await conventionRepository.save(convention1);
+        await conventionRepository.save(convention2);
+        await conventionRepository.save(convention3);
+        await broadcastFeedbacksRepository.save(broadcast2);
+        await broadcastFeedbacksRepository.save(broadcast1);
+        await broadcastFeedbacksRepository.save(broadcast3);
+      });
 
-      expectToEqual(result, {
-        data: [
-          {
-            id: convention3.id,
-            beneficiary: {
-              firstname: convention3.signatories.beneficiary.firstName,
-              lastname: convention3.signatories.beneficiary.lastName,
-            },
-            broadcastFeedback: {
-              ...broadcast3,
-              subscriberErrorFeedback: {
-                message: broadcast3.subscriberErrorFeedback?.message ?? "",
-                error: JSON.stringify(
-                  broadcast3.subscriberErrorFeedback?.error,
-                ),
+      it.each([
+        {
+          requestedPagination: { page: 3, perPage: 1 },
+          expectedResult: {
+            data: [
+              {
+                id: convention1.id,
+                beneficiary: {
+                  firstname: convention1.signatories.beneficiary.firstName,
+                  lastname: convention1.signatories.beneficiary.lastName,
+                },
+                lastBroadcastFeedback: {
+                  ...broadcast1,
+                  subscriberErrorFeedback: {
+                    message: broadcast1.subscriberErrorFeedback?.message ?? "",
+                    error: JSON.stringify(
+                      broadcast1.subscriberErrorFeedback?.error,
+                    ),
+                  },
+                },
               },
+            ],
+            pagination: {
+              currentPage: 3,
+              totalPages: 3,
+              numberPerPage: 1,
+              totalRecords: 3,
             },
           },
-        ],
-        pagination: {
-          currentPage: 3,
-          totalPages: 3,
-          numberPerPage: 1,
-          totalRecords: 3,
         },
-      });
+        {
+          requestedPagination: { page: 1, perPage: 10 },
+          expectedResult: {
+            data: [
+              {
+                id: convention3.id,
+                beneficiary: {
+                  firstname: convention3.signatories.beneficiary.firstName,
+                  lastname: convention3.signatories.beneficiary.lastName,
+                },
+                lastBroadcastFeedback: {
+                  ...broadcast3,
+                  subscriberErrorFeedback: {
+                    message: broadcast3.subscriberErrorFeedback?.message ?? "",
+                    error: JSON.stringify(
+                      broadcast3.subscriberErrorFeedback?.error,
+                    ),
+                  },
+                },
+              },
+              {
+                id: convention2.id,
+                beneficiary: {
+                  firstname: convention2.signatories.beneficiary.firstName,
+                  lastname: convention2.signatories.beneficiary.lastName,
+                },
+                lastBroadcastFeedback: {
+                  ...broadcast2,
+                  subscriberErrorFeedback: {
+                    message: broadcast2.subscriberErrorFeedback?.message ?? "",
+                    error: JSON.stringify(
+                      broadcast2.subscriberErrorFeedback?.error,
+                    ),
+                  },
+                },
+              },
+              {
+                id: convention1.id,
+                beneficiary: {
+                  firstname: convention1.signatories.beneficiary.firstName,
+                  lastname: convention1.signatories.beneficiary.lastName,
+                },
+                lastBroadcastFeedback: {
+                  ...broadcast1,
+                  subscriberErrorFeedback: {
+                    message: broadcast1.subscriberErrorFeedback?.message ?? "",
+                    error: JSON.stringify(
+                      broadcast1.subscriberErrorFeedback?.error,
+                    ),
+                  },
+                },
+              },
+            ],
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 3,
+            },
+          },
+        },
+        {
+          requestedPagination: { page: 2, perPage: 2 },
+          expectedResult: {
+            data: [
+              {
+                id: convention1.id,
+                beneficiary: {
+                  firstname: convention1.signatories.beneficiary.firstName,
+                  lastname: convention1.signatories.beneficiary.lastName,
+                },
+                lastBroadcastFeedback: {
+                  ...broadcast1,
+                  subscriberErrorFeedback: {
+                    message: broadcast1.subscriberErrorFeedback?.message ?? "",
+                    error: JSON.stringify(
+                      broadcast1.subscriberErrorFeedback?.error,
+                    ),
+                  },
+                },
+              },
+            ],
+            pagination: {
+              currentPage: 2,
+              totalPages: 2,
+              numberPerPage: 2,
+              totalRecords: 3,
+            },
+          },
+        },
+      ])(
+        "results are ordered by occurredtAt desc and paginated",
+        async ({ requestedPagination, expectedResult }) => {
+          const result =
+            await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+              {
+                userAgencyIds: [agency.id],
+                pagination: requestedPagination,
+              },
+            );
+
+          expectToEqual(result, expectedResult);
+        },
+      );
     });
   });
 });

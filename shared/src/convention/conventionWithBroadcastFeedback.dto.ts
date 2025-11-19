@@ -5,5 +5,5 @@ import type { WithFirstnameAndLastname } from "./convention.schema";
 export type ConventionWithBroadcastFeedback = {
   id: ConventionId;
   beneficiary: WithFirstnameAndLastname;
-  broadcastFeedback: ConventionLastBroadcastFeedbackResponse;
+  lastBroadcastFeedback: ConventionLastBroadcastFeedbackResponse;
 };

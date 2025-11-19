@@ -3,7 +3,7 @@ import type {
   ApiConsumerName,
   ConventionId,
   ConventionStatus,
-  DateString,
+  DateTimeIsoString,
 } from "..";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 
@@ -29,7 +29,7 @@ export type BroadcastFeedback = {
   subscriberErrorFeedback?: SubscriberErrorFeedback;
   requestParams: ConventionBroadcastRequestParams;
   response?: BroadcastFeedbackResponse;
-  occurredAt: DateString;
+  occurredAt: DateTimeIsoString;
   handledByAgency: boolean;
 };
 
