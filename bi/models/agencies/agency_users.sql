@@ -1,7 +1,11 @@
 {{
   config(
     materialized='table',
-    schema='analytics'
+    schema='analytics',
+    post_hook=[
+      "CREATE INDEX IF NOT EXISTS idx_agency_users_agency_id ON {{ this }} (agency_id)",
+      "CREATE INDEX IF NOT EXISTS idx_agency_users_user_id ON {{ this }} (user_id)"
+    ]
   )
 }}
 

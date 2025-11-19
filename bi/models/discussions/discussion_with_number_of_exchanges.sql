@@ -1,7 +1,14 @@
 {{
   config(
     materialized='table',
-    schema='analytics'
+    schema='analytics',
+    post_hook=[
+      "CREATE INDEX IF NOT EXISTS idx_discussions_id ON {{ this }} (id)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_siret ON {{ this }} (siret)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_status ON {{ this }} (status)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_created_at ON {{ this }} (created_at)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_convention_id ON {{ this }} (convention_id)"
+    ]
   )
 }}
 
