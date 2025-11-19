@@ -1,7 +1,12 @@
 {{
   config(
     materialized='table',
-    schema='analytics'
+    schema='analytics',
+    post_hook=[
+      "CREATE INDEX IF NOT EXISTS idx_establishment_offers_siret ON {{ this }} (siret)",
+      "CREATE INDEX IF NOT EXISTS idx_establishment_offers_appellation ON {{ this }} (appellation_code)",
+      "CREATE INDEX IF NOT EXISTS idx_establishment_offers_rome ON {{ this }} (code_rome)"
+    ]
   )
 }}
 
