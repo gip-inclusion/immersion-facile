@@ -5,10 +5,17 @@
   )
 }}
 
-select 
-    discussions.*,
-    count(exchanges.id) as number_of_exchanges
-from discussions
-left join exchanges 
-    on discussions.id = exchanges.discussion_id
-group by discussions.id, discussions.siret
+with exchange_counts as (
+  select
+    discussion_id,
+    count(*) as number_of_exchanges
+  from {{ source('immersion', 'exchanges') }}
+  group by discussion_id
+)
+
+select
+  d.*,
+  coalesce(ec.number_of_exchanges, 0) as number_of_exchanges
+from {{ source('immersion', 'discussions') }} d
+left join exchange_counts ec
+  on d.id = ec.discussion_id

@@ -1,0 +1,214 @@
+{{
+  config(
+    materialized='table',
+    schema='analytics'
+  )
+}}
+
+select
+    -- Convention base fields
+    c.id,
+    c.status as status_technical,
+    c.date_submission,
+    c.date_validation,
+    c.date_approval,
+    c.date_start,
+    c.date_end,
+    c.immersion_objective,
+    c.work_conditions,
+    c.immersion_activities,
+    c.immersion_skills,
+    c.individual_protection,
+    c.sanitary_prevention,
+    c.sanitary_prevention_description,
+    c.siret,
+    c.business_name,
+    c.immersion_address,
+    c.created_at,
+    c.updated_at,
+    c.internship_kind,
+    c.business_advantages,
+    c.status_justification,
+    c.validators,
+    c.renewed_from,
+    c.renewed_justification,
+    c.establishment_number_employees,
+    c.individual_protection_description,
+    c.acquisition_campaign as convention_acquisition_campaign,
+    c.acquisition_keyword as convention_acquisition_keyword,
+
+    -- Status translation
+    cst.translation as status_french,
+
+    -- Schedule JSON extractions
+    c.schedule -> 'complexSchedule' as schedule_complex,
+    (c.schedule ->> 'workedDays')::numeric as schedule_worked_days,
+    (c.schedule ->> 'totalHours')::numeric as schedule_total_hours,
+
+    -- Postal code regex extraction
+    (regexp_match(c.immersion_address, '\d{5}'))[1] as immersion_postal_code,
+
+    -- Validator fields from JSON
+    c.validators #>> '{agencyValidator, firstname}' as validator_firstname,
+    c.validators #>> '{agencyValidator, lastname}' as validator_lastname,
+
+    -- Agency fields
+    a.id as agency_id,
+    a.name as agency_name,
+    refer_a.name as referring_agency_name,
+    case
+        when a.kind = 'pole-emploi' then 'france-travail'
+        else a.kind
+    end as agency_kind,
+    pdr.department_name as agency_department_name,
+    pdr.region_name as agency_region_name,
+
+    -- FT Connect user fields
+    ftu.advisor_email as ft_advisor_email,
+    ftu.ft_connect_id as ft_connect_id,
+
+    -- Appellation and ROME fields
+    pad.libelle_appellation_long as appellation_label,
+    prd.code_rome as rome_code,
+
+    -- Establishment enrichment
+    case
+        when estab.siret is not null then true
+        else false
+    end as is_referenced_establishment,
+    estab.source_provider as establishment_source_provider,
+    estab.naf_code as establishment_naf_code,
+    estab.name as establishment_name,
+    estab.customized_name as establishment_customized_name,
+    estab.welcome_address_street_number_and_address as establishment_address,
+    estab.welcome_address_postcode as establishment_postcode,
+    estab.welcome_address_city as establishment_city,
+    estab.welcome_address_department_code as establishment_department_code,
+    dept_estab.department_name as establishment_department_name,
+    dept_estab.region_name as establishment_region_name,
+
+    -- Beneficiary fields
+    b.id as beneficiary_id,
+    b.first_name as beneficiary_first_name,
+    b.last_name as beneficiary_last_name,
+    concat(b.first_name, ' ', b.last_name) as beneficiary_full_name,
+    b.email as beneficiary_email,
+    b.phone as beneficiary_phone,
+    b.signed_at as beneficiary_signed_at,
+    case
+        when b.signed_at is not null then true
+        else false
+    end as is_signed_by_beneficiary,
+    (b.extra_fields ->> 'birthdate')::timestamp with time zone as beneficiary_birthdate,
+    b.extra_fields ->> 'emergencyContact' as beneficiary_emergency_contact,
+    b.extra_fields ->> 'emergencyContactPhone' as beneficiary_emergency_contact_phone,
+    b.extra_fields ->> 'levelOfEducation' as beneficiary_level_of_education,
+    b.extra_fields ->> 'isRqth' as beneficiary_is_rqth,
+    b.extra_fields ->> 'schoolName' as beneficiary_school_name,
+    b.extra_fields ->> 'schoolPostcode' as beneficiary_school_postcode,
+
+    -- Establishment tutor fields
+    et.id as establishment_tutor_id,
+    et.first_name as establishment_tutor_first_name,
+    et.last_name as establishment_tutor_last_name,
+    concat(et.first_name, ' ', et.last_name) as establishment_tutor_full_name,
+    et.extra_fields ->> 'job' as establishment_tutor_job,
+    concat(et.first_name, ' ', et.last_name, ' ', et.extra_fields ->> 'job') as establishment_tutor_full_name_with_job,
+    et.email as establishment_tutor_email,
+    et.phone as establishment_tutor_phone,
+    et.signed_at as establishment_tutor_signed_at,
+
+    -- Establishment representative fields
+    er.id as establishment_representative_id,
+    er.first_name as establishment_representative_first_name,
+    er.last_name as establishment_representative_last_name,
+    concat(er.first_name, ' ', er.last_name) as establishment_representative_full_name,
+    er.email as establishment_representative_email,
+    er.phone as establishment_representative_phone,
+    er.signed_at as establishment_representative_signed_at,
+    case
+        when er.signed_at is not null then true
+        else false
+    end as is_signed_by_establishment_representative,
+
+    -- Beneficiary representative fields
+    br.id as beneficiary_representative_id,
+    br.first_name as beneficiary_representative_first_name,
+    br.last_name as beneficiary_representative_last_name,
+    concat(br.first_name, ' ', br.last_name) as beneficiary_representative_full_name,
+    br.email as beneficiary_representative_email,
+    br.phone as beneficiary_representative_phone,
+    br.signed_at as beneficiary_representative_signed_at,
+    case
+        when c.beneficiary_representative_id is null then null
+        when br.signed_at is not null then true
+        else false
+    end as is_signed_by_beneficiary_representative,
+
+    -- Beneficiary current employer fields
+    bce.id as beneficiary_current_employer_id,
+    bce.first_name as beneficiary_current_employer_first_name,
+    bce.last_name as beneficiary_current_employer_last_name,
+    concat(bce.first_name, ' ', bce.last_name) as beneficiary_current_employer_full_name,
+    bce.email as beneficiary_current_employer_email,
+    bce.phone as beneficiary_current_employer_phone,
+    bce.signed_at as beneficiary_current_employer_signed_at,
+    case
+        when c.beneficiary_current_employer_id is null then null
+        when bce.signed_at is not null then true
+        else false
+    end as is_signed_by_beneficiary_current_employer,
+
+    -- Assessment fields
+    ass.status as assessment_status,
+    ass.created_at as assessment_created_at,
+    ass.establishment_feedback as assessment_establishment_feedback,
+    ass.number_of_hours_actually_made as assessment_hours_actually_made
+
+from {{ source('immersion', 'conventions') }} as c
+
+-- Agency joins
+inner join {{ source('immersion', 'agencies') }} as a
+    on a.id = c.agency_id
+left join {{ source('immersion', 'agencies') }} as refer_a
+    on a.refers_to_agency_id = refer_a.id
+left join {{ source('immersion', 'public_department_region') }} as pdr
+    on pdr.department_code = a.department_code
+
+-- FT Connect users (via junction table)
+left join {{ source('immersion', 'conventions__ft_connect_users') }} as cftu
+    on c.id = cftu.convention_id
+left join {{ source('immersion', 'ft_connect_users') }} as ftu
+    on ftu.ft_connect_id = cftu.ft_connect_id
+
+-- Appellation and ROME reference data
+inner join {{ source('immersion', 'public_appellations_data') }} as pad
+    on pad.ogr_appellation = c.immersion_appellation
+inner join {{ source('immersion', 'public_romes_data') }} as prd
+    on pad.code_rome::bpchar = prd.code_rome
+
+-- Establishment enrichment
+left join {{ source('immersion', 'establishments') }} as estab
+    on estab.siret = c.siret
+left join {{ source('immersion', 'public_department_region') }} as dept_estab
+    on dept_estab.department_code = estab.welcome_address_department_code
+
+-- Assessment
+left join {{ source('immersion', 'immersion_assessments') }} as ass
+    on ass.convention_id = c.id
+
+-- Actors (5 different roles)
+inner join {{ source('immersion', 'actors') }} as b
+    on c.beneficiary_id = b.id
+inner join {{ source('immersion', 'actors') }} as et
+    on c.establishment_tutor_id = et.id
+inner join {{ source('immersion', 'actors') }} as er
+    on c.establishment_representative_id = er.id
+left join {{ source('immersion', 'actors') }} as br
+    on c.beneficiary_representative_id = br.id
+left join {{ source('immersion', 'actors') }} as bce
+    on c.beneficiary_current_employer_id = bce.id
+
+-- Status translation
+inner join {{ source('immersion', 'convention_status_translations') }} as cst
+    on c.status = cst.status
