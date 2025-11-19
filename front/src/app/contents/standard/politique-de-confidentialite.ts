@@ -15,7 +15,7 @@ export default {
 <p>Immersion Facilitée a pour objectif de faciliter les immersions professionnelles, celles-ci étant un levier puissant d’accompagnement à l’emploi.</p>
 <p>Elle peut traiter des données à caractère personnel pour les finalités suivantes :
   <ul>
-    <li>Dématérialiser le procédures de conventionnement de la mise en situation en milieu professionnel, immersion, stage ou période d'observation professionnelle, ainsi que l'amélioration et la facilitation du parcours d'accès ;</li>
+    <li>Dématérialiser les procédures de conventionnement de la mise en situation en milieu professionnel, immersion, stage ou période d'observation professionnelle, ainsi que l'amélioration et la facilitation du parcours d'accès ;</li>
     <li>Construire et développer une base entreprises immersions contenant les entreprises volontaires pour accueillir les personnes</li>
     <li>Faciliter des tâches des prescripteurs dans la décision et le suivi des bénéficiaires de la période de mise en situation en milieu professionnel </li>
     <li>Suivre et analyser l’analyse des données de pilotage lors des mises en relation et la réalisation de statistiques partagées avec les acteurs de l’insertion</li>
