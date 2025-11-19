@@ -2,6 +2,7 @@ import { addDays, isBefore } from "date-fns";
 import subDays from "date-fns/subDays";
 import { map, propEq, sort, toPairs } from "ramda";
 import {
+  type AgencyId,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
@@ -327,21 +328,18 @@ export class InMemoryConventionQueries implements ConventionQueries {
   };
 
   public async getConventionsWithErroredBroadcastFeedbackForAgencyUser({
-    userId,
+    userAgencyIds,
     pagination,
   }: {
-    userId: UserId;
+    userAgencyIds: AgencyId[];
     pagination: Required<PaginationQueryParams>;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>> {
-    const userAgenciesIds = this.agencyRepository.agencies
-      .filter((agency) => !!agency.usersRights[userId])
-      .map((agency) => agency.id);
     const userConventions = this.conventionRepository.conventions.filter(
-      (convention) => userAgenciesIds.includes(convention.agencyId),
+      (convention) => userAgencyIds.includes(convention.agencyId),
     );
     const results: ConventionWithBroadcastFeedback[] = await Promise.all(
       userConventions.map(async (convention) => {
-        const broadcastFeedback =
+        const lastBroadcastFeedback =
           await this.broadcastFeedbacksRepository.getLastBroadcastFeedback(
             convention.id,
           );
@@ -351,13 +349,31 @@ export class InMemoryConventionQueries implements ConventionQueries {
             firstname: convention.signatories.beneficiary.firstName,
             lastname: convention.signatories.beneficiary.lastName,
           },
-          broadcastFeedback,
+          lastBroadcastFeedback,
         };
       }),
     );
 
     return {
-      data: results.filter((result) => result.broadcastFeedback !== null),
+      data: results
+        .filter(
+          (
+            result,
+          ): result is ConventionWithBroadcastFeedback & {
+            lastBroadcastFeedback: NonNullable<
+              ConventionWithBroadcastFeedback["lastBroadcastFeedback"]
+            >;
+          } => result.lastBroadcastFeedback !== null,
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.lastBroadcastFeedback.occurredAt).getTime() -
+            new Date(a.lastBroadcastFeedback.occurredAt).getTime(),
+        )
+        .slice(
+          (pagination.page - 1) * pagination.perPage,
+          pagination.page * pagination.perPage,
+        ),
       pagination: {
         totalRecords: results.length,
         currentPage: pagination.page,

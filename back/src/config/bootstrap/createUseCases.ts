@@ -42,7 +42,6 @@ import { GetConvention } from "../../domains/convention/use-cases/GetConvention"
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
-import { makeGetConventionsWithErroredBroadcastFeedbackForAgencyUser } from "../../domains/convention/use-cases/GetConventionsWithErroredBroadcastFeedbackForAgencyUser";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
@@ -591,15 +590,17 @@ export const createUseCases = ({
       ),
     }),
     ...instantiatedUseCasesFromFunctions({
-      getConventionsWithErroredBroadcastFeedback: (
-        pagination: PaginationQueryParams,
-        currentUser: ConnectedUser,
-      ) =>
+      getConventionsWithErroredBroadcastFeedback: (params: {
+        pagination: PaginationQueryParams;
+        currentUser: ConnectedUser;
+      }) =>
         uowPerformer.perform((uow) =>
           uow.conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
-              userId: currentUser.id,
-              pagination,
+              userAgencyIds: params.currentUser.agencyRights
+                .filter((agencyRight) => agencyRight.roles.length > 0)
+                .map((agencyRight) => agencyRight.agency.id),
+              pagination: params.pagination,
             },
           ),
         ),
@@ -908,10 +909,6 @@ export const createUseCases = ({
     getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
       uowPerformer,
     }),
-    getConventionsWithErroredBroadcastFeedbackForAgencyUser:
-      makeGetConventionsWithErroredBroadcastFeedbackForAgencyUser({
-        uowPerformer,
-      }),
     transferConventionToAgency: makeTransferConventionToAgency({
       uowPerformer,
       deps: { createNewEvent },

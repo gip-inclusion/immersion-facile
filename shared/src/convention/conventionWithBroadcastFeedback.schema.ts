@@ -12,7 +12,7 @@ export const conventionWithBroadcastFeedbackSchema: ZodSchemaWithInputMatchingOu
   z.object({
     id: conventionIdSchema,
     beneficiary: withFirstnameAndLastnameSchema,
-    broadcastFeedback: broadcastFeedbackSchema,
+    lastBroadcastFeedback: broadcastFeedbackSchema,
   });
 
 export const paginatedConventionWithBroadcastFeedbackSchema =

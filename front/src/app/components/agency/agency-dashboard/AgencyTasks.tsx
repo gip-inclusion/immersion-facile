@@ -95,50 +95,45 @@ export const AgencyTasks = ({
         isLoadingConventionsWithBroadcastError) && <Loader />}
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
         {!isLoadingConventionsToManage &&
-          conventionsToManagePagination?.totalRecords && (
+          conventionsToManagePagination?.totalRecords !== undefined &&
+          conventionsToManagePagination.totalRecords > 0 && (
             <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
               <TaskSummary
-                count={conventionsToManagePagination?.totalRecords}
+                count={conventionsToManagePagination.totalRecords}
                 countLabel="Actions urgentes"
                 icon="fr-icon-edit-line"
-                {...(conventionsToManagePagination?.totalRecords > 0
-                  ? {
-                      buttonProps: {
-                        children: "Traiter cette liste",
-                        onClick: () =>
-                          onSeeAllConventionsClick(
-                            <ConventionsToManageList
-                              title="Actions urgentes"
-                              dateRange={dateStartFrom1MonthAgoToIn5Days}
-                            />,
-                          ),
-                      },
-                    }
-                  : {})}
+                buttonProps={{
+                  children: "Traiter cette liste",
+                  onClick: () =>
+                    onSeeAllConventionsClick(
+                      <ConventionsToManageList
+                        title="Actions urgentes"
+                        dateRange={dateStartFrom1MonthAgoToIn5Days}
+                      />,
+                    ),
+                }}
               />
             </div>
           )}
         {!isLoadingConventionsWithBroadcastError &&
-          conventionsWithErroredBroadcastFeedbackPagination?.totalRecords && (
+          conventionsWithErroredBroadcastFeedbackPagination?.totalRecords !==
+            undefined &&
+          conventionsWithErroredBroadcastFeedbackPagination.totalRecords >
+            0 && (
             <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
               <TaskSummary
                 count={
-                  conventionsWithErroredBroadcastFeedbackPagination?.totalRecords
+                  conventionsWithErroredBroadcastFeedbackPagination.totalRecords
                 }
                 countLabel="Conventions à vérifier"
                 icon="fr-icon-link-unlink"
-                {...(conventionsWithErroredBroadcastFeedbackPagination?.totalRecords >
-                0
-                  ? {
-                      buttonProps: {
-                        children: "Traiter cette liste",
-                        onClick: () =>
-                          onSeeAllConventionsClick(
-                            <ConventionsWithBroadcastErrorList title="Conventions à vérifier" />,
-                          ),
-                      },
-                    }
-                  : {})}
+                buttonProps={{
+                  children: "Traiter cette liste",
+                  onClick: () =>
+                    onSeeAllConventionsClick(
+                      <ConventionsWithBroadcastErrorList title="Conventions à vérifier" />,
+                    ),
+                }}
               />
             </div>
           )}

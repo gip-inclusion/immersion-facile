@@ -1,4 +1,5 @@
 import type {
+  AgencyId,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
@@ -81,7 +82,7 @@ export interface ConventionQueries {
   }): Promise<ConventionMarketingData[]>;
 
   getConventionsWithErroredBroadcastFeedbackForAgencyUser(params: {
-    userId: UserId;
+    userAgencyIds: AgencyId[];
     pagination: PaginationQueryParams;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>>;
 }
