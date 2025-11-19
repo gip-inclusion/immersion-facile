@@ -1,7 +1,23 @@
 {{
   config(
     materialized='table',
-    schema='analytics'
+    schema='analytics',
+    post_hook=[
+      "CREATE INDEX IF NOT EXISTS idx_conventions_status ON {{ this }} (status_technical)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_status_french ON {{ this }} (status_french)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_agency_id ON {{ this }} (agency_id)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_agency_status ON {{ this }} (agency_status)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_agency_kind ON {{ this }} (agency_kind)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_siret ON {{ this }} (siret)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_date_start ON {{ this }} (date_start)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_date_end ON {{ this }} (date_end)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_date_submission ON {{ this }} (date_submission)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_date_approval ON {{ this }} (date_approval)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_agency_region ON {{ this }} (agency_region_name)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_estab_region ON {{ this }} (establishment_region_name)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_rome_code ON {{ this }} (rome_code)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_id ON {{ this }} (id)"
+    ]
   )
 }}
 
@@ -55,6 +71,7 @@ select
     -- Agency fields
     a.id as agency_id,
     a.name as agency_name,
+    a.status as agency_status,
     refer_a.name as referring_agency_name,
     case
         when a.kind = 'pole-emploi' then 'france-travail'
