@@ -96,7 +96,7 @@ export const ConventionsWithBroadcastErrorList = ({
               </>
             }
             description={getDescription(
-              conventionWithBroadcastFeedback.broadcastFeedback
+              conventionWithBroadcastFeedback.lastBroadcastFeedback
                 ?.subscriberErrorFeedback?.message ?? "",
             )}
             buttonProps={{

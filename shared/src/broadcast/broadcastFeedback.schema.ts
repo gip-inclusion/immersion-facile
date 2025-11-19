@@ -6,7 +6,7 @@ import {
 } from "../apiConsumer/apiConsumer.schema";
 import { conventionStatuses } from "../convention/convention.dto";
 import { conventionIdSchema } from "../convention/convention.schema";
-import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import { dateTimeIsoStringSchema } from "../utils/date";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type {
   BroadcastFeedbackResponse,
@@ -45,7 +45,7 @@ export const broadcastFeedbackSchema: ZodSchemaWithInputMatchingOutput<Conventio
       subscriberErrorFeedback: subscriberErrorFeedbackSchema.optional(),
       requestParams: conventionBroadcastRequestParamsSchema,
       response: broadcastFeedbackResponseSchema.optional(),
-      occurredAt: makeDateStringSchema(),
+      occurredAt: dateTimeIsoStringSchema,
       handledByAgency: z.boolean(),
     })
     .nullable();

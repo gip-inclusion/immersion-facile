@@ -593,7 +593,7 @@ describe("authenticatedConventionRoutes", () => {
     });
   });
 
-  describe("GetErroredConventionsForAgencyUser", () => {
+  describe("getConventionsWithErroredBroadcastFeedbackForAgencyUser", () => {
     it("200 - Successfully gets empty array oferrored conventions for agency user", async () => {
       const response =
         await httpClient.getConventionsWithErroredBroadcastFeedbackForAgencyUser(

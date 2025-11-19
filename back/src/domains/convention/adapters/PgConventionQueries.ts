@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { jsonBuildObject } from "kysely/helpers/postgres";
 import { andThen } from "ramda";
 import {
+  type AgencyId,
   type AssessmentCompletionStatusFilter,
   type ConventionAssessmentFields,
   type ConventionDto,
@@ -16,7 +17,7 @@ import {
   conventionSchema,
   type DataWithPagination,
   type DateFilter,
-  type DateString,
+  type DateTimeIsoString,
   errors,
   type FindSimilarConventionsParams,
   type GetPaginatedConventionsFilters,
@@ -343,20 +344,29 @@ export class PgConventionQueries implements ConventionQueries {
   }
 
   public async getConventionsWithErroredBroadcastFeedbackForAgencyUser({
-    userId,
+    userAgencyIds,
     pagination,
   }: {
-    userId: UserId;
+    userAgencyIds: AgencyId[];
     pagination: Required<PaginationQueryParams>;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>> {
+    if (userAgencyIds.length === 0)
+      return {
+        data: [],
+        pagination: {
+          totalRecords: 0,
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 0,
+        },
+      };
+
     const { page, perPage } = pagination;
     const offset = (page - 1) * perPage;
     const result = await this.transaction
       .with("conventions_with_latest_feedback", (qb) =>
         qb
-          .selectFrom("users__agencies as ua")
-          .selectAll()
-          .innerJoin("conventions as c", "c.agency_id", "ua.agency_id")
+          .selectFrom("conventions as c")
           .innerJoin(
             "actors as beneficiary",
             "beneficiary.id",
@@ -380,11 +390,13 @@ export class PgConventionQueries implements ConventionQueries {
             eb.ref("bf.service_name").as("serviceName"),
             eb.ref("subscriber_error_feedback").as("subscriberErrorFeedback"),
             eb.ref("bf.request_params").as("requestParams"),
-            sql<DateString>`date_to_iso(bf.occurred_at)`.as("occurredAt"),
+            sql<DateTimeIsoString>`date_to_iso(bf.occurred_at)`.as(
+              "occurredAt",
+            ),
             eb.ref("bf.handled_by_agency").as("handledByAgency"),
             eb.ref("bf.response").as("response"),
           ])
-          .where("ua.user_id", "=", userId)
+          .where("c.agency_id", "in", userAgencyIds)
           .distinctOn("c.id")
           .orderBy("c.id")
           .orderBy("bf.occurred_at", "desc"),
@@ -393,6 +405,7 @@ export class PgConventionQueries implements ConventionQueries {
       .selectAll()
       .select(sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"))
       .where("cf.subscriberErrorFeedback", "is not", null)
+      .orderBy("cf.occurredAt", "desc")
       .limit(pagination.perPage)
       .offset(offset)
       .execute();
@@ -407,7 +420,7 @@ export class PgConventionQueries implements ConventionQueries {
             firstname: row.bFirstName,
             lastname: row.bLastName,
           },
-          broadcastFeedback: {
+          lastBroadcastFeedback: {
             consumerId: row.consumerId,
             consumerName: row.consumerName,
             handledByAgency: row.handledByAgency,
