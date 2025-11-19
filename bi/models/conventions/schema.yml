@@ -1,0 +1,214 @@
+version: 2
+
+models:
+  - name: conventions
+    description: |
+      Comprehensive conventions (immersion applications) data enriched with all related entities:
+      agencies, actors (beneficiary, tutors, representatives), establishments, assessments, and reference data.
+      Grain: 1 row per convention.
+    columns:
+      - name: id
+        description: Primary key - UUID of the convention
+        tests:
+          - unique
+          - not_null
+
+      # Convention base fields
+      - name: status_technical
+        description: Technical status code (e.g., DRAFT, READY_TO_SIGN, VALIDATED)
+      - name: status_french
+        description: French translation of status for reporting
+      - name: date_submission
+        description: Date convention was submitted
+      - name: date_validation
+        description: Date convention was validated
+      - name: date_approval
+        description: Date convention was approved
+      - name: date_start
+        description: Immersion start date
+      - name: date_end
+        description: Immersion end date
+      - name: immersion_objective
+        description: Objective of the immersion
+      - name: immersion_activities
+        description: Activities to be performed during immersion
+      - name: immersion_skills
+        description: Skills to be developed
+      - name: work_conditions
+        description: Specific work conditions
+      - name: individual_protection
+        description: Whether individual protection is required
+      - name: sanitary_prevention
+        description: Whether sanitary prevention measures are in place
+      - name: siret
+        description: SIRET of the business hosting the immersion
+      - name: business_name
+        description: Name of the business
+      - name: immersion_address
+        description: Full address of immersion location
+      - name: immersion_postal_code
+        description: 5-digit postal code extracted from address via regex
+
+      # Schedule fields (from JSON)
+      - name: schedule_complex
+        description: Complex schedule details from JSON
+      - name: schedule_worked_days
+        description: Total number of worked days extracted from schedule JSON
+      - name: schedule_total_hours
+        description: Total hours extracted from schedule JSON
+
+      # Validator fields
+      - name: validator_firstname
+        description: First name of agency validator (from validators JSON)
+      - name: validator_lastname
+        description: Last name of agency validator (from validators JSON)
+
+      # Agency fields
+      - name: agency_id
+        description: Foreign key to agencies
+      - name: agency_name
+        description: Name of the managing agency
+      - name: referring_agency_name
+        description: Name of referring agency if applicable
+      - name: agency_kind
+        description: Type of agency (normalized - pole-emploi becomes france-travail)
+      - name: agency_department_name
+        description: Department name of the agency
+      - name: agency_region_name
+        description: Region name of the agency
+
+      # FT Connect fields
+      - name: ft_advisor_email
+        description: Email of France Travail advisor
+      - name: ft_connect_id
+        description: France Travail Connect ID
+
+      # Appellation/ROME fields
+      - name: appellation_label
+        description: Full label of the job appellation
+      - name: rome_code
+        description: ROME code for the job category
+
+      # Establishment enrichment
+      - name: is_referenced_establishment
+        description: Boolean - true if establishment exists in establishments table
+      - name: establishment_source_provider
+        description: Source of establishment data (e.g., form, API)
+      - name: establishment_naf_code
+        description: NAF/APE code of the establishment
+      - name: establishment_name
+        description: Official name of the establishment
+      - name: establishment_customized_name
+        description: Customized/brand name of the establishment
+      - name: establishment_address
+        description: Address of the establishment
+      - name: establishment_postcode
+        description: Postal code of the establishment
+      - name: establishment_city
+        description: City of the establishment
+      - name: establishment_department_code
+        description: Department code of the establishment
+      - name: establishment_department_name
+        description: Department name of the establishment
+      - name: establishment_region_name
+        description: Region name of the establishment
+
+      # Beneficiary fields
+      - name: beneficiary_id
+        description: Foreign key to actors table
+      - name: beneficiary_first_name
+        description: Beneficiary's first name
+      - name: beneficiary_last_name
+        description: Beneficiary's last name
+      - name: beneficiary_full_name
+        description: Beneficiary's full name (first + last)
+      - name: beneficiary_email
+        description: Beneficiary's email
+      - name: beneficiary_phone
+        description: Beneficiary's phone
+      - name: beneficiary_signed_at
+        description: Timestamp when beneficiary signed
+      - name: is_signed_by_beneficiary
+        description: Boolean - whether beneficiary has signed
+      - name: beneficiary_birthdate
+        description: Birthdate extracted from extra_fields JSON
+      - name: beneficiary_emergency_contact
+        description: Emergency contact name from extra_fields JSON
+      - name: beneficiary_emergency_contact_phone
+        description: Emergency contact phone from extra_fields JSON
+      - name: beneficiary_level_of_education
+        description: Education level from extra_fields JSON
+      - name: beneficiary_is_rqth
+        description: Disability status from extra_fields JSON
+      - name: beneficiary_school_name
+        description: School name from extra_fields JSON
+      - name: beneficiary_school_postcode
+        description: School postal code from extra_fields JSON
+
+      # Establishment tutor fields
+      - name: establishment_tutor_id
+        description: Foreign key to actors table
+      - name: establishment_tutor_first_name
+        description: Tutor's first name
+      - name: establishment_tutor_last_name
+        description: Tutor's last name
+      - name: establishment_tutor_full_name
+        description: Tutor's full name (first + last)
+      - name: establishment_tutor_job
+        description: Tutor's job title from extra_fields JSON
+      - name: establishment_tutor_full_name_with_job
+        description: Tutor's full name with job title
+      - name: establishment_tutor_email
+        description: Tutor's email
+      - name: establishment_tutor_phone
+        description: Tutor's phone
+
+      # Establishment representative fields
+      - name: establishment_representative_id
+        description: Foreign key to actors table
+      - name: establishment_representative_first_name
+        description: Representative's first name
+      - name: establishment_representative_last_name
+        description: Representative's last name
+      - name: establishment_representative_full_name
+        description: Representative's full name (first + last)
+      - name: establishment_representative_email
+        description: Representative's email
+      - name: establishment_representative_phone
+        description: Representative's phone
+      - name: is_signed_by_establishment_representative
+        description: Boolean - whether establishment representative has signed
+
+      # Beneficiary representative fields (optional role)
+      - name: beneficiary_representative_id
+        description: Foreign key to actors table (nullable)
+      - name: beneficiary_representative_full_name
+        description: Representative's full name (nullable)
+      - name: beneficiary_representative_email
+        description: Representative's email (nullable)
+      - name: beneficiary_representative_phone
+        description: Representative's phone (nullable)
+      - name: is_signed_by_beneficiary_representative
+        description: Boolean - null if no representative, true/false otherwise
+
+      # Beneficiary current employer fields (optional role)
+      - name: beneficiary_current_employer_id
+        description: Foreign key to actors table (nullable)
+      - name: beneficiary_current_employer_full_name
+        description: Current employer's full name (nullable)
+      - name: beneficiary_current_employer_email
+        description: Current employer's email (nullable)
+      - name: beneficiary_current_employer_phone
+        description: Current employer's phone (nullable)
+      - name: is_signed_by_beneficiary_current_employer
+        description: Boolean - null if no current employer, true/false otherwise
+
+      # Assessment fields
+      - name: assessment_status
+        description: Status of the immersion assessment
+      - name: assessment_created_at
+        description: Date assessment was created
+      - name: assessment_establishment_feedback
+        description: Feedback from establishment
+      - name: assessment_hours_actually_made
+        description: Actual hours completed during immersion
