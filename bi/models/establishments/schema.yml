@@ -69,3 +69,35 @@ models:
     tests:
       - unique:
           column_name: "(siret || '-' || appellation_code)"
+
+  - name: establishment_users
+    description: "Users associated with establishments, including roles and contact preferences. Grain: 1 row per (siret, user_id) pair."
+    columns:
+      - name: siret
+        description: "Foreign key to establishments table"
+        tests:
+          - not_null
+      - name: user_id
+        description: "Foreign key to users table"
+        tests:
+          - not_null
+      - name: user_email
+        description: "User's email address"
+      - name: user_first_name
+        description: "User's first name"
+      - name: user_last_name
+        description: "User's last name"
+      - name: user_full_name
+        description: "User's full name (first + last)"
+      - name: role
+        description: "User's role at the establishment"
+      - name: job
+        description: "User's job title"
+      - name: phone
+        description: "User's phone number"
+      - name: should_receive_discussion_notifications
+        description: "Whether user receives discussion notifications"
+      - name: is_main_contact_by_phone
+        description: "Whether user is main phone contact"
+      - name: is_main_contact_in_person
+        description: "Whether user is main in-person contact"
