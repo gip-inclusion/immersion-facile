@@ -5,11 +5,12 @@ import {
   type FrontRouteKeys,
   type FrontRouteUnion,
   routes,
+  useRoute,
 } from "../../routes/routes";
 
 export type BreadcrumbsItem = {
   label: string;
-  route: Route<FrontRouteUnion>;
+  route: Route<FrontRouteUnion> | (() => Route<FrontRouteUnion>);
   children?: {
     [K in FrontRouteKeys]?: BreadcrumbsItem;
   };
@@ -49,7 +50,12 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
     children: {
       search: {
         label: "Recherche",
-        route: routes.search(),
+        route: () => {
+          const route = useRoute();
+          return routes.search(
+            route.name === "externalSearch" ? route.params : {},
+          );
+        },
         children: {
           externalSearch: {
             label: "Résultats LaBonneBoite",
