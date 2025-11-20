@@ -88,6 +88,38 @@ describe("GetExternalOffers", () => {
         })),
       );
     });
+
+    it("handles naf codes", async () => {
+      const lbbResultForExpectedNafCode = new LaBonneBoiteCompanyDtoBuilder()
+        .withNaf({ code: "1072Z", nomenclature: "" })
+        .build();
+      const lbbResultForOtherNafCode = new LaBonneBoiteCompanyDtoBuilder()
+        .withNaf({ code: "1072A", nomenclature: "" })
+        .build();
+      laBonneBoiteGateway.setNextResults([
+        lbbResultForExpectedNafCode,
+        lbbResultForOtherNafCode,
+      ]);
+      const result = await getExternalOffers.execute(
+        {
+          appellationCodes: ["14704"],
+          nafCodes: ["1072Z"],
+          distanceKm: 30,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+        undefined,
+      );
+      expectToEqual(result, [
+        {
+          ...lbbResultForExpectedNafCode.toSearchResult({
+            romeCode: "A1409",
+            romeLabel: "Élevage",
+          }),
+          distance_m: 276612,
+        },
+      ]);
+    });
   });
   describe("Wrong paths", () => {
     it("throws a bad request error if geoparams provided but distanceKm is not valid", async () => {
