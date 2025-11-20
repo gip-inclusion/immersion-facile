@@ -22,15 +22,7 @@ export type SearchPageParams = GetOffersFlatQueryParams & {
   nafLabel?: string;
 } & WithAcquisition;
 
-export type SearchStatus =
-  | "noSearchMade"
-  | "ok"
-  | "initialFetch"
-  | "extraFetch"
-  | "error";
-
 interface SearchState {
-  searchStatus: SearchStatus;
   searchResultsWithPagination: DataWithPagination<SearchResultDto>;
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
@@ -48,7 +40,6 @@ const emptySearchResult: DataWithPagination<SearchResultDto> = {
 };
 
 export const initialState: SearchState = {
-  searchStatus: "noSearchMade",
   searchResultsWithPagination: emptySearchResult,
   currentSearchResult: null,
   isLoading: false,
@@ -69,13 +60,8 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    getOffersRequested: (
-      state,
-      action: PayloadAction<GetOffersPayload>,
-    ) => {
-      state.searchStatus = "initialFetch";
+    getOffersRequested: (state, action: PayloadAction<GetOffersPayload>) => {
       state.searchResultsWithPagination = emptySearchResult;
-      console.log("action.payload", action.payload);
       state.searchParams = action.payload;
       state.isLoading = true;
     },
@@ -88,7 +74,6 @@ export const searchSlice = createSlice({
     ) => {
       state.searchResultsWithPagination =
         action.payload.searchResultsWithPagination;
-      state.searchStatus = "ok";
       state.isLoading = false;
     },
     fetchSearchResultRequested: (
@@ -119,9 +104,6 @@ export const searchSlice = createSlice({
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
-    },
-    clearSearchStatusRequested: (state) => {
-      state.searchStatus = initialState.searchStatus;
     },
   },
 });

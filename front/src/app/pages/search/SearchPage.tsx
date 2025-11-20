@@ -17,6 +17,7 @@ import {
   PageHeader,
   RichDropdown,
   SectionAccordion,
+  SectionHighlight,
   SectionTextEmbed,
   useScrollToTop,
 } from "react-design-system";
@@ -46,13 +47,11 @@ import {
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import {
-  initialState,
-  type SearchPageParams,
-  searchSlice,
-} from "src/core-logic/domain/search/search.slice";
+
 import { useStyles } from "tss-react/dsfr";
 import "./SearchPage.scss";
+import labonneboiteLogoUrl from "src/assets/img/logo-lbb-centered.png";
+import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import Styles from "./SearchPage.styles";
 
 const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
@@ -81,9 +80,11 @@ const parisLatLon = {
   longitude: 2.3522,
 };
 const parisDistanceKm = 10;
-const defaultValuesForExternalSearch: Pick<
-  SearchPageParams,
-  "latitude" | "longitude" | "distanceKm" | "place" | "appellations"
+const defaultValuesForExternalSearch: Required<
+  Pick<
+    SearchPageParams,
+    "latitude" | "longitude" | "distanceKm" | "place" | "appellations"
+  >
 > = {
   latitude: parisLatLon.latitude,
   longitude: parisLatLon.longitude,
@@ -110,8 +111,6 @@ export const SearchPage = ({
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
-  const initialSearchSliceState = initialState;
-  const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const { pagination } = useAppSelector(
     searchSelectors.searchResultsWithPagination,
   );
@@ -141,6 +140,11 @@ export const SearchPage = ({
       ? defaultValuesForExternalSearch.appellations
       : undefined,
     place: isExternal ? defaultValuesForExternalSearch.place : undefined,
+    appellationCodes: isExternal
+      ? defaultValuesForExternalSearch.appellations.map(
+          (appellation) => appellation.appellationCode,
+        )
+      : undefined,
     ...acquisitionParams,
   };
 
@@ -169,19 +173,38 @@ export const SearchPage = ({
     ),
     mode: "onTouched",
   });
-  const { handleSubmit, setValue, register, control, getValues } = methods;
+  const {
+    handleSubmit,
+    setValue,
+    register,
+    control,
+    getValues,
+    formState: { errors },
+    clearErrors,
+  } = methods;
   const formValues = getValues();
   const [lat, lon, distanceKm, place] = useWatch({
     control,
     name: ["latitude", "longitude", "distanceKm", "place"],
   });
 
-  const availableForInitialSearchRequest =
+  const searchHasBeenMade = searchMade !== null;
+
+  const internalSearchIsAvailableForInitialSearchRequest =
     !isExternal &&
+    !searchHasBeenMade &&
     keys(routeParams).length &&
-    searchStatus === initialSearchSliceState.searchStatus &&
     lat !== 0 &&
     lon !== 0;
+
+  const externalSearchIsAvailableForInitialSearchRequest =
+    isExternal &&
+    !searchHasBeenMade &&
+    keys(routeParams).length &&
+    lat !== 0 &&
+    lon !== 0 &&
+    distanceKm !== 0;
+  routeParams.appellationCodes && routeParams.appellationCodes.length > 0;
 
   const setTempValuesAsFormValues = useCallback(
     (values: Partial<SearchPageParams>) => {
@@ -205,11 +228,15 @@ export const SearchPage = ({
   useScrollToTop(pagination?.currentPage ?? 1);
 
   useEffect(() => {
-    if (availableForInitialSearchRequest) {
+    if (
+      internalSearchIsAvailableForInitialSearchRequest ||
+      externalSearchIsAvailableForInitialSearchRequest
+    ) {
       onSearchFormSubmit(filterFormValues(formValues));
     }
   }, [
-    availableForInitialSearchRequest,
+    internalSearchIsAvailableForInitialSearchRequest,
+    externalSearchIsAvailableForInitialSearchRequest,
     onSearchFormSubmit,
     filterFormValues,
     formValues,
@@ -217,7 +244,7 @@ export const SearchPage = ({
 
   useEffect(() => {
     return () => {
-      dispatch(searchSlice.actions.clearSearchStatusRequested());
+      setSearchMade(null);
       dispatch(
         geosearchSlice.actions.emptyQueryRequested({
           locator: "search-form-place",
@@ -240,22 +267,23 @@ export const SearchPage = ({
   );
 
   const placeInputLabel = <>...dans la ville</>;
-  const shouldShowInitialScreen =
-    searchStatus === "noSearchMade" && !isExternal;
-  const displayAppellationsOrNaf = () => {
+  const displayAppellationsOrNaf = (): string => {
     const appellationDisplayed = formValues.appellations?.length
       ? formValues.appellations.map(
           (appellation) => appellation.appellationLabel,
         )
       : [];
-    return appellationDisplayed.length
+    const appellationsToDisplay = appellationDisplayed.length
       ? appellationDisplayed.join(" - ")
       : "Tous les métiers";
+    return [appellationsToDisplay, formValues.nafLabel]
+      .filter(Boolean)
+      .join(" - ");
   };
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
-        {shouldShowInitialScreen ? (
+        {!searchHasBeenMade ? (
           <>
             <PageHeader
               title={
@@ -382,6 +410,42 @@ export const SearchPage = ({
           <>
             {isLoading && <Loader />}
             <Breadcrumbs />
+            {isExternal && (
+              <div className={fr.cx("fr-container", "fr-mb-4w")}>
+                <SectionHighlight
+                  className={fr.cx(
+                    "fr-grid-row",
+                    "fr-grid-row--gutters",
+                    "fr-grid-row--middle",
+                  )}
+                >
+                  <div className={fr.cx("fr-col-12", "fr-col-lg-2")}>
+                    <img src={labonneboiteLogoUrl} alt="La Bonne Boite" />
+                  </div>
+                  <div className={fr.cx("fr-col-12", "fr-col-lg-10")}>
+                    <h1 className={fr.cx("fr-h3", "fr-mb-1w")}>
+                      Vos résultats La Bonne Boite
+                    </h1>
+                    <p className={fr.cx("fr-text--md", "fr-mb-0")}>
+                      Voici{" "}
+                      <strong>
+                        {pagination.totalRecords} entreprises à fort potentiel
+                        d’embauche
+                      </strong>{" "}
+                      provenant de{" "}
+                      <a
+                        href="https://www.labonneboite.fr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        La Bonne Boite
+                      </a>
+                      .
+                    </p>
+                  </div>
+                </SectionHighlight>
+              </div>
+            )}
             <form
               onSubmit={handleSubmit((value) => {
                 if (tempValue !== null) {
@@ -419,6 +483,7 @@ export const SearchPage = ({
                         className={fr.cx("fr-mb-2w")}
                         label={appellationInputLabel}
                         onAppellationSelected={(appellationMatch) => {
+                          clearErrors("appellations");
                           setTempValue({
                             ...tempValue,
                             appellations: [appellationMatch.appellation],
@@ -440,7 +505,11 @@ export const SearchPage = ({
                           placeholder: useNaturalLanguageForAppellations
                             ? "Ex : Boulanger, faire du pain, etc"
                             : "Ex : Boulanger, styliste, etc",
+                          defaultInputValue:
+                            formValues.appellations?.[0]?.appellationLabel,
                         }}
+                        state={errors.appellations ? "error" : undefined}
+                        stateRelatedMessage={errors.appellations?.message}
                       />
                       {tempValue.appellations?.length && (
                         <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>
@@ -519,6 +588,7 @@ export const SearchPage = ({
                         locator="search-form-place"
                         label={placeInputLabel}
                         onPlaceSelected={(lookupSearchResult) => {
+                          clearErrors("place");
                           if (!lookupSearchResult) return;
                           const newValues = {
                             place: lookupSearchResult.label,
@@ -563,6 +633,8 @@ export const SearchPage = ({
                           inputId:
                             domElementIds[route.name].placeAutocompleteInput,
                         }}
+                        state={errors.place ? "error" : undefined}
+                        stateRelatedMessage={errors.place?.message}
                       />
 
                       <Select
@@ -719,7 +791,7 @@ export const SearchPage = ({
                     <div
                       className={cx(fr.cx("fr-mb-4w"), Styles.resultsSummary)}
                     >
-                      {searchStatus === "ok" && (
+                      {!isExternal && (
                         <>
                           <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
                             <strong>{pagination.totalRecords}</strong> résultat

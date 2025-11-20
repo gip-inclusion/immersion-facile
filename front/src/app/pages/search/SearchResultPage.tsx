@@ -206,7 +206,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
               </Button>
             </div>
             <SearchResultLabels
-              fitForDisabledWorkers={currentSearchResult.fitForDisabledWorkers}
+              truc={currentSearchResult.fitForDisabledWorkers}
             />
             <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
               {currentSearchResult.customizedName ?? currentSearchResult.name}
