@@ -1,14 +1,28 @@
 {{
   config(
     materialized='table',
-    schema='analytics'
+    schema='analytics',
+    post_hook=[
+      "CREATE INDEX IF NOT EXISTS idx_discussions_id ON {{ this }} (id)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_siret ON {{ this }} (siret)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_status ON {{ this }} (status)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_created_at ON {{ this }} (created_at)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_convention_id ON {{ this }} (convention_id)"
+    ]
   )
 }}
 
-select 
-    discussions.*,
-    count(exchanges.id) as number_of_exchanges
-from discussions
-left join exchanges 
-    on discussions.id = exchanges.discussion_id
-group by discussions.id, discussions.siret
+with exchange_counts as (
+  select
+    discussion_id,
+    count(*) as number_of_exchanges
+  from {{ source('immersion', 'exchanges') }}
+  group by discussion_id
+)
+
+select
+  d.*,
+  coalesce(ec.number_of_exchanges, 0) as number_of_exchanges
+from {{ source('immersion', 'discussions') }} d
+left join exchange_counts ec
+  on d.id = ec.discussion_id
