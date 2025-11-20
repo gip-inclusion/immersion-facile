@@ -16,6 +16,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conventions_agency_region ON {{ this }} (agency_region_name)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_estab_region ON {{ this }} (establishment_region_name)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_rome_code ON {{ this }} (rome_code)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_appellation_code ON {{ this }} (appellation_code)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_id ON {{ this }} (id)"
     ]
   )
@@ -85,6 +86,7 @@ select
     ftu.ft_connect_id as ft_connect_id,
 
     -- Appellation and ROME fields
+    pad.ogr_appellation as appellation_code,
     pad.libelle_appellation_long as appellation_label,
     prd.code_rome as rome_code,
 
