@@ -22,20 +22,19 @@ type SearchEpic = AppEpic<SearchAction>;
 const getOffersEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   action$.pipe(
     filter(searchSlice.actions.getOffersRequested.match),
-    switchMap((action) => {
-      console.log("getOffersEpic", action.payload);
-      return (isGetExternalOffersPayload(action.payload)
+    switchMap((action) =>
+      (isGetExternalOffersPayload(action.payload)
         ? searchGateway.getExternalOffers$(action.payload)
         : searchGateway.getOffers$(action.payload)
       ).pipe(
         take(1),
-        map((searchResultWithPagination) => searchSlice.actions.getOffersSucceeded({
-          searchResultsWithPagination: searchResultWithPagination,
-          searchParams: action.payload,
-        })
-        )
-      );
-    },
+        map((searchResultWithPagination) =>
+          searchSlice.actions.getOffersSucceeded({
+            searchResultsWithPagination: searchResultWithPagination,
+            searchParams: action.payload,
+          }),
+        ),
+      ),
     ),
   );
 

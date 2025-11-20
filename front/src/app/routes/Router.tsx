@@ -10,7 +10,6 @@ import { PageHeader } from "react-design-system";
 import {
   type AdminTabRouteName,
   type AppellationAndRomeDto,
-  type AppellationCode,
   adminTabRouteNames,
   parseStringToJsonOrThrow,
 } from "shared";
@@ -135,17 +134,17 @@ const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
     },
     externalSearch: () => {
       const urlParams = getUrlParameters(window.location);
+      const appellations = parseStringToJsonOrThrow<
+        AppellationAndRomeDto[],
+        "appellations"
+      >(urlParams.appellations, "appellations");
       store.dispatch(
         searchSlice.actions.getOffersRequested({
           ...urlParams,
-          appellations: parseStringToJsonOrThrow<
-            AppellationAndRomeDto[],
-            "appellations"
-          >(urlParams.appellations, "appellations"),
-          appellationCodes: parseStringToJsonOrThrow<
-            AppellationCode[],
-            "appellationCodes"
-          >(urlParams.appellationCodes, "appellationCodes"),
+          appellations,
+          appellationCodes: appellations.map(
+            (appellation) => appellation.appellationCode,
+          ),
           isExternal: true,
           sortBy: "score",
           sortOrder: "asc",
@@ -290,10 +289,16 @@ const getPageByRouteName: {
       route={route}
       useNaturalLanguageForAppellations
       isExternal={false}
+      key="internal-search"
     />
   ),
   externalSearch: (route) => (
-    <SearchPage route={route} useNaturalLanguageForAppellations isExternal />
+    <SearchPage
+      route={route}
+      useNaturalLanguageForAppellations
+      isExternal
+      key="external-search"
+    />
   ),
   searchForStudent: (route) => (
     <SearchPage

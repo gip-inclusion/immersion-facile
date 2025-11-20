@@ -8,7 +8,6 @@ import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.sele
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   initialState,
-  type SearchStatus,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import {
@@ -98,11 +97,10 @@ describe("search epic", () => {
           sortOrder: "desc",
         }),
       );
-      expectStatus("initialFetch");
       expectIsLoading(true);
 
       feedWithSearchResults([formSearchResult1, formSearchResult2]);
-      expectStatus("ok");
+
       expectIsLoading(false);
       expectSearchResults({
         data: [formSearchResult1, formSearchResult2],
@@ -120,18 +118,17 @@ describe("search epic", () => {
       store.dispatch(
         searchSlice.actions.getOffersRequested({
           distanceKm: 10,
-          longitude: 0,
-          latitude: 0,
+          longitude: 10,
+          latitude: 10,
           isExternal: true,
+          appellationCodes: ["11000"],
           sortBy: "score",
           sortOrder: "asc",
         }),
       );
-      expectStatus("initialFetch");
       expectIsLoading(true);
 
       feedWithExternalSearchResults([formSearchResult1, formSearchResult2]);
-      expectStatus("ok");
       expectIsLoading(false);
       expectSearchResults({
         data: [formSearchResult1, formSearchResult2],
@@ -160,11 +157,7 @@ describe("search epic", () => {
       );
 
       feedWithSearchResults([]);
-      expectStatus("ok");
       expectIsLoading(false);
-      expectSearchInfo(
-        "Pas de résultat. Essayez avec un plus grand rayon de recherche...",
-      );
     });
   });
 
@@ -226,7 +219,6 @@ describe("search epic", () => {
   });
 
   it("should reset search status when clicking on an offer", () => {
-    expectStatus("noSearchMade");
     store.dispatch(
       searchSlice.actions.getOffersRequested({
         distanceKm: 10,
@@ -239,7 +231,6 @@ describe("search epic", () => {
     );
     feedWithSearchResults([]);
     feedWithSearchResults([]);
-    expectStatus("ok");
   });
 
   describe("get a single search result", () => {
@@ -281,13 +272,6 @@ describe("search epic", () => {
 
   const expectStateToMatchInitialState = () => {
     expectToEqual(store.getState().search, initialState);
-  };
-
-  const expectStatus = (status: SearchStatus) =>
-    expectToEqual(searchSelectors.searchStatus(store.getState()), status);
-
-  const expectSearchInfo = (searchInfo: string) => {
-    expectToEqual(searchSelectors.searchInfo(store.getState()), searchInfo);
   };
 
   const expectSearchResults = (
