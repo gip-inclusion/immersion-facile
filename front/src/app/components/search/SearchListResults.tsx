@@ -49,13 +49,15 @@ export const SearchListResults = ({
   const { cx, classes } = useStyleUtils();
   const { totalPages, currentPage, numberPerPage } = pagination;
   const hasResults = searchResults.length > 0;
+  const isSearchWithAppellation =
+    searchParams.appellations && searchParams.appellations.length > 0;
+  const isSearchWithGeoParams = hasSearchGeoParams(searchParams);
+  const isSearchWithAppellationAndGeoParams =
+    isSearchWithGeoParams && isSearchWithAppellation;
   const shouldShowExternalResultsPush =
-    !isExternal &&
-    hasSearchGeoParams(searchParams) &&
-    searchParams.appellations &&
-    searchParams.appellations.length > 0;
+    !isExternal && isSearchWithAppellationAndGeoParams;
   return (
-    <div className={fr.cx("fr-container")}>
+    <div className={fr.cx("fr-container", isExternal && "fr-mb-8w")}>
       <div
         className={fr.cx(
           "fr-grid-row",
@@ -74,16 +76,22 @@ export const SearchListResults = ({
             {!hasResults && (
               <div
                 className={cx(
-                  fr.cx("fr-col-6", "fr-py-6w"),
+                  fr.cx(
+                    `fr-col-${isExternal && !isSearchWithAppellationAndGeoParams ? "8" : "6"}`,
+                    "fr-py-6w",
+                  ),
                   classes["text-centered"],
                 )}
               >
                 <p className={fr.cx("fr-h6")}>
-                  Aucun résultat ne correspond à votre recherche 😓
+                  {isExternal && !isSearchWithAppellationAndGeoParams
+                    ? "Votre recherche n'a pas abouti car vous n'avez pas sélectionné de métier ou de ville."
+                    : "Aucun résultat ne correspond à votre recherche 😓"}
                 </p>
                 <p>
-                  Vous pouvez essayer d'élargir votre recherche en augmentant le
-                  rayon de recherche ou en ne sélectionnant pas de métier.
+                  {isExternal && !isSearchWithAppellationAndGeoParams
+                    ? "Sélectionnez une ville et un métier pour trouver des entreprises à fort potentiel d'embauche."
+                    : "Vous pouvez essayer d'élargir votre recherche en augmentant le rayon de recherche ou en sélectionnant un métier."}
                 </p>
               </div>
             )}
@@ -263,6 +271,7 @@ const ExternalResultsPush = () => {
       nafCodes: undefined,
       nafLabel: undefined,
       appellationCodes: undefined,
+      fitForDisabledWorkers: undefined,
     },
   });
   return (

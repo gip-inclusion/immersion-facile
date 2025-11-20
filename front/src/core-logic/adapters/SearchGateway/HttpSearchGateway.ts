@@ -24,7 +24,7 @@ import type {
 import { match, P } from "ts-pattern";
 
 export class HttpSearchGateway implements SearchGateway {
-  constructor(private readonly httpClient: HttpClient<SearchRoutes>) { }
+  constructor(private readonly httpClient: HttpClient<SearchRoutes>) {}
 
   public async contactEstablishment(
     params: CreateDiscussionDto,

@@ -44,11 +44,11 @@ type LegacySearchQueryCommonParamsDto = {
 
 export type LegacySearchQueryWithOptionalGeoParamsDto =
   LegacySearchQueryCommonParamsDto &
-  LegacyGeoQueryOptionalParamsWithSortedBy<"date" | "score">;
+    LegacyGeoQueryOptionalParamsWithSortedBy<"date" | "score">;
 
 export type LegacySearchQueryParamsWithGeoParams =
   LegacySearchQueryCommonParamsDto &
-  LegacyGeoQueryParamsWithSortedBy<"distance">;
+    LegacyGeoQueryParamsWithSortedBy<"distance">;
 
 export type LegacySearchQueryBaseWithoutAppellationsAndRomeDto =
   | LegacySearchQueryParamsWithGeoParams
@@ -56,7 +56,7 @@ export type LegacySearchQueryBaseWithoutAppellationsAndRomeDto =
 
 export type LegacySearchQueryParamsDto =
   LegacySearchQueryBaseWithoutAppellationsAndRomeDto &
-  LegacySearchQueryParamsAppellationsAndRome;
+    LegacySearchQueryParamsAppellationsAndRome;
 
 type LegacySearchQueryParamsAppellationsAndRome = {
   appellationCodes?: AppellationCode[];
