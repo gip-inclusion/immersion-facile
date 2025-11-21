@@ -101,7 +101,6 @@ export const TransferModalContent = ({
               placeholder: "Veuillez choisir un type d'organisme",
             },
           }}
-          shouldLockToPeAgencies={false}
           shouldFilterDelegationPrescriptionAgencyKind={false}
           shouldShowAgencyKindField={convention.internshipKind === "immersion"}
           agencyDepartmentOptions={departmentOptions}

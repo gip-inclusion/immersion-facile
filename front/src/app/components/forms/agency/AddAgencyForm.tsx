@@ -274,7 +274,6 @@ const AgencyForm = ({
                   placeholder: "Veuillez choisir un type de structure",
                 },
               }}
-              shouldLockToPeAgencies={false}
               shouldFilterDelegationPrescriptionAgencyKind={true}
               shouldShowAgencyKindField
               agencyDepartmentOptions={departmentOptions}
