@@ -60,7 +60,7 @@ describe("Update agency status", () => {
 
     it.each([
       { status: "active" },
-      { status: "rejected", rejectionJustification: "justification" },
+      { status: "rejected", statusJustification: "justification" },
     ] satisfies UpdateAgencyStatusParamsWithoutId[])(
       "Updates an agency status in repository and publishes an event to notify if status becomes $status",
       async (testParams) => {

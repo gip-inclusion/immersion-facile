@@ -146,7 +146,7 @@ describe("AddAgency use case", () => {
           {
             ...createParisMissionLocaleParams,
             status: "needsReview",
-            rejectionJustification: null,
+            statusJustification: null,
             codeSafir: null,
             counsellorEmails: [],
             validatorEmails: [],
@@ -194,7 +194,7 @@ describe("AddAgency use case", () => {
           {
             ...createParisMissionLocaleParams,
             status: "needsReview",
-            rejectionJustification: null,
+            statusJustification: null,
             codeSafir: null,
             counsellorEmails: [],
             validatorEmails: [],
@@ -225,7 +225,7 @@ describe("AddAgency use case", () => {
           {
             ...createParisMissionLocaleParams,
             status: "needsReview",
-            rejectionJustification: null,
+            statusJustification: null,
             codeSafir: null,
             counsellorEmails: [],
             validatorEmails: [],
@@ -270,7 +270,7 @@ describe("AddAgency use case", () => {
         validatorEmails: [],
         status: "needsReview",
         codeSafir: null,
-        rejectionJustification: null,
+        statusJustification: null,
       };
       uow.userRepository.users = [counsellor, validator, validator2];
       uow.agencyRepository.agencies = [
@@ -315,7 +315,7 @@ describe("AddAgency use case", () => {
             ...createAgencyWithRefersToParams,
             status: "needsReview",
             codeSafir: null,
-            rejectionJustification: null,
+            statusJustification: null,
             counsellorEmails: [],
             validatorEmails: [],
           },
