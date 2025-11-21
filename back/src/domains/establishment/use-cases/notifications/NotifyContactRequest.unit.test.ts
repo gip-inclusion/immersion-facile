@@ -72,232 +72,230 @@ describe("NotifyContactRequest", () => {
 
   describe("Right paths", () => {
     describe("Contact mode email", () => {
-      it.each(["1_ELEVE_1_STAGE", "IF"] satisfies DiscussionKind[])(
-        "Sends ContactByEmailRequest email with kind %s to establishment ",
-        async (kind) => {
-          const discussion = new DiscussionBuilder()
-            .withId(discussionId)
-            .withSiret(siret)
-            .withContactMode("EMAIL")
-            .withDiscussionKind(kind)
-            .withEstablishmentContact({
-              email: allowedContactEmail,
-              copyEmails: [allowedCopyEmail],
-            })
-            .withAppellationCode(TEST_APPELLATION_CODE)
-            .build() as DiscussionDtoEmail;
+      it.each([
+        "1_ELEVE_1_STAGE",
+        "IF",
+      ] satisfies DiscussionKind[])("Sends ContactByEmailRequest email with kind %s to establishment ", async (kind) => {
+        const discussion = new DiscussionBuilder()
+          .withId(discussionId)
+          .withSiret(siret)
+          .withContactMode("EMAIL")
+          .withDiscussionKind(kind)
+          .withEstablishmentContact({
+            email: allowedContactEmail,
+            copyEmails: [allowedCopyEmail],
+          })
+          .withAppellationCode(TEST_APPELLATION_CODE)
+          .build() as DiscussionDtoEmail;
 
-          uow.discussionRepository.discussions = [discussion];
+        uow.discussionRepository.discussions = [discussion];
 
-          const validEmailPayload: ContactEstablishmentEventPayload = {
-            discussionId: discussion.id,
-            siret: discussion.siret,
-          };
+        const validEmailPayload: ContactEstablishmentEventPayload = {
+          discussionId: discussion.id,
+          siret: discussion.siret,
+        };
 
-          await notifyContactRequest.execute(validEmailPayload);
+        await notifyContactRequest.execute(validEmailPayload);
 
-          const { establishmentContact } = discussion;
+        const { establishmentContact } = discussion;
 
-          const expectedReplyToEmail = `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply.reply.domain.com`;
+        const expectedReplyToEmail = `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply.reply.domain.com`;
 
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "CONTACT_BY_EMAIL_REQUEST",
-                recipients: [establishmentContact.email],
-                sender: immersionFacileNoReplyEmailSender,
-                replyTo: {
-                  email: expectedReplyToEmail,
-                  name: `${getFormattedFirstnameAndLastname({ firstname: discussion.potentialBeneficiary.firstName, lastname: discussion.potentialBeneficiary.lastName })} - via Immersion Facilitée`,
-                },
-                params:
-                  discussion.kind === "IF"
-                    ? {
-                        replyToEmail: expectedReplyToEmail,
-                        appellationLabel: TEST_APPELLATION_LABEL,
-                        businessAddress: addressDtoToString(discussion.address),
-                        businessName: discussion.businessName,
-                        contactFirstName: getFormattedFirstnameAndLastname({
-                          firstname: establishmentContact.firstName,
-                        }),
-                        contactLastName: getFormattedFirstnameAndLastname({
-                          lastname: establishmentContact.lastName,
-                        }),
-                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
-                        kind: discussion.kind,
-                        immersionObjective:
-                          discussion.potentialBeneficiary.immersionObjective ??
-                          undefined,
-                        potentialBeneficiaryFirstName:
-                          getFormattedFirstnameAndLastname({
-                            firstname:
-                              discussion.potentialBeneficiary.firstName,
-                          }),
-                        potentialBeneficiaryLastName:
-                          getFormattedFirstnameAndLastname({
-                            lastname: discussion.potentialBeneficiary.lastName,
-                          }),
-                        potentialBeneficiaryDatePreferences:
-                          discussion.potentialBeneficiary.datePreferences,
-                        potentialBeneficiaryPhone:
-                          discussion.potentialBeneficiary.phone,
-                        potentialBeneficiaryExperienceAdditionalInformation:
-                          discussion.potentialBeneficiary
-                            .experienceAdditionalInformation,
-                        potentialBeneficiaryHasWorkingExperience:
-                          discussion.potentialBeneficiary.hasWorkingExperience,
-                        potentialBeneficiaryResumeLink:
-                          discussion.potentialBeneficiary.resumeLink,
-                      }
-                    : {
-                        replyToEmail: expectedReplyToEmail,
-                        appellationLabel: TEST_APPELLATION_LABEL,
-                        businessAddress: addressDtoToString(discussion.address),
-                        businessName: discussion.businessName,
-                        contactFirstName: getFormattedFirstnameAndLastname({
-                          firstname: establishmentContact.firstName,
-                        }),
-                        contactLastName: getFormattedFirstnameAndLastname({
-                          lastname: establishmentContact.lastName,
-                        }),
-                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
-                        kind: discussion.kind,
-                        immersionObjective:
-                          discussion.potentialBeneficiary.immersionObjective,
-                        potentialBeneficiaryFirstName:
-                          getFormattedFirstnameAndLastname({
-                            firstname:
-                              discussion.potentialBeneficiary.firstName,
-                          }),
-                        potentialBeneficiaryLastName:
-                          getFormattedFirstnameAndLastname({
-                            lastname: discussion.potentialBeneficiary.lastName,
-                          }),
-                        potentialBeneficiaryDatePreferences:
-                          discussion.potentialBeneficiary.datePreferences,
-                        potentialBeneficiaryPhone:
-                          discussion.potentialBeneficiary.phone,
-                        levelOfEducation:
-                          discussion.potentialBeneficiary.levelOfEducation,
-                      },
-                cc: establishmentContact.copyEmails,
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "CONTACT_BY_EMAIL_REQUEST",
+              recipients: [establishmentContact.email],
+              sender: immersionFacileNoReplyEmailSender,
+              replyTo: {
+                email: expectedReplyToEmail,
+                name: `${getFormattedFirstnameAndLastname({ firstname: discussion.potentialBeneficiary.firstName, lastname: discussion.potentialBeneficiary.lastName })} - via Immersion Facilitée`,
               },
-            ],
-          });
-        },
-      );
+              params:
+                discussion.kind === "IF"
+                  ? {
+                      replyToEmail: expectedReplyToEmail,
+                      appellationLabel: TEST_APPELLATION_LABEL,
+                      businessAddress: addressDtoToString(discussion.address),
+                      businessName: discussion.businessName,
+                      contactFirstName: getFormattedFirstnameAndLastname({
+                        firstname: establishmentContact.firstName,
+                      }),
+                      contactLastName: getFormattedFirstnameAndLastname({
+                        lastname: establishmentContact.lastName,
+                      }),
+                      discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+                      kind: discussion.kind,
+                      immersionObjective:
+                        discussion.potentialBeneficiary.immersionObjective ??
+                        undefined,
+                      potentialBeneficiaryFirstName:
+                        getFormattedFirstnameAndLastname({
+                          firstname: discussion.potentialBeneficiary.firstName,
+                        }),
+                      potentialBeneficiaryLastName:
+                        getFormattedFirstnameAndLastname({
+                          lastname: discussion.potentialBeneficiary.lastName,
+                        }),
+                      potentialBeneficiaryDatePreferences:
+                        discussion.potentialBeneficiary.datePreferences,
+                      potentialBeneficiaryPhone:
+                        discussion.potentialBeneficiary.phone,
+                      potentialBeneficiaryExperienceAdditionalInformation:
+                        discussion.potentialBeneficiary
+                          .experienceAdditionalInformation,
+                      potentialBeneficiaryHasWorkingExperience:
+                        discussion.potentialBeneficiary.hasWorkingExperience,
+                      potentialBeneficiaryResumeLink:
+                        discussion.potentialBeneficiary.resumeLink,
+                    }
+                  : {
+                      replyToEmail: expectedReplyToEmail,
+                      appellationLabel: TEST_APPELLATION_LABEL,
+                      businessAddress: addressDtoToString(discussion.address),
+                      businessName: discussion.businessName,
+                      contactFirstName: getFormattedFirstnameAndLastname({
+                        firstname: establishmentContact.firstName,
+                      }),
+                      contactLastName: getFormattedFirstnameAndLastname({
+                        lastname: establishmentContact.lastName,
+                      }),
+                      discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+                      kind: discussion.kind,
+                      immersionObjective:
+                        discussion.potentialBeneficiary.immersionObjective,
+                      potentialBeneficiaryFirstName:
+                        getFormattedFirstnameAndLastname({
+                          firstname: discussion.potentialBeneficiary.firstName,
+                        }),
+                      potentialBeneficiaryLastName:
+                        getFormattedFirstnameAndLastname({
+                          lastname: discussion.potentialBeneficiary.lastName,
+                        }),
+                      potentialBeneficiaryDatePreferences:
+                        discussion.potentialBeneficiary.datePreferences,
+                      potentialBeneficiaryPhone:
+                        discussion.potentialBeneficiary.phone,
+                      levelOfEducation:
+                        discussion.potentialBeneficiary.levelOfEducation,
+                    },
+              cc: establishmentContact.copyEmails,
+            },
+          ],
+        });
+      });
     });
 
     describe("Contact mode phone", () => {
-      it.each(["1_ELEVE_1_STAGE", "IF"] satisfies DiscussionKind[])(
-        "Sends ContactByPhoneRequest email with kind %s to potential beneficiary",
-        async () => {
-          const discussion = new DiscussionBuilder()
-            .withId(discussionId)
-            .withSiret(siret)
-            .withContactMode("PHONE")
-            .withEstablishmentContact({
-              email: allowedContactEmail,
-              copyEmails: [allowedCopyEmail],
-            })
-            .withAppellationCode(TEST_APPELLATION_CODE)
-            .build() as DiscussionDtoPhone;
+      it.each([
+        "1_ELEVE_1_STAGE",
+        "IF",
+      ] satisfies DiscussionKind[])("Sends ContactByPhoneRequest email with kind %s to potential beneficiary", async () => {
+        const discussion = new DiscussionBuilder()
+          .withId(discussionId)
+          .withSiret(siret)
+          .withContactMode("PHONE")
+          .withEstablishmentContact({
+            email: allowedContactEmail,
+            copyEmails: [allowedCopyEmail],
+          })
+          .withAppellationCode(TEST_APPELLATION_CODE)
+          .build() as DiscussionDtoPhone;
 
-          uow.discussionRepository.discussions = [discussion];
+        uow.discussionRepository.discussions = [discussion];
 
-          const validPhonePayload: ContactEstablishmentEventPayload = {
-            discussionId: discussion.id,
-            siret: discussion.siret,
-          };
+        const validPhonePayload: ContactEstablishmentEventPayload = {
+          discussionId: discussion.id,
+          siret: discussion.siret,
+        };
 
-          await notifyContactRequest.execute(validPhonePayload);
+        await notifyContactRequest.execute(validPhonePayload);
 
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
-                recipients: [discussion.potentialBeneficiary.email],
-                sender: immersionFacileNoReplyEmailSender,
-                params: {
-                  businessName: discussion.businessName,
-                  contactFirstName: getFormattedFirstnameAndLastname({
-                    firstname: discussion.establishmentContact.firstName,
-                  }),
-                  contactLastName: getFormattedFirstnameAndLastname({
-                    lastname: discussion.establishmentContact.lastName,
-                  }),
-                  contactPhone: discussion.establishmentContact.phone,
-                  kind: discussion.kind,
-                  potentialBeneficiaryFirstName:
-                    getFormattedFirstnameAndLastname({
-                      firstname: discussion.potentialBeneficiary.firstName,
-                    }),
-                  potentialBeneficiaryLastName:
-                    getFormattedFirstnameAndLastname({
-                      lastname: discussion.potentialBeneficiary.lastName,
-                    }),
-                },
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
+              recipients: [discussion.potentialBeneficiary.email],
+              sender: immersionFacileNoReplyEmailSender,
+              params: {
+                businessName: discussion.businessName,
+                contactFirstName: getFormattedFirstnameAndLastname({
+                  firstname: discussion.establishmentContact.firstName,
+                }),
+                contactLastName: getFormattedFirstnameAndLastname({
+                  lastname: discussion.establishmentContact.lastName,
+                }),
+                contactPhone: discussion.establishmentContact.phone,
+                kind: discussion.kind,
+                potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname(
+                  {
+                    firstname: discussion.potentialBeneficiary.firstName,
+                  },
+                ),
+                potentialBeneficiaryLastName: getFormattedFirstnameAndLastname({
+                  lastname: discussion.potentialBeneficiary.lastName,
+                }),
               },
-            ],
-          });
-        },
-      );
+            },
+          ],
+        });
+      });
     });
 
     describe("Contact mode in person", () => {
-      it.each(["1_ELEVE_1_STAGE", "IF"] satisfies DiscussionKind[])(
-        "Sends ContactInPersonRequest email with kind %s to potential beneficiary",
-        async () => {
-          const discussion = new DiscussionBuilder()
-            .withId(discussionId)
-            .withSiret(siret)
-            .withContactMode("IN_PERSON")
-            .withEstablishmentContact({
-              email: allowedContactEmail,
-              copyEmails: [allowedCopyEmail],
-            })
-            .withAppellationCode(TEST_APPELLATION_CODE)
-            .build() as DiscussionDtoInPerson;
+      it.each([
+        "1_ELEVE_1_STAGE",
+        "IF",
+      ] satisfies DiscussionKind[])("Sends ContactInPersonRequest email with kind %s to potential beneficiary", async () => {
+        const discussion = new DiscussionBuilder()
+          .withId(discussionId)
+          .withSiret(siret)
+          .withContactMode("IN_PERSON")
+          .withEstablishmentContact({
+            email: allowedContactEmail,
+            copyEmails: [allowedCopyEmail],
+          })
+          .withAppellationCode(TEST_APPELLATION_CODE)
+          .build() as DiscussionDtoInPerson;
 
-          uow.discussionRepository.discussions = [discussion];
+        uow.discussionRepository.discussions = [discussion];
 
-          const validInPersonPayload: ContactEstablishmentEventPayload = {
-            discussionId: discussion.id,
-            siret: discussion.siret,
-          };
+        const validInPersonPayload: ContactEstablishmentEventPayload = {
+          discussionId: discussion.id,
+          siret: discussion.siret,
+        };
 
-          await notifyContactRequest.execute(validInPersonPayload);
+        await notifyContactRequest.execute(validInPersonPayload);
 
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
-                recipients: [discussion.potentialBeneficiary.email],
-                sender: immersionFacileNoReplyEmailSender,
-                params: {
-                  businessName: discussion.businessName,
-                  contactFirstName: getFormattedFirstnameAndLastname({
-                    firstname: discussion.establishmentContact.firstName,
-                  }),
-                  contactLastName: getFormattedFirstnameAndLastname({
-                    lastname: discussion.establishmentContact.lastName,
-                  }),
-                  businessAddress: addressDtoToString(discussion.address),
-                  kind: discussion.kind,
-                  potentialBeneficiaryFirstName:
-                    getFormattedFirstnameAndLastname({
-                      firstname: discussion.potentialBeneficiary.firstName,
-                    }),
-                  potentialBeneficiaryLastName:
-                    getFormattedFirstnameAndLastname({
-                      lastname: discussion.potentialBeneficiary.lastName,
-                    }),
-                },
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
+              recipients: [discussion.potentialBeneficiary.email],
+              sender: immersionFacileNoReplyEmailSender,
+              params: {
+                businessName: discussion.businessName,
+                contactFirstName: getFormattedFirstnameAndLastname({
+                  firstname: discussion.establishmentContact.firstName,
+                }),
+                contactLastName: getFormattedFirstnameAndLastname({
+                  lastname: discussion.establishmentContact.lastName,
+                }),
+                businessAddress: addressDtoToString(discussion.address),
+                kind: discussion.kind,
+                potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname(
+                  {
+                    firstname: discussion.potentialBeneficiary.firstName,
+                  },
+                ),
+                potentialBeneficiaryLastName: getFormattedFirstnameAndLastname({
+                  lastname: discussion.potentialBeneficiary.lastName,
+                }),
               },
-            ],
-          });
-        },
-      );
+            },
+          ],
+        });
+      });
     });
   });
 

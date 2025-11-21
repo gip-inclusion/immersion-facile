@@ -170,30 +170,27 @@ describe("Send signature link", () => {
       "IN_REVIEW",
       ...conventionStatusesWithJustification,
       ...conventionStatusesWithValidator,
-    ] as const)(
-      "throws bad request if convention status %s does not allow send signature link",
-      async (conventionStatus) => {
-        const convention = new ConventionDtoBuilder()
-          .withId(conventionId)
-          .withStatus(conventionStatus)
-          .build();
-        uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-        uow.conventionRepository.setConventions([convention]);
+    ] as const)("throws bad request if convention status %s does not allow send signature link", async (conventionStatus) => {
+      const convention = new ConventionDtoBuilder()
+        .withId(conventionId)
+        .withStatus(conventionStatus)
+        .build();
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+      uow.conventionRepository.setConventions([convention]);
 
-        await expectPromiseToFailWithError(
-          usecase.execute(
-            {
-              conventionId: convention.id,
-              role: "beneficiary-representative",
-            },
-            validatorJwtPayload,
-          ),
-          errors.convention.sendSignatureLinkNotAllowedForStatus({
-            status: convention.status,
-          }),
-        );
-      },
-    );
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId: convention.id,
+            role: "beneficiary-representative",
+          },
+          validatorJwtPayload,
+        ),
+        errors.convention.sendSignatureLinkNotAllowedForStatus({
+          status: convention.status,
+        }),
+      );
+    });
 
     it("throws bad request if role to send signature link does not exist", async () => {
       uow.agencyRepository.agencies = [
@@ -397,44 +394,41 @@ describe("Send signature link", () => {
       "+68940301010", //  Polynésie française
       "+687261234", // Nouvelle-Calédonie
       "+508412345", //Saint-Pierre-et-Miquelon
-    ])(
-      "throws bad request if phone number format %s is incorrect",
-      async (phoneNumber) => {
-        const shortLinkId = "link1";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
-        const conventionWithIncorrectPhoneFormat = new ConventionDtoBuilder(
-          convention,
-        )
-          .withBeneficiaryPhone(phoneNumber)
-          .build();
-        uow.conventionRepository.setConventions([
-          conventionWithIncorrectPhoneFormat,
-        ]);
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [notConnectedUser.id]: {
-              roles: ["validator"],
-              isNotifiedByEmail: true,
-            },
-          }),
-        ];
-        uow.userRepository.users = [notConnectedUser];
+    ])("throws bad request if phone number format %s is incorrect", async (phoneNumber) => {
+      const shortLinkId = "link1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+      const conventionWithIncorrectPhoneFormat = new ConventionDtoBuilder(
+        convention,
+      )
+        .withBeneficiaryPhone(phoneNumber)
+        .build();
+      uow.conventionRepository.setConventions([
+        conventionWithIncorrectPhoneFormat,
+      ]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notConnectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+      uow.userRepository.users = [notConnectedUser];
 
-        await expectPromiseToFailWithError(
-          usecase.execute(
-            {
-              conventionId,
-              role: "beneficiary",
-            },
-            validatorJwtPayload,
-          ),
-          errors.convention.invalidMobilePhoneNumber({
-            conventionId: conventionWithIncorrectPhoneFormat.id,
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId,
             role: "beneficiary",
-          }),
-        );
-      },
-    );
+          },
+          validatorJwtPayload,
+        ),
+        errors.convention.invalidMobilePhoneNumber({
+          conventionId: conventionWithIncorrectPhoneFormat.id,
+          role: "beneficiary",
+        }),
+      );
+    });
 
     it("throws bad request if signatory has already signed", async () => {
       const conventionAlreadySigned = new ConventionDtoBuilder(convention)
@@ -469,78 +463,78 @@ describe("Send signature link", () => {
   });
 
   describe("Right paths: send signature link sms", () => {
-    it.each(["validator", "counsellor"] as const)(
-      "When pro connected %s triggers it",
-      async (role) => {
-        const shortLinkId = "link1";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+    it.each([
+      "validator",
+      "counsellor",
+    ] as const)("When pro connected %s triggers it", async (role) => {
+      const shortLinkId = "link1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
-        uow.conventionRepository.setConventions([convention]);
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [connectedUser.id]: {
-              roles: [role],
-              isNotifiedByEmail: false,
-            },
-          }),
-        ];
-        uow.userRepository.users = [connectedUser];
-
-        await usecase.execute(
-          {
-            conventionId,
-            role: "establishment-representative",
+      uow.conventionRepository.setConventions([convention]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [connectedUser.id]: {
+            roles: [role],
+            isNotifiedByEmail: false,
           },
-          connectedUserPayload,
-        );
+        }),
+      ];
+      uow.userRepository.users = [connectedUser];
 
-        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-          [shortLinkId]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: convention.signatories.establishmentRepresentative.role,
-            email: convention.signatories.establishmentRepresentative.email,
-            now: timeGateway.now(),
-            targetRoute: frontRoutes.conventionToSign,
-            extraQueryParams: { mtm_source: "sms-signature-link" },
-          }),
-        });
+      await usecase.execute(
+        {
+          conventionId,
+          role: "establishment-representative",
+        },
+        connectedUserPayload,
+      );
 
-        expectObjectInArrayToMatch(uow.outboxRepository.events, [
-          { topic: "NotificationAdded" },
-          {
-            topic: "ConventionSignatureLinkManuallySent",
-            payload: {
-              convention,
-              recipientRole: "establishment-representative",
-              transport: "sms",
-              triggeredBy: {
-                kind: "connected-user",
-                userId: connectedUser.id,
-              },
-            },
-          },
-        ]);
-        expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
-          {
-            kind: "sms",
-            followedIds: {
-              conventionId: convention.id,
-              agencyId: convention.agencyId,
-              establishmentSiret: convention.siret,
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinkId]: fakeGenerateMagicLinkUrlFn({
+          id: convention.id,
+          role: convention.signatories.establishmentRepresentative.role,
+          email: convention.signatories.establishmentRepresentative.email,
+          now: timeGateway.now(),
+          targetRoute: frontRoutes.conventionToSign,
+          extraQueryParams: { mtm_source: "sms-signature-link" },
+        }),
+      });
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        {
+          topic: "ConventionSignatureLinkManuallySent",
+          payload: {
+            convention,
+            recipientRole: "establishment-representative",
+            transport: "sms",
+            triggeredBy: {
+              kind: "connected-user",
               userId: connectedUser.id,
             },
-            templatedContent: {
-              recipientPhone:
-                convention.signatories.establishmentRepresentative.phone,
-              kind: "ReminderForSignatories",
-              params: {
-                shortLink: makeShortLinkUrl(config, shortLinkId),
-              },
+          },
+        },
+      ]);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        {
+          kind: "sms",
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
+            userId: connectedUser.id,
+          },
+          templatedContent: {
+            recipientPhone:
+              convention.signatories.establishmentRepresentative.phone,
+            kind: "ReminderForSignatories",
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkId),
             },
           },
-        ]);
-      },
-    );
+        },
+      ]);
+    });
 
     it("When backoffice admin triggers it", async () => {
       const shortLinkId = "link1";
@@ -583,156 +577,151 @@ describe("Send signature link", () => {
       ]);
     });
 
-    it.each(["validator", "counsellor"] as const)(
-      "When not connected agency user %s triggers it",
-      async (role) => {
-        const shortLinkId = "link1";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+    it.each([
+      "validator",
+      "counsellor",
+    ] as const)("When not connected agency user %s triggers it", async (role) => {
+      const shortLinkId = "link1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
-        uow.conventionRepository.setConventions([convention]);
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [notConnectedUser.id]: {
-              roles: [role],
-              isNotifiedByEmail: true,
-            },
-          }),
-        ];
-        uow.userRepository.users = [notConnectedUser];
-
-        await usecase.execute(
-          {
-            conventionId,
-            role: "establishment-representative",
+      uow.conventionRepository.setConventions([convention]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notConnectedUser.id]: {
+            roles: [role],
+            isNotifiedByEmail: true,
           },
-          role === "validator" ? validatorJwtPayload : counsellorJwtPayload,
-        );
+        }),
+      ];
+      uow.userRepository.users = [notConnectedUser];
 
-        expectObjectInArrayToMatch(uow.outboxRepository.events, [
-          { topic: "NotificationAdded" },
-          {
-            topic: "ConventionSignatureLinkManuallySent",
-            payload: {
-              convention,
-              recipientRole: "establishment-representative",
-              transport: "sms",
-              triggeredBy: {
-                kind: "convention-magic-link",
-                role,
-              },
-            },
-          },
-        ]);
-        expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
-          {
-            kind: "sms",
-            followedIds: {
-              conventionId: convention.id,
-              agencyId: convention.agencyId,
-              establishmentSiret: convention.siret,
-              userId: undefined,
-            },
-            templatedContent: {
-              recipientPhone:
-                convention.signatories.establishmentRepresentative.phone,
-              kind: "ReminderForSignatories",
-              params: {
-                shortLink: makeShortLinkUrl(config, shortLinkId),
-              },
+      await usecase.execute(
+        {
+          conventionId,
+          role: "establishment-representative",
+        },
+        role === "validator" ? validatorJwtPayload : counsellorJwtPayload,
+      );
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        {
+          topic: "ConventionSignatureLinkManuallySent",
+          payload: {
+            convention,
+            recipientRole: "establishment-representative",
+            transport: "sms",
+            triggeredBy: {
+              kind: "convention-magic-link",
+              role,
             },
           },
-        ]);
-      },
-    );
+        },
+      ]);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        {
+          kind: "sms",
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
+            userId: undefined,
+          },
+          templatedContent: {
+            recipientPhone:
+              convention.signatories.establishmentRepresentative.phone,
+            kind: "ReminderForSignatories",
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkId),
+            },
+          },
+        },
+      ]);
+    });
 
     it.each([
       "beneficiary",
       "beneficiary-representative",
       "beneficiary-current-employer",
       "establishment-representative",
-    ] as SignatoryRole[])(
-      "When not connected signatory %s triggers it",
-      async (role) => {
-        const signatoryJwtPayload = createConventionMagicLinkPayload({
-          id: conventionId,
-          role: role,
-          email: `${role}@mail.com`,
-          now: new Date(),
-        });
-        const shortLinkId = "link1";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+    ] as SignatoryRole[])("When not connected signatory %s triggers it", async (role) => {
+      const signatoryJwtPayload = createConventionMagicLinkPayload({
+        id: conventionId,
+        role: role,
+        email: `${role}@mail.com`,
+        now: new Date(),
+      });
+      const shortLinkId = "link1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
-        const conventionWithAllSignatories = new ConventionDtoBuilder(
-          convention,
-        )
-          .withBeneficiaryRepresentative({
-            role: "beneficiary-representative",
-            email: "beneficiary-representative@mail.com",
-            phone: "+33622222222",
-            firstName: "Marie",
-            lastName: "Dupont",
-          })
-          .withBeneficiaryCurrentEmployer({
-            role: "beneficiary-current-employer",
-            email: "beneficiary-current-employer@mail.com",
-            phone: "+33633333333",
-            firstName: "Jean",
-            lastName: "Martin",
-            job: "Manager",
-            businessSiret: "98765432109876",
-            businessName: "Entreprise Actuelle",
-            businessAddress: "123 rue de l'emploi, 75001 Paris",
-          })
-          .build();
+      const conventionWithAllSignatories = new ConventionDtoBuilder(convention)
+        .withBeneficiaryRepresentative({
+          role: "beneficiary-representative",
+          email: "beneficiary-representative@mail.com",
+          phone: "+33622222222",
+          firstName: "Marie",
+          lastName: "Dupont",
+        })
+        .withBeneficiaryCurrentEmployer({
+          role: "beneficiary-current-employer",
+          email: "beneficiary-current-employer@mail.com",
+          phone: "+33633333333",
+          firstName: "Jean",
+          lastName: "Martin",
+          job: "Manager",
+          businessSiret: "98765432109876",
+          businessName: "Entreprise Actuelle",
+          businessAddress: "123 rue de l'emploi, 75001 Paris",
+        })
+        .build();
 
-        uow.conventionRepository.setConventions([conventionWithAllSignatories]);
-        uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-        uow.userRepository.users = [notConnectedUser];
+      uow.conventionRepository.setConventions([conventionWithAllSignatories]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+      uow.userRepository.users = [notConnectedUser];
 
-        await usecase.execute(
-          {
-            conventionId,
-            role: "establishment-representative",
-          },
-          signatoryJwtPayload,
-        );
+      await usecase.execute(
+        {
+          conventionId,
+          role: "establishment-representative",
+        },
+        signatoryJwtPayload,
+      );
 
-        expectObjectInArrayToMatch(uow.outboxRepository.events, [
-          { topic: "NotificationAdded" },
-          {
-            topic: "ConventionSignatureLinkManuallySent",
-            payload: {
-              convention,
-              recipientRole: "establishment-representative",
-              transport: "sms",
-              triggeredBy: {
-                kind: "convention-magic-link",
-                role,
-              },
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        {
+          topic: "ConventionSignatureLinkManuallySent",
+          payload: {
+            convention,
+            recipientRole: "establishment-representative",
+            transport: "sms",
+            triggeredBy: {
+              kind: "convention-magic-link",
+              role,
             },
           },
-        ]);
-        expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
-          {
-            kind: "sms",
-            followedIds: {
-              conventionId: convention.id,
-              agencyId: convention.agencyId,
-              establishmentSiret: convention.siret,
-              userId: undefined,
-            },
-            templatedContent: {
-              recipientPhone:
-                convention.signatories.establishmentRepresentative.phone,
-              kind: "ReminderForSignatories",
-              params: {
-                shortLink: makeShortLinkUrl(config, shortLinkId),
-              },
+        },
+      ]);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        {
+          kind: "sms",
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
+            userId: undefined,
+          },
+          templatedContent: {
+            recipientPhone:
+              convention.signatories.establishmentRepresentative.phone,
+            kind: "ReminderForSignatories",
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkId),
             },
           },
-        ]);
-      },
-    );
+        },
+      ]);
+    });
 
     it.each([
       "+33600000000", // metropole

@@ -2,7 +2,7 @@ const fs = require("fs");
 const { execSync } = require("child_process");
 
 const replaceInFileSync = (filePath, regex, replacement) => {
-  let data = fs.readFileSync(filePath, "utf8");
+  const data = fs.readFileSync(filePath, "utf8");
   const updatedData = data.replace(regex, replacement);
   fs.writeFileSync(filePath, updatedData);
 };
@@ -35,7 +35,7 @@ fs.copyFileSync(
 );
 
 const removeFromFileLinesThatInclude = (filePath, regex) => {
-  let data = fs.readFileSync(filePath, "utf8");
+  const data = fs.readFileSync(filePath, "utf8");
   const updatedData = data
     .split("\n")
     .filter((line) => !regex.test(line))

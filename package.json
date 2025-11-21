@@ -17,6 +17,7 @@
     "check:glob": "biome check --diagnostic-level=error",
     "check:fix": "biome check --write --diagnostic-level=error .",
     "check:fix-unsafe": "biome check --write --unsafe --diagnostic-level=error .",
+    "check:migrate": "biome migrate --write",
     "back": "pnpm --dir back",
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",
@@ -40,7 +41,7 @@
     "bi:fullcheck": "cd bi && ./activate.sh && ./run_dbt.sh debug && ./run_dbt.sh run"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.1.1",
+    "@biomejs/biome": "2.3.7",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "turbo": "1.4.6",

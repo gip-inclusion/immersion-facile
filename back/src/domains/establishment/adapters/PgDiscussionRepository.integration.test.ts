@@ -1067,18 +1067,19 @@ describe("PgDiscussionRepository", () => {
       discussionInRepo: DiscussionDto;
       params: Partial<HasDiscussionMatchingParams>;
       result: boolean;
-    }[])(
-      `hasDiscussionMatching '$result'
-          with params: '$params'`,
-      async ({ discussionInRepo, params, result }) => {
-        await pgDiscussionRepository.insert(discussionInRepo);
+    }[])(`hasDiscussionMatching '$result'
+          with params: '$params'`, async ({
+      discussionInRepo,
+      params,
+      result,
+    }) => {
+      await pgDiscussionRepository.insert(discussionInRepo);
 
-        expectToEqual(
-          await pgDiscussionRepository.hasDiscussionMatching(params),
-          result,
-        );
-      },
-    );
+      expectToEqual(
+        await pgDiscussionRepository.hasDiscussionMatching(params),
+        result,
+      );
+    });
 
     it("throws when no params provided", async () => {
       await expectPromiseToFailWithError(

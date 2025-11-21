@@ -692,30 +692,31 @@ jeudi : 09:00-12:45, 13:15-17:00`,
   });
 
   describe("dateIsoStringSchema schema", () => {
-    it.each(["2022-07-05", "Not a date", "31-07-2022"])(
-      "parse '%s' is not valid",
-      (date) => {
-        expect(() => dateTimeIsoStringSchema.parse(date)).toThrow(
-          new ZodError([
-            {
-              code: "invalid_string",
-              validation: "datetime",
-              message: localization.invalidDate,
-              path: [],
-            },
-          ]),
-        );
-      },
-    );
+    it.each([
+      "2022-07-05",
+      "Not a date",
+      "31-07-2022",
+    ])("parse '%s' is not valid", (date) => {
+      expect(() => dateTimeIsoStringSchema.parse(date)).toThrow(
+        new ZodError([
+          {
+            code: "invalid_string",
+            validation: "datetime",
+            message: localization.invalidDate,
+            path: [],
+          },
+        ]),
+      );
+    });
 
-    it.each(["2022-02-27T10:00:00.001Z", new Date().toISOString()])(
-      "parse '%s' is valid",
-      (date) => {
-        expect(dateTimeIsoStringSchema.parse(date)).toBe(
-          new Date(date).toISOString(),
-        );
-      },
-    );
+    it.each([
+      "2022-02-27T10:00:00.001Z",
+      new Date().toISOString(),
+    ])("parse '%s' is valid", (date) => {
+      expect(dateTimeIsoStringSchema.parse(date)).toBe(
+        new Date(date).toISOString(),
+      );
+    });
   });
 
   describe("french hour changes (changement d'heure)", () => {

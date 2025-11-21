@@ -6,7 +6,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     { replace: true },
     `
     WITH agencies_with_postal_code AS
-      (SELECT name, kind, (regexp_match(address, '\d{5}'))[1] AS postal_code
+      (SELECT name, kind, (regexp_match(address, 'd{5}'))[1] AS postal_code
        FROM agencies)
     SELECT name, kind, department FROM agencies_with_postal_code AS a
     LEFT JOIN postal_code_department_region AS pcdr ON pcdr.postal_code = a.postal_code
@@ -21,7 +21,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     WITH offers_by_department AS 
       (WITH establishments_by_department AS 
          (WITH form_establishments_postal_code AS 
-            (SELECT siret, (regexp_match(address,  '\d{5}'))[1] AS postal_code
+            (SELECT siret, (regexp_match(address,  'd{5}'))[1] AS postal_code
              FROM establishments WHERE data_source = 'form')
          SELECT siret, department
          FROM form_establishments_postal_code AS fepc

@@ -183,22 +183,19 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
           .withDiscussionKind("1_ELEVE_1_STAGE")
           .withContactMode("PHONE")
           .build(),
-      ])(
-        "Gets discussion with kind $kind and contact mode $contactMode based on establishment contact email",
-        async (discussion) => {
-          uow.discussionRepository.discussions = [discussion];
+      ])("Gets discussion with kind $kind and contact mode $contactMode based on establishment contact email", async (discussion) => {
+        uow.discussionRepository.discussions = [discussion];
 
-          expectToEqual(
-            await getDiscussionByIdForEstablishment.execute(
-              discussionWithUserEmailInContact.id,
-              {
-                userId: user.id,
-              },
-            ),
-            new DiscussionBuilder(discussion).buildRead(),
-          );
-        },
-      );
+        expectToEqual(
+          await getDiscussionByIdForEstablishment.execute(
+            discussionWithUserEmailInContact.id,
+            {
+              userId: user.id,
+            },
+          ),
+          new DiscussionBuilder(discussion).buildRead(),
+        );
+      });
     });
 
     describe("email matching on discussion", () => {

@@ -38,14 +38,9 @@ describe("string utils", () => {
         "input-mille-sabords-capitaine-21--super",
       ],
       ["autocomplete-input", null, ":rb1:", "autocomplete-input-rb1"],
-    ])(
-      "should clean strings to HTML attribute value",
-      (input, prefix, suffix, expected) => {
-        expect(cleanStringToHTMLAttribute(input, prefix, suffix)).toBe(
-          expected,
-        );
-      },
-    );
+    ])("should clean strings to HTML attribute value", (input, prefix, suffix, expected) => {
+      expect(cleanStringToHTMLAttribute(input, prefix, suffix)).toBe(expected);
+    });
   });
   describe("slugify", () => {
     it.each([
@@ -108,12 +103,13 @@ describe("string utils", () => {
     ])(`should return true for "%s"`, (input) => {
       expect(looksLikeSiret(input)).toBe(true);
     });
-    it.each(["123 456 789 AAA10 1", "not-a-siret", ""])(
-      `should return false for "%s"`,
-      (input) => {
-        expect(looksLikeSiret(input)).toBe(false);
-      },
-    );
+    it.each([
+      "123 456 789 AAA10 1",
+      "not-a-siret",
+      "",
+    ])(`should return false for "%s"`, (input) => {
+      expect(looksLikeSiret(input)).toBe(false);
+    });
   });
 
   describe("doesStringContainsHTML", () => {

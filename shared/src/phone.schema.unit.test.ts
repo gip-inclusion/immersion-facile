@@ -15,12 +15,9 @@ describe("phonesShema", () => {
     ["751234", "+687751234"], //NC
     ["723456", "+681723456"], //WF
     ["551234", "+508551234"], //PM
-  ])(
-    "should be valid for mobile phone number %s %s",
-    async (phone, expected) => {
-      expect(phoneSchema.parse(phone)).toBe(expected);
-    },
-  );
+  ])("should be valid for mobile phone number %s %s", async (phone, expected) => {
+    expect(phoneSchema.parse(phone)).toBe(expected);
+  });
 
   it.each<string>([
     "+33600000000",
@@ -36,12 +33,9 @@ describe("phonesShema", () => {
     "+687751234",
     "+681821234",
     "+508551234",
-  ])(
-    "should get that it's a mobile number for mobile phone number %s",
-    async (phone) => {
-      expect(isValidMobilePhone(phone)).toBe(true);
-    },
-  );
+  ])("should get that it's a mobile number for mobile phone number %s", async (phone) => {
+    expect(isValidMobilePhone(phone)).toBe(true);
+  });
 
   it.each<[string, string]>([
     ["01 00 00 00 00", "+33100000000"], //FR

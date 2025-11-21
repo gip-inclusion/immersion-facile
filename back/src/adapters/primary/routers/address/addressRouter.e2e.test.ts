@@ -81,29 +81,31 @@ describe("address router", () => {
       });
     });
 
-    it.each(["1,", "1, ", "⠀  , a ", " )),$,#                  "])(
-      `${displayRouteName(
-        addressRoutes.lookupStreetAddress,
-      )} 400 with lookup="%s"`,
-      async (lookup) => {
-        const response = await httpClient.lookupStreetAddress({
-          queryParams: {
-            lookup,
-          },
-        });
+    it.each([
+      "1,",
+      "1, ",
+      "⠀  , a ",
+      " )),$,#                  ",
+    ])(`${displayRouteName(
+      addressRoutes.lookupStreetAddress,
+    )} 400 with lookup="%s"`, async (lookup) => {
+      const response = await httpClient.lookupStreetAddress({
+        queryParams: {
+          lookup,
+        },
+      });
 
-        expectHttpResponseToEqual(response, {
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          issues: [
+            "lookup : String must contain at least 2 character(s), excluding special chars",
+          ],
+          message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /address/lookupStreetAddress`,
           status: 400,
-          body: {
-            issues: [
-              "lookup : String must contain at least 2 character(s), excluding special chars",
-            ],
-            message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /address/lookupStreetAddress`,
-            status: 400,
-          },
-        });
-      },
-    );
+        },
+      });
+    });
   });
 
   describe("GET /address/lookup-location", () => {

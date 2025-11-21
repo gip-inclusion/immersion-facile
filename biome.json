@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.7/schema.json",
   "assist": {
     "actions": {
       "source": {
@@ -17,7 +17,8 @@
       },
       "suspicious": {
         "noConfusingVoidType": "off",
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "useIterableCallbackReturn": "warn"
       },
       "security": {
         "noDangerouslySetInnerHtml": "warn"
@@ -55,13 +56,16 @@
     "maxSize": 10485760,
     "ignoreUnknown": true,
     "includes": [
-      "**",
-      "!**/node_modules",
-      "!**/*.js",
-      "!**/*.tar.gz",
-      "!**/.vscode",
-      "!**/libs/react-design-system/public/dsfr",
-      "!**/*.css"
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.json",
+      "**/*.scss",
+      "biome.json",
+      "tsconfig.json",
+      "turbo.json",
+      "babel.config.js",
+      "package.json",
+      "!!**/node_modules"
     ]
   }
 }

@@ -152,31 +152,32 @@ describe("Update Convention", () => {
           );
         });
 
-        it.each(["agency-viewer", "agency-admin", "to-review"] as AgencyRole[])(
-          "throws unauthorized if user has not enough rights on agency and is not backoffice admin neither establishment-representative on convention",
-          async (role) => {
-            uow.conventionRepository.setConventions([convention]);
-            uow.agencyRepository.agencies = [
-              toAgencyWithRights(agency, {
-                [connectedUser.id]: {
-                  roles: [role],
-                  isNotifiedByEmail: false,
-                },
-              }),
-            ];
-            uow.userRepository.users = [connectedUser];
+        it.each([
+          "agency-viewer",
+          "agency-admin",
+          "to-review",
+        ] as AgencyRole[])("throws unauthorized if user has not enough rights on agency and is not backoffice admin neither establishment-representative on convention", async (role) => {
+          uow.conventionRepository.setConventions([convention]);
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [connectedUser.id]: {
+                roles: [role],
+                isNotifiedByEmail: false,
+              },
+            }),
+          ];
+          uow.userRepository.users = [connectedUser];
 
-            await expectPromiseToFailWithError(
-              updateConvention.execute(
-                {
-                  convention,
-                },
-                { userId: connectedUser.id },
-              ),
-              errors.convention.updateForbidden({ id: convention.id }),
-            );
-          },
-        );
+          await expectPromiseToFailWithError(
+            updateConvention.execute(
+              {
+                convention,
+              },
+              { userId: connectedUser.id },
+            ),
+            errors.convention.updateForbidden({ id: convention.id }),
+          );
+        });
       });
 
       describe("with convention jwt payload", () => {
@@ -203,31 +204,28 @@ describe("Update Convention", () => {
           "agency-viewer",
           "agency-admin",
           "establishment-tutor",
-        ] as Role[])(
-          "throws forbiden if user role is not allowed",
-          async (role) => {
-            uow.conventionRepository.setConventions([convention]);
+        ] as Role[])("throws forbiden if user role is not allowed", async (role) => {
+          uow.conventionRepository.setConventions([convention]);
 
-            const jwtPayload = createConventionMagicLinkPayload({
+          const jwtPayload = createConventionMagicLinkPayload({
+            id: convention.id,
+            role,
+            email: notConnectedUser.email,
+            now: new Date(),
+          });
+
+          await expectPromiseToFailWithError(
+            updateConvention.execute(
+              {
+                convention,
+              },
+              jwtPayload,
+            ),
+            errors.convention.updateForbidden({
               id: convention.id,
-              role,
-              email: notConnectedUser.email,
-              now: new Date(),
-            });
-
-            await expectPromiseToFailWithError(
-              updateConvention.execute(
-                {
-                  convention,
-                },
-                jwtPayload,
-              ),
-              errors.convention.updateForbidden({
-                id: convention.id,
-              }),
-            );
-          },
-        );
+            }),
+          );
+        });
       });
     });
 
@@ -253,62 +251,56 @@ describe("Update Convention", () => {
       "CANCELLED",
       "DEPRECATED",
       "ACCEPTED_BY_VALIDATOR",
-    ] as ConventionStatus[])(
-      "rejects when convention initial status is %s",
-      async (initialStatus: ConventionStatus) => {
-        const storedConvention = new ConventionDtoBuilder()
-          .withStatus(initialStatus)
-          .build();
+    ] as ConventionStatus[])("rejects when convention initial status is %s", async (initialStatus: ConventionStatus) => {
+      const storedConvention = new ConventionDtoBuilder()
+        .withStatus(initialStatus)
+        .build();
 
-        uow.conventionRepository.setConventions([storedConvention]);
+      uow.conventionRepository.setConventions([storedConvention]);
 
-        const updatedConvention = new ConventionDtoBuilder()
-          .withId(storedConvention.id)
-          .withStatus("READY_TO_SIGN")
-          .withStatusJustification("justif")
-          .build();
+      const updatedConvention = new ConventionDtoBuilder()
+        .withId(storedConvention.id)
+        .withStatus("READY_TO_SIGN")
+        .withStatusJustification("justif")
+        .build();
 
-        await expectPromiseToFailWithError(
-          updateConvention.execute(
-            {
-              convention: updatedConvention,
-            },
-            {
-              applicationId: storedConvention.id,
-              role: "beneficiary",
-              emailHash: makeHashByRolesForTest(
-                convention,
-                counsellorUser,
-                validatorUser,
-              ).beneficiary,
-            },
-          ),
-          errors.convention.updateBadStatusInRepo({
-            id: storedConvention.id,
-            status: storedConvention.status,
-          }),
-        );
-      },
-    );
+      await expectPromiseToFailWithError(
+        updateConvention.execute(
+          {
+            convention: updatedConvention,
+          },
+          {
+            applicationId: storedConvention.id,
+            role: "beneficiary",
+            emailHash: makeHashByRolesForTest(
+              convention,
+              counsellorUser,
+              validatorUser,
+            ).beneficiary,
+          },
+        ),
+        errors.convention.updateBadStatusInRepo({
+          id: storedConvention.id,
+          status: storedConvention.status,
+        }),
+      );
+    });
 
-    it.each(conventionStatuses.filter((status) => status !== "READY_TO_SIGN"))(
-      "rejects applications if the updated convention status is not READY_TO_SIGN",
-      async (status: ConventionStatus) => {
-        const convention = new ConventionDtoBuilder()
-          .withStatus(status)
-          .build();
+    it.each(
+      conventionStatuses.filter((status) => status !== "READY_TO_SIGN"),
+    )("rejects applications if the updated convention status is not READY_TO_SIGN", async (status: ConventionStatus) => {
+      const convention = new ConventionDtoBuilder().withStatus(status).build();
 
-        uow.conventionRepository.setConventions([convention]);
+      uow.conventionRepository.setConventions([convention]);
 
-        await expectPromiseToFailWithError(
-          updateConvention.execute(
-            { convention },
-            { userId: backofficeAdminUser.id },
-          ),
-          errors.convention.updateBadStatusInParams({ id: convention.id }),
-        );
-      },
-    );
+      await expectPromiseToFailWithError(
+        updateConvention.execute(
+          { convention },
+          { userId: backofficeAdminUser.id },
+        ),
+        errors.convention.updateBadStatusInParams({ id: convention.id }),
+      );
+    });
     it("throws if convention already updated when user try to update it", async () => {
       const updatedAt = "2025-01-01";
       const firstUpdatedConvention = new ConventionDtoBuilder(convention)
@@ -374,58 +366,55 @@ describe("Update Convention", () => {
           validatorUser,
         )["establishment-representative"],
       },
-    ] as ConventionDomainPayload[])(
-      "updates the Convention in the repository when updated by signatories user",
-      async (payload) => {
-        uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-        uow.conventionRepository.setConventions([convention]);
+    ] as ConventionDomainPayload[])("updates the Convention in the repository when updated by signatories user", async (payload) => {
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+      uow.conventionRepository.setConventions([convention]);
 
-        const updatedConvention = new ConventionDtoBuilder(convention)
-          .withStatus("READY_TO_SIGN")
-          .withBeneficiaryEmail("new@email.fr")
-          .withStatusJustification("justif")
+      const updatedConvention = new ConventionDtoBuilder(convention)
+        .withStatus("READY_TO_SIGN")
+        .withBeneficiaryEmail("new@email.fr")
+        .withStatusJustification("justif")
 
-          .build();
+        .build();
 
-        await updateConvention.execute(
-          { convention: updatedConvention },
-          payload,
-        );
-        const expectedUpdatedConventionInRepo = {
-          ...updatedConvention,
-          status: "PARTIALLY_SIGNED",
-          signatories: {
-            ...updatedConvention.signatories,
-            [conventionSignatoryRoleBySignatoryKey[
-              payload.role as keyof typeof conventionSignatoryRoleBySignatoryKey
-            ]]: {
-              ...updatedConvention.signatories[
-                conventionSignatoryRoleBySignatoryKey[
-                  payload.role as keyof typeof conventionSignatoryRoleBySignatoryKey
-                ]
-              ],
-              signedAt: timeGateway.now().toISOString(),
+      await updateConvention.execute(
+        { convention: updatedConvention },
+        payload,
+      );
+      const expectedUpdatedConventionInRepo = {
+        ...updatedConvention,
+        status: "PARTIALLY_SIGNED",
+        signatories: {
+          ...updatedConvention.signatories,
+          [conventionSignatoryRoleBySignatoryKey[
+            payload.role as keyof typeof conventionSignatoryRoleBySignatoryKey
+          ]]: {
+            ...updatedConvention.signatories[
+              conventionSignatoryRoleBySignatoryKey[
+                payload.role as keyof typeof conventionSignatoryRoleBySignatoryKey
+              ]
+            ],
+            signedAt: timeGateway.now().toISOString(),
+          },
+        },
+      };
+
+      expectToEqual(uow.conventionRepository.conventions, [
+        expectedUpdatedConventionInRepo,
+      ]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        createNewEvent({
+          topic: "ConventionModifiedAndSigned",
+          payload: {
+            convention: expectedUpdatedConventionInRepo as ConventionDto,
+            triggeredBy: {
+              kind: "convention-magic-link",
+              role: payload.role,
             },
           },
-        };
-
-        expectToEqual(uow.conventionRepository.conventions, [
-          expectedUpdatedConventionInRepo,
-        ]);
-        expectArraysToMatch(uow.outboxRepository.events, [
-          createNewEvent({
-            topic: "ConventionModifiedAndSigned",
-            payload: {
-              convention: expectedUpdatedConventionInRepo as ConventionDto,
-              triggeredBy: {
-                kind: "convention-magic-link",
-                role: payload.role,
-              },
-            },
-          }),
-        ]);
-      },
-    );
+        }),
+      ]);
+    });
 
     it.each([
       {
@@ -449,62 +438,60 @@ describe("Update Convention", () => {
       { userId: backofficeAdminUser.id },
       { userId: validatorUser.id },
       { userId: counsellorUser.id },
-    ] as (ConventionDomainPayload | ConnectedUserDomainJwtPayload)[])(
-      "updates the Convention in the repository updated by non signatories user",
-      async (payload) => {
-        uow.userRepository.users = [
-          validatorUser,
-          counsellorUser,
-          backofficeAdminUser,
-        ];
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [validatorUser.id]: {
-              roles: ["validator"],
-              isNotifiedByEmail: true,
-            },
-            [counsellorUser.id]: {
-              roles: ["counsellor"],
-              isNotifiedByEmail: true,
-            },
-          }),
-        ];
-        uow.conventionRepository.setConventions([convention]);
+    ] as (
+      | ConventionDomainPayload
+      | ConnectedUserDomainJwtPayload
+    )[])("updates the Convention in the repository updated by non signatories user", async (payload) => {
+      uow.userRepository.users = [
+        validatorUser,
+        counsellorUser,
+        backofficeAdminUser,
+      ];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [validatorUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+          [counsellorUser.id]: {
+            roles: ["counsellor"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+      uow.conventionRepository.setConventions([convention]);
 
-        const updatedConvention = new ConventionDtoBuilder(convention)
-          .withStatus("READY_TO_SIGN")
-          .withBeneficiaryEmail("new@email.fr")
-          .withStatusJustification("justif")
-          .build();
+      const updatedConvention = new ConventionDtoBuilder(convention)
+        .withStatus("READY_TO_SIGN")
+        .withBeneficiaryEmail("new@email.fr")
+        .withStatusJustification("justif")
+        .build();
 
-        await updateConvention.execute(
-          { convention: updatedConvention },
-          payload,
-        );
-        expectToEqual(uow.conventionRepository.conventions, [
-          updatedConvention,
-        ]);
-        expectToEqual(uow.outboxRepository.events, [
-          createNewEvent({
-            topic: "ConventionSubmittedAfterModification",
-            payload: {
-              convention: updatedConvention,
-              triggeredBy: {
-                ...("userId" in payload
-                  ? {
-                      kind: "connected-user",
-                      userId: payload.userId,
-                    }
-                  : {
-                      kind: "convention-magic-link",
-                      role: payload.role,
-                    }),
-              },
+      await updateConvention.execute(
+        { convention: updatedConvention },
+        payload,
+      );
+      expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
+      expectToEqual(uow.outboxRepository.events, [
+        createNewEvent({
+          topic: "ConventionSubmittedAfterModification",
+          payload: {
+            convention: updatedConvention,
+            triggeredBy: {
+              ...("userId" in payload
+                ? {
+                    kind: "connected-user",
+                    userId: payload.userId,
+                  }
+                : {
+                    kind: "convention-magic-link",
+                    role: payload.role,
+                  }),
             },
-          }),
-        ]);
-      },
-    );
+          },
+        }),
+      ]);
+    });
 
     it("With tutor different of establishment representative", async () => {
       const tutor: EstablishmentTutor = {
@@ -545,29 +532,26 @@ describe("Update Convention", () => {
       expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
     });
 
-    it.each(statusTransitionConfigs.READY_TO_SIGN.validInitialStatuses)(
-      "allows when convention initial status is %s",
-      async (initialStatus: ConventionStatus) => {
-        const storedConvention = new ConventionDtoBuilder(convention)
-          .withStatus(initialStatus)
-          .build();
+    it.each(
+      statusTransitionConfigs.READY_TO_SIGN.validInitialStatuses,
+    )("allows when convention initial status is %s", async (initialStatus: ConventionStatus) => {
+      const storedConvention = new ConventionDtoBuilder(convention)
+        .withStatus(initialStatus)
+        .build();
 
-        uow.conventionRepository.setConventions([storedConvention]);
+      uow.conventionRepository.setConventions([storedConvention]);
 
-        const updatedConvention = new ConventionDtoBuilder(storedConvention)
-          .withStatus("READY_TO_SIGN")
-          .withStatusJustification("justif")
-          .build();
+      const updatedConvention = new ConventionDtoBuilder(storedConvention)
+        .withStatus("READY_TO_SIGN")
+        .withStatusJustification("justif")
+        .build();
 
-        await updateConvention.execute(
-          { convention: updatedConvention },
-          { userId: backofficeAdminUser.id },
-        );
+      await updateConvention.execute(
+        { convention: updatedConvention },
+        { userId: backofficeAdminUser.id },
+      );
 
-        expectToEqual(uow.conventionRepository.conventions, [
-          updatedConvention,
-        ]);
-      },
-    );
+      expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
+    });
   });
 });

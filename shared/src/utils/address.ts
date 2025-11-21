@@ -11,13 +11,11 @@ export interface CaptureAddressGroupsResult {
 export const captureAddressGroups = (
   fullAddressString: string,
 ): CaptureAddressGroupsResult => {
-  const captureAddressGroupsRegex =
-    // @ts-ignore
-    /(?<address>^.*)(?<postalCode>[0-9]{5}) (?<city>.+$)/u;
+  const captureAddressGroupsRegex = /(^.*)([0-9]{5}) (.+$)/u;
   const capture = captureAddressGroupsRegex.exec(fullAddressString);
-  const address = capture?.groups?.address;
-  const postalCode = capture?.groups?.postalCode;
-  const city = capture?.groups?.city;
+  const address = capture?.[1];
+  const postalCode = capture?.[2];
+  const city = capture?.[3];
 
   return {
     address: dropLastComma(trim(address ?? "")),

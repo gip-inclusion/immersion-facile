@@ -606,61 +606,61 @@ describe("conventionDtoSchema", () => {
         maxCalendarDays: maximumCalendarDayByInternshipKind[internshipKind],
       }));
 
-      it.each(calendarDayAndInternShips)(
-        "for $internshipKind rejects when it is more than $maxCalendarDays",
-        ({ internshipKind, maxCalendarDays }) => {
-          const convention = new ConventionDtoBuilder()
-            .withInternshipKind(internshipKind)
-            .withDateStart(DATE_START)
-            .withDateEnd(
-              addDays(new Date(DATE_START), maxCalendarDays + 1).toISOString(),
-            )
-            .withSchedule(reasonableSchedule, [
-              "lundi",
-              "mercredi",
-              "vendredi",
-              "samedi",
-              "dimanche",
-            ])
-            .build();
+      it.each(
+        calendarDayAndInternShips,
+      )("for $internshipKind rejects when it is more than $maxCalendarDays", ({
+        internshipKind,
+        maxCalendarDays,
+      }) => {
+        const convention = new ConventionDtoBuilder()
+          .withInternshipKind(internshipKind)
+          .withDateStart(DATE_START)
+          .withDateEnd(
+            addDays(new Date(DATE_START), maxCalendarDays + 1).toISOString(),
+          )
+          .withSchedule(reasonableSchedule, [
+            "lundi",
+            "mercredi",
+            "vendredi",
+            "samedi",
+            "dimanche",
+          ])
+          .build();
 
-          expectConventionInvalidWithIssueMessages(
-            conventionSchema,
-            convention,
-            {
-              dateEnd: getConventionTooLongMessageAndPath({
-                internshipKind,
-                dateEnd: "",
-                dateStart: "",
-              }).message,
-            },
-          );
-        },
-      );
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
+          dateEnd: getConventionTooLongMessageAndPath({
+            internshipKind,
+            dateEnd: "",
+            dateStart: "",
+          }).message,
+        });
+      });
 
-      it.each(calendarDayAndInternShips)(
-        "for $intershipKind accepts end date that are <= $maxCalendarDays calendar days after the start date",
-        ({ internshipKind, maxCalendarDays }) => {
-          const dateStart = DATE_START;
-          const dateEnd = addDays(
-            new Date(DATE_START),
-            maxCalendarDays,
-          ).toISOString();
-          const convention = new ConventionDtoBuilder()
-            .withInternshipKind(internshipKind)
-            .withDateStart(dateStart)
-            .withDateEnd(dateEnd)
-            .withSchedule(reasonableSchedule, [
-              "jeudi",
-              "vendredi",
-              "samedi",
-              "dimanche",
-            ])
-            .build();
+      it.each(
+        calendarDayAndInternShips,
+      )("for $intershipKind accepts end date that are <= $maxCalendarDays calendar days after the start date", ({
+        internshipKind,
+        maxCalendarDays,
+      }) => {
+        const dateStart = DATE_START;
+        const dateEnd = addDays(
+          new Date(DATE_START),
+          maxCalendarDays,
+        ).toISOString();
+        const convention = new ConventionDtoBuilder()
+          .withInternshipKind(internshipKind)
+          .withDateStart(dateStart)
+          .withDateEnd(dateEnd)
+          .withSchedule(reasonableSchedule, [
+            "jeudi",
+            "vendredi",
+            "samedi",
+            "dimanche",
+          ])
+          .build();
 
-          expectConventionDtoToBeValid(convention);
-        },
-      );
+        expectConventionDtoToBeValid(convention);
+      });
     });
 
     describe("when max hours per week is exceeded", () => {
@@ -848,31 +848,27 @@ describe("conventionDtoSchema", () => {
           "DEPRECATED",
         ]);
 
-      it.each(allowWithoutSignature.map((status) => ({ status })))(
-        "WITHOUT signatures, a Convention CAN be $status",
-        ({ status }) => {
-          const convention = new ConventionDtoBuilder()
-            .withStatus(status)
-            .notSigned()
-            .build();
-          expectConventionDtoToBeValid(convention);
-        },
-      );
+      it.each(
+        allowWithoutSignature.map((status) => ({ status })),
+      )("WITHOUT signatures, a Convention CAN be $status", ({ status }) => {
+        const convention = new ConventionDtoBuilder()
+          .withStatus(status)
+          .notSigned()
+          .build();
+        expectConventionDtoToBeValid(convention);
+      });
 
-      it.each(failingWithoutSignature.map((status) => ({ status })))(
-        "WITHOUT signatures, a Convention CANNOT be $status",
-        ({ status }) => {
-          const convention = new ConventionDtoBuilder()
-            .withStatus(status)
-            .notSigned()
-            .build();
-          expectConventionInvalidWithIssueMessages(
-            conventionSchema,
-            convention,
-            { status: "La confirmation de votre accord est obligatoire." },
-          );
-        },
-      );
+      it.each(
+        failingWithoutSignature.map((status) => ({ status })),
+      )("WITHOUT signatures, a Convention CANNOT be $status", ({ status }) => {
+        const convention = new ConventionDtoBuilder()
+          .withStatus(status)
+          .notSigned()
+          .build();
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
+          status: "La confirmation de votre accord est obligatoire.",
+        });
+      });
     });
   });
 

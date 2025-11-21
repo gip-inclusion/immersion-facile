@@ -286,46 +286,43 @@ describe("UpdateDiscussionStatus", () => {
           },
           expectedRejectionReason: "my rejection reason",
         },
-      ])(
-        "rejects discussion with kind $params.rejectionKind",
-        async ({
+      ])("rejects discussion with kind $params.rejectionKind", async ({
+        expectedRejectionReason,
+        params: { discussionId, ...rest },
+      }) => {
+        await updateDiscussionStatus.execute(
+          { discussionId, ...rest },
+          authorizedUser,
+        );
+
+        const { htmlContent, subject } = makeExpectedEmailParams(
           expectedRejectionReason,
-          params: { discussionId, ...rest },
-        }) => {
-          await updateDiscussionStatus.execute(
-            { discussionId, ...rest },
-            authorizedUser,
-          );
+          discussion.establishmentContact.firstName,
+          discussion.establishmentContact.lastName,
+        );
 
-          const { htmlContent, subject } = makeExpectedEmailParams(
-            expectedRejectionReason,
-            discussion.establishmentContact.firstName,
-            discussion.establishmentContact.lastName,
-          );
-
-          expectDiscussionInRepoAndInOutbox({
-            triggeredBy: {
-              kind: "connected-user",
-              userId: authorizedUser.id,
-            },
-            expectedDiscussion: {
-              ...discussion,
-              ...rest,
-              exchanges: [
-                ...discussion.exchanges,
-                {
-                  subject,
-                  message: htmlContent,
-                  attachments: [],
-                  sender: "establishment",
-                  recipient: "potentialBeneficiary",
-                  sentAt: timeGateway.now().toISOString(),
-                },
-              ],
-            },
-          });
-        },
-      );
+        expectDiscussionInRepoAndInOutbox({
+          triggeredBy: {
+            kind: "connected-user",
+            userId: authorizedUser.id,
+          },
+          expectedDiscussion: {
+            ...discussion,
+            ...rest,
+            exchanges: [
+              ...discussion.exchanges,
+              {
+                subject,
+                message: htmlContent,
+                attachments: [],
+                sender: "establishment",
+                recipient: "potentialBeneficiary",
+                sentAt: timeGateway.now().toISOString(),
+              },
+            ],
+          },
+        });
+      });
     });
 
     describe("validate user rights", () => {

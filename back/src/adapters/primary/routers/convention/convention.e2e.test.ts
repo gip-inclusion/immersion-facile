@@ -281,57 +281,56 @@ describe("convention e2e", () => {
       ];
     });
 
-    it.each(["ConventionJwt", "BackOfficeJwt", "ConnectedUserJwt"] as const)(
-      "200 - succeeds with JWT %s",
-      async (scenario) => {
-        inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
+    it.each([
+      "ConventionJwt",
+      "BackOfficeJwt",
+      "ConnectedUserJwt",
+    ] as const)("200 - succeeds with JWT %s", async (scenario) => {
+      inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
 
-        const jwt = match(scenario)
-          .with("ConventionJwt", () =>
-            generateConventionJwt({
-              applicationId: convention.id,
-              role: "beneficiary",
-              emailHash: makeEmailHash(
-                convention.signatories.beneficiary.email,
-              ),
-              iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
-              exp:
-                Math.round(gateways.timeGateway.now().getTime() / 1000) +
-                31 * 24 * 3600,
-              version: currentJwtVersions.convention,
-            }),
-          )
-          .with("BackOfficeJwt", () =>
-            generateConnectedUserJwt(backofficeAdminJwtPayload),
-          )
-          .with("ConnectedUserJwt", () =>
-            generateConnectedUserJwt({
-              userId: validator.id,
-              version: currentJwtVersions.connectedUser,
-              iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
-            }),
-          )
-          .exhaustive();
+      const jwt = match(scenario)
+        .with("ConventionJwt", () =>
+          generateConventionJwt({
+            applicationId: convention.id,
+            role: "beneficiary",
+            emailHash: makeEmailHash(convention.signatories.beneficiary.email),
+            iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+            exp:
+              Math.round(gateways.timeGateway.now().getTime() / 1000) +
+              31 * 24 * 3600,
+            version: currentJwtVersions.convention,
+          }),
+        )
+        .with("BackOfficeJwt", () =>
+          generateConnectedUserJwt(backofficeAdminJwtPayload),
+        )
+        .with("ConnectedUserJwt", () =>
+          generateConnectedUserJwt({
+            userId: validator.id,
+            version: currentJwtVersions.connectedUser,
+            iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+          }),
+        )
+        .exhaustive();
 
-        const response = await magicLinkRequest.getConvention({
-          headers: { authorization: jwt },
-          urlParams: { conventionId: convention.id },
-        });
+      const response = await magicLinkRequest.getConvention({
+        headers: { authorization: jwt },
+        urlParams: { conventionId: convention.id },
+      });
 
-        expectHttpResponseToEqual(response, {
-          status: 200,
-          body: {
-            ...convention,
-            agencyName: peAgency.name,
-            agencyDepartment: peAgency.address.departmentCode,
-            agencyKind: peAgency.kind,
-            agencySiret: peAgency.agencySiret,
-            agencyCounsellorEmails: peAgency.counsellorEmails,
-            agencyValidatorEmails: [validator.email],
-          },
-        });
-      },
-    );
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          ...convention,
+          agencyName: peAgency.name,
+          agencyDepartment: peAgency.address.departmentCode,
+          agencyKind: peAgency.kind,
+          agencySiret: peAgency.agencySiret,
+          agencyCounsellorEmails: peAgency.counsellorEmails,
+          agencyValidatorEmails: [validator.email],
+        },
+      });
+    });
 
     it("400 - no JWT", async () => {
       const response = await magicLinkRequest.getConvention({
@@ -513,105 +512,105 @@ describe("convention e2e", () => {
       inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
     });
 
-    it.each(["ConventionJwt", "BackOfficeJwt", "ConnectedUserJwt"] as const)(
-      "200 - Succeeds with JWT %s",
-      async (scenario) => {
-        const jwt = match(scenario)
-          .with("ConventionJwt", () =>
-            generateConventionJwt(
-              createConventionMagicLinkPayload({
-                id: convention.id,
-                role: "counsellor",
-                email: "counsellor@pe.fr",
-                now: gateways.timeGateway.now(),
-              }),
-            ),
-          )
-          .with("BackOfficeJwt", () =>
-            generateConnectedUserJwt({
-              userId: validator.id,
-              version: currentJwtVersions.connectedUser,
-              iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
-              exp:
-                Math.round(gateways.timeGateway.now().getTime() / 1000) + 3600,
+    it.each([
+      "ConventionJwt",
+      "BackOfficeJwt",
+      "ConnectedUserJwt",
+    ] as const)("200 - Succeeds with JWT %s", async (scenario) => {
+      const jwt = match(scenario)
+        .with("ConventionJwt", () =>
+          generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: convention.id,
+              role: "counsellor",
+              email: "counsellor@pe.fr",
+              now: gateways.timeGateway.now(),
             }),
-          )
-          .with("ConnectedUserJwt", () =>
-            generateConnectedUserJwt({
-              userId: validator.id,
-              version: currentJwtVersions.connectedUser,
-              iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
-            }),
-          )
-          .exhaustive();
+          ),
+        )
+        .with("BackOfficeJwt", () =>
+          generateConnectedUserJwt({
+            userId: validator.id,
+            version: currentJwtVersions.connectedUser,
+            iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+            exp: Math.round(gateways.timeGateway.now().getTime() / 1000) + 3600,
+          }),
+        )
+        .with("ConnectedUserJwt", () =>
+          generateConnectedUserJwt({
+            userId: validator.id,
+            version: currentJwtVersions.connectedUser,
+            iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+          }),
+        )
+        .exhaustive();
 
-        const response = await magicLinkRequest.updateConventionStatus({
-          headers: { authorization: jwt },
-          body: {
-            status: "REJECTED",
-            statusJustification: "test-justification",
-            conventionId: convention.id,
+      const response = await magicLinkRequest.updateConventionStatus({
+        headers: { authorization: jwt },
+        body: {
+          status: "REJECTED",
+          statusJustification: "test-justification",
+          conventionId: convention.id,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: { id: convention.id },
+      });
+
+      await eventCrawler.processNewEvents();
+
+      expectToEqual(
+        gateways.franceTravailGateway.legacyBroadcastConventionCalls,
+        [
+          {
+            activitesObservees: convention.immersionActivities,
+            adresseImmersion: convention.immersionAddress,
+            codeAppellation: "017751",
+            codeRome: convention.immersionAppellation.romeCode,
+            competencesObservees:
+              "Utilisation des pneus optimale, gestion de carburant",
+            dateDebut: convention.dateStart,
+            dateDemande: convention.dateSubmission,
+            dateFin: convention.dateEnd,
+            dateNaissance: new Date(
+              convention.signatories.beneficiary.birthdate,
+            ).toISOString(),
+            descriptionPreventionSanitaire: "fourniture de gel",
+            dureeImmersion: 70,
+            email: "beneficiary@email.fr",
+            emailTuteur: "establishment@example.com",
+            id: externalId,
+            nom: "Ocon",
+            nomPrenomFonctionTuteur: "Alain Prost Big Boss",
+            objectifDeImmersion: 2,
+            originalId: "a99eaca1-ee70-4c90-b3f4-668d492f7392",
+            peConnectId: "some-id",
+            prenom: "Esteban",
+            preventionSanitaire: true,
+            protectionIndividuelle: true,
+            raisonSociale: "Beta.gouv.fr",
+            signatureBeneficiaire: true,
+            signatureEntreprise: true,
+            siret: "12345678901234",
+            statut: "REJETÉ",
+            telephone: "+33123456780",
+            telephoneTuteur: "+33601010101",
+            typeAgence: "france-travail",
+            nomAgence: peAgency.name,
+            prenomValidateurRenseigne:
+              convention.validators?.agencyValidator?.firstname,
+            nomValidateurRenseigne:
+              convention.validators?.agencyValidator?.lastname,
+            rqth: "N",
+            prenomTuteur: convention.establishmentTutor.firstName,
+            nomTuteur: convention.establishmentTutor.lastName,
+            fonctionTuteur: convention.establishmentTutor.job,
           },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 200,
-          body: { id: convention.id },
-        });
-
-        await eventCrawler.processNewEvents();
-
-        expectToEqual(
-          gateways.franceTravailGateway.legacyBroadcastConventionCalls,
-          [
-            {
-              activitesObservees: convention.immersionActivities,
-              adresseImmersion: convention.immersionAddress,
-              codeAppellation: "017751",
-              codeRome: convention.immersionAppellation.romeCode,
-              competencesObservees:
-                "Utilisation des pneus optimale, gestion de carburant",
-              dateDebut: convention.dateStart,
-              dateDemande: convention.dateSubmission,
-              dateFin: convention.dateEnd,
-              dateNaissance: new Date(
-                convention.signatories.beneficiary.birthdate,
-              ).toISOString(),
-              descriptionPreventionSanitaire: "fourniture de gel",
-              dureeImmersion: 70,
-              email: "beneficiary@email.fr",
-              emailTuteur: "establishment@example.com",
-              id: externalId,
-              nom: "Ocon",
-              nomPrenomFonctionTuteur: "Alain Prost Big Boss",
-              objectifDeImmersion: 2,
-              originalId: "a99eaca1-ee70-4c90-b3f4-668d492f7392",
-              peConnectId: "some-id",
-              prenom: "Esteban",
-              preventionSanitaire: true,
-              protectionIndividuelle: true,
-              raisonSociale: "Beta.gouv.fr",
-              signatureBeneficiaire: true,
-              signatureEntreprise: true,
-              siret: "12345678901234",
-              statut: "REJETÉ",
-              telephone: "+33123456780",
-              telephoneTuteur: "+33601010101",
-              typeAgence: "france-travail",
-              nomAgence: peAgency.name,
-              prenomValidateurRenseigne:
-                convention.validators?.agencyValidator?.firstname,
-              nomValidateurRenseigne:
-                convention.validators?.agencyValidator?.lastname,
-              rqth: "N",
-              prenomTuteur: convention.establishmentTutor.firstName,
-              nomTuteur: convention.establishmentTutor.lastName,
-              fonctionTuteur: convention.establishmentTutor.job,
-            },
-          ],
-        );
-      },
-    );
+        ],
+      );
+    });
 
     it("when a convention is ACCEPTED_BY_VALIDATOR, an Establishment Lead is created", async () => {
       const jwt = generateConventionJwt(

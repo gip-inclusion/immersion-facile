@@ -224,19 +224,19 @@ describe("BrevoNotificationGateway unit", () => {
       <br/>Chaque utilisateur peut se créer un espace personnel afin de voir, pré-valider ou valider et piloter ses conventions, en fonction de ses droits.
       <br/>false
       <br/>
-      <br/><ul style=\"list-style-type: none; border: 1px solid #ddd; padding: 16px;\"><li><strong>Jean Dupont - jean-dupont@gmail.com</strong></li>
+      <br/><ul style="list-style-type: none; border: 1px solid #ddd; padding: 16px;"><li><strong>Jean Dupont - jean-dupont@gmail.com</strong></li>
       <br/><li><strong>Valideur</strong> (peut valider des conventions de l’agence et modifier leur statut)</li>
       <br/><li>Reçoit les emails de toutes les conventions de  Agence du Grand Est</li>
       <br/><li><a 
-      href=\"https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence\" 
-      target=\"_blank\">Espace personnel</a></li></ul>
+      href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" 
+      target="_blank">Espace personnel</a></li></ul>
       <br/>
-      <br/><ul style=\"list-style-type: none; border: 1px solid #ddd; padding: 16px;\"><li><strong>Jeanne Dupont - jeanne-dupont@gmail.com</strong></li>
+      <br/><ul style="list-style-type: none; border: 1px solid #ddd; padding: 16px;"><li><strong>Jeanne Dupont - jeanne-dupont@gmail.com</strong></li>
       <br/><li><strong>Pré-Valideur</strong> (peut pré-valider les conventions de l’agence et modifier leur statut)</li>
       <br/><li>Reçoit les emails de toutes les conventions de  Agence du Grand Est</li>
       <br/><li><a 
-      href=\"https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence\" 
-      target=\"_blank\">Espace personnel</a></li></ul>
+      href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" 
+      target="_blank">Espace personnel</a></li></ul>
       <br/>
       <br/>
       <br/>
@@ -256,13 +256,13 @@ describe("BrevoNotificationGateway unit", () => {
       <table>
       <tr>
       <td 
-      align=\"center\" 
-      width=\"600\"
-      style=\"padding: 20px; padding-top: 10px; padding-bottom: 30px;\"
+      align="center" 
+      width="600"
+      style="padding: 20px; padding-top: 10px; padding-bottom: 30px;"
       >
       <a
-      style=\"text-decoration: none; display: inline-block; padding: 10px 20px; text-align: center; background-color: #000091; color: #fff;\"
-      href=\"https://app.livestorm.co/itou/prescripteur-utiliser-le-site-dimmersion-facilitee?utm_source=if&utm_medium=mail&utm_campaign=transac-activation\"
+      style="text-decoration: none; display: inline-block; padding: 10px 20px; text-align: center; background-color: #000091; color: #fff;"
+      href="https://app.livestorm.co/itou/prescripteur-utiliser-le-site-dimmersion-facilitee?utm_source=if&utm_medium=mail&utm_campaign=transac-activation"
       >
       Je m'inscris au webinaire
       </a>

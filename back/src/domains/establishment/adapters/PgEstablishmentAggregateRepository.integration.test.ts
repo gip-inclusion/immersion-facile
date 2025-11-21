@@ -1965,30 +1965,30 @@ describe("PgEstablishmentAggregateRepository", () => {
         originalEstablishment: EstablishmentAggregate;
         updatedEstablishment: EstablishmentAggregate;
         title: string;
-      }[])(
-        "$title",
-        async ({ originalEstablishment, updatedEstablishment }) => {
-          // Prepare
-          await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-            originalEstablishment,
-          );
+      }[])("$title", async ({
+        originalEstablishment,
+        updatedEstablishment,
+      }) => {
+        // Prepare
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          originalEstablishment,
+        );
 
-          expectToEqual(
-            await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
-            [originalEstablishment],
-          );
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
+          [originalEstablishment],
+        );
 
-          await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
-            updatedEstablishment,
-            updatedAt,
-          );
+        await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
+          updatedEstablishment,
+          updatedAt,
+        );
 
-          expectToEqual(
-            await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
-            [updatedEstablishment],
-          );
-        },
-      );
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
+          [updatedEstablishment],
+        );
+      });
     });
   });
 

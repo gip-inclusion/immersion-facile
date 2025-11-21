@@ -56,43 +56,38 @@ describe("Update agency status", () => {
     it.each([
       { status: "active" },
       { status: "rejected", rejectionJustification: "justification" },
-    ] satisfies UpdateAgencyStatusParamsWithoutId[])(
-      "Updates an agency status in repository and publishes an event to notify if status becomes $status",
-      async (testParams) => {
-        // Prepare
-        uow.agencyRepository.agencies = [toAgencyWithRights(existingAgency)];
+    ] satisfies UpdateAgencyStatusParamsWithoutId[])("Updates an agency status in repository and publishes an event to notify if status becomes $status", async (testParams) => {
+      // Prepare
+      uow.agencyRepository.agencies = [toAgencyWithRights(existingAgency)];
 
-        // Act
-        await updateAgencyStatus.execute(
-          {
-            id: existingAgency.id,
-            ...testParams,
-          },
-          connectedBackofficeAdmin,
-        );
+      // Act
+      await updateAgencyStatus.execute(
+        {
+          id: existingAgency.id,
+          ...testParams,
+        },
+        connectedBackofficeAdmin,
+      );
 
-        // Assert
-        expect(uow.agencyRepository.agencies[0].status).toBe(
-          testParams?.status,
-        );
-        expectObjectInArrayToMatch(uow.outboxRepository.events, [
-          {
-            id: nextUuid,
-            topic:
-              testParams.status === "active"
-                ? "AgencyActivated"
-                : "AgencyRejected",
-            payload: {
-              agencyId: existingAgency.id,
-              triggeredBy: {
-                kind: "connected-user",
-                userId: backofficeAdmin.id,
-              },
+      // Assert
+      expect(uow.agencyRepository.agencies[0].status).toBe(testParams?.status);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          id: nextUuid,
+          topic:
+            testParams.status === "active"
+              ? "AgencyActivated"
+              : "AgencyRejected",
+          payload: {
+            agencyId: existingAgency.id,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: backofficeAdmin.id,
             },
           },
-        ]);
-      },
-    );
+        },
+      ]);
+    });
   });
 
   describe("wrong paths", () => {

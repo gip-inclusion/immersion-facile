@@ -99,38 +99,35 @@ describe("EditCounsellorName", () => {
       "DEPRECATED",
       "ACCEPTED_BY_COUNSELLOR",
       "ACCEPTED_BY_VALIDATOR",
-    ] satisfies ConventionStatus[])(
-      "should throw an error if convention status %s does not allow counsellor names to be edited",
-      async (status) => {
-        const conventionWithStatus = new ConventionDtoBuilder(convention)
-          .withStatus(status)
-          .build();
-        uow.userRepository.users = [notConnectedUser];
-        uow.conventionRepository.setConventions([conventionWithStatus]);
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [notConnectedUser.id]: {
-              roles: ["validator"],
-              isNotifiedByEmail: true,
-            },
-          }),
-          toAgencyWithRights(otherAgency, {}),
-        ];
+    ] satisfies ConventionStatus[])("should throw an error if convention status %s does not allow counsellor names to be edited", async (status) => {
+      const conventionWithStatus = new ConventionDtoBuilder(convention)
+        .withStatus(status)
+        .build();
+      uow.userRepository.users = [notConnectedUser];
+      uow.conventionRepository.setConventions([conventionWithStatus]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notConnectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        }),
+        toAgencyWithRights(otherAgency, {}),
+      ];
 
-        await expectPromiseToFailWithError(
-          usecase.execute(
-            {
-              conventionId: convention.id,
-            },
-            validatorJwtPayload,
-          ),
-          errors.convention.editCounsellorNameNotAllowedForStatus({
-            status,
-          }),
-        );
-        expectObjectInArrayToMatch(uow.outboxRepository.events, []);
-      },
-    );
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId: convention.id,
+          },
+          validatorJwtPayload,
+        ),
+        errors.convention.editCounsellorNameNotAllowedForStatus({
+          status,
+        }),
+      );
+      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+    });
 
     it("throw an error if convention is not found", async () => {
       await expectPromiseToFailWithError(
@@ -199,36 +196,33 @@ describe("EditCounsellorName", () => {
         "agency-viewer",
         "agency-admin",
         "to-review",
-      ] satisfies AgencyRole[])(
-        "throws unauthorized if user has not enough rights on agency",
-        async (role) => {
-          uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.agencies = [
-            toAgencyWithRights(agency, {
-              [connectedUser.id]: {
-                roles: [role],
-                isNotifiedByEmail: false,
-              },
-            }),
-            toAgencyWithRights(otherAgency, {}),
-          ];
-          uow.userRepository.users = [connectedUser];
+      ] satisfies AgencyRole[])("throws unauthorized if user has not enough rights on agency", async (role) => {
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [connectedUser.id]: {
+              roles: [role],
+              isNotifiedByEmail: false,
+            },
+          }),
+          toAgencyWithRights(otherAgency, {}),
+        ];
+        uow.userRepository.users = [connectedUser];
 
-          await expectPromiseToFailWithError(
-            usecase.execute(
-              {
-                conventionId,
-                firstname: "ali",
-                lastname: "baba",
-              },
-              {
-                userId: connectedUser.id,
-              },
-            ),
-            errors.convention.editCounsellorNameNotAuthorizedForRole(),
-          );
-        },
-      );
+        await expectPromiseToFailWithError(
+          usecase.execute(
+            {
+              conventionId,
+              firstname: "ali",
+              lastname: "baba",
+            },
+            {
+              userId: connectedUser.id,
+            },
+          ),
+          errors.convention.editCounsellorNameNotAuthorizedForRole(),
+        );
+      });
 
       it("if agencyWithRefersTo, throws an error if validator attempts to edit counsellor's names", async () => {
         uow.conventionRepository.setConventions([conventionWithAgencyRefersTo]);
@@ -288,34 +282,31 @@ describe("EditCounsellorName", () => {
         "to-review",
         "agency-viewer",
         "agency-admin",
-      ] satisfies AgencyRole[])(
-        "throws unauthorized if user role is not allowed",
-        async (role) => {
-          uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.agencies = [
-            toAgencyWithRights(agency, {}),
-            toAgencyWithRights(otherAgency, {}),
-          ];
-          const jwtPayload = createConventionMagicLinkPayload({
-            id: conventionId,
-            role,
-            email: notConnectedUser.email,
-            now: new Date(),
-          });
+      ] satisfies AgencyRole[])("throws unauthorized if user role is not allowed", async (role) => {
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {}),
+          toAgencyWithRights(otherAgency, {}),
+        ];
+        const jwtPayload = createConventionMagicLinkPayload({
+          id: conventionId,
+          role,
+          email: notConnectedUser.email,
+          now: new Date(),
+        });
 
-          await expectPromiseToFailWithError(
-            usecase.execute(
-              {
-                conventionId,
-                firstname: "ali",
-                lastname: "baba",
-              },
-              jwtPayload,
-            ),
-            errors.convention.editCounsellorNameNotAuthorizedForRole(),
-          );
-        },
-      );
+        await expectPromiseToFailWithError(
+          usecase.execute(
+            {
+              conventionId,
+              firstname: "ali",
+              lastname: "baba",
+            },
+            jwtPayload,
+          ),
+          errors.convention.editCounsellorNameNotAuthorizedForRole(),
+        );
+      });
 
       it("if agencyWithRefersTo, throws an error if validator attempts to change agency", async () => {
         uow.conventionRepository.setConventions([conventionWithAgencyRefersTo]);
@@ -359,74 +350,75 @@ describe("EditCounsellorName", () => {
 
   describe("Right paths: edit counsellor names on convention", () => {
     describe("with connected user", () => {
-      it.each(["validator", "counsellor", "back-office"] satisfies Role[])(
-        "triggered by connected-user user with role %s",
-        async (role) => {
-          const user: ConnectedUser = {
-            ...connectedUser,
-            isBackofficeAdmin: role === "back-office",
-          };
-          uow.conventionRepository.setConventions([convention]);
-          uow.userRepository.users = [user];
+      it.each([
+        "validator",
+        "counsellor",
+        "back-office",
+      ] satisfies Role[])("triggered by connected-user user with role %s", async (role) => {
+        const user: ConnectedUser = {
+          ...connectedUser,
+          isBackofficeAdmin: role === "back-office",
+        };
+        uow.conventionRepository.setConventions([convention]);
+        uow.userRepository.users = [user];
 
-          uow.agencyRepository.agencies = [
-            toAgencyWithRights(
-              agency,
-              role === "validator" || role === "counsellor"
-                ? {
-                    [user.id]: {
-                      roles: [role],
-                      isNotifiedByEmail: true,
-                    },
-                  }
-                : {},
-            ),
-            toAgencyWithRights(otherAgency, {}),
-          ];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(
+            agency,
+            role === "validator" || role === "counsellor"
+              ? {
+                  [user.id]: {
+                    roles: [role],
+                    isNotifiedByEmail: true,
+                  },
+                }
+              : {},
+          ),
+          toAgencyWithRights(otherAgency, {}),
+        ];
 
-          await usecase.execute(
-            {
-              conventionId,
+        await usecase.execute(
+          {
+            conventionId,
+            firstname: "ali",
+            lastname: "baba",
+          },
+          {
+            userId: connectedUser.id,
+          },
+        );
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          {
+            ...convention,
+            agencyReferent: {
               firstname: "ali",
               lastname: "baba",
             },
-            {
-              userId: connectedUser.id,
+          },
+        ]);
+        expectToEqual(uow.conventionRepository.conventions, [
+          {
+            ...convention,
+            agencyReferent: {
+              firstname: "ali",
+              lastname: "baba",
             },
-          );
-
-          expectToEqual(uow.conventionRepository.conventions, [
-            {
-              ...convention,
-              agencyReferent: {
-                firstname: "ali",
-                lastname: "baba",
+          },
+        ]);
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionCounsellorNameEdited",
+            payload: {
+              conventionId: convention.id,
+              triggeredBy: {
+                kind: "connected-user",
+                userId: user.id,
               },
             },
-          ]);
-          expectToEqual(uow.conventionRepository.conventions, [
-            {
-              ...convention,
-              agencyReferent: {
-                firstname: "ali",
-                lastname: "baba",
-              },
-            },
-          ]);
-          expectArraysToMatch(uow.outboxRepository.events, [
-            {
-              topic: "ConventionCounsellorNameEdited",
-              payload: {
-                conventionId: convention.id,
-                triggeredBy: {
-                  kind: "connected-user",
-                  userId: user.id,
-                },
-              },
-            },
-          ]);
-        },
-      );
+          },
+        ]);
+      });
 
       it("edit counsellor names with empty firstname and lastname", async () => {
         const conventionWithAgencyReferent = new ConventionDtoBuilder(
@@ -490,59 +482,58 @@ describe("EditCounsellorName", () => {
         ]);
       });
 
-      it.each(conventionStatusesWithoutJustificationNorValidator)(
-        "with status %s",
-        async (status) => {
-          const initialConvention = new ConventionDtoBuilder(convention)
-            .withStatus(status)
-            .build();
-          uow.conventionRepository.setConventions([initialConvention]);
-          uow.userRepository.users = [connectedUser];
-          uow.agencyRepository.agencies = [
-            toAgencyWithRights(agency, {
-              [connectedUser.id]: {
-                roles: ["validator"],
-                isNotifiedByEmail: true,
-              },
-            }),
-            toAgencyWithRights(otherAgency, {}),
-          ];
+      it.each(
+        conventionStatusesWithoutJustificationNorValidator,
+      )("with status %s", async (status) => {
+        const initialConvention = new ConventionDtoBuilder(convention)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions([initialConvention]);
+        uow.userRepository.users = [connectedUser];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [connectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(otherAgency, {}),
+        ];
 
-          await usecase.execute(
-            {
-              conventionId,
+        await usecase.execute(
+          {
+            conventionId,
+            firstname: "ali",
+            lastname: "baba",
+          },
+          {
+            userId: connectedUser.id,
+          },
+        );
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          {
+            ...initialConvention,
+            agencyReferent: {
               firstname: "ali",
               lastname: "baba",
             },
-            {
-              userId: connectedUser.id,
-            },
-          );
+          },
+        ]);
 
-          expectToEqual(uow.conventionRepository.conventions, [
-            {
-              ...initialConvention,
-              agencyReferent: {
-                firstname: "ali",
-                lastname: "baba",
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionCounsellorNameEdited",
+            payload: {
+              conventionId: initialConvention.id,
+              triggeredBy: {
+                kind: "connected-user",
+                userId: connectedUser.id,
               },
             },
-          ]);
-
-          expectArraysToMatch(uow.outboxRepository.events, [
-            {
-              topic: "ConventionCounsellorNameEdited",
-              payload: {
-                conventionId: initialConvention.id,
-                triggeredBy: {
-                  kind: "connected-user",
-                  userId: connectedUser.id,
-                },
-              },
-            },
-          ]);
-        },
-      );
+          },
+        ]);
+      });
 
       it("triggered by backoffice admin for a convention with agency with refersTo", async () => {
         const backofficeAdmin = new ConnectedUserBuilder()
@@ -656,119 +647,118 @@ describe("EditCounsellorName", () => {
     });
 
     describe("with convention jwt payload", () => {
-      it.each(["validator", "counsellor"] satisfies Role[])(
-        "triggered by jwt role %s",
-        async (role) => {
-          uow.conventionRepository.setConventions([convention]);
-          uow.userRepository.users = [notConnectedUser];
+      it.each([
+        "validator",
+        "counsellor",
+      ] satisfies Role[])("triggered by jwt role %s", async (role) => {
+        uow.conventionRepository.setConventions([convention]);
+        uow.userRepository.users = [notConnectedUser];
 
-          uow.agencyRepository.agencies = [
-            toAgencyWithRights(
-              agency,
-              role === "validator" || role === "counsellor"
-                ? {
-                    [notConnectedUser.id]: {
-                      roles: [role],
-                      isNotifiedByEmail: true,
-                    },
-                  }
-                : {},
-            ),
-            toAgencyWithRights(otherAgency, {}),
-          ];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(
+            agency,
+            role === "validator" || role === "counsellor"
+              ? {
+                  [notConnectedUser.id]: {
+                    roles: [role],
+                    isNotifiedByEmail: true,
+                  },
+                }
+              : {},
+          ),
+          toAgencyWithRights(otherAgency, {}),
+        ];
 
-          const jwtPayload = createConventionMagicLinkPayload({
-            id: conventionId,
-            role,
-            email: notConnectedUser.email,
-            now: new Date(),
-          });
+        const jwtPayload = createConventionMagicLinkPayload({
+          id: conventionId,
+          role,
+          email: notConnectedUser.email,
+          now: new Date(),
+        });
 
-          await usecase.execute(
-            {
-              conventionId,
+        await usecase.execute(
+          {
+            conventionId,
+            firstname: "ali",
+            lastname: "baba",
+          },
+          jwtPayload,
+        );
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          {
+            ...convention,
+            agencyReferent: {
               firstname: "ali",
               lastname: "baba",
             },
-            jwtPayload,
-          );
+          },
+        ]);
 
-          expectToEqual(uow.conventionRepository.conventions, [
-            {
-              ...convention,
-              agencyReferent: {
-                firstname: "ali",
-                lastname: "baba",
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionCounsellorNameEdited",
+            payload: {
+              conventionId: convention.id,
+              triggeredBy: {
+                kind: "convention-magic-link",
+                role: jwtPayload.role,
               },
             },
-          ]);
+          },
+        ]);
+      });
 
-          expectArraysToMatch(uow.outboxRepository.events, [
-            {
-              topic: "ConventionCounsellorNameEdited",
-              payload: {
-                conventionId: convention.id,
-                triggeredBy: {
-                  kind: "convention-magic-link",
-                  role: jwtPayload.role,
-                },
-              },
+      it.each(
+        conventionStatusesWithoutJustificationNorValidator,
+      )("with status %s", async (status) => {
+        const initialConvention = new ConventionDtoBuilder(convention)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions([initialConvention]);
+        uow.userRepository.users = [notConnectedUser];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notConnectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
             },
-          ]);
-        },
-      );
+          }),
+          toAgencyWithRights(otherAgency, {}),
+        ];
 
-      it.each(conventionStatusesWithoutJustificationNorValidator)(
-        "with status %s",
-        async (status) => {
-          const initialConvention = new ConventionDtoBuilder(convention)
-            .withStatus(status)
-            .build();
-          uow.conventionRepository.setConventions([initialConvention]);
-          uow.userRepository.users = [notConnectedUser];
-          uow.agencyRepository.agencies = [
-            toAgencyWithRights(agency, {
-              [notConnectedUser.id]: {
-                roles: ["validator"],
-                isNotifiedByEmail: true,
-              },
-            }),
-            toAgencyWithRights(otherAgency, {}),
-          ];
+        await usecase.execute(
+          {
+            conventionId,
+            firstname: "ali",
+            lastname: "baba",
+          },
+          validatorJwtPayload,
+        );
 
-          await usecase.execute(
-            {
-              conventionId,
+        expectToEqual(uow.conventionRepository.conventions, [
+          {
+            ...initialConvention,
+            agencyReferent: {
               firstname: "ali",
               lastname: "baba",
             },
-            validatorJwtPayload,
-          );
+          },
+        ]);
 
-          expectToEqual(uow.conventionRepository.conventions, [
-            {
-              ...initialConvention,
-              agencyReferent: {
-                firstname: "ali",
-                lastname: "baba",
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionCounsellorNameEdited",
+            payload: {
+              conventionId: initialConvention.id,
+              triggeredBy: {
+                kind: "convention-magic-link",
+                role: validatorJwtPayload.role,
               },
             },
-          ]);
-
-          expectArraysToMatch(uow.outboxRepository.events, [
-            {
-              topic: "ConventionCounsellorNameEdited",
-              payload: {
-                conventionId: initialConvention.id,
-                triggeredBy: {
-                  kind: "convention-magic-link",
-                  role: validatorJwtPayload.role,
-                },
-              },
-            },
-          ]);
-        },
-      );
+          },
+        ]);
+      });
 
       it("counsellor of an agency with refersTo can edit counsellor name", async () => {
         const counsellorPayload = createConventionMagicLinkPayload({

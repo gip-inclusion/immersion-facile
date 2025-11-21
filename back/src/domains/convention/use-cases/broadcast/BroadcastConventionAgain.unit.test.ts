@@ -93,62 +93,62 @@ describe("BroadcastConventionAgain", () => {
 
   describe("Right paths", () => {
     describe("when there is no previous broadcast", () => {
-      it.each([adminUser, userWithEnoughRights])(
-        "trigger ConventionBroadcastAgain event with the whole convention in payload",
-        async (user) => {
-          await broadcastConventionAgain.execute(
-            { conventionId: convention.id },
-            user,
-          );
+      it.each([
+        adminUser,
+        userWithEnoughRights,
+      ])("trigger ConventionBroadcastAgain event with the whole convention in payload", async (user) => {
+        await broadcastConventionAgain.execute(
+          { conventionId: convention.id },
+          user,
+        );
 
-          expectArraysToMatch(uow.outboxRepository.events, [
-            {
-              topic: "ConventionBroadcastRequested",
-              status: "never-published",
-              payload: {
-                convention: convention,
-                triggeredBy: { kind: "connected-user", userId: user.id },
-              },
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionBroadcastRequested",
+            status: "never-published",
+            payload: {
+              convention: convention,
+              triggeredBy: { kind: "connected-user", userId: user.id },
             },
-          ]);
-        },
-      );
+          },
+        ]);
+      });
     });
 
     describe("when there is a previous broadcast", () => {
-      it.each([adminUser, userWithEnoughRights])(
-        "trigger ConventionBroadcastAgain event with the whole convention in payload",
-        async (user) => {
-          uow.broadcastFeedbacksRepository.save({
-            serviceName: broadcastToFtLegacyServiceName,
-            consumerId: "my-consumer-id",
-            consumerName: "My consumer name",
-            requestParams: {
-              conventionId: convention.id,
-            },
-            response: { httpStatus: 404 },
-            subscriberErrorFeedback: { message: "Ops, something is bad" },
-            occurredAt: subDays(timeGateway.now(), 1),
-            handledByAgency: true,
-          });
+      it.each([
+        adminUser,
+        userWithEnoughRights,
+      ])("trigger ConventionBroadcastAgain event with the whole convention in payload", async (user) => {
+        uow.broadcastFeedbacksRepository.save({
+          serviceName: broadcastToFtLegacyServiceName,
+          consumerId: "my-consumer-id",
+          consumerName: "My consumer name",
+          requestParams: {
+            conventionId: convention.id,
+          },
+          response: { httpStatus: 404 },
+          subscriberErrorFeedback: { message: "Ops, something is bad" },
+          occurredAt: subDays(timeGateway.now(), 1),
+          handledByAgency: true,
+        });
 
-          await broadcastConventionAgain.execute(
-            { conventionId: convention.id },
-            user,
-          );
+        await broadcastConventionAgain.execute(
+          { conventionId: convention.id },
+          user,
+        );
 
-          expectArraysToMatch(uow.outboxRepository.events, [
-            {
-              topic: "ConventionBroadcastRequested",
-              status: "never-published",
-              payload: {
-                convention,
-                triggeredBy: { kind: "connected-user", userId: user.id },
-              },
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionBroadcastRequested",
+            status: "never-published",
+            payload: {
+              convention,
+              triggeredBy: { kind: "connected-user", userId: user.id },
             },
-          ]);
-        },
-      );
+          },
+        ]);
+      });
 
       it("throws tooManyRequest when user request broadcast again before 4h since last broadcast", async () => {
         const lastBroadcastDate = subHours(

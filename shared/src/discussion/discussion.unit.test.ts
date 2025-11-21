@@ -148,15 +148,15 @@ describe("Discussions", () => {
       },
     ];
 
-    it.each(testCases)(
-      "returns $expectedDisplayStatus when $message",
-      ({ discussion, expectedDisplayStatus }) => {
-        expectToEqual(
-          getDiscussionDisplayStatus({ discussion, now }),
-          expectedDisplayStatus,
-        );
-      },
-    );
+    it.each(testCases)("returns $expectedDisplayStatus when $message", ({
+      discussion,
+      expectedDisplayStatus,
+    }) => {
+      expectToEqual(
+        getDiscussionDisplayStatus({ discussion, now }),
+        expectedDisplayStatus,
+      );
+    });
   });
 
   describe("Discussion schema", () => {
@@ -197,30 +197,28 @@ describe("Discussions", () => {
       discussionInPersonIF,
       discussionPhone1E1S,
       discussionPhoneIF,
-    ])(
-      "Test discussionReadSchema",
-      ({ establishmentContact, appellationCode, ...rest }) => {
-        const discussionRead: DiscussionReadDto = {
-          ...rest,
-          establishmentContact: {
-            firstName: establishmentContact.firstName,
-            lastName: establishmentContact.lastName,
-            job: establishmentContact.job,
-          },
-          appellation: {
-            appellationCode: appellationCode,
-            appellationLabel: "osef",
-            romeCode: "A2023",
-            romeLabel: "osef",
-          },
-        };
+    ])("Test discussionReadSchema", ({
+      establishmentContact,
+      appellationCode,
+      ...rest
+    }) => {
+      const discussionRead: DiscussionReadDto = {
+        ...rest,
+        establishmentContact: {
+          firstName: establishmentContact.firstName,
+          lastName: establishmentContact.lastName,
+          job: establishmentContact.job,
+        },
+        appellation: {
+          appellationCode: appellationCode,
+          appellationLabel: "osef",
+          romeCode: "A2023",
+          romeLabel: "osef",
+        },
+      };
 
-        expectToEqual(
-          discussionReadSchema.parse(discussionRead),
-          discussionRead,
-        );
-      },
-    );
+      expectToEqual(discussionReadSchema.parse(discussionRead), discussionRead);
+    });
   });
 });
 describe("makeExchangeEmailSchema", () => {
