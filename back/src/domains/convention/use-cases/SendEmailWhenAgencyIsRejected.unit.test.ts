@@ -24,7 +24,7 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
     .withName("just-rejected-agency")
     .withLogoUrl("https://logo.com")
     .withStatus("rejected")
-    .withRejectionJustification("rejection justification")
+    .withStatusJustification("rejection justification")
     .build();
 
   const [
@@ -125,7 +125,7 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
             params: {
               agencyName: agency.name,
               // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              rejectionJustification: agency.rejectionJustification!,
+              statusJustification: agency.statusJustification!,
             },
           },
         ],
@@ -139,7 +139,7 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
         .withName("just-rejected-agency-refered-to-other-agency")
         .withLogoUrl("https://logo-refers-to.com")
         .withStatus("rejected")
-        .withRejectionJustification(
+        .withStatusJustification(
           "rejection justification for agency with refers to",
         )
         .withRefersToAgencyInfo({
@@ -212,9 +212,9 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
             ],
             params: {
               agencyName: agencyWithRefersTo.name,
-              rejectionJustification:
+              statusJustification:
                 // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                agencyWithRefersTo.rejectionJustification!,
+                agencyWithRefersTo.statusJustification!,
             },
           },
         ],
@@ -243,7 +243,7 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
       // Prepare
       uow.agencyRepository.agencies = [
         toAgencyWithRights(
-          new AgencyDtoBuilder(agency).withRejectionJustification(null).build(),
+          new AgencyDtoBuilder(agency).withStatusJustification(null).build(),
           {
             [user4.id]: {
               isNotifiedByEmail: true,
@@ -268,7 +268,7 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
     it("If the agency have a rejection justification but don't have rejected status then the feature raise a bad agency status error.", async () => {
       const agencyActiveWithJustification = new AgencyDtoBuilder(agency)
         .withStatus("active")
-        .withRejectionJustification("justif")
+        .withStatusJustification("justif")
         .build();
       // Prepare
       uow.agencyRepository.agencies = [
@@ -307,7 +307,7 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
       uow.agencyRepository.agencies = [
         toAgencyWithRights(
           new AgencyDtoBuilder(agency)
-            .withRejectionJustification("justif")
+            .withStatusJustification("justif")
             .build(),
           {
             [user4.id]: {

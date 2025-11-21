@@ -75,7 +75,7 @@ export type EmailParamsByEmailType = {
   };
   AGENCY_WAS_REJECTED: {
     agencyName: string;
-    rejectionJustification: string;
+    statusJustification: string;
   };
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;

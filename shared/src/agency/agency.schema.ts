@@ -156,7 +156,7 @@ export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       refersToAgencyName: zStringMinLength1.or(z.null()),
-      rejectionJustification: zStringMinLength1.or(z.null()),
+      statusJustification: zStringMinLength1.or(z.null()),
     }),
   )
   .and(withAcquisitionSchema);
@@ -177,7 +177,7 @@ export const agencyDtoForAgencyUsersAndAdminsSchema: ZodSchemaWithInputMatchingO
         codeSafir: zStringMinLength1.or(z.null()),
         refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
         refersToAgencyName: zStringMinLength1.or(z.null()),
-        rejectionJustification: z.string().or(z.null()),
+        statusJustification: z.string().or(z.null()),
       }),
     )
     .and(withAcquisitionSchema)
@@ -192,7 +192,7 @@ export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       refersToAgencyName: zStringMinLength1.or(z.null()),
-      rejectionJustification: z.string().or(z.null()),
+      statusJustification: z.string().or(z.null()),
     }),
   )
   .and(withAcquisitionSchema);
@@ -215,7 +215,7 @@ export const updateAgencyStatusParamsWithoutIdSchema: ZodSchemaWithInputMatching
     .or(
       z.object({
         status: z.literal("rejected"),
-        rejectionJustification: zStringMinLength1,
+        statusJustification: zStringMinLength1,
       }),
     );
 

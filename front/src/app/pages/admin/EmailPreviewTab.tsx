@@ -212,7 +212,7 @@ export const defaultEmailValueByEmailKind: {
   },
   AGENCY_WAS_REJECTED: {
     agencyName: "AGENCY_NAME",
-    rejectionJustification: "REJECTION_JUSTIFICATION",
+    statusJustification: "STATUS_JUSTIFICATION",
   },
   AGENCY_FIRST_REMINDER: {
     agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
