@@ -21,6 +21,7 @@ import {
   type KyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import type {
+  DeleteNotificationsParams,
   EmailNotificationFilters,
   NotificationRepository,
   SmsNotificationFilters,
@@ -36,6 +37,83 @@ export class PgNotificationRepository implements NotificationRepository {
     private transaction: KyselyDb,
     private maxRetrievedNotifications = 30,
   ) {}
+
+  async test_getAllNotifications(): Promise<Notification[]> {
+    return [
+      ...(await getSmsNotificationBuilder(this.transaction).execute()),
+      ...(await getEmailsNotificationBuilder(this.transaction).execute()),
+    ].map(({ notif }) => notif);
+  }
+
+  public async deleteOldestNotifications({
+    createdAt,
+    limit,
+  }: DeleteNotificationsParams): Promise<number> {
+    return this.transaction
+      .with("to_delete", (qb) =>
+        qb
+          .selectFrom("notifications_email")
+          .select(({ eb }) => [
+            "notifications_email.id",
+            "notifications_email.created_at",
+            eb.val("email").as("type"),
+          ])
+          .where("notifications_email.created_at", "<=", createdAt.to)
+          .unionAll(
+            qb
+              .selectFrom("notifications_sms")
+              .select(({ eb }) => [
+                "notifications_sms.id",
+                "notifications_sms.created_at",
+                eb.val("sms").as("type"),
+              ])
+              .where("notifications_sms.created_at", "<=", createdAt.to),
+          )
+          .orderBy(["created_at asc", "type desc"]) // type desc for delete sms by priority if some date email === date sms
+          .limit(limit),
+      )
+      .with("deleted_email_recipients", (qb) =>
+        qb
+          .deleteFrom("notifications_email_recipients")
+          .using("to_delete")
+          .whereRef(
+            "notifications_email_recipients.notifications_email_id",
+            "=",
+            "to_delete.id",
+          )
+          .where("to_delete.type", "=", "email"),
+      )
+      .with("deleted_emails", (qb) =>
+        qb
+          .deleteFrom("notifications_email")
+          .using("to_delete")
+          .whereRef("to_delete.id", "=", "notifications_email.id")
+          .where("to_delete.type", "=", "email")
+          .returning("notifications_email.id"),
+      )
+      .with("deleted_sms", (qb) =>
+        qb
+          .deleteFrom("notifications_sms")
+          .using("to_delete")
+          .whereRef("to_delete.id", "=", "notifications_sms.id")
+          .where("to_delete.type", "=", "sms")
+          .returning("notifications_sms.id"),
+      )
+      .selectFrom((qb) =>
+        qb
+          .selectFrom("deleted_emails")
+          .select(({ fn }) => fn.count("deleted_emails.id").as("count"))
+          .unionAll(
+            qb
+              .selectFrom("deleted_sms")
+              .select(({ fn }) => fn.count("deleted_sms.id").as("count")),
+          )
+          .as("total"),
+      )
+      .select(({ fn }) => fn.sum("total.count").as("total_deleted"))
+      .executeTakeFirst()
+      .then((result) => (result ? Number(result.total_deleted) : 0));
+  }
 
   public async getLastSmsNotificationByFilter(
     filters: SmsNotificationFilters,
