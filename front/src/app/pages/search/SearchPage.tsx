@@ -471,6 +471,7 @@ export const SearchPage = ({
                   const updatedValues = {
                     ...tempValue,
                     appellations: undefined,
+                    appellationCodes: undefined,
                   };
                   onSearchFormSubmit(updatedValues);
                 }}
