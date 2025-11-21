@@ -21,6 +21,7 @@ import {
   type KyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import type {
+  DeleteNotificationsParams,
   EmailNotificationFilters,
   NotificationRepository,
   SmsNotificationFilters,
@@ -36,6 +37,26 @@ export class PgNotificationRepository implements NotificationRepository {
     private transaction: KyselyDb,
     private maxRetrievedNotifications = 30,
   ) {}
+
+  async test_getAllNotifications(): Promise<Notification[]> {
+    const sms = await getSmsNotificationBuilder(this.transaction)
+      .execute()
+      .then(map((row) => row.notif));
+
+    const emails = await getEmailsNotificationBuilder(this.transaction)
+
+      .execute()
+      .then(map((row) => row.notif));
+
+    return [...sms, ...emails];
+  }
+
+  public async deleteOldestNotifications(
+    params: DeleteNotificationsParams,
+  ): Promise<number> {
+    // throw new Error("Method not implemented.");
+    return 0;
+  }
 
   public async getLastSmsNotificationByFilter(
     filters: SmsNotificationFilters,
