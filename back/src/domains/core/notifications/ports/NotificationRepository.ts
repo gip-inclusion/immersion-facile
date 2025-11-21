@@ -25,7 +25,15 @@ export type SmsNotificationFilters = {
   smsKind: TemplatedSms["kind"];
 };
 
+export type DeleteNotificationsParams = {
+  limit: number;
+  createdAt: {
+    to: Date;
+  };
+};
+
 export interface NotificationRepository {
+  deleteOldestNotifications(params: DeleteNotificationsParams): Promise<number>;
   getSmsByIds: (ids: NotificationId[]) => Promise<SmsNotification[]>;
   getEmailsByIds: (ids: NotificationId[]) => Promise<EmailNotification[]>;
   save: (notification: Notification) => Promise<void>;
