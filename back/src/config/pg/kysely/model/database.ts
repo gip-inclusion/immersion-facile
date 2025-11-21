@@ -632,7 +632,7 @@ interface NotificationsEmailAttachments {
 type RecipientType = "cc" | "to";
 
 interface NotificationsEmailRecipients {
-  notifications_email_id: string;
+  notifications_email_id: string; // TODO : on delete cascade constraint
   email: string;
   recipient_type: RecipientType;
 }
