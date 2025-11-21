@@ -316,14 +316,6 @@ export const ConventionForm = ({
     id: `im-convention-form__step-${step - 1}`,
   });
 
-  const shouldLockToPeAgencies = !!(
-    route.name === "conventionImmersion" &&
-    route.params.jwt &&
-    isFtConnectIdentity(
-      conventionValues?.signatories.beneficiary.federatedIdentity,
-    )
-  );
-
   const conventionIsLoading = isLoading || !reduxFormUiReady;
 
   const validateSteps = async (type: "clearAllErrors" | "doNotClear") => {
@@ -504,7 +496,6 @@ export const ConventionForm = ({
                       agencyIdField,
                       agencyKindField,
                     }}
-                    shouldLockToPeAgencies={shouldLockToPeAgencies}
                     shouldFilterDelegationPrescriptionAgencyKind={false}
                     shouldShowAgencyKindField={
                       conventionValues?.internshipKind === "immersion"
