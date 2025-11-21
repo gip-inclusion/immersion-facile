@@ -27,10 +27,18 @@
     }
   }
 
-  &--opened-top {
+  &--opened-top-right {
     #{$component}__menu {
       top: auto;
       bottom: 100%;
+    }
+  }
+  &--opened-top-left {
+    #{$component}__menu {
+      top: auto; 
+      bottom: 100%;
+      left: 0;
+      right: auto;
     }
   }
 }
