@@ -24,9 +24,9 @@ export const makeUpdateAgencyStatus = useCaseBuilder("UpdateAgencyStatus")
     const updatedAgencyParams: PartialAgencyDto = {
       id: inputParams.id,
       status: inputParams.status,
-      rejectionJustification:
+      statusJustification:
         inputParams.status === "rejected"
-          ? inputParams.rejectionJustification
+          ? inputParams.statusJustification
           : null,
     };
     await uow.agencyRepository.update(updatedAgencyParams);

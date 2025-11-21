@@ -96,7 +96,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
       ...createAgencyDto,
       status: "needsReview",
       codeSafir: null,
-      rejectionJustification: null,
+      statusJustification: null,
     };
   }
 

@@ -230,7 +230,7 @@ describe("PgAgencyRepository", () => {
           })
           .withPhoneNumber("0610101010")
           .withKind("pole-emploi")
-          .withRejectionJustification("justification du rejet")
+          .withStatusJustification("justification du rejet")
           .withSignature("new signature")
           .withLogoUrl("http://new-logo-url.fr")
           .withAgencySiret("11110000111100")
@@ -253,7 +253,7 @@ describe("PgAgencyRepository", () => {
 
       const updatedFields: Partial<AgencyWithoutRights> = {
         status: "rejected",
-        rejectionJustification: "justification du rejet",
+        statusJustification: "justification du rejet",
         phoneNumber: "0610101010",
       };
       await agencyRepository.update({

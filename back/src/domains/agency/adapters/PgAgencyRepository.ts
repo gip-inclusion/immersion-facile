@@ -109,7 +109,7 @@ export class PgAgencyRepository implements AgencyRepository {
           JSON.stringify(agency.coveredDepartments),
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
-        rejection_justification: agency.rejectionJustification,
+        status_justification: agency.statusJustification,
         phone_number: agency.phoneNumber,
       }))
       .where("id", "=", agency.id)
@@ -351,7 +351,7 @@ export class PgAgencyRepository implements AgencyRepository {
           signature: ref("agencies.email_signature"),
           refersToAgencyId: cast<AgencyId>(ref("agencies.refers_to_agency_id")),
           refersToAgencyName: ref("refered_agencies.name"),
-          rejectionJustification: ref("agencies.rejection_justification"),
+          statusJustification: ref("agencies.status_justification"),
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),
           phoneNumber: ref("agencies.phone_number"),
