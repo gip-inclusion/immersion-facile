@@ -206,7 +206,7 @@ interface Agencies extends WithAcquisition {
   department_code: string;
   covered_departments: Json;
   refers_to_agency_id: string | null;
-  rejection_justification: string | null;
+  status_justification: string | null;
   phone_number: string;
 }
 

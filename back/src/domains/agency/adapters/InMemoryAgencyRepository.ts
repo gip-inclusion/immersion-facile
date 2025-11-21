@@ -319,7 +319,7 @@ const agency3: AgencyWithUsersRights = {
   refersToAgencyId: null,
   refersToAgencyName: null,
   codeSafir: null,
-  rejectionJustification: null,
+  statusJustification: null,
   phoneNumber: "+33600000003",
 };
 
@@ -349,7 +349,7 @@ const agency1: AgencyWithUsersRights = {
   refersToAgencyId: null,
   refersToAgencyName: null,
   codeSafir: null,
-  rejectionJustification: null,
+  statusJustification: null,
   phoneNumber: "+33600000001",
 };
 const testAgencies: AgencyWithUsersRights[] = [
@@ -379,7 +379,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     refersToAgencyId: null,
     refersToAgencyName: null,
     codeSafir: null,
-    rejectionJustification: null,
+    statusJustification: null,
     phoneNumber: "+33600000000",
   },
   agency1,
@@ -410,7 +410,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     logoUrl: "http://LOGO AGENCY 2 URL",
     refersToAgencyId: null,
     refersToAgencyName: null,
-    rejectionJustification: null,
+    statusJustification: null,
     codeSafir: null,
     phoneNumber: "+33600000002",
   },
@@ -440,7 +440,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     logoUrl: "http://LOGO AGENCY 4 URL",
     refersToAgencyId: agency3.id,
     refersToAgencyName: agency3.name,
-    rejectionJustification: null,
+    statusJustification: null,
     codeSafir: null,
     phoneNumber: "+33600000004",
   },
@@ -469,7 +469,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     logoUrl: "http://LOGO AGENCY 5 URL",
     refersToAgencyId: agency1.id,
     refersToAgencyName: agency1.name,
-    rejectionJustification: null,
+    statusJustification: null,
     codeSafir: null,
     phoneNumber: "+33600000005",
   },

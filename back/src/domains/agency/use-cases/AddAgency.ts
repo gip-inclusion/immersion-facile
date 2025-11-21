@@ -66,7 +66,7 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
       ...rest,
       status: "needsReview",
       codeSafir: null,
-      rejectionJustification: null,
+      statusJustification: null,
       usersRights: makeUserRights(
         validatorUserIdsForAgency,
         counsellorUserIdsForAgency,

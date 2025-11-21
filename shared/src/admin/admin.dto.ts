@@ -55,7 +55,7 @@ export type UpdateAgencyStatusParamsWithoutId =
     }
   | {
       status: Extract<ActiveOrRejectedStatus, "rejected">;
-      rejectionJustification: string;
+      statusJustification: string;
     };
 
 export type GetUsersFilters = {
