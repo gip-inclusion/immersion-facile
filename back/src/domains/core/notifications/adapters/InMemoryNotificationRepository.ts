@@ -21,6 +21,7 @@ import {
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
 import type {
+  DeleteNotificationsParams,
   EmailNotificationFilters,
   NotificationRepository,
   SmsNotificationFilters,
@@ -29,6 +30,36 @@ import type {
 export class InMemoryNotificationRepository implements NotificationRepository {
   // for tests purposes
   public notifications: Notification[] = [];
+
+  async deleteOldestNotifications({
+    limit,
+    createdAt,
+  }: DeleteNotificationsParams): Promise<number> {
+    const { deleted, notificationsToKeep } = this.notifications
+      .sort((a, b) => (a.createdAt >= b.createdAt ? 0 : -1))
+      .reduce<{
+        notificationsToKeep: Notification[];
+        deleted: number;
+      }>(
+        ({ deleted, notificationsToKeep }, notification) => {
+          const isDeleted = !(
+            deleted === limit || new Date(notification.createdAt) > createdAt.to
+          );
+
+          return {
+            notificationsToKeep: [
+              ...notificationsToKeep,
+              ...(isDeleted ? [] : [notification]),
+            ],
+            deleted: deleted + (isDeleted ? 1 : 0),
+          };
+        },
+        { notificationsToKeep: [], deleted: 0 },
+      );
+
+    this.notifications = notificationsToKeep;
+    return deleted;
+  }
 
   async getLastSmsNotificationByFilter(
     filters: SmsNotificationFilters,
