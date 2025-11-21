@@ -5,12 +5,10 @@ import {
   type AppellationCode,
   addressDtoToString,
   addressStringToDto,
-  appellationCodeSchema,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionReadDto,
-  errors,
   type FtConnectIdentity,
   type ImmersionObjective,
   type InternshipKind,
@@ -19,6 +17,7 @@ import {
   type LevelOfEducation,
   mergeObjectsExceptFalsyValues,
   type NafCode,
+  parseStringToJsonOrThrow,
   reasonableSchedule,
   type ScheduleDto,
   toDateUTCString,
@@ -27,7 +26,6 @@ import type { CreateConventionPresentationInitialValues } from "src/app/componen
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import type { searchParams } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { param, type ValueSerializer } from "type-route";
@@ -343,42 +341,45 @@ export const makeValuesToWatchInUrl = (
   );
 };
 
-const parseStringToJsonOrThrow = <T>(
-  raw: string,
-  paramName: ConventionFormKeysInUrl | keyof typeof searchParams,
-): T => {
-  try {
-    return JSON.parse(raw);
-  } catch (_error) {
-    throw errors.routeParams.malformedJson({ paramName });
-  }
-};
-
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {
-  parse: (raw) => parseStringToJsonOrThrow(raw, "schedule"),
+  parse: (raw) =>
+    parseStringToJsonOrThrow<ScheduleDto, "schedule">(raw, "schedule"),
   stringify: (schedule) => JSON.stringify(schedule),
 };
 
 export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRomeDto> =
   {
-    parse: (raw) => parseStringToJsonOrThrow(raw, "immersionAppellation"),
+    parse: (raw) =>
+      parseStringToJsonOrThrow<AppellationAndRomeDto, "immersionAppellation">(
+        raw,
+        "immersionAppellation",
+      ),
     stringify: (appellationDto) => JSON.stringify(appellationDto),
   };
 
 export const appellationAndRomeDtoArraySerializer: ValueSerializer<
   AppellationAndRomeDto[]
 > = {
-  parse: (raw) => parseStringToJsonOrThrow(raw, "appellations"),
+  parse: (raw) =>
+    parseStringToJsonOrThrow<AppellationAndRomeDto[], "appellations">(
+      raw,
+      "appellations",
+    ),
   stringify: (appellationDto) => JSON.stringify(appellationDto),
 };
 
-export const appellationStringSerializer: ValueSerializer<AppellationCode> = {
-  parse: (raw) => appellationCodeSchema.parse(raw),
-  stringify: (appellation) => appellation,
+export const appellationStringSerializer: ValueSerializer<AppellationCode[]> = {
+  parse: (raw) =>
+    parseStringToJsonOrThrow<AppellationCode[], "appellationCodes">(
+      raw,
+      "appellationCodes",
+    ),
+  stringify: (appellationCodes) => JSON.stringify(appellationCodes),
 };
 
 export const nafCodeSerializer: ValueSerializer<NafCode[]> = {
-  parse: (raw) => parseStringToJsonOrThrow(raw, "nafCodes"),
+  parse: (raw) =>
+    parseStringToJsonOrThrow<NafCode[], "nafCodes">(raw, "nafCodes"),
   stringify: (nafCode) => JSON.stringify(nafCode),
 };
 

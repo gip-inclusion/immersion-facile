@@ -16,12 +16,12 @@ export const getPaginationParamsForWeb = ({
 }:
   | PaginationQueryParams
   | undefined = {}): Required<PaginationQueryParams> => ({
-  page: page ?? defaultPageInPagination,
-  perPage: Math.min(
-    perPage ?? defaultPerPageInWebPagination,
-    maxPerPageInWebPagination,
-  ),
-});
+    page: page ?? defaultPageInPagination,
+    perPage: Math.min(
+      perPage ?? defaultPerPageInWebPagination,
+      maxPerPageInWebPagination,
+    ),
+  });
 
 export const getPaginationParamsForApiConsumer = ({
   page,
@@ -29,12 +29,12 @@ export const getPaginationParamsForApiConsumer = ({
 }:
   | PaginationQueryParams
   | undefined = {}): Required<PaginationQueryParams> => ({
-  page: page ?? defaultPageInPagination,
-  perPage: Math.min(
-    perPage ?? defaultPerPageInApiPagination,
-    maxPerPageInApiPagination,
-  ),
-});
+    page: page ?? defaultPageInPagination,
+    perPage: Math.min(
+      perPage ?? defaultPerPageInApiPagination,
+      maxPerPageInApiPagination,
+    ),
+  });
 
 export const calculateLimitAndOffsetFromPagination = ({
   page,

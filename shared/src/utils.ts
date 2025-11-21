@@ -219,3 +219,7 @@ export const populatePropIfDefined = <T>(prop: keyof T, value: ValueOf<T>) =>
 
 export const optional = <T>(v: T | null): NonNullable<T> | undefined =>
   v ?? undefined;
+
+export const isFunction = <T>(
+  value: unknown,
+): value is (...args: unknown[]) => T => typeof value === "function";

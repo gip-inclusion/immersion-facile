@@ -94,7 +94,7 @@ export interface EstablishmentAggregateRepository {
   ): Promise<RepositorySearchImmertionResult[]>;
   getOffers(
     params: GetOffersParams,
-  ): Promise<DataWithPagination<RepositorySearchImmertionResult>>;
+  ): Promise<DataWithPagination<SearchResultDto>>;
   //Sirets
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;
   getSiretOfEstablishmentsToSuggestUpdate(before: Date): Promise<SiretDto[]>;

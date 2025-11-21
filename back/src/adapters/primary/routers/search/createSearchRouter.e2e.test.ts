@@ -3,8 +3,9 @@ import {
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
+  type GetOffersFlatQueryParams,
   type Group,
-  type LegacySearchQueryParamsWithGeoParams,
+  type Pagination,
   type SearchResultDto,
   type SearchRoutes,
   type SiretDto,
@@ -147,7 +148,7 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
   ])
   .build();
 
-describe("search-immersion route", () => {
+describe("/offers route", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<SearchRoutes>;
   let gateways: InMemoryGateways;
@@ -162,7 +163,7 @@ describe("search-immersion route", () => {
     gateways = testAppAndDeps.gateways;
   });
 
-  describe("from front - /immersion-offers", () => {
+  describe("from front - /offers", () => {
     describe("accepts valid requests", () => {
       it("with given appellationCode and position", async () => {
         const immersionOffer = new OfferEntityBuilder()
@@ -179,61 +180,50 @@ describe("search-immersion route", () => {
         );
 
         // Act and assert
-        const result = await httpClient.legacySearch({
+        const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: [immersionOffer.appellationCode],
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
-            sortedBy: "distance",
+            sortBy: "distance",
           },
         });
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: [
-            establishmentAggregateToSearchResultByRomeForFirstLocation(
-              establishmentAggregate2,
-              immersionOffer.romeCode,
-              0,
-            ),
-          ],
+          body: {
+            data: [
+              establishmentAggregateToSearchResultByRomeForFirstLocation(
+                establishmentAggregate2,
+                immersionOffer.romeCode,
+                0,
+              ),
+            ],
+            pagination: getBasicPagination(),
+          },
         });
       });
 
       it("with no specified appellationCode", async () => {
-        const result = await httpClient.legacySearch({
+        const result = await httpClient.getOffers({
           queryParams: {
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
-            sortedBy: "distance",
+            sortBy: "distance",
           },
         });
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: [],
-        });
-      });
-
-      it("with filter voluntaryToImmersion", async () => {
-        const result = await httpClient.legacySearch({
-          queryParams: {
-            distanceKm: 30,
-            longitude: 2.34999,
-            latitude: 48.8531,
-            voluntaryToImmersion: true,
-            sortedBy: "distance",
+          body: {
+            data: [],
+            pagination: getBasicPagination({ totalRecords: 0 }),
           },
         });
-
-        expectHttpResponseToEqual(result, {
-          status: 200,
-          body: [],
-        });
       });
 
-      it("sortedBy score supported", async () => {
+      it("sortBy score supported", async () => {
         const immersionOffer = new OfferEntityBuilder()
           .withRomeCode(establishmentAggregate2.offers[0].romeCode)
           .withAppellationCode(
@@ -246,31 +236,33 @@ describe("search-immersion route", () => {
           establishmentAggregate2,
         );
 
-        const result = await httpClient.legacySearch({
+        const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: [immersionOffer.appellationCode],
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
-            voluntaryToImmersion: true,
-            sortedBy: "score",
+            sortBy: "score",
           },
         });
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: [
-            establishmentAggregateToSearchResultByRomeForFirstLocation(
-              establishmentAggregate2,
-              immersionOffer.romeCode,
-              0,
-            ),
-          ],
+          body: {
+            pagination: getBasicPagination({}),
+            data: [
+              establishmentAggregateToSearchResultByRomeForFirstLocation(
+                establishmentAggregate2,
+                immersionOffer.romeCode,
+                0,
+              ),
+            ],
+          },
         });
       });
     });
 
-    describe("with filter establishmentSearchableBy", () => {
+    describe("with filter searchableBy", () => {
       beforeEach(async () => {
         inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
           new EstablishmentAggregateBuilder()
@@ -341,86 +333,95 @@ describe("search-immersion route", () => {
         ];
       });
 
-      it("with filter establishmentSearchableBy defined to students", async () => {
-        const result = await httpClient.legacySearch({
+      it("with filter searchableBy defined to students", async () => {
+        const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
             longitude: defaultLocation.position.lon,
             latitude: defaultLocation.position.lat,
-            sortedBy: "distance",
-            establishmentSearchableBy: "students",
+            sortBy: "distance",
+            searchableBy: "students",
           },
         });
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: toSearchImmersionResults(
-            [
-              { siret: siret1, offer: offer1, establishment },
-              { siret: siret2, offer: offer2, establishment },
-            ],
-            0,
-          ),
+          body: {
+            pagination: getBasicPagination({ totalRecords: 2 }),
+            data: toSearchImmersionResults(
+              [
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret2, offer: offer2, establishment },
+              ],
+              0,
+            ),
+          },
         });
       });
 
-      it("with filter establishmentSearchableBy defined to jobSeekers", async () => {
-        const result = await httpClient.legacySearch({
+      it("with filter searchableBy defined to jobSeekers", async () => {
+        const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
             longitude: defaultLocation.position.lon,
             latitude: defaultLocation.position.lat,
-            sortedBy: "distance",
-            establishmentSearchableBy: "jobSeekers",
+            sortBy: "distance",
+            searchableBy: "jobSeekers",
           },
         });
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: toSearchImmersionResults(
-            [
-              { siret: siret1, offer: offer1, establishment },
-              { siret: siret3, offer: offer1, establishment },
-            ],
-            0,
-          ),
+          body: {
+            pagination: getBasicPagination({ totalRecords: 2 }),
+            data: toSearchImmersionResults(
+              [
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret3, offer: offer1, establishment },
+              ],
+              0,
+            ),
+          },
         });
       });
 
-      it("with filter establishmentSearchableBy not defined", async () => {
-        const result = await httpClient.legacySearch({
+      it("with filter searchableBy not defined", async () => {
+        const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
             longitude: defaultLocation.position.lon,
             latitude: defaultLocation.position.lat,
-            sortedBy: "distance",
+            sortBy: "distance",
           },
         });
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: toSearchImmersionResults(
-            [
-              { siret: siret1, offer: offer1, establishment },
-              { siret: siret2, offer: offer2, establishment },
-              { siret: siret3, offer: offer1, establishment },
-            ],
-            0,
-          ),
+          body: {
+            pagination: getBasicPagination({ totalRecords: 3 }),
+            data: toSearchImmersionResults(
+              [
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret2, offer: offer2, establishment },
+                { siret: siret3, offer: offer1, establishment },
+              ],
+              0,
+            ),
+          },
         });
       });
     });
 
     it("rejects invalid requests with error code 400", async () => {
-      const result = await httpClient.legacySearch({
+      const result = await httpClient.getOffers({
         queryParams: {
           distanceKm: 30,
           longitude: 2.34999,
           latitude: 48.8531,
-          sortedBy: "distance",
+          sortBy: "distance",
           appellationCodes: ["XXX"],
         },
       });
@@ -430,7 +431,7 @@ describe("search-immersion route", () => {
           status: 400,
           issues: ["appellationCodes.0 : Code appellation incorrect"],
           message:
-            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /offers",
         },
       });
     });
@@ -505,11 +506,11 @@ describe("search-immersion route", () => {
         ];
       });
       it("should return 400 if distance is supplied but no lat/lon/distanceKm", async () => {
-        const result = await httpClient.legacySearch({
+        const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: ["14704"],
-            sortedBy: "distance",
-          } as unknown as LegacySearchQueryParamsWithGeoParams, // forcing the type to check the error
+            sortBy: "distance",
+          } as unknown as GetOffersFlatQueryParams, // forcing the type to check the error
         });
         expectHttpResponseToEqual(result, {
           status: 400,
@@ -521,17 +522,17 @@ describe("search-immersion route", () => {
               "distanceKm : Invalid input: expected number, received NaN",
             ],
             message:
-              "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
+              "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /offers",
           },
         });
       });
       it("should return 400 if distance is supplied but only lat", async () => {
-        const result = await httpClient.legacySearch({
+        const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: ["14704"],
-            sortedBy: "distance",
+            sortBy: "distance",
             latitude: 48.8531,
-          } as unknown as LegacySearchQueryParamsWithGeoParams, // forcing the type to check the error
+          } as unknown as GetOffersFlatQueryParams, // forcing the type to check the error
         });
         expectHttpResponseToEqual(result, {
           status: 400,
@@ -542,46 +543,52 @@ describe("search-immersion route", () => {
               "distanceKm : Invalid input: expected number, received NaN",
             ],
             message:
-              "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
+              "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /offers",
           },
         });
       });
       it("should return results if no geo params are set and no appellations", async () => {
-        const results = await httpClient.legacySearch({
+        const results = await httpClient.getOffers({
           queryParams: {
-            sortedBy: "score",
+            sortBy: "score",
           },
         });
 
         expectHttpResponseToEqual(results, {
           status: 200,
-          body: toSearchImmersionResults(
-            [
-              { siret: siret1, offer: offer1, establishment },
-              { siret: siret2, offer: offer2, establishment },
-              { siret: siret3, offer: offer1, establishment },
-            ],
-            false,
-          ),
+          body: {
+            pagination: getBasicPagination({ totalRecords: 3 }),
+            data: toSearchImmersionResults(
+              [
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret2, offer: offer2, establishment },
+                { siret: siret3, offer: offer1, establishment },
+              ],
+              false,
+            ),
+          },
         });
       });
       it("should return results if no geo params are set but appellations are supplied", async () => {
-        const results = await httpClient.legacySearch({
+        const results = await httpClient.getOffers({
           queryParams: {
-            sortedBy: "date",
+            sortBy: "date",
             appellationCodes: [offer1.appellationCode],
           },
         });
 
         expectHttpResponseToEqual(results, {
           status: 200,
-          body: toSearchImmersionResults(
-            [
-              { siret: siret1, offer: offer1, establishment },
-              { siret: siret3, offer: offer1, establishment },
-            ],
-            false,
-          ),
+          body: {
+            pagination: getBasicPagination({ totalRecords: 2 }),
+            data: toSearchImmersionResults(
+              [
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret3, offer: offer1, establishment },
+              ],
+              false,
+            ),
+          },
         });
       });
     });
@@ -816,4 +823,140 @@ describe("search-immersion route", () => {
       });
     });
   });
+});
+
+describe(`${displayRouteName(searchImmersionRoutes.getExternalOffers)}`, () => {
+  let inMemoryUow: InMemoryUnitOfWork;
+  let httpClient: HttpClient<SearchRoutes>;
+  let gateways: InMemoryGateways;
+  beforeEach(async () => {
+    const testAppAndDeps = await buildTestApp();
+    inMemoryUow = testAppAndDeps.inMemoryUow;
+    httpClient = createSupertestSharedClient(
+      searchImmersionRoutes,
+      testAppAndDeps.request,
+    );
+    gateways = testAppAndDeps.gateways;
+  });
+
+  describe("wrong paths", () => {
+    it("400 - no geo params", async () => {
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["14704"],
+          sortBy: "distance",
+          distanceKm: 10,
+        } as any,
+      });
+      inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate2,
+        establishmentAggregate1,
+      ];
+      gateways.laBonneBoiteGateway.setNextResults([{} as any]);
+      expectHttpResponseToEqual(result, {
+        status: 400,
+        body: {
+          status: 400,
+          issues: [
+            "latitude : Invalid input: expected number, received NaN",
+            "longitude : Invalid input: expected number, received NaN",
+          ],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /external-offers",
+        },
+      });
+    });
+    it("400 - invalid geo params (distanceKm 0)", async () => {
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["14704"],
+          distanceKm: 0,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate2,
+        establishmentAggregate1,
+      ];
+      gateways.laBonneBoiteGateway.setNextResults([{} as any]);
+      expectHttpResponseToEqual(result, {
+        status: 400,
+        body: {
+          status: 400,
+          issues: ["distanceKm : Cette valeur doit être positive"],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /external-offers",
+        },
+      });
+    });
+    it("400 - appellation code not found", async () => {
+      const appellationCodeNotFound = "99999";
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: [appellationCodeNotFound],
+          distanceKm: 10,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      expectHttpResponseToEqual(result, {
+        status: 400,
+        body: {
+          status: 400,
+          message: "No Rome code matching appellation codes 99999",
+        },
+      });
+    });
+  });
+  describe("valid paths", () => {
+    it("200 - route with mandatory params", async () => {
+      const lbbResult: LaBonneBoiteCompanyDto =
+        new LaBonneBoiteCompanyDtoBuilder().withRome("A1409").build();
+      gateways.laBonneBoiteGateway.setNextResults([lbbResult]);
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["14704"],
+          distanceKm: 10,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      expectHttpResponseToEqual(result, {
+        status: 200,
+        body: [
+          {
+            ...lbbResult.toSearchResult({
+              romeCode: expect.any(String),
+              romeLabel: expect.any(String),
+            }),
+            distance_m: 276612,
+          },
+        ],
+      });
+    });
+    it("200 - empty results", async () => {
+      gateways.laBonneBoiteGateway.setNextResults([]);
+      const result = await httpClient.getExternalOffers({
+        queryParams: {
+          appellationCodes: ["19540"],
+          distanceKm: 10,
+          latitude: 48.8531,
+          longitude: 2.34999,
+        },
+      });
+      expectHttpResponseToEqual(result, {
+        status: 200,
+        body: [],
+      });
+    });
+  });
+});
+
+const getBasicPagination = (params: Partial<Pagination> = {}) => ({
+  totalRecords: 1,
+  currentPage: 1,
+  totalPages: 1,
+  numberPerPage: 12,
+  ...params,
 });

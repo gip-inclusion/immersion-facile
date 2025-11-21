@@ -7,7 +7,12 @@ import {
   useRef,
 } from "react";
 import { PageHeader } from "react-design-system";
-import { type AdminTabRouteName, adminTabRouteNames } from "shared";
+import {
+  type AdminTabRouteName,
+  type AppellationAndRomeDto,
+  adminTabRouteNames,
+  parseStringToJsonOrThrow,
+} from "shared";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
@@ -34,8 +39,10 @@ import { StatsPage } from "src/app/pages/StatsPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { MyProfile } from "src/app/pages/user/MyProfile";
 import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";
+import { getUrlParameters } from "src/app/utils/url.utils";
 import { store } from "src/config/dependencies";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import type { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
@@ -121,6 +128,25 @@ const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
       store.dispatch(
         connectedUserSlice.actions.currentUserFetchRequested({
           feedbackTopic: "unused",
+        }),
+      );
+    },
+    externalSearch: () => {
+      const urlParams = getUrlParameters(window.location);
+      const appellations = parseStringToJsonOrThrow<
+        AppellationAndRomeDto[],
+        "appellations"
+      >(urlParams.appellations, "appellations");
+      store.dispatch(
+        searchSlice.actions.getOffersRequested({
+          ...urlParams,
+          appellations,
+          appellationCodes: appellations.map(
+            (appellation) => appellation.appellationCode,
+          ),
+          isExternal: true,
+          sortBy: "score",
+          sortOrder: "asc",
         }),
       );
     },
@@ -232,9 +258,9 @@ const getPageByRouteName: {
   homeCandidates: () => <HomePage type="candidate" />,
   homeEstablishments: () => <HomePage type="establishment" />,
   assessment: (route) => <AssessmentPage route={route} />,
-  searchResult: () => <SearchResultPage />,
-  searchResultForStudent: () => <SearchResultPage />,
-  searchResultExternal: () => <SearchResultPage isExternal />,
+  searchResult: () => <SearchResultPage isExternal={false} />,
+  searchResultForStudent: () => <SearchResultPage isExternal={false} />,
+  searchResultExternal: () => <SearchResultPage isExternal={true} />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionConnectedUser: (route) => (
     <ConventionManageConnectedUserPage route={route} />
@@ -257,10 +283,27 @@ const getPageByRouteName: {
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => (
-    <SearchPage route={route} useNaturalLanguageForAppellations />
+    <SearchPage
+      route={route}
+      useNaturalLanguageForAppellations
+      isExternal={false}
+      key="internal-search"
+    />
+  ),
+  externalSearch: (route) => (
+    <SearchPage
+      route={route}
+      useNaturalLanguageForAppellations
+      isExternal
+      key="external-search"
+    />
   ),
   searchForStudent: (route) => (
-    <SearchPage route={route} useNaturalLanguageForAppellations />
+    <SearchPage
+      route={route}
+      useNaturalLanguageForAppellations
+      isExternal={false}
+    />
   ),
   standard: (route) =>
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
