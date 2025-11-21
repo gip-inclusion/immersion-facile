@@ -65,7 +65,7 @@ sources:
             description: "Departments covered by the agency"
           - name: refers_to_agency_id
             description: "Reference to another agency"
-          - name: rejection_justification
+          - name: status_justification
             description: "Reason for rejection if applicable"
           - name: phone_number
             description: "Phone number of the agency"

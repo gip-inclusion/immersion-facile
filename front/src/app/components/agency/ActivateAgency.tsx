@@ -24,7 +24,7 @@ import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
 import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 
-type RejectionJustificationForm = { rejectionJustification: string };
+type StatusJustificationForm = { statusJustification: string };
 type ManageAgencyToReviewAdminForm = {
   agencyId: AgencyId;
 };
@@ -37,16 +37,14 @@ const rejectAgencyModal = createModal({
 const RejectAgencyModalContent = ({
   onReject,
 }: {
-  onReject: (rejectionJustification: RejectionJustificationForm) => void;
+  onReject: (statusJustification: StatusJustificationForm) => void;
 }) => {
-  const methods = useForm<RejectionJustificationForm>({
+  const methods = useForm<StatusJustificationForm>({
     mode: "onTouched",
     defaultValues: {
-      rejectionJustification: undefined,
+      statusJustification: undefined,
     },
-    resolver: zodResolver(
-      z.object({ rejectionJustification: zStringMinLength1 }),
-    ),
+    resolver: zodResolver(z.object({ statusJustification: zStringMinLength1 })),
   });
   const { register, handleSubmit, formState, getValues } = methods;
 
@@ -64,7 +62,7 @@ const RejectAgencyModalContent = ({
           nativeTextAreaProps={{
             id: domElementIds.admin.agencyTab
               .rejectAgencyModalJustificationInput,
-            ...register("rejectionJustification"),
+            ...register("statusJustification"),
           }}
         />
         <ButtonsGroup
@@ -204,11 +202,11 @@ export const ActivateAgency = () => {
       {agencyNeedingReview?.id &&
         createPortal(
           <RejectAgencyModalContent
-            onReject={({ rejectionJustification }) =>
+            onReject={({ statusJustification }) =>
               updateAgencyStatus({
                 id: agencyNeedingReview.id,
                 status: "rejected",
-                rejectionJustification,
+                statusJustification,
               })
             }
           />,
