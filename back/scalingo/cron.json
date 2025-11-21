@@ -21,6 +21,10 @@
       "size": "M"
     },
     {
+      "command": "0 2 * * * pnpm back run trigger-delete-old-notifications",
+      "size": "M"
+    },
+    {
       "command": "0 3 * * * pnpm back run trigger-early-morning-jobs",
       "size": "M"
     },
