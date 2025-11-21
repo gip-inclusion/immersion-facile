@@ -487,7 +487,6 @@ const ConventionSummarySection = ({
                 <SignButton
                   disabled={isLoading}
                   id={domElementIds.conventionToSign.openSignModalButton}
-                  submitButtonId={domElementIds.conventionToSign.submitButton}
                   signatory={currentSignatory}
                   internshipKind={convention?.internshipKind}
                   onConfirmClick={handleSubmit(onConfirmSubmit)}
