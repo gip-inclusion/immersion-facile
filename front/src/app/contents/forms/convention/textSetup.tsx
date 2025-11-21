@@ -202,7 +202,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     modifyConventionAgencyTitle:
       "Rediriger vers la bonne structure d'accompagnement",
     modifyConventionOtherInformations: "Modifier une autre information",
-    conventionAlreadyMarkedAsEligible: "Demande déjà validée.",
+    conventionAlreadyMarkedAsEligible: "Demande déjà pré-validée.",
     markAsEligible: "Pré-valider la demande",
     conventionAlreadyValidated: "Demande déjà validée",
     markAsValidated: "Valider la demande",
@@ -211,6 +211,8 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     markAsDeprecated: "Annuler la demande",
     modifyCounsellorName: "Modifier le nom du conseiller",
     modifyCounsellorNameTitle: "Modifier le nom du conseiller",
+    broadcastConventionAgain: "Rediffuser dans votre applicatif",
+    broadcastConventionAgainTitle: "Rediffuser dans votre applicatif",
   },
   sign: {
     title:

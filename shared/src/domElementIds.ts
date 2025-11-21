@@ -407,6 +407,7 @@ export const domElementIds = {
     validatorModal: "im-validator-modal",
     cancelModal: "im-cancel-modal",
     renewModal: "im-renew-modal",
+    fillAssessmentInfoModal: "im-fill-assessment-info-modal",
     openSendSignatureLinkModal:
       "im-convention-validation__open-send-signature-link-modal",
     sendSignatureLinkModal:
