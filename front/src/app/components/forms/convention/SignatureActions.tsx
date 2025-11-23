@@ -65,7 +65,6 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
             signatory={signatory}
             internshipKind={internshipKind}
             id={domElementIds.conventionToSign.openSignModalButton}
-            submitButtonId={domElementIds.conventionToSign.submitButton}
             onCloseSignModalWithoutSignature={onCloseSignModalWithoutSignature}
           />
         </li>

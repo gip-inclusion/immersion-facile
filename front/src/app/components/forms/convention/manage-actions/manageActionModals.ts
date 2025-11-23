@@ -1,6 +1,6 @@
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { domElementIds } from "shared";
-import type { VerificationAction } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
+import type { VerificationActionWithModal } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
 
 const createRejectModalParams = {
   id: domElementIds.manageConvention.rejectedModal,
@@ -73,7 +73,49 @@ const {
   close: closeRenewConventionModal,
 } = createModal(createRenewConventionModalParams);
 
-export const modalByAction = (verificationAction: VerificationAction) => {
+const createBroadcastAgainModalParams = {
+  id: domElementIds.manageConvention.broadcastAgainModal,
+  isOpenedByDefault: false,
+};
+const {
+  Component: BroadcastAgainModal,
+  open: openBroadcastAgainModal,
+  close: closeBroadcastAgainModal,
+} = createModal(createBroadcastAgainModalParams);
+
+const createMarkAsHandledModalParams = {
+  id: domElementIds.manageConvention.erroredConventionHandledModal,
+  isOpenedByDefault: false,
+};
+const {
+  Component: MarkAsHandledModal,
+  open: openMarkAsHandledModal,
+  close: closeMarkAsHandledModal,
+} = createModal(createMarkAsHandledModalParams);
+
+const createFillAssessmentInfoModalParams = {
+  id: domElementIds.manageConvention.fillAssessmentInfoModal,
+  isOpenedByDefault: false,
+};
+const {
+  Component: FillAssessmentInfoModal,
+  open: openFillAssessmentInfoModal,
+  close: closeFillAssessmentInfoModal,
+} = createModal(createFillAssessmentInfoModalParams);
+
+const createSignModalParams = {
+  id: "im-convention-validation__sign-modal",
+  isOpenedByDefault: false,
+};
+const {
+  Component: SignModal,
+  open: openSignModal,
+  close: closeSignModal,
+} = createModal(createSignModalParams);
+
+export const modalByAction = (
+  verificationAction: VerificationActionWithModal,
+) => {
   const modals = {
     REJECT: {
       modal: RejectModal,
@@ -122,6 +164,30 @@ export const modalByAction = (verificationAction: VerificationAction) => {
       openModal: openEditCounsellorNameModal,
       closeModal: closeEditCounsellorNameModal,
       createModalParams: createEditCounsellorNameModalParams,
+    },
+    BROADCAST_AGAIN: {
+      modal: BroadcastAgainModal,
+      openModal: openBroadcastAgainModal,
+      closeModal: closeBroadcastAgainModal,
+      createModalParams: createBroadcastAgainModalParams,
+    },
+    MARK_AS_HANDLED: {
+      modal: MarkAsHandledModal,
+      openModal: openMarkAsHandledModal,
+      closeModal: closeMarkAsHandledModal,
+      createModalParams: createMarkAsHandledModalParams,
+    },
+    FILL_ASSESSMENT_INFO: {
+      modal: FillAssessmentInfoModal,
+      openModal: openFillAssessmentInfoModal,
+      closeModal: closeFillAssessmentInfoModal,
+      createModalParams: createFillAssessmentInfoModalParams,
+    },
+    SIGN: {
+      modal: SignModal,
+      openModal: openSignModal,
+      closeModal: closeSignModal,
+      createModalParams: createSignModalParams,
     },
   };
   return modals[verificationAction];
