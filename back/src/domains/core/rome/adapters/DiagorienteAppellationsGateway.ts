@@ -54,7 +54,10 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
   }
 
   async searchAppellations(rawQuery: string): Promise<AppellationDto[]> {
-    const tokenData = await this.getAccessToken();
+    const tokenData = await this.getAccessToken()
+      // Must not throw since usecase make a failback to internal appellation search
+      .catch(() => null);
+    if (!tokenData) return [];
     const cachedSearchAppellations = this.#withCache({
       overrideCacheDurationInHours: 24,
       logParams: {
