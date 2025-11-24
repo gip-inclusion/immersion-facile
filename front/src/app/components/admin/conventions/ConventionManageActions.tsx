@@ -81,7 +81,6 @@ export const ConventionManageActions = ({
       | WithConventionId
       | MarkPartnersErroredConventionAsHandledRequest,
   ) => {
-    // Handle BROADCAST_AGAIN
     if (verificationAction === "BROADCAST_AGAIN" && "conventionId" in params) {
       dispatch(
         conventionActionSlice.actions.broadcastConventionToPartnerRequested({
@@ -92,7 +91,6 @@ export const ConventionManageActions = ({
       return;
     }
 
-    // Handle MARK_AS_HANDLED
     if (verificationAction === "MARK_AS_HANDLED" && "conventionId" in params) {
       dispatch(
         partnersErroredConventionSlice.actions.markAsHandledRequested({
@@ -104,7 +102,6 @@ export const ConventionManageActions = ({
       return;
     }
 
-    // Handle SIGN
     if (verificationAction === "SIGN" && "conventionId" in params) {
       dispatch(
         conventionActionSlice.actions.signConventionRequested({
@@ -116,7 +113,6 @@ export const ConventionManageActions = ({
       return;
     }
 
-    // Handle TRANSFER
     if ("agencyId" in params) {
       dispatch(
         conventionActionSlice.actions.transferConventionToAgencyRequested({
@@ -132,7 +128,6 @@ export const ConventionManageActions = ({
       return;
     }
 
-    // Handle EDIT_COUNSELLOR_NAME
     if (
       "firstname" in params &&
       "lastname" in params &&
@@ -148,7 +143,6 @@ export const ConventionManageActions = ({
       return;
     }
 
-    // Handle RENEW
     if ("schedule" in params) {
       dispatch(
         conventionActionSlice.actions.renewConventionRequested({
@@ -160,7 +154,6 @@ export const ConventionManageActions = ({
       return;
     }
 
-    // Handle status changes
     if ("status" in params) {
       if (params.status === "ACCEPTED_BY_COUNSELLOR") {
         dispatch(

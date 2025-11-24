@@ -11,13 +11,13 @@ import { ModalWrapper } from "../../forms/convention/manage-actions/ManageAction
 export type ButtonArea = (typeof allAreas)[number];
 
 const allAreas = [
-  "OtherActionArea",
-  "CancelationArea",
-  "EditionArea",
-  "ValidationArea",
-  "AssessmentArea",
-  "ConventionArea",
-  "SignatureArea",
+  "otherActionArea",
+  "cancelationArea",
+  "editionArea",
+  "validationArea",
+  "assessmentArea",
+  "conventionArea",
+  "signatureArea",
 ] as const;
 
 const getButtonWithSubMenuLabels: (
@@ -34,13 +34,13 @@ const getButtonWithSubMenuLabels: (
       : "Autres actions";
 
   return {
-    CancelationArea: "Annulation",
-    EditionArea: "Édition",
-    ValidationArea: "Validation",
-    AssessmentArea: "Bilan",
-    ConventionArea: "Convention",
-    OtherActionArea: otherActionLabel,
-    SignatureArea: "Signature",
+    cancelationArea: "Annuler la demande",
+    editionArea: "Modifier la convention",
+    validationArea: "Validation",
+    assessmentArea: "Bilan",
+    conventionArea: "Convention",
+    otherActionArea: otherActionLabel,
+    signatureArea: "Signature",
   };
 };
 
@@ -56,7 +56,7 @@ const getPrimaryAreaBySubStatus = (
         "partiallySignedWithBroadcastError",
         "partiallySignedWithoutBroadcastError",
       ),
-      (): ButtonArea => (isSignVisible ? "SignatureArea" : "EditionArea"),
+      (): ButtonArea => (isSignVisible ? "signatureArea" : "editionArea"),
     )
     .with(
       P.union(
@@ -67,7 +67,7 @@ const getPrimaryAreaBySubStatus = (
         "acceptedByCounsellorWithBroadcastError",
         "acceptedByCounsellorWithoutBroadcastError",
       ),
-      (): ButtonArea => "ValidationArea",
+      (): ButtonArea => "validationArea",
     )
     .with(
       P.union(
@@ -80,7 +80,7 @@ const getPrimaryAreaBySubStatus = (
         "acceptedByValidatorWithoutAssessmentDidStartEndingTomorrowOrAlreadyEndedWithBroadcastError",
         "acceptedByValidatorWithoutAssessmentDidStartEndingTomorrowOrAlreadyEndedWithoutBroadcastError",
       ),
-      (): ButtonArea => "ConventionArea",
+      (): ButtonArea => "conventionArea",
     )
     .with(
       P.union(
@@ -91,7 +91,7 @@ const getPrimaryAreaBySubStatus = (
         "deprecatedWithBroadcastError",
         "deprecatedWithoutBroadcastError",
       ),
-      (): ButtonArea => "OtherActionArea",
+      (): ButtonArea => "otherActionArea",
     )
     .exhaustive();
 };
@@ -110,29 +110,13 @@ type RenderedButtons = {
 const getAreasConfig = (
   buttonsConfig: ButtonConfiguration[],
 ): Record<ButtonArea, ButtonConfiguration[]> => {
-  return {
-    CancelationArea: buttonsConfig.filter(
-      (item) => item.buttonArea === "CancelationArea",
-    ),
-    EditionArea: buttonsConfig.filter(
-      (item) => item.buttonArea === "EditionArea",
-    ),
-    ValidationArea: buttonsConfig.filter(
-      (item) => item.buttonArea === "ValidationArea",
-    ),
-    AssessmentArea: buttonsConfig.filter(
-      (item) => item.buttonArea === "AssessmentArea",
-    ),
-    ConventionArea: buttonsConfig.filter(
-      (item) => item.buttonArea === "ConventionArea",
-    ),
-    OtherActionArea: buttonsConfig.filter(
-      (item) => item.buttonArea === "OtherActionArea",
-    ),
-    SignatureArea: buttonsConfig.filter(
-      (item) => item.buttonArea === "SignatureArea",
-    ),
-  };
+  return allAreas.reduce(
+    (acc, area) => {
+      acc[area] = buttonsConfig.filter((item) => item.buttonArea === area);
+      return acc;
+    },
+    {} as Record<ButtonArea, ButtonConfiguration[]>,
+  );
 };
 
 const getRightAndLeftAreas = (
@@ -147,11 +131,11 @@ const getRightAndLeftAreas = (
   const primaryArea = getPrimaryAreaBySubStatus(subStatus, isSignVisible);
 
   const shouldShowOtherActionOnLeft =
-    areasConfig["OtherActionArea"].length > 0 &&
-    primaryArea !== "OtherActionArea";
+    areasConfig["otherActionArea"].length > 0 &&
+    primaryArea !== "otherActionArea";
 
   const leftAreas: ButtonArea[] = shouldShowOtherActionOnLeft
-    ? ["OtherActionArea"]
+    ? ["otherActionArea"]
     : [];
 
   const rightAreasWithoutPrimary = allAreas.filter(
@@ -172,7 +156,7 @@ export const renderButtonsBySubStatus = ({
   );
   const isSignVisible = buttonsConfig.some(
     (config) =>
-      config.buttonArea === "SignatureArea" && config.isVisibleForUserRights,
+      config.buttonArea === "signatureArea" && config.isVisibleForUserRights,
   );
   const primaryArea = getPrimaryAreaBySubStatus(subStatus, isSignVisible);
 
@@ -186,7 +170,7 @@ export const renderButtonsBySubStatus = ({
   const renderButtonsForArea = (
     buttonConfigurations: ButtonConfiguration[],
     area: ButtonArea,
-    position: "left" | "right",
+    position: "top-left" | "top-right",
   ): { buttons: ReactElement[]; modals: ReactElement[] } => {
     if (buttonConfigurations.length === 0) {
       return { buttons: [], modals: [] };
@@ -239,9 +223,7 @@ export const renderButtonsBySubStatus = ({
         iconPosition="right"
         navItems={navItems}
         priority={priority}
-        {...(position === "right"
-          ? { openedTopRight: true }
-          : { openedTopLeft: true })}
+        position={position}
       />
     );
 
@@ -250,11 +232,11 @@ export const renderButtonsBySubStatus = ({
 
   const leftButtonsResults = leftAreas
     .filter((area) => areasConfig[area].length > 0)
-    .map((area) => renderButtonsForArea(areasConfig[area], area, "left"));
+    .map((area) => renderButtonsForArea(areasConfig[area], area, "top-left"));
 
   const rightButtonsResults = rightAreas
     .filter((area) => areasConfig[area].length > 0)
-    .map((area) => renderButtonsForArea(areasConfig[area], area, "right"));
+    .map((area) => renderButtonsForArea(areasConfig[area], area, "top-right"));
 
   const leftButtons = leftButtonsResults.flatMap((result) => result.buttons);
   const rightButtons = rightButtonsResults.flatMap((result) => result.buttons);
