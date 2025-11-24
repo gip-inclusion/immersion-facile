@@ -9,8 +9,7 @@ export type ButtonWithSubMenuProps = {
   buttonLabel: string;
   buttonIconId: Exclude<ButtonProps["iconId"], undefined>;
   id?: string;
-  openedTopLeft?: boolean;
-  openedTopRight?: boolean;
+  position?: "top-left" | "top-right";
   className?: string;
   priority?: ButtonProps["priority"];
   iconPosition?: ButtonProps["iconPosition"];
@@ -21,8 +20,7 @@ export const ButtonWithSubMenu = ({
   buttonLabel,
   buttonIconId,
   id,
-  openedTopLeft,
-  openedTopRight,
+  position,
   className,
   priority,
   iconPosition,
@@ -60,8 +58,8 @@ export const ButtonWithSubMenu = ({
       className={cx(
         Styles.root,
         isOpen && Styles.isOpened,
-        openedTopRight && Styles.openedTopRight,
-        openedTopLeft && Styles.openedTopLeft,
+        position === "top-right" && Styles.openedTopRight,
+        position === "top-left" && Styles.openedTopLeft,
       )}
     >
       <Button

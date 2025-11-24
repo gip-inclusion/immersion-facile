@@ -416,7 +416,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.duplicateConventionButton,
       }),
       isVisibleForUserRights: true,
-      buttonArea: "OtherActionArea",
+      buttonArea: "otherActionArea",
     },
     REJECT: {
       props: getVerificationActionProps({
@@ -436,7 +436,7 @@ const createButtonPropsByVerificationAction = (
         "REJECTED",
         requesterRoles,
       ),
-      buttonArea: "CancelationArea",
+      buttonArea: "cancelationArea",
     },
     CANCEL: {
       props: getVerificationActionProps({
@@ -452,7 +452,7 @@ const createButtonPropsByVerificationAction = (
           domElementIds.manageConvention.conventionValidationCancelButton,
       }),
       isVisibleForUserRights: shouldShowCancelButton,
-      buttonArea: "CancelationArea",
+      buttonArea: "cancelationArea",
     },
     EDIT_COUNSELLOR_NAME: {
       props: getVerificationActionProps({
@@ -471,7 +471,7 @@ const createButtonPropsByVerificationAction = (
         "READY_TO_SIGN",
         requesterRoles,
       ),
-      buttonArea: "EditionArea",
+      buttonArea: "editionArea",
     },
     TRANSFER: {
       props: getVerificationActionProps({
@@ -486,7 +486,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.transferToAgencyButton,
       }),
       isVisibleForUserRights: shouldShowTransferButton(),
-      buttonArea: "EditionArea",
+      buttonArea: "editionArea",
     },
     EDIT_CONVENTION: {
       props: getVerificationActionProps({
@@ -498,7 +498,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.editLink,
       }),
       isVisibleForUserRights: shouldShowModifyConventionButton(),
-      buttonArea: "EditionArea",
+      buttonArea: "editionArea",
     },
     BROADCAST_AGAIN: {
       props: getVerificationActionProps({
@@ -513,7 +513,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.broadcastConventionAgainButton,
       }),
       isVisibleForUserRights: shouldShowBroadcastAgainButton,
-      buttonArea: "OtherActionArea",
+      buttonArea: "otherActionArea",
     },
     ACCEPT_COUNSELLOR: {
       props: getVerificationActionProps({
@@ -539,7 +539,7 @@ const createButtonPropsByVerificationAction = (
         "ACCEPTED_BY_COUNSELLOR",
         requesterRoles,
       ),
-      buttonArea: "ValidationArea",
+      buttonArea: "validationArea",
     },
     ACCEPT_VALIDATOR: {
       props: getVerificationActionProps({
@@ -569,7 +569,7 @@ const createButtonPropsByVerificationAction = (
         "ACCEPTED_BY_VALIDATOR",
         requesterRoles,
       ),
-      buttonArea: "ValidationArea",
+      buttonArea: "validationArea",
     },
     RENEW: {
       props: getVerificationActionProps({
@@ -584,7 +584,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.openRenewModalButton,
       }),
       isVisibleForUserRights: shouldShowRenewConventionButton,
-      buttonArea: "OtherActionArea",
+      buttonArea: "otherActionArea",
     },
     DECLARE_ABANDONMENT: {
       props: getVerificationActionProps({
@@ -595,7 +595,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.abandonAssessmentButton,
       }),
       isVisibleForUserRights: shouldShowAssessmentAbandonAction,
-      buttonArea: "CancelationArea",
+      buttonArea: "cancelationArea",
     },
     ACCESS_CONVENTION: {
       props: getVerificationActionProps({
@@ -606,7 +606,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.openDocumentButton,
       }),
       isVisibleForUserRights: shouldShowConventionDocumentButton,
-      buttonArea: "ConventionArea",
+      buttonArea: "conventionArea",
     },
     ACCESS_ASSESSMENT: {
       props: getVerificationActionProps({
@@ -617,7 +617,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.assessmentDocumentButton,
       }),
       isVisibleForUserRights: shouldShowAssessmentDocumentAction,
-      buttonArea: "AssessmentArea",
+      buttonArea: "assessmentArea",
     },
     FILL_ASSESSMENT: {
       props: getVerificationActionProps({
@@ -628,7 +628,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.assessmentFullFillButton,
       }),
       isVisibleForUserRights: shouldShowAssessmentFullFillAction,
-      buttonArea: "AssessmentArea",
+      buttonArea: "assessmentArea",
     },
     FILL_ASSESSMENT_INFO: {
       props: getVerificationActionProps({
@@ -642,7 +642,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.assessmentFullFillButton,
       }),
       isVisibleForUserRights: shouldShowFillAssessmentInfoButton,
-      buttonArea: "AssessmentArea",
+      buttonArea: "assessmentArea",
     },
     DEPRECATE: {
       props: getVerificationActionProps({
@@ -662,7 +662,7 @@ const createButtonPropsByVerificationAction = (
         "DEPRECATED",
         requesterRoles,
       ),
-      buttonArea: "CancelationArea",
+      buttonArea: "cancelationArea",
     },
     MARK_AS_HANDLED: {
       props: getVerificationActionProps({
@@ -678,7 +678,7 @@ const createButtonPropsByVerificationAction = (
           domElementIds.manageConvention.openMarkConventionAsHandledModal,
       }),
       isVisibleForUserRights: shouldShowMarkAsHandledButton,
-      buttonArea: "OtherActionArea",
+      buttonArea: "otherActionArea",
     },
     SIGN: {
       props: getVerificationActionProps({
@@ -694,7 +694,7 @@ const createButtonPropsByVerificationAction = (
         buttonId: domElementIds.manageConvention.openSignModalButton,
       }),
       isVisibleForUserRights: shouldShowSignatureAction,
-      buttonArea: "SignatureArea",
+      buttonArea: "signatureArea",
     },
   };
 };
