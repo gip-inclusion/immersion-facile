@@ -20,7 +20,7 @@ jobs:
 
       - name: Dump the remote database data and restore it to the local database.
         run: >-
-          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL bash -c "
+          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
                 echo \"> \$(date) - activate Scalingo CLI, PG then login\" &&
                   install-scalingo-cli &&
                   dbclient-fetcher pgsql &&
@@ -59,6 +59,18 @@ jobs:
                     --exit-on-error\
                     --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
                 echo \"> \$(date) - Finished restoring schema\" &&
+                  exit 0"
+
+      - name: Run DBT transformations
+        run: >-
+          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
+                echo \"> \$(date) - Starting DBT run\" &&
+                echo \"> Connecting to: \$DBT_HOST:\$DBT_PORT/\$DBT_DATABASE as \$DBT_USER\" &&
+                echo \"> Navigating to bi directory\" &&
+                  cd bi &&
+                echo \"> Running dbt transformations\" &&
+                  ./run_dbt.sh run &&
+                echo \"> \$(date) - DBT run completed successfully\" &&
                   exit 0"
 
 
