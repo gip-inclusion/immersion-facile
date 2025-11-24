@@ -3,6 +3,7 @@ import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import type { ReactElement } from "react";
 import { ButtonWithSubMenu } from "react-design-system";
+import { domElementIds } from "shared";
 import type { ButtonConfiguration } from "src/app/components/forms/convention/manage-actions/getButtonConfigBySubStatus";
 import type { ConventionSubStatus } from "src/app/utils/conventionSubStatus";
 import { match, P } from "ts-pattern";
@@ -20,9 +21,11 @@ const allAreas = [
   "signatureArea",
 ] as const;
 
-const getButtonWithSubMenuLabels: (
+const getButtonWithSubMenuIdAndLabels: (
   subStatus: ConventionSubStatus,
-) => Record<ButtonArea, string> = (subStatus: ConventionSubStatus) => {
+) => Record<ButtonArea, { id?: string; label: string }> = (
+  subStatus: ConventionSubStatus,
+) => {
   const otherActionLabel =
     subStatus === "cancelledWithBroadcastError" ||
     subStatus === "cancelledWithoutBroadcastError" ||
@@ -30,17 +33,29 @@ const getButtonWithSubMenuLabels: (
     subStatus === "deprecatedWithoutBroadcastError" ||
     subStatus === "rejectedWithBroadcastError" ||
     subStatus === "rejectedWithoutBroadcastError"
-      ? "Gérer la synchronisation"
-      : "Autres actions";
+      ? {
+          id: domElementIds.manageConvention.otherActionsButton,
+          label: "Gérer la synchronisation",
+        }
+      : {
+          id: domElementIds.manageConvention.otherActionsButton,
+          label: "Autres actions",
+        };
 
   return {
-    cancelationArea: "Annuler la demande",
-    editionArea: "Modifier la convention",
-    validationArea: "Validation",
-    assessmentArea: "Bilan",
-    conventionArea: "Convention",
+    cancelationArea: {
+      id: domElementIds.manageConvention.cancelActionButton,
+      label: "Annuler la demande",
+    },
+    editionArea: {
+      id: domElementIds.manageConvention.editActionsButton,
+      label: "Modifier la convention",
+    },
+    validationArea: { label: "" },
+    assessmentArea: { label: "" },
+    conventionArea: { label: "" },
     otherActionArea: otherActionLabel,
-    signatureArea: "Signature",
+    signatureArea: { label: "" },
   };
 };
 
@@ -218,7 +233,8 @@ export const renderButtonsBySubStatus = ({
     const buttonWithSubMenu = (
       <ButtonWithSubMenu
         key={area}
-        buttonLabel={getButtonWithSubMenuLabels(subStatus)[area]}
+        id={getButtonWithSubMenuIdAndLabels(subStatus)[area].id ?? undefined}
+        buttonLabel={getButtonWithSubMenuIdAndLabels(subStatus)[area].label}
         buttonIconId="fr-icon-arrow-down-s-line"
         iconPosition="right"
         navItems={navItems}
