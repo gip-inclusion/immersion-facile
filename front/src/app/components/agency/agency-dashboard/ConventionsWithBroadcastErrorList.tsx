@@ -90,8 +90,15 @@ export const ConventionsWithBroadcastErrorList = ({
                       conventionWithBroadcastFeedback.beneficiary.lastname,
                   })}
                 </span>
-                <Badge className={fr.cx("fr-badge--error")}>
-                  ❌ Erreur de synchronisation
+                <Badge className={fr.cx("fr-badge--error")} small>
+                  <i
+                    className={fr.cx(
+                      "fr-icon-error-fill",
+                      "fr-icon--sm",
+                      "fr-mr-1v",
+                    )}
+                  />
+                  Erreur de synchronisation
                 </Badge>
               </>
             }
