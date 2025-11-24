@@ -5,14 +5,21 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ErrorNotifications } from "react-design-system";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import {
+  FormProvider,
+  useForm,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AgencyDto,
+  type AgencyStatus,
   agencyKindToLabel,
   agencyStatusToLabel,
   allAgencyStatuses,
   type CreateAgencyDto,
+  closedOrRejectedAgencyStatuses,
   domElementIds,
   editAgencySchema,
 } from "shared";
@@ -62,7 +69,8 @@ export const EditAgencyForm = ({
     mode: "onTouched",
     defaultValues: agency,
   });
-  const { register, handleSubmit, formState } = methods;
+  const { register, handleSubmit, formState, getValues, setValue, control } =
+    methods;
 
   const getFieldError = makeFieldError(formState);
 
@@ -74,6 +82,14 @@ export const EditAgencyForm = ({
     routeName === "adminAgencies" || routeName === "adminAgencyDetail";
 
   const refersToOtherAgency = !!agency.refersToAgencyId;
+
+  const formValues = getValues();
+
+  const [status] = useWatch({
+    control,
+    name: ["status"],
+  });
+
   return (
     <FormProvider {...methods}>
       <form
@@ -108,6 +124,8 @@ export const EditAgencyForm = ({
 
           {isRouteAdmin && (
             <>
+              <h2 className={fr.cx("fr-h6", "fr-mt-4w")}>Section admin IF</h2>
+
               <Select
                 label={"!Type de structure!"}
                 options={kindOptions}
@@ -122,10 +140,32 @@ export const EditAgencyForm = ({
                 options={statusListOfOptions}
                 placeholder="Sélectionner un statut"
                 nativeSelectProps={{
-                  ...register("status"),
                   id: adminAgencyIds.editAgencyFormStatusSelector,
+                  value: status,
+                  onChange: (event) => {
+                    const agencyStatus = event.currentTarget
+                      .value as AgencyStatus;
+                    if (
+                      !closedOrRejectedAgencyStatuses.includes(agencyStatus)
+                    ) {
+                      setValue("statusJustification", null);
+                    }
+                    setValue("status", agencyStatus);
+                  },
                 }}
+                {...getFieldError("status")}
               />
+              {closedOrRejectedAgencyStatuses.includes(formValues.status) && (
+                <Input
+                  textArea
+                  label="!Justification du statut !"
+                  nativeTextAreaProps={{
+                    ...register("statusJustification"),
+                    id: adminAgencyIds.editAgencyFormStatusJustificationInput,
+                  }}
+                  {...getFieldError("statusJustification")}
+                />
+              )}
 
               <Input
                 label="!Code Safir de l'agence !"
