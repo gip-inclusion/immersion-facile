@@ -180,4 +180,11 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
       ...withAcquisition,
     });
   }
+
+  public withValidatorEmails(validatorEmails: string[]) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      validatorEmails,
+    });
+  }
 }

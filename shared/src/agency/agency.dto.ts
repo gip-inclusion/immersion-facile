@@ -22,6 +22,11 @@ export const allAgencyStatuses = [
   "needsReview",
   "from-api-PE",
 ] as const;
+export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
+export const closedOrRejectedAgencyStatuses: AgencyStatus[] = [
+  "closed",
+  "rejected",
+];
 
 export type CreateAgencyDto = {
   id: AgencyId;
@@ -157,8 +162,6 @@ export type AgencyOption = {
   address: AddressDto;
   refersToAgencyName: string | null;
 };
-
-export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 
 export const agencyKindFilters = [
   "immersionPeOnly",

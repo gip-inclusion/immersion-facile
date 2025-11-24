@@ -26,14 +26,15 @@ import {
   type AgencyIdResponse,
   type AgencyKind,
   type AgencyOption,
+  activeAgencyStatuses,
   agencyKindFilters,
   allAgencyStatuses,
   type CreateAgencyDto,
   type CreateAgencyInitialValues,
+  closedOrRejectedAgencyStatuses,
   type ListAgencyOptionsRequestDto,
   orderedAgencyKindList,
   type PrivateListAgenciesRequestDto,
-  type WithAgencyDto,
   type WithAgencyId,
   type WithAgencyStatus,
 } from "./agency.dto";
@@ -148,6 +149,26 @@ export const createAgencySchema: z.ZodType<
     }
   });
 
+const mustHaveStatutJustificationIfClosedOrRejected = (
+  agency: AgencyDto,
+): boolean => {
+  const agencyIsActiveOrInReview = [
+    ...activeAgencyStatuses,
+    "needsReview",
+  ].includes(agency.status);
+  const agencyIsNotActiveAndStatusJustificationIsFilled =
+    closedOrRejectedAgencyStatuses.includes(agency.status) &&
+    agency.statusJustification &&
+    agency.statusJustification?.trim().length > 0;
+  if (
+    agencyIsActiveOrInReview ||
+    agencyIsNotActiveAndStatusJustificationIsFilled
+  ) {
+    return true;
+  }
+  return false;
+};
+
 export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
   .object({ ...commonAgencyShape, ...withEmails })
   .and(
@@ -159,7 +180,11 @@ export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       statusJustification: zStringMinLength1.or(z.null()),
     }),
   )
-  .and(withAcquisitionSchema);
+  .and(withAcquisitionSchema)
+  .refine(mustHaveStatutJustificationIfClosedOrRejected, {
+    message: "Une agence inactive doit avoir une justification",
+    path: ["statusJustification"],
+  });
 
 const withAdminEmailsSchema: ZodSchemaWithInputMatchingOutput<{
   admins: Email[];
@@ -192,14 +217,13 @@ export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       refersToAgencyName: zStringMinLength1.or(z.null()),
-      statusJustification: z.string().or(z.null()),
+      statusJustification: zStringMinLength1.or(z.null()),
     }),
   )
-  .and(withAcquisitionSchema);
-
-export const withAgencySchema: ZodSchemaWithInputMatchingOutput<WithAgencyDto> =
-  z.object({
-    agency: agencySchema,
+  .and(withAcquisitionSchema)
+  .refine(mustHaveStatutJustificationIfClosedOrRejected, {
+    message: "Une agence inactive doit avoir une justification",
+    path: ["statusJustification"],
   });
 
 export const privateListAgenciesRequestSchema: ZodSchemaWithInputMatchingOutput<PrivateListAgenciesRequestDto> =
