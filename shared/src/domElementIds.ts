@@ -741,6 +741,8 @@ export const domElementIds = {
       editAgencyForm: "im-form-edit-agency",
       activateAgencySelector: "agency-selector",
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
+      editAgencyFormStatusJustificationInput:
+        "im-form-edit-agency__status-justification-input",
       editAgencyFormKindSelector: "im-form-edit-agency__kind-select",
       editAgencyFormSafirCodeInput: "im-form-edit-agency__safir-code-input",
       editAgencyFormEditSubmitButton: "im-form-edit-agency__submit-button",
