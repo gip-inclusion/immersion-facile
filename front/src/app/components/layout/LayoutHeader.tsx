@@ -1,9 +1,12 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import { Header, type HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 
-import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
+import {
+  ButtonWithSubMenu,
+  MaintenanceCallout,
+  useLayout,
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
@@ -27,16 +30,7 @@ export const LayoutHeader = () => {
 
   const currentRoute = useRoute();
   const darkModeState = useIsDark();
-  const { classes } = makeStyles({ name: LayoutHeader.displayName })(() => ({
-    operator: {
-      boxSizing: "content-box",
-      width: window.matchMedia(fr.breakpoints.up("md").replace("@media ", ""))
-        .matches
-        ? "10.5rem"
-        : "100%",
-      maxWidth: "10.5rem !important",
-    },
-  }))();
+
   const immersionFacileLogo = darkModeState.isDark
     ? immersionFacileDarkLogo
     : immersionFacileLightLogo;
@@ -306,6 +300,16 @@ export const LayoutHeader = () => {
       ],
     });
   }
+
+  const { isLayoutDesktop } = useLayout();
+
+  const { classes } = makeStyles({ name: LayoutHeader.displayName })(() => ({
+    operator: {
+      boxSizing: "content-box",
+      width: isLayoutDesktop ? "10.5rem" : "100%",
+      maxWidth: "10.5rem !important",
+    },
+  }))();
 
   return (
     <>
