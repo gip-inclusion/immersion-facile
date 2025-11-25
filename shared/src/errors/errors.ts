@@ -742,7 +742,8 @@ export const errors = {
       new ForbiddenError(
         "Le jeton d'authentification (JWT) fourni est invalide.",
       ),
-    expiredJwt: () => new ForbiddenError(authExpiredMessage),
+    expiredJwt: (expiredDurationText?: string) =>
+      new ForbiddenError(authExpiredMessage(expiredDurationText ?? "")),
     notFound: ({ userId }: { userId: UserId }) =>
       new NotFoundError(
         `Aucun utilisateur trouvé avec l'identifiant : ${userId}.`,

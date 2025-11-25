@@ -131,7 +131,7 @@ describe("Delete establishment", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { message: authExpiredMessage, status: 401 },
+      body: { message: authExpiredMessage(), status: 401 },
       status: 401,
     });
   });

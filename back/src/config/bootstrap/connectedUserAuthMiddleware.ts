@@ -48,7 +48,7 @@ export const makeConnectedUserAuthMiddleware = (
         status: unauthorizedError.status,
         message:
           "name" in error && error.name === "TokenExpiredError"
-            ? authExpiredMessage
+            ? authExpiredMessage()
             : invalidTokenMessage,
       });
     }

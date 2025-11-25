@@ -43,5 +43,5 @@ export type WithIdToken = {
   idToken: IdToken;
 };
 
-export const authExpiredMessage =
-  "Le jeton d'authentification (JWT) fourni a expiré.";
+export const authExpiredMessage = (durationText?: string) =>
+  `Le jeton d'authentification (JWT) fourni a expiré${durationText ? ` depuis ${durationText}` : ""}`;

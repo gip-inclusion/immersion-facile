@@ -489,6 +489,8 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         const userId = "new-user-id";
         uuidGenerator.setNextUuid(userId);
 
+        const expirationDate = subDays(timeGateway.now(), 1);
+
         await expectPromiseToFailWithError(
           afterOAuthSuccessRedirection.execute({
             code: generateEmailAuthCode({
@@ -497,7 +499,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             }),
             state: initialOngoingOAuth.state,
           }),
-          errors.user.expiredJwt(),
+          errors.user.expiredJwt(
+            (timeGateway.now().getTime() - expirationDate.getTime()) /
+              1000 /
+              60 +
+              " minutes",
+          ),
         );
       });
     });

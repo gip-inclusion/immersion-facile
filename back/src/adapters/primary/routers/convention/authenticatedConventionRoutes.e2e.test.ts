@@ -113,7 +113,7 @@ describe("authenticatedConventionRoutes", () => {
         body: { conventionId: "11111111-1111-4111-9111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
-        body: { message: authExpiredMessage, status: 401 },
+        body: { message: authExpiredMessage(), status: 401 },
         status: 401,
       });
     });
@@ -679,7 +679,7 @@ describe("authenticatedConventionRoutes", () => {
           },
         );
       expectHttpResponseToEqual(response, {
-        body: { message: authExpiredMessage, status: 401 },
+        body: { message: authExpiredMessage(), status: 401 },
         status: 401,
       });
     });
