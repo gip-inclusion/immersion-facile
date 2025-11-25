@@ -1,5 +1,4 @@
 {
-  "root": false,
   "$schema": "https://biomejs.dev/schemas/2.3.7/schema.json",
   "extends": "//",
   "linter": {
@@ -27,6 +26,7 @@
     "includes": [
       "src/**/*.ts",
       "src/**/*.json",
+      "scalingo/cron.json",
       "biome.json",
       "tsconfig.json",
       "tsconfig.prod.json",

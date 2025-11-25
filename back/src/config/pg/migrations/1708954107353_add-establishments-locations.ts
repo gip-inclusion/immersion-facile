@@ -205,7 +205,9 @@ const createEstablishmentsView = (
   direction: "up" | "down",
 ) => {
   if (direction === "down") {
-    pgm.sql(`
+    pgm.sql(
+      // biome-ignore-start lint/suspicious/noUselessEscapeInString: keep the regex as is
+      `
     CREATE MATERIALIZED VIEW view_establishments AS
     WITH count_conventions_by_siret AS (
       SELECT conventions.siret,
@@ -263,12 +265,16 @@ const createEstablishmentsView = (
       LEFT JOIN establishments__immersion_contacts eic ON ((eic.establishment_siret = e.siret)))
       LEFT JOIN immersion_contacts ic ON ((eic.contact_uuid = ic.uuid)))
       LEFT JOIN view_siret_with_department_region sdr ON ((sdr.siret = e.siret)))
-      LEFT JOIN public_naf_classes_2008 pnc ON (((pnc.class_id)::text = regexp_replace((e.naf_code)::text, '(dd)(dd)(w)'::text, '\\1.\\2'::text))))
+      LEFT JOIN public_naf_classes_2008 pnc ON (((pnc.class_id)::text = regexp_replace((e.naf_code)::text, '(\d\d)(\d\d)(\w)'::text, '\\1.\\2'::text))))
       LEFT JOIN count_contact_requests_by_siret count_rel ON ((count_rel.siret = e.siret)))
       LEFT JOIN count_conventions_by_siret count_conv ON ((count_conv.siret = e.siret)));
-    `);
+    `,
+      // biome-ignore-end lint/suspicious/noUselessEscapeInString: keep the regex as is
+    );
   } else {
-    pgm.sql(`
+    pgm.sql(
+      // biome-ignore-start lint/suspicious/noUselessEscapeInString: keep the regex as is
+      `
     CREATE MATERIALIZED VIEW view_establishments AS
     WITH count_conventions_by_siret AS (
       SELECT conventions.siret,
@@ -326,12 +332,14 @@ const createEstablishmentsView = (
       LEFT JOIN establishments__immersion_contacts eic ON ((eic.establishment_siret = e.siret)))
       LEFT JOIN immersion_contacts ic ON ((eic.contact_uuid = ic.uuid)))
       LEFT JOIN view_siret_with_department_region sdr ON ((sdr.siret = e.siret)))
-      LEFT JOIN public_naf_classes_2008 pnc ON (((pnc.class_id)::text = regexp_replace((e.naf_code)::text, '(dd)(dd)(w)'::text, '\\1.\\2'::text))))
+      LEFT JOIN public_naf_classes_2008 pnc ON (((pnc.class_id)::text = regexp_replace((e.naf_code)::text, '(\d\d)(\d\d)(\w)'::text, '\\1.\\2'::text))))
       LEFT JOIN count_contact_requests_by_siret count_rel ON ((count_rel.siret = e.siret)))
       LEFT JOIN count_conventions_by_siret count_conv ON ((count_conv.siret = e.siret))
       LEFT JOIN establishments_locations loc ON ((loc.establishment_siret = e.siret))
       )
-      `);
+      `,
+      // biome-ignore-end lint/suspicious/noUselessEscapeInString: keep the regex as is
+    );
   }
 };
 

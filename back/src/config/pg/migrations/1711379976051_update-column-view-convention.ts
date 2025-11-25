@@ -14,7 +14,9 @@ const createViewConventions = (
   pgm: MigrationBuilder,
   direction: "up" | "down",
 ) => {
-  pgm.sql(`
+  pgm.sql(
+    // biome-ignore-start lint/suspicious/noUselessEscapeInString: keep the regex as is
+    `
     create view view_conventions
             (id, "Structure", "Type de structure", "Département de la structure", "Région de la structure",
              "Date de la demande", "Date de validation", "Statut", tech_status, "Accepté par l'entreprise",
@@ -81,7 +83,7 @@ SELECT c.id,
        c.schedule -> 'complexSchedule'::text                                          AS "Programme",
        (c.schedule -> 'workedDays'::text)::numeric                                    AS "Total jours d'immersion",
        (c.schedule -> 'totalHours'::text)::numeric                                    AS "Total heures d'immersion",
-       (regexp_match(c.immersion_address::text, 'd{5}'::text))[1]                    AS "Code Postal",
+       (regexp_match(c.immersion_address::text, '\d{5}'::text))[1]                    AS "Code Postal",
        concat(b.first_name, ' ', b.last_name)                                         AS "Bénéficiaire",
        b.email                                                                        AS "Email bénéficiaire",
        b.phone                                                                        AS "Téléphone bénéficiaire",
@@ -130,5 +132,7 @@ FROM conventions c
          LEFT JOIN actors br ON c.beneficiary_representative_id = br.id
          LEFT JOIN convention_status_translations cst ON c.status = cst.status
          LEFT JOIN actors bce ON c.beneficiary_current_employer_id = bce.id;
-    `);
+    `,
+    // biome-ignore-end lint/suspicious/noUselessEscapeInString: keep the regex as is
+  );
 };
