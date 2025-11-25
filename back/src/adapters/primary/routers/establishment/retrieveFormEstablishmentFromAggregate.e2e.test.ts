@@ -317,7 +317,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: authExpiredMessage,
+        message: authExpiredMessage(),
         status: 401,
       },
       status: 401,
