@@ -1,19 +1,24 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-
-import { useState } from "react";
+import Button from "@codegouvfr/react-dsfr/Button";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { type ReactNode, useState } from "react";
+import { useLayout } from "react-design-system";
+import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import type {
-  ConnectedUserJwt,
-  ConventionJwt,
-  ConventionReadDto,
-  EditConventionCounsellorNameRequestDto,
-  ExcludeFromExisting,
-  MarkPartnersErroredConventionAsHandledRequest,
-  RenewConventionParams,
-  Role,
-  TransferConventionToAgencyRequestDto,
-  UpdateConventionStatusRequestDto,
-  WithConventionId,
+import {
+  type ConnectedUserJwt,
+  type ConventionJwt,
+  type ConventionReadDto,
+  domElementIds,
+  type EditConventionCounsellorNameRequestDto,
+  type ExcludeFromExisting,
+  type MarkPartnersErroredConventionAsHandledRequest,
+  type RenewConventionParams,
+  type Role,
+  type TransferConventionToAgencyRequestDto,
+  type UpdateConventionStatusRequestDto,
+  type WithConventionId,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { getButtonConfigBySubStatus } from "src/app/components/forms/convention/manage-actions/getButtonConfigBySubStatus";
@@ -46,6 +51,11 @@ type ConventionManageActionsProps = {
   convention: ConventionReadDto;
   roles: Role[];
 };
+
+const mobileManageConventionModal = createModal({
+  id: "mobile-manage-convention-modal",
+  isOpenedByDefault: false,
+});
 
 export const ConventionManageActions = ({
   convention,
@@ -210,6 +220,27 @@ export const ConventionManageActions = ({
       role !== "agency-admin",
   );
 
+  const hasBroadcastError = !!broadcastErrorFeedback;
+  const subStatus = getConventionSubStatus(convention, hasBroadcastError);
+
+  const buttonConfig = getButtonConfigBySubStatus({
+    convention,
+    jwt: jwtParams.jwt,
+    disabled,
+    requesterRoles,
+    createOnSubmitWithFeedbackKind,
+    setValidatorWarningMessage,
+    currentUser,
+    broadcastErrorFeedback: broadcastErrorFeedback ?? null,
+  });
+
+  const { leftButtons, rightButtons, modals } = renderButtonsBySubStatus({
+    buttonConfig,
+    subStatus,
+  });
+
+  const { isLayoutDesktop } = useLayout();
+
   return (
     <div
       style={{
@@ -220,6 +251,7 @@ export const ConventionManageActions = ({
         background: "var(--background-raised-grey)",
         padding: ".3rem",
         zIndex: 10,
+        borderTop: "1px solid var(--border-default-grey)",
       }}
     >
       {validatorWarningMessage && (
@@ -244,67 +276,101 @@ export const ConventionManageActions = ({
           "convention-action-edit-counsellor-name",
           "partner-conventions",
         ]}
-        className="fr-mb-2w"
+        className={fr.cx("fr-mb-2w")}
         closable
       />
 
-      {(() => {
-        const hasBroadcastError = !!broadcastErrorFeedback;
-        const subStatus = getConventionSubStatus(convention, hasBroadcastError);
-
-        const buttonConfig = getButtonConfigBySubStatus({
-          convention,
-          jwt: jwtParams.jwt,
-          disabled,
-          requesterRoles,
-          createOnSubmitWithFeedbackKind,
-          setValidatorWarningMessage,
-          currentUser,
-          broadcastErrorFeedback: broadcastErrorFeedback ?? null,
-        });
-
-        const { leftButtons, rightButtons, modals } = renderButtonsBySubStatus({
-          buttonConfig,
-          subStatus,
-        });
-
-        return (
+      <div
+        className={fr.cx("fr-container", "fr-py-1w")}
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {isLayoutDesktop ? (
+          <ConventionManageActionsButtonsDesktop
+            leftButtons={leftButtons}
+            rightButtons={rightButtons}
+          />
+        ) : (
           <>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-              }}
+            <Button
+              id={domElementIds.manageConvention.mobileManageConventionButton}
+              className={fr.cx("fr-container")}
+              onClick={() => mobileManageConventionModal.open()}
             >
-              {leftButtons.length > 0 && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "1rem",
-                    marginLeft: "2rem",
-                  }}
-                >
-                  {leftButtons}
-                </div>
-              )}
-              {rightButtons.length > 0 && (
-                <div style={{ marginLeft: "auto" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "1rem",
-                      marginRight: "2rem",
-                    }}
-                  >
-                    {rightButtons}
-                  </div>
-                </div>
-              )}
-            </div>
-            {modals}
+              Gérer la convention
+            </Button>
+            {createPortal(
+              <mobileManageConventionModal.Component title="Actions">
+                <ConventionManageActionsButtonsMobile
+                  leftButtons={leftButtons}
+                  rightButtons={rightButtons}
+                />
+              </mobileManageConventionModal.Component>,
+              document.body,
+            )}
           </>
-        );
-      })()}
+        )}
+      </div>
+      {modals}
     </div>
   );
 };
+
+const ConventionManageActionsButtonsDesktop = ({
+  leftButtons,
+  rightButtons,
+}: {
+  leftButtons: ReactNode[];
+  rightButtons: ReactNode[];
+}) => (
+  <>
+    {leftButtons.length > 0 && (
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+        }}
+      >
+        {leftButtons}
+      </div>
+    )}
+    {rightButtons.length > 0 && (
+      <div style={{ marginLeft: "auto" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+          }}
+        >
+          {rightButtons}
+        </div>
+      </div>
+    )}
+  </>
+);
+
+const ConventionManageActionsButtonsMobile = ({
+  leftButtons,
+  rightButtons,
+}: {
+  leftButtons: ReactNode[];
+  rightButtons: ReactNode[];
+}) => (
+  <div className={fr.cx("fr-container")}>
+    <div
+      style={{
+        display: "flex",
+        gap: "1rem",
+        flexDirection: "column-reverse",
+        marginBottom: "1rem",
+      }}
+    >
+      {rightButtons.length > 0 && rightButtons}
+    </div>
+    <div style={{ display: "flex", gap: "1rem", flexDirection: "column" }}>
+      {leftButtons.length > 0 && leftButtons}
+    </div>
+  </div>
+);

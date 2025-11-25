@@ -364,6 +364,8 @@ export const domElementIds = {
 
   manageConvention: {
     otherActionsButton: "im-manage-convention__other-actions-button",
+    mobileManageConventionButton:
+      "im-manage-convention__mobile-manage-convention-button",
     cancelActionButton: "im-manage-convention__cancel-action-button",
     editActionsButton: "im-manage-convention__edit-actions-button",
     editLink: "im-manage-convention__edit-link",
