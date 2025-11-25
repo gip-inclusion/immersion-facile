@@ -208,11 +208,12 @@ export const broadcastFeedbackErrorMap: Record<
         <p>
           {"->"} Si les bonnes informations sont celles saisies dans la
           convention, modifiez les informations du candidat dans votre logiciel
-          (i-milo), puis rediffusez la convention via Immersion Facilitée.
+          (MAP ou i-milo), puis rediffusez la convention via Immersion
+          Facilitée.
         </p>
         <p>
           {"->"} Si les bonnes informations sont celles saisies dans votre
-          logiciel (MAP)
+          logiciel (MAP ou i-milo)
           {!isConventionValidated
             ? ", modifiez les informations du candidat sur la demande de convention, et renvoyez-la en signature."
             : " :"}
