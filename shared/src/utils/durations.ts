@@ -1,5 +1,6 @@
-import { formatDuration, intervalToDuration } from "date-fns";
+import { type Duration, formatDuration, intervalToDuration } from "date-fns";
 import { fr as frLocale } from "date-fns/locale";
+import type { ExtractFromExisting } from "../utils";
 
 export const oneMinuteInSeconds = 60;
 export const oneHourInSeconds = 60 * oneMinuteInSeconds;
@@ -7,7 +8,10 @@ export const oneDayInSecond = oneHourInSeconds * 24;
 export const fiveMinutesInSeconds = 5 * oneMinuteInSeconds;
 export const ONE_SECOND_MS = 1_000;
 
-type DurationFormat = "minutes" | "hours" | "days";
+type DurationFormat = ExtractFromExisting<
+  keyof Duration,
+  "minutes" | "hours" | "days"
+>;
 
 export const displayDuration = (
   durationInSeconds: number,

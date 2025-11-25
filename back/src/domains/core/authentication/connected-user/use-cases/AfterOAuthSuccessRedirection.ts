@@ -77,7 +77,10 @@ export class AfterOAuthSuccessRedirection extends TransactionalUseCase<
     this.#generateConnectedUserJwt = generateConnectedUserJwt;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
     this.#timeGateway = timeGateway;
-    this.#throwIfIncorrectJwt = makeThrowIfIncorrectJwt(verifyEmailAuthCodeJwt);
+    this.#throwIfIncorrectJwt = makeThrowIfIncorrectJwt(
+      verifyEmailAuthCodeJwt,
+      timeGateway,
+    );
   }
 
   protected async _execute(

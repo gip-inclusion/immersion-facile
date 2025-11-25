@@ -289,7 +289,7 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: authExpiredMessage,
+        message: authExpiredMessage(),
         status: 401,
       },
       status: 401,
