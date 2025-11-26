@@ -48,7 +48,7 @@ export type ButtonConfiguration = {
 type CreateButtonConfigurationsBySubStatusParams = {
   convention: ConventionReadDto;
   jwt: string;
-  disabled: boolean;
+  disabledButtons: Partial<Record<VerificationAction, boolean>>;
   requesterRoles: Role[];
   createOnSubmitWithFeedbackKind: (
     verificationAction: VerificationAction,
@@ -289,7 +289,7 @@ const createButtonPropsByVerificationAction = (
   const {
     convention,
     jwt,
-    disabled,
+    disabledButtons,
     requesterRoles,
     createOnSubmitWithFeedbackKind,
     setValidatorWarningMessage,
@@ -423,7 +423,7 @@ const createButtonPropsByVerificationAction = (
         modalTitle: t.verification.rejectConvention,
         verificationAction: "REJECT",
         convention,
-        disabled,
+        disabled: disabledButtons["REJECT"],
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId:
@@ -443,7 +443,9 @@ const createButtonPropsByVerificationAction = (
         modalTitle: t.verification.markAsCancelled,
         verificationAction: "CANCEL",
         convention,
-        disabled: disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
+        disabled:
+          disabledButtons["CANCEL"] ||
+          convention.status !== "ACCEPTED_BY_VALIDATOR",
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId:
@@ -459,7 +461,7 @@ const createButtonPropsByVerificationAction = (
         modalTitle: t.verification.modifyCounsellorNameTitle,
         verificationAction: "EDIT_COUNSELLOR_NAME",
         convention,
-        disabled,
+        disabled: disabledButtons["EDIT_COUNSELLOR_NAME"],
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId: domElementIds.manageConvention.editCounsellorNameButton,
@@ -478,7 +480,7 @@ const createButtonPropsByVerificationAction = (
         modalTitle: t.verification.modifyConventionAgencyTitle,
         verificationAction: "TRANSFER",
         convention,
-        disabled,
+        disabled: disabledButtons["TRANSFER"],
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId: domElementIds.manageConvention.transferToAgencyButton,
@@ -491,7 +493,9 @@ const createButtonPropsByVerificationAction = (
         children: t.verification.modifyConventionOtherInformations,
         verificationAction: "EDIT_CONVENTION",
         convention,
-        disabled,
+        disabled:
+          disabledButtons["TRANSFER"] ||
+          disabledButtons["EDIT_COUNSELLOR_NAME"],
         jwt,
         buttonId: domElementIds.manageConvention.editLink,
       }),
@@ -503,7 +507,7 @@ const createButtonPropsByVerificationAction = (
         children: t.verification.broadcastConventionAgain,
         verificationAction: "BROADCAST_AGAIN",
         convention,
-        disabled,
+        disabled: disabledButtons["BROADCAST_AGAIN"],
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         initialStatus: convention.status,
@@ -525,7 +529,9 @@ const createButtonPropsByVerificationAction = (
             ? t.verification.conventionAlreadyMarkedAsEligible
             : t.verification.markAsEligible,
         verificationAction: "ACCEPT_COUNSELLOR",
-        disabled: disabled || convention.status !== "IN_REVIEW",
+        disabled:
+          disabledButtons["ACCEPT_COUNSELLOR"] ||
+          convention.status !== "IN_REVIEW",
         convention,
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
@@ -562,7 +568,7 @@ const createButtonPropsByVerificationAction = (
         iconId: "fr-icon-checkbox-circle-line",
         iconPosition: "left",
         disabled:
-          disabled ||
+          disabledButtons["ACCEPT_VALIDATOR"] ||
           (convention.status !== "IN_REVIEW" &&
             convention.status !== "ACCEPTED_BY_COUNSELLOR"),
       }),
@@ -655,7 +661,7 @@ const createButtonPropsByVerificationAction = (
         modalTitle: t.verification.markAsDeprecated,
         verificationAction: "DEPRECATE",
         convention,
-        disabled,
+        disabled: disabledButtons["DEPRECATE"],
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId:
@@ -675,7 +681,7 @@ const createButtonPropsByVerificationAction = (
         modalTitle: "Marquer la convention comme traitée",
         initialStatus: convention.status,
         convention,
-        disabled,
+        disabled: disabledButtons["MARK_AS_HANDLED"],
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId:
@@ -692,7 +698,7 @@ const createButtonPropsByVerificationAction = (
           "Accepter les dispositions réglementaires et terminer la signature",
         initialStatus: convention.status,
         convention,
-        disabled,
+        disabled: disabledButtons["SIGN"],
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId: domElementIds.manageConvention.openSignModalButton,
