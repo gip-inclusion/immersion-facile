@@ -1,4 +1,8 @@
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import type {
+  FrIconClassName,
+  RiIconClassName,
+} from "@codegouvfr/react-dsfr/fr/generatedFromCss/classNames";
 import type { Dispatch, SetStateAction } from "react";
 import type {
   ConventionDto,
@@ -20,6 +24,8 @@ import type { Link } from "type-route";
 type BaseVerificationActionParams = {
   children: string;
   buttonId: string;
+  iconId?: FrIconClassName | RiIconClassName;
+  iconPosition?: "left" | "right";
   disabled?: boolean;
 };
 
@@ -113,11 +119,18 @@ export type VerificationActionProps =
         children: string;
         linkProps: Link;
         id: string;
+        iconId?: FrIconClassName | RiIconClassName;
+        iconPosition?: "left" | "right";
       };
       modalWrapperProps: null;
     }
   | {
-      buttonProps: ButtonProps & { children: string; id: string };
+      buttonProps: ButtonProps & {
+        children: string;
+        id: string;
+        iconId?: FrIconClassName | RiIconClassName;
+        iconPosition?: "left" | "right";
+      };
       modalWrapperProps: ModalWrapperProps;
     };
 
@@ -129,8 +142,15 @@ export const getVerificationActionProps = (
       params.verificationAction as VerificationActionWithLink,
     )
   ) {
-    const { verificationAction, children, convention, jwt, buttonId } =
-      params as BaseVerificationActionParams & VerificationActionLinkParams;
+    const {
+      verificationAction,
+      children,
+      convention,
+      jwt,
+      buttonId,
+      iconId,
+      iconPosition,
+    } = params as BaseVerificationActionParams & VerificationActionLinkParams;
 
     const link = linkByAction(verificationAction, {
       convention,
@@ -142,9 +162,11 @@ export const getVerificationActionProps = (
         children,
         linkProps: link,
         id: buttonId,
+        iconId,
+        iconPosition,
       },
       modalWrapperProps: null,
-    };
+    } as VerificationActionProps;
   }
 
   const {
@@ -158,6 +180,8 @@ export const getVerificationActionProps = (
     onCloseValidatorModalWithoutValidatorInfo,
     modalTitle,
     buttonId,
+    iconId,
+    iconPosition,
   } = params as BaseVerificationActionParams & VerificationActionModalParams;
 
   return {
@@ -166,6 +190,8 @@ export const getVerificationActionProps = (
       onClick: () => modalByAction(verificationAction).openModal(),
       disabled,
       id: buttonId,
+      iconId,
+      iconPosition,
     },
     modalWrapperProps: {
       title: modalTitle,
@@ -177,5 +203,5 @@ export const getVerificationActionProps = (
       onCloseValidatorModalWithoutValidatorInfo:
         onCloseValidatorModalWithoutValidatorInfo,
     },
-  };
+  } as VerificationActionProps;
 };
