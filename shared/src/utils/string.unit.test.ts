@@ -1,5 +1,6 @@
 import { emailExchangeSplitters } from "../discussion/discussion.helpers";
 import {
+  cleanSpecialChars,
   cleanStringToHTMLAttribute,
   doesStringContainsHTML,
   getFormattedFirstnameAndLastname,
@@ -199,6 +200,19 @@ describe("string utils", () => {
       },
     ])("for $inputs return $expectedOutput", ({ inputs, expectedOutput }) => {
       expect(getFormattedFirstnameAndLastname(inputs)).toBe(expectedOutput);
+    });
+  });
+
+  describe("cleanSpecialChars", () => {
+    it.each([
+      ["Bouchon d’oreilles + gants", "Bouchon d'oreilles + gants"],
+      ["Chaussures de sécurité…", "Chaussures de securite..."],
+      ["GANTS / GILET HAUTE VISIBILITE", "GANTS / GILET HAUTE VISIBILITE"],
+      ["test guillemets “”", 'test guillemets ""'],
+      ["test tiret – —", "test tiret - -"],
+      ["test espace insécable \u00A0", "test espace insecable  "],
+    ])("should clean special chars", (input, expected) => {
+      expect(cleanSpecialChars(input)).toBe(expected);
     });
   });
 });
