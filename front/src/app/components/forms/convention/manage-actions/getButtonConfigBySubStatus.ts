@@ -533,6 +533,8 @@ const createButtonPropsByVerificationAction = (
         onSubmit: createOnSubmitWithFeedbackKind,
         buttonId:
           domElementIds.manageConvention.conventionValidationValidateButton,
+        iconId: "fr-icon-checkbox-circle-line",
+        iconPosition: "left",
       }),
       isVisibleForUserRights: isAllowedConventionTransition(
         convention,
@@ -559,6 +561,8 @@ const createButtonPropsByVerificationAction = (
         onCloseValidatorModalWithoutValidatorInfo: setValidatorWarningMessage,
         buttonId:
           domElementIds.manageConvention.conventionValidationValidateButton,
+        iconId: "fr-icon-checkbox-circle-line",
+        iconPosition: "left",
         disabled:
           disabled ||
           (convention.status !== "IN_REVIEW" &&
@@ -604,6 +608,8 @@ const createButtonPropsByVerificationAction = (
         jwt,
         convention,
         buttonId: domElementIds.manageConvention.openDocumentButton,
+        iconId: "fr-icon-checkbox-circle-line",
+        iconPosition: "left",
       }),
       isVisibleForUserRights: shouldShowConventionDocumentButton,
       buttonArea: "conventionArea",
