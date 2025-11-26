@@ -3,8 +3,10 @@ import {
   type DataWithPagination,
   expectPromiseToFailWithError,
   type GetOffersFlatQueryParams,
+  type GetOffersPerPageOption,
   type SearchResultDto,
 } from "shared";
+import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -90,8 +92,10 @@ describe("GetOffers", () => {
       sirets: [establishment2.establishment.siret],
     };
 
-    const result: DataWithPagination<SearchResultDto> =
-      await getOffers.execute(searchParams);
+    const result: DataWithPagination<SearchResultDto> = await getOffers.execute(
+      searchParams,
+      undefined,
+    );
 
     expect(result.data).toHaveLength(1);
     expect(result.data[0].siret).toBe(establishment2.establishment.siret);
@@ -105,14 +109,21 @@ describe("GetOffers", () => {
     );
   });
 
-  it("should return more results when no filters", async () => {
-    const resultWithoutFilters = await getOffers.execute({
-      sortBy: "date",
-      sortOrder: "desc",
-    });
+  it("should return more results when no filters, and web user", async () => {
+    const resultWithoutFilters = await getOffers.execute(
+      {
+        sortBy: "date",
+        sortOrder: "desc",
+      },
+      undefined,
+    );
 
     expect(resultWithoutFilters.data).toHaveLength(4);
     expect(resultWithoutFilters.pagination.totalRecords).toBe(4);
+    const defaultNumberPerPageForWeb: GetOffersPerPageOption = 12;
+    expect(resultWithoutFilters.pagination.numberPerPage).toBe(
+      defaultNumberPerPageForWeb,
+    );
 
     expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
     expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(4);
@@ -121,12 +132,30 @@ describe("GetOffers", () => {
     );
   });
 
+  it("should return more results when no filters, and API consumer, default number of result is bigger for API", async () => {
+    const apiConsumer = new ApiConsumerBuilder().build();
+    const resultWithoutFilters = await getOffers.execute(
+      {
+        sortBy: "date",
+        sortOrder: "desc",
+      },
+      apiConsumer,
+    );
+
+    expect(resultWithoutFilters.data).toHaveLength(4);
+    expect(resultWithoutFilters.pagination.totalRecords).toBe(4);
+    expect(resultWithoutFilters.pagination.numberPerPage).toBe(100);
+  });
+
   describe("wrong path", () => {
     it("should throw when sort is distance but no location is provided", async () => {
       await expectPromiseToFailWithError(
-        getOffers.execute({
-          sortBy: "distance",
-        } as any),
+        getOffers.execute(
+          {
+            sortBy: "distance",
+          } as any,
+          undefined,
+        ),
         new BadRequestError(
           "Schema validation failed in usecase GetOffers. See issues for details.",
           [
@@ -140,12 +169,15 @@ describe("GetOffers", () => {
 
     it("needs complete geoparams, not partial, throws otherwise", async () => {
       await expectPromiseToFailWithError(
-        getOffers.execute({
-          sortBy: "date",
-          latitude: 48.856614,
-          // missing longitude
-          distanceKm: 80,
-        } as any),
+        getOffers.execute(
+          {
+            sortBy: "date",
+            latitude: 48.856614,
+            // missing longitude
+            distanceKm: 80,
+          } as any,
+          undefined,
+        ),
         new BadRequestError(
           "Invalid geo params, needs latitude, longitude and distanceKm",
         ),

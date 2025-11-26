@@ -88,7 +88,7 @@ export const CreateDiscussionForm = ({
       siret: route.params.siret,
       appellationCode: getDefaultAppellationCode(
         appellations,
-        route.params.appellationCode,
+        route.params.appellationCode[0],
       ),
       datePreferences: "",
       potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",

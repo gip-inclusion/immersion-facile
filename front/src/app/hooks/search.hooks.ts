@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { keys } from "shared";
+import { type GetOffersFlatQueryParams, keys } from "shared";
 import {
   type AcquisitionParams,
   acquisitionParams,
@@ -18,10 +18,12 @@ import type { Route } from "type-route";
 
 export const encodedSearchUriParams = [
   "place",
-] satisfies (keyof SearchPageParams)[];
+] satisfies (keyof GetOffersFlatQueryParams)[];
 
 export type SearchRoute = Route<
-  typeof routes.search | typeof routes.searchForStudent
+  | typeof routes.search
+  | typeof routes.searchForStudent
+  | typeof routes.externalSearch
 >;
 
 const filterUrlsParamsAndUpdateUrl = ({
@@ -60,19 +62,15 @@ const filterUrlsParamsAndUpdateUrl = ({
 export const useSearch = ({ name }: SearchRoute) => {
   const dispatch = useDispatch();
   return {
-    triggerSearch: ({ appellations, ...rest }: SearchPageParams) => {
+    triggerSearch: (params: SearchPageParams, isExternal: boolean) => {
       dispatch(
-        searchSlice.actions.searchRequested({
-          ...rest,
-          establishmentSearchableBy:
-            name === "searchForStudent" ? "students" : "jobSeekers",
-          appellationCodes: appellations?.map(
-            (appellation) => appellation.appellationCode,
-          ),
+        searchSlice.actions.getOffersRequested({
+          ...params,
+          isExternal,
         }),
       );
       filterUrlsParamsAndUpdateUrl({
-        values: { ...rest, appellations },
+        values: params,
         urlParams: getUrlParameters(window.location),
         routeName: name,
       });

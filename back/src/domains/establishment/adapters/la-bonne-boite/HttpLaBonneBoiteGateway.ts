@@ -15,9 +15,6 @@ import {
   LaBonneBoiteCompanyDto,
 } from "./LaBonneBoiteCompanyDto";
 
-const MAX_PAGE_SIZE = 100;
-const MAX_DISTANCE_IN_KM = 100;
-
 const lbbMaxQueryPerSeconds = 1;
 const numberOfIFInstances = 2; // 2x is the number of instances of node running this.
 
@@ -54,7 +51,15 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
             `lbb_${romeCode}_${lat.toFixed(3)}_${lon.toFixed(3)}${
               nafCodes ? `_${nafCodes.join("_")}` : ""
             }`,
-          cb: async ({ lon, lat, romeCode, nafCodes }) =>
+          cb: async ({
+            lon,
+            lat,
+            romeCode,
+            nafCodes,
+            distanceKm,
+            page,
+            perPage,
+          }) =>
             this.#limiter.schedule(async () =>
               this.httpClient
                 .getCompanies({
@@ -62,11 +67,11 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
                     authorization: await this.#makeAutorization(),
                   },
                   queryParams: {
-                    distance: MAX_DISTANCE_IN_KM,
+                    distance: distanceKm,
                     longitude: lon,
                     latitude: lat,
-                    page: 1,
-                    page_size: MAX_PAGE_SIZE,
+                    page,
+                    page_size: perPage,
                     rome: [romeCode],
                     ...(nafCodes ? { naf: nafCodes } : {}),
                   },
@@ -105,7 +110,10 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
                 : true,
             ),
           )
-          .catch(() => []),
+          .catch((error) => {
+            console.error("error", error);
+            return [];
+          }),
     );
   }
 

@@ -28,12 +28,13 @@ describe("rootApp epic", () => {
     };
 
     store.dispatch(
-      searchSlice.actions.searchRequested({
+      searchSlice.actions.getOffersRequested({
         distanceKm: 10,
         longitude: 0,
         latitude: 0,
         appellationCodes: ["11000"],
-        sortedBy: "distance",
+        sortBy: "distance",
+        sortOrder: "desc",
         place: "23 rue lunaire, 44000 Nantes",
         fitForDisabledWorkers: undefined,
       }),

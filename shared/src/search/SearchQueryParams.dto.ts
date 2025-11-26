@@ -71,15 +71,18 @@ type LegacySearchCommonParamsDto = {
 
 // NEW MODEL (from v3)
 
-type GetOffersFlatParamsCommon = {
+type WithAppellationCodes = {
+  appellationCodes: AppellationCode[];
+};
+
+type GetOffersFlatParamsCommon = WithAcquisition & {
   place?: string; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
-  appellationCodes?: AppellationCode[];
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
   locationIds?: LocationId[];
   nafCodes?: NafCode[];
   searchableBy?: EstablishmentSearchableByValue;
   sirets?: SiretDto[];
-};
+} & Partial<WithAppellationCodes>;
 
 export type GeoQueryParamsWithSortedBy<T extends SearchSortedBy> = {
   sortBy: T;
@@ -99,3 +102,15 @@ export type SearchQueryParamsWithGeoParams = GetOffersFlatParamsCommon &
 
 export type GetOffersFlatQueryParams = PaginationQueryParams &
   (SearchQueryParamsWithGeoParams | SearchQueryWithOptionalGeoParamsDto);
+
+export type GetExternalOffersFlatQueryParams = WithAppellationCodes &
+  WithNafCodes &
+  LatLonDistance;
+
+export const hasSearchGeoParams = (
+  geoParams: Partial<LatLonDistance>,
+): geoParams is LatLonDistance =>
+  !!geoParams.latitude &&
+  !!geoParams.longitude &&
+  !!geoParams.distanceKm &&
+  geoParams.distanceKm > 0;

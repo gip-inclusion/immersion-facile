@@ -1,5 +1,6 @@
 import type { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
 import { flatten, keys } from "ramda";
+import { isFunction } from "shared";
 import type {
   Breadcrumbs,
   BreadcrumbsItem,
@@ -51,7 +52,11 @@ const isRouteInChildren = <T>(
   return keys(children).some((key) => {
     const child = children[key];
     if (!child) return false;
-    if (child.route.name === currentRouteKey) return true;
+    if (
+      (isFunction(child.route) ? child.route().name : child.route.name) ===
+      currentRouteKey
+    )
+      return true;
     if (child.children) {
       return isRouteInChildren(currentRouteKey, child);
     }
@@ -63,7 +68,10 @@ const formatToBreadcrumbsSegments = <T>(
   currentRouteKey: T,
 ): BreadcrumbProps["segments"] => {
   const { label, route, children } = ancestor;
-  const ancestorSegment = { label, linkProps: route.link };
+  const ancestorSegment = {
+    label,
+    linkProps: isFunction(route) ? route().link : route.link,
+  };
   if (!children || ancestor.route.name === currentRouteKey)
     return [ancestorSegment];
   const childSegments = flatten(
@@ -73,7 +81,9 @@ const formatToBreadcrumbsSegments = <T>(
       if (!child) return;
 
       const { route, label, children: childChildren } = child;
-      const { name: routeName, link: linkProps } = route;
+      const { name: routeName, link: linkProps } = isFunction(route)
+        ? route()
+        : route;
 
       if (
         isRouteInChildren(currentRouteKey, child) &&

@@ -3,7 +3,10 @@ import { withAcquisitionSchema } from "../acquisition.dto";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { nafCodesSchema, withNafCodesSchema } from "../naf/naf.schema";
 import type { SortDirection } from "../pagination/pagination.dto";
-import { sortDirectionSchema } from "../pagination/pagination.schema";
+import {
+  paginationQueryParamsSchema,
+  sortDirectionSchema,
+} from "../pagination/pagination.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -15,6 +18,7 @@ import {
   zUuidLike,
 } from "../zodUtils";
 import type {
+  GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   LegacySearchQueryParamsDto,
 } from "./SearchQueryParams.dto";
@@ -64,23 +68,33 @@ export const legacySearchParamsSchema: ZodSchemaWithInputMatchingOutput<LegacySe
       }),
     );
 
+const latLonDistanceSchema = z.object({
+  latitude: zToNumber,
+  longitude: zToNumber,
+  distanceKm: distanceKmSchema,
+});
+
+const geoParamsByDistanceSchema = z.object({
+  sortBy: z.literal("distance"),
+  sortOrder: sortDirectionSchema.default("asc"),
+  latitude: zToNumber,
+  longitude: zToNumber,
+  distanceKm: distanceKmSchema,
+});
+
+const geoParamsByDateOrScoreSchema = z.object({
+  sortBy: z.enum(["date", "score"], {
+    error: localization.invalidEnum,
+  }),
+  sortOrder: sortDirectionSchema.default("desc"),
+  latitude: zToNumber.optional(),
+  longitude: zToNumber.optional(),
+  distanceKm: distanceKmSchema.optional(),
+});
+
 const geoParamsAndSortSchema = z.discriminatedUnion("sortBy", [
-  z.object({
-    sortBy: z.enum(["date", "score"], {
-      error: localization.invalidEnum,
-    }),
-    sortOrder: sortDirectionSchema.default("desc"),
-    latitude: zToNumber.optional(),
-    longitude: zToNumber.optional(),
-    distanceKm: distanceKmSchema.optional(),
-  }),
-  z.object({
-    sortBy: z.literal("distance"),
-    sortOrder: sortDirectionSchema.default("asc"),
-    latitude: zToNumber,
-    longitude: zToNumber,
-    distanceKm: distanceKmSchema,
-  }),
+  geoParamsByDateOrScoreSchema,
+  geoParamsByDistanceSchema,
 ]);
 
 export const getOffersFlatParamsSchema: z.ZodType<
@@ -101,5 +115,20 @@ export const getOffersFlatParamsSchema: z.ZodType<
       })
       .optional(),
   })
+  .and(paginationQueryParamsSchema)
   .and(geoParamsAndSortSchema)
+  .and(withAcquisitionSchema);
+
+export const getExternalOffersFlatParamsSchema: z.ZodType<
+  GetExternalOffersFlatQueryParams,
+  Omit<GetExternalOffersFlatQueryParams, "sortOrder"> & {
+    sortOrder?: SortDirection;
+  }
+> = z
+  .object({
+    appellationCodes: z.array(appellationCodeSchema),
+    nafCodes: nafCodesSchema.optional(),
+  })
+  .and(paginationQueryParamsSchema)
+  .and(latLonDistanceSchema)
   .and(withAcquisitionSchema);
