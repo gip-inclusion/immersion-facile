@@ -364,9 +364,7 @@ const createButtonPropsByVerificationAction = (
     ]);
 
   const shouldShowMarkAsHandledButton =
-    shouldShowBroadcastAgainButton &&
-    !!broadcastErrorFeedback &&
-    !currentUser.isBackofficeAdmin;
+    shouldShowBroadcastAgainButton && !!broadcastErrorFeedback;
 
   const shouldShowCancelButton =
     isAllowedConventionTransition(convention, "CANCELLED", requesterRoles) &&
