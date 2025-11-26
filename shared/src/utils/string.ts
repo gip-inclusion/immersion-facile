@@ -98,3 +98,23 @@ export const splitTextOnFirstSeparator = (
     ? [text.split(separator)[0], text.split(separator)[1]]
     : [text];
 };
+
+export function cleanSpecialChars(input: string): string {
+  const replacements: Record<string, string> = {
+    "’": "'",
+    "‘": "'",
+    "“": '"',
+    "”": '"',
+    "–": "-",
+    "—": "-",
+    "…": "...",
+    "\u00A0": " ",
+  };
+
+  const cleaned = Object.entries(replacements).reduce(
+    (acc, [from, to]) => acc.replace(new RegExp(from, "g"), to),
+    input,
+  );
+
+  return removeDiacritics(cleaned);
+}
