@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { mapObjIndexed } from "ramda";
 import { type ReactNode, useState } from "react";
 import { useLayout } from "react-design-system";
 import { createPortal } from "react-dom";
@@ -23,11 +24,12 @@ import {
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { getButtonConfigBySubStatus } from "src/app/components/forms/convention/manage-actions/getButtonConfigBySubStatus";
 import type { VerificationAction } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
-import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { getConventionSubStatus } from "src/app/utils/conventionSubStatus";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import type { Feedback as FeedbackType } from "src/core-logic/domain/feedback/feedback.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { renderButtonsBySubStatus } from "./renderButtonsBySubStatus";
@@ -57,6 +59,14 @@ const mobileManageConventionModal = createModal({
   isOpenedByDefault: false,
 });
 
+const getDisabledButtons = (
+  params: Partial<Record<VerificationAction, FeedbackType | undefined>>,
+): Partial<Record<VerificationAction, boolean>> => {
+  const hasFeedback = (feedback: FeedbackType | undefined) =>
+    feedback !== undefined;
+  return mapObjIndexed(hasFeedback, params);
+};
+
 export const ConventionManageActions = ({
   convention,
   roles,
@@ -68,14 +78,25 @@ export const ConventionManageActions = ({
     partnersErroredConventionSelectors.lastBroadcastFeedback,
   )?.subscriberErrorFeedback;
 
-  const conventionActionsFeedback = useFeedbackTopics([
-    "convention-action-accept-by-counsellor",
-    "convention-action-accept-by-validator",
-    "convention-action-reject",
-    "convention-action-deprecate",
-    "convention-action-cancel",
-    "convention-action-renew",
-  ]);
+  const disabledButtons: Partial<Record<VerificationAction, boolean>> =
+    getDisabledButtons({
+      ACCEPT_VALIDATOR: useFeedbackTopic(
+        "convention-action-accept-by-validator",
+      ),
+      ACCEPT_COUNSELLOR: useFeedbackTopic(
+        "convention-action-accept-by-counsellor",
+      ),
+      REJECT: useFeedbackTopic("convention-action-reject"),
+      DEPRECATE: useFeedbackTopic("convention-action-deprecate"),
+      CANCEL: useFeedbackTopic("convention-action-cancel"),
+      RENEW: useFeedbackTopic("convention-action-renew"),
+      EDIT_COUNSELLOR_NAME: useFeedbackTopic(
+        "convention-action-edit-counsellor-name",
+      ),
+      TRANSFER: useFeedbackTopic("transfer-convention-to-agency"),
+      BROADCAST_AGAIN: useFeedbackTopic("broadcast-convention-again"),
+      SIGN: useFeedbackTopic("convention-action-sign"),
+    });
 
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
@@ -213,8 +234,6 @@ export const ConventionManageActions = ({
     }
   };
 
-  const disabled = !!conventionActionsFeedback.length;
-
   const requesterRoles = roles.filter(
     (role): role is ExcludeFromExisting<Role, "agency-admin"> =>
       role !== "agency-admin",
@@ -226,7 +245,7 @@ export const ConventionManageActions = ({
   const buttonConfig = getButtonConfigBySubStatus({
     convention,
     jwt: jwtParams.jwt,
-    disabled,
+    disabledButtons,
     requesterRoles,
     createOnSubmitWithFeedbackKind,
     setValidatorWarningMessage,
