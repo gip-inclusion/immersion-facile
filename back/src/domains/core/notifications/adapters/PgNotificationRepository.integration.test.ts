@@ -1,10 +1,17 @@
-import { subDays, subHours } from "date-fns";
+import {
+  addMilliseconds,
+  subDays,
+  subHours,
+  subMilliseconds,
+  subYears,
+} from "date-fns";
 import type { Pool } from "pg";
 import {
   type ConventionId,
   type EmailAttachment,
   type EmailNotification,
   expectArraysToEqual,
+  expectArraysToEqualIgnoringOrder,
   expectToEqual,
   type Notification,
   type NotificationErrored,
@@ -13,6 +20,7 @@ import {
   type TemplatedEmail,
   type TemplatedSms,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -20,130 +28,132 @@ import {
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
-const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";
-const now = new Date();
-const emailNotifications: EmailNotification[] = [
-  {
-    kind: "email",
-    id: "11111111-1111-4000-1111-111111111111",
-    createdAt: subHours(now, 2).toISOString(),
-    followedIds: { agencyId },
-    templatedContent: {
-      replyTo: { email: "yolo@mail.com", name: "Yolo" },
-      kind: "AGENCY_WAS_ACTIVATED",
-      recipients: ["bob@mail.com"],
-      cc: [],
-      params: {
-        agencyName: "My agency",
-        agencyLogoUrl: "http://logo.com",
-        refersToOtherAgency: false,
-        agencyReferdToName: undefined,
-        users: [
-          {
-            firstName: "Jean",
-            lastName: "Dupont",
-            email: "jean-dupont@gmail.com",
-            agencyName: "Agence du Grand Est",
-            isNotifiedByEmail: true,
-            roles: ["validator"],
-          },
+describe("PgNotificationRepository", () => {
+  const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";
+  const now = new Date();
+  const emailNotifications: EmailNotification[] = [
+    {
+      kind: "email",
+      id: "11111111-1111-4000-1111-111111111111",
+      createdAt: subHours(now, 2).toISOString(),
+      followedIds: { agencyId },
+      templatedContent: {
+        replyTo: { email: "yolo@mail.com", name: "Yolo" },
+        kind: "AGENCY_WAS_ACTIVATED",
+        recipients: ["bob@mail.com"],
+        cc: [],
+        params: {
+          agencyName: "My agency",
+          agencyLogoUrl: "http://logo.com",
+          refersToOtherAgency: false,
+          agencyReferdToName: undefined,
+          users: [
+            {
+              firstName: "Jean",
+              lastName: "Dupont",
+              email: "jean-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
 
+            {
+              firstName: "Jeanne",
+              lastName: "Dupont",
+              email: "jeanne-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+          ],
+        },
+        attachments: [
           {
-            firstName: "Jeanne",
-            lastName: "Dupont",
-            email: "jeanne-dupont@gmail.com",
-            agencyName: "Agence du Grand Est",
-            isNotifiedByEmail: true,
-            roles: ["counsellor"],
+            name: "myFile.pdf",
+            content: "myFile content as base64",
           },
         ],
       },
-      attachments: [
-        {
-          name: "myFile.pdf",
-          content: "myFile content as base64",
+    },
+    {
+      kind: "email",
+      id: "22222222-2222-4000-2222-222222222222",
+      createdAt: subHours(now, 3).toISOString(),
+      followedIds: { agencyId },
+      templatedContent: {
+        kind: "TEST_EMAIL",
+        recipients: ["lulu@mail.com"],
+        cc: ["bob@mail.com"],
+        params: {
+          url: "https://google.com",
+          input1: "test input 1",
+          input2: "test input 2",
         },
-      ],
-    },
-  },
-  {
-    kind: "email",
-    id: "22222222-2222-4000-2222-222222222222",
-    createdAt: subHours(now, 3).toISOString(),
-    followedIds: { agencyId },
-    templatedContent: {
-      kind: "TEST_EMAIL",
-      recipients: ["lulu@mail.com"],
-      cc: ["bob@mail.com"],
-      params: {
-        url: "https://google.com",
-        input1: "test input 1",
-        input2: "test input 2",
+        attachments: [
+          {
+            url: "http://my-file.com",
+          },
+        ],
       },
-      attachments: [
-        {
-          url: "http://my-file.com",
+    },
+    {
+      kind: "email",
+      id: "33333333-3333-4000-3333-333333333333",
+      createdAt: now.toISOString(),
+      followedIds: { agencyId },
+      templatedContent: {
+        kind: "AGENCY_LAST_REMINDER",
+        recipients: ["yo@remind.com"],
+        cc: ["yala@jo.com"],
+        params: {
+          agencyReferentName: "Agency Referent Name",
+          conventionId: "",
+          agencyMagicLinkUrl: "",
+          beneficiaryFirstName: "Bob",
+          beneficiaryLastName: "L'éponge",
+          businessName: "Essuie-tout",
         },
-      ],
-    },
-  },
-  {
-    kind: "email",
-    id: "33333333-3333-4000-3333-333333333333",
-    createdAt: now.toISOString(),
-    followedIds: { agencyId },
-    templatedContent: {
-      kind: "AGENCY_LAST_REMINDER",
-      recipients: ["yo@remind.com"],
-      cc: ["yala@jo.com"],
-      params: {
-        agencyReferentName: "Agency Referent Name",
-        conventionId: "",
-        agencyMagicLinkUrl: "",
-        beneficiaryFirstName: "Bob",
-        beneficiaryLastName: "L'éponge",
-        businessName: "Essuie-tout",
+        attachments: undefined,
       },
-      attachments: undefined,
     },
-  },
-];
+  ];
 
-const sms: TemplatedSms = {
-  kind: "ReminderForSignatories",
-  recipientPhone: "33610101010",
-  params: { shortLink: "https://short.link" },
-};
-const smsNotificationId = "11111111-1111-4111-1111-111111111111";
-const smsNotification: Notification = {
-  id: smsNotificationId,
-  kind: "sms",
-  createdAt: new Date("2023-01-01").toISOString(),
-  followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
-  templatedContent: sms,
-};
+  const sms: TemplatedSms = {
+    kind: "ReminderForSignatories",
+    recipientPhone: "33610101010",
+    params: { shortLink: "https://short.link" },
+  };
+  const smsNotificationId = "11111111-1111-4111-1111-111111111111";
+  const smsNotification: Notification = {
+    id: smsNotificationId,
+    kind: "sms",
+    createdAt: new Date("2023-01-01").toISOString(),
+    followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
+    templatedContent: sms,
+  };
 
-const emailNotificationsReOrderedByDate = [
-  emailNotifications[2],
-  emailNotifications[0],
-  emailNotifications[1],
-];
+  const emailNotificationsReOrderedByDate = [
+    emailNotifications[2],
+    emailNotifications[0],
+    emailNotifications[1],
+  ];
 
-const maxRetrievedNotifications = 2;
+  const maxRetrievedNotifications = 2;
 
-const withToBeSendState: { state: NotificationState } = {
-  state: {
-    status: "to-be-send",
-    occurredAt: expect.any(String),
-  },
-};
+  const withToBeSendState: { state: NotificationState } = {
+    state: {
+      status: "to-be-send",
+      occurredAt: expect.any(String),
+    },
+  };
 
-const addWithToBeSentState = <T extends Notification>(notification: T): T => ({
-  ...notification,
-  ...withToBeSendState,
-});
+  const addWithToBeSentState = <T extends Notification>(
+    notification: T,
+  ): T => ({
+    ...notification,
+    ...withToBeSendState,
+  });
 
-describe("PgNotificationRepository", () => {
   let pool: Pool;
   let db: KyselyDb;
   let pgNotificationRepository: PgNotificationRepository;
@@ -167,6 +177,172 @@ describe("PgNotificationRepository", () => {
 
   afterAll(async () => {
     await pool.end();
+  });
+
+  describe("deleteOldestNotifications", () => {
+    const now = new Date();
+    const oneYearAgo = subYears(now, 1);
+    const twoYearsAgo = subYears(now, 2);
+
+    const makeEmailAndSmsNotifications = (createdAt: Date): Notification[] => [
+      {
+        createdAt: createdAt.toISOString(),
+        followedIds: {
+          agencyId: uuid(),
+          conventionId: uuid(),
+          establishmentSiret: "12345678901234",
+          userId: uuid(),
+        },
+        id: uuid(),
+        kind: "email",
+        templatedContent: {
+          kind: "TEST_EMAIL",
+          params: { input1: "sdfsfd", input2: "sfdsfsdf", url: "http://" },
+          recipients: ["mail1@mail.com", "mail2@mail.com"],
+          attachments: [
+            { content: "dsfsdfsdfsdfsdfdfs", name: "sfsdfsdf", url: "http://" },
+          ],
+          cc: ["mail3@mail.com", "mail4@mail.com"],
+          replyTo: { email: "mail@mail.com", name: "sfsdfsdfs" },
+          sender: {
+            email: "sender@mail.com",
+            name: "dsùfjsdf",
+          },
+        },
+      },
+      {
+        createdAt: createdAt.toISOString(),
+        followedIds: {
+          agencyId: uuid(),
+          conventionId: uuid(),
+          establishmentSiret: "12345678901234",
+          userId: uuid(),
+        },
+        id: uuid(),
+        kind: "sms",
+        templatedContent: {
+          kind: "HelloWorld",
+          params: { testMessage: "dsfsdf:sdnfkjshf" },
+          recipientPhone: "+33677884455",
+        },
+      },
+    ];
+
+    const [emailCreatedOneYearMinusOneMSAgo, smsCreatedOneYearMinusOneMSAgo] =
+      makeEmailAndSmsNotifications(addMilliseconds(oneYearAgo, 1));
+    const [emailCreatedOneYearAgo, smsCreatedOneYearAgo] =
+      makeEmailAndSmsNotifications(oneYearAgo);
+    const [emailCreatedTwoYearsAgo, smsCreatedTwoYearsAgo] =
+      makeEmailAndSmsNotifications(twoYearsAgo);
+    const [emailCreatedTwoYearsAndOneMSAgo, smsCreatedTwoYearsAndOneMSAgo] =
+      makeEmailAndSmsNotifications(subMilliseconds(twoYearsAgo, 1));
+
+    beforeEach(async () => {
+      await pgNotificationRepository.save(emailCreatedOneYearMinusOneMSAgo);
+      await pgNotificationRepository.save(emailCreatedTwoYearsAndOneMSAgo);
+      await pgNotificationRepository.save(emailCreatedTwoYearsAgo);
+      await pgNotificationRepository.save(emailCreatedOneYearAgo);
+      await pgNotificationRepository.save(smsCreatedOneYearMinusOneMSAgo);
+      await pgNotificationRepository.save(smsCreatedOneYearAgo);
+      await pgNotificationRepository.save(smsCreatedTwoYearsAgo);
+      await pgNotificationRepository.save(smsCreatedTwoYearsAndOneMSAgo);
+    });
+
+    describe("createdAt Param", () => {
+      it("when to range param set with one year ago, delete notifications that are created before one year ago", async () => {
+        expectToEqual(
+          await pgNotificationRepository.deleteOldestNotifications({
+            limit: 10,
+            createdAt: {
+              to: oneYearAgo,
+            },
+          }),
+          6,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await pgNotificationRepository.test_getAllNotifications()).map(
+            ({ id }) => id,
+          ),
+          [
+            emailCreatedOneYearMinusOneMSAgo.id,
+            smsCreatedOneYearMinusOneMSAgo.id,
+          ],
+        );
+      });
+
+      it("when to range param set with now, delete all notifications", async () => {
+        expectToEqual(
+          await pgNotificationRepository.deleteOldestNotifications({
+            limit: 10,
+            createdAt: {
+              to: now,
+            },
+          }),
+          8,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          await pgNotificationRepository.test_getAllNotifications(),
+          [],
+        );
+      });
+    });
+
+    describe("limit Param", () => {
+      it("when limit 1, delete oldest notifications sms by priority", async () => {
+        const limit = 1;
+        expectToEqual(
+          await pgNotificationRepository.deleteOldestNotifications({
+            limit: limit,
+            createdAt: {
+              to: now,
+            },
+          }),
+          limit,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await pgNotificationRepository.test_getAllNotifications()).map(
+            ({ id }) => id,
+          ),
+          [
+            emailCreatedOneYearMinusOneMSAgo.id,
+            smsCreatedOneYearMinusOneMSAgo.id,
+            emailCreatedOneYearAgo.id,
+            smsCreatedOneYearAgo.id,
+            emailCreatedTwoYearsAgo.id,
+            smsCreatedTwoYearsAgo.id,
+            emailCreatedTwoYearsAndOneMSAgo.id,
+          ],
+        );
+      });
+
+      it("when limit 4, delete 4 oldest notifications", async () => {
+        const limit = 4;
+        expectToEqual(
+          await pgNotificationRepository.deleteOldestNotifications({
+            limit: limit,
+            createdAt: {
+              to: now,
+            },
+          }),
+          limit,
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          (await pgNotificationRepository.test_getAllNotifications()).map(
+            ({ id }) => id,
+          ),
+          [
+            emailCreatedOneYearMinusOneMSAgo.id,
+            smsCreatedOneYearMinusOneMSAgo.id,
+            emailCreatedOneYearAgo.id,
+            smsCreatedOneYearAgo.id,
+          ],
+        );
+      });
+    });
   });
 
   describe("save", () => {
