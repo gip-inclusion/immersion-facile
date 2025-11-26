@@ -37,7 +37,7 @@ const emptyAgency: AgencyDto = {
   refersToAgencyId: null,
   refersToAgencyName: null,
   codeSafir: null,
-  rejectionJustification: null,
+  statusJustification: null,
   phoneNumber: "+33600000000",
 };
 
@@ -153,10 +153,10 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withRejectionJustification(rejectionJustification: string | null) {
+  public withStatusJustification(statusJustification: string | null) {
     return new AgencyDtoBuilder({
       ...this.#agency,
-      rejectionJustification,
+      statusJustification,
     });
   }
 
@@ -178,6 +178,13 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       ...withAcquisition,
+    });
+  }
+
+  public withValidatorEmails(validatorEmails: string[]) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      validatorEmails,
     });
   }
 }

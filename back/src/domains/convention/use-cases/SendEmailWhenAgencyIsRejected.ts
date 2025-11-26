@@ -38,7 +38,7 @@ export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgen
         actual: agency.status,
         expected: rejectedStatus,
       });
-    if (!agency.rejectionJustification)
+    if (!agency.statusJustification)
       throw errors.agency.notRejected({ agencyId });
 
     const referedAgency = agency.refersToAgencyId
@@ -68,7 +68,7 @@ export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgen
         recipients: users.map((user) => user.email),
         params: {
           agencyName: agency.name,
-          rejectionJustification: agency.rejectionJustification,
+          statusJustification: agency.statusJustification,
         },
       },
       followedIds: {

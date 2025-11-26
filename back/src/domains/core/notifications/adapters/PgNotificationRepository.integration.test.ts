@@ -689,7 +689,7 @@ const createTemplatedEmailAndNotification = ({
     cc,
     params: {
       agencyName: "My agency",
-      rejectionJustification: "Justification",
+      statusJustification: "Justification",
     },
     ...(attachments ? { attachments } : {}),
   };

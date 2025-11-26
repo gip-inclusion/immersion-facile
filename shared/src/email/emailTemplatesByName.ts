@@ -1452,10 +1452,10 @@ Tél : ${beneficiaryPhone}`,
     AGENCY_WAS_REJECTED: {
       niceName: "Agence - Refusée",
       tags: ["rejet prescripteur"],
-      createEmailVariables: ({ agencyName, rejectionJustification }) => ({
+      createEmailVariables: ({ agencyName, statusJustification }) => ({
         subject: `Rejet de ${agencyName} comme structure prescriptrice`,
         greetings: "Bonjour,",
-        content: `La demande d'activation de : ${agencyName} sur Immersion Facilitée comme prescripteur a été refusée pour les raisons suivantes : ${rejectionJustification}.
+        content: `La demande d'activation de : ${agencyName} sur Immersion Facilitée comme prescripteur a été refusée pour les raisons suivantes : ${statusJustification}.
 
 Pour toute question concernant ce rejet, il est possible de nous contacter : contact@immersion-facile.beta.gouv.fr`,
         subContent: defaultSignature("immersion"),

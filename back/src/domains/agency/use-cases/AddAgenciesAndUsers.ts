@@ -325,7 +325,7 @@ const createNewAgencies = async ({
         },
       },
       codeSafir: null,
-      rejectionJustification: null,
+      statusJustification: null,
     };
 
     await agencyRepository.insert(agency);
