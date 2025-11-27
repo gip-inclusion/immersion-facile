@@ -29,6 +29,17 @@ export const createAuthRouter = (deps: AppDependencies) => {
     ),
   );
 
+  authSharedRouter.getOAuthLogoutUrl(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getOAuthLogoutUrl.execute(
+          req.query,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   authSharedRouter.getConnectedUser(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
@@ -40,11 +51,11 @@ export const createAuthRouter = (deps: AppDependencies) => {
       ),
   );
 
-  authSharedRouter.getOAuthLogoutUrl(
+  authSharedRouter.getConnectedUsers(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getOAuthLogoutUrl.execute(
+        deps.useCases.getConnectedUsers.execute(
           req.query,
           getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
