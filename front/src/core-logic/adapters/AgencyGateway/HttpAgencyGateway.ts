@@ -93,23 +93,6 @@ export class HttpAgencyGateway implements AgencyGateway {
         ),
     );
   }
-  getAgencyUsers$(
-    agencyId: AgencyId,
-    token: ConnectedUserJwt,
-  ): Observable<ConnectedUser[]> {
-    return from(
-      this.httpClient
-        .getAgencyUsersByAgencyId({
-          urlParams: { agencyId },
-          headers: { authorization: token },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, ({ body }) => body)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
 
   public getAgencyPublicInfoById$({
     agencyId,

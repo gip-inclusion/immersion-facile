@@ -2,8 +2,10 @@ import type { Observable } from "rxjs";
 import type {
   AbsoluteUrl,
   ConnectedUser,
+  ConnectedUserJwt,
   InitiateLoginByEmailParams,
   WithIdToken,
+  WithUserFilters,
 } from "shared";
 
 export interface AuthGateway {
@@ -12,4 +14,8 @@ export interface AuthGateway {
     payload: WithIdToken & { authToken: string },
   ): Observable<AbsoluteUrl>;
   getCurrentUser$(token: string): Observable<ConnectedUser>;
+  getConnectedUsers$: (
+    token: ConnectedUserJwt,
+    filters: WithUserFilters,
+  ) => Observable<ConnectedUser[]>;
 }

@@ -190,7 +190,7 @@ describe("fetchAgency", () => {
         isLoading: true,
       });
 
-      dependencies.agencyGateway.fetchedAgencyUsers$.error(
+      dependencies.authGateway.getConnectedUsersResponse$.error(
         new Error(
           "Une erreur est survenue lors de la récupération de la liste des utilisateurs de cette agence",
         ),
@@ -585,7 +585,7 @@ describe("fetchAgency", () => {
   const feedWithFetchedAgencyUsers = (
     agencyUsers: ConnectedUsersWithNormalizedAgencyRightsById,
   ) => {
-    dependencies.agencyGateway.fetchedAgencyUsers$.next(
+    dependencies.authGateway.getConnectedUsersResponse$.next(
       values(agencyUsers).map((agencyUser) => ({
         ...agencyUser,
         agencyRights: values(agencyUser.agencyRights),
