@@ -2,9 +2,11 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Table from "@codegouvfr/react-dsfr/Table";
+import { values } from "ramda";
 import { Fragment, useMemo, useState } from "react";
 import { HeadingSection, NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
+import { useDispatch } from "react-redux";
 import {
   type AgencyRight,
   addressDtoToString,
@@ -17,7 +19,10 @@ import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { AgencyLineRightsCTAs } from "src/app/components/agency/agencies-table/agency-line/AgencyLineRightsCTAs";
 import { agencyRolesToDisplay } from "src/app/contents/userRolesToDisplay";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { AgencyLineAdminEmails } from "./agency-line/AgencyLineAdminEmails";
 
 type AgencyRightsTableProps = {
@@ -43,8 +48,18 @@ export const AgencyRightsTable = ({
   onUserUpdateRequested,
   onUserRegistrationCancelledRequested,
 }: AgencyRightsTableProps) => {
+  const dispatch = useDispatch();
   const [selectedAgencyRight, setSelectedAgencyRight] =
     useState<AgencyRight | null>(null);
+  const selectedAgencyUsersById = useAppSelector(
+    fetchAgencySelectors.agencyUsers,
+  );
+  const selectedAgencyHasCounsellorRoles = values(selectedAgencyUsersById).some(
+    (user) =>
+      values(user.agencyRights)
+        .filter((right) => right.agency.id === selectedAgencyRight?.agency.id)
+        .some((right) => right.roles.includes("counsellor")),
+  );
 
   const userModal = useMemo(
     () =>
@@ -59,6 +74,11 @@ export const AgencyRightsTable = ({
 
   const onUpdateClicked = (agencyRight: AgencyRight) => {
     if (!userModal) return;
+    dispatch(
+      fetchAgencySlice.actions.fetchAgencyUsersRequested({
+        agencyId: agencyRight.agency.id,
+      }),
+    );
     setSelectedAgencyRight(agencyRight);
     userModal.open();
   };
@@ -99,6 +119,7 @@ export const AgencyRightsTable = ({
           <userModal.Component title={"Modifier le rôle de l'utilisateur"}>
             {selectedAgencyRight && (
               <AgencyUserModificationForm
+                modalId={modalId}
                 agencyUser={{
                   agencyId: selectedAgencyRight.agency.id,
                   userId: user.id,
@@ -118,6 +139,7 @@ export const AgencyRightsTable = ({
                 }
                 onSubmit={onUserUpdateRequested}
                 routeName="myProfile"
+                hasCounsellorRoles={selectedAgencyHasCounsellorRoles}
               />
             )}
           </userModal.Component>,

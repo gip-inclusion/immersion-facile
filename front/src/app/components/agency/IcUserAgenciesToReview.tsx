@@ -3,6 +3,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { values } from "ramda";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -20,8 +21,11 @@ import {
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 
 type IcUserAgenciesToReviewProps = {
   agenciesNeedingReviewForUser: AgencyRight[];
@@ -34,13 +38,13 @@ type IcUserAgenciesToReviewModalProps = {
 
 const AgencyReviewForm = ({
   agency,
-  setSelectedAgency,
+  selectAgency,
   selectedUser,
   setModalProps,
 }: {
   agency: AgencyDtoForAgencyUsersAndAdmins;
   selectedUser: User;
-  setSelectedAgency: (agency: AgencyDtoForAgencyUsersAndAdmins) => void;
+  selectAgency: (agency: AgencyDtoForAgencyUsersAndAdmins) => void;
   setModalProps: (modalProps: IcUserAgenciesToReviewModalProps) => void;
 }) => (
   <div className={fr.cx("fr-col-4")}>
@@ -76,7 +80,7 @@ const AgencyReviewForm = ({
                     title: "Rattacher cet utilisateur",
                     mode: "register",
                   });
-                  setSelectedAgency(agency);
+                  selectAgency(agency);
                   openIcUserRegistrationToAgencyModal();
                 },
                 children: "Valider",
@@ -89,7 +93,7 @@ const AgencyReviewForm = ({
                     title: "Refuser le rattachement",
                     mode: "reject",
                   });
-                  setSelectedAgency(agency);
+                  selectAgency(agency);
                   openIcUserRegistrationToAgencyModal();
                 },
                 children: "Refuser",
@@ -111,6 +115,15 @@ export const IcUserAgenciesToReview = ({
     useState<AgencyDtoForAgencyUsersAndAdmins>();
   const [modalProps, setModalProps] =
     useState<IcUserAgenciesToReviewModalProps | null>(null);
+  const selectedAgencyUsersById = useAppSelector(
+    fetchAgencySelectors.agencyUsers,
+  );
+  const selectedAgencyHasCounsellorRoles = values(selectedAgencyUsersById).some(
+    (user) =>
+      values(user.agencyRights)
+        .filter((right) => right.agency.id === selectedAgency?.id)
+        .some((right) => right.roles.includes("counsellor")),
+  );
 
   const onUserRegistrationSubmitted = (
     userParamsForAgency: UserParamsForAgency,
@@ -122,13 +135,22 @@ export const IcUserAgenciesToReview = ({
     );
   };
 
+  const selectAgency = (agency: AgencyDtoForAgencyUsersAndAdmins) => {
+    setSelectedAgency(agency);
+    dispatch(
+      fetchAgencySlice.actions.fetchAgencyUsersRequested({
+        agencyId: agency.id,
+      }),
+    );
+  };
+
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
       {agenciesNeedingReviewForUser.map(({ agency }) => (
         <AgencyReviewForm
           key={agency.id}
           agency={agency}
-          setSelectedAgency={setSelectedAgency}
+          selectAgency={selectAgency}
           setModalProps={setModalProps}
           selectedUser={selectedUser}
         />
@@ -144,6 +166,7 @@ export const IcUserAgenciesToReview = ({
               />
             ) : (
               <AgencyUserModificationForm
+                modalId={userRegistrationToAgencyModalConfig.id}
                 agencyUser={{
                   agencyId: selectedAgency.id,
                   userId: selectedUser.id,
@@ -156,6 +179,7 @@ export const IcUserAgenciesToReview = ({
                 onSubmit={onUserRegistrationSubmitted}
                 agencyHasRefersTo={!!selectedAgency.refersToAgencyId}
                 routeName="adminAgencies"
+                hasCounsellorRoles={selectedAgencyHasCounsellorRoles}
               />
             )
           ) : (
@@ -168,14 +192,16 @@ export const IcUserAgenciesToReview = ({
   );
 };
 
+const userRegistrationToAgencyModalConfig = {
+  isOpenedByDefault: false,
+  id: domElementIds.admin.agencyTab.userRegistrationToAgencyModal,
+};
+
 const {
   Component: IcUserRegistrationToAgencyModal,
   open: openIcUserRegistrationToAgencyModal,
   close: closeIcUserRegistrationToAgencyModal,
-} = createModal({
-  isOpenedByDefault: false,
-  id: domElementIds.admin.agencyTab.userRegistrationToAgencyModal,
-});
+} = createModal(userRegistrationToAgencyModalConfig);
 
 type IcUserRegistrationToAgencyFormProps = {
   agency: {

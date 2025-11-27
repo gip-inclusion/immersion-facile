@@ -6,7 +6,10 @@ import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-u
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
-import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithOrWithoutFeedbackTopic,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 export interface FetchAgencyState {
   agency: AgencyDto | null;
@@ -45,7 +48,7 @@ export const fetchAgencySlice = createSlice({
 
     fetchAgencyUsersRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<WithAgencyId>,
+      _action: PayloadActionWithOrWithoutFeedbackTopic<WithAgencyId>,
     ) => {
       state.isLoading = true;
     },
@@ -59,7 +62,9 @@ export const fetchAgencySlice = createSlice({
     },
     fetchAgencyUsersFailed: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+      _action: PayloadActionWithOrWithoutFeedbackTopic<{
+        errorMessage: string;
+      }>,
     ) => {
       state.isLoading = false;
     },

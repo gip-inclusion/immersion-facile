@@ -31,6 +31,11 @@ export type PayloadActionWithFeedbackTopic<
   P extends Record<string, unknown> = {},
 > = PayloadAction<P & PayloadWithFeedbackTopic>;
 
+export type PayloadActionWithOrWithoutFeedbackTopic<
+  // biome-ignore lint/complexity/noBannedTypes: need to use {}
+  P extends Record<string, unknown> = {},
+> = PayloadAction<P & { feedbackTopic?: FeedbackTopic }>;
+
 export type PayloadActionWithFeedbackTopicError =
   PayloadActionWithFeedbackTopic<{ errorMessage: string }>;
 
