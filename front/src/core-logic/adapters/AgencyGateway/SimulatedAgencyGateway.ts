@@ -11,7 +11,6 @@ import {
   type CreateAgencyDto,
   errors,
   type ListAgencyOptionsRequestDto,
-  toAgencyDtoForAgencyUsersAndAdmins,
   toAgencyPublicDisplayDto,
   type UpdateAgencyStatusParams,
   type UserParamsForAgency,
@@ -74,68 +73,6 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .withName("Test Agency Needs review 2 (front)")
   .withStatus("needsReview")
   .build();
-
-const simulatedUsers: ConnectedUser[] = [
-  {
-    id: "fake-user-id-1",
-    email: "jbon8745@wanadoo.fr",
-    firstName: "Jean",
-    lastName: "Bon",
-    agencyRights: [
-      {
-        agency: toAgencyDtoForAgencyUsersAndAdmins(
-          MISSION_LOCAL_AGENCY_ACTIVE,
-          [],
-        ),
-        isNotifiedByEmail: true,
-        roles: ["agency-admin"],
-      },
-      {
-        agency: toAgencyDtoForAgencyUsersAndAdmins(PE_AGENCY_ACTIVE, []),
-        isNotifiedByEmail: true,
-        roles: ["validator"],
-      },
-    ],
-    dashboards: { agencies: {}, establishments: {} },
-    proConnect: {
-      externalId: "fake-user-external-id-1",
-      siret: "00000000001111",
-    },
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "fake-user-id-2",
-    email: "remi@sanfamille.fr",
-    firstName: "Rémi",
-    lastName: "Sanfamille",
-    agencyRights: [],
-    dashboards: { agencies: {}, establishments: {} },
-    proConnect: {
-      externalId: "fake-user-external-id-2",
-      siret: "00000000002222",
-    },
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "user-in-error",
-    email: "fake-user-email-4@test.fr",
-    firstName: "Jean-Michel",
-    lastName: "Jeplante",
-    agencyRights: [
-      {
-        agency: toAgencyDtoForAgencyUsersAndAdmins(PE_AGENCY_ACTIVE, []),
-        isNotifiedByEmail: true,
-        roles: ["agency-admin"],
-      },
-    ],
-    dashboards: { agencies: {}, establishments: {} },
-    proConnect: {
-      externalId: "fake-user-in-error-external-id",
-      siret: "00000000006666",
-    },
-    createdAt: new Date().toISOString(),
-  },
-];
 
 export class SimulatedAgencyGateway implements AgencyGateway {
   constructor(private simulatedLatency = 0) {}
@@ -205,19 +142,6 @@ export class SimulatedAgencyGateway implements AgencyGateway {
       );
     }
     throw errors.agency.notFound({ agencyId });
-  }
-
-  getAgencyUsers$(
-    agencyId: AgencyId,
-    _token: ConnectedUserJwt,
-  ): Observable<ConnectedUser[]> {
-    return of(
-      simulatedUsers.filter((user) =>
-        user.agencyRights.some(
-          (agencyRight) => agencyRight.agency.id === agencyId,
-        ),
-      ),
-    );
   }
 
   public getImmersionFacileAgencyId$(): Observable<AgencyId> {

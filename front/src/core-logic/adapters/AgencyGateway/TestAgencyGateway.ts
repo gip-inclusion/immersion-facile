@@ -28,8 +28,6 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public fetchedAgency$ = new Subject<AgencyDto>();
 
-  public fetchedAgencyUsers$ = new Subject<ConnectedUser[]>();
-
   public updateAgencyResponse$ = new Subject<undefined>();
 
   public updateUserAgencyRightResponse$ = new Subject<undefined>();
@@ -56,13 +54,6 @@ export class TestAgencyGateway implements AgencyGateway {
     _token: ConnectedUserJwt,
   ): Observable<AgencyDto> {
     return this.fetchedAgency$;
-  }
-
-  public getAgencyUsers$(
-    _agencyId: AgencyId,
-    _token: ConnectedUserJwt,
-  ): Observable<ConnectedUser[]> {
-    return this.fetchedAgencyUsers$;
   }
 
   public getAgencyPublicInfoById$(

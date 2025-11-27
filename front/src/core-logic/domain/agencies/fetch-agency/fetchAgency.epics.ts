@@ -39,8 +39,8 @@ const getAgencyUsersEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
   action$.pipe(
     filter(fetchAgencySlice.actions.fetchAgencyUsersRequested.match),
     switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
-      dependencies.agencyGateway
-        .getAgencyUsers$(action.payload.agencyId, getAdminToken(state$.value))
+      dependencies.authGateway
+        .getConnectedUsers$(getAdminToken(state$.value), action.payload)
         .pipe(
           map(normalizeUsers),
           map((users) =>

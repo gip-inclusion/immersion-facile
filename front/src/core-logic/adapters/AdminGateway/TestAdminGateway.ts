@@ -24,8 +24,6 @@ export class TestAdminGateway implements AdminGateway {
 
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
 
-  public getAgencyUsersToReviewResponse$ = new Subject<ConnectedUser[]>();
-
   public getAllApiConsumers$ = (_adminToken: ConnectedUserJwt) =>
     this.apiConsumers$;
 
@@ -78,10 +76,6 @@ export class TestAdminGateway implements AdminGateway {
 
   public getDashboardUrl$(): Observable<DashboardUrlAndName> {
     return this.dashboardUrl$;
-  }
-
-  public getConnectedUsersToReview$(): Observable<ConnectedUser[]> {
-    return this.getAgencyUsersToReviewResponse$;
   }
 
   public getLastNotifications$(

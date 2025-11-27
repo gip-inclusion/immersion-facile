@@ -13,6 +13,8 @@ export class TestAuthGateway implements AuthGateway {
 
   public currentUser$ = new Subject<ConnectedUser>();
 
+  public getConnectedUsersResponse$ = new Subject<ConnectedUser[]>();
+
   public loginByEmail$(_params: InitiateLoginByEmailParams): Observable<void> {
     return this.loginByEmailResponse$;
   }
@@ -22,5 +24,9 @@ export class TestAuthGateway implements AuthGateway {
 
   public getCurrentUser$(_token: string): Observable<ConnectedUser> {
     return this.currentUser$;
+  }
+
+  public getConnectedUsers$(): Observable<ConnectedUser[]> {
+    return this.getConnectedUsersResponse$;
   }
 }
