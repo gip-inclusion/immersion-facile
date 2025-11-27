@@ -76,7 +76,7 @@ describe("Admin router", () => {
 
   const now = new Date();
   let sharedRequest: HttpClient<AdminRoutes>;
-  let token: ConnectedUserJwt;
+  let backOfficeAdminToken: ConnectedUserJwt;
   let nonAdminToken: ConnectedUserJwt;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -111,7 +111,7 @@ describe("Admin router", () => {
     inMemoryUow.agencyRepository.agencies = [];
 
     gateways.timeGateway.defaultDate = now;
-    token = generateConnectedUserJwt(backofficeAdminJwtPayload);
+    backOfficeAdminToken = generateConnectedUserJwt(backofficeAdminJwtPayload);
     nonAdminToken = generateConnectedUserJwt(nonAdminJwtPayload);
 
     getFeatureFlags = async () => {
@@ -126,7 +126,7 @@ describe("Admin router", () => {
     it("200 - Gets the absolute Url of the events dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
         urlParams: { dashboardName: "adminEvents" },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
         queryParams: {},
       });
 
@@ -142,7 +142,7 @@ describe("Admin router", () => {
     it("200 - Gets the absolute Url of the establishments dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
         urlParams: { dashboardName: "adminEstablishments" },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
         queryParams: {},
       });
       expectHttpResponseToEqual(response, {
@@ -158,7 +158,7 @@ describe("Admin router", () => {
       const agencyId = "my-agency-id";
       const response = await sharedRequest.getDashboardUrl({
         urlParams: { dashboardName: "adminAgencyDetails" },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
         queryParams: { agencyId: agencyId },
       });
       expectHttpResponseToEqual(response, {
@@ -173,7 +173,7 @@ describe("Admin router", () => {
     it("400 - unknown dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
         urlParams: { dashboardName: "unknown-dashboard" },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
         queryParams: {},
       });
 
@@ -195,7 +195,7 @@ describe("Admin router", () => {
     it("400 - no agencyId is provided for agency dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
         urlParams: { dashboardName: "agency" },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
         queryParams: {},
       });
 
@@ -278,7 +278,7 @@ describe("Admin router", () => {
             title: "title",
           }),
         },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       expectHttpResponseToEqual(response, {
@@ -320,7 +320,7 @@ describe("Admin router", () => {
 
       const response = await sharedRequest.updateFeatureFlags({
         body: params,
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       expectHttpResponseToEqual(response, {
@@ -352,7 +352,7 @@ describe("Admin router", () => {
 
       const response = await sharedRequest.updateFeatureFlags({
         body: updateParams,
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       expectHttpResponseToEqual(response, {
@@ -414,32 +414,6 @@ describe("Admin router", () => {
   });
 
   describe(`${displayRouteName(
-    adminRoutes.getConnectedUsers,
-  )} List connected users`, () => {
-    it("200 - Gets the list of connected users with role 'to-review'", async () => {
-      const response = await sharedRequest.getConnectedUsers({
-        queryParams: { agencyRole: "to-review" },
-        headers: { authorization: token },
-      });
-      expectHttpResponseToEqual(response, {
-        status: 200,
-        body: [],
-      });
-    });
-
-    it("401 - missing token", async () => {
-      const response = await sharedRequest.getConnectedUsers({
-        queryParams: { agencyRole: "to-review" },
-        headers: { authorization: "" },
-      });
-      expectHttpResponseToEqual(response, {
-        status: 401,
-        body: { status: 401, message: "Veuillez vous authentifier" },
-      });
-    });
-  });
-
-  describe(`${displayRouteName(
     adminRoutes.updateUserRoleForAgency,
   )} Update user role for agency`, () => {
     const validatorInAgency = new ConnectedUserBuilder()
@@ -494,7 +468,7 @@ describe("Admin router", () => {
           isNotifiedByEmail: true,
           email: toReviewUser.email,
         },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       expectHttpResponseToEqual(response, {
@@ -554,7 +528,7 @@ describe("Admin router", () => {
           isNotifiedByEmail: false,
           email: toReviewUser.email,
         },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       expectHttpResponseToEqual(response, {
@@ -626,7 +600,7 @@ describe("Admin router", () => {
           isNotifiedByEmail: false,
           email: connectedUser.email,
         },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       expectHttpResponseToEqual(response, {
@@ -667,7 +641,7 @@ describe("Admin router", () => {
           userId: user.id,
           justification: "osef",
         },
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       expectHttpResponseToEqual(response, {
@@ -715,7 +689,7 @@ describe("Admin router", () => {
         body: createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
         ),
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       // biome-ignore lint/style/noNonNullAssertion: testing purpose
@@ -767,7 +741,7 @@ describe("Admin router", () => {
 
       const response = await sharedRequest.saveApiConsumer({
         body: createApiConsumerParamsFromApiConsumer(updatedApiConsumer),
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
 
       // biome-ignore lint/style/noNonNullAssertion: testing purpose
@@ -818,7 +792,7 @@ describe("Admin router", () => {
   )} gets all api consumers`, () => {
     it("200 - gets all api consumers", async () => {
       const response = await sharedRequest.getAllApiConsumers({
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
       });
       expectHttpResponseToEqual(response, {
         status: 200,
@@ -857,7 +831,7 @@ describe("Admin router", () => {
   )} gets users appling filters`, () => {
     it("200 - gets all users matching the query", async () => {
       const response = await sharedRequest.getUsers({
-        headers: { authorization: token },
+        headers: { authorization: backOfficeAdminToken },
         queryParams: { emailContains: "yolo" },
       });
       expectHttpResponseToEqual(response, {
