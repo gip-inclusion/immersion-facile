@@ -4,7 +4,10 @@ import type { WithAgencyId } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { normalizeUsers } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.epics";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
-import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithOrWithoutFeedbackTopic,
+} from "src/core-logic/domain/feedback/feedback.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -38,7 +41,7 @@ const getAgencyEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
 const getAgencyUsersEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
   action$.pipe(
     filter(fetchAgencySlice.actions.fetchAgencyUsersRequested.match),
-    switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
+    switchMap((action: PayloadActionWithOrWithoutFeedbackTopic<WithAgencyId>) =>
       dependencies.authGateway
         .getConnectedUsers$(getAdminToken(state$.value), action.payload)
         .pipe(
@@ -49,7 +52,9 @@ const getAgencyUsersEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
           catchEpicError((error: Error) =>
             fetchAgencySlice.actions.fetchAgencyUsersFailed({
               errorMessage: error.message,
-              feedbackTopic: action.payload.feedbackTopic,
+              ...(action.payload.feedbackTopic
+                ? { feedbackTopic: action.payload.feedbackTopic }
+                : {}),
             }),
           ),
         ),
