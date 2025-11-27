@@ -1,5 +1,4 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
 import { userParamsForAgencySchema } from "../admin/admin.schema";
 import {
   agencyIdResponseSchema,
@@ -62,13 +61,6 @@ export const agencyRoutes = defineRoutes({
     url: "/agency-public-info-by-id",
     queryParamsSchema: withAgencyIdSchema,
     responses: { 200: agencyPublicDisplaySchema },
-  }),
-  getAgencyUsersByAgencyId: defineRoute({
-    method: "get",
-    url: "/agencies/:agencyId/users",
-
-    ...withAuthorizationHeaders,
-    responses: { 200: z.array(connectedUserSchema) },
   }),
   getImmersionFacileAgencyId: defineRoute({
     method: "get",

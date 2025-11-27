@@ -1,5 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import z from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { withUserFiltersSchema } from "../admin/admin.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import {
@@ -52,6 +54,16 @@ export const authRoutes = defineRoutes({
     responses: {
       200: connectedUserSchema,
       400: httpErrorSchema,
+      401: httpErrorSchema,
+    },
+  }),
+  getConnectedUsers: defineRoute({
+    method: "get",
+    url: "/inclusion-connected/users",
+    queryParamsSchema: withUserFiltersSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: z.array(connectedUserSchema),
       401: httpErrorSchema,
     },
   }),
