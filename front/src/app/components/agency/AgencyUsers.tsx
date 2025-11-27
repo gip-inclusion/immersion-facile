@@ -113,6 +113,10 @@ export const AgencyUsers = ({
       )
     : [values(agencyUsersById), []];
 
+  const hasCounsellorRoles = agencyUsers.some((user) =>
+    user.agencyRights[agency.id].roles.includes("counsellor"),
+  );
+
   const onUserUpdateSubmitted = (userParamsForAgency: UserParamsForAgency) => {
     isLocationAdmin
       ? dispatch(
@@ -274,6 +278,7 @@ export const AgencyUsers = ({
                     : onUserUpdateSubmitted
                 }
                 routeName={routeName}
+                hasCounsellorRoles={hasCounsellorRoles}
               />
             </>
           )}
