@@ -1,3 +1,4 @@
+import { type ConventionReadDto, cleanSpecialChars } from "shared";
 import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
@@ -47,8 +48,20 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
           })
         : undefined;
 
-    const response =
-      await deps.franceTravailGateway.notifyOnConventionUpdated(inputParams);
+    const cleanedConventionParams: ConventionReadDto = {
+      ...inputParams.convention,
+      sanitaryPreventionDescription: cleanSpecialChars(
+        inputParams.convention.sanitaryPreventionDescription,
+      ),
+      individualProtectionDescription: cleanSpecialChars(
+        inputParams.convention.individualProtectionDescription,
+      ),
+    };
+
+    const response = await deps.franceTravailGateway.notifyOnConventionUpdated({
+      ...inputParams,
+      convention: cleanedConventionParams,
+    });
 
     if (deps.options.resyncMode)
       await uow.conventionsToSyncRepository.save({
