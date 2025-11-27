@@ -77,7 +77,6 @@ export const AgencyRightsTable = ({
     dispatch(
       fetchAgencySlice.actions.fetchAgencyUsersRequested({
         agencyId: agencyRight.agency.id,
-        feedbackTopic: "agency-user-for-dashboard",
       }),
     );
     setSelectedAgencyRight(agencyRight);
