@@ -169,7 +169,7 @@ describe("Agency registration for authenticated users", () => {
       );
       expectIsFetchingIcUsersNeedingReviewToBe(true);
 
-      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next([
+      dependencies.authGateway.getConnectedUsersResponse$.next([
         {
           ...authUser1,
           agencyRights: [agency1Right, agency2Right],
@@ -208,7 +208,7 @@ describe("Agency registration for authenticated users", () => {
       );
       expectIsFetchingIcUsersNeedingReviewToBe(true);
 
-      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next([
+      dependencies.authGateway.getConnectedUsersResponse$.next([
         {
           ...authUser1,
           agencyRights: [agency1Right, agency2Right],
@@ -253,7 +253,7 @@ describe("Agency registration for authenticated users", () => {
       );
       const errorMessage = "Error fetching users to review";
       expectIsFetchingIcUsersNeedingReviewToBe(true);
-      dependencies.adminGateway.getAgencyUsersToReviewResponse$.error(
+      dependencies.authGateway.getConnectedUsersResponse$.error(
         new Error(errorMessage),
       );
       expectIsFetchingIcUsersNeedingReviewToBe(false);
@@ -278,7 +278,7 @@ describe("Agency registration for authenticated users", () => {
       );
       expectIsFetchingAgencyUsersToBe(true);
 
-      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next([
+      dependencies.authGateway.getConnectedUsersResponse$.next([
         {
           ...authUser1,
           agencyRights: [agency1Right, agency2Right],
@@ -302,7 +302,7 @@ describe("Agency registration for authenticated users", () => {
       );
       const errorMessage = "Error fetching users";
       expectIsFetchingAgencyUsersToBe(true);
-      dependencies.adminGateway.getAgencyUsersToReviewResponse$.error(
+      dependencies.authGateway.getConnectedUsersResponse$.error(
         new Error(errorMessage),
       );
       expectIsFetchingAgencyUsersToBe(false);
