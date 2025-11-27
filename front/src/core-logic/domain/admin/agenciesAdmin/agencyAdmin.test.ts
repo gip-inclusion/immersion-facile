@@ -500,7 +500,7 @@ describe("agencyAdmin", () => {
   };
 
   const feedWithIcUsers = (icUsers: ConnectedUser[]) => {
-    dependencies.adminGateway.getAgencyUsersToReviewResponse$.next(icUsers);
+    dependencies.authGateway.getConnectedUsersResponse$.next(icUsers);
   };
 
   const whenSearchTextIsProvided = (searchedText: string) => {

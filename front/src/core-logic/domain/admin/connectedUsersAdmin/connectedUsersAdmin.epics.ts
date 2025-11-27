@@ -28,14 +28,14 @@ export type ConnectedUsersAdminAction = ActionOfSlice<
 type ConnectedUsersAdminActionEpic = AppEpic<ConnectedUsersAdminAction>;
 
 const fetchConnectedUsersWithAgencyNeedingReviewEpic: ConnectedUsersAdminActionEpic =
-  (action$, state$, { adminGateway }) =>
+  (action$, state$, { authGateway }) =>
     action$.pipe(
       filter(
         connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewRequested
           .match,
       ),
       switchMap((action: PayloadAction<WithUserFilters>) =>
-        adminGateway.getConnectedUsersToReview$(
+        authGateway.getConnectedUsers$(
           getAdminToken(state$.value),
           action.payload,
         ),
@@ -54,12 +54,12 @@ const fetchConnectedUsersWithAgencyNeedingReviewEpic: ConnectedUsersAdminActionE
 const fetchConnectedUsersWithAgencyIdEpic: ConnectedUsersAdminActionEpic = (
   action$,
   state$,
-  { adminGateway },
+  { authGateway },
 ) =>
   action$.pipe(
     filter(connectedUsersAdminSlice.actions.fetchAgencyUsersRequested.match),
     switchMap((action: PayloadAction<WithUserFilters>) =>
-      adminGateway.getConnectedUsersToReview$(
+      authGateway.getConnectedUsers$(
         getAdminToken(state$.value),
         action.payload,
       ),
