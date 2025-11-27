@@ -51,17 +51,6 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     ),
   );
 
-  sharedAgencyRouter.getAgencyUsersByAgencyId(
-    deps.connectedUserAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getConnectedUsers.execute(
-          req.params,
-          getGenericAuthOrThrow(req.payloads?.currentUser),
-        ),
-      ),
-  );
-
   sharedAgencyRouter.getImmersionFacileAgencyId((req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.getImmersionFacileAgencyIdByKind.execute(),
