@@ -25,8 +25,8 @@ export type AcquisitionParams = Partial<{
   [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
-    ? T
-    : never;
+  ? T
+  : never;
 }>;
 
 type AcquisitionParamsKeys = keyof typeof acquisitionParams;
@@ -289,6 +289,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       appellationCode: param.query.ofType(appellationStringSerializer),
     },
     () => `/${frontRoutes.searchResultExternal}`,
+  ),
+  magicLinkInterstitial: defineRoute(
+    { code: param.query.string, state: param.query.string, email: param.query.string },
+    () => `/${frontRoutes.magicLinkInterstitial}`,
   ),
   manageConvention: defineRoute(
     { jwt: param.query.string },

@@ -367,14 +367,15 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 `/${page}?discussionId=discussion0`,
               );
 
-            const redirectedUrl = await afterOAuthSuccessRedirection.execute({
+            const response = await afterOAuthSuccessRedirection.execute({
               code: "my-code",
               state: initialOngoingOAuth.state,
             });
 
-            expect(redirectedUrl).toBe(
-              `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
-            );
+            expectToEqual(response, {
+              provider: "proConnect",
+              redirectUri: `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
+            });
           },
         );
       });
@@ -399,7 +400,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         await expectPromiseToFailWithError(
           afterOAuthSuccessRedirection.execute(params),
-          errors.proConnect.missingOAuth({
+          errors.auth.missingOAuth({
             state: params.state,
           }),
         );
@@ -428,7 +429,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             code: "my-code",
             state: "my-state",
           }),
-          errors.proConnect.nonceMismatch(),
+          errors.auth.nonceMismatch(),
         );
       });
     });
@@ -454,7 +455,10 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           code: generateEmailAuthCode({ version: 1 }),
           state: initialOngoingOAuth.state,
         });
-        expectToEqual(result, expect.any(String));
+        expectToEqual(result, {
+          provider: "email",
+          redirectUri: `${immersionBaseUrl}/admin?token=${correctToken}&firstName=&lastName=&email=my-email@mail.com&idToken=&provider=email`,
+        });
       });
 
       it("throws if token is NOT from the server", async () => {
@@ -501,9 +505,9 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           }),
           errors.user.expiredJwt(
             (timeGateway.now().getTime() - expirationDate.getTime()) /
-              1000 /
-              60 +
-              " minutes",
+            1000 /
+            60 +
+            " minutes",
           ),
         );
       });
@@ -529,7 +533,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           const userId = "new-user-id";
           uuidGenerator.setNextUuid(userId);
 
-          const redirectedUrl = await afterOAuthSuccessRedirection.execute({
+          const response = await afterOAuthSuccessRedirection.execute({
             code: generateEmailAuthCode({ version: 1 }),
             state: initialOngoingOAuth.state,
           });
@@ -554,9 +558,10 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             },
           ]);
 
-          expect(redirectedUrl).toBe(
-            `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
-          );
+          expectToEqual(response, {
+            provider: "email",
+            redirectUri: `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
+          });
         },
       );
     });
@@ -577,20 +582,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
-      const loginUrl = await afterOAuthSuccessRedirection.execute({
+      expectPromiseToFailWithError(afterOAuthSuccessRedirection.execute({
         code: "osef",
         state: initialOngoingOAuth.state,
-      });
-
-      expectToEqual(
-        loginUrl,
-        `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
+      }),
+        errors.auth.alreadyUsedAuthentication(),
       );
-
-      expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-        initialOngoingOAuth,
-      ]);
-      expectToEqual(uow.userRepository.users, []);
     });
 
     it("proConnect", async () => {
@@ -604,14 +601,17 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
-      const loginUrl = await afterOAuthSuccessRedirection.execute({
+      const response = await afterOAuthSuccessRedirection.execute({
         code: "osef",
         state: initialOngoingOAuth.state,
       });
 
       expectToEqual(
-        loginUrl,
-        `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
+        response,
+        {
+          redirectUri: `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
+          provider: "proConnect",
+        },
       );
 
       expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
@@ -669,12 +669,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       proConnect:
         options.externalId !== null
           ? {
-              externalId:
-                options.externalId !== undefined
-                  ? options.externalId
-                  : defaultExpectedIcIdTokenPayload.sub,
-              siret: defaultExpectedIcIdTokenPayload.siret,
-            }
+            externalId:
+              options.externalId !== undefined
+                ? options.externalId
+                : defaultExpectedIcIdTokenPayload.sub,
+            siret: defaultExpectedIcIdTokenPayload.siret,
+          }
           : null,
       createdAt: new Date().toISOString(),
     };

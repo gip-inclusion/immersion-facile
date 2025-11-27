@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AbsoluteUrl,
+  AfterOAuthSuccessRedirectionResponse,
   Email,
   FederatedIdentity,
   WithRedirectUri,
@@ -28,7 +29,7 @@ export interface AuthState {
   afterLoginRedirectionUrl: AbsoluteUrl | null;
 }
 
-const initialState: AuthState = {
+export const initialAuthState: AuthState = {
   isLoading: true,
   isRequestingLoginByEmail: false,
   federatedIdentityWithUser: null,
@@ -48,12 +49,12 @@ const onFederatedIdentityReceived = (
 
 export const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState: initialAuthState,
   reducers: {
     saveRedirectionAfterLoginRequested: (
       _state,
       _action: PayloadAction<WithUrl>,
-    ) => {},
+    ) => { },
     saveRedirectAfterLoginSucceeded: (
       state,
       action: PayloadAction<WithUrl>,
@@ -67,7 +68,7 @@ export const authSlice = createSlice({
       state.afterLoginRedirectionUrl = action.payload.url;
     },
     redirectionAfterLoginNotFoundInDevice: (state) => state,
-    redirectAndClearUrlAfterLoginRequested: () => {},
+    redirectAndClearUrlAfterLoginRequested: () => { },
     redirectAndClearUrlAfterLoginSucceeded: (
       state,
       _action: PayloadAction<WithUrl | undefined>,
@@ -117,6 +118,25 @@ export const authSlice = createSlice({
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isRequestingLoginByEmail = false;
+    },
+    confirmLoginByMagicLinkRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        code: string;
+        state: string;
+        email: Email;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    confirmLoginByMagicLinkSucceded: (state, _action: PayloadActionWithFeedbackTopic<AfterOAuthSuccessRedirectionResponse>) => {
+      state.isLoading = false;
+    },
+    confirmLoginByMagicLinkFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
     },
   },
 });

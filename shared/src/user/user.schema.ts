@@ -23,6 +23,7 @@ import {
 } from "../zodUtils";
 import type {
   ConnectedUser,
+  ConnectedUserQueryParams,
   User,
   UserId,
   UserWithNumberOfAgenciesAndEstablishments,
@@ -104,3 +105,13 @@ export const connectedUserSchema: ZodSchemaWithInputMatchingOutput<ConnectedUser
       isBackofficeAdmin: z.boolean().optional(),
     }),
   );
+
+export const connectedUserQueryParamsSchema: ZodSchemaWithInputMatchingOutput<ConnectedUserQueryParams> =
+  z.object({
+    token: zStringMinLength1,
+    idToken: z.string(),
+    provider: z.enum(["proConnect", "email"]),
+    email: emailSchema,
+    firstName: zStringCanBeEmpty,
+    lastName: zStringCanBeEmpty,
+  });

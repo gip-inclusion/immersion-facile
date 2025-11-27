@@ -1,13 +1,15 @@
 import { delay, type Observable, of } from "rxjs";
 import type {
   AbsoluteUrl,
+  AfterOAuthSuccessRedirectionResponse,
   ConnectedUser,
   InitiateLoginByEmailParams,
+  OAuthSuccessLoginParams,
 } from "shared";
 import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 
 export class SimulatedAuthGateway implements AuthGateway {
-  constructor(private simulatedLatency = 0) {}
+  constructor(private simulatedLatency = 0) { }
   loginByEmail$(_params: InitiateLoginByEmailParams): Observable<void> {
     return of(undefined).pipe(delay(this.simulatedLatency));
   }
@@ -16,6 +18,15 @@ export class SimulatedAuthGateway implements AuthGateway {
   }
   public getCurrentUser$(_token: string): Observable<ConnectedUser> {
     return of(simulatedUserConnected);
+  }
+  public confirmLoginByMagicLink$(_params: OAuthSuccessLoginParams): Observable<AfterOAuthSuccessRedirectionResponse> {
+    return of({
+      ...simulatedUserConnected,
+      idToken: "fake-id-token",
+      provider: "email",
+      token: "fake-token",
+      redirectUri: "http://fake-redirect.com",
+    });
   }
 }
 
