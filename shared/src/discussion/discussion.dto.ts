@@ -273,6 +273,10 @@ export type EstablishmentExchange = CommonExchange &
 export type PotentialBeneficiaryExchange = CommonExchange &
   SpecificExchangeSender<"potentialBeneficiary">;
 
+export type ExchangeSender =
+  | SpecificExchangeSender<"establishment">
+  | SpecificExchangeSender<"potentialBeneficiary">;
+
 export type Exchange = EstablishmentExchange | PotentialBeneficiaryExchange;
 
 export type ExchangeRead = CommonExchange &
