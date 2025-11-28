@@ -166,6 +166,7 @@ export const IcUserAgenciesToReview = ({
               />
             ) : (
               <AgencyUserModificationForm
+                modalId={userRegistrationToAgencyModalConfig.id}
                 agencyUser={{
                   agencyId: selectedAgency.id,
                   userId: selectedUser.id,
@@ -191,14 +192,16 @@ export const IcUserAgenciesToReview = ({
   );
 };
 
+const userRegistrationToAgencyModalConfig = {
+  isOpenedByDefault: false,
+  id: domElementIds.admin.agencyTab.userRegistrationToAgencyModal,
+};
+
 const {
   Component: IcUserRegistrationToAgencyModal,
   open: openIcUserRegistrationToAgencyModal,
   close: closeIcUserRegistrationToAgencyModal,
-} = createModal({
-  isOpenedByDefault: false,
-  id: domElementIds.admin.agencyTab.userRegistrationToAgencyModal,
-});
+} = createModal(userRegistrationToAgencyModalConfig);
 
 type IcUserRegistrationToAgencyFormProps = {
   agency: {

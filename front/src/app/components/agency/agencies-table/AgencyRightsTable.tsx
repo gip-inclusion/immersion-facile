@@ -119,6 +119,7 @@ export const AgencyRightsTable = ({
           <userModal.Component title={"Modifier le rôle de l'utilisateur"}>
             {selectedAgencyRight && (
               <AgencyUserModificationForm
+                modalId={modalId}
                 agencyUser={{
                   agencyId: selectedAgencyRight.agency.id,
                   userId: user.id,

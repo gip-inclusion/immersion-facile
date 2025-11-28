@@ -42,28 +42,28 @@ export const AgencyUsers = ({
   const isLocationAdmin =
     routeName === "adminAgencies" || routeName === "adminAgencyDetail";
 
+  const manageUserModalId = isLocationAdmin
+    ? domElementIds.admin.agencyTab.editAgencyManageUserModal
+    : domElementIds.agencyDashboard.agencyDetails.editAgencyManageUserModal;
+  const removeUserModalId = isLocationAdmin
+    ? domElementIds.admin.agencyTab.editAgencyRemoveUserModal
+    : domElementIds.agencyDashboard.agencyDetails.editAgencyRemoveUserModal;
   const manageUserModal = useMemo(
     () =>
       createModal({
         isOpenedByDefault: false,
-        id: isLocationAdmin
-          ? domElementIds.admin.agencyTab.editAgencyManageUserModal
-          : domElementIds.agencyDashboard.agencyDetails
-              .editAgencyManageUserModal,
+        id: manageUserModalId,
       }),
-    [isLocationAdmin],
+    [manageUserModalId],
   );
 
   const removeUserModal = useMemo(
     () =>
       createModal({
         isOpenedByDefault: false,
-        id: isLocationAdmin
-          ? domElementIds.admin.agencyTab.editAgencyRemoveUserModal
-          : domElementIds.agencyDashboard.agencyDetails
-              .editAgencyRemoveUserModal,
+        id: removeUserModalId,
       }),
-    [isLocationAdmin],
+    [removeUserModalId],
   );
   const dispatch = useDispatch();
 
@@ -279,6 +279,7 @@ export const AgencyUsers = ({
                 }
                 routeName={routeName}
                 hasCounsellorRoles={hasCounsellorRoles}
+                modalId={manageUserModalId}
               />
             </>
           )}

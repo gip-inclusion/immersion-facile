@@ -2,9 +2,10 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   domElementIds,
@@ -28,6 +29,7 @@ export const AgencyUserModificationForm = ({
   onSubmit,
   routeName,
   hasCounsellorRoles,
+  modalId,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
@@ -37,7 +39,13 @@ export const AgencyUserModificationForm = ({
   onSubmit: (userParamsForAgency: UserParamsForAgency) => void;
   routeName: AgencyOverviewRouteName;
   hasCounsellorRoles: boolean;
+  modalId: string;
 }) => {
+  const onCloseModal = () => {
+    reset(agencyUser);
+    setDisplayFirstCounsellorInformation(false);
+  };
+
   const [
     displayFirstCounsellorInformation,
     setDisplayFirstCounsellorInformation,
@@ -65,11 +73,6 @@ export const AgencyUserModificationForm = ({
     });
     closeModal();
   };
-
-  useEffect(() => {
-    reset(agencyUser);
-    setDisplayFirstCounsellorInformation(false);
-  }, [agencyUser, reset]);
 
   const availableRoles = keys(agencyRolesToDisplay).filter(
     (role) => role !== "to-review",
@@ -104,6 +107,17 @@ export const AgencyUserModificationForm = ({
 
   const [invalidEmailMessage, setInvalidEmailMessage] =
     useState<ReactNode | null>(null);
+
+  useIsModalOpen(
+    {
+      id: modalId,
+      isOpenedByDefault: false,
+    },
+    {
+      onConceal: onCloseModal,
+      onDisclose: onCloseModal,
+    },
+  );
 
   if (!agencyUser) return null;
 
