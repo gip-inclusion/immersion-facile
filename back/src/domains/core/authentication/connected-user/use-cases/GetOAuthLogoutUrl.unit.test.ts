@@ -50,7 +50,7 @@ describe("GetOAuthLogoutUrl", () => {
       uow.ongoingOAuthRepository.ongoingOAuths = [];
       await expectPromiseToFailWithError(
         getOAuthLogoutUrl.execute({ idToken: "whatever" }, user),
-        errors.proConnect.missingOAuth({}),
+        errors.auth.missingOAuth({}),
       );
     });
 
@@ -69,8 +69,7 @@ describe("GetOAuthLogoutUrl", () => {
       const idToken = "fake-id-token";
       expectToEqual(
         await getOAuthLogoutUrl.execute({ idToken }, user),
-        `${
-          fakeProviderConfig.providerBaseUri
+        `${fakeProviderConfig.providerBaseUri
         }${fakeProConnectLogoutUri}?${queryParamsAsString({
           postLogoutRedirectUrl:
             fakeProviderConfig.immersionRedirectUri.afterLogout,

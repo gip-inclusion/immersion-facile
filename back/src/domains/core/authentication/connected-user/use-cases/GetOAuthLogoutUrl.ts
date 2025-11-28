@@ -19,7 +19,7 @@ export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
     const ongoingOAuth = await uow.ongoingOAuthRepository.findByUserId(
       currentUser.id,
     );
-    if (!ongoingOAuth) throw errors.proConnect.missingOAuth({});
+    if (!ongoingOAuth) throw errors.auth.missingOAuth({});
     return oAuthGateway.getLogoutUrl({
       idToken: inputParams.idToken,
       state: ongoingOAuth.state,

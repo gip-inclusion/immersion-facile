@@ -1,5 +1,4 @@
 import {
-  type AbsoluteUrl,
   AgencyDtoBuilder,
   type AuthRoutes,
   allowedLoginUris,
@@ -87,7 +86,7 @@ describe("user connexion flow", () => {
         `${displayRouteName(
           authRoutes.initiateLoginByOAuth,
         )} 302 > [ProConnect]/login-pro-connect - 302 > ${displayRouteName(
-          authRoutes.afterOAuthSuccessRedirection,
+          authRoutes.afterOAuthLogin,
         )} 302 > page %s with required connected user params`,
         async (page) => {
           const generatedUserId = "my-user-id";
@@ -107,8 +106,7 @@ describe("user connexion flow", () => {
               status: 302,
               headers: {
                 location: encodeURI(
-                  `${
-                    appConfig.proConnectConfig.providerBaseUri
+                  `${appConfig.proConnectConfig.providerBaseUri
                   }/login-pro-connect?${queryParamsAsString({
                     nonce,
                     state,
@@ -132,7 +130,7 @@ describe("user connexion flow", () => {
             },
           });
 
-          const response = await httpClient.afterOAuthSuccessRedirection({
+          const response = await httpClient.afterOAuthLogin({
             queryParams: {
               code: authCode,
               state,
@@ -148,11 +146,11 @@ describe("user connexion flow", () => {
             throw errors.generic.testError("Response must be 302");
           const locationHeader = response.headers.location as string;
           const locationPrefix = `${appConfig.immersionFacileBaseUrl}${redirectUri}&token=`;
-
+          const { params } = decodeURIWithParams(locationHeader);
           expect(locationHeader).toContain(locationPrefix);
           const { userId } = decodeJwtWithoutSignatureCheck<{
             userId: string;
-          }>(locationHeader.replace(locationPrefix, ""));
+          }>(params?.token ?? "");
           expect(userId).toBe(generatedUserId);
           expectToEqual(inMemoryUow.ongoingOAuthRepository.ongoingOAuths, [
             {
@@ -204,8 +202,7 @@ describe("user connexion flow", () => {
           status: 302,
           headers: {
             location: encodeURI(
-              `${
-                appConfig.proConnectConfig.providerBaseUri
+              `${appConfig.proConnectConfig.providerBaseUri
               }/login-pro-connect?${queryParamsAsString({
                 nonce,
                 state,
@@ -235,7 +232,7 @@ describe("user connexion flow", () => {
         },
       });
 
-      const response = await httpClient.afterOAuthSuccessRedirection({
+      const response = await httpClient.afterOAuthLogin({
         queryParams: {
           code: authCode,
           state,
@@ -267,8 +264,8 @@ describe("user connexion flow", () => {
         `${displayRouteName(
           authRoutes.initiateLoginByEmail,
         )} 200 | EMAIL with connexion link > ${displayRouteName(
-          authRoutes.afterOAuthSuccessRedirection,
-        )} 302 > page %s with required connected user params`,
+          authRoutes.afterOAuthLogin,
+        )} 200 > page %s with required connected user params`,
         async (uri) => {
           const email: Email = "mail@email.com";
           const generatedUserId = "my-user-id";
@@ -300,7 +297,7 @@ describe("user connexion flow", () => {
           const notification = notifications.at(0);
           if (!notification) throw new Error("missing notifification");
           if (notification.templatedContent.kind !== "LOGIN_BY_EMAIL_REQUESTED")
-            throw new Error("bads notificiation kind");
+            throw new Error("bad notification kind");
 
           const code = decodeURIWithParams(
             notification.templatedContent.params.loginLink,
@@ -310,31 +307,42 @@ describe("user connexion flow", () => {
             throw new Error(
               `missing code on url ${notification.templatedContent.params.loginLink}`,
             );
-          const response = await httpClient.afterOAuthSuccessRedirection({
+          const response = await httpClient.afterOAuthLogin({
             queryParams: {
               code,
               state,
             },
           });
 
+          if (response.status !== 200)
+            throw errors.generic.testError("Response must be 200");
+
           expectHttpResponseToEqual(response, {
-            body: {},
-            status: 302,
+            body: {
+              redirectUri: expect.any(String),
+              provider: "email",
+            },
+            status: 200,
           });
-          const locationHeader = response.headers.location as AbsoluteUrl;
-          const redirectUrl: AbsoluteUrl = `${appConfig.immersionFacileBaseUrl}/${uri}`;
-          const locationPrefix = `${redirectUrl}?token=`;
 
-          expect(locationHeader).toContain(locationPrefix);
 
-          const token = decodeURIWithParams(locationHeader).params?.token;
+          const { params } = decodeURIWithParams(
+            response.body.redirectUri,
+          );
 
-          if (!token)
-            throw new Error(`Missing token param on url ${locationHeader}`);
+          expectToEqual(params, {
+            token: expect.any(String),
+            firstName: "",
+            lastName: "",
+            email,
+            idToken: "",
+            provider: "email",
+          });
+
           expectToEqual(
             decodeJwtWithoutSignatureCheck<{
               userId: string;
-            }>(token).userId,
+            }>(params?.token ?? "").userId,
             generatedUserId,
           );
 
@@ -410,20 +418,17 @@ describe("user connexion flow", () => {
           ...agencyUser,
           dashboards: {
             agencies: {
-              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
-                agencyUser.id
-              }/${gateways.timeGateway.now()}`,
-              erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
-                agencyUser.id
-              }/${gateways.timeGateway.now()}`,
+              agencyDashboardUrl: `http://stubAgencyUserDashboard/${agencyUser.id
+                }/${gateways.timeGateway.now()}`,
+              erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agencyUser.id
+                }/${gateways.timeGateway.now()}`,
               statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${gateways.timeGateway.now()}/${agency.kind}`,
               statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${gateways.timeGateway.now()}`,
               statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${gateways.timeGateway.now()}`,
             },
             establishments: {
-              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
-                agencyUser.id
-              }/${gateways.timeGateway.now()}`,
+              conventions: `http://stubEstablishmentConventionsDashboardUrl/${agencyUser.id
+                }/${gateways.timeGateway.now()}`,
             },
           },
           agencyRights: [
@@ -544,13 +549,12 @@ describe("user connexion flow", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: `${
-          appConfig.proConnectConfig.providerBaseUri
-        }${fakeProConnectLogoutUri}?${queryParamsAsString({
-          postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
-          idToken: "fake-id-token",
-          state,
-        })}`,
+        body: `${appConfig.proConnectConfig.providerBaseUri
+          }${fakeProConnectLogoutUri}?${queryParamsAsString({
+            postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
+            idToken: "fake-id-token",
+            state,
+          })}`,
         status: 200,
       });
     });

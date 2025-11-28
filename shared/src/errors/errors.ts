@@ -238,7 +238,7 @@ export const errors = {
         `Une relance de demande de completion du bilan a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
   },
-  proConnect: {
+  auth: {
     missingOAuth: ({ state }: { state?: OAuthState }) =>
       new ForbiddenError(
         `Il n'y a pas d'OAuth en cours ${state ? `avec l'état '${state}'` : ""}}`,
@@ -249,6 +249,8 @@ export const errors = {
       new BadRequestError(
         `Impossible de récupérer les infos ProConnect : ${message}`,
       ),
+    alreadyUsedAuthentication: () =>
+      new BadRequestError("Ce lien d'authentification a déjà été utilisé."),
   },
   convention: {
     editCounsellorNameNotAuthorizedForRole: () =>

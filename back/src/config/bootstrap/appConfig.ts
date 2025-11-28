@@ -145,19 +145,19 @@ export class AppConfig {
   public get cellarS3Params(): S3Params {
     return this.documentGateway === "S3"
       ? {
-          endPoint: this.#throwIfNotDefinedOrDefault("CELLAR_ADDON_HOST"),
-          accessKeyId: this.#throwIfNotDefinedOrDefault("CELLAR_ADDON_KEY_ID"),
-          secretAccessKey: this.#throwIfNotDefinedOrDefault(
-            "CELLAR_ADDON_KEY_SECRET",
-          ),
-          bucketName: this.#throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
-        }
+        endPoint: this.#throwIfNotDefinedOrDefault("CELLAR_ADDON_HOST"),
+        accessKeyId: this.#throwIfNotDefinedOrDefault("CELLAR_ADDON_KEY_ID"),
+        secretAccessKey: this.#throwIfNotDefinedOrDefault(
+          "CELLAR_ADDON_KEY_SECRET",
+        ),
+        bucketName: this.#throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
+      }
       : {
-          endPoint: "NOT S3 Gateway",
-          accessKeyId: "NOT S3 Gateway",
-          secretAccessKey: "NOT S3 Gateway",
-          bucketName: "NOT S3 Gateway",
-        };
+        endPoint: "NOT S3 Gateway",
+        accessKeyId: "NOT S3 Gateway",
+        secretAccessKey: "NOT S3 Gateway",
+        bucketName: "NOT S3 Gateway",
+      };
   }
 
   // Visible for testing.
@@ -291,7 +291,7 @@ export class AppConfig {
         this.proConnectGateway !== "HTTPS" ? "fake secret" : undefined,
       ),
       immersionRedirectUri: {
-        afterLogin: `${this.immersionFacileBaseUrl}/api${authRoutes.afterOAuthSuccessRedirection.url}`,
+        afterLogin: `${this.immersionFacileBaseUrl}/api${authRoutes.afterOAuthLogin.url}`,
         afterLogout: this.immersionFacileBaseUrl,
       },
       providerBaseUri: this.#throwIfNotAbsoluteUrl(

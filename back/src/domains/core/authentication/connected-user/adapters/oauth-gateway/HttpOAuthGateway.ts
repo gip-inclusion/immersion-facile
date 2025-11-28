@@ -94,7 +94,7 @@ export class HttpOAuthGateway implements OAuthGateway {
     });
 
     if (response.status === 400)
-      throw errors.proConnect.couldNotGetUserInfo({
+      throw errors.auth.couldNotGetUserInfo({
         message: JSON.stringify(response.body, null, 2),
       });
 

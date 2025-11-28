@@ -1,6 +1,6 @@
 import {
   type AbsoluteUrl,
-  type AlreadyAuthenticatedUserQueryParams,
+  type AfterOAuthSuccessRedirectionResponse,
   type ConnectedUserQueryParams,
   currentJwtVersions,
   decodeURIWithParams,
@@ -38,11 +38,9 @@ import type {
   OAuthGateway,
 } from "../port/OAuthGateway";
 
-type ConnectedRedirectUrl = AbsoluteUrl;
-
 export class AfterOAuthSuccessRedirection extends TransactionalUseCase<
   OAuthSuccessLoginParams,
-  ConnectedRedirectUrl
+  AfterOAuthSuccessRedirectionResponse
 > {
   protected inputSchema = oAuthSuccessLoginParamsSchema;
 
@@ -86,27 +84,26 @@ export class AfterOAuthSuccessRedirection extends TransactionalUseCase<
   protected async _execute(
     { code, state }: OAuthSuccessLoginParams,
     uow: UnitOfWork,
-  ): Promise<ConnectedRedirectUrl> {
+  ): Promise<AfterOAuthSuccessRedirectionResponse> {
     const ongoingOAuth = await uow.ongoingOAuthRepository.findByState(state);
 
     if (!ongoingOAuth)
-      throw errors.proConnect.missingOAuth({
+      throw errors.auth.missingOAuth({
         state,
       });
 
-    const { uriWithoutParams, params } = decodeURIWithParams(
-      ongoingOAuth.fromUri,
-    );
-
-    if (ongoingOAuth.usedAt)
-      return `${this.#immersionFacileBaseUrl}${
-        uriWithoutParams
-      }?${queryParamsAsString<AlreadyAuthenticatedUserQueryParams>({
-        alreadyUsedAuthentication: true,
-      })}`;
+    if (ongoingOAuth.usedAt) {
+      if (ongoingOAuth.provider === "email") {
+        throw errors.auth.alreadyUsedAuthentication();
+      }
+      return {
+        provider: ongoingOAuth.provider,
+        redirectUri: `${this.#immersionFacileBaseUrl}${ongoingOAuth.fromUri}?alreadyUsedAuthentication=true`,
+      };
+    }
 
     const { newOrUpdatedUser, accessToken } = await (ongoingOAuth.provider ===
-    "email"
+      "email"
       ? this.#onEmailProvider(uow, ongoingOAuth, code as EmailAuthCodeJwt)
       : this.#onProConnectProvider(uow, ongoingOAuth, code));
 
@@ -116,9 +113,9 @@ export class AfterOAuthSuccessRedirection extends TransactionalUseCase<
       usedAt: this.#timeGateway.now(),
       ...(ongoingOAuth.provider === "proConnect"
         ? {
-            externalId: newOrUpdatedUser.proConnect?.externalId,
-            accessToken: accessToken?.accessToken,
-          }
+          externalId: newOrUpdatedUser.proConnect?.externalId,
+          accessToken: accessToken?.accessToken,
+        }
         : {}),
       ...(ongoingOAuth.provider === "email"
         ? { email: ongoingOAuth.email }
@@ -146,23 +143,29 @@ export class AfterOAuthSuccessRedirection extends TransactionalUseCase<
       ),
     ]);
 
-    return `${this.#immersionFacileBaseUrl}${
-      uriWithoutParams
-    }?${queryParamsAsString<ConnectedUserQueryParams>({
-      ...params,
-      token: this.#generateConnectedUserJwt(
-        {
-          userId: newOrUpdatedUser.id,
-          version: currentJwtVersions.connectedUser,
-        },
-        TWELVE_HOURS_IN_SECONDS,
-      ),
-      firstName: newOrUpdatedUser.firstName,
-      lastName: newOrUpdatedUser.lastName,
-      email: newOrUpdatedUser.email,
-      idToken: accessToken?.idToken ?? "",
+    const { uriWithoutParams, params } = decodeURIWithParams(
+      ongoingOAuth.fromUri,
+    );
+
+    return {
       provider: ongoingOAuth.provider,
-    })}`;
+      redirectUri: `${this.#immersionFacileBaseUrl}${uriWithoutParams
+        }?${queryParamsAsString<ConnectedUserQueryParams>({
+          ...params,
+          token: this.#generateConnectedUserJwt(
+            {
+              userId: newOrUpdatedUser.id,
+              version: currentJwtVersions.connectedUser,
+            },
+            TWELVE_HOURS_IN_SECONDS,
+          ),
+          firstName: newOrUpdatedUser.firstName,
+          lastName: newOrUpdatedUser.lastName,
+          email: newOrUpdatedUser.email,
+          idToken: accessToken?.idToken ?? "",
+          provider: ongoingOAuth.provider,
+        })}`,
+    };
   }
 
   async #onProConnectProvider(
@@ -178,7 +181,7 @@ export class AfterOAuthSuccessRedirection extends TransactionalUseCase<
     });
 
     if (accessToken.payload.nonce !== ongoingOAuth.nonce)
-      throw errors.proConnect.nonceMismatch();
+      throw errors.auth.nonceMismatch();
 
     return {
       newOrUpdatedUser: await this.#makeNewOrUpdatedProConnectedUser(

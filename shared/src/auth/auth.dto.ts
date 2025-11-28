@@ -1,3 +1,4 @@
+import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
 import type { frontRoutes } from "../routes/route.utils";
 import type { EmailAuthCodeJwt } from "../tokens/jwt.dto";
@@ -41,6 +42,11 @@ export type InitiateLoginByEmailParams = WithRedirectUri & {
 
 export type WithIdToken = {
   idToken: IdToken;
+};
+
+export type AfterOAuthSuccessRedirectionResponse = {
+  provider: IdentityProvider;
+  redirectUri: AbsoluteUrl;
 };
 
 export const authExpiredMessage = (durationText?: string) =>

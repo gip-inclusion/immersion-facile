@@ -8,6 +8,7 @@ import {
 } from "../user/user.schema";
 import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 import {
+  afterOAuthSuccessRedirectionResponseSchema,
   initiateLoginByEmailParamsSchema,
   oAuthSuccessLoginParamsSchema,
   withIdTokenSchema,
@@ -36,12 +37,15 @@ export const authRoutes = defineRoutes({
       200: expressEmptyResponseBody,
     },
   }),
-  afterOAuthSuccessRedirection: defineRoute({
+  afterOAuthLogin: defineRoute({
     method: "get",
     url: "/inclusion-connect-after-login", // URI déclarée chez ProConnect, ne pas toucher sauf si on change la config chez ProConnect
     queryParamsSchema: oAuthSuccessLoginParamsSchema,
     responses: {
+      200: afterOAuthSuccessRedirectionResponseSchema,
       302: emptyObjectSchema,
+      400: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   getConnectedUser: defineRoute({

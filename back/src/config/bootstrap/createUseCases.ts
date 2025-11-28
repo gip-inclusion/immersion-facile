@@ -930,7 +930,7 @@ export const createUseCases = ({
       deps: {
         uuidGenerator,
         saveNotificationAndRelatedEvent,
-        oAuthConfig: config.proConnectConfig,
+        appConfig: config,
         generateEmailAuthCodeJwt,
       },
     }),
@@ -990,10 +990,10 @@ const instantiatedUseCasesFromFunctions = <
 >(
   lamdas: T,
 ): {
-  [K in keyof T]: T[K] extends (p: infer Input) => Promise<infer Output>
+    [K in keyof T]: T[K] extends (p: infer Input) => Promise<infer Output>
     ? InstantiatedUseCase<Input, Output, any>
     : never;
-} =>
+  } =>
   keys(lamdas).reduce(
     (acc, key) => ({
       ...acc,
@@ -1013,16 +1013,16 @@ const instantiatedUseCasesFromClasses = <
 >(
   useCases: T,
 ): {
-  [K in keyof T]: T[K] extends TransactionalUseCase<
-    infer Input,
-    infer Output,
-    infer JwtPayload
-  >
+    [K in keyof T]: T[K] extends TransactionalUseCase<
+      infer Input,
+      infer Output,
+      infer JwtPayload
+    >
     ? InstantiatedUseCase<Input, Output, JwtPayload>
     : T[K] extends UseCase<infer Input2, infer Output2, infer JwtPayload2>
-      ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
-      : never;
-} =>
+    ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
+    : never;
+  } =>
   keys(useCases).reduce(
     (acc, useCaseKey) => ({
       ...acc,
