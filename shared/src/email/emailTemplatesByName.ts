@@ -1870,9 +1870,10 @@ Profil du candidat :
     DISCUSSION_EXCHANGE_FORBIDDEN: {
       niceName: "Établissement - Réponse à candidature impossible",
       createEmailVariables: ({ reason, sender }) => ({
-        bypassLayout: true,
         subject: "Réponse à la candidature impossible",
+        greetings: "Bonjour",
         content: discussionExchangeForbidenContents[sender][reason],
+        subContent: defaultSignature("immersion"),
       }),
       tags: ["réponse candidature impossible"],
     },
@@ -2135,6 +2136,10 @@ export const discussionExchangeForbidenContents: Record<
   Record<DiscussionExchangeForbiddenReason, string>
 > = {
   establishment: {
+    user_unknown_or_missing_rights_on_establishment: `
+        Vous ne faites pas parti des contacts ou des administrateurs de l'entreprise sur Immersion Facilitée.
+        Veuillez vous rapprocher des administrateurs de l'entreprise accueillante si vous souhaitez pouvoir répondre à une candidature.
+    `,
     discussion_completed: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         Le candidat ne recevra pas votre message.`,
@@ -2145,6 +2150,9 @@ export const discussionExchangeForbidenContents: Record<
         Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
   },
   potentialBeneficiary: {
+    user_unknown_or_missing_rights_on_establishment: `
+        Vous n'êtes pas le candidat associé à cette candidature.
+    `,
     discussion_completed: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         L'entreprise ne recevra pas votre message.
