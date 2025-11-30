@@ -140,6 +140,7 @@ export const AgencyRightsTable = ({
                 onSubmit={onUserUpdateRequested}
                 routeName="myProfile"
                 hasCounsellorRoles={selectedAgencyHasCounsellorRoles}
+                isFTAgency={selectedAgencyRight.agency.kind === "pole-emploi"}
               />
             )}
           </userModal.Component>,
