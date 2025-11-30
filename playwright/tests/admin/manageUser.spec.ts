@@ -9,7 +9,7 @@ test.describe("Manage users in admin", () => {
   test.use({ storageState: testConfig.adminAuthFile });
 
   test("Can add a user to an agency", async ({ page }) => {
-    await addUserToAgency(page, "PE Paris");
+    await addUserToAgency(page, "Cap emploi Paris");
   });
 
   test("Can edit roles of a user", async ({ page }) => {
@@ -18,7 +18,7 @@ test.describe("Manage users in admin", () => {
     await fillAutocomplete({
       page,
       locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,
-      value: "PE Paris",
+      value: "Cap emploi Paris",
     });
     await expect(
       page.locator(`#${domElementIds.admin.agencyTab.agencyUsersTable}`),
@@ -69,5 +69,32 @@ test.describe("Manage users in admin", () => {
       )
       .click();
     await expect(page.locator(".fr-alert--success").first()).toBeVisible();
+  });
+
+  test("Can't add a counsellor role to a user in a FT agency", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await goToAdminTab(page, "adminAgencies");
+    await fillAutocomplete({
+      page,
+      locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,
+      value: "PE Paris",
+    });
+    await expect(
+      page.locator(`#${domElementIds.admin.agencyTab.agencyUsersTable}`),
+    ).toBeVisible();
+    await page
+      .locator(
+        `[id^=${domElementIds.admin.agencyTab.editAgencyUserRoleButton}]`,
+      )
+      .first()
+      .click();
+    const availableRolesCount = await page
+      .locator(
+        `[for^="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}"]`,
+      )
+      .count();
+    expect(availableRolesCount).toBe(3); // administrateur, validateur, lecteur
   });
 });
