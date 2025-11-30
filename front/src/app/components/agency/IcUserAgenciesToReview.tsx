@@ -180,6 +180,7 @@ export const IcUserAgenciesToReview = ({
                 agencyHasRefersTo={!!selectedAgency.refersToAgencyId}
                 routeName="adminAgencies"
                 hasCounsellorRoles={selectedAgencyHasCounsellorRoles}
+                isFTAgency={selectedAgency.kind === "pole-emploi"}
               />
             )
           ) : (

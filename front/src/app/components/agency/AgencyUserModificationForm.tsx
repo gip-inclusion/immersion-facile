@@ -30,6 +30,7 @@ export const AgencyUserModificationForm = ({
   routeName,
   hasCounsellorRoles,
   modalId,
+  isFTAgency,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
@@ -40,6 +41,7 @@ export const AgencyUserModificationForm = ({
   routeName: AgencyOverviewRouteName;
   hasCounsellorRoles: boolean;
   modalId: string;
+  isFTAgency: boolean;
 }) => {
   const onCloseModal = () => {
     reset(agencyUser);
@@ -75,7 +77,8 @@ export const AgencyUserModificationForm = ({
   };
 
   const availableRoles = keys(agencyRolesToDisplay).filter(
-    (role) => role !== "to-review",
+    (role) =>
+      role !== "to-review" && (isFTAgency ? role !== "counsellor" : true),
   );
   const checkboxOptions = availableRoles.map((availableRole) => {
     return {
