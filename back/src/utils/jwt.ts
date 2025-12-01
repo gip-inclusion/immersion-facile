@@ -3,10 +3,10 @@ import {
   type ConventionJwtPayload,
   type CreateConventionMagicLinkPayloadProperties,
   currentJwtVersions,
-  decodeJwtWithoutSignatureCheck,
   type Email,
   type EmailHash,
   errors,
+  getJwtExpiredSinceInSeconds,
 } from "shared";
 import type { JwtKind, VerifyJwtFn } from "../domains/core/jwt";
 import type { TimeGateway } from "../domains/core/time-gateway/ports/TimeGateway";
@@ -28,18 +28,21 @@ export const generateES256KeyPair = (): {
   });
 
 export const makeThrowIfIncorrectJwt =
-  <K extends JwtKind>(verfifyJwt: VerifyJwtFn<K>, timeGateway: TimeGateway) =>
+  <K extends JwtKind>(verifyJwt: VerifyJwtFn<K>, timeGateway: TimeGateway) =>
   (code: string) => {
     try {
-      verfifyJwt(code);
+      verifyJwt(code);
     } catch (error: any) {
       if (error?.message === "jwt expired") {
-        const decoded = decodeJwtWithoutSignatureCheck<{ exp: number }>(code);
-        const expiredSinceSeconds =
-          Math.floor(timeGateway.now().getTime() / 1000) - decoded.exp;
-        throw errors.user.expiredJwt(
-          `${Math.ceil(expiredSinceSeconds / 60)} minutes`,
+        const expiredSinceSeconds = getJwtExpiredSinceInSeconds(
+          code,
+          timeGateway.now(),
         );
+        if (expiredSinceSeconds) {
+          throw errors.user.expiredJwt(
+            `${Math.ceil(expiredSinceSeconds / 60)} minutes`,
+          );
+        }
       }
       throw errors.user.invalidJwt();
     }

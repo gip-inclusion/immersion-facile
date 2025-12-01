@@ -64,6 +64,7 @@ const topics = [
   "establishments-batch",
   "form-establishment",
   "login-by-email",
+  "magic-link-interstitial",
   "partner-conventions",
   "search-result",
   "send-signature-link",
@@ -673,6 +674,19 @@ export const feedbacks: Record<
         "Problème lors de la récupération de vos conventions qui ont eu des erreurs de diffusion",
       message:
         "Une erreur est survenue lors de la récupération de vos conventions qui ont eu des erreurs de diffusion",
+    },
+  },
+  "magic-link-interstitial": {
+    "fetch.success": {
+      action: authSlice.actions.confirmLoginByMagicLinkSucceeded,
+      title: "Connexion réussie",
+      message: "Vous êtes maintenant connecté à Immersion Facilitée",
+    },
+    "fetch.error": {
+      action: authSlice.actions.confirmLoginByMagicLinkFailed,
+      title: "Erreur de connexion",
+      message:
+        "Une erreur est survenue lors de la connexion via le lien magique",
     },
   },
   unused: {},

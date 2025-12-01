@@ -121,6 +121,10 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
       },
     },
   },
+  magicLinkInterstitial: {
+    label: "Connexion à Immersion Facilitée",
+    route: routes.magicLinkInterstitial({ email: "", code: "", state: "" }),
+  },
 };
 
 export const getBreadcrumbs = makeBreadcrumbsSegments<typeof breadcrumbs>(

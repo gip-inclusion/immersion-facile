@@ -92,7 +92,7 @@ const logout: AuthEpic = (
     filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
     switchMap((action) => {
       const { federatedIdentityWithUser } = state$.value.auth;
-      if (!federatedIdentityWithUser) throw errors.proConnect.missingOAuth({});
+      if (!federatedIdentityWithUser) throw errors.auth.missingOAuth({});
       const { provider } = federatedIdentityWithUser;
       if (
         provider === "proConnect" &&
@@ -177,6 +177,38 @@ const requestLoginByEmail: AuthEpic = (action$, _, { authGateway }) =>
     ),
   );
 
+const confirmLoginByMagicLink: AuthEpic = (
+  action$,
+  _,
+  { authGateway, navigationGateway },
+) =>
+  action$.pipe(
+    filter(authSlice.actions.confirmLoginByMagicLinkRequested.match),
+    switchMap((action) =>
+      authGateway
+        .confirmLoginByMagicLink$({
+          code: action.payload.code,
+          state: action.payload.state,
+        })
+        .pipe(
+          map((response) => {
+            const { redirectUri } = response;
+            navigationGateway.goToUrl(redirectUri);
+            return authSlice.actions.confirmLoginByMagicLinkSucceeded({
+              ...response,
+              feedbackTopic: action.payload.feedbackTopic,
+            });
+          }),
+          catchEpicError((error) =>
+            authSlice.actions.confirmLoginByMagicLinkFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const authEpics = [
   storeFederatedIdentityInDevice,
   checkConnectedWithFederatedIdentity,
@@ -186,4 +218,5 @@ export const authEpics = [
   clearAndRedirectAfterLoginFromDevice,
   checkRedirectionAfterLogin,
   requestLoginByEmail,
+  confirmLoginByMagicLink,
 ];

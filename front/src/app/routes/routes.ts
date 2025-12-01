@@ -290,6 +290,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.searchResultExternal}`,
   ),
+  magicLinkInterstitial: defineRoute(
+    {
+      code: param.query.string,
+      state: param.query.string,
+      email: param.query.string,
+    },
+    () => `/${frontRoutes.magicLinkInterstitial}`,
+  ),
   manageConvention: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.manageConvention}`,

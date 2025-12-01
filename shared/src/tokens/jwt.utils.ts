@@ -1,5 +1,6 @@
 import { decode } from "js-base64";
 import type { UserId } from "../user/user.dto";
+import { safeParseJson } from "../utils/json";
 import { currentJwtVersions } from "./jwt.dto";
 import type {
   ConnectedUserJwtPayload,
@@ -44,3 +45,23 @@ export const createConnectedUserJwtPayload = ({
   exp,
   version: currentJwtVersions.connectedUser,
 });
+
+export const getJwtExpiredSinceInSeconds = (jwt: string, now: Date) => {
+  const decoded = decodeJwtWithoutSignatureCheck<{ exp: number }>(jwt);
+  const expiredSinceSeconds = Math.floor(now.getTime() / 1000) - decoded.exp;
+  return expiredSinceSeconds > 0 ? expiredSinceSeconds : undefined;
+};
+
+export const handleJWTStringPossiblyContainingJsonError = (
+  // JWT errors are wrongly formatted as JSON strings in back/src/utils/jwt.ts
+  errorMessagePossiblyContainingJson: string,
+) => {
+  const parsedMessage = safeParseJson(errorMessagePossiblyContainingJson);
+  const isMessageJsonError =
+    parsedMessage !== null &&
+    typeof parsedMessage === "object" &&
+    "message" in parsedMessage;
+  return isMessageJsonError
+    ? (parsedMessage.message as string)
+    : errorMessagePossiblyContainingJson;
+};

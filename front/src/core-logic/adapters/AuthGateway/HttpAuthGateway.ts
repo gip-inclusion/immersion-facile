@@ -1,10 +1,12 @@
 import { from, type Observable } from "rxjs";
 import type {
   AbsoluteUrl,
+  AfterOAuthSuccessRedirectionResponse,
   AuthRoutes,
   ConnectedUser,
   ConnectedUserJwt,
   InitiateLoginByEmailParams,
+  OAuthSuccessLoginParams,
   WithIdToken,
   WithUserFilters,
 } from "shared";
@@ -18,7 +20,7 @@ import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 import { match } from "ts-pattern";
 
 export class HttpAuthGateway implements AuthGateway {
-  constructor(private readonly httpClient: HttpClient<AuthRoutes>) {}
+  constructor(private readonly httpClient: HttpClient<AuthRoutes>) { }
 
   loginByEmail$(params: InitiateLoginByEmailParams): Observable<void> {
     return from(
@@ -84,6 +86,25 @@ export class HttpAuthGateway implements AuthGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public confirmLoginByMagicLink$(
+    params: OAuthSuccessLoginParams,
+  ): Observable<AfterOAuthSuccessRedirectionResponse> {
+    return from(
+      this.httpClient
+        .afterOAuthLogin({
+          queryParams: params,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 302 }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 403 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
