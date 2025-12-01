@@ -57,8 +57,15 @@ jobs:
                     --no-privileges\
                     --no-comments\
                     --exit-on-error\
-                    --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
+                    --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql 2>&1 | awk '{print strftime(\"%Y-%m-%d %H:%M:%S\"), \$0; fflush()}' &&
                 echo \"> \$(date) - Finished restoring schema\" &&
+                  exit 0"
+      - name: Run DBT transformations
+        run: >-
+          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
+                echo \"> \$(date) - Starting DBT run\" &&
+                  cd bi && ./run_dbt.sh run &&
+                echo \"> \$(date) - DBT run completed successfully\" &&
                   exit 0"
 
 
