@@ -1,4 +1,4 @@
-import { expectObjectsToMatch, sleep } from "shared";
+import { expectObjectsToMatch, expectToEqual } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
@@ -9,10 +9,10 @@ import {
 import { diagorienteAppellationsRoutes } from "./DiagorienteAppellationsGateway.routes";
 
 describe("DiagorienteAppellationsGateway", () => {
+  const config = AppConfig.createFromEnv();
   let appellationsGateway: DiagorienteAppellationsGateway;
 
   beforeEach(() => {
-    const config = AppConfig.createFromEnv();
     appellationsGateway = new DiagorienteAppellationsGateway(
       createFetchSharedClient(diagorienteAppellationsRoutes, fetch),
       {
@@ -38,7 +38,7 @@ describe("DiagorienteAppellationsGateway", () => {
         await appellationsGateway.getAccessToken();
       const { access_token: newToken } =
         await appellationsGateway.getAccessToken();
-      expect(originalToken).toEqual(newToken);
+      expectToEqual(originalToken, newToken);
     });
   });
 
@@ -46,7 +46,6 @@ describe("DiagorienteAppellationsGateway", () => {
     it("fetches search corretly", async () => {
       const result = await appellationsGateway.searchAppellations("luthier");
 
-      await sleep(1000);
       expect(result).toEqual([
         {
           appellationCode: "16229",
@@ -189,7 +188,6 @@ describe("DiagorienteAppellationsGateway", () => {
     );
 
     it("fallsback to empty array when duration is over maximum", async () => {
-      const config = AppConfig.createFromEnv();
       const maxDurationMs = 100;
       const appellationsGatewayWithLowMaxDuration =
         new DiagorienteAppellationsGateway(
@@ -202,12 +200,31 @@ describe("DiagorienteAppellationsGateway", () => {
           maxDurationMs,
         );
 
-      const appellations =
+      expectToEqual(
         await appellationsGatewayWithLowMaxDuration.searchAppellations(
           "design",
+        ),
+        [],
+      );
+    });
+
+    it("fallsback to empty array when issue with access token", async () => {
+      const appellationsGatewayWithBadClientSecret =
+        new DiagorienteAppellationsGateway(
+          createFetchSharedClient(diagorienteAppellationsRoutes, fetch),
+          {
+            clientId: config.diagorienteApiClientId,
+            clientSecret: "BAD secret",
+          },
+          withNoCache,
         );
 
-      expect(appellations).toEqual([]);
+      expectToEqual(
+        await appellationsGatewayWithBadClientSecret.searchAppellations(
+          "design",
+        ),
+        [],
+      );
     });
   });
 });
