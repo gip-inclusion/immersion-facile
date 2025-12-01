@@ -101,6 +101,7 @@ export const makeTransferConventionToAgency = useCaseBuilder(
         deps.createNewEvent({
           topic: "ConventionTransferredToAgency",
           payload: {
+            convention: updatedConvention,
             conventionId: updatedConvention.id,
             agencyId: inputParams.agencyId,
             justification: inputParams.justification,
