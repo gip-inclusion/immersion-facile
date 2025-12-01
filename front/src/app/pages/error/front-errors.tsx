@@ -122,7 +122,7 @@ const EstablishmentDashboardButton: ErrorButton = (
   </Button>
 );
 
-const HomeButton: ErrorButton = (
+export const HomeButton: ErrorButton = (
   <Button
     priority="primary"
     linkProps={{

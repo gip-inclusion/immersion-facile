@@ -1,8 +1,11 @@
 import { z } from "zod";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { emailSchema } from "../email/email.schema";
 import { frontRoutes } from "../routes/route.utils";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import {
+  type AfterOAuthSuccessRedirectionResponse,
+  type AlreadyAuthenticatedUserQueryParams,
   allowedLoginSources,
   type InitiateLoginByEmailParams,
   type OAuthSuccessLoginParams,
@@ -57,4 +60,15 @@ export const oAuthSuccessLoginParamsSchema: ZodSchemaWithInputMatchingOutput<OAu
 export const withIdTokenSchema: ZodSchemaWithInputMatchingOutput<WithIdToken> =
   z.object({
     idToken: z.string(),
+  });
+
+export const alreadyAuthenticatedUserSchema: ZodSchemaWithInputMatchingOutput<AlreadyAuthenticatedUserQueryParams> =
+  z.object({
+    alreadyUsedAuthentication: z.literal(true),
+  });
+
+export const afterOAuthSuccessRedirectionResponseSchema: ZodSchemaWithInputMatchingOutput<AfterOAuthSuccessRedirectionResponse> =
+  z.object({
+    provider: z.enum(["proConnect", "email"]),
+    redirectUri: absoluteUrlSchema,
   });

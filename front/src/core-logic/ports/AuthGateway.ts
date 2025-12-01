@@ -1,9 +1,11 @@
 import type { Observable } from "rxjs";
 import type {
   AbsoluteUrl,
+  AfterOAuthSuccessRedirectionResponse,
   ConnectedUser,
   ConnectedUserJwt,
   InitiateLoginByEmailParams,
+  OAuthSuccessLoginParams,
   WithIdToken,
   WithUserFilters,
 } from "shared";
@@ -18,4 +20,7 @@ export interface AuthGateway {
     token: ConnectedUserJwt,
     filters: WithUserFilters,
   ) => Observable<ConnectedUser[]>;
+  confirmLoginByMagicLink$(
+    params: OAuthSuccessLoginParams,
+  ): Observable<AfterOAuthSuccessRedirectionResponse>;
 }
