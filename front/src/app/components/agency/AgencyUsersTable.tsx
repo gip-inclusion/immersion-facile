@@ -71,6 +71,7 @@ export const AgencyUsersTable = ({
             {
               children: "Modifier",
               priority: "secondary",
+              className: fr.cx("fr-my-1v", "fr-my-md-0"),
               disabled:
                 agency.refersToAgencyId !== null &&
                 agencyUser.agencyRights[agency.id].roles.includes("validator"),
@@ -89,6 +90,7 @@ export const AgencyUsersTable = ({
               disabled:
                 agency.refersToAgencyId !== null &&
                 agencyUser.agencyRights[agency.id].roles.includes("validator"),
+              className: fr.cx("fr-my-1v", "fr-my-md-0"),
               id: `${
                 routeName === "adminAgencies" ||
                 routeName === "adminAgencyDetail"
