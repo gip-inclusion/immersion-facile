@@ -27,7 +27,19 @@ export const makeGetConnectedUsers = useCaseBuilder("GetConnectedUsers")
 
     const users = await getConnectedUsersByUserIds(uow, userIds, agencyId);
 
-    return users.sort((a, b) =>
-      a.lastName.toLowerCase() < b.lastName.toLowerCase() ? -1 : 1,
-    );
+    return users.sort((a, b) => {
+      const firstNameA = a.firstName.trim();
+      const firstNameB = b.firstName.trim();
+
+      const isAEmpty = firstNameA === "";
+      const isBEmpty = firstNameB === "";
+
+      if (isAEmpty !== isBEmpty) return isAEmpty ? -1 : 1;
+      if (isAEmpty && isBEmpty) return a.email.localeCompare(b.email);
+
+      const compareFirstName = firstNameA.localeCompare(firstNameB);
+      return compareFirstName !== 0
+        ? compareFirstName
+        : a.lastName.trim().localeCompare(b.lastName.trim());
+    });
   });
