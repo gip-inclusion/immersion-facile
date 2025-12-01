@@ -1,3 +1,4 @@
+import subDays from "date-fns/subDays";
 import { partition, uniqBy } from "ramda";
 import {
   type AbsoluteUrl,
@@ -153,13 +154,17 @@ export class SendAssessmentNeededNotifications extends UseCase<
         },
         sortBy: "dateStart",
       });
+
     const conventionsUpdatedInRangeAndEndingUpToRange =
       await this.#outOfTransaction.conventionQueries.getConventions({
         filters: {
           endDate: {
             to: params.conventionEndDate.to,
           },
-          updateDate: params.conventionEndDate,
+          updateDate: {
+            from: subDays(params.conventionEndDate.from, 2),
+            to: params.conventionEndDate.to,
+          },
           withStatuses: validatedConventionStatuses,
         },
         sortBy: "dateStart",

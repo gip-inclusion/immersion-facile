@@ -306,7 +306,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("getConventionsByFilters", () => {
+  describe("getConventions", () => {
     const agency = AgencyDtoBuilder.create()
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff")
       .build();
