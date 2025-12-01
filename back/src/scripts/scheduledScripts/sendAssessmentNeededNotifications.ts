@@ -21,7 +21,7 @@ import { handleCRONScript } from "../handleCRONScript";
 import { getDateRangeFromScriptParams } from "../utils";
 
 /**
- *  we can pass date params to this script like this: pnpm back trigger-sending-emails-with-assessment-creation-link 2024-07-01 2024-01-24
+ *  we can pass date params to this script like this: pnpm back trigger-sending-assessment-needed-notifications 2024-07-01 2024-01-24
  */
 
 const logger = createLogger(__filename);
