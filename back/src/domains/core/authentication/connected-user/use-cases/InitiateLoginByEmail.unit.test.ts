@@ -3,10 +3,12 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   type UserWithAdminRights,
 } from "shared";
+import { AppConfigBuilder } from "../../../../../utils/AppConfigBuilder";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -35,8 +37,6 @@ describe("RequestLoginByEmail usecase", () => {
 
   const fakeJwt = "fake-email-auth-jwt";
   const fakeGenerateEmailAuthCode: GenerateEmailAuthCodeJwt = () => fakeJwt;
-
-  const baseUrl = "http://after-login.com";
   const redirectUri = // must be allowed by the schema
     "/tableau-de-bord-etablissement/discussions?discussionId=any-discussion-id";
 
@@ -48,7 +48,7 @@ describe("RequestLoginByEmail usecase", () => {
     createdAt: new Date().toISOString(),
     proConnect: null,
   };
-
+  const testDomain = "after-login.com";
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
@@ -66,16 +66,11 @@ describe("RequestLoginByEmail usecase", () => {
         ),
         uuidGenerator,
         generateEmailAuthCodeJwt: fakeGenerateEmailAuthCode,
-        oAuthConfig: {
-          clientId: "",
-          clientSecret: "",
-          immersionRedirectUri: {
-            afterLogin: "http://after-login.com",
-            afterLogout: "http://after-logout.com",
-          },
-          providerBaseUri: "https://toto.com",
-          scope: "",
-        },
+        appConfig: new AppConfigBuilder()
+          .withConfigParams({
+            DOMAIN: testDomain,
+          })
+          .build(),
       },
     });
   });
@@ -132,7 +127,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
+            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}`,
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,
@@ -176,7 +171,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
+            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}`,
             fullname: "",
           },
           recipients: [user.email],
@@ -201,7 +196,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
+            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}`,
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,

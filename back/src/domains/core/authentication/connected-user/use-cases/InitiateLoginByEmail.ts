@@ -1,4 +1,6 @@
 import {
+  type Email,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   type InitiateLoginByEmailParams,
   immersionFacileNoReplyEmailSender,
@@ -6,7 +8,7 @@ import {
   type OAuthSuccessLoginParams,
   queryParamsAsString,
 } from "shared";
-import type { OAuthConfig } from "../../../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
 import type { GenerateEmailAuthCodeJwt } from "../../../jwt";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../useCaseBuilder";
@@ -19,7 +21,7 @@ export const makeInitiateLoginByEmail = useCaseBuilder("InitiateLoginByEmail")
   .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     uuidGenerator: UuidGenerator;
-    oAuthConfig: OAuthConfig;
+    appConfig: AppConfig;
     generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt;
   }>()
   .build(async ({ inputParams: { email, redirectUri }, uow, deps }) => {
@@ -48,10 +50,15 @@ export const makeInitiateLoginByEmail = useCaseBuilder("InitiateLoginByEmail")
           sender: immersionFacileNoReplyEmailSender,
           params: {
             loginLink: `${
-              deps.oAuthConfig.immersionRedirectUri.afterLogin
-            }?${queryParamsAsString<OAuthSuccessLoginParams>({
+              deps.appConfig.immersionFacileBaseUrl
+            }/${frontRoutes.magicLinkInterstitial}?${queryParamsAsString<
+              OAuthSuccessLoginParams & {
+                email: Email;
+              }
+            >({
               code: deps.generateEmailAuthCodeJwt({ version: 1 }),
               state,
+              email,
             })}`,
             fullname:
               user?.firstName && user.lastName
