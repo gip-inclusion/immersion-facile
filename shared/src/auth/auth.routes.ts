@@ -38,11 +38,15 @@ export const authRoutes = defineRoutes({
       200: expressEmptyResponseBody,
     },
   }),
-  afterOAuthSuccessRedirection: defineRoute({
+  afterOAuthSuccess: defineRoute({
     method: "get",
     url: "/inclusion-connect-after-login", // URI déclarée chez ProConnect, ne pas toucher sauf si on change la config chez ProConnect
     queryParamsSchema: oAuthSuccessLoginParamsSchema,
     responses: {
+      200: z.object({
+        redirectUri: absoluteUrlSchema,
+        provider: z.enum(["email", "proConnect"]),
+      }),
       302: emptyObjectSchema,
     },
   }),

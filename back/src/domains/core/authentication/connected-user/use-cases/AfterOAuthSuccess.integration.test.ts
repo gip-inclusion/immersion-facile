@@ -20,9 +20,9 @@ import {
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { GetAccessTokenPayload } from "../port/OAuthGateway";
-import { AfterOAuthSuccessRedirection } from "./AfterOAuthSuccessRedirection";
+import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
 
-describe("AfterOAuthSuccessRedirection use case", () => {
+describe("AfterOAuthSuccess use case", () => {
   const correctToken = "my-correct-token";
   const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
   const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
@@ -38,7 +38,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
   let db: KyselyDb;
   let uow: UnitOfWork;
   let oAuthGateway: InMemoryOAuthGateway;
-  let afterOAuthSuccessRedirection: AfterOAuthSuccessRedirection;
+  let afterOAuthSuccessRedirection: AfterOAuthSuccess;
   let timeGateway: CustomTimeGateway;
 
   beforeAll(async () => {
@@ -48,7 +48,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     const uuidGenerator = new UuidV4Generator();
     oAuthGateway = new InMemoryOAuthGateway(fakeProviderConfig);
     timeGateway = new CustomTimeGateway();
-    afterOAuthSuccessRedirection = new AfterOAuthSuccessRedirection(
+    afterOAuthSuccessRedirection = new AfterOAuthSuccess(
       new PgUowPerformer(db, createPgUow),
       makeCreateNewEvent({
         timeGateway,

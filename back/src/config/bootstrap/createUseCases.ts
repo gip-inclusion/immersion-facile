@@ -80,7 +80,7 @@ import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/De
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
-import { AfterOAuthSuccessRedirection } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccessRedirection";
+import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccess";
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
 import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
 import { InitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
@@ -283,7 +283,7 @@ export const createUseCases = ({
         uuidGenerator,
         gateways.oAuthGateway,
       ),
-      afterOAuthSuccessRedirection: new AfterOAuthSuccessRedirection(
+      afterOAuthSuccessRedirection: new AfterOAuthSuccess(
         uowPerformer,
         createNewEvent,
         gateways.oAuthGateway,
@@ -952,7 +952,7 @@ export const createUseCases = ({
       deps: {
         uuidGenerator,
         saveNotificationAndRelatedEvent,
-        oAuthConfig: config.proConnectConfig,
+        appConfig: config,
         generateEmailAuthCodeJwt,
       },
     }),

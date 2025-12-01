@@ -50,7 +50,7 @@ describe("GetOAuthLogoutUrl", () => {
       uow.ongoingOAuthRepository.ongoingOAuths = [];
       await expectPromiseToFailWithError(
         getOAuthLogoutUrl.execute({ idToken: "whatever" }, user),
-        errors.proConnect.missingOAuth({}),
+        errors.auth.missingOAuth({}),
       );
     });
 

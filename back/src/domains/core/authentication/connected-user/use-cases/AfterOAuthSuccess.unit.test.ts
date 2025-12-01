@@ -31,7 +31,7 @@ import {
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { GetAccessTokenPayload } from "../port/OAuthGateway";
-import { AfterOAuthSuccessRedirection } from "./AfterOAuthSuccessRedirection";
+import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
 
 describe("AfterOAuthSuccessRedirection use case", () => {
   const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
@@ -56,7 +56,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
   let uow: InMemoryUnitOfWork;
   let oAuthGateway: InMemoryOAuthGateway;
   let uuidGenerator: TestUuidGenerator;
-  let afterOAuthSuccessRedirection: AfterOAuthSuccessRedirection;
+  let afterOAuthSuccessRedirection: AfterOAuthSuccess;
   let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
@@ -66,7 +66,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     timeGateway = new CustomTimeGateway();
     const verifyEmailAuthCode = makeVerifyJwtES256<"emailAuthCode">(publicKey);
 
-    afterOAuthSuccessRedirection = new AfterOAuthSuccessRedirection(
+    afterOAuthSuccessRedirection = new AfterOAuthSuccess(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
         timeGateway: timeGateway,
@@ -359,23 +359,25 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       });
 
       describe("handle dynamic login pages", () => {
-        it.each(
-          allowedLoginSources,
-        )("generates an app token and returns a redirection url which includes token and user data for %s", async (page) => {
-          const { initialOngoingOAuth, fromUri } =
-            makeSuccessfulAuthenticationConditions(
-              `/${page}?discussionId=discussion0`,
-            );
+        it.each(allowedLoginSources)(
+          "generates an app token and returns a redirection url which includes token and user data for %s",
+          async (page) => {
+            const { initialOngoingOAuth, fromUri } =
+              makeSuccessfulAuthenticationConditions(
+                `/${page}?discussionId=discussion0`,
+              );
 
-          const redirectedUrl = await afterOAuthSuccessRedirection.execute({
-            code: "my-code",
-            state: initialOngoingOAuth.state,
-          });
+            const response = await afterOAuthSuccessRedirection.execute({
+              code: "my-code",
+              state: initialOngoingOAuth.state,
+            });
 
-          expect(redirectedUrl).toBe(
-            `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
-          );
-        });
+            expectToEqual(response, {
+              provider: "proConnect",
+              redirectUri: `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
+            });
+          },
+        );
       });
     });
 
@@ -453,7 +455,10 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           code: generateEmailAuthCode({ version: 1 }),
           state: initialOngoingOAuth.state,
         });
-        expectToEqual(result, expect.any(String));
+        expectToEqual(result, {
+          provider: "email",
+          redirectUri: `${immersionBaseUrl}/admin?token=${correctToken}&firstName=&lastName=&email=my-email@mail.com&idToken=&provider=email`,
+        });
       });
 
       it("throws if token is NOT from the server", async () => {
@@ -461,7 +466,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         const verifyEmailAuthCode =
           makeVerifyJwtES256<"emailAuthCode">(otherPrivateKey);
 
-        afterOAuthSuccessRedirection = new AfterOAuthSuccessRedirection(
+        afterOAuthSuccessRedirection = new AfterOAuthSuccess(
           new InMemoryUowPerformer(uow),
           makeCreateNewEvent({
             timeGateway: timeGateway,
@@ -500,9 +505,9 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           }),
           errors.user.expiredJwt(
             (timeGateway.now().getTime() - expirationDate.getTime()) /
-              1000 /
-              60 +
-              " minutes",
+            1000 /
+            60 +
+            " minutes",
           ),
         );
       });
@@ -553,9 +558,10 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           },
         ]);
 
-        expect(redirectedUrl).toBe(
-          `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
-        );
+        expectToEqual(redirectedUrl, {
+          provider: "email",
+          redirectUri: `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
+        });
       });
     });
   });
@@ -575,20 +581,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
-      const loginUrl = await afterOAuthSuccessRedirection.execute({
-        code: "osef",
-        state: initialOngoingOAuth.state,
-      });
-
-      expectToEqual(
-        loginUrl,
-        `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
+      expectPromiseToFailWithError(
+        afterOAuthSuccessRedirection.execute({
+          code: "osef",
+          state: initialOngoingOAuth.state,
+        }),
+        new Error("Already used authentication"), // temp
       );
-
-      expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-        initialOngoingOAuth,
-      ]);
-      expectToEqual(uow.userRepository.users, []);
     });
 
     it("proConnect", async () => {
@@ -602,15 +601,15 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
-      const loginUrl = await afterOAuthSuccessRedirection.execute({
+      const response = await afterOAuthSuccessRedirection.execute({
         code: "osef",
         state: initialOngoingOAuth.state,
       });
 
-      expectToEqual(
-        loginUrl,
-        `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
-      );
+      expectToEqual(response, {
+        redirectUri: `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
+        provider: "proConnect",
+      });
 
       expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
         initialOngoingOAuth,
@@ -667,12 +666,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       proConnect:
         options.externalId !== null
           ? {
-              externalId:
-                options.externalId !== undefined
-                  ? options.externalId
-                  : defaultExpectedIcIdTokenPayload.sub,
-              siret: defaultExpectedIcIdTokenPayload.siret,
-            }
+            externalId:
+              options.externalId !== undefined
+                ? options.externalId
+                : defaultExpectedIcIdTokenPayload.sub,
+            siret: defaultExpectedIcIdTokenPayload.siret,
+          }
           : null,
       createdAt: new Date().toISOString(),
     };

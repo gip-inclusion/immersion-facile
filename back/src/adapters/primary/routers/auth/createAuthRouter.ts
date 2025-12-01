@@ -17,11 +17,16 @@ export const createAuthRouter = (deps: AppDependencies) => {
     ),
   );
 
-  authSharedRouter.afterOAuthSuccessRedirection((req, res) =>
-    sendRedirectResponse(req, res, () =>
-      deps.useCases.afterOAuthSuccessRedirection.execute(req.query),
-    ),
-  );
+  authSharedRouter.afterOAuthLogin(async (req, res) => {
+    return sendHttpResponse(req, res, async () => {
+      const useCaseResult =
+        await deps.useCases.afterOAuthSuccessRedirection.execute(req.query);
+      if (useCaseResult.provider === "proConnect") {
+        return res.status(302).redirect(useCaseResult.redirectUri);
+      }
+      return useCaseResult;
+    });
+  });
 
   authSharedRouter.initiateLoginByEmail((req, res) =>
     sendHttpResponse(req, res, () =>
