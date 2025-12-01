@@ -89,7 +89,7 @@ describe("auth router", () => {
           `${displayRouteName(
             authRoutes.initiateLoginByOAuth,
           )} 302 > [ProConnect]/login-pro-connect - 302 > ${displayRouteName(
-            authRoutes.afterOAuthSuccess,
+            authRoutes.afterOAuthLogin,
           )} 302 > page %s with required connected user params`,
           async (page) => {
             const generatedUserId = "my-user-id";
@@ -133,7 +133,7 @@ describe("auth router", () => {
               },
             });
 
-            const response = await httpClient.afterOAuthSuccess({
+            const response = await httpClient.afterOAuthLogin({
               queryParams: {
                 code: authCode,
                 state,
@@ -231,7 +231,7 @@ describe("auth router", () => {
           },
         });
 
-        const response = await httpClient.afterOAuthSuccess({
+        const response = await httpClient.afterOAuthLogin({
           queryParams: {
             code: authCode,
             state,
@@ -263,7 +263,7 @@ describe("auth router", () => {
           `${displayRouteName(
             authRoutes.initiateLoginByEmail,
           )} 200 | EMAIL with connexion link > ${displayRouteName(
-            authRoutes.afterOAuthSuccess,
+            authRoutes.afterOAuthLogin,
           )} 200 > page %s with required connected user params`,
           async (uri) => {
             const email: Email = "mail@email.com";
@@ -306,7 +306,7 @@ describe("auth router", () => {
               throw new Error(
                 `missing code on url ${notification.templatedContent.params.loginLink}`,
               );
-            const response = await httpClient.afterOAuthSuccess({
+            const response = await httpClient.afterOAuthLogin({
               queryParams: {
                 code,
                 state,

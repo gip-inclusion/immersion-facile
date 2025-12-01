@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AbsoluteUrl,
+  AfterOAuthSuccessRedirectionResponse,
   Email,
   FederatedIdentity,
   WithRedirectUri,
@@ -28,7 +29,7 @@ export interface AuthState {
   afterLoginRedirectionUrl: AbsoluteUrl | null;
 }
 
-const initialState: AuthState = {
+export const initialAuthState: AuthState = {
   isLoading: true,
   isRequestingLoginByEmail: false,
   federatedIdentityWithUser: null,
@@ -48,7 +49,7 @@ const onFederatedIdentityReceived = (
 
 export const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState: initialAuthState,
   reducers: {
     saveRedirectionAfterLoginRequested: (
       _state,
@@ -117,6 +118,28 @@ export const authSlice = createSlice({
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isRequestingLoginByEmail = false;
+    },
+    confirmLoginByMagicLinkRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        code: string;
+        state: string;
+        email: Email;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    confirmLoginByMagicLinkSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<AfterOAuthSuccessRedirectionResponse>,
+    ) => {
+      state.isLoading = false;
+    },
+    confirmLoginByMagicLinkFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
     },
   },
 });

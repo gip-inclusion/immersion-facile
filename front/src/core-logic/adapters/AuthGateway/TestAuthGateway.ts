@@ -1,13 +1,17 @@
 import { type Observable, Subject } from "rxjs";
 import type {
   AbsoluteUrl,
+  AfterOAuthSuccessRedirectionResponse,
   ConnectedUser,
   InitiateLoginByEmailParams,
+  OAuthSuccessLoginParams,
 } from "shared";
 import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 
 export class TestAuthGateway implements AuthGateway {
   public loginByEmailResponse$ = new Subject<void>();
+  public confirmLoginByMagicLinkResponse$ =
+    new Subject<AfterOAuthSuccessRedirectionResponse>();
 
   public getLogoutUrlResponse$ = new Subject<AbsoluteUrl>();
 
@@ -28,5 +32,11 @@ export class TestAuthGateway implements AuthGateway {
 
   public getConnectedUsers$(): Observable<ConnectedUser[]> {
     return this.getConnectedUsersResponse$;
+  }
+
+  public confirmLoginByMagicLink$(
+    _params: OAuthSuccessLoginParams,
+  ): Observable<AfterOAuthSuccessRedirectionResponse> {
+    return this.confirmLoginByMagicLinkResponse$;
   }
 }

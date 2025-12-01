@@ -11,6 +11,7 @@ import {
   type AuthState,
   authSlice,
   type FederatedIdentityWithUser,
+  initialAuthState,
 } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
@@ -453,6 +454,65 @@ describe("Auth slice", () => {
           message: errorMessage,
         },
       );
+    });
+  });
+  describe("login by magic link", () => {
+    it("should handle login by magic link confirmation successfully and redirect to the given redirectUri", () => {
+      expectAuthStateToBe(initialAuthState);
+      const redirectUri = "http://fake-url.com/if/establishment";
+      store.dispatch(
+        authSlice.actions.confirmLoginByMagicLinkRequested({
+          code: "fake-code",
+          state: "fake-state",
+          email: "email@mail.com",
+          feedbackTopic: "magic-link-interstitial",
+        }),
+      );
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isLoading: true,
+      });
+      dependencies.authGateway.confirmLoginByMagicLinkResponse$.next({
+        ...connectedUserFederatedIdentity,
+        redirectUri,
+      });
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isLoading: false,
+      });
+      expectToEqual(dependencies.navigationGateway.wentToUrls, [redirectUri]);
+    });
+    it("should handle login by magic link confirmation failed", () => {
+      expectAuthStateToBe(initialAuthState);
+      store.dispatch(
+        authSlice.actions.confirmLoginByMagicLinkRequested({
+          code: "fake-code",
+          state: "fake-state",
+          email: "email@mail.com",
+          feedbackTopic: "magic-link-interstitial",
+        }),
+      );
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isLoading: true,
+      });
+      const errorMessage = "Error message from gateway";
+      dependencies.authGateway.confirmLoginByMagicLinkResponse$.error(
+        new Error(errorMessage),
+      );
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isLoading: false,
+      });
+      expectToEqual(dependencies.navigationGateway.wentToUrls, []);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "magic-link-interstitial": {
+          on: "fetch",
+          level: "error",
+          title: "Erreur de connexion",
+          message: errorMessage,
+        },
+      });
     });
   });
 

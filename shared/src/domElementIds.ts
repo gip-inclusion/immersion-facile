@@ -892,6 +892,9 @@ export const domElementIds = {
       contactSupport: "im-login-form__contact-support-link--manage-discussion",
     },
   },
+  magicLinkInterstitial: {
+    confirmLoginButton: "im-magic-link-interstitial__confirm-login-button",
+  },
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
     tabContainer: "im-establishment-dashboard__tab-container",
