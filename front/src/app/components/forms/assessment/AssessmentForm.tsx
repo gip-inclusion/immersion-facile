@@ -243,7 +243,7 @@ const AssessmentStatusSection = ({
         <div className={fr.cx("fr-col-lg-7")}>
           <RadioButtons
             id={domElementIds.assessment.statusInput}
-            legend="L'immersion a-t-elle été effectuée ?"
+            legend="L'immersion a-t-elle été effectuée ? *"
             options={assessmentStatuses.map((value) => ({
               label: getLabels(convention.internshipKind)[value],
               nativeInputProps: {
@@ -266,7 +266,7 @@ const AssessmentStatusSection = ({
           {formValues.status === "PARTIALLY_COMPLETED" && (
             <>
               <Input
-                label="S’il y a eu une fin d’immersion anticipée, quelle a été la date du dernier jour de présence en entreprise ?"
+                label="S’il y a eu une fin d’immersion anticipée, quelle a été la date du dernier jour de présence en entreprise ? *"
                 hintText={`Date indiquée dans la convention : ${toDisplayedDate(
                   {
                     date: convertLocaleDateToUtcTimezoneDate(
@@ -404,7 +404,7 @@ const AssessmentContractSection = ({
   return (
     <>
       <RadioButtons
-        legend="L'immersion a-t-elle débouché sur une embauche ?"
+        legend="L'immersion a-t-elle débouché sur une embauche ? *"
         id={domElementIds.assessment.endedWithAJobInput}
         options={[
           {
@@ -434,7 +434,7 @@ const AssessmentContractSection = ({
         <div className={fr.cx("fr-grid-row", "fr-mb-4w")}>
           <div className={fr.cx("fr-col-lg-5")}>
             <Select
-              label="Type de contrat associé à l’embauche :"
+              label="Type de contrat associé à l’embauche : *"
               id={domElementIds.assessment.typeOfContractInput}
               options={typeOfContracts.map((contractType) => ({
                 label: contractType,
@@ -447,7 +447,7 @@ const AssessmentContractSection = ({
             />
 
             <Input
-              label="Date de début du contrat :"
+              label="Date de début du contrat : *"
               nativeInputProps={{
                 ...register("contractStartDate"),
                 id: domElementIds.assessment.contractStartDateInput,
@@ -516,7 +516,7 @@ const AssessmentCommentsSection = ({
         />
         <Input
           textArea
-          label="Avez-vous une appréciation générale à donner sur l'immersion ?"
+          label="Avez-vous une appréciation générale à donner sur l'immersion ? *"
           nativeTextAreaProps={{
             ...register("establishmentFeedback"),
             id: domElementIds.assessment.establishmentAdvicesInput,
@@ -525,7 +525,7 @@ const AssessmentCommentsSection = ({
         />
         <Input
           textArea
-          label="Sur la base de l'objectif de l'immersion et du métier observé, quels conseils donneriez-vous au candidat pour la suite de son parcours professionnel ?"
+          label="Sur la base de l'objectif de l'immersion et du métier observé, quels conseils donneriez-vous au candidat pour la suite de son parcours professionnel ? *"
           nativeTextAreaProps={{
             ...register("establishmentAdvices"),
             id: domElementIds.assessment.establishmentFeedbackInput,
