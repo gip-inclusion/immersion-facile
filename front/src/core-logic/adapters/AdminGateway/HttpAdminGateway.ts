@@ -17,7 +17,6 @@ import {
   type UserParamsForAgency,
   type UserWithNumberOfAgenciesAndEstablishments,
   type WithAgencyIdAndUserId,
-  type WithUserFilters,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -112,25 +111,6 @@ export class HttpAdminGateway implements AdminGateway {
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 403) }, logBodyAndThrow)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
-
-  public getConnectedUsersToReview$(
-    token: ConnectedUserJwt,
-    filters: WithUserFilters,
-  ): Observable<ConnectedUser[]> {
-    return from(
-      this.httpClient
-        .getConnectedUsers({
-          queryParams: filters,
-          headers: { authorization: token },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, ({ body }) => body)
-            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

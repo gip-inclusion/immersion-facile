@@ -3,8 +3,10 @@ import type {
   AbsoluteUrl,
   AuthRoutes,
   ConnectedUser,
+  ConnectedUserJwt,
   InitiateLoginByEmailParams,
   WithIdToken,
+  WithUserFilters,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -17,6 +19,7 @@ import { match } from "ts-pattern";
 
 export class HttpAuthGateway implements AuthGateway {
   constructor(private readonly httpClient: HttpClient<AuthRoutes>) {}
+
   loginByEmail$(params: InitiateLoginByEmailParams): Observable<void> {
     return from(
       this.httpClient
@@ -61,6 +64,25 @@ export class HttpAuthGateway implements AuthGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getConnectedUsers$(
+    token: ConnectedUserJwt,
+    filters: WithUserFilters,
+  ): Observable<ConnectedUser[]> {
+    return from(
+      this.httpClient
+        .getConnectedUsers({
+          queryParams: filters,
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
             .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
