@@ -80,10 +80,10 @@ export class AppellationSearch extends TransactionalUseCase<
     const appellations =
       await this.#appellationsGateway.searchAppellations(searchText);
 
-    if (appellations.length === 0) return [];
-
-    return uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-      appellations.map(({ appellationCode }) => appellationCode),
-    );
+    return appellations.length > 0
+      ? uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+          appellations.map(({ appellationCode }) => appellationCode),
+        )
+      : [];
   }
 }
