@@ -163,7 +163,11 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                sender: "establishment",
+                htmlContent: `
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
+                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
@@ -244,7 +248,11 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                sender: "potentialBeneficiary",
+                htmlContent: `
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
+                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
@@ -311,7 +319,11 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                sender: "establishment",
+                htmlContent: `
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
+                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
@@ -362,7 +374,11 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                sender: "establishment",
+                htmlContent: `
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
+                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
@@ -409,6 +425,7 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
+                sender: "potentialBeneficiary",
                 htmlContent: expect.any(String),
                 subject: lastBeneficiaryExchange.subject,
               },
