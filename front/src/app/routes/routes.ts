@@ -86,10 +86,16 @@ export type FrontRouteKeys = keyof typeof routes;
 
 const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
 
-const agencyDashboard = defineRoute(connectedUserParams, () => [
-  `/${frontRoutes.agencyDashboard}`,
-  "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
-]);
+const agencyDashboard = defineRoute(
+  {
+    ...connectedUserParams,
+    isAgencyRegistration: param.query.optional.boolean,
+  },
+  () => [
+    `/${frontRoutes.agencyDashboard}`,
+    "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
+  ],
+);
 
 const establishmentDashboard = defineRoute(
   connectedUserParams,

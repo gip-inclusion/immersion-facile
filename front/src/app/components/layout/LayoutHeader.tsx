@@ -244,7 +244,8 @@ export const LayoutHeader = () => {
           text: "Inscrire mon organisme",
           isActive: currentRoute.name === routes.addAgency().name,
           linkProps: {
-            ...routes.agencyDashboardAgencies().link,
+            ...routes.agencyDashboardAgencies({ isAgencyRegistration: true })
+              .link,
             id: agencyIds.agencyDashboardAgencies,
           },
         },
