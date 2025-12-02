@@ -1660,7 +1660,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       }),
     },
     CONTACT_BY_EMAIL_REQUEST: {
-      niceName: "Établissement - Mise en relation par mail",
+      niceName: "Établissement - MER - instructions par mail",
       tags: ["mise en relation mail"],
       createEmailVariables: (params) => ({
         subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
@@ -1706,7 +1706,7 @@ Profil du candidat :
           content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton ci-dessus)
+          - répondre directement à cet email, il lui sera transmis. ${establishmentReplyWarning}
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${params.potentialBeneficiaryPhone}`,
         },
@@ -1744,7 +1744,7 @@ Profil du candidat :
       }),
     },
     CONTACT_BY_EMAIL_REQUEST_LEGACY: {
-      niceName: "Établissement - Mise en relation par mail (Legacy)",
+      niceName: "Établissement - MER - instructions par mail (Legacy)",
       tags: ["mise en relation mail"],
       createEmailVariables: ({
         appellationLabel,
@@ -1791,7 +1791,7 @@ Profil du candidat :
           content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton "Écrire au candidat" ci-dessus)
+          - répondre directement à cet email, il lui sera transmis. ${establishmentReplyWarning}
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
         },
@@ -1800,7 +1800,7 @@ Profil du candidat :
       }),
     },
     CONTACT_BY_PHONE_INSTRUCTIONS: {
-      niceName: "Établissement - Indication de mise en relation par téléphone",
+      niceName: "Établissement - MER - instructions par téléphone",
       tags: ["mise en relation tel"],
       createEmailVariables: ({
         businessName,
@@ -1829,7 +1829,7 @@ Profil du candidat :
       }),
     },
     CONTACT_IN_PERSON_INSTRUCTIONS: {
-      niceName: "Établissement - Indication de mise en relation en personne",
+      niceName: "Établissement - MER - instructions en personne",
       tags: ["mise en relation en personne"],
       createEmailVariables: ({
         welcomeAddress,
@@ -1860,16 +1860,22 @@ Profil du candidat :
 
     DISCUSSION_EXCHANGE: {
       niceName:
-        "Établissement - Échange entre établissement et potentiel bénéficiaire",
+        "Établissement - MER - Échange entre établissement et potentiel bénéficiaire",
       tags: ["échange établissement potentiel bénéficiaire"],
-      createEmailVariables: ({ subject, htmlContent }) => ({
+      createEmailVariables: ({ subject, htmlContent, sender }) => ({
         bypassLayout: true,
         subject,
-        content: htmlContent,
+        content:
+          sender === "establishment"
+            ? htmlContent
+            : `
+          ⚠️ Important : ${establishmentReplyWarning}
+          ${htmlContent}
+        `,
       }),
     },
     DISCUSSION_EXCHANGE_FORBIDDEN: {
-      niceName: "MER - Réponse à candidature impossible",
+      niceName: "Établissement - MER - Réponse à candidature impossible",
       createEmailVariables: ({ reason, sender, admins }) => ({
         subject: "Réponse à la candidature impossible",
         greetings: "Bonjour",
@@ -1879,7 +1885,7 @@ Profil du candidat :
       tags: ["réponse candidature impossible"],
     },
     DISCUSSION_BENEFICIARY_FOLLOW_UP: {
-      niceName: "MER - Candidat - Relance par téléphone",
+      niceName: "Établissement - MER - Relance par téléphone pour candidat",
       tags: ["mer_candidat_relanceParTelephone"],
       createEmailVariables: ({
         businessName,
@@ -1949,7 +1955,7 @@ Profil du candidat :
       }),
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
-      niceName: "MER - Etablissement - Clôture automatique",
+      niceName: "Établissement - MER - Clôture automatique pour entreprise",
       tags: ["MER_etablissement_clotureAutomatique"],
       createEmailVariables: ({
         beneficiaryFirstName,
@@ -1981,7 +1987,7 @@ Profil du candidat :
       }),
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
-      niceName: "MER - Candidat - Clôture automatique",
+      niceName: "Établissement - MER - Clôture automatique pour candidat",
       tags: ["MER_candidat_clotureAutomatique"],
       createEmailVariables: ({
         discussionCreatedAt,
@@ -2145,7 +2151,7 @@ export const discussionExchangeForbiddenContents = (
         <strong>Administrateurs de l’entreprise sur Immersion Facilitée :</strong>
         ${admins
           .map(({ email, firstName, lastName }) =>
-            `${firstName} ${lastName} ${email}`.trim(),
+            `${firstName} ${lastName} <a href="mailto:${email}" target="_blank">${email}</a>`.trim(),
           )
           .map((line) => `- ${line}`)
           .join("\n")}
@@ -2182,3 +2188,6 @@ export const discussionExchangeForbiddenContents = (
         Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
   },
 });
+
+const establishmentReplyWarning =
+  "Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée. Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.";

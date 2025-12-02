@@ -13,6 +13,7 @@ import type {
   ContactLevelOfEducation,
   DiscussionExchangeForbiddenParams,
   DiscussionKind,
+  ExchangeRole,
 } from "../discussion/discussion.dto";
 import type { AgencyRole, EstablishmentRole } from "../role/role.dto";
 import type { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -268,6 +269,7 @@ export type EmailParamsByEmailType = {
   DISCUSSION_EXCHANGE: {
     subject: string;
     htmlContent: string;
+    sender: ExchangeRole;
   };
   DISCUSSION_EXCHANGE_FORBIDDEN: DiscussionExchangeForbiddenParams;
   DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
