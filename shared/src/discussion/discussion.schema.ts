@@ -64,6 +64,7 @@ export const withDiscussionIdSchema: ZodSchemaWithInputMatchingOutput<WithDiscus
 
 export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export const discussionExchangeForbidenReasons = [
+  "user_unknown_or_missing_rights_on_establishment",
   "establishment_missing",
   "discussion_completed",
 ] as const;
@@ -323,6 +324,13 @@ export const discussionExchangeForbiddenParamsSchema: ZodSchemaWithInputMatching
   z.object({
     sender: exchangeRoleSchema,
     reason: discussionExchangeForbidenReasonSchema,
+    admins: z.array(
+      z.object({
+        firstName: zStringCanBeEmpty,
+        lastName: zStringCanBeEmpty,
+        email: emailSchema,
+      }),
+    ),
   });
 
 const contactInformationsCommonSchema = z.object({

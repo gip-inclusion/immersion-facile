@@ -1,5 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
-import { discussionExchangeForbidenContents } from "shared";
+import { discussionExchangeForbiddenContents } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -71,10 +71,9 @@ const sendMessageEpic: DiscussionEpic = (
         map((result) =>
           "reason" in result
             ? discussionSlice.actions.sendExchangeFailed({
-                errorMessage:
-                  discussionExchangeForbidenContents[result.sender][
-                    result.reason
-                  ],
+                errorMessage: discussionExchangeForbiddenContents(
+                  result.admins,
+                )[result.sender][result.reason],
                 feedbackTopic: action.payload.feedbackTopic,
               })
             : discussionSlice.actions.sendExchangeSucceeded({

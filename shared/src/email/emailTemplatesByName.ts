@@ -16,6 +16,7 @@ import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { emailAttachements } from "./email.content";
+import type { Email } from "./email.dto";
 import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind: InternshipKind) =>
@@ -1868,11 +1869,12 @@ Profil du candidat :
       }),
     },
     DISCUSSION_EXCHANGE_FORBIDDEN: {
-      niceName: "Établissement - Réponse à candidature impossible",
-      createEmailVariables: ({ reason, sender }) => ({
-        bypassLayout: true,
+      niceName: "MER - Réponse à candidature impossible",
+      createEmailVariables: ({ reason, sender, admins }) => ({
         subject: "Réponse à la candidature impossible",
-        content: discussionExchangeForbidenContents[sender][reason],
+        greetings: "Bonjour",
+        content: discussionExchangeForbiddenContents(admins)[sender][reason],
+        subContent: defaultSignature("immersion"),
       }),
       tags: ["réponse candidature impossible"],
     },
@@ -2130,11 +2132,31 @@ const generateUserInfo = (
   `;
 };
 
-export const discussionExchangeForbidenContents: Record<
-  ExchangeRole,
-  Record<DiscussionExchangeForbiddenReason, string>
-> = {
+export const discussionExchangeForbiddenContents = (
+  admins: { firstName: string; lastName: string; email: Email }[],
+): Record<ExchangeRole, Record<DiscussionExchangeForbiddenReason, string>> => ({
   establishment: {
+    user_unknown_or_missing_rights_on_establishment: `
+        Vous avez tenté de répondre à un candidat depuis un email de candidature Immersion Facilitée.
+        Malheureusement, <strong>votre message n’a pas pu être transmis</strong> : vous ne disposez pas des droits nécessaires pour répondre au nom de l’entreprise concernée.
+        
+        Pour pouvoir répondre au candidat via Immersion Facilitée, vous devez être inscrit(e) dans l’espace entreprise avec les bons droits.
+
+        <strong>Administrateurs de l’entreprise sur Immersion Facilitée :</strong>
+        ${admins
+          .map(({ email, firstName, lastName }) =>
+            `${firstName} ${lastName} ${email}`.trim(),
+          )
+          .map((line) => `- ${line}`)
+          .join("\n")}
+
+        Nous vous invitons à contacter l’un d’entre eux afin qu’il puisse :
+        - vous ajouter à l’espace entreprise, ou
+        - ajuster vos droits pour vous permettre de répondre directement aux candidatures.
+        
+        Une fois vos droits mis à jour, vous pourrez répondre normalement.
+        
+    `,
     discussion_completed: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         Le candidat ne recevra pas votre message.`,
@@ -2145,6 +2167,9 @@ export const discussionExchangeForbidenContents: Record<
         Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
   },
   potentialBeneficiary: {
+    user_unknown_or_missing_rights_on_establishment: `
+        Vous n'êtes pas le candidat associé à cette candidature.
+    `,
     discussion_completed: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         L'entreprise ne recevra pas votre message.
@@ -2156,4 +2181,4 @@ export const discussionExchangeForbidenContents: Record<
 
         Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
   },
-};
+});
