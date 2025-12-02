@@ -47,6 +47,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getLastNotifications.execute(
+          undefined,
           getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
@@ -144,6 +145,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getAllApiConsumers.execute(
+          undefined,
           getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),

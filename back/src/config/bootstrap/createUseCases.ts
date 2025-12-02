@@ -1,14 +1,13 @@
 import { keys } from "ramda";
 import {
-  type ApiConsumerId,
   type ConnectedUser,
-  type FindSimilarConventionsParams,
-  type FindSimilarConventionsResponseDto,
+  type ConventionId,
+  findSimilarConventionsParamsSchema,
   NotFoundError,
-  type PaginationQueryParams,
-  type ShortLinkId,
-  type SiretDto,
+  paginationRequiredQueryParamsSchema,
+  siretSchema,
 } from "shared";
+import z from "zod";
 import { makeAddAgenciesAndUsers } from "../../domains/agency/use-cases/AddAgenciesAndUsers";
 import { makeAddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
@@ -119,6 +118,7 @@ import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGate
 import type { TransactionalUseCase, UseCase } from "../../domains/core/UseCase";
 import type { OutOfTransactionQueries } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../domains/core/useCaseBuilder";
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
 import { makeAddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
@@ -589,63 +589,85 @@ export const createUseCases = ({
         gateways.timeGateway,
       ),
     }),
-    ...instantiatedUseCasesFromFunctions({
-      getConventionsWithErroredBroadcastFeedback: (params: {
-        pagination: PaginationQueryParams;
-        currentUser: ConnectedUser;
-      }) =>
-        uowPerformer.perform((uow) =>
+
+    getConventionsWithErroredBroadcastFeedback: useCaseBuilder(
+      "getConventionsWithErroredBroadcastFeedback",
+    )
+      .withCurrentUser<ConnectedUser>()
+      .withInput(paginationRequiredQueryParamsSchema)
+      .build(
+        (
+          { currentUser, uow, inputParams: pagination }, // 	uowPerformer.perform((uow) =>
+        ) =>
           uow.conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
-              userAgencyIds: params.currentUser.agencyRights
+              userAgencyIds: currentUser.agencyRights
                 .filter((agencyRight) => agencyRight.roles.length > 0)
                 .map((agencyRight) => agencyRight.agency.id),
-              pagination: params.pagination,
+              pagination,
             },
           ),
-        ),
-      getFeatureFlags: (_: void) => queries.featureFlag.getAll(),
-      getLink: (shortLinkId: ShortLinkId) =>
-        queries.shortLink.getById(shortLinkId),
-      getApiConsumerById: (id: ApiConsumerId) =>
-        uowPerformer.perform((uow) => uow.apiConsumerRepository.getById(id)),
-      getAllApiConsumers: (currentUser: ConnectedUser) => {
-        throwIfNotAdmin(currentUser);
-        return uowPerformer.perform((uow) =>
-          uow.apiConsumerRepository.getAll(),
-        );
-      },
-      isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
-        uowPerformer.perform((uow) =>
-          uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
-            siret,
-          ),
-        ),
-      getImmersionFacileAgencyIdByKind: (_: void) =>
-        uowPerformer.perform(async (uow) => {
-          const agencyId =
-            await uow.agencyRepository.getImmersionFacileAgencyId();
-          if (!agencyId) {
-            throw new NotFoundError(
-              "No agency found with kind immersion-facilitee",
-            );
-          }
-          return agencyId;
-        }),
-      getLastNotifications: (currentUser: ConnectedUser) => {
-        throwIfNotAdmin(currentUser);
-        return uowPerformer.perform((uow) =>
-          uow.notificationRepository.getLastNotifications(),
-        );
-      },
+      )({ uowPerformer }),
 
-      findSimilarConventions: (
-        params: FindSimilarConventionsParams,
-      ): Promise<FindSimilarConventionsResponseDto> =>
+    getFeatureFlags: useCaseBuilder("getFeatureFlags")
+      .notTransactional()
+      .build(() => queries.featureFlag.getAll())({}),
+
+    getLink: useCaseBuilder("getLink")
+      .withInput(z.string())
+      .notTransactional()
+      .build(({ inputParams }) => queries.shortLink.getById(inputParams))({}),
+
+    getApiConsumerById: useCaseBuilder("getApiConsumerById")
+      .withInput(z.string())
+      .build(({ inputParams, uow }) =>
+        uow.apiConsumerRepository.getById(inputParams),
+      )({ uowPerformer }),
+
+    getAllApiConsumers: useCaseBuilder("getAllApiConsumers")
+      .withCurrentUser<ConnectedUser>()
+      .build(({ currentUser, uow }) => {
+        throwIfNotAdmin(currentUser);
+        return uow.apiConsumerRepository.getAll();
+      })({ uowPerformer }),
+
+    isFormEstablishmentWithSiretAlreadySaved: useCaseBuilder(
+      "isFormEstablishmentWithSiretAlreadySaved",
+    )
+      .withInput(siretSchema)
+      .build(({ inputParams: siret, uow }) =>
+        uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
+          siret,
+        ),
+      )({ uowPerformer }),
+
+    getImmersionFacileAgencyIdByKind: useCaseBuilder(
+      "getImmersionFacileAgencyIdByKind",
+    ).build(async ({ uow }) => {
+      const agencyId = await uow.agencyRepository.getImmersionFacileAgencyId();
+      if (!agencyId)
+        throw new NotFoundError(
+          "No agency found with kind immersion-facilitee",
+        );
+      return agencyId;
+    })({ uowPerformer }),
+
+    getLastNotifications: useCaseBuilder("getLastNotifications")
+      .withCurrentUser<ConnectedUser>()
+      .build(({ currentUser, uow }) => {
+        throwIfNotAdmin(currentUser);
+        return uow.notificationRepository.getLastNotifications();
+      })({ uowPerformer }),
+
+    findSimilarConventions: useCaseBuilder("findSimilarConventions")
+      .withInput(findSimilarConventionsParamsSchema)
+      .withOutput<{ similarConventionIds: ConventionId[] }>()
+      .notTransactional()
+      .build(({ inputParams }) =>
         queries.convention
-          .findSimilarConventions(params)
+          .findSimilarConventions(inputParams)
           .then((similarConventionIds) => ({ similarConventionIds })),
-    }),
+      )({}),
 
     getOffers: makeGetOffers({
       uowPerformer,
@@ -979,31 +1001,6 @@ const instantiatedUseCaseFromClass = <Input, Output, JwtPayload>(
   execute: (p, jwtPayload) => useCase.execute(p, jwtPayload),
   useCaseName: useCase.constructor.name,
 });
-
-const createInstantiatedUseCase = <Input = void, Output = void>(params: {
-  useCaseName: string;
-  execute: (params: Input) => Promise<Output>;
-}): InstantiatedUseCase<Input, Output, unknown> => params;
-
-const instantiatedUseCasesFromFunctions = <
-  T extends Record<string, (...params: any[]) => Promise<unknown>>,
->(
-  lamdas: T,
-): {
-  [K in keyof T]: T[K] extends (p: infer Input) => Promise<infer Output>
-    ? InstantiatedUseCase<Input, Output, any>
-    : never;
-} =>
-  keys(lamdas).reduce(
-    (acc, key) => ({
-      ...acc,
-      [key]: createInstantiatedUseCase({
-        useCaseName: key as string,
-        execute: lamdas[key],
-      }),
-    }),
-    {} as any,
-  );
 
 const instantiatedUseCasesFromClasses = <
   T extends Record<
