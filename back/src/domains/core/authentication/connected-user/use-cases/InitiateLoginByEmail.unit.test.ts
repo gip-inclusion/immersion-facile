@@ -127,7 +127,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}`,
+            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}&email=${user.email}`,
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,
@@ -171,7 +171,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}`,
+            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}&email=${user.email}`,
             fullname: "",
           },
           recipients: [user.email],
@@ -196,7 +196,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}`,
+            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}&email=${user.email}`,
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,
