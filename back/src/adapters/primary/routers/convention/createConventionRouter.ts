@@ -72,10 +72,10 @@ export const createConventionRouter = (deps: AppDependencies) => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getConventionsWithErroredBroadcastFeedback.execute({
-          pagination: req.query,
-          currentUser: getGenericAuthOrThrow(req.payloads?.currentUser),
-        }),
+        deps.useCases.getConventionsWithErroredBroadcastFeedback.execute(
+          req.query,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
       ),
   );
 
