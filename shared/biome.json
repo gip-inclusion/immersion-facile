@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.7/schema.json",
   "extends": "//",
   "linter": {
     "rules": {
@@ -19,5 +19,18 @@
     "indentWidth": 2,
     "indentStyle": "space",
     "formatWithErrors": true
+  },
+  "files": {
+    "maxSize": 10485760,
+    "ignoreUnknown": true,
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.json",
+      "biome.json",
+      "tsconfig.json",
+      "babel.config.js",
+      "package.json",
+      "jest.config.js"
+    ]
   }
 }
