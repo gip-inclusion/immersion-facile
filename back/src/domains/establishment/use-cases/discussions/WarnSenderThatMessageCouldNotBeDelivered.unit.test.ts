@@ -61,6 +61,7 @@ describe("WarnSenderThatMessageCouldNotBeDelivered", () => {
           email: senderEmail,
         },
         params: {
+          sender: "establishment",
           subject: "Test Subject",
           htmlContent: "Test Content",
         },
@@ -201,6 +202,7 @@ describe("WarnSenderThatMessageCouldNotBeDelivered", () => {
               email: "sender@example.com",
             },
             params: {
+              sender: "establishment",
               subject: "Test Subject",
               htmlContent: "Test Content",
             },
@@ -247,6 +249,7 @@ describe("WarnSenderThatMessageCouldNotBeDelivered", () => {
               email: "",
             },
             params: {
+              sender: "establishment",
               subject: "Test Subject",
               htmlContent: "Test Content",
             },
