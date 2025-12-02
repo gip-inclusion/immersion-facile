@@ -20,7 +20,7 @@ import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 import { match } from "ts-pattern";
 
 export class HttpAuthGateway implements AuthGateway {
-  constructor(private readonly httpClient: HttpClient<AuthRoutes>) { }
+  constructor(private readonly httpClient: HttpClient<AuthRoutes>) {}
 
   loginByEmail$(params: InitiateLoginByEmailParams): Observable<void> {
     return from(
