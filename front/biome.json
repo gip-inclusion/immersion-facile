@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.7/schema.json",
   "extends": "//",
   "linter": {
     "rules": {
@@ -14,6 +14,17 @@
   "files": {
     "maxSize": 10485760,
     "ignoreUnknown": true,
-    "includes": ["!**/public", "!**/dev-dist", "!**/scalingo", "!**/dist"]
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.json",
+      "src/**/*.scss",
+      "biome.json",
+      "tsconfig.json",
+      "vite.config.ts",
+      "babel.config.js",
+      "package.json",
+      "postcss.config.js"
+    ]
   }
 }
