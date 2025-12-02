@@ -359,25 +359,24 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       });
 
       describe("handle dynamic login pages", () => {
-        it.each(allowedLoginSources)(
-          "generates an app token and returns a redirection url which includes token and user data for %s",
-          async (page) => {
-            const { initialOngoingOAuth, fromUri } =
-              makeSuccessfulAuthenticationConditions(
-                `/${page}?discussionId=discussion0`,
-              );
+        it.each(
+          allowedLoginSources,
+        )("generates an app token and returns a redirection url which includes token and user data for %s", async (page) => {
+          const { initialOngoingOAuth, fromUri } =
+            makeSuccessfulAuthenticationConditions(
+              `/${page}?discussionId=discussion0`,
+            );
 
-            const response = await afterOAuthSuccessRedirection.execute({
-              code: "my-code",
-              state: initialOngoingOAuth.state,
-            });
+          const response = await afterOAuthSuccessRedirection.execute({
+            code: "my-code",
+            state: initialOngoingOAuth.state,
+          });
 
-            expectToEqual(response, {
-              provider: "proConnect",
-              redirectUri: `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
-            });
-          },
-        );
+          expectToEqual(response, {
+            provider: "proConnect",
+            redirectUri: `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
+          });
+        });
       });
     });
 
@@ -505,9 +504,9 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           }),
           errors.user.expiredJwt(
             (timeGateway.now().getTime() - expirationDate.getTime()) /
-            1000 /
-            60 +
-            " minutes",
+              1000 /
+              60 +
+              " minutes",
           ),
         );
       });
@@ -666,12 +665,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       proConnect:
         options.externalId !== null
           ? {
-            externalId:
-              options.externalId !== undefined
-                ? options.externalId
-                : defaultExpectedIcIdTokenPayload.sub,
-            siret: defaultExpectedIcIdTokenPayload.siret,
-          }
+              externalId:
+                options.externalId !== undefined
+                  ? options.externalId
+                  : defaultExpectedIcIdTokenPayload.sub,
+              siret: defaultExpectedIcIdTokenPayload.siret,
+            }
           : null,
       createdAt: new Date().toISOString(),
     };
