@@ -16,7 +16,6 @@ import type {
   UserParamsForAgency,
   UserWithNumberOfAgenciesAndEstablishments,
   WithAgencyIdAndUserId,
-  WithUserFilters,
 } from "shared";
 
 export interface AdminGateway {
@@ -34,10 +33,6 @@ export interface AdminGateway {
     params: GetDashboardParams,
     token: ConnectedUserJwt,
   ) => Observable<DashboardUrlAndName>;
-  getConnectedUsersToReview$: (
-    token: ConnectedUserJwt,
-    filters: WithUserFilters,
-  ) => Observable<ConnectedUser[]>;
   updateFeatureFlags$: (
     params: SetFeatureFlagParam,
     adminToken: ConnectedUserJwt,

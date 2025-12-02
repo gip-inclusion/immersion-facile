@@ -24,10 +24,6 @@ export interface AgencyGateway {
     agencyId: AgencyId,
     token: ConnectedUserJwt,
   ): Observable<AgencyDto>;
-  getAgencyUsers$(
-    agencyId: AgencyId,
-    token: ConnectedUserJwt,
-  ): Observable<ConnectedUser[]>;
   getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto>;
