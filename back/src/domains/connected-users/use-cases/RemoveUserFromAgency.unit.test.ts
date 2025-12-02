@@ -354,75 +354,74 @@ describe("RemoveUserFromAgency", () => {
       triggeredByRole: "agency-admin",
       triggeredByUser: agencyAdminUser,
     },
-  ])(
-    "$triggeredByRole can remove user from agency",
-    async ({ triggeredByUser }) => {
-      const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
-      const otherUserWithRightOnAgencies: User = {
-        ...notAdmin,
-        id: "other-user-id",
-      };
+  ])("$triggeredByRole can remove user from agency", async ({
+    triggeredByUser,
+  }) => {
+    const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
+    const otherUserWithRightOnAgencies: User = {
+      ...notAdmin,
+      id: "other-user-id",
+    };
 
-      uow.userRepository.users = [notAdminUser, otherUserWithRightOnAgencies];
-      uow.agencyRepository.agencies = [
-        toAgencyWithRights(agency, {
-          [notAdminUser.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-          [otherUserWithRightOnAgencies.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        }),
-        toAgencyWithRights(agency2, {
-          [notAdminUser.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-          [otherUserWithRightOnAgencies.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        }),
-      ];
+    uow.userRepository.users = [notAdminUser, otherUserWithRightOnAgencies];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [notAdminUser.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+        [otherUserWithRightOnAgencies.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+      }),
+      toAgencyWithRights(agency2, {
+        [notAdminUser.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+        [otherUserWithRightOnAgencies.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+      }),
+    ];
 
-      const inputParams: WithAgencyIdAndUserId = {
-        agencyId: agency.id,
-        userId: notAdminUser.id,
-      };
-      await removeUserFromAgency.execute(inputParams, triggeredByUser);
+    const inputParams: WithAgencyIdAndUserId = {
+      agencyId: agency.id,
+      userId: notAdminUser.id,
+    };
+    await removeUserFromAgency.execute(inputParams, triggeredByUser);
 
-      expectToEqual(uow.agencyRepository.agencies, [
-        toAgencyWithRights(agency, {
-          [otherUserWithRightOnAgencies.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        }),
-        toAgencyWithRights(agency2, {
-          [notAdminUser.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-          [otherUserWithRightOnAgencies.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        }),
-      ]);
-      expectArraysToMatch(uow.outboxRepository.events, [
-        {
-          topic: "ConnectedUserAgencyRightChanged",
-          payload: {
-            ...inputParams,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: triggeredByUser.id,
-            },
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights(agency, {
+        [otherUserWithRightOnAgencies.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+      }),
+      toAgencyWithRights(agency2, {
+        [notAdminUser.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+        [otherUserWithRightOnAgencies.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+      }),
+    ]);
+    expectArraysToMatch(uow.outboxRepository.events, [
+      {
+        topic: "ConnectedUserAgencyRightChanged",
+        payload: {
+          ...inputParams,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: triggeredByUser.id,
           },
         },
-      ]);
-    },
-  );
+      },
+    ]);
+  });
 });

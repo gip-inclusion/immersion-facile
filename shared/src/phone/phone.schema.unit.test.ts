@@ -23,12 +23,9 @@ describe("phonesShema", () => {
     "+34912345678", // ES
     "+4532123456", // DK
     "+35312345678", // IR
-  ])(
-    "should be valid for fix phone number (FR and other countries) %s",
-    async (phone) => {
-      expect(phoneNumberSchema.parse(phone)).toBe(phone);
-    },
-  );
+  ])("should be valid for fix phone number (FR and other countries) %s", async (phone) => {
+    expect(phoneNumberSchema.parse(phone)).toBe(phone);
+  });
 
   it.each<string>([
     "+33600000000", //FR
@@ -48,12 +45,9 @@ describe("phonesShema", () => {
     "+34612345678", // ES
     "+4521123456", // DK
     "+351912345678", // IR
-  ])(
-    "should be valid for mobile phone number (FR and other countries) %s",
-    async (phone) => {
-      expect(phoneNumberSchema.parse(phone)).toBe(phone);
-    },
-  );
+  ])("should be valid for mobile phone number (FR and other countries) %s", async (phone) => {
+    expect(phoneNumberSchema.parse(phone)).toBe(phone);
+  });
 
   it.each<string>([
     "+33600000000",
@@ -73,23 +67,17 @@ describe("phonesShema", () => {
     "+34612345678", // ES
     "+4521123456", // DK
     "+351912345678", // IR
-  ])(
-    "should be a valid mobile phone number (FR and other countries) %s",
-    async (phone) => {
-      expect(isValidMobilePhone(phone)).toBe(true);
-    },
-  );
+  ])("should be a valid mobile phone number (FR and other countries) %s", async (phone) => {
+    expect(isValidMobilePhone(phone)).toBe(true);
+  });
   it.each<string>([
     "+41000123456", // CH
     "+390012345678", // IT
     // "+3221234567", // BE not valid, but libphonenumber-js/min sees it as valid
     // "+34598765432", // ES not valid, but libphonenumber-js/min sees it as valid
-  ])(
-    "invalid phone number (due to local number assignation) should not be considered as a valid phone number %s",
-    async (phone) => {
-      expect(() => phoneNumberSchema.parse(phone)).toThrow();
-    },
-  );
+  ])("invalid phone number (due to local number assignation) should not be considered as a valid phone number %s", async (phone) => {
+    expect(() => phoneNumberSchema.parse(phone)).toThrow();
+  });
 });
 
 describe("toInternationalPhoneNumber", () => {
@@ -103,11 +91,8 @@ describe("toInternationalPhoneNumber", () => {
     ["071234567", "BE", "+3271234567"], // BE
     ["0441234567", "CH", "+41441234567"], // CH
     ["0612345678", "IT", "+390612345678"], // IT
-  ])(
-    "should assign the right prefix to the phone number %s",
-    async (phone, countryCode, expected) => {
-      const result = toInternationalPhoneNumber(phone, countryCode);
-      expect(result).toBe(expected);
-    },
-  );
+  ])("should assign the right prefix to the phone number %s", async (phone, countryCode, expected) => {
+    const result = toInternationalPhoneNumber(phone, countryCode);
+    expect(result).toBe(expected);
+  });
 });

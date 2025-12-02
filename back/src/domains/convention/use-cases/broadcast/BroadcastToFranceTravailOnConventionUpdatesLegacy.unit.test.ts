@@ -345,81 +345,83 @@ describe("Broadcasts events to France Travail (LEGACY Version)", () => {
         } as Partial<FeatureFlags>,
         ...createAgencyAndLinkedConvention("cap-emploi"),
       },
-    ])(
-      "when enable $agencyKind feature flag is ACTIVE",
-      ({ agencyKind, featureFlag, agency, convention }) => {
-        it(`broadcasts to france travail, even for convention linked to ${agencyKind}`, async () => {
-          uow.agencyRepository.agencies = [agency];
-          uow.featureFlagRepository.featureFlags = {
-            enableBroadcastOfMissionLocaleToFT: {
-              kind: "boolean",
-              isActive: false,
-            },
-            enableBroadcastOfCapEmploiToFT: {
-              kind: "boolean",
-              isActive: false,
-            },
-            enableBroadcastOfConseilDepartementalToFT: {
-              kind: "boolean",
-              isActive: false,
-            },
-            ...featureFlag,
-          };
-          await broadcastToFranceTravailOnConventionUpdates.execute({
-            convention,
-          });
-
-          expect(
-            franceTravailGateway.legacyBroadcastConventionCalls,
-          ).toHaveLength(1);
-          expectObjectsToMatch(
-            franceTravailGateway.legacyBroadcastConventionCalls[0],
-            {
-              siret: convention.siret,
-              typeAgence: agencyKind,
-            },
-          );
+    ])("when enable $agencyKind feature flag is ACTIVE", ({
+      agencyKind,
+      featureFlag,
+      agency,
+      convention,
+    }) => {
+      it(`broadcasts to france travail, even for convention linked to ${agencyKind}`, async () => {
+        uow.agencyRepository.agencies = [agency];
+        uow.featureFlagRepository.featureFlags = {
+          enableBroadcastOfMissionLocaleToFT: {
+            kind: "boolean",
+            isActive: false,
+          },
+          enableBroadcastOfCapEmploiToFT: {
+            kind: "boolean",
+            isActive: false,
+          },
+          enableBroadcastOfConseilDepartementalToFT: {
+            kind: "boolean",
+            isActive: false,
+          },
+          ...featureFlag,
+        };
+        await broadcastToFranceTravailOnConventionUpdates.execute({
+          convention,
         });
 
-        it(`do not broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
-          uow.featureFlagRepository.featureFlags = featureFlag;
+        expect(
+          franceTravailGateway.legacyBroadcastConventionCalls,
+        ).toHaveLength(1);
+        expectObjectsToMatch(
+          franceTravailGateway.legacyBroadcastConventionCalls[0],
+          {
+            siret: convention.siret,
+            typeAgence: agencyKind,
+          },
+        );
+      });
 
-          const agencyWithRefersTo = toAgencyWithRights(
-            new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
-              .withId("agency-with-refers-to-id")
-              .withKind("autre")
-              .withRefersToAgencyInfo({
-                refersToAgencyId: agency.id,
-                refersToAgencyName: agency.name,
-              })
-              .build(),
-          );
+      it(`do not broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
+        uow.featureFlagRepository.featureFlags = featureFlag;
 
-          const conventionLinkedToAgencyReferingToOther =
-            new ConventionDtoBuilder()
-              .withId("22222222-2222-4000-9222-222222222222")
-              .withAgencyId(agencyWithRefersTo.id)
-              .withStatus("ACCEPTED_BY_VALIDATOR")
-              .build();
+        const agencyWithRefersTo = toAgencyWithRights(
+          new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
+            .withId("agency-with-refers-to-id")
+            .withKind("autre")
+            .withRefersToAgencyInfo({
+              refersToAgencyId: agency.id,
+              refersToAgencyName: agency.name,
+            })
+            .build(),
+        );
 
-          uow.agencyRepository.agencies = [agency, agencyWithRefersTo];
+        const conventionLinkedToAgencyReferingToOther =
+          new ConventionDtoBuilder()
+            .withId("22222222-2222-4000-9222-222222222222")
+            .withAgencyId(agencyWithRefersTo.id)
+            .withStatus("ACCEPTED_BY_VALIDATOR")
+            .build();
 
-          const externalId = "00000000001";
-          uow.conventionExternalIdRepository.externalIdsByConventionId = {
-            [conventionLinkedToAgencyReferingToOther.id]: externalId,
-          };
+        uow.agencyRepository.agencies = [agency, agencyWithRefersTo];
 
-          await broadcastToFranceTravailOnConventionUpdates.execute({
-            convention: conventionLinkedToAgencyReferingToOther,
-          });
+        const externalId = "00000000001";
+        uow.conventionExternalIdRepository.externalIdsByConventionId = {
+          [conventionLinkedToAgencyReferingToOther.id]: externalId,
+        };
 
-          // Assert
-          expect(
-            franceTravailGateway.legacyBroadcastConventionCalls,
-          ).toHaveLength(0);
+        await broadcastToFranceTravailOnConventionUpdates.execute({
+          convention: conventionLinkedToAgencyReferingToOther,
         });
-      },
-    );
+
+        // Assert
+        expect(
+          franceTravailGateway.legacyBroadcastConventionCalls,
+        ).toHaveLength(0);
+      });
+    });
 
     describe.each([
       {
@@ -434,35 +436,36 @@ describe("Broadcasts events to France Travail (LEGACY Version)", () => {
         agencyKind: "cap-emploi" as AgencyKindForFt,
         ...createAgencyAndLinkedConvention("cap-emploi"),
       },
-    ])(
-      "when $agencyKind feature flag is OFF",
-      ({ agencyKind, agency, convention }) => {
-        it(`does NOT broadcasts to france travail, for ${agencyKind}`, async () => {
-          uow.agencyRepository.agencies = [agency];
-          uow.featureFlagRepository.featureFlags = {
-            enableBroadcastOfMissionLocaleToFT: {
-              kind: "boolean",
-              isActive: false,
-            },
-            enableBroadcastOfCapEmploiToFT: {
-              kind: "boolean",
-              isActive: false,
-            },
-            enableBroadcastOfConseilDepartementalToFT: {
-              kind: "boolean",
-              isActive: false,
-            },
-          };
+    ])("when $agencyKind feature flag is OFF", ({
+      agencyKind,
+      agency,
+      convention,
+    }) => {
+      it(`does NOT broadcasts to france travail, for ${agencyKind}`, async () => {
+        uow.agencyRepository.agencies = [agency];
+        uow.featureFlagRepository.featureFlags = {
+          enableBroadcastOfMissionLocaleToFT: {
+            kind: "boolean",
+            isActive: false,
+          },
+          enableBroadcastOfCapEmploiToFT: {
+            kind: "boolean",
+            isActive: false,
+          },
+          enableBroadcastOfConseilDepartementalToFT: {
+            kind: "boolean",
+            isActive: false,
+          },
+        };
 
-          await broadcastToFranceTravailOnConventionUpdates.execute({
-            convention,
-          });
-
-          expect(
-            franceTravailGateway.legacyBroadcastConventionCalls,
-          ).toHaveLength(0);
+        await broadcastToFranceTravailOnConventionUpdates.execute({
+          convention,
         });
-      },
-    );
+
+        expect(
+          franceTravailGateway.legacyBroadcastConventionCalls,
+        ).toHaveLength(0);
+      });
+    });
   });
 });

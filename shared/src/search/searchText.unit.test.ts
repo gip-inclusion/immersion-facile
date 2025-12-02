@@ -24,11 +24,11 @@ describe("searchTextSchema", () => {
       initialSearchText: "boulanger / patissier",
       expectedSearchText: "boulanger   patissier",
     },
-  ])(
-    "for $initialSearchText, replace special characters by space then trim",
-    ({ initialSearchText, expectedSearchText }) => {
-      const newSearchText = searchTextSchema.parse(initialSearchText);
-      expect(newSearchText).toBe(expectedSearchText);
-    },
-  );
+  ])("for $initialSearchText, replace special characters by space then trim", ({
+    initialSearchText,
+    expectedSearchText,
+  }) => {
+    const newSearchText = searchTextSchema.parse(initialSearchText);
+    expect(newSearchText).toBe(expectedSearchText);
+  });
 });

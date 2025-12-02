@@ -543,85 +543,80 @@ export const rejectStatusTransitionTests = ({
     });
 
     if (notAllowedRolesToUpdate.length) {
-      it.each(notAllowedRolesToUpdate.map((role) => ({ role })))(
-        "Rejected from role '$role'",
-        ({ role }) => {
-          const userId = "userWithRoleEstablishmentRepresentative";
-          return testRejectsStatusUpdate({
-            userId,
-            role: role as ConventionRole,
-            initialStatus: someValidInitialStatus,
-            expectedError: errors.convention.badRoleStatusChange({
-              roles: [role],
-              status: updateStatusParams.status,
-              conventionId: updateStatusParams.conventionId,
-            }),
-          });
-        },
-      );
+      it.each(
+        notAllowedRolesToUpdate.map((role) => ({ role })),
+      )("Rejected from role '$role'", ({ role }) => {
+        const userId = "userWithRoleEstablishmentRepresentative";
+        return testRejectsStatusUpdate({
+          userId,
+          role: role as ConventionRole,
+          initialStatus: someValidInitialStatus,
+          expectedError: errors.convention.badRoleStatusChange({
+            roles: [role],
+            status: updateStatusParams.status,
+            conventionId: updateStatusParams.conventionId,
+          }),
+        });
+      });
     }
 
     if (notAllowedConnectedUsersToUpdate.length) {
-      it.each(notAllowedConnectedUsersToUpdate.map((userId) => ({ userId })))(
-        "Rejected from userId '$userId'",
-        ({ userId }) => {
-          const user = makeUserIdMapConnectedUser[userId];
-          const getRoles = (): Role[] => {
-            if (user.email === establishmentRepEmail)
-              return ["establishment-representative"];
+      it.each(
+        notAllowedConnectedUsersToUpdate.map((userId) => ({ userId })),
+      )("Rejected from userId '$userId'", ({ userId }) => {
+        const user = makeUserIdMapConnectedUser[userId];
+        const getRoles = (): Role[] => {
+          if (user.email === establishmentRepEmail)
+            return ["establishment-representative"];
 
-            if (user.isBackofficeAdmin) return ["back-office"];
+          if (user.isBackofficeAdmin) return ["back-office"];
 
-            return (
-              agencyWithoutCounsellorEmail.usersRights[userId]?.roles ?? []
-            );
-          };
+          return agencyWithoutCounsellorEmail.usersRights[userId]?.roles ?? [];
+        };
 
-          const roles = getRoles();
-          return testRejectsStatusUpdate({
-            userId,
-            initialStatus: someValidInitialStatus,
-            expectedError: roles.length
-              ? errors.convention.badRoleStatusChange({
-                  roles,
-                  status: updateStatusParams.status,
-                  conventionId: updateStatusParams.conventionId,
-                })
-              : errors.user.noRightsOnAgency({
-                  agencyId: agencyWithoutCounsellorEmail.id,
-                  userId: user.id,
-                }),
-          });
-        },
-      );
+        const roles = getRoles();
+        return testRejectsStatusUpdate({
+          userId,
+          initialStatus: someValidInitialStatus,
+          expectedError: roles.length
+            ? errors.convention.badRoleStatusChange({
+                roles,
+                status: updateStatusParams.status,
+                conventionId: updateStatusParams.conventionId,
+              })
+            : errors.user.noRightsOnAgency({
+                agencyId: agencyWithoutCounsellorEmail.id,
+                userId: user.id,
+              }),
+        });
+      });
     }
 
-    it.each(forbiddenInitalStatuses.map((status) => ({ status })))(
-      "Rejected from status $status",
-      ({ status }) => {
-        // this case is handle separately cause we don't have yet another way to test refined transition config
-        // TODO refactor this to handle all refine
-        const agencyHasTwoStepsAndValidatorTriesToValidate =
-          updateStatusParams.status === "ACCEPTED_BY_VALIDATOR" &&
-          status === "IN_REVIEW";
+    it.each(
+      forbiddenInitalStatuses.map((status) => ({ status })),
+    )("Rejected from status $status", ({ status }) => {
+      // this case is handle separately cause we don't have yet another way to test refined transition config
+      // TODO refactor this to handle all refine
+      const agencyHasTwoStepsAndValidatorTriesToValidate =
+        updateStatusParams.status === "ACCEPTED_BY_VALIDATOR" &&
+        status === "IN_REVIEW";
 
-        const error = agencyHasTwoStepsAndValidatorTriesToValidate
-          ? errors.convention.twoStepsValidationBadStatus({
-              targetStatus: updateStatusParams.status,
-              conventionId: updateStatusParams.conventionId,
-            })
-          : errors.convention.badStatusTransition({
-              currentStatus: status,
-              targetStatus: updateStatusParams.status,
-            });
+      const error = agencyHasTwoStepsAndValidatorTriesToValidate
+        ? errors.convention.twoStepsValidationBadStatus({
+            targetStatus: updateStatusParams.status,
+            conventionId: updateStatusParams.conventionId,
+          })
+        : errors.convention.badStatusTransition({
+            currentStatus: status,
+            targetStatus: updateStatusParams.status,
+          });
 
-        return testRejectsStatusUpdate({
-          role: someValidRole,
-          initialStatus: status,
-          expectedError: error,
-        });
-      },
-    );
+      return testRejectsStatusUpdate({
+        role: someValidRole,
+        initialStatus: status,
+        expectedError: error,
+      });
+    });
   });
 };
 
@@ -653,32 +648,29 @@ export const acceptStatusTransitionTests = ({
       nextDate,
     });
 
-    it.each(allowedMagicLinkRoles.map((role) => ({ role })))(
-      "Accepted from role '$role'",
-      ({ role }) =>
-        testAcceptsStatusUpdate({
-          role,
-          initialStatus: someValidInitialStatus,
-        }),
-    );
+    it.each(
+      allowedMagicLinkRoles.map((role) => ({ role })),
+    )("Accepted from role '$role'", ({ role }) =>
+      testAcceptsStatusUpdate({
+        role,
+        initialStatus: someValidInitialStatus,
+      }));
 
     if (allowedConnectedUsers.length)
-      it.each(allowedConnectedUsers.map((userId) => ({ userId })))(
-        "Accepted from userId '$userId'",
-        ({ userId }) =>
-          testAcceptsStatusUpdate({
-            userId,
-            initialStatus: someValidInitialStatus,
-          }),
-      );
-
-    it.each(allowedInitialStatuses.map((status) => ({ status })))(
-      "Accepted from status $status",
-      ({ status }) =>
+      it.each(
+        allowedConnectedUsers.map((userId) => ({ userId })),
+      )("Accepted from userId '$userId'", ({ userId }) =>
         testAcceptsStatusUpdate({
-          role: someValidRole,
-          initialStatus: status,
-        }),
-    );
+          userId,
+          initialStatus: someValidInitialStatus,
+        }));
+
+    it.each(
+      allowedInitialStatuses.map((status) => ({ status })),
+    )("Accepted from status $status", ({ status }) =>
+      testAcceptsStatusUpdate({
+        role: someValidRole,
+        initialStatus: status,
+      }));
   });
 };

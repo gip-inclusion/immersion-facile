@@ -321,15 +321,16 @@ https://app-smtp.brevo.com/log
         | { expectNotCalled: true }
         | { expectedParams: InitiateCrispConversationParams }
       )
-    >)(
-      "Ticket on crisp: $name",
-      async ({ tallyForm, expectedParams, expectNotCalled }) => {
-        await sendSupportTicketToCrisp.execute(tallyForm);
-        expectNotCalled
-          ? expectCrispInitiatedConversationParams([])
-          : expectCrispInitiatedConversationParams([expectedParams]);
-      },
-    );
+    >)("Ticket on crisp: $name", async ({
+      tallyForm,
+      expectedParams,
+      expectNotCalled,
+    }) => {
+      await sendSupportTicketToCrisp.execute(tallyForm);
+      expectNotCalled
+        ? expectCrispInitiatedConversationParams([])
+        : expectCrispInitiatedConversationParams([expectedParams]);
+    });
   });
 
   const expectCrispInitiatedConversationParams = (

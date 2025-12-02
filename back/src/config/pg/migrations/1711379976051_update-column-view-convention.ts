@@ -14,6 +14,7 @@ const createViewConventions = (
   pgm: MigrationBuilder,
   direction: "up" | "down",
 ) => {
+  // biome-ignore-start lint/suspicious/noUselessEscapeInString: sql query
   pgm.sql(`
     create view view_conventions
             (id, "Structure", "Type de structure", "Département de la structure", "Région de la structure",
@@ -131,4 +132,5 @@ FROM conventions c
          LEFT JOIN convention_status_translations cst ON c.status = cst.status
          LEFT JOIN actors bce ON c.beneficiary_current_employer_id = bce.id;
     `);
+  // biome-ignore-end lint/suspicious/noUselessEscapeInString: sql query
 };

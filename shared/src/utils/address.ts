@@ -17,6 +17,7 @@ export const captureAddressGroups = (
   fullAddressString: string,
 ): CaptureAddressGroupsResult => {
   const captureAddressGroupsRegex =
+    // biome-ignore lint/suspicious/noTsIgnore: legacy regex
     // @ts-ignore
     /(?<address>^.*)(?<postalCode>[0-9]{5}) (?<city>.+$)/u;
   const capture = captureAddressGroupsRegex.exec(fullAddressString);

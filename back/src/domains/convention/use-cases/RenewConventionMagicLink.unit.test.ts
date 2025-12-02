@@ -120,60 +120,57 @@ describe("RenewConventionMagicLink use case", () => {
           validatorEmail,
         ],
       ),
-    ])(
-      "Posts an event to deliver a correct JWT for correct responses for role %s",
-      async (expectedRole, expectedEmails) => {
-        const expiredPayload = createConventionMagicLinkPayload({
+    ])("Posts an event to deliver a correct JWT for correct responses for role %s", async (expectedRole, expectedEmails) => {
+      const expiredPayload = createConventionMagicLinkPayload({
+        id: validConvention.id,
+        role: expectedRole,
+        email: expectedEmails,
+        now: timeGateway.now(),
+      });
+
+      const request: RenewMagicLinkRequestDto = {
+        originalUrl: "http://immersionfacile.fr/verifier-et-signer",
+
+        expiredJwt: generateConventionJwt(expiredPayload),
+      };
+
+      const shortLinks = ["shortLink1", "shortLink2"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
+
+      await useCase.execute(request);
+
+      expect(uow.outboxRepository.events).toHaveLength(1);
+
+      const renewalEvent = uow.outboxRepository.events[0];
+      expect(renewalEvent.topic).toBe("MagicLinkRenewalRequested");
+
+      const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload &
+        WithTriggeredBy;
+      expect(dispatchedPayload.emails).toEqual([expectedEmails]);
+      expectToEqual(dispatchedPayload.triggeredBy, {
+        kind: "convention-magic-link",
+        role: expectedRole,
+      });
+
+      expectToEqual(
+        [dispatchedPayload.magicLink, dispatchedPayload.conventionStatusLink],
+        [
+          `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+          `${config.immersionFacileBaseUrl}/api/to/${shortLinks[1]}`,
+        ],
+      );
+
+      expectToEqual(
+        uow.shortLinkQuery.getShortLinks()[shortLinks[0]],
+        fakeGenerateMagicLinkUrlFn({
           id: validConvention.id,
           role: expectedRole,
           email: expectedEmails,
           now: timeGateway.now(),
-        });
-
-        const request: RenewMagicLinkRequestDto = {
-          originalUrl: "http://immersionfacile.fr/verifier-et-signer",
-
-          expiredJwt: generateConventionJwt(expiredPayload),
-        };
-
-        const shortLinks = ["shortLink1", "shortLink2"];
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
-
-        await useCase.execute(request);
-
-        expect(uow.outboxRepository.events).toHaveLength(1);
-
-        const renewalEvent = uow.outboxRepository.events[0];
-        expect(renewalEvent.topic).toBe("MagicLinkRenewalRequested");
-
-        const dispatchedPayload =
-          renewalEvent.payload as RenewMagicLinkPayload & WithTriggeredBy;
-        expect(dispatchedPayload.emails).toEqual([expectedEmails]);
-        expectToEqual(dispatchedPayload.triggeredBy, {
-          kind: "convention-magic-link",
-          role: expectedRole,
-        });
-
-        expectToEqual(
-          [dispatchedPayload.magicLink, dispatchedPayload.conventionStatusLink],
-          [
-            `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
-            `${config.immersionFacileBaseUrl}/api/to/${shortLinks[1]}`,
-          ],
-        );
-
-        expectToEqual(
-          uow.shortLinkQuery.getShortLinks()[shortLinks[0]],
-          fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
-            role: expectedRole,
-            email: expectedEmails,
-            now: timeGateway.now(),
-            targetRoute: frontRoutes.conventionToSign,
-          }),
-        );
-      },
-    );
+          targetRoute: frontRoutes.conventionToSign,
+        }),
+      );
+    });
 
     it("Also work when using encoded Url", async () => {
       shortLinkIdGeneratorGateway.addMoreShortLinkIds([
