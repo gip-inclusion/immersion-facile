@@ -24,7 +24,7 @@
     "@babel/core": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
     "@babel/preset-typescript": "^7.27.1",
-    "@codegouvfr/react-dsfr": "^1.27.0",
+    "@codegouvfr/react-dsfr": "^1.29.0",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@hookform/error-message": "^2.0.1",
