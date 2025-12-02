@@ -426,6 +426,24 @@ export const defaultEmailValueByEmailKind: {
   DISCUSSION_EXCHANGE_FORBIDDEN: {
     reason: "discussion_completed",
     sender: "establishment",
+    admins: [
+      { firstName: "Martin", lastName: "Fowler", email: "m.fowler@mail.com" },
+      {
+        firstName: "Wilson H.",
+        lastName: "Dikout",
+        email: "whdickout@supermail.com",
+      },
+      {
+        firstName: "Adrien",
+        lastName: "Bernard",
+        email: "adrien.bernard@corp.com",
+      },
+      {
+        firstName: "",
+        lastName: "",
+        email: "unknown.dude@mail.com",
+      },
+    ],
   },
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: ["undelivered@email.com", "whatever@email.com"],

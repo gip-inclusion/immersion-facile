@@ -6,19 +6,19 @@ import {
   type DateString,
   type DiscussionDto,
   type DiscussionExchangeForbiddenParams,
+  type DiscussionExchangeForbiddenReason,
   type DiscussionId,
   discussionIdSchema,
   type Email,
   type Exchange,
   type ExchangeRole,
+  type ExchangeSender,
   type ExtractFromExisting,
   emailSchema,
   errors,
   exchangeRoleSchema,
   localization,
-  type User,
   type UserId,
-  type UserWithAdminRights,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -171,15 +171,41 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         discussion.siret,
       );
 
-    if (!establishment || discussion.status === "REJECTED")
-      return this.#notifyForbidden({
-        uow,
-        discussion,
-        source,
-        messageInput,
-        establishment,
-      });
+    return !establishment || discussion.status === "REJECTED"
+      ? this.#notifyForbidden({
+          uow,
+          discussion,
+          source,
+          messageInput,
+          establishment,
+          reason: !establishment
+            ? "establishment_missing"
+            : "discussion_completed",
+        })
+      : this.#onEstablishmentAndDiscussionNotRejected({
+          discussion,
+          uow,
+          establishment,
+          source,
+          messageInput,
+        });
+  }
 
+  async #onEstablishmentAndDiscussionNotRejected({
+    discussion,
+    uow,
+    establishment,
+    messageInput,
+    source,
+  }: {
+    discussion: DiscussionDto;
+    uow: UnitOfWork;
+    establishment: EstablishmentAggregate;
+    messageInput:
+      | MessageInputFromDashboardWithUserId
+      | MessageInputFromInboundParsing;
+    source: InputSource;
+  }) {
     if (
       this.#isUserPotentialBeneficiaryOnDiscussion({
         messageInput,
@@ -190,29 +216,53 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         uow,
         discussion,
         messageInput,
-        userOnDiscussion: {
-          firstName: discussion.potentialBeneficiary.firstName,
-          lastName: discussion.potentialBeneficiary.lastName,
-          email: discussion.potentialBeneficiary.email,
-        },
+        exchangeSender: { sender: "potentialBeneficiary" },
         source,
       });
     }
 
-    const connectedUserOnDiscussion =
-      await this.#getEstablishmentUserInfosByEmailOrId(
-        uow,
-        messageInput,
-        establishment,
-      );
+    const user = isMessageInputFromEmail(messageInput)
+      ? await uow.userRepository.findByEmail(messageInput.senderEmail)
+      : await uow.userRepository.getById(messageInput.userId);
 
-    return this.#addExchangeAndSendEvent({
-      uow,
-      discussion,
-      messageInput,
-      userOnDiscussion: connectedUserOnDiscussion,
-      source,
-    });
+    if (
+      user &&
+      establishment.userRights.some(
+        (userRight) =>
+          userRight.userId === user.id &&
+          (userRight.role === "establishment-admin" ||
+            userRight.role === "establishment-contact"),
+      )
+    )
+      return this.#addExchangeAndSendEvent({
+        uow,
+        discussion,
+        messageInput,
+        exchangeSender: {
+          sender: "establishment",
+          firstname: user.firstName,
+          lastname: user.lastName,
+          email: user.email,
+        },
+        source,
+      });
+
+    if (isMessageInputFromEmail(messageInput))
+      return this.#notifyForbidden({
+        uow,
+        discussion,
+        source,
+        messageInput,
+        reason: "user_unknown_or_missing_rights_on_establishment",
+        establishment,
+      });
+
+    throw !user
+      ? errors.user.notFound({ userId: messageInput.userId })
+      : errors.establishment.notAdminOrContactRight({
+          siret: establishment.establishment.siret,
+          userId: user.id,
+        });
   }
 
   #isUserPotentialBeneficiaryOnDiscussion({
@@ -234,16 +284,16 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
     uow,
     discussion,
     messageInput,
-    userOnDiscussion,
     source,
+    exchangeSender,
   }: {
     uow: UnitOfWork;
     discussion: DiscussionDto;
     messageInput:
       | MessageInputFromDashboardWithUserId
       | MessageInputFromInboundParsing;
-    userOnDiscussion: Pick<User, "firstName" | "lastName" | "email">;
     source: InputSource;
+    exchangeSender: ExchangeSender;
   }): Promise<Exchange> {
     const exchange: Exchange = {
       subject: makeFormattedSubject({
@@ -258,14 +308,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         : this.#timeGateway.now().toISOString(),
       message: messageInput.message,
       attachments: messageInput.attachments,
-      ...(messageInput.recipientRole === "potentialBeneficiary"
-        ? {
-            sender: "establishment",
-            firstname: userOnDiscussion.firstName,
-            lastname: userOnDiscussion.lastName,
-            email: userOnDiscussion.email,
-          }
-        : { sender: "potentialBeneficiary" }),
+      ...exchangeSender,
     };
 
     await Promise.all([
@@ -285,58 +328,40 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
     return exchange;
   }
 
-  async #getEstablishmentUserInfosByEmailOrId(
-    uow: UnitOfWork,
-    messageInput:
-      | MessageInputFromDashboardWithUserId
-      | MessageInputFromInboundParsing,
-    establishment: EstablishmentAggregate,
-  ): Promise<UserWithAdminRights> {
-    const user = isMessageInputFromEmail(messageInput)
-      ? await uow.userRepository.findByEmail(messageInput.senderEmail)
-      : await uow.userRepository.getById(messageInput.userId);
-
-    if (!user) {
-      throw isMessageInputFromEmail(messageInput)
-        ? errors.user.notFoundByEmail({ email: messageInput.senderEmail })
-        : errors.user.notFound({ userId: messageInput.userId });
-    }
-
-    if (
-      !establishment.userRights.some(
-        (userRight) =>
-          userRight.userId === user.id &&
-          (userRight.role === "establishment-admin" ||
-            userRight.role === "establishment-contact"),
-      )
-    ) {
-      throw errors.establishment.notAdminOrContactRight({
-        siret: establishment.establishment.siret,
-        userId: user.id,
-      });
-    }
-    return user;
-  }
-
   async #notifyForbidden({
     uow,
     discussion,
-    establishment,
     source,
     messageInput,
+    reason,
+    establishment,
   }: {
     uow: UnitOfWork;
     discussion: DiscussionDto;
     source: InputSource;
     messageInput: MessageInput;
-    establishment: EstablishmentAggregate | undefined;
+    reason: DiscussionExchangeForbiddenReason;
+    establishment?: EstablishmentAggregate;
   }): Promise<DiscussionExchangeForbiddenParams> {
+    const adminUsers = establishment
+      ? await uow.userRepository.getByIds(
+          establishment.userRights
+            .filter((right) => right.role === "establishment-admin")
+            .map(({ userId }) => userId),
+        )
+      : [];
+
     const params: DiscussionExchangeForbiddenParams = {
-      reason: !establishment ? "establishment_missing" : "discussion_completed",
       sender:
         messageInput.recipientRole === "establishment"
           ? "potentialBeneficiary"
           : "establishment",
+      reason,
+      admins: adminUsers.map(({ firstName, lastName, email }) => ({
+        firstName,
+        lastName,
+        email,
+      })),
     };
 
     if (source === "inbound-parsing" && isMessageInputFromEmail(messageInput))
@@ -348,11 +373,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         templatedContent: {
           kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
           params,
-          recipients: [
-            messageInput.recipientRole === "potentialBeneficiary"
-              ? messageInput.senderEmail
-              : discussion.potentialBeneficiary.email,
-          ],
+          recipients: [messageInput.senderEmail],
         },
       });
 

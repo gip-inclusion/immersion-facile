@@ -424,7 +424,17 @@ describe("discussion e2e", () => {
         }),
         {
           status: 202,
-          body: { reason: "discussion_completed", sender: "establishment" },
+          body: {
+            reason: "discussion_completed",
+            sender: "establishment",
+            admins: [
+              {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+              },
+            ],
+          },
         },
       );
 
