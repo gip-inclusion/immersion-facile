@@ -119,26 +119,25 @@ describe("GetAssessmentByConventionId", () => {
       );
     });
 
-    it.each(failingRoles)(
-      "throws forbidden if magicLink role is '%s'",
-      async (role) => {
-        await expectPromiseToFailWithError(
-          getAssessment.execute(
-            { conventionId: convention.id },
-            {
-              applicationId: convention.id,
-              emailHash: makeHashByRolesForTest(
-                convention,
-                counsellor,
-                validator,
-              )[role],
-              role: role as ConventionRole,
-            },
-          ),
-          errors.assessment.forbidden("GetAssessment"),
-        );
-      },
-    );
+    it.each(
+      failingRoles,
+    )("throws forbidden if magicLink role is '%s'", async (role) => {
+      await expectPromiseToFailWithError(
+        getAssessment.execute(
+          { conventionId: convention.id },
+          {
+            applicationId: convention.id,
+            emailHash: makeHashByRolesForTest(
+              convention,
+              counsellor,
+              validator,
+            )[role],
+            role: role as ConventionRole,
+          },
+        ),
+        errors.assessment.forbidden("GetAssessment"),
+      );
+    });
 
     it("throws forbidden if user doesnt have allowed assessment role on convention", async () => {
       uow.conventionRepository.setConventions([convention]);
@@ -154,39 +153,39 @@ describe("GetAssessmentByConventionId", () => {
       );
     });
 
-    it.each(["counsellor", "validator"] satisfies Role[])(
-      "throw forbidden if the jwt role is '%s' the user is not notified on agency rights",
-      async (role) => {
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [counsellor.id]: {
-              isNotifiedByEmail: false,
-              roles: ["counsellor"],
-            },
-            [validator.id]: {
-              isNotifiedByEmail: false,
-              roles: ["validator"],
-            },
-          }),
-        ];
+    it.each([
+      "counsellor",
+      "validator",
+    ] satisfies Role[])("throw forbidden if the jwt role is '%s' the user is not notified on agency rights", async (role) => {
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [counsellor.id]: {
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+          [validator.id]: {
+            isNotifiedByEmail: false,
+            roles: ["validator"],
+          },
+        }),
+      ];
 
-        await expectPromiseToFailWithError(
-          getAssessment.execute(
-            { conventionId: convention.id },
-            {
-              ...establishmentTutorPayload,
-              emailHash: makeHashByRolesForTest(
-                convention,
-                counsellor,
-                validator,
-              )[role],
-              role,
-            },
-          ),
-          errors.assessment.forbidden("GetAssessment"),
-        );
-      },
-    );
+      await expectPromiseToFailWithError(
+        getAssessment.execute(
+          { conventionId: convention.id },
+          {
+            ...establishmentTutorPayload,
+            emailHash: makeHashByRolesForTest(
+              convention,
+              counsellor,
+              validator,
+            )[role],
+            role,
+          },
+        ),
+        errors.assessment.forbidden("GetAssessment"),
+      );
+    });
 
     it("throw not found error when no assessment exist", async () => {
       uow.assessmentRepository.assessments = [];
@@ -204,28 +203,27 @@ describe("GetAssessmentByConventionId", () => {
   });
 
   describe("Right paths", () => {
-    it.each(passingRoles)(
-      "get existing assessment with magic link role '%s'",
-      async (role) => {
-        expectToEqual(
-          await getAssessment.execute(
-            {
-              conventionId: convention.id,
-            },
-            {
-              ...establishmentTutorPayload,
-              role,
-              emailHash: makeHashByRolesForTest(
-                convention,
-                counsellor,
-                validator,
-              )[role],
-            },
-          ),
-          assessment,
-        );
-      },
-    );
+    it.each(
+      passingRoles,
+    )("get existing assessment with magic link role '%s'", async (role) => {
+      expectToEqual(
+        await getAssessment.execute(
+          {
+            conventionId: convention.id,
+          },
+          {
+            ...establishmentTutorPayload,
+            role,
+            emailHash: makeHashByRolesForTest(
+              convention,
+              counsellor,
+              validator,
+            )[role],
+          },
+        ),
+        assessment,
+      );
+    });
 
     it("get existing assessment if user is validator", async () => {
       uow.conventionRepository.setConventions([convention]);

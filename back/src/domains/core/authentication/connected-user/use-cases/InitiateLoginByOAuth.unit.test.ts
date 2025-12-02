@@ -15,51 +15,50 @@ import { InitiateLoginByOAuth } from "./InitiateLoginByOAuth";
 
 describe("InitiateLoginByOAuth usecase", () => {
   describe("With OAuthGateway mode 'proConnect'", () => {
-    it.each(allowedLoginUris)(
-      "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
-      async (uri) => {
-        const state = "my-state";
-        const nonce = "my-nonce";
-        const uow = createInMemoryUow();
-        const uuidGenerator = new TestUuidGenerator();
-        const useCase = new InitiateLoginByOAuth(
-          new InMemoryUowPerformer(uow),
-          uuidGenerator,
-          new InMemoryOAuthGateway(fakeProviderConfig),
-        );
+    it.each(
+      allowedLoginUris,
+    )("construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth", async (uri) => {
+      const state = "my-state";
+      const nonce = "my-nonce";
+      const uow = createInMemoryUow();
+      const uuidGenerator = new TestUuidGenerator();
+      const useCase = new InitiateLoginByOAuth(
+        new InMemoryUowPerformer(uow),
+        uuidGenerator,
+        new InMemoryOAuthGateway(fakeProviderConfig),
+      );
 
-        uuidGenerator.setNextUuids([nonce, state]);
+      uuidGenerator.setNextUuids([nonce, state]);
 
-        const sourcePage: WithRedirectUri = {
-          redirectUri: `/${uri}?discussionId=discussion0`,
-        };
-        const redirectUrl = await useCase.execute(sourcePage);
-        const loginEndpoint = "login-pro-connect";
+      const sourcePage: WithRedirectUri = {
+        redirectUri: `/${uri}?discussionId=discussion0`,
+      };
+      const redirectUrl = await useCase.execute(sourcePage);
+      const loginEndpoint = "login-pro-connect";
 
-        expectToEqual(
-          redirectUrl,
-          encodeURI(
-            `${
-              fakeProviderConfig.providerBaseUri
-            }/${loginEndpoint}?${queryParamsAsString({
-              nonce,
-              state,
-            })}`,
-          ),
-        );
-
-        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-          {
-            fromUri: sourcePage.redirectUri,
+      expectToEqual(
+        redirectUrl,
+        encodeURI(
+          `${
+            fakeProviderConfig.providerBaseUri
+          }/${loginEndpoint}?${queryParamsAsString({
             nonce,
             state,
-            provider: "proConnect",
-            externalId: undefined,
-            accessToken: undefined,
-            usedAt: null,
-          },
-        ]);
-      },
-    );
+          })}`,
+        ),
+      );
+
+      expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+        {
+          fromUri: sourcePage.redirectUri,
+          nonce,
+          state,
+          provider: "proConnect",
+          externalId: undefined,
+          accessToken: undefined,
+          usedAt: null,
+        },
+      ]);
+    });
   });
 });

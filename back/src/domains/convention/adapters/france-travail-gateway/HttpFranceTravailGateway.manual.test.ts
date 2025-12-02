@@ -141,38 +141,38 @@ describe("HttpFranceTravailGateway", () => {
         body: {},
       },
     },
-  ] satisfies TestCase[])(
-    "Should have status $expected.status when $testMessage",
-    async ({ fields, expected }) => {
-      const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createFtAxiosHttpClientForTest(config),
-        withCache,
-        config.ftApiUrl,
-        config.franceTravailAccessTokenConfig,
-        noRetries,
-        franceTravailRoutes,
+  ] satisfies TestCase[])("Should have status $expected.status when $testMessage", async ({
+    fields,
+    expected,
+  }) => {
+    const httpFranceTravailGateway = new HttpFranceTravailGateway(
+      createFtAxiosHttpClientForTest(config),
+      withCache,
+      config.ftApiUrl,
+      config.franceTravailAccessTokenConfig,
+      noRetries,
+      franceTravailRoutes,
+    );
+
+    const response =
+      await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
+        ...ftConvention,
+        ...fields,
+      });
+
+    if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
+      throw errors.generic.testError(
+        `Should not occurs : response status was ${response.status}`,
       );
 
-      const response =
-        await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
-          ...ftConvention,
-          ...fields,
-        });
-
-      if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
-        throw errors.generic.testError(
-          `Should not occurs : response status was ${response.status}`,
-        );
-
-      const { status, subscriberErrorFeedback } = response;
-      expectToEqual(status, expected.status);
-      expectToEqual(
-        subscriberErrorFeedback.message,
-        expected.subscriberErrorFeedback.message,
-      );
-      expect(subscriberErrorFeedback.error).toBeDefined();
-    },
-  );
+    const { status, subscriberErrorFeedback } = response;
+    expectToEqual(status, expected.status);
+    expectToEqual(
+      subscriberErrorFeedback.message,
+      expected.subscriberErrorFeedback.message,
+    );
+    expect(subscriberErrorFeedback.error).toBeDefined();
+  });
 
   it.each([
     {
@@ -195,29 +195,29 @@ describe("HttpFranceTravailGateway", () => {
       },
       expected: { status: 200, body: "" },
     },
-  ] satisfies TestCase[])(
-    "Should have status $expected.status when $testMessage",
-    async ({ fields, expected }) => {
-      const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createFtAxiosHttpClientForTest(config),
-        withCache,
-        config.ftApiUrl,
-        config.franceTravailAccessTokenConfig,
-        noRetries,
-        franceTravailRoutes,
-      );
+  ] satisfies TestCase[])("Should have status $expected.status when $testMessage", async ({
+    fields,
+    expected,
+  }) => {
+    const httpFranceTravailGateway = new HttpFranceTravailGateway(
+      createFtAxiosHttpClientForTest(config),
+      withCache,
+      config.ftApiUrl,
+      config.franceTravailAccessTokenConfig,
+      noRetries,
+      franceTravailRoutes,
+    );
 
-      const response =
-        await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
-          ...ftConvention,
-          ...fields,
-        });
+    const response =
+      await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
+        ...ftConvention,
+        ...fields,
+      });
 
-      if (!isBroadcastResponseOk(expected))
-        throw errors.generic.testError("Should not occurs");
-      expectToEqual(response, expected);
-    },
-  );
+    if (!isBroadcastResponseOk(expected))
+      throw errors.generic.testError("Should not occurs");
+    expectToEqual(response, expected);
+  });
 
   it("error feedback axios timeout", async () => {
     const axiosInstance = makeAxiosInstances(

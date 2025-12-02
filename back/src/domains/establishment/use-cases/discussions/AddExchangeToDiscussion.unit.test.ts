@@ -474,8 +474,7 @@ describe("AddExchangeToDiscussion", () => {
               email: adminUserEstablishment1.email,
               firstname: adminUserEstablishment1.firstName,
               lastname: adminUserEstablishment1.lastName,
-              // biome-ignore lint/style/noNonNullAssertion: testing purpose
-              message: firstInboundParsingItem.RawHtmlBody?.trim()!,
+              message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(),
               sender: "establishment",
               subject: firstInboundParsingItem.Subject,
               sentAt: new Date(
@@ -596,8 +595,7 @@ describe("AddExchangeToDiscussion", () => {
 
             const expectedNewMessage: Exchange = {
               sender: "potentialBeneficiary",
-              // biome-ignore lint/style/noNonNullAssertion: testing purpose
-              message: firstInboundParsingItem.RawHtmlBody?.trim()!,
+              message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(),
               sentAt: new Date(
                 firstInboundParsingItem.SentAtDate,
               ).toISOString(),

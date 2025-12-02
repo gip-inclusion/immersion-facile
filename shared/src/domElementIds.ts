@@ -21,12 +21,8 @@ type FrontRoutePossibleValues =
   | string
   | FrontRouteParametrizedValue;
 
-type FrontRouteValue<V extends FrontRoutePossibleValues> = V extends Record<
-  string,
-  string
->
-  ? FrontRouteValue<V>
-  : V;
+type FrontRouteValue<V extends FrontRoutePossibleValues> =
+  V extends Record<string, string> ? FrontRouteValue<V> : V;
 
 type FrontRoutesValues = Record<
   string,

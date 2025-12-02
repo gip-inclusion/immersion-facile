@@ -105,21 +105,21 @@ describe("GetEstablishmentNameAndAdmins", () => {
             dashboards: { agencies: {}, establishments: {} },
           },
         },
-      ] satisfies { name: string; currentUser: ConnectedUser }[])(
-        "$name",
-        async ({ currentUser }) => {
-          expectToEqual(
-            await getEstablishmentNameAndAdmins.execute(
-              { siret: establishment.establishment.siret },
-              currentUser,
-            ),
-            {
-              name: establishment.establishment.name,
-              adminEmails: [establishmentAdminUser.email],
-            },
-          );
-        },
-      );
+      ] satisfies {
+        name: string;
+        currentUser: ConnectedUser;
+      }[])("$name", async ({ currentUser }) => {
+        expectToEqual(
+          await getEstablishmentNameAndAdmins.execute(
+            { siret: establishment.establishment.siret },
+            currentUser,
+          ),
+          {
+            name: establishment.establishment.name,
+            adminEmails: [establishmentAdminUser.email],
+          },
+        );
+      });
     });
 
     it("With establishment custom name if provided", async () => {

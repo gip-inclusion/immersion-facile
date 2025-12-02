@@ -166,15 +166,15 @@ describe("Discussions", () => {
       },
     ];
 
-    it.each(testCases)(
-      "returns $expectedDisplayStatus when $message",
-      ({ discussion, expectedDisplayStatus }) => {
-        expectToEqual(
-          getDiscussionDisplayStatus({ discussion, now }),
-          expectedDisplayStatus,
-        );
-      },
-    );
+    it.each(testCases)("returns $expectedDisplayStatus when $message", ({
+      discussion,
+      expectedDisplayStatus,
+    }) => {
+      expectToEqual(
+        getDiscussionDisplayStatus({ discussion, now }),
+        expectedDisplayStatus,
+      );
+    });
   });
 
   describe("Discussion schema", () => {
