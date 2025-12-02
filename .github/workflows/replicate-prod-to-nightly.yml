@@ -20,46 +20,49 @@ jobs:
 
       - name: Dump the remote database data and restore it to the local database.
         run: >-
-          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL bash -c "
-                echo \"> \$(date) - activate Scalingo CLI, PG then login\" &&
+          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
+                echo \"> \$(date) - Installing tools\" &&
                   install-scalingo-cli &&
                   dbclient-fetcher pgsql &&
-                  scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_SECNUM }} &&
-                echo \"> \$(date) - Getting Bearer token\" &&
-                  BEARER_TOKEN=\$(curl -s -H \"Accept: application/json\" \
-                    -H \"Content-Type: application/json\" \
-                    -u \":${{ secrets.SCALINGO_API_TOKEN_SECNUM }}\" \
-                    -X POST https://auth.scalingo.com/v1/tokens/exchange\
-                     | jq -r '.token') &&
-                echo \"> \$(date) - Getting PG Addon ID\" &&
-                  ADDON_ID=\$(curl -H \"Accept: application/json\"\
-                    -H \"Content-Type: application/json\"\
-                    -H \"Authorization: Bearer \$BEARER_TOKEN\"\
-                    -X GET https://api.osc-secnum-fr1.scalingo.com/v1/apps/if-prod-back/addons\
-                    | jq -r '.addons[] | select(.addon_provider.id==\"postgresql\") | .id') &&
-                echo \"> PG Addon ID is : \$ADDON_ID\" &&
-                echo \"> \$(date) - Downloading last DB backup\" &&
-                  scalingo --region osc-secnum-fr1 --app if-prod-back --addon=\$ADDON_ID backups-download --output=dump.tar.gz &&
-                  tar --to-stdout -xzf dump.tar.gz > dump.pgsql &&
-                echo \"> \$(date) - Create a Table of content for restore, ignore postgis related schemas and tables:\" &&
-                  pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology | grep -v outbox | grep -v notifications | grep -v short_links | grep -v metabase > list.txt &&
-                echo \"> \$(date) - Dropping data and schema owned by current user\" &&
+                echo \"> \$(date) - Dumping prod DB (excluding large unused tables)\" &&
+                  pg_dump --dbname=\"\$SOURCE_PROD_DATABASE_URL\" \
+                    --format=custom \
+                    --no-owner \
+                    --no-privileges \
+                    --no-comments \
+                    --exclude-table=outbox \
+                    --exclude-table=outbox_publications \
+                    --exclude-table=outbox_failures \
+                    --exclude-table=notifications_email \
+                    --exclude-table=notifications_email_recipients \
+                    --exclude-table=notifications_email_attachments \
+                    --exclude-table=notifications_sms \
+                    --exclude-table=short_links \
+                    --exclude-table=spatial_ref_sys \
+                    --exclude-schema=tiger \
+                    --exclude-schema=tiger_data \
+                    --exclude-schema=topology \
+                    --exclude-schema=\"metabase*\" \
+                    --file=dump.pgsql &&
+                echo \"> \$(date) - Dump complete, dropping nightly data\" &&
                   psql \$SCALINGO_POSTGRESQL_URL -c 'DROP OWNED BY CURRENT_USER CASCADE;' &&
                 echo \"> \$(date) - Add Postgis extension if not exists\" &&
                   psql \$SCALINGO_POSTGRESQL_URL -c 'CREATE EXTENSION IF NOT EXISTS postgis;' &&
-                echo \"> \$(date) - Start pg_restore\" &&\
-                  pg_restore\
-                    --jobs=8\
-                    --disable-triggers\
-                    --use-list=list.txt\
-                    --verbose\
-                    --no-owner\
-                    --no-privileges\
-                    --no-comments\
-                    --exit-on-error\
-                    --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql 2>&1 | awk '{print strftime(\"%Y-%m-%d %H:%M:%S\"), \$0; fflush()}' &&
-                echo \"> \$(date) - Finished restoring schema\" &&
+                echo \"> \$(date) - Starting restore to nightly\" &&
+                  pg_restore \
+                    --dbname=\$SCALINGO_POSTGRESQL_URL \
+                    --jobs=8 \
+                    --verbose \
+                    --no-owner \
+                    --no-privileges \
+                    --disable-triggers \
+                    --exit-on-error \
+                    dump.pgsql 2>&1 | awk '{print strftime(\"%Y-%m-%d %H:%M:%S\"), \$0; fflush()}' &&
+                echo \"> \$(date) - Cleaning up dump file\" &&
+                  rm -f dump.pgsql &&
+                echo \"> \$(date) - Finished restoring\" &&
                   exit 0"
+
       - name: Run DBT transformations
         run: >-
           scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
@@ -67,5 +70,3 @@ jobs:
                   cd bi && ./run_dbt.sh run &&
                 echo \"> \$(date) - DBT run completed successfully\" &&
                   exit 0"
-
-
