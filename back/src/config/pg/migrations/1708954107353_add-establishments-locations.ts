@@ -205,6 +205,7 @@ const createEstablishmentsView = (
   direction: "up" | "down",
 ) => {
   if (direction === "down") {
+    // biome-ignore-start lint/suspicious/noUselessEscapeInString: sql query
     pgm.sql(`
     CREATE MATERIALIZED VIEW view_establishments AS
     WITH count_conventions_by_siret AS (
@@ -267,7 +268,9 @@ const createEstablishmentsView = (
       LEFT JOIN count_contact_requests_by_siret count_rel ON ((count_rel.siret = e.siret)))
       LEFT JOIN count_conventions_by_siret count_conv ON ((count_conv.siret = e.siret)));
     `);
+    // biome-ignore-end lint/suspicious/noUselessEscapeInString: sql query
   } else {
+    // biome-ignore-start lint/suspicious/noUselessEscapeInString: sql query
     pgm.sql(`
     CREATE MATERIALIZED VIEW view_establishments AS
     WITH count_conventions_by_siret AS (
@@ -332,6 +335,7 @@ const createEstablishmentsView = (
       LEFT JOIN establishments_locations loc ON ((loc.establishment_siret = e.siret))
       )
       `);
+    // biome-ignore-end lint/suspicious/noUselessEscapeInString: sql query
   }
 };
 

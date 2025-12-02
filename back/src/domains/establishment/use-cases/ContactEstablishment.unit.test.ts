@@ -767,10 +767,13 @@ describe("ContactEstablishment", () => {
             businessName: establishment.establishment.name,
             createdAt: timeGateway.now().toISOString(),
             updatedAt: timeGateway.now().toISOString(),
-            address:
-              // biome-ignore lint/style/noNonNullAssertion: testing purpose
-              establishment.establishment.potentialBeneficiaryWelcomeAddress
-                ?.address!,
+            address: establishment.establishment
+              .potentialBeneficiaryWelcomeAddress?.address ?? {
+              streetNumberAndAddress: "",
+              city: "",
+              postcode: "",
+              departmentCode: "",
+            },
             contactMode: "IN_PERSON",
             kind: "IF",
             potentialBeneficiary: {

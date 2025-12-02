@@ -1954,20 +1954,20 @@ describe("Pg implementation of ConventionQueries", () => {
             },
           },
         },
-      ])(
-        "results are ordered by occurredtAt desc and paginated",
-        async ({ requestedPagination, expectedResult }) => {
-          const result =
-            await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
-              {
-                userAgencyIds: [agency.id],
-                pagination: requestedPagination,
-              },
-            );
+      ])("results are ordered by occurredtAt desc and paginated", async ({
+        requestedPagination,
+        expectedResult,
+      }) => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agency.id],
+              pagination: requestedPagination,
+            },
+          );
 
-          expectToEqual(result, expectedResult);
-        },
-      );
+        expectToEqual(result, expectedResult);
+      });
     });
   });
 });

@@ -1162,27 +1162,27 @@ describe("PgAgencyRepository", () => {
       expect(hasAlreadySimilarAgency).toBe(false);
     });
 
-    it.each([...activeAgencyStatuses, "needsReview"] as AgencyStatus[])(
-      "return true if there is an agency %s with given address and kind",
-      async (status) => {
-        const activeAgencyAlreadyInDb = toAgencyWithRights(
-          agency1builder.withStatus(status).build(),
-          {
-            [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-          },
-        );
-        await agencyRepository.insert(activeAgencyAlreadyInDb);
-        const newAgencyId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-        const hasAlreadySimilarAgency =
-          await agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
-            address: activeAgencyAlreadyInDb.address,
-            kind: activeAgencyAlreadyInDb.kind,
-            idToIgnore: newAgencyId,
-          });
+    it.each([
+      ...activeAgencyStatuses,
+      "needsReview",
+    ] as AgencyStatus[])("return true if there is an agency %s with given address and kind", async (status) => {
+      const activeAgencyAlreadyInDb = toAgencyWithRights(
+        agency1builder.withStatus(status).build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        },
+      );
+      await agencyRepository.insert(activeAgencyAlreadyInDb);
+      const newAgencyId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const hasAlreadySimilarAgency =
+        await agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
+          address: activeAgencyAlreadyInDb.address,
+          kind: activeAgencyAlreadyInDb.kind,
+          idToIgnore: newAgencyId,
+        });
 
-        expect(hasAlreadySimilarAgency).toBe(true);
-      },
-    );
+      expect(hasAlreadySimilarAgency).toBe(true);
+    });
   });
 
   describe("findExistingActiveSirets()", () => {

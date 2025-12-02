@@ -77,11 +77,8 @@ import { partnerNames } from "./partnerNames";
 
 const logger = createLogger(__filename);
 
-export type Gateways = ReturnType<typeof createGateways> extends Promise<
-  infer T
->
-  ? T
-  : never;
+export type Gateways =
+  ReturnType<typeof createGateways> extends Promise<infer T> ? T : never;
 
 export const createFetchHttpClientForExternalAPIs = <
   R extends Record<string, UnknownSharedRoute>,

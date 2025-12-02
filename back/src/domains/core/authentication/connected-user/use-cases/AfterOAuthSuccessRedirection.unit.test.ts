@@ -359,24 +359,23 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       });
 
       describe("handle dynamic login pages", () => {
-        it.each(allowedLoginSources)(
-          "generates an app token and returns a redirection url which includes token and user data for %s",
-          async (page) => {
-            const { initialOngoingOAuth, fromUri } =
-              makeSuccessfulAuthenticationConditions(
-                `/${page}?discussionId=discussion0`,
-              );
-
-            const redirectedUrl = await afterOAuthSuccessRedirection.execute({
-              code: "my-code",
-              state: initialOngoingOAuth.state,
-            });
-
-            expect(redirectedUrl).toBe(
-              `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
+        it.each(
+          allowedLoginSources,
+        )("generates an app token and returns a redirection url which includes token and user data for %s", async (page) => {
+          const { initialOngoingOAuth, fromUri } =
+            makeSuccessfulAuthenticationConditions(
+              `/${page}?discussionId=discussion0`,
             );
-          },
-        );
+
+          const redirectedUrl = await afterOAuthSuccessRedirection.execute({
+            code: "my-code",
+            state: initialOngoingOAuth.state,
+          });
+
+          expect(redirectedUrl).toBe(
+            `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
+          );
+        });
       });
     });
 
@@ -510,55 +509,54 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     });
 
     describe("handle dynamic login pages", () => {
-      it.each(allowedLoginSources)(
-        "generates an app token and returns a redirection url which includes token and user data for %s, create user and update onGoingOAuth",
-        async (page) => {
-          const email = "my-email@mail.com";
+      it.each(
+        allowedLoginSources,
+      )("generates an app token and returns a redirection url which includes token and user data for %s, create user and update onGoingOAuth", async (page) => {
+        const email = "my-email@mail.com";
 
-          const initialOngoingOAuth: OngoingOAuth = {
-            fromUri: `/${page}?discussionId=discussion0`,
-            provider: "email",
-            state: "my-state",
-            nonce: "nounce", // matches the one in the payload of the token
+        const initialOngoingOAuth: OngoingOAuth = {
+          fromUri: `/${page}?discussionId=discussion0`,
+          provider: "email",
+          state: "my-state",
+          nonce: "nounce", // matches the one in the payload of the token
+          email,
+          usedAt: null,
+        };
+
+        uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
+
+        const userId = "new-user-id";
+        uuidGenerator.setNextUuid(userId);
+
+        const redirectedUrl = await afterOAuthSuccessRedirection.execute({
+          code: generateEmailAuthCode({ version: 1 }),
+          state: initialOngoingOAuth.state,
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          {
+            id: userId,
             email,
-            usedAt: null,
-          };
+            createdAt: timeGateway.now().toISOString(),
+            firstName: "",
+            lastName: "",
+            proConnect: null,
+            lastLoginAt: timeGateway.now().toISOString(),
+          },
+        ]);
 
-          uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
+        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+          {
+            ...initialOngoingOAuth,
+            userId,
+            usedAt: timeGateway.now(),
+          },
+        ]);
 
-          const userId = "new-user-id";
-          uuidGenerator.setNextUuid(userId);
-
-          const redirectedUrl = await afterOAuthSuccessRedirection.execute({
-            code: generateEmailAuthCode({ version: 1 }),
-            state: initialOngoingOAuth.state,
-          });
-
-          expectToEqual(uow.userRepository.users, [
-            {
-              id: userId,
-              email,
-              createdAt: timeGateway.now().toISOString(),
-              firstName: "",
-              lastName: "",
-              proConnect: null,
-              lastLoginAt: timeGateway.now().toISOString(),
-            },
-          ]);
-
-          expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-            {
-              ...initialOngoingOAuth,
-              userId,
-              usedAt: timeGateway.now(),
-            },
-          ]);
-
-          expect(redirectedUrl).toBe(
-            `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
-          );
-        },
-      );
+        expect(redirectedUrl).toBe(
+          `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
+        );
+      });
     });
   });
 

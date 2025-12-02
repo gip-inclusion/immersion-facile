@@ -34,11 +34,8 @@ import { createUseCases } from "./createUseCases";
 
 const uuidGenerator = new UuidV4Generator();
 
-export type AppDependencies = ReturnType<
-  typeof createAppDependencies
-> extends Promise<infer T>
-  ? T
-  : never;
+export type AppDependencies =
+  ReturnType<typeof createAppDependencies> extends Promise<infer T> ? T : never;
 
 export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createMakeProductionPgPool(config);

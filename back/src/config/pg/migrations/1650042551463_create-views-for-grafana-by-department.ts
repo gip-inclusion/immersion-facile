@@ -4,6 +4,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createView(
     "view_agencies_by_department",
     { replace: true },
+    // biome-ignore-start lint/suspicious/noUselessEscapeInString: sql query
     `
     WITH agencies_with_postal_code AS
       (SELECT name, kind, (regexp_match(address, '\d{5}'))[1] AS postal_code
@@ -12,11 +13,13 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     LEFT JOIN postal_code_department_region AS pcdr ON pcdr.postal_code = a.postal_code
     ORDER BY department
   `,
+    // biome-ignore-end lint/suspicious/noUselessEscapeInString: sql query
   );
 
   pgm.createView(
     "view_offers_by_department",
     { replace: true },
+    // biome-ignore-start lint/suspicious/noUselessEscapeInString: sql query
     `
     WITH offers_by_department AS 
       (WITH establishments_by_department AS 
@@ -36,6 +39,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     LEFT JOIN public_romes_data prd on prd.code_rome = obd.rome_code 
     LEFT JOIN public_appellations_data pad on pad.ogr_appellation = obd.rome_appellation 
     LEFT JOIN establishments e on e.siret = obd.siret`,
+    // biome-ignore-end lint/suspicious/noUselessEscapeInString: sql query
   );
 }
 

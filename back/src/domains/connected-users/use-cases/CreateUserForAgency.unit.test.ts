@@ -199,59 +199,58 @@ describe("CreateUserForAgency", () => {
       triggeredByRole: "agency-admin",
       triggeredByUser: connectedAgencyAdminUser,
     },
-  ])(
-    "$triggeredByRole can create new user with its agency rights if no other users exist by email",
-    async ({ triggeredByUser }) => {
-      const newUserId = uuidGenerator.new();
-      uow.userRepository.users = [counsellor];
+  ])("$triggeredByRole can create new user with its agency rights if no other users exist by email", async ({
+    triggeredByUser,
+  }) => {
+    const newUserId = uuidGenerator.new();
+    uow.userRepository.users = [counsellor];
 
-      const userForAgency: UserParamsForAgency = {
-        userId: newUserId,
-        agencyId: agencyWithCounsellor.id,
-        roles: ["counsellor"],
-        isNotifiedByEmail: false,
-        email: "new-user@email.fr",
-      };
+    const userForAgency: UserParamsForAgency = {
+      userId: newUserId,
+      agencyId: agencyWithCounsellor.id,
+      roles: ["counsellor"],
+      isNotifiedByEmail: false,
+      email: "new-user@email.fr",
+    };
 
-      //TODO: ici un usecase de commande qui retourne de la data et en prime, le retour attendu n'est pas testé
-      await createUserForAgency.execute(userForAgency, triggeredByUser);
+    //TODO: ici un usecase de commande qui retourne de la data et en prime, le retour attendu n'est pas testé
+    await createUserForAgency.execute(userForAgency, triggeredByUser);
 
-      expectToEqual(uow.userRepository.users, [
-        counsellor,
-        {
-          id: userForAgency.userId,
-          email: userForAgency.email,
-          createdAt: timeGateway.now().toISOString(),
-          firstName: emptyName,
-          lastName: emptyName,
-          proConnect: null,
+    expectToEqual(uow.userRepository.users, [
+      counsellor,
+      {
+        id: userForAgency.userId,
+        email: userForAgency.email,
+        createdAt: timeGateway.now().toISOString(),
+        firstName: emptyName,
+        lastName: emptyName,
+        proConnect: null,
+      },
+    ]);
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights(agencyWithCounsellor, {
+        [newUserId]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [counsellor.id]: {
+          isNotifiedByEmail: false,
+          roles: ["counsellor"],
         },
-      ]);
-      expectToEqual(uow.agencyRepository.agencies, [
-        toAgencyWithRights(agencyWithCounsellor, {
-          [newUserId]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-          [counsellor.id]: {
-            isNotifiedByEmail: false,
-            roles: ["counsellor"],
-          },
-        }),
-      ]);
+      }),
+    ]);
 
-      expectToEqual(uow.outboxRepository.events, [
-        createNewEvent({
-          topic: "ConnectedUserAgencyRightChanged",
-          payload: {
-            agencyId: userForAgency.agencyId,
-            userId: userForAgency.userId,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: triggeredByUser.id,
-            },
+    expectToEqual(uow.outboxRepository.events, [
+      createNewEvent({
+        topic: "ConnectedUserAgencyRightChanged",
+        payload: {
+          agencyId: userForAgency.agencyId,
+          userId: userForAgency.userId,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: triggeredByUser.id,
           },
-        }),
-      ]);
-    },
-  );
+        },
+      }),
+    ]);
+  });
 
   it.each([
     {
@@ -262,83 +261,82 @@ describe("CreateUserForAgency", () => {
       triggeredByRole: "agency-admin",
       triggeredByUser: connectedAgencyAdminUser,
     },
-  ])(
-    "$triggeredByRole can add agency rights to an existing user",
-    async ({ triggeredByUser }) => {
-      const validator: User = {
-        id: "validator",
-        email: "user@email.fr",
-        firstName: "John",
-        lastName: "Doe",
-        proConnect: {
-          externalId: "osef",
-          siret: fakeProConnectSiret,
+  ])("$triggeredByRole can add agency rights to an existing user", async ({
+    triggeredByUser,
+  }) => {
+    const validator: User = {
+      id: "validator",
+      email: "user@email.fr",
+      firstName: "John",
+      lastName: "Doe",
+      proConnect: {
+        externalId: "osef",
+        siret: fakeProConnectSiret,
+      },
+      createdAt: timeGateway.now().toISOString(),
+    };
+    uow.userRepository.users = [
+      validator,
+      counsellor,
+      connectedAgencyAdminUser,
+    ];
+
+    const anotherAgency = new AgencyDtoBuilder()
+      .withId("another-agency-id")
+      .build();
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithCounsellor, {
+        [connectedAgencyAdminUser.id]: {
+          isNotifiedByEmail: false,
+          roles: ["agency-admin"],
         },
-        createdAt: timeGateway.now().toISOString(),
-      };
-      uow.userRepository.users = [
-        validator,
-        counsellor,
-        connectedAgencyAdminUser,
-      ];
+      }),
+      toAgencyWithRights(anotherAgency, {
+        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    ];
 
-      const anotherAgency = new AgencyDtoBuilder()
-        .withId("another-agency-id")
-        .build();
-      uow.agencyRepository.agencies = [
-        toAgencyWithRights(agencyWithCounsellor, {
-          [connectedAgencyAdminUser.id]: {
-            isNotifiedByEmail: false,
-            roles: ["agency-admin"],
-          },
-        }),
-        toAgencyWithRights(anotherAgency, {
-          [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
-      ];
+    const userForAgency: UserParamsForAgency = {
+      userId: validator.id,
+      agencyId: agencyWithCounsellor.id,
+      roles: ["counsellor"],
+      isNotifiedByEmail: false,
+      email: validator.email,
+    };
 
-      const userForAgency: UserParamsForAgency = {
-        userId: validator.id,
-        agencyId: agencyWithCounsellor.id,
-        roles: ["counsellor"],
-        isNotifiedByEmail: false,
-        email: validator.email,
-      };
+    await createUserForAgency.execute(userForAgency, triggeredByUser);
 
-      await createUserForAgency.execute(userForAgency, triggeredByUser);
-
-      expectToEqual(uow.agencyRepository.agencies, [
-        toAgencyWithRights(agencyWithCounsellor, {
-          [connectedAgencyAdminUser.id]: {
-            isNotifiedByEmail: false,
-            roles: ["agency-admin"],
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights(agencyWithCounsellor, {
+        [connectedAgencyAdminUser.id]: {
+          isNotifiedByEmail: false,
+          roles: ["agency-admin"],
+        },
+        [validator.id]: {
+          isNotifiedByEmail: userForAgency.isNotifiedByEmail,
+          roles: userForAgency.roles,
+        },
+      }),
+      toAgencyWithRights(anotherAgency, {
+        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    ]);
+    expectToEqual(uow.outboxRepository.events, [
+      createNewEvent({
+        topic: "ConnectedUserAgencyRightChanged",
+        payload: {
+          agencyId: agencyWithCounsellor.id,
+          userId: validator.id,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: triggeredByUser.id,
           },
-          [validator.id]: {
-            isNotifiedByEmail: userForAgency.isNotifiedByEmail,
-            roles: userForAgency.roles,
-          },
-        }),
-        toAgencyWithRights(anotherAgency, {
-          [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
-      ]);
-      expectToEqual(uow.outboxRepository.events, [
-        createNewEvent({
-          topic: "ConnectedUserAgencyRightChanged",
-          payload: {
-            agencyId: agencyWithCounsellor.id,
-            userId: validator.id,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: triggeredByUser.id,
-            },
-          },
-        }),
-      ]);
-    },
-  );
+        },
+      }),
+    ]);
+  });
 
   it("throw if user already exist in agency", async () => {
     const validator: User = {
