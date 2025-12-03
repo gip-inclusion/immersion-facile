@@ -1,14 +1,20 @@
 version: 2
 
 models:
-  - name: daily_searches
-    description: "Daily count of unique searches made since 2024-01-01"
+  - name: most_frequent_searches
+    description: "Top 1000 most frequent searches per day (last year). Passthrough from materialized view."
     columns:
       - name: day
-        description: "Date of the search (truncated to day)"
+        description: "Date of the searches"
         tests:
           - not_null
-      - name: number_of_searches
-        description: "Count of unique searches made on that day"
+      - name: appellation_code
+        description: "Appellation code searched"
+      - name: address
+        description: "Search address"
+      - name: department_code
+        description: "Department code"
+      - name: count
+        description: "Number of searches for this combination"
         tests:
           - not_null
