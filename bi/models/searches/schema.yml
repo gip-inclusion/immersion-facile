@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: most_frequent_searches
-    description: "Top 1000 most frequent searches per day (last year). Passthrough from materialized view."
+    description: "Top 1000 most frequent searches per day (last year). Passthrough from stats table."
     columns:
       - name: day
         description: "Date of the searches"

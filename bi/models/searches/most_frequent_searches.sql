@@ -1,7 +1,7 @@
 {{
     config(
         materialized='table',
-        schema='public_analytics'
+        schema='analytics'
     )
 }}
 
@@ -11,4 +11,4 @@ select
     address,
     department_code,
     count
-from {{ source('immersion', 'most_frequent_searches') }}
+from {{ source('immersion', 'stats__most_frequent_searches') }}
