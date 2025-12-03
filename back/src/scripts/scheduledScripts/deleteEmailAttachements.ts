@@ -4,6 +4,7 @@ import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { PgNotificationRepository } from "../../domains/core/notifications/adapters/PgNotificationRepository";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
+import { monitoredAsUseCase } from "../utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -32,7 +33,10 @@ export const triggerDeleteEmailAttachements = ({
   handleCRONScript({
     name: "deleteEmailAttachements",
     config,
-    script: executeTriggerDeleteEmailAttachements,
+    script: monitoredAsUseCase({
+      name: "DeleteEmailAttachements",
+      cb: executeTriggerDeleteEmailAttachements,
+    }),
     handleResults: ({ numberOfDeletedAttachements }) =>
       `Deleted : ${numberOfDeletedAttachements} attachements`,
     logger,

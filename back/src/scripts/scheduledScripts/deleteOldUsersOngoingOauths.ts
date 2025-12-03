@@ -5,6 +5,7 @@ import { createMakeScriptPgPool } from "../../config/pg/pgPool";
 import { PgOngoingOAuthRepository } from "../../domains/core/authentication/connected-user/adapters/PgOngoingOAuthRepository";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
+import { monitoredAsUseCase } from "../utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -35,7 +36,10 @@ export const triggerDeleteOldUsersOngoingOauths = ({
   handleCRONScript({
     name: "triggerDeleteOldUsersOngoingOauths",
     config,
-    script: deleteOldUsersOngoingOauths,
+    script: monitoredAsUseCase({
+      name: "DeleteOldUsersOngoingOauths",
+      cb: deleteOldUsersOngoingOauths,
+    }),
     handleResults: ({ numberOfOngoingOauthsDeleted }) =>
       `${numberOfOngoingOauthsDeleted} ongoing oauths deleted, because they were more than ${numberOfMonthBeforeDeletion} months old`,
     logger,

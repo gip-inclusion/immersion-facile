@@ -20,6 +20,7 @@ import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
+import { monitoredAsUseCase } from "./utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -95,7 +96,10 @@ const updateAppellations =
 handleCRONScript({
   name: "update-rome-legacy-rome-v3-data-from-france-travail-API",
   config,
-  script: main,
+  script: monitoredAsUseCase({
+    name: "UpdateLegacyRomeV3FromFtApi",
+    cb: main,
+  }),
   handleResults: ({ numberOfAppellations }) =>
     [
       "Updated successfully rome and appellations data from ROME-3 API",
