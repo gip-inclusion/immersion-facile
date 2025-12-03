@@ -70,6 +70,6 @@ jobs:
         run: >-
           scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
                 echo \"> \$(date) - Starting DBT run\" &&
-                  cd bi && ./run_dbt.sh run &&
+                  ./run_dbt.sh run &&
                 echo \"> \$(date) - DBT run completed successfully\" &&
                   exit 0"
