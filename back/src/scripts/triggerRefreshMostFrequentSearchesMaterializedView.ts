@@ -1,26 +1,28 @@
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { createMakeScriptPgPool } from "../config/pg/pgPool";
+import { updateStatsMostFrequentSearchesSql } from "../domains/establishment/adapters/updateStatsMostFrequentSearchesSql";
 import { handleCRONScript } from "./handleCRONScript";
 import { monitoredAsUseCase } from "./utils";
 
 const config = AppConfig.createFromEnv();
-const refreshMostFrequentSearchesMaterializedView = async () => {
+
+const refreshStatsTable = async () => {
   const pool = createMakeScriptPgPool(config)();
-  const client = await pool.connect();
+  const db = makeKyselyDb(pool);
 
-  await client.query("REFRESH MATERIALIZED VIEW most_frequent_searches;");
+  await updateStatsMostFrequentSearchesSql(db);
 
-  client.release();
   await pool.end();
 };
 
 handleCRONScript({
-  name: "most_frequent_searches materialized view",
+  name: "stats__most_frequent_searches table",
   config,
   script: monitoredAsUseCase({
-    name: "RefreshMostFrequentSearchesMaterializedView",
-    cb: refreshMostFrequentSearchesMaterializedView,
+    name: "RefreshStatsMostFrequentSearches",
+    cb: refreshStatsTable,
   }),
   handleResults: () =>
-    "searches_made_aggregated materialized view refreshed successfully",
+    "stats__most_frequent_searches table refreshed successfully",
 });
