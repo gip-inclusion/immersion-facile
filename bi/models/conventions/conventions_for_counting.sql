@@ -1,7 +1,7 @@
 {{
   config(
     materialized='table',
-    schema='public_analytics',
+    schema='analytics',
     post_hook=[
       "CREATE INDEX IF NOT EXISTS idx_conv_count_status ON {{ this }} (status_technical)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_agency_status ON {{ this }} (agency_status)",
