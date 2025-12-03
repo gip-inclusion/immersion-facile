@@ -40,6 +40,26 @@ describe("PgAgencyRepository", () => {
     .withEmail("validator2@agency1.fr")
     .buildUser();
 
+  const admin1 = new ConnectedUserBuilder()
+    .withId("10000000-0000-0000-0000-000000000005")
+    .withEmail("admin1@mail.fr")
+    .buildUser();
+
+  const admin2 = new ConnectedUserBuilder()
+    .withId("10000000-0000-0000-0000-000000000006")
+    .withEmail("admin2@mail.fr")
+    .buildUser();
+
+  const userToReview = new ConnectedUserBuilder()
+    .withId("10000000-0000-0000-0000-000000000007")
+    .withEmail("userToReview@mail.fr")
+    .buildUser();
+
+  const userToReview2 = new ConnectedUserBuilder()
+    .withId("10000000-0000-0000-0000-000000000008")
+    .withEmail("userToReview2@mail.fr")
+    .buildUser();
+
   const agency1builder = AgencyDtoBuilder.create(
     "10000000-0000-0000-1111-000000000001",
   )
@@ -108,6 +128,10 @@ describe("PgAgencyRepository", () => {
     await userRepository.save(validator2);
     await userRepository.save(counsellor1);
     await userRepository.save(counsellor2);
+    await userRepository.save(admin1);
+    await userRepository.save(admin2);
+    await userRepository.save(userToReview);
+    await userRepository.save(userToReview2);
   });
 
   describe("insert()", () => {
@@ -337,7 +361,57 @@ describe("PgAgencyRepository", () => {
       );
     });
   });
+  describe("getAllAgenciesWithUsersToReview()", () => {
+    const agency1 = toAgencyWithRights(agency1builder.build(), {
+      [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      [admin1.id]: {
+        isNotifiedByEmail: false,
+        roles: ["agency-admin"],
+      },
+      [userToReview.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
+      [userToReview2.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
+    });
+    const agency2 = toAgencyWithRights(agency2builder.build(), {
+      [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+      [userToReview.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
+    });
+    const agency3 = toAgencyWithRights(
+      agency1builder.withId("11111111-1111-1111-1111-111111111111").build(),
+      {
+        [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [admin2.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+      },
+    );
 
+    it("returns empty array when there are no users to review", async () => {
+      expectToEqual(
+        await agencyRepository.getAllAgenciesWithUsersToReview(),
+        [],
+      );
+    });
+
+    it("returns all agencies with number of number to review", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        agencyRepository.insert(agency2),
+        agencyRepository.insert(agency3),
+      ]);
+
+      expectToEqual(await agencyRepository.getAllAgenciesWithUsersToReview(), [
+        {
+          agencyId: agency1.id,
+          agencyName: agency1.name,
+          numberOfUsersToReview: 2,
+        },
+        {
+          agencyId: agency2.id,
+          agencyName: agency2.name,
+          numberOfUsersToReview: 1,
+        },
+      ]);
+    });
+  });
   describe("getBySafirAndActiveStatus()", () => {
     const agency1WithSafir = toAgencyWithRights(
       agency1builder.withCodeSafir(safirCode).build(),
