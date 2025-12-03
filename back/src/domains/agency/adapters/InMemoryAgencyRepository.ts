@@ -161,8 +161,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
         ).length;
 
         return {
-          agencyId: agency.id,
-          agencyName: agency.name,
+          agency,
           numberOfUsersToReview,
         };
       })

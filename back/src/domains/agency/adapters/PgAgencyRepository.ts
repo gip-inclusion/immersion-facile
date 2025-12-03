@@ -123,23 +123,42 @@ export class PgAgencyRepository implements AgencyRepository {
   public async getAllAgenciesWithUsersToReview(): Promise<
     AgencyWithNumberOfUsersToReview[]
   > {
-    const results = await this.transaction
+    const agencyIdsWithUsersToReview = await this.transaction
       .selectFrom("users__agencies")
-      .leftJoin("agencies", "users__agencies.agency_id", "agencies.id")
       .select(({ ref, fn }) => [
-        cast<AgencyId>(ref("agencies.id")).as("agencyId"),
-        cast<string>(ref("agencies.name")).as("agencyName"),
-        fn.count<number>("users__agencies.user_id").as("numberOfUsersToReview"),
+        cast<AgencyId>(ref("agency_id")).as("agencyId"),
+        fn.count<number>("user_id").as("numberOfUsersToReview"),
       ])
       .where("roles", "@>", `["to-review"]`)
-      .groupBy(["agencies.id", "agencies.name"])
+      .groupBy("agency_id")
       .execute();
 
-    return results.map(({ agencyId, agencyName, numberOfUsersToReview }) => ({
-      agencyId,
-      agencyName,
-      numberOfUsersToReview: Number(numberOfUsersToReview),
-    }));
+    if (agencyIdsWithUsersToReview.length === 0) return [];
+
+    const agencyIds = agencyIdsWithUsersToReview.map(
+      (result) => result.agencyId,
+    );
+
+    const results = await this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("agencies.id", "in", agencyIds)
+      .execute();
+
+    return results
+      .map(({ agency }) => {
+        const agencyWithRights = this.#pgAgencyToAgencyWithRights(agency);
+        if (!agencyWithRights) return null;
+
+        const numberOfUsersToReview = agencyIdsWithUsersToReview.find(
+          (result) => result.agencyId === agencyWithRights.id,
+        )?.numberOfUsersToReview;
+
+        if (!numberOfUsersToReview) return null;
+        return {
+          agency: agencyWithRights,
+          numberOfUsersToReview: Number(numberOfUsersToReview),
+        };
+      })
+      .filter(isTruthy);
   }
 
   public async getById(

@@ -398,18 +398,19 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(agency3),
       ]);
 
-      expectToEqual(await agencyRepository.getAllAgenciesWithUsersToReview(), [
-        {
-          agencyId: agency1.id,
-          agencyName: agency1.name,
-          numberOfUsersToReview: 2,
-        },
-        {
-          agencyId: agency2.id,
-          agencyName: agency2.name,
-          numberOfUsersToReview: 1,
-        },
-      ]);
+      expectArraysToEqualIgnoringOrder(
+        await agencyRepository.getAllAgenciesWithUsersToReview(),
+        [
+          {
+            agency: agency1,
+            numberOfUsersToReview: 2,
+          },
+          {
+            agency: agency2,
+            numberOfUsersToReview: 1,
+          },
+        ],
+      );
     });
   });
   describe("getBySafirAndActiveStatus()", () => {
