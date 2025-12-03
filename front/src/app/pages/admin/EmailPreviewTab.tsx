@@ -267,6 +267,16 @@ export const defaultEmailValueByEmailKind: {
     agencyLogoUrl: defaultEmailPreviewUrl,
     validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
   },
+  AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
+    firstName: "FIRST_NAME",
+    lastName: "LAST_NAME",
+    agencies: [
+      {
+        agencyName: "AGENCY_NAME",
+        numberOfUsersToReview: 1,
+      },
+    ],
+  },
   AGENCY_DELEGATION_CONTACT_INFORMATION: {
     agencyName: "AGENCY_NAME",
     agencyProvince: "AGENCY_PROVINCE",
