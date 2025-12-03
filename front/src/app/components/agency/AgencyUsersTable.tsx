@@ -69,7 +69,7 @@ export const AgencyUsersTable = ({
           inlineLayoutWhen={"always"}
           buttons={[
             {
-              children: "Modifier",
+              children: agencyUser.agencyRights[agency.id].roles.includes("to-review") ? "Valider" : "Modifier",
               priority: "secondary",
               className: fr.cx("fr-my-1v"),
               disabled:
