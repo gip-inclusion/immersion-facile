@@ -5,6 +5,7 @@ import { createMakeScriptPgPool } from "../../config/pg/pgPool";
 import { PgDiscussionRepository } from "../../domains/establishment/adapters/PgDiscussionRepository";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
+import { monitoredAsUseCase } from "../utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -33,7 +34,10 @@ export const triggerDeleteOldDiscussionMessages = ({
   handleCRONScript({
     name: "triggerDeleteOldDiscussionMessages",
     config,
-    script: deleteOldDiscussionMessages,
+    script: monitoredAsUseCase({
+      name: "DeleteOldDiscussionMessages",
+      cb: deleteOldDiscussionMessages,
+    }),
     handleResults: ({ numberOfMessagesDeleted }) =>
       `${numberOfMessagesDeleted} messages in discussion were deleted, because they were more than ${numberOfMonthBeforeDeletion} months old`,
     logger,

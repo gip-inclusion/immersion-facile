@@ -2,6 +2,7 @@ import { AppConfig } from "../config/bootstrap/appConfig";
 import { createMakeScriptPgPool } from "../config/pg/pgPool";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
+import { monitoredAsUseCase } from "./utils";
 
 const logger = createLogger(__filename);
 
@@ -30,6 +31,9 @@ const refreshMaterializedViews = async () => {
 handleCRONScript({
   name: "refresh materialized views",
   config,
-  script: refreshMaterializedViews,
+  script: monitoredAsUseCase({
+    name: "RefreshMaterializedViews",
+    cb: refreshMaterializedViews,
+  }),
   handleResults: () => "Materialized views refreshed successfully",
 });

@@ -1,4 +1,5 @@
 import type { DateRange } from "shared";
+import { useCaseBuilder } from "../domains/core/useCaseBuilder";
 
 export const getDateRangeFromScriptParams = ({
   scriptParams,
@@ -15,4 +16,14 @@ export const getDateRangeFromScriptParams = ({
     from,
     to,
   };
+};
+
+export const monitoredAsUseCase = <T extends () => Promise<unknown>>(params: {
+  name: string;
+  cb: T;
+}): T => {
+  const useCase = useCaseBuilder(params.name)
+    .notTransactional()
+    .build(params.cb as any)({});
+  return (() => useCase.execute()) as T;
 };

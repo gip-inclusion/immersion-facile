@@ -18,6 +18,7 @@ import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
+import { monitoredAsUseCase } from "./utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -154,7 +155,10 @@ const insertAppellations =
 handleCRONScript({
   name: "update-rome-data-from-france-travail-ROME-4-api",
   config,
-  script: main,
+  script: monitoredAsUseCase({
+    name: "UpdateRome4DataFromFtApi",
+    cb: main,
+  }),
   handleResults: ({ numberOfAppellations, numberOfRomes }) =>
     [
       "Updated successfully rome and appellations data from ROME-4 API",
