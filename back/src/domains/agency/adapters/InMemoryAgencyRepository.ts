@@ -22,6 +22,7 @@ import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetwe
 import type {
   AgencyRepository,
   AgencyRightOfUser,
+  AgencyWithNumberOfUsersToReview,
   GetAgenciesFilters,
   PartialAgencyWithUsersRights,
 } from "../ports/AgencyRepository";
@@ -147,6 +148,25 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return values(this.#agencies)
       .filter(isTruthy)
       .filter((agency) => agency.refersToAgencyId === id);
+  }
+
+  public async getAllAgenciesWithUsersToReview(): Promise<
+    AgencyWithNumberOfUsersToReview[]
+  > {
+    return values(this.#agencies)
+      .filter(isTruthy)
+      .map((agency) => {
+        const numberOfUsersToReview = toPairs(agency.usersRights).filter(
+          ([_, right]) => right?.roles.includes("to-review"),
+        ).length;
+
+        return {
+          agencyId: agency.id,
+          agencyName: agency.name,
+          numberOfUsersToReview,
+        };
+      })
+      .filter((result) => result.numberOfUsersToReview > 0);
   }
 
   public async getImmersionFacileAgencyId(): Promise<AgencyId> {

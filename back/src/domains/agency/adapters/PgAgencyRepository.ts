@@ -31,6 +31,7 @@ import { createLogger } from "../../../utils/logger";
 import type {
   AgencyRepository,
   AgencyRightOfUser,
+  AgencyWithNumberOfUsersToReview,
   GetAgenciesFilters,
   PartialAgencyWithUsersRights,
 } from "../ports/AgencyRepository";
@@ -117,6 +118,28 @@ export class PgAgencyRepository implements AgencyRepository {
 
     if (agency.usersRights)
       await this.#saveAgencyRights(agency.id, agency.usersRights);
+  }
+
+  public async getAllAgenciesWithUsersToReview(): Promise<
+    AgencyWithNumberOfUsersToReview[]
+  > {
+    const results = await this.transaction
+      .selectFrom("users__agencies")
+      .leftJoin("agencies", "users__agencies.agency_id", "agencies.id")
+      .select(({ ref, fn }) => [
+        cast<AgencyId>(ref("agencies.id")).as("agencyId"),
+        cast<string>(ref("agencies.name")).as("agencyName"),
+        fn.count<number>("users__agencies.user_id").as("numberOfUsersToReview"),
+      ])
+      .where("roles", "@>", `["to-review"]`)
+      .groupBy(["agencies.id", "agencies.name"])
+      .execute();
+
+    return results.map(({ agencyId, agencyName, numberOfUsersToReview }) => ({
+      agencyId,
+      agencyName,
+      numberOfUsersToReview: Number(numberOfUsersToReview),
+    }));
   }
 
   public async getById(
