@@ -4,6 +4,7 @@ import { createMakeScriptPgPool } from "../../config/pg/pgPool";
 import { deactivateUnresponsiveEstablishmentsQuery } from "../../domains/establishment/adapters/PgEstablishmentAggregateRepository.sql";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
+import { monitoredAsUseCase } from "../utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -40,7 +41,10 @@ export const triggerDeactivateUnresponsiveEstablishments = ({
   handleCRONScript({
     name: "deactivateUnresponsiveEstablishments",
     config,
-    script: deactivateUnresponsiveEstablishments,
+    script: monitoredAsUseCase({
+      name: "DeactivateUnresponsiveEstablishments",
+      cb: deactivateUnresponsiveEstablishments,
+    }),
     handleResults: (report) =>
       report.status === "success"
         ? `${report.updatedCount} unresponsive establishments deactivated successfully`

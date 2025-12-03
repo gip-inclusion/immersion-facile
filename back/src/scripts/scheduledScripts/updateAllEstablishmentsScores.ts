@@ -4,6 +4,7 @@ import { createMakeScriptPgPool } from "../../config/pg/pgPool";
 import { updateAllEstablishmentScoresQuery } from "../../domains/establishment/adapters/PgEstablishmentAggregateRepository.sql";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
+import { monitoredAsUseCase } from "../utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -33,7 +34,10 @@ export const triggerUpdateAllEstablishmentsScores = ({
   handleCRONScript({
     name: "updateAllEstablishmentsScores",
     config,
-    script: updateScores,
+    script: monitoredAsUseCase({
+      name: "UpdateAllEstablishmentsScores",
+      cb: updateScores,
+    }),
     handleResults: (report) =>
       report.status === "success"
         ? "Establishment score updated successfully"
