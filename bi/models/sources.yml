@@ -834,8 +834,8 @@ sources:
           - name: naf_code
             description: "NAF code"
 
-      - name: most_frequent_searches
-        description: "Materialized view with top 1000 most frequent searches per day (last year)"
+      - name: stats__most_frequent_searches
+        description: "Top 1000 most frequent searches per day (last year)"
         columns:
           - name: day
             description: "Date of the searches"
