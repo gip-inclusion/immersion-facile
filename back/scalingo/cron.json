@@ -5,6 +5,10 @@
       "size": "M"
     },
     {
+      "command": "45 22 * * * pnpm back run trigger-refresh-most-frequent-searches-materialized-view",
+      "size": "M"
+    },
+    {
       "command": "45 23 * * * pnpm back run trigger-contact-request-beneficiary-reminder-15-days",
       "size": "M"
     },

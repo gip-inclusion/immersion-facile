@@ -39,6 +39,9 @@ jobs:
                     --exclude-table=notifications_sms \
                     --exclude-table=short_links \
                     --exclude-table=spatial_ref_sys \
+                    --exclude-table=searches_made \
+                    --exclude-table=searches_made__appellation_code \
+                    --exclude-table=searches_made__naf_code \
                     --exclude-schema=tiger \
                     --exclude-schema=tiger_data \
                     --exclude-schema=topology \
