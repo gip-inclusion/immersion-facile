@@ -834,6 +834,20 @@ sources:
           - name: naf_code
             description: "NAF code"
 
+      - name: most_frequent_searches
+        description: "Materialized view with top 1000 most frequent searches per day (last year)"
+        columns:
+          - name: day
+            description: "Date of the searches"
+          - name: appellation_code
+            description: "Appellation code searched"
+          - name: address
+            description: "Search address"
+          - name: department_code
+            description: "Department code"
+          - name: count
+            description: "Number of searches for this combination"
+
       - name: short_links
         description: "Short links"
         columns:
