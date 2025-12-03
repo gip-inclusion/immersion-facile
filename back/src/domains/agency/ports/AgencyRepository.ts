@@ -10,7 +10,6 @@ import type {
   DepartmentCode,
   OmitFromExistingKeys,
   SiretDto,
-  User,
   UserId,
   WithUserFilters,
 } from "shared";
@@ -40,12 +39,9 @@ export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
 };
 
 export type AgencyWithNumberOfUsersToReview = {
-  agencyId: AgencyId;
-  agencyName: string;
+  agency: AgencyWithUsersRights;
   numberOfUsersToReview: number;
 };
-
-export type Test = Record<AgencyId, User>;
 
 export interface AgencyRepository {
   insert(agency: AgencyWithUsersRights): Promise<void>;
