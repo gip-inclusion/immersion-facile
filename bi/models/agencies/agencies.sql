@@ -1,7 +1,13 @@
 {{
   config(
     materialized='table',
-    schema='analytics'
+    schema='analytics',
+    post_hook=[
+          "CREATE INDEX IF NOT EXISTS idx_agencies_id ON {{ this }} (id)",
+          "CREATE INDEX IF NOT EXISTS idx_agencies_name ON {{ this }} (name)",
+          "CREATE INDEX IF NOT EXISTS idx_agencies_kind ON {{ this }} (kind)",
+          "CREATE INDEX IF NOT EXISTS idx_agencies_status ON {{ this }} (status)",
+    ]
   )
 }}
 
@@ -29,7 +35,7 @@ select
     pdr.department_name,
     pdr.region_name,
     a.refers_to_agency_id,
-    a.rejection_justification,
+    a.status_justification,
     a.covered_departments,
     a.acquisition_campaign,
     a.acquisition_keyword,

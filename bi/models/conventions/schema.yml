@@ -212,3 +212,48 @@ models:
         description: Feedback from establishment
       - name: assessment_hours_actually_made
         description: Actual hours completed during immersion
+
+  - name: conventions_for_counting
+    description: |
+      Lightweight conventions table optimized for aggregation queries (counting, grouping).
+      Contains only filter and grouping columns - no large JSON or text fields.
+      Use this table for Metabase dashboards that count conventions by agency, region, etc.
+      Grain: 1 row per convention.
+    columns:
+      - name: id
+        description: Primary key - UUID of the convention
+        tests:
+          - unique
+          - not_null
+      - name: siret
+        description: SIRET of the business hosting the immersion
+      - name: agency_id
+        description: Foreign key to agencies
+      - name: agency_name
+        description: Name of the managing agency
+      - name: status_technical
+        description: Technical status code (e.g., DRAFT, ACCEPTED_BY_VALIDATOR)
+      - name: agency_status
+        description: Status of the agency (active, from-api-PE, etc.)
+      - name: agency_kind
+        description: Type of agency (france-travail, mission-locale, etc.)
+      - name: agency_department_name
+        description: Department name of the agency
+      - name: agency_region_name
+        description: Region name of the agency
+      - name: date_validation
+        description: Date convention was validated
+      - name: date_submission
+        description: Date convention was submitted
+      - name: date_start
+        description: Immersion start date
+      - name: date_end
+        description: Immersion end date
+      - name: rome_code
+        description: ROME code for the job category
+      - name: appellation_code
+        description: Appellation code for the specific job
+      - name: establishment_department_name
+        description: Department name of the establishment
+      - name: establishment_region_name
+        description: Region name of the establishment
