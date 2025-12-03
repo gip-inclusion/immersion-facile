@@ -61,6 +61,7 @@ export interface Database {
   searches_made__appellation_code: SearchesMadeAppellationCode;
   searches_made__naf_code: SearchesMadeNafCode;
   searches_made: SearchesMade;
+  stats__most_frequent_searches: StatsMostFrequentSearches;
   short_links: ShortLinks;
   users__agencies: UsersAgencies;
   users_admins: UsersAdmins;
@@ -561,6 +562,14 @@ interface SearchesMade extends WithAcquisition {
   sorted_by: Generated<SortedBy | null>;
   update_date: Generated<Timestamp | null>;
   voluntary_to_immersion: boolean | null;
+}
+
+interface StatsMostFrequentSearches {
+  day: Timestamp;
+  appellation_code: string | null;
+  address: string | null;
+  department_code: string | null;
+  count: number;
 }
 
 interface UsersAgencies {
