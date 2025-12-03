@@ -78,6 +78,14 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     statusJustification: string;
   };
+  AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
+    firstName: string;
+    lastName: string;
+    agencies: {
+      agencyName: string;
+      numberOfUsersToReview: number;
+    }[];
+  };
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyReferentName: string | undefined;

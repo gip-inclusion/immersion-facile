@@ -1462,6 +1462,39 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         subContent: defaultSignature("immersion"),
       }),
     },
+    AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
+      niceName: "Espace prescripteurs - Demande de rattachement",
+      tags: ["espacePrescripteur_demandeDeRattachement"],
+      createEmailVariables: ({ firstName, lastName, agencies }) => ({
+        subject:
+          "Immersion Facilitée - Des demandes de rattachement en attente pour vos organismes ",
+        greetings: `Bonjour ${firstName} ${lastName},`,
+        content: `Vous avez des utilisateurs en attente de rattachement sur Immersion Facilitée.
+        
+        Récapitulatif des demandes en attente :
+
+        <ul>
+          ${agencies.map((agency) => `<li>${agency.agencyName} : ${agency.numberOfUsersToReview} demande${agency.numberOfUsersToReview > 1 ? "s" : ""}</li>`).join("")}
+        </ul>
+
+        En validant ces demandes, vous permettez à vos collaborateurs d’accéder aux conventions et aux statistiques de vos organismes.
+       
+       `,
+        buttons: [
+          {
+            label: "Accéder à mon espace",
+            url: "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-entreprise accueillante-immersion facilitee 2024.pdf",
+          },
+        ],
+        highlight: {
+          content:
+            "Voici un article d’aide pour vous guider dans la gestion de ces demandes : <a href='https://aide.immersion-facile.beta.gouv.fr/fr/article/administrateur-comment-gerer-les-acces-a-lespace-prescripteur-de-vos-collaborateurs-1cdg4de/' target='_blank'>Administrateur - Comment gérer les accès à l'espace prescripteur de vos collaborateurs</a>",
+        },
+        subContent: `Vous recevrez un rappel d’ici une semaine si des demandes restent en attente.
+        ${defaultSignature("immersion")}
+        `,
+      }),
+    },
     IC_USER_RIGHTS_HAS_CHANGED: {
       niceName: "ProConnect - Changement de droit sur agence",
       tags: ["activation BO prescripteur"],
