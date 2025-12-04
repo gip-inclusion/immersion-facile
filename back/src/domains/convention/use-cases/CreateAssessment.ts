@@ -49,6 +49,16 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
         uow,
       });
 
+      if (
+        assessment.status === "PARTIALLY_COMPLETED" &&
+        assessment.lastDayOfPresence &&
+        (new Date(assessment.lastDayOfPresence) <
+          new Date(convention.dateStart) ||
+          new Date(assessment.lastDayOfPresence) > new Date(convention.dateEnd))
+      ) {
+        throw errors.assessment.lastDayOfPresenceNotInConventionRange();
+      }
+
       const assessmentEntity = await createAssessmentEntityIfNotExist(
         uow,
         convention,
