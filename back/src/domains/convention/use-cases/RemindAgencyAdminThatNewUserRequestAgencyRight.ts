@@ -1,5 +1,5 @@
 import { toPairs, uniq } from "ramda";
-import { isTruthy, type UserId } from "shared";
+import { type AbsoluteUrl, isTruthy, type UserId } from "shared";
 import { z } from "zod";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -34,13 +34,16 @@ export class RemindAgencyAdminThatNewUserRequestAgencyRight extends Transactiona
   protected inputSchema = z.void();
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  readonly #immersionBaseUrl: AbsoluteUrl;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    immersionBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#immersionBaseUrl = immersionBaseUrl;
   }
 
   protected async _execute(
@@ -109,6 +112,7 @@ export class RemindAgencyAdminThatNewUserRequestAgencyRight extends Transactiona
               params: {
                 firstName: admin.firstName,
                 lastName: admin.lastName,
+                immersionBaseUrl: this.#immersionBaseUrl,
                 agencies: admin.agencies.map((agency) => ({
                   agencyName: agency.agencyName,
                   numberOfUsersToReview: agency.numberOfUsersToReview,

@@ -270,6 +270,7 @@ export const defaultEmailValueByEmailKind: {
   AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
     firstName: "FIRST_NAME",
     lastName: "LAST_NAME",
+    immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
     agencies: [
       {
         agencyName: "AGENCY_NAME",
