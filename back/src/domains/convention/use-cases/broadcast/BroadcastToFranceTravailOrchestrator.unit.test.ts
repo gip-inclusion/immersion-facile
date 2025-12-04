@@ -108,14 +108,16 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
 
     it("triggers legacy broadcast", async () => {
       await broadcastToFranceTravailOrchestrator.execute({
-        convention: conventionReadDto,
+        conventionId: convention.id,
         assessment,
       });
-      expectLegacyBroadcastCallsToEqual([{ convention: conventionReadDto }]);
+      expectLegacyBroadcastCallsToEqual([{ convention: convention }]);
     });
 
     it("does NOT trigger standard format broadcast", async () => {
-      await broadcastToFranceTravailOrchestrator.execute({ convention });
+      await broadcastToFranceTravailOrchestrator.execute({
+        conventionId: convention.id,
+      });
       expectStandardBroadcastCallsToEqual([]);
     });
 
@@ -130,7 +132,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
         });
 
       await broadcastToFranceTravailOrchestratorForAssementCreated.execute({
-        convention,
+        conventionId: convention.id,
         assessment,
       });
 
@@ -148,14 +150,18 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     });
 
     it("triggers standard broadcast", async () => {
-      await broadcastToFranceTravailOrchestrator.execute({ convention });
+      await broadcastToFranceTravailOrchestrator.execute({
+        conventionId: convention.id,
+      });
       expectStandardBroadcastCallsToEqual([
         { eventType: "CONVENTION_UPDATED", convention: conventionReadDto },
       ]);
     });
 
     it("does NOT trigger legacy broadcast", async () => {
-      await broadcastToFranceTravailOrchestrator.execute({ convention });
+      await broadcastToFranceTravailOrchestrator.execute({
+        conventionId: convention.id,
+      });
       expectLegacyBroadcastCallsToEqual([]);
     });
 
@@ -176,7 +182,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       it("throws when assessment is missing", async () => {
         await expectPromiseToFailWithError(
           broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
-            convention,
+            conventionId: convention.id,
           }),
           errors.assessment.missingAssessment({ conventionId: convention.id }),
         );
@@ -184,7 +190,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
 
       it("triggers standard broadcast, with assessment when all is good", async () => {
         await broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
-          convention,
+          conventionId: convention.id,
           assessment,
         });
 
