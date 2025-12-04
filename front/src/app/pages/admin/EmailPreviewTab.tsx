@@ -602,10 +602,9 @@ export const defaultEmailValueByEmailKind: {
     },
   },
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
-    contactFirstName: "CONTACT_FIRST_NAME",
-    contactLastName: "CONTACT_LAST_NAME",
     businessName: "BUSINESS_NAME",
     businessAddresses: ["BUSINESS_ADDRESS_1", "BUSINESS_ADDRESS_2"],
+    appelationLabels: ["Boulanger", "Pâtissier"],
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: "ADVISOR_FIRST_NAME",
