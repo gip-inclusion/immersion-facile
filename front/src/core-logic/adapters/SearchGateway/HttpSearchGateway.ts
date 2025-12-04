@@ -106,7 +106,6 @@ export class HttpSearchGateway implements SearchGateway {
         .getExternalOffers({
           queryParams: {
             ...params,
-            appellationCodes: params.appellationCodes ?? [],
             latitude: params.latitude ?? 0,
             longitude: params.longitude ?? 0,
             distanceKm: params.distanceKm ?? 0,

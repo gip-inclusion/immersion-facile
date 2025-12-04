@@ -110,10 +110,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
                 : true,
             ),
           )
-          .catch((error) => {
-            console.error("error", error);
-            return [];
-          }),
+          .catch(() => []),
     );
   }
 

@@ -4,12 +4,12 @@ import type { FitForDisableWorkerOption } from "shared";
 import { useStyles } from "tss-react/dsfr";
 
 type ImmersionOfferLabelsProps = {
-  truc?: FitForDisableWorkerOption | null;
+  fitForDisabledWorkers?: FitForDisableWorkerOption | null;
   className?: string;
 };
 
 export const SearchResultLabels = ({
-  truc: fitForDisabledWorkers,
+  fitForDisabledWorkers,
 }: ImmersionOfferLabelsProps) => (
   <ul className={fr.cx("fr-card__desc", "fr-badges-group")}>
     {fitForDisabledWorkers === "yes-declared-only" && (

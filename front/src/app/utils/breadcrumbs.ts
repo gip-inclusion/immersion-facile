@@ -5,6 +5,7 @@ import type {
   Breadcrumbs,
   BreadcrumbsItem,
 } from "src/app/contents/breadcrumbs/breadcrumbs";
+import type { Route } from "type-route";
 
 type RoutesKeysFromBreadcrumbs<T extends Record<keyof T, BreadcrumbsItem>> = {
   [K in keyof T]:
@@ -52,11 +53,7 @@ const isRouteInChildren = <T>(
   return keys(children).some((key) => {
     const child = children[key];
     if (!child) return false;
-    if (
-      (isFunction(child.route) ? child.route().name : child.route.name) ===
-      currentRouteKey
-    )
-      return true;
+    if (getRoute(child.route).name === currentRouteKey) return true;
     if (child.children) {
       return isRouteInChildren(currentRouteKey, child);
     }
@@ -70,7 +67,7 @@ const formatToBreadcrumbsSegments = <T>(
   const { label, route, children } = ancestor;
   const ancestorSegment = {
     label,
-    linkProps: isFunction(route) ? route().link : route.link,
+    linkProps: getRoute(route).link,
   };
   if (!children || ancestor.route.name === currentRouteKey)
     return [ancestorSegment];
@@ -81,9 +78,7 @@ const formatToBreadcrumbsSegments = <T>(
       if (!child) return;
 
       const { route, label, children: childChildren } = child;
-      const { name: routeName, link: linkProps } = isFunction(route)
-        ? route()
-        : route;
+      const { name: routeName, link: linkProps } = getRoute(route);
 
       if (
         isRouteInChildren(currentRouteKey, child) &&
@@ -101,4 +96,8 @@ const formatToBreadcrumbsSegments = <T>(
     }),
   ).filter((child) => child !== undefined);
   return [ancestorSegment, ...childSegments];
+};
+
+const getRoute = <T>(route: Route<T> | (() => Route<T>)): Route<T> => {
+  return isFunction(route) ? route() : route;
 };

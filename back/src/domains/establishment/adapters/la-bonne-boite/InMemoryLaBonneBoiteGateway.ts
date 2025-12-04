@@ -25,6 +25,9 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
       : this._results
           .filter((result) => result.isCompanyRelevant())
           .filter((result) =>
+            romeCode ? result.props.rome === romeCode : true,
+          )
+          .filter((result) =>
             nafCodes?.length ? nafCodes.includes(result.props.naf) : true,
           )
           .map((result) =>

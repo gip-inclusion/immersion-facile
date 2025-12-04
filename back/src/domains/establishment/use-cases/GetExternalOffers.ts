@@ -20,16 +20,17 @@ export const makeGetExternalOffers = useCaseBuilder("GetExternalOffers")
     laBonneBoiteGateway: LaBonneBoiteGateway;
   }>()
   .build(async ({ inputParams, deps, uow }) => {
-    const { appellationCodes, distanceKm, latitude, longitude, nafCodes } =
+    const { appellationCode, distanceKm, latitude, longitude, nafCodes } =
       inputParams;
 
     // Get ROME
-    const [rome] =
+    const [romeAndAppellation] =
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-        appellationCodes,
+        [appellationCode],
       );
-    if (!rome) throw errors.search.noRomeForAppellations(appellationCodes);
-    const { romeCode, romeLabel } = rome;
+    if (!romeAndAppellation)
+      throw errors.search.noRomeForAppellations([appellationCode]);
+    const { romeCode, romeLabel } = romeAndAppellation;
     return await deps.laBonneBoiteGateway.searchCompanies({
       distanceKm,
       lat: latitude,

@@ -53,10 +53,10 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
             page,
             perPage,
           })
-        : getPaginationParamsForWeb(
-            { page, perPage },
-            { overrideDefaultPerPage: defaultPerPage },
-          ),
+        : getPaginationParamsForWeb({
+            page,
+            perPage: perPage ?? defaultPerPage,
+          }),
       filters: {
         appellationCodes,
         fitForDisabledWorkers,
