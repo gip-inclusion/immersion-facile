@@ -7,7 +7,6 @@ import {
   type ConnectedUser,
   type ConventionReadDto,
   type ConventionStatus,
-  conventionEstablishmentsRoles,
   domElementIds,
   type EditConventionCounsellorNameRequestDto,
   establishmentsRoles,
@@ -312,10 +311,7 @@ const createButtonPropsByVerificationAction = (
   const shouldShowAssessmentAbandonAction =
     canAssessmentBeFilled(convention) &&
     isConventionEndingInOneDayOrMore(convention) &&
-    intersection(requesterRoles, [
-      ...establishmentsRoles,
-      ...conventionEstablishmentsRoles,
-    ]).length > 0;
+    hasAllowedRoleOnAssessment(requesterRoles, "CreateAssessment", convention);
 
   const shouldShowAssessmentFullFillAction =
     canAssessmentBeFilled(convention) &&
