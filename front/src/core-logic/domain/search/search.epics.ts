@@ -1,11 +1,6 @@
 import { filter, map, of, switchMap, take } from "rxjs";
+import { type SearchResultDto, searchResultSchema } from "shared";
 import {
-  type GetExternalOffersFlatQueryParams,
-  type SearchResultDto,
-  searchResultSchema,
-} from "shared";
-import {
-  type GetOffersPayload,
   type SearchResultPayload,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
@@ -23,8 +18,16 @@ const getOffersEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   action$.pipe(
     filter(searchSlice.actions.getOffersRequested.match),
     switchMap((action) =>
-      (isGetExternalOffersPayload(action.payload)
-        ? searchGateway.getExternalOffers$(action.payload)
+      (action.payload.isExternal === true
+        ? searchGateway.getExternalOffers$({
+            ...action.payload,
+            appellationCode: action.payload.appellationCodes
+              ? action.payload.appellationCodes[0]
+              : "",
+            latitude: action.payload.latitude ?? 0,
+            longitude: action.payload.longitude ?? 0,
+            distanceKm: action.payload.distanceKm ?? 0,
+          })
         : searchGateway.getOffers$(action.payload)
       ).pipe(
         take(1),
@@ -90,10 +93,3 @@ export const searchEpics = [
   fetchSearchResultEpic,
   searchResultExternalProvidedEpic,
 ];
-
-const isGetExternalOffersPayload = (
-  payload: Pick<GetOffersPayload, "isExternal" | "appellationCodes">,
-): payload is GetExternalOffersFlatQueryParams =>
-  payload.isExternal === true &&
-  Array.isArray(payload.appellationCodes) &&
-  (payload.appellationCodes?.length ?? 0) > 0;

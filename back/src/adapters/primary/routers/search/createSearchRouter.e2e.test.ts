@@ -843,7 +843,7 @@ describe(`${displayRouteName(searchImmersionRoutes.getExternalOffers)}`, () => {
     it("400 - no geo params", async () => {
       const result = await httpClient.getExternalOffers({
         queryParams: {
-          appellationCodes: ["14704"],
+          appellationCode: "14704",
           sortBy: "distance",
           distanceKm: 10,
         } as any,
@@ -869,7 +869,7 @@ describe(`${displayRouteName(searchImmersionRoutes.getExternalOffers)}`, () => {
     it("400 - invalid geo params (distanceKm 0)", async () => {
       const result = await httpClient.getExternalOffers({
         queryParams: {
-          appellationCodes: ["14704"],
+          appellationCode: "14704",
           distanceKm: 0,
           latitude: 48.8531,
           longitude: 2.34999,
@@ -894,7 +894,7 @@ describe(`${displayRouteName(searchImmersionRoutes.getExternalOffers)}`, () => {
       const appellationCodeNotFound = "99999";
       const result = await httpClient.getExternalOffers({
         queryParams: {
-          appellationCodes: [appellationCodeNotFound],
+          appellationCode: appellationCodeNotFound,
           distanceKm: 10,
           latitude: 48.8531,
           longitude: 2.34999,
@@ -916,7 +916,7 @@ describe(`${displayRouteName(searchImmersionRoutes.getExternalOffers)}`, () => {
       gateways.laBonneBoiteGateway.setNextResults([lbbResult]);
       const result = await httpClient.getExternalOffers({
         queryParams: {
-          appellationCodes: ["14704"],
+          appellationCode: "14704",
           distanceKm: 10,
           latitude: 48.8531,
           longitude: 2.34999,
@@ -939,7 +939,7 @@ describe(`${displayRouteName(searchImmersionRoutes.getExternalOffers)}`, () => {
       gateways.laBonneBoiteGateway.setNextResults([]);
       const result = await httpClient.getExternalOffers({
         queryParams: {
-          appellationCodes: ["19540"],
+          appellationCode: "19540",
           distanceKm: 10,
           latitude: 48.8531,
           longitude: 2.34999,

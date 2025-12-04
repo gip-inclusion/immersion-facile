@@ -32,11 +32,13 @@ describe("GetExternalOffers", () => {
 
   describe("Right paths", () => {
     it("returns the search results with valid input params", async () => {
-      const lbbResult = new LaBonneBoiteCompanyDtoBuilder().build();
+      const lbbResult = new LaBonneBoiteCompanyDtoBuilder()
+        .withRome("A1409")
+        .build();
       laBonneBoiteGateway.setNextResults([lbbResult]);
       const result = await getExternalOffers.execute(
         {
-          appellationCodes: ["14704"],
+          appellationCode: "14704",
           distanceKm: 30,
           latitude: 48.8531,
           longitude: 2.34999,
@@ -54,7 +56,7 @@ describe("GetExternalOffers", () => {
         },
       ]);
     });
-    it("handles multiple appellation codes", async () => {
+    it("handles appellation code", async () => {
       const lbbResultForAppellation14704 = new LaBonneBoiteCompanyDtoBuilder()
         .withRome("A1409")
         .build();
@@ -68,7 +70,7 @@ describe("GetExternalOffers", () => {
       laBonneBoiteGateway.setNextResults(lbbResults);
       const result = await getExternalOffers.execute(
         {
-          appellationCodes: ["14704", "19540"],
+          appellationCode: "14704",
           distanceKm: 30,
           latitude: 48.8531,
           longitude: 2.34999,
@@ -76,25 +78,25 @@ describe("GetExternalOffers", () => {
         undefined,
       );
 
-      expectToEqual(
-        result,
-        lbbResults.map((lbbResult) => ({
-          ...lbbResult.toSearchResult({
-            // fake from in memory la bonne boite gateway, not relevant for the test
-            romeCode: expect.any(String),
-            romeLabel: expect.any(String),
+      expectToEqual(result, [
+        {
+          ...lbbResultForAppellation14704.toSearchResult({
+            romeCode: "A1409",
+            romeLabel: "Élevage",
           }),
           distance_m: 276612,
-        })),
-      );
+        },
+      ]);
     });
 
     it("handles naf codes", async () => {
       const lbbResultForExpectedNafCode = new LaBonneBoiteCompanyDtoBuilder()
         .withNaf({ code: "1072Z", nomenclature: "" })
+        .withRome("A1409")
         .build();
       const lbbResultForOtherNafCode = new LaBonneBoiteCompanyDtoBuilder()
         .withNaf({ code: "1072A", nomenclature: "" })
+        .withRome("A1409")
         .build();
       laBonneBoiteGateway.setNextResults([
         lbbResultForExpectedNafCode,
@@ -102,7 +104,7 @@ describe("GetExternalOffers", () => {
       ]);
       const result = await getExternalOffers.execute(
         {
-          appellationCodes: ["14704"],
+          appellationCode: "14704",
           nafCodes: ["1072Z"],
           distanceKm: 30,
           latitude: 48.8531,
@@ -126,7 +128,7 @@ describe("GetExternalOffers", () => {
       expectPromiseToFailWithError(
         getExternalOffers.execute(
           {
-            appellationCodes: ["14704"],
+            appellationCode: "14704",
             latitude: 10,
             longitude: 10,
             distanceKm: 0,
@@ -144,7 +146,7 @@ describe("GetExternalOffers", () => {
       expectPromiseToFailWithError(
         getExternalOffers.execute(
           {
-            appellationCodes: [nonExistingAppellationCode],
+            appellationCode: nonExistingAppellationCode,
             distanceKm: 30,
             latitude: 48.8531,
             longitude: 2.34999,
