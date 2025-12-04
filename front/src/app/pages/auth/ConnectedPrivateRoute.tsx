@@ -239,7 +239,9 @@ export const ConnectedPrivateRoute = ({
             vSpacing={2}
           >
             <section className={fr.cx("fr-mb-8w")}>
-              <h2 className={fr.cx("fr-h3")}>{pageContent.cardsTitle}</h2>
+              {pageContent.cardsTitle && (
+                <h2 className={fr.cx("fr-h3")}>{pageContent.cardsTitle}</h2>
+              )}
               <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
                 {pageContent.cards?.map((card) => (
                   <div
