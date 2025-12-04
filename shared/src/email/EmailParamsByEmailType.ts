@@ -81,6 +81,7 @@ export type EmailParamsByEmailType = {
   AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
     firstName: string;
     lastName: string;
+    immersionBaseUrl: AbsoluteUrl;
     agencies: {
       agencyName: string;
       numberOfUsersToReview: number;
