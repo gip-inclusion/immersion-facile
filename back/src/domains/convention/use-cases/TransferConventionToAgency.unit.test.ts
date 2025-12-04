@@ -433,7 +433,6 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              convention: transferredConvention,
               conventionId: transferredConvention.id,
               agencyId: otherAgency.id,
               justification: "change of agency",
@@ -484,7 +483,6 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              convention: transferredConvention,
               agencyId: otherAgency.id,
               conventionId: transferredConvention.id,
               justification: "change of agency",
@@ -536,7 +534,6 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              convention: transferredConvention,
               agencyId: otherAgency.id,
               conventionId: transferredConvention.id,
               justification: "change of agency",
@@ -592,7 +589,6 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              convention: transferredConvention,
               agencyId: otherAgency.id,
               conventionId: transferredConvention.id,
               justification: "change of agency",
@@ -683,7 +679,6 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                convention: transferredConvention,
                 conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
@@ -737,7 +732,6 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                convention: transferredConvention,
                 conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency kind",
@@ -802,7 +796,6 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              convention: transferredConvention,
               conventionId: transferredConvention.id,
               agencyId: otherAgency.id,
               justification: "change of agency",
@@ -853,7 +846,6 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              convention: transferredConvention,
               agencyId: otherAgency.id,
               conventionId: transferredConvention.id,
               justification: "change of agency",
@@ -910,7 +902,6 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              convention: transferredConvention,
               agencyId: otherAgency.id,
               conventionId: transferredConvention.id,
               justification: "change of agency",
@@ -1009,7 +1000,6 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                convention: transferredConvention,
                 conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
@@ -1069,7 +1059,6 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                convention: transferredConvention,
                 conventionId: transferredConvention.id,
                 agencyId: otherAgency.id,
                 justification: "change of agency kind",
