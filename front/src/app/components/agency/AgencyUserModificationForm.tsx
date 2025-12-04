@@ -1,10 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   domElementIds,
@@ -27,6 +28,9 @@ export const AgencyUserModificationForm = ({
   areRolesDisabled,
   onSubmit,
   routeName,
+  hasCounsellorRoles,
+  modalId,
+  isFTAgency,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
@@ -35,7 +39,20 @@ export const AgencyUserModificationForm = ({
   areRolesDisabled?: boolean;
   onSubmit: (userParamsForAgency: UserParamsForAgency) => void;
   routeName: AgencyOverviewRouteName;
+  hasCounsellorRoles: boolean;
+  modalId: string;
+  isFTAgency: boolean;
 }) => {
+  const onCloseModal = () => {
+    reset(agencyUser);
+    setDisplayFirstCounsellorInformation(false);
+  };
+
+  const [
+    displayFirstCounsellorInformation,
+    setDisplayFirstCounsellorInformation,
+  ] = useState<boolean>(false);
+
   const methods = useForm<UserParamsForAgency>({
     resolver: zodResolver(userParamsForAgencySchema),
     mode: "onTouched",
@@ -59,12 +76,9 @@ export const AgencyUserModificationForm = ({
     closeModal();
   };
 
-  useEffect(() => {
-    reset(agencyUser);
-  }, [agencyUser, reset]);
-
   const availableRoles = keys(agencyRolesToDisplay).filter(
-    (role) => role !== "to-review",
+    (role) =>
+      role !== "to-review" && (isFTAgency ? role !== "counsellor" : true),
   );
   const checkboxOptions = availableRoles.map((availableRole) => {
     return {
@@ -79,6 +93,9 @@ export const AgencyUserModificationForm = ({
           setValue("roles", rolesToSet, {
             shouldValidate: true,
           });
+          setDisplayFirstCounsellorInformation(
+            !hasCounsellorRoles && rolesToSet.includes("counsellor"),
+          );
         },
       },
       hintText: agencyRolesToDisplay[availableRole].description,
@@ -93,6 +110,17 @@ export const AgencyUserModificationForm = ({
 
   const [invalidEmailMessage, setInvalidEmailMessage] =
     useState<ReactNode | null>(null);
+
+  useIsModalOpen(
+    {
+      id: modalId,
+      isOpenedByDefault: false,
+    },
+    {
+      onConceal: onCloseModal,
+      onDisclose: onCloseModal,
+    },
+  );
 
   if (!agencyUser) return null;
 
@@ -148,6 +176,26 @@ export const AgencyUserModificationForm = ({
         />
 
         {invalidEmailMessage}
+        {displayFirstCounsellorInformation && (
+          <Alert
+            className={fr.cx("fr-my-4w")}
+            severity="warning"
+            title="Modification du processus de validation"
+            description={
+              <>
+                <p>
+                  L’ajout d’un premier pré-validateur active un processus de
+                  validation en deux étapes.
+                </p>
+                <p>
+                  Cette configuration est adaptée aux structures où un premier
+                  niveau relit les conventions, puis un deuxième niveau s’occupe
+                  de la validation administrative.
+                </p>
+              </>
+            }
+          />
+        )}
         <Button
           id={
             agencyUserModificationFormIds(routeName)
