@@ -65,7 +65,8 @@
       "turbo.json",
       "babel.config.js",
       "package.json",
-      "!!**/node_modules"
+      "!!**/node_modules",
+      "!!**/docker-data"
     ]
   }
 }
