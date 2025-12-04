@@ -181,6 +181,10 @@ export const errors = {
       new BadRequestError(validationResult.message),
   },
   assessment: {
+    lastDayOfPresenceNotInConventionRange: () =>
+      new BadRequestError(
+        `La date du dernier jour de présence doit être comprise entre la date de début et la date de fin de l'immersion.`,
+      ),
     alreadyExist: (conventionId: ConventionId) =>
       new ConflictError(
         `Il n'est pas possible de créer le bilan car un bilan existe déjà pour la convention '${conventionId}'.`,

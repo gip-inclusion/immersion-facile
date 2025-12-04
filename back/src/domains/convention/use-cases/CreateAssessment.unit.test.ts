@@ -1,3 +1,4 @@
+import { addDays, subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AssessmentDto,
@@ -155,6 +156,44 @@ describe("CreateAssessment", () => {
       await expectPromiseToFailWithError(
         createAssessment.execute(assessment, tutorPayload),
         errors.assessment.alreadyExist(assessment.conventionId),
+      );
+    });
+
+    it("throws bad request if the last day of presence is before the convention start", async () => {
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: subDays(
+          new Date(validatedConvention.dateStart),
+          1,
+        ).toISOString(),
+        numberOfMissedHours: 2.5,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+      };
+      await expectPromiseToFailWithError(
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
+        errors.assessment.lastDayOfPresenceNotInConventionRange(),
+      );
+    });
+
+    it("throws bad request if the last day of presence is after the convention end", async () => {
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: addDays(
+          new Date(validatedConvention.dateEnd),
+          1,
+        ).toISOString(),
+        numberOfMissedHours: 2.5,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+      };
+      await expectPromiseToFailWithError(
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
+        errors.assessment.lastDayOfPresenceNotInConventionRange(),
       );
     });
 
