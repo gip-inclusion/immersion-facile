@@ -411,7 +411,7 @@ const getEstablishmentUserRow = ({
           establishmentUsersEditModal.open();
         },
         priority: "secondary",
-        className: fr.cx("fr-mb-0"),
+        className: fr.cx("fr-my-1v"),
         type: "button",
         id: `${domElementIds.establishmentDashboard.manageEstablishments.editUserButton}-${index}`,
       },
@@ -422,7 +422,7 @@ const getEstablishmentUserRow = ({
           establishmentUsersDeleteModal.open();
         },
         priority: "secondary",
-        className: fr.cx("fr-mb-0"),
+        className: fr.cx("fr-my-1v"),
         type: "button",
         disabled: isLastAdmin,
         title: isLastAdmin
