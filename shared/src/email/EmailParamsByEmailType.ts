@@ -408,10 +408,9 @@ export type EmailParamsByEmailType = {
       | undefined;
   };
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
-    contactFirstName: string;
-    contactLastName: string;
     businessName: string;
     businessAddresses: string[];
+    appelationLabels: string[];
   };
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: string;
