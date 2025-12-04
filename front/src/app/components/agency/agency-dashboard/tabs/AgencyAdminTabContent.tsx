@@ -90,7 +90,7 @@ export const AgencyAdminTabContent = ({
           <AgencyRightsTable
             agencyRights={agenciesUserIsNotAdminOn}
             user={currentUser}
-            title={`Organismes auquels vous êtes rattaché (${agenciesUserIsNotAdminOn.length} organismes)`}
+            title={`Organismes auxquels vous êtes rattaché (${agenciesUserIsNotAdminOn.length} organismes)`}
             modalId={domElementIds.agencyDashboard.agencyTab.userRightsModal}
             onUserUpdateRequested={onUserUpdateRequested(
               "agency-user-for-dashboard",
