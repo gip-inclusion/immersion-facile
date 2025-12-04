@@ -591,7 +591,7 @@ export const createUseCases = ({
     }),
 
     getConventionsWithErroredBroadcastFeedback: useCaseBuilder(
-      "getConventionsWithErroredBroadcastFeedback",
+      "GetConventionsWithErroredBroadcastFeedback",
     )
       .withCurrentUser<ConnectedUser>()
       .withInput(paginationRequiredQueryParamsSchema)
@@ -609,22 +609,22 @@ export const createUseCases = ({
           ),
       )({ uowPerformer }),
 
-    getFeatureFlags: useCaseBuilder("getFeatureFlags")
+    getFeatureFlags: useCaseBuilder("GetFeatureFlags")
       .notTransactional()
       .build(() => queries.featureFlag.getAll())({}),
 
-    getLink: useCaseBuilder("getLink")
+    getLink: useCaseBuilder("GetLink")
       .withInput(z.string())
       .notTransactional()
       .build(({ inputParams }) => queries.shortLink.getById(inputParams))({}),
 
-    getApiConsumerById: useCaseBuilder("getApiConsumerById")
+    getApiConsumerById: useCaseBuilder("GetApiConsumerById")
       .withInput(z.string())
       .build(({ inputParams, uow }) =>
         uow.apiConsumerRepository.getById(inputParams),
       )({ uowPerformer }),
 
-    getAllApiConsumers: useCaseBuilder("getAllApiConsumers")
+    getAllApiConsumers: useCaseBuilder("GetAllApiConsumers")
       .withCurrentUser<ConnectedUser>()
       .build(({ currentUser, uow }) => {
         throwIfNotAdmin(currentUser);
@@ -632,7 +632,7 @@ export const createUseCases = ({
       })({ uowPerformer }),
 
     isFormEstablishmentWithSiretAlreadySaved: useCaseBuilder(
-      "isFormEstablishmentWithSiretAlreadySaved",
+      "IsFormEstablishmentWithSiretAlreadySaved",
     )
       .withInput(siretSchema)
       .build(({ inputParams: siret, uow }) =>
@@ -642,7 +642,7 @@ export const createUseCases = ({
       )({ uowPerformer }),
 
     getImmersionFacileAgencyIdByKind: useCaseBuilder(
-      "getImmersionFacileAgencyIdByKind",
+      "GetImmersionFacileAgencyIdByKind",
     ).build(async ({ uow }) => {
       const agencyId = await uow.agencyRepository.getImmersionFacileAgencyId();
       if (!agencyId)
@@ -652,14 +652,14 @@ export const createUseCases = ({
       return agencyId;
     })({ uowPerformer }),
 
-    getLastNotifications: useCaseBuilder("getLastNotifications")
+    getLastNotifications: useCaseBuilder("GetLastNotifications")
       .withCurrentUser<ConnectedUser>()
       .build(({ currentUser, uow }) => {
         throwIfNotAdmin(currentUser);
         return uow.notificationRepository.getLastNotifications();
       })({ uowPerformer }),
 
-    findSimilarConventions: useCaseBuilder("findSimilarConventions")
+    findSimilarConventions: useCaseBuilder("FindSimilarConventions")
       .withInput(findSimilarConventionsParamsSchema)
       .withOutput<{ similarConventionIds: ConventionId[] }>()
       .notTransactional()
