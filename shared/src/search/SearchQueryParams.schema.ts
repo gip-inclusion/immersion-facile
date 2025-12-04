@@ -126,7 +126,7 @@ export const getExternalOffersFlatParamsSchema: z.ZodType<
   }
 > = z
   .object({
-    appellationCodes: z.array(appellationCodeSchema),
+    appellationCode: appellationCodeSchema,
     nafCodes: nafCodesSchema.optional(),
   })
   .and(paginationQueryParamsSchema)

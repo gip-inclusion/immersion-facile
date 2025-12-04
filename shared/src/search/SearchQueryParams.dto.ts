@@ -103,8 +103,9 @@ export type SearchQueryParamsWithGeoParams = GetOffersFlatParamsCommon &
 export type GetOffersFlatQueryParams = PaginationQueryParams &
   (SearchQueryParamsWithGeoParams | SearchQueryWithOptionalGeoParamsDto);
 
-export type GetExternalOffersFlatQueryParams = WithAppellationCodes &
-  WithNafCodes &
+export type GetExternalOffersFlatQueryParams = {
+  appellationCode: AppellationCode;
+} & WithNafCodes &
   LatLonDistance;
 
 export const hasSearchGeoParams = (
