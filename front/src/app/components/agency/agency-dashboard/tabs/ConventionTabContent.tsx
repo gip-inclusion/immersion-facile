@@ -139,7 +139,7 @@ export const ConventionTabContent = ({
           ]}
         >
           Créer une convention depuis votre espace vous permet de la pré-remplir
-          avec vos informations. Sélectionnez l’organisme pour lequelle vous
+          avec vos informations. Sélectionnez l’organisme pour lequel vous
           souhaitez initier la convention.
           <Select
             label={"Organisme"}
