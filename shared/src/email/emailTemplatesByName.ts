@@ -1464,7 +1464,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
       niceName: "Espace prescripteurs - Demande de rattachement",
       tags: ["espacePrescripteur_demandeDeRattachement"],
-      createEmailVariables: ({ firstName, lastName, agencies }) => ({
+      createEmailVariables: ({
+        firstName,
+        lastName,
+        agencies,
+        immersionBaseUrl,
+      }) => ({
         subject:
           "Immersion Facilitée - Des demandes de rattachement en attente pour vos organismes ",
         greetings: `Bonjour ${firstName} ${lastName},`,
@@ -1482,7 +1487,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         buttons: [
           {
             label: "Accéder à mon espace",
-            url: "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-entreprise accueillante-immersion facilitee 2024.pdf",
+            url: `${immersionBaseUrl}/${frontRoutes.agencyDashboard}/agences`,
           },
         ],
         highlight: {

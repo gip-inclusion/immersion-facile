@@ -29,6 +29,7 @@ const remindAgencyAdminThatNewUserRequestAgencyRightScript = async () => {
         new UuidV4Generator(),
         new CustomTimeGateway(),
       ),
+      config.immersionFacileBaseUrl,
     );
 
   const result = await remindAgencyAdminThatNewUserRequestAgencyRight.execute();

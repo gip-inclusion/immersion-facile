@@ -1,4 +1,8 @@
-import { AgencyDtoBuilder, ConnectedUserBuilder } from "shared";
+import {
+  type AbsoluteUrl,
+  AgencyDtoBuilder,
+  ConnectedUserBuilder,
+} from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -61,6 +65,8 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
     .withName("Agency 3")
     .build();
 
+  const immersionBaseUrl: AbsoluteUrl = "https://immersion-base-url.com";
+
   let uow: InMemoryUnitOfWork;
   let remindAgencyAdminThatNewUserRequestAgencyRight: RemindAgencyAdminThatNewUserRequestAgencyRight;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
@@ -78,6 +84,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
           new UuidV4Generator(),
           new CustomTimeGateway(),
         ),
+        immersionBaseUrl,
       );
   });
 
@@ -152,6 +159,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
             params: {
               firstName: admin1.firstName,
               lastName: admin1.lastName,
+              immersionBaseUrl,
               agencies: [
                 {
                   agencyName: agency1.name,
@@ -166,6 +174,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
             params: {
               firstName: admin2.firstName,
               lastName: admin2.lastName,
+              immersionBaseUrl,
               agencies: [
                 {
                   agencyName: agency2.name,
@@ -218,6 +227,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
             params: {
               firstName: admin1.firstName,
               lastName: admin1.lastName,
+              immersionBaseUrl,
               agencies: [
                 {
                   agencyName: agency1.name,
