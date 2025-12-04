@@ -399,7 +399,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         await expectPromiseToFailWithError(
           afterOAuthSuccessRedirection.execute(params),
-          errors.proConnect.missingOAuth({
+          errors.auth.missingOAuth({
             state: params.state,
           }),
         );
@@ -428,7 +428,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             code: "my-code",
             state: "my-state",
           }),
-          errors.proConnect.nonceMismatch(),
+          errors.auth.nonceMismatch(),
         );
       });
     });
@@ -585,7 +585,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           code: "osef",
           state: initialOngoingOAuth.state,
         }),
-        new Error("Already used authentication"), // temp
+        errors.auth.alreadyUsedAuthentication(),
       );
     });
 
