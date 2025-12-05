@@ -1,4 +1,4 @@
-import { ConnectedUserBuilder, getFormattedFirstnameAndLastname } from "shared";
+import { ConnectedUserBuilder } from "shared";
 import { locationToRawAddress } from "../../../../utils/address";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -99,17 +99,14 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
             cc: [establishmentContact1.email, establishmentContact2.email],
             params: {
               businessName: establishmentAggregate.establishment.name,
-              contactFirstName: getFormattedFirstnameAndLastname({
-                firstname: establishmentAdmin.firstName,
-              }),
-              contactLastName: getFormattedFirstnameAndLastname({
-                lastname: establishmentAdmin.lastName,
-              }),
               businessAddresses:
                 establishmentAggregate.establishment.locations.map(
                   ({ id, address }) =>
                     locationToRawAddress(id, address).rawAddress,
                 ),
+              appelationLabels: establishmentAggregate.offers.map(
+                (offer) => offer.appellationLabel,
+              ),
             },
           },
         ],

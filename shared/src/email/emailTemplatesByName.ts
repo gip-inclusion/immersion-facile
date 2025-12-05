@@ -1507,40 +1507,50 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
 
     NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
-      niceName: "Établissement - Référencement réussie",
-      tags: ["confirmation enregistrement entreprise"],
+      niceName: "Inscription - Entreprise - Référencement réussi",
+      tags: ["inscription_entreprise_referencementReussi"],
       createEmailVariables: ({
         businessName,
         businessAddresses,
-        contactFirstName,
-        contactLastName,
+        appelationLabels,
       }) => ({
-        subject: `Confirmation de création de votre établissement ${businessName} pour accueillir des immersions`,
+        subject: `Votre entreprise ${businessName} est désormais prête à accueillir des immersions !`,
         greetings: "Bonjour,",
         content: `
-      <strong>Félicitations !</strong>
+      Félicitations ! Vous venez d'enregistrer l'entreprise ${businessName} sur Immersion Facilitée pour accueillir des immersions professionnelles.      
 
-      Vous venez d'enregistrer votre établissement ${businessName} (${
-        businessAddresses[0]
-      }) pour accueillir des immersions professionnelles.      
+      <strong>👤 Votre rôle en tant qu'administrateur</strong>
 
-      ${contactFirstName} ${contactLastName} recevra bien les demandes d'immersion.
-      
-      Votre entreprise sera visible sur notre moteur de recherche sur les lieux d'immersion suivants :      
-      ${businessAddresses.map((address) => `• ${address}\n`).join("")}
-      Pour ces demandes, il n'est pas utile de demander un CV. Il s'agit seulement de passer quelques jours ensemble pour une découverte réciproque. 
+      Vous êtes maintenant admin de l'entreprise. À ce titre, vous pouvez :
 
-      Si vous avez des projets de recrutement et si, grâce à une immersion, vous retenez un profil qui vous convient, un conseiller emploi vous proposera, si nécessaire,  un plan de formation sur mesure. 
+        • gérer les informations et les offres de l'entreprise ;
+        • suivre les demandes d'immersion ;
+        • accéder aux conventions ;
+        • ajouter ou retirer des administrateurs et des contacts.
 
-      Merci d'avoir rejoint la communauté des “entreprises s'engagent” et de contribuer ainsi à l'accès à l'emploi de tous les publics.
-      `,
-        subContent: defaultSignature("immersion"),
+      Les contacts peuvent consulter les conventions et les candidatures de l'entreprise, et y répondre.`,
+
         buttons: [
           {
-            label: "Nos bons conseils",
-            url: "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-entreprise accueillante-immersion facilitee 2024.pdf",
+            label: "Découvrir nos conseils pour démarrer",
+            url: "https://pages.immersion-facile.beta.gouv.fr/ressources-entreprises/fiche-conseil-entreprise/",
           },
         ],
+        subContent: `         
+      <strong>🏢 Votre entreprise</strong>
+      
+      Votre entreprise apparaîtra dans les résultats de recherche correspondant aux critères suivants :
+      
+      <strong>Métier(s) :</strong>
+
+      ${appelationLabels.map((label) => `• ${label}\n`).join("")}
+      <strong>Lieu(x) d'immersion :</strong>
+
+      ${businessAddresses.map((address) => `• ${address}\n`).join("")}
+      Pour ces demandes, il n'est pas nécessaire de demander un CV. L'objectif est simplement de passer quelques jours ensemble pour une découverte réciproque. 
+
+      Si une immersion se passe bien et que vous souhaitez aller plus loin, un conseiller emploi pourra vous accompagner et, si besoin, proposer un plan de formation sur mesure.
+      ${defaultSignature("immersion")}`,
       }),
     },
     SUGGEST_EDIT_FORM_ESTABLISHMENT: {
