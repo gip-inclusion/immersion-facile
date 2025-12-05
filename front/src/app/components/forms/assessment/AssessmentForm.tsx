@@ -29,6 +29,7 @@ import {
   type FormAssessmentDto,
   type InternshipKind,
   type Role,
+  toDateUTCString,
   toDisplayedDate,
   typeOfContracts,
 } from "shared";
@@ -279,6 +280,8 @@ const AssessmentStatusSection = ({
                   ...register("lastDayOfPresence"),
                   id: domElementIds.assessment.lastDayOfPresenceInput,
                   defaultValue: convention.dateEnd,
+                  min: toDateUTCString(new Date(convention.dateStart)),
+                  max: toDateUTCString(new Date(convention.dateEnd)),
                 }}
                 {...getFieldError("lastDayOfPresence")}
               />
