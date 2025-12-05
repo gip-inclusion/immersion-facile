@@ -572,6 +572,8 @@ const filterSearch =
         // Search in beneficiary names
         sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
         sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("b.first_name")} || ' ' || ${eb.ref("b.last_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("b.last_name")} || ' ' || ${eb.ref("b.first_name")} ILIKE ${pattern}`,
         // Search in establishment business name
         sql<any>`${eb.ref("business_name")} ILIKE ${pattern}`,
         // Search in establishment SIRET
@@ -585,6 +587,8 @@ const filterSearch =
         // Search agency referent names
         sql<any>`${eb.ref("agency_referent_first_name")} ILIKE ${pattern}`,
         sql<any>`${eb.ref("agency_referent_last_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("agency_referent_first_name")} || ' ' || ${eb.ref("agency_referent_last_name")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("agency_referent_last_name")} || ' ' || ${eb.ref("agency_referent_first_name")} ILIKE ${pattern}`,
       ]),
     );
   };
