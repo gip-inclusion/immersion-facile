@@ -14,6 +14,7 @@ export type MultipleAppellationAutocompleteLocator =
 export type AppellationAutocompleteLocator =
   | "search-form-appellation"
   | "convention-profession"
+  | "form-establishment-add-offer-modal"
   | MultipleAppellationAutocompleteLocator;
 
 const initialState: AutocompleteState<

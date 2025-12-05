@@ -451,14 +451,15 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                     nextTitle={steps[currentStep].nextTitle}
                   />
                   {match(currentStep)
-                    .with(1, () => (
+                    // TODO : remettre ordre
+                    .with(2, () => (
                       <BusinessAndAdminSection
                         mode={mode}
                         currentStep={currentStep}
                         onStepChange={onStepChange}
                       />
                     ))
-                    .with(2, () => (
+                    .with(1, () => (
                       <OffersSection
                         mode={mode}
                         onStepChange={onStepChange}

@@ -1,5 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
+import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   type AppellationAndRomeDto,
@@ -34,6 +37,11 @@ const getAppellationKey = (
   return `${appellationCode}-${appellationLabel}`;
 };
 
+const addOfferModal = createModal({
+  isOpenedByDefault: false,
+  id: "im-add-offer-modal",
+});
+
 export const MultipleAppellationInput = ({
   name,
   label,
@@ -46,63 +54,63 @@ export const MultipleAppellationInput = ({
 }: MultipleAppellationInputProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
+  useIsModalOpen(addOfferModal);
+
   return (
     <div
       className={cx(fr.cx("fr-input-group"), "im-appellation-autocomplete")}
       id={id}
     >
-      <>
-        {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
-        {currentAppellations.map(
-          ({ appellationCode, appellationLabel }, index) => {
-            const key = getAppellationKey(appellationCode, appellationLabel);
-            const locator: AppellationAutocompleteLocator = `multiple-appellation-${index}`;
-            return (
-              <div
-                className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-                key={key}
-              >
-                <div className={fr.cx("fr-col", !!index && "fr-mt-2w")}>
-                  <AppellationAutocomplete
-                    locator={locator}
-                    disabled={disabled}
-                    multiple
-                    label={"Rechercher un métier *"}
-                    onAppellationSelected={(selectedAppellationMatch) => {
-                      onAppellationAdd(
-                        selectedAppellationMatch.appellation,
-                        index,
-                      );
-                    }}
-                    onAppellationClear={() => {
-                      onAppellationDelete(index);
-                    }}
-                    selectProps={{
-                      inputId: `${id}-${index}`,
-                    }}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  iconId="fr-icon-delete-bin-line"
-                  title="Suppression"
+      {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
+      {currentAppellations.map(
+        ({ appellationCode, appellationLabel }, index) => {
+          const key = getAppellationKey(appellationCode, appellationLabel);
+          const locator: AppellationAutocompleteLocator = `multiple-appellation-${index}`;
+          return (
+            <div
+              className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
+              key={key}
+            >
+              <div className={fr.cx("fr-col", !!index && "fr-mt-2w")}>
+                <AppellationAutocomplete
+                  locator={locator}
                   disabled={disabled}
-                  id="im-multiple-appellation-input__delete-option-button"
-                  onClick={() => {
-                    onAppellationDelete(index);
-                    dispatch(
-                      appellationSlice.actions.clearLocatorDataRequested({
-                        locator,
-                        multiple: true,
-                      }),
+                  multiple
+                  label={"Rechercher un métier *"}
+                  onAppellationSelected={(selectedAppellationMatch) => {
+                    onAppellationAdd(
+                      selectedAppellationMatch.appellation,
+                      index,
                     );
+                  }}
+                  onAppellationClear={() => {
+                    onAppellationDelete(index);
+                  }}
+                  selectProps={{
+                    inputId: `${id}-${index}`,
                   }}
                 />
               </div>
-            );
-          },
-        )}
-      </>
+              <Button
+                type="button"
+                iconId="fr-icon-delete-bin-line"
+                title="Suppression"
+                disabled={disabled}
+                id="im-multiple-appellation-input__delete-option-button"
+                onClick={() => {
+                  onAppellationDelete(index);
+                  dispatch(
+                    appellationSlice.actions.clearLocatorDataRequested({
+                      locator,
+                      multiple: true,
+                    }),
+                  );
+                }}
+              />
+            </div>
+          );
+        },
+      )}
       <Button
         className={fr.cx("fr-my-4v")}
         type="button"
@@ -124,6 +132,31 @@ export const MultipleAppellationInput = ({
         >
           {typeof error === "string" ? error : "Indiquez au moins 1 métier."}
         </div>
+      )}
+      {createPortal(
+        <addOfferModal.Component
+          title="Ajouter un métier"
+          buttons={[
+            {
+              doClosesModal: true,
+              children: "Annuler",
+            },
+            {
+              doClosesModal: false,
+              children: "Ajouter ce métier",
+            },
+          ]}
+        >
+          <p>Rechercher un métier</p>
+          <p>::Appelation Input::</p>
+          <p>Proposez-vous du télétravail sur ce métier</p>
+          <ul>
+            <li>Oui, télétravail hybride</li>
+            <li>Oui, 100% télétravail</li>
+            <li>Non, pas de télétravail</li>
+          </ul>
+        </addOfferModal.Component>,
+        document.body,
       )}
     </div>
   );
