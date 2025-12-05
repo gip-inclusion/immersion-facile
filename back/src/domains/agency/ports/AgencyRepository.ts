@@ -38,6 +38,11 @@ export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
   agencyId: AgencyId;
 };
 
+export type AgencyWithNumberOfUsersToReview = {
+  agency: AgencyWithUsersRights;
+  numberOfUsersToReview: number;
+};
+
 export interface AgencyRepository {
   insert(agency: AgencyWithUsersRights): Promise<void>;
   update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
@@ -53,7 +58,7 @@ export interface AgencyRepository {
   }): Promise<AgencyWithUsersRights[]>;
 
   getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyWithUsersRights[]>;
-
+  getAllAgenciesWithUsersToReview(): Promise<AgencyWithNumberOfUsersToReview[]>;
   getImmersionFacileAgencyId(): Promise<AgencyId | undefined>;
   getUserIdWithAgencyRightsByFilters(
     filters: WithUserFilters,
