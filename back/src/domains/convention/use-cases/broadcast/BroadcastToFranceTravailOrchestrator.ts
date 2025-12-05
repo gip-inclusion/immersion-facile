@@ -1,6 +1,6 @@
 import {
   type AssessmentDto,
-  type ConventionDto,
+  type ConventionId,
   type ConventionReadDto,
   errors,
 } from "shared";
@@ -27,7 +27,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
   broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
   broadcastToFranceTravailOnConventionUpdatesLegacy: BroadcastToFranceTravailOnConventionUpdatesLegacy;
 }): InstantiatedUseCase<{
-  convention: ConventionDto;
+  conventionId: ConventionId;
   assessment?: AssessmentDto;
 }> => {
   return {
@@ -36,16 +36,22 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
       const featureFlags = await uowPerformer.perform(async (uow) =>
         uow.featureFlagQueries.getAll(),
       );
+      const convention = await uowPerformer.perform(async (uow) =>
+        uow.conventionRepository.getById(params.conventionId),
+      );
+      if (!convention) {
+        throw errors.convention.notFound({ conventionId: params.conventionId });
+      }
 
       if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive) {
         const { agency, agencyWithRights, referredAgency } =
           await uowPerformer.perform(async (uow) => {
             const agencyWithRights = await uow.agencyRepository.getById(
-              params.convention.agencyId,
+              convention.agencyId,
             );
             if (!agencyWithRights) {
               throw errors.agency.notFound({
-                agencyId: params.convention.agencyId,
+                agencyId: convention.agencyId,
               });
             }
             const agency = await agencyWithRightToAgencyDto(
@@ -65,14 +71,14 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
           });
 
         const assessment = await uowPerformer.perform(async (uow) =>
-          uow.assessmentRepository.getByConventionId(params.convention.id),
+          uow.assessmentRepository.getByConventionId(convention.id),
         );
 
         const assessmentFields =
           assesmentEntityToConventionAssessmentFields(assessment);
 
         const conventionRead: ConventionReadDto = {
-          ...params.convention,
+          ...convention,
           agencyName: agencyWithRights.name,
           agencyDepartment: agencyWithRights.address.departmentCode,
           agencyKind: agencyWithRights.kind,
@@ -86,7 +92,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
         if (eventType === "ASSESSMENT_CREATED") {
           if (!params.assessment)
             throw errors.assessment.missingAssessment({
-              conventionId: params.convention.id,
+              conventionId: convention.id,
             });
 
           return broadcastToFranceTravailOnConventionUpdates.execute({
@@ -104,7 +110,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
 
       if (eventType === "CONVENTION_UPDATED") {
         return broadcastToFranceTravailOnConventionUpdatesLegacy.execute({
-          convention: params.convention,
+          convention: convention,
         });
       }
     },

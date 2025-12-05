@@ -486,7 +486,7 @@ describe("TransferConventionToAgency", () => {
               agencyId: otherAgency.id,
               conventionId: transferredConvention.id,
               justification: "change of agency",
-              previousAgencyId: convention.agencyId,
+              previousAgencyId: initialConvention.agencyId,
               triggeredBy: {
                 kind: "connected-user",
                 userId: connectedUser.id,
@@ -849,7 +849,7 @@ describe("TransferConventionToAgency", () => {
               agencyId: otherAgency.id,
               conventionId: transferredConvention.id,
               justification: "change of agency",
-              previousAgencyId: convention.agencyId,
+              previousAgencyId: initialConvention.agencyId,
               triggeredBy: {
                 kind: "convention-magic-link",
                 role: validatorJwtPayload.role,
