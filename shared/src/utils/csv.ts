@@ -1,12 +1,13 @@
-import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { EstablishmentFormOffer } from "../formEstablishment/FormEstablishment.dto";
 
-export const establishmentAppellationsFromCSVToDto = (
-  appellationsRow: string,
-): AppellationAndRomeDto[] =>
-  appellationsRow
+export const establishmentOffersFromCSVToDto = (
+  offersRow: string,
+): EstablishmentFormOffer[] =>
+  offersRow
     .replaceAll(" ", "")
     .split(",")
     .map((appellationCode) => ({
+      remoteWorkMode: "NO_REMOTE",
       appellationCode,
       appellationLabel: "Should be mapped by backend", // to refacto with Rome 4
       romeCode: "A1101", // to refacto with Rome 4

@@ -1,13 +1,13 @@
 import {
+  appellationAndRomeDtoSchema,
   appellationCodeSchema,
   appellationCodeSchemaOptional,
-  appellationDtoSchema,
 } from "./romeAndAppellation.schema";
 
 describe("appel", () => {
   it("must include rome code and can include appellation", () => {
     expect(() =>
-      appellationDtoSchema.parse({
+      appellationAndRomeDtoSchema.parse({
         romeCode: "A0000",
         appellationCode: "00000",
         romeLabel: "description",
@@ -16,7 +16,7 @@ describe("appel", () => {
     ).not.toThrow();
 
     expect(() =>
-      appellationDtoSchema.parse({
+      appellationAndRomeDtoSchema.parse({
         romeCode: undefined,
         appellationCode: "00000",
         romeLabel: "description",
@@ -25,7 +25,7 @@ describe("appel", () => {
     ).toThrow();
 
     expect(() =>
-      appellationDtoSchema.parse({
+      appellationAndRomeDtoSchema.parse({
         romeCode: "A0000",
         appellationCode: "00000",
         romeLabel: "description",
@@ -34,7 +34,7 @@ describe("appel", () => {
     ).not.toThrow();
 
     expect(() =>
-      appellationDtoSchema.parse({
+      appellationAndRomeDtoSchema.parse({
         romeCode: undefined,
         appellationCode: undefined,
         romeLabel: "description",

@@ -10,7 +10,7 @@ import { useStyles } from "tss-react/dsfr";
 import { SearchResult } from "../../search/SearchResult";
 
 const establishmentToSearchResultPreview = ({
-  appellations,
+  offers,
   naf,
   businessNameCustomized,
   businessName,
@@ -21,9 +21,12 @@ const establishmentToSearchResultPreview = ({
   additionalInformation,
 }: FormEstablishmentDto): SearchResultDto => ({
   establishmentScore: 0,
-  rome: appellations.length > 0 ? appellations[0].romeCode : "",
-  romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
-  appellations: appellations,
+  rome: offers.length > 0 ? offers[0].romeCode : "",
+  romeLabel: offers.length > 0 ? offers[0].romeLabel : "",
+  appellations: offers.map((offer) => ({
+    appellationCode: offer.appellationCode,
+    appellationLabel: offer.appellationLabel,
+  })),
   nafLabel: "",
   naf: naf?.code || "",
   name: businessNameCustomized || businessName || "Mon entreprise",

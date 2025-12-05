@@ -63,7 +63,7 @@ const topics = [
   "establishment-dashboard-discussion-list",
   "establishments-batch",
   "form-establishment",
-  "form-establishment-add-offer-modal",
+  "form-establishment-offer-modal",
   "login-by-email",
   "magic-link-interstitial",
   "partner-conventions",
@@ -414,7 +414,7 @@ export const feedbacks: Record<
       message: "L'entreprise a bien été supprimée",
     },
   },
-  "form-establishment-add-offer-modal": {},
+  "form-establishment-offer-modal": {},
   "siret-input": {},
   assessment: {
     "create.success": {
