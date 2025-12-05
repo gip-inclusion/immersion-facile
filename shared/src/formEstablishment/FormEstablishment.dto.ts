@@ -23,6 +23,27 @@ export const remoteWorkModes = ["HYBRID", "100% REMOTE", "NO_REMOTE"] as const;
 
 export type RemoteWorkMode = (typeof remoteWorkModes)[number];
 
+export const remoteWorkModeLabels: Record<
+  RemoteWorkMode,
+  { label: string; description: string }
+> = {
+  HYBRID: {
+    label: "Télétravail hybride",
+    description:
+      "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
+  },
+  "100% REMOTE": {
+    label: "100% télétravail",
+    description:
+      "Apparaîtra pour la France entière, quelle que soit la localisation du candidat",
+  },
+  NO_REMOTE: {
+    label: "Pas de télétravail",
+    description:
+      "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
+  },
+};
+
 export type EstablishmentFormOffer = AppellationAndRomeDto & WithRemoteWorkMode;
 
 export type WithRemoteWorkMode = {
