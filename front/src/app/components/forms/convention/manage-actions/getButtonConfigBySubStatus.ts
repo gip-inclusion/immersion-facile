@@ -282,6 +282,16 @@ export const getButtonConfigBySubStatus = (
     .exhaustive();
 };
 
+export const hasUserRightsOnAgencyBroadcast = (
+  currentUser: ConnectedUser,
+): boolean => {
+  return currentUser.agencyRights.some(
+    (agencyRight) =>
+      agencyRight.agency.kind === "pole-emploi" ||
+      agencyRight.agency.kind === "mission-locale",
+  );
+};
+
 const createButtonPropsByVerificationAction = (
   params: CreateButtonConfigurationsBySubStatusParams,
 ): Record<VerificationAction, ButtonConfiguration> => {
@@ -357,7 +367,8 @@ const createButtonPropsByVerificationAction = (
       "counsellor",
       "validator",
       "agency-viewer",
-    ]);
+    ]) &&
+    hasUserRightsOnAgencyBroadcast(currentUser);
 
   const shouldShowMarkAsHandledButton =
     shouldShowBroadcastAgainButton && !!broadcastErrorFeedback;

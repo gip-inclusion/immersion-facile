@@ -23,12 +23,14 @@ import {
 } from "shared";
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { Feedback } from "src/app/components/feedback/Feedback";
+import { hasUserRightsOnAgencyBroadcast } from "src/app/components/forms/convention/manage-actions/getButtonConfigBySubStatus";
 import { SubscriberErrorFeedbackComponent } from "src/app/components/SubscriberErrorFeedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import {
   canAssessmentBeFilled,
   isConventionEndingInOneDayOrMore,
@@ -69,6 +71,7 @@ export const ConventionValidation = ({
   const conventionLastBroadcastFeedback = useAppSelector(
     partnersErroredConventionSelectors.lastBroadcastFeedback,
   );
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const [isAssessmentLinkSent, setIsAssessmentLinkSent] =
     useState<boolean>(false);
 
@@ -119,7 +122,9 @@ export const ConventionValidation = ({
 
   const shouldShowConventionLastBroadcastFeedbackErrorInfo =
     conventionLastBroadcastFeedback?.subscriberErrorFeedback &&
-    intersection(roles, [...agencyModifierRoles, "back-office"]).length > 0;
+    intersection(roles, [...agencyModifierRoles, "back-office"]).length > 0 &&
+    currentUser &&
+    hasUserRightsOnAgencyBroadcast(currentUser);
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
