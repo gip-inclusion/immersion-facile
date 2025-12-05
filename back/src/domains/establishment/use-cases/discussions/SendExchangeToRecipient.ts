@@ -100,8 +100,12 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
         kind: "DISCUSSION_EXCHANGE",
         sender: discussionEmailSender,
         params: {
+          sender: lastExchange.sender,
           subject: lastExchange.subject,
-          htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+          htmlContent: `
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
+                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ${discussion.potentialBeneficiary.firstName} ${
                     discussion.potentialBeneficiary.lastName

@@ -31,18 +31,23 @@ describe("AddExchangeToDiscussion", () => {
   const adminUserEstablishment1Builder = new ConnectedUserBuilder()
     .withId("estab1-admin")
     .withEmail("estab1-admin@mail.com");
+  const adminUserEstablishment2Builder = new ConnectedUserBuilder()
+    .withId("estab2-admin")
+    .withEmail("estab2-admin@mail.com");
 
   const adminConnectedUserEstablishment1 =
     adminUserEstablishment1Builder.build();
   const adminUserEstablishment1 = adminUserEstablishment1Builder.buildUser();
+
+  const adminConnectedUserEstablishment2 =
+    adminUserEstablishment2Builder.build();
+  const adminUserEstablishment2 = adminUserEstablishment2Builder.buildUser();
+
   const contactUserEstablishment1 = new ConnectedUserBuilder()
     .withId("estab1-contact")
     .withEmail("estab1-contact@mail.com")
     .buildUser();
-  const adminUserEstablishment2 = new ConnectedUserBuilder()
-    .withId("estab2-admin")
-    .withEmail("estab2-admin@mail.com")
-    .buildUser();
+
   const contactUserEstablishment2 = new ConnectedUserBuilder()
     .withId("estab2-contact")
     .withEmail("estab2-contact@mail.com")
@@ -679,6 +684,13 @@ describe("AddExchangeToDiscussion", () => {
             const expectedResult: DiscussionExchangeForbiddenParams = {
               sender: "establishment",
               reason: "discussion_completed",
+              admins: [
+                {
+                  firstName: adminUserEstablishment2.firstName,
+                  lastName: adminUserEstablishment2.lastName,
+                  email: adminUserEstablishment2.email,
+                },
+              ],
             };
             expectToEqual(
               await addExchangeToDiscussion.execute({
@@ -748,6 +760,13 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(result, {
               reason: "discussion_completed",
               sender: "establishment",
+              admins: [
+                {
+                  firstName: adminUserEstablishment2.firstName,
+                  lastName: adminUserEstablishment2.lastName,
+                  email: adminUserEstablishment2.email,
+                },
+              ],
             });
 
             expectToEqual(uow.discussionRepository.discussions, [
@@ -794,6 +813,13 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(result, {
               reason: "discussion_completed",
               sender: "potentialBeneficiary",
+              admins: [
+                {
+                  firstName: adminUserEstablishment2.firstName,
+                  lastName: adminUserEstablishment2.lastName,
+                  email: adminUserEstablishment2.email,
+                },
+              ],
             });
 
             expectToEqual(uow.discussionRepository.discussions, [
@@ -813,6 +839,13 @@ describe("AddExchangeToDiscussion", () => {
                   params: {
                     reason: "discussion_completed",
                     sender: "potentialBeneficiary",
+                    admins: [
+                      {
+                        firstName: adminUserEstablishment2.firstName,
+                        lastName: adminUserEstablishment2.lastName,
+                        email: adminUserEstablishment2.email,
+                      },
+                    ],
                   },
                   recipients: [discussionRejected.potentialBeneficiary.email],
                 },
@@ -822,6 +855,50 @@ describe("AddExchangeToDiscussion", () => {
           });
         });
       });
+    });
+  });
+
+  describe("wrong paths", () => {
+    it("throws an error if the discussion does not exist", async () => {
+      const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute({
+          source: "inbound-parsing",
+          messageInputs: [
+            {
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
+              message: createInboundParsingResponse([
+                `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`,
+              ]).items[0].RawHtmlBody!,
+              discussionId: notFoundDiscussionId,
+              recipientRole: "establishment",
+              senderEmail: pendingDiscussion1.potentialBeneficiary.email,
+              attachments: [],
+              subject: "",
+              sentAt: new Date().toISOString(),
+            },
+          ],
+        }),
+        errors.discussion.notFound({ discussionId: notFoundDiscussionId }),
+      );
+    });
+
+    it("throws an error if the source is dashboard, but user is not connected", async () => {
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute({
+          source: "dashboard",
+          messageInputs: [
+            {
+              message: "Hello",
+              discussionId: "11111111-e89b-12d3-a456-426614174000",
+              recipientRole: "potentialBeneficiary",
+              attachments: [],
+            },
+          ],
+        }),
+        errors.user.unauthorized(),
+      );
     });
 
     describe("when establishment does not exist", () => {
@@ -860,6 +937,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "establishment",
+            admins: [],
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -880,6 +958,7 @@ describe("AddExchangeToDiscussion", () => {
                 params: {
                   reason: "establishment_missing",
                   sender: "establishment",
+                  admins: [],
                 },
                 recipients: [adminUserEstablishment1.email],
               },
@@ -907,6 +986,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "establishment",
+            admins: [],
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -954,6 +1034,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "potentialBeneficiary",
+            admins: [],
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -974,6 +1055,7 @@ describe("AddExchangeToDiscussion", () => {
                 params: {
                   reason: "establishment_missing",
                   sender: "potentialBeneficiary",
+                  admins: [],
                 },
                 recipients: [pendingDiscussion1.potentialBeneficiary.email],
               },
@@ -983,60 +1065,130 @@ describe("AddExchangeToDiscussion", () => {
         });
       });
     });
-  });
 
-  describe("wrong paths", () => {
-    it("throws an error if the discussion does not exist", async () => {
-      const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
-
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute({
-          source: "inbound-parsing",
-          messageInputs: [
-            {
-              // biome-ignore lint/style/noNonNullAssertion: testing purpose
-              message: createInboundParsingResponse([
-                `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`,
-              ]).items[0].RawHtmlBody!,
-              discussionId: notFoundDiscussionId,
-              recipientRole: "establishment",
-              senderEmail: pendingDiscussion1.potentialBeneficiary.email,
-              attachments: [],
-              subject: "",
-              sentAt: new Date().toISOString(),
-            },
-          ],
-        }),
-        errors.discussion.notFound({ discussionId: notFoundDiscussionId }),
-      );
-    });
-    it("throws an error if the source is dashboard, but user is not connected", async () => {
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute({
-          source: "dashboard",
-          messageInputs: [
-            {
-              message: "Hello",
-              discussionId: "11111111-e89b-12d3-a456-426614174000",
-              recipientRole: "potentialBeneficiary",
-              attachments: [],
-            },
-          ],
-        }),
-        errors.user.unauthorized(),
-      );
-    });
-
-    it("throws an error if user establishment does not exist by email", async () => {
-      uow.userRepository.users = [];
-
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(
+    describe("when sender is not potential beneficiary and don't have right on establishment", () => {
+      const establishmentWithoutRight = new EstablishmentAggregateBuilder(
+        establishment1,
+      )
+        .withUserRights([
           {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            shouldReceiveDiscussionNotifications: true,
+            userId: adminUserEstablishment1.id,
+            isMainContactByPhone: false,
+          },
+        ])
+        .build();
+
+      beforeEach(() => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishmentWithoutRight,
+        ];
+      });
+
+      it("through inbound parsing, do not save the new exchange in the discussion and notify sender that user has no rights on establishment", async () => {
+        expectToEqual(
+          await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  senderEmail: contactUserEstablishment2.email,
+                  sentAt: timeGateway.now().toISOString(),
+                  subject: "",
+                  message: "Hello",
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  attachments: [],
+                },
+              ],
+            },
+            adminConnectedUserEstablishment1,
+          ),
+          {
+            reason: "user_unknown_or_missing_rights_on_establishment",
+            sender: "establishment",
+            admins: [
+              {
+                firstName: adminUserEstablishment1.firstName,
+                lastName: adminUserEstablishment1.lastName,
+                email: adminUserEstablishment1.email,
+              },
+            ],
+          },
+        );
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          pendingDiscussion1,
+          pendingDiscussion2,
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "NotificationAdded",
+          },
+        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+              params: {
+                reason: "user_unknown_or_missing_rights_on_establishment",
+                sender: "establishment",
+                admins: [
+                  {
+                    firstName: adminUserEstablishment1.firstName,
+                    lastName: adminUserEstablishment1.lastName,
+                    email: adminUserEstablishment1.email,
+                  },
+                ],
+              },
+              recipients: [contactUserEstablishment2.email],
+            },
+          ],
+          sms: [],
+        });
+      });
+
+      it("through dashboard, throws a forbidden error ", async () => {
+        await expectPromiseToFailWithError(
+          addExchangeToDiscussion.execute(
+            {
+              source: "dashboard",
+              messageInputs: [
+                {
+                  message: "Hello",
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  attachments: [],
+                },
+              ],
+            },
+            adminConnectedUserEstablishment2,
+          ),
+          errors.establishment.notAdminOrContactRight({
+            userId: adminConnectedUserEstablishment2.id,
+            siret: establishmentWithoutRight.establishment.siret,
+          }),
+        );
+      });
+    });
+
+    describe("when sender is not potential beneficiary and is missing from users", () => {
+      beforeEach(() => {
+        uow.userRepository.users = [adminConnectedUserEstablishment1];
+      });
+
+      it("through inbound parsing, do not save the new exchange in the discussion and notify sender that user has no rights on establishment", async () => {
+        expectToEqual(
+          await addExchangeToDiscussion.execute({
             source: "inbound-parsing",
             messageInputs: [
               {
-                senderEmail: adminConnectedUserEstablishment1.email,
+                senderEmail: adminConnectedUserEstablishment2.email,
                 attachments: [],
                 discussionId: pendingDiscussion1.id,
                 message: "Hello",
@@ -1045,156 +1197,259 @@ describe("AddExchangeToDiscussion", () => {
                 subject: "OSEF",
               },
             ],
-          },
-          adminConnectedUserEstablishment1,
-        ),
-        errors.user.notFoundByEmail({
-          email: adminConnectedUserEstablishment1.email,
-        }),
-      );
-    });
-
-    it("throws an error if user establishment does not exist by userId", async () => {
-      uow.userRepository.users = [];
-
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(
+          }),
           {
-            source: "dashboard",
-            messageInputs: [
+            reason: "user_unknown_or_missing_rights_on_establishment",
+            sender: "establishment",
+            admins: [
               {
-                message: "Hello",
-                discussionId: pendingDiscussion1.id,
-                recipientRole: "potentialBeneficiary",
-                attachments: [],
+                firstName: adminConnectedUserEstablishment1.firstName,
+                lastName: adminConnectedUserEstablishment1.lastName,
+                email: adminConnectedUserEstablishment1.email,
               },
             ],
           },
-          adminConnectedUserEstablishment1,
-        ),
-        errors.user.notFound({ userId: adminConnectedUserEstablishment1.id }),
-      );
-    });
+        );
 
-    it("throws an error if user establishment does not have admin or contact establishment rights", async () => {
-      const establishment = new EstablishmentAggregateBuilder(establishment1)
-        .withUserRights([
+        expectToEqual(uow.discussionRepository.discussions, [
+          pendingDiscussion1,
+          pendingDiscussion2,
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
           {
-            role: "establishment-admin",
-            job: "",
-            phone: "",
-            shouldReceiveDiscussionNotifications: true,
-            userId: "osef",
-            isMainContactByPhone: false,
+            topic: "NotificationAdded",
           },
-        ])
-        .build();
+        ]);
 
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        establishment,
-      ];
-
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(
-          {
-            source: "dashboard",
-            messageInputs: [
-              {
-                message: "Hello",
-                discussionId: pendingDiscussion1.id,
-                recipientRole: "potentialBeneficiary",
-                attachments: [],
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+              params: {
+                reason: "user_unknown_or_missing_rights_on_establishment",
+                sender: "establishment",
+                admins: [
+                  {
+                    firstName: adminConnectedUserEstablishment1.firstName,
+                    lastName: adminConnectedUserEstablishment1.lastName,
+                    email: adminConnectedUserEstablishment1.email,
+                  },
+                ],
               },
-            ],
-          },
-          adminConnectedUserEstablishment1,
-        ),
-        errors.establishment.notAdminOrContactRight({
-          userId: adminConnectedUserEstablishment1.id,
-          siret: establishment.establishment.siret,
-        }),
-      );
+              recipients: [adminConnectedUserEstablishment2.email],
+            },
+          ],
+          sms: [],
+        });
+      });
+
+      it("through dashboard, throws a notFound user error", async () => {
+        await expectPromiseToFailWithError(
+          addExchangeToDiscussion.execute(
+            {
+              source: "dashboard",
+              messageInputs: [
+                {
+                  message: "Hello",
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  attachments: [],
+                },
+              ],
+            },
+            adminConnectedUserEstablishment2,
+          ),
+          errors.user.notFound({ userId: adminConnectedUserEstablishment2.id }),
+        );
+      });
     });
-    it("throws an error if the user is not allowed to send message to the discussion (dashboard)", async () => {
+
+    describe("when sender is existing user but is not allowed to send message to the discussion", () => {
       const connectedUserWithNoRightsOnDiscussion = new ConnectedUserBuilder()
         .withId("no-rights-user")
         .withFirstName("No")
         .withLastName("Rights")
         .withEmail("no.rights@establishment.com")
         .build();
-      uow.userRepository.users = [connectedUserWithNoRightsOnDiscussion];
 
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(
-          {
-            source: "dashboard",
-            messageInputs: [
-              {
-                message: "Hello",
-                discussionId: pendingDiscussion1.id,
-                recipientRole: "potentialBeneficiary",
-                attachments: [],
-              },
-            ],
-          },
+      beforeEach(() => {
+        uow.userRepository.users = [
+          adminConnectedUserEstablishment1,
           connectedUserWithNoRightsOnDiscussion,
-        ),
-        errors.establishment.notAdminOrContactRight({
-          userId: connectedUserWithNoRightsOnDiscussion.id,
-          siret: establishment1.establishment.siret,
-        }),
-      );
-    });
-    it("throws an error if the user is not allowed to send message to the discussion (inbound parsing)", async () => {
-      const connectedUserWithNoRightsOnDiscussion = new ConnectedUserBuilder()
-        .withId("no-rights-user")
-        .withFirstName("No")
-        .withLastName("Rights")
-        .withEmail("no.rights@establishment.com")
-        .build();
-      uow.userRepository.users = [connectedUserWithNoRightsOnDiscussion];
+        ];
+      });
 
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute({
-          source: "inbound-parsing",
-          messageInputs: [
+      it("through inbound parsing, do not save the new exchange in the discussion and notify sender that user has no rights on establishment", async () => {
+        expectToEqual(
+          await addExchangeToDiscussion.execute({
+            source: "inbound-parsing",
+            messageInputs: [
+              {
+                senderEmail: connectedUserWithNoRightsOnDiscussion.email,
+                attachments: [],
+                discussionId: pendingDiscussion1.id,
+                message: "Hello",
+                recipientRole: "potentialBeneficiary",
+                sentAt: new Date().toISOString(),
+                subject: "OSEF",
+              },
+            ],
+          }),
+          {
+            reason: "user_unknown_or_missing_rights_on_establishment",
+            sender: "establishment",
+            admins: [
+              {
+                firstName: adminConnectedUserEstablishment1.firstName,
+                lastName: adminConnectedUserEstablishment1.lastName,
+                email: adminConnectedUserEstablishment1.email,
+              },
+            ],
+          },
+        );
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          pendingDiscussion1,
+          pendingDiscussion2,
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "NotificationAdded",
+          },
+        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
             {
-              senderEmail: connectedUserWithNoRightsOnDiscussion.email,
-              attachments: [],
-              discussionId: pendingDiscussion1.id,
-              message: "Hello",
-              recipientRole: "potentialBeneficiary",
-              sentAt: new Date().toISOString(),
-              subject: "OSEF",
+              kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+              params: {
+                reason: "user_unknown_or_missing_rights_on_establishment",
+                sender: "establishment",
+                admins: [
+                  {
+                    firstName: adminConnectedUserEstablishment1.firstName,
+                    lastName: adminConnectedUserEstablishment1.lastName,
+                    email: adminConnectedUserEstablishment1.email,
+                  },
+                ],
+              },
+              recipients: [connectedUserWithNoRightsOnDiscussion.email],
             },
           ],
-        }),
-        errors.establishment.notAdminOrContactRight({
-          userId: connectedUserWithNoRightsOnDiscussion.id,
-          siret: establishment1.establishment.siret,
-        }),
-      );
+          sms: [],
+        });
+      });
+
+      it("through dashboard - throws a notAdminOrContactRight error", async () => {
+        await expectPromiseToFailWithError(
+          addExchangeToDiscussion.execute(
+            {
+              source: "dashboard",
+              messageInputs: [
+                {
+                  message: "Hello",
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  attachments: [],
+                },
+              ],
+            },
+            connectedUserWithNoRightsOnDiscussion,
+          ),
+          errors.establishment.notAdminOrContactRight({
+            userId: connectedUserWithNoRightsOnDiscussion.id,
+            siret: establishment1.establishment.siret,
+          }),
+        );
+      });
     });
-    it("throws an error if sender email is not discussion potential beneficiary (or establishment) email", async () => {
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute({
-          source: "inbound-parsing",
-          messageInputs: [
+
+    describe("when sender email is not discussion potential beneficiary (or establishment) email and not existing user", () => {
+      const unknownUser = new ConnectedUserBuilder().build();
+
+      it("through inbound parsing, do not save the new exchange in the discussion and notify sender that user has no rights on establishment", async () => {
+        expectToEqual(
+          await addExchangeToDiscussion.execute({
+            source: "inbound-parsing",
+            messageInputs: [
+              {
+                senderEmail: unknownUser.email,
+                attachments: [],
+                discussionId: pendingDiscussion1.id,
+                message: "Hello",
+                recipientRole: "establishment",
+                sentAt: new Date().toISOString(),
+                subject: "OSEF",
+              },
+            ],
+          }),
+          {
+            reason: "user_unknown_or_missing_rights_on_establishment",
+            sender: "potentialBeneficiary",
+            admins: [
+              {
+                firstName: adminUserEstablishment1.firstName,
+                lastName: adminUserEstablishment1.lastName,
+                email: adminUserEstablishment1.email,
+              },
+            ],
+          },
+        );
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          pendingDiscussion1,
+          pendingDiscussion2,
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "NotificationAdded",
+          },
+        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
             {
-              senderEmail: "unknown-sender@example.com",
-              attachments: [],
-              discussionId: pendingDiscussion1.id,
-              message: "Hello",
-              recipientRole: "establishment",
-              sentAt: new Date().toISOString(),
-              subject: "OSEF",
+              kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+              params: {
+                reason: "user_unknown_or_missing_rights_on_establishment",
+                sender: "potentialBeneficiary",
+                admins: [
+                  {
+                    firstName: adminUserEstablishment1.firstName,
+                    lastName: adminUserEstablishment1.lastName,
+                    email: adminUserEstablishment1.email,
+                  },
+                ],
+              },
+              recipients: [unknownUser.email],
             },
           ],
-        }),
-        errors.user.notFoundByEmail({
-          email: "unknown-sender@example.com",
-        }),
-      );
+          sms: [],
+        });
+      });
+
+      it("through dashboard, throws a missing user error", async () => {
+        await expectPromiseToFailWithError(
+          addExchangeToDiscussion.execute(
+            {
+              source: "dashboard",
+              messageInputs: [
+                {
+                  message: "Hello",
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  attachments: [],
+                },
+              ],
+            },
+            unknownUser,
+          ),
+          errors.user.notFound({ userId: unknownUser.id }),
+        );
+      });
     });
   });
 

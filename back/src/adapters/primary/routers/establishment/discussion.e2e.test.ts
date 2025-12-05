@@ -317,6 +317,7 @@ describe("discussion e2e", () => {
             templatedContent: {
               kind: "DISCUSSION_EXCHANGE",
               params: {
+                sender: "establishment",
                 htmlContent: expect.any(String),
                 subject: emailSubject,
               },
@@ -424,7 +425,17 @@ describe("discussion e2e", () => {
         }),
         {
           status: 202,
-          body: { reason: "discussion_completed", sender: "establishment" },
+          body: {
+            reason: "discussion_completed",
+            sender: "establishment",
+            admins: [
+              {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+              },
+            ],
+          },
         },
       );
 

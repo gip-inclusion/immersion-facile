@@ -16,6 +16,7 @@ import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { emailAttachements } from "./email.content";
+import type { Email } from "./email.dto";
 import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind: InternshipKind) =>
@@ -1659,7 +1660,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       }),
     },
     CONTACT_BY_EMAIL_REQUEST: {
-      niceName: "Établissement - Mise en relation par mail",
+      niceName: "Établissement - MER - instructions par mail",
       tags: ["mise en relation mail"],
       createEmailVariables: (params) => ({
         subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
@@ -1705,7 +1706,7 @@ Profil du candidat :
           content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton ci-dessus)
+          - répondre directement à cet email, il lui sera transmis. ${establishmentReplyWarning}
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${params.potentialBeneficiaryPhone}`,
         },
@@ -1743,7 +1744,7 @@ Profil du candidat :
       }),
     },
     CONTACT_BY_EMAIL_REQUEST_LEGACY: {
-      niceName: "Établissement - Mise en relation par mail (Legacy)",
+      niceName: "Établissement - MER - instructions par mail (Legacy)",
       tags: ["mise en relation mail"],
       createEmailVariables: ({
         appellationLabel,
@@ -1790,7 +1791,7 @@ Profil du candidat :
           content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton "Écrire au candidat" ci-dessus)
+          - répondre directement à cet email, il lui sera transmis. ${establishmentReplyWarning}
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
         },
@@ -1799,7 +1800,7 @@ Profil du candidat :
       }),
     },
     CONTACT_BY_PHONE_INSTRUCTIONS: {
-      niceName: "Établissement - Indication de mise en relation par téléphone",
+      niceName: "Établissement - MER - instructions par téléphone",
       tags: ["mise en relation tel"],
       createEmailVariables: ({
         businessName,
@@ -1828,7 +1829,7 @@ Profil du candidat :
       }),
     },
     CONTACT_IN_PERSON_INSTRUCTIONS: {
-      niceName: "Établissement - Indication de mise en relation en personne",
+      niceName: "Établissement - MER - instructions en personne",
       tags: ["mise en relation en personne"],
       createEmailVariables: ({
         welcomeAddress,
@@ -1859,25 +1860,32 @@ Profil du candidat :
 
     DISCUSSION_EXCHANGE: {
       niceName:
-        "Établissement - Échange entre établissement et potentiel bénéficiaire",
+        "Établissement - MER - Échange entre établissement et potentiel bénéficiaire",
       tags: ["échange établissement potentiel bénéficiaire"],
-      createEmailVariables: ({ subject, htmlContent }) => ({
+      createEmailVariables: ({ subject, htmlContent, sender }) => ({
         bypassLayout: true,
         subject,
-        content: htmlContent,
+        content:
+          sender === "establishment"
+            ? htmlContent
+            : `
+          ⚠️ Important : ${establishmentReplyWarning}
+          ${htmlContent}
+        `,
       }),
     },
     DISCUSSION_EXCHANGE_FORBIDDEN: {
-      niceName: "Établissement - Réponse à candidature impossible",
-      createEmailVariables: ({ reason, sender }) => ({
-        bypassLayout: true,
+      niceName: "Établissement - MER - Réponse à candidature impossible",
+      createEmailVariables: ({ reason, sender, admins }) => ({
         subject: "Réponse à la candidature impossible",
-        content: discussionExchangeForbidenContents[sender][reason],
+        greetings: "Bonjour",
+        content: discussionExchangeForbiddenContents(admins)[sender][reason],
+        subContent: defaultSignature("immersion"),
       }),
       tags: ["réponse candidature impossible"],
     },
     DISCUSSION_BENEFICIARY_FOLLOW_UP: {
-      niceName: "MER - Candidat - Relance par téléphone",
+      niceName: "Établissement - MER - Relance par téléphone pour candidat",
       tags: ["mer_candidat_relanceParTelephone"],
       createEmailVariables: ({
         businessName,
@@ -1947,7 +1955,7 @@ Profil du candidat :
       }),
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
-      niceName: "MER - Etablissement - Clôture automatique",
+      niceName: "Établissement - MER - Clôture automatique pour entreprise",
       tags: ["MER_etablissement_clotureAutomatique"],
       createEmailVariables: ({
         beneficiaryFirstName,
@@ -1979,7 +1987,7 @@ Profil du candidat :
       }),
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
-      niceName: "MER - Candidat - Clôture automatique",
+      niceName: "Établissement - MER - Clôture automatique pour candidat",
       tags: ["MER_candidat_clotureAutomatique"],
       createEmailVariables: ({
         discussionCreatedAt,
@@ -2130,11 +2138,31 @@ const generateUserInfo = (
   `;
 };
 
-export const discussionExchangeForbidenContents: Record<
-  ExchangeRole,
-  Record<DiscussionExchangeForbiddenReason, string>
-> = {
+export const discussionExchangeForbiddenContents = (
+  admins: { firstName: string; lastName: string; email: Email }[],
+): Record<ExchangeRole, Record<DiscussionExchangeForbiddenReason, string>> => ({
   establishment: {
+    user_unknown_or_missing_rights_on_establishment: `
+        Vous avez tenté de répondre à un candidat depuis un email de candidature Immersion Facilitée.
+        Malheureusement, <strong>votre message n’a pas pu être transmis</strong> : vous ne disposez pas des droits nécessaires pour répondre au nom de l’entreprise concernée.
+        
+        Pour pouvoir répondre au candidat via Immersion Facilitée, vous devez être inscrit(e) dans l’espace entreprise avec les bons droits.
+
+        <strong>Administrateurs de l’entreprise sur Immersion Facilitée :</strong>
+        ${admins
+          .map(({ email, firstName, lastName }) =>
+            `${firstName} ${lastName} <a href="mailto:${email}" target="_blank">${email}</a>`.trim(),
+          )
+          .map((line) => `- ${line}`)
+          .join("\n")}
+
+        Nous vous invitons à contacter l’un d’entre eux afin qu’il puisse :
+        - vous ajouter à l’espace entreprise, ou
+        - ajuster vos droits pour vous permettre de répondre directement aux candidatures.
+        
+        Une fois vos droits mis à jour, vous pourrez répondre normalement.
+        
+    `,
     discussion_completed: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         Le candidat ne recevra pas votre message.`,
@@ -2145,6 +2173,9 @@ export const discussionExchangeForbidenContents: Record<
         Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
   },
   potentialBeneficiary: {
+    user_unknown_or_missing_rights_on_establishment: `
+        Vous n'êtes pas le candidat associé à cette candidature.
+    `,
     discussion_completed: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         L'entreprise ne recevra pas votre message.
@@ -2156,4 +2187,7 @@ export const discussionExchangeForbidenContents: Record<
 
         Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
   },
-};
+});
+
+const establishmentReplyWarning =
+  "Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée. Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.";

@@ -41,6 +41,7 @@ export type DiscussionExchangeForbiddenReason =
 export type DiscussionExchangeForbiddenParams = {
   sender: ExchangeRole;
   reason: DiscussionExchangeForbiddenReason;
+  admins: { firstName: string; lastName: string; email: Email }[];
 };
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
@@ -272,6 +273,10 @@ export type EstablishmentExchange = CommonExchange &
   SpecificExchangeSender<"establishment">;
 export type PotentialBeneficiaryExchange = CommonExchange &
   SpecificExchangeSender<"potentialBeneficiary">;
+
+export type ExchangeSender =
+  | SpecificExchangeSender<"establishment">
+  | SpecificExchangeSender<"potentialBeneficiary">;
 
 export type Exchange = EstablishmentExchange | PotentialBeneficiaryExchange;
 
