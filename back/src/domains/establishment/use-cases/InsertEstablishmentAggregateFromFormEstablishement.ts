@@ -68,12 +68,10 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       ),
       formEstablishment: {
         ...formEstablishment,
-        appellations:
-          await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-            formEstablishment.appellations.map(
-              ({ appellationCode }) => appellationCode,
-            ),
-          ),
+        offers: formEstablishment.offers.map((offer) => ({
+          ...offer,
+          remoteWorkMode: "NO_REMOTE",
+        })),
         businessNameCustomized:
           formEstablishment.businessNameCustomized?.trim().length === 0
             ? undefined
