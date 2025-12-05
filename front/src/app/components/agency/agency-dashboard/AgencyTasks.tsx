@@ -11,8 +11,10 @@ import { useDispatch } from "react-redux";
 import { NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE } from "shared";
 import { ConventionsToManageList } from "src/app/components/agency/agency-dashboard/ConventionsToManageList";
 import { ConventionsWithBroadcastErrorList } from "src/app/components/agency/agency-dashboard/ConventionsWithBroadcastErrorList";
+import { hasUserRightsOnAgencyBroadcast } from "src/app/components/forms/convention/manage-actions/getButtonConfigBySubStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { conventionsWithBroadcastFeedbackSelectors } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.selectors";
@@ -27,6 +29,8 @@ export const AgencyTasks = ({
 }) => {
   const dispatch = useDispatch();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+
   const isLoadingConventionsToManage = useAppSelector(
     connectedUserConventionsToManageSelectors.isLoading,
   );
@@ -116,6 +120,8 @@ export const AgencyTasks = ({
             </div>
           )}
         {!isLoadingConventionsWithBroadcastError &&
+          currentUser &&
+          hasUserRightsOnAgencyBroadcast(currentUser) &&
           conventionsWithErroredBroadcastFeedbackPagination?.totalRecords !==
             undefined &&
           conventionsWithErroredBroadcastFeedbackPagination.totalRecords >
