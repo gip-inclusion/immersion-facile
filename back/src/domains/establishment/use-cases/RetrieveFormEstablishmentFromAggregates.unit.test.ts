@@ -376,11 +376,12 @@ const makeExpectedFormEstablishment = ({
   ),
   isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
   naf: establishmentAggregate.establishment.nafDto,
-  appellations: establishmentAggregate.offers.map((offer) => ({
-    appellationCode: offer.appellationCode,
-    appellationLabel: offer.appellationLabel,
+  offers: establishmentAggregate.offers.map((offer) => ({
     romeCode: offer.romeCode,
     romeLabel: offer.romeLabel,
+    appellationCode: offer.appellationCode,
+    appellationLabel: offer.appellationLabel,
+    remoteWorkMode: "NO_REMOTE",
   })),
   userRights: [
     {

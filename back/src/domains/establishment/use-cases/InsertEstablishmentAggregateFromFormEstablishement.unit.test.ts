@@ -5,6 +5,7 @@ import {
   type ContactFormEstablishmentUserRight,
   defaultAddress,
   defaultCountryCode,
+  type EstablishmentFormOffer,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -157,7 +158,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
         .withFitForDisabledWorkers("yes-declared-only")
         .withSiret("90040893100013")
-        .withAppellations(appellations)
+        .withOffers(
+          appellations.map((appellation) => ({
+            ...appellation,
+            remoteWorkMode: "NO_REMOTE",
+          })),
+        )
         .withNextAvailabilityDate(nextAvailabilityDate)
         .withAcquisition(withAcquisition)
         .withBusinessAddresses([defaultAddress.formAddress])
@@ -245,25 +251,27 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         acquisitionKeyword: "yolo",
         acquisitionCampaign: "my campaign",
       };
-      const professions: AppellationAndRomeDto[] = [
+      const professions: EstablishmentFormOffer[] = [
         {
           romeCode: "A1101",
           appellationCode: "11717",
           romeLabel: "métier A",
           appellationLabel: "métier A.1",
+          remoteWorkMode: "NO_REMOTE",
         },
         {
           romeCode: "A1102",
           appellationCode: "11716",
           romeLabel: "métier B",
           appellationLabel: "métier B.1",
+          remoteWorkMode: "NO_REMOTE",
         },
       ];
       const nextAvailabilityDate = new Date();
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
         .withFitForDisabledWorkers("yes-declared-only")
         .withSiret("90040893100013")
-        .withAppellations(professions)
+        .withOffers(professions)
         .withNextAvailabilityDate(nextAvailabilityDate)
         .withAcquisition(withAcquisition)
         .withBusinessAddresses([defaultAddress.formAddress])
@@ -512,7 +520,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       nafDto: expectedNafDto,
       numberEmployeesRange: "0",
     });
-    uow.romeRepository.appellations = formEstablishment.appellations;
+    uow.romeRepository.appellations = formEstablishment.offers;
 
     await insertEstablishmentAggregateFromForm.execute(
       { formEstablishment },
@@ -565,12 +573,13 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(previousEstablishment.siret)
       .withBusinessAddresses([defaultAddress.formAddress])
-      .withAppellations([
+      .withOffers([
         {
-          romeLabel: "Boulangerie",
-          appellationLabel: "Boulanger",
           romeCode: newRomeCode,
           appellationCode: "22222",
+          romeLabel: "Boulangerie",
+          appellationLabel: "Boulanger",
+          remoteWorkMode: "NO_REMOTE",
         },
       ])
       .withUserRights([formAdminRight])
@@ -614,8 +623,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       numberEmployeesRange: "0",
     });
 
-    uow.romeRepository.appellations =
-      validFormEstablishmentWithSiret.appellations;
+    uow.romeRepository.appellations = validFormEstablishmentWithSiret.offers;
 
     await insertEstablishmentAggregateFromForm.execute(
       {
@@ -670,8 +678,8 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         },
       ])
       .withOffers(
-        validFormEstablishmentWithSiret.appellations.map((app) => ({
-          ...app,
+        validFormEstablishmentWithSiret.offers.map((offer) => ({
+          ...offer,
           createdAt: timeGateway.now(),
         })),
       )
@@ -731,7 +739,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         numberEmployeesRange: "0",
       });
 
-      uow.romeRepository.appellations = formEstablishment.appellations;
+      uow.romeRepository.appellations = formEstablishment.offers;
 
       await insertEstablishmentAggregateFromForm.execute(
         { formEstablishment },
@@ -768,7 +776,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .build(),
         )
         .withOffers(
-          formEstablishment.appellations.map((app) => ({
+          formEstablishment.offers.map((app) => ({
             ...app,
             createdAt: timeGateway.now(),
           })),
@@ -821,27 +829,29 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     });
 
     it("considers appellation_code as a reference, and ignores the labels, and rome (it fetches the one matching the appellation code anyways)", async () => {
-      const weirdAppellationDto: AppellationAndRomeDto = {
+      const weirdEstablishmentOffer: EstablishmentFormOffer = {
         appellationCode: "12694", // le bon code
         appellationLabel:
           "une boulette, ca devrait être 'Coiffeur / Coiffeuse mixte'",
         romeCode: "A0000", // devrait être D1202
         romeLabel: "une autre boulette, ca devrait être 'Coiffure'",
+        remoteWorkMode: "NO_REMOTE",
       };
 
       const formEstablishmentWithWeirdAppellationDto =
         FormEstablishmentDtoBuilder.valid()
           .withBusinessAddresses([defaultAddress.formAddress])
-          .withAppellations([weirdAppellationDto])
+          .withOffers([weirdEstablishmentOffer])
           .build();
 
-      const correctAppellationDto: AppellationAndRomeDto = {
+      const correctEstablishmentOffer: EstablishmentFormOffer = {
         appellationCode: "12694",
         appellationLabel: "Coiffeur / Coiffeuse mixte",
         romeCode: "D1202",
         romeLabel: "Coiffure",
+        remoteWorkMode: "NO_REMOTE",
       };
-      uow.romeRepository.appellations = [correctAppellationDto];
+      uow.romeRepository.appellations = [correctEstablishmentOffer];
 
       const numberEmployees = "6-9";
       siretGateway.setSirenEstablishment({
@@ -859,7 +869,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       );
 
       const form = FormEstablishmentDtoBuilder.valid()
-        .withAppellations([correctAppellationDto])
+        .withOffers([correctEstablishmentOffer])
         .withBusinessAddresses([defaultAddress.formAddress])
         .build();
 
@@ -903,7 +913,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             ])
             .withOffers([
               {
-                ...correctAppellationDto,
+                ...correctEstablishmentOffer,
                 createdAt: timeGateway.now(),
               },
             ])
@@ -996,7 +1006,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           new SiretEstablishmentDtoBuilder().build(),
         );
 
-        uow.romeRepository.appellations = formEstablishment.appellations;
+        uow.romeRepository.appellations = formEstablishment.offers;
 
         await insertEstablishmentAggregateFromForm.execute(
           {

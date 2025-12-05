@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { InputProps } from "@codegouvfr/react-dsfr/Input";
-
 import Select, {
   type GroupBase,
   type OptionProps,
@@ -47,7 +46,6 @@ export const RSAutocomplete = <T, L>({
   className,
   selectProps,
 }: RSAutocompleteProps<T, L>) => {
-  const hasError = state === "error";
   const { cx } = useStyles();
   const CustomizedOption = selectProps?.components?.Option;
   return (
@@ -62,7 +60,10 @@ export const RSAutocomplete = <T, L>({
       <Select
         {...selectProps}
         classNamePrefix={prefix}
-        className={cx(`${prefix}`, hasError ? "im-select--has-error" : "")}
+        className={cx(
+          `${prefix}`,
+          state === "error" ? "im-select--has-error" : "",
+        )}
         unstyled
         defaultInputValue={selectProps?.defaultInputValue}
         value={selectProps?.value}
@@ -71,7 +72,8 @@ export const RSAutocomplete = <T, L>({
         inputId={selectProps?.inputId}
         filterOption={() => true}
         classNames={{
-          input: () => fr.cx("fr-input", { "fr-input--error": hasError }),
+          input: () =>
+            fr.cx("fr-input", { "fr-input--error": state === "error" }),
           menu: () => cx(fr.cx("fr-menu", "fr-p-0", "fr-m-0"), Styles.menu),
           menuList: () =>
             cx(fr.cx("fr-menu__list", "fr-mb-0"), Styles.menuList),
@@ -109,8 +111,12 @@ export const RSAutocomplete = <T, L>({
         isClearable
         id={`${selectProps?.inputId}-wrapper`}
       />
-
-      {hasError && <p className="fr-error-text">{stateRelatedMessage}</p>}
+      {state === "info" && (
+        <p className="fr-info-text">{stateRelatedMessage}</p>
+      )}
+      {state === "error" && (
+        <p className="fr-error-text">{stateRelatedMessage}</p>
+      )}
     </div>
   );
 };

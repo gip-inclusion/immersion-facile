@@ -29,6 +29,16 @@ export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
   ...array.slice(indexToRemove + 1),
 ];
 
+export const replaceAtIndex = <T>(
+  array: T[],
+  indexToReplace: number,
+  replaceBy: T,
+): T[] => [
+  ...array.slice(0, indexToReplace),
+  replaceBy,
+  ...array.slice(indexToReplace + 1),
+];
+
 export const executeInSequence = async <I, O>(
   array: I[],
   cb: (t: I) => Promise<O>,
