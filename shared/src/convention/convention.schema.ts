@@ -836,7 +836,7 @@ export const findSimilarConventionsResponseSchema: ZodSchemaWithInputMatchingOut
     similarConventionIds: z.array(conventionIdSchema),
   });
 
-const statusSchema = z.enum(conventionStatuses, {
+export const statusSchema = z.enum(conventionStatuses, {
   error: localization.invalidEnum,
 });
 
