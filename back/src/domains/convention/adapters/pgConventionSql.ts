@@ -15,6 +15,7 @@ import {
   type ConventionReadDto,
   conventionReadSchema,
   type DateString,
+  type DateTimeIsoString,
   type Email,
   type OmitFromExistingKeys,
   pipeWithValue,
@@ -56,6 +57,10 @@ export type PaginatedConventionQueryBuilder = SelectQueryBuilder<
   ConventionQueryBuilderDb,
   keyof ConventionQueryBuilderDb,
   { dto: ConventionDto; total_count: number }
+>;
+
+export type ConventionsWithErroredBroadcastFeedbackBuilder = ReturnType<
+  typeof createConventionsWithErroredBroadcastFeedbackBuilder
 >;
 
 // Function to create the common selection part with proper return type
@@ -356,6 +361,55 @@ export const createConventionQueryBuilderForAgencyUser = ({
     sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"),
   );
 };
+
+export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
+  transaction,
+  userAgencyIds,
+}: {
+  transaction: KyselyDb;
+  userAgencyIds: AgencyId[];
+}) =>
+  transaction
+    .with("conventions_with_latest_feedback", (qb) =>
+      qb
+        .selectFrom("conventions as c")
+        .innerJoin(
+          "actors as beneficiary",
+          "beneficiary.id",
+          "c.beneficiary_id",
+        )
+        .innerJoin("broadcast_feedbacks as bf", (join) =>
+          join.on((eb) =>
+            eb(
+              sql`(bf.request_params ->> 'conventionId')::uuid`,
+              "=",
+              eb.ref("c.id"),
+            ),
+          ),
+        )
+        .select((eb) => [
+          eb.ref("c.id").as("conventionId"),
+          eb.ref("c.status").as("conventionStatus"),
+          eb.ref("beneficiary.first_name").as("bFirstName"),
+          eb.ref("beneficiary.last_name").as("bLastName"),
+          eb.ref("bf.consumer_id").as("consumerId"),
+          eb.ref("bf.consumer_name").as("consumerName"),
+          eb.ref("bf.service_name").as("serviceName"),
+          eb.ref("subscriber_error_feedback").as("subscriberErrorFeedback"),
+          eb.ref("bf.request_params").as("requestParams"),
+          sql<DateTimeIsoString>`date_to_iso(bf.occurred_at)`.as("occurredAt"),
+          eb.ref("bf.handled_by_agency").as("handledByAgency"),
+          eb.ref("bf.response").as("response"),
+        ])
+        .where("c.agency_id", "in", userAgencyIds)
+        .distinctOn("c.id")
+        .orderBy("c.id")
+        .orderBy("bf.occurred_at", "desc"),
+    )
+    .selectFrom("conventions_with_latest_feedback as cf")
+    .selectAll()
+    .select(sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"))
+    .where("cf.subscriberErrorFeedback", "is not", null);
 
 export const getConventionAgencyFieldsForAgencies = async (
   transaction: KyselyDb,

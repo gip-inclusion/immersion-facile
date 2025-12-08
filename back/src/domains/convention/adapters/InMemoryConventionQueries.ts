@@ -7,6 +7,7 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
+  type ConventionsWithErroredBroadcastFeedbackFilters,
   type ConventionWithBroadcastFeedback,
   conventionSchema,
   type DataWithPagination,
@@ -14,6 +15,7 @@ import {
   type FindSimilarConventionsParams,
   filter,
   type GetPaginatedConventionsFilters,
+  isManagedBroadcastFeedbackErrorKind,
   NotFoundError,
   type PaginationQueryParams,
   pipeWithValue,
@@ -330,13 +332,16 @@ export class InMemoryConventionQueries implements ConventionQueries {
   public async getConventionsWithErroredBroadcastFeedbackForAgencyUser({
     userAgencyIds,
     pagination,
+    filters = {},
   }: {
     userAgencyIds: AgencyId[];
     pagination: Required<PaginationQueryParams>;
+    filters?: ConventionsWithErroredBroadcastFeedbackFilters;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>> {
     const userConventions = this.conventionRepository.conventions.filter(
       (convention) => userAgencyIds.includes(convention.agencyId),
     );
+
     const results: ConventionWithBroadcastFeedback[] = await Promise.all(
       userConventions.map(async (convention) => {
         const lastBroadcastFeedback =
@@ -354,17 +359,50 @@ export class InMemoryConventionQueries implements ConventionQueries {
       }),
     );
 
+    const filteredResults = results
+      .filter(
+        (
+          result,
+        ): result is ConventionWithBroadcastFeedback & {
+          lastBroadcastFeedback: NonNullable<
+            ConventionWithBroadcastFeedback["lastBroadcastFeedback"]
+          >;
+        } => result.lastBroadcastFeedback !== null,
+      )
+      .filter((result) => {
+        if (filters.broadcastErrorKind) {
+          const message =
+            result.lastBroadcastFeedback?.subscriberErrorFeedback?.message;
+          if (!message) return false;
+
+          const isFunctional = isManagedBroadcastFeedbackErrorKind(message);
+          if (filters.broadcastErrorKind === "functional" && !isFunctional)
+            return false;
+          if (filters.broadcastErrorKind === "technical" && isFunctional)
+            return false;
+        }
+
+        if (filters.conventionStatus && filters.conventionStatus.length > 0) {
+          const convention = userConventions.find(
+            (convention) => convention.id === result.id,
+          );
+          if (
+            !convention ||
+            !filters.conventionStatus.includes(convention.status)
+          )
+            return false;
+        }
+
+        if (filters.search) {
+          if (result.id.toLowerCase() !== filters.search.toLowerCase())
+            return false;
+        }
+
+        return true;
+      });
+
     return {
-      data: results
-        .filter(
-          (
-            result,
-          ): result is ConventionWithBroadcastFeedback & {
-            lastBroadcastFeedback: NonNullable<
-              ConventionWithBroadcastFeedback["lastBroadcastFeedback"]
-            >;
-          } => result.lastBroadcastFeedback !== null,
-        )
+      data: filteredResults
         .sort(
           (a, b) =>
             new Date(b.lastBroadcastFeedback.occurredAt).getTime() -
@@ -375,9 +413,9 @@ export class InMemoryConventionQueries implements ConventionQueries {
           pagination.page * pagination.perPage,
         ),
       pagination: {
-        totalRecords: results.length,
+        totalRecords: filteredResults.length,
         currentPage: pagination.page,
-        totalPages: Math.ceil(results.length / pagination.perPage),
+        totalPages: Math.ceil(filteredResults.length / pagination.perPage),
         numberPerPage: pagination.perPage,
       },
     };

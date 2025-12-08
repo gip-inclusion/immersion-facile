@@ -2004,5 +2004,390 @@ describe("Pg implementation of ConventionQueries", () => {
         expectToEqual(result, expectedResult);
       });
     });
+
+    describe("filters", () => {
+      const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
+      const conventionWithManagedError = new ConventionDtoBuilder()
+        .withId(conventionIdA)
+        .withAgencyId(agencyIdA)
+        .withStatus("READY_TO_SIGN")
+        .build();
+      const conventionWithUnmanagedError = new ConventionDtoBuilder()
+        .withId(conventionIdB)
+        .withAgencyId(agencyIdA)
+        .withStatus("READY_TO_SIGN")
+        .build();
+      const conventionWithManagedErrorInReview = new ConventionDtoBuilder()
+        .withId("cccccccc-cccc-4ccc-8ccc-cccccccccccc")
+        .withAgencyId(agencyIdA)
+        .withStatus("IN_REVIEW")
+        .build();
+
+      const managedErrorFeedback: BroadcastFeedback = {
+        consumerId: null,
+        consumerName: "any-consumer-name",
+        serviceName:
+          "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+        occurredAt: "2024-07-01T00:00:00.000Z",
+        handledByAgency: false,
+        requestParams: {
+          conventionId: conventionWithManagedError.id,
+          conventionStatus: "READY_TO_SIGN",
+        },
+        subscriberErrorFeedback: {
+          message: "Aucun dossier trouvé pour les critères d'identité transmis",
+          error: { code: "MANAGED_ERROR" },
+        },
+        response: {
+          httpStatus: 500,
+          body: { error: "MANAGED_ERROR" },
+        },
+      };
+
+      const unmanagedErrorFeedback: BroadcastFeedback = {
+        consumerId: null,
+        consumerName: "any-consumer-name",
+        serviceName:
+          "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+        occurredAt: "2024-07-02T00:00:00.000Z",
+        handledByAgency: false,
+        requestParams: {
+          conventionId: conventionWithUnmanagedError.id,
+          conventionStatus: "READY_TO_SIGN",
+        },
+        subscriberErrorFeedback: {
+          message: "Some unmanaged error message",
+          error: { code: "UNMANAGED_ERROR" },
+        },
+        response: {
+          httpStatus: 500,
+          body: { error: "UNMANAGED_ERROR" },
+        },
+      };
+
+      const managedErrorFeedbackInReview: BroadcastFeedback = {
+        ...managedErrorFeedback,
+        occurredAt: "2024-07-03T00:00:00.000Z",
+        requestParams: {
+          conventionId: conventionWithManagedErrorInReview.id,
+          conventionStatus: "IN_REVIEW",
+        },
+      };
+
+      beforeEach(async () => {
+        await agencyRepo.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
+        await conventionRepository.save(conventionWithManagedError);
+        await conventionRepository.save(conventionWithUnmanagedError);
+        await conventionRepository.save(conventionWithManagedErrorInReview);
+        await broadcastFeedbacksRepository.save(managedErrorFeedback);
+        await broadcastFeedbacksRepository.save(unmanagedErrorFeedback);
+        await broadcastFeedbacksRepository.save(managedErrorFeedbackInReview);
+      });
+
+      it("should return only functional errors when broadcastErrorKind is 'functional'", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: { broadcastErrorKind: "functional" },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionWithManagedErrorInReview.id,
+              beneficiary: {
+                firstname:
+                  conventionWithManagedErrorInReview.signatories.beneficiary
+                    .firstName,
+                lastname:
+                  conventionWithManagedErrorInReview.signatories.beneficiary
+                    .lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedbackInReview,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedbackInReview.subscriberErrorFeedback
+                      ?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedbackInReview.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+            {
+              id: conventionWithManagedError.id,
+              beneficiary: {
+                firstname:
+                  conventionWithManagedError.signatories.beneficiary.firstName,
+                lastname:
+                  conventionWithManagedError.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedback.subscriberErrorFeedback?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 2,
+          },
+        });
+      });
+
+      it("should return only technical errors when broadcastErrorKind is 'technical'", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: { broadcastErrorKind: "technical" },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionWithUnmanagedError.id,
+              beneficiary: {
+                firstname:
+                  conventionWithUnmanagedError.signatories.beneficiary
+                    .firstName,
+                lastname:
+                  conventionWithUnmanagedError.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...unmanagedErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    unmanagedErrorFeedback.subscriberErrorFeedback?.message ??
+                    "",
+                  error: JSON.stringify(
+                    unmanagedErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("should filter by conventionStatus", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: { conventionStatus: ["IN_REVIEW"] },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionWithManagedErrorInReview.id,
+              beneficiary: {
+                firstname:
+                  conventionWithManagedErrorInReview.signatories.beneficiary
+                    .firstName,
+                lastname:
+                  conventionWithManagedErrorInReview.signatories.beneficiary
+                    .lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedbackInReview,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedbackInReview.subscriberErrorFeedback
+                      ?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedbackInReview.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("should filter by both broadcastErrorKind and conventionStatus", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: {
+                broadcastErrorKind: "functional",
+                conventionStatus: ["READY_TO_SIGN"],
+              },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionWithManagedError.id,
+              beneficiary: {
+                firstname:
+                  conventionWithManagedError.signatories.beneficiary.firstName,
+                lastname:
+                  conventionWithManagedError.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedback.subscriberErrorFeedback?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("should filter by search (convention ID)", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: { search: conventionWithManagedError.id },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionWithManagedError.id,
+              beneficiary: {
+                firstname:
+                  conventionWithManagedError.signatories.beneficiary.firstName,
+                lastname:
+                  conventionWithManagedError.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedback.subscriberErrorFeedback?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("should return empty result when search does not match any convention ID", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: { search: "00000000-0000-0000-0000-000000000000" },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 0,
+          },
+        });
+      });
+
+      it("should filter by search combined with other filters", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: {
+                search: conventionWithManagedError.id,
+                broadcastErrorKind: "functional",
+                conventionStatus: ["READY_TO_SIGN"],
+              },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionWithManagedError.id,
+              beneficiary: {
+                firstname:
+                  conventionWithManagedError.signatories.beneficiary.firstName,
+                lastname:
+                  conventionWithManagedError.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedback.subscriberErrorFeedback?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+    });
   });
 });
