@@ -5,21 +5,23 @@ import { andThen } from "ramda";
 import {
   type AgencyId,
   type AssessmentCompletionStatusFilter,
+  type BroadcastErrorKind,
   type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
   type ConventionStatus,
+  type ConventionsWithErroredBroadcastFeedbackFilters,
   type ConventionWithBroadcastFeedback,
   calculatePaginationResult,
   conventionReadSchema,
   conventionSchema,
   type DataWithPagination,
   type DateFilter,
-  type DateTimeIsoString,
   errors,
   type FindSimilarConventionsParams,
+  functionalBroadcastFeedbackErrorMessage,
   type GetPaginatedConventionsFilters,
   type GetPaginatedConventionsSortBy,
   type NotEmptyArray,
@@ -42,8 +44,10 @@ import type {
 } from "../ports/ConventionQueries";
 import {
   type ConventionQueryBuilder,
+  type ConventionsWithErroredBroadcastFeedbackBuilder,
   createConventionQueryBuilder,
   createConventionQueryBuilderForAgencyUser,
+  createConventionsWithErroredBroadcastFeedbackBuilder,
   getAssessmentFieldsByConventionId,
   getConventionAgencyFieldsForAgencies,
   getReadConventionById,
@@ -346,9 +350,11 @@ export class PgConventionQueries implements ConventionQueries {
   public async getConventionsWithErroredBroadcastFeedbackForAgencyUser({
     userAgencyIds,
     pagination,
+    filters = {},
   }: {
     userAgencyIds: AgencyId[];
     pagination: Required<PaginationQueryParams>;
+    filters?: ConventionsWithErroredBroadcastFeedbackFilters;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>> {
     if (userAgencyIds.length === 0)
       return {
@@ -361,54 +367,20 @@ export class PgConventionQueries implements ConventionQueries {
         },
       };
 
-    const { page, perPage } = pagination;
-    const offset = (page - 1) * perPage;
-    const result = await this.transaction
-      .with("conventions_with_latest_feedback", (qb) =>
-        qb
-          .selectFrom("conventions as c")
-          .innerJoin(
-            "actors as beneficiary",
-            "beneficiary.id",
-            "c.beneficiary_id",
-          )
-          .innerJoin("broadcast_feedbacks as bf", (join) =>
-            join.on((eb) =>
-              eb(
-                sql`(bf.request_params ->> 'conventionId')::uuid`,
-                "=",
-                eb.ref("c.id"),
-              ),
-            ),
-          )
-          .select((eb) => [
-            eb.ref("c.id").as("conventionId"),
-            eb.ref("beneficiary.first_name").as("bFirstName"),
-            eb.ref("beneficiary.last_name").as("bLastName"),
-            eb.ref("bf.consumer_id").as("consumerId"),
-            eb.ref("bf.consumer_name").as("consumerName"),
-            eb.ref("bf.service_name").as("serviceName"),
-            eb.ref("subscriber_error_feedback").as("subscriberErrorFeedback"),
-            eb.ref("bf.request_params").as("requestParams"),
-            sql<DateTimeIsoString>`date_to_iso(bf.occurred_at)`.as(
-              "occurredAt",
-            ),
-            eb.ref("bf.handled_by_agency").as("handledByAgency"),
-            eb.ref("bf.response").as("response"),
-          ])
-          .where("c.agency_id", "in", userAgencyIds)
-          .distinctOn("c.id")
-          .orderBy("c.id")
-          .orderBy("bf.occurred_at", "desc"),
-      )
-      .selectFrom("conventions_with_latest_feedback as cf")
-      .selectAll()
-      .select(sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"))
-      .where("cf.subscriberErrorFeedback", "is not", null)
-      .orderBy("cf.occurredAt", "desc")
-      .limit(pagination.perPage)
-      .offset(offset)
-      .execute();
+    const { broadcastErrorKind, conventionStatus, search, ...rest } = filters;
+    rest satisfies Record<string, never>;
+
+    const result = await pipeWithValue(
+      createConventionsWithErroredBroadcastFeedbackBuilder({
+        transaction: this.transaction,
+        userAgencyIds,
+      }),
+      filterBroadcastErrorKind(broadcastErrorKind),
+      filterConventionStatus(conventionStatus),
+      filterSearchForBroadcastFeedback(search),
+      sortConventionsWithBroadcastFeedback(),
+      applyPaginationToBroadcastFeedback(pagination),
+    ).execute();
 
     const totalRecords = result.at(0)?.total_count ?? 0;
 
@@ -555,6 +527,75 @@ const filterInList =
   ): PaginatedConventionQueryBuilder => {
     if (!list) return builder;
     return builder.where(`conventions.${fieldName}`, "in", list);
+  };
+
+const filterBroadcastErrorKind =
+  (broadcastErrorKind?: BroadcastErrorKind) =>
+  (
+    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
+  ): ConventionsWithErroredBroadcastFeedbackBuilder => {
+    if (!broadcastErrorKind) return builder;
+
+    if (broadcastErrorKind === "functional") {
+      return builder.where((eb) =>
+        eb.or(
+          functionalBroadcastFeedbackErrorMessage.map((message) =>
+            eb(sql`"cf"."subscriberErrorFeedback"->>'message'`, "=", message),
+          ),
+        ),
+      );
+    }
+
+    return builder.where((eb) =>
+      eb.not(
+        eb.or(
+          functionalBroadcastFeedbackErrorMessage.map((message) =>
+            eb(sql`"cf"."subscriberErrorFeedback"->>'message'`, "=", message),
+          ),
+        ),
+      ),
+    );
+  };
+
+const filterConventionStatus =
+  (conventionStatus?: ConventionStatus[]) =>
+  (
+    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
+  ): ConventionsWithErroredBroadcastFeedbackBuilder => {
+    if (!conventionStatus || conventionStatus.length === 0) return builder;
+    return builder.where("cf.conventionStatus", "in", conventionStatus);
+  };
+
+const filterSearchForBroadcastFeedback =
+  (search: string | undefined) =>
+  (
+    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
+  ): ConventionsWithErroredBroadcastFeedbackBuilder => {
+    if (!search) return builder;
+    const pattern = `%${search.toLowerCase()}%`;
+
+    return builder.where((eb) =>
+      eb.or([
+        sql<any>`CAST(${eb.ref("cf.conventionId")} AS text) LIKE ${pattern}`,
+      ]),
+    );
+  };
+
+const sortConventionsWithBroadcastFeedback =
+  () =>
+  (
+    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
+  ): ConventionsWithErroredBroadcastFeedbackBuilder =>
+    builder.orderBy("cf.occurredAt", "desc");
+
+const applyPaginationToBroadcastFeedback =
+  (pagination: Required<PaginationQueryParams>) =>
+  (
+    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
+  ): ConventionsWithErroredBroadcastFeedbackBuilder => {
+    const { page, perPage } = pagination;
+    const offset = (page - 1) * perPage;
+    return builder.limit(perPage).offset(offset);
   };
 
 const filterSearch =

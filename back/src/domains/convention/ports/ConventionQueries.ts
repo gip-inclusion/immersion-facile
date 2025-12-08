@@ -5,6 +5,7 @@ import type {
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
+  ConventionsWithErroredBroadcastFeedbackFilters,
   ConventionWithBroadcastFeedback,
   DataWithPagination,
   DateRange,
@@ -84,5 +85,6 @@ export interface ConventionQueries {
   getConventionsWithErroredBroadcastFeedbackForAgencyUser(params: {
     userAgencyIds: AgencyId[];
     pagination: PaginationQueryParams;
+    filters?: ConventionsWithErroredBroadcastFeedbackFilters;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>>;
 }
