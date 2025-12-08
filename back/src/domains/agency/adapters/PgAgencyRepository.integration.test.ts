@@ -550,54 +550,90 @@ describe("PgAgencyRepository", () => {
       expect(agencies).toEqual([]);
     });
 
-    it("returns all agencies filtered on statuses.", async () => {
-      await Promise.all([
-        agencyRepository.insert(agency1PEVitrySurSeine),
-        agencyRepository.insert(agencyMissionLocale),
-        agencyRepository.insert(agencyAddedFromPeReferenciel),
-        agencyRepository.insert(
-          toAgencyWithRights(needsReviewAgency, {
-            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
-          }),
-        ),
-      ]);
+    describe("filter by agency status", () => {
+      it("returns all agencies filtered on activeAgencyStatuses (active and from-api-PE).", async () => {
+        await Promise.all([
+          agencyRepository.insert(agency1PEVitrySurSeine),
+          agencyRepository.insert(agencyMissionLocale),
+          agencyRepository.insert(agencyAddedFromPeReferenciel),
+          agencyRepository.insert(
+            toAgencyWithRights(needsReviewAgency, {
+              [validator1.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+            }),
+          ),
+        ]);
 
-      const agencies = await agencyRepository.getAgencies({
-        filters: { status: activeAgencyStatuses },
+        const agencies = await agencyRepository.getAgencies({
+          filters: { status: activeAgencyStatuses },
+        });
+        expectToEqual(agencies, [
+          agency1PEVitrySurSeine,
+          agencyMissionLocale,
+          agencyAddedFromPeReferenciel,
+        ]);
       });
-      expectToEqual(agencies, [
-        agency1PEVitrySurSeine,
-        agencyMissionLocale,
-        agencyAddedFromPeReferenciel,
-      ]);
-    });
 
-    it("returns all agencies filtered on statuses, respecting provided limit and position", async () => {
-      await Promise.all([
-        agencyRepository.insert(agency1PEVitrySurSeine),
-        agencyRepository.insert(agency2PEVitryLeFrancois),
-        agencyRepository.insert(agencyMissionLocale),
-        agencyRepository.insert(agencyAddedFromPeReferenciel),
-        agencyRepository.insert(
-          toAgencyWithRights(needsReviewAgency, {
-            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      it("returns all agencies filtered on statuses, respecting provided limit and position", async () => {
+        await Promise.all([
+          agencyRepository.insert(agency1PEVitrySurSeine),
+          agencyRepository.insert(agency2PEVitryLeFrancois),
+          agencyRepository.insert(agencyMissionLocale),
+          agencyRepository.insert(agencyAddedFromPeReferenciel),
+          agencyRepository.insert(
+            toAgencyWithRights(needsReviewAgency, {
+              [validator1.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+            }),
+          ),
+        ]);
+
+        expectToEqual(
+          await agencyRepository.getAgencies({
+            filters: {
+              status: activeAgencyStatuses,
+              position: {
+                position: { lat: 48.866667, lon: 2.333333 },
+                distance_km: 10,
+              },
+            },
+            limit: 2,
           }),
-        ),
-      ]);
+          [agency1PEVitrySurSeine, agency2PEVitryLeFrancois],
+        );
+      });
 
-      expectToEqual(
-        await agencyRepository.getAgencies({
-          filters: {
-            status: activeAgencyStatuses,
-            position: {
-              position: { lat: 48.866667, lon: 2.333333 },
-              distance_km: 10,
+      it("with status filter 'closed'", async () => {
+        const closedAgency = toAgencyWithRights(
+          // TODO : parsing de schema en DB qui peut montrer des incohérences de données d'agence dans les tests d'intégration
+          new AgencyDtoBuilder(needsReviewAgency)
+            .withStatusJustification(null)
+            .withStatus("closed")
+            .build(),
+          {
+            [validator1.id]: {
+              isNotifiedByEmail: false,
+              roles: ["validator"],
             },
           },
-          limit: 2,
-        }),
-        [agency1PEVitrySurSeine, agency2PEVitryLeFrancois],
-      );
+        );
+
+        await Promise.all([
+          agencyRepository.insert(agency1PEVitrySurSeine),
+          agencyRepository.insert(agencyMissionLocale),
+          agencyRepository.insert(agencyAddedFromPeReferenciel),
+          agencyRepository.insert(closedAgency),
+        ]);
+
+        const agencies = await agencyRepository.getAgencies({
+          filters: { status: ["closed"] },
+        });
+        expectToEqual(agencies, [closedAgency]);
+      });
     });
 
     describe("filter agency kinds", () => {
