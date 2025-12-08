@@ -4,7 +4,6 @@ import {
   type ConventionId,
   findSimilarConventionsParamsSchema,
   NotFoundError,
-  paginationRequiredQueryParamsSchema,
   siretSchema,
 } from "shared";
 import z from "zod";
@@ -32,6 +31,7 @@ import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases
 import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
 import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
+import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
@@ -591,25 +591,6 @@ export const createUseCases = ({
       ),
     }),
 
-    getConventionsWithErroredBroadcastFeedback: useCaseBuilder(
-      "GetConventionsWithErroredBroadcastFeedback",
-    )
-      .withCurrentUser<ConnectedUser>()
-      .withInput(paginationRequiredQueryParamsSchema)
-      .build(
-        (
-          { currentUser, uow, inputParams: pagination }, // 	uowPerformer.perform((uow) =>
-        ) =>
-          uow.conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
-            {
-              userAgencyIds: currentUser.agencyRights
-                .filter((agencyRight) => agencyRight.roles.length > 0)
-                .map((agencyRight) => agencyRight.agency.id),
-              pagination,
-            },
-          ),
-      )({ uowPerformer }),
-
     getFeatureFlags: useCaseBuilder("GetFeatureFlags")
       .notTransactional()
       .build(() => queries.featureFlag.getAll())({}),
@@ -723,6 +704,11 @@ export const createUseCases = ({
     getLastBroadcastFeedback: makeGetLastBroadcastFeedback({
       uowPerformer,
     }),
+
+    getConventionsWithErroredBroadcastFeedback:
+      makeGetConventionsWithErroredBroadcastFeedback({
+        uowPerformer,
+      }),
 
     rejectUserForAgency: makeRejectUserForAgency({
       uowPerformer,

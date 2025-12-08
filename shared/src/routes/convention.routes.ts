@@ -24,11 +24,13 @@ import {
   withConventionIdLegacySchema,
   withConventionIdSchema,
 } from "../convention/convention.schema";
-import { paginatedConventionWithBroadcastFeedbackSchema } from "../convention/conventionWithBroadcastFeedback.schema";
+import {
+  flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
+  paginatedConventionWithBroadcastFeedbackSchema,
+} from "../convention/conventionWithBroadcastFeedback.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
-import { paginationRequiredQueryParamsSchema } from "../pagination/pagination.schema";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { expressEmptyResponseBody } from "../zodUtils";
 
@@ -255,7 +257,8 @@ export const authenticatedConventionRoutes = defineRoutes({
     method: "get",
     url: "/inclusion-connected/conventions-with-errored-broadcast-feedback",
     ...withAuthorizationHeaders,
-    queryParamsSchema: paginationRequiredQueryParamsSchema,
+    queryParamsSchema:
+      flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
     responses: {
       200: paginatedConventionWithBroadcastFeedbackSchema,
       400: httpErrorSchema,
