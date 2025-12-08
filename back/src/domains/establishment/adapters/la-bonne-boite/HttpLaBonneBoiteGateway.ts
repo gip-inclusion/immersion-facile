@@ -18,7 +18,7 @@ import {
 const lbbMaxQueryPerSeconds = 1;
 const numberOfIFInstances = 2; // 2x is the number of instances of node running this.
 
-const lbbV2App = "api_labonneboitev2";
+const lbbScope = "api_labonneboitev2 search office"; // office is probably useless for IF, but better to be safe than sorry
 
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   #limiter = new Bottleneck({
@@ -157,7 +157,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
 
   async #makeAutorization(): Promise<string> {
     const result = await this.franceTravailGateway.getAccessToken(
-      `application_${this.franceTravailClientId} ${lbbV2App}`,
+      `application_${this.franceTravailClientId} ${lbbScope}`,
     );
 
     return `Bearer ${result.access_token}`;
