@@ -63,6 +63,7 @@ export const createLbbRoutes = (peApiUrl: AbsoluteUrl) =>
       responses: {
         200: lbbResponseSchema,
         401: z.any(),
+        403: z.any(),
         404: z.any(),
         500: z.any(),
       },
