@@ -17,6 +17,7 @@ import {
   calculatePaginationResult,
   conventionReadSchema,
   conventionSchema,
+  conventionWithBroadcastFeedbackSchema,
   type DataWithPagination,
   type DateFilter,
   errors,
@@ -385,27 +386,33 @@ export class PgConventionQueries implements ConventionQueries {
     const totalRecords = result.at(0)?.total_count ?? 0;
 
     const conventionsWithErroredBroadcastFeedback: ConventionWithBroadcastFeedback[] =
-      result.map((row) => {
-        return {
-          id: row.conventionId,
-          beneficiary: {
-            firstname: row.bFirstName,
-            lastname: row.bLastName,
+      result.map((row) =>
+        validateAndParseZodSchema({
+          schemaName: "conventionWithBroadcastFeedbackSchema",
+          inputSchema: conventionWithBroadcastFeedbackSchema,
+          schemaParsingInput: {
+            id: row.conventionId,
+            conventionStatus: row.conventionStatus,
+            beneficiary: {
+              firstname: row.bFirstName,
+              lastname: row.bLastName,
+            },
+            lastBroadcastFeedback: {
+              consumerId: row.consumerId,
+              consumerName: row.consumerName,
+              handledByAgency: row.handledByAgency,
+              occurredAt: row.occurredAt,
+              requestParams: row.requestParams,
+              serviceName: row.serviceName,
+              response: row.response,
+              subscriberErrorFeedback: row.subscriberErrorFeedback
+                ? row.subscriberErrorFeedback
+                : undefined,
+            },
           },
-          lastBroadcastFeedback: {
-            consumerId: row.consumerId,
-            consumerName: row.consumerName,
-            handledByAgency: row.handledByAgency,
-            occurredAt: row.occurredAt,
-            requestParams: row.requestParams,
-            serviceName: row.serviceName,
-            response: row.response,
-            subscriberErrorFeedback: row.subscriberErrorFeedback
-              ? row.subscriberErrorFeedback
-              : undefined,
-          },
-        } satisfies ConventionWithBroadcastFeedback;
-      });
+          logger,
+        }),
+      );
 
     return {
       data: conventionsWithErroredBroadcastFeedback,

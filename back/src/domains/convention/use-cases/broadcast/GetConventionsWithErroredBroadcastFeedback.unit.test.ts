@@ -108,6 +108,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       data: [
         {
           id: convention1.id,
+          conventionStatus: convention1.status,
           beneficiary: {
             firstname: convention1.signatories.beneficiary.firstName,
             lastname: convention1.signatories.beneficiary.lastName,
@@ -136,6 +137,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       data: [
         {
           id: convention2.id,
+          conventionStatus: convention2.status,
           beneficiary: {
             firstname: convention2.signatories.beneficiary.firstName,
             lastname: convention2.signatories.beneficiary.lastName,
@@ -144,6 +146,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
         },
         {
           id: convention1.id,
+          conventionStatus: convention1.status,
           beneficiary: {
             firstname: convention1.signatories.beneficiary.firstName,
             lastname: convention1.signatories.beneficiary.lastName,
@@ -178,6 +181,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       data: [
         {
           id: convention2.id,
+          conventionStatus: convention2.status,
           beneficiary: {
             firstname: convention2.signatories.beneficiary.firstName,
             lastname: convention2.signatories.beneficiary.lastName,
@@ -256,6 +260,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       data: [
         {
           id: convention2.id,
+          conventionStatus: convention2.status,
           beneficiary: {
             firstname: convention2.signatories.beneficiary.firstName,
             lastname: convention2.signatories.beneficiary.lastName,
@@ -264,6 +269,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
         },
         {
           id: convention1.id,
+          conventionStatus: convention1.status,
           beneficiary: {
             firstname: convention1.signatories.beneficiary.firstName,
             lastname: convention1.signatories.beneficiary.lastName,
@@ -293,6 +299,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       data: [
         {
           id: convention1.id,
+          conventionStatus: convention1.status,
           beneficiary: {
             firstname: convention1.signatories.beneficiary.firstName,
             lastname: convention1.signatories.beneficiary.lastName,
@@ -325,6 +332,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       data: [
         {
           id: convention1.id,
+          conventionStatus: convention1.status,
           beneficiary: {
             firstname: convention1.signatories.beneficiary.firstName,
             lastname: convention1.signatories.beneficiary.lastName,
