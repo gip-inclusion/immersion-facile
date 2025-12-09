@@ -288,7 +288,8 @@ export const ConventionList = () => {
         currentUser?.dashboards.agencies.agencyDashboardUrl ? (
           <MetabaseFullScreenButton
             url={currentUser.dashboards.agencies.agencyDashboardUrl}
-            label="Voir l'ancien tableau"
+            label="Télécharger les données (Excel/CSV)"
+            tooltipText="L’export se fait depuis l’ancien tableau Metabase."
           />
         ) : null
       }
