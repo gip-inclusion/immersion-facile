@@ -15,4 +15,16 @@ export class InMemoryPhoneQueries implements PhoneQueries {
   async getPhonesToVerify(): Promise<PhoneInDB[]> {
     return this.#phones;
   }
+
+  async fixPhones(fixedPhones: PhoneInDB[]): Promise<void> {
+    fixedPhones.map((fixedPhone) => {
+      const phoneToFix = this.#phones.find(
+        (phone) => phone.relatedId === fixedPhone.relatedId,
+      );
+
+      if (!phoneToFix) return;
+
+      phoneToFix.phoneNumber = fixedPhone.phoneNumber;
+    });
+  }
 }
