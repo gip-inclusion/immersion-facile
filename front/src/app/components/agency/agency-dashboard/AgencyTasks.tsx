@@ -41,7 +41,7 @@ export const AgencyTasks = ({
     connectedUserConventionsToManageSelectors.pagination,
   );
   const conventionsWithErroredBroadcastFeedbackPagination = useAppSelector(
-    conventionsWithBroadcastFeedbackSelectors.pagination,
+    conventionsWithBroadcastFeedbackSelectors.erroredBroadcastConventionsWithPagination,
   );
   const dateStartFrom1MonthAgoToIn5Days = useMemo(
     () => ({
@@ -77,9 +77,10 @@ export const AgencyTasks = ({
       dispatch(
         conventionsWithBroadcastFeedbackSlice.actions.getConventionsWithErroredBroadcastFeedbackRequested(
           {
-            params: {
+            filters: {
               page: 1,
               perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
+              broadcastErrorKind: "functional",
             },
             jwt: connectedUserJwt,
             feedbackTopic: "conventions-with-broadcast-feedback",
@@ -122,14 +123,15 @@ export const AgencyTasks = ({
         {!isLoadingConventionsWithBroadcastError &&
           currentUser &&
           hasUserRightsOnAgencyBroadcast(currentUser) &&
-          conventionsWithErroredBroadcastFeedbackPagination?.totalRecords !==
-            undefined &&
-          conventionsWithErroredBroadcastFeedbackPagination.totalRecords >
-            0 && (
+          conventionsWithErroredBroadcastFeedbackPagination?.pagination
+            ?.totalRecords !== undefined &&
+          conventionsWithErroredBroadcastFeedbackPagination.pagination
+            .totalRecords > 0 && (
             <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
               <TaskSummary
                 count={
-                  conventionsWithErroredBroadcastFeedbackPagination.totalRecords
+                  conventionsWithErroredBroadcastFeedbackPagination.pagination
+                    .totalRecords
                 }
                 countLabel="Conventions à vérifier"
                 icon="fr-icon-link-unlink"

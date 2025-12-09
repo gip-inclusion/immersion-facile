@@ -4,12 +4,10 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import {
   type ConventionStatus,
   conventionStatusesAllowedForModification,
+  isFunctionalBroadcastFeedbackError,
   type SubscriberErrorFeedback,
 } from "shared";
-import {
-  broadcastFeedbackErrorMap,
-  isManagedBroadcastFeedbackError,
-} from "src/app/contents/broadcast-feedback/broadcastFeedback";
+import { broadcastFeedbackErrorMessageMap } from "src/app/contents/broadcast-feedback/broadcastFeedback";
 
 interface SubscriberErrorFeedbackProps {
   subscriberErrorFeedback: SubscriberErrorFeedback;
@@ -25,15 +23,15 @@ export const SubscriberErrorFeedbackComponent = ({
   const isConventionValidated =
     !conventionStatusesAllowedForModification.includes(conventionStatus);
 
-  const managedError = isManagedBroadcastFeedbackError(message) && (
+  const managedError = isFunctionalBroadcastFeedbackError(message) && (
     <div>
-      <strong>Erreur - {broadcastFeedbackErrorMap[message].description}</strong>
+      <strong>Erreur - {broadcastFeedbackErrorMessageMap[message].description}</strong>
       <Accordion
         label="Détails des solutions possibles"
         className={fr.cx("fr-mb-3w", "fr-mt-1w")}
       >
         <>
-          {broadcastFeedbackErrorMap[message].solution(isConventionValidated)}
+          {broadcastFeedbackErrorMessageMap[message].solution(isConventionValidated)}
         </>
       </Accordion>
     </div>

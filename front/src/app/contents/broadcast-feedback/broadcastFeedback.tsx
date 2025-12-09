@@ -1,33 +1,13 @@
 import type { ReactNode } from "react";
-
-const errorKind = [
-  "Aucun dossier trouvé pour les critères d'identité transmis",
-  "Aucune mission locale trouvée pour le numéro de SIRET fourni",
-  "L'email transmis par le partenaire ne correspond pas à l'email renseigné dans le dossier du jeune",
-  "Aucun employeur trouvé pour le code renseigné",
-  "Le téléphone transmis par le partenaire ne correspond pas au téléphone renseigné dans le dossier du jeune",
-  "Aucun métier trouvé pour le code ROME renseigné",
-  "L'email et le téléphone transmis par le partenaires ne correspondent pas aux email et téléphone renseignés dans le dossier du jeune",
-  "Plusieurs dossiers trouvés pour les critères transmis",
-  "Identifiant National DE non trouvé",
-  "Identifiant National DE trouvé mais écart sur la date de naissance",
-  "Accord non signé pour ce type de structure d'accompagnement",
-] as const;
-
-export type BroadcastFeedbackErrorKind = (typeof errorKind)[number];
+import type { FunctionalBroadcastFeedbackErrorMessage } from "shared";
 
 type BroadcastFeedbackError = {
   description: string;
   solution: (isConventionValidated?: boolean) => ReactNode;
 };
 
-export const isManagedBroadcastFeedbackError = (
-  message: string,
-): message is BroadcastFeedbackErrorKind =>
-  Object.hasOwn(broadcastFeedbackErrorMap, message);
-
-export const broadcastFeedbackErrorMap: Record<
-  BroadcastFeedbackErrorKind,
+export const broadcastFeedbackErrorMessageMap: Record<
+  FunctionalBroadcastFeedbackErrorMessage,
   BroadcastFeedbackError
 > = {
   "Aucun dossier trouvé pour les critères d'identité transmis": {
@@ -289,4 +269,7 @@ export const broadcastFeedbackErrorMap: Record<
       </>
     ),
   },
-} satisfies Record<BroadcastFeedbackErrorKind, BroadcastFeedbackError>;
+} satisfies Record<
+  FunctionalBroadcastFeedbackErrorMessage,
+  BroadcastFeedbackError
+>;
