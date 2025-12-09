@@ -84,7 +84,7 @@ export const agenciesSlice = createSlice({
       state.feedback = { kind: "errored", errorMessage: action.payload };
       state.isLoading = false;
     },
-    addAgencyCleared: (state, _action: PayloadAction<void>) => {
+    addAgencyClearRequested: (state, _action: PayloadAction<void>) => {
       state.feedback = { kind: "idle" };
       state.isLoading = false;
     },

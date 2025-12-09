@@ -126,7 +126,7 @@ describe("Agencies in store", () => {
       expectIsLoadingToBe(false);
       expectFeedbackToEqual({ kind: "agencyAdded" });
 
-      store.dispatch(agenciesSlice.actions.addAgencyCleared());
+      store.dispatch(agenciesSlice.actions.addAgencyClearRequested());
       expectFeedbackToEqual({ kind: "idle" });
     });
 
@@ -145,7 +145,7 @@ describe("Agencies in store", () => {
       expectIsLoadingToBe(false);
       expectFeedbackToEqual({ kind: "agencyOfTypeOtherAdded" });
 
-      store.dispatch(agenciesSlice.actions.addAgencyCleared());
+      store.dispatch(agenciesSlice.actions.addAgencyClearRequested());
       expectFeedbackToEqual({ kind: "idle" });
     });
 
@@ -167,7 +167,7 @@ describe("Agencies in store", () => {
       expectIsLoadingToBe(false);
       expectFeedbackToEqual({ kind: "errored", errorMessage });
 
-      store.dispatch(agenciesSlice.actions.addAgencyCleared());
+      store.dispatch(agenciesSlice.actions.addAgencyClearRequested());
       expectFeedbackToEqual({ kind: "idle" });
     });
   });
