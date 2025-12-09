@@ -1779,6 +1779,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: convention.id,
+              conventionStatus: "READY_TO_SIGN",
               beneficiary: {
                 firstname: convention.signatories.beneficiary.firstName,
                 lastname: convention.signatories.beneficiary.lastName,
@@ -1876,6 +1877,7 @@ describe("Pg implementation of ConventionQueries", () => {
             data: [
               {
                 id: convention1.id,
+                conventionStatus: convention1.status,
                 beneficiary: {
                   firstname: convention1.signatories.beneficiary.firstName,
                   lastname: convention1.signatories.beneficiary.lastName,
@@ -1905,6 +1907,7 @@ describe("Pg implementation of ConventionQueries", () => {
             data: [
               {
                 id: convention3.id,
+                conventionStatus: convention3.status,
                 beneficiary: {
                   firstname: convention3.signatories.beneficiary.firstName,
                   lastname: convention3.signatories.beneficiary.lastName,
@@ -1921,6 +1924,7 @@ describe("Pg implementation of ConventionQueries", () => {
               },
               {
                 id: convention2.id,
+                conventionStatus: convention2.status,
                 beneficiary: {
                   firstname: convention2.signatories.beneficiary.firstName,
                   lastname: convention2.signatories.beneficiary.lastName,
@@ -1937,6 +1941,7 @@ describe("Pg implementation of ConventionQueries", () => {
               },
               {
                 id: convention1.id,
+                conventionStatus: convention1.status,
                 beneficiary: {
                   firstname: convention1.signatories.beneficiary.firstName,
                   lastname: convention1.signatories.beneficiary.lastName,
@@ -1966,6 +1971,7 @@ describe("Pg implementation of ConventionQueries", () => {
             data: [
               {
                 id: convention1.id,
+                conventionStatus: convention1.status,
                 beneficiary: {
                   firstname: convention1.signatories.beneficiary.firstName,
                   lastname: convention1.signatories.beneficiary.lastName,
@@ -2102,6 +2108,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedErrorInReview.id,
+              conventionStatus: conventionWithManagedErrorInReview.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedErrorInReview.signatories.beneficiary
@@ -2124,6 +2131,7 @@ describe("Pg implementation of ConventionQueries", () => {
             },
             {
               id: conventionWithManagedError.id,
+              conventionStatus: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,
@@ -2165,6 +2173,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithUnmanagedError.id,
+              conventionStatus: conventionWithUnmanagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithUnmanagedError.signatories.beneficiary
@@ -2208,6 +2217,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedErrorInReview.id,
+              conventionStatus: conventionWithManagedErrorInReview.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedErrorInReview.signatories.beneficiary
@@ -2255,6 +2265,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedError.id,
+              conventionStatus: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,
@@ -2296,6 +2307,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedError.id,
+              conventionStatus: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,
@@ -2362,6 +2374,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedError.id,
+              conventionStatus: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,

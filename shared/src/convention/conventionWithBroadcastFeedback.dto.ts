@@ -8,6 +8,7 @@ import type { WithFirstnameAndLastname } from "./convention.schema";
 
 export type ConventionWithBroadcastFeedback = {
   id: ConventionId;
+  conventionStatus: ConventionStatus;
   beneficiary: WithFirstnameAndLastname;
   lastBroadcastFeedback: ConventionLastBroadcastFeedbackResponse;
 };
@@ -29,7 +30,7 @@ export const functionalBroadcastFeedbackErrorMessage = [
 export type FunctionalBroadcastFeedbackErrorMessage =
   (typeof functionalBroadcastFeedbackErrorMessage)[number];
 
-export const isManagedBroadcastFeedbackErrorKind = (
+export const isFunctionalBroadcastFeedbackError = (
   message: string,
 ): message is FunctionalBroadcastFeedbackErrorMessage =>
   functionalBroadcastFeedbackErrorMessage.includes(
@@ -52,3 +53,30 @@ export type GetConventionsWithErroredBroadcastFeedbackParams =
   WithRequiredPagination & {
     filters?: ConventionsWithErroredBroadcastFeedbackFilters;
   };
+
+export const flatParamsToGetConventionsWithErroredBroadcastFeedbackParams = (
+  flatParams: FlatGetConventionsWithErroredBroadcastFeedbackParams,
+): GetConventionsWithErroredBroadcastFeedbackParams => {
+  const {
+    page,
+    perPage,
+    broadcastErrorKind,
+    conventionStatus,
+    search,
+    ...rest
+  } = flatParams;
+
+  rest satisfies Record<string, never>;
+
+  return {
+    pagination: {
+      page,
+      perPage,
+    },
+    filters: {
+      broadcastErrorKind,
+      conventionStatus,
+      search,
+    },
+  };
+};

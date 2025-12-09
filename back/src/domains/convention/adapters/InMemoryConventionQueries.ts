@@ -15,7 +15,7 @@ import {
   type FindSimilarConventionsParams,
   filter,
   type GetPaginatedConventionsFilters,
-  isManagedBroadcastFeedbackErrorKind,
+  isFunctionalBroadcastFeedbackError,
   NotFoundError,
   type PaginationQueryParams,
   pipeWithValue,
@@ -350,6 +350,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           );
         return {
           id: convention.id,
+          conventionStatus: convention.status,
           beneficiary: {
             firstname: convention.signatories.beneficiary.firstName,
             lastname: convention.signatories.beneficiary.lastName,
@@ -375,7 +376,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
             result.lastBroadcastFeedback?.subscriberErrorFeedback?.message;
           if (!message) return false;
 
-          const isFunctional = isManagedBroadcastFeedbackErrorKind(message);
+          const isFunctional = isFunctionalBroadcastFeedbackError(message);
           if (filters.broadcastErrorKind === "functional" && !isFunctional)
             return false;
           if (filters.broadcastErrorKind === "technical" && isFunctional)
