@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   authenticatedConventionRoutes,
   flatParamsToGetConventionsForAgencyUserParams,
+  flatParamsToGetConventionsWithErroredBroadcastFeedbackParams,
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
@@ -73,7 +74,9 @@ export const createConventionRouter = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getConventionsWithErroredBroadcastFeedback.execute(
-          req.query,
+          flatParamsToGetConventionsWithErroredBroadcastFeedbackParams(
+            req.query,
+          ),
           getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),

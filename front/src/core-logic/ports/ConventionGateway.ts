@@ -14,8 +14,8 @@ import type {
   EditConventionCounsellorNameRequestDto,
   FindSimilarConventionsParams,
   FlatGetConventionsForAgencyUserParams,
+  FlatGetConventionsWithErroredBroadcastFeedbackParams,
   MarkPartnersErroredConventionAsHandledRequest,
-  PaginationQueryParams,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
@@ -100,7 +100,7 @@ export interface ConventionGateway {
     jwt: ConventionSupportedJwt,
   ): Observable<ConventionLastBroadcastFeedbackResponse>;
   getConventionsWithErroredBroadcastFeedback$(
-    params: Required<PaginationQueryParams>,
+    params: FlatGetConventionsWithErroredBroadcastFeedbackParams,
     jwt: string,
   ): Observable<DataWithPagination<ConventionWithBroadcastFeedback>>;
 }

@@ -1,27 +1,17 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { createRootSelector } from "src/core-logic/storeConfig/store";
+import type { RootState } from "src/core-logic/storeConfig/store";
 
-const conventionsWithBroadcastFeedbackState = createRootSelector(
-  (state) => state.conventionsWithBroadcastFeedback,
-);
-
-const conventionsWithBroadcastFeedback = createSelector(
-  conventionsWithBroadcastFeedbackState,
-  (state) => state.conventions,
-);
-
-const pagination = createSelector(
-  conventionsWithBroadcastFeedbackState,
-  (state) => state.pagination,
-);
-
-const isLoading = createSelector(
-  conventionsWithBroadcastFeedbackState,
-  (state) => state.isLoading,
-);
+const conventionsWithBroadcastFeedbackState = (state: RootState) =>
+  state.conventionsWithBroadcastFeedback;
 
 export const conventionsWithBroadcastFeedbackSelectors = {
-  conventionsWithBroadcastFeedback,
-  pagination,
-  isLoading,
+  isLoading: createSelector(
+    conventionsWithBroadcastFeedbackState,
+    ({ isLoading }) => isLoading,
+  ),
+  erroredBroadcastConventionsWithPagination: createSelector(
+    conventionsWithBroadcastFeedbackState,
+    ({ erroredBroadcastConventionsWithPagination }) =>
+      erroredBroadcastConventionsWithPagination,
+  ),
 };
