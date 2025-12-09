@@ -22,7 +22,7 @@ const getConventionsWithErroredBroadcastFeedbackEpic: ConnectedUserConventionsWi
       switchMap((action) =>
         conventionGateway
           .getConventionsWithErroredBroadcastFeedback$(
-            action.payload.params,
+            action.payload.filters,
             action.payload.jwt,
           )
           .pipe(

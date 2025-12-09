@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type {
-  DataWithPagination,
-  Pagination,
-  PaginationQueryParams,
+import {
+  type DataWithPagination,
+  defaultPerPageInWebPagination,
+  type FlatGetConventionsWithErroredBroadcastFeedbackParams,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -10,16 +10,37 @@ import type {
 } from "src/core-logic/domain/feedback/feedback.slice";
 import type { ConventionWithBroadcastFeedback } from "../../../../../../shared/src/convention/conventionWithBroadcastFeedback.dto";
 
-type ConnectedUserConventionsWithBroadcastFeedbackState = {
-  conventions: ConventionWithBroadcastFeedback[];
-  isLoading: boolean;
-  pagination: Pagination | undefined;
+export type FetchConventionsWithErroredBroadcastFeedbackRequestedPayload = {
+  jwt: string;
+  filters: FlatGetConventionsWithErroredBroadcastFeedbackParams;
 };
 
-const initialState: ConnectedUserConventionsWithBroadcastFeedbackState = {
-  conventions: [],
+export type ConventionsWithBroadcastFeedbackState = {
+  isLoading: boolean;
+  erroredBroadcastConventionsWithPagination: DataWithPagination<ConventionWithBroadcastFeedback> & {
+    filters: FlatGetConventionsWithErroredBroadcastFeedbackParams;
+  };
+};
+
+export const initialConventionsWithPagination: DataWithPagination<ConventionWithBroadcastFeedback> & {
+  filters: FlatGetConventionsWithErroredBroadcastFeedbackParams;
+} = {
+  data: [],
+  pagination: {
+    totalRecords: 0,
+    currentPage: 1,
+    totalPages: 1,
+    numberPerPage: defaultPerPageInWebPagination,
+  },
+  filters: {
+    page: 1,
+    perPage: defaultPerPageInWebPagination,
+  },
+};
+
+const initialState: ConventionsWithBroadcastFeedbackState = {
   isLoading: false,
-  pagination: undefined,
+  erroredBroadcastConventionsWithPagination: initialConventionsWithPagination,
 };
 
 export const conventionsWithBroadcastFeedbackSlice = createSlice({
@@ -28,12 +49,13 @@ export const conventionsWithBroadcastFeedbackSlice = createSlice({
   reducers: {
     getConventionsWithErroredBroadcastFeedbackRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{
-        params: Required<PaginationQueryParams>;
-        jwt: string;
-      }>,
+      action: PayloadActionWithFeedbackTopic<FetchConventionsWithErroredBroadcastFeedbackRequestedPayload>,
     ) => {
       state.isLoading = true;
+      state.erroredBroadcastConventionsWithPagination = {
+        ...state.erroredBroadcastConventionsWithPagination,
+        filters: action.payload.filters,
+      };
     },
     getConventionsWithErroredBroadcastFeedbackSucceeded: (
       state,
@@ -42,14 +64,20 @@ export const conventionsWithBroadcastFeedbackSlice = createSlice({
       >,
     ) => {
       state.isLoading = false;
-      state.conventions = action.payload.data;
-      state.pagination = action.payload.pagination;
+      state.erroredBroadcastConventionsWithPagination = {
+        ...state.erroredBroadcastConventionsWithPagination,
+        ...action.payload,
+      };
     },
     getConventionsWithErroredBroadcastFeedbackFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
+    },
+    clearConventionsWithBroadcastFeedbackFilters: (state) => {
+      state.erroredBroadcastConventionsWithPagination =
+        initialConventionsWithPagination;
     },
   },
 });

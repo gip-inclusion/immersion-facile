@@ -28,6 +28,7 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
       [
         {
           id: "1",
+          conventionStatus: "IN_REVIEW",
           beneficiary: {
             firstname: "John",
             lastname: "Doe",
@@ -52,7 +53,13 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
     store.dispatch(
       conventionsWithBroadcastFeedbackSlice.actions.getConventionsWithErroredBroadcastFeedbackRequested(
         {
-          params: { page: 1, perPage: 10 },
+          filters: {
+            page: 1,
+            perPage: 10,
+            search: "any-search",
+            broadcastErrorKind: "functional",
+            conventionStatus: ["IN_REVIEW"],
+          },
           jwt: "my-jwt",
           feedbackTopic: "conventions-with-broadcast-feedback",
         },
@@ -69,16 +76,23 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
         pagination,
       },
     );
+    const erroredBroadcastConventionsWithPagination =
+      getErroredBroadcastConventionsWithPagination();
     expectToEqual(
-      conventionsWithBroadcastFeedbackSelectors.pagination(store.getState()),
+      erroredBroadcastConventionsWithPagination.pagination,
       pagination,
     );
     expectToEqual(
-      conventionsWithBroadcastFeedbackSelectors.conventionsWithBroadcastFeedback(
-        store.getState(),
-      ),
+      erroredBroadcastConventionsWithPagination.data,
       conventionsWithBroadcastFeedback,
     );
+    expectToEqual(erroredBroadcastConventionsWithPagination.filters, {
+      page: 1,
+      perPage: 10,
+      search: "any-search",
+      broadcastErrorKind: "functional",
+      conventionStatus: ["IN_REVIEW"],
+    });
   });
 
   it("get the conventions with errored broadcast feedback failed", () => {
@@ -91,7 +105,13 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
       conventionsWithBroadcastFeedbackSlice.actions.getConventionsWithErroredBroadcastFeedbackRequested(
         {
           feedbackTopic: "conventions-with-broadcast-feedback",
-          params: { page: 1, perPage: 10 },
+          filters: {
+            page: 1,
+            perPage: 10,
+            search: "any-search",
+            broadcastErrorKind: "functional",
+            conventionStatus: ["IN_REVIEW"],
+          },
           jwt: "my-jwt",
         },
       ),
@@ -120,4 +140,91 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
       },
     });
   });
+
+  it("should clear filters when clearConventionsWithBroadcastFeedbackFilters is dispatched", () => {
+    const pagination: Pagination = {
+      totalRecords: 1,
+      currentPage: 1,
+      totalPages: 1,
+      numberPerPage: 10,
+    };
+    const conventionsWithBroadcastFeedback: ConventionWithBroadcastFeedback[] =
+      [
+        {
+          id: "1",
+          conventionStatus: "IN_REVIEW",
+          beneficiary: {
+            firstname: "John",
+            lastname: "Doe",
+          },
+          lastBroadcastFeedback: {
+            serviceName: "any-service-name",
+            consumerId: null,
+            consumerName: "any-consumer-name",
+            occurredAt: "2024-07-01T00:00:00.000Z",
+            handledByAgency: true,
+            requestParams: {
+              conventionId: "1",
+            },
+          },
+        },
+      ];
+
+    store.dispatch(
+      conventionsWithBroadcastFeedbackSlice.actions.getConventionsWithErroredBroadcastFeedbackRequested(
+        {
+          filters: {
+            page: 2,
+            perPage: 20,
+            search: "any-search",
+            broadcastErrorKind: "functional",
+            conventionStatus: ["IN_REVIEW"],
+          },
+          jwt: "my-jwt",
+          feedbackTopic: "conventions-with-broadcast-feedback",
+        },
+      ),
+    );
+
+    dependencies.conventionGateway.getConventionsWithErroredBroadcastFeedbackResult$.next(
+      {
+        data: conventionsWithBroadcastFeedback,
+        pagination,
+      },
+    );
+
+    expectToEqual(getErroredBroadcastConventionsWithPagination().filters, {
+      page: 2,
+      perPage: 20,
+      search: "any-search",
+      broadcastErrorKind: "functional",
+      conventionStatus: ["IN_REVIEW"],
+    });
+
+    store.dispatch(
+      conventionsWithBroadcastFeedbackSlice.actions.clearConventionsWithBroadcastFeedbackFilters(),
+    );
+
+    const erroredBroadcastConventionsWithPaginationAfterClear =
+      getErroredBroadcastConventionsWithPagination();
+    expectToEqual(erroredBroadcastConventionsWithPaginationAfterClear.filters, {
+      page: 1,
+      perPage: 20,
+    });
+    expectToEqual(erroredBroadcastConventionsWithPaginationAfterClear.data, []);
+    expectToEqual(
+      erroredBroadcastConventionsWithPaginationAfterClear.pagination,
+      {
+        totalRecords: 0,
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: 20,
+      },
+    );
+  });
+
+  const getErroredBroadcastConventionsWithPagination = () =>
+    conventionsWithBroadcastFeedbackSelectors.erroredBroadcastConventionsWithPagination(
+      store.getState(),
+    );
 });
