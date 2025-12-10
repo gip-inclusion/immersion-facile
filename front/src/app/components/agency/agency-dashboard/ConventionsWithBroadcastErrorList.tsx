@@ -36,7 +36,7 @@ export const ConventionsWithBroadcastErrorList = ({
     if (isManagedBroadcastFeedbackError(errorMessage)) {
       return broadcastFeedbackErrorMap[errorMessage].description;
     }
-    return "Une erreur technique s'est produite.";
+    return "Une erreur technique s'est produite. Veuillez contacter votre DSI pour la corriger.";
   };
 
   const getConventionsWithErroredBroadcastFeedbackRequested = useCallback(

@@ -101,6 +101,10 @@ export const broadcastFeedbackErrorMap: Record<
           présent dans la demande de convention.
         </p>
         <p>
+          {"->"} Rediffuser la convention dans votre SI depuis Immersion
+          facilitée
+        </p>
+        <p>
           Le SIRET de l'entreprise est automatiquement vérifié dès la création
           de la demande sur Immersion Facilitée, donc il ne peut pas être erroné
           ou correspondre à une entreprise fermée.
@@ -191,40 +195,88 @@ export const broadcastFeedbackErrorMap: Record<
     ),
   },
   "Identifiant National DE non trouvé": {
-    description: "Le bénéficiaire n'est pas inscrit dans votre structure.",
-    solution: () => (
+    description:
+      "Le bénéficiaire n'est pas inscrit à France travail OU l'adresse mail indiquée sur la convention n'est pas identique à celle du dossier France travail.",
+    solution: (isConventionValidated) => (
       <>
+        <p>{"-> "}Dans le cas ou il n'est pas inscrit :</p>
         <p>
-          {"->"} Inscrivez-le dans votre structure (en Cat. 5 s'il a été radié),
-          puis rediffusez la convention dans Immersion facilitée.
+          {isConventionValidated ? (
+            "Je procède à son inscription avant validation de la convention"
+          ) : (
+            <ul>
+              <li>Procéder à l'inscription du bénéficiaire</li>
+              <li>
+                Rediffuser la convention dans votre SI depuis Immersion
+                facilitée
+              </li>
+            </ul>
+          )}
+        </p>
+        <p>{"-> "}Dans le cas où l'adresse mail est différente:</p>
+        <p>
+          {isConventionValidated ? (
+            "Je contacte le bénéficiaire pour l'informer que je modifie l'adresse mail indiquée sur la convention par celle présente dans le dossier France travail avant validation de la convention."
+          ) : (
+            <ul>
+              <li>
+                Faire modifier l'adresse mail du bénéficiaire avec son accord au
+                sein de France travail
+              </li>
+              <li>
+                Rediffuser la convention dans votre SI depuis Immersion
+                facilitée
+              </li>
+            </ul>
+          )}
         </p>
       </>
     ),
   },
   "Identifiant National DE trouvé mais écart sur la date de naissance": {
-    description: "La date de naissance du bénéficiaire ne concorde pas.",
+    description:
+      "La date de naissance du bénéficiaire indiquée sur la convention n'est pas identique à celle du dossier France travail.",
     solution: (isConventionValidated) => (
       <>
-        <p>
-          {"->"} Si les bonnes informations sont celles saisies dans la
-          convention, modifiez les informations du candidat dans votre logiciel
-          (MAP ou i-milo), puis rediffusez la convention via Immersion
-          Facilitée.
-        </p>
-        <p>
-          {"->"} Si les bonnes informations sont celles saisies dans votre
-          logiciel (MAP ou i-milo)
-          {!isConventionValidated
-            ? ", modifiez les informations du candidat sur la demande de convention, et renvoyez-la en signature."
-            : " :"}
-        </p>
-        {isConventionValidated && (
-          <ol>
-            <li>Dupliquez la convention.</li>
-            <li>Corrigez les informations bénéficiaire.</li>
-            <li>Renvoyez la nouvelle convention en signature.</li>
-            <li>Annulez l'ancienne convention.</li>
-          </ol>
+        {isConventionValidated ? (
+          <>
+            <p>
+              {"->"} Si la convention a été validée, il n'y a pas longtemps :
+            </p>
+            <ul>
+              <li>Dupliquer la convention.</li>
+              <li>Corriger la date de naissance du bénéficiaire.</li>
+              <li>Renvoyer la nouvelle convention en signature.</li>
+              <li>Attendre la validation</li>
+              <li>Vérifier son intégration dans vos applicatifs.</li>
+              <li>Annuler l'ancienne convention.</li>
+            </ul>
+
+            <p>{"->"} Si la convention a été validée, il y longtemps :</p>
+            <ul>
+              <li>
+                Contacter notre centre d'aide pour erreur date de naissance
+              </li>
+              <li>
+                Communiquer la date de naissance à modifier et le numéro de
+                convention.
+              </li>
+              <li>
+                Nous procéderons à la modification et l'installation de la
+                convention dans vos applicatifs.
+              </li>
+            </ul>
+          </>
+        ) : (
+          <ul>
+            <li>
+              Faire modifier la date de naissance du bénéficiaire avec son
+              accord au sein de France travail
+            </li>
+            <li>
+              Rediffuser la convention dans votre SI depuis Immersion facilitée
+            </li>
+          </ul>
         )}
       </>
     ),
