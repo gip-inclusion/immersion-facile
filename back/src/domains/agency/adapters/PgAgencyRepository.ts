@@ -152,7 +152,6 @@ export class PgAgencyRepository implements AgencyRepository {
           (result) => result.agencyId === agencyWithRights.id,
         )?.numberOfUsersToReview;
 
-        if (!numberOfUsersToReview) return null;
         return {
           agency: agencyWithRights,
           numberOfUsersToReview: Number(numberOfUsersToReview),

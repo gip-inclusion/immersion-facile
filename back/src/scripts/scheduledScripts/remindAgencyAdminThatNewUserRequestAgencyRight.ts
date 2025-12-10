@@ -1,7 +1,7 @@
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
-import { RemindAgencyAdminThatNewUserRequestAgencyRight } from "../../domains/convention/use-cases/RemindAgencyAdminThatNewUserRequestAgencyRight";
-import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
+import { makeRemindAgencyAdminThatNewUserRequestAgencyRight } from "../../domains/convention/use-cases/RemindAgencyAdminThatNewUserRequestAgencyRight";
+import { makeSaveNotificationsBatchAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -12,25 +12,23 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const remindAgencyAdminThatNewUserRequestAgencyRightScript = async () => {
-  logger.info({
-    message:
-      "Starting remind agency admin that new user request agency right script",
-  });
-
   const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );
 
   const remindAgencyAdminThatNewUserRequestAgencyRight =
-    new RemindAgencyAdminThatNewUserRequestAgencyRight(
+    makeRemindAgencyAdminThatNewUserRequestAgencyRight({
       uowPerformer,
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        new CustomTimeGateway(),
-      ),
-      config.immersionFacileBaseUrl,
-    );
+      deps: {
+        saveNotificationsBatchAndRelatedEvent:
+          makeSaveNotificationsBatchAndRelatedEvent(
+            new UuidV4Generator(),
+            new CustomTimeGateway(),
+          ),
+        immersionBaseUrl: config.immersionFacileBaseUrl,
+      },
+    });
 
   const result = await remindAgencyAdminThatNewUserRequestAgencyRight.execute();
   return result;

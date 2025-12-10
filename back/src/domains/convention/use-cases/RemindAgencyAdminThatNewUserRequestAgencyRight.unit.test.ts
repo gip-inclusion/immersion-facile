@@ -5,10 +5,10 @@ import {
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
-  type ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
+  type ExpectSavedNotificationsBatchAndEvent,
+  makeExpectSavedNotificationsBatchAndEvent,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import { makeSaveNotificationsBatchAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -16,7 +16,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { RemindAgencyAdminThatNewUserRequestAgencyRight } from "./RemindAgencyAdminThatNewUserRequestAgencyRight";
+import {
+  makeRemindAgencyAdminThatNewUserRequestAgencyRight,
+  type RemindAgencyAdminThatNewUserRequestAgencyRight,
+} from "./RemindAgencyAdminThatNewUserRequestAgencyRight";
 
 describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
   const admin1 = new ConnectedUserBuilder()
@@ -69,23 +72,27 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
 
   let uow: InMemoryUnitOfWork;
   let remindAgencyAdminThatNewUserRequestAgencyRight: RemindAgencyAdminThatNewUserRequestAgencyRight;
-  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
-      uow.notificationRepository,
-      uow.outboxRepository,
-    );
-    remindAgencyAdminThatNewUserRequestAgencyRight =
-      new RemindAgencyAdminThatNewUserRequestAgencyRight(
-        new InMemoryUowPerformer(uow),
-        makeSaveNotificationAndRelatedEvent(
-          new UuidV4Generator(),
-          new CustomTimeGateway(),
-        ),
-        immersionBaseUrl,
+    expectSavedNotificationsBatchAndEvent =
+      makeExpectSavedNotificationsBatchAndEvent(
+        uow.notificationRepository,
+        uow.outboxRepository,
       );
+    remindAgencyAdminThatNewUserRequestAgencyRight =
+      makeRemindAgencyAdminThatNewUserRequestAgencyRight({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          saveNotificationsBatchAndRelatedEvent:
+            makeSaveNotificationsBatchAndRelatedEvent(
+              new UuidV4Generator(),
+              new CustomTimeGateway(),
+            ),
+          immersionBaseUrl,
+        },
+      });
   });
 
   describe("When there are no agencies with users to review", () => {
@@ -102,7 +109,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
 
       await remindAgencyAdminThatNewUserRequestAgencyRight.execute();
 
-      expectSavedNotificationsAndEvents({
+      expectSavedNotificationsBatchAndEvent({
         emails: [],
       });
     });
@@ -151,7 +158,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
 
       await remindAgencyAdminThatNewUserRequestAgencyRight.execute();
 
-      expectSavedNotificationsAndEvents({
+      expectSavedNotificationsBatchAndEvent({
         emails: [
           {
             kind: "AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION",
@@ -219,7 +226,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
 
       await remindAgencyAdminThatNewUserRequestAgencyRight.execute();
 
-      expectSavedNotificationsAndEvents({
+      expectSavedNotificationsBatchAndEvent({
         emails: [
           {
             kind: "AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION",
@@ -262,7 +269,7 @@ describe("RemindAgencyAdminThatNewUserRequestAgencyRight", () => {
 
       await remindAgencyAdminThatNewUserRequestAgencyRight.execute();
 
-      expectSavedNotificationsAndEvents({
+      expectSavedNotificationsBatchAndEvent({
         emails: [],
       });
     });
