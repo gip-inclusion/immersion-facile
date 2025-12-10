@@ -4,11 +4,11 @@ import type { PhoneInDB } from "../use-cases/VerifyAndFixPhones";
 export class InMemoryPhoneQueries implements PhoneQueries {
   #phones: PhoneInDB[] = [];
 
-  setPhones(phones: PhoneInDB[]) {
+  set phones(phones: PhoneInDB[]) {
     this.#phones = phones;
   }
 
-  getPhones(): PhoneInDB[] {
+  get phones(): PhoneInDB[] {
     return this.#phones;
   }
 
@@ -16,7 +16,7 @@ export class InMemoryPhoneQueries implements PhoneQueries {
     return this.#phones;
   }
 
-  async fixPhones(fixedPhones: PhoneInDB[]): Promise<void> {
+  async updatePhones(fixedPhones: PhoneInDB[]): Promise<void> {
     fixedPhones.map((fixedPhone) => {
       const phoneToFix = this.#phones.find(
         (phone) => phone.relatedId === fixedPhone.relatedId,
