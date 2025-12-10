@@ -1,7 +1,7 @@
 import {
   type AbsoluteUrl,
+  type ConnectedUser,
   errors,
-  type User,
   type WithIdToken,
   withIdTokenSchema,
 } from "shared";
@@ -13,7 +13,7 @@ export type GetOAuthLogoutUrl = ReturnType<typeof makeGetOAuthLogoutUrl>;
 export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
   .withInput<WithIdToken>(withIdTokenSchema)
   .withOutput<AbsoluteUrl>()
-  .withCurrentUser<User>()
+  .withCurrentUser<ConnectedUser>()
   .withDeps<{ oAuthGateway: OAuthGateway }>()
   .build(async ({ inputParams, uow, deps: { oAuthGateway }, currentUser }) => {
     const ongoingOAuth = await uow.ongoingOAuthRepository.findByUserId(

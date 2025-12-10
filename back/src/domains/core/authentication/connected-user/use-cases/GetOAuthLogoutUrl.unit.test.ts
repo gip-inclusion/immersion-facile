@@ -1,10 +1,10 @@
 import {
+  ConnectedUserBuilder,
   defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   queryParamsAsString,
-  type User,
 } from "shared";
 import {
   createInMemoryUow,
@@ -23,14 +23,17 @@ import {
 } from "./GetOAuthLogoutUrl";
 
 describe("GetOAuthLogoutUrl", () => {
-  const user: User = {
-    id: "my-user-id",
-    email: "user@mail.com",
-    firstName: "User",
-    lastName: "App",
-    createdAt: new Date().toISOString(),
-    proConnect: defaultProConnectInfos,
-  };
+  const connectedUserBuilder = new ConnectedUserBuilder()
+    .withId("my-user-id")
+    .withEmail("user@mail.com")
+    .withFirstName("User")
+    .withLastName("App")
+    .withCreatedAt(new Date())
+    .withProConnectInfos(defaultProConnectInfos);
+
+  const user = connectedUserBuilder.buildUser();
+  const connectedUser = connectedUserBuilder.build();
+
   describe("With OAuthGateway provider 'proConnect'", () => {
     let uow: InMemoryUnitOfWork;
     let getOAuthLogoutUrl: GetOAuthLogoutUrl;
@@ -49,7 +52,7 @@ describe("GetOAuthLogoutUrl", () => {
     it("throws when it does not find the ongoingOAuth", async () => {
       uow.ongoingOAuthRepository.ongoingOAuths = [];
       await expectPromiseToFailWithError(
-        getOAuthLogoutUrl.execute({ idToken: "whatever" }, user),
+        getOAuthLogoutUrl.execute({ idToken: "whatever" }, connectedUser),
         errors.auth.missingOAuth({}),
       );
     });
@@ -68,7 +71,7 @@ describe("GetOAuthLogoutUrl", () => {
       uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];
       const idToken = "fake-id-token";
       expectToEqual(
-        await getOAuthLogoutUrl.execute({ idToken }, user),
+        await getOAuthLogoutUrl.execute({ idToken }, connectedUser),
         `${
           fakeProviderConfig.providerBaseUri
         }${fakeProConnectLogoutUri}?${queryParamsAsString({
