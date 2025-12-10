@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
+import { fr } from "@codegouvfr/react-dsfr";
+import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import {
   type ConventionStatus,
   conventionStatusesAllowedForModification,
@@ -24,8 +27,15 @@ export const SubscriberErrorFeedbackComponent = ({
 
   const managedError = isManagedBroadcastFeedbackError(message) && (
     <div>
-      <p>Erreur - {broadcastFeedbackErrorMap[message].description}</p>
-      {broadcastFeedbackErrorMap[message].solution(isConventionValidated)}
+      <strong>Erreur - {broadcastFeedbackErrorMap[message].description}</strong>
+      <Accordion
+        label="Détail de l'erreur"
+        className={fr.cx("fr-mb-3w", "fr-mt-1w")}
+      >
+        <>
+          {broadcastFeedbackErrorMap[message].solution(isConventionValidated)}
+        </>
+      </Accordion>
     </div>
   );
 
@@ -34,9 +44,16 @@ export const SubscriberErrorFeedbackComponent = ({
       {managedError}
       {!managedError && (
         <div>
-          <p>Une erreur technique s'est produite.</p>
-          <p>Voici le détail :</p>
-          <p>{message}</p>
+          <strong>
+            Une erreur technique s'est produite. Veuillez contacter votre DSI
+            pour la corriger.
+          </strong>
+          <Accordion
+            label="Détail de l'erreur"
+            className={fr.cx("fr-mb-4w", "fr-mt-1w")}
+          >
+            <p>{message}</p>
+          </Accordion>
         </div>
       )}
     </>
