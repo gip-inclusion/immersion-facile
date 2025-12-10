@@ -1,10 +1,10 @@
 import {
+  ConnectedUserBuilder,
   defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   queryParamsAsString,
-  type User,
 } from "shared";
 import {
   createInMemoryUow,
@@ -24,14 +24,17 @@ import {
 } from "./GetOAuthLogoutUrl";
 
 describe("GetOAuthLogoutUrl", () => {
-  const user: User = {
-    id: "my-user-id",
-    email: "user@mail.com",
-    firstName: "User",
-    lastName: "App",
-    createdAt: new Date().toISOString(),
-    proConnect: defaultProConnectInfos,
-  };
+  const connectedUserBuilder = new ConnectedUserBuilder()
+    .withId("my-user-id")
+    .withEmail("user@mail.com")
+    .withFirstName("User")
+    .withLastName("App")
+    .withCreatedAt(new Date())
+    .withProConnectInfos(defaultProConnectInfos);
+
+  const user = connectedUserBuilder.buildUser();
+  const connectedUser = connectedUserBuilder.build();
+
   describe("With OAuthGateway provider 'proConnect'", () => {
     let uow: InMemoryUnitOfWork;
     let getOAuthLogoutUrl: GetOAuthLogoutUrl;
@@ -54,7 +57,7 @@ describe("GetOAuthLogoutUrl", () => {
         await expectPromiseToFailWithError(
           getOAuthLogoutUrl.execute(
             { idToken: "whatever", provider: "proConnect" },
-            user,
+            connectedUser,
           ),
           errors.auth.missingOAuth({}),
         );
@@ -76,7 +79,7 @@ describe("GetOAuthLogoutUrl", () => {
         expectToEqual(
           await getOAuthLogoutUrl.execute(
             { idToken, provider: "proConnect" },
-            user,
+            connectedUser,
           ),
           `${
             fakeProviderConfig.providerBaseUri
@@ -96,7 +99,7 @@ describe("GetOAuthLogoutUrl", () => {
 
         const logoutUrl = await getOAuthLogoutUrl.execute(
           { idToken, provider: "peConnect" },
-          user,
+          connectedUser,
         );
 
         expectToEqual(
