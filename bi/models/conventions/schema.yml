@@ -40,6 +40,32 @@ models:
         description: Whether individual protection is required
       - name: sanitary_prevention
         description: Whether sanitary prevention measures are in place
+      - name: sanitary_prevention_description
+        description: Description of sanitary prevention measures
+      - name: created_at
+        description: Timestamp when convention was created
+      - name: updated_at
+        description: Timestamp when convention was last updated
+      - name: internship_kind
+        description: Kind of internship ("immersion" | "mini-stage")
+      - name: business_advantages
+        description: Advantages offered by the business
+      - name: status_justification
+        description: Justification for the current status
+      - name: validators
+        description: JSON object containing validator information
+      - name: renewed_from
+        description: ID of convention this was renewed from
+      - name: renewed_justification
+        description: Justification for renewal
+      - name: establishment_number_employees
+        description: Number of employees at the establishment
+      - name: individual_protection_description
+        description: Description of individual protection measures
+      - name: convention_acquisition_campaign
+        description: Acquisition campaign that led to this convention
+      - name: convention_acquisition_keyword
+        description: Acquisition keyword that led to this convention
       - name: siret
         description: SIRET of the business hosting the immersion
       - name: business_name
@@ -68,6 +94,10 @@ models:
         description: Foreign key to agencies
       - name: agency_name
         description: Name of the managing agency
+      - name: agency_status
+        description: Status of the agency (active, from-api-PE, etc.)
+      - name: agency_siret
+        description: SIRET of the agency
       - name: referring_agency_name
         description: Name of referring agency if applicable
       - name: agency_kind
@@ -166,6 +196,8 @@ models:
         description: Tutor's email
       - name: establishment_tutor_phone
         description: Tutor's phone
+      - name: establishment_tutor_signed_at
+        description: Timestamp when tutor signed
 
       # Establishment representative fields
       - name: establishment_representative_id
@@ -180,30 +212,44 @@ models:
         description: Representative's email
       - name: establishment_representative_phone
         description: Representative's phone
+      - name: establishment_representative_signed_at
+        description: Timestamp when establishment representative signed
       - name: is_signed_by_establishment_representative
         description: Boolean - whether establishment representative has signed
 
       # Beneficiary representative fields (optional role)
       - name: beneficiary_representative_id
         description: Foreign key to actors table (nullable)
+      - name: beneficiary_representative_first_name
+        description: Representative's first name (nullable)
+      - name: beneficiary_representative_last_name
+        description: Representative's last name (nullable)
       - name: beneficiary_representative_full_name
         description: Representative's full name (nullable)
       - name: beneficiary_representative_email
         description: Representative's email (nullable)
       - name: beneficiary_representative_phone
         description: Representative's phone (nullable)
+      - name: beneficiary_representative_signed_at
+        description: Timestamp when beneficiary representative signed (nullable)
       - name: is_signed_by_beneficiary_representative
         description: Boolean - null if no representative, true/false otherwise
 
       # Beneficiary current employer fields (optional role)
       - name: beneficiary_current_employer_id
         description: Foreign key to actors table (nullable)
+      - name: beneficiary_current_employer_first_name
+        description: Current employer's first name (nullable)
+      - name: beneficiary_current_employer_last_name
+        description: Current employer's last name (nullable)
       - name: beneficiary_current_employer_full_name
         description: Current employer's full name (nullable)
       - name: beneficiary_current_employer_email
         description: Current employer's email (nullable)
       - name: beneficiary_current_employer_phone
         description: Current employer's phone (nullable)
+      - name: beneficiary_current_employer_signed_at
+        description: Timestamp when current employer signed (nullable)
       - name: is_signed_by_beneficiary_current_employer
         description: Boolean - null if no current employer, true/false otherwise
 
@@ -235,6 +281,8 @@ models:
           - not_null
       - name: siret
         description: SIRET of the business hosting the immersion
+      - name: business_name
+        description: Name of the business
       - name: agency_id
         description: Foreign key to agencies
       - name: agency_name
@@ -257,6 +305,8 @@ models:
         description: Immersion start date
       - name: date_end
         description: Immersion end date
+      - name: rome_code
+        description: ROME code for the job category
       - name: rome_label
         description: Full label of the ROME code (e.g., "Commerce")
       - name: appellation_label
