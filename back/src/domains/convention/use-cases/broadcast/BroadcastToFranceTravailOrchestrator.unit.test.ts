@@ -42,13 +42,22 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       refersToAgencyName: referredAgency.name,
     })
     .build();
+
+  const conventionWithoutAssessment = new ConventionDtoBuilder()
+    .withId("convention-without-assessment-id")
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .withAgencyId(agency.id)
+    .build();
+
   const convention = new ConventionDtoBuilder()
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .withAgencyId(agency.id)
     .build();
+
   const assessment = new AssessmentDtoBuilder()
     .withConventionId(convention.id)
     .build();
+
   const conventionReadDto: ConventionReadDto = {
     ...convention,
     agencyName: agency.name,
@@ -82,7 +91,10 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
         broadcastToFranceTravailOnConventionUpdatesLegacy: legacyBroadcastToFT,
       });
 
-    uow.conventionRepository.setConventions([convention]);
+    uow.conventionRepository.setConventions([
+      convention,
+      conventionWithoutAssessment,
+    ]);
     uow.assessmentRepository.assessments = [
       createAssessmentEntity(assessment, convention),
     ];
@@ -109,7 +121,6 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     it("triggers legacy broadcast", async () => {
       await broadcastToFranceTravailOrchestrator.execute({
         conventionId: convention.id,
-        assessment,
       });
       expectLegacyBroadcastCallsToEqual([{ convention: convention }]);
     });
@@ -133,7 +144,6 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
 
       await broadcastToFranceTravailOrchestratorForAssementCreated.execute({
         conventionId: convention.id,
-        assessment,
       });
 
       expectLegacyBroadcastCallsToEqual([]);
@@ -182,16 +192,17 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       it("throws when assessment is missing", async () => {
         await expectPromiseToFailWithError(
           broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
-            conventionId: convention.id,
+            conventionId: conventionWithoutAssessment.id,
           }),
-          errors.assessment.missingAssessment({ conventionId: convention.id }),
+          errors.assessment.missingAssessment({
+            conventionId: conventionWithoutAssessment.id,
+          }),
         );
       });
 
       it("triggers standard broadcast, with assessment when all is good", async () => {
         await broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
           conventionId: convention.id,
-          assessment,
         });
 
         expectLegacyBroadcastCallsToEqual([]);
