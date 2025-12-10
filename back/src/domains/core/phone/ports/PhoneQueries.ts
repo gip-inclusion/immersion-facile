@@ -1,6 +1,16 @@
-import type { PhoneInDB } from "../use-cases/VerifyAndFixPhones";
+import type {
+  PhoneInDB,
+  PhoneSourceTable,
+} from "../use-cases/VerifyAndFixPhones";
 
 export interface PhoneQueries {
-  getPhonesToVerify: () => Promise<PhoneInDB[]>;
-  updatePhones: (phones: PhoneInDB[]) => Promise<void>;
+  getPhonesToVerify: (
+    tableName: PhoneSourceTable,
+    page: number,
+    perPage: number,
+  ) => Promise<PhoneInDB[]>;
+  updatePhones: (
+    phones: PhoneInDB[],
+    tableName: PhoneSourceTable,
+  ) => Promise<void>;
 }

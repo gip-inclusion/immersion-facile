@@ -7,18 +7,20 @@ import type { Database } from "../../../../config/pg/kysely/model/database";
 import { useCaseBuilder } from "../../useCaseBuilder";
 import type { PhoneQueries } from "../ports/PhoneQueries";
 
+export type PhoneSourceTable = ExtractFromExisting<
+	keyof Database,
+	| "discussions"
+	| "agencies"
+	| "actors"
+	| "api_consumers"
+	| "establishments__users"
+	| "notifications_sms"
+>;
+
 export type PhoneInDB = {
 	phoneNumber: string;
 	phoneLabelInTable: string;
-	sourceTable: ExtractFromExisting<
-		keyof Database,
-		| "discussions"
-		| "agencies"
-		| "actors"
-		| "api_consumers"
-		| "establishments__users"
-		| "notifications_sms"
-	>;
+	sourceTable: PhoneSourceTable;
 	relatedId: string;
 };
 
@@ -37,37 +39,69 @@ export const makeVerifyAndFixPhone = useCaseBuilder("VerifyAndFixPhones")
 	.withOutput<FixPhonesReport>()
 	.notTransactional()
 	.build(async ({ deps }) => {
-		const phonesInDB = await deps.getPhonesToVerify();
-
-		const initialReport: FixPhonesReport = {
+		const report: FixPhonesReport = {
 			correctPhonesInDB: [],
 			fixedPhonesInDB: [],
 			unfixablePhonesInDB: [],
 		};
 
-		const result = phonesInDB.reduce((acc, phone) => {
-			if (isValidPhoneNumber(phone.phoneNumber)) {
-				acc.correctPhonesInDB.push(phone);
-				return acc;
-			}
+		const sourceTables: PhoneInDB["sourceTable"][] = [
+			"discussions",
+			"agencies",
+			"actors",
+			"api_consumers",
+			"establishments__users",
+			"notifications_sms",
+		];
 
-			const fixedPhoneNumber = fixPhoneNumberCountryCode(phone.phoneNumber);
-			if (fixedPhoneNumber) {
-				acc.fixedPhonesInDB.push({ ...phone, phoneNumber: fixedPhoneNumber });
-				return acc;
-			}
+		for (const table of sourceTables) {
+			let phonesBatch: PhoneInDB[] = [];
+			let page = 1;
+			const perPage = 5;
 
-			acc.unfixablePhonesInDB.push({
-				...phone,
-				phoneNumber: defaultPhoneNumber,
-			});
-			return acc;
-		}, initialReport);
+			do {
+				const batchReport: FixPhonesReport = {
+					correctPhonesInDB: [],
+					fixedPhonesInDB: [],
+					unfixablePhonesInDB: [],
+				};
 
-		await deps.updatePhones(result.fixedPhonesInDB);
-		await deps.updatePhones(result.unfixablePhonesInDB);
+				phonesBatch = await deps.getPhonesToVerify(table, page, perPage);
 
-		return result;
+				phonesBatch.forEach((phone) => {
+					if (isValidPhoneNumber(phone.phoneNumber)) {
+						batchReport.correctPhonesInDB.push(phone);
+					}
+
+					const fixedPhoneNumber = fixPhoneNumberCountryCode(phone.phoneNumber);
+
+					if (!isValidPhoneNumber(phone.phoneNumber) && fixedPhoneNumber) {
+						batchReport.fixedPhonesInDB.push({
+							...phone,
+							phoneNumber: fixedPhoneNumber,
+						});
+					}
+
+					if (!isValidPhoneNumber(phone.phoneNumber) && !fixedPhoneNumber) {
+						batchReport.unfixablePhonesInDB.push({
+							...phone,
+							phoneNumber: defaultPhoneNumber,
+						});
+					}
+				});
+
+				await deps.updatePhones(batchReport.fixedPhonesInDB, table);
+				await deps.updatePhones(batchReport.unfixablePhonesInDB, table);
+
+				report.correctPhonesInDB.push(...batchReport.correctPhonesInDB);
+				report.fixedPhonesInDB.push(...batchReport.fixedPhonesInDB);
+				report.unfixablePhonesInDB.push(...batchReport.unfixablePhonesInDB);
+
+				page++;
+			} while (phonesBatch.length > 0);
+		}
+
+		return report;
 	});
 
 const fixPhoneNumberCountryCode = (phoneNumber: string): string | undefined => {

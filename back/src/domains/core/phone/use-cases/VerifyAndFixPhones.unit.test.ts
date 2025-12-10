@@ -40,7 +40,7 @@ describe("VerifyAndFixPhones", () => {
   });
 
   it("Correct phone", async () => {
-    inMemoryPhoneQueries.phones = [correctPhoneInDB];
+    inMemoryPhoneQueries.setPhones([correctPhoneInDB], "discussions");
     const report = await verifyAndFixPhones.execute();
 
     expectToEqual(report, {
@@ -49,11 +49,13 @@ describe("VerifyAndFixPhones", () => {
       unfixablePhonesInDB: [],
     });
 
-    expectToEqual(inMemoryPhoneQueries.phones, [correctPhoneInDB]);
+    expectToEqual(inMemoryPhoneQueries.getPhones("discussions"), [
+      correctPhoneInDB,
+    ]);
   });
 
   it("Fixable phone number", async () => {
-    inMemoryPhoneQueries.phones = [fixablePhoneInDB];
+    inMemoryPhoneQueries.setPhones([fixablePhoneInDB], "discussions");
 
     const report = await verifyAndFixPhones.execute();
 
@@ -68,11 +70,13 @@ describe("VerifyAndFixPhones", () => {
       unfixablePhonesInDB: [],
     });
 
-    expectToEqual(inMemoryPhoneQueries.phones, [fixedPhoneInDB]);
+    expectToEqual(inMemoryPhoneQueries.getPhones("discussions"), [
+      fixedPhoneInDB,
+    ]);
   });
 
   it("Unfixable phone number", async () => {
-    inMemoryPhoneQueries.phones = [unfixablePhoneInDB];
+    inMemoryPhoneQueries.setPhones([unfixablePhoneInDB], "discussions");
 
     const report = await verifyAndFixPhones.execute();
 
@@ -82,7 +86,7 @@ describe("VerifyAndFixPhones", () => {
       unfixablePhonesInDB: [unfixablePhoneInDB],
     });
 
-    expectToEqual(inMemoryPhoneQueries.phones, [
+    expectToEqual(inMemoryPhoneQueries.getPhones("discussions"), [
       { ...unfixablePhoneInDB, phoneNumber: defaultPhoneNumber },
     ]);
   });
