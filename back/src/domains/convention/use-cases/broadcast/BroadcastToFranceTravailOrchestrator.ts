@@ -1,14 +1,10 @@
-import {
-  type AssessmentDto,
-  type ConventionId,
-  type ConventionReadDto,
-  errors,
-} from "shared";
+import { type ConventionId, type ConventionReadDto, errors } from "shared";
 import type { InstantiatedUseCase } from "../../../../config/bootstrap/createUseCases";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
 import { getReferedAgency } from "../../../core/api-consumer/helpers/agency";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getOnlyAssessmentDto } from "../../entities/AssessmentEntity";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import type { BroadcastConventionParams } from "./broadcastConventionParams";
@@ -28,7 +24,6 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
   broadcastToFranceTravailOnConventionUpdatesLegacy: BroadcastToFranceTravailOnConventionUpdatesLegacy;
 }): InstantiatedUseCase<{
   conventionId: ConventionId;
-  assessment?: AssessmentDto;
 }> => {
   return {
     useCaseName: "BroadcastToFranceTravailOrchestrator",
@@ -89,8 +84,12 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
           ...assessmentFields,
         };
 
+        const assessmentDto = assessment
+          ? getOnlyAssessmentDto(assessment)
+          : undefined;
+
         if (eventType === "ASSESSMENT_CREATED") {
-          if (!params.assessment)
+          if (!assessmentDto)
             throw errors.assessment.missingAssessment({
               conventionId: convention.id,
             });
@@ -98,7 +97,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
           return broadcastToFranceTravailOnConventionUpdates.execute({
             eventType: "ASSESSMENT_CREATED",
             convention: conventionRead,
-            assessment: params.assessment,
+            assessment: assessmentDto,
           });
         }
 
