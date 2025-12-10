@@ -21,6 +21,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conventions_appellation_code ON {{ this }} (appellation_code)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_id ON {{ this }} (id)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_appellation_label ON {{ this }} (appellation_label)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_rome_label ON {{ this }} (rome_label)",
     ]
   )
 }}
@@ -93,6 +94,7 @@ select
     pad.ogr_appellation as appellation_code,
     pad.libelle_appellation_long as appellation_label,
     prd.code_rome as rome_code,
+    prd.libelle_rome as rome_label,
 
     -- Establishment enrichment
     case
@@ -185,6 +187,8 @@ select
     -- Assessment fields
     ass.status as assessment_status,
     ass.created_at as assessment_created_at,
+    ass.ended_with_a_job as assessment_ended_with_a_job,
+    ass.type_of_contract as assessment_type_of_contract,
     ass.establishment_feedback as assessment_establishment_feedback,
     ass.number_of_hours_actually_made as assessment_hours_actually_made
 

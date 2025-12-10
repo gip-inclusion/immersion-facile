@@ -84,10 +84,14 @@ models:
         description: France Travail Connect ID
 
       # Appellation/ROME fields
+      - name: appellation_code
+        description: Appellation code for the specific job
       - name: appellation_label
         description: Full label of the job appellation
       - name: rome_code
         description: ROME code for the job category
+      - name: rome_label
+        description: Full label of the ROME code
 
       # Establishment enrichment
       - name: is_referenced_establishment
@@ -206,6 +210,10 @@ models:
       # Assessment fields
       - name: assessment_status
         description: Status of the immersion assessment
+      - name: assessment_ended_with_a_job
+        description: Boolean - true if job was found after immersion
+      - name: assessment_type_of_contract
+        description: Type of contract (CDI, CDD...)
       - name: assessment_created_at
         description: Date assessment was created
       - name: assessment_establishment_feedback
@@ -249,11 +257,23 @@ models:
         description: Immersion start date
       - name: date_end
         description: Immersion end date
-      - name: rome_code
-        description: ROME code for the job category
-      - name: appellation_code
-        description: Appellation code for the specific job
+      - name: rome_label
+        description: Full label of the ROME code (e.g., "Commerce")
+      - name: appellation_label
+        description: Full label of the job appellation (long form)
       - name: establishment_department_name
         description: Department name of the establishment
       - name: establishment_region_name
         description: Region name of the establishment
+      - name: immersion_objective
+        description: Objective of the immersion (e.g., "Confirmer un projet professionnel", "Découvrir un métier ou un secteur d'activité", "Initier une démarche de recrutement")
+      - name: is_referenced_establishment
+        description: Boolean - true if establishment exists in establishments table
+      - name: internship_kind
+        description: Kind of internship ("immersion" | "mini-stage")
+      - name: assessment_status
+        description: Status of the immersion assessment
+      - name: assessment_ended_with_a_job
+        description: Boolean - true if job was found after immersion
+      - name: assessment_type_of_contract
+        description: Type of contract (CDI, CDD...)
