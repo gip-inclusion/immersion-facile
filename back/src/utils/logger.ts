@@ -10,6 +10,7 @@ import type {
   FtExternalId,
   LegacySearchQueryParamsDto,
   SiretDto,
+  UserId,
 } from "shared";
 import type { HttpResponse } from "shared-routes";
 import type { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
@@ -144,6 +145,7 @@ type LoggerParams = Partial<{
   subscriptionId: string;
   topic: DomainTopic;
   useCaseName: string;
+  userId: UserId;
 }>;
 
 export type OpacifiedLogger = {
@@ -216,6 +218,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       crispTicket,
       reportTitle,
       sqlQuery,
+      userId,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
@@ -254,6 +257,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         romeLabel,
         cacheKey,
         crispTicket,
+        userId,
       };
 
       const opacifiedWithoutNullOrUndefined = pickBy(
