@@ -12,13 +12,17 @@
       "CREATE INDEX IF NOT EXISTS idx_conv_count_agency_id ON {{ this }} (agency_id)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_agency_name ON {{ this }} (agency_name)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_siret ON {{ this }} (siret)",
+      "CREATE INDEX IF NOT EXISTS idx_conv_count_immersion_objective ON {{ this }} (immersion_objective)",
+      "CREATE INDEX IF NOT EXISTS idx_conv_count_rome_label ON {{ this }} (rome_label)",
+      "CREATE INDEX IF NOT EXISTS idx_conv_count_appellation_label ON {{ this }} (appellation_label)",
     ]
   )
 }}
 
 select
     id,
-    siret,
+    conventions.siret,
+    business_name,
     agency_id,
     agency_name,
     status_technical,
@@ -31,7 +35,21 @@ select
     date_start,
     date_end,
     rome_code,
-    appellation_code,
+    rome_label,
+    appellation_label,
     establishment_department_name,
-    establishment_region_name
+    establishment_region_name,
+    internship_kind,
+    immersion_objective,
+    ass.status as assessment_status,
+    ass.ended_with_a_job as assessment_ended_with_a_job,
+    ass.type_of_contract as assessment_type_of_contract,
+    case
+        when estab.siret is not null then true
+        else false
+    end as is_referenced_establishment
 from {{ ref('conventions') }}
+left join establishments as estab
+    on estab.siret = conventions.siret
+left join immersion_assessments as ass
+    on ass.convention_id = conventions.id
