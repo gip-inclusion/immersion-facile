@@ -8,8 +8,13 @@ import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { equals } from "ramda";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { HeadingSection, RichDropdown, Task } from "react-design-system";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  HeadingSection,
+  RichDropdown,
+  Task,
+  useDebounce,
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   conventionStatuses,
@@ -61,15 +66,12 @@ export const ConventionsWithBroadcastErrorList = ({
     search: filters.search,
   }));
 
-  const [searchValue, setSearchValue] = useState(filters.search ?? "");
-
   useEffect(() => {
     setTempFilters({
       broadcastErrorKind: filters.broadcastErrorKind,
       conventionStatus: filters.conventionStatus,
       search: filters.search,
     });
-    setSearchValue(filters.search ?? "");
   }, [filters.broadcastErrorKind, filters.conventionStatus, filters.search]);
 
   const getDescription = (errorMessage: string) => {
@@ -144,9 +146,7 @@ export const ConventionsWithBroadcastErrorList = ({
             filters: {
               ...filters,
               ...filtersToUse,
-              ...(searchQuery !== undefined && {
-                search: searchQuery || undefined,
-              }),
+              search: searchQuery || undefined,
               page: 1,
               perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
             },
@@ -158,6 +158,22 @@ export const ConventionsWithBroadcastErrorList = ({
     },
     [connectedUserJwt, dispatch, filters, tempFilters],
   );
+
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearchValue = useDebounce(searchValue, 500);
+  const searchBarOnSubmitRef = useRef((query: string) => {
+    onSubmit(tempFilters, query);
+  });
+
+  useEffect(() => {
+    searchBarOnSubmitRef.current = (query: string) => {
+      onSubmit(tempFilters, query);
+    };
+  }, [onSubmit, tempFilters]);
+
+  useEffect(() => {
+    searchBarOnSubmitRef.current(debouncedSearchValue);
+  }, [debouncedSearchValue]);
 
   const getConventionsWithErroredBroadcastFeedbackRequested = useCallback(
     (page: number) => {
@@ -222,10 +238,9 @@ export const ConventionsWithBroadcastErrorList = ({
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
           const query = formData.get("search");
-          onSubmit(
-            tempFilters,
-            query && typeof query === "string" ? query : undefined,
-          );
+          if (query && typeof query === "string") {
+            searchBarOnSubmitRef.current(query);
+          }
         }}
         className={fr.cx("fr-grid-row", "fr-search-bar", "fr-mb-4w")}
       >
@@ -235,7 +250,6 @@ export const ConventionsWithBroadcastErrorList = ({
             placeholder: "ID de convention",
             role: "search",
             name: "search",
-            value: searchValue,
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
               setSearchValue(event.target.value);
             },
