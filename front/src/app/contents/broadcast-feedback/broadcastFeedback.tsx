@@ -252,7 +252,7 @@ export const broadcastFeedbackErrorMap: Record<
               <li>Annuler l'ancienne convention.</li>
             </ul>
 
-            <p>{"->"} Si la convention a été validée, il y longtemps :</p>
+            <p>{"->"} Si la convention a été validée, il y a longtemps :</p>
             <ul>
               <li>
                 Contacter notre centre d'aide pour erreur date de naissance

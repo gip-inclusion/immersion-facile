@@ -29,7 +29,7 @@ export const SubscriberErrorFeedbackComponent = ({
     <div>
       <strong>Erreur - {broadcastFeedbackErrorMap[message].description}</strong>
       <Accordion
-        label="Détail de l'erreur"
+        label="Détails des solutions possibles"
         className={fr.cx("fr-mb-3w", "fr-mt-1w")}
       >
         <>
