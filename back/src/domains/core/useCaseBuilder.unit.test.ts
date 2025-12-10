@@ -1,3 +1,4 @@
+import { type ConnectedUser, ConnectedUserBuilder } from "shared";
 import z from "zod";
 import { createInMemoryUow } from "./unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "./unit-of-work/adapters/InMemoryUowPerformer";
@@ -19,7 +20,7 @@ describe("useCaseBuilder", () => {
       .withInput(z.object({ truc: z.string() }))
       .withOutput<boolean>()
       .withDeps<{ getBidule: () => string }>()
-      .withCurrentUser<{ id: string; email: string }>()
+      .withCurrentUser<ConnectedUser>()
       .build(async ({ inputParams, currentUser, uow, deps }) => {
         isExpectedType<Input>(inputParams);
         isExpectedType<CurrentUser>(currentUser);
@@ -42,7 +43,7 @@ describe("useCaseBuilder", () => {
 
     const result = await addTruc.execute(
       { truc: "yo" },
-      { id: "123", email: "st@mail.com" },
+      new ConnectedUserBuilder().build(),
     );
 
     isExpectedType<Output>(result);
@@ -75,17 +76,16 @@ describe("useCaseBuilder", () => {
     type Input = z.infer<typeof inputSchema>;
     type Output = string;
     type Deps = { getGreeting: () => string };
-    type CurrentUser = { id: string; email: string };
 
     const makeGreetUser = useCaseBuilder("GreetUser")
       .withInput(inputSchema)
       .withOutput<Output>()
       .withDeps<Deps>()
-      .withCurrentUser<CurrentUser>()
+      .withCurrentUser<ConnectedUser>()
       .notTransactional()
       .build(async ({ inputParams, currentUser, deps }) => {
         isExpectedType<Input>(inputParams);
-        isExpectedType<CurrentUser>(currentUser);
+        isExpectedType<ConnectedUser>(currentUser);
         isExpectedType<Deps>(deps);
         // uow should not be available
         return `${deps.getGreeting()} ${inputParams.name} from ${currentUser.email}`;
@@ -98,11 +98,11 @@ describe("useCaseBuilder", () => {
 
     const result = await greetUser.execute(
       { name: "World" },
-      { id: "123", email: "test@example.com" },
+      new ConnectedUserBuilder().build(),
     );
 
     isExpectedType<Output>(result);
-    expect(result).toBe("Hello World from test@example.com");
+    expect(result).toBe("Hello World from default.user@mail.com");
   });
 
   it("should work with notTransactional use cases without deps", async () => {

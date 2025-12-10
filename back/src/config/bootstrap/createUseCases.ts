@@ -118,6 +118,7 @@ import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGate
 import type { TransactionalUseCase, UseCase } from "../../domains/core/UseCase";
 import type { OutOfTransactionQueries } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UseCaseIdentityPayload } from "../../domains/core/useCase.helpers";
 import { useCaseBuilder } from "../../domains/core/useCaseBuilder";
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
@@ -982,11 +983,15 @@ export type InstantiatedUseCase<
   execute: (param: Input, jwtPayload?: JwtPayload) => Promise<Output>;
 };
 
-const instantiatedUseCaseFromClass = <Input, Output, JwtPayload>(
+const instantiatedUseCaseFromClass = <
+  Input,
+  Output,
+  Payload extends UseCaseIdentityPayload,
+>(
   useCase:
-    | TransactionalUseCase<Input, Output, JwtPayload>
-    | UseCase<Input, Output, JwtPayload>,
-): InstantiatedUseCase<Input, Output, JwtPayload> => ({
+    | TransactionalUseCase<Input, Output, Payload>
+    | UseCase<Input, Output, Payload>,
+): InstantiatedUseCase<Input, Output, Payload> => ({
   execute: (p, jwtPayload) => useCase.execute(p, jwtPayload),
   useCaseName: useCase.constructor.name,
 });
