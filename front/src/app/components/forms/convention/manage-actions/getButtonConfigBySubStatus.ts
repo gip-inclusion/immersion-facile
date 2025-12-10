@@ -107,7 +107,6 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["TRANSFER"],
         buttonPropsByVerificationAction["EDIT_CONVENTION"],
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-        buttonPropsByVerificationAction["MARK_AS_HANDLED"],
         buttonPropsByVerificationAction["SIGN"],
       ],
     )
@@ -129,7 +128,6 @@ export const getButtonConfigBySubStatus = (
       buttonPropsByVerificationAction["EDIT_CONVENTION"],
       buttonPropsByVerificationAction["TRANSFER"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-      buttonPropsByVerificationAction["MARK_AS_HANDLED"],
       buttonPropsByVerificationAction["ACCEPT_VALIDATOR"],
     ])
     .with("inReviewWithDoubleValidationWithoutBroadcastError", () => [
@@ -150,7 +148,6 @@ export const getButtonConfigBySubStatus = (
       buttonPropsByVerificationAction["TRANSFER"],
       buttonPropsByVerificationAction["EDIT_CONVENTION"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-      buttonPropsByVerificationAction["MARK_AS_HANDLED"],
       buttonPropsByVerificationAction["ACCEPT_COUNSELLOR"],
     ])
     .with("acceptedByCounsellorWithoutBroadcastError", () => [
@@ -169,7 +166,6 @@ export const getButtonConfigBySubStatus = (
       buttonPropsByVerificationAction["EDIT_COUNSELLOR_NAME"],
       buttonPropsByVerificationAction["EDIT_CONVENTION"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-      buttonPropsByVerificationAction["MARK_AS_HANDLED"],
       buttonPropsByVerificationAction["ACCEPT_VALIDATOR"],
     ])
     .with("acceptedByValidatorWithAssessmentWithoutBroadcastError", () => [
@@ -184,7 +180,6 @@ export const getButtonConfigBySubStatus = (
       buttonPropsByVerificationAction["ACCESS_ASSESSMENT"],
       buttonPropsByVerificationAction["ACCESS_CONVENTION"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-      buttonPropsByVerificationAction["MARK_AS_HANDLED"],
       buttonPropsByVerificationAction["RENEW"],
     ])
     .with(
@@ -203,7 +198,6 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
         buttonPropsByVerificationAction["CANCEL"],
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-        buttonPropsByVerificationAction["MARK_AS_HANDLED"],
         buttonPropsByVerificationAction["RENEW"],
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
       ],
@@ -226,7 +220,6 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["CANCEL"],
         buttonPropsByVerificationAction["DECLARE_ABANDONMENT"],
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-        buttonPropsByVerificationAction["MARK_AS_HANDLED"],
         buttonPropsByVerificationAction["RENEW"],
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
       ],
@@ -249,7 +242,6 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
         buttonPropsByVerificationAction["CANCEL"],
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-        buttonPropsByVerificationAction["MARK_AS_HANDLED"],
         buttonPropsByVerificationAction["RENEW"],
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
         buttonPropsByVerificationAction["FILL_ASSESSMENT"],
@@ -276,7 +268,6 @@ export const getButtonConfigBySubStatus = (
       () => [
         buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
-        buttonPropsByVerificationAction["MARK_AS_HANDLED"],
       ],
     )
     .exhaustive();
