@@ -43,21 +43,8 @@ export const triggerRemindAgencyAdminThatNewUserRequestAgencyRight = ({
     name: "remindAgencyAdminThatNewUserRequestAgencyRight",
     config,
     script: remindAgencyAdminThatNewUserRequestAgencyRightScript,
-    handleResults: ({ remindersSent, failures }) => {
-      const numberOfFailures = failures.length;
-      const errorsAsString = failures
-        .map(
-          (failure) =>
-            `For user id ${failure.userId} : ${failure.error.message}`,
-        )
-        .join("\n");
-
-      return [
-        `Number of reminders sent successfully : ${remindersSent}`,
-        `Number of failures : ${numberOfFailures}`,
-        ...(numberOfFailures > 0 ? [`Failures : \n${errorsAsString}`] : []),
-      ].join("\n");
-    },
+    handleResults: ({ remindersSent }) =>
+      `Number of reminders sent successfully : ${remindersSent}`,
     logger,
     exitOnFinish,
   });

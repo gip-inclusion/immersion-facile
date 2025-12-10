@@ -22,10 +22,6 @@ type AgencyAdminWithAgencies = {
 
 export type RemindAgencyAdminThatNewUserRequestAgencyRightResult = {
   remindersSent: number;
-  failures: {
-    userId: UserId;
-    error: Error;
-  }[];
 };
 
 export type RemindAgencyAdminThatNewUserRequestAgencyRight = ReturnType<
@@ -104,23 +100,9 @@ export const makeRemindAgencyAdminThatNewUserRequestAgencyRight =
           },
         }));
 
-      const failures: { userId: UserId; error: Error }[] = [];
-      let remindersSent = 0;
-
-      try {
-        await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);
-        remindersSent = notifications.length;
-      } catch (error) {
-        notifications.forEach((notification) => {
-          const userId = notification.followedIds.userId;
-          if (userId) {
-            failures.push({
-              userId,
-              error: error instanceof Error ? error : new Error(String(error)),
-            });
-          }
-        });
-      }
-
-      return { remindersSent, failures };
+      return await deps
+        .saveNotificationsBatchAndRelatedEvent(uow, notifications)
+        .then(() => ({
+          remindersSent: notifications.length,
+        }));
     });
