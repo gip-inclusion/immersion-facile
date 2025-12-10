@@ -1,6 +1,6 @@
 import {
+  type ConnectedUserDomainJwtPayload,
   type ConventionJwtPayload,
-  type ConventionRelatedJwtPayload,
   errors,
   type HtmlToPdfRequest,
   htmlToPdfRequestSchema,
@@ -11,7 +11,7 @@ import type { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 export class HtmlToPdf extends UseCase<
   HtmlToPdfRequest,
   string,
-  ConventionJwtPayload
+  ConventionJwtPayload | ConnectedUserDomainJwtPayload
 > {
   protected inputSchema = htmlToPdfRequestSchema;
 
@@ -21,7 +21,7 @@ export class HtmlToPdf extends UseCase<
 
   protected async _execute(
     params: HtmlToPdfRequest,
-    jwtPayload?: ConventionRelatedJwtPayload,
+    jwtPayload?: ConventionJwtPayload | ConnectedUserDomainJwtPayload,
   ): Promise<string> {
     if (!jwtPayload) throw errors.user.unauthorized();
     return this.pdfGeneratorGateway.make(params);

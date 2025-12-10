@@ -108,7 +108,7 @@ type MessageInputFromDashboardWithUserId = MessageInputFromDashboard & {
 export class AddExchangeToDiscussion extends TransactionalUseCase<
   AddExchangeToDiscussionInput,
   Exchange | DiscussionExchangeForbiddenParams,
-  ConnectedUser | null
+  ConnectedUser
 > {
   protected inputSchema = messageInputSchema;
 
@@ -131,7 +131,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
   protected async _execute(
     { messageInputs, source }: AddExchangeToDiscussionInput,
     uow: UnitOfWork,
-    connectedUser: ConnectedUser | null,
+    connectedUser?: ConnectedUser,
   ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
     return Promise.all(
       messageInputs.map((messageInput) =>
@@ -404,7 +404,7 @@ const isMessageInputFromEmail = (
 
 const makeDashboardMessageWithUserId = (
   messageInput: MessageInputFromDashboard,
-  connectedUser: ConnectedUser | null,
+  connectedUser?: ConnectedUser,
 ): MessageInputFromDashboardWithUserId => {
   if (!connectedUser) throw errors.user.unauthorized();
   return { ...messageInput, userId: connectedUser.id };

@@ -1,9 +1,9 @@
 import {
   type AbsoluteUrl,
+  type ConnectedUser,
   errors,
   type LogoutQueryParams,
   logoutQueryParamsSchema,
-  type User,
 } from "shared";
 import { useCaseBuilder } from "../../../useCaseBuilder";
 import type { FtConnectGateway } from "../../ft-connect/port/FtConnectGateway";
@@ -14,7 +14,7 @@ export type GetOAuthLogoutUrl = ReturnType<typeof makeGetOAuthLogoutUrl>;
 export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
   .withInput<LogoutQueryParams>(logoutQueryParamsSchema)
   .withOutput<AbsoluteUrl>()
-  .withCurrentUser<User>()
+  .withCurrentUser<ConnectedUser>()
   .withDeps<{
     oAuthGateway: OAuthGateway;
     ftConnectGateway: FtConnectGateway;
