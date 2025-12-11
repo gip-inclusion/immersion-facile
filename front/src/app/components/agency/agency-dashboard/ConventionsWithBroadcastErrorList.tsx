@@ -50,7 +50,7 @@ export const ConventionsWithBroadcastErrorList = ({
   } = useAppSelector(
     conventionsWithBroadcastFeedbackSelectors.erroredBroadcastConventionsWithPagination,
   );
-  const isFiltersEmpty = equals(
+  const areFiltersEmpty = equals(
     filters,
     initialConventionsWithPagination.filters,
   );
@@ -331,7 +331,7 @@ export const ConventionsWithBroadcastErrorList = ({
       </form>
       {conventionsWithBroadcastFeedback.length === 0 && (
         <p>
-          {isFiltersEmpty
+          {areFiltersEmpty
             ? "Aucune convention à traiter en erreur de diffusion."
             : "Aucune convention trouvée avec ces filtres, vous pouvez modifier les filtres pour élargir votre recherche."}
         </p>
@@ -363,21 +363,21 @@ export const ConventionsWithBroadcastErrorList = ({
                     conventionWithBroadcastFeedback.lastBroadcastFeedback
                       ?.subscriberErrorFeedback?.message ?? "",
                   )
-                    ? "Erreurs fonctionnelles"
-                    : "Erreurs techniques"}
+                    ? "Erreur fonctionnelle"
+                    : "Erreur technique"}
                 </Badge>
                 <Badge
                   className={cx(
                     fr.cx("fr-mx-2v"),
                     labelAndSeverityByStatus[
-                      conventionWithBroadcastFeedback.conventionStatus
+                      conventionWithBroadcastFeedback.status
                     ].color,
                   )}
                   small
                 >
                   {
                     labelAndSeverityByStatus[
-                      conventionWithBroadcastFeedback.conventionStatus
+                      conventionWithBroadcastFeedback.status
                     ].label
                   }
                 </Badge>

@@ -392,7 +392,7 @@ export class PgConventionQueries implements ConventionQueries {
           inputSchema: conventionWithBroadcastFeedbackSchema,
           schemaParsingInput: {
             id: row.conventionId,
-            conventionStatus: row.conventionStatus,
+            status: row.status,
             beneficiary: {
               firstname: row.bFirstName,
               lastname: row.bLastName,
@@ -545,20 +545,20 @@ const filterBroadcastErrorKind =
 
     if (broadcastErrorKind === "functional") {
       return builder.where((eb) =>
-        eb.or(
-          functionalBroadcastFeedbackErrorMessage.map((message) =>
-            eb(sql`"cf"."subscriberErrorFeedback"->>'message'`, "=", message),
-          ),
+        eb(
+          sql`"cf"."subscriberErrorFeedback"->>'message'`,
+          "in",
+          functionalBroadcastFeedbackErrorMessage,
         ),
       );
     }
 
     return builder.where((eb) =>
       eb.not(
-        eb.or(
-          functionalBroadcastFeedbackErrorMessage.map((message) =>
-            eb(sql`"cf"."subscriberErrorFeedback"->>'message'`, "=", message),
-          ),
+        eb(
+          sql`"cf"."subscriberErrorFeedback"->>'message'`,
+          "in",
+          functionalBroadcastFeedbackErrorMessage,
         ),
       ),
     );
@@ -570,7 +570,7 @@ const filterConventionStatus =
     builder: ConventionsWithErroredBroadcastFeedbackBuilder,
   ): ConventionsWithErroredBroadcastFeedbackBuilder => {
     if (!conventionStatus || conventionStatus.length === 0) return builder;
-    return builder.where("cf.conventionStatus", "in", conventionStatus);
+    return builder.where("cf.status", "in", conventionStatus);
   };
 
 const filterSearchForBroadcastFeedback =

@@ -350,7 +350,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           );
         return {
           id: convention.id,
-          conventionStatus: convention.status,
+          status: convention.status,
           beneficiary: {
             firstname: convention.signatories.beneficiary.firstName,
             lastname: convention.signatories.beneficiary.lastName,
@@ -384,14 +384,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         }
 
         if (filters.conventionStatus && filters.conventionStatus.length > 0) {
-          const convention = userConventions.find(
-            (convention) => convention.id === result.id,
-          );
-          if (
-            !convention ||
-            !filters.conventionStatus.includes(convention.status)
-          )
-            return false;
+          if (!filters.conventionStatus.includes(result.status)) return false;
         }
 
         if (filters.search) {

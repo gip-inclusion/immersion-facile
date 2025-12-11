@@ -181,7 +181,7 @@ export const broadcastFeedbackErrorMessageMap: Record<
       <>
         <p>{"-> "}Dans le cas ou il n'est pas inscrit :</p>
         <p>
-          {isConventionValidated ? (
+          {!isConventionValidated ? (
             "Je procède à son inscription avant validation de la convention"
           ) : (
             <ul>
@@ -195,7 +195,7 @@ export const broadcastFeedbackErrorMessageMap: Record<
         </p>
         <p>{"-> "}Dans le cas où l'adresse mail est différente:</p>
         <p>
-          {isConventionValidated ? (
+          {!isConventionValidated ? (
             "Je contacte le bénéficiaire pour l'informer que je modifie l'adresse mail indiquée sur la convention par celle présente dans le dossier France travail avant validation de la convention."
           ) : (
             <ul>
