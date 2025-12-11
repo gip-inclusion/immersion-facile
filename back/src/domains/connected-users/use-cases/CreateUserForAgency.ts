@@ -5,7 +5,10 @@ import {
   type UserParamsForAgency,
   userParamsForAgencySchema,
 } from "shared";
-import { getAgencyRightByUserId } from "../../../utils/agency";
+import {
+  getAgencyRightByUserId,
+  throwErrorIfAttemptToAddCounsellorRoleToFTAgency,
+} from "../../../utils/agency";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -30,6 +33,11 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
     const agency = await uow.agencyRepository.getById(inputParams.agencyId);
     if (!agency)
       throw errors.agency.notFound({ agencyId: inputParams.agencyId });
+
+    throwErrorIfAttemptToAddCounsellorRoleToFTAgency({
+      agencyKind: agency.kind,
+      roles: inputParams.roles,
+    });
 
     if (agency.refersToAgencyId && inputParams.roles.includes("validator"))
       throw errors.agency.invalidRoleUpdateForAgencyWithRefersTo({

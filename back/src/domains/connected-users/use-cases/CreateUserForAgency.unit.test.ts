@@ -98,6 +98,25 @@ describe("CreateUserForAgency", () => {
     uow.userRepository.users = [connectedBackofficeAdminUser, notAdminUser];
   });
 
+  it("throws bad request if attempt to add counsellor role to a user in a FT agency", async () => {
+    const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+
+    await expectPromiseToFailWithError(
+      createUserForAgency.execute(
+        {
+          roles: ["counsellor"],
+          agencyId: agency.id,
+          userId: notAdminUser.id,
+          isNotifiedByEmail: true,
+          email: notAdminUser.email,
+        },
+        connectedBackofficeAdminUser,
+      ),
+      errors.agency.invalidCounsellorRoleForFTAgency(),
+    );
+  });
+
   it("throws Forbidden if token payload is not backoffice token", async () => {
     await expectPromiseToFailWithError(
       createUserForAgency.execute(
