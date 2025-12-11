@@ -7,7 +7,8 @@ import RadioButtons, {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { equals } from "ramda";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ErrorNotifications,
   LinkHome,
@@ -67,7 +68,7 @@ export const AddAgencyForm = () => {
   const feedback = useAppSelector(agenciesSelectors.feedback);
 
   useEffect(() => {
-    dispatch(agenciesSlice.actions.addAgencyCleared());
+    dispatch(agenciesSlice.actions.addAgencyClearRequested());
   }, [dispatch]);
 
   useScrollToTop(feedback.kind === "agencyAdded");
@@ -235,6 +236,11 @@ const AgencyForm = ({
     [dispatch],
   );
 
+  // Ugly, need rework on the whole agency slice and form
+  const initialFormValuesRef = useRef(formInitialValues);
+  const currentValues = watch();
+  const formHasChanged = !equals(initialFormValuesRef.current, currentValues);
+
   useEffect(() => {
     reset(formInitialValues);
   }, [reset, formInitialValues]);
@@ -242,7 +248,11 @@ const AgencyForm = ({
   return (
     <FormProvider {...methods}>
       <form
-        onSubmit={handleSubmit(onFormValid)}
+        onSubmit={handleSubmit((values) => {
+          onFormValid(values);
+          initialFormValuesRef.current = values;
+          reset(values);
+        })}
         id={domElementIds.addAgency.form}
         data-matomo-name={domElementIds.addAgency.form}
       >
@@ -396,16 +406,17 @@ const AgencyForm = ({
                   {...methods.register("id")}
                   type="hidden"
                 />
-
-                <SubmitFeedbackNotification
-                  submitFeedback={submitFeedback}
-                  messageByKind={agenciesSubmitMessageByKind}
-                />
+                {!formHasChanged && (
+                  <SubmitFeedbackNotification
+                    submitFeedback={submitFeedback}
+                    messageByKind={agenciesSubmitMessageByKind}
+                  />
+                )}
 
                 <div className={fr.cx("fr-mt-4w")}>
                   <Button
                     type="submit"
-                    disabled={formState.isSubmitting}
+                    disabled={isLoading}
                     nativeButtonProps={{
                       id: domElementIds.addAgency.submitButton,
                     }}
