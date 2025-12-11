@@ -25,13 +25,17 @@ export const SubscriberErrorFeedbackComponent = ({
 
   const managedError = isFunctionalBroadcastFeedbackError(message) && (
     <div>
-      <strong>Erreur - {broadcastFeedbackErrorMessageMap[message].description}</strong>
+      <strong>
+        Erreur - {broadcastFeedbackErrorMessageMap[message].description}
+      </strong>
       <Accordion
         label="Détails des solutions possibles"
         className={fr.cx("fr-mb-3w", "fr-mt-1w")}
       >
         <>
-          {broadcastFeedbackErrorMessageMap[message].solution(isConventionValidated)}
+          {broadcastFeedbackErrorMessageMap[message].solution(
+            isConventionValidated,
+          )}
         </>
       </Accordion>
     </div>
