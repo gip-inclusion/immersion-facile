@@ -422,6 +422,7 @@ export const domElementIds = {
     deprecatedModalSubmitButton: "im-deprecated-modal__submit-button",
     validatorModalCancelButton: "im-validator-modal__cancel-button",
     validatorModalSubmitButton: "im-validator-modal__submit-button",
+    validatorModalForm: "im-validator-modal__form",
     rejectedModal: "im-rejected-modal",
     deprecatedModal: "im-deprecate-modal",
     validatorModal: "im-validator-modal",
@@ -706,6 +707,7 @@ export const domElementIds = {
       editApiConsumerButton: ({ apiConsumerId }) =>
         `im-technical-options__edit-api-consumer-button--${apiConsumerId}`,
       apiConsumerModal: "im-technical-options__api-consumer-modal",
+      apiConsumerForm: "im-technical-options__api-consumer-form",
       apiConsumerNameInput: "im-technical-options__api-consumer-name-input",
       apiConsumerContactLastNameInput:
         "im-technical-options__api-consumer-contact-last-name-input",

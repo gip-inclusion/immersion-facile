@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
@@ -22,6 +21,7 @@ import { allAgencyKindListOfOptions } from "src/app/components/forms/agency/agen
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
+import { useFormModal } from "src/app/utils/createFormModal";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 
 export const ApiConsumerForm = ({
@@ -30,6 +30,7 @@ export const ApiConsumerForm = ({
   initialValues: ApiConsumer;
 }) => {
   const dispatch = useDispatch();
+  const { formId } = useFormModal();
   const methods = useForm<ApiConsumer>({
     resolver: zodResolver(apiConsumerSchema),
     mode: "onTouched",
@@ -60,7 +61,7 @@ export const ApiConsumerForm = ({
   }, [initialValues, reset]);
 
   return (
-    <form onSubmit={handleSubmit(onValidSubmit)}>
+    <form id={formId} onSubmit={handleSubmit(onValidSubmit)}>
       <input type="hidden" {...register("id")} />
       <Input
         label="Nom du consommateur"
@@ -259,11 +260,6 @@ export const ApiConsumerForm = ({
           </li>
         ))}
       </ul>
-      <Button
-        id={domElementIds.admin.technicalOptionsTab.apiConsumerSubmitButton}
-      >
-        Envoyer
-      </Button>
     </form>
   );
 };
