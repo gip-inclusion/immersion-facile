@@ -9,6 +9,7 @@ import {
   type UserParamsForAgency,
   userParamsForAgencySchema,
 } from "shared";
+import { throwErrorIfAttemptToAddCounsellorRoleToFTAgency } from "../../../utils/agency";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -38,6 +39,11 @@ export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
     const agency = await uow.agencyRepository.getById(inputParams.agencyId);
     if (!agency)
       throw errors.agency.notFound({ agencyId: inputParams.agencyId });
+
+    throwErrorIfAttemptToAddCounsellorRoleToFTAgency({
+      agencyKind: agency.kind,
+      roles: inputParams.roles,
+    });
 
     const agencyRightToUpdate = agency.usersRights[userToUpdate.id];
     if (!agencyRightToUpdate)

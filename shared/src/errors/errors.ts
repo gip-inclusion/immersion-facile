@@ -707,6 +707,10 @@ export const errors = {
       ),
     notRejected: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(`L'agence ${agencyId} n'est pas rejetée.`),
+    invalidCounsellorRoleForFTAgency: () =>
+      new BadRequestError(
+        "Le rôle pré-valideur n'est pas autorisé pour une agence France Travail",
+      ),
     invalidRoleUpdateForOneStepValidationAgency: ({
       agencyId,
     }: {

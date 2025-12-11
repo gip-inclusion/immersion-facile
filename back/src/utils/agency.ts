@@ -2,7 +2,9 @@ import { filter, map, toPairs, uniq } from "ramda";
 import {
   type AgencyDto,
   type AgencyId,
+  type AgencyKind,
   type AgencyRight,
+  type AgencyRole,
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   type ConventionAgencyFields,
@@ -198,6 +200,18 @@ export const throwErrorIfAgencyNotFound = async ({
   }
 
   return agency;
+};
+
+export const throwErrorIfAttemptToAddCounsellorRoleToFTAgency = ({
+  agencyKind,
+  roles,
+}: {
+  agencyKind: AgencyKind;
+  roles: AgencyRole[];
+}) => {
+  if (agencyKind === "pole-emploi" && roles.includes("counsellor")) {
+    throw errors.agency.invalidCounsellorRoleForFTAgency();
+  }
 };
 
 export const agencyDtoToConventionAgencyFields = (

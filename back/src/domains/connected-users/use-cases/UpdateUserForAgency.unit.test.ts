@@ -232,6 +232,29 @@ describe("UpdateUserForAgency", () => {
         errors.agency.userAlreadyExist(),
       );
     });
+
+    it("throws bad request if attempt to add counsellor role to a user in a FT agency", async () => {
+      const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notAdminUser.id]: { roles: ["validator"], isNotifiedByEmail: true },
+        }),
+      ];
+
+      await expectPromiseToFailWithError(
+        updateUserForAgency.execute(
+          {
+            roles: ["counsellor"],
+            agencyId: agency.id,
+            userId: notAdminUser.id,
+            isNotifiedByEmail: true,
+            email: notAdminUser.email,
+          },
+          admin,
+        ),
+        errors.agency.invalidCounsellorRoleForFTAgency(),
+      );
+    });
   });
 
   describe("when updating email", () => {
