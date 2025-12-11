@@ -17,6 +17,15 @@ export type PhoneSourceTable = ExtractFromExisting<
 	| "notifications_sms"
 >;
 
+export const sourceTables: PhoneInDB["sourceTable"][] = [
+	"discussions",
+	"agencies",
+	"actors",
+	"api_consumers",
+	"establishments__users",
+	"notifications_sms",
+];
+
 export type PhoneInDB = {
 	phoneNumber: string;
 	phoneLabelInTable: string;
@@ -45,15 +54,6 @@ export const makeVerifyAndFixPhone = useCaseBuilder("VerifyAndFixPhones")
 			unfixablePhonesInDB: [],
 		};
 
-		const sourceTables: PhoneInDB["sourceTable"][] = [
-			"discussions",
-			"agencies",
-			"actors",
-			"api_consumers",
-			"establishments__users",
-			"notifications_sms",
-		];
-
 		for (const table of sourceTables) {
 			let phonesBatch: PhoneInDB[] = [];
 			let page = 1;
@@ -71,23 +71,23 @@ export const makeVerifyAndFixPhone = useCaseBuilder("VerifyAndFixPhones")
 				phonesBatch.forEach((phone) => {
 					if (isValidPhoneNumber(phone.phoneNumber)) {
 						batchReport.correctPhonesInDB.push(phone);
+						return;
 					}
 
 					const fixedPhoneNumber = fixPhoneNumberCountryCode(phone.phoneNumber);
 
-					if (!isValidPhoneNumber(phone.phoneNumber) && fixedPhoneNumber) {
+					if (fixedPhoneNumber) {
 						batchReport.fixedPhonesInDB.push({
 							...phone,
 							phoneNumber: fixedPhoneNumber,
 						});
+						return;
 					}
 
-					if (!isValidPhoneNumber(phone.phoneNumber) && !fixedPhoneNumber) {
-						batchReport.unfixablePhonesInDB.push({
-							...phone,
-							phoneNumber: defaultPhoneNumber,
-						});
-					}
+					batchReport.unfixablePhonesInDB.push({
+						...phone,
+						phoneNumber: defaultPhoneNumber,
+					});
 				});
 
 				await deps.updatePhones(batchReport.fixedPhonesInDB, table);
