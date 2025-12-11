@@ -1779,7 +1779,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: convention.id,
-              conventionStatus: "READY_TO_SIGN",
+              status: "READY_TO_SIGN",
               beneficiary: {
                 firstname: convention.signatories.beneficiary.firstName,
                 lastname: convention.signatories.beneficiary.lastName,
@@ -1877,7 +1877,7 @@ describe("Pg implementation of ConventionQueries", () => {
             data: [
               {
                 id: convention1.id,
-                conventionStatus: convention1.status,
+                status: convention1.status,
                 beneficiary: {
                   firstname: convention1.signatories.beneficiary.firstName,
                   lastname: convention1.signatories.beneficiary.lastName,
@@ -1907,7 +1907,7 @@ describe("Pg implementation of ConventionQueries", () => {
             data: [
               {
                 id: convention3.id,
-                conventionStatus: convention3.status,
+                status: convention3.status,
                 beneficiary: {
                   firstname: convention3.signatories.beneficiary.firstName,
                   lastname: convention3.signatories.beneficiary.lastName,
@@ -1924,7 +1924,7 @@ describe("Pg implementation of ConventionQueries", () => {
               },
               {
                 id: convention2.id,
-                conventionStatus: convention2.status,
+                status: convention2.status,
                 beneficiary: {
                   firstname: convention2.signatories.beneficiary.firstName,
                   lastname: convention2.signatories.beneficiary.lastName,
@@ -1941,7 +1941,7 @@ describe("Pg implementation of ConventionQueries", () => {
               },
               {
                 id: convention1.id,
-                conventionStatus: convention1.status,
+                status: convention1.status,
                 beneficiary: {
                   firstname: convention1.signatories.beneficiary.firstName,
                   lastname: convention1.signatories.beneficiary.lastName,
@@ -1971,7 +1971,7 @@ describe("Pg implementation of ConventionQueries", () => {
             data: [
               {
                 id: convention1.id,
-                conventionStatus: convention1.status,
+                status: convention1.status,
                 beneficiary: {
                   firstname: convention1.signatories.beneficiary.firstName,
                   lastname: convention1.signatories.beneficiary.lastName,
@@ -2023,7 +2023,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withAgencyId(agencyIdA)
         .withStatus("READY_TO_SIGN")
         .build();
-      const conventionWithManagedErrorInReview = new ConventionDtoBuilder()
+      const conventionInReviewWithManagedError = new ConventionDtoBuilder()
         .withId("cccccccc-cccc-4ccc-8ccc-cccccccccccc")
         .withAgencyId(agencyIdA)
         .withStatus("IN_REVIEW")
@@ -2075,7 +2075,7 @@ describe("Pg implementation of ConventionQueries", () => {
         ...managedErrorFeedback,
         occurredAt: "2024-07-03T00:00:00.000Z",
         requestParams: {
-          conventionId: conventionWithManagedErrorInReview.id,
+          conventionId: conventionInReviewWithManagedError.id,
           conventionStatus: "IN_REVIEW",
         },
       };
@@ -2088,7 +2088,7 @@ describe("Pg implementation of ConventionQueries", () => {
         );
         await conventionRepository.save(conventionWithManagedError);
         await conventionRepository.save(conventionWithUnmanagedError);
-        await conventionRepository.save(conventionWithManagedErrorInReview);
+        await conventionRepository.save(conventionInReviewWithManagedError);
         await broadcastFeedbacksRepository.save(managedErrorFeedback);
         await broadcastFeedbacksRepository.save(unmanagedErrorFeedback);
         await broadcastFeedbacksRepository.save(managedErrorFeedbackInReview);
@@ -2107,14 +2107,14 @@ describe("Pg implementation of ConventionQueries", () => {
         expectToEqual(result, {
           data: [
             {
-              id: conventionWithManagedErrorInReview.id,
-              conventionStatus: conventionWithManagedErrorInReview.status,
+              id: conventionInReviewWithManagedError.id,
+              status: conventionInReviewWithManagedError.status,
               beneficiary: {
                 firstname:
-                  conventionWithManagedErrorInReview.signatories.beneficiary
+                  conventionInReviewWithManagedError.signatories.beneficiary
                     .firstName,
                 lastname:
-                  conventionWithManagedErrorInReview.signatories.beneficiary
+                  conventionInReviewWithManagedError.signatories.beneficiary
                     .lastName,
               },
               lastBroadcastFeedback: {
@@ -2131,7 +2131,7 @@ describe("Pg implementation of ConventionQueries", () => {
             },
             {
               id: conventionWithManagedError.id,
-              conventionStatus: conventionWithManagedError.status,
+              status: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,
@@ -2173,7 +2173,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithUnmanagedError.id,
-              conventionStatus: conventionWithUnmanagedError.status,
+              status: conventionWithUnmanagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithUnmanagedError.signatories.beneficiary
@@ -2216,14 +2216,14 @@ describe("Pg implementation of ConventionQueries", () => {
         expectToEqual(result, {
           data: [
             {
-              id: conventionWithManagedErrorInReview.id,
-              conventionStatus: conventionWithManagedErrorInReview.status,
+              id: conventionInReviewWithManagedError.id,
+              status: conventionInReviewWithManagedError.status,
               beneficiary: {
                 firstname:
-                  conventionWithManagedErrorInReview.signatories.beneficiary
+                  conventionInReviewWithManagedError.signatories.beneficiary
                     .firstName,
                 lastname:
-                  conventionWithManagedErrorInReview.signatories.beneficiary
+                  conventionInReviewWithManagedError.signatories.beneficiary
                     .lastName,
               },
               lastBroadcastFeedback: {
@@ -2265,7 +2265,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedError.id,
-              conventionStatus: conventionWithManagedError.status,
+              status: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,
@@ -2307,7 +2307,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedError.id,
-              conventionStatus: conventionWithManagedError.status,
+              status: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,
@@ -2374,7 +2374,7 @@ describe("Pg implementation of ConventionQueries", () => {
           data: [
             {
               id: conventionWithManagedError.id,
-              conventionStatus: conventionWithManagedError.status,
+              status: conventionWithManagedError.status,
               beneficiary: {
                 firstname:
                   conventionWithManagedError.signatories.beneficiary.firstName,

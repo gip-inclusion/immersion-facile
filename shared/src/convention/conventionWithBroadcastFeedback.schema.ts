@@ -23,7 +23,7 @@ export const conventionWithBroadcastFeedbackSchema: ZodSchemaWithInputMatchingOu
   z.object({
     id: conventionIdSchema,
     beneficiary: withFirstnameAndLastnameSchema,
-    conventionStatus: statusSchema,
+    status: statusSchema,
     lastBroadcastFeedback: broadcastFeedbackSchema,
   });
 

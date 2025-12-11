@@ -28,7 +28,7 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
       [
         {
           id: "1",
-          conventionStatus: "IN_REVIEW",
+          status: "IN_REVIEW",
           beneficiary: {
             firstname: "John",
             lastname: "Doe",
@@ -152,7 +152,7 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
       [
         {
           id: "1",
-          conventionStatus: "IN_REVIEW",
+          status: "IN_REVIEW",
           beneficiary: {
             firstname: "John",
             lastname: "Doe",
