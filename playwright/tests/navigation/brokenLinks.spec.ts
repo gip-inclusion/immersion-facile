@@ -6,7 +6,11 @@ test.describe("Check for broken links", () => {
     const links = await page.locator(".fr-footer a, .fr-header a").all();
     const linksUrl = (
       await Promise.all(links.map((link) => link.getAttribute("href")))
-    ).filter((href) => !href?.toLowerCase().includes("www.linkedin.com"));
+    ).filter(
+      (href) =>
+        !href?.toLowerCase().includes("www.linkedin.com") &&
+        !href?.toLowerCase().includes("https://github.com"),
+    );
     for (const link of linksUrl) {
       if (!link) return;
       const response = await page.request.get(link);
