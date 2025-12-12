@@ -106,6 +106,7 @@ export class PgEstablishmentAggregateRepository
       .values(
         offersWithSiret.map((offerWithSiret) => ({
           appellation_code: Number.parseInt(offerWithSiret.appellationCode),
+          remote_work_mode: offerWithSiret.remoteWorkMode,
           siret: offerWithSiret.siret,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
         })),
@@ -704,6 +705,7 @@ export class PgEstablishmentAggregateRepository
         .values(
           offersToAdd.map((offerToAdd) => ({
             appellation_code: Number.parseInt(offerToAdd.appellationCode),
+            remote_work_mode: offerToAdd.remoteWorkMode,
             created_at: sql`${offerToAdd.createdAt.toISOString()}`,
             siret,
           })),
@@ -1328,6 +1330,7 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                 jsonBuildObject({
                   romeCode: ref("pad.code_rome"),
                   romeLabel: ref("prd.libelle_rome"),
+                  remoteWorkMode: ref("io.remote_work_mode"),
                   appellationCode: sql<string>`${ref(
                     "io.appellation_code",
                   )}::text`,
