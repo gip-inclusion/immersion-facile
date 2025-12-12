@@ -47,6 +47,7 @@
     "trigger-mark-obsolete-discussions-as-deprecated": "ts-node src/scripts/triggerMarkObsoleteDiscussionsAsDeprecated.ts",
     "trigger-mark-establishments-as-searchable-when-max-contacts-allows": "ts-node src/scripts/triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows.ts",
     "trigger-delete-old-discussion-messages": "ts-node src/scripts/triggerDeleteOldDiscussionMessages",
+    "trigger-delete-old-conventions": "ts-node src/scripts/triggerDeleteOldConventions.ts",
     "trigger-delete-old-users-ongoing-oauths": "ts-node src/scripts/triggerDeleteOldUsersOngoingOauths.ts",
     "trigger-refresh-materialized-views": "ts-node src/scripts/triggerRefreshMaterializedViews.ts",
     "trigger-resync-old-conventions-to-pe": "ts-node src/scripts/triggerResyncOldConventionsToPe.ts",

@@ -44,6 +44,24 @@ export class InMemoryConventionRepository implements ConventionRepository {
     return conventionsToDeprecate.filter((id) => id !== undefined);
   }
 
+  public async deleteOldConventions(
+    updatedBefore: Date,
+  ): Promise<ConventionId[]> {
+    const conventionsToDelete = values(this.#conventions).filter(
+      (convention) =>
+        convention.updatedAt &&
+        new Date(convention.updatedAt) <= updatedBefore &&
+        ["DEPRECATED", "CANCELLED", "REJECTED"].includes(convention.status),
+    );
+
+    const deletedIds = conventionsToDelete.map((convention) => convention.id);
+    conventionsToDelete.forEach((convention) => {
+      delete this.#conventions[convention.id];
+    });
+
+    return deletedIds;
+  }
+
   public async getIdsValidatedByEndDateAround(
     dateEnd: Date,
   ): Promise<ConventionId[]> {

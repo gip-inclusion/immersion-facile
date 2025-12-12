@@ -15,4 +15,5 @@ export interface ConventionRepository {
   deprecateConventionsWithoutDefinitiveStatusEndedSince: (
     endedSince: Date,
   ) => Promise<ConventionId[]>;
+  deleteOldConventions: (updatedBefore: Date) => Promise<ConventionId[]>;
 }
