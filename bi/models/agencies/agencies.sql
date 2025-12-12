@@ -35,6 +35,7 @@ select
     pdr.department_name,
     pdr.region_name,
     a.refers_to_agency_id,
+    refersToAgencies.name as refers_to_agency_name,
     a.status_justification,
     a.covered_departments,
     a.acquisition_campaign,
@@ -43,3 +44,5 @@ select
 from {{ source('immersion', 'agencies') }} as a
 left join {{ source('immersion', 'public_department_region') }} as pdr
     on pdr.department_code = a.department_code
+left join {{ source('immersion', 'agencies') }} as refersToAgencies
+    on refersToAgencies.id = a.refers_to_agency_id
