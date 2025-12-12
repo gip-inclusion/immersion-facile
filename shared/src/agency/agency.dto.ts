@@ -203,7 +203,7 @@ export const agencyStatusToLabel: Record<AgencyStatus, string> = {
   active: "Active",
   closed: "Fermée",
   rejected: "Rejetée",
-  needsReview: "En attende d'activation",
+  needsReview: "En attente d'activation",
   "from-api-PE": "Import Api",
 };
 
