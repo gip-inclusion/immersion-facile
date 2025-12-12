@@ -1,5 +1,6 @@
 import {
   type ConnectedUser,
+  type EstablishmentFormOffer,
   errors,
   type WithFormEstablishmentDto,
   withFormEstablishmentSchema,
@@ -68,12 +69,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       ),
       formEstablishment: {
         ...formEstablishment,
-        appellations:
-          await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-            formEstablishment.appellations.map(
-              ({ appellationCode }) => appellationCode,
-            ),
-          ),
+        offers: await this.#makeValidatedOffers(uow, formEstablishment.offers),
         businessNameCustomized:
           formEstablishment.businessNameCustomized?.trim().length === 0
             ? undefined
@@ -97,5 +93,27 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         },
       }),
     );
+  }
+
+  async #makeValidatedOffers(
+    uow: UnitOfWork,
+    offers: EstablishmentFormOffer[],
+  ): Promise<EstablishmentFormOffer[]> {
+    const appellations =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+        offers.map(({ appellationCode }) => appellationCode),
+      );
+
+    return offers.map(({ appellationCode, remoteWorkMode }) => {
+      const appelationAndRome = appellations.find(
+        (appelation) => appelation.appellationCode === appellationCode,
+      );
+      if (!appelationAndRome)
+        throw errors.rome.missingAppellation({ appellationCode });
+      return {
+        ...appelationAndRome,
+        remoteWorkMode,
+      };
+    });
   }
 }
