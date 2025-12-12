@@ -465,6 +465,7 @@ interface ImmersionOffers {
   siret: string;
   created_at: Generated<Timestamp>;
   update_date: Generated<Timestamp>;
+  remote_work_mode: string;
   score: Generated<number | null>;
   appellation_code: number;
 }
