@@ -7,8 +7,8 @@ import {
   defaultMaxContactsPerMonth,
   type EstablishmentCSVRow,
   type EstablishmentRole,
-  establishmentAppellationsFromCSVToDto,
   establishmentCSVRowSchema,
+  establishmentOffersFromCSVToDto,
   type FitForDisableWorkerOption,
   type FormEstablishmentDto,
   type FormEstablishmentSource,
@@ -108,8 +108,8 @@ export const candidateEstablishmentMapper = (
       },
       website: establishmentRow.website as AbsoluteUrl | "",
       source: "immersion-facile" as FormEstablishmentSource,
-      appellations: establishmentAppellationsFromCSVToDto(
-        establishmentRow.appellations_code,
+      offers: establishmentOffersFromCSVToDto(
+        establishmentRow.offers_appellation_code,
       ),
       userRights: makeUserRightsFromCSV(establishmentRow),
       fitForDisabledWorkers: getFitForDisabledWorkers(),
