@@ -146,12 +146,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         naf: establishmentAggregate.establishment?.nafDto,
         fitForDisabledWorkers:
           establishmentAggregate.establishment.fitForDisabledWorkers,
-        appellations: [
+        offers: [
           {
             appellationCode: establishmentAggregate.offers[0].appellationCode,
             appellationLabel: establishmentAggregate.offers[0].appellationLabel,
             romeCode: establishmentAggregate.offers[0].romeCode,
             romeLabel: establishmentAggregate.offers[0].romeLabel,
+            remoteWorkMode: "NO_REMOTE",
           },
         ],
         maxContactsPerMonth:
@@ -213,12 +214,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           },
         ],
         naf: establishmentAggregate.establishment?.nafDto,
-        appellations: [
+        offers: [
           {
             appellationCode: establishmentAggregate.offers[0].appellationCode,
             appellationLabel: establishmentAggregate.offers[0].appellationLabel,
             romeCode: establishmentAggregate.offers[0].romeCode,
             romeLabel: establishmentAggregate.offers[0].romeLabel,
+            remoteWorkMode: "NO_REMOTE",
           },
         ],
         fitForDisabledWorkers:

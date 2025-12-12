@@ -130,12 +130,13 @@ describe("Edit form establishments", () => {
         jobSeekers: false,
         students: true,
       },
-      appellations: [
+      offers: [
         {
           romeCode: "D1103",
           appellationCode: "33333",
           romeLabel: "Boucherie",
           appellationLabel: "Boucher / Bouchère",
+          remoteWorkMode: "NO_REMOTE",
         },
       ],
     };
@@ -358,8 +359,8 @@ function expectEstablishmentInRepoUpdated(
   });
   expectToEqual(
     updatedAggregateInRepo.offers,
-    formEstablishment.appellations.map((appellation) => ({
-      ...appellation,
+    formEstablishment.offers.map((offer) => ({
+      ...offer,
       createdAt: timeGateway.now(),
     })),
   );
