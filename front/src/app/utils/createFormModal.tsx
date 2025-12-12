@@ -32,7 +32,7 @@ export const useFormModal = (): FormModalContextValue => {
   return context;
 };
 
-type FormModalProps = Omit<ModalProps, "buttons" | "children"> & {
+export type FormModalProps = Omit<ModalProps, "buttons" | "children"> & {
   formId: string;
   children: ReactNode;
   buttons?: FormModalButtonConfig[];
@@ -46,8 +46,14 @@ type FormModalComponent = {
   close: () => void;
 };
 
+type CreateFormModalParams = Parameters<typeof createModal>[0] & {
+  formId: string;
+  submitButton?: Pick<FormModalButtonConfig, "id" | "children">;
+  cancelButton?: Pick<FormModalButtonConfig, "id" | "children">;
+};
+
 export const createFormModal = (
-  params: Parameters<typeof createModal>[0],
+  params: CreateFormModalParams,
 ): FormModalComponent => {
   const modal = createModal(params);
 
@@ -93,15 +99,17 @@ export const createFormModal = (
 
     const defaultButtons: FormModalButtonConfig[] = [
       {
-        children: "Annuler",
+        children: params.cancelButton?.children ?? "Annuler",
         type: "button" as const,
         priority: "secondary" as const,
         onClick: handleCancel,
+        id: params.cancelButton?.id,
       },
       {
-        children: "Valider",
+        children: params.submitButton?.children ?? "Valider",
         type: "submit" as const,
         priority: "primary" as const,
+        id: params.submitButton?.id,
       },
     ];
     const buttonsToUse = buttons ?? defaultButtons;

@@ -1,4 +1,3 @@
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
@@ -26,7 +25,6 @@ type RenewConventionParamsInForm = RenewConventionParams;
 
 export const RenewConventionModalContent = ({
   onSubmit,
-  closeModal,
   convention,
 }: {
   onSubmit: (params: RenewConventionParams) => void;
@@ -70,7 +68,7 @@ export const RenewConventionModalContent = ({
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        id="im-convention-renew-form"
+        id={domElementIds.manageConvention.renewModalForm}
       >
         <Input
           label="Identifiant de la convention renouvelée"
@@ -96,31 +94,6 @@ export const RenewConventionModalContent = ({
             errors: displayReadableError(errors),
           })}
           visible={submitCount !== 0 && Object.values(errors).length > 0}
-        />
-
-        <ButtonsGroup
-          alignment="center"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              type: "button",
-              priority: "secondary",
-              onClick: () => {
-                closeModal();
-              },
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.renewModalCancelButton,
-              },
-              children: "Annuler et revenir en arrière",
-            },
-            {
-              type: "submit",
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.submitRenewModalButton,
-              },
-              children: "Renouveler la convention",
-            },
-          ]}
         />
       </form>
     </FormProvider>

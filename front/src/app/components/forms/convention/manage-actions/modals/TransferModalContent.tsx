@@ -76,7 +76,10 @@ export const TransferModalContent = ({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onFormSubmit)}>
+      <form
+        onSubmit={handleSubmit(onFormSubmit)}
+        id={domElementIds.manageConvention.transferConventionModalForm}
+      >
         <AgencySelector
           fields={{
             agencyDepartmentField: {
