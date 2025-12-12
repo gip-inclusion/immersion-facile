@@ -1,27 +1,33 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
+import { useEffect } from "react";
 import {
-  domElementIds,
   getSignatoryProcessedData,
   type InternshipKind,
   type Signatory,
 } from "shared";
+import { useFormModal } from "src/app/utils/createFormModal";
 
 type SignConventionModalContentProps = {
   signatory: Signatory;
   internshipKind: InternshipKind;
-  onSubmit: () => void;
   onCancel: () => void;
 };
 
 export const SignConventionModalContent = ({
   signatory,
   internshipKind,
-  onSubmit,
   onCancel,
 }: SignConventionModalContentProps) => {
   const { signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(signatory);
+
+  const { modalOnCancelCallback } = useFormModal();
+
+  useEffect(() => {
+    return modalOnCancelCallback(() => {
+      onCancel();
+    });
+  }, [modalOnCancelCallback, onCancel]);
 
   return (
     <>
@@ -52,29 +58,6 @@ export const SignConventionModalContent = ({
             : "Dispositions générales :"}
         </h2>
         {regulatoryConditionContent(internshipKind)}
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "1rem",
-          marginTop: "2rem",
-        }}
-      >
-        <Button priority="secondary" onClick={onCancel} type="button">
-          J'abandonne
-        </Button>
-        <Button
-          priority="primary"
-          onClick={onSubmit}
-          type="button"
-          nativeButtonProps={{
-            id: domElementIds.conventionToSign.submitButton,
-          }}
-        >
-          Je termine la signature
-        </Button>
       </div>
     </>
   );
