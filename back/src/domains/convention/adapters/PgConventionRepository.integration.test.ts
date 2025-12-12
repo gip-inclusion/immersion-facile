@@ -1,4 +1,4 @@
-import { addDays, subDays } from "date-fns";
+import { addDays, subDays, subYears } from "date-fns";
 import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
@@ -1153,6 +1153,90 @@ describe("PgConventionRepository", () => {
       await expectConventionInRepoToEqual(convention4ToKeepAsIs);
       await expectConventionInRepoToEqual(convention5ToKeepAsIs);
       await expectConventionInRepoToEqual(convention6ToKeepAsIs);
+    });
+  });
+
+  describe("deleteOldConventions", () => {
+    it("deletes conventions with updated_at older than given date and status DEPRECATED, CANCELLED, or REJECTED", async () => {
+      const updatedBefore = subYears(new Date(), 2);
+      const oldDate = subYears(new Date(), 3).toISOString();
+      const recentDate = subDays(new Date(), 5).toISOString();
+
+      const convention1ToDelete = conventionStylisteBuilder
+        .withId("11111111-1111-4111-9111-111111111111")
+        .withStatus("DEPRECATED")
+        .withUpdatedAt(oldDate)
+        .build();
+
+      const convention2ToDelete = conventionStylisteBuilder
+        .withId("22222222-2222-4222-9222-222222222222")
+        .withStatus("CANCELLED")
+        .withUpdatedAt(oldDate)
+        .build();
+
+      const convention3ToDelete = conventionStylisteBuilder
+        .withId("33333333-3333-4333-9333-333333333333")
+        .withStatus("REJECTED")
+        .withUpdatedAt(oldDate)
+        .build();
+
+      const convention4ToKeep = conventionStylisteBuilder
+        .withId("44444444-4444-4444-9444-444444444444")
+        .withStatus("DEPRECATED")
+        .withUpdatedAt(recentDate)
+        .build();
+
+      const convention5ToKeep = conventionStylisteBuilder
+        .withId("55555555-5555-4555-9555-555555555555")
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withUpdatedAt(oldDate)
+        .build();
+
+      const convention6ToKeep = conventionStylisteBuilder
+        .withId("66666666-6666-4666-9666-666666666666")
+        .withStatus("PARTIALLY_SIGNED")
+        .withUpdatedAt(oldDate)
+        .build();
+
+      await Promise.all([
+        conventionRepository.save(convention1ToDelete, oldDate),
+        conventionRepository.save(convention2ToDelete, oldDate),
+        conventionRepository.save(convention3ToDelete, oldDate),
+        conventionRepository.save(convention4ToKeep, recentDate),
+        conventionRepository.save(convention5ToKeep, oldDate),
+        conventionRepository.save(convention6ToKeep, oldDate),
+      ]);
+
+      const deletedConventionIds =
+        await conventionRepository.deleteOldConventions(updatedBefore);
+
+      expectArraysToEqualIgnoringOrder(deletedConventionIds, [
+        convention1ToDelete.id,
+        convention2ToDelete.id,
+        convention3ToDelete.id,
+      ]);
+
+      expect(
+        await conventionRepository.getById(convention1ToDelete.id),
+      ).toBeUndefined();
+      expect(
+        await conventionRepository.getById(convention2ToDelete.id),
+      ).toBeUndefined();
+      expect(
+        await conventionRepository.getById(convention3ToDelete.id),
+      ).toBeUndefined();
+      expectToEqual(
+        await conventionRepository.getById(convention4ToKeep.id),
+        convention4ToKeep,
+      );
+      expectToEqual(
+        await conventionRepository.getById(convention5ToKeep.id),
+        convention5ToKeep,
+      );
+      expectToEqual(
+        await conventionRepository.getById(convention6ToKeep.id),
+        convention6ToKeep,
+      );
     });
   });
 
