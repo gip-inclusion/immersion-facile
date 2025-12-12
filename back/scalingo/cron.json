@@ -55,6 +55,10 @@
     {
       "command": "0 13 1-7 * 0 pnpm back run trigger-delete-old-users-ongoing-oauths",
       "size": "M"
+    },
+    {
+      "command": "0 10 * * 6 pnpm back run trigger-delete-old-conventions",
+      "size": "M"
     }
   ]
 }

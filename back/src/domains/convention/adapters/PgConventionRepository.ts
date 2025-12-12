@@ -51,6 +51,17 @@ export class PgConventionRepository implements ConventionRepository {
     return result.map(({ id }) => id);
   }
 
+  public async deleteOldConventions(updatedBefore: Date) {
+    const result = await this.transaction
+      .deleteFrom("conventions")
+      .where("updated_at", "<=", updatedBefore)
+      .where("status", "in", ["DEPRECATED", "CANCELLED", "REJECTED"])
+      .returning("id")
+      .execute();
+
+    return result.map(({ id }) => id);
+  }
+
   public async getById(
     conventionId: ConventionId,
   ): Promise<ConventionDto | undefined> {

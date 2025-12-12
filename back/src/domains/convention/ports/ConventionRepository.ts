@@ -16,4 +16,5 @@ export interface ConventionRepository {
     endedSince: Date,
     now?: DateString,
   ) => Promise<ConventionId[]>;
+  deleteOldConventions: (updatedBefore: Date) => Promise<ConventionId[]>;
 }
