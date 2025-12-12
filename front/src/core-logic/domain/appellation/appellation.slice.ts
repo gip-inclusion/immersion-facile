@@ -14,6 +14,7 @@ export type MultipleAppellationAutocompleteLocator =
 export type AppellationAutocompleteLocator =
   | "search-form-appellation"
   | "convention-profession"
+  | "form-establishment-offer-modal"
   | MultipleAppellationAutocompleteLocator;
 
 const initialState: AutocompleteState<
@@ -210,5 +211,5 @@ export const appellationSlice = createSlice({
 const getMultipleAppellationLocatorIndex = (
   locator: MultipleAppellationAutocompleteLocator,
 ): number => {
-  return Number.parseInt(locator.substring(locator.lastIndexOf("-") + 1));
+  return Number.parseInt(locator.substring(locator.lastIndexOf("-") + 1), 10);
 };

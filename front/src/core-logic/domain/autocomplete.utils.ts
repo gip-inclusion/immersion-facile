@@ -13,6 +13,7 @@ export type AutocompleteState<Locator extends string, T> = {
 };
 
 const emptyObject = {};
+
 export type PayloadActionWithLocator<
   Locator extends string,
   Payload = typeof emptyObject,

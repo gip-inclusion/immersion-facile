@@ -3,7 +3,6 @@ import {
   type ConnectedUserJwt,
   defaultMaxContactsPerMonth,
   type EstablishmentNameAndAdmins,
-  emptyAppellationAndRome,
   type FormEstablishmentDto,
   type SiretDto,
 } from "shared";
@@ -36,7 +35,7 @@ export const defaultFormEstablishmentValue = (
   siret: siret || "",
   businessName: "",
   businessAddresses: [],
-  appellations: [emptyAppellationAndRome],
+  offers: [],
   userRights: [],
   contactMode: "EMAIL",
   website: "",

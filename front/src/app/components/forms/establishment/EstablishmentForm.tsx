@@ -30,7 +30,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { type routes, useRoute } from "src/app/routes/routes";
-import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
@@ -254,24 +253,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   useEffect(() => {
     if (!isEstablishmentCreation) {
-      initialFormEstablishment.businessAddresses.map((address, index) => {
+      initialFormEstablishment.businessAddresses.forEach((address, index) => {
         dispatch(
           geocodingSlice.actions.fetchSuggestionsRequested({
             locator: `multiple-address-${index}`,
             lookup: address.rawAddress,
             countryCode: defaultCountryCode,
             selectFirstSuggestion: true,
-          }),
-        );
-      });
-      initialFormEstablishment.appellations.map((appellation, index) => {
-        dispatch(
-          appellationSlice.actions.selectSuggestionRequested({
-            locator: `multiple-appellation-${index}`,
-            item: {
-              appellation,
-              matchRanges: [],
-            },
           }),
         );
       });
@@ -370,20 +358,19 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       setCurrentStep(targetStep);
       return;
     }
-
-    const validatedFields = await Promise.all(
-      fieldsToValidate.map((key) => trigger(key)),
-    );
-
-    if (validatedFields.every((validatedField) => validatedField)) {
-      if (
-        currentStep === 3 &&
-        availableForImmersion === undefined &&
-        mode === "create"
-      )
-        return;
-      setCurrentStep(targetStep);
-    }
+    await validateEstablishmentFormFields({
+      fieldsToValidate,
+      trigger,
+      onSuccess: () => {
+        if (
+          currentStep === 3 &&
+          availableForImmersion === undefined &&
+          mode === "create"
+        )
+          return;
+        setCurrentStep(targetStep);
+      },
+    });
   };
 
   return (
@@ -451,6 +438,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                     nextTitle={steps[currentStep].nextTitle}
                   />
                   {match(currentStep)
+                    // TODO : remettre ordre
                     .with(1, () => (
                       <BusinessAndAdminSection
                         mode={mode}
@@ -491,4 +479,23 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       </>
     </WithFeedbackReplacer>
   );
+};
+
+export const validateEstablishmentFormFields = async ({
+  fieldsToValidate,
+  trigger,
+  onSuccess,
+}: {
+  fieldsToValidate: FieldsToValidate;
+  trigger: (
+    field: keyof FormEstablishmentDto | DotNestedKeys<FormEstablishmentDto>,
+  ) => Promise<boolean>;
+  onSuccess: () => void;
+}) => {
+  const validatedFields = await Promise.all(
+    fieldsToValidate.map((field) => trigger(field)),
+  );
+  if (validatedFields.every((validatedField) => validatedField)) {
+    onSuccess();
+  }
 };
