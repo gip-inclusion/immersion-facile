@@ -34,7 +34,7 @@ export const appellationCodesSchema: ZodSchemaWithInputMatchingOutput<
   AppellationCode[]
 > = z.array(appellationCodeSchema);
 
-export const appellationDtoSchema: ZodSchemaWithInputMatchingOutput<AppellationAndRomeDto> =
+export const appellationAndRomeDtoSchema: ZodSchemaWithInputMatchingOutput<AppellationAndRomeDto> =
   z.object({
     romeCode: codeRomeSchema,
     romeLabel: zStringMinLength1,
@@ -61,7 +61,7 @@ const matchRangeSchema: ZodSchemaWithInputMatchingOutput<MatchRangeDto> =
 export const appellationMatchSchema: ZodSchemaWithInputMatchingOutput<AppellationMatchDto> =
   z.object(
     {
-      appellation: appellationDtoSchema,
+      appellation: appellationAndRomeDtoSchema,
       matchRanges: z.array(matchRangeSchema),
     },
     { error: "Veuillez saisir un métier" },

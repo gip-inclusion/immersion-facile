@@ -32,10 +32,3 @@ export type AppellationMatchDto = {
   appellation: AppellationAndRomeDto;
   matchRanges: MatchRangeDto[];
 };
-
-export const emptyAppellationAndRome: AppellationAndRomeDto = {
-  romeCode: "",
-  appellationCode: "",
-  romeLabel: "",
-  appellationLabel: "",
-};

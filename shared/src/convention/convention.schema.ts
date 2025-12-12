@@ -23,8 +23,8 @@ import { phoneNumberSchema } from "../phone/phone.schema";
 import { allRoles } from "../role/role.dto";
 import { signatoryRoleSchema } from "../role/role.schema";
 import {
+  appellationAndRomeDtoSchema,
   appellationCodeSchema,
-  appellationDtoSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import type { DailyScheduleDto } from "../schedule/Schedule.dto";
 import {
@@ -285,7 +285,7 @@ const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<ConventionCommon>
       sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
       immersionAddress: addressWithPostalCodeSchema,
       immersionObjective: immersionObjectiveSchema,
-      immersionAppellation: appellationDtoSchema,
+      immersionAppellation: appellationAndRomeDtoSchema,
       immersionActivities: zTrimmedStringWithMax(2000),
       immersionSkills: zStringPossiblyEmptyWithMax(2000),
       establishmentTutor: establishmentTutorSchema,

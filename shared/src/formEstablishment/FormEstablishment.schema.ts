@@ -8,7 +8,7 @@ import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { establishmentRoleSchema } from "../role/role.schema";
-import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { appellationAndRomeDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import type { NotEmptyArray } from "../utils";
 import { dateTimeIsoStringSchema } from "../utils/date";
@@ -28,6 +28,7 @@ import type {
   CSVBoolean,
   EstablishmentBatchReport,
   EstablishmentCSVRow,
+  EstablishmentFormOffer,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
@@ -35,7 +36,10 @@ import type {
   SiretAdditionFailure,
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
-import { fitForDisabledWorkersOptions } from "./FormEstablishment.dto";
+import {
+  fitForDisabledWorkersOptions,
+  remoteWorkModes,
+} from "./FormEstablishment.dto";
 
 export const defaultMaxContactsPerMonth = 6;
 export const noContactPerMonth = 0;
@@ -88,6 +92,13 @@ const establishmentAdminSchema = z.object({
 export const formEstablishmentUserRightSchema: ZodSchemaWithInputMatchingOutput<FormEstablishmentUserRight> =
   establishmentAdminSchema.or(establishmentContactSchema);
 
+export const establishmentFormOfferSchema: ZodSchemaWithInputMatchingOutput<EstablishmentFormOffer> =
+  appellationAndRomeDtoSchema.and(
+    z.object({
+      remoteWorkMode: z.enum(remoteWorkModes),
+    }),
+  );
+
 export const formEstablishmentUserRightsSchema: ZodSchemaWithInputMatchingOutput<
   FormEstablishmentUserRight[]
 > = z
@@ -124,6 +135,9 @@ export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources, {
 export const fitForDisabledWorkersSchema = z.enum(fitForDisabledWorkersOptions);
 
 const formEstablishmentCommonShape = {
+  offers: z
+    .array(establishmentFormOfferSchema)
+    .min(1, localization.atLeastOneJob),
   source: formEstablishmentSourceSchema,
   siret: siretSchema,
   businessName: businessNameSchema,
@@ -146,9 +160,7 @@ const formEstablishmentCommonShape = {
   isEngagedEnterprise: zBoolean.optional(),
   fitForDisabledWorkers: fitForDisabledWorkersSchema,
   naf: nafSchema.optional(),
-  appellations: z
-    .array(appellationDtoSchema)
-    .min(1, localization.atLeastOneJob),
+
   userRights: formEstablishmentUserRightsSchema,
   maxContactsPerMonth: z
     .number({
@@ -254,7 +266,7 @@ export const establishmentCSVRowSchema: ZodSchemaWithInputMatchingOutput<Establi
     businessName: zStringMinLength1,
     businessAddress: addressWithPostalCodeSchema,
     naf_code: zStringMinLength1,
-    appellations_code: zStringMinLength1,
+    offers_appellation_code: zStringMinLength1,
     isEngagedEnterprise: csvBooleanSchema,
     contactMode: contactModeSchema,
     isSearchable: csvBooleanSchema,
