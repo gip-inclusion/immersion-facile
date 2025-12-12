@@ -3,7 +3,6 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { addYears } from "date-fns";
@@ -31,13 +30,17 @@ import {
 } from "src/app/contents/admin/apiConsumer";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { createFormModal } from "src/app/utils/createFormModal";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
 
 export const ApiConsumersSection = () => {
-  const isApiConsumerModalOpened = useIsModalOpen(apiConsumerModal);
+  const isApiConsumerModalOpened = useIsModalOpen({
+    id: domElementIds.admin.technicalOptionsTab.apiConsumerModal,
+    isOpenedByDefault: false,
+  });
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
   const dispatch = useDispatch();
   const adminToken = useAdminToken();
@@ -137,6 +140,8 @@ export const ApiConsumersSection = () => {
         <apiConsumerModal.Component
           title="Ajout consommateur api"
           concealingBackdrop
+          formId={domElementIds.admin.technicalOptionsTab.apiConsumerForm}
+          doSubmitClosesModal={false}
         >
           <WithFeedbackReplacer
             topic="api-consumer-global"
@@ -246,7 +251,7 @@ const defaultApiConsumerValues = (id: string): ApiConsumer => ({
   expirationDate: toDateUTCString(addYears(new Date(), 1)),
 });
 
-const apiConsumerModal = createModal({
+export const apiConsumerModal = createFormModal({
   id: domElementIds.admin.technicalOptionsTab.apiConsumerModal,
   isOpenedByDefault: false,
 });

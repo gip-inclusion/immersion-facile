@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -9,13 +8,13 @@ import {
   type ConventionDto,
   type ConventionStatusWithJustification,
   doesStatusNeedsJustification,
-  domElementIds,
   type Role,
   type UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
 } from "shared";
 import type { ModalWrapperProps } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { useFormModal } from "src/app/utils/createFormModal";
 
 export const JustificationModalContent = ({
   onSubmit,
@@ -23,6 +22,8 @@ export const JustificationModalContent = ({
   newStatus,
   convention,
 }: {
+  submitButtonId?: string;
+  cancelButtonId?: string;
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithJustification;
@@ -38,6 +39,7 @@ export const JustificationModalContent = ({
       conventionId: convention.id,
     },
   });
+  const { formId } = useFormModal();
 
   const getFieldError = makeFieldError(formState);
 
@@ -69,7 +71,7 @@ export const JustificationModalContent = ({
         />
       )}
       {doesStatusNeedsJustification(newStatus) && (
-        <form onSubmit={handleSubmit(onFormSubmit)}>
+        <form id={formId} onSubmit={handleSubmit(onFormSubmit)}>
           <Input
             textArea
             label={inputLabelByStatus[newStatus]}
@@ -77,28 +79,6 @@ export const JustificationModalContent = ({
               ...register("statusJustification"),
             }}
             {...getFieldError("statusJustification")}
-          />
-          <ButtonsGroup
-            alignment="center"
-            inlineLayoutWhen="always"
-            buttons={[
-              {
-                type: "button",
-                priority: "secondary",
-                onClick: closeModal,
-                nativeButtonProps: {
-                  id: cancelButtonIdByStatus[newStatus],
-                },
-                children: "Annuler",
-              },
-              {
-                type: "submit",
-                nativeButtonProps: {
-                  id: submitButtonIdByStatus[newStatus],
-                },
-                children: confirmByStatus[newStatus],
-              },
-            ]}
           />
         </form>
       )}
@@ -110,28 +90,4 @@ const inputLabelByStatus: Record<ConventionStatusWithJustification, string> = {
   REJECTED: "Pourquoi l'immersion est-elle refusée ?",
   CANCELLED: "Pourquoi souhaitez-vous annuler cette convention ?",
   DEPRECATED: "Pourquoi l'immersion est-elle obsolète ?",
-};
-
-const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
-  REJECTED: "Confirmer le refus",
-  CANCELLED: "Confirmer l'annulation",
-  DEPRECATED: "Confirmer que la demande est obsolète",
-};
-
-const submitButtonIdByStatus: Record<
-  ConventionStatusWithJustification,
-  string
-> = {
-  REJECTED: domElementIds.manageConvention.rejectedModalSubmitButton,
-  CANCELLED: domElementIds.manageConvention.cancelModalSubmitButton,
-  DEPRECATED: domElementIds.manageConvention.deprecatedModalSubmitButton,
-};
-
-const cancelButtonIdByStatus: Record<
-  ConventionStatusWithJustification,
-  string
-> = {
-  REJECTED: domElementIds.manageConvention.rejectedModalCancelButton,
-  CANCELLED: domElementIds.manageConvention.cancelModalCancelButton,
-  DEPRECATED: domElementIds.manageConvention.deprecatedModalCancelButton,
 };

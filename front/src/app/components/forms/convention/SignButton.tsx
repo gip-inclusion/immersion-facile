@@ -1,6 +1,5 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import type { MouseEventHandler } from "react";
 
 import { createPortal } from "react-dom";
 import type { InternshipKind, Signatory } from "shared";
@@ -11,11 +10,9 @@ export const createSignModalParams = {
   id: "sign",
 };
 
-const {
-  Component: SignModal,
-  open: openSignModal,
-  close: closeSignModal,
-} = createModal(createSignModalParams);
+const { Component: SignModal, open: openSignModal } = createModal(
+  createSignModalParams,
+);
 
 type SignButtonProps = {
   disabled: boolean;
@@ -23,7 +20,6 @@ type SignButtonProps = {
   onCloseSignModalWithoutSignature?: (value: boolean) => void;
   signatory: Signatory;
   internshipKind: InternshipKind;
-  onConfirmClick: MouseEventHandler<HTMLButtonElement>;
   className?: string;
   onOpenSignModal?: () => Promise<boolean>;
 };
@@ -34,7 +30,6 @@ export const SignButton = ({
   onCloseSignModalWithoutSignature,
   signatory,
   internshipKind,
-  onConfirmClick,
   className,
   onOpenSignModal,
 }: SignButtonProps) => {
@@ -74,14 +69,10 @@ export const SignButton = ({
           <SignConventionModalContent
             signatory={signatory}
             internshipKind={internshipKind}
-            onSubmit={() =>
-              onConfirmClick({} as React.MouseEvent<HTMLButtonElement>)
-            }
             onCancel={() => {
               if (onCloseSignModalWithoutSignature) {
                 onCloseSignModalWithoutSignature(true);
               }
-              closeSignModal();
             }}
           />
         </SignModal>,

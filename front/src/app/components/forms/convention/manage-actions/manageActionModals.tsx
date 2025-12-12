@@ -1,77 +1,142 @@
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { domElementIds } from "shared";
+import { createModal, type ModalProps } from "@codegouvfr/react-dsfr/Modal";
+import type { ComponentType } from "react";
+import { type ConventionStatusWithJustification, domElementIds } from "shared";
 import type { VerificationActionWithModal } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
+import {
+  createFormModal,
+  type FormModalProps,
+} from "src/app/utils/createFormModal";
+
+const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
+  REJECTED: "Confirmer le refus",
+  CANCELLED: "Confirmer l'annulation",
+  DEPRECATED: "Confirmer que la demande est obsolète",
+};
+
+const submitButtonIdByStatus: Record<
+  ConventionStatusWithJustification,
+  string
+> = {
+  REJECTED: domElementIds.manageConvention.rejectedModalSubmitButton,
+  CANCELLED: domElementIds.manageConvention.cancelModalSubmitButton,
+  DEPRECATED: domElementIds.manageConvention.deprecatedModalSubmitButton,
+};
+
+const cancelButtonIdByStatus: Record<
+  ConventionStatusWithJustification,
+  string
+> = {
+  REJECTED: domElementIds.manageConvention.rejectedModalCancelButton,
+  CANCELLED: domElementIds.manageConvention.cancelModalCancelButton,
+  DEPRECATED: domElementIds.manageConvention.deprecatedModalCancelButton,
+};
 
 const createRejectModalParams = {
   id: domElementIds.manageConvention.rejectedModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.rejectedModalForm,
+  submitButton: {
+    id: submitButtonIdByStatus.REJECTED,
+    children: confirmByStatus.REJECTED,
+  },
+  cancelButton: {
+    id: cancelButtonIdByStatus.REJECTED,
+  },
 };
 const {
   Component: RejectModal,
   open: openRejectModal,
   close: closeRejectModal,
-} = createModal(createRejectModalParams);
+} = createFormModal(createRejectModalParams);
 
 const createCancelModalParams = {
   id: domElementIds.manageConvention.cancelModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.cancelModalForm,
+  submitButton: {
+    id: submitButtonIdByStatus.CANCELLED,
+    children: confirmByStatus.CANCELLED,
+  },
+  cancelButton: {
+    id: cancelButtonIdByStatus.CANCELLED,
+  },
 };
 const {
   Component: CancelModal,
   open: openCancelModal,
   close: closeCancelModal,
-} = createModal(createCancelModalParams);
+} = createFormModal(createCancelModalParams);
 
 const createDeprecatedModalParams = {
   id: domElementIds.manageConvention.deprecatedModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.deprecateModalForm,
+  submitButton: {
+    id: submitButtonIdByStatus.DEPRECATED,
+    children: confirmByStatus.DEPRECATED,
+  },
+  cancelButton: {
+    id: cancelButtonIdByStatus.DEPRECATED,
+  },
 };
 const {
   Component: DeprecateModal,
   open: openDeprecateModal,
   close: closeDeprecateModal,
-} = createModal(createDeprecatedModalParams);
+} = createFormModal(createDeprecatedModalParams);
 
 const createValidatorModalParams = {
   id: domElementIds.manageConvention.validatorModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.validatorModalForm,
 };
 const {
   Component: ValidatorModal,
   open: openValidatorModal,
   close: closeValidatorModal,
-} = createModal(createValidatorModalParams);
+} = createFormModal(createValidatorModalParams);
 
 const createTransferConventionModalParams = {
   id: domElementIds.manageConvention.transferConventionModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.transferConventionModalForm,
 };
 const {
   Component: TransferConventionModal,
   open: openTransferConventionModal,
   close: closeTransferConventionModal,
-} = createModal(createTransferConventionModalParams);
+} = createFormModal(createTransferConventionModalParams);
 
 const createEditCounsellorNameModalParams = {
   id: domElementIds.manageConvention.editCounsellorNameModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.editCounsellorNameModalForm,
 };
 const {
   Component: EditCounsellorNameModal,
   open: openEditCounsellorNameModal,
   close: closeEditCounsellorNameModal,
-} = createModal(createEditCounsellorNameModalParams);
+} = createFormModal(createEditCounsellorNameModalParams);
 
 const createRenewConventionModalParams = {
   id: domElementIds.manageConvention.renewModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.renewModalForm,
+  submitButton: {
+    id: domElementIds.manageConvention.submitRenewModalButton,
+    children: "Renouveler la convention",
+  },
+  cancelButton: {
+    id: domElementIds.manageConvention.renewModalCancelButton,
+    children: "Annuler et revenir en arrière",
+  },
 };
 
 const {
   Component: RenewConventionModal,
   open: openRenewConventionModal,
   close: closeRenewConventionModal,
-} = createModal(createRenewConventionModalParams);
+} = createFormModal(createRenewConventionModalParams);
 
 const createBroadcastAgainModalParams = {
   id: domElementIds.manageConvention.broadcastAgainModal,
@@ -86,12 +151,13 @@ const {
 const createMarkAsHandledModalParams = {
   id: domElementIds.manageConvention.erroredConventionHandledModal,
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.erroredConventionHandledModal,
 };
 const {
   Component: MarkAsHandledModal,
   open: openMarkAsHandledModal,
   close: closeMarkAsHandledModal,
-} = createModal(createMarkAsHandledModalParams);
+} = createFormModal(createMarkAsHandledModalParams);
 
 const createFillAssessmentInfoModalParams = {
   id: domElementIds.manageConvention.fillAssessmentInfoModal,
@@ -104,19 +170,28 @@ const {
 } = createModal(createFillAssessmentInfoModalParams);
 
 const createSignModalParams = {
-  id: "im-convention-validation__sign-modal",
+  id: domElementIds.manageConvention.sendSignatureLinkModal, //TODO: check if this is correct
   isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.sendSignatureLinkModalForm,
 };
 const {
   Component: SignModal,
   open: openSignModal,
   close: closeSignModal,
-} = createModal(createSignModalParams);
+} = createFormModal(createSignModalParams);
+
+type ModalAction = {
+  modal: ComponentType<FormModalProps> | ComponentType<ModalProps>;
+  openModal: () => void;
+  closeModal: () => void;
+  createModalParams: Parameters<typeof createModal>[0];
+  buttons?: ModalProps["buttons"];
+};
 
 export const modalByAction = (
   verificationAction: VerificationActionWithModal,
-) => {
-  const modals = {
+): ModalAction => {
+  const modals: Record<VerificationActionWithModal, ModalAction> = {
     REJECT: {
       modal: RejectModal,
       openModal: openRejectModal,
@@ -182,6 +257,14 @@ export const modalByAction = (
       openModal: openFillAssessmentInfoModal,
       closeModal: closeFillAssessmentInfoModal,
       createModalParams: createFillAssessmentInfoModalParams,
+      buttons: [
+        {
+          children: "J'ai compris",
+          type: "button",
+          priority: "primary",
+          onClick: closeSignModal,
+        },
+      ],
     },
     SIGN: {
       modal: SignModal,

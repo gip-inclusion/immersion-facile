@@ -1,4 +1,3 @@
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
@@ -7,7 +6,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   type ConventionDto,
   type DateIntervalDto,
-  domElementIds,
   type RenewConventionParams,
   reasonableSchedule,
   renewConventionParamsSchema,
@@ -20,13 +18,13 @@ import {
   makeFieldError,
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
+import { useFormModal } from "src/app/utils/createFormModal";
 import { v4 as uuidV4 } from "uuid";
 
 type RenewConventionParamsInForm = RenewConventionParams;
 
 export const RenewConventionModalContent = ({
   onSubmit,
-  closeModal,
   convention,
 }: {
   onSubmit: (params: RenewConventionParams) => void;
@@ -37,6 +35,7 @@ export const RenewConventionModalContent = ({
     new Date(convention.dateEnd),
     1,
   );
+  const { formId } = useFormModal();
   const defaultDateInterval: DateIntervalDto = {
     start: renewedDefaultDateStart,
     end: addDays(new Date(convention.dateEnd), convention.schedule.workedDays),
@@ -68,10 +67,7 @@ export const RenewConventionModalContent = ({
 
   return (
     <FormProvider {...methods}>
-      <form
-        onSubmit={methods.handleSubmit(onSubmit)}
-        id="im-convention-renew-form"
-      >
+      <form onSubmit={methods.handleSubmit(onSubmit)} id={formId}>
         <Input
           label="Identifiant de la convention renouvelée"
           hintText={
@@ -96,31 +92,6 @@ export const RenewConventionModalContent = ({
             errors: displayReadableError(errors),
           })}
           visible={submitCount !== 0 && Object.values(errors).length > 0}
-        />
-
-        <ButtonsGroup
-          alignment="center"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              type: "button",
-              priority: "secondary",
-              onClick: () => {
-                closeModal();
-              },
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.renewModalCancelButton,
-              },
-              children: "Annuler et revenir en arrière",
-            },
-            {
-              type: "submit",
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.submitRenewModalButton,
-              },
-              children: "Renouveler la convention",
-            },
-          ]}
         />
       </form>
     </FormProvider>

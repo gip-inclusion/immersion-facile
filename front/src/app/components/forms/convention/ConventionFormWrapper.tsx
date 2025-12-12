@@ -489,7 +489,6 @@ const ConventionSummarySection = ({
                   id={domElementIds.conventionToSign.openSignModalButton}
                   signatory={currentSignatory}
                   internshipKind={convention?.internshipKind}
-                  onConfirmClick={handleSubmit(onConfirmSubmit)}
                   onOpenSignModal={() => trigger("statusJustification")}
                   onCloseSignModalWithoutSignature={
                     setIsModalClosedWithoutSignature
