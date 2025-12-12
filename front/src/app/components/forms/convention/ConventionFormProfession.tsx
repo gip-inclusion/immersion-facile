@@ -44,44 +44,42 @@ export const ConventionFormProfession = ({
       />
     );
   return (
-    <>
-      <div className={fr.cx("fr-input-group")}>
-        <AppellationAutocomplete
-          locator="convention-profession"
-          label={label}
-          selectProps={{
-            inputId:
-              domElementIds.conventionImmersionRoute.conventionSection
-                .immersionAppellation,
-          }}
-          onAppellationSelected={(appellationMatch) => {
-            setValue(
-              "immersionAppellation.romeCode",
-              appellationMatch.appellation.romeCode,
-            );
-            setValue(
-              "immersionAppellation.romeLabel",
-              appellationMatch.appellation.romeLabel,
-            );
-            setValue(
-              "immersionAppellation.appellationCode",
-              appellationMatch.appellation.appellationCode,
-            );
-            setValue(
-              "immersionAppellation.appellationLabel",
-              appellationMatch.appellation.appellationLabel,
-            );
-          }}
-          hintText={hintText}
-          onAppellationClear={() => {
-            setValue("immersionAppellation.romeCode", "");
-            setValue("immersionAppellation.romeLabel", "");
-            setValue("immersionAppellation.appellationCode", "");
-            setValue("immersionAppellation.appellationLabel", "");
-          }}
-        />
-        {error && <TextInputError errorMessage={error} />}
-      </div>
-    </>
+    <div className={fr.cx("fr-input-group")}>
+      <AppellationAutocomplete
+        locator="convention-profession"
+        label={label}
+        selectProps={{
+          inputId:
+            domElementIds.conventionImmersionRoute.conventionSection
+              .immersionAppellation,
+        }}
+        onAppellationSelected={(appellationMatch) => {
+          setValue(
+            "immersionAppellation.romeCode",
+            appellationMatch.appellation.romeCode,
+          );
+          setValue(
+            "immersionAppellation.romeLabel",
+            appellationMatch.appellation.romeLabel,
+          );
+          setValue(
+            "immersionAppellation.appellationCode",
+            appellationMatch.appellation.appellationCode,
+          );
+          setValue(
+            "immersionAppellation.appellationLabel",
+            appellationMatch.appellation.appellationLabel,
+          );
+        }}
+        hintText={hintText}
+        onAppellationClear={() => {
+          setValue("immersionAppellation.romeCode", "");
+          setValue("immersionAppellation.romeLabel", "");
+          setValue("immersionAppellation.appellationCode", "");
+          setValue("immersionAppellation.appellationLabel", "");
+        }}
+      />
+      {error && <TextInputError errorMessage={error} />}
+    </div>
   );
 };

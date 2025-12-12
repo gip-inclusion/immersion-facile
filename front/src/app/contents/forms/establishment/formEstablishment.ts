@@ -126,7 +126,7 @@ export const formEstablishmentFieldsLabels = (
       "Mon entreprise est prête à accueillir des personnes en situation de handicap",
     id: domElementIds.establishment[mode].fitForDisabledWorkers,
   },
-  appellations: {
+  offers: {
     label: "Les métiers que vous proposez à l'immersion",
     hintText:
       "Chaque métier correspond à une offre qui apparaitra dans la recherche. Votre établissement peut donc apparaître dans différentes recherches.",
