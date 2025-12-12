@@ -54,7 +54,25 @@ const RejectAgencyModalContent = ({
   };
 
   return (
-    <rejectAgencyModal.Component title="Rejeter cette agence">
+    <rejectAgencyModal.Component
+      title="Rejeter cette agence"
+      buttons={[
+        {
+          iconId: "fr-icon-alert-fill",
+          children: "Annuler",
+          priority: "secondary",
+          onClick: () => rejectAgencyModal.close(),
+        },
+        {
+          id: domElementIds.admin.agencyTab.rejectAgencyModalSubmitButton,
+          iconId: "fr-icon-checkbox-fill",
+          children: "Rejeter cette agence",
+          priority: "primary",
+          type: "submit",
+          disabled: !formState.isValid,
+        },
+      ]}
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
           textArea
@@ -64,28 +82,6 @@ const RejectAgencyModalContent = ({
               .rejectAgencyModalJustificationInput,
             ...register("statusJustification"),
           }}
-        />
-        <ButtonsGroup
-          className={fr.cx("fr-mt-4w")}
-          buttonsEquisized
-          alignment="center"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              iconId: "fr-icon-alert-fill",
-              children: "Annuler",
-              priority: "secondary",
-              onClick: () => rejectAgencyModal.close(),
-            },
-            {
-              id: domElementIds.admin.agencyTab.rejectAgencyModalSubmitButton,
-              iconId: "fr-icon-checkbox-fill",
-              children: "Rejeter cette agence",
-              priority: "primary",
-              type: "submit",
-              disabled: !formState.isValid,
-            },
-          ]}
         />
       </form>
     </rejectAgencyModal.Component>

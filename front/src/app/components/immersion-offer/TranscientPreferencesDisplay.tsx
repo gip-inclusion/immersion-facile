@@ -100,6 +100,46 @@ export const TranscientPreferencesDisplay = (
       )}
 
       <p>Voulez-vous utiliser ces données ?</p>
+    </>
+  );
+  return mode === "modal" ? (
+    <transcientPreferencesModal.Component
+      title="Préremplir le formulaire"
+      buttons={[
+        {
+          type: "button",
+          children: "Oui",
+          id: "transcient-preferences-modal-yes",
+          onClick: () => {
+            savePreferences(true);
+          },
+        },
+        {
+          type: "button",
+          priority: "secondary",
+          children: "Pas cette fois",
+          id: "transcient-preferences-modal-no",
+          onClick: () => {
+            savePreferences(false);
+          },
+        },
+        {
+          type: "button",
+          priority: "secondary",
+          children: "Non, ce n'est pas moi",
+          id: "transcient-preferences-modal-clear",
+          onClick: () => {
+            savePreferences(false);
+            clearTranscientDataForScope();
+          },
+        },
+      ]}
+    >
+      {jsxContent}
+    </transcientPreferencesModal.Component>
+  ) : (
+    <FormOverlay isVisible={displayIsVisible} parentRef={props.parentRef}>
+      {jsxContent}
       <ButtonsGroup
         buttons={[
           {
@@ -131,15 +171,6 @@ export const TranscientPreferencesDisplay = (
           },
         ]}
       />
-    </>
-  );
-  return mode === "modal" ? (
-    <transcientPreferencesModal.Component title="Préremplir le formulaire">
-      {jsxContent}
-    </transcientPreferencesModal.Component>
-  ) : (
-    <FormOverlay isVisible={displayIsVisible} parentRef={props.parentRef}>
-      {jsxContent}
     </FormOverlay>
   );
 };

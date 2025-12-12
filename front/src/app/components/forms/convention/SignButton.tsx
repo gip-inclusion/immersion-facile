@@ -1,16 +1,21 @@
-import Button from "@codegouvfr/react-dsfr/Button";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { useMemo } from "react";
 import { createPortal } from "react-dom";
-import type { InternshipKind, Signatory } from "shared";
+import { domElementIds, type InternshipKind, type Signatory } from "shared";
 import { SignConventionModalContent } from "src/app/components/forms/convention/manage-actions/modals/SignConventionModalContent";
+import {
+  buttonsToModalButtons,
+  createFormModal,
+} from "src/app/utils/createFormModal";
 
 export const createSignModalParams = {
   isOpenedByDefault: false,
   id: "sign",
+  formId: domElementIds.conventionToSign.form,
+  doSubmitClosesModal: true,
 };
 
-const { Component: SignModal, open: openSignModal } = createModal(
+const { Component: SignModal, open: openSignModal } = createFormModal(
   createSignModalParams,
 );
 
@@ -22,6 +27,7 @@ type SignButtonProps = {
   internshipKind: InternshipKind;
   className?: string;
   onOpenSignModal?: () => Promise<boolean>;
+  onSubmit?: () => void;
 };
 
 export const SignButton = ({
@@ -32,7 +38,29 @@ export const SignButton = ({
   internshipKind,
   className,
   onOpenSignModal,
+  onSubmit,
 }: SignButtonProps) => {
+  const customSignModalButtons: ButtonProps[] = useMemo(() => {
+    return [
+      {
+        children: "Annuler",
+        type: "button",
+        priority: "secondary",
+        onClick: () => {
+          if (onCloseSignModalWithoutSignature) {
+            onCloseSignModalWithoutSignature(true);
+          }
+        },
+      },
+      {
+        children: "Je termine la signature",
+        id: domElementIds.conventionToSign.submitButton,
+        type: "submit",
+        priority: "primary",
+        onClick: onSubmit,
+      },
+    ];
+  }, [onCloseSignModalWithoutSignature, onSubmit]);
   return (
     <>
       <Button
@@ -65,6 +93,7 @@ export const SignButton = ({
           title="Accepter les dispositions réglementaires et terminer la signature"
           size="large"
           concealingBackdrop={false}
+          buttons={buttonsToModalButtons(customSignModalButtons)}
         >
           <SignConventionModalContent
             signatory={signatory}
