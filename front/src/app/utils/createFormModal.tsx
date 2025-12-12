@@ -33,7 +33,6 @@ export const useFormModal = (): FormModalContextValue => {
 };
 
 export type FormModalProps = Omit<ModalProps, "buttons" | "children"> & {
-  formId: string;
   children: ReactNode;
   buttons?: FormModalButtonConfig[];
   title: string;
@@ -58,7 +57,6 @@ export const createFormModal = (
   const modal = createModal(params);
 
   const FormModalComponent = ({
-    formId,
     children,
     buttons,
     title,
@@ -121,7 +119,7 @@ export const createFormModal = (
           doClosesModal: doSubmitClosesModal,
           nativeButtonProps: {
             ...button.nativeButtonProps,
-            form: formId,
+            form: params.formId,
             type: "submit" as const,
           },
         };
@@ -139,7 +137,7 @@ export const createFormModal = (
     return (
       <FormModalContext.Provider
         value={{
-          formId,
+          formId: params.formId,
           modalOnCancelCallback: onCancelCallback,
         }}
       >

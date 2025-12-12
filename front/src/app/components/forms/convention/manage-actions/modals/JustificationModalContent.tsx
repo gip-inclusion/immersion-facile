@@ -14,15 +14,14 @@ import {
 } from "shared";
 import type { ModalWrapperProps } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { useFormModal } from "src/app/utils/createFormModal";
 
 export const JustificationModalContent = ({
-  formId,
   onSubmit,
   closeModal,
   newStatus,
   convention,
 }: {
-  formId?: string;
   submitButtonId?: string;
   cancelButtonId?: string;
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
@@ -40,6 +39,7 @@ export const JustificationModalContent = ({
       conventionId: convention.id,
     },
   });
+  const { formId } = useFormModal();
 
   const getFieldError = makeFieldError(formState);
 

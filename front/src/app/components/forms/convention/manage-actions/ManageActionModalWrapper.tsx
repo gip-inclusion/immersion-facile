@@ -189,9 +189,6 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
           },
           ({ newStatus }) => (
             <JustificationModalContent
-              formId={
-                modalObject.type === "form" ? modalObject.formId : undefined
-              }
               onSubmit={(params) => onSubmit(verificationAction, params)}
               closeModal={closeModal}
               newStatus={newStatus}
@@ -322,25 +319,10 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     </Fragment>
   );
 
-  if (modalObject.type === "form") {
-    const FormModal = modalObject.modal;
-    return createPortal(
-      <FormModal
-        title={modalProps.title}
-        doSubmitClosesModal={false}
-        formId={modalObject.formId}
-      >
-        {modalContent}
-      </FormModal>,
-      document.body,
-    );
-  }
-
-  const RegularModal = modalObject.modal;
   return createPortal(
-    <RegularModal title={modalProps.title} buttons={modalObject.buttons}>
+    <modalObject.modal title={modalProps.title} buttons={modalObject.buttons}>
       {modalContent}
-    </RegularModal>,
+    </modalObject.modal>,
 
     document.body,
   );

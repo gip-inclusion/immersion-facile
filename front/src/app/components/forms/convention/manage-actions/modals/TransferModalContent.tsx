@@ -18,6 +18,7 @@ import {
 } from "src/app/components/forms/commons/AgencySelector";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useFormModal } from "src/app/utils/createFormModal";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 
@@ -73,13 +74,10 @@ export const TransferModalContent = ({
   const filteredAgencyOptions = agencyOptions.filter((agency) => {
     return agency.id !== convention.agencyId;
   });
-
+  const { formId } = useFormModal();
   return (
     <FormProvider {...methods}>
-      <form
-        onSubmit={handleSubmit(onFormSubmit)}
-        id={domElementIds.manageConvention.transferConventionModalForm}
-      >
+      <form onSubmit={handleSubmit(onFormSubmit)} id={formId}>
         <AgencySelector
           fields={{
             agencyDepartmentField: {
