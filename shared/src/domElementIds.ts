@@ -410,6 +410,7 @@ export const domElementIds = {
     editCounsellorNameButton:
       "im-convention-validation__edit-counsellor-name-button",
     editCounsellorNameModal: "im-edit-counsellor-name-modal",
+    editCounsellorNameModalForm: "im-edit-counsellor-name-modal__form",
     editCounsellorNameModalSubmitButton:
       "im-edit-counsellor-name-modal__submit-button",
     editCounsellorNameModalCancelButton:
@@ -424,15 +425,21 @@ export const domElementIds = {
     validatorModalSubmitButton: "im-validator-modal__submit-button",
     validatorModalForm: "im-validator-modal__form",
     rejectedModal: "im-rejected-modal",
+    rejectedModalForm: "im-rejected-modal__form",
     deprecatedModal: "im-deprecate-modal",
+    deprecateModalForm: "im-deprecate-modal__form",
     validatorModal: "im-validator-modal",
     cancelModal: "im-cancel-modal",
+    cancelModalForm: "im-cancel-modal__form",
     renewModal: "im-renew-modal",
+    renewModalForm: "im-renew-modal__form",
     fillAssessmentInfoModal: "im-fill-assessment-info-modal",
     openSendSignatureLinkModal:
       "im-convention-validation__open-send-signature-link-modal",
     sendSignatureLinkModal:
       "im-convention-validation__send-signature-link-modal",
+    sendSignatureLinkModalForm:
+      "im-convention-validation__send-signature-link-modal-form",
     submitSendSignatureLinkModalButton:
       "im-convention-validation__send-signature-link-modal-button",
     openSignModalButton: "im-convention-validation__open-sign-modal-button",
@@ -449,6 +456,8 @@ export const domElementIds = {
     openDocumentButton: "im-convention-validation__open-document-button",
     transferConventionModal:
       "im-convention-validation__open-transfer-agency-button",
+    transferConventionModalForm:
+      "im-convention-validation__transfer-agency-modal-form",
     validatorModalLastNameInput: "im-validator-modal__last-name-input",
     validatorModalFirstNameInput: "im-validator-modal__first-name-input",
     editCounsellorNameModalLastNameInput:
@@ -463,6 +472,7 @@ export const domElementIds = {
     broadcastConventionAgainButton: "im-broadcast-convention-again-button",
     erroredConventionHandledModal: "im-errored-convention-handled-modal",
     broadcastAgainModal: "im-broadcast-modal",
+    broadcastAgainModalForm: "im-broadcast-modal__form",
   },
 
   unsubscribeEstablishmentLead: {},

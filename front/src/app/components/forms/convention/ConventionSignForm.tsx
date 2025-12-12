@@ -14,6 +14,7 @@ import {
   type ConventionDto,
   type ConventionReadDto,
   domElementIds,
+  getSignatoryProcessedData,
   isConventionRenewed,
   type PhoneNumber,
   type SignatoryRole,
@@ -106,11 +107,22 @@ export const ConventionSignForm = ({
       }));
     }
   };
+  const feedbacks = useFeedbackTopics([
+    "send-signature-link",
+    "convention-action-sign",
+  ]);
 
-  const onSignFormSubmit: SubmitHandler<ConventionReadDto> = (values): void => {
+  const onSignFormSubmit: SubmitHandler<ConventionReadDto> = (): void => {
     if (!currentSignatory)
       throw new Error("Il n'y a pas de signataire identifié.");
 
+    const { fieldName } = getSignatoryProcessedData(currentSignatory);
+
+    methods.setValue(fieldName, new Date().toISOString(), {
+      shouldValidate: true,
+    });
+
+    const values = methods.getValues();
     const { signedAtFieldName, signatory } = signatoryDataFromConvention(
       mergeDeepRight(
         convention as ConventionDto,
@@ -138,10 +150,7 @@ export const ConventionSignForm = ({
     );
   };
 
-  useScrollToTop(
-    useFeedbackTopics(["send-signature-link", "convention-action-sign"])
-      .length > 0,
-  );
+  useScrollToTop(feedbacks.length > 0);
 
   useEffect(() => {
     if (!isSendSignatureLinkModalOpen) setSignatoryToSendSignatureLink(null);
@@ -192,7 +201,10 @@ export const ConventionSignForm = ({
           <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
             {t.sign.regulations}
           </p>
-          <form id={domElementIds.conventionToSign.form}>
+          <form
+            id={domElementIds.conventionToSign.form}
+            onSubmit={methods.handleSubmit(onSignFormSubmit)}
+          >
             {currentSignatory && (
               <ConventionSummary
                 illustration={commonIllustrations.documentsAdministratifs}
@@ -229,13 +241,6 @@ export const ConventionSignForm = ({
               <SignatureActions
                 internshipKind={convention.internshipKind}
                 signatory={currentSignatory}
-                onSubmitClick={methods.handleSubmit(
-                  onSignFormSubmit,
-                  (errors) => {
-                    // biome-ignore lint/suspicious/noConsole: debug purpose
-                    console.error(methods.getValues(), errors);
-                  },
-                )}
                 jwt={jwt}
                 convention={convention}
                 onCloseSignModalWithoutSignature={

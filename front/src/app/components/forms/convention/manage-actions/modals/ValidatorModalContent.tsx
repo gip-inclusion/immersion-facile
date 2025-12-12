@@ -1,8 +1,7 @@
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { pick } from "ramda";
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionId,
@@ -14,6 +13,7 @@ import {
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useFormModal } from "src/app/utils/createFormModal";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
@@ -34,7 +34,7 @@ export const ValidatorModalContent = ({
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
-
+  const { modalOnCancelCallback } = useFormModal();
   const currentUserName =
     currentUser?.firstName && currentUser?.lastName
       ? pick(["firstname", "lastname"], {
@@ -61,8 +61,25 @@ export const ValidatorModalContent = ({
     closeModal();
   };
   const getFieldError = makeFieldError(formState);
+
+  useEffect(() => {
+    return modalOnCancelCallback(() => {
+      if (onCloseValidatorModalWithoutValidatorInfo) {
+        onCloseValidatorModalWithoutValidatorInfo(
+          warningMessagesByConventionStatus[newStatus],
+        );
+      }
+    });
+  }, [
+    modalOnCancelCallback,
+    onCloseValidatorModalWithoutValidatorInfo,
+    newStatus,
+  ]);
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)}>
+    <form
+      onSubmit={handleSubmit(onFormSubmit)}
+      id={domElementIds.manageConvention.validatorModalForm}
+    >
       <p>
         Pour {newStatus === "ACCEPTED_BY_VALIDATOR" ? "valider" : "pré-valider"}{" "}
         la convention, veuillez saisir les informations de la personne qui
@@ -87,7 +104,7 @@ export const ValidatorModalContent = ({
         }}
         {...getFieldError("lastname")}
       />
-      <ButtonsGroup
+      {/* <ButtonsGroup
         alignment="right"
         inlineLayoutWhen="always"
         buttons={[
@@ -115,7 +132,7 @@ export const ValidatorModalContent = ({
             children: "Valider la demande",
           },
         ]}
-      />
+      /> */}
     </form>
   );
 };
