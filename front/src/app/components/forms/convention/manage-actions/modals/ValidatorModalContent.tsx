@@ -34,7 +34,7 @@ export const ValidatorModalContent = ({
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
-  const { modalOnCancelCallback } = useFormModal();
+  const { modalOnCancelCallback, formId } = useFormModal();
   const currentUserName =
     currentUser?.firstName && currentUser?.lastName
       ? pick(["firstname", "lastname"], {
@@ -76,10 +76,7 @@ export const ValidatorModalContent = ({
     newStatus,
   ]);
   return (
-    <form
-      onSubmit={handleSubmit(onFormSubmit)}
-      id={domElementIds.manageConvention.validatorModalForm}
-    >
+    <form onSubmit={handleSubmit(onFormSubmit)} id={formId}>
       <p>
         Pour {newStatus === "ACCEPTED_BY_VALIDATOR" ? "valider" : "pré-valider"}{" "}
         la convention, veuillez saisir les informations de la personne qui
@@ -104,35 +101,6 @@ export const ValidatorModalContent = ({
         }}
         {...getFieldError("lastname")}
       />
-      {/* <ButtonsGroup
-        alignment="right"
-        inlineLayoutWhen="always"
-        buttons={[
-          {
-            type: "button",
-            priority: "secondary",
-            onClick: () => {
-              if (onCloseValidatorModalWithoutValidatorInfo) {
-                onCloseValidatorModalWithoutValidatorInfo(
-                  warningMessagesByConventionStatus[newStatus],
-                );
-              }
-              closeModal();
-            },
-            nativeButtonProps: {
-              id: domElementIds.manageConvention.validatorModalCancelButton,
-            },
-            children: "Annuler et revenir en arrière",
-          },
-          {
-            type: "submit",
-            nativeButtonProps: {
-              id: domElementIds.manageConvention.validatorModalSubmitButton,
-            },
-            children: "Valider la demande",
-          },
-        ]}
-      /> */}
     </form>
   );
 };

@@ -89,6 +89,14 @@ const createValidatorModalParams = {
   id: domElementIds.manageConvention.validatorModal,
   isOpenedByDefault: false,
   formId: domElementIds.manageConvention.validatorModalForm,
+  submitButton: {
+    id: domElementIds.manageConvention.validatorModalSubmitButton,
+    children: "Valider la demande",
+  },
+  cancelButton: {
+    id: domElementIds.manageConvention.validatorModalCancelButton,
+    children: "Annuler et revenir en arrière",
+  },
 };
 const {
   Component: ValidatorModal,
@@ -180,109 +188,79 @@ const {
   close: closeSignModal,
 } = createFormModal(createSignModalParams);
 
-type ModalAction =
-  | {
-      type: "form";
-      modal: ComponentType<FormModalProps>;
-      openModal: () => void;
-      closeModal: () => void;
-      createModalParams: Parameters<typeof createModal>[0];
-      formId: string;
-    }
-  | {
-      type: "regular";
-      modal: ComponentType<ModalProps>;
-      openModal: () => void;
-      closeModal: () => void;
-      createModalParams: Parameters<typeof createModal>[0];
-      buttons?: ModalProps["buttons"];
-    };
+type ModalAction = {
+  modal: ComponentType<FormModalProps> | ComponentType<ModalProps>;
+  openModal: () => void;
+  closeModal: () => void;
+  createModalParams: Parameters<typeof createModal>[0];
+  buttons?: ModalProps["buttons"];
+};
 
 export const modalByAction = (
   verificationAction: VerificationActionWithModal,
 ): ModalAction => {
   const modals: Record<VerificationActionWithModal, ModalAction> = {
     REJECT: {
-      type: "form",
       modal: RejectModal,
       openModal: openRejectModal,
       closeModal: closeRejectModal,
       createModalParams: createRejectModalParams,
-      formId: domElementIds.manageConvention.rejectedModalForm,
     },
     CANCEL: {
-      type: "form",
       modal: CancelModal,
       openModal: openCancelModal,
       closeModal: closeCancelModal,
       createModalParams: createCancelModalParams,
-      formId: domElementIds.manageConvention.cancelModalForm,
     },
     DEPRECATE: {
-      type: "form",
       modal: DeprecateModal,
       openModal: openDeprecateModal,
       closeModal: closeDeprecateModal,
       createModalParams: createDeprecatedModalParams,
-      formId: domElementIds.manageConvention.deprecateModalForm,
     },
     ACCEPT_COUNSELLOR: {
-      type: "form",
       modal: ValidatorModal,
       openModal: openValidatorModal,
       closeModal: closeValidatorModal,
       createModalParams: createValidatorModalParams,
-      formId: domElementIds.manageConvention.validatorModalForm, //TODO: check if this is correct
     },
     ACCEPT_VALIDATOR: {
-      type: "form",
       modal: ValidatorModal,
       openModal: openValidatorModal,
       closeModal: closeValidatorModal,
       createModalParams: createValidatorModalParams,
-      formId: domElementIds.manageConvention.validatorModalForm,
     },
     TRANSFER: {
-      type: "form",
       modal: TransferConventionModal,
       openModal: openTransferConventionModal,
       closeModal: closeTransferConventionModal,
       createModalParams: createTransferConventionModalParams,
-      formId: domElementIds.manageConvention.transferConventionModal,
     },
     RENEW: {
-      type: "form",
       modal: RenewConventionModal,
       openModal: openRenewConventionModal,
       closeModal: closeRenewConventionModal,
       createModalParams: createRenewConventionModalParams,
-      formId: domElementIds.manageConvention.renewModalForm,
     },
     EDIT_COUNSELLOR_NAME: {
-      type: "form",
       modal: EditCounsellorNameModal,
       openModal: openEditCounsellorNameModal,
       closeModal: closeEditCounsellorNameModal,
       createModalParams: createEditCounsellorNameModalParams,
-      formId: domElementIds.manageConvention.editCounsellorNameModal,
     },
     BROADCAST_AGAIN: {
-      type: "regular",
       modal: BroadcastAgainModal,
       openModal: openBroadcastAgainModal,
       closeModal: closeBroadcastAgainModal,
       createModalParams: createBroadcastAgainModalParams,
     },
     MARK_AS_HANDLED: {
-      type: "form",
       modal: MarkAsHandledModal,
       openModal: openMarkAsHandledModal,
       closeModal: closeMarkAsHandledModal,
       createModalParams: createMarkAsHandledModalParams,
-      formId: domElementIds.manageConvention.erroredConventionHandledModal,
     },
     FILL_ASSESSMENT_INFO: {
-      type: "regular",
       modal: FillAssessmentInfoModal,
       openModal: openFillAssessmentInfoModal,
       closeModal: closeFillAssessmentInfoModal,
@@ -297,12 +275,10 @@ export const modalByAction = (
       ],
     },
     SIGN: {
-      type: "form",
       modal: SignModal,
       openModal: openSignModal,
       closeModal: closeSignModal,
       createModalParams: createSignModalParams,
-      formId: domElementIds.conventionToSign.form,
     },
   };
   return modals[verificationAction];

@@ -31,9 +31,6 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
     onCloseSignModalWithoutSignature,
   } = props;
   const isLoading = useAppSelector(conventionSelectors.isLoading);
-  // const { fieldName } = getSignatoryProcessedData(signatory);
-  // const { setValue } = useFormContext();
-
   return (
     <ul
       className={fr.cx(
@@ -46,12 +43,6 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
       <li>
         <SignButton
           disabled={isLoading}
-          // onConfirmClick={(event: MouseEvent<HTMLButtonElement>) => {
-          //   setValue(fieldName, new Date().toISOString(), {
-          //     shouldValidate: true,
-          //   });
-          //   onSubmitClick(event);
-          // }}
           signatory={signatory}
           internshipKind={internshipKind}
           id={domElementIds.conventionToSign.openSignModalButton}

@@ -4,19 +4,27 @@ import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import {
   type Context,
   createContext,
-  type ReactNode,
   useCallback,
   useContext,
   useRef,
 } from "react";
 
-export type FormModalButtonConfig = ButtonProps & {
-  type?: "button" | "submit";
-};
-
 type FormModalContextValue = {
   formId: string;
   modalOnCancelCallback: (callback: () => void) => () => void;
+  buttons: ButtonProps[];
+};
+
+export const defaultCancelButton: ButtonProps = {
+  children: "Annuler",
+  type: "button" as const,
+  priority: "secondary" as const,
+};
+
+export const defaultSubmitButton: ButtonProps = {
+  children: "Valider",
+  type: "submit" as const,
+  priority: "primary" as const,
 };
 
 const FormModalContext: Context<FormModalContextValue | null> =
@@ -32,12 +40,8 @@ export const useFormModal = (): FormModalContextValue => {
   return context;
 };
 
-export type FormModalProps = Omit<ModalProps, "buttons" | "children"> & {
-  formId: string;
-  children: ReactNode;
-  buttons?: FormModalButtonConfig[];
-  title: string;
-  doSubmitClosesModal: boolean;
+export type FormModalProps = ModalProps & {
+  doSubmitClosesModal?: boolean;
 };
 
 type FormModalComponent = {
@@ -48,8 +52,8 @@ type FormModalComponent = {
 
 type CreateFormModalParams = Parameters<typeof createModal>[0] & {
   formId: string;
-  submitButton?: Pick<FormModalButtonConfig, "id" | "children">;
-  cancelButton?: Pick<FormModalButtonConfig, "id" | "children">;
+  submitButton?: Pick<ButtonProps, "id" | "children">;
+  cancelButton?: Pick<ButtonProps, "id" | "children">;
 };
 
 export const createFormModal = (
@@ -58,7 +62,6 @@ export const createFormModal = (
   const modal = createModal(params);
 
   const FormModalComponent = ({
-    formId,
     children,
     buttons,
     title,
@@ -66,7 +69,7 @@ export const createFormModal = (
     ...modalProps
   }: FormModalProps) => {
     const onCancelCallbacksRef = useRef<Set<() => void>>(new Set());
-    const isCancellingRef = useRef(false);
+    const isSubmittingRef = useRef(false);
 
     const onCancelCallback = useCallback((callback: () => void) => {
       onCancelCallbacksRef.current.add(callback);
@@ -75,15 +78,14 @@ export const createFormModal = (
       };
     }, []);
 
-    const handleCancel = useCallback(() => {
-      isCancellingRef.current = true;
-      if (isCancellingRef.current) {
+    const handleConceal = useCallback(() => {
+      if (!isSubmittingRef.current) {
         onCancelCallbacksRef.current.forEach((callback) => {
           callback();
         });
       }
       queueMicrotask(() => {
-        isCancellingRef.current = false;
+        isSubmittingRef.current = false;
       });
     }, []);
 
@@ -93,35 +95,44 @@ export const createFormModal = (
         isOpenedByDefault: false,
       },
       {
-        onConceal: handleCancel,
+        onConceal: handleConceal,
       },
     );
 
-    const defaultButtons: FormModalButtonConfig[] = [
+    const defaultButtons: ButtonProps[] = [
       {
-        children: params.cancelButton?.children ?? "Annuler",
-        type: "button" as const,
-        priority: "secondary" as const,
-        onClick: handleCancel,
+        ...defaultCancelButton,
+        onClick: handleConceal,
         id: params.cancelButton?.id,
       },
       {
-        children: params.submitButton?.children ?? "Valider",
-        type: "submit" as const,
-        priority: "primary" as const,
+        ...defaultSubmitButton,
         id: params.submitButton?.id,
+        onClick: () => {
+          isSubmittingRef.current = true;
+        },
       },
     ];
     const buttonsToUse = buttons ?? defaultButtons;
+    const buttonsArray = Array.isArray(buttonsToUse)
+      ? buttonsToUse
+      : [buttonsToUse];
+    const buttonsFiltered = (buttonsArray ?? defaultButtons).filter(
+      (button) => button !== undefined,
+    );
 
-    const transformedButtons = buttonsToUse.map((button) => {
+    const transformedButtons = buttonsFiltered.map((button) => {
       if (button.type === "submit") {
         return {
           ...button,
           doClosesModal: doSubmitClosesModal,
           nativeButtonProps: {
             ...button.nativeButtonProps,
-            form: formId,
+            onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+              isSubmittingRef.current = true;
+              button.nativeButtonProps?.onClick?.(event);
+            },
+            form: params.formId,
             type: "submit" as const,
           },
         };
@@ -130,17 +141,14 @@ export const createFormModal = (
     });
 
     const modalButtons: ModalProps["buttons"] =
-      transformedButtons.length === 0
-        ? undefined
-        : transformedButtons.length === 1
-          ? transformedButtons[0]
-          : [transformedButtons[0], ...transformedButtons.slice(1)];
+      buttonsToModalButtons(transformedButtons);
 
     return (
       <FormModalContext.Provider
         value={{
-          formId,
+          formId: params.formId,
           modalOnCancelCallback: onCancelCallback,
+          buttons: transformedButtons,
         }}
       >
         <modal.Component title={title} buttons={modalButtons} {...modalProps}>
@@ -156,3 +164,12 @@ export const createFormModal = (
     close: modal.close,
   };
 };
+
+export const buttonsToModalButtons = (
+  buttons: ButtonProps[],
+): ModalProps["buttons"] =>
+  buttons.length === 0
+    ? undefined
+    : buttons.length === 1
+      ? buttons[0]
+      : [buttons[0], ...buttons.slice(1)];

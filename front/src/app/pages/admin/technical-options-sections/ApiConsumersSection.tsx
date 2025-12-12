@@ -1,9 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { addYears } from "date-fns";
 import { Fragment, useEffect, useState } from "react";
@@ -28,22 +27,39 @@ import {
   formatApiConsumerRights,
   makeApiConsumerActionButtons,
 } from "src/app/contents/admin/apiConsumer";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { createFormModal } from "src/app/utils/createFormModal";
+import {
+  buttonsToModalButtons,
+  createFormModal,
+  defaultCancelButton,
+  defaultSubmitButton,
+} from "src/app/utils/createFormModal";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
-import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
 
+const submitButtonId = {
+  id: domElementIds.admin.technicalOptionsTab.apiConsumerSubmitButton,
+};
+
+export const apiConsumerModal = createFormModal({
+  id: domElementIds.admin.technicalOptionsTab.apiConsumerModal,
+  isOpenedByDefault: false,
+  formId: domElementIds.admin.technicalOptionsTab.apiConsumerForm,
+  submitButton: {
+    ...submitButtonId,
+  },
+});
+
 export const ApiConsumersSection = () => {
-  const isApiConsumerModalOpened = useIsModalOpen({
-    id: domElementIds.admin.technicalOptionsTab.apiConsumerModal,
-    isOpenedByDefault: false,
-  });
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
   const dispatch = useDispatch();
   const adminToken = useAdminToken();
+  const feedback = useFeedbackTopic("api-consumer-global");
+  const isConsumerAdded =
+    feedback?.on === "create" && feedback?.level === "success";
   useEffect(() => {
     adminToken &&
       dispatch(
@@ -53,16 +69,6 @@ export const ApiConsumersSection = () => {
       dispatch(apiConsumerSlice.actions.clearApiConsumersRequested());
     };
   }, [adminToken, dispatch]);
-
-  useEffect(() => {
-    if (isApiConsumerModalOpened) return;
-    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
-    adminToken &&
-      dispatch(
-        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
-      );
-  }, [isApiConsumerModalOpened, dispatch, adminToken]);
 
   const [currentApiConsumerToEdit, setCurrentApiConsumerToEdit] =
     useState<ApiConsumer>(defaultApiConsumerValues(uuidV4()));
@@ -98,6 +104,17 @@ export const ApiConsumersSection = () => {
       new Date(apiConsumer2.createdAt).getTime() -
       new Date(apiConsumer1.createdAt).getTime(),
   );
+
+  const closeButton: ButtonProps = {
+    children: "Fermer la fenêtre",
+    type: "button",
+    priority: "primary",
+    onClick: apiConsumerModal.close,
+  };
+
+  const customModalButtons: ButtonProps[] = isConsumerAdded
+    ? [closeButton]
+    : [defaultCancelButton, defaultSubmitButton];
 
   const tableDataFromApiConsumers = sortedApiConsumers.map((apiConsumer) => [
     formatApiConsumerName(apiConsumer.id, apiConsumer.name),
@@ -140,8 +157,8 @@ export const ApiConsumersSection = () => {
         <apiConsumerModal.Component
           title="Ajout consommateur api"
           concealingBackdrop
-          formId={domElementIds.admin.technicalOptionsTab.apiConsumerForm}
           doSubmitClosesModal={false}
+          buttons={buttonsToModalButtons(customModalButtons)}
         >
           <WithFeedbackReplacer
             topic="api-consumer-global"
@@ -249,9 +266,4 @@ const defaultApiConsumerValues = (id: string): ApiConsumer => ({
   },
   createdAt: toDateUTCString(new Date()),
   expirationDate: toDateUTCString(addYears(new Date(), 1)),
-});
-
-export const apiConsumerModal = createFormModal({
-  id: domElementIds.admin.technicalOptionsTab.apiConsumerModal,
-  isOpenedByDefault: false,
 });
