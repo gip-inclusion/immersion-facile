@@ -19,6 +19,16 @@ export type ImmersionContactInEstablishmentId = Flavor<
   "ImmersionContactInEstablishmentId"
 >;
 
+export const remoteWorkModes = ["HYBRID", "100% REMOTE", "NO_REMOTE"] as const;
+
+export type RemoteWorkMode = (typeof remoteWorkModes)[number];
+
+export type EstablishmentFormOffer = AppellationAndRomeDto & WithRemoteWorkMode;
+
+export type WithRemoteWorkMode = {
+  remoteWorkMode: RemoteWorkMode;
+};
+
 const contactModes = ["EMAIL", "PHONE", "IN_PERSON"] as const;
 export type ContactMode = (typeof contactModes)[number];
 export const isContactMode = includesTypeGuard(contactModes);
@@ -91,7 +101,7 @@ export const fitForDisabledWorkersOptions = [
 
 export type CommonFormEstablishmentDto = {
   additionalInformation?: string;
-  appellations: AppellationAndRomeDto[]; // at least one
+  offers: EstablishmentFormOffer[];
   businessAddresses: FormEstablishmentAddress[];
   userRights: FormEstablishmentUserRight[];
   businessName: BusinessName;
@@ -136,7 +146,7 @@ export type EstablishmentCSVRow = {
   businessName: string;
   businessAddress: string;
   naf_code: string;
-  appellations_code: string;
+  offers_appellation_code: string;
   contactMode: ContactMode;
   isEngagedEnterprise: CSVBoolean;
   isSearchable?: CSVBoolean;

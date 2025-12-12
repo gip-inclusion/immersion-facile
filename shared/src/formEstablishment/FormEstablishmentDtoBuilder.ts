@@ -3,11 +3,11 @@ import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition } from "../address/address.dto";
 import type { Builder } from "../Builder";
 import { errors } from "../errors/errors";
-import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 import type {
   ContactMode,
   EstablishmentCSVRow,
+  EstablishmentFormOffer,
   EstablishmentSearchableBy,
   FitForDisableWorkerOption,
   FormEstablishmentAddress,
@@ -114,24 +114,27 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   siret: "01234567890123",
   website: "https://www@super.com/jobs",
   additionalInformation: "",
-  appellations: [
+  offers: [
     {
       romeCode: "A1111",
       appellationCode: "11111",
       romeLabel: "Boulangerie",
       appellationLabel: "Boulanger - Boulangère",
+      remoteWorkMode: "NO_REMOTE",
     },
     {
       romeCode: "B9112",
       appellationCode: "22222",
       romeLabel: "Patissier",
       appellationLabel: "Patissier - Patissière",
+      remoteWorkMode: "NO_REMOTE",
     },
     {
       romeCode: "D1103",
       appellationCode: "33333",
       romeLabel: "Boucherie",
       appellationLabel: "Boucher / Bouchère",
+      remoteWorkMode: "NO_REMOTE",
     },
   ],
   maxContactsPerMonth: defaultMaxContactsPerMonth,
@@ -167,18 +170,20 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
   siret: "01234567890123",
   website: "https://updated.website.com",
   additionalInformation: "This is an updated information",
-  appellations: [
+  offers: [
     {
       romeCode: "A1234",
       appellationCode: "11234",
       romeLabel: "Label rome 1",
       appellationLabel: "Appellation 1",
+      remoteWorkMode: "NO_REMOTE",
     },
     {
       romeCode: "B1234",
       appellationCode: "21234",
       romeLabel: "Label rome 2",
       appellationLabel: "Appellation 2",
+      remoteWorkMode: "NO_REMOTE",
     },
   ],
   maxContactsPerMonth: defaultMaxContactsPerMonth - 5,
@@ -206,7 +211,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   userRights: [],
   businessName: "",
   siret: "",
-  appellations: [],
+  offers: [],
   website: "",
   additionalInformation: "",
   fitForDisabledWorkers: "no",
@@ -244,10 +249,10 @@ export class FormEstablishmentDtoBuilder
     return this.#dto;
   }
 
-  public withAppellations(appellations: AppellationAndRomeDto[]) {
+  public withOffers(offers: EstablishmentFormOffer[]) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
-      appellations,
+      offers,
     });
   }
 
@@ -390,8 +395,8 @@ const formEstablishmentToEstablishmentCsvRow = (
     siret: establishment.siret,
     website: establishment.website ?? "",
     additionalInformation: establishment.additionalInformation ?? "",
-    appellations_code: establishment.appellations
-      .map((appellation) => appellation.appellationCode)
+    offers_appellation_code: establishment.offers
+      .map((offer) => offer.appellationCode)
       .join(","),
     isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
     isSearchable:
