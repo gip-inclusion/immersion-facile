@@ -130,14 +130,9 @@ export const makeEstablishmentAggregate = async ({
       }),
     },
     userRights: updatedUserRights,
-    offers: formEstablishment.appellations.map(
-      ({ appellationCode, appellationLabel, romeCode, romeLabel }) => ({
-        romeCode,
-        appellationCode,
-        appellationLabel,
-        romeLabel,
-        createdAt: timeGateway.now(),
-      }),
-    ),
+    offers: formEstablishment.offers.map((offer) => ({
+      ...offer,
+      createdAt: timeGateway.now(),
+    })),
   };
 };

@@ -1,13 +1,13 @@
 import {
   type AbsoluteUrl,
   type AdminFormEstablishmentUserRight,
-  type AppellationAndRomeDto,
   addressDtoToString,
   ConnectedUserBuilder,
   type ConnectedUserDomainJwtPayload,
   type ContactFormEstablishmentUserRight,
   defaultAddress,
   defaultCountryCode,
+  type EstablishmentFormOffer,
   errors,
   expectObjectInArrayToMatch,
   expectObjectsToMatch,
@@ -173,11 +173,12 @@ describe("Update Establishment aggregate from form data", () => {
       .withCreatedAt(now)
       .build();
 
-    const updatedAppellation: AppellationAndRomeDto = {
+    const updatedOffer: EstablishmentFormOffer = {
       romeLabel: "Boulangerie",
       appellationLabel: "Boulanger",
       romeCode: "A1101",
       appellationCode: "22222",
+      remoteWorkMode: "NO_REMOTE",
     };
     const nextAvailabilityDate = new Date();
     const updatedFormAdmin: AdminFormEstablishmentUserRight = {
@@ -195,7 +196,7 @@ describe("Update Establishment aggregate from form data", () => {
     };
     const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
-      .withAppellations([updatedAppellation])
+      .withOffers([updatedOffer])
       .withBusinessAddresses([
         {
           id: defaultAddress.formAddress.id,
@@ -267,10 +268,10 @@ describe("Update Establishment aggregate from form data", () => {
             )
             .withOffers([
               new OfferEntityBuilder()
-                .withRomeLabel(updatedAppellation.romeLabel)
-                .withRomeCode(updatedAppellation.romeCode)
-                .withAppellationCode(updatedAppellation.appellationCode)
-                .withAppellationLabel(updatedAppellation.appellationLabel)
+                .withRomeLabel(updatedOffer.romeLabel)
+                .withRomeCode(updatedOffer.romeCode)
+                .withAppellationCode(updatedOffer.appellationCode)
+                .withAppellationLabel(updatedOffer.appellationLabel)
                 .withCreatedAt(timeGateway.now())
                 .build(),
             ])
@@ -370,10 +371,10 @@ describe("Update Establishment aggregate from form data", () => {
             )
             .withOffers([
               new OfferEntityBuilder()
-                .withRomeLabel(updatedAppellation.romeLabel)
-                .withRomeCode(updatedAppellation.romeCode)
-                .withAppellationCode(updatedAppellation.appellationCode)
-                .withAppellationLabel(updatedAppellation.appellationLabel)
+                .withRomeLabel(updatedOffer.romeLabel)
+                .withRomeCode(updatedOffer.romeCode)
+                .withAppellationCode(updatedOffer.appellationCode)
+                .withAppellationLabel(updatedOffer.appellationLabel)
                 .withCreatedAt(timeGateway.now())
                 .build(),
             ])
@@ -574,8 +575,8 @@ describe("Update Establishment aggregate from form data", () => {
           .build(),
       )
       .withOffers(
-        updatedFormEstablishment.appellations.map((appellation) => ({
-          ...appellation,
+        updatedFormEstablishment.offers.map((offer) => ({
+          ...offer,
           createdAt: now,
         })),
       )
@@ -915,6 +916,10 @@ describe("Update Establishment aggregate from form data", () => {
         expectSavedNotificationsAndEvents({
           emails: [],
         });
+      });
+
+      it("WIP updates offer remote work mode of an establishment aggregate", () => {
+        expect(false).toBeTruthy();
       });
     });
   });
