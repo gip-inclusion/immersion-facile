@@ -45,6 +45,12 @@ models:
         description: "CC email addresses"
       - name: appellation_code
         description: "Foreign key to public_appellations_data table"
+      - name: appellation_label
+        description: "Full job title"
+      - name: rome_label
+        description: "ROME job category label"
+      - name: rome_code
+        description: "ROME job category code"
       - name: immersion_objective
         description: "Objective of immersion"
       - name: street_number_and_address

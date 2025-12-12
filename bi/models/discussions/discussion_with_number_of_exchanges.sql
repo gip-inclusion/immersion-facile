@@ -22,7 +22,14 @@ with exchange_counts as (
 
 select
   d.*,
+  pad.libelle_appellation_long as appellation_label,
+  prd.code_rome as rome_code,
+  prd.libelle_rome as rome_label,
   coalesce(ec.number_of_exchanges, 0) as number_of_exchanges
 from {{ source('immersion', 'discussions') }} d
 left join exchange_counts ec
   on d.id = ec.discussion_id
+inner join {{ source('immersion', 'public_appellations_data') }} as pad
+    on pad.ogr_appellation = d.appellation_code
+inner join {{ source('immersion', 'public_romes_data') }} as prd
+    on pad.code_rome::bpchar = prd.code_rome

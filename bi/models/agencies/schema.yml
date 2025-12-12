@@ -23,6 +23,8 @@ models:
         description: Full name of the region
       - name: refers_to_agency_id
         description: Reference to parent agency if applicable
+      - name: refers_to_agency_name
+        description: The name of the parent agency if applicable
       - name: status
         description: Current status of the agency
 
