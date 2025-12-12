@@ -12,8 +12,8 @@ import { contactModeSchema } from "../formEstablishment/FormEstablishment.schema
 import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import {
+  appellationAndRomeDtoSchema,
   appellationCodeSchema,
-  appellationDtoSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -246,7 +246,7 @@ export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionRe
   commonDiscussionSchema
     .and(
       z.object({
-        appellation: appellationDtoSchema,
+        appellation: appellationAndRomeDtoSchema,
         exchanges: z.array(exchangeReadSchema),
       }),
     )
@@ -303,7 +303,7 @@ export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<Discussion
     id: discussionIdSchema,
     siret: siretSchema,
     status: discussionStatusSchema,
-    appellation: appellationDtoSchema,
+    appellation: appellationAndRomeDtoSchema,
     businessName: zStringMinLength1,
     createdAt: makeDateStringSchema(),
     kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),

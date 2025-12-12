@@ -75,8 +75,8 @@ export const InitiateConventionButton = () => {
   const values = watch();
 
   const onSubmit = (data: InitiateConventionFormData) => {
-    const appellation = establishment?.appellations.find(
-      (appellation) => appellation.appellationCode === data.appellation,
+    const appellation = establishment?.offers.find(
+      (offer) => offer.appellationCode === data.appellation,
     );
     routes
       .conventionImmersion({
@@ -91,14 +91,14 @@ export const InitiateConventionButton = () => {
   useEffect(() => {
     if (
       !isEstablishmentDefault &&
-      establishment.appellations.length === 1 &&
+      establishment.offers.length === 1 &&
       values.appellation === ""
     ) {
-      setValue("appellation", establishment.appellations[0].appellationCode, {
+      setValue("appellation", establishment.offers[0].appellationCode, {
         shouldValidate: true,
       });
     }
-  }, [isEstablishmentDefault, establishment.appellations, values, setValue]);
+  }, [isEstablishmentDefault, establishment.offers, values, setValue]);
 
   useEffect(() => {
     if (
@@ -202,14 +202,13 @@ export const InitiateConventionButton = () => {
               placeholder="Sélectionnez un métier"
               className={fr.cx("fr-mt-2w")}
               disabled={
-                isEstablishmentDefault ||
-                establishment.appellations.length === 1
+                isEstablishmentDefault || establishment.offers.length === 1
               }
               options={
                 !isEstablishmentDefault
-                  ? establishment?.appellations.map((appellation) => ({
-                      value: appellation.appellationCode,
-                      label: appellation.appellationLabel,
+                  ? establishment?.offers.map((offer) => ({
+                      value: offer.appellationCode,
+                      label: offer.appellationLabel,
                     }))
                   : []
               }

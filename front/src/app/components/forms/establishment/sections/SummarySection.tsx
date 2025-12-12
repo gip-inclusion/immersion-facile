@@ -101,10 +101,8 @@ export const SummarySection = ({
             Métiers proposés :
           </p>
           <ul id={domElementIds.establishment.create.summaryAppellations}>
-            {formValues.appellations.map((appellation) => (
-              <li key={appellation.appellationCode}>
-                {appellation.appellationLabel}
-              </li>
+            {formValues.offers.map((offer) => (
+              <li key={offer.appellationCode}>{offer.appellationLabel}</li>
             ))}
           </ul>
         </SectionHighlight>

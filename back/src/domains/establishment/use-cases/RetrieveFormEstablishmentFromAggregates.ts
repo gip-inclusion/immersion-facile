@@ -73,10 +73,9 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       fitForDisabledWorkers:
         establishmentAggregate.establishment.fitForDisabledWorkers,
       naf: establishmentAggregate.establishment?.nafDto,
-      appellations:
-        await uow.establishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
-          establishmentAggregate.establishment.siret,
-        ),
+      offers: establishmentAggregate.offers.map(
+        ({ createdAt, ...offer }) => offer,
+      ),
       userRights: await this.#makeFormUserRights(
         uow,
         establishmentAggregate.userRights,
