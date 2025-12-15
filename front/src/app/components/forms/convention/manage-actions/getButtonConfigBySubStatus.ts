@@ -276,6 +276,9 @@ export const getButtonConfigBySubStatus = (
 export const hasUserRightsOnAgencyBroadcast = (
   currentUser: ConnectedUser,
 ): boolean => {
+  if (currentUser.isBackofficeAdmin) {
+    return true;
+  }
   return currentUser.agencyRights.some(
     (agencyRight) =>
       agencyRight.agency.kind === "pole-emploi" ||
