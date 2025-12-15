@@ -10,7 +10,7 @@
 }}
 
 select
-    eu.siret,
+    eu.siret::text as siret,
     eu.user_id,
     u.email as user_email,
     u.first_name as user_first_name,
@@ -25,7 +25,7 @@ select
     u.created_at as user_created_at,
     u.updated_at as user_updated_at,
     u.pro_connect_sub,
-    u.pro_connect_siret,
+    u.pro_connect_siret::text as pro_connect_siret,
     u.last_login_at
 from {{ source('immersion', 'establishments__users') }} as eu
 inner join {{ source('immersion', 'users') }} as u

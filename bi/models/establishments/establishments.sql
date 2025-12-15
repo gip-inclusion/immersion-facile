@@ -13,7 +13,7 @@
 }}
 
 select
-    siret,
+    siret::text as siret,
     name,
     customized_name,
     created_at,

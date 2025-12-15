@@ -42,7 +42,7 @@ select
     c.individual_protection,
     c.sanitary_prevention,
     c.sanitary_prevention_description,
-    c.siret,
+    c.siret::text as siret,
     c.business_name,
     c.immersion_address,
     c.created_at,
@@ -77,7 +77,7 @@ select
     a.id as agency_id,
     a.name as agency_name,
     a.status as agency_status,
-    a.agency_siret as agency_siret,
+    a.agency_siret::text as agency_siret,
     refer_a.name as referring_agency_name,
     case
         when a.kind = 'pole-emploi' then 'france-travail'
