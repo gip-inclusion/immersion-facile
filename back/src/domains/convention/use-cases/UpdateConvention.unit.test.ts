@@ -578,6 +578,34 @@ describe("Update Convention", () => {
       expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
     });
 
+    it("clears dateApproval when updating convention", async () => {
+      const storedConvention = new ConventionDtoBuilder(convention)
+        .withDateApproval("2024-01-15T10:00:00.000Z")
+        .build();
+
+      uow.conventionRepository.setConventions([storedConvention]);
+
+      const updatedConvention = new ConventionDtoBuilder(storedConvention)
+        .withStatus("READY_TO_SIGN")
+        .withBeneficiaryEmail("new@email.fr")
+        .withStatusJustification("justif")
+        .build();
+
+      await updateConvention.execute(
+        {
+          convention: updatedConvention,
+        },
+        { userId: backofficeAdminUser.id },
+      );
+
+      expectToEqual(uow.conventionRepository.conventions, [
+        {
+          ...updatedConvention,
+          dateApproval: undefined,
+        },
+      ]);
+    });
+
     it.each(
       statusTransitionConfigs.READY_TO_SIGN.validInitialStatuses,
     )("allows when convention initial status is %s", async (initialStatus: ConventionStatus) => {
