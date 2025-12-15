@@ -11,7 +11,7 @@
 
 select
     eli.id,
-    eli.establishment_siret,
+    eli.establishment_siret::text as establishment_siret,
     eli.street_number_and_address,
     eli.post_code,
     eli.city,

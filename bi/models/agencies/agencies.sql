@@ -25,7 +25,7 @@ select
     a.created_at,
     a.updated_at,
     a.status,
-    a.agency_siret,
+    a.agency_siret::text as agency_siret,
     a.code_safir,
     a.logo_url,
     a.street_number_and_address,

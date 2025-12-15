@@ -11,7 +11,7 @@
 }}
 
 select
-    offers.siret,
+    offers.siret::text as siret,
     offers.appellation_code,
     offers.created_at,
     offers.update_date,
