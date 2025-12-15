@@ -434,7 +434,7 @@ export const SearchPage = ({
                       </strong>{" "}
                       provenant de{" "}
                       <a
-                        href="https://www.labonneboite.fr"
+                        href="https://labonneboite.francetravail.fr/"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
