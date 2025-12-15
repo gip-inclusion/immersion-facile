@@ -53,9 +53,18 @@ export class PgConventionRepository implements ConventionRepository {
 
   public async deleteOldConventions(updatedBefore: Date) {
     const result = await this.transaction
+      .with("conventionRenewedFrom", (qb) =>
+        qb
+          .selectFrom("conventions")
+          .select("renewed_from")
+          .where("renewed_from", "is not", null),
+      )
       .deleteFrom("conventions")
       .where("updated_at", "<=", updatedBefore)
       .where("status", "in", ["DEPRECATED", "CANCELLED", "REJECTED"])
+      .where("id", "not in", (eb) =>
+        eb.selectFrom("conventionRenewedFrom").select("renewed_from"),
+      )
       .returning("id")
       .execute();
 

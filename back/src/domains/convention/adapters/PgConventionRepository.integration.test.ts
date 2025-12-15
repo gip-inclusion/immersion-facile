@@ -1238,6 +1238,53 @@ describe("PgConventionRepository", () => {
         convention6ToKeep,
       );
     });
+
+    it("does not delete conventions that are referenced by renewed_from even if they meet deletion criteria", async () => {
+      const updatedBefore = subYears(new Date(), 2);
+      const oldDate = subYears(new Date(), 3).toISOString();
+
+      const conventionReferencedByRenewed = conventionStylisteBuilder
+        .withId("77777777-7777-4777-9777-777777777777")
+        .withStatus("DEPRECATED")
+        .withUpdatedAt(oldDate)
+        .build();
+
+      const conventionWithRenewedFrom = conventionStylisteBuilder
+        .withId("88888888-8888-4888-9888-888888888888")
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withRenewed({
+          from: conventionReferencedByRenewed.id,
+          justification: "Renewed from old convention",
+        })
+        .withUpdatedAt(subDays(new Date(), 5).toISOString())
+        .build();
+
+      const conventionToDelete = conventionStylisteBuilder
+        .withId("99999999-9999-4999-9999-999999999999")
+        .withStatus("CANCELLED")
+        .withUpdatedAt(oldDate)
+        .build();
+
+      const conventionToKeep = conventionStylisteBuilder
+        .withId("10101010-1010-4101-9101-101010101010")
+        .withStatus("CANCELLED")
+        .withUpdatedAt(subDays(new Date(), 5).toISOString())
+        .build();
+
+      await Promise.all([
+        conventionRepository.save(conventionReferencedByRenewed, oldDate),
+        conventionRepository.save(conventionWithRenewedFrom),
+        conventionRepository.save(conventionToDelete, oldDate),
+        conventionRepository.save(conventionToKeep),
+      ]);
+
+      const deletedConventionIds =
+        await conventionRepository.deleteOldConventions(updatedBefore);
+
+      expectArraysToEqualIgnoringOrder(deletedConventionIds, [
+        conventionToDelete.id,
+      ]);
+    });
   });
 
   describe("getIdsByEstablishmentRepresentativeEmail", () => {
