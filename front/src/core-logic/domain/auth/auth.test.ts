@@ -83,7 +83,7 @@ describe("Auth slice", () => {
     });
   });
 
-  it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for, and redirects to provider logout page", () => {
+  it("redirects to provider logout page, then deletes federatedIdentity & partialConventionInUrl stored in device and in store", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
@@ -107,9 +107,13 @@ describe("Auth slice", () => {
     });
 
     store.dispatch(
-      authSlice.actions.federatedIdentityDeletionTriggered({
+      authSlice.actions.fetchLoggoutUrlRequested({
         mode: "device-and-oauth",
       }),
+    );
+
+    dependencies.authGateway.getLogoutUrlResponse$.next(
+      "http://yolo-logout.com",
     );
 
     expectAuthStateToBe({
@@ -120,22 +124,11 @@ describe("Auth slice", () => {
       requestedEmail: null,
     });
 
-    dependencies.authGateway.getLogoutUrlResponse$.next(
-      "http://yolo-logout.com",
-    );
     expectFederatedIdentityInDevice(undefined);
     expectPartialConventionInUrlInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, [
       "http://yolo-logout.com",
     ]);
-
-    expectAuthStateToBe({
-      afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
-      isLoading: true,
-      isRequestingLoginByEmail: false,
-      requestedEmail: null,
-    });
     expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
   });
 
@@ -162,7 +155,7 @@ describe("Auth slice", () => {
       firstName: "BOB",
     });
     store.dispatch(
-      authSlice.actions.federatedIdentityDeletionTriggered({
+      authSlice.actions.fetchLoggoutUrlRequested({
         mode: "device-only",
       }),
     );
@@ -213,7 +206,7 @@ describe("Auth slice", () => {
     });
 
     store.dispatch(
-      authSlice.actions.federatedIdentityDeletionTriggered({
+      authSlice.actions.fetchLoggoutUrlRequested({
         mode: "device-only",
       }),
     );

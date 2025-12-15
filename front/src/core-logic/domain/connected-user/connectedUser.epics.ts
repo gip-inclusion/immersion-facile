@@ -68,7 +68,7 @@ const getCurrentUserEpic: ConnectedUserEpic = (
           map(connectedUserSlice.actions.currentUserFetchSucceeded),
           catchEpicError((error) =>
             error?.message.includes(authExpiredMessage())
-              ? authSlice.actions.federatedIdentityDeletionTriggered({
+              ? authSlice.actions.fetchLoggoutUrlRequested({
                   mode: "device-only",
                 })
               : connectedUserSlice.actions.currentUserFetchFailed({

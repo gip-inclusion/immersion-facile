@@ -40,7 +40,7 @@ export const ConventionMiniStagePage = ({
 
   useEffect(() => {
     dispatch(
-      authSlice.actions.federatedIdentityDeletionTriggered({
+      authSlice.actions.fetchLoggoutUrlRequested({
         mode: "device-and-oauth",
       }),
     );
