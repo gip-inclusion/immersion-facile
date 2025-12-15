@@ -206,8 +206,8 @@ export const emailTemplatesByName =
       }),
     },
     AGENCY_WAS_ACTIVATED: {
-      niceName: "Agence - Activée",
-      tags: ["activation prescripteur"],
+      niceName: "Espace prescripteur - Admin agence - Agence activée",
+      tags: ["espacePrescripteur", "adminAgence", "agenceActivee"],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyName,
@@ -268,7 +268,7 @@ export const emailTemplatesByName =
         buttons: [
           {
             label: "Je m'inscris au webinaire",
-            url: "https://app.livestorm.co/itou/prescripteur-utiliser-le-site-dimmersion-facilitee?utm_source=if&utm_medium=mail&utm_campaign=transac-activation",
+            url: "https://pages.immersion-facile.beta.gouv.fr/prescripteurs-nos-prochains-webinaires/",
           },
         ],
         agencyLogoUrl,

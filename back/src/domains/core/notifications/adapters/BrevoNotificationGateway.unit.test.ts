@@ -160,7 +160,7 @@ describe("BrevoNotificationGateway unit", () => {
               email: "establishment-ceo@gmail.com",
             },
           ],
-          tags: ["activation prescripteur"],
+          tags: ["espacePrescripteur", "adminAgence", "agenceActivee"],
           subject: "Immersion Facilitée - Votre structure a été activée",
           htmlContent: ignoreTabs(`
       <html lang="fr">
@@ -262,7 +262,7 @@ describe("BrevoNotificationGateway unit", () => {
       >
       <a
       style="text-decoration: none; display: inline-block; padding: 10px 20px; text-align: center; background-color: #000091; color: #fff;"
-      href="https://app.livestorm.co/itou/prescripteur-utiliser-le-site-dimmersion-facilitee?utm_source=if&utm_medium=mail&utm_campaign=transac-activation"
+      href="https://pages.immersion-facile.beta.gouv.fr/prescripteurs-nos-prochains-webinaires/"
       >
       Je m'inscris au webinaire
       </a>
