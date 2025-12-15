@@ -71,25 +71,44 @@ const storeFederatedIdentityInDevice: AuthEpic = (
     }),
   );
 
+const redirectToProviderLoggoutPage: AuthEpic = (
+  action$,
+  _,
+  { navigationGateway },
+) =>
+  action$.pipe(
+    filter(authSlice.actions.federatedIdentityInDeviceDeletionSucceeded.match),
+    tap((action) => {
+      if (action.payload) {
+        navigationGateway.goToUrl(action.payload);
+      }
+    }),
+    map(() => authSlice.actions.redirectAfterLoggoutSucceeded()),
+  );
+
 const deleteFederatedIdentityFromDevice: AuthEpic = (
   action$,
   _,
   { localDeviceRepository },
 ) =>
   action$.pipe(
-    filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
+    filter(authSlice.actions.fetchLoggoutUrlSucceeded.match),
     tap(() => localDeviceRepository.delete("federatedIdentityWithUser")),
     tap(() => localDeviceRepository.delete("partialConventionInUrl")),
-    map(() => authSlice.actions.federatedIdentityInDeviceDeletionSucceeded()),
+    map((action) =>
+      authSlice.actions.federatedIdentityInDeviceDeletionSucceeded(
+        action.payload,
+      ),
+    ),
   );
 
-const logout: AuthEpic = (
+const logoutEpic: AuthEpic = (
   action$,
   state$,
   { navigationGateway, authGateway },
 ) =>
   action$.pipe(
-    filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
+    filter(authSlice.actions.fetchLoggoutUrlRequested.match),
     switchMap((action) => {
       const { federatedIdentityWithUser } = state$.value.auth;
       if (!federatedIdentityWithUser) throw errors.auth.missingOAuth({});
@@ -107,10 +126,9 @@ const logout: AuthEpic = (
       return of(undefined);
     }),
     map((logoutUrl) => {
-      if (logoutUrl) navigationGateway.goToUrl(logoutUrl);
-      return authSlice.actions.logOutFromProviderSucceeded();
+      return authSlice.actions.fetchLoggoutUrlSucceeded(logoutUrl);
     }),
-    catchEpicError((_error) => authSlice.actions.logOutFromProviderFailed()),
+    catchEpicError((_error) => authSlice.actions.fetchLoggoutUrlFailed()),
   );
 
 const checkConnectedWithFederatedIdentity: AuthEpic = (
@@ -212,11 +230,12 @@ const confirmLoginByMagicLink: AuthEpic = (
 export const authEpics = [
   storeFederatedIdentityInDevice,
   checkConnectedWithFederatedIdentity,
-  logout,
+  logoutEpic,
   deleteFederatedIdentityFromDevice,
   storeRedirectionUrlAfterLoginInDevice,
   clearAndRedirectAfterLoginFromDevice,
   checkRedirectionAfterLogin,
   requestLoginByEmail,
   confirmLoginByMagicLink,
+  redirectToProviderLoggoutPage,
 ];
