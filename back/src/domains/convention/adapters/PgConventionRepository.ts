@@ -29,12 +29,14 @@ export class PgConventionRepository implements ConventionRepository {
 
   public async deprecateConventionsWithoutDefinitiveStatusEndedSince(
     endedSince: Date,
+    now?: DateString,
   ) {
     const result = await this.transaction
       .updateTable("conventions")
       .set({
         status: "DEPRECATED",
         status_justification: sql`'Devenu obsolète car statut ' || status || ' alors que la date de fin est dépassée depuis longtemps'`,
+        updated_at: now ?? sql`now()`,
       })
       .where("date_end", "<=", endedSince)
       .where("status", "not in", [

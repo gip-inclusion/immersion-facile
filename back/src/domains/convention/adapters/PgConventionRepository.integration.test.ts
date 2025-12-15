@@ -8,6 +8,7 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
+  type DateString,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   errors,
@@ -1076,10 +1077,11 @@ describe("PgConventionRepository", () => {
         .withStatus("READY_TO_SIGN")
         .build();
 
+      const originalUpdatedAt = new Date("2022-01-01T00:00:00").toISOString();
       await Promise.all([
         conventionRepository.save(
           convention1ToMarkAsDeprecated,
-          anyConventionUpdatedAt,
+          originalUpdatedAt,
         ),
         conventionRepository.save(
           convention2ToKeepAsIs,
@@ -1115,9 +1117,12 @@ describe("PgConventionRepository", () => {
         ),
       ]);
 
+      const updatedAt = timeGateway.now().toISOString();
+
       const numberOfUpdatedConventions =
         await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
           dateSince,
+          updatedAt,
         );
 
       expectArraysToEqualIgnoringOrder(numberOfUpdatedConventions, [
@@ -1127,10 +1132,22 @@ describe("PgConventionRepository", () => {
         convention9ToMarkAsDeprecated.id,
       ]);
 
-      await expectConventionInRepoToBeDeprecated(convention1ToMarkAsDeprecated);
-      await expectConventionInRepoToBeDeprecated(convention7ToMarkAsDeprecated);
-      await expectConventionInRepoToBeDeprecated(convention8ToMarkAsDeprecated);
-      await expectConventionInRepoToBeDeprecated(convention9ToMarkAsDeprecated);
+      await expectConventionInRepoToBeDeprecated(
+        convention1ToMarkAsDeprecated,
+        updatedAt,
+      );
+      await expectConventionInRepoToBeDeprecated(
+        convention7ToMarkAsDeprecated,
+        updatedAt,
+      );
+      await expectConventionInRepoToBeDeprecated(
+        convention8ToMarkAsDeprecated,
+        updatedAt,
+      );
+      await expectConventionInRepoToBeDeprecated(
+        convention9ToMarkAsDeprecated,
+        updatedAt,
+      );
       await expectConventionInRepoToEqual(convention2ToKeepAsIs);
       await expectConventionInRepoToEqual(convention3ToKeepAsIs);
       await expectConventionInRepoToEqual(convention4ToKeepAsIs);
@@ -1295,11 +1312,13 @@ describe("PgConventionRepository", () => {
 
   const expectConventionInRepoToBeDeprecated = async (
     convention: ConventionDto,
+    updatedAt: DateString,
   ) => {
     expectToEqual(await conventionRepository.getById(convention.id), {
       ...convention,
       status: "DEPRECATED",
       statusJustification: `Devenu obsolète car statut ${convention.status} alors que la date de fin est dépassée depuis longtemps`,
+      updatedAt,
     });
   };
 });
