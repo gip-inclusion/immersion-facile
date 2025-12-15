@@ -108,10 +108,12 @@ export class UpdateConvention extends TransactionalUseCase<
     const hasSignatoryRole = userRolesOnConvention.some((role) =>
       isSignatoryRole(role),
     );
-    const conventionWithSignatoriesSignedAtCleared = {
-      ...convention,
-      signatories: clearSignedAtForAllSignatories(convention),
-    };
+    const conventionWithSignatoriesSignedAtAndDateApprovalCleared: ConventionDto =
+      {
+        ...convention,
+        dateApproval: undefined,
+        signatories: clearSignedAtForAllSignatories(convention),
+      };
 
     const triggeredBy: TriggeredBy =
       "userId" in jwtPayload
@@ -142,7 +144,7 @@ export class UpdateConvention extends TransactionalUseCase<
       const { signedConvention } = await signConvention({
         uow,
         convention: {
-          ...conventionWithSignatoriesSignedAtCleared,
+          ...conventionWithSignatoriesSignedAtAndDateApprovalCleared,
           ...agencyDtoToConventionAgencyFields(agency),
           ...assessmentFields,
         },
@@ -165,13 +167,14 @@ export class UpdateConvention extends TransactionalUseCase<
     } else {
       await Promise.all([
         uow.conventionRepository.update(
-          conventionWithSignatoriesSignedAtCleared,
+          conventionWithSignatoriesSignedAtAndDateApprovalCleared,
         ),
         uow.outboxRepository.save(
           this.createNewEvent({
             topic: "ConventionSubmittedAfterModification",
             payload: {
-              convention: conventionWithSignatoriesSignedAtCleared,
+              convention:
+                conventionWithSignatoriesSignedAtAndDateApprovalCleared,
               triggeredBy,
             },
           }),
