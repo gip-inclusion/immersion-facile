@@ -24,6 +24,7 @@ type RichTableProps = {
   searchBar: {
     label: string;
     placeholder: string;
+    hintText?: string;
     onSubmit: (value: string) => void;
   };
   pagination: PaginationProps;
@@ -97,18 +98,25 @@ export const RichTable = ({
           }}
           className={fr.cx("fr-grid-row", "fr-search-bar")}
         >
-          <Input
-            label={searchBar.label}
-            nativeInputProps={{
-              placeholder: searchBar.placeholder,
-              role: "search",
-              name: "search",
-              onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                setSearchValue(event.target.value);
-              },
-            }}
-            className={fr.cx("fr-mb-0", "fr-col-lg-7")}
-          />
+          <div className={fr.cx("fr-col-lg-7")}>
+            <Input
+              label={searchBar.label}
+              nativeInputProps={{
+                placeholder: searchBar.placeholder,
+                role: "search",
+                name: "search",
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                  setSearchValue(event.target.value);
+                },
+              }}
+              className={fr.cx("fr-mb-0")}
+            />
+            {searchBar.hintText && (
+              <span className={fr.cx("fr-hint-text", "fr-mt-1w")}>
+                {searchBar.hintText}
+              </span>
+            )}
+          </div>
           <Button type="submit">Rechercher</Button>
         </form>
         {dropdownFilters && (
