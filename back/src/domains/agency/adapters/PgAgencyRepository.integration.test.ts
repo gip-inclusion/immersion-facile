@@ -1,3 +1,4 @@
+import { subDays, subMonths } from "date-fns";
 import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
@@ -5,6 +6,7 @@ import {
   type AgencyWithUsersRights,
   activeAgencyStatuses,
   ConnectedUserBuilder,
+  ConventionDtoBuilder,
   errors,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
@@ -18,6 +20,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type { AgencyWithoutRights } from "../ports/AgencyRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
@@ -1333,6 +1336,159 @@ describe("PgAgencyRepository", () => {
       const existingSirets =
         await agencyRepository.getExistingActiveSirets(sirets);
       expect(existingSirets).toEqual([activeAgency.agencySiret]);
+    });
+  });
+
+  describe("deleteOldAgenciesWithoutConventions", () => {
+    const threeMonthsAgo = subMonths(new Date(), 3);
+    const oldDate = subMonths(new Date(), 4).toISOString();
+    const recentDate = subDays(new Date(), 5).toISOString();
+
+    const oldClosedAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("11111111-1111-4111-9111-111111111111")
+        .withStatus("closed")
+        .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      },
+    );
+
+    const oldRejectedAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("22222222-2222-4222-9222-222222222222")
+        .withStatus("rejected")
+        .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      },
+    );
+
+    const recentClosedAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("33333333-3333-4333-9333-333333333333")
+        .withStatus("closed")
+        .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      },
+    );
+
+    const activeAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("44444444-4444-4444-9444-444444444444")
+        .withStatus("active")
+        .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      },
+    );
+
+    const oldClosedAgencyWithConvention = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("55555555-5555-4555-9555-555555555555")
+        .withStatus("closed")
+        .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      },
+    );
+
+    it("deletes agencies with status closed or rejected, updated_at older than given date, and without conventions", async () => {
+      await Promise.all([
+        agencyRepository.insert(oldClosedAgency, oldDate),
+        agencyRepository.insert(oldRejectedAgency, oldDate),
+        agencyRepository.insert(recentClosedAgency, recentDate),
+        agencyRepository.insert(activeAgency, oldDate),
+        agencyRepository.insert(oldClosedAgencyWithConvention, oldDate),
+      ]);
+
+      const conventionRepository = new PgConventionRepository(db);
+      const convention = new ConventionDtoBuilder()
+        .withId("cccccccc-cccc-4ccc-9ccc-cccccccccccc")
+        .withAgencyId(oldClosedAgencyWithConvention.id)
+        .build();
+
+      await conventionRepository.save(convention);
+
+      const deletedAgencyIds =
+        await agencyRepository.deleteOldClosedAgenciesWithoutConventions({
+          updatedBefore: threeMonthsAgo,
+        });
+
+      expectArraysToEqualIgnoringOrder(deletedAgencyIds, [
+        oldClosedAgency.id,
+        oldRejectedAgency.id,
+      ]);
+
+      expect(
+        await agencyRepository.getById(oldClosedAgency.id),
+      ).toBeUndefined();
+      expect(
+        await agencyRepository.getById(oldRejectedAgency.id),
+      ).toBeUndefined();
+
+      const agenciesToKeep = await agencyRepository.getByIds([
+        recentClosedAgency.id,
+        activeAgency.id,
+        oldClosedAgencyWithConvention.id,
+      ]);
+
+      expectArraysToEqualIgnoringOrder(agenciesToKeep, [
+        recentClosedAgency,
+        activeAgency,
+        oldClosedAgencyWithConvention,
+      ]);
+    });
+
+    it("deletes agencies that refer to a deleted agency via refers_to_agency_id", async () => {
+      const agencyReferringToAgencyThatShouldBeDeleted = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("bbbbbbbb-bbbb-4bbb-9bbb-bbbbbbbbbbbb")
+          .withStatus("active")
+          .withRefersToAgencyInfo({
+            refersToAgencyId: oldClosedAgency.id,
+            refersToAgencyName: oldClosedAgency.name,
+          })
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        },
+      );
+
+      const agencyNotReferringToDeletedAgency = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("cccccccc-cccc-4ccc-9ccc-cccccccccccc")
+          .withStatus("active")
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        },
+      );
+
+      await Promise.all([
+        agencyRepository.insert(oldClosedAgency, oldDate),
+        agencyRepository.insert(agencyReferringToAgencyThatShouldBeDeleted),
+        agencyRepository.insert(agencyNotReferringToDeletedAgency),
+      ]);
+
+      const deletedAgencyIds =
+        await agencyRepository.deleteOldClosedAgenciesWithoutConventions({
+          updatedBefore: threeMonthsAgo,
+        });
+
+      expectArraysToEqualIgnoringOrder(deletedAgencyIds, [
+        oldClosedAgency.id,
+        agencyReferringToAgencyThatShouldBeDeleted.id,
+      ]);
+
+      const agenciesToKeep = await agencyRepository.getByIds([
+        agencyNotReferringToDeletedAgency.id,
+      ]);
+
+      expectArraysToEqualIgnoringOrder(agenciesToKeep, [
+        agencyNotReferringToDeletedAgency,
+      ]);
     });
   });
 });

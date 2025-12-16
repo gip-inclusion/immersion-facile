@@ -7,6 +7,7 @@ import type {
   AgencyRight,
   AgencyStatus,
   AgencyWithUsersRights,
+  DateString,
   DepartmentCode,
   OmitFromExistingKeys,
   SiretDto,
@@ -44,7 +45,7 @@ export type AgencyWithNumberOfUsersToReview = {
 };
 
 export interface AgencyRepository {
-  insert(agency: AgencyWithUsersRights): Promise<void>;
+  insert(agency: AgencyWithUsersRights, updatedAt?: DateString): Promise<void>;
   update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
 
   getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
@@ -70,6 +71,9 @@ export interface AgencyRepository {
     idToIgnore: AgencyId;
   }): Promise<boolean>;
   getExistingActiveSirets(sirets: SiretDto[]): Promise<SiretDto[]>;
+  deleteOldClosedAgenciesWithoutConventions(params: {
+    updatedBefore: Date;
+  }): Promise<AgencyId[]>;
 }
 
 export const updateAgencyRightsForUser = async (

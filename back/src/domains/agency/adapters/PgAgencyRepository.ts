@@ -11,6 +11,7 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   activeAgencyStatuses,
+  type DateString,
   type DepartmentCode,
   errors,
   isTruthy,
@@ -43,12 +44,15 @@ const MAX_AGENCIES_RETURNED = 1500;
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async insert(agency: AgencyWithUsersRights): Promise<void> {
-    await this.insertAgency(agency);
+  public async insert(
+    agency: AgencyWithUsersRights,
+    updatedAt?: DateString,
+  ): Promise<void> {
+    await this.insertAgency(agency, updatedAt);
     await this.#saveAgencyRights(agency.id, agency.usersRights);
   }
 
-  private insertAgency(agency: AgencyWithUsersRights) {
+  private insertAgency(agency: AgencyWithUsersRights, updatedAt?: DateString) {
     return this.transaction
       .insertInto("agencies")
       .values(({ fn }) => ({
@@ -72,6 +76,7 @@ export class PgAgencyRepository implements AgencyRepository {
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
         phone_number: agency.phoneNumber,
+        updated_at: updatedAt ?? sql`now()`,
       }))
       .execute()
       .catch((error) => {
@@ -500,5 +505,45 @@ export class PgAgencyRepository implements AgencyRepository {
       .execute();
 
     return results.map(({ agency_siret }) => agency_siret);
+  }
+
+  async deleteOldClosedAgenciesWithoutConventions(params: {
+    updatedBefore: Date;
+  }): Promise<AgencyId[]> {
+    const { updatedBefore } = params;
+    const result = await this.transaction
+      .withRecursive("agenciesToDelete", (qb) =>
+        qb
+          .selectFrom("agencies")
+          .select("id")
+          .where("status", "in", ["closed", "rejected"])
+          .where("updated_at", "<=", updatedBefore)
+          .where(({ eb }) =>
+            eb.not(
+              eb.exists(
+                eb
+                  .selectFrom("conventions")
+                  .select("id")
+                  .whereRef("conventions.agency_id", "=", "agencies.id"),
+              ),
+            ),
+          )
+          .union(
+            qb
+              .selectFrom("agencies")
+              .select("agencies.id")
+              .innerJoin(
+                "agenciesToDelete",
+                "agencies.refers_to_agency_id",
+                "agenciesToDelete.id",
+              ),
+          ),
+      )
+      .deleteFrom("agencies")
+      .where("id", "in", (eb) => eb.selectFrom("agenciesToDelete").select("id"))
+      .returning("id")
+      .execute();
+
+    return result.map(({ id }) => id);
   }
 }

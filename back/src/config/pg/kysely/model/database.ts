@@ -195,7 +195,7 @@ interface Agencies extends WithAcquisition {
   legacy_address: string | null;
   position: Generated<string>;
   created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
+  updated_at: Timestamp | Generated<Timestamp>;
   status: Generated<string>;
   kind: string;
   agency_siret: string;
