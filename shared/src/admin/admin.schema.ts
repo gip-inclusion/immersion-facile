@@ -5,6 +5,7 @@ import { emailSchema } from "../email/email.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { userIdSchema } from "../user/user.schema";
 import {
+  localization,
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "../zodUtils";
@@ -28,7 +29,9 @@ export const userParamsForAgencySchema: ZodSchemaWithInputMatchingOutput<UserPar
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,
-    roles: z.array(agencyRoleSchema),
+    roles: z
+      .array(agencyRoleSchema)
+      .min(1, { message: localization.atLeastOneRole }),
     isNotifiedByEmail: z.boolean(),
     email: emailSchema,
   });
