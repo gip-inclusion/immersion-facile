@@ -51,7 +51,8 @@ export class PgConventionRepository implements ConventionRepository {
     return result.map(({ id }) => id);
   }
 
-  public async deleteOldConventions(updatedBefore: Date) {
+  public async deleteOldConventions(params: { updatedBefore: Date }) {
+    const { updatedBefore } = params;
     const result = await this.transaction
       .with("conventionRenewedFrom", (qb) =>
         qb

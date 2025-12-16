@@ -21,9 +21,9 @@ const deleteOldConventions = async () => {
     numberOfYearsBeforeDeletion,
   );
 
-  const deletedConventionIds = await conventionRepository.deleteOldConventions(
-    deleteAllConventionsBefore,
-  );
+  const deletedConventionIds = await conventionRepository.deleteOldConventions({
+    updatedBefore: deleteAllConventionsBefore,
+  });
 
   const numberOfConventionsDeleted = deletedConventionIds.length;
 
