@@ -3,6 +3,7 @@ import { z } from "zod";
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",
   atLeastOneJob: "Vous devez renseigner au moins un métier",
+  atLeastOneRole: "Vous devez choisir au moins un rôle",
   beneficiaryTutorEmailMustBeDistinct:
     "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
   expectedBoolean: "La sélection d'une valeur (oui/non) est obligatoire",
