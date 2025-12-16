@@ -1,5 +1,6 @@
 import { keys } from "ramda";
 import {
+  type AgencyUsersRights,
   type ConnectedUser,
   errors,
   type UserParamsForAgency,
@@ -13,6 +14,7 @@ import type { DashboardGateway } from "../../core/dashboard/port/DashboardGatewa
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+import { validateAgencyRights } from "../helpers/agencyRights.helper";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 import { getUserByEmailAndCreateIfMissing } from "../helpers/connectedUser.helper";
 
@@ -57,16 +59,24 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
     );
     if (isUserAlreadyLinkedToAgency) throw errors.agency.userAlreadyExist();
 
+    const updatedAgencyRights: AgencyUsersRights = {
+      ...agency.usersRights,
+      [user.id]: {
+        roles: inputParams.roles,
+        isNotifiedByEmail: inputParams.isNotifiedByEmail,
+      },
+    };
+
+    validateAgencyRights(
+      agency.id,
+      updatedAgencyRights,
+      agency.refersToAgencyId,
+    );
+
     await Promise.all([
       uow.agencyRepository.update({
         id: agency.id,
-        usersRights: {
-          ...agency.usersRights,
-          [user.id]: {
-            roles: inputParams.roles,
-            isNotifiedByEmail: inputParams.isNotifiedByEmail,
-          },
-        },
+        usersRights: updatedAgencyRights,
       }),
       uow.outboxRepository.save(
         deps.createNewEvent({
