@@ -178,7 +178,7 @@ const {
 } = createModal(createFillAssessmentInfoModalParams);
 
 const createSignModalParams = {
-  id: domElementIds.manageConvention.sendSignatureLinkModal, //TODO: check if this is correct
+  id: domElementIds.manageConvention.signModal,
   isOpenedByDefault: false,
   formId: domElementIds.manageConvention.sendSignatureLinkModalForm,
 };
@@ -270,7 +270,7 @@ export const modalByAction = (
           children: "J'ai compris",
           type: "button",
           priority: "primary",
-          onClick: closeSignModal,
+          onClick: closeFillAssessmentInfoModal,
         },
       ],
     },
