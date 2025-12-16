@@ -1208,7 +1208,7 @@ describe("PgConventionRepository", () => {
       ]);
 
       const deletedConventionIds =
-        await conventionRepository.deleteOldConventions(updatedBefore);
+        await conventionRepository.deleteOldConventions({ updatedBefore });
 
       expectArraysToEqualIgnoringOrder(deletedConventionIds, [
         convention1ToDelete.id,
@@ -1271,15 +1271,15 @@ describe("PgConventionRepository", () => {
         .withUpdatedAt(subDays(new Date(), 5).toISOString())
         .build();
 
+      await conventionRepository.save(conventionReferencedByRenewed, oldDate);
       await Promise.all([
-        conventionRepository.save(conventionReferencedByRenewed, oldDate),
         conventionRepository.save(conventionWithRenewedFrom),
         conventionRepository.save(conventionToDelete, oldDate),
         conventionRepository.save(conventionToKeep),
       ]);
 
       const deletedConventionIds =
-        await conventionRepository.deleteOldConventions(updatedBefore);
+        await conventionRepository.deleteOldConventions({ updatedBefore });
 
       expectArraysToEqualIgnoringOrder(deletedConventionIds, [
         conventionToDelete.id,

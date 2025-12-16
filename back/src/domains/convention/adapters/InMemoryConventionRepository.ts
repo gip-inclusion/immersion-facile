@@ -44,9 +44,9 @@ export class InMemoryConventionRepository implements ConventionRepository {
     return conventionsToDeprecate.filter((id) => id !== undefined);
   }
 
-  public async deleteOldConventions(
-    _updatedBefore: Date,
-  ): Promise<ConventionId[]> {
+  public async deleteOldConventions(_params: {
+    updatedBefore: Date;
+  }): Promise<ConventionId[]> {
     throw errors.generic.fakeError("Not implemented");
   }
 
