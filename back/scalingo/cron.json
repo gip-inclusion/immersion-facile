@@ -59,6 +59,10 @@
     {
       "command": "0 10 * * 6 pnpm back run trigger-delete-old-conventions",
       "size": "M"
+    },
+    {
+      "command": "0 15 * * 6 pnpm back run trigger-delete-old-closed-agencies-without-conventions",
+      "size": "M"
     }
   ]
 }
