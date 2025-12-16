@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { partition, values } from "ramda";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tag } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
@@ -71,7 +71,7 @@ export const AgencyUsers = ({
     (UserParamsForAgency & { isIcUser: boolean }) | null
   >(null);
 
-  const [mode, setMode] = useState<"add" | "update" | null>(null);
+  const [mode, setMode] = useState<"add" | "update" | "delete" | null>(null);
 
   const onModifyClicked = (
     agencyUser: ConnectedUserWithNormalizedAgencyRights,
@@ -86,13 +86,13 @@ export const AgencyUsers = ({
       isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
       isIcUser: !!agencyUser.proConnect,
     });
-    manageUserModal.open();
   };
 
   const onDeleteClicked = (
     agencyUser: ConnectedUserWithNormalizedAgencyRights,
   ) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    setMode("delete");
     setSelectedUserData({
       agencyId: agency.id,
       userId: agencyUser.id,
@@ -173,6 +173,12 @@ export const AgencyUsers = ({
 
     removeUserModal.close();
   };
+
+  useEffect(() => {
+    if (selectedUserData && mode === "update") {
+      manageUserModal.open();
+    }
+  }, [selectedUserData, mode]);
 
   return (
     <>
