@@ -8,6 +8,7 @@ import {
   type AgencyStatus,
   type AgencyWithUsersRights,
   activeAgencyStatuses,
+  type DateString,
   type DepartmentCode,
   errors,
   type GeoPositionDto,
@@ -53,7 +54,10 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     });
   }
 
-  public async insert(agency: AgencyWithUsersRights): Promise<void> {
+  public async insert(
+    agency: AgencyWithUsersRights,
+    _updatedAt?: DateString,
+  ): Promise<void> {
     if (this.#agencies[agency.id]) throw errors.agency.alreadyExist(agency.id);
     if (!values(agency.usersRights).length)
       throw errors.agency.noUsers(agency.id);
@@ -242,6 +246,12 @@ export class InMemoryAgencyRepository implements AgencyRepository {
           sirets.includes(agency.agencySiret),
       )
       .map((agency) => agency.agencySiret);
+  }
+
+  public async deleteOldClosedAgenciesWithoutConventions(_params: {
+    updatedBefore: Date;
+  }): Promise<AgencyId[]> {
+    throw errors.generic.fakeError("Not implemented");
   }
 }
 
