@@ -779,6 +779,7 @@ export const domElementIds = {
         "im-edit-agency-user__is-notified-by-email-toggle",
       editAgencyUserTooltip: "im-edit-agency-user__tooltip",
       rejectAgencyModal: "im-reject-agency-modal",
+      rejectAgencyModalForm: "im-reject-agency-modal__form",
       agencyToReviewInput: "im-agency-to-review__input",
       agencyToReviewButton: "im-agency-to-review__review-button",
       agencyToReviewActivateButton: "im-agency-to-review__activate-button",

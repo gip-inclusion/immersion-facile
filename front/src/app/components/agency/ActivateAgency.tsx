@@ -53,6 +53,8 @@ const RejectAgencyModalContent = ({
     rejectAgencyModal.close();
   };
 
+  const formId = domElementIds.admin.agencyTab.rejectAgencyModalForm;
+
   return (
     <rejectAgencyModal.Component
       title="Rejeter cette agence"
@@ -69,11 +71,15 @@ const RejectAgencyModalContent = ({
           children: "Rejeter cette agence",
           priority: "primary",
           type: "submit",
+          doClosesModal: false,
           disabled: !formState.isValid,
+          nativeButtonProps: {
+            form: formId,
+          },
         },
       ]}
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} id={formId}>
         <Input
           textArea
           label="Justification"
