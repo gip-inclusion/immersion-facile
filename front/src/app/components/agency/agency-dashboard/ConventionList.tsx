@@ -644,8 +644,10 @@ export const ConventionList = () => {
               }}
               searchBar={{
                 label: "Rechercher",
+                hintText:
+                  "Astuce : Saisir un nom de conseiller dans la recherche permet d’afficher uniquement ses conventions.",
                 placeholder:
-                  "Rechercher une convention (ID de convention, nom, prénom, email, SIRET, ... )",
+                  "Rechercher une convention (ID, nom, prénom, conseiller, email, SIRET…)",
                 onSubmit: (query: string) => {
                   onSubmit(tempFilters, query);
                 },
