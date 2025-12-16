@@ -60,7 +60,6 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     verificationAction,
     convention,
     initialStatus,
-    currentSignatoryRoles,
     onSubmit,
     onCloseValidatorModalWithoutValidatorInfo,
     currentUser,
@@ -68,7 +67,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   const modalObject = modalByAction(verificationAction);
   const { createModalParams } = modalObject;
   const isModalOpen = useIsModalOpen(createModalParams);
-  const [modalProps, setModalProps] = useState<ModalWrapperProps>(props);
+  const [modalProps] = useState<ModalWrapperProps>(props);
   const renewFeedback = useFeedbackTopic("convention-action-renew");
   const showTransferModal = verificationAction === "TRANSFER";
   const showEditCounsellorNameModal =
@@ -119,12 +118,6 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     return null;
 
   const { closeModal } = modalObject;
-  const onModalPropsChange = (newProps: Partial<ModalWrapperProps>) => {
-    setModalProps({
-      ...modalProps,
-      ...newProps,
-    });
-  };
 
   const modalContent = (
     <Fragment
@@ -193,8 +186,6 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
               closeModal={closeModal}
               newStatus={newStatus}
               convention={convention}
-              currentSignatoryRoles={currentSignatoryRoles}
-              onModalPropsChange={onModalPropsChange}
             />
           ),
         )
