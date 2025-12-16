@@ -8,11 +8,9 @@ import {
   type ConventionDto,
   type ConventionStatusWithJustification,
   doesStatusNeedsJustification,
-  type Role,
   type UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
 } from "shared";
-import type { ModalWrapperProps } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useFormModal } from "src/app/utils/createFormModal";
 
@@ -22,14 +20,10 @@ export const JustificationModalContent = ({
   newStatus,
   convention,
 }: {
-  submitButtonId?: string;
-  cancelButtonId?: string;
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithJustification;
   convention: ConventionDto;
-  currentSignatoryRoles: Role[];
-  onModalPropsChange: (props: Partial<ModalWrapperProps>) => void;
 }) => {
   const { register, handleSubmit, formState } = useForm({
     resolver: zodResolver(updateConventionStatusRequestSchema),
