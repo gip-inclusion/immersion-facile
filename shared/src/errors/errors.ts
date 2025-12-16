@@ -695,7 +695,7 @@ export const errors = {
       new NotFoundError(`L'agence ${agencyId} n'a aucun utilisateur rattaché`),
     notEnoughCounsellors: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
-        `L'agence ${agencyId} doit avoir au moins un conseiller recevant les emails.`,
+        `L'agence ${agencyId} doit avoir au moins un pré-valideur recevant les emails.`,
       ),
     noUsers: (agencyId: AgencyId) =>
       new BadRequestError(
