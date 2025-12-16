@@ -189,8 +189,8 @@ export const AgencyUserModificationForm = ({
                 </p>
                 <p>
                   Cette configuration est adaptée aux structures où un premier
-                  niveau relit les conventions, puis un deuxième niveau s’occupe
-                  de la validation administrative.
+                  niveau vérifie les conventions, puis un deuxième niveau
+                  s’occupe de la validation administrative.
                 </p>
               </>
             }
