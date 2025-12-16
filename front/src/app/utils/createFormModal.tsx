@@ -4,6 +4,7 @@ import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import {
   type Context,
   createContext,
+  type ReactElement,
   useCallback,
   useContext,
   useRef,
@@ -44,8 +45,8 @@ export type FormModalProps = ModalProps & {
   doSubmitClosesModal?: boolean;
 };
 
-type FormModalComponent = {
-  Component: (props: FormModalProps) => JSX.Element;
+type FormModal = {
+  Component: (props: FormModalProps) => ReactElement<FormModalProps>;
   open: () => void;
   close: () => void;
 };
@@ -56,9 +57,7 @@ type CreateFormModalParams = Parameters<typeof createModal>[0] & {
   cancelButton?: Pick<ButtonProps, "id" | "children">;
 };
 
-export const createFormModal = (
-  params: CreateFormModalParams,
-): FormModalComponent => {
+export const createFormModal = (params: CreateFormModalParams): FormModal => {
   const modal = createModal(params);
 
   const FormModalComponent = ({
