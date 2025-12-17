@@ -327,3 +327,7 @@ models:
         description: Boolean - true if job was found after immersion
       - name: assessment_type_of_contract
         description: Type of contract (CDI, CDD...)
+      - name: beneficiary_email
+        description: Beneficiary's email
+      - name: schedule_total_hours
+        description: Total hours extracted from schedule JSON

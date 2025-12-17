@@ -30,6 +30,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 on-run-end:
   - "ANALYZE public_analytics.conventions"
+  - "ANALYZE public_analytics.conventions_for_counting"
   - "ANALYZE public_analytics.establishments"
   - "ANALYZE public_analytics.establishment_locations"
   - "ANALYZE public_analytics.establishment_offers"
