@@ -20,7 +20,7 @@
 }}
 
 select
-    id,
+    conventions.id,
     conventions.siret,
     business_name,
     agency_id,
@@ -47,8 +47,12 @@ select
     case
         when estab.siret is not null then true
         else false
-    end as is_referenced_establishment
+    end as is_referenced_establishment,
+    b.email as beneficiary_email,
+    conventions.schedule_total_hours as schedule_total_hours
 from {{ ref('conventions') }}
+inner join {{ source('immersion', 'actors') }} as b
+    on conventions.beneficiary_id = b.id
 left join establishments as estab
     on estab.siret = conventions.siret
 left join immersion_assessments as ass
