@@ -1,20 +1,17 @@
 import {
   type AgencyDto,
   type ConventionDto,
-  type ConventionRole,
+  type Email,
   errors,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
   type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
-import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -27,28 +24,16 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
-  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-
-  readonly #timeGateway: TimeGateway;
-
-  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
-
   readonly #config: AppConfig;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    timeGateway: TimeGateway,
-    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     config: AppConfig,
   ) {
     super(uowPerformer);
 
     this.#config = config;
-    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
-    this.#timeGateway = timeGateway;
-    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
@@ -74,30 +59,20 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
         agency,
         convention,
         recipients: [conventionAdvisorEntity.advisor.email],
-        role: "validator",
         warning: undefined,
         uow,
       });
 
     const hasCounsellors = agency.counsellorEmails.length > 0;
 
-    const recipients: {
-      recipients: string[];
-      role: ConventionRole;
-    } = hasCounsellors
-      ? {
-          recipients: agency.counsellorEmails,
-          role: "counsellor",
-        }
-      : {
-          recipients: agency.validatorEmails,
-          role: "validator",
-        };
+    const recipients: Email[] = hasCounsellors
+      ? agency.counsellorEmails
+      : agency.validatorEmails;
 
     return this.#sendEmailToRecipients({
       agency,
       convention,
-      ...recipients,
+      recipients,
       warning:
         agency.kind === "pole-emploi"
           ? "Merci de vérifier le conseiller référent associé à ce bénéficiaire."
@@ -110,32 +85,17 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
     agency,
     recipients,
     convention,
-    role,
     warning,
     uow,
   }: {
-    recipients: string[];
+    recipients: Email[];
     agency: AgencyDto;
     convention: ConventionDto;
-    role: ConventionRole;
     warning?: string;
     uow: UnitOfWork;
   }) {
     await Promise.all(
       recipients.map(async (email) => {
-        const makeMagicShortLink = prepareConventionMagicShortLinkMaker({
-          conventionMagicLinkPayload: {
-            id: convention.id,
-            role,
-            email,
-            now: this.#timeGateway.now(),
-          },
-          uow,
-          config: this.#config,
-          generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-        });
-
         return this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
@@ -157,10 +117,10 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
               lastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              magicLink: await makeMagicShortLink({
-                targetRoute: frontRoutes.manageConvention,
-                lifetime: "short",
-              }),
+              magicLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: convention.id },
+              )}`,
               agencyLogoUrl: agency.logoUrl ?? undefined,
               warning,
             },
