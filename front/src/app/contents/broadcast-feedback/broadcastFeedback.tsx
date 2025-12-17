@@ -221,7 +221,8 @@ export const broadcastFeedbackErrorMessageMap: Record<
         {isConventionValidated ? (
           <>
             <p>
-              {"->"} Si la convention a été validée, il n'y a pas longtemps :
+              {"->"} Si la convention a été validée, il n'y a pas longtemps et
+              que le bilan n'a pas été complété :
             </p>
             <ul>
               <li>Dupliquer la convention.</li>
@@ -232,7 +233,10 @@ export const broadcastFeedbackErrorMessageMap: Record<
               <li>Annuler l'ancienne convention.</li>
             </ul>
 
-            <p>{"->"} Si la convention a été validée, il y a longtemps :</p>
+            <p>
+              {"->"} Si la convention a été validée, il y a longtemps ou que le
+              bilan a été complété :
+            </p>
             <ul>
               <li>
                 Contacter notre centre d'aide pour erreur date de naissance
