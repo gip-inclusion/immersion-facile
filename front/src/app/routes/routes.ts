@@ -312,7 +312,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.manageConvention}`,
   ),
   manageConventionConnectedUser: defineRoute(
-    { conventionId: param.query.string },
+    { ...connectedUserParams, conventionId: param.query.string },
     () => `/${frontRoutes.manageConventionUserConnected}`,
   ),
   manageEstablishmentAdmin: defineRoute(

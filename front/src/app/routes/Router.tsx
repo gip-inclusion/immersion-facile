@@ -264,7 +264,14 @@ const getPageByRouteName: {
   searchResultExternal: () => <SearchResultPage isExternal={true} />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionConnectedUser: (route) => (
-    <ConventionManageConnectedUserPage route={route} />
+    <ConnectedPrivateRoute
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à cette convention" />
+      }
+    >
+      <ConventionManageConnectedUserPage route={route} />
+    </ConnectedPrivateRoute>
   ),
   myProfile: (route) => (
     <ConnectedPrivateRoute

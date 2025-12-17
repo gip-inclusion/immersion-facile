@@ -913,6 +913,18 @@ export const domElementIds = {
     },
   },
   manageConventionUserConnected: {
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--manage-convention-user-connected",
+      byEmailButton:
+        "im-login-form__connect-button--manage-convention-user-connected-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--manage-convention-user-connected",
+      retryButton:
+        "im-login-form__retry-login-button--manage-convention-user-connected",
+      contactSupport:
+        "im-login-form__contact-support-link--manage-convention-user-connected",
+    },
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
   },

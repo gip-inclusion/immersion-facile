@@ -1,4 +1,4 @@
-import { uniqBy } from "ramda";
+import { uniq, uniqBy } from "ramda";
 import {
   type AgencyDto,
   type ConventionDto,
@@ -7,6 +7,7 @@ import {
   errors,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -81,30 +82,14 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
       ],
     );
 
-    const agencyRecipientsRoleAndEmail: {
-      role: ConventionRole;
-      email: Email;
-    }[] = uniqBy(
-      (recipient) => recipient.email,
-      [
-        ...agency.counsellorEmails.map(
-          (counsellorEmail): { role: ConventionRole; email: Email } => ({
-            role: "counsellor",
-            email: counsellorEmail,
-          }),
-        ),
-        ...agency.validatorEmails.map(
-          (validatorEmail): { role: ConventionRole; email: Email } => ({
-            role: "validator",
-            email: validatorEmail,
-          }),
-        ),
-      ],
-    );
+    const agencyRecipientsEmails: Email[] = uniq([
+      ...agency.counsellorEmails,
+      ...agency.validatorEmails,
+    ]);
 
     await Promise.all([
       ...sendAgencyEmails(
-        agencyRecipientsRoleAndEmail,
+        agencyRecipientsEmails,
         convention,
         uow,
         justification,
@@ -136,7 +121,7 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
   });
 
 const sendAgencyEmails = (
-  agencyRecipientsRoleAndEmail: { role: ConventionRole; email: Email }[],
+  agencyRecipientsEmails: Email[],
   convention: ConventionDto,
   uow: UnitOfWork,
   justification: string,
@@ -149,26 +134,7 @@ const sendAgencyEmails = (
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   },
 ) => {
-  return agencyRecipientsRoleAndEmail.map(async (emailAndRole) => {
-    const { role, email } = emailAndRole;
-    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
-      config: deps.config,
-      conventionMagicLinkPayload: {
-        id: convention.id,
-        role,
-        email,
-        now: deps.timeGateway.now(),
-      },
-      generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-      uow,
-    });
-
-    const shortLink = await makeShortMagicLink({
-      targetRoute: frontRoutes.manageConvention,
-      lifetime: "short",
-    });
-
+  return agencyRecipientsEmails.map(async (email) => {
     return deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
@@ -186,7 +152,12 @@ const sendAgencyEmails = (
           beneficiaryPhone: convention.signatories.beneficiary.phone,
           previousAgencyName,
           justification,
-          magicLink: shortLink,
+          magicLink: `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            `/${frontRoutes.manageConventionUserConnected}`,
+            {
+              conventionId: convention.id,
+            },
+          )}`,
           conventionId: convention.id,
         },
       },
