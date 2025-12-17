@@ -4,9 +4,11 @@ import {
   ConventionDtoBuilder,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
   reasonableSchedule,
 } from "shared";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../../utils/jwtTestHelper";
+import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
+import { AppConfigBuilder } from "../../../../../utils/AppConfigBuilder";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -48,10 +50,12 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
   let agency: AgencyWithUsersRights;
   const timeGateway = new CustomTimeGateway();
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let config: AppConfig;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     agency = uow.agencyRepository.agencies[0];
+    config = new AppConfigBuilder().build();
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -66,8 +70,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
       new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
         new InMemoryUowPerformer(uow),
         saveNotificationAndRelatedEvent,
-        fakeGenerateMagicLinkUrlFn,
-        timeGateway,
+        config,
       );
   });
 
@@ -130,8 +133,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
             advisorLastName: getFormattedFirstnameAndLastname({
               lastname: advisor.lastName,
             }),
-            // biome-ignore lint/style/noNonNullAssertion: <explanation>
-            immersionAddress: conventionDtoFromEvent.immersionAddress!,
+            immersionAddress: conventionDtoFromEvent.immersionAddress,
             beneficiaryFirstName: getFormattedFirstnameAndLastname({
               firstname:
                 conventionDtoFromEvent.signatories.beneficiary.firstName,
@@ -144,13 +146,10 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
             dateStart: conventionDtoFromEvent.dateStart,
             dateEnd: conventionDtoFromEvent.dateEnd,
             businessName: conventionDtoFromEvent.businessName,
-            magicLink: fakeGenerateMagicLinkUrlFn({
-              id: conventionDtoFromEvent.id,
-              role: "validator",
-              targetRoute: frontRoutes.manageConvention,
-              email: advisor.email,
-              now: timeGateway.now(),
-            }),
+            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              `/${frontRoutes.manageConventionUserConnected}`,
+              { conventionId: conventionDtoFromEvent.id },
+            )}`,
             agencyLogoUrl: agency.logoUrl ?? undefined,
           },
         },
