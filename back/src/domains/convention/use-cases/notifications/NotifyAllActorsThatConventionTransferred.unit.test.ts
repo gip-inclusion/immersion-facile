@@ -5,7 +5,9 @@ import {
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -143,7 +145,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
   });
 
   it("should notify agency and signatories that convention has been transferred", async () => {
-    const shortLinks = ["shortLink1", "shortLink2", "shortLink3", "shortLink4"];
+    const shortLinks = ["shortLink1", "shortLink2", "shortLink3"];
     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
     uow.agencyRepository.agencies = [
       toAgencyWithRights(previousAgency, {}),
@@ -181,7 +183,12 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
             beneficiaryPhone: convention.signatories.beneficiary.phone,
             previousAgencyName: previousAgency.name,
             justification: "agency change",
-            magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              `/${frontRoutes.manageConventionUserConnected}`,
+              {
+                conventionId: convention.id,
+              },
+            )}`,
             conventionId: convention.id,
           },
         },
@@ -197,7 +204,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
             agencyAddress: `${newAgency.address.streetNumberAndAddress} ${newAgency.address.postcode} ${newAgency.address.city}`,
             businessName: convention.businessName,
             justification: "agency change",
-            magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[1]}`,
+            magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
             conventionId: convention.id,
           },
         },
@@ -215,7 +222,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
             agencyAddress: `${newAgency.address.streetNumberAndAddress} ${newAgency.address.postcode} ${newAgency.address.city}`,
             businessName: convention.businessName,
             justification: "agency change",
-            magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[2]}`,
+            magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[1]}`,
             conventionId: convention.id,
           },
         },
@@ -231,7 +238,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
             agencyAddress: `${newAgency.address.streetNumberAndAddress} ${newAgency.address.postcode} ${newAgency.address.city}`,
             businessName: convention.businessName,
             justification: "agency change",
-            magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[3]}`,
+            magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[2]}`,
             conventionId: convention.id,
           },
         },

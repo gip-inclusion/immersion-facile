@@ -1,6 +1,8 @@
 import type { PathParameters, SharedRoute, Url } from "shared-routes";
 import type { UnknownResponses } from "shared-routes/defineRoutes";
 import type { AllowedLoginSource } from "../auth/auth.dto";
+import type { RawQueryParams } from "../utils/queryParams";
+import { queryParamsAsString } from "../utils/queryParams";
 
 export const makeUrlWithParams = <
   U extends Url,
@@ -14,6 +16,14 @@ export const makeUrlWithParams = <
     (_, paramName) => (params as any)[paramName],
   ) as U;
 
+export const makeUrlWithQueryParams = <U extends Url>(
+  url: U,
+  queryParams: RawQueryParams,
+): Url => {
+  const queryString = queryParamsAsString(queryParams);
+  return (queryString ? `${url}?${queryString}` : url) as Url;
+};
+
 const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   admin: "admin",
   establishment: "establishment",
@@ -22,6 +32,7 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
     "tableau-de-bord-etablissement/discussions",
   agencyDashboard: "tableau-de-bord-agence",
   addAgency: "ajouter-prescripteur",
+  manageConventionUserConnected: "pilotage-convention-inclusion-connect",
 };
 
 export const frontRoutes = {
@@ -47,7 +58,6 @@ export const frontRoutes = {
   magicLinkRenewal: "refraichir-lien",
   magicLinkInterstitial: "connexion-interstitiel",
   manageConvention: "pilotage-convention",
-  manageConventionUserConnected: "pilotage-convention-inclusion-connect",
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
   profile: "mon-profil",
   search: "recherche",

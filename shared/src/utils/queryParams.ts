@@ -2,7 +2,7 @@ import { join, keys, reduce } from "ramda";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import { pipeWithValue } from "../pipeWithValue";
 
-type RawQueryParams = { [key: string]: string | boolean | number };
+export type RawQueryParams = { [key: string]: string | boolean | number };
 
 export type QueryParams<T extends RawQueryParams> = {
   [K in keyof T]: T[K];

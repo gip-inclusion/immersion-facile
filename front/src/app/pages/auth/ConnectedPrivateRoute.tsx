@@ -23,7 +23,7 @@ import {
   emailSchema,
   immersionFacileNoReplyEmail,
   isFederatedIdentityProvider,
-  queryParamsAsString,
+  makeUrlWithQueryParams,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -107,7 +107,8 @@ type ConnectPrivateRoute =
   | FrontDashboardRoute
   | Route<typeof routes.formEstablishment>
   | Route<typeof routes.myProfile>
-  | Route<typeof routes.addAgency>;
+  | Route<typeof routes.addAgency>
+  | Route<typeof routes.manageConventionConnectedUser>;
 
 type ConnectedPrivateRouteProps = {
   route: ConnectPrivateRoute;
@@ -294,6 +295,8 @@ const getAllowedStartAuthPage = (
 ): AllowedLoginSource => {
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
+  if (routeName === "manageConventionConnectedUser")
+    return "manageConventionUserConnected";
   if (
     agencyDashboardRoutes.includes(routeName as AgencyDashboardRouteName) &&
     "isAgencyRegistration" in routeParams &&
@@ -474,11 +477,43 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
         },
       ],
     },
+    manageConventionUserConnected: {
+      title: "Mon espace prescripteur",
+      description: (
+        <>
+          <strong>Un compte unique</strong> pour accéder à vos conventions et
+          consulter vos statistiques.
+        </>
+      ),
+      cardsTitle: "Tous les avantages du compte prescripteur",
+      withEmailLogin: true,
+      cards: [
+        {
+          title: "Une connexion simplifiée",
+          description:
+            "Pas besoin de créer un nouveau mot de passe si vous appartenez à France Travail, Cap Emploi...",
+          illustration: commonIllustrations.warning,
+        },
+        {
+          title: "Un seul identifiant",
+          description:
+            "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
+          illustration: commonIllustrations.inscription,
+        },
+        {
+          title: "Tout au même endroit",
+          description:
+            "Un seul espace pour accéder aux conventions et statistiques de vos organismes.",
+          illustration: commonIllustrations.monCompte,
+        },
+      ],
+    },
     admin: {
       title: "Mon espace administrateur",
       description: "Pour la super team IF 😉",
       withEmailLogin: true,
     },
+
     default: {
       title: "Se connecter avec ProConnect",
       description:
@@ -576,9 +611,10 @@ const LoginWithProConnect = ({
       <div className={fr.cx("fr-my-2w")}>
         <ProConnectButton
           id={domElementIds[page].login.proConnectButton}
-          url={`/api${authRoutes.initiateLoginByOAuth.url}?${queryParamsAsString(
+          url={makeUrlWithQueryParams(
+            `/api${authRoutes.initiateLoginByOAuth.url}`,
             queryParamsResult.value,
-          )}`}
+          )}
         />
       </div>
     </>
