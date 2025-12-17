@@ -546,8 +546,7 @@ export const createUseCases = ({
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
           uowPerformer,
           saveNotificationAndRelatedEvent,
-          generateConventionMagicLinkUrl,
-          gateways.timeGateway,
+          config,
         ),
       notifyAgencyThatAssessmentIsCreated:
         new NotifyAgencyThatAssessmentIsCreated(

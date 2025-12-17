@@ -1,12 +1,12 @@
 import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
   type WithConventionDto,
   withConventionSchema,
 } from "shared";
-import type { GenerateConventionMagicLinkUrl } from "../../../../../config/bootstrap/magicLinkUrl";
+import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
-import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
@@ -16,21 +16,16 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
-  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-
-  readonly #timeGateway: TimeGateway;
+  readonly #config: AppConfig;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    timeGateway: TimeGateway,
+    config: AppConfig,
   ) {
     super(uowPerformer);
-
-    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#config = config;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#timeGateway = timeGateway;
   }
 
   public async _execute(
@@ -74,13 +69,12 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
             immersionAddress: convention.immersionAddress,
-            magicLink: this.#generateConventionMagicLinkUrl({
-              id: convention.id,
-              role: "validator",
-              targetRoute: frontRoutes.manageConvention,
-              email: conventionFtAdvisor.advisor.email,
-              now: this.#timeGateway.now(),
-            }),
+            magicLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              `/${frontRoutes.manageConventionUserConnected}`,
+              {
+                conventionId: convention.id,
+              },
+            )}`,
           },
         },
         followedIds: {
