@@ -3,24 +3,21 @@ import {
   ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
-  expectToEqual,
   type FtConnectIdentity,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
-import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -79,7 +76,6 @@ describe("NotifyConventionNeedsReview", () => {
 
   let uow: InMemoryUnitOfWork;
   let notifyNewConventionNeedsReview: NotifyNewConventionNeedsReview;
-  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
   let conventionInReview: ConventionDto;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
@@ -88,7 +84,6 @@ describe("NotifyConventionNeedsReview", () => {
   beforeEach(() => {
     config = new AppConfigBuilder().build();
     uow = createInMemoryUow();
-    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -96,9 +91,6 @@ describe("NotifyConventionNeedsReview", () => {
     notifyNewConventionNeedsReview = new NotifyNewConventionNeedsReview(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      fakeGenerateMagicLinkUrlFn,
-      timeGateway,
-      shortLinkIdGeneratorGateway,
       config,
     );
     uow.userRepository.users = [
@@ -119,21 +111,8 @@ describe("NotifyConventionNeedsReview", () => {
     it("Nominal case: Sends notification email to councellor, with 2 existing councellors", async () => {
       uow.agencyRepository.agencies = [agencyWithCounsellorsAndValidators];
 
-      const shortLinkIds = ["shortlink1"];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-
       await notifyNewConventionNeedsReview.execute({
         convention: conventionInReview,
-      });
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReview.id,
-          email: councellor2.email,
-          now: timeGateway.now(),
-          role: "counsellor",
-          targetRoute: frontRoutes.manageConvention,
-        }),
       });
       expectSavedNotificationsAndEvents({
         emails: [
@@ -153,7 +132,10 @@ describe("NotifyConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: conventionInReview.id },
+              )}`,
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -168,28 +150,8 @@ describe("NotifyConventionNeedsReview", () => {
     it("No counsellors available: we fall back to validators: Sends notification email to those validators (using 2 of them)", async () => {
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
 
-      const shortLinkIds = ["shortlink1", "shortlink2"];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-
       await notifyNewConventionNeedsReview.execute({
         convention: conventionInReview,
-      });
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReview.id,
-          email: validator1.email,
-          now: timeGateway.now(),
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReview.id,
-          email: validator2.email,
-          now: timeGateway.now(),
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-        }),
       });
 
       expectSavedNotificationsAndEvents({
@@ -210,7 +172,10 @@ describe("NotifyConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: conventionInReview.id },
+              )}`,
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -234,7 +199,10 @@ describe("NotifyConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: conventionInReview.id },
+              )}`,
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -263,9 +231,6 @@ describe("NotifyConventionNeedsReview", () => {
         .withFederatedIdentity(ftIdentity)
         .build();
 
-      const shortLinkIds = ["shortlink1"];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-
       const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
         _entityName: "ConventionFranceTravailAdvisor",
         advisor: {
@@ -308,7 +273,10 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: conventionInReviewWithFtAdvisor.id },
+              )}`,
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithCounsellorsAndValidators.logoUrl ?? undefined,
@@ -322,8 +290,6 @@ describe("NotifyConventionNeedsReview", () => {
 
     it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
-      const shortLinkId = "shortlink1";
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
       const conventionInReviewWithFtAdvisor = new ConventionDtoBuilder(
         defaultConvention,
@@ -352,16 +318,6 @@ describe("NotifyConventionNeedsReview", () => {
         convention: conventionInReviewWithFtAdvisor,
       });
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkId]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReviewWithFtAdvisor.id,
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-          email: ftAdvisorEmail,
-          now: timeGateway.now(),
-        }),
-      });
-
       expectSavedNotificationsAndEvents({
         emails: [
           {
@@ -384,7 +340,10 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkId),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: conventionInReviewWithFtAdvisor.id },
+              )}`,
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -410,31 +369,10 @@ describe("NotifyConventionNeedsReview", () => {
     });
 
     it("Nominal case: Sends notification email to validators", async () => {
-      const shortLinkIds = ["link1", "link2", "link3", "link4"];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
 
       await notifyNewConventionNeedsReview.execute({
         convention: acceptedByCounsellorConvention,
-      });
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-          id: acceptedByCounsellorConvention.id,
-          email: validator1.email,
-          now: timeGateway.now(),
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-        }),
-
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: acceptedByCounsellorConvention.id,
-          email: validator2.email,
-          now: timeGateway.now(),
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-        }),
       });
 
       expectSavedNotificationsAndEvents({
@@ -459,7 +397,10 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: acceptedByCounsellorConvention.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: acceptedByCounsellorConvention.id },
+              )}`,
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -486,7 +427,10 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: acceptedByCounsellorConvention.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: acceptedByCounsellorConvention.id },
+              )}`,
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -506,8 +450,6 @@ describe("NotifyConventionNeedsReview", () => {
 
     it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
-      const shortLinkId = "shortlink1";
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
       const conventionAcceptedByCounsellorWithFtAdvisor =
         new ConventionDtoBuilder(defaultConvention)
@@ -535,16 +477,6 @@ describe("NotifyConventionNeedsReview", () => {
         convention: conventionAcceptedByCounsellorWithFtAdvisor,
       });
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkId]: fakeGenerateMagicLinkUrlFn({
-          id: conventionAcceptedByCounsellorWithFtAdvisor.id,
-          role: "validator",
-          targetRoute: frontRoutes.manageConvention,
-          email: ftAdvisorEmail,
-          now: timeGateway.now(),
-        }),
-      });
-
       expectSavedNotificationsAndEvents({
         emails: [
           {
@@ -570,7 +502,12 @@ describe("NotifyConventionNeedsReview", () => {
               }),
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkId),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                {
+                  conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
+                },
+              )}`,
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
