@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { uniqBy } from "ramda";
+import { uniq } from "ramda";
 import {
   type AgencyDto,
   type AgencyWithUsersRights,
@@ -9,7 +9,7 @@ import {
   type ConventionActorRole,
   type ConventionDto,
   type ConventionReadDto,
-  type ConventionRole,
+  type Email,
   type EstablishmentRepresentative,
   type ExtractFromExisting,
   errors,
@@ -19,6 +19,7 @@ import {
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
+  makeUrlWithQueryParams,
   type ReminderKind,
   smsRecipientPhoneSchema,
   type TemplatedEmail,
@@ -39,11 +40,6 @@ import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-
-type EmailWithRole = {
-  email: string;
-  role: ConventionRole;
-};
 
 type SignatoriesReminderKind = ExtractFromExisting<
   ReminderKind,
@@ -167,35 +163,19 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         kind: reminderKind,
       });
 
-    const emailWithRoles = uniqBy(
-      (emailWithRole) => emailWithRole.email,
-      [
-        ...agency.validatorEmails.map(
-          (email) =>
-            ({
-              role: "validator",
-              email,
-            }) satisfies EmailWithRole,
-        ),
-        ...agency.counsellorEmails.map(
-          (email) =>
-            ({
-              role: "counsellor",
-              email,
-            }) satisfies EmailWithRole,
-        ),
-      ],
-    );
+    const emails = uniq([
+      ...agency.validatorEmails,
+      ...agency.counsellorEmails,
+    ]);
 
     await this.#saveNotificationsBatchAndRelatedEvent(
       uow,
       await Promise.all(
-        emailWithRoles.map((emailWithRole) =>
+        emails.map((email) =>
           this.#createAgencyReminderEmail(
-            emailWithRole,
+            email,
             conventionRead,
             agency,
-            uow,
             reminderKind,
           ),
         ),
@@ -297,25 +277,11 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   }
 
   async #createAgencyReminderEmail(
-    { email, role }: EmailWithRole,
+    email: Email,
     convention: ConventionReadDto,
     agency: AgencyDto,
-    uow: UnitOfWork,
     kind: AgenciesReminderKind,
   ): Promise<NotificationContentAndFollowedIds> {
-    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
-      config: this.#config,
-      conventionMagicLinkPayload: {
-        id: convention.id,
-        role,
-        email,
-        now: this.#timeGateway.now(),
-      },
-      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      uow,
-    });
-
     const templatedEmail: TemplatedEmail =
       kind === "FirstReminderForAgency"
         ? {
@@ -336,10 +302,12 @@ export class NotifyConventionReminder extends TransactionalUseCase<
               businessName: convention.businessName,
               dateStart: convention.dateStart,
               dateEnd: convention.dateEnd,
-              agencyMagicLinkUrl: await makeShortMagicLink({
-                targetRoute: frontRoutes.manageConvention,
-                lifetime: "short",
-              }),
+              agencyMagicLinkUrl: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                {
+                  conventionId: convention.id,
+                },
+              )}`,
             },
           }
         : {
@@ -357,10 +325,12 @@ export class NotifyConventionReminder extends TransactionalUseCase<
                 lastname: convention.signatories.beneficiary.lastName,
               }),
               businessName: convention.businessName,
-              agencyMagicLinkUrl: await makeShortMagicLink({
-                targetRoute: frontRoutes.manageConvention,
-                lifetime: "short",
-              }),
+              agencyMagicLinkUrl: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                {
+                  conventionId: convention.id,
+                },
+              )}`,
             },
           };
 
