@@ -3,6 +3,7 @@ import type {
   FederatedIdentityProvider,
   FtConnectToken,
   FtExternalId,
+  IdToken,
   InternshipKind,
 } from "shared";
 import type { EntityFromDto } from "../../../../../utils/EntityFromDto";
@@ -28,6 +29,7 @@ type BeneficiaryBasicIdentity = Pick<
 export type ConventionFtConnectFields = BeneficiaryBasicIdentity & {
   fedId: FtConnectToken;
   fedIdProvider: FederatedIdentityProvider;
+  fedIdToken: IdToken;
 };
 
 export type FtUserAndAdvisor = {
@@ -37,10 +39,12 @@ export type FtUserAndAdvisor = {
 
 export const toPartialConventionDtoWithFtIdentity = (
   ftConnectUserInfo: FtConnectUserDto,
+  ftConnectIdToken: IdToken,
 ): ConventionFtConnectFields => ({
   email: ftConnectUserInfo.email || "",
   firstName: ftConnectUserInfo.firstName,
   lastName: ftConnectUserInfo.lastName,
   fedId: ftConnectUserInfo.peExternalId,
   fedIdProvider: "peConnect",
+  fedIdToken: ftConnectIdToken,
 });

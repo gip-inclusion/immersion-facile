@@ -65,6 +65,7 @@ export class LinkFranceTravailAdvisorAndRedirectToConvention extends Transaction
       return this.#makeRedirectUrl({
         fedIdProvider: "peConnect",
         fedId: authFailed,
+        fedIdToken: accessToken.idToken,
       });
     const { user, advisors } = userAndAdvisors;
 
@@ -79,6 +80,8 @@ export class LinkFranceTravailAdvisorAndRedirectToConvention extends Transaction
       peUserAndAdvisor,
     );
 
-    return this.#makeRedirectUrl(toPartialConventionDtoWithFtIdentity(user));
+    return this.#makeRedirectUrl(
+      toPartialConventionDtoWithFtIdentity(user, accessToken.idToken),
+    );
   }
 }

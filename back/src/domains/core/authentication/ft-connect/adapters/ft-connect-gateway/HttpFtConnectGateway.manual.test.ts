@@ -83,6 +83,7 @@ describe("HttpFtConnectGateway", () => {
   const accessToken = {
     expiresIn: 50,
     value: "my-access-token",
+    idToken: "my-id-token",
   };
 
   describe("getAccessToken", () => {
@@ -91,6 +92,7 @@ describe("HttpFtConnectGateway", () => {
         const expectedResponse: ExternalAccessToken = {
           access_token: "5656sdfsdfsdfsdf654",
           expires_in: 50,
+          id_token: "my-id-token",
         };
         mock
           .onPost(routes.exchangeCodeForAccessToken.url)

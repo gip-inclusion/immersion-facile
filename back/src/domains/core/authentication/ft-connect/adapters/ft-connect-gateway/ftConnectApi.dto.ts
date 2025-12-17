@@ -6,6 +6,7 @@ import type { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
 export type ExternalAccessToken = {
   access_token: string;
   expires_in: number;
+  id_token: string;
 };
 
 // External contract from https://pole-emploi.io/data/api/pole-emploi-connect

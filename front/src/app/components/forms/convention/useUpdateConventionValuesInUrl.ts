@@ -29,7 +29,7 @@ export const useUpdateConventionValuesInUrl = (
         filterParamsForRoute({
           urlParams,
           matchingParams: conventionParams,
-          forceExcludeParams: ["fedId", "fedIdProvider"],
+          forceExcludeParams: ["fedId", "fedIdProvider", "fedIdToken"],
         }),
       );
 
@@ -40,6 +40,7 @@ export const useUpdateConventionValuesInUrl = (
         const {
           fedId: _,
           fedIdProvider: __,
+          fedIdToken: ___,
           ...watchedValuesWithoutFederatedIdentity
         } = watchedValues;
 

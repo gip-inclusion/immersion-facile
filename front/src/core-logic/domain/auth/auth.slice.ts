@@ -4,6 +4,7 @@ import type {
   AfterOAuthSuccessRedirectionResponse,
   Email,
   FederatedIdentity,
+  IdToken,
   WithRedirectUri,
 } from "shared";
 import type {
@@ -15,6 +16,7 @@ export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;
   firstName: string;
   lastName: string;
+  idToken: IdToken;
 };
 
 type WithUrl = {

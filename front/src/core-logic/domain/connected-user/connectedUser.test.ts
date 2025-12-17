@@ -83,6 +83,7 @@ describe("InclusionConnected", () => {
     lastName: "",
     provider: "peConnect",
     token: "fake-token",
+    idToken: "fake-id-token",
   };
 
   beforeEach(() => {

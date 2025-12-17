@@ -30,6 +30,7 @@ describe("Auth slice", () => {
     email: "john.doe@mail.com",
     firstName: "John",
     lastName: "Doe",
+    idToken: "pe-connect-id-token",
   };
 
   const connectedUserFederatedIdentity: FederatedIdentityWithUser = {

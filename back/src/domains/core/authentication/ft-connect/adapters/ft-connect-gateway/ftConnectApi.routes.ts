@@ -115,4 +115,5 @@ export const toAccessToken = (
 ): AccessTokenDto => ({
   value: externalAccessToken.access_token,
   expiresIn: externalAccessToken.expires_in,
+  idToken: externalAccessToken.id_token,
 });
