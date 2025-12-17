@@ -1,14 +1,18 @@
+import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   conventionMagicLinkRoutes,
+  currentJwtVersions,
   expectArraysToEqualIgnoringOrder,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectInArrayToMatch,
   expectToEqual,
+  frontRoutes,
+  makeUrlWithQueryParams,
   type Signatories,
   type TemplatedEmail,
   technicalRoutes,
@@ -153,11 +157,17 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       initialConvention,
     );
 
-    const { validatorReviewJwt } = await establishmentSignsApplication(
+    await establishmentSignsApplication(
       appAndDeps,
       establishmentSignJwt,
       initialConvention,
     );
+    const validatorReviewJwt = appAndDeps.generateConnectedUserJwt({
+      version: currentJwtVersions.connectedUser,
+      iat: Date.now(),
+      exp: addDays(new Date(), 30).getTime(),
+      userId: validator.id,
+    });
 
     await validatorValidatesApplicationWhichTriggersConventionToBeSent(
       appAndDeps,
@@ -306,14 +316,10 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   };
 
   const establishmentSignsApplication = async (
-    { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
+    { request, gateways, eventCrawler, inMemoryUow, appConfig }: TestAppAndDeps,
     establishmentSignJwt: string,
     initialConvention: ConventionDto,
   ) => {
-    const technicalRoutesClient = createSupertestSharedClient(
-      technicalRoutes,
-      request,
-    );
     gateways.timeGateway.setNextDate(establishmentRepresentativeSignDate);
 
     await request
@@ -360,14 +366,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     );
     expect(needsReviewEmail.recipients).toEqual([validator.email]);
 
-    return {
-      validatorReviewJwt: expectJwtInMagicLinkAndGetIt(
-        await shortLinkRedirectToLinkWithValidation(
-          needsReviewEmail.params.magicLink,
-          technicalRoutesClient,
-        ),
-      ),
-    };
+    expect(needsReviewEmail.params.magicLink).toBe(
+      `${appConfig.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        `/${frontRoutes.manageConventionUserConnected}`,
+        { conventionId: initialConvention.id },
+      )}`,
+    );
   };
 
   const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (

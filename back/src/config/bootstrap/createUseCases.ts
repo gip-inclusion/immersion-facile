@@ -501,9 +501,6 @@ export const createUseCases = ({
       notifyNewConventionNeedsReview: new NotifyNewConventionNeedsReview(
         uowPerformer,
         saveNotificationAndRelatedEvent,
-        generateConventionMagicLinkUrl,
-        gateways.timeGateway,
-        gateways.shortLinkGenerator,
         config,
       ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyConventionSubmitted(
