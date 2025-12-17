@@ -14,6 +14,7 @@ import {
   frontRoutes,
   type GenericActor,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
   type ReminderKind,
   splitCasesBetweenPassingAndFailing,
   type TemplatedEmail,
@@ -162,7 +163,6 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       },
     );
-    const shortLinkIds = ["link1", "link2", "link3", "link4"];
 
     beforeEach(() => {
       uow.userRepository.users = [
@@ -172,7 +172,6 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         validator2,
       ];
       uow.agencyRepository.agencies = [agencyWithRight];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
     });
 
     describe("FirstReminderForAgency", () => {
@@ -193,36 +192,11 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         });
 
         //Assert
-        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "validator",
-            targetRoute: frontRoutes.manageConvention,
-            email: validator1.email,
-            now: timeGateway.now(),
-          }),
-          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "validator",
-            targetRoute: frontRoutes.manageConvention,
-            email: validator2.email,
-            now: timeGateway.now(),
-          }),
-          [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "counsellor",
-            targetRoute: frontRoutes.manageConvention,
-            email: councellor1.email,
-            now: timeGateway.now(),
-          }),
-          [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "counsellor",
-            targetRoute: frontRoutes.manageConvention,
-            email: councellor2.email,
-            now: timeGateway.now(),
-          }),
-        });
+
+        const agencyMagicLinkUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+          `/${frontRoutes.manageConventionUserConnected}`,
+          { conventionId: convention.id },
+        )}`;
 
         expectSavedNotificationsBatchAndEvent({
           emails: [
@@ -230,25 +204,25 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
               email: validator1.email,
               agency: agencyWithRight,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+              agencyMagicLinkUrl,
             }),
             makeAgencyFirstReminderEmail({
               email: validator2.email,
               agency: agencyWithRight,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+              agencyMagicLinkUrl,
             }),
             makeAgencyFirstReminderEmail({
               email: councellor1.email,
               agency: agencyWithRight,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
+              agencyMagicLinkUrl,
             }),
             makeAgencyFirstReminderEmail({
               email: councellor2.email,
               agency: agencyWithRight,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
+              agencyMagicLinkUrl,
             }),
           ],
         });
@@ -298,58 +272,33 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         });
 
         //Assert
-        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "validator",
-            targetRoute: frontRoutes.manageConvention,
-            email: validator1.email,
-            now: timeGateway.now(),
-          }),
-          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "validator",
-            targetRoute: frontRoutes.manageConvention,
-            email: validator2.email,
-            now: timeGateway.now(),
-          }),
-          [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "counsellor",
-            targetRoute: frontRoutes.manageConvention,
-            email: councellor1.email,
-            now: timeGateway.now(),
-          }),
-          [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
-            id: convention.id,
-            role: "counsellor",
-            targetRoute: frontRoutes.manageConvention,
-            email: councellor2.email,
-            now: timeGateway.now(),
-          }),
-        });
+
+        const agencyMagicLinkUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+          `/${frontRoutes.manageConventionUserConnected}`,
+          { conventionId: convention.id },
+        )}`;
 
         expectSavedNotificationsBatchAndEvent({
           emails: [
             makeAgencyLastReminderEmail({
               email: validator1.email,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+              agencyMagicLinkUrl,
             }),
             makeAgencyLastReminderEmail({
               email: validator2.email,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+              agencyMagicLinkUrl,
             }),
             makeAgencyLastReminderEmail({
               email: councellor1.email,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
+              agencyMagicLinkUrl,
             }),
             makeAgencyLastReminderEmail({
               email: councellor2.email,
               convention,
-              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
+              agencyMagicLinkUrl,
             }),
           ],
         });
@@ -748,12 +697,12 @@ const makeAgencyFirstReminderEmail = ({
   email,
   agency,
   convention,
-  shortLinkUrl,
+  agencyMagicLinkUrl,
 }: {
   email: string;
   agency: AgencyWithUsersRights;
   convention: ConventionDto;
-  shortLinkUrl: AbsoluteUrl;
+  agencyMagicLinkUrl: AbsoluteUrl;
 }): TemplatedEmail => ({
   kind: "AGENCY_FIRST_REMINDER",
   recipients: [email],
@@ -772,18 +721,18 @@ const makeAgencyFirstReminderEmail = ({
     businessName: convention.businessName,
     dateStart: convention.dateStart,
     dateEnd: convention.dateEnd,
-    agencyMagicLinkUrl: shortLinkUrl,
+    agencyMagicLinkUrl,
   },
 });
 
 const makeAgencyLastReminderEmail = ({
   email,
   convention,
-  shortLinkUrl,
+  agencyMagicLinkUrl,
 }: {
   email: string;
   convention: ConventionDto;
-  shortLinkUrl: AbsoluteUrl;
+  agencyMagicLinkUrl: AbsoluteUrl;
 }): TemplatedEmail => ({
   kind: "AGENCY_LAST_REMINDER",
   recipients: [email],
@@ -799,7 +748,7 @@ const makeAgencyLastReminderEmail = ({
       lastname: convention.signatories.beneficiary.lastName,
     }),
     businessName: convention.businessName,
-    agencyMagicLinkUrl: shortLinkUrl,
+    agencyMagicLinkUrl,
   },
 });
 
