@@ -114,6 +114,7 @@ export const LayoutHeader = () => {
             const {
               fedId: _1,
               fedIdProvider: _2,
+              fedIdToken: _3,
               ...rest
             } = currentRoute.params;
             routes.conventionImmersion(rest).replace();

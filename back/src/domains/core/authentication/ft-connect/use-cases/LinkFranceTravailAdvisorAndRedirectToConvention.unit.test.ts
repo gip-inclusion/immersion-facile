@@ -96,7 +96,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${userFtExternalId}&fedIdProvider=peConnect`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${userFtExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
       );
     });
   });
@@ -124,7 +124,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}`,
+        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}&fedIdToken=fake-id-token`,
       );
       expectToEqual(
         uow.conventionFranceTravailAdvisorRepository
@@ -141,7 +141,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftNotJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftNotJobseekerUser.peExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
       );
       expectToEqual(
         uow.conventionFranceTravailAdvisorRepository
@@ -167,7 +167,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
       await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
     expect(urlWithQueryParams).toBe(
-      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
+      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftJobseekerUser.peExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
     );
     expectToEqual(
       uow.conventionFranceTravailAdvisorRepository
@@ -224,4 +224,5 @@ const ftCapEmploiAdvisor: FtConnectImmersionAdvisorDto = {
 const accessToken: AccessTokenDto = {
   expiresIn: 1,
   value: "",
+  idToken: "fake-id-token",
 };

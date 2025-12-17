@@ -37,7 +37,8 @@ const storeConventionRouteParamsOnDevice = (
   const {
     fedId: _1,
     fedIdProvider: _2,
-    jwt: _3,
+    fedIdToken: _3,
+    jwt: _4,
     ...partialConvention
   } = routeParams;
   if (keys(partialConvention).length) {
@@ -158,6 +159,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
     if (
       initialRouteParams.fedId &&
       initialRouteParams.fedIdProvider &&
+      initialRouteParams.fedIdToken &&
       initialRouteParams.email &&
       initialRouteParams.firstName &&
       initialRouteParams.lastName
@@ -165,6 +167,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
       const {
         fedId: _,
         fedIdProvider: __,
+        fedIdToken: ___,
         ...paramsWithoutFederatedIdentity
       } = initialRouteParams;
       if (initialRouteParams.fedIdProvider === "peConnect")
@@ -173,6 +176,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
             federatedIdentityWithUser: {
               provider: initialRouteParams.fedIdProvider,
               token: initialRouteParams.fedId,
+              idToken: initialRouteParams.fedIdToken,
               email: initialRouteParams.email,
               firstName: initialRouteParams.firstName,
               lastName: initialRouteParams.lastName,
