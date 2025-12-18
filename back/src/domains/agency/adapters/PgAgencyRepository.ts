@@ -512,10 +512,10 @@ export class PgAgencyRepository implements AgencyRepository {
   }): Promise<AgencyId[]> {
     const { updatedBefore } = params;
     const result = await this.transaction
-      .withRecursive("agenciesToDelete", (qb) =>
+      .withRecursive("deletionCandidates", (qb) =>
         qb
           .selectFrom("agencies")
-          .select("id")
+          .select("agencies.id")
           .where("status", "in", ["closed", "rejected"])
           .where("updated_at", "<=", updatedBefore)
           .where(({ eb }) =>
@@ -527,8 +527,53 @@ export class PgAgencyRepository implements AgencyRepository {
                   .whereRef("conventions.agency_id", "=", "agencies.id"),
               ),
             ),
+          ),
+      )
+      .withRecursive("candidateSubtree", (qb) =>
+        qb
+          .selectFrom("deletionCandidates")
+          .select(({ ref }) => [
+            ref("deletionCandidates.id").as("root_id"),
+            ref("deletionCandidates.id").as("id"),
+          ])
+          .unionAll(
+            qb
+              .selectFrom("agencies")
+              .innerJoin(
+                "candidateSubtree",
+                "agencies.refers_to_agency_id",
+                "candidateSubtree.id",
+              )
+              .select(({ ref }) => [
+                ref("candidateSubtree.root_id").as("root_id"),
+                ref("agencies.id").as("id"),
+              ]),
+          ),
+      )
+      .withRecursive("agenciesToDelete", (qb) =>
+        qb
+          .selectFrom("deletionCandidates")
+          .select("deletionCandidates.id")
+          .where(({ eb }) =>
+            eb.not(
+              eb.exists(
+                eb
+                  .selectFrom("candidateSubtree")
+                  .innerJoin(
+                    "conventions",
+                    "conventions.agency_id",
+                    "candidateSubtree.id",
+                  )
+                  .select("conventions.id")
+                  .whereRef(
+                    "candidateSubtree.root_id",
+                    "=",
+                    "deletionCandidates.id",
+                  ),
+              ),
+            ),
           )
-          .union(
+          .unionAll(
             qb
               .selectFrom("agencies")
               .select("agencies.id")
@@ -536,6 +581,16 @@ export class PgAgencyRepository implements AgencyRepository {
                 "agenciesToDelete",
                 "agencies.refers_to_agency_id",
                 "agenciesToDelete.id",
+              )
+              .where(({ eb }) =>
+                eb.not(
+                  eb.exists(
+                    eb
+                      .selectFrom("conventions")
+                      .select("id")
+                      .whereRef("conventions.agency_id", "=", "agencies.id"),
+                  ),
+                ),
               ),
           ),
       )
