@@ -71,7 +71,7 @@ const storeFederatedIdentityInDevice: AuthEpic = (
     }),
   );
 
-const redirectToProviderLoggoutPage: AuthEpic = (
+const redirectToProviderLogoutPage: AuthEpic = (
   action$,
   _,
   { navigationGateway },
@@ -83,7 +83,7 @@ const redirectToProviderLoggoutPage: AuthEpic = (
         navigationGateway.goToUrl(action.payload);
       }
     }),
-    map(() => authSlice.actions.redirectAfterLoggoutSucceeded()),
+    map(() => authSlice.actions.redirectAfterLogoutSucceeded()),
   );
 
 const deleteFederatedIdentityFromDevice: AuthEpic = (
@@ -92,7 +92,7 @@ const deleteFederatedIdentityFromDevice: AuthEpic = (
   { localDeviceRepository },
 ) =>
   action$.pipe(
-    filter(authSlice.actions.fetchLoggoutUrlSucceeded.match),
+    filter(authSlice.actions.fetchLogoutUrlSucceeded.match),
     tap(() => localDeviceRepository.delete("federatedIdentityWithUser")),
     tap(() => localDeviceRepository.delete("partialConventionInUrl")),
     map((action) =>
@@ -108,7 +108,7 @@ const logoutEpic: AuthEpic = (
   { navigationGateway, authGateway },
 ) =>
   action$.pipe(
-    filter(authSlice.actions.fetchLoggoutUrlRequested.match),
+    filter(authSlice.actions.fetchLogoutUrlRequested.match),
     switchMap((action) => {
       const { federatedIdentityWithUser } = state$.value.auth;
       if (!federatedIdentityWithUser) throw errors.auth.missingOAuth({});
@@ -127,9 +127,9 @@ const logoutEpic: AuthEpic = (
       return of(undefined);
     }),
     map((logoutUrl) => {
-      return authSlice.actions.fetchLoggoutUrlSucceeded(logoutUrl);
+      return authSlice.actions.fetchLogoutUrlSucceeded(logoutUrl);
     }),
-    catchEpicError((_error) => authSlice.actions.fetchLoggoutUrlFailed()),
+    catchEpicError((_error) => authSlice.actions.fetchLogoutUrlFailed()),
   );
 
 const checkConnectedWithFederatedIdentity: AuthEpic = (
@@ -238,5 +238,5 @@ export const authEpics = [
   checkRedirectionAfterLogin,
   requestLoginByEmail,
   confirmLoginByMagicLink,
-  redirectToProviderLoggoutPage,
+  redirectToProviderLogoutPage,
 ];

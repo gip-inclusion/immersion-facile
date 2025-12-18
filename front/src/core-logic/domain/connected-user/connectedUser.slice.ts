@@ -65,7 +65,7 @@ export const connectedUserSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(authSlice.actions.fetchLoggoutUrlSucceeded, (state) => {
+    builder.addCase(authSlice.actions.fetchLogoutUrlSucceeded, (state) => {
       state.currentUser = null;
     });
 

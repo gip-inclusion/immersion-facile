@@ -116,7 +116,7 @@ describe("Auth slice", () => {
     });
 
     store.dispatch(
-      authSlice.actions.fetchLoggoutUrlRequested({
+      authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-and-oauth",
       }),
     );
@@ -165,7 +165,7 @@ describe("Auth slice", () => {
       firstName: "BOB",
     });
     store.dispatch(
-      authSlice.actions.fetchLoggoutUrlRequested({
+      authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-only",
       }),
     );
@@ -216,7 +216,7 @@ describe("Auth slice", () => {
     });
 
     store.dispatch(
-      authSlice.actions.fetchLoggoutUrlRequested({
+      authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-only",
       }),
     );

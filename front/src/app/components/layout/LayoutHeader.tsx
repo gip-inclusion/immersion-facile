@@ -103,7 +103,7 @@ export const LayoutHeader = () => {
       buttonProps: {
         onClick: () => {
           dispatch(
-            authSlice.actions.fetchLoggoutUrlRequested({
+            authSlice.actions.fetchLogoutUrlRequested({
               mode:
                 federatedIdentity?.provider === "email"
                   ? "device-only"
