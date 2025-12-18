@@ -11,17 +11,26 @@ type SignConventionModalContentProps = {
   signatory: Signatory;
   internshipKind: InternshipKind;
   onCancel: () => void;
+  onSubmit?: () => void;
 };
 
 export const SignConventionModalContent = ({
   signatory,
   internshipKind,
   onCancel,
+  onSubmit,
 }: SignConventionModalContentProps) => {
   const { signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(signatory);
 
-  const { modalOnCancelCallback } = useFormModal();
+  const { modalOnCancelCallback, formId } = useFormModal();
+
+  const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (onSubmit) {
+      onSubmit();
+    }
+  };
 
   useEffect(() => {
     return modalOnCancelCallback(() => {
@@ -31,6 +40,7 @@ export const SignConventionModalContent = ({
 
   return (
     <>
+      {onSubmit && <form onSubmit={onFormSubmit} id={formId} />}
       {internshipKind === "mini-stage-cci" && (
         <p>
           Les étudiants ne sont pas soumis aux périodes de vacances scolaires

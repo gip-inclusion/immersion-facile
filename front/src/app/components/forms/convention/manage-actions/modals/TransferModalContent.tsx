@@ -1,4 +1,3 @@
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback } from "react";
@@ -7,7 +6,6 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
   type DepartmentCode,
-  domElementIds,
   makeListAgencyOptionsKindFilter,
   type TransferConventionToAgencyRequestDto,
   transferConventionToAgencyRequestSchema,
@@ -112,35 +110,11 @@ export const TransferModalContent = ({
         />
         <Input
           textArea
-          label="justification"
+          label="Justification"
           nativeTextAreaProps={{
             ...register("justification"),
           }}
           {...getFieldError("justification")}
-        />
-        <ButtonsGroup
-          alignment="center"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              type: "button",
-              priority: "secondary",
-              onClick: () => {
-                closeModal();
-              },
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.transferToAgencyCancelButton,
-              },
-              children: "Annuler et revenir en arrière",
-            },
-            {
-              type: "submit",
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.transferToAgencySubmitButton,
-              },
-              children: "Terminer",
-            },
-          ]}
         />
       </form>
     </FormProvider>

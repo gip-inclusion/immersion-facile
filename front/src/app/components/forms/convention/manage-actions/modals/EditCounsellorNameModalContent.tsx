@@ -1,4 +1,3 @@
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -9,6 +8,7 @@ import {
   type WithOptionalFirstnameAndLastname,
   withOptionalFirstnameAndLastnameSchema,
 } from "shared";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 export const EditCounsellorNameModalContent = ({
   onSubmit,
@@ -19,10 +19,11 @@ export const EditCounsellorNameModalContent = ({
   closeModal: () => void;
   conventionId: ConventionId;
 }) => {
-  const { register, handleSubmit } = useForm<WithOptionalFirstnameAndLastname>({
-    resolver: zodResolver(withOptionalFirstnameAndLastnameSchema),
-    mode: "onTouched",
-  });
+  const { register, handleSubmit, formState } =
+    useForm<WithOptionalFirstnameAndLastname>({
+      resolver: zodResolver(withOptionalFirstnameAndLastnameSchema),
+      mode: "onTouched",
+    });
   const onFormSubmit: SubmitHandler<WithOptionalFirstnameAndLastname> = ({
     firstname,
     lastname,
@@ -30,8 +31,12 @@ export const EditCounsellorNameModalContent = ({
     onSubmit({ conventionId, firstname, lastname });
     closeModal();
   };
+  const getFieldError = makeFieldError(formState);
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)}>
+    <form
+      onSubmit={handleSubmit(onFormSubmit)}
+      id={domElementIds.manageConvention.editCounsellorNameModalForm}
+    >
       <p>
         Le nom du conseiller est fourni à titre informatif. Toute réaffectation
         de la convention ne peut être effectuée que par (ou via) l'agence.
@@ -45,6 +50,7 @@ export const EditCounsellorNameModalContent = ({
           id: domElementIds.manageConvention
             .editCounsellorNameModalFirstNameInput,
         }}
+        {...getFieldError("firstname")}
       />
       <Input
         label={"Nom"}
@@ -54,32 +60,7 @@ export const EditCounsellorNameModalContent = ({
           id: domElementIds.manageConvention
             .editCounsellorNameModalLastNameInput,
         }}
-      />
-      <ButtonsGroup
-        alignment="center"
-        inlineLayoutWhen="always"
-        buttons={[
-          {
-            type: "button",
-            priority: "secondary",
-            onClick: () => {
-              closeModal();
-            },
-            nativeButtonProps: {
-              id: domElementIds.manageConvention
-                .editCounsellorNameModalCancelButton,
-            },
-            children: "Annuler",
-          },
-          {
-            type: "submit",
-            nativeButtonProps: {
-              id: domElementIds.manageConvention
-                .editCounsellorNameModalSubmitButton,
-            },
-            children: "Enregistrer",
-          },
-        ]}
+        {...getFieldError("lastname")}
       />
     </form>
   );

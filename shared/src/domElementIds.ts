@@ -448,6 +448,7 @@ export const domElementIds = {
     openSendAssessmentLinkModal:
       "im-convention-validation__open-send-assessment-link-modal",
     signModal: "im-convention-validation__sign-modal",
+    signModalForm: "im-convention-validation__sign-modal-form",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
     submitRenewModalButton:
       "im-convention-validation__submit-renew-modal-button",
