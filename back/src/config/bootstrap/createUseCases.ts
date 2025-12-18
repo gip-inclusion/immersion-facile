@@ -792,7 +792,10 @@ export const createUseCases = ({
     }),
     getOAuthLogoutUrl: makeGetOAuthLogoutUrl({
       uowPerformer,
-      deps: { oAuthGateway: gateways.oAuthGateway },
+      deps: {
+        oAuthGateway: gateways.oAuthGateway,
+        ftConnectGateway: gateways.ftConnectGateway,
+      },
     }),
     createAssessment: makeCreateAssessment({
       uowPerformer,

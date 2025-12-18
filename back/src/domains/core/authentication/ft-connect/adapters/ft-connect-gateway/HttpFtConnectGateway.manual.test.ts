@@ -44,6 +44,7 @@ describe("HttpFtConnectGateway", () => {
       immersionFacileBaseUrl: "https://fake-immersion.fr",
       franceTravailClientId: "pe-client-id",
       franceTravailClientSecret: "pe-client-secret",
+      ftAuthCandidatUrl: "https://fake-ft-candidat.fr",
     },
   );
 

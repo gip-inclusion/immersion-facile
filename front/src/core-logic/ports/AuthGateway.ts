@@ -5,15 +5,15 @@ import type {
   ConnectedUser,
   ConnectedUserJwt,
   InitiateLoginByEmailParams,
+  LogoutQueryParams,
   OAuthSuccessLoginParams,
-  WithIdToken,
   WithUserFilters,
 } from "shared";
 
 export interface AuthGateway {
   loginByEmail$: (params: InitiateLoginByEmailParams) => Observable<void>;
   getLogoutUrl$(
-    payload: WithIdToken & { authToken: string },
+    payload: LogoutQueryParams & { authToken: string },
   ): Observable<AbsoluteUrl>;
   getCurrentUser$(token: string): Observable<ConnectedUser>;
   getConnectedUsers$: (

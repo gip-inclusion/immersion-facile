@@ -84,11 +84,19 @@ describe("Auth slice", () => {
     });
   });
 
-  it("redirects to provider logout page, then deletes federatedIdentity & partialConventionInUrl stored in device and in store", () => {
+  it.each([
+    {
+      provider: "proConnect",
+      federatedIdentity: connectedUserFederatedIdentity,
+    },
+    { provider: "peConnect", federatedIdentity: peConnectedFederatedIdentity },
+  ])("when provider = '$provider', deletes federatedIdentity & partialConventionInUrl stored in device and in store, then redirects to provider logout page", ({
+    federatedIdentity,
+  }) => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: connectedUserFederatedIdentity,
+        federatedIdentityWithUser: federatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         requestedEmail: null,
@@ -101,7 +109,7 @@ describe("Auth slice", () => {
     }));
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
-      connectedUserFederatedIdentity,
+      federatedIdentity,
     );
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
@@ -127,10 +135,11 @@ describe("Auth slice", () => {
 
     expectFederatedIdentityInDevice(undefined);
     expectPartialConventionInUrlInDevice(undefined);
+    expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
+
     expectToEqual(dependencies.navigationGateway.wentToUrls, [
       "http://yolo-logout.com",
     ]);
-    expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
   });
 
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page.", () => {

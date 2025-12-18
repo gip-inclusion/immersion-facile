@@ -1,3 +1,8 @@
+import {
+  type AbsoluteUrl,
+  queryParamsAsString,
+  type WithIdToken,
+} from "shared";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
 import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
@@ -28,6 +33,13 @@ export class InMemoryFtConnectGateway implements FtConnectGateway {
       advisors: this.#advisors,
       user: this.#user,
     };
+  }
+
+  public async getLogoutUrl({ idToken }: WithIdToken): Promise<AbsoluteUrl> {
+    return `https://fake-ft-connect-logout-url?${queryParamsAsString({
+      id_token_hint: idToken,
+      redirect_uri: "fake-redirect-uri",
+    })}` as AbsoluteUrl;
   }
 
   public setAccessToken(accessToken: AccessTokenDto) {

@@ -378,7 +378,7 @@ describe("auth router", () => {
     )} returns the logout url`, () => {
       it("returns 401 if not logged in", async () => {
         const response = await httpClient.getOAuthLogoutUrl({
-          queryParams: { idToken: "fake-id-token" },
+          queryParams: { idToken: "fake-id-token", provider: "proConnect" },
           headers: { authorization: "" },
         });
 
@@ -420,6 +420,7 @@ describe("auth router", () => {
           headers: { authorization: token },
           queryParams: {
             idToken: "fake-id-token",
+            provider: "proConnect",
           },
         });
 

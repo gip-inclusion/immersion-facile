@@ -63,4 +63,5 @@ export type FtConnectOauthConfig = {
   franceTravailClientId: string;
   franceTravailClientSecret: string;
   immersionFacileBaseUrl: AbsoluteUrl;
+  ftAuthCandidatUrl: AbsoluteUrl;
 };
