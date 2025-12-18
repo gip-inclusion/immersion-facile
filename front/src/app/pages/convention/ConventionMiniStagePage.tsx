@@ -40,7 +40,7 @@ export const ConventionMiniStagePage = ({
 
   useEffect(() => {
     dispatch(
-      authSlice.actions.fetchLoggoutUrlRequested({
+      authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-and-oauth",
       }),
     );
