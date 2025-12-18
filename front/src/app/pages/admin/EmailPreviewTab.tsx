@@ -296,7 +296,7 @@ export const defaultEmailValueByEmailKind: {
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: defaultEmailPreviewUrl,
     agencyReferentName: "AGENCY_REFERENT_NAME",
-    assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
+    manageConventionLink: "MANAGE_CONVENTION_LINK",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
