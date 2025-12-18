@@ -9,10 +9,12 @@ import {
   expectPromiseToFailWithError,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
   reasonableSchedule,
 } from "shared";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -61,16 +63,17 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   let usecase: NotifyAgencyThatAssessmentIsCreated;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
+  let config: AppConfig;
 
   beforeEach(() => {
     uow = createInMemoryUow();
 
     timeGateway = new CustomTimeGateway();
+    config = new AppConfigBuilder().build();
     usecase = new NotifyAgencyThatAssessmentIsCreated(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      fakeGenerateMagicLinkUrlFn,
-      timeGateway,
+      config,
     );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
@@ -147,14 +150,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment,
             numberOfHoursMade: "45h",
-            magicLink: fakeGenerateMagicLinkUrlFn({
-              targetRoute: frontRoutes.assessmentDocument,
-              id: convention.id,
-              role: "validator",
-              email: validator.email,
-              now: timeGateway.now(),
-              lifetime: "long",
-            }),
+            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              `/${frontRoutes.manageConventionUserConnected}`,
+              { conventionId: convention.id },
+            )}`,
           },
           recipients: [validator.email],
         },
@@ -179,14 +178,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment,
             numberOfHoursMade: "45h",
-            magicLink: fakeGenerateMagicLinkUrlFn({
-              targetRoute: frontRoutes.assessmentDocument,
-              id: convention.id,
-              role: "validator",
-              email: validator2.email,
-              now: timeGateway.now(),
-              lifetime: "long",
-            }),
+            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              `/${frontRoutes.manageConventionUserConnected}`,
+              { conventionId: convention.id },
+            )}`,
           },
           recipients: [validator2.email],
         },
@@ -309,14 +304,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
                 convention.immersionAppellation.appellationLabel,
               assessment,
               numberOfHoursMade: "45h",
-              magicLink: fakeGenerateMagicLinkUrlFn({
-                targetRoute: frontRoutes.assessmentDocument,
-                id: convention.id,
-                role: "validator",
-                email: advisorEmail,
-                now: timeGateway.now(),
-                lifetime: "long",
-              }),
+              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: convention.id },
+              )}`,
             },
             recipients: [advisorEmail],
           },

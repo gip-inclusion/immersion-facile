@@ -319,8 +319,8 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       }),
     },
     ASSESSMENT_AGENCY_NOTIFICATION: {
-      niceName: "Bilan - Prescripteurs - Lien de création du bilan",
-      tags: ["bilan_prescripteur_formulaireBilan"],
+      niceName: "Bilan - Prescripteurs - Relance bilan non rempli",
+      tags: ["bilan", "prescripteurs", "relanceBilanNonRempli"],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyReferentName,
@@ -332,7 +332,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         conventionId,
         internshipKind,
       }) => ({
-        subject: `Immersion Facilitée - Bilan disponible pour l'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+        subject: `Immersion Facilitée - Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} n'a pas encore rempli le bilan`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
         Nous constatons que le bilan ${
