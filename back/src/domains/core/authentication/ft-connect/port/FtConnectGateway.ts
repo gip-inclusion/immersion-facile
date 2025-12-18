@@ -1,3 +1,4 @@
+import type { AbsoluteUrl, WithIdToken } from "shared";
 import type { AccessTokenDto } from "../dto/AccessToken.dto";
 import type { FtConnectAdvisorDto } from "../dto/FtConnectAdvisor.dto";
 import type { FtConnectUserDto } from "../dto/FtConnectUserDto";
@@ -13,4 +14,5 @@ export interface FtConnectGateway {
       }
     | undefined
   >;
+  getLogoutUrl({ idToken }: WithIdToken): Promise<AbsoluteUrl>;
 }

@@ -6,8 +6,8 @@ import type {
   ConnectedUser,
   ConnectedUserJwt,
   InitiateLoginByEmailParams,
+  LogoutQueryParams,
   OAuthSuccessLoginParams,
-  WithIdToken,
   WithUserFilters,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -39,11 +39,12 @@ export class HttpAuthGateway implements AuthGateway {
   public getLogoutUrl$({
     idToken,
     authToken,
-  }: WithIdToken & { authToken: string }): Observable<AbsoluteUrl> {
+    provider,
+  }: LogoutQueryParams & { authToken: string }): Observable<AbsoluteUrl> {
     return from(
       this.httpClient
         .getOAuthLogoutUrl({
-          queryParams: { idToken },
+          queryParams: { idToken, provider },
           headers: { authorization: authToken },
         })
         .then((response) =>

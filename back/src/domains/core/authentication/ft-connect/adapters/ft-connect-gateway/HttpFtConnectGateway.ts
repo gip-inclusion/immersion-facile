@@ -1,5 +1,11 @@
 import Bottleneck from "bottleneck";
-import { errors, HTTP_STATUS, queryParamsAsString } from "shared";
+import {
+  type AbsoluteUrl,
+  errors,
+  HTTP_STATUS,
+  queryParamsAsString,
+  type WithIdToken,
+} from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
@@ -178,6 +184,16 @@ export class HttpFtConnectGateway implements FtConnectGateway {
           ).map(toFtConnectAdvisorDto),
         }
       : undefined;
+  }
+
+  public async getLogoutUrl({ idToken }: WithIdToken): Promise<AbsoluteUrl> {
+    const uri: AbsoluteUrl = `${this.configs.ftAuthCandidatUrl}/compte/deconnexion`;
+    const postLogoutRedirectUri = this.configs.immersionFacileBaseUrl;
+
+    return `${uri}?${queryParamsAsString({
+      id_token_hint: idToken,
+      redirect_uri: postLogoutRedirectUri,
+    })}`;
   }
 
   async #userIsJobseeker(

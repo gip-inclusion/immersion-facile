@@ -1,5 +1,6 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
+import type { FederatedIdentityProvider } from "../federatedIdentities/federatedIdentity.dto";
 import type { frontRoutes } from "../routes/route.utils";
 import type { EmailAuthCodeJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
@@ -38,6 +39,10 @@ export type WithRedirectUri = {
 
 export type InitiateLoginByEmailParams = WithRedirectUri & {
   email: Email;
+};
+
+export type LogoutQueryParams = WithIdToken & {
+  provider: FederatedIdentityProvider;
 };
 
 export type WithIdToken = {

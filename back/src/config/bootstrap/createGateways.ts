@@ -189,6 +189,7 @@ export const createGateways = async (
             immersionFacileBaseUrl: config.immersionFacileBaseUrl,
             franceTravailClientId: config.franceTravailClientId,
             franceTravailClientSecret: config.franceTravailClientSecret,
+            ftAuthCandidatUrl: config.ftAuthCandidatUrl,
           },
         )
       : new InMemoryFtConnectGateway();

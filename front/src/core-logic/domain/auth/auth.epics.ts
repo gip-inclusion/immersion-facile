@@ -114,13 +114,14 @@ const logoutEpic: AuthEpic = (
       if (!federatedIdentityWithUser) throw errors.auth.missingOAuth({});
       const { provider } = federatedIdentityWithUser;
       if (
-        provider === "proConnect" &&
+        (provider === "proConnect" || provider === "peConnect") &&
         action.payload.mode === "device-and-oauth"
       ) {
         const { idToken } = federatedIdentityWithUser;
         return authGateway.getLogoutUrl$({
           idToken: state$.value.auth.federatedIdentityWithUser ? idToken : "",
           authToken: state$.value.auth.federatedIdentityWithUser?.token ?? "",
+          provider,
         });
       }
       return of(undefined);

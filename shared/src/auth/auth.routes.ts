@@ -12,8 +12,8 @@ import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 import {
   afterOAuthSuccessRedirectionResponseSchema,
   initiateLoginByEmailParamsSchema,
+  logoutQueryParamsSchema,
   oAuthSuccessLoginParamsSchema,
-  withIdTokenSchema,
   withRedirectUriSchema,
 } from "./auth.schema";
 
@@ -74,7 +74,7 @@ export const authRoutes = defineRoutes({
   getOAuthLogoutUrl: defineRoute({
     method: "get",
     url: "/logout/oauth",
-    queryParamsSchema: withIdTokenSchema,
+    queryParamsSchema: logoutQueryParamsSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: absoluteUrlSchema,
