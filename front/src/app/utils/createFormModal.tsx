@@ -55,6 +55,7 @@ type CreateFormModalParams = Parameters<typeof createModal>[0] & {
   formId: string;
   submitButton?: Pick<ButtonProps, "id" | "children">;
   cancelButton?: Pick<ButtonProps, "id" | "children">;
+  doSubmitClosesModal?: boolean;
 };
 
 export const createFormModal = (params: CreateFormModalParams): FormModal => {
@@ -124,7 +125,7 @@ export const createFormModal = (params: CreateFormModalParams): FormModal => {
       if (button.type === "submit") {
         return {
           ...button,
-          doClosesModal: doSubmitClosesModal,
+          doClosesModal: doSubmitClosesModal ?? params.doSubmitClosesModal,
           nativeButtonProps: {
             ...button.nativeButtonProps,
             onClick: (event: React.MouseEvent<HTMLButtonElement>) => {

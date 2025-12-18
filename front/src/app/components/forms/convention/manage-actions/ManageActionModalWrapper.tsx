@@ -302,6 +302,13 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
                 }
                 internshipKind={props.convention.internshipKind}
                 onCancel={() => {}}
+                onSubmit={() => {
+                  if (onSubmit) {
+                    onSubmit(verificationAction, {
+                      conventionId: convention.id,
+                    });
+                  }
+                }}
               />
             );
           },
@@ -311,7 +318,6 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   );
 
   const Modal = modalObject.modal;
-
   return createPortal(
     <Modal {...modalProps}>{modalContent}</Modal>,
     document.body,

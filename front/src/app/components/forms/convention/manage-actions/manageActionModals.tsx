@@ -42,6 +42,7 @@ const createRejectModalParams = {
   cancelButton: {
     id: cancelButtonIdByStatus.REJECTED,
   },
+  doSubmitClosesModal: false,
 };
 const {
   Component: RejectModal,
@@ -60,6 +61,7 @@ const createCancelModalParams = {
   cancelButton: {
     id: cancelButtonIdByStatus.CANCELLED,
   },
+  doSubmitClosesModal: false,
 };
 const {
   Component: CancelModal,
@@ -78,6 +80,7 @@ const createDeprecatedModalParams = {
   cancelButton: {
     id: cancelButtonIdByStatus.DEPRECATED,
   },
+  doSubmitClosesModal: false,
 };
 const {
   Component: DeprecateModal,
@@ -108,6 +111,13 @@ const createTransferConventionModalParams = {
   id: domElementIds.manageConvention.transferConventionModal,
   isOpenedByDefault: false,
   formId: domElementIds.manageConvention.transferConventionModalForm,
+  doSubmitClosesModal: false,
+  submitButton: {
+    id: domElementIds.manageConvention.transferToAgencySubmitButton,
+  },
+  cancelButton: {
+    id: domElementIds.manageConvention.transferToAgencyCancelButton,
+  },
 };
 const {
   Component: TransferConventionModal,
@@ -119,6 +129,7 @@ const createEditCounsellorNameModalParams = {
   id: domElementIds.manageConvention.editCounsellorNameModal,
   isOpenedByDefault: false,
   formId: domElementIds.manageConvention.editCounsellorNameModalForm,
+  doSubmitClosesModal: false,
 };
 const {
   Component: EditCounsellorNameModal,
@@ -180,7 +191,7 @@ const {
 const createSignModalParams = {
   id: domElementIds.manageConvention.signModal,
   isOpenedByDefault: false,
-  formId: domElementIds.manageConvention.sendSignatureLinkModalForm,
+  formId: domElementIds.manageConvention.signModalForm,
 };
 const {
   Component: SignModal,
