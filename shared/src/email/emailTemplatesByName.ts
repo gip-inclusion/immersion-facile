@@ -324,7 +324,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       createEmailVariables: ({
         agencyLogoUrl,
         agencyReferentName,
-        assessmentCreationLink,
+        manageConventionLink,
         beneficiaryFirstName,
         beneficiaryLastName,
         tutorEmail,
@@ -348,8 +348,8 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       `,
         buttons: [
           {
-            label: "Formulaire de bilan",
-            url: assessmentCreationLink,
+            label: "Piloter la convention",
+            url: manageConventionLink,
           },
         ],
         subContent: `

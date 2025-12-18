@@ -9,7 +9,9 @@ import {
   ConventionDtoBuilder,
   type DateString,
   expectObjectInArrayToMatch,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
   type Notification,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -224,7 +226,10 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: convention.id },
+              )}`,
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
@@ -300,7 +305,10 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: convention.id },
+              )}`,
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
@@ -392,7 +400,10 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+                `/${frontRoutes.manageConventionUserConnected}`,
+                { conventionId: convention.id },
+              )}`,
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),

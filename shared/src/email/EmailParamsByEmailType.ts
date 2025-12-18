@@ -90,7 +90,7 @@ export type EmailParamsByEmailType = {
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyReferentName: string | undefined;
-    assessmentCreationLink: string;
+    manageConventionLink: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     tutorEmail: string;

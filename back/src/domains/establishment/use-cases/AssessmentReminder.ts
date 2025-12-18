@@ -1,18 +1,17 @@
 import subDays from "date-fns/subDays";
-import { difference, uniqBy } from "ramda";
+import { difference, uniq } from "ramda";
 import {
   type AbsoluteUrl,
-  type AgencyRole,
   type ConventionId,
   type ConventionReadDto,
   type Email,
-  type ExtractFromExisting,
   errors,
   executeInSequence,
   frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   localization,
+  makeUrlWithQueryParams,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -242,9 +241,6 @@ const sendAgencyAssessmentReminder = async ({
   uow,
   saveNotificationAndRelatedEvent,
   convention,
-  now,
-  generateConventionMagicLinkUrl,
-  shortLinkIdGeneratorGateway,
   config,
 }: SendAssessmentReminderParams) => {
   if (convention.internshipKind !== "immersion") return;
@@ -263,44 +259,12 @@ const sendAgencyAssessmentReminder = async ({
   const advisorEmail = conventionAdvisorEntity?.advisor?.email;
   const agency = await agencyWithRightToAgencyDto(uow, agencyWithUserRights);
 
-  const recipientsEmailAndRole: {
-    email: Email;
-    role: ExtractFromExisting<AgencyRole, "validator" | "counsellor">;
-  }[] = advisorEmail
-    ? [{ email: advisorEmail, role: "validator" }]
-    : uniqBy(
-        (recipient) => recipient.email,
-        [
-          ...agency.validatorEmails.map((email) => ({
-            email,
-            role: "validator" as const,
-          })),
-          ...agency.counsellorEmails.map((email) => ({
-            email,
-            role: "counsellor" as const,
-          })),
-        ],
-      );
+  const recipientsEmails: Email[] = advisorEmail
+    ? [advisorEmail]
+    : uniq([...agency.validatorEmails, ...agency.counsellorEmails]);
 
   await Promise.all(
-    recipientsEmailAndRole.map(async ({ email, role }) => {
-      const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
-        config,
-        conventionMagicLinkPayload: {
-          id: convention.id,
-          email,
-          role,
-          now,
-        },
-        generateConventionMagicLinkUrl: generateConventionMagicLinkUrl,
-        shortLinkIdGeneratorGateway: shortLinkIdGeneratorGateway,
-        uow,
-      });
-      const assessmentCreationLink = await makeShortMagicLink({
-        targetRoute: frontRoutes.assessment,
-        lifetime: "short",
-        extraQueryParams: { mtm_source: "assessment-reminder" },
-      });
+    recipientsEmails.map(async (email) => {
       const notification: NotificationContentAndFollowedIds = {
         kind: "email",
         templatedContent: {
@@ -321,7 +285,10 @@ const sendAgencyAssessmentReminder = async ({
             internshipKind: convention.internshipKind,
             businessName: convention.businessName,
             agencyLogoUrl: agency.logoUrl ?? undefined,
-            assessmentCreationLink,
+            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              `/${frontRoutes.manageConventionUserConnected}`,
+              { conventionId: convention.id },
+            )}`,
             tutorEmail: convention.establishmentTutor.email,
           },
         },
