@@ -1,6 +1,6 @@
 import { filter, map, of, tap } from "rxjs";
 import { switchMap } from "rxjs/operators";
-import { errors } from "shared";
+import { errors, isFederatedIdentityProviderWithLogoutCallback } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -114,7 +114,7 @@ const logoutEpic: AuthEpic = (
       if (!federatedIdentityWithUser) throw errors.auth.missingOAuth({});
       const { provider } = federatedIdentityWithUser;
       if (
-        (provider === "proConnect" || provider === "peConnect") &&
+        isFederatedIdentityProviderWithLogoutCallback(provider) &&
         action.payload.mode === "device-and-oauth"
       ) {
         const { idToken } = federatedIdentityWithUser;
