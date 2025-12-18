@@ -93,7 +93,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
-    port: 3000,
+    port: Number.parseInt(process.env.PORT || "3000", 10),
   },
   preview: {
     port: 5000,
