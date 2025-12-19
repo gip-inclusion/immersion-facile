@@ -375,14 +375,10 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   };
 
   const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
-    { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
+    { request, gateways, eventCrawler, inMemoryUow, appConfig }: TestAppAndDeps,
     validatorReviewJwt: string,
     initialConvention: ConventionDto,
   ) => {
-    const technicalRoutesClient = createSupertestSharedClient(
-      technicalRoutes,
-      request,
-    );
     const params: UpdateConventionStatusRequestDto = {
       status: "ACCEPTED_BY_VALIDATOR",
       conventionId: initialConvention.id,
@@ -451,11 +447,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       validator.email,
     ]);
 
-    expectJwtInMagicLinkAndGetIt(
-      await shortLinkRedirectToLinkWithValidation(
-        needsToTriggerConventionSentEmail.params.magicLink,
-        technicalRoutesClient,
-      ),
+    // Validators now get user-connected URLs instead of magic link shortlinks
+    expect(needsToTriggerConventionSentEmail.params.magicLink).toBe(
+      `${appConfig.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        `/${frontRoutes.manageConventionUserConnected}`,
+        { conventionId: initialConvention.id },
+      )}`,
     );
   };
 

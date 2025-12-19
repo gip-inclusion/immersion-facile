@@ -3,11 +3,14 @@ import {
   type AgencyDto,
   type AgencyWithUsersRights,
   type ConventionDto,
+  type ConventionRole,
   displayEmergencyContactInfos,
   type EmailNotification,
   errors,
   expectToEqual,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeUrlWithQueryParams,
   type Notification,
   type NotificationId,
   type NotificationKind,
@@ -277,8 +280,17 @@ export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
   config: AppConfig,
   conventionToSignLinkId: ShortLinkId,
   assessmentShortlink: ShortLinkId | undefined,
-) =>
-  expectToEqual(templatedEmails, {
+  role: ConventionRole,
+) => {
+  const isAgencyModifierRole = role === "validator" || role === "counsellor";
+  const magicLink = isAgencyModifierRole
+    ? `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        `/${frontRoutes.manageConventionUserConnected}`,
+        { conventionId: convention.id },
+      )}`
+    : makeShortLinkUrl(config, conventionToSignLinkId);
+
+  return expectToEqual(templatedEmails, {
     kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
     recipients,
     params: {
@@ -306,7 +318,7 @@ export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
         beneficiary: convention.signatories.beneficiary,
       }),
       agencyLogoUrl: agency.logoUrl ?? undefined,
-      magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
+      magicLink,
       assessmentMagicLink: assessmentShortlink
         ? makeShortLinkUrl(config, assessmentShortlink)
         : undefined,
@@ -317,6 +329,7 @@ export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
         : "",
     },
   });
+};
 
 export const expectNotifyConventionRejected = (
   templatedEmail: TemplatedEmail,

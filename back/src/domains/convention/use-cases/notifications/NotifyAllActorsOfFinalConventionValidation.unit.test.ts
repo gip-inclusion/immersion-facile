@@ -169,7 +169,10 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         },
       ];
 
-      const shortlinkIds = actors.flatMap((actor) => {
+      const actorsWithShortlinks = actors.filter(
+        (actor) => actor.role !== "validator" && actor.role !== "counsellor",
+      );
+      const shortlinkIds = actorsWithShortlinks.flatMap((actor) => {
         return actor.assessmentCreationLinkId
           ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
           : [actor.conventionShortlinkId];
@@ -181,7 +184,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: validConventionWithSameTutorAndRepresentative,
       });
 
-      const expectedShorlinks = actors.reduce(
+      const expectedShorlinks = actorsWithShortlinks.reduce(
         (acc, actor) => ({
           ...acc,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
@@ -234,6 +237,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
+          actor.role,
         );
       });
     });
@@ -280,7 +284,10 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         .withBeneficiaryCurrentEmployer(currentEmployer)
         .build();
 
-      const shortlinkIds = actors.flatMap((actor) => {
+      const actorsWithShortlinks = actors.filter(
+        (actor) => actor.role !== "validator" && actor.role !== "counsellor",
+      );
+      const shortlinkIds = actorsWithShortlinks.flatMap((actor) => {
         return actor.assessmentCreationLinkId
           ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
           : [actor.conventionShortlinkId];
@@ -292,7 +299,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: conventionWithBeneficiaryCurrentEmployer,
       });
 
-      const expectedShorlinks = actors.reduce(
+      const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
@@ -345,6 +352,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
+          actor.role,
         );
       });
     });
@@ -391,7 +399,10 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
 
-      const shortlinkIds = actors.flatMap((actor) => {
+      const actorsWithShortlinks = actors.filter(
+        (actor) => actor.role !== "validator" && actor.role !== "counsellor",
+      );
+      const shortlinkIds = actorsWithShortlinks.flatMap((actor) => {
         return actor.assessmentCreationLinkId
           ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
           : [actor.conventionShortlinkId];
@@ -403,7 +414,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: conventionWithBeneficiaryCurrentEmployer,
       });
 
-      const expectedShorlinks = actors.reduce(
+      const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
@@ -456,6 +467,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
+          actor.role,
         );
       });
     });
@@ -496,7 +508,10 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         },
       ];
 
-      const shortlinkIds = actors.flatMap((actor) => {
+      const actorsWithShortlinks = actors.filter(
+        (actor) => actor.role !== "validator" && actor.role !== "counsellor",
+      );
+      const shortlinkIds = actorsWithShortlinks.flatMap((actor) => {
         return actor.assessmentCreationLinkId
           ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
           : [actor.conventionShortlinkId];
@@ -514,7 +529,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative,
       });
 
-      const expectedShorlinks = actors.reduce(
+      const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
@@ -567,6 +582,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
+          actor.role,
         );
       });
     });
@@ -623,7 +639,10 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         [userConventionAdvisor],
       );
 
-      const shortlinkIds = actors.flatMap((actor) => {
+      const actorsWithShortlinks = actors.filter(
+        (actor) => actor.role !== "validator" && actor.role !== "counsellor",
+      );
+      const shortlinkIds = actorsWithShortlinks.flatMap((actor) => {
         return actor.assessmentCreationLinkId
           ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
           : [actor.conventionShortlinkId];
@@ -635,7 +654,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: validConventionWithSameTutorAndRepresentative,
       });
 
-      const expectedShorlinks = actors.reduce(
+      const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
@@ -687,6 +706,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
+          actor.role,
         );
       });
     });
@@ -732,7 +752,10 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         [userConventionAdvisor],
       );
 
-      const shortlinkIds = actors.flatMap((actor) => {
+      const actorsWithShortlinks = actors.filter(
+        (actor) => actor.role !== "validator" && actor.role !== "counsellor",
+      );
+      const shortlinkIds = actorsWithShortlinks.flatMap((actor) => {
         return actor.assessmentCreationLinkId
           ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
           : [actor.conventionShortlinkId];
@@ -744,7 +767,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: validConventionWithSameTutorAndRepresentative,
       });
 
-      const expectedShorlinks = actors.reduce(
+      const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
@@ -796,6 +819,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
+          actor.role,
         );
       });
     });
