@@ -2,7 +2,6 @@ import { values } from "ramda";
 import {
   type AgencyWithUsersRights,
   type ConventionDto,
-  type ConventionJwtPayload,
   filterNotFalsy,
   frontRoutes,
   getFormattedFirstnameAndLastname,
@@ -24,7 +23,11 @@ import { retrieveConventionWithAgency } from "../../entities/Convention";
 
 export const NO_JUSTIFICATION = "Aucune justification trouvée.";
 
-export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification extends TransactionalUseCase<WithConventionDto> {
+export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification extends TransactionalUseCase<
+  WithConventionDto,
+  void,
+  void
+> {
   protected inputSchema = withConventionSchema;
 
   readonly #timeGateway: TimeGateway;
@@ -57,7 +60,6 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
   protected async _execute(
     { convention }: WithConventionDto,
     uow: UnitOfWork,
-    _jwtPayload?: ConventionJwtPayload | undefined,
   ): Promise<void> {
     const { agency, convention: conventionReadDto } =
       await retrieveConventionWithAgency(uow, convention.id);
