@@ -2,6 +2,8 @@ import { parseISO } from "date-fns";
 import { uniqBy } from "ramda";
 import {
   type AgencyDto,
+  type AgencyModifierRole,
+  agencyModifierRoles,
   type ConventionDto,
   type ConventionRole,
   type CreateConventionMagicLinkPayloadProperties,
@@ -11,6 +13,7 @@ import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
+  makeUrlWithQueryParams,
   type TemplatedEmail,
   type WithConventionDto,
   withConventionSchema,
@@ -157,6 +160,16 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       uow,
     });
 
+    const magicLink = agencyModifierRoles.includes(role as AgencyModifierRole)
+      ? `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+          `/${frontRoutes.manageConventionUserConnected}`,
+          { conventionId: convention.id },
+        )}`
+      : await makeShortMagicLink({
+          targetRoute: frontRoutes.conventionDocument,
+          lifetime: "long",
+        });
+
     return {
       kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients: [recipient],
@@ -184,10 +197,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           beneficiary,
         }),
         agencyLogoUrl: agency.logoUrl ?? undefined,
-        magicLink: await makeShortMagicLink({
-          targetRoute: frontRoutes.conventionDocument,
-          lifetime: "long",
-        }),
+        magicLink,
         assessmentMagicLink: shouldHaveAssessmentMagicLink
           ? await makeShortMagicLink({
               targetRoute: frontRoutes.assessment,
