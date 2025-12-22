@@ -78,7 +78,7 @@ export const OffersSection = ({
           type="button"
           iconId="fr-icon-add-line"
           title="Ajouter un métier"
-          id={"add-offer-button"}
+          id={domElementIds.establishment[mode].addOfferButton}
           priority="secondary"
           onClick={() => {
             setSelectedOfferIndex(null);
@@ -96,6 +96,7 @@ export const OffersSection = ({
               <OfferCard
                 key={`${offer.appellationCode}-${index}`}
                 index={index}
+                mode={mode}
                 onEditOfferClick={() => {
                   setSelectedOfferIndex(index);
                   dispatch(
@@ -201,7 +202,7 @@ export const OffersSection = ({
         </>
       )}
       {createPortal(
-        <OfferModal selectedOfferIndex={selectedOfferIndex} />,
+        <OfferModal selectedOfferIndex={selectedOfferIndex} mode={mode} />,
         document.body,
       )}
     </>

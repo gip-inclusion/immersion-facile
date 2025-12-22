@@ -9,6 +9,7 @@ import {
   domElementIds,
   type FormEstablishmentDto,
   getFormattedFirstnameAndLastname,
+  remoteWorkModeLabels,
   toDisplayedPhoneNumber,
 } from "shared";
 import type {
@@ -102,7 +103,10 @@ export const SummarySection = ({
           </p>
           <ul id={domElementIds.establishment.create.summaryAppellations}>
             {formValues.offers.map((offer) => (
-              <li key={offer.appellationCode}>{offer.appellationLabel}</li>
+              <li key={offer.appellationCode}>
+                {offer.appellationLabel} -{" "}
+                {remoteWorkModeLabels[offer.remoteWorkMode].label}
+              </li>
             ))}
           </ul>
         </SectionHighlight>
