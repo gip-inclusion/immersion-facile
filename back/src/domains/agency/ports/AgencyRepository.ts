@@ -74,6 +74,9 @@ export interface AgencyRepository {
   deleteOldClosedAgenciesWithoutConventions(params: {
     updatedBefore: Date;
   }): Promise<AgencyId[]>;
+  closeInactiveAgenciesWithoutRecentConventions(params: {
+    noConventionSince: Date;
+  }): Promise<AgencyId[]>;
 }
 
 export const updateAgencyRightsForUser = async (
