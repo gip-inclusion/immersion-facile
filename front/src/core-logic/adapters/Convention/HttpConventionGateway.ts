@@ -21,7 +21,7 @@ import type {
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
-  ShareLinkByEmailDto,
+  ShareConventionByEmailDto,
   TransferConventionToAgencyRequestDto,
   UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
@@ -271,7 +271,7 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public shareConventionLinkByEmail(
-    conventionDto: ShareLinkByEmailDto,
+    conventionDto: ShareConventionByEmailDto,
   ): Promise<boolean> {
     return this.unauthenticatedHttpClient
       .shareConvention({

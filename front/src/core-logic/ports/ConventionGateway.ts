@@ -19,7 +19,7 @@ import type {
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
-  ShareLinkByEmailDto,
+  ShareConventionByEmailDto,
   TransferConventionToAgencyRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
@@ -62,7 +62,7 @@ export interface ConventionGateway {
     jwt: ConventionJwt | ConnectedUserJwt,
   ): Observable<void>;
   shareConventionLinkByEmail(
-    shareLinkByEmailDto: ShareLinkByEmailDto,
+    shareLinkByEmailDto: ShareConventionByEmailDto,
   ): Promise<boolean>;
   sendSignatureLink$(
     params: SendSignatureLinkRequestDto,

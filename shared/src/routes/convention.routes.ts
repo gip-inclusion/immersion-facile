@@ -31,7 +31,7 @@ import {
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
-import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
+import { shareConventionByEmailSchema } from "../ShareLinkByEmailDto";
 import { expressEmptyResponseBody } from "../zodUtils";
 
 export type ConventionMagicLinkRoutes = typeof conventionMagicLinkRoutes;
@@ -200,7 +200,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
   shareConvention: defineRoute({
     url: "/share-immersion-demand",
     method: "post",
-    requestBodySchema: shareLinkByEmailSchema,
+    requestBodySchema: shareConventionByEmailSchema,
     responses: { 200: expressEmptyResponseBody, 400: httpErrorSchema },
   }),
   renewMagicLink: defineRoute({

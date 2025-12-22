@@ -1,23 +1,37 @@
 import { z } from "zod";
 import type { InternshipKind } from "./convention/convention.dto";
 import { internshipKindSchema } from "./convention/convention.schema";
-import { emailSchema } from "./email/email.schema";
+import { emailPossiblyEmptySchema, emailSchema } from "./email/email.schema";
 import {
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
+  zStringCanBeEmpty,
 } from "./zodUtils";
 
-export type ShareLinkByEmailDto = {
-  conventionLink: string;
+export type ShareConventionByEmailDto = {
   internshipKind: InternshipKind;
-  email: string;
-  details: string;
+  senderEmail: string;
+  recipientEmail?: string;
+  details?: string;
 };
 
-export const shareLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareLinkByEmailDto> =
-  z.object({
-    internshipKind: internshipKindSchema,
-    conventionLink: zStringMinLength1,
-    email: emailSchema,
-    details: zStringMinLength1,
-  });
+export const shareConventionByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionByEmailDto> =
+  z
+    .object({
+      internshipKind: internshipKindSchema,
+      senderEmail: emailSchema,
+      recipientEmail: emailPossiblyEmptySchema,
+      details: zStringCanBeEmpty,
+    })
+    .refine(
+      (data) => {
+        if (data.recipientEmail && data.recipientEmail.length > 0) {
+          return data.details && data.details.length > 0;
+        }
+        return true;
+      },
+      {
+        message:
+          "L'adresse email du destinataire et le message sont obligatoires",
+        path: ["details"],
+      },
+    );
