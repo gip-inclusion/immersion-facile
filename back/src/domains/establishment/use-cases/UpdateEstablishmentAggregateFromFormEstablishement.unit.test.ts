@@ -918,8 +918,63 @@ describe("Update Establishment aggregate from form data", () => {
         });
       });
 
-      it("WIP updates offer remote work mode of an establishment aggregate", () => {
-        expect(false).toBeTruthy();
+      it("updates offer remote work mode of an establishment aggregate", async () => {
+        uow.userRepository.users = [user];
+        const initialOffer = updatedFormEstablishment.offers[0];
+        const updatedOffer: EstablishmentFormOffer = {
+          ...initialOffer,
+          remoteWorkMode: "100% REMOTE",
+        };
+        const updatedFormEstablishmentWithOfferRemoteWorkMode: FormEstablishmentDto =
+          {
+            ...updatedFormEstablishment,
+            offers: [updatedOffer],
+          };
+        const expectedEstablishmentAggregate = {
+          ...updatedEstablishmentAggregate,
+          offers: [
+            {
+              ...updatedOffer,
+              createdAt: timeGateway.now(),
+            },
+          ],
+        };
+        await updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment: updatedFormEstablishmentWithOfferRemoteWorkMode,
+          },
+          {
+            userId: user.id,
+          },
+        );
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            {
+              ...updatedEstablishmentAggregate,
+              offers: expectedEstablishmentAggregate.offers,
+            },
+          ],
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UpdatedEstablishmentAggregateInsertedFromForm",
+            payload: {
+              siret: expectedEstablishmentAggregate.establishment.siret,
+              triggeredBy: {
+                kind: "connected-user",
+                userId: user.id,
+              },
+            },
+          },
+        ]);
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [expectedEstablishmentAggregate],
+        );
       });
     });
   });
