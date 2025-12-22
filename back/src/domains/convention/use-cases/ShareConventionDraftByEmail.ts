@@ -1,20 +1,14 @@
-import {
-  type AbsoluteUrl,
-  errors,
-  type ShareLinkByEmailDto,
-  shareLinkByEmailSchema,
-} from "shared";
+import type { ShareConventionDraftByEmailDto } from "shared/src/convention/shareConventionDraftByEmail.dto";
+import { shareConventionDraftByEmailSchema } from "shared/src/convention/shareConventionDraftByEmail.schema";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
-import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { makeShortLink } from "../../core/short-link/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareLinkByEmailDto> {
-  protected inputSchema = shareLinkByEmailSchema;
+export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConventionDraftByEmailDto> {
+  protected inputSchema = shareConventionDraftByEmailSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -35,46 +29,28 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareLinkBy
   }
 
   public async _execute(
-    params: ShareLinkByEmailDto,
+    params: ShareConventionDraftByEmailDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    throwErrorIfUrlNotFromIFDomain({
-      url: params.conventionLink,
-      expectedDomain: this.#config.immersionFacileDomain,
-    });
-
-    const shortLink = await makeShortLink({
-      uow,
-      longLink: params.conventionLink as AbsoluteUrl,
-      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      config: this.#config,
-    });
+    // const shortLink = await makeShortLink({
+    //   uow,
+    //   longLink: params.conventionLink as AbsoluteUrl,
+    //   shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
+    //   config: this.#config,
+    // });
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "SHARE_DRAFT_CONVENTION_BY_LINK",
-        recipients: [params.email],
+        recipients: [params.senderEmail],
         params: {
-          internshipKind: params.internshipKind,
           additionalDetails: params.details,
-          conventionFormUrl: shortLink,
+          conventionFormUrl: "",
+          internshipKind: "immersion",
         },
       },
       followedIds: {},
     });
   }
 }
-
-const throwErrorIfUrlNotFromIFDomain = ({
-  url,
-  expectedDomain,
-}: {
-  url: string;
-  expectedDomain: string;
-}) => {
-  const urlObj = new URL(url);
-  if (!urlObj.hostname.endsWith(expectedDomain)) {
-    notifyToTeamAndThrowError(errors.url.notFromIFDomain(url));
-  }
-};

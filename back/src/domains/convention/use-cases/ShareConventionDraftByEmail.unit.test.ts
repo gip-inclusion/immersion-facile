@@ -23,7 +23,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ShareConventionLinkByEmail } from "./ShareConventionLinkByEmail";
+import { ShareConventionLinkByEmail } from "./ShareConventionDraftByEmail";
 
 describe("ShareConventionLinkByEmail", () => {
   const email = "fake-email@yahoo.com";
@@ -72,10 +72,9 @@ describe("ShareConventionLinkByEmail", () => {
 
       await expectPromiseToFailWithError(
         usecase.execute({
-          conventionLink,
-          email,
+          convention: {},
+          senderEmail: email,
           details: messageContent,
-          internshipKind,
         }),
         errors.url.notFromIFDomain(conventionLink),
       );
@@ -84,13 +83,10 @@ describe("ShareConventionLinkByEmail", () => {
 
   describe("right path", () => {
     it("sends an email", async () => {
-      const conventionLink = `${config.immersionFacileBaseUrl}/demande-immersion`;
-
       await usecase.execute({
-        conventionLink,
-        email,
+        convention: {},
+        senderEmail: email,
         details: messageContent,
-        internshipKind,
       });
 
       expectSavedNotificationsAndEvents({

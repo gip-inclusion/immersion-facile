@@ -20,7 +20,7 @@ import type {
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   SendSignatureLinkRequestDto,
-  ShareLinkByEmailDto,
+  ShareConventionDraftByEmailDto,
   TransferConventionToAgencyRequestDto,
   UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
@@ -257,12 +257,12 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public shareConventionLinkByEmail(
-    conventionDto: ShareLinkByEmailDto,
+  public shareConventionDraftByEmail(
+    shareConventionDraftDto: ShareConventionDraftByEmailDto,
   ): Promise<boolean> {
     return this.unauthenticatedHttpClient
       .shareConvention({
-        body: conventionDto,
+        body: shareConventionDraftDto,
       })
       .then((response) =>
         match(response)
