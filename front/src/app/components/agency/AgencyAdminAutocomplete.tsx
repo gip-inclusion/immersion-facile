@@ -50,6 +50,7 @@ export const AgencyAdminAutocomplete = ({
   label,
   className,
   locator,
+  onAgencySelected,
 }: AgencyAdminAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
   const {
@@ -101,6 +102,7 @@ export const AgencyAdminAutocomplete = ({
           if (searchResult) {
             updateSearchTerm(searchResult.label);
             selectOption(searchResult.value.id);
+            onAgencySelected(searchResult.value);
           }
         },
         onInputChange: (searchTerm) => {
