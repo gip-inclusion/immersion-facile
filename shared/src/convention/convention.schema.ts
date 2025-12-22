@@ -185,7 +185,7 @@ const studentBeneficiarySchema: ZodSchemaWithInputMatchingOutput<
   }),
 );
 
-const establishmentTutorSchema: ZodSchemaWithInputMatchingOutput<EstablishmentTutor> =
+export const establishmentTutorSchema: ZodSchemaWithInputMatchingOutput<EstablishmentTutor> =
   actorSchema.merge(
     z.object({
       role: z.literal("establishment-tutor"),
@@ -237,7 +237,7 @@ const conventionValidatorFirstnameAndLastnameSchema: ZodSchemaWithInputMatchingO
     lastname: z.string().optional(),
   });
 
-const conventionValidatorsSchema: ZodSchemaWithInputMatchingOutput<ConventionValidatorInputNames> =
+export const conventionValidatorsSchema: ZodSchemaWithInputMatchingOutput<ConventionValidatorInputNames> =
   z.object({
     agencyCounsellor: conventionValidatorFirstnameAndLastnameSchema.optional(),
     agencyValidator: conventionValidatorFirstnameAndLastnameSchema.optional(),
@@ -250,7 +250,7 @@ export const editConventionCounsellorNameRequestSchema: ZodSchemaWithInputMatchi
     }),
   );
 
-const renewedSchema = z.object({
+export const renewedSchema = z.object({
   from: conventionIdSchema,
   justification: zStringMinLength1,
 });

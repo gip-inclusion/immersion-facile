@@ -6,28 +6,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
+  type ConventionDto,
   domElementIds,
-  type InternshipKind,
-  type ShareConventionByEmailDto,
-  shareConventionByEmailSchema,
+  type ShareConventionLinkByEmailDto,
+  shareConventionLinkByEmailSchema,
 } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 type ShareFormProps = {
   onSuccess: () => void;
   onError: () => void;
-  conventionFormData: {
-    internshipKind: InternshipKind;
-  };
+  conventionFormData: Partial<ConventionDto>;
 };
 
 const makeInitialValues = ({
-  internshipKind,
+  conventionFormData,
 }: {
-  internshipKind: InternshipKind;
-}): ShareConventionByEmailDto => ({
-  internshipKind,
+  conventionFormData: Partial<ConventionDto>;
+}): ShareConventionLinkByEmailDto => ({
   senderEmail: "",
+  convention: conventionFormData,
 });
 
 export const ShareForm = ({
@@ -36,22 +34,22 @@ export const ShareForm = ({
   onError,
 }: ShareFormProps) => {
   const [isOnlyForSelf, setIsOnlyForSelf] = useState(false);
-  const onSubmit = async (values: ShareConventionByEmailDto) => {
+  const onSubmit = async (values: ShareConventionLinkByEmailDto) => {
     const result =
       await outOfReduxDependencies.conventionGateway.shareConventionLinkByEmail(
         values,
       );
     result ? onSuccess() : onError();
   };
-  const methods = useForm<ShareConventionByEmailDto>({
+  const methods = useForm<ShareConventionLinkByEmailDto>({
     mode: "onTouched",
-    defaultValues: makeInitialValues(conventionFormData),
-    resolver: zodResolver(shareConventionByEmailSchema),
+    defaultValues: makeInitialValues({ conventionFormData }),
+    resolver: zodResolver(shareConventionLinkByEmailSchema),
   });
   const { register, handleSubmit, formState, reset, setValue } = methods;
 
   useEffect(() => {
-    reset(makeInitialValues(conventionFormData));
+    reset(makeInitialValues({ conventionFormData }));
   }, [conventionFormData, reset]);
 
   return (
