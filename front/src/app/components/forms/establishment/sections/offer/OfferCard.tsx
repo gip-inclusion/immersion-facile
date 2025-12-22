@@ -23,7 +23,10 @@ export const OfferCard = ({
   const formValues = watch();
   const { appellationLabel, remoteWorkMode } = formValues.offers[index];
   return (
-    <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+    <div
+      className={fr.cx("fr-col-12", "fr-col-lg-6")}
+      id={`${domElementIds.establishment[mode].offerCard}-${index}`}
+    >
       <article className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w")}>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
           <h3 className={fr.cx("fr-h6", "fr-col-lg-7", "fr-col-5", "fr-mb-0")}>

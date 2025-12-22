@@ -552,6 +552,7 @@ export const domElementIds = {
       summaryBusinessAddresses:
         "im-form-create-establishment__summary-business-addresses",
       summaryAppellations: "im-form-create-establishment__summary-appellations",
+      offerCard: "im-form-create-establishment__offer-card",
     },
     edit: {
       form: "im-form-edit-establishment",
@@ -609,6 +610,7 @@ export const domElementIds = {
         `im-form-edit-establishment__next-button--step-${currentStep}`,
       searchableBy: "im-form-edit-establishment__searchable-by",
       refreshEditLink: "im-form-edit-establishment__refresh-link",
+      offerCard: "im-form-edit-establishment__offer-card",
     },
     admin: {
       form: "im-form-manage-establishment-admin",
@@ -680,6 +682,7 @@ export const domElementIds = {
         "im-form-manage-establishment-admin__max-contacts-per-month-value",
       nextAvailabilityDateValue:
         "im-form-manage-establishment-admin__current-next-availablity-date-value",
+      offerCard: "im-form-manage-establishment-admin__offer-card",
     },
   },
   assessment: {

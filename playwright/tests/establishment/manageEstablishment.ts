@@ -152,21 +152,15 @@ const checkEstablishment = async (
     ).toLowerCase(),
   ).toContain(businessAddress.rawAddress.toLowerCase());
 
-  await expect(
-    await page
-      .locator(
-        `#${domElementIds.establishment.admin.appellations}-0-wrapper .im-select__single-value`,
-      )
-      .innerText(),
-  ).toContain("Lamineur écrouteur / Lamineuse écrouteuse");
+  const firstOfferCardContent = await page
+    .locator(`#${domElementIds.establishment.admin.offerCard}-0`)
+    .innerText();
 
-  await expect(
-    await page
-      .locator(
-        `#${domElementIds.establishment.admin.appellations}-1-wrapper .im-select__single-value`,
-      )
-      .innerText(),
-  ).toContain("Bûcheron");
+  await expect(firstOfferCardContent).toContain(
+    "Employé / Employée de routage",
+  );
+
+  await expect(firstOfferCardContent).toContain("PAS DE TÉLÉTRAVAIL");
 
   await expect(
     await page.locator(
