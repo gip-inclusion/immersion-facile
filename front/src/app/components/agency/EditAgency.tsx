@@ -6,8 +6,10 @@ import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
 import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
+import { useDispatch } from "react-redux";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { connectedUsersAdminSelectors } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.selectors";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
 import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
@@ -17,6 +19,7 @@ export const EditAgency = () => {
   const agencyUsersById = useAppSelector(
     connectedUsersAdminSelectors.agencyUsers,
   );
+  const dispatch = useDispatch();
   return (
     <BackofficeDashboardTabContent title="Editer une agence">
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
@@ -27,7 +30,9 @@ export const EditAgency = () => {
             inputId: "agency-autocomplete",
             placeholder: "Ex : Agence de Berry",
           }}
-          onAgencySelected={() => {}}
+          onAgencySelected={() => {
+            dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+          }}
           onAgencyClear={() => {}}
         />
       </div>
