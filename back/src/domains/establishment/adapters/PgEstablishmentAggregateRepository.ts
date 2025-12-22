@@ -692,26 +692,7 @@ export class PgEstablishmentAggregateRepository
     const existingOffers = existingAggregate.offers;
     const siret = existingAggregate.establishment.siret;
 
-    const offersToAdd = updatedOffers.filter(
-      (updatedOffer) =>
-        !existingOffers.find((existingOffer) =>
-          offersEqual(existingOffer, updatedOffer),
-        ),
-    );
-
-    if (offersToAdd.length > 0)
-      await this.transaction
-        .insertInto("immersion_offers")
-        .values(
-          offersToAdd.map((offerToAdd) => ({
-            appellation_code: Number.parseInt(offerToAdd.appellationCode),
-            remote_work_mode: offerToAdd.remoteWorkMode,
-            created_at: sql`${offerToAdd.createdAt.toISOString()}`,
-            siret,
-          })),
-        )
-        .execute();
-
+    // First, remove offers that are not present in the updated aggregate
     const offersToRemove = existingOffers.filter(
       (updatedOffer) =>
         !updatedOffers.find((existingOffer) =>
@@ -751,8 +732,29 @@ export class PgEstablishmentAggregateRepository
           "appellation_code",
           "in",
           offersToRemoveByAppellationCode.map((appellationCode) =>
-            Number.parseInt(appellationCode),
+            Number.parseInt(appellationCode, 10),
           ),
+        )
+        .execute();
+
+    const offersToAdd = updatedOffers.filter(
+      (updatedOffer) =>
+        !existingOffers.find((existingOffer) =>
+          offersEqual(existingOffer, updatedOffer),
+        ),
+    );
+
+    // Then, add offers (if any) that are present in the updated aggregate
+    if (offersToAdd.length > 0)
+      await this.transaction
+        .insertInto("immersion_offers")
+        .values(
+          offersToAdd.map((offerToAdd) => ({
+            appellation_code: Number.parseInt(offerToAdd.appellationCode, 10),
+            remote_work_mode: offerToAdd.remoteWorkMode,
+            created_at: sql`${offerToAdd.createdAt.toISOString()}`,
+            siret,
+          })),
         )
         .execute();
   }
@@ -790,7 +792,8 @@ export class PgEstablishmentAggregateRepository
 
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
   // Only compare romeCode and appellationCode
-  a.appellationCode === b.appellationCode;
+  a.appellationCode === b.appellationCode &&
+  a.remoteWorkMode === b.remoteWorkMode;
 
 const objectsDeepEqual = <T>(a: T, b: T) =>
   equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here

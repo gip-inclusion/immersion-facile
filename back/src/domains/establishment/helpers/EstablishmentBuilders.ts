@@ -11,6 +11,7 @@ import {
   type Location,
   type NafDto,
   type NumberEmployeesRange,
+  type RemoteWorkMode,
   type RomeCode,
   type WithAcquisition,
 } from "shared";
@@ -542,6 +543,13 @@ export class OfferEntityBuilder implements Builder<OfferEntity> {
     return new OfferEntityBuilder({
       ...this.entity,
       romeLabel,
+    });
+  }
+
+  public withRemoteWorkMode(remoteWorkMode: RemoteWorkMode) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      remoteWorkMode,
     });
   }
 }
