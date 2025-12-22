@@ -6,8 +6,10 @@ export type WithAcquisition = {
   acquisitionKeyword?: string | undefined;
 };
 
+export const withAcquisitionShape = {
+  acquisitionCampaign: z.string().optional(),
+  acquisitionKeyword: z.string().optional(),
+};
+
 export const withAcquisitionSchema: ZodSchemaWithInputMatchingOutput<WithAcquisition> =
-  z.object({
-    acquisitionCampaign: z.string().optional(),
-    acquisitionKeyword: z.string().optional(),
-  });
+  z.object(withAcquisitionShape);

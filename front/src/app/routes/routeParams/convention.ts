@@ -9,6 +9,7 @@ import {
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionReadDto,
+  type CreateConventionPresentationInitialValues,
   type FtConnectIdentity,
   type ImmersionObjective,
   type InternshipKind,
@@ -22,7 +23,6 @@ import {
   type ScheduleDto,
   toDateUTCString,
 } from "shared";
-import type { CreateConventionPresentationInitialValues } from "src/app/components/forms/convention/conventionHelpers";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";

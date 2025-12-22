@@ -29,6 +29,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
+import { v4 as uuid } from "uuid";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type {
   GenerateConnectedUserJwt,
@@ -187,10 +188,12 @@ describe("convention e2e", () => {
 
         const response = await unauthenticatedRequest.shareConvention({
           body: {
-            conventionLink: veryLongConventionLink,
+            senderEmail: "any@email.fr",
             details: "Le message du mail",
-            email: "any@email.fr",
-            internshipKind: "immersion",
+            conventionDraft: {
+              id: uuid(),
+              internshipKind: "immersion",
+            },
           },
         });
 
@@ -224,9 +227,11 @@ describe("convention e2e", () => {
         const response = await unauthenticatedRequest.shareConvention({
           body: {
             details: "any@email.fr",
-            email: "any@email.fr",
-            internshipKind: "immersion",
-            conventionLink: "",
+            senderEmail: "any@email.fr",
+            conventionDraft: {
+              id: uuid(),
+              internshipKind: "immersion",
+            },
           },
         });
 
