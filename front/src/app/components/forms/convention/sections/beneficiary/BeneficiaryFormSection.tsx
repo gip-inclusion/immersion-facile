@@ -63,9 +63,10 @@ export const BeneficiaryFormSection = ({
   const isSuccessfullyPeConnected = useAppSelector(authSelectors.isPeConnected);
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
-  const { register, getValues, setValue, formState } =
+  const { register, getValues, setValue, formState, watch } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
+  const agencyKind = watch("agencyKind");
   const dispatch = useDispatch();
   const getFieldError = makeFieldError(formState);
   const { getFormFields } = getFormContents(
@@ -225,7 +226,9 @@ export const BeneficiaryFormSection = ({
         }}
       />
 
-      {values.signatories.beneficiary.email && <ConventionEmailWarning />}
+      {values.signatories.beneficiary.email && (
+        <ConventionEmailWarning agencyKind={agencyKind} />
+      )}
       <PhoneInput
         label={formContents["signatories.beneficiary.phone"].label}
         hintText={formContents["signatories.beneficiary.phone"].hintText}
