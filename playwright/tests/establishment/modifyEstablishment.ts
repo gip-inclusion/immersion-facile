@@ -131,16 +131,15 @@ const step2 = async (
     `#${domElementIds.establishment.edit.businessAddresses}-delete-option-button-0`,
   ); // twice, to remove the second address
 
-  await page.fill(
-    `#${domElementIds.establishment.edit.appellations} .im-select__input`,
-    "buchero",
+  await page.click(`#${domElementIds.establishment.edit.deleteOfferButton}-0`);
+
+  await page.click(`#${domElementIds.establishment.edit.editOfferButton}-0`);
+
+  await page.click(
+    `[for='${domElementIds.establishment.edit.remoteWorkMode}-2']`, // NO_REMOTE
   );
-  await page
-    .locator(
-      `#${domElementIds.establishment.edit.appellations} .im-select__option`,
-    )
-    .first()
-    .click();
+
+  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
 
   await fillAutocomplete({
     page,
