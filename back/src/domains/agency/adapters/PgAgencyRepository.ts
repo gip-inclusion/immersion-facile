@@ -76,6 +76,7 @@ export class PgAgencyRepository implements AgencyRepository {
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
         phone_number: agency.phoneNumber,
+        status_justification: agency.statusJustification,
         updated_at: updatedAt ?? sql`now()`,
       }))
       .execute()
@@ -596,6 +597,35 @@ export class PgAgencyRepository implements AgencyRepository {
       )
       .deleteFrom("agencies")
       .where("id", "in", (eb) => eb.selectFrom("agenciesToDelete").select("id"))
+      .returning("id")
+      .execute();
+
+    return result.map(({ id }) => id);
+  }
+
+  async closeInactiveAgenciesWithoutRecentConventions(params: {
+    noConventionSince: Date;
+  }): Promise<AgencyId[]> {
+    const { noConventionSince } = params;
+    const result = await this.transaction
+      .updateTable("agencies")
+      .set({
+        status: "closed",
+        status_justification: "Agence fermée automatiquement pour inactivité",
+        updated_at: sql`NOW()`,
+      })
+      .where("status", "not in", ["closed", "needsReview", "rejected"])
+      .where(({ eb }) =>
+        eb.not(
+          eb.exists(
+            eb
+              .selectFrom("conventions")
+              .select("id")
+              .whereRef("conventions.agency_id", "=", "agencies.id")
+              .where("conventions.date_submission", ">=", noConventionSince),
+          ),
+        ),
+      )
       .returning("id")
       .execute();
 
