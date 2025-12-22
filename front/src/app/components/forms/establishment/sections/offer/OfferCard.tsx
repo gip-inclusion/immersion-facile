@@ -3,16 +3,20 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { useFormContext } from "react-hook-form";
 import {
+  domElementIds,
   type FormEstablishmentDto,
   remoteWorkModeLabels,
   removeAtIndex,
 } from "shared";
+import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
 
 export const OfferCard = ({
   index,
+  mode,
   onEditOfferClick,
 }: {
   index: number;
+  mode: Mode;
   onEditOfferClick: () => void;
 }) => {
   const { setValue, watch } = useFormContext<FormEstablishmentDto>();
@@ -39,13 +43,17 @@ export const OfferCard = ({
               iconPosition: "right",
               iconId: "fr-icon-edit-line",
               priority: "tertiary",
+              type: "button",
               onClick: onEditOfferClick,
+              id: `${domElementIds.establishment[mode].editOfferButton}-${index}`,
             },
             {
               children: "Supprimer",
               iconPosition: "right",
               iconId: "fr-icon-delete-bin-line",
               priority: "tertiary",
+              type: "button",
+              id: `${domElementIds.establishment[mode].deleteOfferButton}-${index}`,
               onClick: () => {
                 const offers = formValues.offers;
                 const newOffers = removeAtIndex(offers, index);

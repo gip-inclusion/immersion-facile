@@ -101,25 +101,44 @@ const step2 = async (page: Page) => {
     value: "28 rue des mimosas",
     endpoint: addressRoutes.lookupStreetAddress.url,
   });
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(2000);
+
+  await page.click(`#${domElementIds.establishment.create.addOfferButton}`);
 
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.establishment.create.appellations}-0`,
+    locator: `#${domElementIds.establishment.create.appellations}`,
     value: "boulang",
     endpoint: formCompletionRoutes.appellation.url,
   });
 
   await page.click(
-    `#${domElementIds.establishment.create.appellations}-add-option-button`,
+    `[for='${domElementIds.establishment.create.remoteWorkMode}-1']`, // 100% REMOTE
   );
+
+  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+
+  await page.click(`#${domElementIds.establishment.create.editOfferButton}-0`);
+  await page.click(
+    `[for='${domElementIds.establishment.create.remoteWorkMode}-0']`, // HYBRID
+  );
+
+  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+
+  await page.click(`#${domElementIds.establishment.create.addOfferButton}`);
 
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.establishment.create.appellations}-1`,
+    locator: `#${domElementIds.establishment.create.appellations}`,
     value: "route",
     endpoint: formCompletionRoutes.appellation.url,
   });
+
+  await page.click(
+    `[for='${domElementIds.establishment.create.remoteWorkMode}-1']`, // 100% REMOTE
+  );
+
+  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
 
   await goToNextStep(page, 2, "create");
 };
