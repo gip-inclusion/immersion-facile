@@ -449,7 +449,7 @@ export type EmailParamsByEmailType = {
   };
   SHARE_DRAFT_CONVENTION_BY_LINK: {
     internshipKind: InternshipKind;
-    additionalDetails: string;
+    additionalDetails: string | undefined;
     conventionFormUrl: string;
   };
   SIGNATORY_REMINDER: {
