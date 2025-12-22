@@ -253,6 +253,11 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }): Promise<AgencyId[]> {
     throw errors.generic.fakeError("Not implemented");
   }
+  public async closeInactiveAgenciesWithoutRecentConventions(_params: {
+    noConventionSince: Date;
+  }): Promise<AgencyId[]> {
+    throw errors.generic.fakeError("Not implemented");
+  }
 }
 
 const sortByNearestFrom =
