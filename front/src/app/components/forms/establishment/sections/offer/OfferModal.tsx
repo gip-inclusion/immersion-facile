@@ -6,6 +6,7 @@ import { equals } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  domElementIds,
   type EstablishmentFormOffer,
   establishmentFormOfferSchema,
   type FormEstablishmentDto,
@@ -16,6 +17,7 @@ import {
   replaceAtIndex,
 } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
+import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { v4 as uuidV4 } from "uuid";
 import type { $ZodIssue } from "zod/v4/core";
@@ -47,13 +49,15 @@ const emptyOffer: CurrentOffer = {
 
 const offerModal = createModal({
   isOpenedByDefault: false,
-  id: "im-offer-modal",
+  id: domElementIds.establishment.offerModal,
 });
 
 export const OfferModal = ({
   selectedOfferIndex,
+  mode,
 }: {
   selectedOfferIndex: number | null;
+  mode: Mode;
 }) => {
   const { watch, setValue } = useFormContext<FormEstablishmentDto>();
   const formValues = watch();
@@ -99,6 +103,7 @@ export const OfferModal = ({
             selectedOfferIndex !== null
               ? "Modifier ce métier"
               : "Ajouter ce métier",
+          id: domElementIds.establishment.offerModalSubmitButton,
           onClick: async () => {
             const { offers } = formValues;
             const validCurrentOfferResult =
@@ -122,6 +127,9 @@ export const OfferModal = ({
         <AppellationAutocomplete
           label={"Rechercher un métier"}
           locator={"form-establishment-offer-modal"}
+          selectProps={{
+            inputId: domElementIds.establishment[mode].appellations,
+          }}
           initialInputValue={
             selectedOfferIndex
               ? formValues.offers[selectedOfferIndex].appellationLabel
@@ -164,10 +172,12 @@ export const OfferModal = ({
         />
         <RadioButtons
           legend={"Proposez-vous du télétravail sur ce métier ?"}
+          id={domElementIds.establishment[mode].remoteWorkMode}
           options={remoteWorkModes.map((remoteWorkMode) => ({
             label: remoteWorkModeLabels[remoteWorkMode].label,
             nativeInputProps: {
               value: remoteWorkMode,
+
               checked: currentOffer.remoteWorkMode === remoteWorkMode,
               onChange: () => {
                 setErrors([]);
