@@ -132,7 +132,7 @@ describe("NotifyConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: conventionInReview.id },
               )}`,
@@ -172,7 +172,7 @@ describe("NotifyConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: conventionInReview.id },
               )}`,
@@ -199,7 +199,7 @@ describe("NotifyConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: conventionInReview.id },
               )}`,
@@ -273,7 +273,7 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: conventionInReviewWithFtAdvisor.id },
               )}`,
@@ -340,7 +340,7 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: conventionInReviewWithFtAdvisor.id },
               )}`,
@@ -397,7 +397,7 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: acceptedByCounsellorConvention.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: acceptedByCounsellorConvention.id },
               )}`,
@@ -427,7 +427,7 @@ describe("NotifyConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: acceptedByCounsellorConvention.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: acceptedByCounsellorConvention.id },
               )}`,
@@ -502,7 +502,7 @@ describe("NotifyConventionNeedsReview", () => {
               }),
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 {
                   conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,

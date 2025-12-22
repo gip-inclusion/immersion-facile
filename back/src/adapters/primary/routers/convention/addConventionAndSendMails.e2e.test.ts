@@ -366,7 +366,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     );
     expect(needsReviewEmail.recipients).toEqual([validator.email]);
 
-    expect(needsReviewEmail.params.magicLink).toBe(
+    expect(needsReviewEmail.params.manageConventionLink).toBe(
       `${appConfig.immersionFacileBaseUrl}${makeUrlWithQueryParams(
         `/${frontRoutes.manageConventionUserConnected}`,
         { conventionId: initialConvention.id },

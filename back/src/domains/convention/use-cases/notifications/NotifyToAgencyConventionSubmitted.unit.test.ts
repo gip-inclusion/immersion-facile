@@ -178,7 +178,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       convention: validConvention,
     });
 
-    const magicLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+    const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
       `/${frontRoutes.manageConventionUserConnected}`,
       { conventionId: validConvention.id },
     )}`;
@@ -194,7 +194,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(agencyWithOnlyValidator, validConvention),
-            magicLink,
+            manageConventionLink,
             agencyLogoUrl: agencyWithOnlyValidator.logoUrl ?? undefined,
           },
         },
@@ -207,7 +207,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withAgencyId(agencyWithConsellorsAndValidator.id)
       .build();
 
-    const magicLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+    const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
       `/${frontRoutes.manageConventionUserConnected}`,
       { conventionId: validConvention.id },
     )}`;
@@ -230,7 +230,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               agencyWithConsellorsAndValidator,
               validConvention,
             ),
-            magicLink,
+            manageConventionLink,
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
@@ -247,7 +247,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               agencyWithConsellorsAndValidator,
               validConvention,
             ),
-            magicLink,
+            manageConventionLink,
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
@@ -266,7 +266,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withFederatedIdentity(ftIdentity)
       .build();
 
-    const magicLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+    const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
       `/${frontRoutes.manageConventionUserConnected}`,
       { conventionId: validConvention.id },
     )}`;
@@ -300,7 +300,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               agencyWithConsellorsAndValidator,
               validConvention,
             ),
-            magicLink,
+            manageConventionLink,
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
             warning:
@@ -319,7 +319,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               agencyWithConsellorsAndValidator,
               validConvention,
             ),
-            magicLink,
+            manageConventionLink,
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
             warning:
@@ -342,7 +342,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withFederatedIdentity(ftIdentity)
       .build();
 
-    const magicLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+    const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
       `/${frontRoutes.manageConventionUserConnected}`,
       { conventionId: validConvention.id },
     )}`;
@@ -382,7 +382,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               agencyWithConsellorsAndValidator,
               validConvention,
             ),
-            magicLink,
+            manageConventionLink,
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },

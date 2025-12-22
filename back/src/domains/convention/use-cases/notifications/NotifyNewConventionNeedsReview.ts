@@ -92,7 +92,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
             businessName: convention.businessName,
             conventionId: convention.id,
             internshipKind: convention.internshipKind,
-            magicLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               {
                 conventionId: convention.id,

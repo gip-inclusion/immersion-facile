@@ -146,7 +146,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
             dateStart: conventionDtoFromEvent.dateStart,
             dateEnd: conventionDtoFromEvent.dateEnd,
             businessName: conventionDtoFromEvent.businessName,
-            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               { conventionId: conventionDtoFromEvent.id },
             )}`,

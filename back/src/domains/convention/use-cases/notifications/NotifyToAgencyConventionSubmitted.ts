@@ -117,7 +117,7 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
               lastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              magicLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: convention.id },
               )}`,

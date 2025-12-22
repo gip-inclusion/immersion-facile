@@ -19,6 +19,7 @@ import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
+import { ConventionManageConnectedUser } from "src/app/pages/agency-dashboard/ConventionManageConnectedUser";
 import { AdminPrivateRoute } from "src/app/pages/auth/AdminPrivateRoute";
 import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { DashboardPrivateRoute } from "src/app/pages/auth/DashboardPrivateRoute";
@@ -28,7 +29,6 @@ import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/Be
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
-import { ConventionManageConnectedUserPage } from "src/app/pages/convention/ConventionManageConnectedUserPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
@@ -270,7 +270,7 @@ const getPageByRouteName: {
         <PageHeader title="Vous devez vous connecter pour accéder à cette convention" />
       }
     >
-      <ConventionManageConnectedUserPage route={route} />
+      <ConventionManageConnectedUser route={route} />
     </ConnectedPrivateRoute>
   ),
   myProfile: (route) => (

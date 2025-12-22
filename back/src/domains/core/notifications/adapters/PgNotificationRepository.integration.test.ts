@@ -108,7 +108,7 @@ describe("PgNotificationRepository", () => {
         params: {
           agencyReferentName: "Agency Referent Name",
           conventionId: "",
-          agencyMagicLinkUrl: "",
+          manageConventionLink: "",
           beneficiaryFirstName: "Bob",
           beneficiaryLastName: "L'éponge",
           businessName: "Essuie-tout",
@@ -558,7 +558,7 @@ describe("PgNotificationRepository", () => {
               previousAgencyName: "Agence du Grand Est",
               internshipKind: "immersion",
               justification: "Justification",
-              magicLink: "https://magic-link.com",
+              manageConventionLink: "https://magic-link.com",
             },
           },
         };
@@ -599,7 +599,7 @@ describe("PgNotificationRepository", () => {
               previousAgencyName: "Agence du Grand Est",
               internshipKind: "immersion",
               justification: "Justification",
-              magicLink: "https://magic-link.com",
+              manageConventionLink: "https://magic-link.com",
             },
           },
         };
@@ -625,7 +625,7 @@ describe("PgNotificationRepository", () => {
               previousAgencyName: "Agence du Grand Est",
               internshipKind: "immersion",
               justification: "Justification",
-              magicLink: "https://magic-link.com",
+              manageConventionLink: "https://magic-link.com",
             },
           },
         };

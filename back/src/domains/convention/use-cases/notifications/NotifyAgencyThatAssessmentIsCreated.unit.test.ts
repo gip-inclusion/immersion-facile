@@ -150,7 +150,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment,
             numberOfHoursMade: "45h",
-            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               { conventionId: convention.id },
             )}`,
@@ -178,7 +178,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment,
             numberOfHoursMade: "45h",
-            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               { conventionId: convention.id },
             )}`,
@@ -304,7 +304,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
                 convention.immersionAppellation.appellationLabel,
               assessment,
               numberOfHoursMade: "45h",
-              magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: convention.id },
               )}`,

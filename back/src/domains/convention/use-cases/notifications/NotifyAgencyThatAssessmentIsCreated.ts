@@ -99,7 +99,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
       });
 
       await executeInSequence(recipientsEmails, async (email) => {
-        const magicLink = `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        const manageConventionLink = `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
           `/${frontRoutes.manageConventionUserConnected}`,
           { conventionId: convention.id },
         )}`;
@@ -127,7 +127,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
                 convention.immersionAppellation.appellationLabel,
               assessment,
               numberOfHoursMade,
-              magicLink,
+              manageConventionLink,
             },
           },
           followedIds: {
