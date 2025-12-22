@@ -48,7 +48,7 @@ export type EmailParamsByEmailType = {
     delegationProviderMail: string;
   };
   AGENCY_FIRST_REMINDER: {
-    agencyMagicLinkUrl: string;
+    manageConventionLink: string;
     agencyName: string;
     agencyReferentName: string | undefined;
     beneficiaryFirstName: string;
@@ -59,7 +59,7 @@ export type EmailParamsByEmailType = {
     dateEnd: string;
   };
   AGENCY_LAST_REMINDER: {
-    agencyMagicLinkUrl: string;
+    manageConventionLink: string;
     agencyReferentName: string | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -132,7 +132,7 @@ export type EmailParamsByEmailType = {
     assessment: AssessmentDtoCompleted | AssessmentDtoPartiallyCompleted;
     immersionAppellationLabel: string;
     numberOfHoursMade: string;
-    magicLink: string;
+    manageConventionLink: string;
   };
   ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
     agencyReferentName: string | undefined;
@@ -237,7 +237,7 @@ export type EmailParamsByEmailType = {
   CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
     previousAgencyName: string;
     justification: string;
-    magicLink: string;
+    manageConventionLink: string;
     conventionId: ConventionId;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -363,7 +363,7 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
     firstName: string;
     lastName: string;
-    magicLink: AbsoluteUrl;
+    manageConventionLink: AbsoluteUrl;
     warning?: string;
   };
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
@@ -400,7 +400,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     conventionId: ConventionId;
     internshipKind: InternshipKind;
-    magicLink: string;
+    manageConventionLink: string;
     possibleRoleAction: string;
     validatorName: string;
     peAdvisor:
@@ -429,7 +429,7 @@ export type EmailParamsByEmailType = {
     dateEnd: string;
     dateStart: string;
     immersionAddress: string;
-    magicLink: string;
+    manageConventionLink: string;
   };
   REJECTED_CONVENTION_NOTIFICATION: {
     agencyName: string;

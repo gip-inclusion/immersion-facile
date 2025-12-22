@@ -215,7 +215,7 @@ export const defaultEmailValueByEmailKind: {
     statusJustification: "STATUS_JUSTIFICATION",
   },
   AGENCY_FIRST_REMINDER: {
-    agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
+    manageConventionLink: "CONVENTION_VERIFICATION_LINK",
     agencyReferentName: "AGENCY_REFERENT_NAME",
     agencyName: "AGENCY_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
@@ -226,7 +226,7 @@ export const defaultEmailValueByEmailKind: {
     dateEnd: "DATE_END",
   },
   AGENCY_LAST_REMINDER: {
-    agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
+    manageConventionLink: "MANAGE_CONVENTION_LINK",
     agencyReferentName: "AGENCY_REFERENT_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
@@ -404,7 +404,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryPhone: "BENEFICIARY_PHONE",
     previousAgencyName: "PREVIOUS_AGENCY_NAME",
     justification: "JUSTIFICATION",
-    magicLink: "MAGIC_LINK",
+    manageConventionLink: "MANAGE_CONVENTION_LINK",
     internshipKind: "immersion",
   },
   CONVENTION_TRANSFERRED_SIGNATORY_NOTIFICATION: {
@@ -532,7 +532,7 @@ export const defaultEmailValueByEmailKind: {
     numberOfHoursMade: "30h",
     immersionObjective: "Confirmer un projet professionnel",
     internshipKind: "immersion",
-    magicLink: "http://MAGIC_LINK",
+    manageConventionLink: "http://MANAGE_CONVENTION_LINK",
   },
   ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
     agencyReferentName: "AGENCY_REFERENT_NAME",
@@ -561,7 +561,7 @@ export const defaultEmailValueByEmailKind: {
     dateEnd: "DATE_END",
     businessName: "BUSINESS_NAME",
     agencyName: "AGENCY_NAME",
-    magicLink: "http://MAGIC_LINK",
+    manageConventionLink: "http://MANAGE_CONVENTION_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
     warning: "WARNING",
   },
@@ -602,7 +602,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     conventionId: "CONVENTION_ID",
     internshipKind: "immersion",
-    magicLink: "MAGIC_LINK",
+    manageConventionLink: "MANAGE_CONVENTION_LINK",
     possibleRoleAction: "POSSIBLE_ROLE_ACTION",
     validatorName: "VALIDATOR_NAME",
     peAdvisor: {
@@ -628,7 +628,7 @@ export const defaultEmailValueByEmailKind: {
     dateStart: "DATE_START",
     dateEnd: "DATE_END",
     businessName: "BUSINESS_NAME",
-    magicLink: "MAGIC_LINK",
+    manageConventionLink: "MANAGE_CONVENTION_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
   },
   REJECTED_CONVENTION_NOTIFICATION: {

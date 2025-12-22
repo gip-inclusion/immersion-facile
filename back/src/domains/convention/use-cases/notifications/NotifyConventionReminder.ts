@@ -302,7 +302,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
               businessName: convention.businessName,
               dateStart: convention.dateStart,
               dateEnd: convention.dateEnd,
-              agencyMagicLinkUrl: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 {
                   conventionId: convention.id,
@@ -325,7 +325,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
                 lastname: convention.signatories.beneficiary.lastName,
               }),
               businessName: convention.businessName,
-              agencyMagicLinkUrl: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+              manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 {
                   conventionId: convention.id,

@@ -69,7 +69,7 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
             immersionAddress: convention.immersionAddress,
-            magicLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               {
                 conventionId: convention.id,

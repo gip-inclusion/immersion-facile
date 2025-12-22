@@ -108,7 +108,7 @@ export const emailTemplatesByName =
       niceName: "Convention - Premier rappel de validation à l'agence",
       tags: ["relance vérification manquante"],
       createEmailVariables: ({
-        agencyMagicLinkUrl,
+        manageConventionLink,
         agencyReferentName,
         agencyName,
         beneficiaryFirstName,
@@ -143,7 +143,7 @@ export const emailTemplatesByName =
         buttons: [
           {
             label: "Voir la convention",
-            url: agencyMagicLinkUrl,
+            url: manageConventionLink,
           },
         ],
         subContent: `Bonne journée,
@@ -154,7 +154,7 @@ export const emailTemplatesByName =
       niceName: "Convention - Dernier rappel de validation à l'agence",
       tags: ["relance vérification manquante"],
       createEmailVariables: ({
-        agencyMagicLinkUrl,
+        manageConventionLink,
         agencyReferentName,
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -176,7 +176,7 @@ export const emailTemplatesByName =
         buttons: [
           {
             label: "Voir la convention",
-            url: agencyMagicLinkUrl,
+            url: manageConventionLink,
           },
         ],
         subContent: `
@@ -490,7 +490,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         immersionAppellationLabel,
         assessment,
         numberOfHoursMade,
-        magicLink,
+        manageConventionLink,
       }) => {
         const lastDayOfPresence =
           assessment.status === "COMPLETED"
@@ -546,7 +546,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
           buttons: [
             {
               label: "Consulter le bilan",
-              url: magicLink,
+              url: manageConventionLink,
             },
           ],
           subContent: `
@@ -945,7 +945,7 @@ Profil du candidat :
       createEmailVariables: ({
         previousAgencyName,
         justification,
-        magicLink,
+        manageConventionLink,
         conventionId,
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -964,7 +964,7 @@ Email : ${beneficiaryEmail}
 Tél : ${beneficiaryPhone}`,
         buttons: [
           {
-            url: magicLink,
+            url: manageConventionLink,
             label: "Examiner la demande",
           },
         ],
@@ -1474,7 +1474,7 @@ Tél : ${beneficiaryPhone}`,
         firstName,
         internshipKind,
         lastName,
-        magicLink,
+        manageConventionLink,
         warning,
       }) => ({
         subject:
@@ -1491,7 +1491,7 @@ Tél : ${beneficiaryPhone}`,
 
       
 
-      Vous pouvez prendre connaissance de la demande en <a href="${magicLink}" target="_blank">cliquant ici</a>.
+      Vous pouvez prendre connaissance de la demande en <a href="${manageConventionLink}" target="_blank">cliquant ici</a>.
       <ul>
         <li><strong>ATTENTION !</strong> Vous pouvez renvoyer un lien de signature par SMS en un clic aux signataires qui ont renseigné un numéro de mobile. Il vous suffit de cliquer sur le bouton 'Faire signer par SMS' dans l'encadré correspondant au signataire auquel vous souhaitez adresser le SMS.</li>
         <li>Vous pouvez dès maintenant demander des modifications ou la refuser si nécessaire.</li>   
@@ -1667,7 +1667,7 @@ Tél : ${beneficiaryPhone}`,
         businessName,
         conventionId,
         internshipKind,
-        magicLink,
+        manageConventionLink,
         possibleRoleAction,
         validatorName,
         peAdvisor,
@@ -1701,7 +1701,7 @@ Tél : ${beneficiaryPhone}`,
         buttons: [
           {
             label: "Examiner la demande",
-            url: magicLink,
+            url: manageConventionLink,
             target: "_blank",
           },
         ],
@@ -1775,7 +1775,7 @@ Tél : ${beneficiaryPhone}`,
         conventionId,
         dateEnd,
         dateStart,
-        magicLink,
+        manageConventionLink,
         immersionAddress,
       }) => ({
         subject: `Pour action : la demande de convention d'immersion envoyée par ${beneficiaryFirstName} ${beneficiaryLastName} est totalement signée. À vous de la valider !`,
@@ -1788,7 +1788,7 @@ Tél : ${beneficiaryPhone}`,
       À vous de l'étudier !</strong>`,
         buttons: [
           {
-            url: magicLink,
+            url: manageConventionLink,
             label: "Voir la demande",
             target: "_blank",
           },

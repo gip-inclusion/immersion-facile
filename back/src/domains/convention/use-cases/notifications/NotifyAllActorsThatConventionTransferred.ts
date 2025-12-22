@@ -152,7 +152,7 @@ const sendAgencyEmails = (
           beneficiaryPhone: convention.signatories.beneficiary.phone,
           previousAgencyName,
           justification,
-          magicLink: `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+          manageConventionLink: `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
             `/${frontRoutes.manageConventionUserConnected}`,
             {
               conventionId: convention.id,

@@ -193,7 +193,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
         //Assert
 
-        const agencyMagicLinkUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
           `/${frontRoutes.manageConventionUserConnected}`,
           { conventionId: convention.id },
         )}`;
@@ -204,25 +204,25 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
               email: validator1.email,
               agency: agencyWithRight,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
             makeAgencyFirstReminderEmail({
               email: validator2.email,
               agency: agencyWithRight,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
             makeAgencyFirstReminderEmail({
               email: councellor1.email,
               agency: agencyWithRight,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
             makeAgencyFirstReminderEmail({
               email: councellor2.email,
               agency: agencyWithRight,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
           ],
         });
@@ -273,7 +273,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
         //Assert
 
-        const agencyMagicLinkUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
           `/${frontRoutes.manageConventionUserConnected}`,
           { conventionId: convention.id },
         )}`;
@@ -283,22 +283,22 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             makeAgencyLastReminderEmail({
               email: validator1.email,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
             makeAgencyLastReminderEmail({
               email: validator2.email,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
             makeAgencyLastReminderEmail({
               email: councellor1.email,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
             makeAgencyLastReminderEmail({
               email: councellor2.email,
               convention,
-              agencyMagicLinkUrl,
+              manageConventionLink,
             }),
           ],
         });
@@ -697,12 +697,12 @@ const makeAgencyFirstReminderEmail = ({
   email,
   agency,
   convention,
-  agencyMagicLinkUrl,
+  manageConventionLink,
 }: {
   email: string;
   agency: AgencyWithUsersRights;
   convention: ConventionDto;
-  agencyMagicLinkUrl: AbsoluteUrl;
+  manageConventionLink: AbsoluteUrl;
 }): TemplatedEmail => ({
   kind: "AGENCY_FIRST_REMINDER",
   recipients: [email],
@@ -721,18 +721,18 @@ const makeAgencyFirstReminderEmail = ({
     businessName: convention.businessName,
     dateStart: convention.dateStart,
     dateEnd: convention.dateEnd,
-    agencyMagicLinkUrl,
+    manageConventionLink,
   },
 });
 
 const makeAgencyLastReminderEmail = ({
   email,
   convention,
-  agencyMagicLinkUrl,
+  manageConventionLink,
 }: {
   email: string;
   convention: ConventionDto;
-  agencyMagicLinkUrl: AbsoluteUrl;
+  manageConventionLink: AbsoluteUrl;
 }): TemplatedEmail => ({
   kind: "AGENCY_LAST_REMINDER",
   recipients: [email],
@@ -748,7 +748,7 @@ const makeAgencyLastReminderEmail = ({
       lastname: convention.signatories.beneficiary.lastName,
     }),
     businessName: convention.businessName,
-    agencyMagicLinkUrl,
+    manageConventionLink,
   },
 });
 

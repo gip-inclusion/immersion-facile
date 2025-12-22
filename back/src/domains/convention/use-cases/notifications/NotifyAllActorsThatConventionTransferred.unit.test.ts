@@ -183,7 +183,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
             beneficiaryPhone: convention.signatories.beneficiary.phone,
             previousAgencyName: previousAgency.name,
             justification: "agency change",
-            magicLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               {
                 conventionId: convention.id,

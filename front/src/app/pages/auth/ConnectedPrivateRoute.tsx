@@ -364,6 +364,38 @@ const establishmentDashboardContent: PageContent = {
   ],
 };
 
+const agencyDashboardContent: PageContent = {
+  title: "Mon espace prescripteur",
+  description: (
+    <>
+      <strong>Un compte unique</strong> pour accéder à vos conventions et
+      consulter vos statistiques.
+    </>
+  ),
+  cardsTitle: "Tous les avantages du compte prescripteur",
+  withEmailLogin: true,
+  cards: [
+    {
+      title: "Une connexion simplifiée",
+      description:
+        "Pas besoin de créer un nouveau mot de passe si vous appartenez à France Travail, Cap Emploi...",
+      illustration: commonIllustrations.warning,
+    },
+    {
+      title: "Un seul identifiant",
+      description:
+        "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
+      illustration: commonIllustrations.inscription,
+    },
+    {
+      title: "Tout au même endroit",
+      description:
+        "Un seul espace pour accéder aux conventions et statistiques de vos organismes.",
+      illustration: commonIllustrations.monCompte,
+    },
+  ],
+};
+
 const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
   {
     establishment: {
@@ -446,68 +478,8 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
         },
       ],
     },
-    agencyDashboard: {
-      title: "Mon espace prescripteur",
-      description: (
-        <>
-          <strong>Un compte unique</strong> pour accéder à vos conventions et
-          consulter vos statistiques.
-        </>
-      ),
-      cardsTitle: "Tous les avantages du compte prescripteur",
-      withEmailLogin: true,
-      cards: [
-        {
-          title: "Une connexion simplifiée",
-          description:
-            "Pas besoin de créer un nouveau mot de passe si vous appartenez à France Travail, Cap Emploi...",
-          illustration: commonIllustrations.warning,
-        },
-        {
-          title: "Un seul identifiant",
-          description:
-            "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
-          illustration: commonIllustrations.inscription,
-        },
-        {
-          title: "Tout au même endroit",
-          description:
-            "Un seul espace pour accéder aux conventions et statistiques de vos organismes.",
-          illustration: commonIllustrations.monCompte,
-        },
-      ],
-    },
-    manageConventionUserConnected: {
-      title: "Mon espace prescripteur",
-      description: (
-        <>
-          <strong>Un compte unique</strong> pour accéder à vos conventions et
-          consulter vos statistiques.
-        </>
-      ),
-      cardsTitle: "Tous les avantages du compte prescripteur",
-      withEmailLogin: true,
-      cards: [
-        {
-          title: "Une connexion simplifiée",
-          description:
-            "Pas besoin de créer un nouveau mot de passe si vous appartenez à France Travail, Cap Emploi...",
-          illustration: commonIllustrations.warning,
-        },
-        {
-          title: "Un seul identifiant",
-          description:
-            "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
-          illustration: commonIllustrations.inscription,
-        },
-        {
-          title: "Tout au même endroit",
-          description:
-            "Un seul espace pour accéder aux conventions et statistiques de vos organismes.",
-          illustration: commonIllustrations.monCompte,
-        },
-      ],
-    },
+    agencyDashboard: agencyDashboardContent,
+    manageConventionUserConnected: agencyDashboardContent,
     admin: {
       title: "Mon espace administrateur",
       description: "Pour la super team IF 😉",
