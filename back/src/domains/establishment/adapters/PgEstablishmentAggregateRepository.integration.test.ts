@@ -3325,6 +3325,24 @@ describe("PgEstablishmentAggregateRepository", () => {
           [establishment],
         );
       });
+      it("adds a new row in immersion_offers table with remote work mode", async () => {
+        const offer = new OfferEntityBuilder()
+          .withRemoteWorkMode("100% REMOTE")
+          .build();
+        const establishment = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siret1)
+          .withOffers([offer])
+          .withUserRights([osefUserRight])
+          .build();
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishment,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
+          [establishment],
+        );
+      });
     });
 
     describe("updateEstablishmentAggregate", () => {
@@ -3343,6 +3361,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         acquisitionCampaign: "my-campaign",
         acquisitionKeyword: "my-keyword",
       };
+      const analysteEnGeomatiqueImmersionOfferRemote = new OfferEntityBuilder()
+        .withRomeLabel("Information géographique")
+        .withRomeCode("M1808")
+        .withAppellationLabel("Analyste en géomatique")
+        .withAppellationCode("10946")
+        .withRemoteWorkMode("100% REMOTE")
+        .build();
 
       beforeEach(async () => {
         await pgUserRepository.save(user);
@@ -3394,7 +3419,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               },
             ])
             .withOffers([
-              analysteEnGeomatiqueImmersionOffer,
+              analysteEnGeomatiqueImmersionOfferRemote,
               artisteCirqueOffer,
               cuvisteOffer,
             ])
