@@ -1,26 +1,21 @@
 import { z } from "zod";
-import type { InternshipKind } from "./convention/convention.dto";
-import { internshipKindSchema } from "./convention/convention.schema";
-import { emailPossiblyEmptySchema, emailSchema } from "./email/email.schema";
+import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import {
   type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
-} from "./zodUtils";
+} from "../zodUtils";
+import {
+  conventionToShareSchema,
+  type ShareConventionLinkByEmailDto,
+} from "./shareConventionLinkByEmail.dto";
 
-export type ShareConventionByEmailDto = {
-  internshipKind: InternshipKind;
-  senderEmail: string;
-  recipientEmail?: string;
-  details?: string;
-};
-
-export const shareConventionByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionByEmailDto> =
+export const shareConventionLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionLinkByEmailDto> =
   z
     .object({
-      internshipKind: internshipKindSchema,
       senderEmail: emailSchema,
       recipientEmail: emailPossiblyEmptySchema,
       details: zStringCanBeEmpty,
+      convention: conventionToShareSchema,
     })
     .refine(
       (data) => {

@@ -1,16 +1,10 @@
-import {
-  agencyKindSchema,
-  type ConventionReadDto,
-  conventionSchema,
-  type EstablishmentTutor,
-  type InternshipKind,
-  type OmitFromExistingKeys,
-  refersToAgencyIdSchema,
-  type Signatories,
-  type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
-} from "shared";
-import { z } from "zod";
+import type { OmitFromExistingKeys } from "../utils";
+import type {
+  ConventionReadDto,
+  EstablishmentTutor,
+  InternshipKind,
+  Signatories,
+} from "./convention.dto";
 
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;
@@ -57,25 +51,6 @@ export type ConventionPresentation = OmitFromExistingKeys<
   WithSignatures &
   WithFromPeConnectedUser;
 
-export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<ConventionPresentation> =
-  conventionSchema.and(
-    z.object({
-      agencyDepartment: z.string(),
-      agencyRefersTo: z
-        .object({
-          id: refersToAgencyIdSchema,
-          name: zStringMinLength1,
-          kind: agencyKindSchema,
-        })
-        .optional(),
-    }),
-  );
-
 export type WithStatusJustification = {
   statusJustification: string;
 };
-
-export const statusJustificationSchema: ZodSchemaWithInputMatchingOutput<WithStatusJustification> =
-  z.object({
-    statusJustification: zStringMinLength1,
-  });

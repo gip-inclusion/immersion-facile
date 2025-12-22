@@ -194,10 +194,9 @@ describe("convention e2e", () => {
 
         const response = await unauthenticatedRequest.shareConvention({
           body: {
-            conventionLink: veryLongConventionLink,
+            senderEmail: "any@email.fr",
             details: "Le message du mail",
-            email: "any@email.fr",
-            internshipKind: "immersion",
+            convention: {},
           },
         });
 
@@ -231,9 +230,8 @@ describe("convention e2e", () => {
         const response = await unauthenticatedRequest.shareConvention({
           body: {
             details: "any@email.fr",
-            email: "any@email.fr",
-            internshipKind: "immersion",
-            conventionLink: "",
+            senderEmail: "any@email.fr",
+            convention: {},
           },
         });
 

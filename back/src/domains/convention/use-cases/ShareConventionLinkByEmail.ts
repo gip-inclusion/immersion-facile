@@ -1,6 +1,6 @@
 import {
-  type ShareConventionByEmailDto,
-  shareConventionByEmailSchema,
+  type ShareConventionLinkByEmailDto,
+  shareConventionLinkByEmailSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -9,8 +9,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConventionByEmailDto> {
-  protected inputSchema = shareConventionByEmailSchema;
+export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConventionLinkByEmailDto> {
+  protected inputSchema = shareConventionLinkByEmailSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -31,7 +31,7 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConven
   }
 
   public async _execute(
-    params: ShareConventionByEmailDto,
+    params: ShareConventionLinkByEmailDto,
     uow: UnitOfWork,
   ): Promise<void> {
     // const shortLink = await makeShortLink({
@@ -47,9 +47,9 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConven
         kind: "SHARE_DRAFT_CONVENTION_BY_LINK",
         recipients: [params.senderEmail],
         params: {
-          internshipKind: params.internshipKind,
           additionalDetails: params.details,
           conventionFormUrl: "",
+          internshipKind: "immersion",
         },
       },
       followedIds: {},
