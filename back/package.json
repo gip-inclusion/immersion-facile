@@ -49,6 +49,7 @@
     "trigger-delete-old-discussion-messages": "ts-node src/scripts/triggerDeleteOldDiscussionMessages",
     "trigger-delete-old-conventions": "ts-node src/scripts/triggerDeleteOldConventions.ts",
     "trigger-delete-old-closed-agencies-without-conventions": "ts-node src/scripts/triggerDeleteOldClosedAgenciesWithoutConventions.ts",
+    "trigger-close-inactive-agencies-without-recent-conventions": "ts-node src/scripts/triggerCloseInactiveAgenciesWithoutRecentConventions.ts",
     "trigger-delete-old-users-ongoing-oauths": "ts-node src/scripts/triggerDeleteOldUsersOngoingOauths.ts",
     "trigger-refresh-materialized-views": "ts-node src/scripts/triggerRefreshMaterializedViews.ts",
     "trigger-resync-old-conventions-to-pe": "ts-node src/scripts/triggerResyncOldConventionsToPe.ts",
