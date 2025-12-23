@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { partition, values } from "ramda";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Tag } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
@@ -86,6 +86,7 @@ export const AgencyUsers = ({
       isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
       isIcUser: !!agencyUser.proConnect,
     });
+    manageUserModal.open();
   };
 
   const onDeleteClicked = (
@@ -174,12 +175,6 @@ export const AgencyUsers = ({
     removeUserModal.close();
   };
 
-  useEffect(() => {
-    if (selectedUserData && mode === "update") {
-      manageUserModal.open();
-    }
-  }, [selectedUserData, mode]);
-
   return (
     <>
       <h2 className={fr.cx("fr-h5", "fr-mb-1v", "fr-mt-4w")}>Utilisateurs</h2>
@@ -262,34 +257,36 @@ export const AgencyUsers = ({
               : "Ajouter un utilisateur"
           }
         >
-          {selectedUserData && mode && (
-            <>
-              <h3 className={fr.cx("fr-h5", "fr-text--bold", "fr-text--sm")}>
-                Informations personnelles
-              </h3>
-              <p className={fr.cx("fr-text--sm")}>
-                {selectedUserData.isIcUser
-                  ? `Pour modifier ses informations personnelles, l'utilisateur doit passer par son compte ProConnect créé avec l'email ${selectedUserData.email}`
-                  : `Pour ajouter un nom, prénom et mot de passe, l'utilisateur doit se créer un compte 
+          <Fragment key={`${selectedUserData?.userId}-${mode}`}>
+            {selectedUserData && mode && (
+              <>
+                <h3 className={fr.cx("fr-h5", "fr-text--bold", "fr-text--sm")}>
+                  Informations personnelles
+                </h3>
+                <p className={fr.cx("fr-text--sm")}>
+                  {selectedUserData.isIcUser
+                    ? `Pour modifier ses informations personnelles, l'utilisateur doit passer par son compte ProConnect créé avec l'email ${selectedUserData.email}`
+                    : `Pour ajouter un nom, prénom et mot de passe, l'utilisateur doit se créer un compte 
                   via ProConnect, avec l'email ${selectedUserData.email}.
                   Nous vous déconseillons de créer un compte pour les boites génériques pour conserver la traçabilité des actions sur les demandes de conventions d'immersion.`}
-              </p>
-              <AgencyUserModificationForm
-                agencyUser={selectedUserData}
-                closeModal={() => manageUserModal.close()}
-                agencyHasRefersTo={!!agency.refersToAgencyId}
-                onSubmit={
-                  mode === "add"
-                    ? onUserCreationSubmitted
-                    : onUserUpdateSubmitted
-                }
-                routeName={routeName}
-                hasCounsellorRoles={hasCounsellorRoles}
-                modalId={manageUserModalId}
-                isFTAgency={agency.kind === "pole-emploi"}
-              />
-            </>
-          )}
+                </p>
+                <AgencyUserModificationForm
+                  agencyUser={selectedUserData}
+                  closeModal={() => manageUserModal.close()}
+                  agencyHasRefersTo={!!agency.refersToAgencyId}
+                  onSubmit={
+                    mode === "add"
+                      ? onUserCreationSubmitted
+                      : onUserUpdateSubmitted
+                  }
+                  routeName={routeName}
+                  hasCounsellorRoles={hasCounsellorRoles}
+                  modalId={manageUserModalId}
+                  isFTAgency={agency.kind === "pole-emploi"}
+                />
+              </>
+            )}
+          </Fragment>
         </manageUserModal.Component>,
         document.body,
       )}
