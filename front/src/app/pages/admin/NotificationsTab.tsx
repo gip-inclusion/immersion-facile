@@ -175,6 +175,7 @@ const Email = ({ email }: { email: EmailNotification }) => (
               "unsubscribeToEmailShortLink",
               "registerEstablishmentShortLink",
               "loginLink",
+              "manageConventionLink",
             ];
 
             return (
