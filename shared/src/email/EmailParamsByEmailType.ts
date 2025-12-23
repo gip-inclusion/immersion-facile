@@ -81,6 +81,9 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     statusJustification: string;
   };
+  AGENCY_CLOSED_FOR_INACTIVITY: {
+    agencyName: string;
+  };
   AGENCY_WITH_REFERS_TO_ACTIVATED: {
     nameOfAgencyRefering: string;
     refersToAgencyName: string;

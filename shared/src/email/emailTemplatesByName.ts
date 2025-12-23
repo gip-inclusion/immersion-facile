@@ -288,6 +288,24 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         subContent: defaultSignature("immersion"),
       }),
     },
+    AGENCY_CLOSED_FOR_INACTIVITY: {
+      niceName: "Espace prescripteurs - Fermeture automatique",
+      tags: ["espacePrescripteur_fermetureAutomatique"],
+      createEmailVariables: ({ agencyName }) => ({
+        subject:
+          "Fermeture automatique de votre organisme sur Immersion Facilitée",
+        greetings: "Bonjour,",
+        content: `Votre organisme (${agencyName}) a été automatiquement fermé sur Immersion Facilitée en raison d’une période prolongée d’inactivité.
+
+        Un organisme peut être considéré comme inactif lorsqu’il ne présente aucune convention validée ou en cours de validation depuis 6 mois.
+
+        Cette fermeture n’a pas d’impact sur les conventions qui auraient déjà été signées et archivées.
+        
+        Si cette fermeture ne correspond pas à votre situation, ou si l’organisme doit être rouvert, vous pouvez <a href="https://aide.immersion-facile.beta.gouv.fr/fr/" target="_blank">contacter le support</a>.
+        `,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     AGENCY_WITH_REFERS_TO_ACTIVATED: {
       niceName:
         "Agence - notification de l'agence prescriptrice lors de l'activation d'une agence accompagnatrice",
