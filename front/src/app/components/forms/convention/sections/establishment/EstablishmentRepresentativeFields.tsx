@@ -140,7 +140,7 @@ export const EstablishmentRepresentativeFields = ({
         }}
       />
       {values.signatories.establishmentRepresentative?.email && (
-        <ConventionEmailWarning />
+        <ConventionEmailWarning shouldShowFtSpecificMessage={false} />
       )}
     </>
   );

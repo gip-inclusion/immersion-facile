@@ -142,7 +142,7 @@ export const BeneficiaryRepresentativeFields = ({
         }}
       />
       {values.signatories.beneficiaryRepresentative?.email && (
-        <ConventionEmailWarning />
+        <ConventionEmailWarning shouldShowFtSpecificMessage={false} />
       )}
       <PhoneInput
         label={

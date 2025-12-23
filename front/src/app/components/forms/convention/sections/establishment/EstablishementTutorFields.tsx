@@ -114,7 +114,9 @@ export const EstablishementTutorFields = ({
               });
             }}
           />
-          {values.establishmentTutor?.email && <ConventionEmailWarning />}
+          {values.establishmentTutor?.email && (
+            <ConventionEmailWarning shouldShowFtSpecificMessage={false} />
+          )}
         </>
       )}
       <Input
