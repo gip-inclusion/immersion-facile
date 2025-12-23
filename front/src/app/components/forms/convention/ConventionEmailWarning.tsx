@@ -1,11 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { type AgencyKind, loginFtConnect } from "shared";
+import { loginFtConnect } from "shared";
 
 export const ConventionEmailWarning = ({
-  agencyKind,
+  shouldShowFtSpecificMessage,
 }: {
-  agencyKind?: AgencyKind;
+  shouldShowFtSpecificMessage: boolean;
 }) => {
   return (
     <Alert
@@ -13,7 +13,7 @@ export const ConventionEmailWarning = ({
       severity="info"
       className={fr.cx("fr-mb-2w")}
       description={
-        agencyKind && agencyKind === "pole-emploi" ? (
+        shouldShowFtSpecificMessage ? (
           <>
             L'adresse email indiquée doit être la même que celle du compte
             France Travail du candidat. Cela permet de transmettre correctement

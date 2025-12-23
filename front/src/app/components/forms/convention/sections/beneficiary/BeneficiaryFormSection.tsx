@@ -226,7 +226,9 @@ export const BeneficiaryFormSection = ({
       />
 
       {values.signatories.beneficiary.email && (
-        <ConventionEmailWarning agencyKind={values.agencyKind} />
+        <ConventionEmailWarning
+          shouldShowFtSpecificMessage={values.agencyKind === "pole-emploi"}
+        />
       )}
       <PhoneInput
         label={formContents["signatories.beneficiary.phone"].label}
