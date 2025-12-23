@@ -41,7 +41,7 @@
     "react-select": "^5.9.0",
     "require-from-string": "^2.0.2",
     "scss-mapper": "workspace:*",
-    "storybook": "7.6.20",
+    "storybook": "7.6.21",
     "tss-react": "^4.5.2",
     "type-route": "^1.0.0",
     "typescript": "^5.8.3",
