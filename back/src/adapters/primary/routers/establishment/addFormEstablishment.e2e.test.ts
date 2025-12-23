@@ -82,7 +82,7 @@ describe("Add form establishment", () => {
       ]);
 
       inMemoryUow.romeRepository.appellations =
-        defaultValidFormEstablishment.appellations;
+        defaultValidFormEstablishment.offers;
     });
 
     it(`${displayRouteName(

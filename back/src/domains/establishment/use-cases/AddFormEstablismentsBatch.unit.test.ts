@@ -123,8 +123,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       ],
     ]);
 
-    uow.romeRepository.appellations =
-      defaultValidFormEstablishment.appellations;
+    uow.romeRepository.appellations = defaultValidFormEstablishment.offers;
   });
 
   it("throws Forbidden if currentUser user is not admin", async () => {
@@ -211,8 +210,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               },
             ])
             .withOffers(
-              form.appellations.map((appellation) => ({
-                ...appellation,
+              form.offers.map((offer) => ({
+                ...offer,
                 createdAt: timeGateway.now(),
               })),
             )
@@ -390,9 +389,9 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               },
             ])
             .withOffers(
-              formEstablishmentBatch.formEstablishments[0].appellations.map(
-                (appellation) => ({
-                  ...appellation,
+              formEstablishmentBatch.formEstablishments[0].offers.map(
+                (offer) => ({
+                  ...offer,
                   createdAt: timeGateway.now(),
                 }),
               ),
@@ -453,9 +452,9 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 .build(),
             )
             .withOffers(
-              formEstablishmentBatch.formEstablishments[1].appellations.map(
-                (appellation) => ({
-                  ...appellation,
+              formEstablishmentBatch.formEstablishments[1].offers.map(
+                (offer) => ({
+                  ...offer,
                   createdAt: timeGateway.now(),
                 }),
               ),

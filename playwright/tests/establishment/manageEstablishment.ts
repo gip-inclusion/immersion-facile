@@ -18,40 +18,40 @@ export const checkEstablishmentUpdatedThroughBackOfficeAdmin =
   (
     makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
   ): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    const updatedEstablishment = makeUpdatedEstablishment(retry);
-    await goToManageEtablishmentBySiretInAdmin(
-      page,
-      updatedEstablishment.siret,
-    );
-    await checkEstablishment(page, updatedEstablishment);
-  };
+    async ({ page }, { retry }) => {
+      const updatedEstablishment = makeUpdatedEstablishment(retry);
+      await goToManageEtablishmentBySiretInAdmin(
+        page,
+        updatedEstablishment.siret,
+      );
+      await checkEstablishment(page, updatedEstablishment);
+    };
 
 export const checkAvailabilityThoughBackOfficeAdmin =
   (
     makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
   ): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    const updatedEstablishment = makeUpdatedEstablishment(retry);
-    await goToManageEtablishmentBySiretInAdmin(
-      page,
-      updatedEstablishment.siret,
-    );
-    await checkAvailabilityButtons(page, "admin", "Oui");
-  };
+    async ({ page }, { retry }) => {
+      const updatedEstablishment = makeUpdatedEstablishment(retry);
+      await goToManageEtablishmentBySiretInAdmin(
+        page,
+        updatedEstablishment.siret,
+      );
+      await checkAvailabilityButtons(page, "admin", "Oui");
+    };
 
 export const checkAvailabilityThoughEstablishmentDashboard =
   (
     makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
   ): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    const updatedEstablishment = makeUpdatedEstablishment(retry);
-    await goToManageEstablishmentThroughEstablishmentDashboard(
-      page,
-      updatedEstablishment,
-    );
-    await checkAvailabilityButtons(page, "edit", "Non");
-  };
+    async ({ page }, { retry }) => {
+      const updatedEstablishment = makeUpdatedEstablishment(retry);
+      await goToManageEstablishmentThroughEstablishmentDashboard(
+        page,
+        updatedEstablishment,
+      );
+      await checkAvailabilityButtons(page, "edit", "Non");
+    };
 
 export const deleteEstablishmentInBackOfficeAdmin = async (
   page: Page,
@@ -152,34 +152,26 @@ const checkEstablishment = async (
     ).toLowerCase(),
   ).toContain(businessAddress.rawAddress.toLowerCase());
 
-  await expect(
-    await page
-      .locator(
-        `#${domElementIds.establishment.admin.appellations}-0-wrapper .im-select__single-value`,
-      )
-      .innerText(),
-  ).toContain("Lamineur écrouteur / Lamineuse écrouteuse");
+  const firstOfferCardContent = await page
+    .locator(`#${domElementIds.establishment.admin.offerCard}-0`)
+    .innerText();
 
-  await expect(
-    await page
-      .locator(
-        `#${domElementIds.establishment.admin.appellations}-1-wrapper .im-select__single-value`,
-      )
-      .innerText(),
-  ).toContain("Bûcheron");
+  await expect(firstOfferCardContent).toContain(
+    "routage",
+  );
+
+  await expect(firstOfferCardContent).toContain("PAS DE TÉLÉTRAVAIL");
 
   await expect(
     await page.locator(
-      `#${domElementIds.establishment.admin.fitForDisabledWorkers}-${
-        updatedEstablishmentInfos.fitForDisabledWorkers ? "1" : "0"
+      `#${domElementIds.establishment.admin.fitForDisabledWorkers}-${updatedEstablishmentInfos.fitForDisabledWorkers ? "1" : "0"
       }`,
     ),
   ).toBeChecked();
 
   await expect(
     await page.locator(
-      `#${domElementIds.establishment.admin.isEngagedEnterprise}-${
-        updatedEstablishmentInfos.isEngagedEnterprise ? "1" : "0"
+      `#${domElementIds.establishment.admin.isEngagedEnterprise}-${updatedEstablishmentInfos.isEngagedEnterprise ? "1" : "0"
       }`,
     ),
   ).toBeChecked();

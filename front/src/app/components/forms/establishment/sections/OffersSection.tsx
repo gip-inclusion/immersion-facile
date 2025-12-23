@@ -1,13 +1,15 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { values } from "ramda";
+import { useState } from "react";
 import { ErrorNotifications, HeadingSection } from "react-design-system";
+import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
-  type AppellationAndRomeDto,
   addressDtoToString,
   domElementIds,
-  emptyAppellationAndRome,
   type FormEstablishmentDto,
   removeAtIndex,
 } from "shared";
@@ -17,13 +19,18 @@ import type {
   Step,
 } from "src/app/components/forms/establishment/EstablishmentForm";
 import { MultipleAddressInput } from "src/app/components/forms/establishment/MultipleAddressInput";
-import { MultipleAppellationInput } from "src/app/components/forms/establishment/MultipleAppellationInput";
+import { OfferCard } from "src/app/components/forms/establishment/sections/offer/OfferCard";
+import {
+  OfferModal,
+  offerModal,
+} from "src/app/components/forms/establishment/sections/offer/OfferModal";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   displayReadableError,
   getFormContents,
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
+import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { v4 as uuidV4 } from "uuid";
 
 export const OffersSection = ({
@@ -43,15 +50,73 @@ export const OffersSection = ({
     formState: { errors },
   } = methods;
   const formValues = watch();
-  const formContents = getFormContents(
+  const { getFormErrors, getFormFields } = getFormContents(
     formEstablishmentFieldsLabels(mode),
-  ).getFormFields();
-  const formErrors = getFormContents(
-    formEstablishmentFieldsLabels(mode),
-  ).getFormErrors();
+  );
+  const dispatch = useDispatch();
+  const formContents = getFormFields();
+  const formErrors = getFormErrors();
+  const [selectedOfferIndex, setSelectedOfferIndex] = useState<number | null>(
+    null,
+  );
 
   return (
     <>
+      <HeadingSection
+        title={formContents.offers.label}
+        description="Les métiers que vous proposez à l’immersion"
+      >
+        <p>
+          Chaque métier correspond à une offre qui apparaitra dans la recherche.
+          Votre entreprise peut donc apparaître dans différentes recherches.
+        </p>
+        <Button
+          className={fr.cx("fr-my-4v")}
+          type="button"
+          iconId="fr-icon-add-line"
+          title="Ajouter un métier"
+          id={domElementIds.establishment[mode].addOfferButton}
+          priority="secondary"
+          onClick={() => {
+            setSelectedOfferIndex(null);
+            appellationSlice.actions.clearLocatorDataRequested({
+              locator: "form-establishment-offer-modal",
+            });
+            offerModal.open();
+          }}
+        >
+          Ajouter un métier
+        </Button>
+        {formValues.offers.length > 0 && (
+          <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+            {formValues.offers.map((offer, index) => (
+              <OfferCard
+                key={`${offer.appellationCode}-${index}`}
+                index={index}
+                mode={mode}
+                onEditOfferClick={() => {
+                  setSelectedOfferIndex(index);
+                  dispatch(
+                    appellationSlice.actions.selectSuggestionRequested({
+                      item: {
+                        appellation: {
+                          appellationCode: offer.appellationCode,
+                          appellationLabel: offer.appellationLabel,
+                          romeCode: offer.romeCode,
+                          romeLabel: offer.romeLabel,
+                        },
+                        matchRanges: [],
+                      },
+                      locator: "form-establishment-offer-modal",
+                    }),
+                  );
+                  offerModal.open();
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </HeadingSection>
       <HeadingSection
         title={formContents.businessAddresses.label}
         description="Par défaut, vous apparaîtrez dans les résultats de recherche liés à l’adresse de votre établissement. Vous pouvez ajouter d’autres adresses si vous proposez des immersions ailleurs. Par exemple : votre société est située à Dijon (adresse liée à votre SIRET) mais vous proposez une immersion dans votre antenne de Nantes."
@@ -81,30 +146,6 @@ export const OffersSection = ({
             setValue("businessAddresses", newAddresses);
           }}
           id={domElementIds.establishment[mode].businessAddresses}
-        />
-      </HeadingSection>
-      <HeadingSection
-        title={formContents.appellations.label}
-        description="Les métiers que vous proposez à l’immersion"
-      >
-        <MultipleAppellationInput
-          name={formContents.appellations.name}
-          id={domElementIds.establishment[mode].appellations}
-          onAppellationAdd={(appellation, index) => {
-            const appellationsToUpdate = formValues.appellations;
-            appellationsToUpdate[index] = appellation;
-            setValue("appellations", appellationsToUpdate);
-          }}
-          onAppellationDelete={(appellationIndex) => {
-            const appellationsToUpdate = formValues.appellations;
-            const newAppellations: AppellationAndRomeDto[] =
-              appellationIndex === 0 && appellationsToUpdate.length === 1
-                ? [emptyAppellationAndRome]
-                : removeAtIndex(formValues.appellations, appellationIndex);
-            setValue("appellations", newAppellations);
-          }}
-          currentAppellations={formValues.appellations}
-          error={errors?.appellations?.message}
         />
       </HeadingSection>
       {isStepMode && (
@@ -141,7 +182,7 @@ export const OffersSection = ({
               {
                 children: "Étape suivante",
                 onClick: () => {
-                  onStepChange(3, ["appellations", "businessAddresses"]);
+                  onStepChange(3, ["offers", "businessAddresses"]);
                 },
                 type: "button",
                 iconId: "fr-icon-arrow-right-line",
@@ -156,6 +197,10 @@ export const OffersSection = ({
             ]}
           />
         </>
+      )}
+      {createPortal(
+        <OfferModal selectedOfferIndex={selectedOfferIndex} mode={mode} />,
+        document.body,
       )}
     </>
   );

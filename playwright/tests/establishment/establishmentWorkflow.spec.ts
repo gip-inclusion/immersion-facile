@@ -156,7 +156,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
   test(
     "searches for available establishment",
-    searchEstablishmentAndExpectResultToHaveLength(makeUpdatedEstablishment, 2),
+    searchEstablishmentAndExpectResultToHaveLength(makeUpdatedEstablishment, 1),
   );
 
   test.describe("Check displayed availability", () => {
