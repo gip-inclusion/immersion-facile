@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
+import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { equals } from "ramda";
 import { type ReactNode, useMemo } from "react";
@@ -47,19 +48,15 @@ export const EstablishmentDashboardTabs = ({
     discussionsFilters,
     initialDiscussionsWithPagination.filters,
   );
-  const userHasNoDiscussions = discussions.length === 0 && filtersAreEmpty;
+  const userHasDiscussions = discussions.length > 0 || !filtersAreEmpty;
 
   const tabs = useMemo(
     () =>
       getDashboardTabs(
-        makeEstablishmentDashboardTabs(
-          currentUser,
-          route,
-          userHasNoDiscussions,
-        ),
+        makeEstablishmentDashboardTabs(currentUser, route, userHasDiscussions),
         currentTab,
       ),
-    [currentUser, currentTab, route, userHasNoDiscussions],
+    [currentUser, currentTab, route, userHasDiscussions],
   );
   const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
   const shouldRedirectToMainTab =
@@ -124,72 +121,85 @@ const makeEstablishmentDashboardTabs = (
     establishments,
   }: ConnectedUser,
   route: FrontEstablishmentDashboardRoute,
-  userHasNoDiscussions: boolean,
-): DashboardTab[] => [
-  {
-    label: "Conventions",
-    tabId: "conventions",
-    content: (
-      <>
-        <HeadingSection
-          title="Piloter une convention"
-          titleAs="h2"
-          titleAction={<InitiateConventionButton />}
-          className={fr.cx("fr-mt-0")}
-        >
-          <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
-        </HeadingSection>
-        {conventions ? (
-          <MetabaseView
-            title={"Tableau des conventions en cours"}
-            subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
-            url={conventions}
-          />
-        ) : (
-          <p> Aucune convention trouvée pour votre compte</p>
-        )}
-      </>
-    ),
-  },
-  ...(!userHasNoDiscussions
-    ? [
-        {
-          label: "Candidatures",
-          tabId: "discussions",
-          content:
-            route.name === "establishmentDashboardDiscussions" &&
-            route.params.discussionId ? (
-              <DiscussionManageContent
-                discussionId={route.params.discussionId}
-              />
-            ) : (
-              <DiscussionList />
-            ),
-        },
-      ]
-    : []),
-  ...(establishments &&
-  establishments?.filter(
-    (establishment) => establishment.role === "establishment-admin",
-  ).length > 0
-    ? [
-        {
-          label:
-            establishments.length > 1
-              ? "Mes établissements"
-              : "Mon établissement",
-          tabId: "fiche-entreprise",
-          content: (
-            <ManageEstablishmentsTab
-              establishments={establishments.filter(
-                (establishment) => establishment.role === "establishment-admin",
-              )}
+  userHasDiscussions: boolean,
+): DashboardTab[] => {
+  const establishmentsArray = establishments ?? [];
+  const userIsOnboarding = establishmentsArray.length === 0;
+  const userCanManageEstablishments =
+    establishmentsArray.filter(
+      (establishment) => establishment.role === "establishment-admin",
+    ).length > 0;
+
+  return [
+    {
+      label: "Conventions",
+      tabId: "conventions",
+      content: (
+        <>
+          <HeadingSection
+            title="Piloter une convention"
+            titleAs="h2"
+            titleAction={<InitiateConventionButton />}
+            className={fr.cx("fr-mt-0")}
+          >
+            <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
+          </HeadingSection>
+          {conventions ? (
+            <MetabaseView
+              title={"Tableau des conventions en cours"}
+              subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
+              url={conventions}
             />
-          ),
-        },
-      ]
-    : []),
-];
+          ) : (
+            <p> Aucune convention trouvée pour votre compte</p>
+          )}
+        </>
+      ),
+    },
+    ...(userHasDiscussions
+      ? [
+          {
+            label: "Candidatures",
+            tabId: "discussions",
+            content: <DiscussionTabContent route={route} />,
+          },
+        ]
+      : []),
+    ...(userCanManageEstablishments
+      ? [
+          {
+            label:
+              establishmentsArray.length > 1
+                ? "Mes établissements"
+                : "Mon établissement",
+            tabId: "fiche-entreprise",
+            content: (
+              <ManageEstablishmentsTab
+                establishments={establishmentsArray.filter(
+                  (establishment) =>
+                    establishment.role === "establishment-admin",
+                )}
+              />
+            ),
+          },
+        ]
+      : []),
+    ...(userIsOnboarding
+      ? [
+          {
+            label: "Candidatures",
+            tabId: "discussions",
+            content: <OnboardingTabContent />,
+          },
+          {
+            label: "Mon établissement",
+            tabId: "fiche-entreprise",
+            content: <OnboardingTabContent />,
+          },
+        ]
+      : []),
+  ];
+};
 
 const getDashboardTabs = (
   rawTabs: DashboardTab[],
@@ -224,3 +234,51 @@ const isEstablishmentDashboardTab = (
   input: string,
 ): input is EstablishmentDashboardTab =>
   establishmentDashboardTabsList.includes(input as EstablishmentDashboardTab);
+
+const OnboardingTabContent = () => (
+  <>
+    <h3>Accès limité</h3>
+    <p>
+      Cet onglet n’est pas accessible car aucune entreprise n’est actuellement
+      rattachée à ce compte.
+    </p>
+    <p>Cette situation peut se produire dans les cas suivants :</p>
+    <ul>
+      <li>l’entreprise n’a pas encore été créée sur Immersion Facilitée,</li>
+      <li>
+        une autre adresse email est enregistrée comme contact de l’entreprise,
+      </li>
+      <li>
+        un administrateur de l’entreprise ne vous a pas encore ajouté comme
+        utilisateur.
+      </li>
+    </ul>
+    <p>
+      Cet espace reste pleinement utilisable pour le suivi des conventions
+      auxquelles ce compte est associé.
+    </p>
+    <Highlight className={fr.cx("fr-ml-0")}>
+      Cet espace reste pleinement utilisable pour le suivi des conventions
+      auxquelles ce compte est associé.
+    </Highlight>
+    <Button
+      {...routes.formEstablishment().link}
+      iconId="fr-icon-add-line"
+      iconPosition="left"
+    >
+      Créer une entreprise
+    </Button>
+  </>
+);
+
+const DiscussionTabContent = ({
+  route,
+}: {
+  route: FrontEstablishmentDashboardRoute;
+}) =>
+  route.name === "establishmentDashboardDiscussions" &&
+  route.params.discussionId ? (
+    <DiscussionManageContent discussionId={route.params.discussionId} />
+  ) : (
+    <DiscussionList />
+  );
