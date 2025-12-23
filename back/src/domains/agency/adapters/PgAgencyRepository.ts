@@ -602,33 +602,4 @@ export class PgAgencyRepository implements AgencyRepository {
 
     return result.map(({ id }) => id);
   }
-
-  async closeInactiveAgenciesWithoutRecentConventions(params: {
-    noConventionSince: Date;
-  }): Promise<AgencyId[]> {
-    const { noConventionSince } = params;
-    const result = await this.transaction
-      .updateTable("agencies")
-      .set({
-        status: "closed",
-        status_justification: "Agence fermée automatiquement pour inactivité",
-        updated_at: sql`NOW()`,
-      })
-      .where("status", "not in", ["closed", "needsReview", "rejected"])
-      .where(({ eb }) =>
-        eb.not(
-          eb.exists(
-            eb
-              .selectFrom("conventions")
-              .select("id")
-              .whereRef("conventions.agency_id", "=", "agencies.id")
-              .where("conventions.date_submission", ">=", noConventionSince),
-          ),
-        ),
-      )
-      .returning("id")
-      .execute();
-
-    return result.map(({ id }) => id);
-  }
 }
