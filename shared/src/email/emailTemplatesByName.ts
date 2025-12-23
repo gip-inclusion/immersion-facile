@@ -291,13 +291,16 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     AGENCY_CLOSED_FOR_INACTIVITY: {
       niceName: "Espace prescripteurs - Fermeture automatique",
       tags: ["espacePrescripteur_fermetureAutomatique"],
-      createEmailVariables: ({ agencyName }) => ({
+      createEmailVariables: ({
+        agencyName,
+        numberOfMonthsWithoutConvention,
+      }) => ({
         subject:
           "Fermeture automatique de votre organisme sur Immersion Facilitée",
         greetings: "Bonjour,",
         content: `Votre organisme (${agencyName}) a été automatiquement fermé sur Immersion Facilitée en raison d’une période prolongée d’inactivité.
 
-        Un organisme peut être considéré comme inactif lorsqu’il ne présente aucune convention validée ou en cours de validation depuis 6 mois.
+        Un organisme peut être considéré comme inactif lorsqu’il ne présente aucune convention validée ou en cours de validation depuis ${numberOfMonthsWithoutConvention} mois.
 
         Cette fermeture n’a pas d’impact sur les conventions qui auraient déjà été signées et archivées.
         
