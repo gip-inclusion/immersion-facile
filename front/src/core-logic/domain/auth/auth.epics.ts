@@ -1,13 +1,19 @@
-import { filter, map, of, tap } from "rxjs";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { filter, map, type Observable, of, tap } from "rxjs";
 import { switchMap } from "rxjs/operators";
-import { errors, isFederatedIdentityProviderWithLogoutCallback } from "shared";
+import {
+  type AbsoluteUrl,
+  errors,
+  isFederatedIdentityProviderWithLogoutCallback,
+} from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
+import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { authSlice } from "./auth.slice";
+import { type AuthState, authSlice } from "./auth.slice";
 
 export type AuthAction = ActionOfSlice<typeof authSlice>;
 type AuthEpic = AppEpic<AuthAction>;
@@ -97,39 +103,53 @@ const deleteFederatedIdentityFromDevice: AuthEpic = (
     tap(() => localDeviceRepository.delete("partialConventionInUrl")),
     map((action) =>
       authSlice.actions.federatedIdentityInDeviceDeletionSucceeded(
-        action.payload,
+        action.payload.url,
       ),
     ),
   );
 
-const logoutEpic: AuthEpic = (
-  action$,
-  state$,
-  { navigationGateway, authGateway },
-) =>
+const getLogoutUrl$ = (
+  action: PayloadAction<{
+    mode: "device-only" | "device-and-oauth";
+  }>,
+  authState: AuthState,
+  authGateway: AuthGateway,
+): Observable<AbsoluteUrl | undefined> => {
+  const { federatedIdentityWithUser } = authState;
+  if (!federatedIdentityWithUser) throw errors.auth.missingOAuth({});
+  const { provider } = federatedIdentityWithUser;
+  if (
+    isFederatedIdentityProviderWithLogoutCallback(provider) &&
+    action.payload.mode === "device-and-oauth"
+  ) {
+    const { idToken } = federatedIdentityWithUser;
+    return authGateway.getLogoutUrl$({
+      idToken: authState.federatedIdentityWithUser ? idToken : "",
+      authToken: authState.federatedIdentityWithUser?.token ?? "",
+      provider,
+    });
+  }
+  return of(undefined);
+};
+
+const logoutEpic: AuthEpic = (action$, state$, { authGateway }) =>
   action$.pipe(
     filter(authSlice.actions.fetchLogoutUrlRequested.match),
-    switchMap((action) => {
-      const { federatedIdentityWithUser } = state$.value.auth;
-      if (!federatedIdentityWithUser) throw errors.auth.missingOAuth({});
-      const { provider } = federatedIdentityWithUser;
-      if (
-        isFederatedIdentityProviderWithLogoutCallback(provider) &&
-        action.payload.mode === "device-and-oauth"
-      ) {
-        const { idToken } = federatedIdentityWithUser;
-        return authGateway.getLogoutUrl$({
-          idToken: state$.value.auth.federatedIdentityWithUser ? idToken : "",
-          authToken: state$.value.auth.federatedIdentityWithUser?.token ?? "",
-          provider,
-        });
-      }
-      return of(undefined);
-    }),
-    map((logoutUrl) => {
-      return authSlice.actions.fetchLogoutUrlSucceeded(logoutUrl);
-    }),
-    catchEpicError((_error) => authSlice.actions.fetchLogoutUrlFailed()),
+    switchMap((action) =>
+      getLogoutUrl$(action, state$.value.auth, authGateway).pipe(
+        map((logoutUrl) => {
+          return authSlice.actions.fetchLogoutUrlSucceeded({
+            url: logoutUrl,
+            feedbackTopic: action.payload.feedbackTopic,
+          });
+        }),
+        catchEpicError((_errorr) =>
+          authSlice.actions.fetchLogoutUrlFailed({
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
   );
 
 const checkConnectedWithFederatedIdentity: AuthEpic = (

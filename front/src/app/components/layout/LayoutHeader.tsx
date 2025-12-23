@@ -1,7 +1,8 @@
 import { Header, type HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
-
 import {
   ButtonWithSubMenu,
   MaintenanceCallout,
@@ -10,6 +11,7 @@ import {
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
+import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {
@@ -20,9 +22,16 @@ import { routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { makeStyles } from "tss-react/dsfr";
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
+
+const logoutErrorModal = createModal({
+  isOpenedByDefault: false,
+  id: "im-logout-error-modal",
+});
 
 export const LayoutHeader = () => {
   const dispatch = useDispatch();
@@ -47,6 +56,9 @@ export const LayoutHeader = () => {
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const logoutFeedback = useAppSelector(feedbacksSelectors.feedbacks)[
+    "auth-global"
+  ];
 
   const tools: HeaderProps["quickAccessItems"] = [
     {
@@ -108,6 +120,7 @@ export const LayoutHeader = () => {
                 federatedIdentity?.provider === "email"
                   ? "device-only"
                   : "device-and-oauth",
+              feedbackTopic: "auth-global",
             }),
           );
           if (isPeConnected && currentRoute.name === "conventionImmersion") {
@@ -313,8 +326,22 @@ export const LayoutHeader = () => {
     },
   }))();
 
+  useFeedbackEventCallback("auth-global", "delete.error", () => {
+    logoutErrorModal.open();
+  });
+
+  useIsModalOpen(logoutErrorModal, {
+    onConceal: () => {
+      logoutErrorModal.close();
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    },
+  });
+
   return (
     <>
+      <logoutErrorModal.Component title={logoutFeedback?.title}>
+        <p>{logoutFeedback?.message}</p>
+      </logoutErrorModal.Component>
       {enableMaintenance.isActive && (
         <MaintenanceCallout
           message={
