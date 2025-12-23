@@ -118,6 +118,7 @@ describe("Auth slice", () => {
     store.dispatch(
       authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-and-oauth",
+        feedbackTopic: "auth-global",
       }),
     );
 
@@ -167,6 +168,7 @@ describe("Auth slice", () => {
     store.dispatch(
       authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-only",
+        feedbackTopic: "auth-global",
       }),
     );
 
@@ -218,6 +220,7 @@ describe("Auth slice", () => {
     store.dispatch(
       authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-only",
+        feedbackTopic: "auth-global",
       }),
     );
 
@@ -241,6 +244,59 @@ describe("Auth slice", () => {
       requestedEmail: null,
     });
     expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
+  });
+
+  it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page (when provider is not 'proConnect')", () => {
+    ({ store, dependencies } = createTestStore({
+      auth: {
+        isRequestingLoginByEmail: false,
+        federatedIdentityWithUser: peConnectedFederatedIdentity,
+        afterLoginRedirectionUrl: null,
+        isLoading: true,
+        requestedEmail: null,
+      },
+      connectedUser: {
+        currentUser: new ConnectedUserBuilder().build(),
+        isLoading: false,
+        agenciesToReview: [],
+      },
+    }));
+    dependencies.localDeviceRepository.set(
+      "federatedIdentityWithUser",
+      peConnectedFederatedIdentity,
+    );
+    dependencies.localDeviceRepository.set("partialConventionInUrl", {
+      firstName: "BOB",
+    });
+
+    store.dispatch(
+      authSlice.actions.fetchLogoutUrlRequested({
+        mode: "device-and-oauth",
+        feedbackTopic: "auth-global",
+      }),
+    );
+
+    dependencies.authGateway.getLogoutUrlResponse$.error(new Error("Error"));
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: peConnectedFederatedIdentity,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
+    expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
+    expectToEqual(dependencies.navigationGateway.wentToUrls, []);
+    expectToEqual(
+      feedbacksSelectors.feedbacks(store.getState())["auth-global"],
+      {
+        on: "delete",
+        level: "error",
+        title: "Une erreur est survenue lors de la déconnexion",
+        message: "Vous n'avez pas pu vous déconnecter.",
+      },
+    );
   });
 
   it("retrieves federatedIdentity if stored in device", () => {

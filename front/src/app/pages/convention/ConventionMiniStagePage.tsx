@@ -42,6 +42,7 @@ export const ConventionMiniStagePage = ({
     dispatch(
       authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-and-oauth",
+        feedbackTopic: "auth-global",
       }),
     );
   }, [dispatch]);

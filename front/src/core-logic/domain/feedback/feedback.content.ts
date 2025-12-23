@@ -81,7 +81,13 @@ export const feedbacks: Record<
   FeedbackTopic,
   Partial<Partial<Record<ActionKindAndLevel, FeedbackWithActionName>>>
 > = {
-  "auth-global": {},
+  "auth-global": {
+    "delete.error": {
+      action: authSlice.actions.fetchLogoutUrlFailed,
+      title: "Une erreur est survenue lors de la déconnexion",
+      message: "Vous n'avez pas pu vous déconnecter.",
+    },
+  },
   "api-consumer-global": {
     "create.success": {
       action: apiConsumerSlice.actions.saveApiConsumerSucceeded,

@@ -90,22 +90,21 @@ export const authSlice = createSlice({
     },
     fetchLogoutUrlRequested: (
       state,
-      _action: PayloadAction<{
+      _action: PayloadActionWithFeedbackTopic<{
         mode: "device-only" | "device-and-oauth";
       }>,
     ) => state,
+    fetchLogoutUrlSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ url: AbsoluteUrl | undefined }>,
+    ) => state,
+    fetchLogoutUrlFailed: (state, _action: PayloadActionWithFeedbackTopic) =>
+      state,
     redirectAfterLogoutSucceeded: (state) => state,
     federatedIdentityInDeviceDeletionSucceeded: (
       state,
       _action: PayloadAction<AbsoluteUrl | undefined>,
     ) => {
-      state.federatedIdentityWithUser = null;
-    },
-    fetchLogoutUrlSucceeded: (
-      state,
-      _action: PayloadAction<AbsoluteUrl | undefined>,
-    ) => state,
-    fetchLogoutUrlFailed: (state) => {
       state.federatedIdentityWithUser = null;
     },
     loginByEmailRequested: (
