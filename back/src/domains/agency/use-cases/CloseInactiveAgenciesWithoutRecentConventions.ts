@@ -1,3 +1,4 @@
+import { subMonths } from "date-fns";
 import { toPairs } from "ramda";
 import { type AgencyWithUsersRights, isTruthy, type UserId } from "shared";
 import { z } from "zod";
@@ -9,7 +10,7 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type CloseInactiveAgenciesWithoutRecentConventionsInput = {
-  noConventionSince: Date;
+  numberOfMonthsWithoutConvention: number;
 };
 
 export type CloseInactiveAgenciesWithoutRecentConventionsResult = {
@@ -21,7 +22,7 @@ export type CloseInactiveAgenciesWithoutRecentConventions = ReturnType<
 >;
 
 const closeInactiveAgenciesWithoutRecentConventionsInputSchema = z.object({
-  noConventionSince: z.date(),
+  numberOfMonthsWithoutConvention: z.number(),
 });
 
 export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
@@ -33,13 +34,18 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
     saveNotificationsBatchAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent;
   }>()
   .build(async ({ uow, deps, inputParams }) => {
-    const { noConventionSince } = inputParams;
+    const { numberOfMonthsWithoutConvention } = inputParams;
 
     const activeAgencies = await uow.agencyRepository.getAgencies({
       filters: {
         status: ["active", "from-api-PE"],
       },
     });
+
+    const noConventionSince = subMonths(
+      new Date(),
+      numberOfMonthsWithoutConvention,
+    );
 
     const agenciesToClose = await getAgenciesToClose(
       activeAgencies,
@@ -56,6 +62,7 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
     const notifications = await getNotificationsForClosedAgencies(
       agenciesToClose,
       uow,
+      numberOfMonthsWithoutConvention,
     );
 
     await Promise.all(
@@ -77,6 +84,7 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
 const getNotificationsForClosedAgencies = async (
   agencies: AgencyWithUsersRights[],
   uow: UnitOfWork,
+  numberOfMonthsWithoutConvention: number,
 ): Promise<NotificationContentAndFollowedIds[]> => {
   const notificationsPromises = agencies.map(async (agency) => {
     const agencyAdminUserIds: UserId[] = toPairs(agency.usersRights)
@@ -99,6 +107,7 @@ const getNotificationsForClosedAgencies = async (
         recipients: recipients,
         params: {
           agencyName: agency.name,
+          numberOfMonthsWithoutConvention: numberOfMonthsWithoutConvention,
         },
       },
       followedIds: {

@@ -83,6 +83,7 @@ export type EmailParamsByEmailType = {
   };
   AGENCY_CLOSED_FOR_INACTIVITY: {
     agencyName: string;
+    numberOfMonthsWithoutConvention: number;
   };
   AGENCY_WITH_REFERS_TO_ACTIVATED: {
     nameOfAgencyRefering: string;

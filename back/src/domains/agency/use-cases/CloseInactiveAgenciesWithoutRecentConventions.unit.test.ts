@@ -1,10 +1,11 @@
-import { subDays, subMonths } from "date-fns";
+import { subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   expectToEqual,
 } from "shared";
+import { numberOfMonthsWithoutConvention as numberOfMonthsWithoutConventionFromScript } from "../../../scripts/scheduledScripts/closeInactiveAgenciesWithoutRecentConventions";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
   type ExpectSavedNotificationsBatchAndEvent,
@@ -24,6 +25,8 @@ import {
 } from "./CloseInactiveAgenciesWithoutRecentConventions";
 
 describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
+  const numberOfMonthsWithoutConvention =
+    numberOfMonthsWithoutConventionFromScript;
   const admin1 = new ConnectedUserBuilder()
     .withId("admin1-id")
     .withEmail("admin1@agency1.fr")
@@ -119,7 +122,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
 
       const result =
         await closeInactiveAgenciesWithoutRecentConventions.execute({
-          noConventionSince: new Date("2020-01-01"),
+          numberOfMonthsWithoutConvention,
         });
 
       expectToEqual(result, {
@@ -151,7 +154,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
 
       const result =
         await closeInactiveAgenciesWithoutRecentConventions.execute({
-          noConventionSince: subMonths(new Date(), 6),
+          numberOfMonthsWithoutConvention,
         });
 
       expectToEqual(result, {
@@ -188,7 +191,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
 
       const result =
         await closeInactiveAgenciesWithoutRecentConventions.execute({
-          noConventionSince: subMonths(new Date(), 6),
+          numberOfMonthsWithoutConvention,
         });
 
       expectToEqual(result, {
@@ -215,6 +218,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
             recipients: [admin1.email],
             params: {
               agencyName: agency1.name,
+              numberOfMonthsWithoutConvention,
             },
           },
           {
@@ -222,6 +226,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
             recipients: [admin2.email],
             params: {
               agencyName: agency2.name,
+              numberOfMonthsWithoutConvention,
             },
           },
         ],
@@ -255,7 +260,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
 
       const result =
         await closeInactiveAgenciesWithoutRecentConventions.execute({
-          noConventionSince: subMonths(new Date(), 6),
+          numberOfMonthsWithoutConvention,
         });
 
       expectToEqual(result, {
@@ -278,6 +283,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
             recipients: [admin2.email],
             params: {
               agencyName: agency2.name,
+              numberOfMonthsWithoutConvention,
             },
           },
         ],
@@ -335,7 +341,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
 
       const result =
         await closeInactiveAgenciesWithoutRecentConventions.execute({
-          noConventionSince: subMonths(new Date(), 6),
+          numberOfMonthsWithoutConvention,
         });
 
       expectToEqual(result, {
@@ -373,7 +379,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
 
       const result =
         await closeInactiveAgenciesWithoutRecentConventions.execute({
-          noConventionSince: subMonths(new Date(), 6),
+          numberOfMonthsWithoutConvention,
         });
 
       expectToEqual(result, {
@@ -387,6 +393,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
             recipients: [admin1.email],
             params: {
               agencyName: agency1.name,
+              numberOfMonthsWithoutConvention,
             },
           },
           {
@@ -394,6 +401,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
             recipients: [admin1.email],
             params: {
               agencyName: agency2.name,
+              numberOfMonthsWithoutConvention,
             },
           },
         ],
