@@ -84,6 +84,7 @@ test.describe("Convention creation and modification workflow", () => {
           page,
           emailType: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           elementIndex: 0,
+          label: "manageConventionLink",
         });
         await validatorMagicLinkLocator.click();
 
@@ -169,6 +170,7 @@ test.describe("Convention creation and modification workflow", () => {
           page,
           emailType: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           elementIndex: 0,
+          label: "manageConventionLink",
         });
         expect(href).not.toBe(null);
         if (!href)
