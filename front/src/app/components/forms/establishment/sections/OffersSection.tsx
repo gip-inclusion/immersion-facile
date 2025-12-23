@@ -1,7 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { values } from "ramda";
 import { useState } from "react";
 import { ErrorNotifications, HeadingSection } from "react-design-system";
@@ -21,7 +20,10 @@ import type {
 } from "src/app/components/forms/establishment/EstablishmentForm";
 import { MultipleAddressInput } from "src/app/components/forms/establishment/MultipleAddressInput";
 import { OfferCard } from "src/app/components/forms/establishment/sections/offer/OfferCard";
-import { OfferModal } from "src/app/components/forms/establishment/sections/offer/OfferModal";
+import {
+  OfferModal,
+  offerModal,
+} from "src/app/components/forms/establishment/sections/offer/OfferModal";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   displayReadableError,
@@ -30,11 +32,6 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { v4 as uuidV4 } from "uuid";
-
-const offerModal = createModal({
-  isOpenedByDefault: false,
-  id: "im-offer-modal",
-});
 
 export const OffersSection = ({
   mode,

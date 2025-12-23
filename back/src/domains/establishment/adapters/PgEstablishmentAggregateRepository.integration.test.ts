@@ -3327,7 +3327,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
       it("adds a new row in immersion_offers table with remote work mode", async () => {
         const offer = new OfferEntityBuilder()
-          .withRemoteWorkMode("100% REMOTE")
+          .withRemoteWorkMode("FULL_REMOTE")
           .build();
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret1)
@@ -3366,7 +3366,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withRomeCode("M1808")
         .withAppellationLabel("Analyste en géomatique")
         .withAppellationCode("10946")
-        .withRemoteWorkMode("100% REMOTE")
+        .withRemoteWorkMode("FULL_REMOTE")
         .build();
 
       beforeEach(async () => {
