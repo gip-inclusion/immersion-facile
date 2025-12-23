@@ -692,7 +692,6 @@ export class PgEstablishmentAggregateRepository
     const existingOffers = existingAggregate.offers;
     const siret = existingAggregate.establishment.siret;
 
-    // First, remove offers that are not present in the updated aggregate
     const offersToRemove = existingOffers.filter(
       (updatedOffer) =>
         !updatedOffers.find((existingOffer) =>
@@ -744,7 +743,6 @@ export class PgEstablishmentAggregateRepository
         ),
     );
 
-    // Then, add offers (if any) that are present in the updated aggregate
     if (offersToAdd.length > 0)
       await this.transaction
         .insertInto("immersion_offers")
@@ -791,7 +789,6 @@ export class PgEstablishmentAggregateRepository
 }
 
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
-  // Only compare romeCode and appellationCode
   a.appellationCode === b.appellationCode &&
   a.remoteWorkMode === b.remoteWorkMode;
 

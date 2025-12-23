@@ -19,7 +19,7 @@ export type ImmersionContactInEstablishmentId = Flavor<
   "ImmersionContactInEstablishmentId"
 >;
 
-export const remoteWorkModes = ["HYBRID", "100% REMOTE", "NO_REMOTE"] as const;
+export const remoteWorkModes = ["HYBRID", "FULL_REMOTE", "NO_REMOTE"] as const;
 
 export type RemoteWorkMode = (typeof remoteWorkModes)[number];
 
@@ -32,7 +32,7 @@ export const remoteWorkModeLabels: Record<
     description:
       "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
   },
-  "100% REMOTE": {
+  FULL_REMOTE: {
     label: "100% télétravail",
     description:
       "Apparaîtra pour la France entière, quelle que soit la localisation du candidat",
