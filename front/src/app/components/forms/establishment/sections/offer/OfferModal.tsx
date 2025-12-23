@@ -47,7 +47,7 @@ const emptyOffer: CurrentOffer = {
   remoteWorkMode: undefined,
 };
 
-const offerModal = createModal({
+export const offerModal = createModal({
   isOpenedByDefault: false,
   id: domElementIds.establishment.offerModal,
 });

@@ -130,7 +130,7 @@ const step2 = async (page: Page) => {
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.establishment.create.appellations}`,
-    value: "route",
+    value: "routage",
     endpoint: formCompletionRoutes.appellation.url,
   });
 

@@ -923,7 +923,7 @@ describe("Update Establishment aggregate from form data", () => {
         const initialOffer = updatedFormEstablishment.offers[0];
         const updatedOffer: EstablishmentFormOffer = {
           ...initialOffer,
-          remoteWorkMode: "100% REMOTE",
+          remoteWorkMode: "FULL_REMOTE",
         };
         const updatedFormEstablishmentWithOfferRemoteWorkMode: FormEstablishmentDto =
           {
