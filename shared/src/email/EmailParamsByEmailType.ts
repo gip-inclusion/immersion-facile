@@ -447,9 +447,13 @@ export type EmailParamsByEmailType = {
     rejectionReason: string;
     signature: string;
   };
-  SHARE_DRAFT_CONVENTION_BY_LINK: {
+  SHARE_CONVENTION_DRAFT_RECIPIENT: {
     internshipKind: InternshipKind;
     additionalDetails: string | undefined;
+    conventionFormUrl: string;
+  };
+  SHARE_CONVENTION_DRAFT_SELF: {
+    internshipKind: InternshipKind;
     conventionFormUrl: string;
   };
   SIGNATORY_REMINDER: {

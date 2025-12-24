@@ -1,12 +1,12 @@
 import type { Flavor } from "../typeFlavors";
 import type { DeepPartial, OmitFromExistingKeys } from "../utils";
 import type { InternshipKind } from "./convention.dto";
-import type { ConventionPresentation } from "./conventionPresentation.dto";
+import type { CreateConventionPresentationInitialValues } from "./conventionPresentation.dto";
 
 export type ConventionDraftId = Flavor<string, "ConventionDraftId">;
 
 export type ConventionDraftDto = DeepPartial<
-  OmitFromExistingKeys<ConventionPresentation, "id">
+  OmitFromExistingKeys<CreateConventionPresentationInitialValues, "id">
 > & {
   id: ConventionDraftId;
   internshipKind: InternshipKind;
@@ -37,7 +37,7 @@ const replaceEmptyStringByUndefined = <T>(obj: T): T => {
 export const toConventionDraftDto = ({
   convention,
 }: {
-  convention: ConventionPresentation;
+  convention: CreateConventionPresentationInitialValues;
 }): ConventionDraftDto => ({
   ...replaceEmptyStringByUndefined(convention),
   id: convention.id as ConventionDraftId,

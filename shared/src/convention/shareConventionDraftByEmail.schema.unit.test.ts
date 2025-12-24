@@ -26,7 +26,7 @@ describe("shareConventionLinkByEmailSchema schema validation", () => {
   });
 });
 
-describe("sharedConventionSchema schema validation", () => {
+describe("conventionDraftSchema schema validation", () => {
   it.each([
     {
       id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
@@ -48,6 +48,20 @@ describe("sharedConventionSchema schema validation", () => {
       signatories: {
         establishmentRepresentative: {
           phone: "",
+        },
+      },
+    } satisfies ConventionDraftDto,
+    {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+      internshipKind: "mini-stage-cci",
+      signatories: {
+        beneficiary: {
+          address: {
+            streetNumberAndAddress: "17 rue de la paix, 75000 Paris",
+            postcode: "75000",
+            departmentCode: "75",
+            city: "Paris",
+          },
         },
       },
     } satisfies ConventionDraftDto,
