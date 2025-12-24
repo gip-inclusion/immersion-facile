@@ -4,10 +4,21 @@ import {
   type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
 } from "../zodUtils";
+import type { ConventionDto } from "./convention.dto";
 import {
-  conventionToShareSchema,
-  type ShareConventionLinkByEmailDto,
-} from "./shareConventionLinkByEmail.dto";
+  immersionConventionSchema,
+  miniStageConventionSchema,
+} from "./convention.schema";
+import type { ConventionPresentation } from "./conventionPresentation.dto";
+import type { ShareConventionLinkByEmailDto } from "./shareConventionLinkByEmail.dto";
+
+export const sharedConventionSchema: ZodSchemaWithInputMatchingOutput<
+  Partial<ConventionPresentation>
+> = (immersionConventionSchema as unknown as z.ZodObject<any>)
+  .partial()
+  .or(
+    (miniStageConventionSchema as unknown as z.ZodObject<any>).partial(),
+  ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>;
 
 export const shareConventionLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionLinkByEmailDto> =
   z
@@ -15,7 +26,7 @@ export const shareConventionLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<
       senderEmail: emailSchema,
       recipientEmail: emailPossiblyEmptySchema,
       details: zStringCanBeEmpty,
-      convention: conventionToShareSchema,
+      convention: sharedConventionSchema,
     })
     .refine(
       (data) => {
