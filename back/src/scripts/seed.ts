@@ -38,6 +38,7 @@ const resetDb = async (db: KyselyDb) => {
   await db.deleteFrom("users").execute();
   await db.deleteFrom("users_admins").execute();
   await db.deleteFrom("conventions").execute();
+  await db.deleteFrom("convention_drafts").execute();
   await db.deleteFrom("agency_groups__agencies").execute();
   await db.deleteFrom("agency_groups").execute();
   await db.deleteFrom("agencies").execute();

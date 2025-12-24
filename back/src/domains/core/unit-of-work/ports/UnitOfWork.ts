@@ -2,6 +2,7 @@ import type { AgencyGroupRepository } from "../../../agency/ports/AgencyGroupRep
 import type { AgencyRepository } from "../../../agency/ports/AgencyRepository";
 import type { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
 import type { AssessmentRepository } from "../../../convention/ports/AssessmentRepository";
+import type { ConventionDraftRepository } from "../../../convention/ports/ConventionDraftRepository";
 import type { ConventionExternalIdRepository } from "../../../convention/ports/ConventionExternalIdRepository";
 import type { ConventionQueries } from "../../../convention/ports/ConventionQueries";
 import type { ConventionRepository } from "../../../convention/ports/ConventionRepository";
@@ -36,6 +37,7 @@ export type UnitOfWork = {
   agencyRepository: AgencyRepository;
   apiConsumerRepository: ApiConsumerRepository;
   assessmentRepository: AssessmentRepository;
+  conventionDraftRepository: ConventionDraftRepository;
   conventionExternalIdRepository: ConventionExternalIdRepository;
   conventionFranceTravailAdvisorRepository: ConventionFranceTravailAdvisorRepository;
   conventionQueries: ConventionQueries;
