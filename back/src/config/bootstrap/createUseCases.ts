@@ -525,6 +525,7 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
         gateways.shortLinkGenerator,
+        gateways.timeGateway,
         config,
       ),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),

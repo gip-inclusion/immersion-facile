@@ -647,9 +647,13 @@ export const defaultEmailValueByEmailKind: {
     rejectionReason: "REJECTION_REASON",
     signature: "SIGNATURE",
   },
-  SHARE_DRAFT_CONVENTION_BY_LINK: {
+  SHARE_CONVENTION_DRAFT_RECIPIENT: {
     internshipKind: "immersion",
     additionalDetails: "ADDITIONAL_DETAILS",
+    conventionFormUrl: "CONVENTION_FORM_URL",
+  },
+  SHARE_CONVENTION_DRAFT_SELF: {
+    internshipKind: "immersion",
     conventionFormUrl: "CONVENTION_FORM_URL",
   },
   SIGNATORY_REMINDER: {

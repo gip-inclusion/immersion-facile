@@ -1878,7 +1878,7 @@ Tél : ${beneficiaryPhone}`,
         agencyLogoUrl,
       }),
     },
-    SHARE_DRAFT_CONVENTION_BY_LINK: {
+    SHARE_CONVENTION_DRAFT_RECIPIENT: {
       niceName: "Convention - Partage du formulaire par lien",
       tags: ["partage de convention"],
       createEmailVariables: ({
@@ -1894,10 +1894,33 @@ Tél : ${beneficiaryPhone}`,
         <strong>Une demande de convention ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
         } doit être complétée :</strong>
+
         ${additionalDetails}
+        
+        Vous pouvez désormais accéder à la demande pendant 30 jours grâce au lien ci-dessous :
       `,
         buttons: [{ label: "Compléter la demande", url: conventionFormUrl }],
         subContent: defaultSignature(internshipKind),
+      }),
+    },
+    SHARE_CONVENTION_DRAFT_SELF: {
+      niceName: "Convention - Brouillon de convention",
+      tags: ["convention_brouillonConvention"],
+      createEmailVariables: ({ conventionFormUrl, internshipKind }) => ({
+        subject: "Votre brouillon de convention",
+        greetings: "Bonjour,",
+        content: `
+Vous avez demandé à recevoir le lien vers votre brouillon de convention. Vous pouvez désormais y accéder pendant 30 jours grâce au lien ci-dessous :
+      `,
+        buttons: [
+          { label: "Mon brouillon de convention", url: conventionFormUrl },
+        ],
+        subContent: `
+        Si vous avez choisi de partager la convention avec une autre personne pour vous aider à la remplir, elle recevra également ce lien et pourra compléter les informations nécessaires.
+        
+Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moindre question, notre équipe reste à votre écoute.
+        ${defaultSignature(internshipKind)}
+          `,
       }),
     },
     SIGNATORY_REMINDER: {

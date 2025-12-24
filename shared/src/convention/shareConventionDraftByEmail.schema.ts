@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { agencyKindSchema } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import {
   deepPartialSchema,
@@ -28,6 +29,8 @@ export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionD
       .and(
         z.object({
           id: conventionDraftIdSchema,
+          agencyKind: agencyKindSchema.optional(),
+          agencyDepartment: z.string().optional(),
         }),
       ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDraftDto>
   ).catch((ctx) => {
@@ -41,23 +44,9 @@ export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionD
   });
 
 export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailDto> =
-  z
-    .object({
-      senderEmail: emailSchema,
-      recipientEmail: emailPossiblyEmptySchema,
-      details: zStringCanBeEmpty.optional(),
-      conventionDraft: conventionDraftSchema,
-    })
-    .refine(
-      (data) => {
-        if (data.recipientEmail && data.recipientEmail.length > 0) {
-          return data.details && data.details.length > 0;
-        }
-        return true;
-      },
-      {
-        message:
-          "L'adresse email du destinataire et le message sont obligatoires",
-        path: ["details"],
-      },
-    );
+  z.object({
+    senderEmail: emailSchema,
+    recipientEmail: emailPossiblyEmptySchema,
+    details: zStringCanBeEmpty.optional(),
+    conventionDraft: conventionDraftSchema,
+  });
