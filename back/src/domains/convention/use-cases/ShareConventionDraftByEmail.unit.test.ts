@@ -1,10 +1,9 @@
-import { afterEach } from "node:test";
 import {
-  errors,
-  expectObjectInArrayToMatch,
-  expectPromiseToFailWithError,
+  type ConventionDraftDto,
+  expectToEqual,
   type InternshipKind,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -57,51 +56,77 @@ describe("ShareConventionLinkByEmail", () => {
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
       shortLinkIdGeneratorGateway,
+      timeGateway,
       config,
     );
   });
 
-  describe("Wrong paths", () => {
-    afterEach(() => {
-      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
-      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+  it("sends an email to the sender only", async () => {
+    const conventionDraft: ConventionDraftDto = {
+      id: uuid(),
+      internshipKind,
+    };
+    await usecase.execute({
+      conventionDraft,
+      senderEmail: email,
     });
 
-    it("throws bad request if convention link does not come from IF domain", async () => {
-      const conventionLink = "https://fake-url.com/demande-immersion";
-
-      await expectPromiseToFailWithError(
-        usecase.execute({
-          convention: {},
-          senderEmail: email,
-          details: messageContent,
-        }),
-        errors.url.notFromIFDomain(conventionLink),
-      );
+    expectToEqual(
+      await uow.conventionDraftRepository.getById(conventionDraft.id),
+      conventionDraft,
+    );
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "SHARE_CONVENTION_DRAFT_SELF",
+          recipients: [email],
+          params: {
+            internshipKind,
+            conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
+          },
+        },
+      ],
     });
   });
 
-  describe("right path", () => {
-    it("sends an email", async () => {
-      await usecase.execute({
-        convention: {},
-        senderEmail: email,
-        details: messageContent,
-      });
+  it("sends an email to the sender and the recipient", async () => {
+    const recipientEmail = "recipient-email@test.com";
+    const conventionDraft: ConventionDraftDto = {
+      id: uuid(),
+      internshipKind,
+    };
 
-      expectSavedNotificationsAndEvents({
-        emails: [
-          {
-            kind: "SHARE_DRAFT_CONVENTION_BY_LINK",
-            recipients: [email],
-            params: {
-              internshipKind,
-              additionalDetails: messageContent,
-              conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
-            },
+    await usecase.execute({
+      conventionDraft,
+      senderEmail: email,
+      recipientEmail,
+      details: messageContent,
+    });
+
+    expectToEqual(
+      await uow.conventionDraftRepository.getById(conventionDraft.id),
+      conventionDraft,
+    );
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "SHARE_CONVENTION_DRAFT_SELF",
+          recipients: [email],
+          params: {
+            internshipKind,
+            conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
           },
-        ],
-      });
+        },
+        {
+          kind: "SHARE_CONVENTION_DRAFT_RECIPIENT",
+          recipients: [recipientEmail],
+          params: {
+            internshipKind,
+            conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
+            additionalDetails: messageContent,
+          },
+        },
+      ],
     });
   });
 });
