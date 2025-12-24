@@ -1,6 +1,6 @@
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
-import { withAcquisitionSchema } from "../acquisition.dto";
+import { withAcquisitionSchema, withAcquisitionShape } from "../acquisition.dto";
 import {
   agencyIdSchema,
   agencyKindSchema,
@@ -186,25 +186,23 @@ const studentBeneficiarySchema: ZodSchemaWithInputMatchingOutput<
 );
 
 export const establishmentTutorSchema: ZodSchemaWithInputMatchingOutput<EstablishmentTutor> =
-  actorSchema.merge(
-    z.object({
-      role: z.literal("establishment-tutor"),
-      job: zTrimmedStringMax255,
-    }),
-  );
+  actorSchema.extend({
+    role: z.literal("establishment-tutor"),
+    job: zTrimmedStringMax255,
+  });
 
 const establishmentRepresentativeSchema: ZodSchemaWithInputMatchingOutput<EstablishmentRepresentative> =
-  signatorySchema.merge(
-    z.object({
+  signatorySchema.extend(
+    {
       role: z.literal("establishment-representative"),
-    }),
+    }
   );
 
 const beneficiaryRepresentativeSchema: ZodSchemaWithInputMatchingOutput<BeneficiaryRepresentative> =
-  signatorySchema.merge(
-    z.object({
+  signatorySchema.extend(
+    {
       role: z.literal("beneficiary-representative"),
-    }),
+    },
   );
 
 const beneficiaryCurrentEmployerSchema: ZodSchemaWithInputMatchingOutput<BeneficiaryCurrentEmployer> =
@@ -255,7 +253,7 @@ export const renewedSchema = z.object({
   justification: zStringMinLength1,
 });
 
-const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<ConventionCommon> =
+export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<ConventionCommon> =
   z
     .object({
       id: conventionIdSchema,
@@ -295,7 +293,7 @@ const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<ConventionCommon>
       establishmentNumberEmployeesRange:
         numberOfEmployeesRangeSchema.optional(),
     })
-    .and(withAcquisitionSchema);
+    .extend(withAcquisitionShape).partial();
 
 export const internshipKindSchema: ZodSchemaWithInputMatchingOutput<InternshipKind> =
   z.enum(internshipKinds, {
@@ -333,6 +331,9 @@ export const conventionInternshipKindSpecificSchema: ZodSchemaWithInputMatchingO
     signatories: cciSignatoriesSchema,
   }),
 ]);
+
+export const conventionWithInternshipKindSchema = conventionCommonSchema
+.and(conventionInternshipKindSpecificSchema);
 
 export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
   conventionCommonSchema

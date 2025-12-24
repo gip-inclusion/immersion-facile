@@ -1,5 +1,6 @@
 import { expectToEqual } from "../test.helpers";
-import type { ShareConventionLinkByEmailDto } from "./shareConventionLinkByEmail.dto";
+import { conventionCommonSchema } from "./convention.schema";
+import { makeSchemaPartial, type ShareConventionLinkByEmailDto } from "./shareConventionLinkByEmail.dto";
 import { shareConventionLinkByEmailSchema } from "./shareConventionLinkByEmail.schema";
 
 describe("shareConventionLinkByEmailSchema schema validation", () => {
@@ -12,5 +13,16 @@ describe("shareConventionLinkByEmailSchema schema validation", () => {
     };
 
     expectToEqual(shareConventionLinkByEmailSchema.parse(data), data);
+  });
+});
+
+describe("makeSchemaPartial", () => {
+  it("makes the schema partial", () => {
+    const result = conventionCommonSchema.safeParse({
+      immersionAddress: "17 rue de la paix, 75000 Paris",
+    });
+
+    console.log(result.error);
+    expect(result.success).toBeTruthy();
   });
 });

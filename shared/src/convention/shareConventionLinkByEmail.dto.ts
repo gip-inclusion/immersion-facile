@@ -1,8 +1,6 @@
 import z from "zod";
 import {
   agencyIdSchema,
-  agencyKindSchema,
-  refersToAgencyIdSchema,
 } from "../agency/agency.schema";
 import { businessNameSchema } from "../business/business";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
@@ -14,46 +12,36 @@ import {
   numberOfEmployeesRangeSchema,
   siretSchema,
 } from "../siret/siret.schema";
+import { OmitFromExistingKeys } from "../utils";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
-  type ZodSchemaWithInputMatchingOutput,
   zBoolean,
-  zStringMinLength1,
   zStringPossiblyEmptyWithMax,
   zTrimmedStringWithMax,
+  type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
-import { conventionStatuses } from "./convention.dto";
+import { ConventionReadDto } from "./convention.dto";
 import {
   conventionIdSchema,
   conventionValidatorsSchema,
+  conventionWithInternshipKindSchema,
   establishmentTutorSchema,
   immersionObjectiveSchema,
-  renewedSchema,
   withOptionalFirstnameAndLastnameSchema,
 } from "./convention.schema";
 import type { ConventionPresentation } from "./conventionPresentation.dto";
 
-export type ConventionToShareDto = Partial<ConventionPresentation>;
+export type ConventionToShareDto = Partial<OmitFromExistingKeys<ConventionPresentation, "status" | "statusJustification" | "updatedAt" | "dateValidation" | "dateApproval" | "renewed"| "agencyDepartment" | "agencyRefersTo">>;
 
 export const conventionToShareSchema: ZodSchemaWithInputMatchingOutput<ConventionToShareDto> =
   z.object({
     id: conventionIdSchema,
-    status: z.enum(conventionStatuses, {
-      error: localization.invalidEnum,
-    }),
     statusJustification: z.string().optional(),
     agencyId: agencyIdSchema,
-    updatedAt: makeDateStringSchema().optional(),
     dateSubmission: makeDateStringSchema(),
     dateStart: makeDateStringSchema(localization.invalidDateStart),
     dateEnd: makeDateStringSchema(localization.invalidDateEnd),
-    dateValidation: makeDateStringSchema(
-      localization.invalidValidationFormatDate,
-    ).optional(),
-    dateApproval: makeDateStringSchema(
-      localization.invalidApprovalFormatDate,
-    ).optional(),
     siret: siretSchema,
     businessName: businessNameSchema,
     schedule: scheduleSchema,
@@ -71,19 +59,13 @@ export const conventionToShareSchema: ZodSchemaWithInputMatchingOutput<Conventio
     establishmentTutor: establishmentTutorSchema,
     validators: conventionValidatorsSchema.optional(),
     agencyReferent: withOptionalFirstnameAndLastnameSchema.optional(),
-    renewed: renewedSchema.optional(),
     establishmentNumberEmployeesRange: numberOfEmployeesRangeSchema.optional(),
-    agencyDepartment: z.string(),
-    agencyRefersTo: z
-      .object({
-        id: refersToAgencyIdSchema,
-        name: zStringMinLength1,
-        kind: agencyKindSchema,
-      })
-      .optional(),
     acquisitionCampaign: z.string().optional(),
     acquisitionKeyword: z.string().optional(),
   });
+
+const testSchema = z.object({ test: z.string()});
+// export const makeSchemaPartial: ZodSchemaWithInputMatchingOutput<Partial<ConventionReadDto>> = conventionWithInternshipKindSchema.partial();
 
 export type ShareConventionLinkByEmailDto = {
   senderEmail: string;
