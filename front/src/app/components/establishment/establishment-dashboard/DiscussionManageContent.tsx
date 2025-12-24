@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
   type ConnectedUser,
+  type CreateConventionPresentationInitialValues,
   createOpaqueEmail,
   type DiscussionId,
   type DiscussionReadDto,
@@ -40,7 +41,6 @@ import {
   RejectDiscussionModal,
 } from "src/app/components/admin/establishments/RejectDiscussionModal";
 import { DiscussionStatusBadge } from "src/app/components/establishment/establishment-dashboard/DiscussionStatusBadge";
-import type { CreateConventionPresentationInitialValues } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";

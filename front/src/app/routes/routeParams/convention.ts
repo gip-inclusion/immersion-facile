@@ -22,7 +22,6 @@ import {
   type ScheduleDto,
   toDateUTCString,
 } from "shared";
-import type { CreateConventionPresentationInitialValues } from "src/app/components/forms/convention/conventionHelpers";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
@@ -30,6 +29,7 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { param, type ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
+import type { CreateConventionPresentationInitialValues } from "../../../../../shared/src/convention/conventionPresentation.dto";
 
 type ConventionRoutes =
   | ConventionMiniStagePageRoute

@@ -22,13 +22,6 @@ export const ShareConventionLink = () => {
     useCopyButton(t.copyLinkTooltip);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const shareLinkByEmail = t.shareLinkByMail.share;
-  const getConventionFormData = () => ({
-    establishmentRepresentativeEmail:
-      getValues().signatories.establishmentRepresentative.email,
-    firstName: getValues().signatories.beneficiary.firstName,
-    lastName: getValues().signatories.beneficiary.lastName,
-    internshipKind: getValues().internshipKind,
-  });
   const [_isModalOpened, setIsModalOpened] = useState(false);
   return (
     <>
@@ -61,7 +54,7 @@ export const ShareConventionLink = () => {
                   onError={() => {
                     setEmailSent(false);
                   }}
-                  conventionFormData={getConventionFormData()}
+                  conventionFormData={getValues()}
                 />
                 <p className={fr.cx("fr-hr-or", "fr-mt-3w")}>ou</p>
                 <div

@@ -23,14 +23,12 @@ import {
   type InternshipKind,
   isSignatory,
   type Role,
+  statusJustificationSchema,
   toDisplayedDate,
+  type WithStatusJustification,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
-import {
-  statusJustificationSchema,
-  type WithStatusJustification,
-} from "src/app/components/forms/convention/conventionHelpers";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";

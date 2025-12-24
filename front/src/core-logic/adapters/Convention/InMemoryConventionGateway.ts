@@ -21,7 +21,7 @@ import {
   type RenewConventionParams,
   type RenewMagicLinkRequestDto,
   type SendSignatureLinkRequestDto,
-  type ShareLinkByEmailDto,
+  type ShareConventionLinkByEmailDto,
   sleep,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
@@ -161,7 +161,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   public async shareConventionLinkByEmail(
-    _shareLinkByEmailDTO: ShareLinkByEmailDto,
+    _shareLinkByEmailDTO: ShareConventionLinkByEmailDto,
   ): Promise<boolean> {
     return true;
   }

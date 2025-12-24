@@ -31,7 +31,10 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addressDtoToString,
   type Beneficiary,
+  type ConventionPresentation,
   type ConventionReadDto,
+  type CreateConventionPresentationInitialValues,
+  conventionPresentationSchema,
   conventionSchema,
   type DepartmentCode,
   defaultCountryCode,
@@ -46,6 +49,7 @@ import {
   isFtConnectIdentity,
   keys,
   makeListAgencyOptionsKindFilter,
+  undefinedIfEmptyString,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
 import {
@@ -57,12 +61,6 @@ import {
   creationFormModes,
   type SupportedConventionRoutes,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
-import {
-  type ConventionPresentation,
-  type CreateConventionPresentationInitialValues,
-  conventionPresentationSchema,
-  undefinedIfEmptyString,
-} from "src/app/components/forms/convention/conventionHelpers";
 import { BeneficiaryFormSection } from "src/app/components/forms/convention/sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";

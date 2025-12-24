@@ -156,7 +156,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   copyLinkTooltip: "Copier le lien pour partager le formulaire",
   linkCopied: "Lien copié !",
   shareLinkByMail: {
-    share: "Partagez cette demande de convention par e-mail",
+    share: "Partager ou enregistrer un brouillon",
     sharedSuccessfully:
       "Cette demande de convention a bien été partagée par mail.",
     errorWhileSharing: "Erreur lors de l'envoi de l'email",
