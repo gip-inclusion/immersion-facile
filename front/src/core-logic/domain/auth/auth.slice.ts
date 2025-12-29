@@ -98,8 +98,9 @@ export const authSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{ url: AbsoluteUrl | undefined }>,
     ) => state,
-    fetchLogoutUrlFailed: (state, _action: PayloadActionWithFeedbackTopic) =>
-      state,
+    fetchLogoutUrlFailed: (state, _action: PayloadActionWithFeedbackTopic) => {
+      state.federatedIdentityWithUser = null;
+    },
     redirectAfterLogoutSucceeded: (state) => state,
     federatedIdentityInDeviceDeletionSucceeded: (
       state,
