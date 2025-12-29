@@ -1,15 +1,16 @@
 import { expectToEqual } from "../test.helpers";
-import { conventionCommonSchema } from "./convention.schema";
-import type { ConventionPresentation } from "./conventionPresentation.dto";
-import type { ShareConventionLinkByEmailDto } from "./shareConventionLinkByEmail.dto";
+import type {
+  ShareConventionLinkByEmailDto,
+  SharedConventionDto,
+} from "./shareConventionLinkByEmail.dto";
 import {
   shareConventionLinkByEmailSchema,
-  shareConventionSchema,
+  sharedConventionSchema,
 } from "./shareConventionLinkByEmail.schema";
 
 describe("shareConventionLinkByEmailSchema schema validation", () => {
   it("accepts valid data", () => {
-    const convention: Partial<ConventionPresentation> = {};
+    const convention: SharedConventionDto = {};
 
     const data: ShareConventionLinkByEmailDto = {
       senderEmail: "test@test.com",
@@ -22,21 +23,29 @@ describe("shareConventionLinkByEmailSchema schema validation", () => {
   });
 });
 
-describe("sharedConventionSchema", () => {
-  it("makes the schema partial", () => {
-    const convention: Partial<ConventionPresentation> = {
+describe("sharedConventionSchema schema validation", () => {
+  it.each([
+    {
       immersionAddress: "17 rue de la paix, 75000 Paris",
-    };
-
-    const result = shareConventionSchema.safeParse(convention);
-
-    expect(result.success).toBeTruthy();
-  });
-
-  it.skip("makes the schema partial", () => {
-    const result = conventionCommonSchema.safeParse({
-      immersionAddress: "17 rue de la paix, 75000 Paris",
-    });
+    } satisfies SharedConventionDto,
+    {
+      internshipKind: "immersion",
+      signatories: {
+        beneficiary: {
+          email: "beneficiary@test.com",
+        },
+      },
+    } satisfies SharedConventionDto,
+    {
+      internshipKind: "immersion",
+      signatories: {
+        establishmentRepresentative: {
+          phone: "",
+        },
+      },
+    } satisfies SharedConventionDto,
+  ])("makes the schema partial", (convention: SharedConventionDto) => {
+    const result = sharedConventionSchema.safeParse(convention);
 
     expect(result.success).toBeTruthy();
   });

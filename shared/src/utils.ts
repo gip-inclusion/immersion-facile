@@ -223,3 +223,9 @@ export const optional = <T>(v: T | null): NonNullable<T> | undefined =>
 export const isFunction = <T>(
   value: unknown,
 ): value is (...args: unknown[]) => T => typeof value === "function";
+
+export type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;

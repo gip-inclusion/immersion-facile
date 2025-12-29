@@ -36,11 +36,7 @@ import {
   type InternshipKind,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
-import {
-  conventionInternshipKindSpecificSchema,
-  conventionReadSchema,
-  conventionSchema,
-} from "./convention.schema";
+import { conventionReadSchema, conventionSchema } from "./convention.schema";
 import {
   getConventionTooLongMessageAndPath,
   getOverMaxWorkedDaysMessageAndPath,

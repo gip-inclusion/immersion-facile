@@ -121,3 +121,37 @@ export type ZodSchemaWithInputMatchingOutput<T> = z.ZodType<
   T,
   z.core.$ZodTypeInternals<T, T>
 >;
+
+export const deepPartialSchema = <T extends z.ZodTypeAny>(
+  schema: T,
+): z.ZodTypeAny => {
+  if (schema.def.type === "object") {
+    const newShape: Record<string, z.ZodTypeAny> = {};
+    for (const [key, value] of Object.entries(
+      (schema as unknown as z.ZodObject<any>).shape,
+    )) {
+      newShape[key] = deepPartialSchema(value as z.ZodTypeAny).optional();
+    }
+    return z.object(newShape);
+  }
+
+  if (schema.def.type === "array") {
+    return z.array(
+      deepPartialSchema((schema as unknown as z.ZodArray<any>).element),
+    );
+  }
+
+  if (schema.def.type === "optional") {
+    return deepPartialSchema(
+      (schema as unknown as z.ZodOptional<any>).unwrap(),
+    ).optional();
+  }
+
+  if (schema.def.type === "nullable") {
+    return deepPartialSchema(
+      (schema as unknown as z.ZodNullable<any>).unwrap(),
+    ).nullable();
+  }
+
+  return schema;
+};

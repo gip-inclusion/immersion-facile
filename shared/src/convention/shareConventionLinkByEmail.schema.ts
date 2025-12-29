@@ -1,24 +1,33 @@
 import { z } from "zod";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import {
+  deepPartialSchema,
   type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
 } from "../zodUtils";
-import type { ConventionDto } from "./convention.dto";
 import {
   immersionConventionSchema,
   miniStageConventionSchema,
 } from "./convention.schema";
-import type { ConventionPresentation } from "./conventionPresentation.dto";
-import type { ShareConventionLinkByEmailDto } from "./shareConventionLinkByEmail.dto";
+import type {
+  ShareConventionLinkByEmailDto,
+  SharedConventionDto,
+} from "./shareConventionLinkByEmail.dto";
 
-export const shareConventionSchema: ZodSchemaWithInputMatchingOutput<
-  Partial<ConventionPresentation>
-> = (immersionConventionSchema as unknown as z.ZodObject<any>)
-  .partial()
-  .or(
-    (miniStageConventionSchema as unknown as z.ZodObject<any>).partial(),
-  ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>;
+export const sharedConventionSchema: ZodSchemaWithInputMatchingOutput<SharedConventionDto> =
+  (
+    deepPartialSchema(immersionConventionSchema as unknown as z.ZodTypeAny).or(
+      deepPartialSchema(miniStageConventionSchema as unknown as z.ZodTypeAny),
+    ) as unknown as ZodSchemaWithInputMatchingOutput<SharedConventionDto>
+  ).catch((ctx) => {
+    const nonTooSmallErrors = ctx.issues.filter(
+      (issue) => issue.code !== "too_small",
+    );
+    if (nonTooSmallErrors.length > 0) {
+      throw new z.ZodError(nonTooSmallErrors as z.core.$ZodIssue[]);
+    }
+    return ctx.value as SharedConventionDto;
+  });
 
 export const shareConventionLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionLinkByEmailDto> =
   z
@@ -26,7 +35,7 @@ export const shareConventionLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<
       senderEmail: emailSchema,
       recipientEmail: emailPossiblyEmptySchema,
       details: zStringCanBeEmpty,
-      convention: shareConventionSchema,
+      convention: sharedConventionSchema,
     })
     .refine(
       (data) => {
