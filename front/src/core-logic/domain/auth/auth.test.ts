@@ -280,13 +280,13 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: peConnectedFederatedIdentity,
+      federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       requestedEmail: null,
     });
 
-    expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
+    expectFederatedIdentityInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, []);
     expectToEqual(
       feedbacksSelectors.feedbacks(store.getState())["auth-global"],
@@ -541,6 +541,7 @@ describe("Auth slice", () => {
       });
       expectToEqual(dependencies.navigationGateway.wentToUrls, [redirectUri]);
     });
+
     it("should handle login by magic link confirmation failed", () => {
       expectAuthStateToBe(initialAuthState);
       store.dispatch(
