@@ -3,7 +3,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
-import { type ConventionReadDto, domElementIds } from "shared";
+import { type ConventionPresentation, domElementIds } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { match } from "ts-pattern";
 import { ShareForm } from "./ShareForm";
@@ -17,7 +17,7 @@ const {
 });
 
 export const ShareConventionDraft = () => {
-  const { getValues } = useFormContext<ConventionReadDto>();
+  const { getValues } = useFormContext<ConventionPresentation>();
   const t = useConventionTexts(getValues().internshipKind);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const shareLinkByEmail = t.shareConventionDraftByMail.share;

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import {
   deepPartialSchema,
+  localization,
   type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
 } from "../zodUtils";
@@ -11,14 +12,24 @@ import {
 } from "./convention.schema";
 import type {
   ConventionDraftDto,
+  ConventionDraftId,
   ShareConventionDraftByEmailDto,
 } from "./shareConventionDraftByEmail.dto";
 
+const conventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftId> =
+  z.uuid(localization.invalidUuid);
+
 export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftDto> =
   (
-    deepPartialSchema(immersionConventionSchema as unknown as z.ZodTypeAny).or(
-      deepPartialSchema(miniStageConventionSchema as unknown as z.ZodTypeAny),
-    ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDraftDto>
+    deepPartialSchema(immersionConventionSchema as unknown as z.ZodTypeAny)
+      .or(
+        deepPartialSchema(miniStageConventionSchema as unknown as z.ZodTypeAny),
+      )
+      .and(
+        z.object({
+          id: conventionDraftIdSchema,
+        }),
+      ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDraftDto>
   ).catch((ctx) => {
     const nonTooSmallErrors = ctx.issues.filter(
       (issue) => issue.code !== "too_small",
@@ -34,8 +45,8 @@ export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput
     .object({
       senderEmail: emailSchema,
       recipientEmail: emailPossiblyEmptySchema,
-      details: zStringCanBeEmpty,
-      convention: conventionDraftSchema,
+      details: zStringCanBeEmpty.optional(),
+      conventionDraft: conventionDraftSchema,
     })
     .refine(
       (data) => {

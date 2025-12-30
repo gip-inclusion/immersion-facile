@@ -327,5 +327,45 @@ describe("zodUtils", () => {
 
       expect(canHaveEmptyArray.success).toBeTruthy();
     });
+
+    it("makes deep partial work with union", () => {
+      const unionSchema = deepPartialSchema(
+        z.object({
+          person: z.object({
+            name: z.string(),
+          }),
+        }),
+      ).or(
+        z.object({
+          otherInfo: z.string(),
+        }),
+      );
+
+      const result = unionSchema.safeParse({
+        person: {},
+      });
+
+      expect(result.success).toBeTruthy();
+    });
+
+    it("makes deep partial work with intersection", () => {
+      const intersectionSchema = deepPartialSchema(
+        z.object({
+          person: z.object({
+            name: z.string(),
+          }),
+        }),
+      ).and(
+        z.object({
+          otherInfo: z.string(),
+        }),
+      );
+
+      const result = intersectionSchema.safeParse({
+        otherInfo: "Other info",
+      });
+
+      expect(result.success).toBeTruthy();
+    });
   });
 });

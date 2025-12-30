@@ -6,26 +6,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  type ConventionDto,
+  type ConventionPresentation,
   domElementIds,
   type ShareConventionDraftByEmailDto,
   shareConventionDraftByEmailSchema,
+  toConventionDraftDto,
 } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 type ShareFormProps = {
   onSuccess: () => void;
   onError: () => void;
-  conventionFormData: Partial<ConventionDto>;
+  conventionFormData: ConventionPresentation;
 };
 
 const makeInitialValues = ({
   conventionFormData,
 }: {
-  conventionFormData: Partial<ConventionDto>;
+  conventionFormData: ConventionPresentation;
 }): ShareConventionDraftByEmailDto => ({
   senderEmail: "",
-  convention: conventionFormData,
+  conventionDraft: toConventionDraftDto({ convention: conventionFormData }),
 });
 
 export const ShareForm = ({

@@ -10,13 +10,16 @@ import {
 
 describe("shareConventionLinkByEmailSchema schema validation", () => {
   it("accepts valid data", () => {
-    const convention: ConventionDraftDto = {};
+    const convention: ConventionDraftDto = {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+      internshipKind: "immersion",
+    };
 
     const data: ShareConventionDraftByEmailDto = {
       senderEmail: "test@test.com",
       details: "",
       recipientEmail: "",
-      convention,
+      conventionDraft: convention,
     };
 
     expectToEqual(shareConventionDraftByEmailSchema.parse(data), data);
@@ -26,9 +29,12 @@ describe("shareConventionLinkByEmailSchema schema validation", () => {
 describe("sharedConventionSchema schema validation", () => {
   it.each([
     {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
       immersionAddress: "17 rue de la paix, 75000 Paris",
+      internshipKind: "immersion",
     } satisfies ConventionDraftDto,
     {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
       internshipKind: "immersion",
       signatories: {
         beneficiary: {
@@ -37,6 +43,7 @@ describe("sharedConventionSchema schema validation", () => {
       },
     } satisfies ConventionDraftDto,
     {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
       internshipKind: "immersion",
       signatories: {
         establishmentRepresentative: {

@@ -31,6 +31,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
+import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
@@ -196,7 +197,10 @@ describe("convention e2e", () => {
           body: {
             senderEmail: "any@email.fr",
             details: "Le message du mail",
-            convention: {},
+            conventionDraft: {
+              id: uuid(),
+              internshipKind: "immersion",
+            },
           },
         });
 
@@ -231,7 +235,10 @@ describe("convention e2e", () => {
           body: {
             details: "any@email.fr",
             senderEmail: "any@email.fr",
-            convention: {},
+            conventionDraft: {
+              id: uuid(),
+              internshipKind: "immersion",
+            },
           },
         });
 

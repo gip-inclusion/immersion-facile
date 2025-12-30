@@ -153,5 +153,25 @@ export const deepPartialSchema = <T extends z.ZodTypeAny>(
     ).nullable();
   }
 
+  if (schema.def.type === "union") {
+    const unionSchema = schema as unknown as z.ZodUnion<any>;
+    return z.union(
+      unionSchema.options.map((option: z.ZodTypeAny) =>
+        deepPartialSchema(option),
+      ),
+    );
+  }
+
+  if (schema.def.type === "intersection") {
+    const def = schema.def as unknown as {
+      left: z.ZodTypeAny;
+      right: z.ZodTypeAny;
+    };
+    return z.intersection(
+      deepPartialSchema(def.left),
+      deepPartialSchema(def.right),
+    );
+  }
+
   return schema;
 };
