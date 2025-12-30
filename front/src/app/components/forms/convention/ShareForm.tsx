@@ -8,8 +8,8 @@ import { useForm } from "react-hook-form";
 import {
   type ConventionDto,
   domElementIds,
-  type ShareConventionLinkByEmailDto,
-  shareConventionLinkByEmailSchema,
+  type ShareConventionDraftByEmailDto,
+  shareConventionDraftByEmailSchema,
 } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
@@ -23,7 +23,7 @@ const makeInitialValues = ({
   conventionFormData,
 }: {
   conventionFormData: Partial<ConventionDto>;
-}): ShareConventionLinkByEmailDto => ({
+}): ShareConventionDraftByEmailDto => ({
   senderEmail: "",
   convention: conventionFormData,
 });
@@ -34,17 +34,17 @@ export const ShareForm = ({
   onError,
 }: ShareFormProps) => {
   const [isOnlyForSelf, setIsOnlyForSelf] = useState(false);
-  const onSubmit = async (values: ShareConventionLinkByEmailDto) => {
+  const onSubmit = async (values: ShareConventionDraftByEmailDto) => {
     const result =
-      await outOfReduxDependencies.conventionGateway.shareConventionLinkByEmail(
+      await outOfReduxDependencies.conventionGateway.shareConventionDraftByEmail(
         values,
       );
     result ? onSuccess() : onError();
   };
-  const methods = useForm<ShareConventionLinkByEmailDto>({
+  const methods = useForm<ShareConventionDraftByEmailDto>({
     mode: "onTouched",
     defaultValues: makeInitialValues({ conventionFormData }),
-    resolver: zodResolver(shareConventionLinkByEmailSchema),
+    resolver: zodResolver(shareConventionDraftByEmailSchema),
   });
   const { register, handleSubmit, formState, reset, setValue } = methods;
 

@@ -1,25 +1,25 @@
 import { expectToEqual } from "../test.helpers";
 import type {
-  ShareConventionLinkByEmailDto,
-  SharedConventionDto,
-} from "./shareConventionLinkByEmail.dto";
+  ConventionDraftDto,
+  ShareConventionDraftByEmailDto,
+} from "./shareConventionDraftByEmail.dto";
 import {
-  shareConventionLinkByEmailSchema,
-  sharedConventionSchema,
-} from "./shareConventionLinkByEmail.schema";
+  conventionDraftSchema,
+  shareConventionDraftByEmailSchema,
+} from "./shareConventionDraftByEmail.schema";
 
 describe("shareConventionLinkByEmailSchema schema validation", () => {
   it("accepts valid data", () => {
-    const convention: SharedConventionDto = {};
+    const convention: ConventionDraftDto = {};
 
-    const data: ShareConventionLinkByEmailDto = {
+    const data: ShareConventionDraftByEmailDto = {
       senderEmail: "test@test.com",
       details: "",
       recipientEmail: "",
       convention,
     };
 
-    expectToEqual(shareConventionLinkByEmailSchema.parse(data), data);
+    expectToEqual(shareConventionDraftByEmailSchema.parse(data), data);
   });
 });
 
@@ -27,7 +27,7 @@ describe("sharedConventionSchema schema validation", () => {
   it.each([
     {
       immersionAddress: "17 rue de la paix, 75000 Paris",
-    } satisfies SharedConventionDto,
+    } satisfies ConventionDraftDto,
     {
       internshipKind: "immersion",
       signatories: {
@@ -35,7 +35,7 @@ describe("sharedConventionSchema schema validation", () => {
           email: "beneficiary@test.com",
         },
       },
-    } satisfies SharedConventionDto,
+    } satisfies ConventionDraftDto,
     {
       internshipKind: "immersion",
       signatories: {
@@ -43,9 +43,9 @@ describe("sharedConventionSchema schema validation", () => {
           phone: "",
         },
       },
-    } satisfies SharedConventionDto,
-  ])("makes the schema partial", (convention: SharedConventionDto) => {
-    const result = sharedConventionSchema.safeParse(convention);
+    } satisfies ConventionDraftDto,
+  ])("makes the schema partial", (convention: ConventionDraftDto) => {
+    const result = conventionDraftSchema.safeParse(convention);
 
     expect(result.success).toBeTruthy();
   });

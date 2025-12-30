@@ -28,7 +28,7 @@ import {
   flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
   paginatedConventionWithBroadcastFeedbackSchema,
 } from "../convention/conventionWithBroadcastFeedback.schema";
-import { shareConventionLinkByEmailSchema } from "../convention/shareConventionLinkByEmail.schema";
+import { shareConventionDraftByEmailSchema } from "../convention/shareConventionDraftByEmail.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -200,7 +200,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
   shareConvention: defineRoute({
     url: "/share-immersion-demand",
     method: "post",
-    requestBodySchema: shareConventionLinkByEmailSchema,
+    requestBodySchema: shareConventionDraftByEmailSchema,
     responses: { 200: expressEmptyResponseBody, 400: httpErrorSchema },
   }),
   renewMagicLink: defineRoute({

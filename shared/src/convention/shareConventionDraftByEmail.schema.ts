@@ -10,15 +10,15 @@ import {
   miniStageConventionSchema,
 } from "./convention.schema";
 import type {
-  ShareConventionLinkByEmailDto,
-  SharedConventionDto,
-} from "./shareConventionLinkByEmail.dto";
+  ConventionDraftDto,
+  ShareConventionDraftByEmailDto,
+} from "./shareConventionDraftByEmail.dto";
 
-export const sharedConventionSchema: ZodSchemaWithInputMatchingOutput<SharedConventionDto> =
+export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftDto> =
   (
     deepPartialSchema(immersionConventionSchema as unknown as z.ZodTypeAny).or(
       deepPartialSchema(miniStageConventionSchema as unknown as z.ZodTypeAny),
-    ) as unknown as ZodSchemaWithInputMatchingOutput<SharedConventionDto>
+    ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDraftDto>
   ).catch((ctx) => {
     const nonTooSmallErrors = ctx.issues.filter(
       (issue) => issue.code !== "too_small",
@@ -26,16 +26,16 @@ export const sharedConventionSchema: ZodSchemaWithInputMatchingOutput<SharedConv
     if (nonTooSmallErrors.length > 0) {
       throw new z.ZodError(nonTooSmallErrors as z.core.$ZodIssue[]);
     }
-    return ctx.value as SharedConventionDto;
+    return ctx.value as ConventionDraftDto;
   });
 
-export const shareConventionLinkByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionLinkByEmailDto> =
+export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailDto> =
   z
     .object({
       senderEmail: emailSchema,
       recipientEmail: emailPossiblyEmptySchema,
       details: zStringCanBeEmpty,
-      convention: sharedConventionSchema,
+      convention: conventionDraftSchema,
     })
     .refine(
       (data) => {

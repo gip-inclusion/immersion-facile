@@ -23,7 +23,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ShareConventionLinkByEmail } from "./ShareConventionLinkByEmail";
+import { ShareConventionLinkByEmail } from "./ShareConventionDraftByEmail";
 
 describe("ShareConventionLinkByEmail", () => {
   const email = "fake-email@yahoo.com";

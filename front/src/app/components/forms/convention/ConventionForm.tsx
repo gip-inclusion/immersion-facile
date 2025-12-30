@@ -102,7 +102,7 @@ import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice"
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { useStyles } from "tss-react/dsfr";
-import { ShareConventionLink } from "./ShareConventionLink";
+import { ShareConventionDraft } from "./ShareConventionDraft";
 
 type StepSeverity = "error" | "success" | "info";
 export type EmailValidationErrorsState = Partial<
@@ -679,7 +679,7 @@ export const ConventionForm = ({
                   "fr-btns-group--icon-left",
                 )}
               >
-                <ShareConventionLink />
+                <ShareConventionDraft />
                 <Button
                   type="button"
                   id={

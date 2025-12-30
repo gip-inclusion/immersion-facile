@@ -8,16 +8,19 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import { match } from "ts-pattern";
 import { ShareForm } from "./ShareForm";
 
-const { Component: ShareLinkModal, open: openShareLinkModal } = createModal({
+const {
+  Component: ShareConventionDraftModal,
+  open: openShareConventionDraftModal,
+} = createModal({
   isOpenedByDefault: false,
   id: "shareLink",
 });
 
-export const ShareConventionLink = () => {
+export const ShareConventionDraft = () => {
   const { getValues } = useFormContext<ConventionReadDto>();
   const t = useConventionTexts(getValues().internshipKind);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
-  const shareLinkByEmail = t.shareLinkByMail.share;
+  const shareLinkByEmail = t.shareConventionDraftByMail.share;
   const [_isModalOpened, setIsModalOpened] = useState(false);
   return (
     <>
@@ -25,7 +28,7 @@ export const ShareConventionLink = () => {
         type="button"
         iconId="fr-icon-mail-line"
         onClick={() => {
-          openShareLinkModal();
+          openShareConventionDraftModal();
           setEmailSent(null);
           setIsModalOpened(true);
         }}
@@ -37,10 +40,10 @@ export const ShareConventionLink = () => {
         Partager la convention
       </Button>
       {createPortal(
-        <ShareLinkModal title={shareLinkByEmail}>
+        <ShareConventionDraftModal title={shareLinkByEmail}>
           {match(emailSent)
-            .with(true, () => t.shareLinkByMail.sharedSuccessfully)
-            .with(false, () => t.shareLinkByMail.errorWhileSharing)
+            .with(true, () => t.shareConventionDraftByMail.sharedSuccessfully)
+            .with(false, () => t.shareConventionDraftByMail.errorWhileSharing)
             .with(null, () => (
               <ShareForm
                 onSuccess={() => {
@@ -53,7 +56,7 @@ export const ShareConventionLink = () => {
               />
             ))
             .exhaustive()}
-        </ShareLinkModal>,
+        </ShareConventionDraftModal>,
         document.body,
       )}
     </>

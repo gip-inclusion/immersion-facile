@@ -1,7 +1,5 @@
-import {
-  type ShareConventionLinkByEmailDto,
-  shareConventionLinkByEmailSchema,
-} from "shared";
+import type { ShareConventionDraftByEmailDto } from "shared/src/convention/shareConventionDraftByEmail.dto";
+import { shareConventionDraftByEmailSchema } from "shared/src/convention/shareConventionDraftByEmail.schema";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
@@ -9,8 +7,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConventionLinkByEmailDto> {
-  protected inputSchema = shareConventionLinkByEmailSchema;
+export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConventionDraftByEmailDto> {
+  protected inputSchema = shareConventionDraftByEmailSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -31,7 +29,7 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConven
   }
 
   public async _execute(
-    params: ShareConventionLinkByEmailDto,
+    params: ShareConventionDraftByEmailDto,
     uow: UnitOfWork,
   ): Promise<void> {
     // const shortLink = await makeShortLink({

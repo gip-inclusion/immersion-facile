@@ -1,11 +1,11 @@
 import type { DeepPartial } from "../utils";
 import type { ConventionPresentation } from "./conventionPresentation.dto";
 
-export type SharedConventionDto = DeepPartial<ConventionPresentation>;
+export type ConventionDraftDto = DeepPartial<ConventionPresentation>;
 
-export type ShareConventionLinkByEmailDto = {
+export type ShareConventionDraftByEmailDto = {
   senderEmail: string;
   recipientEmail?: string;
   details?: string;
-  convention: SharedConventionDto;
+  convention: ConventionDraftDto;
 };
