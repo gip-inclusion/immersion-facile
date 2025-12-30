@@ -76,6 +76,7 @@ export class PgAgencyRepository implements AgencyRepository {
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
         phone_number: agency.phoneNumber,
+        status_justification: agency.statusJustification,
         updated_at: updatedAt ?? sql`now()`,
       }))
       .execute()

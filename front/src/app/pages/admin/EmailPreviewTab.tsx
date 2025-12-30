@@ -278,6 +278,10 @@ export const defaultEmailValueByEmailKind: {
       },
     ],
   },
+  AGENCY_CLOSED_FOR_INACTIVITY: {
+    agencyName: "AGENCY_NAME",
+    numberOfMonthsWithoutConvention: 6,
+  },
   AGENCY_DELEGATION_CONTACT_INFORMATION: {
     agencyName: "AGENCY_NAME",
     agencyProvince: "AGENCY_PROVINCE",
