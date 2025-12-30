@@ -153,7 +153,6 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   },
   yes: "Oui",
   no: "Non",
-  copyLinkTooltip: "Copier le lien pour partager le formulaire",
   linkCopied: "Lien copié !",
   shareLinkByMail: {
     share: "Partager ou enregistrer un brouillon",

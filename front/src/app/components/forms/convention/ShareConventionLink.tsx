@@ -1,8 +1,6 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useState } from "react";
-import { useCopyButton } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
 import { type ConventionReadDto, domElementIds } from "shared";
@@ -18,8 +16,6 @@ const { Component: ShareLinkModal, open: openShareLinkModal } = createModal({
 export const ShareConventionLink = () => {
   const { getValues } = useFormContext<ConventionReadDto>();
   const t = useConventionTexts(getValues().internshipKind);
-  const { onCopyButtonClick, isCopied, copyButtonIsDisabled, copyButtonLabel } =
-    useCopyButton(t.copyLinkTooltip);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const shareLinkByEmail = t.shareLinkByMail.share;
   const [_isModalOpened, setIsModalOpened] = useState(false);
@@ -46,32 +42,15 @@ export const ShareConventionLink = () => {
             .with(true, () => t.shareLinkByMail.sharedSuccessfully)
             .with(false, () => t.shareLinkByMail.errorWhileSharing)
             .with(null, () => (
-              <>
-                <ShareForm
-                  onSuccess={() => {
-                    setEmailSent(true);
-                  }}
-                  onError={() => {
-                    setEmailSent(false);
-                  }}
-                  conventionFormData={getValues()}
-                />
-                <p className={fr.cx("fr-hr-or", "fr-mt-3w")}>ou</p>
-                <div
-                  className={fr.cx("fr-btns-group", "fr-btns-group--center")}
-                >
-                  <Button
-                    type="button"
-                    disabled={copyButtonIsDisabled}
-                    onClick={() => {
-                      onCopyButtonClick(window.location.href);
-                    }}
-                    id={domElementIds.conventionImmersionRoute.copyLinkButton}
-                  >
-                    {isCopied ? t.linkCopied : copyButtonLabel}
-                  </Button>
-                </div>
-              </>
+              <ShareForm
+                onSuccess={() => {
+                  setEmailSent(true);
+                }}
+                onError={() => {
+                  setEmailSent(false);
+                }}
+                conventionFormData={getValues()}
+              />
             ))
             .exhaustive()}
         </ShareLinkModal>,
