@@ -480,6 +480,8 @@ export const domElementIds = {
   unsubscribeEstablishmentLead: {},
 
   establishment: {
+    offerModal: "im-offer-modal",
+    offerModalSubmitButton: "im-offer-modal__submit-button",
     login: {
       byEmailButton: "im-login-form__connect-button--establishment-email",
       proConnectButton:
@@ -490,6 +492,9 @@ export const domElementIds = {
     },
     create: {
       form: "im-form-create-establishment",
+      addOfferButton: "im-form-create-establishment__add-offer-button",
+      editOfferButton: "im-form-create-establishment__edit-offer-button",
+      deleteOfferButton: "im-form-create-establishment__delete-offer-button",
       addressAutocomplete:
         "im-form-create-establishment__autocomplete-address-creation-establishment-form",
       siret: "im-form-create-establishment__siret",
@@ -520,6 +525,7 @@ export const domElementIds = {
       fitForDisabledWorkers:
         "im-form-create-establishment__fit-for-disabled-workers",
       appellations: "im-form-create-establishment__appellations",
+      remoteWorkMode: "im-form-create-establishment__remote-work-mode",
       website: "im-form-create-establishment__website",
       additionalInformation:
         "im-form-create-establishment__additional-information",
@@ -546,9 +552,13 @@ export const domElementIds = {
       summaryBusinessAddresses:
         "im-form-create-establishment__summary-business-addresses",
       summaryAppellations: "im-form-create-establishment__summary-appellations",
+      offerCard: "im-form-create-establishment__offer-card",
     },
     edit: {
       form: "im-form-edit-establishment",
+      addOfferButton: "im-form-edit-establishment__add-offer-button",
+      editOfferButton: "im-form-edit-establishment__edit-offer-button",
+      deleteOfferButton: "im-form-edit-establishment__delete-offer-button",
       addressAutocomplete:
         "im-form-edit-establishment__autocomplete-address-creation-establishment-form",
       siret: "im-form-edit-establishment__siret",
@@ -577,6 +587,7 @@ export const domElementIds = {
       fitForDisabledWorkers:
         "im-form-edit-establishment__fit-for-disabled-workers",
       appellations: "im-form-edit-establishment__appellations",
+      remoteWorkMode: "im-form-edit-establishment__remote-work-mode",
       website: "im-form-edit-establishment__website",
       additionalInformation:
         "im-form-edit-establishment__additional-information",
@@ -599,9 +610,14 @@ export const domElementIds = {
         `im-form-edit-establishment__next-button--step-${currentStep}`,
       searchableBy: "im-form-edit-establishment__searchable-by",
       refreshEditLink: "im-form-edit-establishment__refresh-link",
+      offerCard: "im-form-edit-establishment__offer-card",
     },
     admin: {
       form: "im-form-manage-establishment-admin",
+      addOfferButton: "im-form-manage-establishment-admin__add-offer-button",
+      editOfferButton: "im-form-manage-establishment-admin__edit-offer-button",
+      deleteOfferButton:
+        "im-form-manage-establishment-admin__delete-offer-button",
       manageButton: "im-form-manage-establishment-admin__manage-button",
       searchableBy: "im-form-manage-establishment-admin__searchable-by",
       startFormButton: "im-form-manage-establishment-admin__start-button",
@@ -646,6 +662,7 @@ export const domElementIds = {
       fitForDisabledWorkers:
         "im-form-manage-establishment-admin__fit-for-disabled-workers",
       appellations: "im-form-manage-establishment-admin__appellations",
+      remoteWorkMode: "im-form-manage-establishment-admin__remote-work-mode",
       website: "im-form-manage-establishment-admin__website",
       additionalInformation:
         "im-form-manage-establishment-admin__additional-information",
@@ -665,6 +682,7 @@ export const domElementIds = {
         "im-form-manage-establishment-admin__max-contacts-per-month-value",
       nextAvailabilityDateValue:
         "im-form-manage-establishment-admin__current-next-availablity-date-value",
+      offerCard: "im-form-manage-establishment-admin__offer-card",
     },
   },
   assessment: {
