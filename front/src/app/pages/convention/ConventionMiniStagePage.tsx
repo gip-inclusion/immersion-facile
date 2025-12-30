@@ -7,7 +7,9 @@ import {
   ConventionFormWrapper,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { routes } from "src/app/routes/routes";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { Route } from "type-route";
 
@@ -23,6 +25,7 @@ export const ConventionMiniStagePage = ({
   route,
 }: ConventionMiniStagePageProps) => {
   const dispatch = useDispatch();
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const t = useConventionTexts("mini-stage-cci");
   const initialRouteParams = useRef(route.params).current;
   const { jwt: _, ...routeParamsWithoutJwt } = initialRouteParams;
@@ -30,6 +33,7 @@ export const ConventionMiniStagePage = ({
     () => keys(routeParamsWithoutJwt).length > 0,
     [routeParamsWithoutJwt],
   );
+  const isFTConnected = federatedIdentity?.provider === "peConnect";
 
   const getMode = (): ConventionFormMode => {
     if ("jwt" in initialRouteParams) return "edit";
@@ -39,13 +43,15 @@ export const ConventionMiniStagePage = ({
   const mode = getMode();
 
   useEffect(() => {
-    dispatch(
-      authSlice.actions.fetchLogoutUrlRequested({
-        mode: "device-and-oauth",
-        feedbackTopic: "auth-global",
-      }),
-    );
-  }, [dispatch]);
+    if (isFTConnected) {
+      dispatch(
+        authSlice.actions.fetchLogoutUrlRequested({
+          mode: "device-and-oauth",
+          feedbackTopic: "auth-global",
+        }),
+      );
+    }
+  }, [dispatch, isFTConnected]);
 
   return (
     <MainWrapper
