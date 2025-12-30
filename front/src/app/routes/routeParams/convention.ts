@@ -9,6 +9,7 @@ import {
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionReadDto,
+  type CreateConventionPresentationInitialValues,
   type FtConnectIdentity,
   type ImmersionObjective,
   type InternshipKind,
@@ -29,7 +30,6 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { param, type ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
-import type { CreateConventionPresentationInitialValues } from "../../../../../shared/src/convention/conventionPresentation.dto";
 
 type ConventionRoutes =
   | ConventionMiniStagePageRoute
