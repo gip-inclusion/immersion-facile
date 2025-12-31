@@ -68,7 +68,7 @@ import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-ca
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
-import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
+import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
@@ -572,6 +572,7 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
         gateways.shortLinkGenerator,
+        gateways.timeGateway,
         config,
       ),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),

@@ -4,6 +4,7 @@ import {
   AgencyDtoBuilder,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
+  type ConventionDraftId,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -31,6 +32,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
+import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
@@ -188,16 +190,18 @@ describe("convention e2e", () => {
       it("should successfully ask for a short link", async () => {
         const shortLinkId = "shortLink1";
         gateways.shortLinkGenerator.addMoreShortLinkIds([shortLinkId]);
-        const veryLongConventionLink =
-          "http://localhost:3000/demande-immersion?email=&firstName=&lastName=&phone=&financiaryHelp=&emergencyContact=&emergencyContactPhone=&isRqth=false&birthdate=&agencyDepartment=&siret=&businessName=&businessAdvantages=&etFirstName=&etLastName=&etJob=&etPhone=&etEmail=&erFirstName=&erLastName=&erPhone=&erEmail=&immersionAddress=&immersionActivities=&immersionSkills=&sanitaryPreventionDescription=&workConditions=&dateStart=2023-08-05&dateEnd=2023-08-06&schedule=%7B%22totalHours%22%3A0%2C%22workedDays%22%3A0%2C%22isSimple%22%3Atrue%2C%22selectedIndex%22%3A0%2C%22complexSchedule%22%3A%5B%7B%22date%22%3A%222023-08-05T00%3A00%3A00.000Z%22%2C%22timePeriods%22%3A%5B%5D%7D%2C%7B%22date%22%3A%222023-08-06T00%3A00%3A00.000Z%22%2C%22timePeriods%22%3A%5B%5D%7D%5D%7D";
+        const conventionDraftId: ConventionDraftId =
+          "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+        const conventionDraftLink = `http://localhost/demande-immersion?draftId=${conventionDraftId}`;
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
         const response = await unauthenticatedRequest.shareConvention({
           body: {
-            conventionLink: veryLongConventionLink,
-            details: "Le message du mail",
-            email: "any@email.fr",
-            internshipKind: "immersion",
+            senderEmail: "any@email.fr",
+            conventionDraft: {
+              id: conventionDraftId,
+              internshipKind: "immersion",
+            },
           },
         });
 
@@ -212,7 +216,7 @@ describe("convention e2e", () => {
         expectToEqual(sentEmails.length, 1);
         const conventionShortLinkEmail = expectEmailOfType(
           sentEmails[0],
-          "SHARE_DRAFT_CONVENTION_BY_LINK",
+          "SHARE_CONVENTION_DRAFT_SELF",
         );
 
         const sharedConventionLink =
@@ -221,7 +225,7 @@ describe("convention e2e", () => {
             technicalRoutesClient,
           );
 
-        expectToEqual(veryLongConventionLink, sharedConventionLink);
+        expectToEqual(conventionDraftLink, sharedConventionLink);
       });
     });
 
@@ -231,9 +235,11 @@ describe("convention e2e", () => {
         const response = await unauthenticatedRequest.shareConvention({
           body: {
             details: "any@email.fr",
-            email: "any@email.fr",
-            internshipKind: "immersion",
-            conventionLink: "",
+            senderEmail: "invalid-email",
+            conventionDraft: {
+              id: uuid(),
+              internshipKind: "immersion",
+            },
           },
         });
 
@@ -243,7 +249,9 @@ describe("convention e2e", () => {
             status: 400,
             message:
               "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /share-immersion-demand",
-            issues: ["conventionLink : Ce champ est obligatoire"],
+            issues: [
+              "senderEmail : Veuillez saisir une adresse e-mail valide - email fourni : invalid-email",
+            ],
           },
         });
       });

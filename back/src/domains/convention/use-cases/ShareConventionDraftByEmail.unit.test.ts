@@ -1,10 +1,9 @@
-import { afterEach } from "node:test";
 import {
-  errors,
-  expectObjectInArrayToMatch,
-  expectPromiseToFailWithError,
+  type ConventionDraftDto,
+  expectToEqual,
   type InternshipKind,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -23,7 +22,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ShareConventionLinkByEmail } from "./ShareConventionLinkByEmail";
+import { ShareConventionLinkByEmail } from "./ShareConventionDraftByEmail";
 
 describe("ShareConventionLinkByEmail", () => {
   const email = "fake-email@yahoo.com";
@@ -57,55 +56,77 @@ describe("ShareConventionLinkByEmail", () => {
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
       shortLinkIdGeneratorGateway,
+      timeGateway,
       config,
     );
   });
 
-  describe("Wrong paths", () => {
-    afterEach(() => {
-      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
-      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+  it("sends an email to the sender only", async () => {
+    const conventionDraft: ConventionDraftDto = {
+      id: uuid(),
+      internshipKind,
+    };
+    await usecase.execute({
+      conventionDraft,
+      senderEmail: email,
     });
 
-    it("throws bad request if convention link does not come from IF domain", async () => {
-      const conventionLink = "https://fake-url.com/demande-immersion";
-
-      await expectPromiseToFailWithError(
-        usecase.execute({
-          conventionLink,
-          email,
-          details: messageContent,
-          internshipKind,
-        }),
-        errors.url.notFromIFDomain(conventionLink),
-      );
+    expectToEqual(
+      await uow.conventionDraftRepository.getById(conventionDraft.id),
+      conventionDraft,
+    );
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "SHARE_CONVENTION_DRAFT_SELF",
+          recipients: [email],
+          params: {
+            internshipKind,
+            conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
+          },
+        },
+      ],
     });
   });
 
-  describe("right path", () => {
-    it("sends an email", async () => {
-      const conventionLink = `${config.immersionFacileBaseUrl}/demande-immersion`;
+  it("sends an email to the sender and the recipient", async () => {
+    const recipientEmail = "recipient-email@test.com";
+    const conventionDraft: ConventionDraftDto = {
+      id: uuid(),
+      internshipKind,
+    };
 
-      await usecase.execute({
-        conventionLink,
-        email,
-        details: messageContent,
-        internshipKind,
-      });
+    await usecase.execute({
+      conventionDraft,
+      senderEmail: email,
+      recipientEmail,
+      details: messageContent,
+    });
 
-      expectSavedNotificationsAndEvents({
-        emails: [
-          {
-            kind: "SHARE_DRAFT_CONVENTION_BY_LINK",
-            recipients: [email],
-            params: {
-              internshipKind,
-              additionalDetails: messageContent,
-              conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
-            },
+    expectToEqual(
+      await uow.conventionDraftRepository.getById(conventionDraft.id),
+      conventionDraft,
+    );
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "SHARE_CONVENTION_DRAFT_SELF",
+          recipients: [email],
+          params: {
+            internshipKind,
+            conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
           },
-        ],
-      });
+        },
+        {
+          kind: "SHARE_CONVENTION_DRAFT_RECIPIENT",
+          recipients: [recipientEmail],
+          params: {
+            internshipKind,
+            conventionFormUrl: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
+            additionalDetails: messageContent,
+          },
+        },
+      ],
     });
   });
 });
