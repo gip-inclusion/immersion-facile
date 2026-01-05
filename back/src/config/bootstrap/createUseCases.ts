@@ -39,6 +39,7 @@ import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetA
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
+import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
@@ -1052,6 +1053,7 @@ export const createUseCases = ({
         uowPerformer,
         deps: { saveNotificationsBatchAndRelatedEvent, config },
       }),
+    getConventionDraftById: makeGetConventionDraftById({ uowPerformer }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

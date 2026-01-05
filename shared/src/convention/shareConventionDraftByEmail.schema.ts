@@ -17,7 +17,7 @@ import type {
   ShareConventionDraftByEmailDto,
 } from "./shareConventionDraftByEmail.dto";
 
-const conventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftId> =
+export const conventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftId> =
   z.uuid(localization.invalidUuid);
 
 export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftDto> =
