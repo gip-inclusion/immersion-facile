@@ -1724,7 +1724,7 @@ describe("Pg implementation of ConventionQueries", () => {
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-01T00:00:00.000Z",
-          handledByAgency: true,
+          handledByAgency: false,
           requestParams: {
             conventionId: conventionIdA,
             conventionStatus: "READY_TO_SIGN",
@@ -1744,7 +1744,7 @@ describe("Pg implementation of ConventionQueries", () => {
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-30T00:00:00.000Z",
-          handledByAgency: true,
+          handledByAgency: false,
           requestParams: {
             conventionId: convention.id,
             conventionStatus: "READY_TO_SIGN",
@@ -1805,6 +1805,189 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
+    describe("when there are conventions with handled broadcast errors", () => {
+      const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
+      const defaultPagination = { page: 1, perPage: 10 };
+
+      beforeEach(async () => {
+        await agencyRepo.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
+      });
+
+      it("should not return conventions where the latest errored broadcast feedback is handled", async () => {
+        const conventionA = new ConventionDtoBuilder()
+          .withId(conventionIdA)
+          .withAgencyId(agencyIdA)
+          .build();
+        const conventionB = new ConventionDtoBuilder()
+          .withId(conventionIdB)
+          .withAgencyId(agencyIdA)
+          .build();
+
+        const handledErrorFeedback: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-01T00:00:00.000Z",
+          handledByAgency: true,
+          requestParams: {
+            conventionId: conventionA.id,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          subscriberErrorFeedback: {
+            message: "any-error-message",
+            error: { code: "ANY_ERROR_CODE" },
+          },
+          response: {
+            httpStatus: 500,
+            body: { error: "ANY_ERROR_CODE" },
+          },
+        };
+        const unhandledErrorFeedback: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-02T00:00:00.000Z",
+          handledByAgency: false,
+          requestParams: {
+            conventionId: conventionB.id,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          subscriberErrorFeedback: {
+            message: "any-error-message",
+            error: { code: "ANY_ERROR_CODE" },
+          },
+          response: {
+            httpStatus: 500,
+            body: { error: "ANY_ERROR_CODE" },
+          },
+        };
+
+        await conventionRepository.save(conventionA);
+        await conventionRepository.save(conventionB);
+        await broadcastFeedbacksRepository.save(handledErrorFeedback);
+        await broadcastFeedbacksRepository.save(unhandledErrorFeedback);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: defaultPagination,
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionB.id,
+              status: conventionB.status,
+              beneficiary: {
+                firstname: conventionB.signatories.beneficiary.firstName,
+                lastname: conventionB.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...unhandledErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    unhandledErrorFeedback.subscriberErrorFeedback?.message ??
+                    "",
+                  error: JSON.stringify(
+                    unhandledErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+
+        const handledConventionInResults = result.data.some(
+          (convention) => convention.id === conventionA.id,
+        );
+        expect(handledConventionInResults).toBe(false);
+      });
+
+      it("should not return conventions where the latest broadcast feedback is handled, even if earlier ones were unhandled", async () => {
+        const convention = new ConventionDtoBuilder()
+          .withId(conventionIdA)
+          .withAgencyId(agencyIdA)
+          .build();
+
+        const unhandledErrorFeedback: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-01T00:00:00.000Z",
+          handledByAgency: false,
+          requestParams: {
+            conventionId: convention.id,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          subscriberErrorFeedback: {
+            message: "any-error-message-1",
+            error: { code: "ANY_ERROR_CODE_1" },
+          },
+          response: {
+            httpStatus: 500,
+            body: { error: "ANY_ERROR_CODE_1" },
+          },
+        };
+        const handledErrorFeedback: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-30T00:00:00.000Z",
+          handledByAgency: true,
+          requestParams: {
+            conventionId: convention.id,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          subscriberErrorFeedback: {
+            message: "any-error-message-2",
+            error: { code: "ANY_ERROR_CODE_2" },
+          },
+          response: {
+            httpStatus: 500,
+            body: { error: "ANY_ERROR_CODE_2" },
+          },
+        };
+
+        await conventionRepository.save(convention);
+        await broadcastFeedbacksRepository.save(unhandledErrorFeedback);
+        await broadcastFeedbacksRepository.save(handledErrorFeedback);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: defaultPagination,
+            },
+          );
+
+        expectToEqual(result, {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 0,
+          },
+        });
+      });
+    });
+
     describe("when there are several conventions with errored broadcast feedback", () => {
       const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
       const convention1 = new ConventionDtoBuilder()
@@ -1825,7 +2008,7 @@ describe("Pg implementation of ConventionQueries", () => {
         serviceName:
           "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
         occurredAt: "2024-07-01T00:00:00.000Z",
-        handledByAgency: true,
+        handledByAgency: false,
         requestParams: {
           conventionId: convention1.id,
           conventionStatus: "READY_TO_SIGN",

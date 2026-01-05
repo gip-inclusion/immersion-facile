@@ -395,7 +395,7 @@ export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
           eb.ref("bf.consumer_id").as("consumerId"),
           eb.ref("bf.consumer_name").as("consumerName"),
           eb.ref("bf.service_name").as("serviceName"),
-          eb.ref("subscriber_error_feedback").as("subscriberErrorFeedback"),
+          eb.ref("bf.subscriber_error_feedback").as("subscriberErrorFeedback"),
           eb.ref("bf.request_params").as("requestParams"),
           sql<DateTimeIsoString>`date_to_iso(bf.occurred_at)`.as("occurredAt"),
           eb.ref("bf.handled_by_agency").as("handledByAgency"),
@@ -409,7 +409,8 @@ export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
     .selectFrom("conventions_with_latest_feedback as cf")
     .selectAll()
     .select(sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"))
-    .where("cf.subscriberErrorFeedback", "is not", null);
+    .where("cf.subscriberErrorFeedback", "is not", null)
+    .where("cf.handledByAgency", "=", false);
 
 export const getConventionAgencyFieldsForAgencies = async (
   transaction: KyselyDb,
