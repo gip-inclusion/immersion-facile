@@ -115,15 +115,35 @@ const getConventionIdsToRemind = async ({
   const daysAfterLastNotifications =
     mode === "3daysAfterInitialAssessmentEmail" ? 3 : 10;
 
-  const notificationSentToEstablishments =
-    await outOfTrx.notificationRepository.getEmailsByFilters({
+  const potentialConventionsToRemind: ConventionId[] = [];
+  const batchLimit = 50;
+  let offset = 0;
+
+  while (true) {
+    const batch = await outOfTrx.notificationRepository.getEmailsByFilters({
       emailType: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
       createdAt: subDays(now, daysAfterLastNotifications),
+      offset,
+      limit: batchLimit,
     });
 
-  const potentialConventionsToRemind = notificationSentToEstablishments
-    .map((notification) => notification.followedIds.conventionId)
-    .filter((conventionId) => conventionId !== undefined);
+    if (batch.length === 0) {
+      break;
+    }
+
+    batch.forEach((notification) => {
+      const conventionId = notification.followedIds.conventionId;
+      if (conventionId !== undefined) {
+        potentialConventionsToRemind.push(conventionId);
+      }
+    });
+
+    if (batch.length < batchLimit) {
+      break;
+    }
+
+    offset += batch.length;
+  }
 
   const conventionsWithAssessments = (
     await outOfTrx.assessmentRepository.getByConventionIds(

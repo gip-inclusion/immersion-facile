@@ -208,7 +208,8 @@ export class PgNotificationRepository implements NotificationRepository {
           : qb,
     )
       .orderBy("e.created_at", "desc")
-      .limit(this.maxRetrievedNotifications)
+      .limit(filters.limit ?? this.maxRetrievedNotifications)
+      .offset(filters.offset ?? 0)
       .execute()
       .then(map((row) => row.notif));
   }

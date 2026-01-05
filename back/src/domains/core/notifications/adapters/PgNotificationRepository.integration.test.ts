@@ -652,6 +652,97 @@ describe("PgNotificationRepository", () => {
         });
         expectToEqual(response, []);
       });
+
+      describe("pagination with offset and limit", () => {
+        it("returns first batch when no offset is provided", async () => {
+          const response = await pgNotificationRepository.getEmailsByFilters({
+            limit: 2,
+          });
+          expectToEqual(
+            response,
+            emailNotificationsReOrderedByDate
+              .slice(0, 2)
+              .map(addWithToBeSentState),
+          );
+        });
+
+        it("returns second batch when offset is provided", async () => {
+          const response = await pgNotificationRepository.getEmailsByFilters({
+            offset: 2,
+            limit: 2,
+          });
+          expectToEqual(
+            response,
+            emailNotificationsReOrderedByDate
+              .slice(2, 4)
+              .map(addWithToBeSentState),
+          );
+        });
+
+        it("returns empty array when offset exceeds total count", async () => {
+          const response = await pgNotificationRepository.getEmailsByFilters({
+            offset: 100,
+            limit: 10,
+          });
+          expectToEqual(response, []);
+        });
+
+        it("paginates correctly with createdAt filter", async () => {
+          const today = new Date();
+          const emailNotificationToday: EmailNotification = {
+            createdAt: today.toISOString(),
+            followedIds: { agencyId },
+            id: "44444444-4444-4000-4444-444444444444",
+            kind: "email",
+            templatedContent: {
+              kind: "TEST_EMAIL",
+              recipients: ["today@mail.com"],
+              cc: [],
+              params: {
+                url: "https://google.com",
+                input1: "test input 1",
+                input2: "test input 2",
+              },
+            },
+          };
+          const emailNotificationYesterday: EmailNotification = {
+            createdAt: subDays(today, 1).toISOString(),
+            followedIds: { agencyId },
+            id: "55555555-5555-4000-5555-555555555555",
+            kind: "email",
+            templatedContent: {
+              kind: "TEST_EMAIL",
+              recipients: ["yesterday@mail.com"],
+              cc: [],
+              params: {
+                url: "https://google.com",
+                input1: "test input 1",
+                input2: "test input 2",
+              },
+            },
+          };
+          await pgNotificationRepository.saveBatch([
+            emailNotificationToday,
+            emailNotificationYesterday,
+          ]);
+
+          const firstPage = await pgNotificationRepository.getEmailsByFilters({
+            createdAt: today,
+            offset: 0,
+            limit: 1,
+          });
+          expectToEqual(firstPage, [
+            { ...emailNotificationToday, ...withToBeSendState },
+          ]);
+
+          const secondPage = await pgNotificationRepository.getEmailsByFilters({
+            createdAt: today,
+            offset: 1,
+            limit: 1,
+          });
+          expectToEqual(secondPage, []);
+        });
+      });
     });
   });
 
