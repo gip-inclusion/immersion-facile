@@ -27,7 +27,10 @@ import {
   flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
   paginatedConventionWithBroadcastFeedbackSchema,
 } from "../convention/conventionWithBroadcastFeedback.schema";
-import { shareConventionDraftByEmailSchema } from "../convention/shareConventionDraftByEmail.schema";
+import {
+  conventionDraftSchema,
+  shareConventionDraftByEmailSchema,
+} from "../convention/shareConventionDraftByEmail.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -197,10 +200,20 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     },
   }),
   shareConvention: defineRoute({
-    url: "/share-immersion-demand",
+    url: "/convention-drafts",
     method: "post",
     requestBodySchema: shareConventionDraftByEmailSchema,
     responses: { 200: expressEmptyResponseBody, 400: httpErrorSchema },
+  }),
+
+  getConventionDraft: defineRoute({
+    url: "/convention-drafts/:conventionDraftId",
+    method: "get",
+    responses: {
+      200: conventionDraftSchema,
+      400: httpErrorSchema,
+      404: httpErrorSchema,
+    },
   }),
 
   findSimilarConventions: defineRoute({

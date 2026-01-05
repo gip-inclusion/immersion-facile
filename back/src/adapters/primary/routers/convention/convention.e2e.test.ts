@@ -241,12 +241,73 @@ describe("convention e2e", () => {
           body: {
             status: 400,
             message:
-              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /share-immersion-demand",
+              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /convention-drafts",
             issues: [
               "senderEmail : Veuillez saisir une adresse e-mail valide - email fourni : 'invalid-email'",
             ],
           },
         });
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    unauthenticatedConventionRoutes.getConventionDraft,
+  )} gets a convention draft`, () => {
+    it("200 - Returns the convention draft when it exists", async () => {
+      const conventionDraftId: ConventionDraftId =
+        "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const conventionDraft = {
+        id: conventionDraftId,
+        internshipKind: "immersion" as const,
+      };
+      await inMemoryUow.conventionDraftRepository.save(
+        conventionDraft,
+        new Date().toISOString(),
+      );
+
+      const response = await unauthenticatedRequest.getConventionDraft({
+        urlParams: { conventionDraftId },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: conventionDraft,
+      });
+    });
+
+    it("400 - Returns error when conventionDraftId is not a valid UUID", async () => {
+      const response = await unauthenticatedRequest.getConventionDraft({
+        urlParams: { conventionDraftId: "invalid-uuid" as ConventionDraftId },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          status: 400,
+          message:
+            "Schema validation failed in usecase GetConventionDraftById. See issues for details.",
+          issues: ["Le format de l'identifiant est invalide"],
+        },
+      });
+    });
+
+    it("404 - Returns error when convention draft does not exist", async () => {
+      const nonExistentId: ConventionDraftId =
+        "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
+
+      const response = await unauthenticatedRequest.getConventionDraft({
+        urlParams: { conventionDraftId: nonExistentId },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message: errors.conventionDraft.notFound({
+            conventionDraftId: nonExistentId,
+          }).message,
+        },
       });
     });
   });
