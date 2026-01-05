@@ -4,6 +4,8 @@ import type {
   ApiConsumerName,
   AuthenticatedConventionRoutes,
   ConnectedUserJwt,
+  ConventionDraftDto,
+  ConventionDraftId,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -270,6 +272,22 @@ export class HttpConventionGateway implements ConventionGateway {
           .with({ status: 400 }, () => false)
           .otherwise(otherwiseThrow),
       );
+  }
+
+  public getConventionDraftById$(
+    conventionDraftId: ConventionDraftId,
+  ): Observable<ConventionDraftDto | undefined> {
+    return from(
+      this.unauthenticatedHttpClient
+        .getConventionDraft({ urlParams: { conventionDraftId } })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 404 }, () => undefined)
+            .otherwise(otherwiseThrow),
+        ),
+    );
   }
 
   public signConvention$(
