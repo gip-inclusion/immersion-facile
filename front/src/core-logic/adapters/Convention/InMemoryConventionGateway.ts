@@ -4,6 +4,8 @@ import {
   type AgencyOption,
   type ApiConsumerName,
   type ConnectedUserJwt,
+  type ConventionDraftDto,
+  type ConventionDraftId,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -41,6 +43,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   // For testing purpose
   public convention$ = new Subject<ConventionReadDto | undefined>();
+
+  public conventionDraft$ = new Subject<ConventionDraftDto | undefined>();
 
   public conventionDashboardUrl$ = new Subject<DashboardUrlAndName>();
 
@@ -156,6 +160,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _shareLinkByEmailDTO: ShareConventionDraftByEmailDto,
   ): Promise<boolean> {
     return true;
+  }
+
+  public getConventionDraftById$(
+    _conventionDraftId: ConventionDraftId,
+  ): Observable<ConventionDraftDto | undefined> {
+    return this.conventionDraft$;
   }
 
   public signConvention$(

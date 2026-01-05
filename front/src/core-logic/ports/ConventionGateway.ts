@@ -2,6 +2,8 @@ import type { Observable } from "rxjs";
 import type {
   ApiConsumerName,
   ConnectedUserJwt,
+  ConventionDraftDto,
+  ConventionDraftId,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -100,4 +102,7 @@ export interface ConventionGateway {
     params: FlatGetConventionsWithErroredBroadcastFeedbackParams,
     jwt: string,
   ): Observable<DataWithPagination<ConventionWithBroadcastFeedback>>;
+  getConventionDraftById$(
+    conventionDraftId: ConventionDraftId,
+  ): Observable<ConventionDraftDto | undefined>;
 }
