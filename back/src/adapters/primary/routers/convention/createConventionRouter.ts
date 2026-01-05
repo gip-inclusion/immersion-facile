@@ -29,6 +29,14 @@ export const createConventionRouter = (deps: AppDependencies) => {
     ),
   );
 
+  unauthenticatedConventionSharedRouter.getConventionDraft((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getConventionDraftById.execute(
+        req.params.conventionDraftId,
+      ),
+    ),
+  );
+
   unauthenticatedConventionSharedRouter.createConvention((req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.addConvention.execute(req.body),

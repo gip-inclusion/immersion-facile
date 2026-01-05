@@ -14,6 +14,7 @@ import type {
   ImmersionObjective,
   ReminderKind,
 } from "../convention/convention.dto";
+import type { ConventionDraftId } from "../convention/shareConventionDraftByEmail.dto";
 import type {
   DiscussionId,
   DiscussionKind,
@@ -487,6 +488,16 @@ export const errors = {
     validatorOfAgencyRefersToNotAllowed: () =>
       new ForbiddenError(
         `Les validateurs de l'agence référente ne sont pas autorisés à accéder à cette fonctionnalité.`,
+      ),
+  },
+  conventionDraft: {
+    notFound: ({
+      conventionDraftId,
+    }: {
+      conventionDraftId: ConventionDraftId;
+    }) =>
+      new NotFoundError(
+        `Aucun brouillon de convention trouvé avec l'identifiant '${conventionDraftId}'.`,
       ),
   },
   establishment: {
