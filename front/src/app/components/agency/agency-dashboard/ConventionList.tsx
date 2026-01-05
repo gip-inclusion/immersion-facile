@@ -171,27 +171,35 @@ export const ConventionList = () => {
   const agencyOptions: CheckboxProps["options"] = useMemo(() => {
     if (!hasManyAgencies || !currentUser?.agencyRights) return [];
 
-    return currentUser.agencyRights.map((agencyRight) => ({
-      label: agencyRight.agency.name,
-      nativeInputProps: {
-        value: agencyRight.agency.id,
-        checked:
-          tempFilters.agencyIds?.includes(agencyRight.agency.id) ?? false,
-        onChange: (event) => {
-          const existingAgencyIds = tempFilters.agencyIds ?? [];
-          const newAgencyIds = event.currentTarget.checked
-            ? [...existingAgencyIds, event.currentTarget.value]
-            : existingAgencyIds.filter(
-                (id) => id !== event.currentTarget.value,
-              );
+    return currentUser.agencyRights
+      .filter(
+        (agencyRight) =>
+          agencyRight.agency.status !== "needsReview" &&
+          agencyRight.agency.status !== "rejected",
+      )
+      .map((agencyRight) => ({
+        label: agencyRight.agency.name,
+        nativeInputProps: {
+          value: agencyRight.agency.id,
+          checked:
+            tempFilters.agencyIds?.includes(agencyRight.agency.id) ?? false,
+          onChange: (event) => {
+            const existingAgencyIds = tempFilters.agencyIds ?? [];
+            const newAgencyIds = event.currentTarget.checked
+              ? [...existingAgencyIds, event.currentTarget.value]
+              : existingAgencyIds.filter(
+                  (id) => id !== event.currentTarget.value,
+                );
 
-          setTempFilters({
-            ...tempFilters,
-            agencyIds: isNotEmptyArray(newAgencyIds) ? newAgencyIds : undefined,
-          });
+            setTempFilters({
+              ...tempFilters,
+              agencyIds: isNotEmptyArray(newAgencyIds)
+                ? newAgencyIds
+                : undefined,
+            });
+          },
         },
-      },
-    }));
+      }));
   }, [hasManyAgencies, currentUser?.agencyRights, tempFilters]);
 
   const startDateOptions: RadioButtonsProps["options"] = useMemo(
