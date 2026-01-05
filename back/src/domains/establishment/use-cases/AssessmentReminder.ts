@@ -127,10 +127,6 @@ const getConventionIdsToRemind = async ({
       limit: batchLimit,
     });
 
-    if (batch.length === 0) {
-      break;
-    }
-
     batch.forEach((notification) => {
       const conventionId = notification.followedIds.conventionId;
       if (conventionId !== undefined) {
