@@ -1505,11 +1505,11 @@ describe("PgAgencyRepository", () => {
           [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       );
+      await agencyRepository.insert(closedAgency1, oldDate);
 
-      await Promise.all([
-        agencyRepository.insert(closedAgency1, oldDate),
-        agencyRepository.insert(agencyReferringToDeletedAgencyWithConvention),
-      ]);
+      await agencyRepository.insert(
+        agencyReferringToDeletedAgencyWithConvention,
+      );
 
       const convention = new ConventionDtoBuilder()
         .withId("dddddddd-dddd-4ddd-9ddd-dddddddddddc")
