@@ -1944,24 +1944,9 @@ describe("Pg implementation of ConventionQueries", () => {
           },
         };
         const handledErrorFeedback: BroadcastFeedback = {
-          consumerId: null,
-          consumerName: "any-consumer-name",
-          serviceName:
-            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          ...unhandledErrorFeedback,
           occurredAt: "2024-07-30T00:00:00.000Z",
           handledByAgency: true,
-          requestParams: {
-            conventionId: convention.id,
-            conventionStatus: "READY_TO_SIGN",
-          },
-          subscriberErrorFeedback: {
-            message: "any-error-message-2",
-            error: { code: "ANY_ERROR_CODE_2" },
-          },
-          response: {
-            httpStatus: 500,
-            body: { error: "ANY_ERROR_CODE_2" },
-          },
         };
 
         await conventionRepository.save(convention);
