@@ -17,6 +17,8 @@ export type EmailNotificationFilters = {
   emailType?: EmailType;
   conventionId?: ConventionId;
   createdAt?: Date;
+  offset?: number;
+  limit?: number;
 };
 
 export type SmsNotificationFilters = {

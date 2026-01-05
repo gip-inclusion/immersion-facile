@@ -107,7 +107,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   public async getEmailsByFilters(filters: EmailNotificationFilters) {
-    return this.notifications.filter(
+    const filteredNotifications = this.notifications.filter(
       (notification): notification is EmailNotification => {
         if (notification.kind !== "email") return false;
 
@@ -147,6 +147,15 @@ export class InMemoryNotificationRepository implements NotificationRepository {
         return true;
       },
     );
+
+    const sortedNotifications = filteredNotifications.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    const offset = filters.offset ?? 0;
+    const limit = filters.limit ?? 30;
+    return sortedNotifications.slice(offset, offset + limit);
   }
 
   public async getLastNotifications() {
