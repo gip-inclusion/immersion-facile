@@ -688,9 +688,9 @@ describe("PgNotificationRepository", () => {
         });
 
         it("paginates correctly with createdAt filter", async () => {
-          const today = new Date();
+          const threeDaysAgo = subDays(new Date(), 3);
           const emailNotificationToday: EmailNotification = {
-            createdAt: today.toISOString(),
+            createdAt: threeDaysAgo.toISOString(),
             followedIds: { agencyId },
             id: "44444444-4444-4000-4444-444444444444",
             kind: "email",
@@ -706,7 +706,7 @@ describe("PgNotificationRepository", () => {
             },
           };
           const emailNotificationYesterday: EmailNotification = {
-            createdAt: subDays(today, 1).toISOString(),
+            createdAt: subDays(threeDaysAgo, 1).toISOString(),
             followedIds: { agencyId },
             id: "55555555-5555-4000-5555-555555555555",
             kind: "email",
@@ -727,7 +727,7 @@ describe("PgNotificationRepository", () => {
           ]);
 
           const firstPage = await pgNotificationRepository.getEmailsByFilters({
-            createdAt: today,
+            createdAt: threeDaysAgo,
             offset: 0,
             limit: 1,
           });
@@ -736,7 +736,7 @@ describe("PgNotificationRepository", () => {
           ]);
 
           const secondPage = await pgNotificationRepository.getEmailsByFilters({
-            createdAt: today,
+            createdAt: threeDaysAgo,
             offset: 1,
             limit: 1,
           });
