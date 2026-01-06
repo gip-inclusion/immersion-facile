@@ -12,6 +12,7 @@ import {
   type SetStateAction,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -83,7 +84,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useMatomo } from "src/app/hooks/useMatomo";
 import {
-  getConventionInitialValuesFromUrl,
+  getConventionInitialValuesFromUrl as getConventionInitialValuesFromUrlOrDraft,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
@@ -98,6 +99,7 @@ import {
   conventionSlice,
   type NumberOfSteps,
 } from "src/core-logic/domain/convention/convention.slice";
+import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
@@ -131,6 +133,9 @@ export const ConventionForm = ({
   const route = useRoute() as SupportedConventionRoutes;
 
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
+  const fetchedConventionDraft = useAppSelector(
+    conventionDraftSelectors.conventionDraft,
+  );
 
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
@@ -147,19 +152,24 @@ export const ConventionForm = ({
   const establishmentAddressCountryCode = useAppSelector(
     siretSelectors.countryCode,
   );
-  const conventionInitialValuesFromUrl = getConventionInitialValuesFromUrl({
-    route,
-    internshipKind,
-  });
+  const conventionInitialValuesFromUrlOrDraft = useMemo(
+    () =>
+      getConventionInitialValuesFromUrlOrDraft({
+        route,
+        internshipKind,
+        conventionDraft: fetchedConventionDraft,
+      }),
+    [internshipKind, route, fetchedConventionDraft],
+  );
   const acquisitionParams = useGetAcquisitionParams();
 
   const initialValues = useRef<CreateConventionPresentationInitialValues>({
-    ...conventionInitialValuesFromUrl,
+    ...conventionInitialValuesFromUrlOrDraft,
     ...acquisitionParams,
     signatories: {
-      ...conventionInitialValuesFromUrl.signatories,
+      ...conventionInitialValuesFromUrlOrDraft.signatories,
       beneficiary: makeInitialBenefiaryForm(
-        conventionInitialValuesFromUrl.signatories.beneficiary,
+        conventionInitialValuesFromUrlOrDraft.signatories.beneficiary,
         federatedIdentity,
       ),
     },
@@ -360,7 +370,7 @@ export const ConventionForm = ({
     };
   };
 
-  useMatomo(conventionInitialValuesFromUrl.internshipKind);
+  useMatomo(conventionInitialValuesFromUrlOrDraft.internshipKind);
 
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(
@@ -444,6 +454,7 @@ export const ConventionForm = ({
       );
     }
   }, [defaultValues, dispatch]);
+
   return (
     <FormProvider {...methods}>
       {conventionIsLoading && <Loader />}

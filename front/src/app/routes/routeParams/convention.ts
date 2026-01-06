@@ -7,9 +7,11 @@ import {
   addressStringToDto,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  type ConventionDraftDto,
   type ConventionDto,
   type ConventionReadDto,
   type CreateConventionPresentationInitialValues,
+  type DateString,
   type FtConnectIdentity,
   type ImmersionObjective,
   type InternshipKind,
@@ -21,6 +23,7 @@ import {
   parseStringToJsonOrThrow,
   reasonableSchedule,
   type ScheduleDto,
+  type Signatories,
   toDateUTCString,
 } from "shared";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
@@ -38,9 +41,11 @@ type ConventionRoutes =
 
 export const getConventionInitialValuesFromUrl = ({
   route,
+  conventionDraft,
   internshipKind,
 }: {
   route: ConventionRoutes;
+  conventionDraft: ConventionDraftDto | null;
   internshipKind: InternshipKind;
 }): CreateConventionPresentationInitialValues => {
   const params = mergeObjectsExceptFalsyValues(
@@ -51,7 +56,9 @@ export const getConventionInitialValuesFromUrl = ({
   );
   const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
     {
-      ...conventionPresentationFromParams(params),
+      ...(conventionDraft
+        ? conventionPresentationFromConventionDraft(conventionDraft)
+        : conventionPresentationFromUrlParams(params)),
       id: uuidV4(),
       status: "READY_TO_SIGN",
       dateSubmission: toDateUTCString(new Date()),
@@ -465,54 +472,84 @@ export type ConventionParamsInUrl = Partial<{
     : never;
 }>;
 
-const beneficiaryRepresentativeFromParams = (
-  params: ConventionParamsInUrl,
-): BeneficiaryRepresentative | undefined =>
-  params.brEmail || params.brPhone || params.brFirstName || params.brLastName
+const beneficiaryRepresentativeFromParams = ({
+  email,
+  phone,
+  firstName,
+  lastName,
+}: {
+  email?: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
+}): BeneficiaryRepresentative | undefined =>
+  email || phone || firstName || lastName
     ? {
         role: "beneficiary-representative",
-        firstName: params.brFirstName ?? "",
-        lastName: params.brLastName ?? "",
-        email: params.brEmail ?? "",
-        phone: params.brPhone ?? "",
+        firstName: firstName ?? "",
+        lastName: lastName ?? "",
+        email: email ?? "",
+        phone: phone ?? "",
       }
     : undefined;
 
-const beneficiaryCurrentEmployerFromParams = (
-  params: ConventionParamsInUrl,
-): BeneficiaryCurrentEmployer | undefined =>
-  params.bceBusinessName ||
-  params.bceSiret ||
-  params.bceFirstName ||
-  params.bceLastName ||
-  params.bceEmail ||
-  params.bcePhone ||
-  params.bceJob ||
-  params.bceBusinessAddress
+const beneficiaryCurrentEmployerFromParams = ({
+  businessName,
+  businessSiret,
+  firstName,
+  lastName,
+  email,
+  phone,
+  job,
+  businessAddress,
+}: {
+  businessName?: string;
+  businessSiret?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  job?: string;
+  businessAddress?: string;
+}): BeneficiaryCurrentEmployer | undefined =>
+  businessName ||
+  businessSiret ||
+  firstName ||
+  lastName ||
+  email ||
+  phone ||
+  job ||
+  businessAddress
     ? {
-        businessSiret: params.bceSiret ?? "",
-        businessName: params.bceBusinessName ?? "",
-        firstName: params.bceFirstName ?? "",
-        lastName: params.bceLastName ?? "",
-        email: params.bceEmail ?? "",
-        phone: params.bcePhone ?? "",
-        job: params.bceJob ?? "",
+        businessSiret: businessSiret ?? "",
+        businessName: businessName ?? "",
+        firstName: firstName ?? "",
+        lastName: lastName ?? "",
+        email: email ?? "",
+        phone: phone ?? "",
+        job: job ?? "",
         role: "beneficiary-current-employer",
-        businessAddress: params.bceBusinessAddress ?? "",
+        businessAddress: businessAddress ?? "",
       }
     : undefined;
 
-const scheduleFromParams = (
-  params: ConventionParamsInUrl,
-): Pick<ConventionDto, "dateStart" | "dateEnd" | "schedule"> => {
+const scheduleFromParams = ({
+  dateStart: dateStartParam,
+  dateEnd: dateEndParam,
+  schedule: scheduleParam,
+}: {
+  dateStart?: DateString;
+  dateEnd?: DateString;
+  schedule?: ScheduleDto;
+}): Pick<ConventionDto, "dateStart" | "dateEnd" | "schedule"> => {
   const dateStart =
-    params.dateStart ?? toDateUTCString(addDays(startOfToday(), 2));
-  const dateEnd = params.dateEnd ?? toDateUTCString(addDays(startOfToday(), 3));
+    dateStartParam ?? toDateUTCString(addDays(startOfToday(), 2));
+  const dateEnd = dateEndParam ?? toDateUTCString(addDays(startOfToday(), 3));
   return {
     dateStart,
     dateEnd,
     schedule:
-      params.schedule ??
+      scheduleParam ??
       reasonableSchedule(
         {
           start: new Date(dateStart),
@@ -524,7 +561,7 @@ const scheduleFromParams = (
   };
 };
 
-const conventionPresentationFromParams = (
+const conventionPresentationFromUrlParams = (
   params: ConventionParamsInUrl,
 ): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
   // Agency
@@ -578,8 +615,22 @@ const conventionPresentationFromParams = (
       email: params.erEmail ?? "",
       phone: params.erPhone ?? "",
     },
-    beneficiaryRepresentative: beneficiaryRepresentativeFromParams(params),
-    beneficiaryCurrentEmployer: beneficiaryCurrentEmployerFromParams(params),
+    beneficiaryRepresentative: beneficiaryRepresentativeFromParams({
+      email: params.brEmail,
+      phone: params.brPhone,
+      firstName: params.brFirstName,
+      lastName: params.brLastName,
+    }),
+    beneficiaryCurrentEmployer: beneficiaryCurrentEmployerFromParams({
+      businessName: params.bceBusinessName ?? "",
+      businessSiret: params.bceSiret ?? "",
+      firstName: params.bceFirstName ?? "",
+      lastName: params.bceLastName ?? "",
+      email: params.bceEmail ?? "",
+      phone: params.bcePhone ?? "",
+      job: params.bceJob ?? "",
+      businessAddress: params.bceBusinessAddress ?? "",
+    }),
   },
 
   // Schedule
@@ -606,3 +657,189 @@ const conventionPresentationFromParams = (
   immersionActivities: params.immersionActivities ?? "",
   immersionSkills: params.immersionSkills ?? "",
 });
+
+const conventionPresentationFromConventionDraft = (
+  conventionDraft: ConventionDraftDto,
+): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
+  // Agency
+  agencyId: conventionDraft.agencyId ?? undefined,
+  agencyDepartment: conventionDraft.agencyDepartment ?? "",
+  agencyKind: conventionDraft.agencyKind as AgencyKind | undefined,
+  agencyReferent: {
+    firstname: conventionDraft.agencyReferent?.firstname ?? "",
+    lastname: conventionDraft.agencyReferent?.lastname ?? "",
+  },
+
+  //Actors
+  establishmentTutor: {
+    role: "establishment-tutor",
+    firstName: conventionDraft.establishmentTutor?.firstName ?? "",
+    lastName: conventionDraft.establishmentTutor?.lastName ?? "",
+    email: conventionDraft.establishmentTutor?.email ?? "",
+    phone: conventionDraft.establishmentTutor?.phone ?? "",
+    job: conventionDraft.establishmentTutor?.job ?? "",
+  },
+  signatories: {
+    beneficiary: {
+      role: "beneficiary",
+      firstName: conventionDraft.signatories?.beneficiary?.firstName ?? "",
+      lastName: conventionDraft.signatories?.beneficiary?.lastName ?? "",
+      email: conventionDraft.signatories?.beneficiary?.email ?? "",
+      phone: conventionDraft.signatories?.beneficiary?.phone ?? "",
+      emergencyContact:
+        conventionDraft.signatories?.beneficiary?.emergencyContact ?? "",
+      emergencyContactPhone:
+        conventionDraft.signatories?.beneficiary?.emergencyContactPhone ?? "",
+      emergencyContactEmail:
+        conventionDraft.signatories?.beneficiary?.emergencyContactEmail ?? "",
+      address: getMiniStageSignatoryProperty({
+        conventionDraft,
+        signatoryKey: "beneficiary",
+        propertyKey: "address",
+      }),
+      levelOfEducation:
+        (getMiniStageSignatoryProperty({
+          conventionDraft,
+          signatoryKey: "beneficiary",
+          propertyKey: "levelOfEducation",
+        }) as LevelOfEducation) ?? "",
+      schoolName:
+        getMiniStageSignatoryProperty({
+          conventionDraft,
+          signatoryKey: "beneficiary",
+          propertyKey: "schoolName",
+        }) ?? "",
+      schoolPostcode:
+        getMiniStageSignatoryProperty({
+          conventionDraft,
+          signatoryKey: "beneficiary",
+          propertyKey: "schoolPostcode",
+        }) ?? "",
+      financiaryHelp:
+        conventionDraft.signatories?.beneficiary?.financiaryHelp ?? "",
+      birthdate: conventionDraft.signatories?.beneficiary?.birthdate ?? "",
+      isRqth: conventionDraft.signatories?.beneficiary?.isRqth ?? false,
+      ...(conventionDraft.signatories?.beneficiary?.federatedIdentity
+        ?.provider &&
+      conventionDraft.signatories?.beneficiary?.federatedIdentity?.token
+        ? {
+            federatedIdentity: {
+              provider: conventionDraft.signatories?.beneficiary
+                ?.federatedIdentity?.provider as FtConnectIdentity["provider"],
+              token:
+                conventionDraft.signatories?.beneficiary?.federatedIdentity
+                  ?.token,
+            },
+          }
+        : {}),
+    },
+    establishmentRepresentative: {
+      role: "establishment-representative",
+      firstName:
+        conventionDraft.signatories?.establishmentRepresentative?.firstName ??
+        "",
+      lastName:
+        conventionDraft.signatories?.establishmentRepresentative?.lastName ??
+        "",
+      email:
+        conventionDraft.signatories?.establishmentRepresentative?.email ?? "",
+      phone:
+        conventionDraft.signatories?.establishmentRepresentative?.phone ?? "",
+    },
+    beneficiaryRepresentative: beneficiaryRepresentativeFromParams({
+      email:
+        conventionDraft.signatories?.beneficiaryRepresentative?.email ?? "",
+      phone:
+        conventionDraft.signatories?.beneficiaryRepresentative?.phone ?? "",
+      firstName:
+        conventionDraft.signatories?.beneficiaryRepresentative?.firstName ?? "",
+      lastName:
+        conventionDraft.signatories?.beneficiaryRepresentative?.lastName ?? "",
+    }),
+    beneficiaryCurrentEmployer: beneficiaryCurrentEmployerFromParams({
+      businessName:
+        conventionDraft.signatories?.beneficiaryCurrentEmployer?.businessName ??
+        "",
+      businessSiret:
+        conventionDraft.signatories?.beneficiaryCurrentEmployer
+          ?.businessSiret ?? "",
+      firstName:
+        conventionDraft.signatories?.beneficiaryCurrentEmployer?.firstName ??
+        "",
+      lastName:
+        conventionDraft.signatories?.beneficiaryCurrentEmployer?.lastName ?? "",
+      email:
+        conventionDraft.signatories?.beneficiaryCurrentEmployer?.email ?? "",
+      phone:
+        conventionDraft.signatories?.beneficiaryCurrentEmployer?.phone ?? "",
+      job: conventionDraft.signatories?.beneficiaryCurrentEmployer?.job ?? "",
+      businessAddress:
+        conventionDraft.signatories?.beneficiaryCurrentEmployer
+          ?.businessAddress ?? "",
+    }),
+  },
+
+  // Schedule
+  ...scheduleFromParams({
+    dateStart: conventionDraft.dateStart,
+    dateEnd: conventionDraft.dateEnd,
+    schedule: conventionDraft.schedule as ScheduleDto | undefined,
+  }),
+
+  // Enterprise
+  siret: conventionDraft.siret ?? "",
+  businessName: conventionDraft.businessName ?? "",
+  immersionAddress: conventionDraft.immersionAddress ?? "",
+  workConditions: conventionDraft.workConditions ?? "",
+  businessAdvantages: conventionDraft.businessAdvantages ?? "",
+
+  // Covid
+  individualProtection: conventionDraft.individualProtection ?? undefined,
+  individualProtectionDescription:
+    conventionDraft.individualProtectionDescription ?? "",
+  sanitaryPrevention: conventionDraft.sanitaryPrevention ?? undefined,
+  sanitaryPreventionDescription:
+    conventionDraft.sanitaryPreventionDescription ?? "",
+
+  // Immersion
+  immersionObjective: conventionDraft.immersionObjective as
+    | ImmersionObjective
+    | undefined,
+  immersionAppellation: conventionDraft.immersionAppellation
+    ? ({
+        appellationCode: conventionDraft.immersionAppellation.appellationCode,
+        appellationLabel: conventionDraft.immersionAppellation.appellationLabel,
+        romeCode: conventionDraft.immersionAppellation.romeCode,
+        romeLabel: conventionDraft.immersionAppellation.romeLabel,
+      } as AppellationAndRomeDto)
+    : undefined,
+  immersionActivities: conventionDraft.immersionActivities ?? "",
+  immersionSkills: conventionDraft.immersionSkills ?? "",
+});
+
+const getMiniStageSignatoryProperty = <
+  S extends keyof Signatories<"mini-stage-cci">,
+  K extends keyof NonNullable<Signatories<"mini-stage-cci">[S]>,
+>({
+  conventionDraft,
+  signatoryKey,
+  propertyKey,
+}: {
+  conventionDraft: ConventionDraftDto;
+  signatoryKey: S;
+  propertyKey: K;
+}): NonNullable<Signatories<"mini-stage-cci">[S]>[K] | undefined => {
+  if (
+    conventionDraft.internshipKind === "mini-stage-cci" &&
+    conventionDraft.signatories &&
+    signatoryKey in conventionDraft.signatories &&
+    conventionDraft.signatories[signatoryKey]
+  ) {
+    return (
+      conventionDraft.signatories[signatoryKey] as NonNullable<
+        Signatories<"mini-stage-cci">[S]
+      >
+    )[propertyKey];
+  }
+  return undefined;
+};

@@ -21,7 +21,8 @@ export const useUpdateConventionValuesInUrl = (
         (route.name !== "conventionImmersion" &&
           route.name !== "conventionImmersionForExternals" &&
           route.name !== "conventionMiniStage") ||
-        !!route.params.jwt
+        !!route.params.jwt ||
+        !!route.params.conventionDraftId
       )
         return;
 
