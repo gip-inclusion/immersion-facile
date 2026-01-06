@@ -44,6 +44,8 @@ import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
+import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
@@ -90,8 +92,12 @@ export const ConventionFormWrapper = ({
     connectedUserSelectors.userRolesForFetchedConvention,
   );
   const conventionIsLoading = useAppSelector(conventionSelectors.isLoading);
+  const conventionDraftIsLoading = useAppSelector(
+    conventionDraftSelectors.isLoading,
+  );
   const currentUserIsLoading = useAppSelector(connectedUserSelectors.isLoading);
-  const isLoading = conventionIsLoading || currentUserIsLoading;
+  const isLoading =
+    conventionIsLoading || currentUserIsLoading || conventionDraftIsLoading;
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
@@ -120,7 +126,14 @@ export const ConventionFormWrapper = ({
   useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
 
   useEffect(() => {
-    if (mode === "edit" && route.params.jwt) {
+    if (mode === "create-from-shared" && route.params.conventionDraftId) {
+      dispatch(
+        conventionDraftSlice.actions.fetchConventionDraftRequested({
+          conventionDraftId: route.params.conventionDraftId,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+    } else if (mode === "edit" && route.params.jwt) {
       dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
       const { applicationId } =
         decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
@@ -184,8 +197,8 @@ export const ConventionFormWrapper = ({
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-      {isLoading && <Loader />}
       {match({
+        isLoading,
         showSummary,
         formSuccessfullySubmitted,
         isUpdateMode: mode === "edit",
@@ -211,7 +224,9 @@ export const ConventionFormWrapper = ({
           fetchedConvention?.status === "ACCEPTED_BY_COUNSELLOR" &&
           fetchedConvention?.agencyRefersTo &&
           !userRolesOnConvention.includes("counsellor"),
+        conventionDraftIsLoading,
       })
+        .with({ isLoading: true }, () => <Loader />)
         .with({ hasConventionUpdateConflict: true }, () => (
           <section className={fr.cx("fr-col-12")}>
             <Alert

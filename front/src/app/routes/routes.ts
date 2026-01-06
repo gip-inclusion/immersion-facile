@@ -52,6 +52,7 @@ export const acquisitionParams = {
 export const conventionParams = {
   ...conventionValuesFromUrl,
   discussionId: param.query.optional.string,
+  conventionDraftId: param.query.optional.string,
   ...acquisitionParams,
 };
 
@@ -207,6 +208,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       jwt: param.query.optional.string,
       conventionId: param.query.optional.string,
+      conventionDraftId: param.query.optional.string,
       ...conventionValuesFromUrl,
     },
     () => `/${frontRoutes.conventionMiniStageRoute}`,

@@ -129,6 +129,7 @@ const getActivateDraftConventionButtonProps = ({
     initialConvention: getConventionInitialValuesFromUrl({
       route: routes.conventionImmersion(),
       internshipKind: "immersion",
+      conventionDraft: null,
     }),
     discussion,
     connectedUser,

@@ -57,6 +57,7 @@ export const ConventionImmersionPage = ({
     mtm_campaign: _,
     mtm_kwd: __,
     skipIntro,
+    conventionDraftId,
     ...routeParamsWithoutJwtAndTrackers
   } = route.params;
 
@@ -68,14 +69,12 @@ export const ConventionImmersionPage = ({
 
   const isSharedConvention = useMemo(
     () =>
-      keys(routeParamsWithoutJwtAndTrackers).length > 0 &&
-      !isPeConnected &&
-      !skipIntro,
-    [routeParamsWithoutJwtAndTrackers, isPeConnected, skipIntro],
+      keys(routeParamsWithoutJwtAndTrackers).length > 0 || !!conventionDraftId,
+    [routeParamsWithoutJwtAndTrackers, conventionDraftId],
   );
 
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
-    useState(isSharedConvention);
+    useState(isSharedConvention && !isPeConnected && !skipIntro);
 
   const getPageHeaderTitle = (
     jwt: string | undefined,
@@ -125,11 +124,13 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     jwt: _,
     mtm_campaign: __,
     mtm_kwd: ____,
+    conventionDraftId,
     ...routeParamsWithoutJwtAndTrackers
   } = initialRouteParams;
   const isSharedConvention = useMemo(
-    () => keys(routeParamsWithoutJwtAndTrackers).length > 0,
-    [routeParamsWithoutJwtAndTrackers],
+    () =>
+      keys(routeParamsWithoutJwtAndTrackers).length > 0 || !!conventionDraftId,
+    [routeParamsWithoutJwtAndTrackers, conventionDraftId],
   );
 
   const getMode = (): ConventionFormMode => {
