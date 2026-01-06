@@ -133,6 +133,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
       .orderBy("updated_at", "asc")
       .limit(MAX_DELETE_BATCH_SIZE)
       .execute();
+    if (ongoingOauthsToDelete.length === 0) return 0;
     const response = await this.transaction
       .deleteFrom("users_ongoing_oauths")
       .where(
