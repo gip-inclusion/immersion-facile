@@ -18,14 +18,16 @@ const closeInactiveAgenciesWithoutRecentConventionsScript = async () => {
     createMakeProductionPgPool(config),
   );
 
+  const timeGateway = new CustomTimeGateway();
   const closeInactiveAgenciesWithoutRecentConventions =
     makeCloseInactiveAgenciesWithoutRecentConventions({
       uowPerformer,
       deps: {
+        timeGateway,
         saveNotificationsBatchAndRelatedEvent:
           makeSaveNotificationsBatchAndRelatedEvent(
             new UuidV4Generator(),
-            new CustomTimeGateway(),
+            timeGateway,
           ),
       },
     });

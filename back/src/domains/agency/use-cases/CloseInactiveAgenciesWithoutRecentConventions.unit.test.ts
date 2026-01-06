@@ -5,7 +5,6 @@ import {
   ConventionDtoBuilder,
   expectToEqual,
 } from "shared";
-import { numberOfMonthsWithoutConvention as numberOfMonthsWithoutConventionFromScript } from "../../../scripts/scheduledScripts/closeInactiveAgenciesWithoutRecentConventions";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
   type ExpectSavedNotificationsBatchAndEvent,
@@ -25,8 +24,8 @@ import {
 } from "./CloseInactiveAgenciesWithoutRecentConventions";
 
 describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
-  const numberOfMonthsWithoutConvention =
-    numberOfMonthsWithoutConventionFromScript;
+  const numberOfMonthsWithoutConvention = 6;
+
   const admin1 = new ConnectedUserBuilder()
     .withId("admin1-id")
     .withEmail("admin1@agency1.fr")
@@ -59,6 +58,8 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
   let uow: InMemoryUnitOfWork;
   let closeInactiveAgenciesWithoutRecentConventions: CloseInactiveAgenciesWithoutRecentConventions;
   let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
+  let timeGateway: CustomTimeGateway;
+  const defaultDate = new Date("2021-09-01T10:10:00.000Z");
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -67,14 +68,16 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         uow.notificationRepository,
         uow.outboxRepository,
       );
+    timeGateway = new CustomTimeGateway(defaultDate);
     closeInactiveAgenciesWithoutRecentConventions =
       makeCloseInactiveAgenciesWithoutRecentConventions({
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
+          timeGateway,
           saveNotificationsBatchAndRelatedEvent:
             makeSaveNotificationsBatchAndRelatedEvent(
               new UuidV4Generator(),
-              new CustomTimeGateway(),
+              timeGateway,
             ),
         },
       });
@@ -328,7 +331,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         .withId("recent-convention-id")
         .withAgencyId(referringAgency.id)
         .withStatus("READY_TO_SIGN")
-        .withDateSubmission(subDays(new Date(), 30).toISOString())
+        .withDateSubmission(subDays(defaultDate, 30).toISOString())
         .build();
 
       uow.agencyRepository.agencies = [
