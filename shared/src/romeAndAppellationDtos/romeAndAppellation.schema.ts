@@ -35,12 +35,15 @@ export const appellationCodesSchema: ZodSchemaWithInputMatchingOutput<
 > = z.array(appellationCodeSchema);
 
 export const appellationAndRomeDtoSchema: ZodSchemaWithInputMatchingOutput<AppellationAndRomeDto> =
-  z.object({
-    romeCode: codeRomeSchema,
-    romeLabel: zStringMinLength1,
-    appellationCode: appellationCodeSchema,
-    appellationLabel: zStringMinLength1,
-  });
+  z.object(
+    {
+      romeCode: codeRomeSchema,
+      romeLabel: zStringMinLength1,
+      appellationCode: appellationCodeSchema,
+      appellationLabel: zStringMinLength1,
+    },
+    { error: "Ce champ est obligatoire. Veuillez choisir un métier." },
+  );
 
 const matchRangeSchema: ZodSchemaWithInputMatchingOutput<MatchRangeDto> =
   z.object({
