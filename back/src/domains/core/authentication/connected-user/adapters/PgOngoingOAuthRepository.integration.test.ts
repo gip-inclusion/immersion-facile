@@ -115,6 +115,15 @@ describe("PgOngoingOAuthRepository", () => {
   });
 
   describe("deleteOldOngoingOauths", () => {
+    it("does nothing if no ongoing oauths to delete", async () => {
+      const numberOfOngoingOauthsDeleted =
+        await pgOngoingOAuthRepository.deleteOldOngoingOauths(
+          new Date("2025-05-01"),
+        );
+
+      expectToEqual(numberOfOngoingOauthsDeleted, 0);
+    });
+
     it("deletes old ongoing oauths", async () => {
       await pgUserRepository.save(user);
       const oldOngoingOAuth: OngoingOAuth = {
