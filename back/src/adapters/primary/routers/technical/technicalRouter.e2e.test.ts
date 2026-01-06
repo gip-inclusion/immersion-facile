@@ -330,7 +330,7 @@ describe("technical router", () => {
       expectHttpResponseToEqual(response, {
         body: {
           issues: [
-            "email : Veuillez saisir une adresse e-mail valide - email fourni : invalid-email",
+            "email : Veuillez saisir une adresse e-mail valide - email fourni : 'invalid-email'",
           ],
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /validate-email",

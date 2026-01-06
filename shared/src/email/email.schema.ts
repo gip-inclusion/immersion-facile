@@ -32,7 +32,7 @@ export const emailSchema: ZodSchemaWithInputMatchingOutput<Email> = z
       .string()
       .regex(temporaryEmailRegex, {
         error: (error) =>
-          `${localization.invalidEmailFormat} - email fourni : ${error.input}`,
+          `${localization.invalidEmailFormat}${error.input && error.input.length > 0 ? ` - email fourni : '${error.input}'` : ""}`,
       }),
   );
 
