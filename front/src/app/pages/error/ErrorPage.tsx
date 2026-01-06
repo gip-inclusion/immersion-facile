@@ -35,7 +35,7 @@ export const ErrorPage = ({
 }: ErrorPageProperties): ReactElement => {
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="default" vSpacing={0}>
+      <MainWrapper layout="default">
         <ErrorPageContent {...getPageContentProps(error, title, buttons)} />
       </MainWrapper>
     </HeaderFooterLayout>
