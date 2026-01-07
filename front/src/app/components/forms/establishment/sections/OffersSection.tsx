@@ -64,12 +64,9 @@ export const OffersSection = ({
     <>
       <HeadingSection
         title={formContents.offers.label}
-        description="Les métiers que vous proposez à l’immersion"
+        description=" Chaque métier correspond à une offre qui apparaitra dans la recherche.
+          Votre entreprise peut donc apparaître dans différentes recherches."
       >
-        <p>
-          Chaque métier correspond à une offre qui apparaitra dans la recherche.
-          Votre entreprise peut donc apparaître dans différentes recherches.
-        </p>
         <Button
           className={fr.cx("fr-my-4v")}
           type="button"
@@ -117,37 +114,41 @@ export const OffersSection = ({
           </div>
         )}
       </HeadingSection>
-      <HeadingSection
-        title={formContents.businessAddresses.label}
-        description="Par défaut, vous apparaîtrez dans les résultats de recherche liés à l’adresse de votre établissement. Vous pouvez ajouter d’autres adresses si vous proposez des immersions ailleurs. Par exemple : votre société est située à Dijon (adresse liée à votre SIRET) mais vous proposez une immersion dans votre antenne de Nantes."
-      >
-        <MultipleAddressInput
-          name="businessAddress"
-          currentAddresses={formValues.businessAddresses}
-          onAddressAdded={(address, index) => {
-            const currentAddresses = formValues.businessAddresses;
-            currentAddresses[index] = {
-              id: uuidV4(),
-              rawAddress: addressDtoToString(address),
-            };
-            setValue("businessAddresses", currentAddresses);
-          }}
-          onAddressDeleted={(index) => {
-            const addresses = formValues.businessAddresses;
-            const newAddresses =
-              index === 0 && addresses.length === 1
-                ? [
-                    {
-                      id: "",
-                      rawAddress: "",
-                    },
-                  ]
-                : removeAtIndex(addresses, index);
-            setValue("businessAddresses", newAddresses);
-          }}
-          id={domElementIds.establishment[mode].businessAddresses}
-        />
-      </HeadingSection>
+      {formValues.offers.filter(
+        (offer) => offer.remoteWorkMode !== "FULL_REMOTE",
+      ).length > 0 && (
+        <HeadingSection
+          title={formContents.businessAddresses.label}
+          description="Par défaut, vous apparaîtrez dans les résultats de recherche liés à l’adresse de votre établissement. Vous pouvez ajouter d’autres adresses si vous proposez des immersions ailleurs. Par exemple : votre société est située à Dijon (adresse liée à votre SIRET) mais vous proposez une immersion dans votre antenne de Nantes."
+        >
+          <MultipleAddressInput
+            name="businessAddress"
+            currentAddresses={formValues.businessAddresses}
+            onAddressAdded={(address, index) => {
+              const currentAddresses = formValues.businessAddresses;
+              currentAddresses[index] = {
+                id: uuidV4(),
+                rawAddress: addressDtoToString(address),
+              };
+              setValue("businessAddresses", currentAddresses);
+            }}
+            onAddressDeleted={(index) => {
+              const addresses = formValues.businessAddresses;
+              const newAddresses =
+                index === 0 && addresses.length === 1
+                  ? [
+                      {
+                        id: "",
+                        rawAddress: "",
+                      },
+                    ]
+                  : removeAtIndex(addresses, index);
+              setValue("businessAddresses", newAddresses);
+            }}
+            id={domElementIds.establishment[mode].businessAddresses}
+          />
+        </HeadingSection>
+      )}
       {isStepMode && (
         <>
           <ErrorNotifications
