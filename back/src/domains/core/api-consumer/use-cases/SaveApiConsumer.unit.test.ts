@@ -70,6 +70,7 @@ describe("SaveApiConsumer", () => {
         result,
         generateApiConsumerJwtTestFn({
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
+          version: 1,
         }),
       );
       expectToEqual(uow.apiConsumerRepository.consumers, [

@@ -62,6 +62,7 @@ describe("POST contact-establishment public V2 route", () => {
     inMemoryUow.userRepository.users = [user];
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
+      version: 1,
     });
     sharedRequest = createSupertestSharedClient(
       publicApiV2SearchEstablishmentRoutes,
@@ -86,6 +87,7 @@ describe("POST contact-establishment public V2 route", () => {
       headers: {
         authorization: generateApiConsumerJwt({
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
+          version: 1,
         }),
       },
       body: contactEstablishment,
@@ -105,6 +107,7 @@ describe("POST contact-establishment public V2 route", () => {
       headers: {
         authorization: generateApiConsumerJwt({
           id: unauthorizedApiConsumer.id,
+          version: 1,
         }),
       },
       body: contactEstablishment,
@@ -271,6 +274,7 @@ describe("POST contact-establishment public V2 route", () => {
         "Authorization",
         generateApiConsumerJwt({
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
+          version: 1,
         }),
       )
       .send(contactEstablishment);
@@ -324,6 +328,7 @@ describe("POST contact-establishment public V2 route", () => {
         "Authorization",
         generateApiConsumerJwt({
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
+          version: 1,
         }),
       )
       .send(contactEstablishmentWithoutLocationId);

@@ -4,7 +4,7 @@ import {
   type AssessmentDto,
   allRoles,
   ConnectedUserBuilder,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   ConventionDtoBuilder,
   type ConventionRole,
   conventionStatuses,
@@ -66,7 +66,7 @@ describe("CreateAssessment", () => {
     establishmentAdvices: "mon conseil",
   };
 
-  const tutorPayload: ConventionDomainPayload = {
+  const tutorPayload: ConventionDomainJwtPayload = {
     applicationId: validatedConvention.id,
     role: "establishment-tutor",
     emailHash: makeEmailHash(validatedConvention.establishmentTutor.email),

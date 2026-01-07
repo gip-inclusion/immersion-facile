@@ -53,6 +53,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       await buildTestApp(config));
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
+      version: 1,
     });
 
     sharedRequest = createSupertestSharedClient(
@@ -172,6 +173,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
   it("return 403 if forbidden", async () => {
     const authToken = generateApiConsumerJwt({
       id: unauthorizedApiConsumer.id,
+      version: 1,
     });
 
     const response = await sharedRequest.getOfferBySiretAndAppellationCode({

@@ -3,7 +3,7 @@ import {
   AgencyDtoBuilder,
   BadRequestError,
   ConnectedUserBuilder,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionRelatedJwtPayload,
@@ -106,7 +106,7 @@ describe("RenewConvention", () => {
   }: {
     conventionId: ConventionId;
     role: ConventionRole;
-  }): ConventionDomainPayload => ({
+  }): ConventionDomainJwtPayload => ({
     applicationId: conventionId,
     role,
     emailHash: "my-hash",

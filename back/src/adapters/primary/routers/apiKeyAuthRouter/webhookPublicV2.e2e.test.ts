@@ -46,6 +46,7 @@ describe("Webhook routes", () => {
       ];
       const authToken = generateApiConsumerJwt({
         id: authorizedSubscriptionApiConsumer.id,
+        version: 1,
       });
 
       const response = await sharedRequest.subscribeToWebhook({
@@ -73,6 +74,7 @@ describe("Webhook routes", () => {
       inMemoryUow.apiConsumerRepository.consumers = [unauthorizedApiConsumer];
       const authToken = generateApiConsumerJwt({
         id: unauthorizedApiConsumer.id,
+        version: 1,
       });
 
       const response = await sharedRequest.subscribeToWebhook({
@@ -136,6 +138,7 @@ describe("Webhook routes", () => {
       ];
       const authToken = generateApiConsumerJwt({
         id: apiConsumersWithSubscriptions.id,
+        version: 1,
       });
 
       const response = await sharedRequest.listActiveSubscriptions({
@@ -157,6 +160,7 @@ describe("Webhook routes", () => {
       ];
       const authToken = generateApiConsumerJwt({
         id: unauthorizedSubscriptionApiConsumer.id,
+        version: 1,
       });
 
       const response = await sharedRequest.listActiveSubscriptions({
@@ -212,6 +216,7 @@ describe("Webhook routes", () => {
       ];
       const authToken = generateApiConsumerJwt({
         id: authorizedSubscriptionApiConsumer.id,
+        version: 1,
       });
 
       const response = await sharedRequest.unsubscribeToWebhook({
@@ -285,6 +290,7 @@ describe("Webhook routes", () => {
       ];
       const authToken = generateApiConsumerJwt({
         id: unauthorizedApiConsumerWithSubscriptions.id,
+        version: 1,
       });
 
       const response = await sharedRequest.unsubscribeToWebhook({

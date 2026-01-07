@@ -776,7 +776,9 @@ describe("Admin router", () => {
         body: createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
         ),
-        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+        headers: {
+          authorization: generateApiConsumerJwt({ id: "osef", version: 1 }),
+        },
       });
 
       expectResponseAndReturnJwt(response, {
@@ -816,7 +818,9 @@ describe("Admin router", () => {
         body: createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
         ),
-        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+        headers: {
+          authorization: generateApiConsumerJwt({ id: "osef", version: 1 }),
+        },
       });
 
       expectHttpResponseToEqual(response, {
@@ -854,7 +858,9 @@ describe("Admin router", () => {
 
     it("401 - not with backOfficeJwt", async () => {
       const response = await sharedRequest.getUsers({
-        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+        headers: {
+          authorization: generateApiConsumerJwt({ id: "osef", version: 1 }),
+        },
         queryParams: { emailContains: "yolo" },
       });
 

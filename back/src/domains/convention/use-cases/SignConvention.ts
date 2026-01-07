@@ -1,6 +1,6 @@
 import {
   type ConnectedUserDomainJwtPayload,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   errors,
   type WithConventionId,
   type WithConventionIdLegacy,
@@ -19,7 +19,7 @@ import {
 export class SignConvention extends TransactionalUseCase<
   WithConventionId,
   WithConventionIdLegacy,
-  ConventionDomainPayload | ConnectedUserDomainJwtPayload
+  ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload
 > {
   protected inputSchema = withConventionIdSchema;
 
@@ -40,7 +40,7 @@ export class SignConvention extends TransactionalUseCase<
   public async _execute(
     { conventionId }: WithConventionId,
     uow: UnitOfWork,
-    jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
+    jwtPayload: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
     const convention =
       await uow.conventionQueries.getConventionById(conventionId);
