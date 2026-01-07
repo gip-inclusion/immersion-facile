@@ -23,6 +23,7 @@ import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { initialDiscussionsWithPagination } from "src/core-logic/domain/discussion/discussion.slice";
 import { MetabaseView } from "../../MetabaseView";
@@ -236,39 +237,71 @@ const isEstablishmentDashboardTab = (
   establishmentDashboardTabsList.includes(input as EstablishmentDashboardTab);
 
 const OnboardingTabContent = () => (
-  <>
-    <h3>Accès limité</h3>
-    <p>
-      Cet onglet n’est pas accessible car aucune entreprise n’est actuellement
-      rattachée à ce compte.
-    </p>
-    <p>Cette situation peut se produire dans les cas suivants :</p>
-    <ul>
-      <li>l’entreprise n’a pas encore été créée sur Immersion Facilitée,</li>
-      <li>
-        une autre adresse email est enregistrée comme contact de l’entreprise,
-      </li>
-      <li>
-        un administrateur de l’entreprise ne vous a pas encore ajouté comme
-        utilisateur.
-      </li>
-    </ul>
-    <p>
-      Cet espace reste pleinement utilisable pour le suivi des conventions
-      auxquelles ce compte est associé.
-    </p>
-    <Highlight className={fr.cx("fr-ml-0")}>
-      Cet espace reste pleinement utilisable pour le suivi des conventions
-      auxquelles ce compte est associé.
-    </Highlight>
-    <Button
-      {...routes.formEstablishment().link}
-      iconId="fr-icon-add-line"
-      iconPosition="left"
+  <section className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
+    <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
+      <h3>Accès limité</h3>
+      <p>
+        Cet onglet n’est pas accessible car aucune entreprise n’est actuellement
+        rattachée à ce compte.
+      </p>
+      <p>Cette situation peut se produire dans les cas suivants :</p>
+      <ul>
+        <li>l’entreprise n’a pas encore été créée sur Immersion Facilitée,</li>
+        <li>
+          une autre adresse email est enregistrée comme contact de l’entreprise,
+        </li>
+        <li>
+          un administrateur de l’entreprise ne vous a pas encore ajouté comme
+          utilisateur.
+        </li>
+      </ul>
+      <p>
+        Cet espace reste pleinement utilisable pour le suivi des conventions
+        auxquelles ce compte est associé.
+      </p>
+      <Highlight className={fr.cx("fr-ml-0")}>
+        <strong>Besoin d’aide ?</strong> N’hésitez pas à{" "}
+        <a
+          href="https://aide.immersion-facile.beta.gouv.fr/fr/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          contacter le support
+        </a>
+        ou lire notre article d’aide sur{" "}
+        <a
+          href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-referencer-mon-entreprise-en-tant-quentreprise-accueillante-zr6rxv/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          le référencement d’une entreprise
+        </a>
+        .
+      </Highlight>
+      <Button
+        {...routes.formEstablishment().link}
+        iconId="fr-icon-add-line"
+        iconPosition="left"
+      >
+        Créer une entreprise
+      </Button>
+    </div>
+    <div
+      className={fr.cx(
+        "fr-col-12",
+        "fr-col-lg-5",
+        "fr-hidden",
+        "fr-unhidden-lg",
+        "fr-px-12w",
+        "fr-py-4w",
+        "fr-grid-row--middle",
+      )}
     >
-      Créer une entreprise
-    </Button>
-  </>
+      <div>
+        <img src={commonIllustrations.errorMissing} alt="Accès limité" />
+      </div>
+    </div>
+  </section>
 );
 
 const DiscussionTabContent = ({
