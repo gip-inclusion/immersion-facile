@@ -28,17 +28,17 @@ export const remoteWorkModeLabels: Record<
   { label: string; description: string }
 > = {
   HYBRID: {
-    label: "Télétravail hybride",
+    label: "Oui, télétravail hybride",
     description:
       "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
   },
   FULL_REMOTE: {
-    label: "100% télétravail",
+    label: "Oui, 100% télétravail",
     description:
       "Apparaîtra pour la France entière, quelle que soit la localisation du candidat",
   },
   NO_REMOTE: {
-    label: "Pas de télétravail",
+    label: "Non, pas de télétravail",
     description:
       "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
   },
