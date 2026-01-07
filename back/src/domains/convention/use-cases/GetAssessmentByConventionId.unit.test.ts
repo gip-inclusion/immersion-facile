@@ -3,7 +3,7 @@ import {
   type AssessmentDto,
   allRoles,
   ConnectedUserBuilder,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   ConventionDtoBuilder,
   type ConventionJwtPayload,
   type ConventionRole,
@@ -48,7 +48,7 @@ describe("GetAssessmentByConventionId", () => {
     .withIsAdmin(true)
     .buildUser();
   const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
-  const establishmentTutorPayload: ConventionDomainPayload = {
+  const establishmentTutorPayload: ConventionDomainJwtPayload = {
     applicationId: convention.id,
     role: "establishment-tutor",
     emailHash: makeEmailHash(convention.establishmentTutor.email),

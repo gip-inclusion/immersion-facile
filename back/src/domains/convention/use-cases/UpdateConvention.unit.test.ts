@@ -5,7 +5,7 @@ import {
   type AgencyRole,
   ConnectedUserBuilder,
   type ConnectedUserDomainJwtPayload,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionRole,
@@ -231,7 +231,7 @@ describe("Update Convention", () => {
           uow.conventionRepository.setConventions([convention]);
 
           const requestedConventionId = "1dd5c20e-6dd2-45af-affe-927358005250";
-          const jwtPayload: ConventionDomainPayload = {
+          const jwtPayload: ConventionDomainJwtPayload = {
             applicationId: requestedConventionId,
             role: "beneficiary",
             emailHash: "yolo",
@@ -412,7 +412,7 @@ describe("Update Convention", () => {
           validatorUser,
         )["establishment-representative"],
       },
-    ] as ConventionDomainPayload[])("updates the Convention in the repository when updated by signatories user", async (payload) => {
+    ] as ConventionDomainJwtPayload[])("updates the Convention in the repository when updated by signatories user", async (payload) => {
       uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
       uow.conventionRepository.setConventions([convention]);
 
@@ -485,7 +485,7 @@ describe("Update Convention", () => {
       { userId: validatorUser.id },
       { userId: counsellorUser.id },
     ] as (
-      | ConventionDomainPayload
+      | ConventionDomainJwtPayload
       | ConnectedUserDomainJwtPayload
     )[])("updates the Convention in the repository updated by non signatories user", async (payload) => {
       uow.userRepository.users = [

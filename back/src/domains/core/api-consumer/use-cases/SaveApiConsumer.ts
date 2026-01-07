@@ -77,6 +77,7 @@ export class SaveApiConsumer extends TransactionalUseCase<
     if (isNewApiConsumer)
       return this.#generateApiConsumerJwt({
         id: input.id,
+        version: 1,
       });
 
     return;

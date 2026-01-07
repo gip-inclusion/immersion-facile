@@ -69,9 +69,11 @@ describe("bottleneck", () => {
     inMemoryUow.apiConsumerRepository.consumers = [consumer1, consumer2];
     authorizationToken1 = generateApiConsumerJwt({
       id: consumer1.id,
+      version: 1,
     });
     authorizationToken2 = generateApiConsumerJwt({
       id: consumer2.id,
+      version: 1,
     });
     sharedRequest = createSupertestSharedClient(
       publicApiV2ConventionRoutes,

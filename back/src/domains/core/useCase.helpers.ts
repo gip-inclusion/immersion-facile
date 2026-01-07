@@ -2,7 +2,7 @@ import {
   type ApiConsumer,
   type ConnectedUser,
   type ConnectedUserDomainJwtPayload,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   calculateDurationInSecondsFrom,
   castError,
   type LegacySearchQueryParamsDto,
@@ -39,7 +39,7 @@ export const extractValue = (
 };
 
 export type UseCaseIdentityPayload =
-  | ConventionDomainPayload
+  | ConventionDomainJwtPayload
   | ConnectedUserDomainJwtPayload
   | ConnectedUser
   | ApiConsumer

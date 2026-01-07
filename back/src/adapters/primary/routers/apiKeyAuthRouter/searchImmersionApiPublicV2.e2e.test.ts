@@ -47,6 +47,7 @@ describe("search route", () => {
     );
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
+      version: 1,
     });
   });
 
@@ -74,6 +75,7 @@ describe("search route", () => {
       it("rejects unauthorized consumer", async () => {
         const authToken = generateApiConsumerJwt({
           id: unauthorizedApiConsumer.id,
+          version: 1,
         });
         const response = await sharedRequest.searchImmersion({
           headers: {
@@ -183,6 +185,7 @@ describe("search route", () => {
             "Authorization",
             generateApiConsumerJwt({
               id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              version: 1,
             }),
           );
 
@@ -199,6 +202,7 @@ describe("search route", () => {
             "Authorization",
             generateApiConsumerJwt({
               id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              version: 1,
             }),
           );
 
@@ -217,6 +221,7 @@ describe("search route", () => {
             "Authorization",
             generateApiConsumerJwt({
               id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              version: 1,
             }),
           );
         expect(response.status).toBe(200);
@@ -231,6 +236,7 @@ describe("search route", () => {
             "Authorization",
             generateApiConsumerJwt({
               id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              version: 1,
             }),
           )
           .expect(200, []);
@@ -245,6 +251,7 @@ describe("search route", () => {
             "Authorization",
             generateApiConsumerJwt({
               id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              version: 1,
             }),
           )
           .expect(200, []);
@@ -411,6 +418,7 @@ describe("search route", () => {
               "Authorization",
               generateApiConsumerJwt({
                 id: authorizedUnJeuneUneSolutionApiConsumer.id,
+                version: 1,
               }),
             );
 
@@ -429,6 +437,7 @@ describe("search route", () => {
               "Authorization",
               generateApiConsumerJwt({
                 id: authorizedUnJeuneUneSolutionApiConsumer.id,
+                version: 1,
               }),
             )
             .expect(200, toSearchImmersionResults([siret1, siret3]));
@@ -443,6 +452,7 @@ describe("search route", () => {
               "Authorization",
               generateApiConsumerJwt({
                 id: authorizedUnJeuneUneSolutionApiConsumer.id,
+                version: 1,
               }),
             )
             .expect(200, toSearchImmersionResults([siret1, siret2, siret3]));

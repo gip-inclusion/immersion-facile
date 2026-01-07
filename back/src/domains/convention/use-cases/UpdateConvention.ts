@@ -1,7 +1,7 @@
 import {
   allModifierRoles,
   type ConnectedUserDomainJwtPayload,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   type ConventionDto,
   type ConventionStatus,
   errors,
@@ -36,7 +36,7 @@ import {
 export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,
   WithConventionIdLegacy,
-  ConventionDomainPayload | ConnectedUserDomainJwtPayload
+  ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload
 > {
   protected inputSchema = updateConventionRequestSchema;
 
@@ -51,7 +51,7 @@ export class UpdateConvention extends TransactionalUseCase<
   protected async _execute(
     { convention }: UpdateConventionRequestDto,
     uow: UnitOfWork,
-    jwtPayload?: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
+    jwtPayload?: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
     if (!jwtPayload) throw errors.user.unauthorized();
 

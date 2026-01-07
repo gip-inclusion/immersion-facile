@@ -2,7 +2,7 @@ import {
   type AgencyId,
   type ConnectedUser,
   type ConnectedUserDomainJwtPayload,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
@@ -91,7 +91,7 @@ const onMagicLink = async ({
   isValidatorOfAgencyRefersToAllowed,
 }: {
   uow: UnitOfWork;
-  jwtPayload: ConventionDomainPayload;
+  jwtPayload: ConventionDomainJwtPayload;
   authorizedRoles: Role[];
   errorToThrow: Error;
   convention: ConventionReadDto;

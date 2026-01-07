@@ -6,7 +6,7 @@ import {
   type ApiConsumer,
   allSignatoryRoles,
   type ConnectedUserDomainJwtPayload,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
@@ -302,7 +302,7 @@ export const shouldBroadcastToFranceTravail = ({
 };
 
 const getRoleAndIcUser = async (
-  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
+  jwtPayload: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload,
   uow: UnitOfWork,
   initialConvention: ConventionDto,
 ): Promise<{ role: Role; userWithRights: UserWithRights | undefined }> => {
@@ -336,7 +336,7 @@ export const signConvention = async ({
 }: {
   uow: UnitOfWork;
   convention: ConventionReadDto;
-  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload;
+  jwtPayload: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload;
   now: DateTimeIsoString;
 }) => {
   const { role, userWithRights } = await getRoleAndIcUser(
@@ -374,7 +374,7 @@ export const domainTopicByTargetStatusMap: Partial<
 };
 
 export const extractUserRolesOnConventionFromJwtPayload = async (
-  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
+  jwtPayload: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload,
   uow: UnitOfWork,
   initialConvention: ConventionDto,
 ): Promise<Role[]> => {

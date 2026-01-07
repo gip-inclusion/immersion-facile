@@ -80,12 +80,15 @@ describe("Convention routes", () => {
     ];
     conventionReadConsumerWithAgencyIdsScopeToken = generateApiConsumerJwt({
       id: conventionReadConsumerWithAgencyIdsScope.id,
+      version: 1,
     });
     conventionReadConsumerWithNoScopeToken = generateApiConsumerJwt({
       id: conventionReadConsumerWithNoScope.id,
+      version: 1,
     });
     conventionUnauthorizedConsumerToken = generateApiConsumerJwt({
       id: conventionUnauthorizedConsumer.id,
+      version: 1,
     });
     sharedRequest = createSupertestSharedClient(
       publicApiV2ConventionRoutes,

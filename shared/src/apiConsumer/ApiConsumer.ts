@@ -8,10 +8,6 @@ import type { DateString, DateTimeIsoString } from "../utils/date";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 
-export type ApiConsumerJwtPayload = {
-  id: ApiConsumerId;
-};
-
 export type ApiConsumerName = Flavor<string, "ApiConsumerName">;
 
 export type ApiConsumerKind = (typeof apiConsumerKinds)[number];

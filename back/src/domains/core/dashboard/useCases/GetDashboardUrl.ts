@@ -1,7 +1,7 @@
 import {
   type AbsoluteUrl,
   type ConnectedUser,
-  type ConventionDomainPayload,
+  type ConventionDomainJwtPayload,
   type DashboardUrlAndName,
   errors,
   type GetDashboardParams,
@@ -15,7 +15,7 @@ import type { DashboardGateway } from "../port/DashboardGateway";
 export class GetDashboardUrl extends UseCase<
   GetDashboardParams,
   DashboardUrlAndName,
-  ConnectedUser | ConventionDomainPayload
+  ConnectedUser | ConventionDomainJwtPayload
 > {
   protected inputSchema = getDashboardParams;
 
@@ -32,7 +32,7 @@ export class GetDashboardUrl extends UseCase<
 
   protected async _execute(
     params: GetDashboardParams,
-    currentUser: ConnectedUser | ConventionDomainPayload,
+    currentUser: ConnectedUser | ConventionDomainJwtPayload,
   ): Promise<DashboardUrlAndName> {
     if (!currentUser) throw errors.user.unauthorized();
 

@@ -24,6 +24,7 @@ describe("Statistics routes", () => {
     ];
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
+      version: 1,
     });
     httpClient = createSupertestSharedClient(
       publicApiV2StatisticsRoutes,
