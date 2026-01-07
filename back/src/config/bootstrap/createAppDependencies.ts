@@ -32,12 +32,11 @@ import { createEventCrawler } from "./createEventCrawler";
 import { createGateways } from "./createGateways";
 import { createUseCases } from "./createUseCases";
 
-const uuidGenerator = new UuidV4Generator();
-
 export type AppDependencies =
   ReturnType<typeof createAppDependencies> extends Promise<infer T> ? T : never;
 
 export const createAppDependencies = async (config: AppConfig) => {
+  const uuidGenerator = new UuidV4Generator();
   const getPgPoolFn = createMakeProductionPgPool(config);
   const gateways = await createGateways(config, uuidGenerator);
 
