@@ -5,6 +5,7 @@ import {
   authExpiredMessage,
   authRoutes,
   ConventionDtoBuilder,
+  type ConventionRole,
   currentJwtVersions,
   decodeJwtWithoutSignatureCheck,
   decodeURIWithParams,
@@ -12,9 +13,14 @@ import {
   displayRouteName,
   type Email,
   errors,
+  expectEmailOfType,
   expectHttpResponseToEqual,
   expectToEqual,
+  frontRoutes,
   queryParamsAsString,
+  type Role,
+  type TechnicalRoutes,
+  technicalRoutes,
   toAgencyDtoForAgencyUsersAndAdmins,
   type User,
   UserBuilder,
@@ -22,6 +28,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
+import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import {
@@ -30,7 +37,12 @@ import {
   fakeProviderConfig,
 } from "../../../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
+import {
+  type GenerateConnectedUserJwt,
+  type GenerateConventionJwt,
+  makeGenerateJwtES256,
+  makeVerifyJwtES256,
+} from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -39,17 +51,22 @@ import {
   buildTestApp,
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
+import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
+import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("auth router", () => {
   const immersionDomain = "immersion.fr";
 
-  let httpClient: HttpClient<AuthRoutes>;
+  let authRoutesClient: HttpClient<AuthRoutes>;
+  let technicalRoutesClient: HttpClient<TechnicalRoutes>;
   let uuidGenerator: UuidGenerator;
   let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
   let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
+  let generateConventionJwt: GenerateConventionJwt;
 
   beforeEach(async () => {
     let request: SuperTest<Test>;
@@ -62,6 +79,7 @@ describe("auth router", () => {
       inMemoryUow,
       appConfig,
       generateConnectedUserJwt,
+      generateConventionJwt,
     } = await buildTestApp(
       new AppConfigBuilder({
         PRO_CONNECT_GATEWAY: "IN_MEMORY",
@@ -71,7 +89,11 @@ describe("auth router", () => {
         DOMAIN: immersionDomain,
       }).build(),
     ));
-    httpClient = createSupertestSharedClient(authRoutes, request);
+    authRoutesClient = createSupertestSharedClient(authRoutes, request);
+    technicalRoutesClient = createSupertestSharedClient(
+      technicalRoutes,
+      request,
+    );
   });
 
   describe("user connexion flow", () => {
@@ -97,7 +119,7 @@ describe("auth router", () => {
           const redirectUri = `/${page}?discussionId=discussion0`;
 
           expectHttpResponseToEqual(
-            await httpClient.initiateLoginByOAuth({
+            await authRoutesClient.initiateLoginByOAuth({
               queryParams: {
                 redirectUri,
               },
@@ -132,7 +154,7 @@ describe("auth router", () => {
             },
           });
 
-          const response = await httpClient.afterOAuthLogin({
+          const response = await authRoutesClient.afterOAuthLogin({
             queryParams: {
               code: authCode,
               state,
@@ -166,7 +188,7 @@ describe("auth router", () => {
       });
 
       it("throws an error if the redirect uri is not allowed", async () => {
-        const response = await httpClient.initiateLoginByOAuth({
+        const response = await authRoutesClient.initiateLoginByOAuth({
           queryParams: {
             redirectUri: "@example.com",
           },
@@ -189,7 +211,7 @@ describe("auth router", () => {
         uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
         expectHttpResponseToEqual(
-          await httpClient.initiateLoginByOAuth({
+          await authRoutesClient.initiateLoginByOAuth({
             queryParams: {
               redirectUri: "/tableau-de-bord-agence/agences/agencyId",
             },
@@ -230,7 +252,7 @@ describe("auth router", () => {
           },
         });
 
-        const response = await httpClient.afterOAuthLogin({
+        const response = await authRoutesClient.afterOAuthLogin({
           queryParams: {
             code: authCode,
             state,
@@ -275,7 +297,7 @@ describe("auth router", () => {
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
           expectHttpResponseToEqual(
-            await httpClient.initiateLoginByEmail({
+            await authRoutesClient.initiateLoginByEmail({
               body: { email, redirectUri: `/${uri}` },
             }),
             {
@@ -303,7 +325,7 @@ describe("auth router", () => {
             throw new Error(
               `missing code on url ${notification.templatedContent.params.loginLink}`,
             );
-          const response = await httpClient.afterOAuthLogin({
+          const response = await authRoutesClient.afterOAuthLogin({
             queryParams: {
               code,
               state,
@@ -377,7 +399,7 @@ describe("auth router", () => {
       authRoutes.getOAuthLogoutUrl,
     )} returns the logout url`, () => {
       it("returns 401 if not logged in", async () => {
-        const response = await httpClient.getOAuthLogoutUrl({
+        const response = await authRoutesClient.getOAuthLogoutUrl({
           queryParams: { idToken: "fake-id-token", provider: "proConnect" },
           headers: { authorization: "" },
         });
@@ -416,7 +438,7 @@ describe("auth router", () => {
           version: currentJwtVersions.connectedUser,
         });
 
-        const response = await httpClient.getOAuthLogoutUrl({
+        const response = await authRoutesClient.getOAuthLogoutUrl({
           headers: { authorization: token },
           queryParams: {
             idToken: "fake-id-token",
@@ -471,7 +493,7 @@ describe("auth router", () => {
           }),
         ];
 
-        const response = await httpClient.getConnectedUser({
+        const response = await authRoutesClient.getConnectedUser({
           queryParams: {},
           headers: {
             authorization: generateConnectedUserJwt({
@@ -517,7 +539,7 @@ describe("auth router", () => {
       it(`${displayRouteName(
         authRoutes.getConnectedUser,
       )} 400 without headers`, async () => {
-        const response = await httpClient.getConnectedUser({
+        const response = await authRoutesClient.getConnectedUser({
           headers: {} as any,
           queryParams: {},
         });
@@ -537,7 +559,7 @@ describe("auth router", () => {
       it(`${displayRouteName(
         authRoutes.getConnectedUser,
       )} 401 with bad token`, async () => {
-        const response = await httpClient.getConnectedUser({
+        const response = await authRoutesClient.getConnectedUser({
           headers: { authorization: "wrong-token" },
           queryParams: {},
         });
@@ -557,7 +579,7 @@ describe("auth router", () => {
           0,
         );
 
-        const response = await httpClient.getConnectedUser({
+        const response = await authRoutesClient.getConnectedUser({
           headers: { authorization: token },
           queryParams: {},
         });
@@ -583,7 +605,7 @@ describe("auth router", () => {
           }),
         ];
 
-        const response = await httpClient.getConnectedUsers({
+        const response = await authRoutesClient.getConnectedUsers({
           queryParams: { agencyId: agency.id },
           headers: {
             authorization: generateConnectedUserJwt({
@@ -617,13 +639,138 @@ describe("auth router", () => {
       });
 
       it("401 - missing token", async () => {
-        const response = await httpClient.getConnectedUsers({
+        const response = await authRoutesClient.getConnectedUsers({
           queryParams: { agencyRole: "to-review" },
           headers: { authorization: "" },
         });
         expectHttpResponseToEqual(response, {
           status: 401,
           body: { status: 401, message: "Veuillez vous authentifier" },
+        });
+      });
+    });
+  });
+
+  describe("renew jwt", () => {
+    describe(`${displayRouteName(
+      authRoutes.renewExpiredJwt,
+    )} renews a jwt1`, () => {
+      describe("convention jwt", () => {
+        it("200 - sends the updated magic link", async () => {
+          uuidGenerator.new = () => uuid();
+          const validConvention = new ConventionDtoBuilder().build();
+
+          const agency = AgencyDtoBuilder.create(validConvention.agencyId)
+            .withName("TEST-name")
+            .withSignature("TEST-signature")
+            .build();
+
+          const convention = new ConventionDtoBuilder().build();
+          inMemoryUow.conventionRepository.setConventions([convention]);
+          inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+
+          gateways.timeGateway.setNextDate(new Date());
+
+          generateConventionJwt = makeGenerateJwtES256<"convention">(
+            appConfig.jwtPrivateKey,
+            3600 * 24, // one day
+          );
+          const shortLinkIds = ["shortLink1", "shortLinkg2"];
+          gateways.shortLinkGenerator.addMoreShortLinkIds(shortLinkIds);
+
+          const originalUrl = `${appConfig.immersionFacileBaseUrl}/${frontRoutes.conventionToSign}`;
+
+          const expiredJwt = generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: validConvention.id,
+              role: "beneficiary",
+              email: validConvention.signatories.beneficiary.email,
+              now: new Date(),
+            }),
+          );
+
+          const response = await authRoutesClient.renewExpiredJwt({
+            queryParams: {
+              expiredJwt,
+              originalUrl: encodeURIComponent(originalUrl),
+            },
+          });
+
+          expect(response.status).toBe(200);
+
+          await processEventsForEmailToBeSent(eventCrawler);
+
+          const sentEmails = gateways.notification.getSentEmails();
+
+          expect(sentEmails).toHaveLength(1);
+
+          const email = expectEmailOfType(sentEmails[0], "MAGIC_LINK_RENEWAL");
+          expect(email.recipients).toEqual([
+            validConvention.signatories.beneficiary.email,
+          ]);
+
+          const magicLink = await shortLinkRedirectToLinkWithValidation(
+            email.params.magicLink,
+            technicalRoutesClient,
+          );
+
+          const newUrlStart = `${originalUrl}?jwt=`;
+
+          expect(magicLink.startsWith(newUrlStart)).toBeTruthy();
+          const renewedJwt = magicLink.replace(newUrlStart, "");
+          expect(renewedJwt !== expiredJwt).toBeTruthy();
+          expect(
+            makeVerifyJwtES256(appConfig.jwtPublicKey)(renewedJwt),
+          ).toBeDefined();
+        });
+
+        it("400 - renew not allowed for back-office", async () => {
+          const convention = new ConventionDtoBuilder()
+            .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
+            .build();
+          inMemoryUow.conventionRepository.setConventions([convention]);
+          inMemoryUow.agencyRepository.agencies = [
+            toAgencyWithRights(
+              AgencyDtoBuilder.create(convention.agencyId)
+                .withName("TEST-name")
+                .withSignature("TEST-signature")
+                .build(),
+            ),
+          ];
+          gateways.timeGateway.setNextDate(new Date());
+
+          generateConventionJwt = makeGenerateJwtES256<"convention">(
+            appConfig.jwtPrivateKey,
+            3600 * 24, // one day
+          );
+
+          const unsupportedRole: Role = "back-office";
+
+          const response = await authRoutesClient.renewExpiredJwt({
+            queryParams: {
+              expiredJwt: generateConventionJwt(
+                createConventionMagicLinkPayload({
+                  id: convention.id,
+                  role: unsupportedRole as ConventionRole,
+                  email: convention.establishmentTutor.email,
+                  now: gateways.timeGateway.now(),
+                }),
+              ),
+              originalUrl: encodeURIComponent(
+                `https://${appConfig.immersionFacileBaseUrl}/${frontRoutes.assessment}`,
+              ),
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
+            status: 400,
+            body: {
+              message: errors.convention.roleHasNoMagicLink({
+                role: unsupportedRole,
+              }).message,
+              status: 400,
+            },
+          });
         });
       });
     });

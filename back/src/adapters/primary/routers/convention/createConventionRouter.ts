@@ -41,12 +41,6 @@ export const createConventionRouter = (deps: AppDependencies) => {
     ),
   );
 
-  unauthenticatedConventionSharedRouter.renewMagicLink((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.renewConventionMagicLink.execute(req.query),
-    ),
-  );
-
   authenticatedConventionSharedRouter.getApiConsumersByConvention(
     deps.connectedUserAuthMiddleware,
     (req, res) =>

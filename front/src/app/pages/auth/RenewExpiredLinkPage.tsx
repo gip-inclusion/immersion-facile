@@ -7,7 +7,7 @@ import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
-  type RenewMagicLinkRequestDto,
+  type RenewExpiredJwtRequestDto,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
@@ -19,7 +19,7 @@ interface RenewExpiredLinkProps {
 }
 
 export const RenewExpiredLinkContent = (
-  renewMagicLinkRequestDto: RenewMagicLinkRequestDto,
+  renewMagicLinkRequestDto: RenewExpiredJwtRequestDto,
 ) => {
   const jwtPayload =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
@@ -45,8 +45,8 @@ export const RenewExpiredLinkContent = (
     }
 
     setRequested(true);
-    outOfReduxDependencies.conventionGateway
-      .renewMagicLink(renewMagicLinkRequestDto)
+    outOfReduxDependencies.authGateway
+      .renewExpiredJwt(renewMagicLinkRequestDto)
       .then(() => {
         setRequestSuccessful(true);
       })

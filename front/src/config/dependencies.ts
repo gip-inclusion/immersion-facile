@@ -54,6 +54,7 @@ const {
   localDeviceRepository,
   sessionDeviceRepository,
   technicalGateway,
+  authGateway,
 } = dependencies;
 
 export const outOfReduxDependencies = {
@@ -62,6 +63,7 @@ export const outOfReduxDependencies = {
   localDeviceRepository,
   sessionDeviceRepository,
   technicalGateway,
+  authGateway,
 };
 
 export const store = createStore({

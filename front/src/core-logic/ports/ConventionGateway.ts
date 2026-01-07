@@ -17,7 +17,6 @@ import type {
   FlatGetConventionsWithErroredBroadcastFeedbackParams,
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
-  RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
   TransferConventionToAgencyRequestDto,
@@ -68,9 +67,7 @@ export interface ConventionGateway {
     params: SendSignatureLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
-  renewMagicLink(
-    renewMagicLinkRequestDto: RenewMagicLinkRequestDto,
-  ): Promise<void>;
+
   renewConvention$(
     params: RenewConventionParams,
     jwt: ConventionSupportedJwt,

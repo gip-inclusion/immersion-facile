@@ -67,5 +67,11 @@ export const createAuthRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authSharedRouter.renewExpiredJwt((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.renewExpiredJwt.execute(req.query),
+    ),
+  );
+
   return router;
 };

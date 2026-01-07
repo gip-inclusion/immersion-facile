@@ -752,6 +752,10 @@ export const errors = {
       new ForbiddenError(
         "Le jeton d'authentification (JWT) fourni est invalide.",
       ),
+    unsupportedJwtPayload: () =>
+      new ForbiddenError(
+        "Les données du jeton d'authentification ne sont pas supportés.",
+      ),
     expiredJwt: (expiredDurationText?: string) =>
       new ForbiddenError(authExpiredMessage(expiredDurationText ?? "")),
     notFound: ({ userId }: { userId: UserId }) =>

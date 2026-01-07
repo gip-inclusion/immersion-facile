@@ -62,7 +62,7 @@ import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases
 import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
-import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
+import { RenewExpiredJwt } from "../../domains/convention/use-cases/RenewExpiredJwt";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
@@ -339,7 +339,7 @@ export const createUseCases = ({
         createNewEvent,
         gateways.timeGateway,
       ),
-      renewConventionMagicLink: new RenewConventionMagicLink(
+      renewExpiredJwt: new RenewExpiredJwt(
         uowPerformer,
         createNewEvent,
         generateConventionMagicLinkUrl,

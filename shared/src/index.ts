@@ -134,6 +134,7 @@ export * from "./sms/smsTemplateByName";
 export * from "./tallyForm";
 export * from "./test.helpers";
 export * from "./tokens/jwt.dto";
+export * from "./tokens/jwt.schema";
 export * from "./tokens/jwt.utils";
 export * from "./tokens/payload.dto";
 export * from "./typeFlavors";

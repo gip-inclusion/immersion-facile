@@ -10,7 +10,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
-  type RenewMagicLinkRequestDto,
+  type RenewExpiredJwtRequestDto,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -29,7 +29,7 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import type { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
-import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
+import { RenewExpiredJwt } from "./RenewExpiredJwt";
 
 describe("RenewConventionMagicLink use case", () => {
   const currentEmployer: BeneficiaryCurrentEmployer = {
@@ -69,7 +69,7 @@ describe("RenewConventionMagicLink use case", () => {
   const timeGateway = new CustomTimeGateway(new Date());
 
   let uow: InMemoryUnitOfWork;
-  let useCase: RenewConventionMagicLink;
+  let useCase: RenewExpiredJwt;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
 
   beforeEach(() => {
@@ -77,7 +77,7 @@ describe("RenewConventionMagicLink use case", () => {
     uow.agencyRepository.agencies = [toAgencyWithRights(defaultAgency)];
     uow.conventionRepository.setConventions([validConvention]);
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
-    useCase = new RenewConventionMagicLink(
+    useCase = new RenewExpiredJwt(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
         timeGateway,
@@ -128,7 +128,7 @@ describe("RenewConventionMagicLink use case", () => {
         now: timeGateway.now(),
       });
 
-      const request: RenewMagicLinkRequestDto = {
+      const request: RenewExpiredJwtRequestDto = {
         originalUrl: "http://immersionfacile.fr/verifier-et-signer",
 
         expiredJwt: generateConventionJwt(expiredPayload),
@@ -184,7 +184,7 @@ describe("RenewConventionMagicLink use case", () => {
         now: timeGateway.now(),
       });
 
-      const request: RenewMagicLinkRequestDto = {
+      const request: RenewExpiredJwtRequestDto = {
         originalUrl: encodeURIComponent(
           "http://immersionfacile.fr/verifier-et-signer",
         ),
@@ -201,7 +201,7 @@ describe("RenewConventionMagicLink use case", () => {
     it("requires a valid application id", async () => {
       const invalidConventionId: ConventionId = "not-a-valid-id";
 
-      const request: RenewMagicLinkRequestDto = {
+      const request: RenewExpiredJwtRequestDto = {
         originalUrl: "https://immersionfacile.com/%jwt%",
         expiredJwt: generateConventionJwt(
           createConventionMagicLinkPayload({
@@ -226,7 +226,7 @@ describe("RenewConventionMagicLink use case", () => {
         .build();
       uow.conventionRepository.setConventions([convention]);
 
-      const request: RenewMagicLinkRequestDto = {
+      const request: RenewExpiredJwtRequestDto = {
         originalUrl: "https://immersionfacile.com/%jwt%",
         expiredJwt: generateConventionJwt(
           createConventionMagicLinkPayload({
@@ -246,7 +246,7 @@ describe("RenewConventionMagicLink use case", () => {
 
     // Admins use non-magic-link based authentication, so no need to renew these.
     it("Refuses to generate backoffice magic links", async () => {
-      const request: RenewMagicLinkRequestDto = {
+      const request: RenewExpiredJwtRequestDto = {
         originalUrl: "https://immersionfacile.com/verification",
         expiredJwt: generateConventionJwt(
           createConventionMagicLinkPayload({
@@ -265,7 +265,7 @@ describe("RenewConventionMagicLink use case", () => {
     });
 
     it("does not accept to renew links from url that are not supported", async () => {
-      const request: RenewMagicLinkRequestDto = {
+      const request: RenewExpiredJwtRequestDto = {
         originalUrl: "immersionfacile.com/",
         expiredJwt: generateConventionJwt(
           createConventionMagicLinkPayload({

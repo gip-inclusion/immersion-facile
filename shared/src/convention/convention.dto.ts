@@ -29,7 +29,6 @@ import type {
 import type { ScheduleDto } from "../schedule/Schedule.dto";
 import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
 import type {
-  AppSupportedJwt,
   expiredMagicLinkErrorMessage,
   unsupportedMagicLinkErrorMessage,
 } from "../tokens/jwt.dto";
@@ -393,11 +392,6 @@ export type GenerateMagicLinkRequestDto = {
   applicationId: ConventionId;
   role: Role;
   expired: boolean;
-};
-
-export type RenewMagicLinkRequestDto = {
-  originalUrl: string;
-  expiredJwt: AppSupportedJwt;
 };
 
 export type RenewMagicLinkResponse = {
