@@ -8,6 +8,7 @@ import type {
   InitiateLoginByEmailParams,
   LogoutQueryParams,
   OAuthSuccessLoginParams,
+  RenewExpiredJwtRequestDto,
   WithUserFilters,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -109,5 +110,16 @@ export class HttpAuthGateway implements AuthGateway {
             .otherwise(otherwiseThrow),
         ),
     );
+  }
+
+  public async renewExpiredJwt(
+    param: RenewExpiredJwtRequestDto,
+  ): Promise<void> {
+    await this.httpClient.renewExpiredJwt({
+      queryParams: {
+        expiredJwt: param.expiredJwt,
+        originalUrl: encodeURIComponent(param.originalUrl),
+      },
+    });
   }
 }

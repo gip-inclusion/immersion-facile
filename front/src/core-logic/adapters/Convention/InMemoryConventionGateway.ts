@@ -19,7 +19,6 @@ import {
   type MarkPartnersErroredConventionAsHandledRequest,
   type PaginationQueryParams,
   type RenewConventionParams,
-  type RenewMagicLinkRequestDto,
   type SendSignatureLinkRequestDto,
   type ShareLinkByEmailDto,
   sleep,
@@ -138,13 +137,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return this.conventionRenewalResult$;
-  }
-
-  public async renewMagicLink(_: RenewMagicLinkRequestDto): Promise<void> {
-    // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
-    // Since this operation makes no sense for local development, the implementation here is left empty.
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
   public async retreiveById(id: ConventionId): Promise<ConventionReadDto> {

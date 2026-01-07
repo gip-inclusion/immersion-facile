@@ -7,6 +7,7 @@ import type {
   InitiateLoginByEmailParams,
   LogoutQueryParams,
   OAuthSuccessLoginParams,
+  RenewExpiredJwtRequestDto,
   WithUserFilters,
 } from "shared";
 
@@ -23,4 +24,7 @@ export interface AuthGateway {
   confirmLoginByMagicLink$(
     params: OAuthSuccessLoginParams,
   ): Observable<AfterOAuthSuccessRedirectionResponse>;
+  renewExpiredJwt(
+    renewMagicLinkRequestDto: RenewExpiredJwtRequestDto,
+  ): Promise<void>;
 }

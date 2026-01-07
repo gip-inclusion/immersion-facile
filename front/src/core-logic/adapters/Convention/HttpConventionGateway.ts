@@ -19,7 +19,6 @@ import type {
   FlatGetConventionsWithErroredBroadcastFeedbackParams,
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
-  RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
   TransferConventionToAgencyRequestDto,
@@ -233,18 +232,6 @@ export class HttpConventionGateway implements ConventionGateway {
             .otherwise(otherwiseThrow),
         ),
     );
-  }
-
-  public async renewMagicLink({
-    expiredJwt,
-    originalUrl,
-  }: RenewMagicLinkRequestDto): Promise<void> {
-    await this.unauthenticatedHttpClient.renewMagicLink({
-      queryParams: {
-        expiredJwt,
-        originalUrl: encodeURIComponent(originalUrl),
-      },
-    });
   }
 
   public retrieveFromToken$(

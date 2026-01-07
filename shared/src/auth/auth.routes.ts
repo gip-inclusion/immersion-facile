@@ -4,6 +4,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withUserFiltersSchema } from "../admin/admin.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import { renewExpiredJwtRequestSchema } from "../tokens/jwt.schema";
 import {
   connectedUserSchema,
   withOptionalUserIdSchema,
@@ -79,6 +80,16 @@ export const authRoutes = defineRoutes({
     responses: {
       200: absoluteUrlSchema,
       401: httpErrorSchema,
+    },
+  }),
+  renewExpiredJwt: defineRoute({
+    url: "/renew-expired-jwt",
+    method: "post",
+    queryParamsSchema: renewExpiredJwtRequestSchema,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });

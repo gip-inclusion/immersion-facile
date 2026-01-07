@@ -7,6 +7,8 @@ import {
   type ConnectedUser,
   type InitiateLoginByEmailParams,
   type OAuthSuccessLoginParams,
+  type RenewExpiredJwtRequestDto,
+  sleep,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
@@ -89,6 +91,13 @@ export class SimulatedAuthGateway implements AuthGateway {
       token: "fake-token",
       redirectUri: "http://fake-redirect.com",
     });
+  }
+
+  public async renewExpiredJwt(_: RenewExpiredJwtRequestDto): Promise<void> {
+    // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
+    // Since this operation makes no sense for local development, the implementation here is left empty.
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
+    throw new Error("500 Not Implemented In InMemory Gateway");
   }
 }
 

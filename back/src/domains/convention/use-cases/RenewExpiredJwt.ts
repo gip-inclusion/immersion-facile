@@ -1,5 +1,6 @@
 import { decode, TokenExpiredError } from "jsonwebtoken";
 import {
+  type AppSupportedDomainJwtPayload,
   type AppSupportedJwt,
   type ConventionId,
   type ConventionJwtPayload,
@@ -8,8 +9,8 @@ import {
   ForbiddenError,
   frontRoutes,
   type InternshipKind,
-  type RenewMagicLinkRequestDto,
-  renewMagicLinkRequestSchema,
+  type RenewExpiredJwtRequestDto,
+  renewExpiredJwtRequestSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
@@ -27,11 +28,11 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class RenewConventionMagicLink extends TransactionalUseCase<
-  RenewMagicLinkRequestDto,
+export class RenewExpiredJwt extends TransactionalUseCase<
+  RenewExpiredJwtRequestDto,
   void
 > {
-  protected inputSchema = renewMagicLinkRequestSchema;
+  protected inputSchema = renewExpiredJwtRequestSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -61,16 +62,24 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   }
 
   protected async _execute(
-    { expiredJwt, originalUrl }: RenewMagicLinkRequestDto,
+    { expiredJwt, originalUrl }: RenewExpiredJwtRequestDto,
     uow: UnitOfWork,
   ) {
-    const { emailHash, role, applicationId } = extractDataFromExpiredJwt(
-      extractConventionJwtPayloadFromExpiredJwt(this.#config, expiredJwt),
+    const appSupportedJwtPayload = extractConventionJwtPayloadFromExpiredJwt(
+      this.#config,
+      expiredJwt,
     );
 
-    const convention = await uow.conventionRepository.getById(applicationId);
+    if (!("applicationId" in appSupportedJwtPayload))
+      throw errors.user.unsupportedJwtPayload();
+
+    const convention = await uow.conventionRepository.getById(
+      appSupportedJwtPayload.applicationId,
+    );
     if (!convention)
-      throw errors.convention.notFound({ conventionId: applicationId });
+      throw errors.convention.notFound({
+        conventionId: appSupportedJwtPayload.applicationId,
+      });
 
     const conventionRead = await conventionDtoToConventionReadDto(
       convention,
@@ -81,14 +90,16 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
-    const emails = conventionEmailsByRole(conventionRead)(role);
+    const emails = conventionEmailsByRole(conventionRead)(
+      appSupportedJwtPayload.role,
+    );
 
     // Only renew the link if the email hash matches
     await this.#onEmails(
       emails,
-      emailHash,
-      applicationId,
-      role,
+      appSupportedJwtPayload.emailHash,
+      appSupportedJwtPayload.applicationId,
+      appSupportedJwtPayload.role,
       this.#findRouteToRenew(originalUrl),
       uow,
       convention.internshipKind,
@@ -144,6 +155,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
         );
       }
     }
+
     if (!foundHit) throw errors.convention.magicLinkNotAssociatedToConvention();
   }
 
@@ -169,27 +181,10 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   }
 }
 
-// Extracts the data necessary for link renewal from any version of magic link payload.
-type LinkRenewData = {
-  role: ConventionRole;
-  applicationId: ConventionId;
-  emailHash?: string;
-};
-const extractDataFromExpiredJwt = (
-  payload: ConventionJwtPayload,
-): LinkRenewData =>
-  // Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
-  // else if (payload.version === 1) {...}
-  ({
-    role: payload.role,
-    applicationId: payload.applicationId,
-    emailHash: payload.emailHash,
-  });
-
 const extractConventionJwtPayloadFromExpiredJwt = (
   config: AppConfig,
   expiredJwt: AppSupportedJwt,
-): ConventionJwtPayload => {
+): AppSupportedDomainJwtPayload => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(config);
   let payloadToExtract: ConventionJwtPayload | undefined;
   try {

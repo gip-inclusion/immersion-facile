@@ -99,7 +99,6 @@ import {
   type MarkPartnersErroredConventionAsHandledRequest,
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   type RenewConventionParams,
-  type RenewMagicLinkRequestDto,
   type RenewMagicLinkResponse,
   type SendSignatureLinkRequestDto,
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
@@ -627,12 +626,6 @@ export const generateMagicLinkRequestSchema: ZodSchemaWithInputMatchingOutput<Ge
       error: localization.invalidEnum,
     }),
     expired: z.boolean(), //< defaults to false
-  });
-
-export const renewMagicLinkRequestSchema: ZodSchemaWithInputMatchingOutput<RenewMagicLinkRequestDto> =
-  z.object({
-    originalUrl: z.string(),
-    expiredJwt: z.string(),
   });
 
 export const renewMagicLinkResponseSchema: ZodSchemaWithInputMatchingOutput<RenewMagicLinkResponse> =
