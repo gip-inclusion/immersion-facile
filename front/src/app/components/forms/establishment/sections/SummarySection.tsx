@@ -90,14 +90,22 @@ export const SummarySection = ({
         description="Ces éléments apparaîtront dans la recherche d’entreprises accueillantes. Votre établissement peut donc apparaître dans différentes recherches."
       >
         <SectionHighlight>
-          <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
-            Adresses d'accueil :
-          </p>
-          <ul id={domElementIds.establishment.create.summaryBusinessAddresses}>
-            {formValues.businessAddresses.map((businessAddress) => (
-              <li key={businessAddress.id}>{businessAddress.rawAddress}</li>
-            ))}
-          </ul>
+          {formValues.offers.filter(
+            (offer) => offer.remoteWorkMode !== "FULL_REMOTE",
+          ).length > 0 && (
+            <>
+              <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
+                Adresses d'accueil :
+              </p>
+              <ul
+                id={domElementIds.establishment.create.summaryBusinessAddresses}
+              >
+                {formValues.businessAddresses.map((businessAddress) => (
+                  <li key={businessAddress.id}>{businessAddress.rawAddress}</li>
+                ))}
+              </ul>
+            </>
+          )}
           <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
             Métiers proposés :
           </p>
