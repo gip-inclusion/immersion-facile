@@ -611,6 +611,16 @@ export const feedbacks: Record<
     },
   },
   "convention-draft": {
+    "create.success": {
+      action: conventionDraftSlice.actions.shareConventionDraftByEmailSucceeded,
+      title: "Partager ou enregistrer un brouillon",
+      message: "Cette demande de convention a bien été partagée par mail.",
+    },
+    "create.error": {
+      action: conventionDraftSlice.actions.shareConventionDraftByEmailFailed,
+      title: "Partager ou enregistrer un brouillon",
+      message: "Erreur lors de l'envoi de l'email",
+    },
     "fetch.error": {
       action: conventionDraftSlice.actions.fetchConventionDraftFailed,
       title: "Problème lors de la récupération du brouillon de convention",

@@ -64,7 +64,7 @@ export interface ConventionGateway {
   ): Observable<void>;
   shareConventionDraftByEmail(
     shareDraftByEmailDto: ShareConventionDraftByEmailDto,
-  ): Promise<boolean>;
+  ): Observable<void>;
   sendSignatureLink$(
     params: SendSignatureLinkRequestDto,
     jwt: ConventionSupportedJwt,

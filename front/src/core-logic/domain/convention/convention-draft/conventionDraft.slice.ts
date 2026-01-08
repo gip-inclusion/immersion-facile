@@ -1,5 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { ConventionDraftDto, ConventionDraftId } from "shared";
+import type {
+  ConventionDraftDto,
+  ConventionDraftId,
+  ShareConventionDraftByEmailDto,
+} from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -37,6 +41,24 @@ export const conventionDraftSlice = createSlice({
       state.isLoading = false;
     },
     fetchConventionDraftFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    shareConventionDraftByEmailRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<ShareConventionDraftByEmailDto>,
+    ) => {
+      state.isLoading = true;
+    },
+    shareConventionDraftByEmailSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<ShareConventionDraftByEmailDto>,
+    ) => {
+      state.isLoading = false;
+    },
+    shareConventionDraftByEmailFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {

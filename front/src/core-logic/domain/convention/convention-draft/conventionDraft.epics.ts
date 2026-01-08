@@ -36,4 +36,33 @@ const fetchConventionDraftEpic: ConventionDraftEpic = (
     ),
   );
 
-export const conventionDraftEpics = [fetchConventionDraftEpic];
+const shareConventionDraftByEmailEpic: ConventionDraftEpic = (
+  action$,
+  _state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(
+      conventionDraftSlice.actions.shareConventionDraftByEmailRequested.match,
+    ),
+    switchMap((action) =>
+      conventionGateway.shareConventionDraftByEmail(action.payload).pipe(
+        map(() =>
+          conventionDraftSlice.actions.shareConventionDraftByEmailSucceeded(
+            action.payload,
+          ),
+        ),
+        catchEpicError((error: Error) =>
+          conventionDraftSlice.actions.shareConventionDraftByEmailFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
+export const conventionDraftEpics = [
+  fetchConventionDraftEpic,
+  shareConventionDraftByEmailEpic,
+];
