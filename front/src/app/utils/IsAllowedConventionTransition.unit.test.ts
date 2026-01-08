@@ -10,6 +10,7 @@ const convention: ConventionReadDto = {
   ...new ConventionDtoBuilder().withStatus("IN_REVIEW").build(),
   agencyKind: "cap-emploi",
   agencySiret: "11112222333300",
+  agencyContactEmail: "contact@mail.com",
   agencyCounsellorEmails: ["counsellor@mail.com"],
   agencyValidatorEmails: ["validator@mail.com"],
   agencyName: "Agence de cap emploi",

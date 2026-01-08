@@ -42,6 +42,7 @@ describe("ConnectedUserConventionsToManage", () => {
       true,
     );
     const agencyFields = {
+      agencyContactEmail: "contact@mail.com",
       agencyName: "Agency Name",
       agencyDepartment: "75",
       agencyKind: "pole-emploi" as const,

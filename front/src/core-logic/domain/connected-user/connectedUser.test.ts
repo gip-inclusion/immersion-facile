@@ -313,6 +313,7 @@ describe("InclusionConnected", () => {
       ...new ConventionDtoBuilder().build(),
       agencyName: "Agence de test",
       agencyDepartment: "75",
+      agencyContactEmail: "contact@mail.com",
       agencyKind: "mission-locale",
       agencySiret: "11112222000033",
       agencyCounsellorEmails: [],
