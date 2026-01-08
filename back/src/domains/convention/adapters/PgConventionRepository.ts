@@ -80,7 +80,9 @@ export class PgConventionRepository implements ConventionRepository {
       agencySiret: _4,
       agencyCounsellorEmails: _5,
       agencyValidatorEmails: _6,
-      assessment: _7,
+      agencyContactEmail: _7,
+      agencyRefersTo: _8,
+      assessment: _9,
       ...dto
     } = readDto;
     return dto;
