@@ -91,54 +91,14 @@ const step1 = async (
 
 const step2 = async (page: Page) => {
   await expectNoErrorVisible(page);
-  await page.click(
-    `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
-  );
 
-  await fillAutocomplete({
-    page,
-    locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
-    value: "28 rue des mimosas",
-    endpoint: addressRoutes.lookupStreetAddress.url,
-  });
-  await page.waitForTimeout(2000);
+  await addOffer(page, "boulang", "fullRemote");
 
-  await page.click(`#${domElementIds.establishment.create.addOfferButton}`);
+  await editOffer(page, 0, "hybrid");
 
-  await fillAutocomplete({
-    page,
-    locator: `#${domElementIds.establishment.create.appellations}`,
-    value: "boulang",
-    endpoint: formCompletionRoutes.appellation.url,
-  });
+  await addOffer(page, "routage", "fullRemote");
 
-  await page.click(
-    `[for='${domElementIds.establishment.create.remoteWorkMode}-1']`, // 100% REMOTE
-  );
-
-  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
-
-  await page.click(`#${domElementIds.establishment.create.editOfferButton}-0`);
-  await page.click(
-    `[for='${domElementIds.establishment.create.remoteWorkMode}-0']`, // HYBRID
-  );
-
-  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
-
-  await page.click(`#${domElementIds.establishment.create.addOfferButton}`);
-
-  await fillAutocomplete({
-    page,
-    locator: `#${domElementIds.establishment.create.appellations}`,
-    value: "routage",
-    endpoint: formCompletionRoutes.appellation.url,
-  });
-
-  await page.click(
-    `[for='${domElementIds.establishment.create.remoteWorkMode}-1']`, // 100% REMOTE
-  );
-
-  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+  await addLocation(page);
 
   await goToNextStep(page, 2, "create");
 };
@@ -193,4 +153,61 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
 
   await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
   await expect(page.locator(".fr-alert--success")).toBeVisible();
+};
+
+type RemoteMode = "hybrid" | "fullRemote" | "onsite";
+const remoteModeIndexMap: Record<RemoteMode, number> = {
+  hybrid: 0,
+  fullRemote: 1,
+  onsite: 2,
+};
+
+const addOffer = async (
+  page: Page,
+  appelationValue: string,
+  remoteMode: RemoteMode,
+) => {
+  await page.click(`#${domElementIds.establishment.create.addOfferButton}`);
+
+  await fillAutocomplete({
+    page,
+    locator: `#${domElementIds.establishment.create.appellations}`,
+    value: appelationValue,
+    endpoint: formCompletionRoutes.appellation.url,
+  });
+
+  await page.click(
+    `[for='${domElementIds.establishment.create.remoteWorkMode}-${remoteModeIndexMap[remoteMode]}']`,
+  );
+
+  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+};
+
+const editOffer = async (
+  page: Page,
+  offerIndex: number,
+  remoteMode: RemoteMode,
+) => {
+  await page.click(
+    `#${domElementIds.establishment.create.editOfferButton}-${offerIndex}`,
+  );
+  await page.click(
+    `[for='${domElementIds.establishment.create.remoteWorkMode}-${remoteModeIndexMap[remoteMode]}']`,
+  );
+
+  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+};
+
+const addLocation = async (page: Page) => {
+  await page.click(
+    `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
+  );
+
+  await fillAutocomplete({
+    page,
+    locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
+    value: "28 rue des mimosas",
+    endpoint: addressRoutes.lookupStreetAddress.url,
+  });
+  await page.waitForTimeout(2000);
 };
