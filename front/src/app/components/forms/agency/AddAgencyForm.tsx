@@ -7,7 +7,6 @@ import RadioButtons, {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { equals } from "ramda";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ErrorNotifications,
@@ -239,8 +238,6 @@ const AgencyForm = ({
 
   // Ugly, need rework on the whole agency slice and form
   const initialFormValuesRef = useRef(formInitialValues);
-  const currentValues = watch();
-  const formHasChanged = !equals(initialFormValuesRef.current, currentValues);
 
   useEffect(() => {
     reset(formInitialValues);
@@ -407,7 +404,7 @@ const AgencyForm = ({
                   {...methods.register("id")}
                   type="hidden"
                 />
-                {!formHasChanged && (
+                {submitFeedback.kind !== "idle" && (
                   <SubmitFeedbackNotification
                     submitFeedback={submitFeedback}
                     messageByKind={agenciesSubmitMessageByKind}

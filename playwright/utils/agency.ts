@@ -58,6 +58,13 @@ export const fillAndSubmitBasicAgencyForm = async (
     .fill("valideur@cap.com");
 
   await page
+    .locator(`#${domElementIds.addAgency.agencyContactEmailInput}`)
+    .click();
+  await page
+    .locator(`#${domElementIds.addAgency.agencyContactEmailInput}`)
+    .fill("valideur@cap.com");
+
+  await page
     .locator(`#${domElementIds.addAgency.phoneNumberInput}`)
     .fill("0600000000");
   await page.locator(`#${domElementIds.addAgency.signatureInput}`).click();
