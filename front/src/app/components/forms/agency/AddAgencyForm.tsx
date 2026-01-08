@@ -441,6 +441,7 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   kind: "",
   name: "",
   createdAt: toDateUTCString(new Date()),
+  agencyContactEmail: "",
   coveredDepartments: [],
   address: {
     streetNumberAndAddress: "",
@@ -459,6 +460,7 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   agencySiret: "",
   refersToAgencyId: null,
   refersToAgencyName: null,
+  refersToAgencyContactEmail: null,
   phoneNumber: "",
 });
 
