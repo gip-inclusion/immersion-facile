@@ -53,6 +53,7 @@ export type ConventionPresentation = OmitFromExistingKeys<
   | "agencyCounsellorEmails"
   | "agencyValidatorEmails"
   | "agencySiret"
+  | "agencyContactEmail"
   | "assessment"
 > &
   WithSignatures &
@@ -62,7 +63,6 @@ export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<Conv
   conventionSchema.and(
     z.object({
       agencyDepartment: z.string(),
-      agencyContactEmail: emailSchema,
       agencyRefersTo: z
         .object({
           id: refersToAgencyIdSchema,
