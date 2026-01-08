@@ -19,19 +19,19 @@ describe("ConventionDraft slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
+  const conventionDraftId: ConventionDraftId =
+    "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+  const conventionDraft: ConventionDraftDto = {
+    id: conventionDraftId,
+    internshipKind: "immersion",
+  };
+
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
 
   describe("Fetch convention draft", () => {
     it("fetches a convention draft successfully", () => {
-      const conventionDraftId: ConventionDraftId =
-        "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-      const conventionDraft: ConventionDraftDto = {
-        id: conventionDraftId,
-        internshipKind: "immersion",
-      };
-
       expectConventionDraftState({
         isLoading: false,
         conventionDraft: null,
@@ -58,8 +58,6 @@ describe("ConventionDraft slice", () => {
     });
 
     it("stores error when fetching convention draft fails", () => {
-      const conventionDraftId: ConventionDraftId =
-        "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
       const errorMessage = "Convention draft not found";
 
       expectConventionDraftState({
@@ -94,6 +92,87 @@ describe("ConventionDraft slice", () => {
           message: errorMessage,
           on: "fetch",
           title: "Problème lors de la récupération du brouillon de convention",
+        },
+      );
+    });
+  });
+
+  describe("Share convention draft by email", () => {
+    it("fetches convention draft successfully before sharing", () => {
+      expectConventionDraftState({
+        isLoading: false,
+        conventionDraft: null,
+      });
+
+      store.dispatch(
+        conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
+          senderEmail: "sender@example.com",
+          recipientEmail: "recipient@example.com",
+          conventionDraft,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+
+      expectConventionDraftState({
+        isLoading: true,
+        conventionDraft: null,
+      });
+
+      dependencies.conventionGateway.shareConventionDraftByEmailResult$.next();
+
+      expectConventionDraftState({
+        isLoading: false,
+        conventionDraft: null,
+      });
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-draft"],
+        {
+          level: "success",
+          message: "Cette demande de convention a bien été partagée par mail.",
+          on: "create",
+          title: "Partager ou enregistrer un brouillon",
+        },
+      );
+    });
+
+    it("handles error when fetching convention draft fails before sharing", () => {
+      const errorMessage = "Erreur lors de l'envoi de l'email";
+
+      expectConventionDraftState({
+        isLoading: false,
+        conventionDraft: null,
+      });
+
+      store.dispatch(
+        conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
+          senderEmail: "sender@example.com",
+          recipientEmail: "recipient@example.com",
+          conventionDraft,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+
+      expectConventionDraftState({
+        isLoading: true,
+        conventionDraft: null,
+      });
+
+      dependencies.conventionGateway.shareConventionDraftByEmailResult$.error(
+        new Error(errorMessage),
+      );
+
+      expectConventionDraftState({
+        isLoading: false,
+        conventionDraft: null,
+      });
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-draft"],
+        {
+          level: "error",
+          message: errorMessage,
+          on: "create",
+          title: "Partager ou enregistrer un brouillon",
         },
       );
     });

@@ -1,10 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   type ConventionPresentation,
   domElementIds,
@@ -12,11 +12,9 @@ import {
   shareConventionDraftByEmailSchema,
   toConventionDraftDto,
 } from "shared";
-import { outOfReduxDependencies } from "src/config/dependencies";
+import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 
 type ShareFormProps = {
-  onSuccess: () => void;
-  onError: () => void;
   conventionFormData: ConventionPresentation;
 };
 
@@ -29,18 +27,16 @@ const makeInitialValues = ({
   conventionDraft: toConventionDraftDto({ convention: conventionFormData }),
 });
 
-export const ShareForm = ({
-  conventionFormData,
-  onSuccess,
-  onError,
-}: ShareFormProps) => {
+export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
+  const dispatch = useDispatch();
   const [isOnlyForSelf, setIsOnlyForSelf] = useState(false);
-  const onSubmit = async (values: ShareConventionDraftByEmailDto) => {
-    const result =
-      await outOfReduxDependencies.conventionGateway.shareConventionDraftByEmail(
-        values,
-      );
-    result ? onSuccess() : onError();
+  const onSubmit = (values: ShareConventionDraftByEmailDto) => {
+    dispatch(
+      conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
+        ...values,
+        feedbackTopic: "convention-draft",
+      }),
+    );
   };
   const methods = useForm<ShareConventionDraftByEmailDto>({
     mode: "onTouched",
@@ -55,8 +51,8 @@ export const ShareForm = ({
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
       id={domElementIds.conventionImmersionRoute.shareForm}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <p className={fr.cx("fr-text--xs")}>
         Tous les champs marqués d'une astérisque (*) sont obligatoires.
@@ -100,14 +96,6 @@ export const ShareForm = ({
         stateRelatedMessage={formState.errors.details?.message}
         disabled={isOnlyForSelf}
       />
-      <Button
-        type="submit"
-        title="Envoyer le brouillon"
-        disabled={!formState.isValid}
-        id={domElementIds.conventionImmersionRoute.shareFormSubmitButton}
-      >
-        Envoyer
-      </Button>
     </form>
   );
 };

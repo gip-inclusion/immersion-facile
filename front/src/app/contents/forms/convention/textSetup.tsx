@@ -156,9 +156,6 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   linkCopied: "Lien copié !",
   shareConventionDraftByMail: {
     share: "Partager ou enregistrer un brouillon",
-    sharedSuccessfully:
-      "Cette demande de convention a bien été partagée par mail.",
-    errorWhileSharing: "Erreur lors de l'envoi de l'email",
   },
   signatures: {
     fixErrors: "Veuillez corriger les champs erronés",
