@@ -127,6 +127,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withName("Agence référente")
         .withId(uuid())
         .withAgencySiret("55552222000055")
+        .withAgencyContactEmail(validator.email)
         .build();
 
       const expectedConventionRead = await insertAgencyAndConvention({
@@ -940,6 +941,7 @@ describe("Pg implementation of ConventionQueries", () => {
       })
       .withAgencySiret(agencySiret)
       .withKind(agencyKind)
+      .withAgencyContactEmail(agencyContactEmail)
       .withRefersToAgencyInfo(
         withRefersToAgency
           ? {
