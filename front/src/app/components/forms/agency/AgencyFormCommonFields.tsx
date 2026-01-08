@@ -204,14 +204,13 @@ export const AgencyFormCommonFields = ({
         }}
         {...getFieldError("agencyContactEmail")}
       />
-      {!refersToOtherAgency && (
+      {!refersToOtherAgency && mode === "create" && (
         <RadioGroup
           {...formContents.stepsForValidation}
           options={numberOfStepsOptions}
           currentValue={validationSteps}
           setCurrentValue={setValidationSteps}
           groupLabel={formContents.stepsForValidation.label}
-          disabled={mode === "edit"}
         />
       )}
       {mode === "create" &&
