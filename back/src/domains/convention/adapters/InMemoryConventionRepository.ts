@@ -87,8 +87,9 @@ const dropConventionReadFields = (
     agencyKind: _4,
     agencyName: _5,
     agencySiret: _6,
-    agencyRefersTo: _7,
-    assessment: _8,
+    agencyContactEmail: _7,
+    agencyRefersTo: _8,
+    assessment: _9,
     ...conventionWithoutReadFields
   } = convention as ConventionReadDto;
   return conventionWithoutReadFields;

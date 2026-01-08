@@ -166,6 +166,7 @@ describe("Convention routes", () => {
           ...convention,
           agencyName: agency.name,
           agencyDepartment: agency.address.departmentCode,
+          agencyContactEmail: agency.agencyContactEmail,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
           agencyCounsellorEmails: agency.counsellorEmails,
@@ -261,6 +262,7 @@ describe("Convention routes", () => {
             agencyName: agency.name,
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
+            agencyContactEmail: agency.agencyContactEmail,
             agencySiret: agency.agencySiret,
             agencyCounsellorEmails: agency.counsellorEmails,
             agencyValidatorEmails: agency.validatorEmails,
@@ -294,6 +296,7 @@ describe("Convention routes", () => {
             {
               ...convention,
               agencyName: agency.name,
+              agencyContactEmail: agency.agencyContactEmail,
               agencyDepartment: agency.address.departmentCode,
               agencyKind: agency.kind,
               agencySiret: agency.agencySiret,

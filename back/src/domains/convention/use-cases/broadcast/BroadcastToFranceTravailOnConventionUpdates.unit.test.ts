@@ -42,12 +42,14 @@ const conventionReadDtoFrom = ({
 }): ConventionReadDto => ({
   ...convention,
   agencyName: agency.name,
+  agencyContactEmail: agency.agencyContactEmail,
   agencyDepartment: agency.address.departmentCode,
   agencyKind: agency.kind,
   agencySiret: agency.agencySiret,
   agencyRefersTo: referredAgency && {
     id: referredAgency.id,
     name: referredAgency.name,
+    contactEmail: referredAgency.agencyContactEmail,
     kind: referredAgency.kind,
   },
   agencyCounsellorEmails: agency.counsellorEmails,
