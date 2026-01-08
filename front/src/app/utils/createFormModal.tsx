@@ -108,6 +108,7 @@ export const createFormModal = (params: CreateFormModalParams): FormModal => {
       {
         ...defaultSubmitButton,
         id: params.submitButton?.id,
+        children: params.submitButton?.children ?? defaultSubmitButton.children,
         onClick: () => {
           isSubmittingRef.current = true;
         },

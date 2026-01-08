@@ -72,6 +72,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
+  public shareConventionDraftByEmailResult$ = new Subject<void>();
+
   public getConventionsForUserResult$ = new Subject<
     DataWithPagination<ConventionReadDto>
   >();
@@ -156,10 +158,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
       : this.convention$;
   }
 
-  public async shareConventionDraftByEmail(
+  public shareConventionDraftByEmail(
     _shareLinkByEmailDTO: ShareConventionDraftByEmailDto,
-  ): Promise<boolean> {
-    return true;
+  ): Observable<void> {
+    return this.shareConventionDraftByEmailResult$;
   }
 
   public getConventionDraftById$(

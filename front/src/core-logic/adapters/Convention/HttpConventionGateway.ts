@@ -261,17 +261,19 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public shareConventionDraftByEmail(
     shareConventionDraftDto: ShareConventionDraftByEmailDto,
-  ): Promise<boolean> {
-    return this.unauthenticatedHttpClient
-      .shareConvention({
-        body: shareConventionDraftDto,
-      })
-      .then((response) =>
-        match(response)
-          .with({ status: 200 }, () => true)
-          .with({ status: 400 }, () => false)
-          .otherwise(otherwiseThrow),
-      );
+  ): Observable<void> {
+    return from(
+      this.unauthenticatedHttpClient
+        .shareConvention({
+          body: shareConventionDraftDto,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
   }
 
   public getConventionDraftById$(

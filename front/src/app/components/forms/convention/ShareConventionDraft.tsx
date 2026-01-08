@@ -1,36 +1,36 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
 import { type ConventionPresentation, domElementIds } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import { match } from "ts-pattern";
+import {
+  buttonsToModalButtons,
+  createFormModal,
+} from "src/app/utils/createFormModal";
 import { ShareForm } from "./ShareForm";
 
-const {
-  Component: ShareConventionDraftModal,
-  open: openShareConventionDraftModal,
-} = createModal({
+const shareConventionDraftModalProps = {
   isOpenedByDefault: false,
   id: "shareLink",
-});
+  formId: domElementIds.conventionImmersionRoute.shareForm,
+};
+const shareConventionDraftModal = createFormModal(
+  shareConventionDraftModalProps,
+);
 
 export const ShareConventionDraft = () => {
   const { getValues } = useFormContext<ConventionPresentation>();
   const t = useConventionTexts(getValues().internshipKind);
-  const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const shareLinkByEmail = t.shareConventionDraftByMail.share;
-  const [_isModalOpened, setIsModalOpened] = useState(false);
+
   return (
     <>
       <Button
         type="button"
         iconId="fr-icon-mail-line"
         onClick={() => {
-          openShareConventionDraftModal();
-          setEmailSent(null);
-          setIsModalOpened(true);
+          shareConventionDraftModal.open();
         }}
         nativeButtonProps={{
           id: domElementIds.conventionImmersionRoute.shareButton,
@@ -39,24 +39,21 @@ export const ShareConventionDraft = () => {
       >
         Partager la convention
       </Button>
+      <Feedback topics={["convention-draft"]} closable />
       {createPortal(
-        <ShareConventionDraftModal title={shareLinkByEmail}>
-          {match(emailSent)
-            .with(true, () => t.shareConventionDraftByMail.sharedSuccessfully)
-            .with(false, () => t.shareConventionDraftByMail.errorWhileSharing)
-            .with(null, () => (
-              <ShareForm
-                onSuccess={() => {
-                  setEmailSent(true);
-                }}
-                onError={() => {
-                  setEmailSent(false);
-                }}
-                conventionFormData={getValues()}
-              />
-            ))
-            .exhaustive()}
-        </ShareConventionDraftModal>,
+        <shareConventionDraftModal.Component
+          title={shareLinkByEmail}
+          doSubmitClosesModal={false}
+          buttons={buttonsToModalButtons([
+            {
+              children: "Envoyer le brouillon",
+              type: "submit",
+              id: domElementIds.conventionImmersionRoute.shareFormSubmitButton,
+            },
+          ])}
+        >
+          <ShareForm conventionFormData={getValues()} />
+        </shareConventionDraftModal.Component>,
         document.body,
       )}
     </>
