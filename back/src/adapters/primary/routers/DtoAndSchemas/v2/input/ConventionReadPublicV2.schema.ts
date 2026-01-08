@@ -16,6 +16,7 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
       agencyName: z.string(),
       agencyDepartment: z.string(),
       agencyKind: agencyKindSchema,
+      agencyContactEmail: emailSchema,
       agencySiret: siretSchema,
       agencyCounsellorEmails: z.array(emailSchema),
       agencyValidatorEmails: z.array(emailSchema),
@@ -23,6 +24,7 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
         .object({
           id: z.string(),
           name: z.string(),
+          contactEmail: emailSchema,
           kind: z.string(),
         })
         .optional(),

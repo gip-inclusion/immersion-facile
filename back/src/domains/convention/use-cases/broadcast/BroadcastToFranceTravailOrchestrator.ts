@@ -75,6 +75,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
         const conventionRead: ConventionReadDto = {
           ...convention,
           agencyName: agencyWithRights.name,
+          agencyContactEmail: agencyWithRights.agencyContactEmail,
           agencyDepartment: agencyWithRights.address.departmentCode,
           agencyKind: agencyWithRights.kind,
           agencySiret: agencyWithRights.agencySiret,

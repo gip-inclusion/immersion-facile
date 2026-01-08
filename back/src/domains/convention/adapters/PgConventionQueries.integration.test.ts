@@ -17,6 +17,7 @@ import {
   type ConventionStatus,
   DATE_START,
   type DateString,
+  type Email,
   expectToEqual,
   reasonableSchedule,
   type SiretDto,
@@ -105,6 +106,7 @@ describe("Pg implementation of ConventionQueries", () => {
       const expectedConventionRead = await insertAgencyAndConvention({
         conventionId: conventionIdA,
         agencyId: conventionIdA,
+        agencyContactEmail: "agency-a-contact@mail.com",
         agencyName: "agency A",
         agencyDepartment: "75",
         agencyKind: "autre",
@@ -131,6 +133,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionId: conventionIdA,
         agencyId: conventionIdA,
         agencyName: "Agency A",
+        agencyContactEmail: "agency-a-contact@mail.com",
         agencyDepartment: "75",
         agencyKind: "autre",
         agencySiret: "11112222000033",
@@ -148,6 +151,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionId: conventionIdA,
         agencyId: conventionIdA,
         agencyName: "agency A",
+        agencyContactEmail: "agency-a-contact@mail.com",
         agencyDepartment: "75",
         agencyKind: "autre",
         agencySiret: "11112222000033",
@@ -179,6 +183,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionId: conventionIdA,
         agencyId: agencyIdA,
         agencyName: "agency PE",
+        agencyContactEmail: "pe-contact@mail.com",
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
         agencySiret: "11112222000044",
@@ -191,6 +196,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionId: conventionIdB,
         agencyId: agencyIdB,
         agencyName: "agency CCI",
+        agencyContactEmail: "cci-contact@mail.com",
         agencyDepartment: "75",
         agencyKind: "cci",
         agencySiret: "11112222000055",
@@ -203,6 +209,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionId: "cccccc99-9c0b-1bbb-bb6d-6bb9bd38bbbb",
         agencyId: "cccccccc-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         agencyName: "agency Mission Locale",
+        agencyContactEmail: "mission-locale-contact@mail.com",
         agencyDepartment: "75",
         agencyKind: "mission-locale",
         agencySiret: "11112222000066",
@@ -845,6 +852,7 @@ describe("Pg implementation of ConventionQueries", () => {
   const insertAgencyAndConvention = async ({
     conventionId,
     agencyId,
+    agencyContactEmail,
     agencyName,
     agencyDepartment,
     agencyKind,
@@ -858,6 +866,7 @@ describe("Pg implementation of ConventionQueries", () => {
   }: {
     conventionId: ConventionId;
     agencyId: string;
+    agencyContactEmail: Email;
     agencyName: string;
     agencyDepartment: string;
     agencyKind: AgencyKind;
@@ -963,11 +972,13 @@ describe("Pg implementation of ConventionQueries", () => {
       ...convention,
       agencyName,
       agencyDepartment,
+      agencyContactEmail,
       agencyKind,
       agencySiret,
       agencyRefersTo: withRefersToAgency && {
         id: withRefersToAgency.id,
         name: withRefersToAgency.name,
+        contactEmail: withRefersToAgency.agencyContactEmail,
         kind: withRefersToAgency.kind,
       },
       agencyValidatorEmails: [validatorUser.email],
@@ -1075,6 +1086,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     const agencyFields = {
       agencyName: agency.name,
+      agencyContactEmail: agency.agencyContactEmail,
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
@@ -1085,6 +1097,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     const differentAgencyFields = {
       agencyName: differentAgency.name,
+      agencyContactEmail: differentAgency.agencyContactEmail,
       agencyDepartment: differentAgency.address.departmentCode,
       agencyKind: differentAgency.kind,
       agencySiret: differentAgency.agencySiret,

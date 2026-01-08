@@ -10,6 +10,7 @@ export const getReferedAgency = async (
     return {
       id: referedAgency.id,
       name: referedAgency.name,
+      contactEmail: referedAgency.agencyContactEmail,
       kind: referedAgency.kind,
     };
   throw errors.agency.notFound({ agencyId });

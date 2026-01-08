@@ -344,6 +344,7 @@ describe("HttpFranceTravailGateway", () => {
         ...new ConventionDtoBuilder().build(),
         agencyName: ftConvention.nomAgence,
         agencyDepartment: "75",
+        agencyContactEmail: "contact@mail.com",
         agencyKind: "pole-emploi",
         agencySiret: "00000000000000",
         agencyCounsellorEmails: [],

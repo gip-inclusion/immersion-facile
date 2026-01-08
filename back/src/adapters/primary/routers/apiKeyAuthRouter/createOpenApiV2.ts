@@ -174,6 +174,7 @@ const conventionExample: ConventionReadDto = {
   agencyDepartment: "75",
   agencyKind: "pole-emploi",
   agencySiret: "11112222000033",
+  agencyContactEmail: "contact@mail.com",
   agencyCounsellorEmails: [],
   agencyValidatorEmails: ["validator@mail.com"],
   agencyRefersTo: undefined,

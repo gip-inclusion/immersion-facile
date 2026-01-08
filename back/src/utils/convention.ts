@@ -69,10 +69,20 @@ export const conventionDtoToConventionReadDto = async (
     agencyCounsellorEmails: agency.counsellorEmails,
     agencyValidatorEmails: agency.validatorEmails,
     agencyName: agency.name,
+    agencyContactEmail: agency.agencyContactEmail,
     agencyDepartment: agency.coveredDepartments.at(0) ?? "",
     agencySiret: agency.agencySiret,
     agencyKind: agency.kind,
-    ...(agencyRefersTo ? { agencyRefersTo } : {}),
+    ...(agencyRefersTo
+      ? {
+          agencyRefersTo: {
+            id: agencyRefersTo.id,
+            name: agencyRefersTo.name,
+            contactEmail: agencyRefersTo.agencyContactEmail,
+            kind: agencyRefersTo.kind,
+          },
+        }
+      : {}),
     ...assesmentEntityToConventionAssessmentFields(assessment),
   };
 };
