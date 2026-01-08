@@ -31,6 +31,7 @@ describe("RemoveUserFromAgency", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: agency.id,
       refersToAgencyName: agency.name,
+      refersToAgencyContactEmail: agency.agencyContactEmail,
     })
     .build();
 
@@ -110,6 +111,7 @@ describe("RemoveUserFromAgency", () => {
         .withRefersToAgencyInfo({
           refersToAgencyId: agency.id,
           refersToAgencyName: agency.name,
+          refersToAgencyContactEmail: agency.agencyContactEmail,
         })
         .build();
 
@@ -239,7 +241,8 @@ describe("RemoveUserFromAgency", () => {
       const agencyWithRefersTo: AgencyDto = new AgencyDtoBuilder()
         .withRefersToAgencyInfo({
           refersToAgencyId: agency.id,
-          refersToAgencyName: "",
+          refersToAgencyName: agency.name,
+          refersToAgencyContactEmail: agency.agencyContactEmail,
         })
         .build();
 

@@ -215,6 +215,7 @@ describe("CreateUserForAgency", () => {
       .withRefersToAgencyInfo({
         refersToAgencyId: agencyWithCounsellor.id,
         refersToAgencyName: agencyWithCounsellor.name,
+        refersToAgencyContactEmail: agencyWithCounsellor.agencyContactEmail,
       })
       .build();
 

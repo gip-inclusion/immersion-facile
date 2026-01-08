@@ -246,6 +246,8 @@ describe("Broadcasts events to France Travail (LEGACY Version)", () => {
         .withRefersToAgencyInfo({
           refersToAgencyId: peAgencyWithoutCounsellorsAndValidators.id,
           refersToAgencyName: peAgencyWithoutCounsellorsAndValidators.name,
+          refersToAgencyContactEmail:
+            peAgencyWithoutCounsellorsAndValidators.agencyContactEmail,
         })
         .build(),
     );
@@ -394,6 +396,7 @@ describe("Broadcasts events to France Travail (LEGACY Version)", () => {
             .withRefersToAgencyInfo({
               refersToAgencyId: agency.id,
               refersToAgencyName: agency.name,
+              refersToAgencyContactEmail: agency.agencyContactEmail,
             })
             .build(),
         );

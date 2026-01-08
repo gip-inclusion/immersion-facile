@@ -2,6 +2,7 @@ import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, DepartmentCode } from "../address/address.dto";
 import type { Builder } from "../Builder";
+import type { Email } from "../email/email.dto";
 import type { DateString } from "../utils/date";
 import type {
   AgencyDto,
@@ -29,6 +30,7 @@ const emptyAgency: AgencyDto = {
   kind: "autre",
   counsellorEmails: [],
   validatorEmails: [],
+  agencyContactEmail: "default.contact@mail.com",
   agencySiret: "12345678904444",
   signature: "empty-signature",
   coveredDepartments: [defaultAddress.departmentCode],
@@ -40,6 +42,7 @@ const emptyAgency: AgencyDto = {
   logoUrl: null,
   refersToAgencyId: null,
   refersToAgencyName: null,
+  refersToAgencyContactEmail: null,
   codeSafir: null,
   statusJustification: null,
   phoneNumber: "+33600000000",
@@ -154,13 +157,21 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
   }
 
   public withRefersToAgencyInfo(
-    params: { refersToAgencyId: AgencyId; refersToAgencyName: string } | null,
+    params: {
+      refersToAgencyId: AgencyId;
+      refersToAgencyName: string;
+      refersToAgencyContactEmail: Email;
+    } | null,
   ) {
     return new AgencyDtoBuilder({
       ...this.#agency,
       ...(params
         ? params
-        : { refersToAgencyId: null, refersToAgencyName: null }),
+        : {
+            refersToAgencyId: null,
+            refersToAgencyName: null,
+            refersToAgencyContactEmail: null,
+          }),
     });
   }
 
@@ -196,6 +207,13 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       validatorEmails,
+    });
+  }
+
+  public withAgencyContactEmail(agencyContactEmail: string) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      agencyContactEmail,
     });
   }
 }

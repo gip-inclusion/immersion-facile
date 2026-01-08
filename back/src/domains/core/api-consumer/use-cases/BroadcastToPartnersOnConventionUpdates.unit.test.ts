@@ -69,6 +69,7 @@ describe("Broadcast to partners on updated convention", () => {
       .withRefersToAgencyInfo({
         refersToAgencyId: agency1.id,
         refersToAgencyName: agency1.name,
+        refersToAgencyContactEmail: agency1.agencyContactEmail,
       })
       .build(),
     {
@@ -396,6 +397,7 @@ describe("Broadcast to partners on updated convention", () => {
       .withRefersToAgencyInfo({
         refersToAgencyId: agency1.id,
         refersToAgencyName: agency1.name,
+        refersToAgencyContactEmail: agency1.agencyContactEmail,
       })
       .build();
 

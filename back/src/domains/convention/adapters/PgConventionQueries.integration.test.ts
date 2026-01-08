@@ -936,6 +936,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ? {
               refersToAgencyId: withRefersToAgency.id,
               refersToAgencyName: withRefersToAgency.name,
+              refersToAgencyContactEmail: withRefersToAgency.agencyContactEmail,
             }
           : null,
       )

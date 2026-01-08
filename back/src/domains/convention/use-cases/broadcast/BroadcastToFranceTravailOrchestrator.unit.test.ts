@@ -40,6 +40,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: referredAgency.id,
       refersToAgencyName: referredAgency.name,
+      refersToAgencyContactEmail: referredAgency.agencyContactEmail,
     })
     .build();
 

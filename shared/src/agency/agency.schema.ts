@@ -116,6 +116,7 @@ const commonAgencyShape = {
   createdAt: makeDateStringSchema(),
   name: stringWithMaxLength255,
   kind: agencyKindSchema,
+  agencyContactEmail: emailSchema,
   coveredDepartments: z.array(zStringMinLength1).min(1),
   address: addressSchema,
   position: geoPositionSchema,
@@ -134,6 +135,7 @@ export const createAgencySchema: z.ZodType<
     z.object({
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       refersToAgencyName: zStringMinLength1.or(z.null()),
+      refersToAgencyContactEmail: emailSchema.or(z.null()),
     }),
   )
   .and(withAcquisitionSchema)
@@ -179,6 +181,7 @@ export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       refersToAgencyName: zStringMinLength1.or(z.null()),
+      refersToAgencyContactEmail: emailSchema.or(z.null()),
       statusJustification: zStringMinLength1.or(z.null()),
     }),
   )
@@ -204,6 +207,7 @@ export const agencyDtoForAgencyUsersAndAdminsSchema: ZodSchemaWithInputMatchingO
         codeSafir: zStringMinLength1.or(z.null()),
         refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
         refersToAgencyName: zStringMinLength1.or(z.null()),
+        refersToAgencyContactEmail: emailSchema.or(z.null()),
         statusJustification: z.string().or(z.null()),
       }),
     )
@@ -219,6 +223,7 @@ export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       refersToAgencyName: zStringMinLength1.or(z.null()),
+      refersToAgencyContactEmail: emailSchema.or(z.null()),
       statusJustification: zStringMinLength1.or(z.null()),
     }),
   )

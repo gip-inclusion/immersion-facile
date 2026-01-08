@@ -47,6 +47,7 @@ describe("Send email when agency of type other added ", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: agency.id,
       refersToAgencyName: agency.name,
+      refersToAgencyContactEmail: agency.agencyContactEmail,
     })
     .withName("just-added-agency-refering-to-other-one")
     .withLogoUrl("https://agency-refering-logo.com")

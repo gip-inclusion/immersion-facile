@@ -85,6 +85,7 @@ describe("GetConnectedUsers", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: agency2.id,
       refersToAgencyName: agency2.name,
+      refersToAgencyContactEmail: agency2.agencyContactEmail,
     })
     .build();
   const agencyAdminUserBuilder = new ConnectedUserBuilder()

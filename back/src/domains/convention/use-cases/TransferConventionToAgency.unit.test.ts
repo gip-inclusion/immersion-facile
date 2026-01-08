@@ -52,6 +52,7 @@ describe("TransferConventionToAgency", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: agency.id,
       refersToAgencyName: agency.name,
+      refersToAgencyContactEmail: agency.agencyContactEmail,
     })
     .build();
 

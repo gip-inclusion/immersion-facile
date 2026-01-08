@@ -78,6 +78,7 @@ describe("Query: List agencies by filter", () => {
       .withRefersToAgencyInfo({
         refersToAgencyId: peAgency2InParis.id,
         refersToAgencyName: peAgency2InParis.name,
+        refersToAgencyContactEmail: peAgency2InParis.agencyContactEmail,
       })
       .withId("5")
       .withName("Agence avec refersTo")

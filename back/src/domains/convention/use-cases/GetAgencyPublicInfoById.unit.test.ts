@@ -19,6 +19,7 @@ describe("GetAgencyPublicInfoById", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: agency.id,
       refersToAgencyName: agency.name,
+      refersToAgencyContactEmail: agency.agencyContactEmail,
     })
     .withId("agency2")
     .build();

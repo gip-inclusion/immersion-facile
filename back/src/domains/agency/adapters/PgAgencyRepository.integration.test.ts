@@ -337,6 +337,7 @@ describe("PgAgencyRepository", () => {
         .withRefersToAgencyInfo({
           refersToAgencyId: agency1.id,
           refersToAgencyName: agency1.name,
+          refersToAgencyContactEmail: agency1.agencyContactEmail,
         })
         .build(),
       {
@@ -987,6 +988,7 @@ describe("PgAgencyRepository", () => {
           .withRefersToAgencyInfo({
             refersToAgencyId: agency1.id,
             refersToAgencyName: agency1.name,
+            refersToAgencyContactEmail: agency1.agencyContactEmail,
           })
           .build(),
         {
@@ -1106,6 +1108,7 @@ describe("PgAgencyRepository", () => {
         .withRefersToAgencyInfo({
           refersToAgencyId: agency1.id,
           refersToAgencyName: agency1.name,
+          refersToAgencyContactEmail: agency1.agencyContactEmail,
         })
         .build(),
       {
@@ -1537,6 +1540,7 @@ describe("PgAgencyRepository", () => {
           .withRefersToAgencyInfo({
             refersToAgencyId: closedAgency1.id,
             refersToAgencyName: closedAgency1.name,
+            refersToAgencyContactEmail: closedAgency1.agencyContactEmail,
           })
           .build(),
         {
@@ -1587,6 +1591,7 @@ describe("PgAgencyRepository", () => {
           .withRefersToAgencyInfo({
             refersToAgencyId: closedAgency1.id,
             refersToAgencyName: closedAgency1.name,
+            refersToAgencyContactEmail: closedAgency1.agencyContactEmail,
           })
           .build(),
         {
@@ -1634,6 +1639,7 @@ describe("PgAgencyRepository", () => {
           .withRefersToAgencyInfo({
             refersToAgencyId: closedAgency1.id,
             refersToAgencyName: closedAgency1.name,
+            refersToAgencyContactEmail: closedAgency1.agencyContactEmail,
           })
           .build(),
         {

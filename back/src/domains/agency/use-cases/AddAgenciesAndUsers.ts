@@ -4,6 +4,8 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   type DepartmentCode,
+  type Email,
+  emailSchema,
   errors,
   executeInSequence,
   type GeoPositionDto,
@@ -25,6 +27,7 @@ import type { AgencyRepository } from "../ports/AgencyRepository";
 
 export type ImportedAgencyAndUserRow = {
   ID: string;
+  "Contact structure": Email;
   SIRET: string;
   "Type structure": string;
   "Nom structure": string;
@@ -40,6 +43,7 @@ export type ImportedAgencyAndUserRow = {
 export const importedAgencyAndUserRowSchema: z.Schema<ImportedAgencyAndUserRow> =
   z.object({
     ID: z.string(),
+    "Contact structure": emailSchema,
     SIRET: z.string(),
     "Type structure": z.string(),
     "Nom structure": z.string(),
@@ -302,6 +306,7 @@ const createNewAgencies = async ({
       status: "active",
       agencySiret: row.SIRET,
       name: row["Nom structure"],
+      agencyContactEmail: row["Contact structure"],
       address: {
         streetNumberAndAddress: row["Adresse ligne 1"],
         postcode: row["Code postal"],
@@ -318,6 +323,7 @@ const createNewAgencies = async ({
       signature: "L'équipe",
       refersToAgencyId: null,
       refersToAgencyName: null,
+      refersToAgencyContactEmail: null,
       phoneNumber: row.Téléphone,
       usersRights: {
         [user.id]: {

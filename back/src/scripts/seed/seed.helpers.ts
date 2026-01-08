@@ -3,6 +3,7 @@ import {
   type AgencyId,
   type AgencyKind,
   type AgencyUsersRights,
+  type Email,
   type UserId,
 } from "shared";
 import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
@@ -25,10 +26,12 @@ export const insertAgencySeed = async ({
   uow,
   kind,
   userId,
+  agencyContactEmail,
 }: {
   uow: UnitOfWork;
   kind: AgencyKind;
   userId: UserId;
+  agencyContactEmail: Email;
 }): Promise<AgencyId> => {
   const address = getRandomAddress();
   const agencyName = `Agence ${kind} ${address.city}`;
@@ -40,6 +43,7 @@ export const insertAgencySeed = async ({
     .withKind(kind)
     .withStatus("active")
     .withAddress(address)
+    .withAgencyContactEmail(agencyContactEmail)
     .build();
 
   const connectedValidator: AgencyUsersRights = {

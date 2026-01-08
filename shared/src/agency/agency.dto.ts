@@ -39,11 +39,13 @@ export type CreateAgencyDto = {
   position: GeoPositionDto;
   counsellorEmails: Email[];
   validatorEmails: Email[];
+  agencyContactEmail: Email;
   agencySiret: SiretDto;
   logoUrl: AbsoluteUrl | null;
   signature: string;
   refersToAgencyId: AgencyId | null;
   refersToAgencyName: string | null;
+  refersToAgencyContactEmail: Email | null;
   phoneNumber: string;
 } & WithAcquisition;
 
