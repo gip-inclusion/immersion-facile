@@ -514,6 +514,7 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
       agencyName: z.string(),
       agencyDepartment: z.string(),
       agencyKind: agencyKindSchema,
+      agencyContactEmail: emailSchema,
       agencySiret: siretSchema,
       agencyCounsellorEmails: z.array(emailSchema),
       agencyValidatorEmails: z.array(emailSchema),
@@ -521,6 +522,7 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
         .object({
           id: refersToAgencyIdSchema,
           name: zStringMinLength1,
+          contactEmail: emailSchema,
           kind: agencyKindSchema,
         })
         .optional(),
