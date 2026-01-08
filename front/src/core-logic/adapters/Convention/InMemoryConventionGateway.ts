@@ -199,6 +199,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return {
       ...convention,
       agencyName: this.#agencies[convention.agencyId]?.name ?? "agency-name",
+      agencyContactEmail: "contact@mail.com",
       agencyDepartment: "75",
       agencyKind: "mission-locale",
       agencySiret: "22220000222200",

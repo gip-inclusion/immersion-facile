@@ -3,6 +3,7 @@ import {
   type ConventionReadDto,
   conventionSchema,
   type EstablishmentTutor,
+  emailSchema,
   type InternshipKind,
   type OmitFromExistingKeys,
   refersToAgencyIdSchema,
@@ -61,10 +62,12 @@ export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<Conv
   conventionSchema.and(
     z.object({
       agencyDepartment: z.string(),
+      agencyContactEmail: emailSchema,
       agencyRefersTo: z
         .object({
           id: refersToAgencyIdSchema,
           name: zStringMinLength1,
+          contactEmail: emailSchema,
           kind: agencyKindSchema,
         })
         .optional(),

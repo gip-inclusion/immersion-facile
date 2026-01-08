@@ -250,6 +250,7 @@ export const ConventionForm = ({
       agencySiret: "",
       agencyKind: selectedAgency.kind,
       agencyName: selectedAgency.name,
+      agencyContactEmail: "",
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
       assessment: null,
