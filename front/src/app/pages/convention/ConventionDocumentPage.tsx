@@ -316,7 +316,7 @@ export const ConventionDocumentPage = ({
                 <ul>
                   <li>
                     <strong>Contact en cas de besoin : </strong>
-                    {convention.agencyCounsellorEmails[0]}
+                    {convention.agencyContactEmail}
                   </li>
                 </ul>
               </li>
@@ -329,7 +329,7 @@ export const ConventionDocumentPage = ({
                 <ul>
                   <li>
                     <strong>Contact en cas de besoin : </strong>
-                    {convention.agencyValidatorEmails[0]}
+                    {convention.agencyRefersTo?.contactEmail}
                   </li>
                 </ul>
               </li>
@@ -344,9 +344,7 @@ export const ConventionDocumentPage = ({
               <ul>
                 <li>
                   <strong>Contact en cas de besoin : </strong>
-                  {convention.agencyCounsellorEmails.length > 0
-                    ? convention.agencyCounsellorEmails[0]
-                    : convention.agencyValidatorEmails[0]}
+                  {convention.agencyContactEmail}
                 </li>
               </ul>
             </li>
