@@ -49,6 +49,7 @@ describe("AddAgenciesAndUsers", () => {
     const rows: ImportedAgencyAndUserRow[] = [
       {
         ID: "1",
+        "Contact structure": "contact-structure-1@mail.com",
         SIRET: siret1,
         "Type structure": "AI",
         "Nom structure": "Structure avec user existant sur IF",
@@ -65,6 +66,7 @@ describe("AddAgenciesAndUsers", () => {
       },
       {
         ID: "2",
+        "Contact structure": "contact-structure-2@mail.com",
         SIRET: siret2,
         "Type structure": "EI",
         "Nom structure": "Structure avec user non existant sur IF",
@@ -196,6 +198,7 @@ describe("AddAgenciesAndUsers", () => {
   describe("rows with duplicates (same siret + nom structure + e-mail authentification + coordonnées + téléphone)", () => {
     const row = {
       ID: "1",
+      "Contact structure": "contact-structure@mail.com",
       SIRET: siret1,
       "Type structure": "AI",
       "Nom structure": "Structure Avec User Existant",
@@ -262,6 +265,7 @@ describe("AddAgenciesAndUsers", () => {
             .withName(row["Nom structure"])
             .withSignature("L'équipe")
             .withCreatedAt(timeGateway.now().toISOString())
+            .withAgencyContactEmail(row["Contact structure"])
             .build(),
           {
             [newUserId]: {
@@ -277,6 +281,7 @@ describe("AddAgenciesAndUsers", () => {
   describe("rows without duplicates", () => {
     const row = {
       ID: "1",
+      "Contact structure": "contact-structure@mail.com",
       SIRET: siret1,
       "Type structure": "ACI",
       "Nom structure": "Nom Structure",
@@ -324,6 +329,7 @@ describe("AddAgenciesAndUsers", () => {
           .withPosition(23, 12)
           .withSignature("L'équipe")
           .withCreatedAt(timeGateway.now().toISOString())
+          .withAgencyContactEmail(row["Contact structure"])
           .build(),
         {
           [newUserId]: {

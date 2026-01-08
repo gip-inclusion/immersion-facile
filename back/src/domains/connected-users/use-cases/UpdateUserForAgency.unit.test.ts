@@ -922,6 +922,7 @@ describe("UpdateUserForAgency", () => {
         .withRefersToAgencyInfo({
           refersToAgencyId: agency.id,
           refersToAgencyName: agency.name,
+          refersToAgencyContactEmail: agency.agencyContactEmail,
         })
         .build();
 

@@ -206,6 +206,7 @@ describe("Agency routes", () => {
         },
         counsellorEmails: ["counsellor@mail.com"],
         validatorEmails: ["validator@mail.com"],
+        agencyContactEmail: "agency-contact@mail.com",
         kind: "mission-locale",
         name: "Mission locale de Paris",
         position: { lat: 10, lon: 20 },
@@ -213,6 +214,7 @@ describe("Agency routes", () => {
         agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
         refersToAgencyId: null,
         refersToAgencyName: null,
+        refersToAgencyContactEmail: null,
         logoUrl: null,
         phoneNumber: "+33600000001",
       };

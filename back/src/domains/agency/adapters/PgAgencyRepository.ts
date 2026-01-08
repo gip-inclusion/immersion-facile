@@ -58,6 +58,7 @@ export class PgAgencyRepository implements AgencyRepository {
       .values(({ fn }) => ({
         id: agency.id,
         name: agency.name,
+        agency_contact_email: agency.agencyContactEmail,
         status: agency.status,
         kind: agency.kind,
         email_signature: agency.signature,
@@ -382,6 +383,7 @@ export class PgAgencyRepository implements AgencyRepository {
           id: cast<AgencyId>(ref("agencies.id")),
           name: ref("agencies.name"),
           status: cast<AgencyStatus>(ref("agencies.status")),
+          agencyContactEmail: ref("agencies.agency_contact_email"),
           kind: cast<AgencyKind>(ref("agencies.kind")),
           logoUrl: sql<AbsoluteUrl>`${ref("agencies.logo_url")}`,
           position: jsonBuildObject({
@@ -406,6 +408,9 @@ export class PgAgencyRepository implements AgencyRepository {
           signature: ref("agencies.email_signature"),
           refersToAgencyId: cast<AgencyId>(ref("agencies.refers_to_agency_id")),
           refersToAgencyName: ref("refered_agencies.name"),
+          refersToAgencyContactEmail: ref(
+            "refered_agencies.agency_contact_email",
+          ),
           statusJustification: ref("agencies.status_justification"),
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),

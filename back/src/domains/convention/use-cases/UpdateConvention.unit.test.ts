@@ -56,6 +56,7 @@ describe("Update Convention", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: "another-agency-id" as AgencyId,
       refersToAgencyName: "Another Agency",
+      refersToAgencyContactEmail: "another-agency-contact@mail.com",
     })
     .build();
   const agencyWithoutRefersTo = new AgencyDtoBuilder(agency)

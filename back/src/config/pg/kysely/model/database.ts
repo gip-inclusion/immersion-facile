@@ -209,6 +209,7 @@ interface Agencies extends WithAcquisition {
   refers_to_agency_id: string | null;
   status_justification: string | null;
   phone_number: string;
+  agency_contact_email: string;
 }
 
 interface BroadcastFeedbacks {

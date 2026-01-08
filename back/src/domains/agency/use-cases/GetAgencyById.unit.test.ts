@@ -27,6 +27,7 @@ describe("getAgencyByIdForDashboard", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: peAgency.id,
       refersToAgencyName: peAgency.name,
+      refersToAgencyContactEmail: peAgency.agencyContactEmail,
     })
     .withName("just-added-agency-refering-to-other-one")
     .withLogoUrl("https://agency-refering-logo.com")
