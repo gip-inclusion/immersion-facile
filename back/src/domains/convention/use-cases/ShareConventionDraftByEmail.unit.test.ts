@@ -1,5 +1,6 @@
 import {
   type ConventionDraftDto,
+  errors,
   expectToEqual,
   type InternshipKind,
 } from "shared";
@@ -73,7 +74,10 @@ describe("ShareConventionLinkByEmail", () => {
 
     expectToEqual(
       await uow.conventionDraftRepository.getById(conventionDraft.id),
-      conventionDraft,
+      {
+        ...conventionDraft,
+        updatedAt: timeGateway.now().toISOString(),
+      },
     );
     expectSavedNotificationsAndEvents({
       emails: [
@@ -105,7 +109,10 @@ describe("ShareConventionLinkByEmail", () => {
 
     expectToEqual(
       await uow.conventionDraftRepository.getById(conventionDraft.id),
-      conventionDraft,
+      {
+        ...conventionDraft,
+        updatedAt: timeGateway.now().toISOString(),
+      },
     );
     expectSavedNotificationsAndEvents({
       emails: [
@@ -128,5 +135,54 @@ describe("ShareConventionLinkByEmail", () => {
         },
       ],
     });
+  });
+
+  it("updates an existing convention draft", async () => {
+    const conventionDraft: ConventionDraftDto = {
+      id: uuid(),
+      internshipKind,
+    };
+    await uow.conventionDraftRepository.save(
+      conventionDraft,
+      "2024-10-08T00:00:00.000Z",
+    );
+
+    await uow.conventionDraftRepository.save(
+      conventionDraft,
+      "2024-10-08T00:11:00.000Z",
+    );
+
+    expectToEqual(
+      await uow.conventionDraftRepository.getById(conventionDraft.id),
+      {
+        ...conventionDraft,
+        updatedAt: "2024-10-08T00:11:00.000Z",
+      },
+    );
+  });
+
+  it("throw a conflict error if the convention draft has been updated since the last save", async () => {
+    const conventionDraft: ConventionDraftDto = {
+      id: uuid(),
+      internshipKind,
+    };
+    await uow.conventionDraftRepository.save(
+      conventionDraft,
+      "2024-10-08T00:11:00.000Z",
+    );
+
+    await expect(
+      usecase.execute({
+        conventionDraft: {
+          ...conventionDraft,
+          updatedAt: "2024-10-08T00:00:00.000Z",
+        },
+        senderEmail: email,
+      }),
+    ).rejects.toThrow(
+      errors.conventionDraft.conflict({
+        conventionDraftId: conventionDraft.id,
+      }),
+    );
   });
 });

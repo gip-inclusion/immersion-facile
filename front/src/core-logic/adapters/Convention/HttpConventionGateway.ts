@@ -271,6 +271,7 @@ export class HttpConventionGateway implements ConventionGateway {
           match(response)
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 409 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

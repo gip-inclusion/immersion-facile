@@ -255,16 +255,14 @@ describe("convention e2e", () => {
     unauthenticatedConventionRoutes.getConventionDraft,
   )} gets a convention draft`, () => {
     it("200 - Returns the convention draft when it exists", async () => {
+      const now = new Date().toISOString();
       const conventionDraftId: ConventionDraftId =
         "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
       const conventionDraft = {
         id: conventionDraftId,
         internshipKind: "immersion" as const,
       };
-      await inMemoryUow.conventionDraftRepository.save(
-        conventionDraft,
-        new Date().toISOString(),
-      );
+      await inMemoryUow.conventionDraftRepository.save(conventionDraft, now);
 
       const response = await unauthenticatedRequest.getConventionDraft({
         urlParams: { conventionDraftId },
@@ -272,7 +270,10 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         status: 200,
-        body: conventionDraft,
+        body: {
+          ...conventionDraft,
+          updatedAt: now,
+        },
       });
     });
 

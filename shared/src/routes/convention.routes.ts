@@ -203,7 +203,11 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     url: "/convention-drafts",
     method: "post",
     requestBodySchema: shareConventionDraftByEmailSchema,
-    responses: { 200: expressEmptyResponseBody, 400: httpErrorSchema },
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      409: httpErrorSchema,
+    },
   }),
 
   getConventionDraft: defineRoute({
