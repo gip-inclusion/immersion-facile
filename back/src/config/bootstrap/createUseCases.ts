@@ -1,3 +1,4 @@
+import { addDays, subDays } from "date-fns";
 import { keys } from "ramda";
 import {
   type ConnectedUser,
@@ -638,10 +639,44 @@ export const createUseCases = ({
       .withInput(findSimilarConventionsParamsSchema)
       .withOutput<{ similarConventionIds: ConventionId[] }>()
       .notTransactional()
-      .build(({ inputParams }) =>
-        queries.convention
-          .findSimilarConventions(inputParams)
-          .then((similarConventionIds) => ({ similarConventionIds })),
+      .build(
+        ({
+          inputParams: {
+            beneficiaryBirthdate,
+            beneficiaryLastName,
+            codeAppellation,
+            dateStart,
+            siret,
+          },
+        }) => {
+          const dateStartToMatch = new Date(dateStart);
+          const numberOfDaysTolerance = 7;
+
+          return queries.convention
+            .getConventionIdsByFilters({
+              filters: {
+                withSirets: [siret],
+                withBeneficiary: {
+                  birthdate: beneficiaryBirthdate,
+                  lastName: beneficiaryLastName,
+                },
+                withAppelationCodes: [codeAppellation],
+                withDateStart: {
+                  to: addDays(dateStartToMatch, numberOfDaysTolerance),
+                  from: subDays(dateStartToMatch, numberOfDaysTolerance),
+                },
+                withStatuses: [
+                  "ACCEPTED_BY_COUNSELLOR",
+                  "ACCEPTED_BY_VALIDATOR",
+                  "IN_REVIEW",
+                  "PARTIALLY_SIGNED",
+                  "READY_TO_SIGN",
+                ],
+              },
+              limit: 20,
+            })
+            .then((similarConventionIds) => ({ similarConventionIds }));
+        },
       )({}),
 
     getOffers: makeGetOffers({

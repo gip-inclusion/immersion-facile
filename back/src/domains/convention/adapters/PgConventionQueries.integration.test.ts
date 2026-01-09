@@ -565,145 +565,280 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("findSimilarConventions", () => {
-    const matchingSiret: SiretDto = "11112222333344";
-    const matchingAppellation: AppellationCode = "140927";
-    const matchingBirthDate = new Date("1992-01-01").toISOString();
-    const matchingBeneficiaryLastname = "M'GOMA";
-    const matchingDateStart = new Date("2021-01-09").toISOString();
-    const someMatchingStatus = "READY_TO_SIGN";
-    const conventionMatchingIdA: ConventionId =
-      "aaaa1111-1111-4111-9111-11111111aaaa";
-    const conventionMatchingIdB: ConventionId =
-      "bbbb1111-1111-4111-9111-11111111bbbb";
-
+  describe("getConventionIdsByFilters", () => {
+    const agency = AgencyDtoBuilder.create().build();
     beforeEach(async () => {
-      await db.deleteFrom("agencies").execute();
-      await db.deleteFrom("conventions").execute();
-
-      const agency = AgencyDtoBuilder.create().build();
-      const conventionBuilderInitialMatching = new ConventionDtoBuilder()
-        .withAgencyId(agency.id)
-        .withSiret(matchingSiret)
-        .withImmersionAppellation({
-          appellationCode: matchingAppellation,
-          romeCode: "11111",
-          appellationLabel: "osef",
-          romeLabel: "osef",
-        })
-        .withBeneficiaryBirthdate(matchingBirthDate)
-        .withBeneficiaryLastName(matchingBeneficiaryLastname)
-        .withDateStart(matchingDateStart)
-        .withDateEnd(new Date("2021-01-25").toISOString())
-        .withStatus(someMatchingStatus);
-
-      const conventionMatchingA = conventionBuilderInitialMatching
-        .withId(conventionMatchingIdA)
-        .build();
-
-      const conventionMatchingB = conventionBuilderInitialMatching
-        .withId(conventionMatchingIdB)
-        .withDateStart(new Date("2021-01-10").toISOString())
-        .build();
-
-      const conventionWithWrongSiret = conventionBuilderInitialMatching
-        .withId("22222222-2222-4222-9222-222222222222")
-        .withSiret("40400000000404")
-        .build();
-
-      const conventionWithWrongAppellation = conventionBuilderInitialMatching
-        .withId("33333333-3333-4333-3333-333333333333")
-        .withImmersionAppellation({
-          appellationCode: "17010",
-          romeCode: "11111",
-          appellationLabel: "osef",
-          romeLabel: "osef",
-        })
-        .build();
-
-      const conventionWithWrongBeneficiaryBirthdate =
-        conventionBuilderInitialMatching
-          .withId("44444444-4444-4444-4444-444444444444")
-          .withBeneficiaryBirthdate(new Date("1993-03-03").toISOString())
-          .build();
-
-      const conventionWithWrongBeneficiaryLastname =
-        conventionBuilderInitialMatching
-          .withId("55555555-5555-4555-5555-555555555555")
-          .withBeneficiaryLastName("Test")
-          .build();
-
-      const conventionWithDateStartToLate = conventionBuilderInitialMatching
-        .withId("66666666-6666-4666-6666-666666666666")
-        .withDateStart(new Date("2021-01-18").toISOString())
-        .build();
-
-      const conventionWithDateStartToEarly = conventionBuilderInitialMatching
-        .withId("66660000-0000-4666-6666-000066660000")
-        .withDateStart(new Date("2021-01-01").toISOString())
-        .build();
-
-      const conventionDeprecated = conventionBuilderInitialMatching
-        .withId("77777777-7777-4777-7777-777777777777")
-        .withStatus("DEPRECATED")
-        .build();
-      const conventionRejected = conventionBuilderInitialMatching
-        .withId("88888888-8888-4888-8888-888888888888")
-        .withStatus("REJECTED")
-        .build();
-      const conventionCancelled = conventionBuilderInitialMatching
-        .withId("99999999-9999-4999-9999-999999999999")
-        .withStatus("CANCELLED")
-        .build();
-
       await agencyRepo.insert(
         toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
       );
-
-      await Promise.all([
-        conventionRepository.save(conventionWithWrongSiret),
-        conventionRepository.save(conventionWithWrongAppellation),
-        conventionRepository.save(conventionWithWrongBeneficiaryBirthdate),
-        conventionRepository.save(conventionWithWrongBeneficiaryLastname),
-        conventionRepository.save(conventionWithDateStartToEarly),
-        conventionRepository.save(conventionWithDateStartToLate),
-        conventionRepository.save(conventionDeprecated),
-        conventionRepository.save(conventionRejected),
-        conventionRepository.save(conventionCancelled),
-        conventionRepository.save(conventionMatchingA),
-        conventionRepository.save(conventionMatchingB),
-      ]);
     });
 
-    it("finds no similar conventions when there is no convention matching", async () => {
-      const similarConventionIdsFound =
-        await conventionQueries.findSimilarConventions({
-          dateStart: new Date("2021-01-01").toISOString(),
-          siret: "12345678901234",
-          beneficiaryBirthdate: new Date("1990-01-01").toISOString(),
-          beneficiaryLastName: "Dupont",
-          codeAppellation: "1234567",
-        });
+    describe("similar conventions", () => {
+      const matchingSiret: SiretDto = "11112222333344";
+      const matchingAppellation: AppellationCode = "140927";
+      const matchingBirthDate = new Date("1992-01-01").toISOString();
+      const matchingBeneficiaryLastname = "M'GOMA";
+      const matchingDateStart = new Date("2021-01-09");
+      const someMatchingStatus = "READY_TO_SIGN";
+      const conventionMatchingIdA: ConventionId =
+        "aaaa1111-1111-4111-9111-11111111aaaa";
+      const conventionMatchingIdB: ConventionId =
+        "bbbb1111-1111-4111-9111-11111111bbbb";
 
-      expectToEqual(similarConventionIdsFound, []);
+      const numberOfDaysTolerance = 7;
+
+      beforeEach(async () => {
+        const conventionBuilderInitialMatching = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withSiret(matchingSiret)
+          .withImmersionAppellation({
+            appellationCode: matchingAppellation,
+            romeCode: "11111",
+            appellationLabel: "osef",
+            romeLabel: "osef",
+          })
+          .withBeneficiaryBirthdate(matchingBirthDate)
+          .withBeneficiaryLastName(matchingBeneficiaryLastname)
+          .withDateStart(matchingDateStart.toISOString())
+          .withDateEnd(new Date("2021-01-25").toISOString())
+          .withStatus(someMatchingStatus);
+
+        const conventionMatchingA = conventionBuilderInitialMatching
+          .withId(conventionMatchingIdA)
+          .build();
+
+        const conventionMatchingB = conventionBuilderInitialMatching
+          .withId(conventionMatchingIdB)
+          .withDateStart(new Date("2021-01-10").toISOString())
+          .build();
+
+        const conventionWithWrongSiret = conventionBuilderInitialMatching
+          .withId("22222222-2222-4222-9222-222222222222")
+          .withSiret("40400000000404")
+          .build();
+
+        const conventionWithWrongAppellation = conventionBuilderInitialMatching
+          .withId("33333333-3333-4333-3333-333333333333")
+          .withImmersionAppellation({
+            appellationCode: "17010",
+            romeCode: "11111",
+            appellationLabel: "osef",
+            romeLabel: "osef",
+          })
+          .build();
+
+        const conventionWithWrongBeneficiaryBirthdate =
+          conventionBuilderInitialMatching
+            .withId("44444444-4444-4444-4444-444444444444")
+            .withBeneficiaryBirthdate(new Date("1993-03-03").toISOString())
+            .build();
+
+        const conventionWithWrongBeneficiaryLastname =
+          conventionBuilderInitialMatching
+            .withId("55555555-5555-4555-5555-555555555555")
+            .withBeneficiaryLastName("Test")
+            .build();
+
+        const conventionWithDateStartToLate = conventionBuilderInitialMatching
+          .withId("66666666-6666-4666-6666-666666666666")
+          .withDateStart(new Date("2021-01-18").toISOString())
+          .build();
+
+        const conventionWithDateStartToEarly = conventionBuilderInitialMatching
+          .withId("66660000-0000-4666-6666-000066660000")
+          .withDateStart(new Date("2021-01-01").toISOString())
+          .build();
+
+        const conventionDeprecated = conventionBuilderInitialMatching
+          .withId("77777777-7777-4777-7777-777777777777")
+          .withStatus("DEPRECATED")
+          .build();
+        const conventionRejected = conventionBuilderInitialMatching
+          .withId("88888888-8888-4888-8888-888888888888")
+          .withStatus("REJECTED")
+          .build();
+        const conventionCancelled = conventionBuilderInitialMatching
+          .withId("99999999-9999-4999-9999-999999999999")
+          .withStatus("CANCELLED")
+          .build();
+
+        await Promise.all([
+          conventionRepository.save(conventionWithWrongSiret),
+          conventionRepository.save(conventionWithWrongAppellation),
+          conventionRepository.save(conventionWithWrongBeneficiaryBirthdate),
+          conventionRepository.save(conventionWithWrongBeneficiaryLastname),
+          conventionRepository.save(conventionWithDateStartToEarly),
+          conventionRepository.save(conventionWithDateStartToLate),
+          conventionRepository.save(conventionDeprecated),
+          conventionRepository.save(conventionRejected),
+          conventionRepository.save(conventionCancelled),
+          conventionRepository.save(conventionMatchingA),
+          conventionRepository.save(conventionMatchingB),
+        ]);
+      });
+
+      it("finds no similar conventions when there is no convention matching", async () => {
+        const dateStartToMatch = new Date("2021-01-01");
+
+        const similarConventionIdsFound =
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withDateStart: {
+                from: subDays(dateStartToMatch, numberOfDaysTolerance),
+                to: addDays(dateStartToMatch, numberOfDaysTolerance),
+              },
+              withSirets: ["12345678901234"],
+              withBeneficiary: {
+                birthdate: new Date("1990-01-01").toISOString(),
+                lastName: "Dupont",
+              },
+              withAppelationCodes: ["1234567"],
+              withStatuses: [
+                "ACCEPTED_BY_COUNSELLOR",
+                "ACCEPTED_BY_VALIDATOR",
+                "IN_REVIEW",
+                "PARTIALLY_SIGNED",
+                "READY_TO_SIGN",
+              ],
+            },
+          });
+
+        expectToEqual(similarConventionIdsFound, []);
+      });
+
+      it("finds similar conventions", async () => {
+        const similarConventionIdsFound =
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withDateStart: {
+                from: subDays(matchingDateStart, numberOfDaysTolerance),
+                to: addDays(matchingDateStart, numberOfDaysTolerance),
+              },
+              withSirets: [matchingSiret],
+              withBeneficiary: {
+                birthdate: matchingBirthDate,
+                lastName: matchingBeneficiaryLastname,
+              },
+              withAppelationCodes: [matchingAppellation],
+              withStatuses: [
+                "ACCEPTED_BY_COUNSELLOR",
+                "ACCEPTED_BY_VALIDATOR",
+                "IN_REVIEW",
+                "PARTIALLY_SIGNED",
+                "READY_TO_SIGN",
+              ],
+            },
+          });
+
+        expectToEqual(similarConventionIdsFound, [
+          conventionMatchingIdB,
+          conventionMatchingIdA,
+        ]);
+      });
     });
 
-    it("finds similar conventions", async () => {
-      const similarConventionIdsFound =
-        await conventionQueries.findSimilarConventions({
-          dateStart: matchingDateStart,
-          siret: matchingSiret,
-          beneficiaryBirthdate: matchingBirthDate,
-          beneficiaryLastName: matchingBeneficiaryLastname,
-          codeAppellation: matchingAppellation,
-        });
+    describe("withEstablishmentRepresentativeEmail Filter", () => {
+      const email = "mail@mail.com";
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentRepresentativeEmail(email)
+        .build();
 
-      expectToEqual(similarConventionIdsFound, [
-        conventionMatchingIdB,
-        conventionMatchingIdA,
-      ]);
+      beforeEach(async () => {
+        await conventionRepository.save(convention, anyConventionUpdatedAt);
+      });
+      it("Match convention with email", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withEstablishmentRepresentative: { email },
+            },
+          }),
+          [convention.id],
+        );
+      });
+
+      it("Without convention with email", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withEstablishmentRepresentative: {
+                email: "notEmail@emauil.ciom",
+              },
+            },
+          }),
+          [],
+        );
+      });
+    });
+
+    describe("withEstablishmentTutorEmail Filter", () => {
+      const email = "mail@mail.com";
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentTutorEmail(email)
+        .build();
+
+      beforeEach(async () => {
+        await conventionRepository.save(convention, anyConventionUpdatedAt);
+      });
+
+      it("retrieve convention id when tutor email match", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withEstablishmentTutor: { email },
+            },
+          }),
+          [convention.id],
+        );
+      });
+
+      it("Doesn't retrieve convention when tutor email doesn't match", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withEstablishmentTutor: { email: "notEmail@emauil.ciom" },
+            },
+          }),
+          [],
+        );
+      });
+    });
+
+    describe("limit", () => {
+      const convention1 = new ConventionDtoBuilder()
+        .withId(uuid())
+        .withAgencyId(agency.id)
+        .withDateStart("2026-01-01")
+        .build();
+      const convention2 = new ConventionDtoBuilder()
+        .withId(uuid())
+        .withAgencyId(agency.id)
+        .withDateStart("2026-01-02")
+        .build();
+
+      beforeEach(async () => {
+        await conventionRepository.save(convention1);
+        await conventionRepository.save(convention2);
+      });
+
+      it("without limit get all convention Ids", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({ filters: {} }),
+          [convention2.id, convention1.id],
+        );
+      });
+
+      it("with limit 1 get convention id with highest start date", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {},
+            limit: 1,
+          }),
+          [convention2.id],
+        );
+      });
     });
   });
 

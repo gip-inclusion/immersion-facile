@@ -1,5 +1,4 @@
-import { addDays, isBefore } from "date-fns";
-import subDays from "date-fns/subDays";
+import { isBefore } from "date-fns";
 import { propEq, toPairs } from "ramda";
 import {
   type AgencyId,
@@ -12,7 +11,6 @@ import {
   conventionSchema,
   type DataWithPagination,
   errors,
-  type FindSimilarConventionsParams,
   type GetPaginatedConventionsFilters,
   isFunctionalBroadcastFeedbackError,
   NotFoundError,
@@ -28,6 +26,7 @@ import type { InMemoryUserRepository } from "../../core/authentication/connected
 import type { InMemoryBroadcastFeedbacksRepository } from "../../core/saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
 import type {
   ConventionQueries,
+  GetConventionIdsParams,
   GetConventionsFilters,
   GetConventionsParams,
   GetPaginatedConventionsForAgencyUserParams,
@@ -49,27 +48,14 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly broadcastFeedbacksRepository: InMemoryBroadcastFeedbacksRepository,
   ) {}
 
-  public async findSimilarConventions(
-    params: FindSimilarConventionsParams,
+  public async getConventionIdsByFilters(
+    params: GetConventionIdsParams,
   ): Promise<ConventionId[]> {
-    const dateStartToMatch = new Date(params.dateStart);
-
-    return this.conventionRepository.conventions
-      .filter(
-        ({
-          siret,
-          immersionAppellation,
-          dateStart,
-          signatories: { beneficiary },
-        }) =>
-          siret === params.siret &&
-          immersionAppellation.appellationCode === params.codeAppellation &&
-          beneficiary.birthdate === params.beneficiaryBirthdate &&
-          beneficiary.lastName === params.beneficiaryLastName &&
-          dateStartToMatch >= subDays(new Date(dateStart), 7) &&
-          dateStartToMatch <= addDays(new Date(dateStart), 7),
-      )
+    const results = this.conventionRepository.conventions
+      .filter(makeApplyFiltersToGetConventionIds(params.filters))
       .map((convention) => convention.id);
+
+    return params.limit ? results.slice(0, params.limit - 1) : results;
   }
 
   public async getConventionById(
@@ -375,6 +361,55 @@ export class InMemoryConventionQueries implements ConventionQueries {
     };
   }
 }
+
+const makeApplyFiltersToGetConventionIds =
+  ({
+    withAppelationCodes,
+    withBeneficiary,
+    withDateStart,
+    withEstablishmentRepresentative,
+    withEstablishmentTutor,
+    withSirets,
+    withStatuses,
+  }: GetConventionIdsParams["filters"]) =>
+  (convention: ConventionDto) =>
+    (
+      [
+        ({ dateStart }) =>
+          withDateStart?.to ? dateStart <= withDateStart : true,
+        ({ dateStart }) =>
+          withDateStart?.from ? dateStart >= withDateStart : true,
+        ({ establishmentTutor }) =>
+          withEstablishmentTutor?.email
+            ? establishmentTutor.email === withEstablishmentTutor.email
+            : true,
+        ({ signatories: { establishmentRepresentative } }) =>
+          withEstablishmentRepresentative?.email
+            ? establishmentRepresentative.email ===
+              withEstablishmentRepresentative.email
+            : true,
+        ({ signatories: { beneficiary } }) =>
+          withBeneficiary?.lastName
+            ? beneficiary.lastName === withBeneficiary.lastName
+            : true,
+        ({ signatories: { beneficiary } }) =>
+          withBeneficiary?.birthdate
+            ? beneficiary.birthdate === withBeneficiary.birthdate
+            : true,
+        ({ status }) =>
+          withStatuses && withStatuses.length > 0
+            ? withStatuses.includes(status)
+            : true,
+        ({ siret }) =>
+          withSirets && withSirets.length > 0
+            ? withSirets.includes(siret)
+            : true,
+        ({ immersionAppellation }) =>
+          withAppelationCodes && withAppelationCodes.length > 0
+            ? withAppelationCodes.includes(immersionAppellation.appellationCode)
+            : true,
+      ] satisfies Array<(convention: ConventionDto) => boolean>
+    ).every((filter) => filter(convention));
 
 const makeApplyFiltersToConventions =
   ({

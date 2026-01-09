@@ -265,17 +265,24 @@ const makeConventionEstablishmentDashboard = async ({
 
   const hasConventionForEstablishmentRepresentative =
     (
-      await uow.conventionRepository.getIdsByEstablishmentRepresentativeEmail(
-        user.email,
-      )
+      await uow.conventionQueries.getConventionIdsByFilters({
+        filters: {
+          withEstablishmentRepresentative: { email: user.email },
+        },
+      })
     ).length > 0;
 
   if (hasConventionForEstablishmentRepresentative)
     return conventionDashboardUrl;
 
   const hasConventionForEstablishmentTutor =
-    (await uow.conventionRepository.getIdsByEstablishmentTutorEmail(user.email))
-      .length > 0;
+    (
+      await uow.conventionQueries.getConventionIdsByFilters({
+        filters: {
+          withEstablishmentTutor: { email: user.email },
+        },
+      })
+    ).length > 0;
 
   if (hasConventionForEstablishmentTutor) return conventionDashboardUrl;
 
