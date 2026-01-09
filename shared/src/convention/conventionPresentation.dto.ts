@@ -1,5 +1,6 @@
 import type { OmitFromExistingKeys } from "../utils";
 import type {
+  ConventionId,
   ConventionReadDto,
   EstablishmentTutor,
   InternshipKind,
@@ -28,13 +29,19 @@ type WithFromPeConnectedUser = {
   fromPeConnectedUser?: boolean;
 };
 
+export type WithConventionIdOrConventionDraftId = {
+  id: ConventionId | ConventionDraftId;
+};
+
 export type CreateConventionPresentationInitialValues = OmitFromExistingKeys<
   Partial<ConventionReadDto>,
+  | "id"
   | "agencyName"
   | "agencyCounsellorEmails"
   | "agencyValidatorEmails"
   | "agencySiret"
 > &
+  WithConventionIdOrConventionDraftId &
   WithSignatures &
   WithEstablishmentTutor &
   WithIntershipKind &
@@ -46,6 +53,7 @@ export type WithConventionDraftId = {
 
 export type ConventionPresentation = OmitFromExistingKeys<
   ConventionReadDto,
+  | "id"
   | "agencyKind"
   | "agencyName"
   | "agencyCounsellorEmails"
@@ -54,6 +62,7 @@ export type ConventionPresentation = OmitFromExistingKeys<
   | "agencyContactEmail"
   | "assessment"
 > &
+  WithConventionIdOrConventionDraftId &
   WithSignatures &
   WithFromPeConnectedUser;
 

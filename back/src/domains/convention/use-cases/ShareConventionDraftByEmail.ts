@@ -1,5 +1,7 @@
 import {
   type AbsoluteUrl,
+  type ConventionDraftDto,
+  errors,
   frontRoutes,
   type ShareConventionDraftByEmailDto,
   shareConventionDraftByEmailSchema,
@@ -12,6 +14,7 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
 
 export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConventionDraftByEmailDto> {
   protected inputSchema = shareConventionDraftByEmailSchema;
@@ -43,6 +46,12 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConven
     uow: UnitOfWork,
   ): Promise<void> {
     const now = this.#timeGateway.now().toISOString();
+
+    await throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave({
+      conventionDraftRepository: uow.conventionDraftRepository,
+      conventionDraftUpdated: params.conventionDraft,
+    });
+
     await uow.conventionDraftRepository.save(params.conventionDraft, now);
 
     const shortLink = await makeShortLink({
@@ -83,3 +92,26 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConven
     }
   }
 }
+
+const throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave =
+  async ({
+    conventionDraftRepository,
+    conventionDraftUpdated,
+  }: {
+    conventionDraftRepository: ConventionDraftRepository;
+    conventionDraftUpdated: ConventionDraftDto;
+  }) => {
+    const existingConventionDraft = await conventionDraftRepository.getById(
+      conventionDraftUpdated.id,
+    );
+
+    if (
+      existingConventionDraft?.updatedAt &&
+      conventionDraftUpdated.updatedAt &&
+      existingConventionDraft.updatedAt > conventionDraftUpdated.updatedAt
+    ) {
+      throw errors.conventionDraft.conflict({
+        conventionDraftId: conventionDraftUpdated.id,
+      });
+    }
+  };

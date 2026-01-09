@@ -21,8 +21,11 @@ export class InMemoryConventionDraftRepository
 
   public async save(
     conventionDraft: ConventionDraftDto,
-    _: DateString,
+    updatedAt: DateString,
   ): Promise<void> {
-    this.#conventionDrafts[conventionDraft.id] = conventionDraft;
+    this.#conventionDrafts[conventionDraft.id] = {
+      ...conventionDraft,
+      updatedAt,
+    };
   }
 }

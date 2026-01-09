@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import type { InsertExpression } from "kysely/dist/cjs/parser/insert-values-parser";
 import type {
   AgencyKind,
   ConventionDraftDto,
@@ -10,8 +11,14 @@ import type {
   Signatories,
 } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type { Database } from "../../../config/pg/kysely/model/database";
 import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
 
+const dateToIsoString = (date: Date | string): string => {
+  return date instanceof Date
+    ? date.toISOString()
+    : new Date(date).toISOString();
+};
 export class PgConventionDraftRepository implements ConventionDraftRepository {
   constructor(private transaction: KyselyDb) {}
 
@@ -44,6 +51,9 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
 
     return {
       id: row.id,
+      updatedAt: row.updated_at
+        ? dateToIsoString(row.updated_at as Date | string)
+        : undefined,
       agencyId: row.agency_id ?? undefined,
       agencyKind: (row.agency_kind as AgencyKind) ?? undefined,
       agencyDepartment: (row.agency_department as DepartmentCode) ?? undefined,
@@ -95,52 +105,67 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
     conventionDraft: ConventionDraftDto,
     now: DateString,
   ): Promise<void> {
+    const newValues = mapToEntity(conventionDraft, now);
+    const { id: _id, ...newValuesExceptId } = newValues as Omit<
+      typeof newValues,
+      "id"
+    > & { id: any };
+
     await this.transaction
       .insertInto("convention_drafts")
-      .values({
-        id: conventionDraft.id,
-        agency_id: conventionDraft.agencyId ?? null,
-        agency_kind: conventionDraft.agencyKind ?? null,
-        agency_department: conventionDraft.agencyDepartment ?? null,
-        date_start: conventionDraft.dateStart ?? null,
-        date_end: conventionDraft.dateEnd ?? null,
-        siret: conventionDraft.siret ?? null,
-        business_name: conventionDraft.businessName ?? null,
-        schedule: conventionDraft.schedule
-          ? sql`${JSON.stringify(conventionDraft.schedule)}`
-          : null,
-        individual_protection: conventionDraft.individualProtection ?? null,
-        individual_protection_description:
-          conventionDraft.individualProtectionDescription ?? null,
-        sanitary_prevention: conventionDraft.sanitaryPrevention ?? null,
-        sanitary_prevention_description:
-          conventionDraft.sanitaryPreventionDescription ?? null,
-        immersion_address: conventionDraft.immersionAddress ?? null,
-        immersion_objective: conventionDraft.immersionObjective ?? null,
-        immersion_appellation:
-          sql`${conventionDraft.immersionAppellation?.appellationCode}` ?? null,
-        immersion_activities: conventionDraft.immersionActivities ?? null,
-        immersion_skills: conventionDraft.immersionSkills ?? null,
-        work_conditions: conventionDraft.workConditions ?? null,
-        internship_kind: conventionDraft.internshipKind ?? null,
-        business_advantages: conventionDraft.businessAdvantages ?? null,
-        acquisition_campaign: conventionDraft.acquisitionCampaign ?? null,
-        acquisition_keyword: conventionDraft.acquisitionKeyword ?? null,
-        establishment_number_employees:
-          conventionDraft.establishmentNumberEmployeesRange ?? null,
-        agency_referent_first_name:
-          conventionDraft.agencyReferent?.firstname ?? null,
-        agency_referent_last_name:
-          conventionDraft.agencyReferent?.lastname ?? null,
-        ft_connect_id: conventionDraft.fromPeConnectedUser ? "true" : null,
-        establishment_tutor: conventionDraft.establishmentTutor
-          ? sql`${JSON.stringify(conventionDraft.establishmentTutor)}`
-          : null,
-        signatories: conventionDraft.signatories
-          ? sql`${JSON.stringify(conventionDraft.signatories)}`
-          : null,
-        updated_at: now ?? sql`now()`,
-      })
+      .values(newValues)
+      .onConflict((oc) => oc.column("id").doUpdateSet(newValuesExceptId))
       .execute();
   }
 }
+
+const mapToEntity = (
+  conventionDraft: ConventionDraftDto,
+  now: DateString,
+): InsertExpression<Database, "convention_drafts"> => {
+  return {
+    id: conventionDraft.id,
+    agency_id: conventionDraft.agencyId,
+    agency_kind: conventionDraft.agencyKind,
+    agency_department: conventionDraft.agencyDepartment,
+    date_start: conventionDraft.dateStart,
+    date_end: conventionDraft.dateEnd,
+    siret: conventionDraft.siret,
+    business_name: conventionDraft.businessName,
+    schedule: conventionDraft.schedule
+      ? sql`${JSON.stringify(conventionDraft.schedule)}`
+      : null,
+    individual_protection: conventionDraft.individualProtection,
+    individual_protection_description:
+      conventionDraft.individualProtectionDescription,
+    sanitary_prevention: conventionDraft.sanitaryPrevention,
+    sanitary_prevention_description:
+      conventionDraft.sanitaryPreventionDescription,
+    immersion_address: conventionDraft.immersionAddress,
+    immersion_objective: conventionDraft.immersionObjective,
+    immersion_appellation: sql`${conventionDraft.immersionAppellation?.appellationCode}`,
+    immersion_activities: conventionDraft.immersionActivities,
+    immersion_skills: conventionDraft.immersionSkills,
+    work_conditions: conventionDraft.workConditions,
+    internship_kind: conventionDraft.internshipKind,
+    business_advantages: conventionDraft.businessAdvantages,
+    acquisition_campaign: conventionDraft.acquisitionCampaign,
+    acquisition_keyword: conventionDraft.acquisitionKeyword,
+    establishment_number_employees:
+      conventionDraft.establishmentNumberEmployeesRange,
+    agency_referent_first_name: conventionDraft.agencyReferent?.firstname,
+    agency_referent_last_name: conventionDraft.agencyReferent?.lastname,
+    ft_connect_id:
+      conventionDraft.signatories?.beneficiary?.federatedIdentity?.provider ===
+      "peConnect"
+        ? conventionDraft.signatories?.beneficiary?.federatedIdentity?.token
+        : undefined,
+    establishment_tutor: conventionDraft.establishmentTutor
+      ? sql`${JSON.stringify(conventionDraft.establishmentTutor)}`
+      : null,
+    signatories: conventionDraft.signatories
+      ? sql`${JSON.stringify(conventionDraft.signatories)}`
+      : null,
+    updated_at: now,
+  };
+};
