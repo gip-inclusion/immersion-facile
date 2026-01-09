@@ -1,6 +1,6 @@
 import { addDays, isBefore } from "date-fns";
 import subDays from "date-fns/subDays";
-import { map, propEq, sort, toPairs } from "ramda";
+import { propEq, toPairs } from "ramda";
 import {
   type AgencyId,
   type ConventionDto,
@@ -13,12 +13,10 @@ import {
   type DataWithPagination,
   errors,
   type FindSimilarConventionsParams,
-  filter,
   type GetPaginatedConventionsFilters,
   isFunctionalBroadcastFeedbackError,
   NotFoundError,
   type PaginationQueryParams,
-  pipeWithValue,
   type SiretDto,
   type UserId,
 } from "shared";
@@ -29,7 +27,6 @@ import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAge
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
 import type { InMemoryBroadcastFeedbacksRepository } from "../../core/saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
 import type {
-  ConventionMarketingData,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -116,43 +113,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
           logger,
         }),
       );
-  }
-
-  public async getConventionsMarketingData({
-    siret,
-  }: {
-    siret: SiretDto;
-  }): Promise<ConventionMarketingData[]> {
-    return pipeWithValue(
-      this.conventionRepository.conventions,
-      filter(
-        (convention) =>
-          convention.siret === siret &&
-          convention.status === "ACCEPTED_BY_VALIDATOR",
-      ),
-      sort((a, b) => {
-        const aDate = a.dateValidation;
-        const bDate = b.dateValidation;
-
-        if (!aDate) return 1;
-        if (!bDate) return -1;
-
-        return new Date(aDate).getTime() - new Date(bDate).getTime();
-      }),
-      map((convention) => ({
-        siret: convention.siret,
-        dateValidation: convention.dateValidation || undefined,
-        dateEnd: convention.dateEnd,
-        establishmentRepresentative: {
-          email: convention.signatories.establishmentRepresentative.email,
-          firstName:
-            convention.signatories.establishmentRepresentative.firstName,
-          lastName: convention.signatories.establishmentRepresentative.lastName,
-        },
-        establishmentNumberEmployeesRange:
-          convention.establishmentNumberEmployeesRange || undefined,
-      })),
-    );
   }
 
   public async getPaginatedConventionsForAgencyUser(
@@ -470,19 +430,6 @@ const makeApplyFiltersToConventions =
             : true,
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
-
-const _makeApplyAssessmentCompletionStatusFilterConventionsReadd =
-  ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
-  (convention: ConventionReadDto) => {
-    if (!assessmentCompletionStatus) return true;
-
-    return (
-      convention.status === "ACCEPTED_BY_VALIDATOR" &&
-      (assessmentCompletionStatus === "completed"
-        ? convention.assessment !== null
-        : convention.assessment === null)
-    );
-  };
 
 const makeApplyAssessmentCompletionStatusFilterConventionsRead =
   ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
