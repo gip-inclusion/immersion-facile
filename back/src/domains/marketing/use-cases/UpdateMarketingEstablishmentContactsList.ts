@@ -1,12 +1,12 @@
 import { equals } from "ramda";
 import {
+  type ConventionDto,
   errors,
   isSuperEstablishment,
   type SiretDto,
   type WithSiretDto,
   withSiretSchema,
 } from "shared";
-import type { ConventionMarketingData } from "../../convention/ports/ConventionQueries";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -43,15 +43,18 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
           siret,
         );
 
-      const validatedConventionsData =
-        await uow.conventionQueries.getConventionsMarketingData({
-          siret: siret,
-        });
+      const validatedConventions = await uow.conventionQueries.getConventions({
+        filters: {
+          withSirets: [siret],
+          withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+        },
+        sortBy: "dateValidation",
+      });
 
       const marketingConventionsData = {
-        firstConvention: validatedConventionsData.at(0),
-        lastConvention: validatedConventionsData.at(-1),
-        totalNumberOfConvention: validatedConventionsData.length,
+        firstConvention: validatedConventions.at(0),
+        lastConvention: validatedConventions.at(-1),
+        totalNumberOfConvention: validatedConventions.length,
       };
 
       return establishment
@@ -77,8 +80,8 @@ const onMissingEstablishment = async (
   timeGateway: TimeGateway,
   establishmentMarketingGateway: EstablishmentMarketingGateway,
   marketingConventionsData: {
-    firstConvention: ConventionMarketingData | undefined;
-    lastConvention: ConventionMarketingData | undefined;
+    firstConvention: ConventionDto | undefined;
+    lastConvention: ConventionDto | undefined;
     totalNumberOfConvention: number;
   },
   siret: SiretDto,
@@ -95,9 +98,9 @@ const onMissingEstablishment = async (
 
   const marketingContact: MarketingContact = {
     createdAt: timeGateway.now(),
-    email: lastConvention.establishmentRepresentative.email,
-    firstName: lastConvention.establishmentRepresentative.firstName,
-    lastName: lastConvention.establishmentRepresentative.lastName,
+    email: lastConvention.signatories.establishmentRepresentative.email,
+    firstName: lastConvention.signatories.establishmentRepresentative.firstName,
+    lastName: lastConvention.signatories.establishmentRepresentative.lastName,
   };
 
   await saveMarketingContactEntity(uow, lastConvention.siret, marketingContact);
@@ -120,8 +123,8 @@ const onEstablishment = async (
   timeGateway: TimeGateway,
   establishmentAggregate: EstablishmentAggregate,
   marketingConventionsData: {
-    firstConvention: ConventionMarketingData | undefined;
-    lastConvention: ConventionMarketingData | undefined;
+    firstConvention: ConventionDto | undefined;
+    lastConvention: ConventionDto | undefined;
     totalNumberOfConvention: number;
   },
 ): Promise<void> => {
@@ -200,8 +203,8 @@ const onEstablishment = async (
 };
 
 const makeConventionInfos = (marketingConventionsData: {
-  firstConvention: ConventionMarketingData | undefined;
-  lastConvention: ConventionMarketingData | undefined;
+  firstConvention: ConventionDto | undefined;
+  lastConvention: ConventionDto | undefined;
   totalNumberOfConvention: number;
 }): ConventionInfos => {
   const { firstConvention, lastConvention, totalNumberOfConvention } =

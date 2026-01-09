@@ -1,6 +1,5 @@
 import { addDays, subDays } from "date-fns";
 import { sql } from "kysely";
-import { jsonBuildObject } from "kysely/helpers/postgres";
 import { andThen } from "ramda";
 import {
   type AgencyId,
@@ -37,7 +36,6 @@ import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import type {
-  ConventionMarketingData,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -131,44 +129,6 @@ export class PgConventionQueries implements ConventionQueries {
           .execute(),
       andThen(validateConventionResults),
     );
-  }
-
-  public async getConventionsMarketingData({
-    siret,
-  }: {
-    siret: SiretDto;
-  }): Promise<ConventionMarketingData[]> {
-    const result = await this.transaction
-      .selectFrom("conventions")
-      .innerJoin(
-        "actors as er",
-        "er.id",
-        "conventions.establishment_representative_id",
-      )
-      .select((eb) => [
-        "conventions.siret as siret",
-        "conventions.date_validation as dateValidation",
-        "conventions.date_end as dateEnd",
-        jsonBuildObject({
-          email: eb.ref("er.email"),
-          firstName: eb.ref("er.first_name"),
-          lastName: eb.ref("er.last_name"),
-        }).as("establishmentRepresentative"),
-        "conventions.establishment_number_employees as establishmentNumberEmployeesRange",
-      ])
-      .where("conventions.siret", "=", siret)
-      .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
-      .orderBy("conventions.date_validation", "asc")
-      .execute();
-
-    return result.map((row) => ({
-      siret: row.siret,
-      dateValidation: row.dateValidation?.toISOString() || undefined,
-      dateEnd: row.dateEnd.toISOString(),
-      establishmentRepresentative: row.establishmentRepresentative,
-      establishmentNumberEmployeesRange:
-        row.establishmentNumberEmployeesRange || undefined,
-    }));
   }
 
   public async getConventionsByScope(params: {
