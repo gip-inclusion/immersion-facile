@@ -1,9 +1,13 @@
+import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { useState } from "react";
 import {
   type ConventionId,
   domElementIds,
   type Email,
   immersionFacileContactEmail,
+  type RenewExpiredJwtRequestDto,
   type SiretDto,
 } from "shared";
 import type {
@@ -12,6 +16,7 @@ import type {
   FrontErrorProps,
 } from "src/app/contents/error/types";
 import { routes } from "src/app/routes/routes";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 export class FrontSpecificError extends Error {
   public props: FrontErrorProps;
@@ -190,3 +195,69 @@ export const ContactUsButton = ({
 };
 
 export const defaultFrontErrorButtons = [HomeButton, ContactUsButton];
+export const RenewMagicLinkButton = ({
+  renewExpiredJwtRequestDto,
+}: {
+  renewExpiredJwtRequestDto: RenewExpiredJwtRequestDto;
+}): React.JSX.Element => {
+  // Flag that tracks if the link renewal had already been requested.
+  const [requested, setRequested] = useState(false);
+  // Tracks the success of the server request.
+  const [requestSuccessful, setRequestSuccessful] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const onClick = async () => {
+    if (location.search.length === 0) {
+      setErrorMessage("URL invalide");
+      return;
+    }
+
+    if (!renewExpiredJwtRequestDto.expiredJwt) {
+      setRequestSuccessful(false);
+      setErrorMessage("URL invalide");
+      return;
+    }
+
+    setRequested(true);
+    outOfReduxDependencies.authGateway
+      .renewExpiredJwt(renewExpiredJwtRequestDto)
+      .then(() => {
+        setRequestSuccessful(true);
+      })
+      .catch((e) => {
+        setErrorMessage(e.message);
+        setRequestSuccessful(true);
+        setRequested(false);
+      });
+  };
+
+  return (
+    <>
+      {!requestSuccessful && (
+        <Button
+          className={fr.cx("fr-mt-2w")}
+          disabled={requested}
+          onClick={onClick}
+          nativeButtonProps={{
+            id: domElementIds.magicLinkRenewal.renewalButton,
+          }}
+        >
+          Demander un nouveau lien
+        </Button>
+      )}
+      {requestSuccessful && (
+        <p>
+          Votre demande est enregistrée. Vous recevrez un message avec le
+          nouveau lien dans quelques instants.{" "}
+        </p>
+      )}
+      {errorMessage && (
+        <Alert
+          severity="error"
+          title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement."
+          description={errorMessage}
+        />
+      )}
+    </>
+  );
+};
