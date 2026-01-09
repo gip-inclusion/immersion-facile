@@ -9,6 +9,7 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { PgConventionDraftRepository } from "./PgConventionDraftRepository";
 
 describe("PgConventionDraftRepository", () => {
+  const now = "2024-10-08T00:00:00.000Z";
   let pool: Pool;
   let pgConventionDraftRepository: PgConventionDraftRepository;
   let db: KyselyDb;
@@ -28,13 +29,13 @@ describe("PgConventionDraftRepository", () => {
   });
 
   describe("save", () => {
-    it("saves a minimal convention draft", async () => {
+    it("create a minimal convention draft", async () => {
       const conventionDraft: ConventionDraftDto = {
         id: uuid(),
         internshipKind: "immersion",
       };
 
-      await pgConventionDraftRepository.save(conventionDraft, "2024-10-08");
+      await pgConventionDraftRepository.save(conventionDraft, now);
 
       const result = await pgConventionDraftRepository.getById(
         conventionDraft.id,
@@ -42,10 +43,11 @@ describe("PgConventionDraftRepository", () => {
       expectToEqual(result, {
         id: conventionDraft.id,
         internshipKind: "immersion",
+        updatedAt: now,
       });
     });
 
-    it("saves a convention draft with more fields", async () => {
+    it("create a convention draft with more fields", async () => {
       const conventionDraft: ConventionDraftDto = {
         id: uuid(),
         agencyKind: "mission-locale",
@@ -80,16 +82,19 @@ describe("PgConventionDraftRepository", () => {
         },
       };
 
-      await pgConventionDraftRepository.save(conventionDraft, "2024-10-08");
+      await pgConventionDraftRepository.save(conventionDraft, now);
 
       const result = await pgConventionDraftRepository.getById(
         conventionDraft.id,
       );
 
-      expectToEqual(result, conventionDraft);
+      expectToEqual(result, {
+        ...conventionDraft,
+        updatedAt: now,
+      });
     });
 
-    it("saves a convention draft with jsonb fields", async () => {
+    it("create a convention draft with jsonb fields", async () => {
       const conventionDraft: ConventionDraftDto = {
         id: uuid(),
         internshipKind: "immersion",
@@ -128,12 +133,41 @@ describe("PgConventionDraftRepository", () => {
         },
       };
 
-      await pgConventionDraftRepository.save(conventionDraft, "2024-10-08");
+      await pgConventionDraftRepository.save(conventionDraft, now);
 
       const result = await pgConventionDraftRepository.getById(
         conventionDraft.id,
       );
-      expectToEqual(result, conventionDraft);
+      expectToEqual(result, {
+        ...conventionDraft,
+        updatedAt: now,
+      });
+    });
+
+    it("update a convention draft", async () => {
+      const conventionDraft: ConventionDraftDto = {
+        id: uuid(),
+        internshipKind: "immersion",
+        businessName: "Test Business",
+      };
+
+      await pgConventionDraftRepository.save(conventionDraft, now);
+
+      const updatedConventionDraft: ConventionDraftDto = {
+        id: conventionDraft.id,
+        internshipKind: "immersion",
+        businessName: "Updated Test Business",
+      };
+
+      await pgConventionDraftRepository.save(updatedConventionDraft, now);
+
+      const result = await pgConventionDraftRepository.getById(
+        conventionDraft.id,
+      );
+      expectToEqual(result, {
+        ...updatedConventionDraft,
+        updatedAt: now,
+      });
     });
   });
 
@@ -209,13 +243,16 @@ describe("PgConventionDraftRepository", () => {
         },
       };
 
-      await pgConventionDraftRepository.save(conventionDraft, "2024-10-08");
+      await pgConventionDraftRepository.save(conventionDraft, now);
 
       const result = await pgConventionDraftRepository.getById(
         conventionDraft.id,
       );
 
-      expectToEqual(result, conventionDraft);
+      expectToEqual(result, {
+        ...conventionDraft,
+        updatedAt: now,
+      });
     });
   });
 });

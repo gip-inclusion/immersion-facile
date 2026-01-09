@@ -59,7 +59,6 @@ export const getConventionInitialValuesFromUrl = ({
       ...(conventionDraft
         ? conventionPresentationFromConventionDraft(conventionDraft)
         : conventionPresentationFromUrlParams(params)),
-      id: uuidV4(),
       status: "READY_TO_SIGN",
       dateSubmission: toDateUTCString(new Date()),
       internshipKind,
@@ -564,6 +563,8 @@ const scheduleFromParams = ({
 const conventionPresentationFromUrlParams = (
   params: ConventionParamsInUrl,
 ): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
+  id: uuidV4(),
+
   // Agency
   agencyId: params.agencyId ?? undefined,
   agencyDepartment: params.agencyDepartment ?? "",
@@ -661,8 +662,11 @@ const conventionPresentationFromUrlParams = (
 const conventionPresentationFromConventionDraft = (
   conventionDraft: ConventionDraftDto,
 ): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
+  id: conventionDraft.id,
+  updatedAt: conventionDraft.updatedAt,
+
   // Agency
-  agencyId: conventionDraft.agencyId ?? undefined,
+  agencyId: conventionDraft.agencyId,
   agencyDepartment: conventionDraft.agencyDepartment ?? "",
   agencyKind: conventionDraft.agencyKind as AgencyKind | undefined,
   agencyReferent: {

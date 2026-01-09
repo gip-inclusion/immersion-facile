@@ -23,18 +23,19 @@ describe("GetConventionDraftById", () => {
   });
 
   it("returns the convention draft when it exists", async () => {
+    const now = new Date().toISOString();
     const conventionDraft: ConventionDraftDto = {
       id: uuid(),
       internshipKind: "immersion",
     };
-    await uow.conventionDraftRepository.save(
-      conventionDraft,
-      new Date().toISOString(),
-    );
+    await uow.conventionDraftRepository.save(conventionDraft, now);
 
     const result = await usecase.execute(conventionDraft.id);
 
-    expectToEqual(result, conventionDraft);
+    expectToEqual(result, {
+      ...conventionDraft,
+      updatedAt: now,
+    });
   });
 
   it("throws NotFoundError when convention draft does not exist", async () => {

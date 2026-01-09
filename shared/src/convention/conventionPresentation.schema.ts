@@ -3,19 +3,26 @@ import {
   agencyKindSchema,
   refersToAgencyIdSchema,
 } from "../agency/agency.schema";
+import { emailSchema } from "../email/email.schema";
 import {
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "../zodUtils";
-import { conventionSchema } from "./convention.schema";
+import { conventionIdSchema, conventionSchema } from "./convention.schema";
 import type {
   ConventionPresentation,
+  WithConventionIdOrConventionDraftId,
   WithStatusJustification,
 } from "./conventionPresentation.dto";
-import { emailSchema } from "../email/email.schema";
+import { conventionDraftIdSchema } from "./shareConventionDraftByEmail.schema";
+
+const withConventionIdOrConventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<WithConventionIdOrConventionDraftId> =
+  z.object({
+    id: conventionIdSchema.or(conventionDraftIdSchema),
+  });
 
 export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<ConventionPresentation> =
-  conventionSchema.and(
+  conventionSchema.and(withConventionIdOrConventionDraftIdSchema).and(
     z.object({
       agencyDepartment: z.string(),
       agencyRefersTo: z

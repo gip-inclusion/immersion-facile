@@ -491,6 +491,14 @@ export const errors = {
       ),
   },
   conventionDraft: {
+    conflict: ({
+      conventionDraftId,
+    }: {
+      conventionDraftId: ConventionDraftId;
+    }) =>
+      new ConflictError(
+        `Le brouillon de convention avec l'identifiant ${conventionDraftId} a déjà été modifié avant votre demande. Veuillez la relire et prendre connaissance des modifications.`,
+      ),
     notFound: ({
       conventionDraftId,
     }: {
