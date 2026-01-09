@@ -8,9 +8,9 @@ import type {
   ConventionsWithErroredBroadcastFeedbackFilters,
   ConventionWithBroadcastFeedback,
   DataWithPagination,
-  DateRange,
   FindSimilarConventionsParams,
   GetConventionsForAgencyUserParams,
+  OptionalDateRange,
   PaginationQueryParams,
   SiretDto,
   UserId,
@@ -22,8 +22,8 @@ export type GetConventionsFilters = {
   startDateLessOrEqual?: Date;
   dateSubmissionEqual?: Date;
   dateSubmissionSince?: Date;
-  endDate?: Partial<DateRange>;
-  updateDate?: Partial<DateRange>;
+  endDate?: OptionalDateRange;
+  updateDate?: OptionalDateRange;
   withStatuses?: ConventionStatus[];
   withSirets?: SiretDto[];
 };

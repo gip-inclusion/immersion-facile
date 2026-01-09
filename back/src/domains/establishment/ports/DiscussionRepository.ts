@@ -10,6 +10,7 @@ import type {
   DiscussionStatus,
   Email,
   LocationId,
+  OptionalDateRange,
   SiretDto,
   UserId,
   WithRequiredPagination,
@@ -26,7 +27,7 @@ export type HasDiscussionMatchingParams = {
 
 export type GetDiscussionIdsParams = {
   filters: {
-    updatedBetween?: Partial<DateRange>;
+    updatedBetween?: OptionalDateRange;
     statuses?: DiscussionStatus[];
   };
   orderBy: "updatedAt";

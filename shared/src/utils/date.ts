@@ -15,6 +15,7 @@ export type DateRange = {
   from: Date;
   to: Date;
 };
+export type OptionalDateRange = Partial<DateRange>;
 
 export const withDateRangeSchema: ZodSchemaWithInputMatchingOutput<DateRange> =
   z
