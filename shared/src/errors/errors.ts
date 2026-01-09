@@ -42,7 +42,11 @@ import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellati
 import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
 import type { UserId } from "../user/user.dto";
-import { type DateRange, toDisplayedDate } from "../utils/date";
+import {
+  type DateRange,
+  type OptionalDateRange,
+  toDisplayedDate,
+} from "../utils/date";
 import { ManagedFTConnectError } from "./ftConnectErrors";
 import {
   BadRequestError,
@@ -134,7 +138,7 @@ export const errors = {
       ),
   },
   generic: {
-    badDateRange: ({ from, to }: Partial<DateRange>) =>
+    badDateRange: ({ from, to }: OptionalDateRange) =>
       new Error(`L'intervale de temps n'est pas supporté. De: ${from} À:${to}`),
     notAnError: () => new Error("Not an error class"),
     testError: (message: string) => new Error(message),
