@@ -1,13 +1,9 @@
-import { addDays } from "date-fns";
-import subDays from "date-fns/subDays";
 import { values } from "ramda";
 import {
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
-  type Email,
   errors,
-  validatedConventionStatuses,
 } from "shared";
 import type { ConventionRepository } from "../ports/ConventionRepository";
 
@@ -50,40 +46,8 @@ export class InMemoryConventionRepository implements ConventionRepository {
     throw errors.generic.fakeError("Not implemented");
   }
 
-  public async getIdsValidatedByEndDateAround(
-    dateEnd: Date,
-  ): Promise<ConventionId[]> {
-    return values(this.#conventions)
-      .filter(
-        (convention) =>
-          validatedConventionStatuses.includes(convention.status) &&
-          new Date(convention.dateEnd) >= subDays(dateEnd, 1) &&
-          new Date(convention.dateEnd) <= addDays(dateEnd, 1),
-      )
-      .map((convention) => convention.id);
-  }
-
   public async getById(id: ConventionId) {
     return this.#conventions[id];
-  }
-
-  public async getIdsByEstablishmentRepresentativeEmail(
-    email: Email,
-  ): Promise<ConventionId[]> {
-    return values(this.#conventions)
-      .filter(
-        ({ signatories }) =>
-          signatories.establishmentRepresentative.email === email,
-      )
-      .map(({ id }) => id);
-  }
-
-  public async getIdsByEstablishmentTutorEmail(
-    email: Email,
-  ): Promise<ConventionId[]> {
-    return values(this.#conventions)
-      .filter(({ establishmentTutor }) => establishmentTutor.email === email)
-      .map(({ id }) => id);
   }
 
   public async save(convention: ConventionDto): Promise<void> {

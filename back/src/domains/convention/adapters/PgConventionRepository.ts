@@ -1,5 +1,3 @@
-import { addDays } from "date-fns";
-import subDays from "date-fns/subDays";
 import { sql } from "kysely";
 import {
   type Beneficiary,
@@ -8,14 +6,12 @@ import {
   type ConventionDto,
   type ConventionId,
   type DateString,
-  type Email,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   errors,
   type InternshipKind,
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
-  validatedConventionStatuses,
 } from "shared";
 import {
   falsyToNull,
@@ -88,56 +84,6 @@ export class PgConventionRepository implements ConventionRepository {
       ...dto
     } = readDto;
     return dto;
-  }
-
-  public async getIdsByEstablishmentRepresentativeEmail(
-    email: Email,
-  ): Promise<ConventionId[]> {
-    const result = await this.transaction
-      .selectFrom("conventions")
-      .select("conventions.id")
-      .leftJoin(
-        "actors",
-        "conventions.establishment_representative_id",
-        "actors.id",
-      )
-      .where("actors.email", "=", email)
-      .execute();
-
-    return result.map(({ id }) => id);
-  }
-
-  public async getIdsByEstablishmentTutorEmail(
-    email: Email,
-  ): Promise<ConventionId[]> {
-    const result = await this.transaction
-      .selectFrom("conventions")
-      .select("conventions.id")
-      .leftJoin("actors", "conventions.establishment_tutor_id", "actors.id")
-      .where("actors.email", "=", email)
-      .execute();
-
-    return result.map(({ id }) => id);
-  }
-
-  public async getIdsValidatedByEndDateAround(endDate: Date) {
-    const result = await this.transaction
-      .selectFrom("conventions")
-      .select("conventions.id")
-      .where("conventions.status", "in", validatedConventionStatuses)
-      .where(
-        sql`conventions.date_end`,
-        ">=",
-        subDays(endDate, 1).toISOString().split("T")[0],
-      )
-      .where(
-        sql`conventions.date_end`,
-        "<=",
-        addDays(endDate, 1).toISOString().split("T")[0],
-      )
-      .execute();
-
-    return result.map(({ id }) => id);
   }
 
   public async save(

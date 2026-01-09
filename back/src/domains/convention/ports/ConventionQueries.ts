@@ -1,5 +1,6 @@
 import type {
   AgencyId,
+  AppellationCode,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
@@ -8,7 +9,8 @@ import type {
   ConventionsWithErroredBroadcastFeedbackFilters,
   ConventionWithBroadcastFeedback,
   DataWithPagination,
-  FindSimilarConventionsParams,
+  DateString,
+  Email,
   GetConventionsForAgencyUserParams,
   OptionalDateRange,
   PaginationQueryParams,
@@ -44,13 +46,34 @@ export type GetPaginatedConventionsForAgencyUserParams =
     pagination: Required<PaginationQueryParams>;
   };
 
+export type GetConventionIdsParams = {
+  filters: {
+    withAppelationCodes?: AppellationCode[];
+    withDateStart?: OptionalDateRange;
+    withSirets?: SiretDto[];
+    withStatuses?: ConventionStatus[];
+    withBeneficiary?: {
+      birthdate?: DateString;
+      lastName?: string;
+    };
+    withEstablishmentRepresentative?: {
+      email?: Email;
+    };
+    withEstablishmentTutor?: {
+      email?: Email;
+    };
+  };
+  limit?: number;
+};
+
 export interface ConventionQueries {
+  getConventionIdsByFilters(
+    params: GetConventionIdsParams,
+  ): Promise<ConventionId[]>;
+
   getConventionById: (
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
-  findSimilarConventions(
-    params: FindSimilarConventionsParams,
-  ): Promise<ConventionId[]>;
 
   getPaginatedConventionsForAgencyUser(
     params: GetPaginatedConventionsForAgencyUserParams,

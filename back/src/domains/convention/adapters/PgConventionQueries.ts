@@ -1,4 +1,3 @@
-import { addDays, subDays } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
@@ -20,7 +19,6 @@ import {
   type DataWithPagination,
   type DateFilter,
   errors,
-  type FindSimilarConventionsParams,
   functionalBroadcastFeedbackErrorMessage,
   type GetPaginatedConventionsFilters,
   type GetPaginatedConventionsSortBy,
@@ -37,6 +35,7 @@ import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import type {
   ConventionQueries,
+  GetConventionIdsParams,
   GetConventionsFilters,
   GetConventionsParams,
   GetConventionsSortBy,
@@ -58,45 +57,101 @@ const logger = createLogger(__filename);
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
 
-  public async findSimilarConventions(
-    params: FindSimilarConventionsParams,
-  ): Promise<ConventionId[]> {
-    const dateStartToMatch = new Date(params.dateStart);
-    const numberOfDaysTolerance = 7;
-    const statusesToIgnore: ConventionStatus[] = [
-      "DEPRECATED",
-      "REJECTED",
-      "CANCELLED",
-    ];
+  public async getConventionIdsByFilters({
+    filters: {
+      withAppelationCodes,
+      withBeneficiary,
+      withDateStart,
+      withEstablishmentRepresentative,
+      withEstablishmentTutor,
+      withSirets,
+      withStatuses,
+    },
+    limit,
+  }: GetConventionIdsParams): Promise<ConventionId[]> {
+    const pgResults = await pipeWithValue(
+      this.transaction
+        .selectFrom("conventions")
+        .select("conventions.id")
+        .orderBy("conventions.date_start", "desc"),
+      (qb) =>
+        withAppelationCodes
+          ? qb.where(
+              "conventions.immersion_appellation",
+              "in",
+              withAppelationCodes.map((code) => +code),
+            )
+          : qb,
+      (qb) =>
+        withSirets ? qb.where("conventions.siret", "in", withSirets) : qb,
+      (qb) =>
+        withStatuses ? qb.where("conventions.status", "in", withStatuses) : qb,
+      (qb) =>
+        withDateStart?.to
+          ? qb.where("conventions.date_start", "<=", withDateStart.to)
+          : qb,
+      (qb) =>
+        withDateStart?.from
+          ? qb.where("conventions.date_start", ">=", withDateStart.from)
+          : qb,
+      (qb) => (limit ? qb.limit(limit) : qb),
+      (qb) =>
+        withEstablishmentRepresentative?.email
+          ? qb
+              .innerJoin(
+                "actors as establishment_representative",
+                "conventions.establishment_representative_id",
+                "establishment_representative.id",
+              )
+              .where(
+                "establishment_representative.email",
+                "=",
+                withEstablishmentRepresentative.email,
+              )
+          : qb,
+      (qb) =>
+        withEstablishmentTutor?.email
+          ? qb
+              .innerJoin(
+                "actors as establishment_tutor",
+                "conventions.establishment_tutor_id",
+                "establishment_tutor.id",
+              )
+              .where(
+                "establishment_tutor.email",
+                "=",
+                withEstablishmentTutor.email,
+              )
+          : qb,
+      (qb) =>
+        withBeneficiary
+          ? pipeWithValue(
+              qb.innerJoin(
+                "actors as beneficiary",
+                "conventions.beneficiary_id",
+                "beneficiary.id",
+              ),
+              (qb) =>
+                withBeneficiary.birthdate
+                  ? qb.where(
+                      sql`beneficiary.extra_fields ->> 'birthdate'`,
+                      "=",
+                      withBeneficiary.birthdate,
+                    )
+                  : qb,
+              (qb) =>
+                withBeneficiary.lastName
+                  ? qb.where(
+                      "beneficiary.last_name",
+                      "=",
+                      withBeneficiary.lastName,
+                    )
+                  : qb,
+            )
+          : qb,
+    ).execute();
 
-    const pgResults = await createConventionQueryBuilder(
-      this.transaction,
-      false,
-    )
-      .where("conventions.siret", "=", params.siret)
-      .where("conventions.immersion_appellation", "=", +params.codeAppellation)
-      .where(
-        sql`b.extra_fields ->> 'birthdate'`,
-        "=",
-        params.beneficiaryBirthdate,
-      )
-      .where("b.last_name", "=", params.beneficiaryLastName)
-      .where(
-        "conventions.date_start",
-        "<=",
-        addDays(dateStartToMatch, numberOfDaysTolerance),
-      )
-      .where(
-        "conventions.date_start",
-        ">=",
-        subDays(dateStartToMatch, numberOfDaysTolerance),
-      )
-      .where("conventions.status", "not in", statusesToIgnore)
-      .orderBy("conventions.date_start", "desc")
-      .limit(20)
-      .execute();
-
-    return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto).id);
+    return pgResults.map(({ id }) => id);
   }
 
   public async getConventionById(
