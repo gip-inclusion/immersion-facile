@@ -348,56 +348,29 @@ export const makeValuesToWatchInUrl = (
   );
 };
 
-const scheduleSerializer: ValueSerializer<ScheduleDto> = {
-  parse: (raw) =>
-    parseStringToJsonOrThrow<ScheduleDto, "schedule">(raw, "schedule"),
-  stringify: (schedule) => JSON.stringify(schedule),
-};
+const makeValueSerializer = <T>(paramName: string): ValueSerializer<T> => ({
+  parse: (raw) => parseStringToJsonOrThrow<T>(raw, paramName),
+  stringify: (value) => JSON.stringify(value),
+});
+
+const scheduleSerializer: ValueSerializer<ScheduleDto> =
+  makeValueSerializer<ScheduleDto>("schedule");
 
 export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRomeDto> =
-  {
-    parse: (raw) =>
-      parseStringToJsonOrThrow<AppellationAndRomeDto, "immersionAppellation">(
-        raw,
-        "immersionAppellation",
-      ),
-    stringify: (appellationDto) => JSON.stringify(appellationDto),
-  };
+  makeValueSerializer<AppellationAndRomeDto>("immersionAppellation");
 
 export const appellationAndRomeDtoArraySerializer: ValueSerializer<
   AppellationAndRomeDto[]
-> = {
-  parse: (raw) =>
-    parseStringToJsonOrThrow<AppellationAndRomeDto[], "appellations">(
-      raw,
-      "appellations",
-    ),
-  stringify: (appellationDto) => JSON.stringify(appellationDto),
-};
+> = makeValueSerializer<AppellationAndRomeDto[]>("appellations");
 
-export const appellationStringSerializer: ValueSerializer<AppellationCode[]> = {
-  parse: (raw) =>
-    parseStringToJsonOrThrow<AppellationCode[], "appellationCodes">(
-      raw,
-      "appellationCodes",
-    ),
-  stringify: (appellationCodes) => JSON.stringify(appellationCodes),
-};
+export const appellationStringSerializer: ValueSerializer<AppellationCode[]> =
+  makeValueSerializer<AppellationCode[]>("appellationCodes");
 
-export const nafCodeSerializer: ValueSerializer<NafCode[]> = {
-  parse: (raw) =>
-    parseStringToJsonOrThrow<NafCode[], "nafCodes">(raw, "nafCodes"),
-  stringify: (nafCode) => JSON.stringify(nafCode),
-};
+export const nafCodeSerializer: ValueSerializer<NafCode[]> =
+  makeValueSerializer<NafCode[]>("nafCodes");
 
-export const remoteWorkModeSerializer: ValueSerializer<RemoteWorkMode[]> = {
-  parse: (raw) =>
-    parseStringToJsonOrThrow<RemoteWorkMode[], "remoteWorkModes">(
-      raw,
-      "remoteWorkModes",
-    ),
-  stringify: (remoteWorkModes) => JSON.stringify(remoteWorkModes),
-};
+export const remoteWorkModeSerializer: ValueSerializer<RemoteWorkMode[]> =
+  makeValueSerializer<RemoteWorkMode[]>("remoteWorkModes");
 
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
 type ConventionQueryParams = typeof conventionValuesFromUrl;
