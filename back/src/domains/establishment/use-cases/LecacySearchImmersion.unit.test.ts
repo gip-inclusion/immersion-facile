@@ -1397,6 +1397,8 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
   name: "passeEmploi",
   createdAt: new Date("2021-12-20").toISOString(),
   expirationDate: new Date("2022-01-01").toISOString(),
+  revokedAt: null,
+  currentKeyIssuedAt: new Date("2021-12-20").toISOString(),
   contact: {
     firstName: "",
     lastName: "",

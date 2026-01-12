@@ -47,6 +47,8 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
     },
   },
   description: "a",
+  revokedAt: null,
+  currentKeyIssuedAt: "2023-09-22T10:00:00.000Z",
 };
 
 export const unauthorizedApiConsumer: ApiConsumer = {
@@ -81,6 +83,8 @@ export const unauthorizedApiConsumer: ApiConsumer = {
     },
   },
   description: "",
+  revokedAt: null,
+  currentKeyIssuedAt: "2023-09-22T10:00:00.000Z",
 };
 
 export const outdatedApiConsumer: ApiConsumer = {
@@ -115,6 +119,8 @@ export const outdatedApiConsumer: ApiConsumer = {
     },
   },
   description: "",
+  revokedAt: null,
+  currentKeyIssuedAt: subYears(new Date(), 2).toISOString(),
 };
 
 export const authorizedSubscriptionApiConsumer: ApiConsumer = {
@@ -184,7 +190,7 @@ export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
 }
 
 const defaultApiConsumer: ApiConsumer = {
-  id: "aaaaaaaa-4444-4444-4444-aaaaaaaaaaaa",
+  id: "aaaaaaaa-4444-4444-8444-aaaaaaaaaaaa",
   name: "unJeuneUneSolution",
   contact: {
     firstName: "john",
@@ -193,7 +199,7 @@ const defaultApiConsumer: ApiConsumer = {
     job: "tech",
     phone: "+33611223344",
   },
-  createdAt: new Date().toISOString(),
+  createdAt: "2020-01-01T00:00:00.000Z",
   expirationDate: addYears(new Date(), 1).toISOString(),
   rights: {
     searchEstablishment: {
@@ -215,6 +221,8 @@ const defaultApiConsumer: ApiConsumer = {
     },
   },
   description: "Default ApiConsumer description for test",
+  revokedAt: null,
+  currentKeyIssuedAt: "2020-01-01T00:00:00.000Z",
 };
 
 export class ApiConsumerBuilder implements Builder<ApiConsumer> {
@@ -259,6 +267,42 @@ export class ApiConsumerBuilder implements Builder<ApiConsumer> {
     return new ApiConsumerBuilder({
       ...this.#dto,
       id,
+    });
+  }
+
+  public withRevokedAt(
+    revokedAt: ApiConsumer["revokedAt"],
+  ): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({
+      ...this.#dto,
+      revokedAt,
+    });
+  }
+
+  public withCurrentKeyIssuedAt(
+    currentKeyIssuedAt: ApiConsumer["currentKeyIssuedAt"],
+  ): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({
+      ...this.#dto,
+      currentKeyIssuedAt,
+    });
+  }
+
+  public withCreatedAt(
+    createdAt: ApiConsumer["createdAt"],
+  ): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({
+      ...this.#dto,
+      createdAt,
+    });
+  }
+
+  public withExpirationDate(
+    expirationDate: ApiConsumer["expirationDate"],
+  ): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({
+      ...this.#dto,
+      expirationDate,
     });
   }
 }

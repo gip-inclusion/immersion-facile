@@ -158,6 +158,8 @@ export type DomainEvent =
   | GenericEvent<"ConnectedUserAgencyRightRejected", RejectConnectedUserRoleForAgencyParams & WithTriggeredBy> // Old name IcUserAgencyRightRejected
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string } & WithTriggeredBy>
+  | GenericEvent<"ApiConsumerRevoked", { consumerId: string } & WithTriggeredBy>
+  | GenericEvent<"ApiConsumerKeyRenewed", { consumerId: string } & WithTriggeredBy>
   // ERRORED CONVENTION RELATED
   | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId } & WithTriggeredBy>;
 

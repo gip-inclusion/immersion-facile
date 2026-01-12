@@ -281,4 +281,6 @@ const defaultApiConsumerValues = (id: string): ApiConsumer => ({
   },
   createdAt: toDateUTCString(new Date()),
   expirationDate: toDateUTCString(addYears(new Date(), 1)),
+  revokedAt: null,
+  currentKeyIssuedAt: new Date().toISOString(),
 });

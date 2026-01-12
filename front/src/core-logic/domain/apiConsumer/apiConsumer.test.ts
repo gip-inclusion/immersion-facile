@@ -39,6 +39,8 @@ const apiConsumer1: ApiConsumer = {
   },
   createdAt: new Date().toISOString(),
   expirationDate: new Date().toISOString(),
+  revokedAt: null,
+  currentKeyIssuedAt: new Date().toISOString(),
 };
 
 describe("api consumer", () => {

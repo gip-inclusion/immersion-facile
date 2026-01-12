@@ -951,6 +951,8 @@ export const errors = {
       new NotFoundError(`Aucun group avec le terme ${groupSlug} trouvé.`),
   },
   apiConsumer: {
+    notFound: ({ id }: { id: ApiConsumerId }) =>
+      new NotFoundError(`Api consumer with id '${id}' not found`),
     forbidden: () => new ForbiddenError(),
     notEnoughPrivilege: () =>
       new ForbiddenError(

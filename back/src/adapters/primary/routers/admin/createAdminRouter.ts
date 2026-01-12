@@ -151,6 +151,28 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
+  sharedAdminRouter.revokeApiConsumer(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.revokeApiConsumer.execute(
+          req.params.consumerId,
+          req.payloads?.currentUser,
+        ),
+      ),
+  );
+
+  sharedAdminRouter.renewApiConsumerKey(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.renewApiConsumerKey.execute(
+          req.params.consumerId,
+          req.payloads?.currentUser,
+        ),
+      ),
+  );
+
   sharedAdminRouter.getUsers(deps.connectedUserAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.getUsers.execute(

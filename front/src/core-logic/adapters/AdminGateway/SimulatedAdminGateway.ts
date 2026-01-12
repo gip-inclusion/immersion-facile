@@ -203,6 +203,8 @@ const apiConsumers: ApiConsumer[] = [
     },
     createdAt: new Date().toISOString(),
     expirationDate: new Date().toISOString(),
+    revokedAt: null,
+    currentKeyIssuedAt: new Date().toISOString(),
     rights: {
       searchEstablishment: {
         kinds: ["READ"],
@@ -236,6 +238,8 @@ const apiConsumers: ApiConsumer[] = [
     },
     createdAt: new Date().toISOString(),
     expirationDate: new Date().toISOString(),
+    revokedAt: null,
+    currentKeyIssuedAt: new Date().toISOString(),
     rights: {
       searchEstablishment: {
         kinds: ["READ"],

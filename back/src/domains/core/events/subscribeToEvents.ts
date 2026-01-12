@@ -215,6 +215,8 @@ const getUseCasesByTopics = (
 
   //Api Consumer related:
   ApiConsumerSaved: [],
+  ApiConsumerRevoked: [],
+  ApiConsumerKeyRenewed: [],
 
   //partnersConvention related
   PartnerErroredConventionMarkedAsHandled: [],

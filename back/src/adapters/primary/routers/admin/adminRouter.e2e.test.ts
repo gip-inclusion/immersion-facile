@@ -707,6 +707,8 @@ describe("Admin router", () => {
         {
           ...authorizedUnJeuneUneSolutionApiConsumer,
           createdAt: now.toISOString(),
+          currentKeyIssuedAt: now.toISOString(),
+          revokedAt: null,
         },
       ]);
     });
@@ -826,6 +828,89 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 401,
         body: { status: 401, message: invalidTokenMessage },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    adminRoutes.revokeApiConsumer,
+  )} revokes an api consumer`, () => {
+    it("200 - revoke existing api consumer", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [
+        authorizedUnJeuneUneSolutionApiConsumer,
+      ];
+
+      const response = await sharedRequest.revokeApiConsumer({
+        urlParams: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
+        headers: { authorization: backOfficeAdminToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+
+      expect(
+        inMemoryUow.apiConsumerRepository.consumers[0].revokedAt,
+      ).not.toBeNull();
+    });
+
+    it("404 - api consumer not found", async () => {
+      const response = await sharedRequest.revokeApiConsumer({
+        urlParams: { consumerId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" },
+        headers: { authorization: backOfficeAdminToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message:
+            "Api consumer with id 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' not found",
+        },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    adminRoutes.renewApiConsumerKey,
+  )} renews an api consumer key`, () => {
+    it("200 - renew key for existing api consumer", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [
+        authorizedUnJeuneUneSolutionApiConsumer,
+      ];
+
+      const response = await sharedRequest.renewApiConsumerKey({
+        urlParams: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
+        headers: { authorization: backOfficeAdminToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: expect.any(String),
+      });
+
+      const jwt = response.body as string;
+      const { id } = makeVerifyJwtES256<"apiConsumer">(
+        appConfig.apiJwtPublicKey,
+      )(jwt);
+
+      expectToEqual(id, authorizedUnJeuneUneSolutionApiConsumer.id);
+    });
+
+    it("404 - api consumer not found", async () => {
+      const response = await sharedRequest.renewApiConsumerKey({
+        urlParams: { consumerId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" },
+        headers: { authorization: backOfficeAdminToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message:
+            "Api consumer with id 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' not found",
+        },
       });
     });
   });
