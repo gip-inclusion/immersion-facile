@@ -31,6 +31,8 @@ export type AuthorisationStatus =
   | "incorrectJwt"
   | "expiredToken"
   | "consumerNotFound"
+  | "consumerRevoked"
+  | "keyRenewed"
   | "tooManyRequests"
   | "unauthenticated";
 
@@ -176,7 +178,8 @@ export const makeConsumerMiddleware = (
     }
 
     try {
-      const { id } = verifyJwt(req.headers.authorization);
+      const jwtPayload = verifyJwt(req.headers.authorization);
+      const { id } = jwtPayload;
 
       const apiConsumer = await getApiConsumerById(id);
 
@@ -188,6 +191,26 @@ export const makeConsumerMiddleware = (
         return responseErrorForV2(res, "consumer not found", 401);
       }
 
+      if (apiConsumer.revokedAt) {
+        log({
+          apiConsumer,
+          authorisationStatus: "consumerRevoked",
+        });
+        return responseErrorForV2(res, "api consumer revoked", 401);
+      }
+
+      if (jwtPayload.iat) {
+        const jwtIssuedAt = new Date(jwtPayload.iat * 1000);
+        const currentKeyIssuedAt = new Date(apiConsumer.currentKeyIssuedAt);
+        if (jwtIssuedAt < currentKeyIssuedAt) {
+          log({
+            apiConsumer,
+            authorisationStatus: "keyRenewed",
+          });
+          return responseErrorForV2(res, "api key has been renewed", 401);
+        }
+      }
+
       if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         log({
           apiConsumer,
@@ -196,7 +219,7 @@ export const makeConsumerMiddleware = (
         return responseErrorForV2(res, "expired token", 401);
       }
 
-      // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
+      // only if the OAuth is known, and the id authorized, not revoked, key valid, and not expired we add apiConsumer payload to the request:
       log({
         apiConsumer,
         authorisationStatus: "authorised",

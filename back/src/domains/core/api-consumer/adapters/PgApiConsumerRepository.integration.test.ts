@@ -26,6 +26,8 @@ const apiConsumer: ApiConsumer = {
   },
   createdAt: new Date().toISOString(),
   expirationDate: new Date().toISOString(),
+  revokedAt: null,
+  currentKeyIssuedAt: new Date().toISOString(),
   rights: {
     searchEstablishment: {
       kinds: ["READ"],
@@ -90,6 +92,8 @@ describe("PgApiConsumerRepository", () => {
       },
       createdAt: new Date().toISOString(),
       expirationDate: new Date().toISOString(),
+      revokedAt: null,
+      currentKeyIssuedAt: new Date().toISOString(),
       rights: {
         searchEstablishment: {
           kinds: ["READ"],

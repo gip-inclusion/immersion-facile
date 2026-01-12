@@ -48,6 +48,8 @@ describe("Get Convention for ApiConsumer", () => {
       convention: conventionRight,
       statistics: { kinds: [], scope: "no-scope", subscriptions: [] },
     },
+    revokedAt: null,
+    currentKeyIssuedAt: new Date().toISOString(),
   });
 
   let getConventionForApiConsumer: GetConventionForApiConsumer;
