@@ -103,6 +103,7 @@ const removeFederatedIdentityFromDevice = ({
 }) => {
   localDeviceRepository.delete("federatedIdentityWithUser");
   localDeviceRepository.delete("partialConventionInUrl");
+  localDeviceRepository.delete("conventionDraftId");
 };
 
 const deleteFederatedIdentityFromDevice: AuthEpic = (

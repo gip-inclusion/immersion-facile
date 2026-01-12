@@ -39,9 +39,15 @@ const storeConventionRouteParamsOnDevice = (
     fedIdProvider: _2,
     fedIdToken: _3,
     jwt: _4,
+    conventionDraftId,
     ...partialConvention
   } = routeParams;
-  if (keys(partialConvention).length) {
+  if (conventionDraftId) {
+    outOfReduxDependencies.localDeviceRepository.set(
+      "conventionDraftId",
+      conventionDraftId,
+    );
+  } else if (keys(partialConvention).length) {
     outOfReduxDependencies.localDeviceRepository.set(
       "partialConventionInUrl",
       partialConvention,

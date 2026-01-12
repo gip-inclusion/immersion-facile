@@ -41,6 +41,7 @@ import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convent
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -122,14 +123,17 @@ export const ConventionFormWrapper = ({
   const [userRolesOnConvention, setUserRolesOnConvention] = useState<Role[]>(
     userRolesForFetchedConvention,
   );
+  const conventionDraftId =
+    outOfReduxDependencies.localDeviceRepository.get("conventionDraftId") ??
+    route.params.conventionDraftId;
 
   useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
 
   useEffect(() => {
-    if (mode === "create-from-shared" && route.params.conventionDraftId) {
+    if (mode === "create-from-shared" && conventionDraftId) {
       dispatch(
         conventionDraftSlice.actions.fetchConventionDraftRequested({
-          conventionDraftId: route.params.conventionDraftId,
+          conventionDraftId: conventionDraftId,
           feedbackTopic: "convention-draft",
         }),
       );
@@ -153,7 +157,7 @@ export const ConventionFormWrapper = ({
         }),
       );
     }
-  }, [dispatch, mode, route.params]);
+  }, [dispatch, mode, route.params, conventionDraftId]);
 
   useEffect(() => {
     if (route.params.jwt) {
