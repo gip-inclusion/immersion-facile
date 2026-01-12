@@ -275,8 +275,7 @@ export const domElementIds = {
   conventionImmersionRoute: {
     form: (params) =>
       `im-convention-${params.internshipKind}-form--${params.mode}`,
-    shareForm: "im-convention-form__share-form",
-    shareFormSubmitButton: "im-convention-form__share-form-submit-button",
+    continueButton: "im-convention-form__continue-button",
     copyLinkButton: "im-convention-form__copy-link-button",
     showFormButton: "im-convention-form__show-form-button",
     submitFormButton: "im-convention-form__submit-form-button",
@@ -377,7 +376,15 @@ export const domElementIds = {
       phone:
         "im-convention-form__signatories-establishmentRepresentative-phone",
     },
-    shareButton: "im-convention-form__share-button",
+    shareConventionDraft: {
+      shareButton: "im-convention-form__share-button",
+      shareForm: "im-convention-form__share-form",
+      shareFormEmailInput: "im-convention-form__share-form-email-input",
+      shareFormRecipientEmailInput:
+        "im-convention-form__share-form-recipient-email-input",
+      shareFormDetailsInput: "im-convention-form__share-form-details-input",
+      shareFormSubmitButton: "im-convention-form__share-form-submit-button",
+    },
     deleteHoursButton: "im-convention-form__delete-hours-button",
   },
 
