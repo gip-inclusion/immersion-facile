@@ -52,9 +52,9 @@ export const updatedEndDateDisplayed = format(
   "dd/MM/yyyy",
 );
 
-export const submitBasicConventionForm = async (
+export const fillBasicConventionForm = async (
   page: Page,
-): Promise<ConventionSubmitted | void> => {
+): Promise<AgencyId | undefined> => {
   await page.goto(frontRoutes.initiateConvention);
   await expect(
     await page.request.get(technicalRoutes.featureFlags.url),
@@ -182,6 +182,16 @@ export const submitBasicConventionForm = async (
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
     faker.word.words(8),
   );
+
+  return agencyId;
+};
+
+export const submitBasicConventionForm = async (
+  page: Page,
+): Promise<ConventionSubmitted | void> => {
+  const agencyId = await fillBasicConventionForm(page);
+  expect(agencyId).not.toBeFalsy();
+  if (!agencyId) return;
   await confirmCreateConventionFormSubmit(page, tomorrowDateDisplayed);
 
   return {
@@ -475,3 +485,17 @@ const getRandomSiret = () =>
   ["722 003 936 02320", "44229377500031", "130 005 481 00010"][
     Math.floor(Math.random() * 3)
   ];
+
+export const shareConventionDraftByEmail = async (page: Page) => {
+  await page.click(
+    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareButton}`,
+  );
+  await page.fill(
+    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormEmailInput}`,
+    "test@immersion-facile.beta.gouv.fr",
+  );
+  await page.click(
+    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormSubmitButton}`,
+  );
+  await expectElementToBeVisible(page, ".fr-alert--success");
+};
