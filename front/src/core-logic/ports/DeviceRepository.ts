@@ -1,4 +1,9 @@
-import type { AbsoluteUrl, SearchResultDto, WithAcquisition } from "shared";
+import type {
+  AbsoluteUrl,
+  ConventionDraftId,
+  SearchResultDto,
+  WithAcquisition,
+} from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
@@ -13,7 +18,8 @@ export type LocalStoragePair =
   | GenericPair<"partialConventionInUrl", Partial<ConventionParamsInUrl>>
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>
-  | GenericPair<"searchResultExternal", SearchResultDto>;
+  | GenericPair<"searchResultExternal", SearchResultDto>
+  | GenericPair<"conventionDraftId", ConventionDraftId>;
 
 export type SessionStoragePair =
   | GenericPair<"acquisitionParams", WithAcquisition>
