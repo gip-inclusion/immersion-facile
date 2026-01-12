@@ -25,20 +25,23 @@ export type RemoteWorkMode = (typeof remoteWorkModes)[number];
 
 export const remoteWorkModeLabels: Record<
   RemoteWorkMode,
-  { label: string; description: string }
+  { label: string; answerLabel: string; description: string }
 > = {
   HYBRID: {
-    label: "Oui, télétravail hybride",
+    label: "Télétravail hybride",
+    answerLabel: "Oui, télétravail hybride",
     description:
       "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
   },
   FULL_REMOTE: {
-    label: "Oui, 100% télétravail",
+    label: "100% télétravail",
+    answerLabel: "Oui, 100% télétravail",
     description:
       "Apparaîtra pour la France entière, quelle que soit la localisation du candidat",
   },
   NO_REMOTE: {
-    label: "Non, pas de télétravail",
+    label: "100% présentiel",
+    answerLabel: "Non, 100% en présentiel",
     description:
       "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
   },
@@ -77,13 +80,13 @@ export type WithJobAndPhone = WithJob & WithPhone;
 
 export type AdminFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-admin"> &
-    Required<WithJobAndPhone> &
-    WithIsMainContactInPerson;
+  Required<WithJobAndPhone> &
+  WithIsMainContactInPerson;
 
 export type ContactFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-contact"> &
-    WithJobAndPhone &
-    WithIsMainContactInPerson;
+  WithJobAndPhone &
+  WithIsMainContactInPerson;
 
 export type FormEstablishmentUserRight =
   | AdminFormEstablishmentUserRight
@@ -140,15 +143,15 @@ export type CommonFormEstablishmentDto = {
 
 type GenericFormEstablishmentDto<T extends ContactMode> =
   CommonFormEstablishmentDto &
-    WithAcquisition & {
-      contactMode: T;
-    } & (T extends "IN_PERSON"
-      ? {
-          potentialBeneficiaryWelcomeAddress: AddressAndPosition;
-        }
-      : {
-          potentialBeneficiaryWelcomeAddress?: never;
-        });
+  WithAcquisition & {
+    contactMode: T;
+  } & (T extends "IN_PERSON"
+    ? {
+      potentialBeneficiaryWelcomeAddress: AddressAndPosition;
+    }
+    : {
+      potentialBeneficiaryWelcomeAddress?: never;
+    });
 
 export type FormEstablishmentDto = GenericFormEstablishmentDto<
   "EMAIL" | "PHONE" | "IN_PERSON"

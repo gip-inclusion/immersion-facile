@@ -174,7 +174,7 @@ export const OfferModal = ({
           legend={"Proposez-vous du télétravail sur ce métier ?"}
           id={domElementIds.establishment[mode].remoteWorkMode}
           options={remoteWorkModes.map((remoteWorkMode) => ({
-            label: remoteWorkModeLabels[remoteWorkMode].label,
+            label: remoteWorkModeLabels[remoteWorkMode].answerLabel,
             nativeInputProps: {
               value: remoteWorkMode,
 
