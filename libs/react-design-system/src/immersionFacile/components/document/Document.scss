@@ -58,6 +58,31 @@
     max-height: 8rem;
     max-width: 8rem;
   }
+  &__header-row {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    flex-wrap: wrap;
+    @include for-print {
+      gap: 2rem;
+    }
+  }
+  &__header-data {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  &__header-icon {
+    width: 5rem;
+    height: auto;
+    @include for-print {
+      width: 3rem;
+    }
+  }
+  &__header-label {
+    display: block;
+    color: var(--text-mention-grey);
+  }
   @include for-print {
     margin-top: -4rem;
   }

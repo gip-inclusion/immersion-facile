@@ -3,6 +3,9 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./Document.scss";
+import candidatIcon from "../../../../public/assets/images/candidat.webp";
+import structureAccueilIcon from "../../../../public/assets/images/structure-accueil.webp";
+import { SectionHighlight } from "../section-highlight/SectionHighlight";
 
 const componentName = "im-convention-document";
 
@@ -12,6 +15,9 @@ export type ConventionDocumentProperties = {
   logos: ReactNode[];
   title: string;
   customActions?: ReactNode[];
+  beneficiaryName: string;
+  businessName: string;
+  internshipKind: "immersion" | "mini-stage-cci";
 };
 
 export const Document = ({
@@ -20,6 +26,9 @@ export const Document = ({
   logos,
   title,
   customActions,
+  beneficiaryName,
+  businessName,
+  internshipKind,
 }: ConventionDocumentProperties) => {
   const { cx } = useStyles();
   const renderLogos = () =>
@@ -51,10 +60,28 @@ export const Document = ({
           >
             {renderLogos()}
           </div>
-          <hr className={fr.cx("fr-hr", "fr-mb-4w")} />
-          <h1 className={cx(fr.cx("fr-mb-8w"), `${componentName}__title`)}>
+          <h1
+            className={cx(
+              fr.cx("fr-mb-8w", "fr-h3"),
+              `${componentName}__title`,
+            )}
+          >
             {title}
           </h1>
+          <SectionHighlight>
+            <div className={`${componentName}__header-row`}>
+              <HeaderData
+                label={`Personne en ${internshipKind === "immersion" ? "immersion" : "mini-stage"}`}
+                value={beneficiaryName}
+                iconSrc={candidatIcon}
+              />
+              <HeaderData
+                label="Entreprise"
+                value={businessName}
+                iconSrc={structureAccueilIcon}
+              />
+            </div>
+          </SectionHighlight>
           <hr className={fr.cx("fr-hr", "fr-mb-4w")} />
         </header>
         <main>{children}</main>
@@ -62,3 +89,26 @@ export const Document = ({
     </section>
   );
 };
+
+const HeaderData = ({
+  label,
+  value,
+  iconSrc,
+}: {
+  label: string;
+  value: string;
+  iconSrc: string;
+}) => (
+  <div className={`${componentName}__header-data`}>
+    <img
+      src={iconSrc}
+      alt=""
+      className={`${componentName}__header-icon`}
+      aria-hidden="true"
+    />
+    <div>
+      <span className={`${componentName}__header-label`}>{label}</span>
+      <h2 className={fr.cx("fr-h6", "fr-mb-0")}>{value}</h2>
+    </div>
+  </div>
+);
