@@ -165,6 +165,42 @@ describe("/offers route", () => {
 
   describe("from front - /offers", () => {
     describe("accepts valid requests", () => {
+      it("with given appellationCode and without position, require sortBy param", async () => {
+        const immersionOffer = new OfferEntityBuilder()
+          .withRomeCode(establishmentAggregate2.offers[0].romeCode)
+          .withAppellationCode(
+            establishmentAggregate2.offers[0].appellationCode,
+          )
+          .withAppellationLabel("Coiffeur / Coiffeuse mixte")
+          .build();
+
+        // Prepare
+        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentAggregate2,
+        );
+
+        // Act and assert
+        const result = await httpClient.getOffers({
+          queryParams: {
+            appellationCodes: [immersionOffer.appellationCode],
+            sortBy: "score",
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: {
+            data: [
+              establishmentAggregateToSearchResultByRomeForFirstLocation(
+                establishmentAggregate2,
+                immersionOffer.romeCode,
+              ),
+            ],
+            pagination: getBasicPagination(),
+          },
+        });
+      });
+
       it("with given appellationCode and position", async () => {
         const immersionOffer = new OfferEntityBuilder()
           .withRomeCode(establishmentAggregate2.offers[0].romeCode)
