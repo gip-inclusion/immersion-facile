@@ -26,6 +26,8 @@ import { useDispatch } from "react-redux";
 import {
   domElementIds,
   type LatLonDistance,
+  remoteWorkModeLabels,
+  remoteWorkModes,
   type SearchSortedBy,
   searchSortedByOptions,
   type ValueOf,
@@ -666,6 +668,30 @@ export const SearchPage = ({
                             }
                           },
                         }}
+                      />
+                      <p className={fr.cx("fr-text--bold", "fr-mt-2w")}>
+                        Quelle(s) offre(s) souhaitez-vous voir ?
+                      </p>
+                      <Checkbox
+                        options={remoteWorkModes.map((mode) => ({
+                          label: remoteWorkModeLabels[mode].label,
+                          nativeInputProps: {
+                            checked: tempValue.remoteWorkModes?.includes(mode),
+                            onChange: () => {
+                              const remoteWorkModesArray =
+                                tempValue.remoteWorkModes || [];
+                              setTempValue({
+                                ...tempValue,
+                                remoteWorkModes:
+                                  tempValue.remoteWorkModes?.includes(mode)
+                                    ? remoteWorkModesArray.filter(
+                                        (m) => m !== mode,
+                                      )
+                                    : [...remoteWorkModesArray, mode],
+                              });
+                            },
+                          },
+                        }))}
                       />
                     </>
                   ),
