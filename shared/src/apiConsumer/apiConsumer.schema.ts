@@ -153,6 +153,8 @@ export const apiConsumerSchema: ZodSchemaWithInputMatchingOutput<ApiConsumer> =
     ...commonApiConsumerShape,
     createdAt: makeDateStringSchema(),
     rights: apiConsumerRightsSchema,
+    revokedAt: dateTimeIsoStringSchema.nullable(),
+    currentKeyIssuedAt: dateTimeIsoStringSchema,
   });
 
 export const apiConsumerSubscriptionIdSchema: ZodSchemaWithInputMatchingOutput<ApiConsumerSubscriptionId> =

@@ -77,6 +77,8 @@ describe("SaveApiConsumer", () => {
         {
           ...authorizedUnJeuneUneSolutionApiConsumer,
           createdAt: today.toISOString(),
+          currentKeyIssuedAt: today.toISOString(),
+          revokedAt: null,
         },
       ]);
       expectToEqual(uow.outboxRepository.events, [
@@ -100,7 +102,7 @@ describe("SaveApiConsumer", () => {
 
     it("Updates an existing api consumer, except subscriptions", async () => {
       const today = new Date("2023-09-22");
-      timeGateway.setNextDates([today]);
+      timeGateway.setNextDates([today, today]);
       const authorizedApiConsumerWithSubscription: ApiConsumer = {
         ...authorizedUnJeuneUneSolutionApiConsumer,
         rights: {

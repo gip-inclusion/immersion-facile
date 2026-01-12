@@ -355,6 +355,8 @@ interface ApiConsumers {
   contact_job: string;
   contact_phone: string;
   rights: Generated<Json>;
+  revoked_at: Timestamp | null;
+  current_key_issued_at: Timestamp;
 }
 
 interface ApiConsumersSubscriptions {

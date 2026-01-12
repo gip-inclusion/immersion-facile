@@ -103,11 +103,14 @@ export class SaveApiConsumer extends TransactionalUseCase<
       };
     }, {} as ApiConsumerRights);
 
+    const now = this.#timeGateway.now().toISOString();
+
     return {
       ...input,
-      createdAt:
-        existingApiConsumer?.createdAt ?? this.#timeGateway.now().toISOString(),
+      createdAt: existingApiConsumer?.createdAt ?? now,
       rights,
+      revokedAt: existingApiConsumer?.revokedAt ?? null,
+      currentKeyIssuedAt: existingApiConsumer?.currentKeyIssuedAt ?? now,
     };
   }
 }

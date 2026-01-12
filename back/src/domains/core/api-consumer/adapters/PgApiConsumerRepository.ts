@@ -8,6 +8,7 @@ import {
   type ApiConsumerRights,
   apiConsumerSchema,
   type DateString,
+  type DateTimeIsoString,
   type Email,
   eventToRightName,
   type WebhookSubscription,
@@ -148,6 +149,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       contact_last_name: rest.contact.lastName,
       contact_job: rest.contact.job,
       contact_phone: rest.contact.phone,
+      revoked_at: rest.revokedAt,
+      current_key_issued_at: rest.currentKeyIssuedAt,
     };
 
     await this.#transaction
@@ -196,25 +199,29 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
 
   #rawPgToApiConsumer({
     subscriptions,
+    revokedAt,
     ...rest
   }: PgRawConsumerData): ApiConsumer {
-    const restWithEmptySubscription: Omit<PgRawConsumerData, "subscriptions"> =
-      {
-        ...rest,
-        rights: keys(rest.rights).reduce(
-          (acc, rightName) => ({
-            ...acc,
-            [rightName]: {
-              ...rest.rights[rightName],
-              subscriptions: [],
-            },
-          }),
-          {},
-        ) as ApiConsumerRights,
-      };
+    const restWithEmptySubscription: Omit<
+      PgRawConsumerData,
+      "subscriptions" | "revokedAt"
+    > = {
+      ...rest,
+      rights: keys(rest.rights).reduce(
+        (acc, rightName) => ({
+          ...acc,
+          [rightName]: {
+            ...rest.rights[rightName],
+            subscriptions: [],
+          },
+        }),
+        {},
+      ) as ApiConsumerRights,
+    };
 
     const apiConsumer: ApiConsumer = {
       ...restWithEmptySubscription,
+      revokedAt: revokedAt ?? null,
       rights: (subscriptions || []).reduce((acc, subscription) => {
         const rightName = eventToRightName(subscription.subscribedEvent);
         return {
@@ -246,6 +253,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
             rights: cast<ApiConsumerRights>(eb.ref("c.rights")),
             createdAt: sql<DateString>`date_to_iso(c.created_at)`,
             expirationDate: sql<DateString>`date_to_iso(c.expiration_date)`,
+            revokedAt: sql<DateTimeIsoString | null>`date_to_iso(c.revoked_at)`,
+            currentKeyIssuedAt: sql<DateTimeIsoString>`date_to_iso(c.current_key_issued_at)`,
             contact: jsonBuildObject({
               firstName: eb.ref("c.contact_first_name"),
               lastName: eb.ref("c.contact_last_name"),
@@ -276,6 +285,8 @@ type PgRawConsumerData = {
   rights: ApiConsumerRights;
   createdAt: DateString;
   expirationDate: DateString;
+  revokedAt?: DateTimeIsoString;
+  currentKeyIssuedAt: DateTimeIsoString;
   contact: ApiConsumerContact;
   subscriptions: WebhookSubscription[];
 };
