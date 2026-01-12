@@ -124,6 +124,10 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     label: "",
     id: "",
   },
+  createdAt: {
+    label: "",
+    id: "",
+  },
   acquisitionCampaign: {
     label: "",
     id: "",
