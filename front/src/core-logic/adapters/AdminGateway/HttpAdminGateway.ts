@@ -2,6 +2,7 @@ import { from, type Observable } from "rxjs";
 import {
   type AdminRoutes,
   type ApiConsumer,
+  type ApiConsumerId,
   type ApiConsumerJwt,
   type ConnectedUser,
   type ConnectedUserJwt,
@@ -256,6 +257,44 @@ export class HttpAdminGateway implements AdminGateway {
             .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow);
         }),
+    );
+  }
+
+  public revokeApiConsumer$(
+    consumerId: ApiConsumerId,
+    token: ConnectedUserJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .revokeApiConsumer({
+          headers: { authorization: token },
+          urlParams: { consumerId },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: P.union(401, 403, 404, 409) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public renewApiConsumerKey$(
+    consumerId: ApiConsumerId,
+    token: ConnectedUserJwt,
+  ): Observable<ApiConsumerJwt> {
+    return from(
+      this.httpClient
+        .renewApiConsumerKey({
+          headers: { authorization: token },
+          urlParams: { consumerId },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: P.union(401, 403, 404, 409) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   ApiConsumer,
+  ApiConsumerId,
   ApiConsumerJwt,
   ApiConsumerName,
   ConnectedUserJwt,
@@ -108,6 +109,51 @@ export const apiConsumerSlice = createSlice({
     clearApiConsumersRequested: (state) => {
       state.isLoading = false;
       state.apiConsumers = [];
+    },
+    revokeApiConsumerRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        apiConsumerId: ApiConsumerId;
+        adminToken: ConnectedUserJwt;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    revokeApiConsumerSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isLoading = false;
+    },
+    revokeApiConsumerFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isLoading = false;
+    },
+    renewApiConsumerKeyRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        apiConsumerId: ApiConsumerId;
+        adminToken: ConnectedUserJwt;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    renewApiConsumerKeySucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        apiConsumerJwt: ApiConsumerJwt;
+      }>,
+    ) => {
+      state.isLoading = false;
+      state.lastCreatedToken = action.payload.apiConsumerJwt;
+    },
+    renewApiConsumerKeyFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isLoading = false;
     },
   },
 });

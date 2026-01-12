@@ -289,6 +289,127 @@ describe("api consumer", () => {
     expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), []);
   });
 
+  describe("revoke api consumer", () => {
+    it("revokes api consumer successfully", () => {
+      expectInitialStateUnchanged();
+
+      store.dispatch(
+        apiConsumerSlice.actions.revokeApiConsumerRequested({
+          apiConsumerId: apiConsumer1.id,
+          adminToken: "admin-jwt",
+          feedbackTopic: "api-consumer-revoke",
+        }),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.revokeApiConsumerResponse$.next(undefined);
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-revoke": {
+          on: "create",
+          level: "success",
+          title: "Le consommateur d'API a bien été révoqué",
+          message:
+            "Le consommateur d'API a été révoqué et ne peut plus utiliser l'API",
+        },
+      });
+    });
+
+    it("fails on revoke api consumer gateway error", () => {
+      const errorMessage = "failed revoking api consumer";
+
+      expectInitialStateUnchanged();
+
+      store.dispatch(
+        apiConsumerSlice.actions.revokeApiConsumerRequested({
+          apiConsumerId: apiConsumer1.id,
+          adminToken: "admin-jwt",
+          feedbackTopic: "api-consumer-revoke",
+        }),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.revokeApiConsumerResponse$.error(
+        new Error(errorMessage),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-revoke": {
+          on: "create",
+          level: "error",
+          title: "Problème lors de la révocation du consommateur d'API",
+          message: errorMessage,
+        },
+      });
+    });
+  });
+
+  describe("renew api consumer key", () => {
+    it("renews api consumer key successfully and stores new token", () => {
+      const newGeneratedJwt = "new-super-secret-jwt";
+
+      expectInitialStateUnchanged();
+
+      store.dispatch(
+        apiConsumerSlice.actions.renewApiConsumerKeyRequested({
+          apiConsumerId: apiConsumer1.id,
+          adminToken: "admin-jwt",
+          feedbackTopic: "api-consumer-renew",
+        }),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.renewApiConsumerKeyResponse$.next(
+        newGeneratedJwt,
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBe(
+        newGeneratedJwt,
+      );
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-renew": {
+          on: "create",
+          level: "success",
+          title: "La clé API a bien été renouvelée",
+          message:
+            "La nouvelle clé API a été générée. L'ancienne clé est désormais invalide.",
+        },
+      });
+    });
+
+    it("fails on renew api consumer key gateway error", () => {
+      const errorMessage = "failed renewing api consumer key";
+
+      expectInitialStateUnchanged();
+
+      store.dispatch(
+        apiConsumerSlice.actions.renewApiConsumerKeyRequested({
+          apiConsumerId: apiConsumer1.id,
+          adminToken: "admin-jwt",
+          feedbackTopic: "api-consumer-renew",
+        }),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.renewApiConsumerKeyResponse$.error(
+        new Error(errorMessage),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-renew": {
+          on: "create",
+          level: "error",
+          title: "Problème lors du renouvellement de la clé API",
+          message: errorMessage,
+        },
+      });
+    });
+  });
+
   const expectInitialStateUnchanged = () => {
     expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), []);
     expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);

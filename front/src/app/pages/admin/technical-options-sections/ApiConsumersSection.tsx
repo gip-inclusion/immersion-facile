@@ -3,6 +3,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { addYears } from "date-fns";
@@ -52,6 +53,16 @@ export const apiConsumerModal = createFormModal({
   formId: domElementIds.admin.technicalOptionsTab.apiConsumerForm,
 });
 
+const revokeApiConsumerModal = createModal({
+  id: domElementIds.admin.technicalOptionsTab.revokeApiConsumerModal,
+  isOpenedByDefault: false,
+});
+
+const renewApiConsumerKeyModal = createModal({
+  id: domElementIds.admin.technicalOptionsTab.renewApiConsumerKeyModal,
+  isOpenedByDefault: false,
+});
+
 export const ApiConsumersSection = () => {
   const isApiConsumerModalOpened = useIsModalOpen({
     id: domElementIds.admin.technicalOptionsTab.apiConsumerModal,
@@ -61,8 +72,16 @@ export const ApiConsumersSection = () => {
   const dispatch = useDispatch();
   const adminToken = useAdminToken();
   const feedback = useFeedbackTopic("api-consumer-global");
+  const renewFeedback = useFeedbackTopic("api-consumer-renew");
+  const revokeFeedback = useFeedbackTopic("api-consumer-revoke");
   const isConsumerAdded =
     feedback?.on === "create" && feedback?.level === "success";
+  const isKeyRenewed =
+    renewFeedback?.on === "create" && renewFeedback?.level === "success";
+  const isRevoked =
+    revokeFeedback?.on === "create" && revokeFeedback?.level === "success";
+  const [apiConsumerToActOn, setApiConsumerToActOn] =
+    useState<ApiConsumer | null>(null);
 
   useEffect(() => {
     adminToken &&
@@ -109,6 +128,62 @@ export const ApiConsumersSection = () => {
     apiConsumerModal.close();
   };
 
+  const onRevokeClick = (apiConsumer: ApiConsumer) => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    setApiConsumerToActOn(apiConsumer);
+    revokeApiConsumerModal.open();
+  };
+
+  const onRenewKeyClick = (apiConsumer: ApiConsumer) => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
+    setApiConsumerToActOn(apiConsumer);
+    renewApiConsumerKeyModal.open();
+  };
+
+  const onConfirmRevoke = () => {
+    if (!adminToken || !apiConsumerToActOn) return;
+    dispatch(
+      apiConsumerSlice.actions.revokeApiConsumerRequested({
+        apiConsumerId: apiConsumerToActOn.id,
+        adminToken,
+        feedbackTopic: "api-consumer-revoke",
+      }),
+    );
+  };
+
+  const onConfirmRenewKey = () => {
+    if (!adminToken || !apiConsumerToActOn) return;
+    dispatch(
+      apiConsumerSlice.actions.renewApiConsumerKeyRequested({
+        apiConsumerId: apiConsumerToActOn.id,
+        adminToken,
+        feedbackTopic: "api-consumer-renew",
+      }),
+    );
+  };
+
+  const onRevokeModalClose = () => {
+    revokeApiConsumerModal.close();
+    setApiConsumerToActOn(null);
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    adminToken &&
+      dispatch(
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+      );
+  };
+
+  const onRenewKeyModalClose = () => {
+    renewApiConsumerKeyModal.close();
+    setApiConsumerToActOn(null);
+    dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    adminToken &&
+      dispatch(
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+      );
+  };
+
   const lastCreatedToken = useAppSelector(
     apiConsumerSelectors.lastCreatedToken,
   );
@@ -120,7 +195,11 @@ export const ApiConsumersSection = () => {
   );
 
   const tableDataFromApiConsumers = sortedApiConsumers.map((apiConsumer) => [
-    formatApiConsumerName(apiConsumer.id, apiConsumer.name),
+    formatApiConsumerName(
+      apiConsumer.id,
+      apiConsumer.name,
+      apiConsumer.revokedAt,
+    ),
     formatApiConsumerDescription(apiConsumer.description),
     toDisplayedDate({
       date: new Date(apiConsumer.expirationDate),
@@ -128,7 +207,11 @@ export const ApiConsumersSection = () => {
     }),
     formatApiConsumerContact(apiConsumer.contact),
     formatApiConsumerRights(apiConsumer.rights),
-    makeApiConsumerActionButtons(apiConsumer, onEditButtonClick),
+    makeApiConsumerActionButtons(apiConsumer, {
+      onEdit: onEditButtonClick,
+      onRevoke: onRevokeClick,
+      onRenewKey: onRenewKeyClick,
+    }),
   ]);
 
   const closeButton: ButtonProps = {
@@ -194,6 +277,106 @@ export const ApiConsumersSection = () => {
             <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
           </WithFeedbackReplacer>
         </apiConsumerModal.Component>,
+        document.body,
+      )}
+      {createPortal(
+        <revokeApiConsumerModal.Component
+          title="Révoquer le consommateur API"
+          concealingBackdrop
+          buttons={
+            isRevoked
+              ? [
+                  {
+                    children: "Fermer",
+                    type: "button",
+                    priority: "primary",
+                    onClick: onRevokeModalClose,
+                  },
+                ]
+              : [
+                  {
+                    children: "Annuler",
+                    type: "button",
+                    priority: "secondary",
+                    doClosesModal: false,
+                    onClick: onRevokeModalClose,
+                  },
+                  {
+                    children: "Révoquer",
+                    type: "button",
+                    priority: "primary",
+                    doClosesModal: false,
+                    onClick: onConfirmRevoke,
+                  },
+                ]
+          }
+        >
+          <Feedback topics={["api-consumer-revoke"]} />
+          {apiConsumerToActOn && !isRevoked && (
+            <Alert
+              severity="warning"
+              title="Action irréversible"
+              description={`Vous êtes sur le point de révoquer le consommateur "${apiConsumerToActOn.name}". Cette action est permanente et le consommateur ne pourra plus utiliser l'API.`}
+            />
+          )}
+        </revokeApiConsumerModal.Component>,
+        document.body,
+      )}
+      {createPortal(
+        <renewApiConsumerKeyModal.Component
+          title={
+            apiConsumerToActOn?.revokedAt
+              ? "Réactiver le consommateur API"
+              : "Renouveler la clé API"
+          }
+          concealingBackdrop
+          buttons={
+            isKeyRenewed && lastCreatedToken
+              ? undefined
+              : [
+                  {
+                    children: "Annuler",
+                    type: "button",
+                    priority: "secondary",
+                    doClosesModal: false,
+                    onClick: onRenewKeyModalClose,
+                  },
+                  {
+                    children: apiConsumerToActOn?.revokedAt
+                      ? "Réactiver"
+                      : "Renouveler",
+                    type: "button",
+                    priority: "primary",
+                    doClosesModal: false,
+                    onClick: onConfirmRenewKey,
+                  },
+                ]
+          }
+        >
+          {isKeyRenewed && lastCreatedToken ? (
+            <ShowApiKeyToCopy
+              lastCreatedToken={lastCreatedToken}
+              onConfirmTokenModalClose={onRenewKeyModalClose}
+            />
+          ) : (
+            <>
+              <Feedback topics={["api-consumer-renew"]} />
+              {apiConsumerToActOn && (
+                <Alert
+                  severity={apiConsumerToActOn.revokedAt ? "info" : "warning"}
+                  title={
+                    apiConsumerToActOn.revokedAt ? "Réactivation" : "Attention"
+                  }
+                  description={
+                    apiConsumerToActOn.revokedAt
+                      ? `Vous êtes sur le point de réactiver le consommateur "${apiConsumerToActOn.name}". Une nouvelle clé API sera générée et le consommateur pourra à nouveau utiliser l'API.`
+                      : `Vous êtes sur le point de renouveler la clé API pour "${apiConsumerToActOn.name}". L'ancienne clé sera immédiatement invalidée. Assurez-vous de transmettre la nouvelle clé au consommateur.`
+                  }
+                />
+              )}
+            </>
+          )}
+        </renewApiConsumerKeyModal.Component>,
         document.body,
       )}
     </BackofficeDashboardTabContent>
