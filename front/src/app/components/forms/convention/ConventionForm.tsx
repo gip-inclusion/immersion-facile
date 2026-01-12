@@ -376,6 +376,7 @@ export const ConventionForm = ({
     outOfReduxDependencies.localDeviceRepository.delete(
       "partialConventionInUrl",
     );
+    outOfReduxDependencies.localDeviceRepository.delete("conventionDraftId");
     dispatch(conventionSlice.actions.setCurrentStep(1));
   }, [dispatch]);
 
