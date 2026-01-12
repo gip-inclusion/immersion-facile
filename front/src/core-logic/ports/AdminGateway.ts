@@ -1,6 +1,7 @@
 import type { Observable } from "rxjs";
 import type {
   ApiConsumer,
+  ApiConsumerId,
   ApiConsumerJwt,
   ConnectedUser,
   ConnectedUserJwt,
@@ -74,4 +75,14 @@ export interface AdminGateway {
     params: { userId: UserId },
     token: ConnectedUserJwt,
   ): Observable<ConnectedUser>;
+
+  revokeApiConsumer$(
+    consumerId: ApiConsumerId,
+    token: ConnectedUserJwt,
+  ): Observable<void>;
+
+  renewApiConsumerKey$(
+    consumerId: ApiConsumerId,
+    token: ConnectedUserJwt,
+  ): Observable<ApiConsumerJwt>;
 }
