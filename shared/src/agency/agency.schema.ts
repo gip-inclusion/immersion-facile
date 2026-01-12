@@ -11,6 +11,7 @@ import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { allAgencyRoles } from "../role/role.dto";
+import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
@@ -112,6 +113,7 @@ const withEmails = {
 
 const commonAgencyShape = {
   id: agencyIdSchema,
+  createdAt: makeDateStringSchema(),
   name: stringWithMaxLength255,
   kind: agencyKindSchema,
   coveredDepartments: z.array(zStringMinLength1).min(1),

@@ -12,6 +12,7 @@ import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import type { UserId } from "../user/user.dto";
 import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
+import type { DateString } from "../utils/date";
 
 export type CodeSafir = Flavor<string, "CodeSafir">;
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
@@ -32,6 +33,7 @@ export type CreateAgencyDto = {
   id: AgencyId;
   kind: AgencyKind;
   name: string;
+  createdAt: DateString;
   coveredDepartments: DepartmentCode[];
   address: AddressDto;
   position: GeoPositionDto;

@@ -194,7 +194,7 @@ interface Agencies extends WithAcquisition {
   email_signature: string;
   legacy_address: string | null;
   position: Generated<string>;
-  created_at: Generated<Timestamp>;
+  created_at: Timestamp | Generated<Timestamp>;
   updated_at: Timestamp | Generated<Timestamp>;
   status: Generated<string>;
   kind: string;

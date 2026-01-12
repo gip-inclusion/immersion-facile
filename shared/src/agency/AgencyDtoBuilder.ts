@@ -2,6 +2,7 @@ import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, DepartmentCode } from "../address/address.dto";
 import type { Builder } from "../Builder";
+import type { DateString } from "../utils/date";
 import type {
   AgencyDto,
   AgencyId,
@@ -16,11 +17,14 @@ const defaultAddress: AddressDto = {
   postcode: "86000",
 };
 
+export const DATE_CREATION = new Date("2025-02-02").toISOString();
+
 export const defaultValidatorEmail = "default.validator@mail.com";
 
 const emptyAgency: AgencyDto = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   name: "empty-name",
+  createdAt: DATE_CREATION,
   status: "active",
   kind: "autre",
   counsellorEmails: [],
@@ -73,6 +77,13 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
           ...this.#agency.coveredDepartments,
         ]),
       ],
+    });
+  }
+
+  public withCreatedAt(createdAt: DateString) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      createdAt,
     });
   }
 

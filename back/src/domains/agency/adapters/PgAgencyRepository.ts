@@ -77,6 +77,9 @@ export class PgAgencyRepository implements AgencyRepository {
         acquisition_keyword: agency.acquisitionKeyword,
         phone_number: agency.phoneNumber,
         status_justification: agency.statusJustification,
+        created_at: agency.createdAt
+          ? sql<Date>`${agency.createdAt}::timestamp`
+          : sql`now()`,
         updated_at: updatedAt ?? sql`now()`,
       }))
       .execute()
@@ -224,6 +227,7 @@ export class PgAgencyRepository implements AgencyRepository {
       position,
       sirets,
       status,
+      createdAtBefore,
     } = filters;
 
     const results = await pipeWithValue(
@@ -249,6 +253,10 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) =>
         sirets && sirets.length > 0
           ? b.where("agencies.agency_siret", "in", sirets)
+          : b,
+      (b) =>
+        createdAtBefore
+          ? b.where("agencies.created_at", "<=", createdAtBefore)
           : b,
       (b) =>
         position
@@ -402,6 +410,7 @@ export class PgAgencyRepository implements AgencyRepository {
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),
           phoneNumber: ref("agencies.phone_number"),
+          createdAt: sql<DateString>`date_to_iso(agencies.created_at)`,
           usersRights: fn.coalesce(
             fn
               .jsonAgg(

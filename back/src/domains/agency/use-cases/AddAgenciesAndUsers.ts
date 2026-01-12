@@ -298,6 +298,7 @@ const createNewAgencies = async ({
     });
     const agency: AgencyWithUsersRights = {
       id: deps.uuidGenerator.new(),
+      createdAt: deps.timeGateway.now().toISOString(),
       status: "active",
       agencySiret: row.SIRET,
       name: row["Nom structure"],

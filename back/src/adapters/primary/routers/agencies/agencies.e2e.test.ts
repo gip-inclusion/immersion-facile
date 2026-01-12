@@ -196,6 +196,7 @@ describe("Agency routes", () => {
     )} to add Agency`, () => {
       const parisMissionLocaleParams: CreateAgencyDto = {
         id: "some-id",
+        createdAt: new Date().toISOString(),
         coveredDepartments: ["75"],
         address: {
           streetNumberAndAddress: "Agency 1 address",
