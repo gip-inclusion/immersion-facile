@@ -261,6 +261,7 @@ describe("AddAgenciesAndUsers", () => {
             .withPosition(23, 12)
             .withName(row["Nom structure"])
             .withSignature("L'équipe")
+            .withCreatedAt(timeGateway.now().toISOString())
             .build(),
           {
             [newUserId]: {
@@ -322,6 +323,7 @@ describe("AddAgenciesAndUsers", () => {
           .withCoveredDepartments(["75"])
           .withPosition(23, 12)
           .withSignature("L'équipe")
+          .withCreatedAt(timeGateway.now().toISOString())
           .build(),
         {
           [newUserId]: {
