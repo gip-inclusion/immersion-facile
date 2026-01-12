@@ -38,6 +38,8 @@ const topics = [
   "agency-user",
   "api-consumer-global",
   "api-consumer-names",
+  "api-consumer-renew",
+  "api-consumer-revoke",
   "assessment",
   "auth-global",
   "broadcast-convention-again",
@@ -214,6 +216,33 @@ export const feedbacks: Record<
       title: "Problème rencontré",
       message:
         "Une erreur est survenue lors de la récupération de la liste des partenaires à qui rediffuser la convention",
+    },
+  },
+  "api-consumer-revoke": {
+    "create.success": {
+      action: apiConsumerSlice.actions.revokeApiConsumerSucceeded,
+      title: "Le consommateur d'API a bien été révoqué",
+      message:
+        "Le consommateur d'API a été révoqué et ne peut plus utiliser l'API",
+    },
+    "create.error": {
+      action: apiConsumerSlice.actions.revokeApiConsumerFailed,
+      title: "Problème lors de la révocation du consommateur d'API",
+      message:
+        "Une erreur est survenue lors de la révocation du consommateur d'API",
+    },
+  },
+  "api-consumer-renew": {
+    "create.success": {
+      action: apiConsumerSlice.actions.renewApiConsumerKeySucceeded,
+      title: "La clé API a bien été renouvelée",
+      message:
+        "La nouvelle clé API a été générée. L'ancienne clé est désormais invalide.",
+    },
+    "create.error": {
+      action: apiConsumerSlice.actions.renewApiConsumerKeyFailed,
+      title: "Problème lors du renouvellement de la clé API",
+      message: "Une erreur est survenue lors du renouvellement de la clé API",
     },
   },
   "agency-user": {

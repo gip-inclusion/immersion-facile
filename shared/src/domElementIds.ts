@@ -765,6 +765,13 @@ export const domElementIds = {
 
       apiConsumerSubmitButton:
         "im-technical-options__api-consumer-submit-button",
+      revokeApiConsumerButton: ({ apiConsumerId }) =>
+        `im-technical-options__revoke-api-consumer-button--${apiConsumerId}`,
+      renewApiConsumerKeyButton: ({ apiConsumerId }) =>
+        `im-technical-options__renew-api-consumer-key-button--${apiConsumerId}`,
+      revokeApiConsumerModal: "im-technical-options__revoke-api-consumer-modal",
+      renewApiConsumerKeyModal:
+        "im-technical-options__renew-api-consumer-key-modal",
     },
     login: {
       proConnectButton: "im-login-form__inclusion-connect-button--admin",

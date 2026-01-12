@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import type { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
+import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { keys } from "ramda";
 import { useState } from "react";
 import {
@@ -116,10 +117,16 @@ export const formatApiConsumerDescription = (
 export const formatApiConsumerName = (
   id: ApiConsumerId,
   name: ApiConsumerName,
+  revokedAt: string | null,
 ) => (
   <>
     <strong>{id}</strong>
     <br />({name})
+    {revokedAt && (
+      <Badge severity="error" className={fr.cx("fr-mt-1w")}>
+        Révoqué
+      </Badge>
+    )}
   </>
 );
 
@@ -128,18 +135,53 @@ export const formatApiConsumerScope = (scope: NoScope | ConventionScope) => {
   return <ApiConsumerConventionScopeDisplayed scope={scope} />;
 };
 
+type ApiConsumerActionHandlers = {
+  onEdit: (apiConsumer: ApiConsumer) => void;
+  onRevoke: (apiConsumer: ApiConsumer) => void;
+  onRenewKey: (apiConsumer: ApiConsumer) => void;
+};
+
 export const makeApiConsumerActionButtons = (
   apiConsumer: ApiConsumer,
-  onClick: (apiConsumer: ApiConsumer) => void,
-) => (
-  <Button
-    size="small"
-    type="button"
-    onClick={() => onClick(apiConsumer)}
-    id={domElementIds.admin.technicalOptionsTab.editApiConsumerButton({
-      apiConsumerId: apiConsumer.id,
-    })}
-  >
-    Éditer
-  </Button>
-);
+  handlers: ApiConsumerActionHandlers,
+) => {
+  const isRevoked = apiConsumer.revokedAt !== null;
+  return (
+    <ButtonsGroup
+      inlineLayoutWhen="always"
+      buttonsSize="small"
+      buttons={[
+        {
+          children: "Éditer",
+          type: "button",
+          onClick: () => handlers.onEdit(apiConsumer),
+          id: domElementIds.admin.technicalOptionsTab.editApiConsumerButton({
+            apiConsumerId: apiConsumer.id,
+          }),
+          disabled: isRevoked,
+        },
+        {
+          children: "Révoquer",
+          type: "button",
+          priority: "tertiary",
+          onClick: () => handlers.onRevoke(apiConsumer),
+          id: domElementIds.admin.technicalOptionsTab.revokeApiConsumerButton({
+            apiConsumerId: apiConsumer.id,
+          }),
+          disabled: isRevoked,
+        },
+        {
+          children: isRevoked ? "Réactiver" : "Renouveler clé",
+          type: "button",
+          priority: "tertiary",
+          onClick: () => handlers.onRenewKey(apiConsumer),
+          id: domElementIds.admin.technicalOptionsTab.renewApiConsumerKeyButton(
+            {
+              apiConsumerId: apiConsumer.id,
+            },
+          ),
+        },
+      ]}
+    />
+  );
+};
