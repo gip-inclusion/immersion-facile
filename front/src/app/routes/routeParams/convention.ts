@@ -21,6 +21,7 @@ import {
   mergeObjectsExceptFalsyValues,
   type NafCode,
   parseStringToJsonOrThrow,
+  type RemoteWorkMode,
   reasonableSchedule,
   type ScheduleDto,
   type Signatories,
@@ -387,6 +388,15 @@ export const nafCodeSerializer: ValueSerializer<NafCode[]> = {
   parse: (raw) =>
     parseStringToJsonOrThrow<NafCode[], "nafCodes">(raw, "nafCodes"),
   stringify: (nafCode) => JSON.stringify(nafCode),
+};
+
+export const remoteWorkModeSerializer: ValueSerializer<RemoteWorkMode[]> = {
+  parse: (raw) =>
+    parseStringToJsonOrThrow<RemoteWorkMode[], "remoteWorkModes">(
+      raw,
+      "remoteWorkModes",
+    ),
+  stringify: (remoteWorkModes) => JSON.stringify(remoteWorkModes),
 };
 
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;

@@ -18,6 +18,7 @@ import {
   appellationStringSerializer,
   conventionValuesFromUrl,
   nafCodeSerializer,
+  remoteWorkModeSerializer,
 } from "./routeParams/convention";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 
@@ -82,6 +83,7 @@ export const searchParams = {
   perPage: param.query.optional.number,
   nafCodes: param.query.optional.ofType(nafCodeSerializer),
   nafLabel: param.query.optional.string,
+  remoteWorkModes: param.query.optional.ofType(remoteWorkModeSerializer),
   ...acquisitionParams,
 };
 
