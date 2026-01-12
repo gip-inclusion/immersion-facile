@@ -44,13 +44,14 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
   .build(async ({ uow, deps, inputParams }) => {
     const { numberOfMonthsWithoutConvention } = inputParams;
     const now = deps.timeGateway.now();
+    const noConventionSince = subMonths(now, numberOfMonthsWithoutConvention);
+
     const activeAgencies = await uow.agencyRepository.getAgencies({
       filters: {
         status: ["active", "from-api-PE"],
+        createdAtBefore: noConventionSince,
       },
     });
-
-    const noConventionSince = subMonths(now, numberOfMonthsWithoutConvention);
 
     const agenciesToClose = await getAgenciesToClose(
       activeAgencies,
