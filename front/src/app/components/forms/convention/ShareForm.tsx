@@ -51,7 +51,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
 
   return (
     <form
-      id={domElementIds.conventionImmersionRoute.shareForm}
+      id={domElementIds.conventionImmersionRoute.shareConventionDraft.shareForm}
       onSubmit={handleSubmit(onSubmit)}
     >
       <p className={fr.cx("fr-text--xs")}>
@@ -61,6 +61,8 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
         label="Votre adresse email *"
         nativeInputProps={{
           ...register("senderEmail"),
+          id: domElementIds.conventionImmersionRoute.shareConventionDraft
+            .shareFormEmailInput,
           type: "email",
           placeholder: "nom@exemple.com",
         }}
@@ -83,6 +85,8 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
           ...register("recipientEmail"),
           type: "email",
           placeholder: "nom@exemple.com",
+          id: domElementIds.conventionImmersionRoute.shareConventionDraft
+            .shareFormRecipientEmailInput,
         }}
         state={formState.errors.recipientEmail ? "error" : "default"}
         stateRelatedMessage={formState.errors.recipientEmail?.message}
@@ -90,7 +94,11 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
       />
       <Input
         label="Votre message (facultatif)"
-        nativeTextAreaProps={{ ...register("details") }}
+        nativeTextAreaProps={{
+          ...register("details"),
+          id: domElementIds.conventionImmersionRoute.shareConventionDraft
+            .shareFormDetailsInput,
+        }}
         textArea
         state={formState.errors.details ? "error" : "default"}
         stateRelatedMessage={formState.errors.details?.message}

@@ -4,7 +4,7 @@ import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { loginFtConnect } from "shared";
+import { domElementIds, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   type ConventionFormMode,
@@ -222,6 +222,7 @@ const SharedConventionMessage = ({
         onClick={() => onClickContinue()}
         iconId="fr-icon-arrow-right-line"
         iconPosition="right"
+        id={domElementIds.conventionImmersionRoute.continueButton}
       >
         Continuer
       </Button>

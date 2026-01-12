@@ -10,6 +10,9 @@ import {
 import {
   allOtherSignatoriesSignConvention,
   type ConventionSubmitted,
+  confirmCreateConventionFormSubmit,
+  fillBasicConventionForm,
+  shareConventionDraftByEmail,
   signConvention,
   submitBasicConventionForm,
   submitEditConventionForm,
@@ -18,6 +21,28 @@ import {
 } from "../../utils/convention";
 
 test.describe.configure({ mode: "serial" });
+
+test.describe("Convention can be created from shared draft", () => {
+  test.use({ storageState: testConfig.adminAuthFile });
+
+  test("creates a new convention from shared draft", async ({ page }) => {
+    await fillBasicConventionForm(page);
+    await shareConventionDraftByEmail(page);
+    await goToAdminTab(page, "adminNotifications");
+    const href = await getMagicLinkFromEmail({
+      page,
+      emailType: "SHARE_CONVENTION_DRAFT_SELF",
+      label: "conventionFormUrl",
+    });
+    expect(href).not.toBe(null);
+    if (!href) throw new Error("Convention draft magic link not found");
+    await page.goto(href);
+    await page.click(
+      `#${domElementIds.conventionImmersionRoute.continueButton}`,
+    );
+    await confirmCreateConventionFormSubmit(page, tomorrowDateDisplayed);
+  });
+});
 
 test.describe("Convention creation and modification workflow", () => {
   let conventionSubmitted: ConventionSubmitted | void;
