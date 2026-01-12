@@ -27,9 +27,9 @@ export const OfferCard = ({
       className={fr.cx("fr-col-12", "fr-col-lg-6")}
       id={`${domElementIds.establishment[mode].offerCard}-${index}`}
     >
-      <article className={fr.cx("fr-card", "fr-px-4w", "fr-pt-2w")}>
+      <article className={fr.cx("fr-card", "fr-p-2w", "fr-pt-1v")}>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
-          <h3 className={fr.cx("fr-h6", "fr-col-lg-7", "fr-col-5", "fr-mb-0")}>
+          <h3 className={fr.cx("fr-h6", "fr-col-lg-6", "fr-col-5", "fr-mb-0")}>
             {appellationLabel}
           </h3>
           <Badge className={fr.cx("fr-badge--purple-glycine", "fr-ml-auto")}>
@@ -47,6 +47,7 @@ export const OfferCard = ({
               iconId: "fr-icon-edit-line",
               priority: "tertiary",
               type: "button",
+              className: fr.cx("fr-mb-0"),
               onClick: onEditOfferClick,
               id: `${domElementIds.establishment[mode].editOfferButton}-${index}`,
             },
@@ -56,6 +57,7 @@ export const OfferCard = ({
               iconId: "fr-icon-delete-bin-line",
               priority: "tertiary",
               type: "button",
+              className: fr.cx("fr-mb-0"),
               id: `${domElementIds.establishment[mode].deleteOfferButton}-${index}`,
               onClick: () => {
                 const offers = formValues.offers;
