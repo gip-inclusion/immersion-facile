@@ -134,10 +134,10 @@ const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
     },
     externalSearch: () => {
       const urlParams = getUrlParameters(window.location);
-      const appellations = parseStringToJsonOrThrow<
-        AppellationAndRomeDto[],
-        "appellations"
-      >(urlParams.appellations, "appellations");
+      const appellations = parseStringToJsonOrThrow<AppellationAndRomeDto[]>(
+        urlParams.appellations,
+        "appellations",
+      );
       store.dispatch(
         searchSlice.actions.getOffersRequested({
           ...urlParams,
