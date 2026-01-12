@@ -25,6 +25,7 @@ export type GetAgenciesFilters = {
   status?: AgencyStatus[];
   sirets?: SiretDto[];
   doesNotReferToOtherAgency?: true;
+  createdAtBefore?: Date;
 };
 
 export type AgencyWithoutRights = Omit<

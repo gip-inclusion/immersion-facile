@@ -137,6 +137,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
               agency,
               filters?.doesNotReferToOtherAgency,
             ),
+            agencyCreatedAtBefore(agency, filters?.createdAtBefore),
           ].includes(false),
       )
       .slice(0, limit);
@@ -323,6 +324,16 @@ const agencyIsOfPosition = (
   );
 };
 
+const agencyCreatedAtBefore = (
+  agency: AgencyWithUsersRights,
+  createdAtBefore: Date | undefined,
+): boolean => {
+  if (createdAtBefore === undefined) return true;
+  return new Date(agency.createdAt) <= createdAtBefore;
+};
+
+const defaultCreatedAt = new Date("2025-02-02").toISOString();
+
 const agency3: AgencyWithUsersRights = {
   id: "test-agency-3-back",
   name: "Test Agency 3 (back)",
@@ -350,6 +361,7 @@ const agency3: AgencyWithUsersRights = {
   codeSafir: null,
   statusJustification: null,
   phoneNumber: "+33600000003",
+  createdAt: defaultCreatedAt,
 };
 
 const agency1: AgencyWithUsersRights = {
@@ -380,6 +392,7 @@ const agency1: AgencyWithUsersRights = {
   codeSafir: null,
   statusJustification: null,
   phoneNumber: "+33600000001",
+  createdAt: defaultCreatedAt,
 };
 const testAgencies: AgencyWithUsersRights[] = [
   {
@@ -410,6 +423,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     codeSafir: null,
     statusJustification: null,
     phoneNumber: "+33600000000",
+    createdAt: defaultCreatedAt,
   },
   agency1,
   {
@@ -442,6 +456,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     statusJustification: null,
     codeSafir: null,
     phoneNumber: "+33600000002",
+    createdAt: defaultCreatedAt,
   },
   agency3,
   {
@@ -472,6 +487,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     statusJustification: null,
     codeSafir: null,
     phoneNumber: "+33600000004",
+    createdAt: defaultCreatedAt,
   },
   {
     id: "test-agency-5-back-with-refers-to",
@@ -501,5 +517,6 @@ const testAgencies: AgencyWithUsersRights[] = [
     statusJustification: null,
     codeSafir: null,
     phoneNumber: "+33600000005",
+    createdAt: defaultCreatedAt,
   },
 ];

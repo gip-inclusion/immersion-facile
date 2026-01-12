@@ -40,49 +40,6 @@ describe("AddAgency use case", () => {
     .withEmail("validator@mail.com")
     .buildUser();
 
-  const createParisMissionLocaleParams: CreateAgencyDto = {
-    id: "some-id",
-    coveredDepartments: ["75"],
-    address: {
-      streetNumberAndAddress: "10 avenue des Champs Elysées",
-      city: "Paris",
-      departmentCode: "75",
-      postcode: "75017",
-    },
-    counsellorEmails: [counsellor.email],
-    validatorEmails: [validator.email],
-    kind: "mission-locale",
-    name: "Mission locale de Paris",
-    position: { lat: 10, lon: 20 },
-    signature: "Super signature of the agency",
-    logoUrl: "https://www.my-url.com",
-    agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
-    refersToAgencyId: null,
-    refersToAgencyName: null,
-    phoneNumber: "+33600000001",
-  };
-
-  const createAgencyWithRefersToParams: CreateAgencyDto = {
-    id: "another-id",
-    coveredDepartments: ["75"],
-    address: {
-      streetNumberAndAddress: "10bis avenue des Champs Elysées",
-      city: "Paris",
-      departmentCode: "75",
-      postcode: "75017",
-    },
-    counsellorEmails: ["counsellor-from-agency-with-refers-to@mail.com"],
-    validatorEmails: ["mail.should.not.be.applied@email.com"],
-    kind: "mission-locale",
-    name: "Mission locale de Paris Bis",
-    position: { lat: 10, lon: 20 },
-    signature: "Super signature of the agency bis",
-    agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
-    refersToAgencyId: createParisMissionLocaleParams.id,
-    refersToAgencyName: createParisMissionLocaleParams.name,
-    logoUrl: null,
-    phoneNumber: "+33600000001",
-  };
   const uuids = ["uuid1", "uuid2", "uuid3", "uuid4"];
 
   let uow: InMemoryUnitOfWork;
@@ -113,6 +70,51 @@ describe("AddAgency use case", () => {
   });
 
   describe("right paths", () => {
+    const createParisMissionLocaleParams: CreateAgencyDto = {
+      id: "some-id",
+      coveredDepartments: ["75"],
+      createdAt: timeGateway.now().toISOString(),
+      address: {
+        streetNumberAndAddress: "10 avenue des Champs Elysées",
+        city: "Paris",
+        departmentCode: "75",
+        postcode: "75017",
+      },
+      counsellorEmails: [counsellor.email],
+      validatorEmails: [validator.email],
+      kind: "mission-locale",
+      name: "Mission locale de Paris",
+      position: { lat: 10, lon: 20 },
+      signature: "Super signature of the agency",
+      logoUrl: "https://www.my-url.com",
+      agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
+      refersToAgencyId: null,
+      refersToAgencyName: null,
+      phoneNumber: "+33600000001",
+    };
+
+    const createAgencyWithRefersToParams: CreateAgencyDto = {
+      id: "another-id",
+      coveredDepartments: ["75"],
+      createdAt: timeGateway.now().toISOString(),
+      address: {
+        streetNumberAndAddress: "10bis avenue des Champs Elysées",
+        city: "Paris",
+        departmentCode: "75",
+        postcode: "75017",
+      },
+      counsellorEmails: ["counsellor-from-agency-with-refers-to@mail.com"],
+      validatorEmails: ["mail.should.not.be.applied@email.com"],
+      kind: "mission-locale",
+      name: "Mission locale de Paris Bis",
+      position: { lat: 10, lon: 20 },
+      signature: "Super signature of the agency bis",
+      agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
+      refersToAgencyId: createParisMissionLocaleParams.id,
+      refersToAgencyName: createParisMissionLocaleParams.name,
+      logoUrl: null,
+      phoneNumber: "+33600000001",
+    };
     it("add user with both validator and counsellor rights if the user is in validatorEmails and counsellorEmails", async () => {
       uow.agencyRepository.agencies = [];
       uow.userRepository.users = [];
@@ -333,6 +335,51 @@ describe("AddAgency use case", () => {
   });
 
   describe("wrong paths", () => {
+    const createParisMissionLocaleParams: CreateAgencyDto = {
+      id: "some-id",
+      coveredDepartments: ["75"],
+      createdAt: timeGateway.now().toISOString(),
+      address: {
+        streetNumberAndAddress: "10 avenue des Champs Elysées",
+        city: "Paris",
+        departmentCode: "75",
+        postcode: "75017",
+      },
+      counsellorEmails: [counsellor.email],
+      validatorEmails: [validator.email],
+      kind: "mission-locale",
+      name: "Mission locale de Paris",
+      position: { lat: 10, lon: 20 },
+      signature: "Super signature of the agency",
+      logoUrl: "https://www.my-url.com",
+      agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
+      refersToAgencyId: null,
+      refersToAgencyName: null,
+      phoneNumber: "+33600000001",
+    };
+
+    const createAgencyWithRefersToParams: CreateAgencyDto = {
+      id: "another-id",
+      coveredDepartments: ["75"],
+      createdAt: timeGateway.now().toISOString(),
+      address: {
+        streetNumberAndAddress: "10bis avenue des Champs Elysées",
+        city: "Paris",
+        departmentCode: "75",
+        postcode: "75017",
+      },
+      counsellorEmails: ["counsellor-from-agency-with-refers-to@mail.com"],
+      validatorEmails: ["mail.should.not.be.applied@email.com"],
+      kind: "mission-locale",
+      name: "Mission locale de Paris Bis",
+      position: { lat: 10, lon: 20 },
+      signature: "Super signature of the agency bis",
+      agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
+      refersToAgencyId: createParisMissionLocaleParams.id,
+      refersToAgencyName: createParisMissionLocaleParams.name,
+      logoUrl: null,
+      phoneNumber: "+33600000001",
+    };
     it("Fails to add agency if address components are empty", async () => {
       const agencyWithBadAddress: CreateAgencyDto = {
         ...createParisMissionLocaleParams,
