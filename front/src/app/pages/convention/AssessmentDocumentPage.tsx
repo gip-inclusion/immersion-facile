@@ -97,7 +97,13 @@ export const AssessmentDocumentPage = ({
           convention.internshipKind === "immersion"
             ? "de l'immersion professionnelle"
             : "du mini-stage"
-        } au sein de ${convention.businessName}`}
+        }`}
+        beneficiaryName={getFormattedFirstnameAndLastname({
+          firstname: convention.signatories.beneficiary.firstName,
+          lastname: convention.signatories.beneficiary.lastName,
+        })}
+        businessName={convention.businessName}
+        internshipKind={convention.internshipKind}
         customActions={[
           <Button
             key={"htmlToPdfButton"}
@@ -145,62 +151,62 @@ export const AssessmentDocumentPage = ({
           </a>
           ) à l'adresse suivante <strong>{convention.immersionAddress}</strong>.
         </p>
-        <p>
-          Métier observé : {convention.immersionAppellation.appellationLabel}.
-        </p>
-        <p>
-          Objectif{" "}
+        <ul>
+          <li>
+            <strong>Métier observé :</strong>{" "}
+            {convention.immersionAppellation.appellationLabel}
+          </li>
+          <li>
+            <strong>
+              Objectif{" "}
+              {convention.internshipKind === "immersion"
+                ? "de l'immersion"
+                : "du mini-stage"}{" "}
+              :
+            </strong>{" "}
+            {convention.immersionObjective}
+          </li>
+        </ul>
+        <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
+          Évaluation du tuteur{" "}
           {convention.internshipKind === "immersion"
             ? "de l'immersion"
-            : "du mini-stage"}{" "}
-          : {convention.immersionObjective}.
-        </p>
+            : "du mini-stage"}
+        </h2>
         <p>
-          Le tuteur{" "}
+          <strong>Tuteur :</strong>{" "}
           {getFormattedFirstnameAndLastname({
             firstname: convention.establishmentTutor.firstName,
             lastname: convention.establishmentTutor.lastName,
-          })}{" "}
-          de{" "}
-          {getFormattedFirstnameAndLastname({
-            firstname: convention.signatories.beneficiary.firstName,
-            lastname: convention.signatories.beneficiary.lastName,
-          })}{" "}
-          a évalué son{" "}
-          {convention.internshipKind === "immersion"
-            ? "immersion"
-            : "mini-stage"}
-          .
+          })}
         </p>
-        <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
-          Voici les informations saisies durant{" "}
-          {convention.internshipKind === "immersion"
-            ? "cette immersion"
-            : "ce mini-stage"}{" "}
-          :
-        </h2>
         <ul>
           {!isAssessmentLegacy && (
             <li>
-              {convention.internshipKind === "immersion"
-                ? "L'immersion a-t-elle"
-                : "Le mini-stage a-il"}{" "}
-              eu lieu ? {assessment.status === "DID_NOT_SHOW" ? "Non" : "Oui"}
+              <strong>
+                {convention.internshipKind === "immersion"
+                  ? "Immersion réalisée"
+                  : "Mini-stage réalisé"}{" "}
+                :
+              </strong>{" "}
+              {assessment.status === "DID_NOT_SHOW" ? "Non" : "Oui"}
             </li>
           )}
           {isAssessmentLegacy && (
             <li>
-              {convention.internshipKind === "immersion"
-                ? "L'immersion a-t-elle"
-                : "Le mini-stage a-il"}{" "}
-              jusqu'au bout ?{" "}
+              <strong>
+                {convention.internshipKind === "immersion"
+                  ? "Immersion complète"
+                  : "Mini-stage complet"}{" "}
+                :
+              </strong>{" "}
               {assessment.status === "ABANDONED" ? "Non" : "Oui"}
             </li>
           )}
           {assessment.status === "COMPLETED" && (
             <>
               <li>
-                Nombre d'heures totales de l'immersion :{" "}
+                <strong>Nombre total d'heures :</strong>{" "}
                 {computeTotalHours({
                   convention,
                   numberOfMissedHours: 0,
@@ -209,7 +215,7 @@ export const AssessmentDocumentPage = ({
                 })}
               </li>
               <li>
-                Date réelle de fin de l'immersion :{" "}
+                <strong>Date réelle de fin :</strong>{" "}
                 {toDisplayedDate({
                   date: new Date(convention.dateEnd),
                   withHours: false,
@@ -220,7 +226,7 @@ export const AssessmentDocumentPage = ({
           {assessment.status === "PARTIALLY_COMPLETED" && (
             <>
               <li>
-                Nombre d'heures totales de l'immersion :{" "}
+                <strong>Nombre total d'heures :</strong>{" "}
                 {computeTotalHours({
                   convention,
                   numberOfMissedHours: assessment.numberOfMissedHours,
@@ -229,7 +235,7 @@ export const AssessmentDocumentPage = ({
                 })}
               </li>
               <li>
-                Date réelle de fin de l'immersion :{" "}
+                <strong>Date réelle de fin :</strong>{" "}
                 {isStringDate(assessment.lastDayOfPresence ?? "")
                   ? toDisplayedDate({
                       date: new Date(assessment.lastDayOfPresence ?? ""),
@@ -239,39 +245,31 @@ export const AssessmentDocumentPage = ({
               </li>
             </>
           )}
-        </ul>
-        {!isAssessmentLegacy && (
-          <>
-            <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
-              Résultats de{" "}
-              {convention.internshipKind === "immersion"
-                ? "l'immersion"
-                : "du mini-stage"}{" "}
-              :
-            </h2>
-            <ul>
+          {!isAssessmentLegacy && (
+            <>
               <li>
-                {convention.internshipKind === "immersion"
-                  ? "L'immersion a-t-elle débouchée"
-                  : "Le mini-stage a-t-il débouché"}{" "}
-                sur une embauche ? {assessment.endedWithAJob ? "Oui" : "Non"}
+                <strong>Embauche :</strong>{" "}
+                {assessment.endedWithAJob ? "Oui" : "Non"}
               </li>
               {assessment.endedWithAJob && (
                 <>
                   <li>
-                    Date d'embauche:{" "}
+                    <strong>Date d'embauche :</strong>{" "}
                     {toDisplayedDate({
                       date: convertLocaleDateToUtcTimezoneDate(
                         new Date(assessment.contractStartDate),
                       ),
                     })}
                   </li>
-                  <li>Type de contrat : {assessment.typeOfContract}</li>
+                  <li>
+                    <strong>Type de contrat :</strong>{" "}
+                    {assessment.typeOfContract}
+                  </li>
                 </>
               )}
-            </ul>
-          </>
-        )}
+            </>
+          )}
+        </ul>
         <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Appréciation générale :</h2>
         <p
           dangerouslySetInnerHTML={{
