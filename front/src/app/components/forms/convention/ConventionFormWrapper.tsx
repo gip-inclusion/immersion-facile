@@ -23,6 +23,7 @@ import {
   type InternshipKind,
   isSignatory,
   type Role,
+  safeParseJson,
   statusJustificationSchema,
   toDisplayedDate,
   type WithStatusJustification,
@@ -39,6 +40,10 @@ import type { ConventionImmersionPageRoute } from "src/app/pages/convention/Conv
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import {
+  FrontSpecificError,
+  HomeButton,
+} from "src/app/pages/error/front-errors";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -86,6 +91,7 @@ export const ConventionFormWrapper = ({
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const dispatch = useDispatch();
   const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const conventionDraftFormFeedback = useFeedbackTopic("convention-draft");
   const conventionActionEditFeedback = useFeedbackTopic(
     "convention-action-edit",
   );
@@ -102,6 +108,9 @@ export const ConventionFormWrapper = ({
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
+  const fetchConventionDraftError =
+    conventionDraftFormFeedback?.level === "error" &&
+    conventionDraftFormFeedback.on === "fetch";
 
   const formSuccessfullySubmitted =
     (conventionFormFeedback?.level === "success" &&
@@ -198,6 +207,17 @@ export const ConventionFormWrapper = ({
     route,
     fetchedConvention,
   });
+
+  if (route.params.conventionDraftId && fetchConventionDraftError) {
+    const parsedMessage = safeParseJson(conventionDraftFormFeedback.message);
+    throw new FrontSpecificError({
+      title: conventionDraftFormFeedback?.title ?? "Erreur",
+      description:
+        parsedMessage?.message ??
+        "Une erreur est survenue lors de la récupération du brouillon de convention",
+      buttons: [HomeButton],
+    });
+  }
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
