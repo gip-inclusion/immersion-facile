@@ -1,7 +1,7 @@
 import {
+  type ExternalSearchResultDto,
   errors,
   getExternalOffersFlatParamsSchema,
-  type SearchResultDto,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
@@ -14,7 +14,7 @@ export type GetExternalOffers = ReturnType<typeof makeGetExternalOffers>;
 export const makeGetExternalOffers = useCaseBuilder("GetExternalOffers")
   .withCurrentUser<undefined>()
   .withInput(getExternalOffersFlatParamsSchema)
-  .withOutput<SearchResultDto[]>()
+  .withOutput<ExternalSearchResultDto[]>()
   .withDeps<{
     uuidGenerator: UuidGenerator;
     laBonneBoiteGateway: LaBonneBoiteGateway;

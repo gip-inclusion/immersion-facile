@@ -39,6 +39,7 @@ export const stubSearchResult: SearchResultDto = {
   updatedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
   fitForDisabledWorkers: null,
+  remoteWorkMode: "NO_REMOTE",
 };
 
 export class InMemoryGroupRepository implements GroupRepository {

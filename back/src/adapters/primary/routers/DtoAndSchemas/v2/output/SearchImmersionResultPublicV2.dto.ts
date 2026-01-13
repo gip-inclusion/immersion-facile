@@ -2,6 +2,7 @@ import type {
   AddressDto,
   AppellationDto,
   ContactMode,
+  ExternalSearchResultDto,
   GeoPositionDto,
   LocationId,
   RomeCode,
@@ -30,14 +31,15 @@ export type SearchImmersionResultPublicV2 = {
 };
 
 export const domainToSearchImmersionResultPublicV2 = (
-  searchImmersionResult: SearchResultDto,
+  searchImmersionResult: SearchResultDto | ExternalSearchResultDto,
 ): SearchImmersionResultPublicV2 => {
   const {
     createdAt: _createdAt,
     updatedAt: _updatedAt,
     fitForDisabledWorkers: _fitForDisabledWorkers,
     customizedName: _customizedName,
+    remoteWorkMode: _remoteWorkMode,
     ...searchImmersionResultPublicV2Data
-  } = searchImmersionResult;
+  } = searchImmersionResult as SearchResultDto;
   return searchImmersionResultPublicV2Data;
 };

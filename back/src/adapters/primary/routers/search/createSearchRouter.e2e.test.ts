@@ -73,16 +73,19 @@ const toSearchImmersionResults = (
     updatedAt: defaultUpdatedAt.toISOString(),
     createdAt: establishment.createdAt.toISOString(),
     fitForDisabledWorkers: "no",
+    remoteWorkMode: offer.remoteWorkMode,
   }));
 
 const offer1 = new OfferEntityBuilder()
   .withRomeCode("A1409")
   .withAppellationCode("14704")
+  .withRemoteWorkMode("NO_REMOTE")
   .build();
 
 const offer2 = new OfferEntityBuilder()
   .withRomeCode("A1203")
   .withAppellationCode("16067")
+  .withRemoteWorkMode("NO_REMOTE")
   .build();
 
 const score20 = 20;
@@ -91,7 +94,9 @@ const establishment = new EstablishmentEntityBuilder()
   .withScore(score20)
   .build();
 
-const immersionOffer = new OfferEntityBuilder().build();
+const immersionOffer = new OfferEntityBuilder()
+  .withRemoteWorkMode("NO_REMOTE")
+  .build();
 const establishmentAggregate1 = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
@@ -191,10 +196,11 @@ describe("/offers route", () => {
           status: 200,
           body: {
             data: [
-              establishmentAggregateToSearchResultByRomeForFirstLocation(
-                establishmentAggregate2,
-                immersionOffer.romeCode,
-              ),
+              establishmentAggregateToSearchResultByRomeForFirstLocation({
+                establishmentAggregate: establishmentAggregate2,
+                romeCode: immersionOffer.romeCode,
+                remoteWorkMode: "NO_REMOTE",
+              }),
             ],
             pagination: getBasicPagination(),
           },
@@ -230,11 +236,12 @@ describe("/offers route", () => {
           status: 200,
           body: {
             data: [
-              establishmentAggregateToSearchResultByRomeForFirstLocation(
-                establishmentAggregate2,
-                immersionOffer.romeCode,
-                0,
-              ),
+              establishmentAggregateToSearchResultByRomeForFirstLocation({
+                establishmentAggregate: establishmentAggregate2,
+                romeCode: immersionOffer.romeCode,
+                remoteWorkMode: "NO_REMOTE",
+                distance_m: 0,
+              }),
             ],
             pagination: getBasicPagination(),
           },
@@ -287,11 +294,12 @@ describe("/offers route", () => {
           body: {
             pagination: getBasicPagination({}),
             data: [
-              establishmentAggregateToSearchResultByRomeForFirstLocation(
-                establishmentAggregate2,
-                immersionOffer.romeCode,
-                0,
-              ),
+              establishmentAggregateToSearchResultByRomeForFirstLocation({
+                establishmentAggregate: establishmentAggregate2,
+                romeCode: immersionOffer.romeCode,
+                remoteWorkMode: "NO_REMOTE",
+                distance_m: 0,
+              }),
             ],
           },
         });
@@ -546,6 +554,7 @@ describe("/offers route", () => {
                   [{ siret: siret1, offer: offerFullRemote, establishment }],
                   false,
                 )[0],
+                remoteWorkMode: "FULL_REMOTE",
                 // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
@@ -586,6 +595,7 @@ describe("/offers route", () => {
                   [{ siret: siret1, offer: offerFullRemote, establishment }],
                   false,
                 )[0],
+                remoteWorkMode: "FULL_REMOTE",
                 // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
@@ -603,6 +613,7 @@ describe("/offers route", () => {
                   [{ siret: siret1, offer: offerHybrid, establishment }],
                   false,
                 )[0],
+                remoteWorkMode: "HYBRID",
                 // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
@@ -640,7 +651,10 @@ describe("/offers route", () => {
             data: toSearchImmersionResults(
               [{ siret: siret2, offer: offerNoRemote, establishment }],
               false,
-            ),
+            ).map((result) => ({
+              ...result,
+              remoteWorkMode: "NO_REMOTE" as const,
+            })),
           },
         });
       });
@@ -667,6 +681,7 @@ describe("/offers route", () => {
                   [{ siret: siret1, offer: offerFullRemote, establishment }],
                   false,
                 )[0],
+                remoteWorkMode: "FULL_REMOTE",
                 // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
@@ -684,6 +699,7 @@ describe("/offers route", () => {
                   [{ siret: siret1, offer: offerHybrid, establishment }],
                   false,
                 )[0],
+                remoteWorkMode: "HYBRID",
                 // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
@@ -701,6 +717,7 @@ describe("/offers route", () => {
                   [{ siret: siret2, offer: offerNoRemote, establishment }],
                   false,
                 )[0],
+                remoteWorkMode: "NO_REMOTE",
               },
             ],
           },
@@ -981,6 +998,7 @@ describe("/offers route", () => {
           updatedAt: defaultUpdatedAt.toISOString(),
           createdAt: new Date("2024-08-08").toISOString(),
           fitForDisabledWorkers: "no",
+          remoteWorkMode: "NO_REMOTE",
         },
       });
     });

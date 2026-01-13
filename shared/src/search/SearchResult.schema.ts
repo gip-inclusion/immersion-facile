@@ -14,7 +14,11 @@ import {
   zStringMinLength1,
   zUuidLike,
 } from "../zodUtils";
-import type { SearchResultDto } from "./SearchResult.dto";
+import { remoteWorkModeSchema } from "./SearchQueryParams.schema";
+import type {
+  ExternalSearchResultDto,
+  SearchResultDto,
+} from "./SearchResult.dto";
 
 export const searchResultSchema: ZodSchemaWithInputMatchingOutput<SearchResultDto> =
   z.object({
@@ -55,9 +59,50 @@ export const searchResultSchema: ZodSchemaWithInputMatchingOutput<SearchResultDt
     createdAt: dateTimeIsoStringSchema.optional(),
     // locationId: zUuidLike,
     locationId: zUuidLike.or(z.null()),
+    remoteWorkMode: remoteWorkModeSchema,
   });
 
-export const searchResultsSchema = z.array(searchResultSchema);
+export const externalSearchResultSchema: ZodSchemaWithInputMatchingOutput<ExternalSearchResultDto> =
+  z.object({
+    rome: romeCodeSchema,
+    romeLabel: z.string(),
+    naf: z.string(),
+    nafLabel: z.string(),
+    siret: siretSchema,
+    establishmentScore: z.number(),
+    name: z.string(),
+    customizedName: z.string().optional(),
+    voluntaryToImmersion: z.boolean(),
+    position: geoPositionSchema,
+    address: z.object({
+      streetNumberAndAddress: zStringCanBeEmpty,
+      postcode: zStringCanBeEmpty,
+      departmentCode: zStringMinLength1,
+      city: zStringMinLength1,
+    }),
+    contactMode: z
+      .enum(["EMAIL", "PHONE", "IN_PERSON"], {
+        error: localization.invalidEnum,
+      })
+      .optional(),
+    distance_m: z.number().optional(),
+    numberOfEmployeeRange: z.string().optional(),
+    website: absoluteUrlSchema.or(z.literal("")).optional(),
+    additionalInformation: zStringCanBeEmpty.optional(),
+    fitForDisabledWorkers: fitForDisabledWorkersSchema.nullable(),
+    urlOfPartner: z.string().optional(),
+    appellations: z.array(
+      z.object({
+        appellationLabel: z.string(),
+        appellationCode: appellationCodeSchema,
+      }),
+    ),
+    updatedAt: dateTimeIsoStringSchema.optional(),
+    createdAt: dateTimeIsoStringSchema.optional(),
+    locationId: zUuidLike.or(z.null()),
+  });
+
+export const externalSearchResultsSchema = z.array(externalSearchResultSchema);
 
 export const paginatedSearchResultsSchema =
   createPaginatedSchema(searchResultSchema);

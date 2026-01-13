@@ -9,6 +9,7 @@ import {
   type LocationId,
   path,
   pathEq,
+  type RemoteWorkMode,
   type RomeCode,
   replaceArrayElement,
   type SearchResultDto,
@@ -104,6 +105,7 @@ export class InMemoryEstablishmentAggregateRepository
         establishmentAgg: aggregate,
         searchedAppellationCode: offer.appellationCode,
         locationId,
+        remoteWorkMode: offer.remoteWorkMode,
       });
 
     return rest;
@@ -211,10 +213,10 @@ export class InMemoryEstablishmentAggregateRepository
               : true,
           )
           .map((offer) =>
-            establishmentAggregateToSearchResultByRomeForFirstLocation(
-              aggregate,
-              offer.romeCode,
-              filters.geoParams
+            establishmentAggregateToSearchResultByRomeForFirstLocation({
+              establishmentAggregate: aggregate,
+              romeCode: offer.romeCode,
+              distance_m: filters.geoParams
                 ? distanceBetweenCoordinatesInMeters(
                     aggregate.establishment.locations[0].position,
                     {
@@ -223,7 +225,9 @@ export class InMemoryEstablishmentAggregateRepository
                     },
                   )
                 : undefined,
-            ),
+              customScore: undefined,
+              remoteWorkMode: offer.remoteWorkMode,
+            }),
           ),
       );
 
@@ -302,6 +306,7 @@ export class InMemoryEstablishmentAggregateRepository
                   }
                 : {}),
               locationId: aggregate.establishment.locations[0].id,
+              remoteWorkMode: offer.remoteWorkMode,
             }),
           ),
       )
@@ -358,11 +363,13 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
   searchedAppellationCode,
   locationId,
   position,
+  remoteWorkMode,
 }: {
   establishmentAgg: EstablishmentAggregate;
   searchedAppellationCode: AppellationCode;
   locationId: LocationId;
   position?: GeoPositionDto;
+  remoteWorkMode: RemoteWorkMode;
 }): SearchImmersionResult => {
   const romeCode =
     establishmentAgg.offers.find(
@@ -409,21 +416,30 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
     updatedAt: establishmentAgg.establishment.updatedAt?.toISOString(),
     createdAt: establishmentAgg.establishment.createdAt.toISOString(),
     fitForDisabledWorkers: "no",
+    remoteWorkMode: remoteWorkMode,
   };
 };
 
-export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
-  establishmentAggregate: EstablishmentAggregate,
-  romeCode: RomeCode,
-  distance_m?: number,
-  customScore?: number,
-): SearchResultDto => ({
+export const establishmentAggregateToSearchResultByRomeForFirstLocation = ({
+  establishmentAggregate,
+  romeCode,
+  distance_m,
+  customScore,
+  remoteWorkMode,
+}: {
+  establishmentAggregate: EstablishmentAggregate;
+  romeCode: RomeCode;
+  distance_m?: number;
+  customScore?: number;
+  remoteWorkMode: RemoteWorkMode;
+}): SearchResultDto => ({
   rome: romeCode,
   establishmentScore: customScore ?? establishmentAggregate.establishment.score,
   naf: establishmentAggregate.establishment.nafDto.code,
   nafLabel: establishmentAggregate.establishment.nafDto.nomenclature,
   siret: establishmentAggregate.establishment.siret,
   name: establishmentAggregate.establishment.name,
+  customizedName: establishmentAggregate.establishment.customizedName,
   numberOfEmployeeRange:
     establishmentAggregate.establishment.numberEmployeesRange,
   voluntaryToImmersion:
@@ -446,4 +462,5 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
   updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
   createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
   fitForDisabledWorkers: "no",
+  remoteWorkMode: remoteWorkMode,
 });

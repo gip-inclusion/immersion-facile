@@ -21,7 +21,7 @@ import type { OfferEntity } from "../entities/OfferEntity";
 import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 
 export type RepositorySearchResultDto = Omit<SearchResultDto, "urlOfPartner">;
-export type RepositorySearchImmertionResult = Omit<
+export type RepositorySearchImmersionResult = Omit<
   SearchImmersionResult,
   "urlOfPartner"
 >;
@@ -93,7 +93,7 @@ export interface EstablishmentAggregateRepository {
   ): Promise<RepositorySearchResultDto | undefined>;
   legacySearchImmersionResults(
     searchImmersionParams: LegacySearchImmersionParams,
-  ): Promise<RepositorySearchImmertionResult[]>;
+  ): Promise<RepositorySearchImmersionResult[]>;
   getOffers(
     params: GetOffersParams,
   ): Promise<DataWithPagination<SearchResultDto>>;

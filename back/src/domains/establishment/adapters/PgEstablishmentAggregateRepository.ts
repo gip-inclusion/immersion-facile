@@ -43,7 +43,7 @@ import type {
   GetOffersParams,
   LegacySearchImmersionParams,
   OfferWithSiret,
-  RepositorySearchImmertionResult,
+  RepositorySearchImmersionResult,
   RepositorySearchResultDto,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
@@ -326,7 +326,7 @@ export class PgEstablishmentAggregateRepository
     sort,
     filters,
   }: GetOffersParams): Promise<
-    DataWithPagination<RepositorySearchImmertionResult>
+    DataWithPagination<RepositorySearchImmersionResult>
   > {
     const { limit, offset } = calculateLimitAndOffsetFromPagination(pagination);
 
@@ -354,7 +354,7 @@ export class PgEstablishmentAggregateRepository
     searchMade,
     maxResults,
     fitForDisabledWorkers: fitForDisabledWorkersBoolean,
-  }: LegacySearchImmersionParams): Promise<RepositorySearchImmertionResult[]> {
+  }: LegacySearchImmersionParams): Promise<RepositorySearchImmersionResult[]> {
     // exclure
     // - entreprises non cherchables
     // - entreprises pas dispo
@@ -1021,6 +1021,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                   "public_appellations_data.code_rome as rome_code",
                   "created_at",
                   "appellation_code",
+                  "remote_work_mode",
                 ]),
               (eb) =>
                 romeCodes
@@ -1059,6 +1060,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
           "e.score",
           "loc.id as loc_id",
           "offer.rome_code as code_rome",
+          "offer.remote_work_mode",
           sql<AppellationDto[]>`JSON_AGG
               ( JSON_BUILD_OBJECT(
                   'appellationCode', a.ogr_appellation::text,
@@ -1074,6 +1076,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
           "e.score",
           "e.update_date",
           "offer.rome_code",
+          "offer.remote_work_mode",
           "loc.position",
           "loc.id",
         ])
@@ -1149,6 +1152,7 @@ const searchImmersionResultsQuery = async (
           contactMode: ref("e.contact_mode"),
           rome: ref("ro.code_rome"),
           romeLabel: ref("ro.libelle_rome"),
+          remoteWorkMode: sql<RemoteWorkMode>`${ref("r.remote_work_mode")}`,
           address: jsonBuildObject({
             streetNumberAndAddress: ref("loc.street_number_and_address"),
             postcode: ref("loc.post_code"),
@@ -1199,6 +1203,7 @@ const searchImmersionResultsQuery = async (
         position: result.position,
         rome: result.rome,
         romeLabel: result.romeLabel,
+        remoteWorkMode: result.remoteWorkMode,
         siret: result.siret,
         voluntaryToImmersion: Boolean(result.voluntaryToImmersion),
         isSearchable: Boolean(result.isSearchable),

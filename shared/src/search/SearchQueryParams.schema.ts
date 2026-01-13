@@ -98,6 +98,8 @@ const geoParamsAndSortSchema = z.discriminatedUnion("sortBy", [
   geoParamsByDistanceSchema,
 ]);
 
+export const remoteWorkModeSchema = z.enum(remoteWorkModes);
+
 export const getOffersFlatParamsSchema: z.ZodType<
   GetOffersFlatQueryParams,
   Omit<GetOffersFlatQueryParams, "sortOrder"> & {
@@ -118,6 +120,11 @@ export const getOffersFlatParamsSchema: z.ZodType<
       .optional(),
     place: z.string().optional(),
   })
+  .and(
+    z.object({
+      remoteWorkModes: z.array(remoteWorkModeSchema).optional(),
+    }),
+  )
   .and(paginationQueryParamsSchema)
   .and(geoParamsAndSortSchema)
   .and(withAcquisitionSchema);
