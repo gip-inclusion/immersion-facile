@@ -34,6 +34,7 @@ import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../dom
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
+import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
@@ -1054,6 +1055,7 @@ export const createUseCases = ({
         deps: { saveNotificationsBatchAndRelatedEvent, config },
       }),
     getConventionDraftById: makeGetConventionDraftById({ uowPerformer }),
+    deleteConventionDraft: makeDeleteConventionDraft({ uowPerformer }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

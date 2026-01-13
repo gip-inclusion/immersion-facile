@@ -14,6 +14,71 @@ describe("PgConventionDraftRepository", () => {
   let pgConventionDraftRepository: PgConventionDraftRepository;
   let db: KyselyDb;
 
+  const conventionDraft: ConventionDraftDto = {
+    id: uuid(),
+    dateStart: "2024-10-08T00:00:00.000Z",
+    dateEnd: "2024-10-17T00:00:00.000Z",
+    siret: "12345678901234",
+    businessName: "Test Business",
+    individualProtection: true,
+    individualProtectionDescription: "casque et lunettes",
+    sanitaryPrevention: true,
+    sanitaryPreventionDescription: "fourniture de gel",
+    immersionAddress: "169 boulevard de la villette, 75010 Paris",
+    immersionObjective: "Confirmer un projet professionnel",
+    immersionActivities: "Piloter un automobile",
+    immersionSkills: "Utilisation des pneus optimale",
+    workConditions: "Travail en équipe",
+    internshipKind: "immersion",
+    businessAdvantages: "Prise en charge du panier repas",
+    acquisitionCampaign: "campaign-2024",
+    acquisitionKeyword: "emploi",
+    establishmentNumberEmployeesRange: "10-19",
+    agencyReferent: {
+      firstname: "Sophie",
+      lastname: "Durand",
+    },
+    immersionAppellation: {
+      appellationCode: "11573",
+      appellationLabel: "Boulanger / Boulangère",
+      romeCode: "D1102",
+      romeLabel: "Boulangerie - viennoiserie",
+    },
+    schedule: {
+      totalHours: 35,
+      workedDays: 5,
+      isSimple: true,
+      complexSchedule: [
+        {
+          date: "2024-10-08",
+          timePeriods: [{ start: "09:00", end: "17:00" }],
+        },
+      ],
+    },
+    establishmentTutor: {
+      role: "establishment-tutor",
+      email: "tutor@example.com",
+      phone: "+33123456789",
+      firstName: "Jean",
+      lastName: "Dupont",
+      job: "Manager",
+    },
+    signatories: {
+      beneficiary: {
+        role: "beneficiary",
+        email: "beneficiary@example.com",
+        firstName: "Marie",
+        lastName: "Martin",
+      },
+      establishmentRepresentative: {
+        role: "establishment-representative",
+        email: "rep@example.com",
+        firstName: "Pierre",
+        lastName: "Bernard",
+      },
+    },
+  };
+
   beforeAll(() => {
     pool = makeTestPgPool();
     db = makeKyselyDb(pool);
@@ -178,71 +243,6 @@ describe("PgConventionDraftRepository", () => {
     });
 
     it("returns the convention draft with all fields properly mapped", async () => {
-      const conventionDraft: ConventionDraftDto = {
-        id: uuid(),
-        dateStart: "2024-10-08T00:00:00.000Z",
-        dateEnd: "2024-10-17T00:00:00.000Z",
-        siret: "12345678901234",
-        businessName: "Test Business",
-        individualProtection: true,
-        individualProtectionDescription: "casque et lunettes",
-        sanitaryPrevention: true,
-        sanitaryPreventionDescription: "fourniture de gel",
-        immersionAddress: "169 boulevard de la villette, 75010 Paris",
-        immersionObjective: "Confirmer un projet professionnel",
-        immersionActivities: "Piloter un automobile",
-        immersionSkills: "Utilisation des pneus optimale",
-        workConditions: "Travail en équipe",
-        internshipKind: "immersion",
-        businessAdvantages: "Prise en charge du panier repas",
-        acquisitionCampaign: "campaign-2024",
-        acquisitionKeyword: "emploi",
-        establishmentNumberEmployeesRange: "10-19",
-        agencyReferent: {
-          firstname: "Sophie",
-          lastname: "Durand",
-        },
-        immersionAppellation: {
-          appellationCode: "11573",
-          appellationLabel: "Boulanger / Boulangère",
-          romeCode: "D1102",
-          romeLabel: "Boulangerie - viennoiserie",
-        },
-        schedule: {
-          totalHours: 35,
-          workedDays: 5,
-          isSimple: true,
-          complexSchedule: [
-            {
-              date: "2024-10-08",
-              timePeriods: [{ start: "09:00", end: "17:00" }],
-            },
-          ],
-        },
-        establishmentTutor: {
-          role: "establishment-tutor",
-          email: "tutor@example.com",
-          phone: "+33123456789",
-          firstName: "Jean",
-          lastName: "Dupont",
-          job: "Manager",
-        },
-        signatories: {
-          beneficiary: {
-            role: "beneficiary",
-            email: "beneficiary@example.com",
-            firstName: "Marie",
-            lastName: "Martin",
-          },
-          establishmentRepresentative: {
-            role: "establishment-representative",
-            email: "rep@example.com",
-            firstName: "Pierre",
-            lastName: "Bernard",
-          },
-        },
-      };
-
       await pgConventionDraftRepository.save(conventionDraft, now);
 
       const result = await pgConventionDraftRepository.getById(
@@ -253,6 +253,19 @@ describe("PgConventionDraftRepository", () => {
         ...conventionDraft,
         updatedAt: now,
       });
+    });
+  });
+
+  describe("delete", () => {
+    it("deletes a convention draft", async () => {
+      await pgConventionDraftRepository.save(conventionDraft, now);
+
+      await pgConventionDraftRepository.delete([conventionDraft.id]);
+
+      const result = await pgConventionDraftRepository.getById(
+        conventionDraft.id,
+      );
+      expect(result).toBeUndefined();
     });
   });
 });

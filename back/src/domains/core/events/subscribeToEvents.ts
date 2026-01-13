@@ -57,6 +57,7 @@ const getUseCasesByTopics = (
   ConventionSubmittedByBeneficiary: [
     useCases.bindConventionToFederatedIdentity,
     useCases.markDiscussionLinkedToConvention,
+    useCases.deleteConventionDraft,
   ],
 
   // Convention Federated Identities
