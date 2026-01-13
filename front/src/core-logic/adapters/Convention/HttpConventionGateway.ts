@@ -270,8 +270,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: 400 }, logBodyAndThrow)
-            .with({ status: 409 }, logBodyAndThrow)
+            .with({ status: P.union(400, 409) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -287,7 +286,7 @@ export class HttpConventionGateway implements ConventionGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
-            .with({ status: 404 }, () => undefined)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
