@@ -15,10 +15,14 @@ import { useDispatch } from "react-redux";
 import {
   type AppellationDto,
   type ContactMode,
+  type ExternalSearchResultDto,
   getMapsLink,
+  isPhysicalWorkMode,
+  isSearchResultDto,
   makeAppellationInformationUrl,
   makeNafClassInformationUrl,
   makeSiretDescriptionLink,
+  remoteWorkModeLabels,
   type SearchResultDto,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -52,7 +56,7 @@ const SearchResultSection = ({
 );
 
 const getMetaForSearchResult = (
-  currentSearchResult: SearchResultDto | null,
+  currentSearchResult: SearchResultDto | ExternalSearchResultDto | null,
 ): {
   title: string;
   description: string;
@@ -153,6 +157,11 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
 
   const miniMapMarkerKey = "single-result-mini-map-marker";
 
+  const shouldShowPhysicalWorkModeInfos =
+    currentSearchResult &&
+    isSearchResultDto(currentSearchResult) &&
+    isPhysicalWorkMode(currentSearchResult.remoteWorkMode);
+
   return (
     <HeaderFooterLayout>
       <Helmet>
@@ -212,16 +221,47 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
               {currentSearchResult.customizedName ?? currentSearchResult.name}
             </h1>
             <div className={fr.cx("fr-grid-row")}>
-              <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+              <div
+                className={fr.cx(
+                  "fr-col-12",
+                  shouldShowPhysicalWorkModeInfos
+                    ? "fr-col-lg-6"
+                    : "fr-col-lg-12",
+                )}
+              >
                 <SearchResultSection title="Adresse">
-                  <p>
-                    {currentSearchResult.address.streetNumberAndAddress}
-                    {", "}
-                    <span>
-                      {currentSearchResult.address.postcode}{" "}
-                      {currentSearchResult.address.city}
-                    </span>
-                  </p>
+                  {shouldShowPhysicalWorkModeInfos ? (
+                    <>
+                      {currentSearchResult.address.streetNumberAndAddress}
+                      {", "}
+                      <span>
+                        {currentSearchResult.address.postcode}{" "}
+                        {currentSearchResult.address.city}
+                      </span>{" "}
+                      {isSearchResultDto(currentSearchResult) && (
+                        <>
+                          (
+                          {
+                            remoteWorkModeLabels[
+                              currentSearchResult.remoteWorkMode
+                            ].label
+                          }
+                          )
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    isSearchResultDto(currentSearchResult) && (
+                      <p>
+                        France entière -{" "}
+                        {
+                          remoteWorkModeLabels[
+                            currentSearchResult.remoteWorkMode
+                          ].label
+                        }
+                      </p>
+                    )
+                  )}
                   <p>
                     SIRET&nbsp;:{" "}
                     <a
@@ -345,23 +385,25 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
                   </ul>
                 </SearchResultSection>
               </div>
-              <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
-                <SearchMiniMap
-                  kind="single"
-                  isExternal={isExternal}
-                  markerProps={{
-                    position: [
-                      currentSearchResult.position.lat,
-                      currentSearchResult.position.lon,
-                    ],
-                    icon: getIconMarker(
-                      miniMapMarkerKey,
-                      isExternal,
-                      miniMapMarkerKey,
-                    ),
-                  }}
-                />
-              </div>
+              {shouldShowPhysicalWorkModeInfos && (
+                <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+                  <SearchMiniMap
+                    kind="single"
+                    isExternal={isExternal}
+                    markerProps={{
+                      position: [
+                        currentSearchResult.position.lat,
+                        currentSearchResult.position.lon,
+                      ],
+                      icon: getIconMarker(
+                        miniMapMarkerKey,
+                        isExternal,
+                        miniMapMarkerKey,
+                      ),
+                    }}
+                  />
+                </div>
+              )}
             </div>
             <SearchResultContactSection
               onFormSubmitSuccess={onFormSubmitSuccess}

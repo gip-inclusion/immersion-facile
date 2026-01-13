@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AppellationAndRomeDto,
   DataWithPagination,
+  ExternalSearchResultDto,
   GetOffersFlatQueryParams,
   SearchResultDto,
   SearchResultQuery,
@@ -22,12 +23,14 @@ export type SearchPageParams = GetOffersFlatQueryParams & {
   nafLabel?: string;
 } & WithAcquisition;
 
-interface SearchState {
-  searchResultsWithPagination: DataWithPagination<SearchResultDto>;
-  currentSearchResult: SearchResultDto | null;
+type SearchState = {
+  searchResultsWithPagination: DataWithPagination<
+    SearchResultDto | ExternalSearchResultDto
+  >;
+  currentSearchResult: SearchResultDto | ExternalSearchResultDto | null;
   isLoading: boolean;
   searchParams: SearchPageParams;
-}
+};
 
 const emptySearchResult: DataWithPagination<SearchResultDto> = {
   data: [],
@@ -68,7 +71,9 @@ export const searchSlice = createSlice({
     getOffersSucceeded: (
       state,
       action: PayloadAction<{
-        searchResultsWithPagination: DataWithPagination<SearchResultDto>;
+        searchResultsWithPagination: DataWithPagination<
+          SearchResultDto | ExternalSearchResultDto
+        >;
         searchParams: GetOffersFlatQueryParams;
       }>,
     ) => {
@@ -94,7 +99,7 @@ export const searchSlice = createSlice({
     },
     fetchSearchResultSucceeded: (
       state,
-      action: PayloadAction<SearchResultDto>,
+      action: PayloadAction<ExternalSearchResultDto>,
     ) => {
       state.currentSearchResult = action.payload;
       state.isLoading = false;

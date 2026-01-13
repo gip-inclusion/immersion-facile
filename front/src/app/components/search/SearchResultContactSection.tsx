@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type { SearchResultDto } from "shared";
+import type { ExternalSearchResultDto, SearchResultDto } from "shared";
 import { match, P } from "ts-pattern";
 import { CreateDiscussionForm } from "../immersion-offer/CreateDiscussionForm";
 
@@ -10,7 +10,7 @@ export const SearchResultContactSection = ({
 }: {
   onFormSubmitSuccess: () => void;
   formContactRef: React.RefObject<HTMLDivElement>;
-  currentSearchResult: SearchResultDto;
+  currentSearchResult: SearchResultDto | ExternalSearchResultDto;
 }) => (
   <div className={fr.cx("fr-card", "fr-p-4w", "fr-mt-8w")} ref={formContactRef}>
     {match(currentSearchResult.contactMode)
