@@ -205,6 +205,11 @@ export class InMemoryEstablishmentAggregateRepository
               ? filters.appellationCodes.includes(offer.appellationCode)
               : true,
           )
+          .filter((offer) =>
+            filters.remoteWorkModes?.length
+              ? filters.remoteWorkModes.includes(offer.remoteWorkMode)
+              : true,
+          )
           .map((offer) =>
             establishmentAggregateToSearchResultByRomeForFirstLocation(
               aggregate,
