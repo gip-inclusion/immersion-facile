@@ -11,6 +11,7 @@ import {
 import {
   type AppellationCode,
   domElementIds,
+  type ExternalSearchResultDto,
   hasSearchGeoParams,
   isSuperEstablishment,
   type SearchResultDto,
@@ -110,7 +111,7 @@ export const SearchListResults = ({
                     key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                   >
                     <SearchResult
-                      establishment={searchResult}
+                      searchResult={searchResult}
                       illustration={
                         <SearchResultIllustration
                           illustration={
@@ -236,7 +237,11 @@ export const SearchListResults = ({
 
 const makeOfferLink = (
   route: SearchRoute,
-  { siret, locationId, voluntaryToImmersion }: SearchResultDto,
+  {
+    siret,
+    locationId,
+    voluntaryToImmersion,
+  }: SearchResultDto | ExternalSearchResultDto,
   appellationCode?: AppellationCode,
 ): Link => {
   const definedAppellationCode: AppellationCode = appellationCode ?? "";

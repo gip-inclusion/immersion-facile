@@ -147,6 +147,7 @@ export const SearchPage = ({
           (appellation) => appellation.appellationCode,
         )
       : undefined,
+    remoteWorkModes: undefined,
     ...acquisitionParams,
   };
 

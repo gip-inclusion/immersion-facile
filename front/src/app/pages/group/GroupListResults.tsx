@@ -65,7 +65,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                       </div>
                     </SearchResultIllustration>
                   }
-                  establishment={searchResult}
+                  searchResult={searchResult}
                   linkProps={
                     routes.searchResult({
                       appellationCode: [appellationCode],

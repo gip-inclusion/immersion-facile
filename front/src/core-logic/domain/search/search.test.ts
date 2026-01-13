@@ -72,6 +72,7 @@ const immersionOffer: SearchResultDto = {
   locationId,
   updatedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
+  remoteWorkMode: "HYBRID",
 };
 
 describe("search epic", () => {

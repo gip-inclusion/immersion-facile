@@ -163,7 +163,7 @@ export const SearchMiniMap = ({
                   <Popup>
                     <SearchResult
                       key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
-                      establishment={searchResult}
+                      searchResult={searchResult}
                       linkProps={
                         searchResult.voluntaryToImmersion
                           ? routes.searchResult({
