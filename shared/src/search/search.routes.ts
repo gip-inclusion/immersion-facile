@@ -19,6 +19,7 @@ import {
 } from "./SearchResult.schema";
 
 export type SearchRoutes = typeof searchImmersionRoutes;
+
 export const searchImmersionRoutes = defineRoutes({
   getGroupBySlug: defineRoute({
     method: "get",

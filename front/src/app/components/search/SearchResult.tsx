@@ -9,14 +9,17 @@ import { memo, type ReactNode } from "react";
 import {
   type DateTimeIsoString,
   domElementIds,
+  type ExternalSearchResultDto,
   frenchEstablishmentKinds,
+  isSearchResultDto,
+  remoteWorkModeLabels,
   type SearchResultDto,
 } from "shared";
 import type { Link } from "type-route";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
-  establishment: SearchResultDto;
+  searchResult: SearchResultDto | ExternalSearchResultDto;
   linkProps: Link;
   illustration?: ReactNode;
   disableButton?: boolean;
@@ -38,7 +41,7 @@ const getLastDate = (
 
 const SearchResultComponent = ({
   linkProps,
-  establishment,
+  searchResult,
   illustration,
 }: EnterpriseSearchResultProps) => {
   const {
@@ -51,7 +54,7 @@ const SearchResultComponent = ({
     voluntaryToImmersion,
     createdAt,
     updatedAt,
-  } = establishment;
+  } = searchResult;
   const isCustomizedNameValidToDisplay =
     customizedName &&
     customizedName.length > 0 &&
@@ -89,7 +92,9 @@ const SearchResultComponent = ({
       endDetail={dateJobCreatedAt}
       start={
         <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
-          {address.city} ({address.departmentCode})
+          {address.city} ({address.departmentCode}) -{" "}
+          {isSearchResultDto(searchResult) &&
+            remoteWorkModeLabels[searchResult.remoteWorkMode].label}
         </Tag>
       }
     />
