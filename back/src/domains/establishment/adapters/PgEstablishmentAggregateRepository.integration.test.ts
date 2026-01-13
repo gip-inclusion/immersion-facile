@@ -977,6 +977,190 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
         });
       });
+
+      describe("filters.remoteWorkModes", () => {
+        const offerNoRemote = new OfferEntityBuilder()
+          .withRomeCode("A1101")
+          .withAppellationLabel("Ouvrier / Ouvrière agricole")
+          .withAppellationCode("11987")
+          .withRomeLabel("Conduite d'engins agricoles et forestiers")
+          .withRemoteWorkMode("NO_REMOTE")
+          .build();
+
+        const offerHybrid = new OfferEntityBuilder()
+          .withRomeCode("M1805")
+          .withAppellationLabel("Développeur / Développeuse")
+          .withAppellationCode("19999")
+          .withRomeLabel("Études et développement informatique")
+          .withRemoteWorkMode("HYBRID")
+          .build();
+
+        const offerFullRemote = new OfferEntityBuilder()
+          .withRomeCode("M1805")
+          .withAppellationLabel("Ingénieur / Ingénieure logiciel")
+          .withAppellationCode("19998")
+          .withRomeLabel("Études et développement informatique")
+          .withRemoteWorkMode("FULL_REMOTE")
+          .build();
+
+        const establishmentWithNoRemoteOffer =
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("11111111111111")
+            .withOffers([offerNoRemote])
+            .withLocationId(uuid())
+            .withUserRights([osefUserRight])
+            .build();
+
+        const establishmentWithHybridOffer = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("22222222222222")
+          .withOffers([offerHybrid])
+          .withLocationId(uuid())
+          .withUserRights([osefUserRight])
+          .build();
+
+        const establishmentWithFullRemoteOffer =
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("33333333333333")
+            .withOffers([offerFullRemote])
+            .withLocationId(uuid())
+            .withUserRights([osefUserRight])
+            .build();
+
+        const establishmentWithMixedRemoteOffers =
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("44444444444444")
+            .withOffers([offerHybrid, offerFullRemote])
+            .withLocationId(uuid())
+            .withUserRights([osefUserRight])
+            .build();
+
+        const testEstablishmentAggregates: EstablishmentAggregate[] = [
+          establishmentWithNoRemoteOffer,
+          establishmentWithHybridOffer,
+          establishmentWithFullRemoteOffer,
+          establishmentWithMixedRemoteOffers,
+        ];
+
+        beforeEach(async () => {
+          await Promise.all(
+            testEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+        });
+
+        it("doesn't filter by remoteWorkModes when no remoteWorkModes are provided (empty array)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { remoteWorkModes: [] },
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 4, // 1 per establishment (mixed remote offers are grouped by siret + rome + location)
+          });
+        });
+
+        it("filters by remoteWorkModes (single value: NO_REMOTE)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { remoteWorkModes: ["NO_REMOTE"] },
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          });
+
+          expectToEqual(result.data.length, 1);
+          expectToEqual(
+            result.data[0].siret,
+            establishmentWithNoRemoteOffer.establishment.siret,
+          );
+          expectToEqual(result.data[0].rome, offerNoRemote.romeCode);
+        });
+
+        it("filters by remoteWorkModes (single value: HYBRID)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { remoteWorkModes: ["HYBRID"] },
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 2, // establishmentWithHybridOffer + establishmentWithMixedRemoteOffers
+          });
+
+          expectArraysToEqual(
+            result.data.map((r) => r.siret),
+            [
+              establishmentWithHybridOffer.establishment.siret,
+              establishmentWithMixedRemoteOffers.establishment.siret,
+            ],
+          );
+        });
+
+        it("filters by remoteWorkModes (single value: FULL_REMOTE)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { remoteWorkModes: ["FULL_REMOTE"] },
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 2, // establishmentWithFullRemoteOffer + establishmentWithMixedRemoteOffers
+          });
+
+          expectArraysToEqual(
+            result.data.map((r) => r.siret),
+            [
+              establishmentWithFullRemoteOffer.establishment.siret,
+              establishmentWithMixedRemoteOffers.establishment.siret,
+            ],
+          );
+        });
+
+        it("filters by remoteWorkModes (multiple values)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { remoteWorkModes: ["HYBRID", "FULL_REMOTE"] },
+          });
+
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 3, // 1 from establishmentWithHybridOffer + 1 from establishmentWithFullRemoteOffer + 1 from establishmentWithMixedRemoteOffers (grouped by siret+rome+location)
+          });
+
+          const sirets = result.data.map((r) => r.siret);
+          expect(sirets).toContain(
+            establishmentWithHybridOffer.establishment.siret,
+          );
+          expect(sirets).toContain(
+            establishmentWithFullRemoteOffer.establishment.siret,
+          );
+          expect(sirets).toContain(
+            establishmentWithMixedRemoteOffers.establishment.siret,
+          );
+        });
+      });
+
       describe("filters.geoParams", () => {
         const testEstablishmentAggregates: EstablishmentAggregate[] = [
           establishmentWithOfferA1101_AtPosition,

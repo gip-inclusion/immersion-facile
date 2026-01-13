@@ -7,6 +7,7 @@ import type {
   FitForDisableWorkerOption,
   LocationId,
   NafCode,
+  RemoteWorkMode,
   SearchResultDto,
   SearchSortedBy,
   SiretDto,
@@ -42,6 +43,7 @@ type GetOffersFilters = {
   geoParams?: GeoParams;
   locationIds?: LocationId[];
   nafCodes?: NafCode[];
+  remoteWorkModes?: RemoteWorkMode[];
   searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
   sirets?: SiretDto[];
 };

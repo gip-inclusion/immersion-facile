@@ -451,6 +451,263 @@ describe("/offers route", () => {
       });
     });
 
+    describe("with filter remoteWorkModes", () => {
+      const offerFullRemote = new OfferEntityBuilder()
+        .withRomeCode("M1805")
+        .withAppellationLabel("Développeur / Développeuse")
+        .withAppellationCode("19999")
+        .withRomeLabel("Études et développement informatique")
+        .withRemoteWorkMode("FULL_REMOTE")
+        .build();
+
+      const offerHybrid = new OfferEntityBuilder()
+        .withRomeCode("M1805")
+        .withAppellationLabel("Chef de projet")
+        .withAppellationCode("19998")
+        .withRomeLabel("Gestion de projet")
+        .withRemoteWorkMode("HYBRID")
+        .build();
+
+      const offerNoRemote = new OfferEntityBuilder()
+        .withRomeCode("A1409")
+        .withAppellationLabel("Ouvrier agricole")
+        .withAppellationCode("14704")
+        .withRomeLabel("Agriculture")
+        .withRemoteWorkMode("NO_REMOTE")
+        .build();
+
+      beforeEach(async () => {
+        inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret1)
+            .withOffers([offerFullRemote, offerHybrid])
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(siret1)
+                .withScore(score20)
+                .withWebsite("https://www.jobs.fr")
+                .build(),
+            )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
+              },
+            ])
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret2)
+            .withOffers([offerNoRemote])
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(siret2)
+                .withScore(score20)
+                .withWebsite("https://www.jobs.fr")
+                .build(),
+            )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
+              },
+            ])
+            .build(),
+        ];
+      });
+
+      it("with filter remoteWorkModes set to FULL_REMOTE", async () => {
+        const result = await httpClient.getOffers({
+          queryParams: {
+            appellationCodes: [
+              offerFullRemote.appellationCode,
+              offerHybrid.appellationCode,
+              offerNoRemote.appellationCode,
+            ],
+            sortBy: "score",
+            remoteWorkModes: ["FULL_REMOTE"],
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: {
+            pagination: getBasicPagination({ totalRecords: 1 }),
+            data: [
+              {
+                ...toSearchImmersionResults(
+                  [{ siret: siret1, offer: offerFullRemote, establishment }],
+                  false,
+                )[0],
+                // When results are grouped by Rome, all appellations for that Rome are included
+                appellations: [
+                  {
+                    appellationLabel: offerFullRemote.appellationLabel,
+                    appellationCode: offerFullRemote.appellationCode,
+                  },
+                  {
+                    appellationLabel: offerHybrid.appellationLabel,
+                    appellationCode: offerHybrid.appellationCode,
+                  },
+                ],
+              },
+            ],
+          },
+        });
+      });
+
+      it("with filter remoteWorkModes set to multiple values", async () => {
+        const result = await httpClient.getOffers({
+          queryParams: {
+            appellationCodes: [
+              offerFullRemote.appellationCode,
+              offerHybrid.appellationCode,
+              offerNoRemote.appellationCode,
+            ],
+            sortBy: "score",
+            remoteWorkModes: ["FULL_REMOTE", "HYBRID"],
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: {
+            pagination: getBasicPagination({ totalRecords: 2 }),
+            data: [
+              {
+                ...toSearchImmersionResults(
+                  [{ siret: siret1, offer: offerFullRemote, establishment }],
+                  false,
+                )[0],
+                // When results are grouped by Rome, all appellations for that Rome are included
+                appellations: [
+                  {
+                    appellationLabel: offerFullRemote.appellationLabel,
+                    appellationCode: offerFullRemote.appellationCode,
+                  },
+                  {
+                    appellationLabel: offerHybrid.appellationLabel,
+                    appellationCode: offerHybrid.appellationCode,
+                  },
+                ],
+              },
+              {
+                ...toSearchImmersionResults(
+                  [{ siret: siret1, offer: offerHybrid, establishment }],
+                  false,
+                )[0],
+                // When results are grouped by Rome, all appellations for that Rome are included
+                appellations: [
+                  {
+                    appellationLabel: offerFullRemote.appellationLabel,
+                    appellationCode: offerFullRemote.appellationCode,
+                  },
+                  {
+                    appellationLabel: offerHybrid.appellationLabel,
+                    appellationCode: offerHybrid.appellationCode,
+                  },
+                ],
+              },
+            ],
+          },
+        });
+      });
+
+      it("with filter remoteWorkModes set to NO_REMOTE", async () => {
+        const result = await httpClient.getOffers({
+          queryParams: {
+            appellationCodes: [
+              offerFullRemote.appellationCode,
+              offerHybrid.appellationCode,
+              offerNoRemote.appellationCode,
+            ],
+            sortBy: "score",
+            remoteWorkModes: ["NO_REMOTE"],
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: {
+            pagination: getBasicPagination({ totalRecords: 1 }),
+            data: toSearchImmersionResults(
+              [{ siret: siret2, offer: offerNoRemote, establishment }],
+              false,
+            ),
+          },
+        });
+      });
+
+      it("without remoteWorkModes filter returns all offers", async () => {
+        const result = await httpClient.getOffers({
+          queryParams: {
+            appellationCodes: [
+              offerFullRemote.appellationCode,
+              offerHybrid.appellationCode,
+              offerNoRemote.appellationCode,
+            ],
+            sortBy: "score",
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: {
+            pagination: getBasicPagination({ totalRecords: 3 }),
+            data: [
+              {
+                ...toSearchImmersionResults(
+                  [{ siret: siret1, offer: offerFullRemote, establishment }],
+                  false,
+                )[0],
+                // When results are grouped by Rome, all appellations for that Rome are included
+                appellations: [
+                  {
+                    appellationLabel: offerFullRemote.appellationLabel,
+                    appellationCode: offerFullRemote.appellationCode,
+                  },
+                  {
+                    appellationLabel: offerHybrid.appellationLabel,
+                    appellationCode: offerHybrid.appellationCode,
+                  },
+                ],
+              },
+              {
+                ...toSearchImmersionResults(
+                  [{ siret: siret1, offer: offerHybrid, establishment }],
+                  false,
+                )[0],
+                // When results are grouped by Rome, all appellations for that Rome are included
+                appellations: [
+                  {
+                    appellationLabel: offerFullRemote.appellationLabel,
+                    appellationCode: offerFullRemote.appellationCode,
+                  },
+                  {
+                    appellationLabel: offerHybrid.appellationLabel,
+                    appellationCode: offerHybrid.appellationCode,
+                  },
+                ],
+              },
+              {
+                ...toSearchImmersionResults(
+                  [{ siret: siret2, offer: offerNoRemote, establishment }],
+                  false,
+                )[0],
+              },
+            ],
+          },
+        });
+      });
+    });
+
     it("rejects invalid requests with error code 400", async () => {
       const result = await httpClient.getOffers({
         queryParams: {

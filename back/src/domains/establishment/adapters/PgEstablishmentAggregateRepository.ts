@@ -17,6 +17,7 @@ import {
   type LocationId,
   type NafCode,
   pipeWithValue,
+  type RemoteWorkMode,
   type RomeCode,
   type SearchSortedBy,
   type SiretDto,
@@ -869,6 +870,7 @@ type SearchImmersionFilters = {
   romeCodes?: RomeCode[];
   geoParams?: GeoParams;
   nafCodes?: NafCode[];
+  remoteWorkModes?: RemoteWorkMode[];
   sirets?: SiretDto[];
   appellationCodes?: AppellationCode[];
   locationIds?: LocationId[];
@@ -891,6 +893,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
     geoParams,
     locationIds,
     nafCodes,
+    remoteWorkModes,
     romeCodes,
     searchableBy,
     sirets,
@@ -1033,6 +1036,14 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                       "immersion_offers.appellation_code",
                       "in",
                       appellationCodes.map((code) => Number.parseInt(code)),
+                    )
+                  : eb,
+              (eb) =>
+                remoteWorkModes?.length
+                  ? eb.where(
+                      "immersion_offers.remote_work_mode",
+                      "in",
+                      remoteWorkModes,
                     )
                   : eb,
             ).as("offer"),
