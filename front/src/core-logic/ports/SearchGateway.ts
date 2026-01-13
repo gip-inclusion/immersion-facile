@@ -2,6 +2,7 @@ import type { Observable } from "rxjs";
 import type {
   CreateDiscussionDto,
   DataWithPagination,
+  ExternalSearchResultDto,
   GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   GroupSlug,
@@ -13,9 +14,6 @@ import type {
 export type ContactErrorKind = "alreadyContactedRecently";
 
 export interface SearchGateway {
-  getExternalOffers$(
-    params: GetExternalOffersFlatQueryParams,
-  ): Observable<DataWithPagination<SearchResultDto>>;
   getOffers$(
     params: GetOffersFlatQueryParams,
   ): Observable<DataWithPagination<SearchResultDto>>;
@@ -26,5 +24,8 @@ export interface SearchGateway {
   getSearchResult$(params: SiretAndAppellationDto): Observable<SearchResultDto>;
   getExternalSearchResult$(
     params: SiretAndAppellationDto,
-  ): Observable<SearchResultDto>;
+  ): Observable<ExternalSearchResultDto>;
+  getExternalOffers$(
+    params: GetExternalOffersFlatQueryParams,
+  ): Observable<DataWithPagination<ExternalSearchResultDto>>;
 }
