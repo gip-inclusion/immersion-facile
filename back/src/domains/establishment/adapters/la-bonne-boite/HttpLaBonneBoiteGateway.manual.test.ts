@@ -1,10 +1,10 @@
 import type { RedisClientType } from "redis";
 import {
+  type ExternalSearchResultDto,
   expectToEqual,
   type GeoPositionDto,
   type NafCode,
   type RomeDto,
-  type SearchResultDto,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
@@ -281,7 +281,7 @@ describe("HttpLaBonneBoiteGateway", () => {
         page: 2,
         perPage: 2,
       });
-      const expectedResultsOnPage1: SearchResultDto[] = [
+      const expectedResultsOnPage1: ExternalSearchResultDto[] = [
         {
           address: {
             city: "Paris",
@@ -337,7 +337,7 @@ describe("HttpLaBonneBoiteGateway", () => {
           voluntaryToImmersion: false,
         },
       ];
-      const expectedResultsOnPage2: SearchResultDto[] = [
+      const expectedResultsOnPage2: ExternalSearchResultDto[] = [
         {
           address: {
             city: "Paris",

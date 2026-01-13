@@ -3,6 +3,7 @@ import {
   type GeoPositionDto,
   type Location,
   LocationBuilder,
+  type RemoteWorkMode,
   UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -24,11 +25,13 @@ export const makeExpectedSearchResult = ({
   withOffers,
   withLocationAndDistance,
   nafLabel,
+  remoteWorkMode,
 }: {
   establishment: EstablishmentAggregate;
   withOffers: OfferEntity[];
   withLocationAndDistance: Location & { distance?: number };
   nafLabel: string;
+  remoteWorkMode?: RemoteWorkMode;
 }): RepositorySearchResultDto => {
   const firstOffer = withOffers.at(0);
   if (!firstOffer)
@@ -66,6 +69,7 @@ export const makeExpectedSearchResult = ({
       !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached, // <<<<< Donnée renvoyée actuellement alors que pas spécifié dans le DTO?!
     updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
     createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
+    remoteWorkMode: remoteWorkMode ?? firstOffer.remoteWorkMode,
   } as RepositorySearchResultDto; // d'où le as
 };
 
