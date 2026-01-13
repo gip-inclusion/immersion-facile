@@ -80,13 +80,13 @@ export type WithJobAndPhone = WithJob & WithPhone;
 
 export type AdminFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-admin"> &
-  Required<WithJobAndPhone> &
-  WithIsMainContactInPerson;
+    Required<WithJobAndPhone> &
+    WithIsMainContactInPerson;
 
 export type ContactFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-contact"> &
-  WithJobAndPhone &
-  WithIsMainContactInPerson;
+    WithJobAndPhone &
+    WithIsMainContactInPerson;
 
 export type FormEstablishmentUserRight =
   | AdminFormEstablishmentUserRight
@@ -143,15 +143,15 @@ export type CommonFormEstablishmentDto = {
 
 type GenericFormEstablishmentDto<T extends ContactMode> =
   CommonFormEstablishmentDto &
-  WithAcquisition & {
-    contactMode: T;
-  } & (T extends "IN_PERSON"
-    ? {
-      potentialBeneficiaryWelcomeAddress: AddressAndPosition;
-    }
-    : {
-      potentialBeneficiaryWelcomeAddress?: never;
-    });
+    WithAcquisition & {
+      contactMode: T;
+    } & (T extends "IN_PERSON"
+      ? {
+          potentialBeneficiaryWelcomeAddress: AddressAndPosition;
+        }
+      : {
+          potentialBeneficiaryWelcomeAddress?: never;
+        });
 
 export type FormEstablishmentDto = GenericFormEstablishmentDto<
   "EMAIL" | "PHONE" | "IN_PERSON"
