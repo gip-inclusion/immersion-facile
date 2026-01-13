@@ -65,7 +65,7 @@
       "size": "M"
     },
     {
-      "command": "0 16 * * 6 pnpm back run trigger-close-inactive-agencies-without-recent-conventions",
+      "command": "0 7 1 * * pnpm back run trigger-close-inactive-agencies-without-recent-conventions",
       "size": "M"
     }
   ]
