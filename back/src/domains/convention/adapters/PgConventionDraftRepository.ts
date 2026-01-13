@@ -117,6 +117,14 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
       .onConflict((oc) => oc.column("id").doUpdateSet(newValuesExceptId))
       .execute();
   }
+
+  public async delete(ids: ConventionDraftId[]): Promise<void> {
+    if (ids.length === 0) return;
+    await this.transaction
+      .deleteFrom("convention_drafts")
+      .where("id", "in", ids)
+      .execute();
+  }
 }
 
 const mapToEntity = (

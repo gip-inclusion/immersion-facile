@@ -28,4 +28,10 @@ export class InMemoryConventionDraftRepository
       updatedAt,
     };
   }
+
+  public async delete(ids: ConventionDraftId[]): Promise<void> {
+    for (const id of ids) {
+      delete this.#conventionDrafts[id];
+    }
+  }
 }
