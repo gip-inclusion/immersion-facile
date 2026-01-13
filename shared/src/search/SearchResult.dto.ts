@@ -2,6 +2,7 @@ import type { AddressDto, LocationId } from "../address/address.dto";
 import type {
   ContactMode,
   FitForDisableWorkerOption,
+  RemoteWorkMode,
 } from "../formEstablishment/FormEstablishment.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type {
@@ -11,7 +12,7 @@ import type {
 import type { SiretDto } from "../siret/siret";
 import type { DateTimeIsoString } from "../utils/date";
 
-export type SearchResultDto = {
+type CommonSearchResultDto = {
   rome: RomeCode;
   romeLabel: string;
   appellations: AppellationDto[];
@@ -35,6 +36,12 @@ export type SearchResultDto = {
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
 };
+
+export type SearchResultDto = CommonSearchResultDto & {
+  remoteWorkMode: RemoteWorkMode;
+};
+
+export type ExternalSearchResultDto = CommonSearchResultDto;
 
 export type GetOffersPerPageOption = (typeof getOffersPerPageOptions)[number];
 export const getOffersPerPageOptions = [6, 12, 24, 48] as const;

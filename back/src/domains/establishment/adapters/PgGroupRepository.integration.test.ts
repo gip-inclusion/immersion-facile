@@ -7,6 +7,7 @@ import {
   type Group,
   type GroupOptions,
   type Location,
+  type RemoteWorkMode,
   type SearchResultDto,
   UserBuilder,
 } from "shared";
@@ -206,12 +207,14 @@ describe("PgEstablishmentGroupRepository", () => {
       romeLabel,
       appellations,
       location,
+      remoteWorkMode,
     }: {
       establishment: EstablishmentEntity;
       appellations: AppellationDto[];
       rome: string;
       romeLabel: string;
       location: Location;
+      remoteWorkMode: RemoteWorkMode;
     }): SearchResultDto => ({
       appellations,
       romeLabel,
@@ -234,6 +237,7 @@ describe("PgEstablishmentGroupRepository", () => {
       locationId: location.id,
       updatedAt: establishment.updatedAt?.toISOString(),
       createdAt: establishment.createdAt.toISOString(),
+      remoteWorkMode,
     });
 
     expectToEqual(groupWithResults, {
@@ -250,6 +254,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment1.locations[0],
+          remoteWorkMode: "HYBRID",
         }),
         createSearchResult({
           establishment: establishment1,
@@ -266,6 +271,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment1.locations[0],
+          remoteWorkMode: "HYBRID",
         }),
         createSearchResult({
           establishment: establishment2,
@@ -278,6 +284,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment2.locations[0],
+          remoteWorkMode: "HYBRID",
         }),
         createSearchResult({
           establishment: establishment2,
@@ -290,6 +297,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment2.locations[1],
+          remoteWorkMode: "HYBRID",
         }),
       ],
     });

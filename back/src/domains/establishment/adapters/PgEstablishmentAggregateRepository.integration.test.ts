@@ -1062,7 +1062,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             currentPage: 1,
             totalPages: 1,
             numberPerPage: 10,
-            totalRecords: 4, // 1 per establishment (mixed remote offers are grouped by siret + rome + location)
+            totalRecords: 5, // 1 per establishment except establishmentWithMixedRemoteOffers which has 2 (grouped by siret + rome + location + remoteWorkMode)
           });
         });
 
@@ -1145,7 +1145,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             currentPage: 1,
             totalPages: 1,
             numberPerPage: 10,
-            totalRecords: 3, // 1 from establishmentWithHybridOffer + 1 from establishmentWithFullRemoteOffer + 1 from establishmentWithMixedRemoteOffers (grouped by siret+rome+location)
+            totalRecords: 4, // 1 from establishmentWithHybridOffer + 1 from establishmentWithFullRemoteOffer + 2 from establishmentWithMixedRemoteOffers (one for each remoteWorkMode)
           });
 
           const sirets = result.data.map((r) => r.siret);
@@ -3331,6 +3331,8 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentWithOfferA1101_AtPosition.establishment.createdAt.toISOString(),
             updatedAt:
               establishmentWithOfferA1101_AtPosition.establishment.updatedAt.toISOString(),
+            remoteWorkMode:
+              establishmentWithOfferA1101_AtPosition.offers[0].remoteWorkMode,
           },
         );
       });

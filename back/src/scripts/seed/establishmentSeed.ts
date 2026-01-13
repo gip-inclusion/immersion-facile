@@ -45,6 +45,18 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
       .withAppellationLabel("Boucher-charcutier / Bouchère-charcutière")
       .withRomeCode("D1101")
       .build(),
+    new OfferEntityBuilder()
+      .withAppellationCode("12112")
+      .withAppellationLabel("Boulanger / Boulangère")
+      .withRomeCode("D1101")
+      .withRemoteWorkMode("HYBRID")
+      .build(),
+    new OfferEntityBuilder()
+      .withAppellationCode("10512")
+      .withAppellationLabel("Vendeur / Vendeuse en articles de sport")
+      .withRomeCode("D1211")
+      .withRemoteWorkMode("FULL_REMOTE")
+      .build(),
   ])
   .withUserRights([
     {
@@ -85,6 +97,13 @@ const decathlon = new EstablishmentAggregateBuilder()
       .withAppellationCode("20552")
       .withAppellationLabel("Vendeur / Vendeuse en articles de sport")
       .withRomeCode("D1211")
+      .withRemoteWorkMode("NO_REMOTE")
+      .build(),
+    new OfferEntityBuilder()
+      .withAppellationCode("11569")
+      .withAppellationLabel("Boucher-charcutier / Bouchère-charcutière")
+      .withRomeCode("D1211")
+      .withRemoteWorkMode("HYBRID")
       .build(),
   ])
   .withUserRights([
