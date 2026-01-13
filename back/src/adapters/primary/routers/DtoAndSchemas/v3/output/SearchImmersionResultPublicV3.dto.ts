@@ -6,6 +6,7 @@ import type {
   FitForDisableWorkerOption,
   GeoPositionDto,
   LocationId,
+  RemoteWorkMode,
   RomeCode,
   SearchResultDto,
   SiretDto,
@@ -34,6 +35,7 @@ export type SearchImmersionResultPublicV3 = {
   urlOfPartner?: string;
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
+  remoteWorkMode: RemoteWorkMode;
 };
 
 export const domainToSearchImmersionResultPublicV3 = (

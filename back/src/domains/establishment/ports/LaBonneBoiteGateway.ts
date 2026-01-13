@@ -1,7 +1,7 @@
 import type {
+  ExternalSearchResultDto,
   PaginationQueryParams,
   RomeDto,
-  SearchResultDto,
   SiretDto,
   WithNafCodes,
 } from "shared";
@@ -15,9 +15,9 @@ export type SearchCompaniesParams = RomeDto &
 export interface LaBonneBoiteGateway {
   searchCompanies(
     requestParams: SearchCompaniesParams,
-  ): Promise<SearchResultDto[]>;
+  ): Promise<ExternalSearchResultDto[]>;
   fetchCompanyBySiret(
     id: SiretDto,
     romeDto: RomeDto,
-  ): Promise<SearchResultDto | null>;
+  ): Promise<ExternalSearchResultDto | null>;
 }

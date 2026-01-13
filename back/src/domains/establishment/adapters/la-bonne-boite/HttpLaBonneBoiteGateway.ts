@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/node";
 import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
-import type { RomeDto, SearchResultDto, SiretDto } from "shared";
+import type { ExternalSearchResultDto, RomeDto, SiretDto } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import type { WithCache } from "../../../core/caching-gateway/port/WithCache";
@@ -38,11 +38,11 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
 
   public async searchCompanies(
     searchCompaniesParams: SearchCompaniesParams,
-  ): Promise<SearchResultDto[]> {
+  ): Promise<ExternalSearchResultDto[]> {
     return Sentry.startSpan(
       { name: "LaBonneBoiteGateway.searchCompanies" },
       async () =>
-        this.withCache<SearchResultDto[], SearchCompaniesParams>({
+        this.withCache<ExternalSearchResultDto[], SearchCompaniesParams>({
           logParams: {
             partner: "laBonneBoite",
             route: this.lbbRoute.getCompanies,
@@ -117,7 +117,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   public async fetchCompanyBySiret(
     siret: SiretDto,
     romeDto: RomeDto,
-  ): Promise<SearchResultDto | null> {
+  ): Promise<ExternalSearchResultDto | null> {
     return this.withCache({
       logParams: {
         partner: "laBonneBoite",
