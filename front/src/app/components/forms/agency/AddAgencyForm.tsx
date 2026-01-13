@@ -24,6 +24,7 @@ import {
   createAgencySchema,
   type DepartmentCode,
   domElementIds,
+  toDateUTCString,
 } from "shared";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
@@ -439,7 +440,7 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   id,
   kind: "",
   name: "",
-  createdAt: "",
+  createdAt: toDateUTCString(new Date()),
   coveredDepartments: [],
   address: {
     streetNumberAndAddress: "",
