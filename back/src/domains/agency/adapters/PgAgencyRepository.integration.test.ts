@@ -1007,6 +1007,94 @@ describe("PgAgencyRepository", () => {
         expect(agencies).toEqual([agency1]);
       });
     });
+
+    describe("filter createdAtBefore", () => {
+      const baseDate = new Date("2024-01-15T10:00:00Z");
+      const dateBefore = subDays(baseDate, 5); // 2024-01-10
+      const dateAfter = subDays(baseDate, -5); // 2024-01-20
+
+      const agencyCreatedBefore = toAgencyWithRights(
+        agency1builder
+          .withId("00000000-0000-0000-0000-000000000010")
+          .withAgencySiret("00000000000010")
+          .withCreatedAt(dateBefore.toISOString())
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      const agencyCreatedOnDate = toAgencyWithRights(
+        agency1builder
+          .withId("00000000-0000-0000-0000-000000000011")
+          .withAgencySiret("00000000000011")
+          .withCreatedAt(baseDate.toISOString())
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      const agencyCreatedAfter = toAgencyWithRights(
+        agency1builder
+          .withId("00000000-0000-0000-0000-000000000012")
+          .withAgencySiret("00000000000012")
+          .withCreatedAt(dateAfter.toISOString())
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      beforeEach(async () => {
+        await Promise.all([
+          agencyRepository.insert(agencyCreatedBefore),
+          agencyRepository.insert(agencyCreatedOnDate),
+          agencyRepository.insert(agencyCreatedAfter),
+        ]);
+      });
+
+      it("returns only agencies created before or on the specified date", async () => {
+        const agencies = await agencyRepository.getAgencies({
+          filters: { createdAtBefore: baseDate },
+        });
+
+        expectToEqual(agencies, [agencyCreatedBefore, agencyCreatedOnDate]);
+      });
+
+      it("returns nothing when filter date is before all agencies", async () => {
+        const veryOldDate = subDays(dateBefore, 10);
+        const agencies = await agencyRepository.getAgencies({
+          filters: { createdAtBefore: veryOldDate },
+        });
+
+        expect(agencies).toEqual([]);
+      });
+
+      it("returns all agencies when filter date is after all agencies", async () => {
+        const futureDate = subDays(dateAfter, -10);
+        const agencies = await agencyRepository.getAgencies({
+          filters: { createdAtBefore: futureDate },
+        });
+
+        expectToEqual(agencies, [
+          agencyCreatedBefore,
+          agencyCreatedOnDate,
+          agencyCreatedAfter,
+        ]);
+      });
+
+      it("works in combination with other filters", async () => {
+        const agencies = await agencyRepository.getAgencies({
+          filters: {
+            createdAtBefore: baseDate,
+            status: activeAgencyStatuses,
+          },
+        });
+
+        expectToEqual(agencies, [agencyCreatedBefore, agencyCreatedOnDate]);
+      });
+    });
   });
 
   describe("getAgenciesRelatedToAgency()", () => {
