@@ -230,16 +230,26 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
                 )}
               >
                 <SearchResultSection title="Adresse">
-                  {shouldShowPhysicalWorkModeInfos ? (
+                  {isSearchResultDto(currentSearchResult) &&
+                  !isPhysicalWorkMode(currentSearchResult.remoteWorkMode) ? (
+                    <p>
+                      France entière -{" "}
+                      {
+                        remoteWorkModeLabels[currentSearchResult.remoteWorkMode]
+                          .label
+                      }
+                    </p>
+                  ) : (
                     <>
                       {currentSearchResult.address.streetNumberAndAddress}
                       {", "}
                       <span>
                         {currentSearchResult.address.postcode}{" "}
                         {currentSearchResult.address.city}
-                      </span>{" "}
+                      </span>
                       {isSearchResultDto(currentSearchResult) && (
                         <>
+                          {" "}
                           (
                           {
                             remoteWorkModeLabels[
@@ -250,17 +260,6 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
                         </>
                       )}
                     </>
-                  ) : (
-                    isSearchResultDto(currentSearchResult) && (
-                      <p>
-                        France entière -{" "}
-                        {
-                          remoteWorkModeLabels[
-                            currentSearchResult.remoteWorkMode
-                          ].label
-                        }
-                      </p>
-                    )
                   )}
                   <p>
                     SIRET&nbsp;:{" "}
