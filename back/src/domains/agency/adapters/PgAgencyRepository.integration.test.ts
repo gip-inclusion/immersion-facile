@@ -7,6 +7,7 @@ import {
   activeAgencyStatuses,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
+  type DelegationAgencyInfo,
   errors,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
@@ -226,6 +227,22 @@ describe("PgAgencyRepository", () => {
 
       expectToEqual(await agencyRepository.getAgencies({}), [agency1a]);
     });
+
+    it("inserts agency with delegationAgencyInfo null", async () => {
+      const agencyWithNullDelegation = toAgencyWithRights(
+        agency1builder.withKind("autre").build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      await agencyRepository.insert(agencyWithNullDelegation);
+
+      const retrievedAgency = await agencyRepository.getById(
+        agencyWithNullDelegation.id,
+      );
+      expectToEqual(retrievedAgency, agencyWithNullDelegation);
+    });
   });
 
   describe("update()", () => {
@@ -326,6 +343,74 @@ describe("PgAgencyRepository", () => {
         { ...agencyWithTwoStepValidation, ...updatedAgencyRights },
       ]);
     });
+
+    it("updates delegationAgencyInfo from null to filled", async () => {
+      const agencyWithoutDelegationInfo = toAgencyWithRights(
+        agency1builder.withKind("autre").build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      await agencyRepository.insert(agencyWithoutDelegationInfo);
+
+      const delegationInfo = {
+        delegationEndDate: new Date("2029-12-31").toISOString(),
+        delegationAgencyName: "Mission Locale Paris",
+        delegationAgencyKind: "mission-locale" as const,
+      };
+
+      await agencyRepository.update({
+        id: agencyWithoutDelegationInfo.id,
+        delegationAgencyInfo: delegationInfo,
+      });
+
+      const retrievedAgency = await agencyRepository.getById(
+        agencyWithoutDelegationInfo.id,
+      );
+      expectToEqual(retrievedAgency, {
+        ...agencyWithoutDelegationInfo,
+        delegationAgencyInfo: delegationInfo,
+      });
+    });
+
+    it("updates delegationAgencyInfo", async () => {
+      const initialDelegationInfo: DelegationAgencyInfo = {
+        delegationEndDate: new Date("2029-01-01").toISOString(),
+        delegationAgencyName: "Cap Emploi",
+        delegationAgencyKind: "cap-emploi",
+      };
+
+      const agencyWithDelegation = toAgencyWithRights(
+        agency1builder
+          .withKind("autre")
+          .withDelegationAgencyInfo(initialDelegationInfo)
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+      const updatedDelegationInfo: DelegationAgencyInfo = {
+        delegationEndDate: new Date("2030-06-15").toISOString(),
+        delegationAgencyName: "France Travail",
+        delegationAgencyKind: "pole-emploi",
+      };
+
+      await agencyRepository.insert(agencyWithDelegation);
+
+      await agencyRepository.update({
+        id: agencyWithDelegation.id,
+        delegationAgencyInfo: updatedDelegationInfo,
+      });
+
+      const retrievedAgency = await agencyRepository.getById(
+        agencyWithDelegation.id,
+      );
+      expectToEqual(retrievedAgency, {
+        ...agencyWithDelegation,
+        delegationAgencyInfo: updatedDelegationInfo,
+      });
+    });
   });
 
   describe("getById()", () => {
@@ -363,6 +448,32 @@ describe("PgAgencyRepository", () => {
         await agencyRepository.getById(agency2WithRefersToAgency1.id),
         agency2WithRefersToAgency1,
       );
+    });
+
+    it("returns agency with delegationAgencyInfo correctly", async () => {
+      const delegationInfo = {
+        delegationEndDate: new Date("2029-01-01").toISOString(),
+        delegationAgencyName: "France Travail",
+        delegationAgencyKind: "pole-emploi" as const,
+      };
+
+      const agencyWithDelegation = toAgencyWithRights(
+        agency1builder
+          .withKind("autre")
+          .withDelegationAgencyInfo(delegationInfo)
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      await agencyRepository.insert(agencyWithDelegation);
+
+      const retrievedAgency = await agencyRepository.getById(
+        agencyWithDelegation.id,
+      );
+      expectToEqual(retrievedAgency, agencyWithDelegation);
+      expect(retrievedAgency?.delegationAgencyInfo).toEqual(delegationInfo);
     });
   });
   describe("getAllAgenciesWithUsersToReview()", () => {
