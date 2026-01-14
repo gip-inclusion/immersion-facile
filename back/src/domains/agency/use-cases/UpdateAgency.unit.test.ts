@@ -228,12 +228,7 @@ describe("Update agency", () => {
     );
 
     expectToEqual(uow.agencyRepository.agencies, [
-      toAgencyWithRights(updatedAgency, {
-        [agencyAdmin.id]: {
-          isNotifiedByEmail: true,
-          roles: ["agency-admin"],
-        },
-      }),
+      toAgencyWithRights(updatedAgency, {}),
     ]);
   });
 });
