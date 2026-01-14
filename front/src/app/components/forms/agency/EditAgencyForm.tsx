@@ -20,7 +20,7 @@ import {
   allAgencyStatuses,
   type CreateAgencyDto,
   closedOrRejectedAgencyStatuses,
-  type DelegationAgencyKind,
+  delegationAgencyKindList,
   domElementIds,
   editAgencySchema,
 } from "shared";
@@ -58,15 +58,10 @@ const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
   label: agencyStatusToLabel[agencyStatus],
 }));
 
-const delegationAgencyKindOptions: {
-  value: DelegationAgencyKind;
-  label: string;
-}[] = [
-  { value: "pole-emploi", label: "France Travail" },
-  { value: "mission-locale", label: "Mission Locale" },
-  { value: "conseil-departemental", label: "Conseil départemental" },
-  { value: "cap-emploi", label: "Cap emploi" },
-];
+const delegationAgencyKindOptions = delegationAgencyKindList.map((kind) => ({
+  value: kind,
+  label: agencyKindToLabel[kind],
+}));
 
 export const EditAgencyForm = ({
   agency,
