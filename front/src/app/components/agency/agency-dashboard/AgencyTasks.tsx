@@ -98,6 +98,9 @@ export const AgencyTasks = ({
     >
       {(isLoadingConventionsToManage ||
         isLoadingConventionsWithBroadcastError) && <Loader />}
+      {conventionsToManagePagination?.totalRecords === 0 &&
+        conventionsWithErroredBroadcastFeedbackPagination.pagination
+          .totalRecords === 0 && <p>Aucune tâche à traiter.</p>}
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
         {!isLoadingConventionsToManage &&
           conventionsToManagePagination?.totalRecords !== undefined &&
