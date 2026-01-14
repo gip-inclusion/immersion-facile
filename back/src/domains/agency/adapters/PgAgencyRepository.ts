@@ -12,6 +12,7 @@ import {
   type AgencyWithUsersRights,
   activeAgencyStatuses,
   type DateString,
+  type DelegationAgencyInfo,
   type DepartmentCode,
   errors,
   isTruthy,
@@ -78,6 +79,9 @@ export class PgAgencyRepository implements AgencyRepository {
         acquisition_keyword: agency.acquisitionKeyword,
         phone_number: agency.phoneNumber,
         status_justification: agency.statusJustification,
+        delegation_info: agency.delegationAgencyInfo
+          ? JSON.stringify(agency.delegationAgencyInfo)
+          : null,
         created_at: agency.createdAt
           ? sql<Date>`${agency.createdAt}::timestamp`
           : sql`now()`,
@@ -122,6 +126,9 @@ export class PgAgencyRepository implements AgencyRepository {
         updated_at: sql`NOW()`,
         status_justification: agency.statusJustification,
         phone_number: agency.phoneNumber,
+        delegation_info:
+          agency.delegationAgencyInfo &&
+          JSON.stringify(agency.delegationAgencyInfo),
       }))
       .where("id", "=", agency.id)
       .execute();
@@ -413,6 +420,9 @@ export class PgAgencyRepository implements AgencyRepository {
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),
           phoneNumber: ref("agencies.phone_number"),
+          delegationAgencyInfo: cast<DelegationAgencyInfo | null>(
+            ref("agencies.delegation_info"),
+          ),
           createdAt: sql<DateString>`date_to_iso(agencies.created_at)`,
           usersRights: fn.coalesce(
             fn
