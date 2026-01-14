@@ -34,6 +34,17 @@ describe("getAgencyByIdForDashboard", () => {
     .withKind("autre")
     .build();
 
+  const agencyWithDelegation = new AgencyDtoBuilder()
+    .withId("agency-with-delegation")
+    .withName("Agency with delegation")
+    .withKind("autre")
+    .withDelegationAgencyInfo({
+      delegationEndDate: new Date("2029-01-01").toISOString(),
+      delegationAgencyName: "France Travail",
+      delegationAgencyKind: "pole-emploi",
+    })
+    .build();
+
   const counsellor1 = new ConnectedUserBuilder()
     .withId("councellor1")
     .withEmail("councellor1@email.com")
@@ -53,6 +64,11 @@ describe("getAgencyByIdForDashboard", () => {
     .withAgencyRights([
       {
         agency: toAgencyDtoForAgencyUsersAndAdmins(agencyWithRefersTo, []),
+        isNotifiedByEmail: true,
+        roles: ["agency-admin"],
+      },
+      {
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agencyWithDelegation, []),
         isNotifiedByEmail: true,
         roles: ["agency-admin"],
       },
@@ -107,6 +123,29 @@ describe("getAgencyByIdForDashboard", () => {
           ...agencyWithRefersTo,
           counsellorEmails: [counsellor2.email],
           validatorEmails: [validator.email],
+        },
+      );
+    });
+
+    it("get the agency by id with delegationAgencyInfo", async () => {
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agencyWithDelegation, {
+          [agencyAdminUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["agency-admin"],
+          },
+        }),
+      ];
+
+      expectToEqual(
+        await getAgencyById.execute(
+          agencyWithDelegation.id,
+          connectedAgencyAdminUser,
+        ),
+        {
+          ...agencyWithDelegation,
+          counsellorEmails: [],
+          validatorEmails: [],
         },
       );
     });

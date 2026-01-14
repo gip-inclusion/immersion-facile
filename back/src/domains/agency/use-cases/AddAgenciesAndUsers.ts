@@ -325,6 +325,7 @@ const createNewAgencies = async ({
       refersToAgencyName: null,
       refersToAgencyContactEmail: null,
       phoneNumber: row.Téléphone,
+      delegationAgencyInfo: null,
       usersRights: {
         [user.id]: {
           roles: ["agency-admin", "validator"],
