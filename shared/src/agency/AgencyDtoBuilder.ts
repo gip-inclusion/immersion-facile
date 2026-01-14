@@ -9,6 +9,7 @@ import type {
   AgencyId,
   AgencyKind,
   AgencyStatus,
+  DelegationAgencyInfo,
 } from "./agency.dto";
 
 const defaultAddress: AddressDto = {
@@ -46,6 +47,7 @@ const emptyAgency: AgencyDto = {
   codeSafir: null,
   statusJustification: null,
   phoneNumber: "+33600000000",
+  delegationAgencyInfo: null,
 };
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {
@@ -214,6 +216,13 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       contactEmail,
+    });
+  }
+
+  public withDelegationAgencyInfo(delegationAgencyInfo: DelegationAgencyInfo) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      delegationAgencyInfo,
     });
   }
 }

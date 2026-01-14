@@ -33,6 +33,9 @@ import {
   type CreateAgencyDto,
   type CreateAgencyInitialValues,
   closedOrRejectedAgencyStatuses,
+  type DelegationAgencyInfo,
+  type DelegationAgencyKind,
+  delegationAgencyKindList,
   type ListAgencyOptionsRequestDto,
   orderedAgencyKindList,
   type PrivateListAgenciesRequestDto,
@@ -104,6 +107,18 @@ export const listAgencyOptionsRequestSchema: ZodSchemaWithInputMatchingOutput<Li
     status: z.array(agencyStatusSchema).optional(),
   });
 
+const delegationAgencyKindSchema: ZodSchemaWithInputMatchingOutput<DelegationAgencyKind> =
+  z.enum(delegationAgencyKindList, {
+    error: localization.invalidEnum,
+  });
+
+const delegationAgencyInfoSchema: ZodSchemaWithInputMatchingOutput<DelegationAgencyInfo> =
+  z.object({
+    delegationEndDate: makeDateStringSchema().nullable(),
+    delegationAgencyName: z.string().nullable(),
+    delegationAgencyKind: delegationAgencyKindSchema.nullable(),
+  });
+
 const withEmails = {
   counsellorEmails: z.array(emailSchema),
   validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
@@ -136,6 +151,7 @@ export const createAgencySchema: z.ZodType<
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       refersToAgencyName: zStringMinLength1.or(z.null()),
       refersToAgencyContactEmail: emailSchema.or(z.null()),
+      delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
     }),
   )
   .and(withAcquisitionSchema)
@@ -183,6 +199,7 @@ export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       refersToAgencyName: zStringMinLength1.or(z.null()),
       refersToAgencyContactEmail: emailSchema.or(z.null()),
       statusJustification: zStringMinLength1.or(z.null()),
+      delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
     }),
   )
   .and(withAcquisitionSchema)
@@ -209,6 +226,7 @@ export const agencyDtoForAgencyUsersAndAdminsSchema: ZodSchemaWithInputMatchingO
         refersToAgencyName: zStringMinLength1.or(z.null()),
         refersToAgencyContactEmail: emailSchema.or(z.null()),
         statusJustification: z.string().or(z.null()),
+        delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
       }),
     )
     .and(withAcquisitionSchema)
@@ -225,6 +243,7 @@ export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
       refersToAgencyName: zStringMinLength1.or(z.null()),
       refersToAgencyContactEmail: emailSchema.or(z.null()),
       statusJustification: zStringMinLength1.or(z.null()),
+      delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
     }),
   )
   .and(withAcquisitionSchema)

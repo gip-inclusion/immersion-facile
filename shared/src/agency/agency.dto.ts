@@ -47,6 +47,7 @@ export type CreateAgencyDto = {
   refersToAgencyName: string | null;
   refersToAgencyContactEmail: Email | null;
   phoneNumber: string;
+  delegationAgencyInfo: DelegationAgencyInfo | null;
 } & WithAcquisition;
 
 export type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
@@ -157,6 +158,21 @@ export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel).sort(
 export const fitForDelegationAgencyKind = allAgencyKindsAllowedToAdd.filter(
   (kind) => !["autre", "cci", "operateur-cep"].includes(kind),
 );
+
+export const delegationAgencyKindList = [
+  "pole-emploi",
+  "mission-locale",
+  "conseil-departemental",
+  "cap-emploi",
+] as const;
+
+export type DelegationAgencyKind = (typeof delegationAgencyKindList)[number];
+
+export type DelegationAgencyInfo = {
+  delegationEndDate: DateString | null;
+  delegationAgencyName: string | null;
+  delegationAgencyKind: DelegationAgencyKind | null;
+};
 
 export type AgencyOption = {
   id: AgencyId;
