@@ -65,6 +65,7 @@ describe("AddAgency use case", () => {
     refersToAgencyName: null,
     refersToAgencyContactEmail: null,
     phoneNumber: "+33600000001",
+    delegationAgencyInfo: null,
   };
 
   const createAgencyWithRefersToParams: CreateAgencyDto = {
@@ -90,6 +91,7 @@ describe("AddAgency use case", () => {
     refersToAgencyContactEmail: createParisMissionLocaleParams.contactEmail,
     logoUrl: null,
     phoneNumber: "+33600000001",
+    delegationAgencyInfo: null,
   };
 
   const uuids = ["uuid1", "uuid2", "uuid3", "uuid4"];

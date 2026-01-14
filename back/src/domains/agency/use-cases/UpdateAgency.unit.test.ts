@@ -195,4 +195,45 @@ describe("Update agency", () => {
       },
     ]);
   });
+
+  it("updates agency with delegationAgencyInfo", async () => {
+    const agencyWithDelegation = new AgencyDtoBuilder()
+      .withId("agency-with-delegation")
+      .withName("Agency with delegation")
+      .withKind("autre")
+      .withDelegationAgencyInfo({
+        delegationEndDate: new Date("2029-01-01").toISOString(),
+        delegationAgencyName: "France Travail",
+        delegationAgencyKind: "pole-emploi",
+      })
+      .build();
+
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithDelegation, {}),
+    ];
+
+    const updatedDelegationInfo = {
+      delegationEndDate: new Date("2030-06-15").toISOString(),
+      delegationAgencyName: "Mission Locale",
+      delegationAgencyKind: "mission-locale" as const,
+    };
+
+    const updatedAgency = new AgencyDtoBuilder(agencyWithDelegation)
+      .withDelegationAgencyInfo(updatedDelegationInfo)
+      .build();
+
+    await updateAgency.execute(
+      { ...updatedAgency, validatorEmails: ["validator@mail.com"] },
+      connectedAdmin,
+    );
+
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights(updatedAgency, {
+        [agencyAdmin.id]: {
+          isNotifiedByEmail: true,
+          roles: ["agency-admin"],
+        },
+      }),
+    ]);
+  });
 });

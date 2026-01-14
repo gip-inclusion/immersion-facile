@@ -217,6 +217,7 @@ describe("Agency routes", () => {
         refersToAgencyContactEmail: null,
         logoUrl: null,
         phoneNumber: "+33600000001",
+        delegationAgencyInfo: null,
       };
 
       it("200 - support posting valid agency", async () => {

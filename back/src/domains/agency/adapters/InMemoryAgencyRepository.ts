@@ -364,6 +364,7 @@ const agency3: AgencyWithUsersRights = {
   statusJustification: null,
   phoneNumber: "+33600000003",
   createdAt: defaultCreatedAt,
+  delegationAgencyInfo: null,
 };
 
 const agency1: AgencyWithUsersRights = {
@@ -397,6 +398,7 @@ const agency1: AgencyWithUsersRights = {
   statusJustification: null,
   phoneNumber: "+33600000001",
   createdAt: defaultCreatedAt,
+  delegationAgencyInfo: null,
 };
 const testAgencies: AgencyWithUsersRights[] = [
   {
@@ -430,6 +432,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     statusJustification: null,
     phoneNumber: "+33600000000",
     createdAt: defaultCreatedAt,
+    delegationAgencyInfo: null,
   },
   agency1,
   {
@@ -465,6 +468,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     codeSafir: null,
     phoneNumber: "+33600000002",
     createdAt: defaultCreatedAt,
+    delegationAgencyInfo: null,
   },
   agency3,
   {
@@ -498,6 +502,11 @@ const testAgencies: AgencyWithUsersRights[] = [
     codeSafir: null,
     phoneNumber: "+33600000004",
     createdAt: defaultCreatedAt,
+    delegationAgencyInfo: {
+      delegationEndDate: new Date("2029-01-01").toISOString(),
+      delegationAgencyName: "Delegation Agency 1",
+      delegationAgencyKind: "pole-emploi",
+    },
   },
   {
     id: "test-agency-5-back-with-refers-to",
@@ -530,5 +539,10 @@ const testAgencies: AgencyWithUsersRights[] = [
     codeSafir: null,
     phoneNumber: "+33600000005",
     createdAt: defaultCreatedAt,
+    delegationAgencyInfo: {
+      delegationEndDate: new Date("2028-01-01").toISOString(),
+      delegationAgencyName: "Delegation Agency 2",
+      delegationAgencyKind: "pole-emploi",
+    },
   },
 ];
