@@ -204,7 +204,7 @@ export const EditAgencyForm = ({
               </h2>
 
               <Input
-                label="Date de fin de convention de délégation"
+                label="Date d'expiration de la convention de délégation"
                 disabled={!isRouteAdmin}
                 nativeInputProps={{
                   type: "date",
@@ -214,17 +214,17 @@ export const EditAgencyForm = ({
               />
 
               <Input
-                label="Nom du délégataire"
+                label="Nom de l'organisme délégataire"
                 disabled={!isRouteAdmin}
                 nativeInputProps={{
                   ...register("delegationAgencyInfo.delegationAgencyName"),
-                  placeholder: "Nom du délégataire",
+                  placeholder: "Nom de l'organisme délégataire",
                 }}
                 {...getFieldError("delegationAgencyInfo.delegationAgencyName")}
               />
 
               <Select
-                label="Type du délégataire"
+                label="Type de l'organisme délégataire"
                 options={delegationAgencyKindOptions}
                 placeholder="Sélectionner un type"
                 nativeSelectProps={{
