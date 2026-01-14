@@ -343,30 +343,28 @@ export const ConventionList = () => {
                 </Fragment>,
 
                 <Fragment key={`${convention.id}-beneficiary`}>
-                  <div>
-                    <strong>
-                      {getFormattedFirstnameAndLastname({
-                        firstname: convention.signatories.beneficiary.firstName,
-                        lastname: convention.signatories.beneficiary.lastName,
-                      })}
-                    </strong>
-                    {convention.signatories.beneficiary.federatedIdentity
-                      ?.provider === "peConnect" && (
-                      <div className={fr.cx("fr-mt-1w")}>
-                        <img
-                          src={logoFtSvg}
-                          alt=""
-                          aria-hidden="true"
-                          className={fr.cx("fr-icon--sm", "fr-mr-1w")}
-                        />
-                        <strong
-                          className={fr.cx("fr-text--sm", "fr-label--info")}
-                        >
-                          FT Connect
-                        </strong>
-                      </div>
-                    )}
-                  </div>
+                  <strong>
+                    {getFormattedFirstnameAndLastname({
+                      firstname: convention.signatories.beneficiary.firstName,
+                      lastname: convention.signatories.beneficiary.lastName,
+                    })}
+                  </strong>
+                  {convention.signatories.beneficiary.federatedIdentity
+                    ?.provider === "peConnect" && (
+                    <div className={fr.cx("fr-mt-1w")}>
+                      <img
+                        src={logoFtSvg}
+                        alt=""
+                        aria-hidden="true"
+                        className={fr.cx("fr-icon--sm", "fr-mr-1w")}
+                      />
+                      <strong
+                        className={fr.cx("fr-text--sm", "fr-label--info")}
+                      >
+                        FT Connect
+                      </strong>
+                    </div>
+                  )}
                 </Fragment>,
                 <Fragment key={`${convention.id}-establishment`}>
                   <strong>{convention.businessName}</strong>
