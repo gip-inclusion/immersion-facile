@@ -439,6 +439,7 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   name: "",
   createdAt: toDateUTCString(new Date()),
   agencyContactEmail: "",
+  contactEmail: "",
   coveredDepartments: [],
   address: {
     streetNumberAndAddress: "",

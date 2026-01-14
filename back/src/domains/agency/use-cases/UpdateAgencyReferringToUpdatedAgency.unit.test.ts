@@ -49,7 +49,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: updatedAgency.id,
       refersToAgencyName: updatedAgency.name,
-      refersToAgencyContactEmail: updatedAgency.agencyContactEmail,
+      refersToAgencyContactEmail: updatedAgency.contactEmail,
     })
     .build();
   const agency3RefersToUpdatedAgency = new AgencyDtoBuilder()
@@ -59,7 +59,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: updatedAgency.id,
       refersToAgencyName: updatedAgency.name,
-      refersToAgencyContactEmail: updatedAgency.agencyContactEmail,
+      refersToAgencyContactEmail: updatedAgency.contactEmail,
     })
     .build();
   const agencyNotReferingToUpdatedAgency = new AgencyDtoBuilder()

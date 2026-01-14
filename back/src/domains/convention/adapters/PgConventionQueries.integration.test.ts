@@ -947,7 +947,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ? {
               refersToAgencyId: withRefersToAgency.id,
               refersToAgencyName: withRefersToAgency.name,
-              refersToAgencyContactEmail: withRefersToAgency.agencyContactEmail,
+              refersToAgencyContactEmail: withRefersToAgency.contactEmail,
             }
           : null,
       )
@@ -980,7 +980,7 @@ describe("Pg implementation of ConventionQueries", () => {
       agencyRefersTo: withRefersToAgency && {
         id: withRefersToAgency.id,
         name: withRefersToAgency.name,
-        contactEmail: withRefersToAgency.agencyContactEmail,
+        contactEmail: withRefersToAgency.contactEmail,
         kind: withRefersToAgency.kind,
       },
       agencyValidatorEmails: [validatorUser.email],
@@ -1088,7 +1088,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     const agencyFields = {
       agencyName: agency.name,
-      agencyContactEmail: agency.agencyContactEmail,
+      agencyContactEmail: agency.contactEmail,
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
@@ -1099,7 +1099,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     const differentAgencyFields = {
       agencyName: differentAgency.name,
-      agencyContactEmail: differentAgency.agencyContactEmail,
+      agencyContactEmail: differentAgency.contactEmail,
       agencyDepartment: differentAgency.address.departmentCode,
       agencyKind: differentAgency.kind,
       agencySiret: differentAgency.agencySiret,

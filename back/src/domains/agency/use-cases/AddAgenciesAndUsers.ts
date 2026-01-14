@@ -306,7 +306,7 @@ const createNewAgencies = async ({
       status: "active",
       agencySiret: row.SIRET,
       name: row["Nom structure"],
-      agencyContactEmail: row["Contact structure"],
+      contactEmail: row["Contact structure"],
       address: {
         streetNumberAndAddress: row["Adresse ligne 1"],
         postcode: row["Code postal"],

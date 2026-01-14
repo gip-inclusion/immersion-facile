@@ -217,7 +217,7 @@ export const throwErrorIfAttemptToAddCounsellorRoleToFTAgency = ({
 export const agencyDtoToConventionAgencyFields = (
   agency: AgencyDto,
 ): ConventionAgencyFields => ({
-  agencyContactEmail: agency.agencyContactEmail,
+  agencyContactEmail: agency.contactEmail,
   agencyCounsellorEmails: agency.counsellorEmails,
   agencyValidatorEmails: agency.validatorEmails,
   agencyKind: agency.kind,

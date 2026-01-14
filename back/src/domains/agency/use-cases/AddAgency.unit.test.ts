@@ -54,7 +54,7 @@ describe("AddAgency use case", () => {
     },
     counsellorEmails: [counsellor.email],
     validatorEmails: [validator.email],
-    agencyContactEmail: "mission-locale-contact@mail.com",
+    contactEmail: "mission-locale-contact@mail.com",
     kind: "mission-locale",
     name: "Mission locale de Paris",
     position: { lat: 10, lon: 20 },
@@ -79,7 +79,7 @@ describe("AddAgency use case", () => {
     },
     counsellorEmails: ["counsellor-from-agency-with-refers-to@mail.com"],
     validatorEmails: ["mail.should.not.be.applied@email.com"],
-    agencyContactEmail: "agency-contact@mail.com",
+    contactEmail: "agency-contact@mail.com",
     kind: "mission-locale",
     name: "Mission locale de Paris Bis",
     position: { lat: 10, lon: 20 },
@@ -87,8 +87,7 @@ describe("AddAgency use case", () => {
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: createParisMissionLocaleParams.id,
     refersToAgencyName: createParisMissionLocaleParams.name,
-    refersToAgencyContactEmail:
-      createParisMissionLocaleParams.agencyContactEmail,
+    refersToAgencyContactEmail: createParisMissionLocaleParams.contactEmail,
     logoUrl: null,
     phoneNumber: "+33600000001",
   };

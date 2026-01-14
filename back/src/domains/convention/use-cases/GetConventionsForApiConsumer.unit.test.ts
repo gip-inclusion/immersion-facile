@@ -104,7 +104,7 @@ describe("Get Conventions for ApiConsumer", () => {
           {
             ...conventionFranceTravail,
             agencyName: agencyFranceTravail.name,
-            agencyContactEmail: agencyFranceTravail.agencyContactEmail,
+            agencyContactEmail: agencyFranceTravail.contactEmail,
             agencyDepartment: agencyFranceTravail.address.departmentCode,
             agencyKind: agencyFranceTravail.kind,
             agencySiret: agencyFranceTravail.agencySiret,
@@ -137,7 +137,7 @@ describe("Get Conventions for ApiConsumer", () => {
           {
             ...conventionFranceTravail,
             agencyName: agencyFranceTravail.name,
-            agencyContactEmail: agencyFranceTravail.agencyContactEmail,
+            agencyContactEmail: agencyFranceTravail.contactEmail,
             agencyDepartment: agencyFranceTravail.address.departmentCode,
             agencyKind: agencyFranceTravail.kind,
             agencySiret: agencyFranceTravail.agencySiret,
@@ -189,7 +189,7 @@ describe("Get Conventions for ApiConsumer", () => {
           {
             ...conventionMissionLocale,
             agencyName: agencyMissionLocale.name,
-            agencyContactEmail: agencyMissionLocale.agencyContactEmail,
+            agencyContactEmail: agencyMissionLocale.contactEmail,
             agencyDepartment: agencyMissionLocale.address.departmentCode,
             agencyKind: agencyMissionLocale.kind,
             agencySiret: agencyMissionLocale.agencySiret,

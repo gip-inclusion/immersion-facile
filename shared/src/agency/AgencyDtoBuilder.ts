@@ -30,7 +30,7 @@ const emptyAgency: AgencyDto = {
   kind: "autre",
   counsellorEmails: [],
   validatorEmails: [],
-  agencyContactEmail: "default.contact@mail.com",
+  contactEmail: "default.contact@mail.com",
   agencySiret: "12345678904444",
   signature: "empty-signature",
   coveredDepartments: [defaultAddress.departmentCode],
@@ -210,10 +210,10 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withAgencyContactEmail(agencyContactEmail: string) {
+  public withAgencyContactEmail(contactEmail: string) {
     return new AgencyDtoBuilder({
       ...this.#agency,
-      agencyContactEmail,
+      contactEmail,
     });
   }
 }

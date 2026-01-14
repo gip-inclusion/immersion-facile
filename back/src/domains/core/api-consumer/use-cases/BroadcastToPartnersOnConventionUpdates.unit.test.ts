@@ -69,7 +69,7 @@ describe("Broadcast to partners on updated convention", () => {
       .withRefersToAgencyInfo({
         refersToAgencyId: agency1.id,
         refersToAgencyName: agency1.name,
-        refersToAgencyContactEmail: agency1.agencyContactEmail,
+        refersToAgencyContactEmail: agency1.contactEmail,
       })
       .build(),
     {
@@ -202,7 +202,7 @@ describe("Broadcast to partners on updated convention", () => {
               ...convention1,
               agencyName: agency1.name,
               agencyDepartment: agency1.address.departmentCode,
-              agencyContactEmail: agency1.agencyContactEmail,
+              agencyContactEmail: agency1.contactEmail,
               agencyKind: agency1.kind,
               agencySiret: agency1.agencySiret,
               agencyCounsellorEmails: [counsellor1.email],
@@ -229,7 +229,7 @@ describe("Broadcast to partners on updated convention", () => {
               ...convention2,
               agencyName: agency2.name,
               agencyDepartment: agency2.address.departmentCode,
-              agencyContactEmail: agency2.agencyContactEmail,
+              agencyContactEmail: agency2.contactEmail,
               agencyKind: agency2.kind,
               agencySiret: agency2.agencySiret,
               agencyCounsellorEmails: [counsellor2.email],
@@ -277,7 +277,7 @@ describe("Broadcast to partners on updated convention", () => {
               ...convention,
               agencyName: agency2.name,
               agencyDepartment: agency2.address.departmentCode,
-              agencyContactEmail: agency2.agencyContactEmail,
+              agencyContactEmail: agency2.contactEmail,
               agencyKind: agency2.kind,
               agencySiret: agency2.agencySiret,
               agencyCounsellorEmails: [counsellor2.email],
@@ -400,7 +400,7 @@ describe("Broadcast to partners on updated convention", () => {
       .withRefersToAgencyInfo({
         refersToAgencyId: agency1.id,
         refersToAgencyName: agency1.name,
-        refersToAgencyContactEmail: agency1.agencyContactEmail,
+        refersToAgencyContactEmail: agency1.contactEmail,
       })
       .build();
 
@@ -455,7 +455,7 @@ describe("Broadcast to partners on updated convention", () => {
               ...conventionFromAgencyWithRefersTo,
               agencyName: agencyWithRefersTo.name,
               agencyDepartment: agencyWithRefersTo.address.departmentCode,
-              agencyContactEmail: agencyWithRefersTo.agencyContactEmail,
+              agencyContactEmail: agencyWithRefersTo.contactEmail,
               agencyKind: agencyWithRefersTo.kind,
               agencySiret: agencyWithRefersTo.agencySiret,
               agencyCounsellorEmails: [counsellor3.email],
@@ -464,7 +464,7 @@ describe("Broadcast to partners on updated convention", () => {
                 id: agency1.id,
                 kind: agency1.kind,
                 name: agency1.name,
-                contactEmail: agency1.agencyContactEmail,
+                contactEmail: agency1.contactEmail,
               },
               assessment: {
                 status: assessment.status,
@@ -483,7 +483,7 @@ describe("Broadcast to partners on updated convention", () => {
               ...conventionFromAgencyWithRefersTo,
               agencyName: agencyWithRefersTo.name,
               agencyDepartment: agencyWithRefersTo.address.departmentCode,
-              agencyContactEmail: agencyWithRefersTo.agencyContactEmail,
+              agencyContactEmail: agencyWithRefersTo.contactEmail,
               agencyKind: agencyWithRefersTo.kind,
               agencySiret: agencyWithRefersTo.agencySiret,
               agencyCounsellorEmails: [counsellor3.email],
@@ -492,7 +492,7 @@ describe("Broadcast to partners on updated convention", () => {
                 id: agency1.id,
                 kind: agency1.kind,
                 name: agency1.name,
-                contactEmail: agency1.agencyContactEmail,
+                contactEmail: agency1.contactEmail,
               },
               assessment: {
                 status: assessment.status,

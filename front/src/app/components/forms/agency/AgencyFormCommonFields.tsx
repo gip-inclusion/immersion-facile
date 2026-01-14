@@ -196,13 +196,13 @@ export const AgencyFormCommonFields = ({
         {...getFieldError("phoneNumber")}
       />
       <Input
-        label={formContents.agencyContactEmail.label}
-        hintText={formContents.agencyContactEmail.hintText}
+        label={formContents.contactEmail.label}
+        hintText={formContents.contactEmail.hintText}
         nativeInputProps={{
-          ...register("agencyContactEmail"),
-          ...formContents.agencyContactEmail,
+          ...register("contactEmail"),
+          ...formContents.contactEmail,
         }}
-        {...getFieldError("agencyContactEmail")}
+        {...getFieldError("contactEmail")}
       />
       {!refersToOtherAgency && mode === "create" && (
         <RadioGroup

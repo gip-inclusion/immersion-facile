@@ -311,7 +311,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         .withRefersToAgencyInfo({
           refersToAgencyId: agency1.id,
           refersToAgencyName: agency1.name,
-          refersToAgencyContactEmail: agency1.agencyContactEmail,
+          refersToAgencyContactEmail: agency1.contactEmail,
         })
         .withCreatedAt(subMonths(defaultDate, 7).toISOString())
         .build();

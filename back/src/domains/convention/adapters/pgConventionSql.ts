@@ -433,9 +433,7 @@ export const getConventionAgencyFieldsForAgencies = async (
         jsonBuildObject({
           agencyId: ref("agencies.id"),
           agencyName: ref("agencies.name"),
-          agencyContactEmail: ref(
-            "agencies.agency_contact_email",
-          ).$castTo<Email>(),
+          agencyContactEmail: ref("agencies.contact_email").$castTo<Email>(),
           agencyKind: ref("agencies.kind").$castTo<AgencyKind>(),
           agencyDepartment: ref("agencies.department_code"),
           agencySiret: ref("agencies.agency_siret"),
@@ -447,7 +445,7 @@ export const getConventionAgencyFieldsForAgencies = async (
                 id: ref("agencies.refers_to_agency_id").$castTo<AgencyId>(),
                 name: ref("referred_agencies.name").$castTo<string>(),
                 contactEmail: ref(
-                  "referred_agencies.agency_contact_email",
+                  "referred_agencies.contact_email",
                 ).$castTo<Email>(),
                 kind: ref("referred_agencies.kind").$castTo<AgencyKind>(),
               }),

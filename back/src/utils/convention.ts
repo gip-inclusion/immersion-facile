@@ -69,7 +69,7 @@ export const conventionDtoToConventionReadDto = async (
     agencyCounsellorEmails: agency.counsellorEmails,
     agencyValidatorEmails: agency.validatorEmails,
     agencyName: agency.name,
-    agencyContactEmail: agency.agencyContactEmail,
+    agencyContactEmail: agency.contactEmail,
     agencyDepartment: agency.coveredDepartments.at(0) ?? "",
     agencySiret: agency.agencySiret,
     agencyKind: agency.kind,
@@ -78,7 +78,7 @@ export const conventionDtoToConventionReadDto = async (
           agencyRefersTo: {
             id: agencyRefersTo.id,
             name: agencyRefersTo.name,
-            contactEmail: agencyRefersTo.agencyContactEmail,
+            contactEmail: agencyRefersTo.contactEmail,
             kind: agencyRefersTo.kind,
           },
         }
