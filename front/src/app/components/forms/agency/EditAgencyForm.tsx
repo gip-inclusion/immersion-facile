@@ -20,6 +20,7 @@ import {
   allAgencyStatuses,
   type CreateAgencyDto,
   closedOrRejectedAgencyStatuses,
+  type DelegationAgencyKind,
   domElementIds,
   editAgencySchema,
 } from "shared";
@@ -57,6 +58,16 @@ const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
   label: agencyStatusToLabel[agencyStatus],
 }));
 
+const delegationAgencyKindOptions: {
+  value: DelegationAgencyKind;
+  label: string;
+}[] = [
+  { value: "pole-emploi", label: "France Travail" },
+  { value: "mission-locale", label: "Mission Locale" },
+  { value: "conseil-departemental", label: "Conseil départemental" },
+  { value: "cap-emploi", label: "Cap emploi" },
+];
+
 export const EditAgencyForm = ({
   agency,
   routeName,
@@ -67,7 +78,14 @@ export const EditAgencyForm = ({
   const methods = useForm<AgencyDto>({
     resolver: zodResolver(editAgencySchema),
     mode: "onTouched",
-    defaultValues: agency,
+    defaultValues: {
+      ...agency,
+      delegationAgencyInfo: agency.delegationAgencyInfo ?? {
+        delegationEndDate: null,
+        delegationAgencyName: null,
+        delegationAgencyKind: null,
+      },
+    },
   });
   const { register, handleSubmit, formState, getValues, setValue, control } =
     methods;
@@ -175,6 +193,45 @@ export const EditAgencyForm = ({
                   id: adminAgencyIds.editAgencyFormSafirCodeInput,
                 }}
                 {...getFieldError("codeSafir")}
+              />
+            </>
+          )}
+
+          {agency.kind === "autre" && (
+            <>
+              <h2 className={fr.cx("fr-h6", "fr-mt-4w")}>
+                Convention de délégation
+              </h2>
+
+              <Input
+                label="Date de fin de convention de délégation"
+                disabled={!isRouteAdmin}
+                nativeInputProps={{
+                  type: "date",
+                  ...register("delegationAgencyInfo.delegationEndDate"),
+                }}
+                {...getFieldError("delegationAgencyInfo.delegationEndDate")}
+              />
+
+              <Input
+                label="Nom du délégataire"
+                disabled={!isRouteAdmin}
+                nativeInputProps={{
+                  ...register("delegationAgencyInfo.delegationAgencyName"),
+                  placeholder: "Nom du délégataire",
+                }}
+                {...getFieldError("delegationAgencyInfo.delegationAgencyName")}
+              />
+
+              <Select
+                label="Type du délégataire"
+                options={delegationAgencyKindOptions}
+                placeholder="Sélectionner un type"
+                nativeSelectProps={{
+                  ...register("delegationAgencyInfo.delegationAgencyKind"),
+                  disabled: !isRouteAdmin,
+                }}
+                {...getFieldError("delegationAgencyInfo.delegationAgencyKind")}
               />
             </>
           )}
