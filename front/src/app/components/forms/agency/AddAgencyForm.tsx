@@ -460,6 +460,7 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   refersToAgencyName: null,
   refersToAgencyContactEmail: null,
   phoneNumber: "",
+  delegationAgencyInfo: null,
 });
 
 const agencyErrorMessage = (

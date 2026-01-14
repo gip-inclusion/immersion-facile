@@ -151,4 +151,8 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     hintText:
       "Dans l'éventualité que nous vous contactions pour valider le référencement de votre structure, merci de nous indiquer votre numéro de téléphone",
   },
+  delegationAgencyInfo: {
+    label: "",
+    id: "",
+  },
 };
