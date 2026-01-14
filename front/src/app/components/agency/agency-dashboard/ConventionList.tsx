@@ -26,6 +26,7 @@ import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenB
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import logoFtSvg from "src/assets/img/logo-ft.svg";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionListSelectors } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.selectors";
@@ -342,12 +343,30 @@ export const ConventionList = () => {
                 </Fragment>,
 
                 <Fragment key={`${convention.id}-beneficiary`}>
-                  <strong>
-                    {getFormattedFirstnameAndLastname({
-                      firstname: convention.signatories.beneficiary.firstName,
-                      lastname: convention.signatories.beneficiary.lastName,
-                    })}
-                  </strong>
+                  <div>
+                    <strong>
+                      {getFormattedFirstnameAndLastname({
+                        firstname: convention.signatories.beneficiary.firstName,
+                        lastname: convention.signatories.beneficiary.lastName,
+                      })}
+                    </strong>
+                    {convention.signatories.beneficiary.federatedIdentity
+                      ?.provider === "peConnect" && (
+                      <div className={fr.cx("fr-mt-1w")}>
+                        <img
+                          src={logoFtSvg}
+                          alt=""
+                          aria-hidden="true"
+                          className={fr.cx("fr-icon--sm", "fr-mr-1w")}
+                        />
+                        <strong
+                          className={fr.cx("fr-text--sm", "fr-label--info")}
+                        >
+                          FT Connect
+                        </strong>
+                      </div>
+                    )}
+                  </div>
                 </Fragment>,
                 <Fragment key={`${convention.id}-establishment`}>
                   <strong>{convention.businessName}</strong>
