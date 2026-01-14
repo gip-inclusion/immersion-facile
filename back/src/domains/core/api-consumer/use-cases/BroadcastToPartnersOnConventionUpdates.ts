@@ -78,7 +78,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     const conventionRead: ConventionReadDto = {
       ...conventionWithoutAcquisitionParams,
       agencyName: agencyWithRights.name,
-      agencyContactEmail: agencyWithRights.agencyContactEmail,
+      agencyContactEmail: agencyWithRights.contactEmail,
       agencyDepartment: agencyWithRights.address.departmentCode,
       agencyKind: agencyWithRights.kind,
       agencySiret: agencyWithRights.agencySiret,

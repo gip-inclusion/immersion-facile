@@ -20,7 +20,7 @@ export type FormAgencyFieldsLabels = FormFieldsObjectForContent<
 >;
 
 export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
-  agencyContactEmail: {
+  contactEmail: {
     label: "Adresse email à contacter en cas de besoin",
     id: domElementIds.addAgency.agencyContactEmailInput,
     placeholder: "contact@mail.com",

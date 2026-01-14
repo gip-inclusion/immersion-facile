@@ -242,7 +242,7 @@ export const domElementIds = {
     id: "im-form-add-agency__id",
     coveredDepartmentsInput: "im-form-add-agency__covered-departments",
     nameInput: "im-form-add-agency__name",
-    agencyContactEmailInput: "im-form-add-agency__agency-contact-email",
+    agencyContactEmailInput: "im-form-add-agency__contact-email",
     addressInput: {
       address: "im-form-add-agency__address",
       city: "im-form-add-agency__address-city",

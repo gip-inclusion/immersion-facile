@@ -116,7 +116,7 @@ const commonAgencyShape = {
   createdAt: makeDateStringSchema(),
   name: stringWithMaxLength255,
   kind: agencyKindSchema,
-  agencyContactEmail: emailSchema,
+  contactEmail: emailSchema,
   coveredDepartments: z.array(zStringMinLength1).min(1),
   address: addressSchema,
   position: geoPositionSchema,

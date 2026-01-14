@@ -57,7 +57,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: agency.id,
       refersToAgencyName: agency.name,
-      refersToAgencyContactEmail: agency.agencyContactEmail,
+      refersToAgencyContactEmail: agency.contactEmail,
     })
     .withName("just-activated-agency-refering-to-other-one")
     .withLogoUrl("https://agency-refering-logo.com")

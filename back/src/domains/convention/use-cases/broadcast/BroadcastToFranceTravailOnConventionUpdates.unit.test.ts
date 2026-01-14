@@ -42,14 +42,14 @@ const conventionReadDtoFrom = ({
 }): ConventionReadDto => ({
   ...convention,
   agencyName: agency.name,
-  agencyContactEmail: agency.agencyContactEmail,
+  agencyContactEmail: agency.contactEmail,
   agencyDepartment: agency.address.departmentCode,
   agencyKind: agency.kind,
   agencySiret: agency.agencySiret,
   agencyRefersTo: referredAgency && {
     id: referredAgency.id,
     name: referredAgency.name,
-    contactEmail: referredAgency.agencyContactEmail,
+    contactEmail: referredAgency.contactEmail,
     kind: referredAgency.kind,
   },
   agencyCounsellorEmails: agency.counsellorEmails,
@@ -321,7 +321,7 @@ describe("Broadcasts events to France Travail", () => {
           refersToAgencyId: peAgencyWithoutCounsellorsAndValidators.id,
           refersToAgencyName: peAgencyWithoutCounsellorsAndValidators.name,
           refersToAgencyContactEmail:
-            peAgencyWithoutCounsellorsAndValidators.agencyContactEmail,
+            peAgencyWithoutCounsellorsAndValidators.contactEmail,
         })
         .build(),
     );
@@ -492,7 +492,7 @@ describe("Broadcasts events to France Travail", () => {
             .withRefersToAgencyInfo({
               refersToAgencyId: agency.id,
               refersToAgencyName: agency.name,
-              refersToAgencyContactEmail: agency.agencyContactEmail,
+              refersToAgencyContactEmail: agency.contactEmail,
             })
             .build(),
         );

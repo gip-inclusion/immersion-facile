@@ -347,7 +347,7 @@ describe("authenticatedConventionRoutes", () => {
       const agencyFields = {
         agencyName: peAgency.name,
         agencyDepartment: peAgency.address.departmentCode,
-        agencyContactEmail: peAgency.agencyContactEmail,
+        agencyContactEmail: peAgency.contactEmail,
         agencyKind: peAgency.kind,
         agencySiret: peAgency.agencySiret,
         agencyCounsellorEmails: [],
@@ -423,7 +423,7 @@ describe("authenticatedConventionRoutes", () => {
       const agencyFields = {
         agencyName: peAgency.name,
         agencyDepartment: peAgency.address.departmentCode,
-        agencyContactEmail: peAgency.agencyContactEmail,
+        agencyContactEmail: peAgency.contactEmail,
         agencyKind: peAgency.kind,
         agencySiret: peAgency.agencySiret,
         agencyCounsellorEmails: [],
@@ -541,7 +541,7 @@ describe("authenticatedConventionRoutes", () => {
       const agencyFields = {
         agencyName: peAgency.name,
         agencyDepartment: peAgency.address.departmentCode,
-        agencyContactEmail: peAgency.agencyContactEmail,
+        agencyContactEmail: peAgency.contactEmail,
         agencyKind: peAgency.kind,
         agencySiret: peAgency.agencySiret,
         agencyCounsellorEmails: [],

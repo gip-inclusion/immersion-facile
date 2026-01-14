@@ -329,7 +329,7 @@ describe("convention e2e", () => {
           ...convention,
           agencyName: peAgency.name,
           agencyDepartment: peAgency.address.departmentCode,
-          agencyContactEmail: peAgency.agencyContactEmail,
+          agencyContactEmail: peAgency.contactEmail,
           agencyKind: peAgency.kind,
           agencySiret: peAgency.agencySiret,
           agencyCounsellorEmails: peAgency.counsellorEmails,

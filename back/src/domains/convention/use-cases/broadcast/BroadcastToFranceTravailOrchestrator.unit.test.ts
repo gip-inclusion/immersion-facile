@@ -40,7 +40,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     .withRefersToAgencyInfo({
       refersToAgencyId: referredAgency.id,
       refersToAgencyName: referredAgency.name,
-      refersToAgencyContactEmail: referredAgency.agencyContactEmail,
+      refersToAgencyContactEmail: referredAgency.contactEmail,
     })
     .build();
 
@@ -64,11 +64,11 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     agencyName: agency.name,
     agencySiret: agency.agencySiret,
     agencyKind: agency.kind,
-    agencyContactEmail: agency.agencyContactEmail,
+    agencyContactEmail: agency.contactEmail,
     agencyRefersTo: {
       id: referredAgency.id,
       name: referredAgency.name,
-      contactEmail: referredAgency.agencyContactEmail,
+      contactEmail: referredAgency.contactEmail,
       kind: referredAgency.kind,
     },
     agencyDepartment: agency.address.departmentCode,

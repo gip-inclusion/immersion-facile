@@ -206,7 +206,7 @@ describe("Agency routes", () => {
         },
         counsellorEmails: ["counsellor@mail.com"],
         validatorEmails: ["validator@mail.com"],
-        agencyContactEmail: "agency-contact@mail.com",
+        contactEmail: "agency-contact@mail.com",
         kind: "mission-locale",
         name: "Mission locale de Paris",
         position: { lat: 10, lon: 20 },

@@ -260,7 +260,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
       ...convention,
       agencyName: agency.name,
       agencyDepartment: agency.address.departmentCode,
-      agencyContactEmail: agency.agencyContactEmail,
+      agencyContactEmail: agency.contactEmail,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
       agencyCounsellorEmails: counsellors.map(({ email }) => email),
@@ -269,7 +269,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         ? {
             id: referedAgency.id,
             name: referedAgency.name,
-            contactEmail: referedAgency.agencyContactEmail,
+            contactEmail: referedAgency.contactEmail,
             kind: referedAgency.kind,
           }
         : undefined,

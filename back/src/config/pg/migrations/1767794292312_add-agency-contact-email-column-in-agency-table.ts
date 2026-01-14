@@ -3,7 +3,7 @@ import type { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumn("agencies", {
-    agency_contact_email: { type: "text", notNull: false },
+    contact_email: { type: "text", notNull: false },
   });
 
   pgm.sql(`
@@ -20,7 +20,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       ORDER BY ua.agency_id, u.email
     )
     UPDATE agencies a
-    SET agency_contact_email = nc.email
+    SET contact_email = nc.email
     FROM notified_counsellors nc
     WHERE a.id = nc.agency_id
   `);
@@ -39,17 +39,17 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       ORDER BY ua.agency_id, u.email
     )
     UPDATE agencies a
-    SET agency_contact_email = nv.email
+    SET contact_email = nv.email
     FROM notified_validators nv
     WHERE a.id = nv.agency_id
   `);
 
-  pgm.alterColumn("agencies", "agency_contact_email", {
+  pgm.alterColumn("agencies", "contact_email", {
     type: "text",
     notNull: true,
   });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumn("agencies", "agency_contact_email");
+  pgm.dropColumn("agencies", "contact_email");
 }
