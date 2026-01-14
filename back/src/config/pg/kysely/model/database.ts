@@ -210,6 +210,7 @@ interface Agencies extends WithAcquisition {
   status_justification: string | null;
   phone_number: string;
   contact_email: string;
+  delegation_info: Json | null;
 }
 
 interface BroadcastFeedbacks {
