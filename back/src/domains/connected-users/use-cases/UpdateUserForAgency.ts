@@ -82,16 +82,17 @@ export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
 
     validateAgencyRights(agency.id, updatedRights, agency.refersToAgencyId);
 
+    await updateIfUserEmailChanged(
+      userToUpdate,
+      inputParams.email,
+      uow.userRepository,
+    );
+
     await Promise.all([
       uow.agencyRepository.update({
         id: agency.id,
         usersRights: updatedRights,
       }),
-      updateIfUserEmailChanged(
-        userToUpdate,
-        inputParams.email,
-        uow.userRepository,
-      ),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "ConnectedUserAgencyRightChanged",
