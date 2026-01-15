@@ -12,6 +12,7 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { frontErrors } from "src/app/pages/error/front-errors";
 import { routes, useRoute } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -33,6 +34,7 @@ export const ConventionManageContent = ({
   const userRolesForFetchedConvention = useAppSelector(
     connectedUserSelectors.userRolesForFetchedConvention,
   );
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const userRolesAreLoading = useAppSelector(connectedUserSelectors.isLoading);
   const conventionLastBroadcastFeedbackIsLoading = useAppSelector(
     partnersErroredConventionSelectors.isLoading,
@@ -98,7 +100,13 @@ export const ConventionManageContent = ({
     if (
       !conventionFormFeedback?.message.includes(expiredMagicLinkErrorMessage)
     ) {
-      throw new Error(conventionFormFeedback?.message ?? "");
+      if (currentUser?.email) {
+        throw frontErrors.convention.noRightsOnConvention({
+          userEmail: currentUser.email,
+          conventionId: conventionId,
+        });
+      }
+      throw new Error(conventionFormFeedback?.message ?? ""); // TODO: here
     }
     routes
       .renewConventionMagicLink({
