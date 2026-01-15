@@ -44,13 +44,13 @@ export const frontErrors = {
             </p>
           </>
         ),
-        buttons: [HomeButton, ContactUsButton],
+        buttons: defaultFrontErrorButtons,
       }),
     unauthorized: () =>
       new FrontSpecificError({
         title: "Non-autorisé",
         description: "Vous n'êtes pas autorisé à accéder à cette page.",
-        buttons: [HomeButton, ContactUsButton],
+        buttons: defaultFrontErrorButtons,
       }),
   },
   convention: {
@@ -161,3 +161,5 @@ export const ContactUsButton = ({
     </Button>
   );
 };
+
+export const defaultFrontErrorButtons = [HomeButton, ContactUsButton];

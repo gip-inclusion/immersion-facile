@@ -5,7 +5,10 @@ import type {
   ErrorButton,
   FrontErrorProps,
 } from "src/app/contents/error/types";
-import { FrontSpecificError } from "src/app/pages/error/front-errors";
+import {
+  defaultFrontErrorButtons,
+  FrontSpecificError,
+} from "src/app/pages/error/front-errors";
 import { ErrorPageContent } from "./ErrorPageContent";
 
 type ErrorPageProperties = {
@@ -24,7 +27,7 @@ const getPageContentProps = (
   return {
     title: title ?? "Erreur inattendue",
     description: error.message,
-    buttons: buttons ?? [],
+    buttons: buttons ?? defaultFrontErrorButtons,
   };
 };
 
