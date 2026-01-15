@@ -268,6 +268,7 @@ export const ConventionForm = ({
       conventionSlice.actions.showSummaryChangeRequested({
         showSummary: true,
         convention: conventionToSave,
+        fromConventionDraftId: conventionValues.fromConventionDraftId,
       }),
     );
   };

@@ -1,3 +1,4 @@
+import { v4 as uuidV4 } from "uuid";
 import type { Email } from "../email/email.dto";
 import type { Flavor } from "../typeFlavors";
 import type { DeepPartial, OmitFromExistingKeys } from "../utils";
@@ -41,5 +42,5 @@ export const toConventionDraftDto = ({
   convention: CreateConventionPresentationInitialValues;
 }): ConventionDraftDto => ({
   ...replaceEmptyStringByUndefined(convention),
-  id: convention.id as ConventionDraftId,
+  id: convention.fromConventionDraftId ?? uuidV4(),
 });

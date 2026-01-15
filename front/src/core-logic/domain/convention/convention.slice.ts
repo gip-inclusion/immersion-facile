@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AbsoluteUrl,
   AgencyId,
+  ConventionDraftId,
   ConventionId,
   ConventionJwt,
   ConventionReadDto,
@@ -65,7 +66,11 @@ export const conventionSlice = createSlice({
     showSummaryChangeRequested: (
       state,
       action: PayloadAction<
-        | { showSummary: true; convention: ConventionReadDto }
+        | {
+            showSummary: true;
+            convention: ConventionReadDto;
+            fromConventionDraftId?: ConventionDraftId;
+          }
         | { showSummary: false }
       >,
     ) => {
@@ -85,6 +90,7 @@ export const conventionSlice = createSlice({
       state,
       action: PayloadActionWithFeedbackTopic<{
         convention: ConventionReadDto;
+        fromConventionDraftId?: ConventionDraftId;
         discussionId?: DiscussionId;
       }>,
     ) => {

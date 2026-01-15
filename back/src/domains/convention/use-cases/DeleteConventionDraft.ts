@@ -1,7 +1,7 @@
 import {
+  type AddConventionInput,
+  addConventionInputSchema,
   type ConventionDraftId,
-  type WithConventionDto,
-  withConventionSchema,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
@@ -9,10 +9,11 @@ export type DeleteConventionDraft = ReturnType<
   typeof makeDeleteConventionDraft
 >;
 export const makeDeleteConventionDraft = useCaseBuilder("DeleteConventionDraft")
-  .withInput<WithConventionDto>(withConventionSchema)
+  .withInput<AddConventionInput>(addConventionInputSchema)
   .withOutput<void>()
   .build(async ({ inputParams, uow }) => {
+    if (!inputParams.fromConventionDraftId) return;
     await uow.conventionDraftRepository.delete([
-      inputParams.convention.id as ConventionDraftId,
+      inputParams.fromConventionDraftId as ConventionDraftId,
     ]);
   });

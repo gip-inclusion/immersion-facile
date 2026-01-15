@@ -8,22 +8,17 @@ import {
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "../zodUtils";
-import { conventionIdSchema, conventionSchema } from "./convention.schema";
+import { conventionSchema } from "./convention.schema";
 import type {
   ConventionPresentation,
-  WithConventionIdOrConventionDraftId,
   WithStatusJustification,
 } from "./conventionPresentation.dto";
 import { conventionDraftIdSchema } from "./shareConventionDraftByEmail.schema";
 
-const withConventionIdOrConventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<WithConventionIdOrConventionDraftId> =
-  z.object({
-    id: conventionIdSchema.or(conventionDraftIdSchema),
-  });
-
 export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<ConventionPresentation> =
-  conventionSchema.and(withConventionIdOrConventionDraftIdSchema).and(
+  conventionSchema.and(
     z.object({
+      fromConventionDraftId: conventionDraftIdSchema.optional(),
       agencyDepartment: z.string(),
       agencyRefersTo: z
         .object({
