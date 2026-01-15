@@ -2,6 +2,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import {
   type ConventionId,
   domElementIds,
+  type Email,
   immersionFacileContactEmail,
   type SiretDto,
 } from "shared";
@@ -87,6 +88,32 @@ export const frontErrors = {
       new FrontSpecificError({
         title: "Partenaire inconnu",
         description: `Nous n'avons aucun partenaire avec le nom : ${consumerName}. Veuillez vérifier l'orthographe.`,
+        buttons: [HomeButton, ContactUsButton],
+      }),
+    noRightsOnConvention: ({
+      userEmail,
+      conventionId,
+    }: {
+      userEmail: Email;
+      conventionId: ConventionId;
+    }) =>
+      new FrontSpecificError({
+        title: "Accès non autorisé",
+        description: (
+          <>
+            <p>
+              L’accès à cette convention n’est pas possible avec le compte
+              actuel ({userEmail}). Ce compte n’a aucun droit sur la convention.
+            </p>
+            <ul>
+              <li>ID de la convention : {conventionId}</li>
+            </ul>
+            <p>
+              Pour accéder à cette convention, contacter l’agence afin de
+              vérifier ou mettre à jour les droits.
+            </p>
+          </>
+        ),
         buttons: [HomeButton, ContactUsButton],
       }),
   },

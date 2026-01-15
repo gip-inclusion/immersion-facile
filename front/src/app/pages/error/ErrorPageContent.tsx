@@ -12,12 +12,7 @@ export const ErrorPageContent = ({
 }: ErrorPageContentProps) => {
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-      <div className={fr.cx("fr-hidden", "fr-unhidden-lg", "fr-col-2")}>
-        <div>
-          <img src={commonIllustrations.errorMissing} alt="erreur" />
-        </div>
-      </div>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-10")}>
+      <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
         <h1>{title}</h1>
         <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{subtitle}</p>
         <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>{description}</p>
@@ -36,6 +31,9 @@ export const ErrorPageContent = ({
               })
             : null}
         </ul>
+      </div>
+      <div className={fr.cx("fr-hidden", "fr-unhidden-lg", "fr-col-4")}>
+        <img src={commonIllustrations.errorMissing} alt="" />
       </div>
     </div>
   );
