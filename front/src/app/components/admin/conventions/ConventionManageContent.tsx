@@ -106,7 +106,7 @@ export const ConventionManageContent = ({
           conventionId: conventionId,
         });
       }
-      throw new Error(conventionFormFeedback?.message ?? ""); // TODO: here
+      throw new Error(conventionFormFeedback?.message ?? "");
     }
     routes
       .renewConventionMagicLink({
