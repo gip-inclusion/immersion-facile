@@ -109,7 +109,7 @@ export const frontErrors = {
               <li>ID de la convention : {conventionId}</li>
             </ul>
             <p>
-              Pour accéder à cette convention, contacter l’agence afin de
+              Pour accéder à cette convention, contactez l’agence afin de
               vérifier ou mettre à jour les droits.
             </p>
           </>
