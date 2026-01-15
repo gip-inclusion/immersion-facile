@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import Card from "@codegouvfr/react-dsfr/Card";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
@@ -23,7 +24,7 @@ import { filterParamsForRoute } from "src/app/utils/url.utils";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import labonneboiteLogoUrl from "src/assets/img/logo-lbb-on-left.png";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { useStyles } from "tss-react/dsfr";
+
 import type { Link } from "type-route";
 import { SearchResult } from "./SearchResult";
 
@@ -49,13 +50,17 @@ export const SearchListResults = ({
   const { cx, classes } = useStyleUtils();
   const { totalPages, currentPage, numberPerPage } = pagination;
   const hasResults = searchResults.length > 0;
+  const isLastPage = currentPage === totalPages;
   const isSearchWithAppellation =
     searchParams.appellations && searchParams.appellations.length > 0;
   const isSearchWithGeoParams = hasSearchGeoParams(searchParams);
   const isSearchWithAppellationAndGeoParams =
     isSearchWithGeoParams && isSearchWithAppellation;
-  const shouldShowExternalResultsPush =
-    !isExternal && isSearchWithAppellationAndGeoParams;
+  const shouldShowLaBonneBoiteCTA =
+    !isExternal &&
+    hasResults &&
+    isLastPage &&
+    isSearchWithAppellationAndGeoParams;
   return (
     <div className={fr.cx("fr-container", isExternal && "fr-mb-8w")}>
       <div
@@ -135,9 +140,6 @@ export const SearchListResults = ({
                             {!searchResult.voluntaryToImmersion && (
                               <ImTag theme="lbb" />
                             )}
-                            {searchResult.voluntaryToImmersion && (
-                              <ImTag theme="voluntaryToImmersion" />
-                            )}
                           </div>
                         </SearchResultIllustration>
                       }
@@ -151,17 +153,21 @@ export const SearchListResults = ({
                   </div>
                 );
               })}
+            {shouldShowLaBonneBoiteCTA && (
+              <LaBonneBoiteCallToAction searchParams={searchParams} />
+            )}
           </div>
         </div>
-        <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
-          <SearchMiniMap
-            kind="list"
-            activeMarkerKey={activeMarkerKey}
-            setActiveMarkerKey={setActiveMarkerKey}
-            isExternal={isExternal}
-          />
-          {shouldShowExternalResultsPush && <ExternalResultsPush />}
-        </div>
+        {hasResults && (
+          <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+            <SearchMiniMap
+              kind="list"
+              activeMarkerKey={activeMarkerKey}
+              setActiveMarkerKey={setActiveMarkerKey}
+              isExternal={isExternal}
+            />
+          </div>
+        )}
         {!isExternal && (
           <div className={fr.cx("fr-container", "fr-mb-10w")}>
             <div
@@ -257,10 +263,10 @@ const makeOfferLink = (
     : routes.searchResultForStudent(searchParams).link;
 };
 
-const ExternalResultsPush = () => {
-  const { cx } = useStyles();
-  const searchParams = useAppSelector(searchSelectors.searchParams);
-  const filtereddSearchParams = filterParamsForRoute({
+const getFilteredSearchParamsForLBB = (
+  searchParams: ReturnType<typeof searchSelectors.searchParams>,
+) =>
+  filterParamsForRoute({
     urlParams: searchParams,
     matchingParams: {
       distanceKm: undefined,
@@ -274,18 +280,29 @@ const ExternalResultsPush = () => {
       fitForDisabledWorkers: undefined,
     },
   });
+
+const LaBonneBoiteCallToAction = ({
+  searchParams,
+}: {
+  searchParams: ReturnType<typeof searchSelectors.searchParams>;
+}) => {
+  const filteredSearchParams = getFilteredSearchParamsForLBB(searchParams);
   return (
-    <aside className={fr.cx("fr-mt-4w")}>
+    <div className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-6")}>
       <Card
         imageUrl={labonneboiteLogoUrl}
         imageAlt="Logo de LaBonneBoite"
-        title="Et si vous élargissiez votre recherche ?"
-        desc="Des entreprises à fort potentiel d'embauche peuvent être suggérées grâce
-        à notre partenaire LaBonneBoite."
-        className={cx("over-footer")}
-        linkProps={routes.externalSearch(filtereddSearchParams).link}
-        enlargeLink
+        title="Découvrez d'autres entreprises"
+        desc="Explorez plus d'opportunités avec notre partenaire La Bonne Boite"
+        footer={
+          <Button
+            linkProps={routes.externalSearch(filteredSearchParams).link}
+            priority="primary"
+          >
+            Découvrez d'autres entreprises avec La Bonne Boite
+          </Button>
+        }
       />
-    </aside>
+    </div>
   );
 };
