@@ -1,3 +1,4 @@
+import type { Email } from "../email/email.dto";
 import type { Flavor } from "../typeFlavors";
 import type { DeepPartial, OmitFromExistingKeys } from "../utils";
 import type { InternshipKind } from "./convention.dto";
@@ -13,8 +14,8 @@ export type ConventionDraftDto = DeepPartial<
 };
 
 export type ShareConventionDraftByEmailDto = {
-  senderEmail: string;
-  recipientEmail?: string;
+  senderEmail: Email;
+  recipientEmail?: Email;
   details?: string;
   conventionDraft: ConventionDraftDto;
 };
