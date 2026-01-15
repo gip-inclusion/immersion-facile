@@ -73,8 +73,14 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
         label="Je souhaite uniquement enregistrer un brouillon pour moi"
         checked={isOnlyForSelf}
         onChange={(checked) => {
-          setValue("recipientEmail", "");
-          setValue("details", "");
+          setValue(
+            "recipientEmail" as keyof ShareConventionDraftByEmailDto,
+            undefined,
+          );
+          setValue(
+            "details" as keyof ShareConventionDraftByEmailDto,
+            undefined,
+          );
           setIsOnlyForSelf(checked);
         }}
       />
@@ -82,7 +88,9 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
         className={fr.cx("fr-mt-2w")}
         label={`Adresse email du destinataire ${isOnlyForSelf ? "(facultatif)" : "*"}`}
         nativeInputProps={{
-          ...register("recipientEmail"),
+          ...register("recipientEmail", {
+            setValueAs: (v) => (v === "" ? undefined : v),
+          }),
           type: "email",
           placeholder: "nom@exemple.com",
           id: domElementIds.conventionImmersionRoute.shareConventionDraft
@@ -95,7 +103,9 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
       <Input
         label="Votre message (facultatif)"
         nativeTextAreaProps={{
-          ...register("details"),
+          ...register("details", {
+            setValueAs: (v) => (v === "" ? undefined : v),
+          }),
           id: domElementIds.conventionImmersionRoute.shareConventionDraft
             .shareFormDetailsInput,
         }}
