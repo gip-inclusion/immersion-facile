@@ -17,8 +17,6 @@ describe("shareConventionLinkByEmailSchema schema validation", () => {
 
     const data: ShareConventionDraftByEmailDto = {
       senderEmail: "test@test.com",
-      details: "",
-      recipientEmail: "",
       conventionDraft: convention,
     };
 

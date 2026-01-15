@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { agencyKindSchema } from "../agency/agency.schema";
-import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
+import { emailSchema } from "../email/email.schema";
 import {
   deepPartialSchema,
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringCanBeEmpty,
+  zStringMinLength1,
 } from "../zodUtils";
 import {
   immersionConventionSchema,
@@ -46,7 +46,7 @@ export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionD
 export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailDto> =
   z.object({
     senderEmail: emailSchema,
-    recipientEmail: emailPossiblyEmptySchema,
-    details: zStringCanBeEmpty.optional(),
+    recipientEmail: emailSchema.optional(),
+    details: zStringMinLength1.optional(),
     conventionDraft: conventionDraftSchema,
   });
