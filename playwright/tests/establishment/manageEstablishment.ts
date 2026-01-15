@@ -158,7 +158,7 @@ const checkEstablishment = async (
 
   await expect(firstOfferCardContent).toContain("routage");
 
-  await expect(firstOfferCardContent).toContain("PAS DE TÉLÉTRAVAIL");
+  await expect(firstOfferCardContent).toContain("100% PRÉSENTIEL");
 
   await expect(
     await page.locator(
