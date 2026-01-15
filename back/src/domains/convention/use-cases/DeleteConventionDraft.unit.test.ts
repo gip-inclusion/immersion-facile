@@ -1,8 +1,4 @@
-import {
-  type ConventionDraftDto,
-  ConventionDtoBuilder,
-  type ConventionId,
-} from "shared";
+import { type ConventionDraftDto, ConventionDtoBuilder } from "shared";
 import { v4 as uuid } from "uuid";
 import {
   createInMemoryUow,
@@ -33,9 +29,8 @@ describe("DeleteConventionDraft", () => {
     await uow.conventionDraftRepository.save(conventionDraft, now);
 
     await usecase.execute({
-      convention: new ConventionDtoBuilder()
-        .withId(conventionDraft.id as ConventionId)
-        .build(),
+      fromConventionDraftId: conventionDraft.id,
+      convention: new ConventionDtoBuilder().build(),
     });
 
     expect(

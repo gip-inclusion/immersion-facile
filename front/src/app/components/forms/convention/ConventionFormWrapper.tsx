@@ -428,6 +428,7 @@ const ConventionSummarySection = ({
   const onConfirmSubmit = () => {
     dispatch(
       conventionSlice.actions.saveConventionRequested({
+        fromConventionDraftId: route.params.conventionDraftId,
         convention: {
           ...convention,
           statusJustification: getValues("statusJustification"),

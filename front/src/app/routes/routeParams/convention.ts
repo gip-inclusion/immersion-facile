@@ -662,7 +662,8 @@ const conventionPresentationFromUrlParams = (
 const conventionPresentationFromConventionDraft = (
   conventionDraft: ConventionDraftDto,
 ): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
-  id: conventionDraft.id,
+  id: uuidV4(),
+  fromConventionDraftId: conventionDraft.id,
   updatedAt: conventionDraft.updatedAt,
 
   // Agency
