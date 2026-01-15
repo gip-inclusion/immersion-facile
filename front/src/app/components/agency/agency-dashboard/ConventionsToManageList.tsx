@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import { useCallback, useMemo } from "react";
-import { HeadingSection, Task } from "react-design-system";
+import { HeadingSection, HorizontalCard } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
@@ -174,7 +174,7 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
     .run();
 
   return (
-    <Task
+    <HorizontalCard
       title={title}
       titleAs="h3"
       description={description}

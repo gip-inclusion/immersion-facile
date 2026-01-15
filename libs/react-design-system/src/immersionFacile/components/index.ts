@@ -47,7 +47,7 @@ export * from "./separated-section";
 export * from "./skip-links";
 export * from "./submit-confirmation-section";
 export * from "./tag";
-export * from "./task";
+export * from "./horizontalCard";
 export * from "./task-summary";
 export * from "./toastr";
 export * from "./tooltip";

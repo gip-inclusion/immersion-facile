@@ -1,20 +1,20 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { Task, type TaskProps } from "./Task";
+import { HorizontalCard, type HorizontalCardProps } from "./HorizontalCard";
 
-const Component = Task;
+const Component = HorizontalCard;
 type Story = StoryObj<typeof Component>;
-const argTypes: Partial<ArgTypes<TaskProps>> | undefined = {};
+const argTypes: Partial<ArgTypes<HorizontalCardProps>> | undefined = {};
 
 const componentDescription = `
 Afficher des lignes d'éléments.
 
 \`\`\`tsx  
-import { Task } from "react-design-system";
+import { HorizontalCard } from "react-design-system";
 \`\`\`
 `;
 
 export default {
-  title: "Task",
+  title: "HorizontalCard",
   component: Component,
   argTypes,
   parameters: {

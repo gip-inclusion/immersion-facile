@@ -3,9 +3,9 @@ import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { dashboardTitleToClassName, type TitleLevel } from "../../utils";
-import { taskStyles } from "./Task.styles";
+import { horizontalCardStyles } from "./HorizontalCard.styles";
 
-export type TaskProps = {
+export type HorizontalCardProps = {
   className?: string;
   title: ReactNode;
   titleAs: TitleLevel;
@@ -14,14 +14,14 @@ export type TaskProps = {
   footer?: ReactNode;
 };
 
-export const Task = ({
+export const HorizontalCard = ({
   title,
   titleAs,
   description,
   className,
   buttonProps,
   footer,
-}: TaskProps) => {
+}: HorizontalCardProps) => {
   const { cx } = useStyles();
   const Title = titleAs;
 
@@ -45,7 +45,11 @@ export const Task = ({
           {description && <p className={fr.cx("fr-mb-2v")}>{description}</p>}
           {footer && (
             <footer
-              className={cx(taskStyles.footer, "fr-text--sm", "fr-mb-2v")}
+              className={cx(
+                horizontalCardStyles.footer,
+                "fr-text--sm",
+                "fr-mb-2v",
+              )}
             >
               {footer}
             </footer>
@@ -55,7 +59,10 @@ export const Task = ({
           className={fr.cx("fr-col-md-2", "fr-grid-row", "fr-grid-row--right")}
         >
           {buttonProps && (
-            <Button {...buttonProps} className={cx(taskStyles.button)} />
+            <Button
+              {...buttonProps}
+              className={cx(horizontalCardStyles.button)}
+            />
           )}
         </div>
       </div>

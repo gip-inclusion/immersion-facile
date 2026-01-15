@@ -11,8 +11,8 @@ import { equals } from "ramda";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   HeadingSection,
+  HorizontalCard,
   RichDropdown,
-  Task,
   useDebounce,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -338,7 +338,7 @@ export const ConventionsWithBroadcastErrorList = ({
       )}
       {conventionsWithBroadcastFeedback.map(
         (conventionWithBroadcastFeedback) => (
-          <Task
+          <HorizontalCard
             key={conventionWithBroadcastFeedback.id}
             titleAs="h3"
             title={
