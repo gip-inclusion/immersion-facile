@@ -110,6 +110,7 @@ export class PgGroupRepository implements GroupRepository {
             locationId: ref("loc.id"),
             createdAt: sql<DateTimeIsoString>`date_to_iso(e.created_at)`,
             updatedAt: sql<DateTimeIsoString>`date_to_iso(e.update_date)`,
+            remoteWorkMode: sql`MIN(io.remote_work_mode)`,
           }),
         ).as("search_result_dto"),
       )
