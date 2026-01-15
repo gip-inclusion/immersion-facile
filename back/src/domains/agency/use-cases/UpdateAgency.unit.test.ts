@@ -3,6 +3,7 @@ import {
   BadRequestError,
   type ConnectedUser,
   ConnectedUserBuilder,
+  type DelegationAgencyInfo,
   errors,
   expectArraysToMatch,
   expectPromiseToFail,
@@ -212,10 +213,10 @@ describe("Update agency", () => {
       toAgencyWithRights(agencyWithDelegation, {}),
     ];
 
-    const updatedDelegationInfo = {
+    const updatedDelegationInfo: DelegationAgencyInfo = {
       delegationEndDate: new Date("2030-06-15").toISOString(),
       delegationAgencyName: "Mission Locale",
-      delegationAgencyKind: "mission-locale" as const,
+      delegationAgencyKind: "mission-locale",
     };
 
     const updatedAgency = new AgencyDtoBuilder(agencyWithDelegation)
