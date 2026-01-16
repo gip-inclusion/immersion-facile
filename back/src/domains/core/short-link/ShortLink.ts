@@ -1,10 +1,7 @@
-import type {
-  AbsoluteUrl,
-  CreateConventionMagicLinkPayloadProperties,
-  ShortLinkId,
-} from "shared";
+import type { AbsoluteUrl, ShortLinkId } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import type { CreateConventionMagicLinkPayloadProperties } from "../../../utils/jwt";
 import type { UnitOfWork } from "../unit-of-work/ports/UnitOfWork";
 import type { ShortLinkIdGeneratorGateway } from "./ports/ShortLinkIdGeneratorGateway";
 

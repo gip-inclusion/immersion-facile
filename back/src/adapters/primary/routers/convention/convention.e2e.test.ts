@@ -448,7 +448,7 @@ describe("convention e2e", () => {
               email: convention.signatories.beneficiary.email,
               durationDays: 1,
               now: gateways.timeGateway.now(),
-              exp:
+              expOverride:
                 Math.round(gateways.timeGateway.now().getTime() / 1000) -
                 2 * 24 * 3600,
             }),
