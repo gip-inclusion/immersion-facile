@@ -27,18 +27,23 @@ export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
 
     await Promise.all([
-      ...agencies.map(({ id, usersRights }) =>
-        uow.agencyRepository.update({
-          id,
-          usersRights: {
-            ...usersRights,
-            [currentUser.id]: {
-              isNotifiedByEmail: false,
-              roles: ["to-review"],
+      ...agencies.map(async ({ id, usersRights, phoneNumber }) => {
+        const phoneId =
+          await uow.phoneNumberRepository.insertOrGetPhone(phoneNumber);
+        return uow.agencyRepository.update(
+          {
+            id,
+            usersRights: {
+              ...usersRights,
+              [currentUser.id]: {
+                isNotifiedByEmail: false,
+                roles: ["to-review"],
+              },
             },
           },
-        }),
-      ),
+          phoneId,
+        );
+      }),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "AgencyRegisteredToConnectedUser",

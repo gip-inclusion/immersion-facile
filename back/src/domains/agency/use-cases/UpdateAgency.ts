@@ -17,8 +17,12 @@ export const makeUpdateAgency = useCaseBuilder("UpdateAgency")
       ...agencyToUpdate
     } = agency;
 
+    const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+      agencyToUpdate.phoneNumber,
+    );
+
     await Promise.all([
-      uow.agencyRepository.update(agencyToUpdate).catch((error) => {
+      uow.agencyRepository.update(agencyToUpdate, phoneId).catch((error) => {
         if (error.message === `Agency ${agency.id} does not exist`)
           throw errors.agency.notFound({ agencyId: agency.id });
         throw error;

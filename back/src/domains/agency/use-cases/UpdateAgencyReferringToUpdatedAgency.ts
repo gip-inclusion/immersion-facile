@@ -28,11 +28,16 @@ export const makeUpdateAgencyReferringToUpdatedAgency = useCaseBuilder(
       await uow.agencyRepository.getAgenciesRelatedToAgency(updatedAgency.id);
 
     await Promise.all(
-      relatedAgencies.map(async ({ usersRights, id }) => {
-        await uow.agencyRepository.update({
-          id,
-          usersRights: updateRights(usersRights, updatedAgency),
-        });
+      relatedAgencies.map(async ({ usersRights, id, phoneNumber }) => {
+        const phoneId =
+          await uow.phoneNumberRepository.insertOrGetPhone(phoneNumber);
+        await uow.agencyRepository.update(
+          {
+            id,
+            usersRights: updateRights(usersRights, updatedAgency),
+          },
+          phoneId,
+        );
         await uow.outboxRepository.save(
           deps.createNewEvent({
             topic: "AgencyUpdated",
@@ -86,15 +91,15 @@ const updateRights = (
         return isIdToRemove
           ? acc
           : {
-              ...acc,
-              [id]:
-                right && idToUpdate
-                  ? {
-                      isNotifiedByEmail: idToUpdate.isNotifiedByEmail,
-                      roles: uniq([...right.roles, "validator"]),
-                    }
-                  : right,
-            };
+            ...acc,
+            [id]:
+              right && idToUpdate
+                ? {
+                  isNotifiedByEmail: idToUpdate.isNotifiedByEmail,
+                  roles: uniq([...right.roles, "validator"]),
+                }
+                : right,
+          };
       },
       {},
     ),

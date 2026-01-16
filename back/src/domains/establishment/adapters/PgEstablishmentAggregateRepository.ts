@@ -29,7 +29,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
-import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentAggregate, EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
 import {
@@ -51,9 +51,8 @@ const logger = createLogger(__filename);
 const MAX_RESULTS_HARD_LIMIT = 100;
 
 export class PgEstablishmentAggregateRepository
-  implements EstablishmentAggregateRepository
-{
-  constructor(private transaction: KyselyDb) {}
+  implements EstablishmentAggregateRepository {
+  constructor(private transaction: KyselyDb) { }
 
   public async getAllEstablishmentAggregatesForTest(): Promise<
     EstablishmentAggregate[]
@@ -105,7 +104,7 @@ export class PgEstablishmentAggregateRepository
       .insertInto("immersion_offers")
       .values(
         offersWithSiret.map((offerWithSiret) => ({
-          appellation_code: Number.parseInt(offerWithSiret.appellationCode),
+          appellation_code: Number.parseInt(offerWithSiret.appellationCode, 10),
           remote_work_mode: offerWithSiret.remoteWorkMode,
           siret: offerWithSiret.siret,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
@@ -387,8 +386,8 @@ export class PgEstablishmentAggregateRepository
         romeCodes: searchMade.romeCode
           ? [searchMade.romeCode]
           : await this.#getRomeCodeFromAppellationCodes(
-              searchMade.appellationCodes,
-            ),
+            searchMade.appellationCodes,
+          ),
       },
       sort: searchMade.sortedBy
         ? { by: searchMade.sortedBy, direction: "desc" }
@@ -470,9 +469,9 @@ export class PgEstablishmentAggregateRepository
       const nafDto =
         values?.nafDto !== undefined
           ? {
-              naf_code: values.nafDto.code,
-              naf_nomenclature: values.nafDto.nomenclature,
-            }
+            naf_code: values.nafDto.code,
+            naf_nomenclature: values.nafDto.nomenclature,
+          }
           : {};
       const numberEmployees =
         values?.numberEmployeesRange !== undefined
@@ -622,20 +621,31 @@ export class PgEstablishmentAggregateRepository
     const { userRights } = aggregate;
     if (!userRights.length) return;
 
+    const userRightsWithPhoneIds: (EstablishmentUserRight & { phoneId: number | undefined })[] = await Promise.all(userRights.map(async (userRight) => {
+      if (!userRight.phone) return { ...userRight, phoneId: undefined };
+      const phoneId = await this.transaction.selectFrom("phone_numbers")
+        .select("id")
+        .where("phone_number", "=", userRight.phone)
+        .executeTakeFirst();
+      return { ...userRight, phoneId: phoneId?.id };
+    }));
+
     return this.transaction
       .insertInto("establishments__users")
       .values(
-        userRights.map((userRight) => ({
-          siret: aggregate.establishment.siret,
-          user_id: userRight.userId,
-          role: userRight.role,
-          job: userRight.job,
-          phone: userRight.phone,
-          should_receive_discussion_notifications:
-            userRight.shouldReceiveDiscussionNotifications,
-          is_main_contact_by_phone: userRight.isMainContactByPhone,
-          is_main_contact_in_person: userRight.isMainContactInPerson,
-        })),
+        userRightsWithPhoneIds.map((userRight, index) => {
+          const phoneId = userRightsWithPhoneIds[index].phoneId;
+          return ({
+            siret: aggregate.establishment.siret,
+            user_id: userRight.userId,
+            role: userRight.role,
+            job: userRight.job,
+            phone_id: phoneId,
+            should_receive_discussion_notifications: userRight.shouldReceiveDiscussionNotifications,
+            is_main_contact_by_phone: userRight.isMainContactByPhone,
+            is_main_contact_in_person: userRight.isMainContactInPerson,
+          });
+        }),
       )
       .execute()
       .then(() => {
@@ -669,7 +679,7 @@ export class PgEstablishmentAggregateRepository
         "ogr_appellation",
         "in",
         appellationCodes.map((appellationCode) =>
-          Number.parseInt(appellationCode),
+          Number.parseInt(appellationCode, 10),
         ),
       )
       .execute();
@@ -829,26 +839,26 @@ const makeEstablishmentAggregateFromDb = (
       potentialBeneficiaryWelcomeAddress: aggregate.establishment
         .potentialBeneficiaryWelcomeAddress
         ? {
-            address: {
-              streetNumberAndAddress:
-                aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                  .address.streetNumberAndAddress,
-              postcode:
-                aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                  .address.postcode,
-              city: aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                .address.city,
-              departmentCode:
-                aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                  .address.departmentCode,
-            },
-            position: {
-              lat: aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                .position.lat,
-              lon: aggregate.establishment.potentialBeneficiaryWelcomeAddress
-                .position.lon,
-            },
-          }
+          address: {
+            streetNumberAndAddress:
+              aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .address.streetNumberAndAddress,
+            postcode:
+              aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .address.postcode,
+            city: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+              .address.city,
+            departmentCode:
+              aggregate.establishment.potentialBeneficiaryWelcomeAddress
+                .address.departmentCode,
+          },
+          position: {
+            lat: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+              .position.lat,
+            lon: aggregate.establishment.potentialBeneficiaryWelcomeAddress
+              .position.lon,
+          },
+        }
         : undefined,
     },
     offers: aggregate.immersionOffers.map(
@@ -983,22 +993,22 @@ const makeGetFilteredResultsSubQueryBuilder = ({
               (eb) =>
                 geoParams && hasSearchGeoParams(geoParams)
                   ? eb.where(({ fn }) =>
-                      fn("ST_DWithin", [
-                        "position",
-                        fn("ST_GeographyFromText", [
-                          sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
-                        ]),
-                        sql`${(1000 * geoParams.distanceKm).toString()}`,
+                    fn("ST_DWithin", [
+                      "position",
+                      fn("ST_GeographyFromText", [
+                        sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
                       ]),
-                    )
+                      sql`${(1000 * geoParams.distanceKm).toString()}`,
+                    ]),
+                  )
                   : eb,
               (eb) =>
                 locationIds?.length
                   ? eb.where(
-                      "establishments_location_infos.id",
-                      "in",
-                      locationIds,
-                    )
+                    "establishments_location_infos.id",
+                    "in",
+                    locationIds,
+                  )
                   : eb,
             ).as("loc"),
           (join) => join.onRef("loc.siret", "=", "e.siret"),
@@ -1022,18 +1032,18 @@ const makeGetFilteredResultsSubQueryBuilder = ({
               (eb) =>
                 romeCodes
                   ? eb.where(
-                      "public_appellations_data.code_rome",
-                      "in",
-                      romeCodes,
-                    )
+                    "public_appellations_data.code_rome",
+                    "in",
+                    romeCodes,
+                  )
                   : eb,
               (eb) =>
                 appellationCodes?.length
                   ? eb.where(
-                      "immersion_offers.appellation_code",
-                      "in",
-                      appellationCodes.map((code) => Number.parseInt(code)),
-                    )
+                    "immersion_offers.appellation_code",
+                    "in",
+                    appellationCodes.map((code) => Number.parseInt(code, 10)),
+                  )
                   : eb,
             ).as("offer"),
           (join) => join.onRef("offer.siret", "=", "e.siret"),
@@ -1153,13 +1163,13 @@ const searchImmersionResultsQuery = async (
           createdAt: sql<DateTimeIsoString>`date_to_iso(e.created_at)`,
           ...(geoParams && hasSearchGeoParams(geoParams)
             ? {
-                distance_m: fn("ST_Distance", [
-                  ref("loc_pos.position"),
-                  fn("ST_GeographyFromText", [
-                    sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
-                  ]),
+              distance_m: fn("ST_Distance", [
+                ref("loc_pos.position"),
+                fn("ST_GeographyFromText", [
+                  sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
                 ]),
-              }
+              ]),
+            }
             : {}),
           voluntaryToImmersion: sql`TRUE`,
           appellations: ref("r.appellations"),
@@ -1268,16 +1278,16 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
             numberEmployeesRange: ref("e.number_employees"),
             updatedAt: sql<string>`TO_CHAR
                 ( ${ref(
-                  "e.update_date",
-                )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+              "e.update_date",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
             createdAt: sql<string>`TO_CHAR
                 ( ${ref(
-                  "e.created_at",
-                )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+              "e.created_at",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
             lastInseeCheckDate: sql<string>`TO_CHAR
                 ( ${ref(
-                  "e.last_insee_check_date",
-                )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+              "e.last_insee_check_date",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
             isOpen: ref("e.is_open"),
             isMaxDiscussionsForPeriodReached: ref(
               "e.is_max_discussions_for_period_reached",
@@ -1337,8 +1347,8 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                   appellationLabel: ref("pad.libelle_appellation_long"),
                   createdAt: sql<string>`TO_CHAR
                       ( ${ref(
-                        "io.created_at",
-                      )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                    "io.created_at",
+                  )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
                 }).as("offer"),
               )
               .orderBy("io.appellation_code asc"),
@@ -1346,13 +1356,14 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
           userRights: jsonArrayFrom(
             eb
               .selectFrom("establishments__users as eu")
+              .leftJoin("phone_numbers as pn_eu", "eu.phone_id", "pn_eu.id")
               .whereRef("eu.siret", "=", "e.siret")
               .select(({ ref }) =>
                 jsonBuildObject({
                   userId: ref("eu.user_id"),
                   role: ref("eu.role"),
                   job: ref("eu.job"),
-                  phone: ref("eu.phone"),
+                  phone: sql<string>`COALESCE(${ref("pn_eu.phone_number")}, '')`,
                   shouldReceiveDiscussionNotifications: ref(
                     "eu.should_receive_discussion_notifications",
                   ),

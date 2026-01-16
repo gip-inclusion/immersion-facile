@@ -22,6 +22,7 @@ import { PgEstablishmentAggregateRepository } from "../../../establishment/adapt
 import type { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { PgUserRepository } from "../../authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../phone-number/adapters/PgPhoneNumberRepository";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgStatisticQueries } from "./PgStatisticQueries";
 
@@ -30,6 +31,7 @@ describe("PgStatisticQueries", () => {
   let pgConventionRepository: PgConventionRepository;
   let pgAgencyRepository: PgAgencyRepository;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
   let db: KyselyDb;
   let pool: Pool;
 
@@ -42,8 +44,9 @@ describe("PgStatisticQueries", () => {
     pgStatisticQueries = new PgStatisticQueries(db);
     pgConventionRepository = new PgConventionRepository(db);
     pgAgencyRepository = new PgAgencyRepository(db);
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      db,
+      makeKyselyDb(pool),
     );
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
@@ -127,10 +130,14 @@ describe("PgStatisticQueries", () => {
         const userRepository = new PgUserRepository(db);
         await userRepository.save(user);
         await userRepository.save(validator);
+        const phoneId = await pgPhoneNumberRepository.insertOrGetPhone(
+          agency.phoneNumber,
+        );
         await pgAgencyRepository.insert(
           toAgencyWithRights(agency, {
             [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
           }),
+          phoneId,
         );
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregate,

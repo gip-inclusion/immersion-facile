@@ -125,8 +125,9 @@ describe("PgAgencyRepository", () => {
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("users").execute();
 
-    agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
-    userRepository = new PgUserRepository(makeKyselyDb(pool));
+    const kyselyDb = makeKyselyDb(pool);
+    agencyRepository = new PgAgencyRepository(kyselyDb);
+    userRepository = new PgUserRepository(kyselyDb);
 
     await userRepository.save(validator1);
     await userRepository.save(validator2);

@@ -20,6 +20,7 @@ import { z } from "zod";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
+import type { PhoneNumberRepository } from "../../core/phone-number/ports/PhoneNumberRepository";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
@@ -120,6 +121,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       importedAgencyAndUserRows: inputParams,
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
+      phoneNumberRepository: uow.phoneNumberRepository,
       usecaseErrors,
     });
 
@@ -127,6 +129,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       importedAgencyAndUserRows: rowsWithDuplicates,
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
+      phoneNumberRepository: uow.phoneNumberRepository,
       deps,
       usecaseErrors,
     });
@@ -136,6 +139,7 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
       rowsToCreateAsAgencies: uniqRows,
       agencyRepository: uow.agencyRepository,
       userRepository: uow.userRepository,
+      phoneNumberRepository: uow.phoneNumberRepository,
       deps,
       usecaseErrors,
     });
@@ -154,12 +158,14 @@ const linkUsersToExistingAgency = async ({
   importedAgencyAndUserRows,
   agencyRepository,
   userRepository,
+  phoneNumberRepository,
   usecaseErrors,
 }: {
   siretsInIF: SiretDto[];
   importedAgencyAndUserRows: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
   userRepository: UserRepository;
+  phoneNumberRepository: PhoneNumberRepository;
   usecaseErrors: Record<string, Error>;
 }): Promise<void> => {
   const rowsWithSiretAlreadyInIF = importedAgencyAndUserRows.filter((row) =>
@@ -229,17 +235,23 @@ const linkUsersToExistingAgency = async ({
             }),
         );
 
-        await agencyRepository.update({
-          id: agencyIF.id,
-          usersRights: {
-            ...agencyIF.usersRights,
-            ...agencyUsersRights.reduce((acc, curr) => {
-              const { roles, isNotifiedByEmail } = curr;
-              acc[curr.userId] = { roles, isNotifiedByEmail };
-              return acc;
-            }, {} as AgencyUsersRights),
+        const phoneId = await phoneNumberRepository.insertOrGetPhone(
+          agencyIF.phoneNumber,
+        );
+        await agencyRepository.update(
+          {
+            id: agencyIF.id,
+            usersRights: {
+              ...agencyIF.usersRights,
+              ...agencyUsersRights.reduce((acc, curr) => {
+                const { roles, isNotifiedByEmail } = curr;
+                acc[curr.userId] = { roles, isNotifiedByEmail };
+                return acc;
+              }, {} as AgencyUsersRights),
+            },
           },
-        });
+          phoneId,
+        );
       }),
     );
   });
@@ -272,12 +284,14 @@ const createNewAgencies = async ({
   importedAgencyAndUserRows,
   agencyRepository,
   userRepository,
+  phoneNumberRepository,
   deps,
   usecaseErrors,
 }: {
   importedAgencyAndUserRows: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
   userRepository: UserRepository;
+  phoneNumberRepository: PhoneNumberRepository;
   deps: {
     uuidGenerator: UuidGenerator;
     timeGateway: TimeGateway;
@@ -336,7 +350,10 @@ const createNewAgencies = async ({
       statusJustification: null,
     };
 
-    await agencyRepository.insert(agency);
+    const phoneId = await phoneNumberRepository.insertOrGetPhone(
+      agency.phoneNumber,
+    );
+    await agencyRepository.insert(agency, phoneId);
   });
 };
 
@@ -425,6 +442,7 @@ const createNewAgenciesWithSuffix = async ({
   rowsToCreateAsAgencies,
   agencyRepository,
   userRepository,
+  phoneNumberRepository,
   deps,
   usecaseErrors,
 }: {
@@ -432,6 +450,7 @@ const createNewAgenciesWithSuffix = async ({
   rowsToCreateAsAgencies: ImportedAgencyAndUserRow[];
   agencyRepository: AgencyRepository;
   userRepository: UserRepository;
+  phoneNumberRepository: PhoneNumberRepository;
   deps: {
     uuidGenerator: UuidGenerator;
     timeGateway: TimeGateway;
@@ -464,6 +483,7 @@ const createNewAgenciesWithSuffix = async ({
     importedAgencyAndUserRows: updatedRowsWithSuffix,
     agencyRepository,
     userRepository,
+    phoneNumberRepository,
     deps,
     usecaseErrors,
   });

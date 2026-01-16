@@ -25,6 +25,7 @@ import { InMemoryFeatureFlagQueries } from "../../feature-flags/adapters/InMemor
 import { InMemoryFeatureFlagRepository } from "../../feature-flags/adapters/InMemoryFeatureFlagRepository";
 import { InMemoryNafRepository } from "../../naf/adapters/InMemoryNafRepository";
 import { InMemoryNotificationRepository } from "../../notifications/adapters/InMemoryNotificationRepository";
+import { InMemoryPhoneNumberRepository } from "../../phone-number/adapters/InMemoryPhoneNumberRepository";
 import { InMemoryRomeRepository } from "../../rome/adapters/InMemoryRomeRepository";
 import { InMemoryBroadcastFeedbacksRepository } from "../../saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
 import { InMemoryShortLinkRepository } from "../../short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
@@ -94,6 +95,7 @@ export const createInMemoryUow = () => {
     establishmentMarketingRepository:
       new InMemoryEstablishementMarketingRepository(),
     nafRepository: new InMemoryNafRepository(),
+    phoneNumberRepository: new InMemoryPhoneNumberRepository(),
   } satisfies UnitOfWork;
 };
 

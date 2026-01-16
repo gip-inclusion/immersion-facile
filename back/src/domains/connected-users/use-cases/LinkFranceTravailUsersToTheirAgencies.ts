@@ -83,14 +83,20 @@ const updateActiveAgencyWithSafir = async (
   userId: string,
   createNewEvent: CreateNewEvent,
 ): Promise<void> => {
+  const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+    agencyWithSafir.phoneNumber,
+  );
   await Promise.all([
-    uow.agencyRepository.update({
-      id: agencyWithSafir.id,
-      usersRights: {
-        ...agencyWithSafir.usersRights,
-        [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+    uow.agencyRepository.update(
+      {
+        id: agencyWithSafir.id,
+        usersRights: {
+          ...agencyWithSafir.usersRights,
+          [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+        },
       },
-    }),
+      phoneId,
+    ),
     uow.outboxRepository.save(
       createNewEvent({
         topic: "AgencyUpdated",

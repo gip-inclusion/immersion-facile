@@ -54,7 +54,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
     await db.deleteFrom("users").execute();
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      db,
+      makeKyselyDb(pool),
     );
     pgDiscussionRepository = new PgDiscussionRepository(db);
     pgConventionRepository = new PgConventionRepository(db);

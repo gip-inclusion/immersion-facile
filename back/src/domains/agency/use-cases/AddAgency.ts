@@ -38,16 +38,16 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
       rest.refersToAgencyId
         ? await getReferredAgencyValidatorUserIds(uow, rest.refersToAgencyId)
         : await Promise.all(
-            validatorEmails.map(async (email) => ({
-              userId: await createOrGetUserIdByEmail(
-                uow,
-                deps.timeGateway,
-                deps.uuidGenerator,
-                { email },
-              ),
-              isNotifiedByEmail: true,
-            })),
-          );
+          validatorEmails.map(async (email) => ({
+            userId: await createOrGetUserIdByEmail(
+              uow,
+              deps.timeGateway,
+              deps.uuidGenerator,
+              { email },
+            ),
+            isNotifiedByEmail: true,
+          })),
+        );
 
     const counsellorUserIdsForAgency: WithUserIdAndIsNotified[] =
       await Promise.all(
@@ -82,8 +82,12 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
     if (!siretEstablishmentDto)
       throw errors.agency.invalidSiret({ siret: agency.agencySiret });
 
+    const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+      agency.phoneNumber,
+    );
+
     await Promise.all([
-      uow.agencyRepository.insert(agency),
+      uow.agencyRepository.insert(agency, phoneId),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "NewAgencyAdded",

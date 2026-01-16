@@ -43,10 +43,17 @@ export const makeRemoveUserFromAgency = useCaseBuilder("RemoveUserFromAgency")
 
       validateAgencyRights(agency.id, usersRights, agency.refersToAgencyId);
 
-      await uow.agencyRepository.update({
-        id: agency.id,
-        usersRights,
-      });
+      const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+        agency.phoneNumber,
+      );
+
+      await uow.agencyRepository.update(
+        {
+          id: agency.id,
+          usersRights,
+        },
+        phoneId,
+      );
 
       await uow.outboxRepository.save(
         deps.createNewEvent({

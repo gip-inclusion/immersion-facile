@@ -29,7 +29,10 @@ export const makeUpdateAgencyStatus = useCaseBuilder("UpdateAgencyStatus")
           ? inputParams.statusJustification
           : null,
     };
-    await uow.agencyRepository.update(updatedAgencyParams);
+    const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+      existingAgency.phoneNumber,
+    );
+    await uow.agencyRepository.update(updatedAgencyParams, phoneId);
 
     if (inputParams.status === "active" || inputParams.status === "rejected") {
       await uow.outboxRepository.save(

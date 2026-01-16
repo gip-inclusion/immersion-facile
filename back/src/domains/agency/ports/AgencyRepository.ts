@@ -46,8 +46,15 @@ export type AgencyWithNumberOfUsersToReview = {
 };
 
 export interface AgencyRepository {
-  insert(agency: AgencyWithUsersRights, updatedAt?: DateString): Promise<void>;
-  update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
+  insert(
+    agency: AgencyWithUsersRights,
+    phoneId: number,
+    updatedAt?: DateString,
+  ): Promise<void>;
+  update(
+    partialAgency: PartialAgencyWithUsersRights,
+    newPhoneId: number,
+  ): Promise<void>;
 
   getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
   getBySafirAndActiveStatus(
@@ -81,28 +88,36 @@ export const updateAgencyRightsForUser = async (
   uow: UnitOfWork,
   userId: UserId,
   { agencyId, isNotifiedByEmail, roles }: AgencyRightOfUser,
+  phoneId: number,
 ): Promise<void> => {
   const agencyWithRights = await uow.agencyRepository.getById(agencyId);
   if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
-  return uow.agencyRepository.update({
-    id: agencyId,
-    usersRights: {
-      ...agencyWithRights.usersRights,
-      [userId]: { isNotifiedByEmail, roles },
+  return uow.agencyRepository.update(
+    {
+      id: agencyId,
+      usersRights: {
+        ...agencyWithRights.usersRights,
+        [userId]: { isNotifiedByEmail, roles },
+      },
     },
-  });
+    phoneId,
+  );
 };
 
 export const removeAgencyRightsForUser = async (
   uow: UnitOfWork,
   userId: UserId,
   { agencyId }: AgencyRightOfUser,
+  phoneId: number,
 ): Promise<void> => {
   const agencyWithRights = await uow.agencyRepository.getById(agencyId);
   if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
   const { [userId]: _, ...rightsToKeep } = agencyWithRights.usersRights;
-  return uow.agencyRepository.update({
-    id: agencyId,
-    usersRights: rightsToKeep,
-  });
+  return uow.agencyRepository.update(
+    {
+      id: agencyId,
+      usersRights: rightsToKeep,
+    },
+    phoneId,
+  );
 };
