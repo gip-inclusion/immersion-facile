@@ -76,6 +76,13 @@ export const ftConnectErrorStrategy = (
       ),
     ],
     [
+      isGetUserContactDetailsServerInternalError(context, error),
+      makeRawRedirectError(
+        "Nous n’avons pas réussi à récupérer vos coordonnées pôle emploi connect.",
+        error,
+      ),
+    ],
+    [
       isAdvisorForbiddenError(error, context),
       new ManagedFTConnectError("peConnectAdvisorForbiddenAccess", error),
     ],
@@ -94,6 +101,13 @@ export const ftConnectErrorStrategy = (
       isGetUserBirthDateForbiddenError(error, context),
       new ManagedFTConnectError(
         "peConnectGetUserBirthDateForbiddenAccess",
+        error,
+      ),
+    ],
+    [
+      isGetUserContactDetailsForbiddenError(error, context),
+      new ManagedFTConnectError(
+        "peConnectGetUserContactDetailsForbiddenAccess",
         error,
       ),
     ],
@@ -150,6 +164,13 @@ const isGetUserBirthDateServerInternalError = (
   context === "getUserBirthDate" &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
+const isGetUserContactDetailsServerInternalError = (
+  context: FtConnectTargetsKind,
+  error: AxiosError,
+) =>
+  context === "getUserContactDetails" &&
+  error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
+
 const isAdvisorsServerInternalError = (
   context: FtConnectTargetsKind,
   error: AxiosError,
@@ -193,6 +214,13 @@ const isGetUserBirthDateForbiddenError = (
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserBirthDate";
+
+const isGetUserContactDetailsForbiddenError = (
+  error: AxiosError<any, any>,
+  context: FtConnectTargetsKind,
+): boolean =>
+  error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
+  context === "getUserContactDetails";
 
 const isHttpServerError5XX = (error: AxiosError): boolean =>
   !!error &&

@@ -204,6 +204,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
               firstName: initialRouteParams.firstName,
               lastName: initialRouteParams.lastName,
               birthdate: initialRouteParams.birthdate,
+              phone: initialRouteParams.phone,
             },
             feedbackTopic: "auth-global",
           }),

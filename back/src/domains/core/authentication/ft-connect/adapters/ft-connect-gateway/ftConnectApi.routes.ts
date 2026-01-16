@@ -1,4 +1,4 @@
-import type { DateString } from "shared";
+import type { DateString, PhoneNumber } from "shared";
 import { type AbsoluteUrl, queryParamsAsString } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
@@ -66,6 +66,12 @@ export const makeFtConnectExternalRoutes = ({
       headersSchema: ftConnectHeadersSchema,
       responses: { 200: z.any() },
     }),
+    getUserContactDetails: defineRoute({
+      method: "get",
+      url: `${ftApiUrl}/partenaire/peconnect-coordonnees/v1/coordonnees`,
+      headersSchema: ftConnectHeadersSchema,
+      responses: { 200: z.any() },
+    }),
     getUserStatutInfo: defineRoute({
       method: "get",
       url: `${ftApiUrl}/partenaire/peconnect-statut/v1/statut`,
@@ -111,6 +117,7 @@ export const toFtConnectUserDto = (
   externalFtConnectUser: ExternalFtConnectUser & {
     isUserJobseeker: boolean;
     birthdate: DateString;
+    phone?: PhoneNumber;
   },
 ): FtConnectUserDto => {
   return {
@@ -119,6 +126,7 @@ export const toFtConnectUserDto = (
     firstName: externalFtConnectUser.given_name,
     lastName: externalFtConnectUser.family_name,
     birthdate: externalFtConnectUser.birthdate,
+    phone: externalFtConnectUser.phone,
     peExternalId: externalFtConnectUser.idIdentiteExterne,
   };
 };

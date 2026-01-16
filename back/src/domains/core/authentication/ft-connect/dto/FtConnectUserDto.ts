@@ -1,4 +1,4 @@
-import type { DateString, FtExternalId } from "shared";
+import type { DateString, FtExternalId, PhoneNumber } from "shared";
 
 export type FtConnectUserDto = {
   isJobseeker: boolean;
@@ -6,5 +6,6 @@ export type FtConnectUserDto = {
   firstName: string;
   lastName: string;
   birthdate: DateString;
+  phone?: PhoneNumber;
   peExternalId: FtExternalId;
 };

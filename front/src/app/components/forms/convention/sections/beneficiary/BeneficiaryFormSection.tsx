@@ -3,7 +3,7 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
 import { useCallback, useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { type Path, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
@@ -90,14 +90,15 @@ export const BeneficiaryFormSection = ({
 
   useEffect(() => {
     if (userFieldsAreFilled) {
-      const { firstName, lastName, email, birthdate } = connectedUser;
-      const valuesToUpdate = {
+      const { firstName, lastName, email, birthdate, phone } = connectedUser;
+      const valuesToUpdate: Partial<Record<Path<ConventionReadDto>, string>> = {
         "signatories.beneficiary.firstName": firstName,
         "signatories.beneficiary.lastName": lastName,
         "signatories.beneficiary.email": email,
-
-        "signatories.beneficiary.birthdate": birthdate,
+        ...(birthdate && { "signatories.beneficiary.birthdate": birthdate }),
+        ...(phone && { "signatories.beneficiary.phone": phone }),
       };
+
       keys(valuesToUpdate).forEach((key) => setValue(key, valuesToUpdate[key]));
     }
   }, [userFieldsAreFilled, connectedUser, setValue]);
