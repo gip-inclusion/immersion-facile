@@ -23,7 +23,7 @@ export type ConventionFtUserAdvisorEntity = EntityFromDto<
 
 type BeneficiaryBasicIdentity = Pick<
   Beneficiary<InternshipKind>,
-  "email" | "firstName" | "lastName"
+  "email" | "firstName" | "lastName" | "birthdate"
 >;
 
 export type ConventionFtConnectFields = BeneficiaryBasicIdentity & {
@@ -44,6 +44,7 @@ export const toPartialConventionDtoWithFtIdentity = (
   email: ftConnectUserInfo.email || "",
   firstName: ftConnectUserInfo.firstName,
   lastName: ftConnectUserInfo.lastName,
+  birthdate: ftConnectUserInfo.birthdate,
   fedId: ftConnectUserInfo.peExternalId,
   fedIdProvider: "peConnect",
   fedIdToken: ftConnectIdToken,

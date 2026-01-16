@@ -55,4 +55,6 @@ export type ConnectedUserQueryParams = {
   token: ConnectedUserJwt;
   idToken: string;
   provider: IdentityProvider;
-} & Pick<User, "email" | "firstName" | "lastName">;
+} & Pick<User, "email" | "firstName" | "lastName"> & {
+    birthdate?: string;
+  };

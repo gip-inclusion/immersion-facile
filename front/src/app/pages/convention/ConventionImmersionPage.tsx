@@ -184,7 +184,8 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
       initialRouteParams.fedIdToken &&
       initialRouteParams.email &&
       initialRouteParams.firstName &&
-      initialRouteParams.lastName
+      initialRouteParams.lastName &&
+      initialRouteParams.birthdate
     ) {
       const {
         fedId: _,
@@ -202,6 +203,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
               email: initialRouteParams.email,
               firstName: initialRouteParams.firstName,
               lastName: initialRouteParams.lastName,
+              birthdate: initialRouteParams.birthdate,
             },
             feedbackTopic: "auth-global",
           }),

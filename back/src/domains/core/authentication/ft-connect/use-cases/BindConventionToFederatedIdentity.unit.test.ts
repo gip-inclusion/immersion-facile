@@ -218,5 +218,6 @@ const userAdvisorDto: FtUserAndAdvisor = {
     firstName: "",
     isJobseeker: true,
     lastName: "",
+    birthdate: "",
   },
 };

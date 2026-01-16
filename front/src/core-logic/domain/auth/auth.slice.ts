@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AbsoluteUrl,
   AfterOAuthSuccessRedirectionResponse,
+  DateString,
   Email,
   FederatedIdentity,
   IdToken,
@@ -16,6 +17,7 @@ export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;
   firstName: string;
   lastName: string;
+  birthdate: DateString;
   idToken: IdToken;
 };
 

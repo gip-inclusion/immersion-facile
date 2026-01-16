@@ -1,4 +1,8 @@
-import type { AbsoluteUrl, ZodSchemaWithInputMatchingOutput } from "shared";
+import type {
+  AbsoluteUrl,
+  DateString,
+  ZodSchemaWithInputMatchingOutput,
+} from "shared";
 import { z } from "zod";
 import type { BearerToken } from "../../dto/BearerToken";
 import type { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
@@ -32,6 +36,11 @@ export type ExternalFtConnectAdvisor = {
   civilite: "1" | "2";
   mail: string;
   type: FtConnectAdvisorsKind;
+};
+
+// External contract from https://francetravail.io/produits-partages/catalogue/france-travail-connect/date-naissance/documentation#/api-reference/paths/etat-civil/get
+export type ExternalFtConnectBirthDate = {
+  dateDeNaissance: DateString;
 };
 
 // External contract from https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token

@@ -1,6 +1,7 @@
 import {
   emailSchema,
   localization,
+  makeDateStringSchema,
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "shared";
@@ -12,6 +13,7 @@ import {
 } from "../../dto/FtConnectAdvisor.dto";
 import type {
   ExternalFtConnectAdvisor,
+  ExternalFtConnectBirthDate,
   ExternalFtConnectStatut,
   ExternalFtConnectUser,
   FtConnectHeaders,
@@ -61,6 +63,11 @@ const externalftConnectAdvisorSchema: ZodSchemaWithInputMatchingOutput<ExternalF
 export const externalFtConnectAdvisorsSchema: ZodSchemaWithInputMatchingOutput<
   ExternalFtConnectAdvisor[]
 > = z.array(externalftConnectAdvisorSchema);
+
+export const externalFtConnectBirthDateSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectBirthDate> =
+  z.object({
+    dateDeNaissance: makeDateStringSchema(),
+  });
 
 const bearerSchema = z
   .string()
