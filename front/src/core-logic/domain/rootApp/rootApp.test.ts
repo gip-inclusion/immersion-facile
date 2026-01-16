@@ -56,6 +56,7 @@ describe("rootApp epic", () => {
       provider: "proConnect",
       token,
       idToken: "id-token",
+      birthdate: "1990-01-01",
     });
 
     expect(store.getState().auth.federatedIdentityWithUser).toBeNull();

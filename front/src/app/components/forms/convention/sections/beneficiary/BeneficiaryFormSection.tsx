@@ -90,11 +90,13 @@ export const BeneficiaryFormSection = ({
 
   useEffect(() => {
     if (userFieldsAreFilled) {
-      const { firstName, lastName, email } = connectedUser;
+      const { firstName, lastName, email, birthdate } = connectedUser;
       const valuesToUpdate = {
         "signatories.beneficiary.firstName": firstName,
         "signatories.beneficiary.lastName": lastName,
         "signatories.beneficiary.email": email,
+
+        "signatories.beneficiary.birthdate": birthdate,
       };
       keys(valuesToUpdate).forEach((key) => setValue(key, valuesToUpdate[key]));
     }
@@ -188,6 +190,7 @@ export const BeneficiaryFormSection = ({
           type: "date",
           max: "9999-12-31",
         }}
+        disabled={fromPeConnectedUser}
         {...getFieldError("signatories.beneficiary.birthdate")}
       />
       <EmailValidationInput

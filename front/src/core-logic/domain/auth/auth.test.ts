@@ -31,6 +31,7 @@ describe("Auth slice", () => {
     firstName: "John",
     lastName: "Doe",
     idToken: "pe-connect-id-token",
+    birthdate: "1990-01-01",
   };
 
   const connectedUserFederatedIdentity: FederatedIdentityWithUser = {
@@ -40,6 +41,7 @@ describe("Auth slice", () => {
     firstName: "John",
     lastName: "Doe",
     idToken: "id-token",
+    birthdate: "1990-01-01",
   };
 
   let store: ReduxStore;

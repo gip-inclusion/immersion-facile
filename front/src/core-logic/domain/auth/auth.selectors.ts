@@ -68,8 +68,8 @@ const connectedUser = createSelector(
   currentFederatedIdentity,
   (federatedIdentity) => {
     if (!userIsDefined(federatedIdentity)) return;
-    const { email, firstName, lastName } = federatedIdentity;
-    return { email, firstName, lastName };
+    const { email, firstName, lastName, birthdate } = federatedIdentity;
+    return { email, firstName, lastName, birthdate };
   },
 );
 
