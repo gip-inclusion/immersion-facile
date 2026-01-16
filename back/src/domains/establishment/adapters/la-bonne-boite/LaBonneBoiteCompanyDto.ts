@@ -1,7 +1,7 @@
 import type {
+  ExternalSearchResultDto,
   GeoPositionDto,
   RomeDto,
-  SearchResultDto,
   SiretDto,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../../utils/distanceBetweenCoordinatesInMeters";
@@ -76,7 +76,7 @@ export class LaBonneBoiteCompanyDto {
   public toSearchResult(
     romeDto: RomeDto,
     searchedCoordinate?: GeoPositionDto,
-  ): SearchResultDto {
+  ): ExternalSearchResultDto {
     return {
       address: {
         city: this.props.city,

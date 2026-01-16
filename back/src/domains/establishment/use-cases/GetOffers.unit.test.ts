@@ -17,6 +17,7 @@ import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate"
 import {
   boulangerOffer,
   EstablishmentAggregateBuilder,
+  OfferEntityBuilder,
   secretariatOffer,
 } from "../helpers/EstablishmentBuilders";
 import { makeGetOffers } from "./GetOffers";
@@ -145,6 +146,96 @@ describe("GetOffers", () => {
     expect(resultWithoutFilters.data).toHaveLength(4);
     expect(resultWithoutFilters.pagination.totalRecords).toBe(4);
     expect(resultWithoutFilters.pagination.numberPerPage).toBe(100);
+  });
+
+  it("should filter by remoteWorkModes when provided", async () => {
+    // Add establishment with different remote work modes
+    const remoteOffer = new OfferEntityBuilder()
+      .withRomeCode("M1607")
+      .withAppellationLabel("Développeur / Développeuse")
+      .withAppellationCode("19999")
+      .withRomeLabel("Développement")
+      .withRemoteWorkMode("FULL_REMOTE")
+      .build();
+
+    const hybridOffer = new OfferEntityBuilder()
+      .withRomeCode("M1607")
+      .withAppellationLabel("Chef de projet")
+      .withAppellationCode("19998")
+      .withRomeLabel("Gestion de projet")
+      .withRemoteWorkMode("HYBRID")
+      .build();
+
+    const establishment4 = new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("11111111111111")
+      .withOffers([remoteOffer, hybridOffer])
+      .withUserRights(userRights)
+      .build();
+
+    uow.establishmentAggregateRepository.establishmentAggregates.push(
+      establishment4,
+    );
+
+    const searchParams: GetOffersFlatQueryParams = {
+      sortBy: "score",
+      sortOrder: "desc",
+      remoteWorkModes: ["FULL_REMOTE"],
+    };
+
+    const result: DataWithPagination<SearchResultDto> = await getOffers.execute(
+      searchParams,
+      undefined,
+    );
+
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].siret).toBe(establishment4.establishment.siret);
+    expect(result.data[0].appellations[0].appellationCode).toBe(
+      remoteOffer.appellationCode,
+    );
+  });
+
+  it("should filter by multiple remoteWorkModes when provided", async () => {
+    const remoteOffer = new OfferEntityBuilder()
+      .withRomeCode("M1607")
+      .withAppellationLabel("Développeur / Développeuse")
+      .withAppellationCode("19999")
+      .withRomeLabel("Développement")
+      .withRemoteWorkMode("FULL_REMOTE")
+      .build();
+
+    const hybridOffer = new OfferEntityBuilder()
+      .withRomeCode("M1607")
+      .withAppellationLabel("Chef de projet")
+      .withAppellationCode("19998")
+      .withRomeLabel("Gestion de projet")
+      .withRemoteWorkMode("HYBRID")
+      .build();
+
+    const establishment4 = new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("11111111111111")
+      .withOffers([remoteOffer, hybridOffer])
+      .withUserRights(userRights)
+      .build();
+
+    uow.establishmentAggregateRepository.establishmentAggregates.push(
+      establishment4,
+    );
+
+    const searchParams: GetOffersFlatQueryParams = {
+      sortBy: "score",
+      sortOrder: "desc",
+      remoteWorkModes: ["FULL_REMOTE", "HYBRID"],
+    };
+
+    const result: DataWithPagination<SearchResultDto> = await getOffers.execute(
+      searchParams,
+      undefined,
+    );
+
+    expect(result.data).toHaveLength(2);
+    expect(
+      result.data.some((r) => r.siret === establishment4.establishment.siret),
+    ).toBe(true);
   });
 
   describe("wrong path", () => {

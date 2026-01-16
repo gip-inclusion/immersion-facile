@@ -12,12 +12,14 @@ import {
   getOffersFlatParamsSchema,
 } from "./SearchQueryParams.schema";
 import {
+  externalSearchResultSchema,
+  externalSearchResultsSchema,
   paginatedSearchResultsSchema,
   searchResultSchema,
-  searchResultsSchema,
 } from "./SearchResult.schema";
 
 export type SearchRoutes = typeof searchImmersionRoutes;
+
 export const searchImmersionRoutes = defineRoutes({
   getGroupBySlug: defineRoute({
     method: "get",
@@ -41,7 +43,7 @@ export const searchImmersionRoutes = defineRoutes({
     url: "/external-offers",
     queryParamsSchema: getExternalOffersFlatParamsSchema,
     responses: {
-      200: searchResultsSchema,
+      200: externalSearchResultsSchema,
       400: httpErrorSchema,
     },
   }),
@@ -71,7 +73,7 @@ export const searchImmersionRoutes = defineRoutes({
     url: "/external-search-result",
     queryParamsSchema: siretAndAppellationSchema,
     responses: {
-      200: searchResultSchema,
+      200: externalSearchResultSchema,
       400: httpErrorSchema,
       404: httpErrorSchema,
     },

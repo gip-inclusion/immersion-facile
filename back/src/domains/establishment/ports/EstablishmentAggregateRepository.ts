@@ -7,6 +7,7 @@ import type {
   FitForDisableWorkerOption,
   LocationId,
   NafCode,
+  RemoteWorkMode,
   SearchResultDto,
   SearchSortedBy,
   SiretDto,
@@ -20,7 +21,7 @@ import type { OfferEntity } from "../entities/OfferEntity";
 import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 
 export type RepositorySearchResultDto = Omit<SearchResultDto, "urlOfPartner">;
-export type RepositorySearchImmertionResult = Omit<
+export type RepositorySearchImmersionResult = Omit<
   SearchImmersionResult,
   "urlOfPartner"
 >;
@@ -42,6 +43,7 @@ type GetOffersFilters = {
   geoParams?: GeoParams;
   locationIds?: LocationId[];
   nafCodes?: NafCode[];
+  remoteWorkModes?: RemoteWorkMode[];
   searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
   sirets?: SiretDto[];
 };
@@ -91,7 +93,7 @@ export interface EstablishmentAggregateRepository {
   ): Promise<RepositorySearchResultDto | undefined>;
   legacySearchImmersionResults(
     searchImmersionParams: LegacySearchImmersionParams,
-  ): Promise<RepositorySearchImmertionResult[]>;
+  ): Promise<RepositorySearchImmersionResult[]>;
   getOffers(
     params: GetOffersParams,
   ): Promise<DataWithPagination<SearchResultDto>>;

@@ -44,6 +44,7 @@ const establishmentToSearchResultPreview = ({
   locationId: "",
   updatedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
+  remoteWorkMode: offers.length > 0 ? offers[0].remoteWorkMode : "HYBRID",
 });
 
 type SearchResultPreviewProps = {
@@ -78,7 +79,7 @@ export const SearchResultPreview = ({
               href: "#",
               onClick: () => {},
             }}
-            establishment={establishmentToSearchResultPreview(establishment)}
+            searchResult={establishmentToSearchResultPreview(establishment)}
             preview
           />
         </div>
