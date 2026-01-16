@@ -1,6 +1,7 @@
 import { type Observable, Subject } from "rxjs";
 import type {
   ApiConsumer,
+  ApiConsumerId,
   ApiConsumerJwt,
   ConnectedUser,
   ConnectedUserJwt,
@@ -124,5 +125,23 @@ export class TestAdminGateway implements AdminGateway {
     _token: string,
   ): Observable<ConnectedUser> {
     return this.getIcUserResponse$;
+  }
+
+  public revokeApiConsumerResponse$ = new Subject<void>();
+
+  public revokeApiConsumer$(
+    _consumerId: ApiConsumerId,
+    _token: ConnectedUserJwt,
+  ): Observable<void> {
+    return this.revokeApiConsumerResponse$;
+  }
+
+  public renewApiConsumerKeyResponse$ = new Subject<ApiConsumerJwt>();
+
+  public renewApiConsumerKey$(
+    _consumerId: ApiConsumerId,
+    _token: ConnectedUserJwt,
+  ): Observable<ApiConsumerJwt> {
+    return this.renewApiConsumerKeyResponse$;
   }
 }

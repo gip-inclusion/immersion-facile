@@ -82,8 +82,69 @@ const createApiConsumerEpic: ApiConsumerEpic = (
     ),
   );
 
+const revokeApiConsumerEpic: ApiConsumerEpic = (
+  action$,
+  _state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(apiConsumerSlice.actions.revokeApiConsumerRequested.match),
+    switchMap((action) =>
+      adminGateway
+        .revokeApiConsumer$(
+          action.payload.apiConsumerId,
+          action.payload.adminToken,
+        )
+        .pipe(
+          map(() =>
+            apiConsumerSlice.actions.revokeApiConsumerSucceeded({
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            apiConsumerSlice.actions.revokeApiConsumerFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
+const renewApiConsumerKeyEpic: ApiConsumerEpic = (
+  action$,
+  _state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(apiConsumerSlice.actions.renewApiConsumerKeyRequested.match),
+    switchMap((action) =>
+      adminGateway
+        .renewApiConsumerKey$(
+          action.payload.apiConsumerId,
+          action.payload.adminToken,
+        )
+        .pipe(
+          map((apiConsumerJwt) =>
+            apiConsumerSlice.actions.renewApiConsumerKeySucceeded({
+              apiConsumerJwt,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            apiConsumerSlice.actions.renewApiConsumerKeyFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const apiConsumerEpics = [
   retrieveApiConsumersEpic,
   getApiConsumerNamesByConventionEpic,
   createApiConsumerEpic,
+  revokeApiConsumerEpic,
+  renewApiConsumerKeyEpic,
 ];

@@ -127,6 +127,8 @@ export type ApiConsumer = ReplaceTypeAtKey<
   ApiConsumerRights
 > & {
   createdAt: DateString;
+  revokedAt: DateTimeIsoString | null;
+  currentKeyIssuedAt: DateTimeIsoString;
 };
 
 export const createApiConsumerParamsFromApiConsumer = (

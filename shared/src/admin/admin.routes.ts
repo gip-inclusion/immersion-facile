@@ -141,6 +141,30 @@ export const adminRoutes = defineRoutes({
       403: httpErrorSchema,
     },
   }),
+  revokeApiConsumer: defineRoute({
+    method: "post",
+    url: "/admin/api-consumers/:consumerId/revoke",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+      409: httpErrorSchema,
+    },
+  }),
+  renewApiConsumerKey: defineRoute({
+    method: "post",
+    url: "/admin/api-consumers/:consumerId/renew-key",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: apiConsumerJwtSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+      409: httpErrorSchema,
+    },
+  }),
   getUsers: defineRoute({
     method: "get",
     url: "/admin/users",

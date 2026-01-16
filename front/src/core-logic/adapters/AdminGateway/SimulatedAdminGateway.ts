@@ -2,6 +2,7 @@ import { type Observable, of, throwError } from "rxjs";
 import {
   AgencyDtoBuilder,
   type ApiConsumer,
+  type ApiConsumerId,
   type ApiConsumerJwt,
   type ConnectedUser,
   type ConnectedUserJwt,
@@ -157,6 +158,22 @@ export class SimulatedAdminGateway implements AdminGateway {
       dashboards: { agencies: {}, establishments: {} },
     });
   }
+
+  public revokeApiConsumer$(
+    _consumerId: ApiConsumerId,
+    _token: ConnectedUserJwt,
+  ): Observable<void> {
+    return of(undefined);
+  }
+
+  public renewApiConsumerKey$(
+    _consumerId: ApiConsumerId,
+    _token: ConnectedUserJwt,
+  ): Observable<ApiConsumerJwt> {
+    return of(
+      "newFakeTokenJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk4ZDE3NTE3LWJlNDItNDY2OS04OTVkLTQ3ODE0MjBhNjhiOCIsImlhdCI6MTY5MTM5MTk4Mn0.RENEWED_KEY",
+    );
+  }
 }
 
 const simulatedUsers: UserWithNumberOfAgenciesAndEstablishments[] = [
@@ -203,6 +220,8 @@ const apiConsumers: ApiConsumer[] = [
     },
     createdAt: new Date().toISOString(),
     expirationDate: new Date().toISOString(),
+    revokedAt: null,
+    currentKeyIssuedAt: new Date().toISOString(),
     rights: {
       searchEstablishment: {
         kinds: ["READ"],
@@ -236,6 +255,8 @@ const apiConsumers: ApiConsumer[] = [
     },
     createdAt: new Date().toISOString(),
     expirationDate: new Date().toISOString(),
+    revokedAt: null,
+    currentKeyIssuedAt: new Date().toISOString(),
     rights: {
       searchEstablishment: {
         kinds: ["READ"],
