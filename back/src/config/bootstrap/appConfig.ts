@@ -5,6 +5,7 @@ import {
   authRoutes,
   environments,
   filterNotFalsy,
+  loginByEmailLinkDurationInMinutes,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefinedOrDefault,
@@ -262,12 +263,20 @@ export class AppConfig {
       : `https://${this.immersionFacileDomain}`;
   }
 
-  public get magicLinkShortDurationInDays(): number {
+  public get conventionJwtShortDurationInDays(): number {
     return 31; // 1 month
   }
 
-  public get magicLinkLongDurationInDays(): number {
+  public get conventionJwtLongDurationInDays(): number {
     return 31 * 6; // 6 months
+  }
+
+  public get connectedUserJwtDurationInHours(): number {
+    return 12; // 12 hours
+  }
+
+  public get emailAuthCodeJwtDurationInMinutes(): number {
+    return loginByEmailLinkDurationInMinutes; // 15 minutes
   }
 
   public get immersionFacileDomain(): string {

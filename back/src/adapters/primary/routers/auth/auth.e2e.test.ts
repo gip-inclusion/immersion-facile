@@ -94,6 +94,7 @@ describe("auth router", () => {
       technicalRoutes,
       request,
     );
+    gateways.timeGateway.setNextDate(new Date());
   });
 
   describe("user connexion flow", () => {

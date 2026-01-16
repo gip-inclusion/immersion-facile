@@ -18,13 +18,14 @@ export const currentJwtVersions: Record<PayloadKind, number> = {
   convention: 1,
   connectedUser: 1,
   currentUser: 1, // useless, just for typecheck
+  emailAuthCode: 1,
 };
 
 export type JwtDto = {
   jwt: AppSupportedJwt;
 };
 
-export const expiredMagicLinkErrorMessage = "Le lien magique est périmé";
+export const expiredJwtErrorMessage = "Le lien magique est périmé";
 export const unsupportedMagicLinkErrorMessage =
   "Le lien magique est n'est pas valide";
 

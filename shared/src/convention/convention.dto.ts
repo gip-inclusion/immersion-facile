@@ -29,7 +29,7 @@ import type {
 import type { ScheduleDto } from "../schedule/Schedule.dto";
 import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
 import type {
-  expiredMagicLinkErrorMessage,
+  expiredJwtErrorMessage,
   unsupportedMagicLinkErrorMessage,
 } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
@@ -402,9 +402,9 @@ export type GenerateMagicLinkRequestDto = {
   expired: boolean;
 };
 
-export type RenewMagicLinkResponse = {
+export type RenewExpiredJwtResponse = {
   message:
-    | typeof expiredMagicLinkErrorMessage
+    | typeof expiredJwtErrorMessage
     | typeof unsupportedMagicLinkErrorMessage;
   needsNewMagicLink: boolean;
 };

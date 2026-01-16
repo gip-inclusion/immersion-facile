@@ -1,12 +1,20 @@
 import { createHash, generateKeyPairSync } from "node:crypto";
 import {
+  type ConnectedUserDomainJwtPayload,
+  type ConnectedUserJwtPayload,
+  type ConventionId,
   type ConventionJwtPayload,
-  type CreateConventionMagicLinkPayloadProperties,
+  type ConventionRole,
   currentJwtVersions,
   type Email,
+  type EmailAuthCodeDomainJwtPayload,
+  type EmailAuthCodeJwtPayload,
   type EmailHash,
   errors,
   getJwtExpiredSinceInSeconds,
+  oneDayInSecond,
+  oneHourInSeconds,
+  oneMinuteInSeconds,
 } from "shared";
 import type { JwtKind, VerifyJwtFn } from "../domains/core/jwt";
 import type { TimeGateway } from "../domains/core/time-gateway/ports/TimeGateway";
@@ -40,7 +48,7 @@ export const makeThrowIfIncorrectJwt =
         );
         if (expiredSinceSeconds) {
           throw errors.user.expiredJwt(
-            `${Math.ceil(expiredSinceSeconds / 60)} minutes`,
+            `${Math.ceil(expiredSinceSeconds / oneMinuteInSeconds)} minutes`,
           );
         }
       }
@@ -58,29 +66,82 @@ const stringToMd5 = (str: string) => {
 };
 export const makeEmailHash = (email: Email): string => stringToMd5(email);
 
+export type CreateConventionMagicLinkPayloadProperties = {
+  id: ConventionId;
+  role: ConventionRole;
+  email: string;
+  now: Date;
+  durationDays?: number;
+  expOverride?: number;
+};
+
 export const createConventionMagicLinkPayload = ({
   id,
   role,
   email,
   now,
-  sub,
   durationDays = 31,
-  version = currentJwtVersions.convention,
-  exp: expOverride,
+  expOverride,
 }: CreateConventionMagicLinkPayloadProperties): ConventionJwtPayload => {
   const iat = Math.round(now.getTime() / 1000);
-  const exp = expOverride ?? iat + durationDays * 24 * 3600;
+  const exp = expOverride ?? iat + durationDays * oneDayInSecond;
 
   return {
-    version,
+    version: currentJwtVersions.convention,
     applicationId: id, //TODO : replace applicationId by conventionId on convention magic link payload (applicationId was legacy name)
     role,
     iat,
     exp,
     emailHash: makeEmailHash(email),
-    ...(sub ? { sub } : {}),
   };
 };
+
+export type CreateConnectedUserJwtPayloadProperties = {
+  durationHours: number;
+  now: Date;
+  expOverride?: number;
+} & ConnectedUserDomainJwtPayload;
+
+export const createConnectedUserJwtPayload = ({
+  userId,
+  durationHours,
+  now,
+  expOverride,
+}: CreateConnectedUserJwtPayloadProperties): ConnectedUserJwtPayload => {
+  const iat = Math.round(now.getTime() / 1000);
+  const exp = expOverride ?? iat + durationHours * oneHourInSeconds;
+
+  return {
+    version: currentJwtVersions.connectedUser,
+    userId,
+    iat,
+    exp,
+  };
+};
+
+export type EmailAuthCodeJwtPayloadProperties = {
+  now: Date;
+  durationMinutes: number;
+  expOverride?: number;
+} & EmailAuthCodeDomainJwtPayload;
+
+export const createEmailAuthCodeJwtPayload = ({
+  now,
+  durationMinutes,
+  expOverride,
+  emailAuthCode,
+}: EmailAuthCodeJwtPayloadProperties): EmailAuthCodeJwtPayload => {
+  const iat = Math.round(now.getTime() / 1000);
+  const exp = expOverride ?? iat + durationMinutes * oneMinuteInSeconds;
+
+  return {
+    emailAuthCode,
+    version: currentJwtVersions.emailAuthCode,
+    iat,
+    exp,
+  };
+};
+
 export const isSomeEmailMatchingEmailHash = (
   emails: Email[],
   emailHash: EmailHash,

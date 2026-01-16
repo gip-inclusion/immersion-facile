@@ -259,6 +259,10 @@ export const errors = {
       new BadRequestError(
         `Impossible de récupérer les infos ProConnect : ${message}`,
       ),
+    missingOAuthState: (state: OAuthState) =>
+      new BadRequestError(
+        `La connexion en cours (state: ${state}) n'est pas affectée à un identifiant d'utilisateur.`,
+      ),
     alreadyUsedAuthentication: () =>
       new BadRequestError("Ce lien d'authentification a déjà été utilisé."),
   },
@@ -815,8 +819,8 @@ export const errors = {
       new ForbiddenError(
         "Les données du jeton d'authentification ne sont pas supportés.",
       ),
-    expiredJwt: (expiredDurationText?: string) =>
-      new ForbiddenError(authExpiredMessage(expiredDurationText ?? "")),
+    expiredJwt: (durationInMinutes?: number) =>
+      new ForbiddenError(authExpiredMessage(durationInMinutes)),
     notFound: ({ userId }: { userId: UserId }) =>
       new NotFoundError(
         `Aucun utilisateur trouvé avec l'identifiant : ${userId}.`,

@@ -55,5 +55,10 @@ export type AfterOAuthSuccessRedirectionResponse = {
   redirectUri: AbsoluteUrl;
 };
 
-export const authExpiredMessage = (durationText?: string) =>
-  `Le jeton d'authentification (JWT) fourni a expiré${durationText ? ` depuis ${durationText}` : ""}`;
+export const authExpiredBaseMessage =
+  "Le lien d'authentification fourni a expiré";
+
+export const authExpiredMessage = (durationInMinutes?: number) =>
+  durationInMinutes
+    ? `${authExpiredBaseMessage} depuis ${durationInMinutes} minute${durationInMinutes > 1 ? "s" : ""}.`
+    : `${authExpiredBaseMessage}.`;

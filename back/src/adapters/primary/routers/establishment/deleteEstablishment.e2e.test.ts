@@ -3,7 +3,6 @@ import {
   authExpiredMessage,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
-  createConnectedUserJwtPayload,
   currentJwtVersions,
   displayRouteName,
   type EstablishmentRoutes,
@@ -20,6 +19,7 @@ import type { CustomTimeGateway } from "../../../../domains/core/time-gateway/ad
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { buildTestApp } from "../../../../utils/buildTestApp";
+import { createConnectedUserJwtPayload } from "../../../../utils/jwt";
 
 describe("Delete establishment", () => {
   const backofficeAdminUser = new ConnectedUserBuilder()
@@ -150,7 +150,7 @@ describe("Delete establishment", () => {
           createConnectedUserJwtPayload({
             userId: user.id,
             now: timeGateway.now(),
-            durationDays: 2,
+            durationHours: 2,
           }),
         ),
       },

@@ -19,7 +19,7 @@ import {
   expectEmailOfType,
   expectHttpResponseToEqual,
   expectToEqual,
-  expiredMagicLinkErrorMessage,
+  expiredJwtErrorMessage,
   type TechnicalRoutes,
   technicalRoutes,
   type UnauthenticatedConventionRoutes,
@@ -448,7 +448,7 @@ describe("convention e2e", () => {
               email: convention.signatories.beneficiary.email,
               durationDays: 1,
               now: gateways.timeGateway.now(),
-              exp:
+              expOverride:
                 Math.round(gateways.timeGateway.now().getTime() / 1000) -
                 2 * 24 * 3600,
             }),
@@ -459,7 +459,7 @@ describe("convention e2e", () => {
       // GETting the created convention 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
       expectHttpResponseToEqual(response, {
         body: {
-          message: expiredMagicLinkErrorMessage,
+          message: expiredJwtErrorMessage,
           needsNewMagicLink: true,
         },
         status: 403,
