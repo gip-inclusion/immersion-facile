@@ -40,8 +40,7 @@ export type ApiConsumerDomainJwtPayload = {
   id: ApiConsumerId;
 };
 
-// biome-ignore lint/complexity/noBannedTypes: Empty domain payload
-export type EmailAuthCodeDomainJwtPayload = {};
+export type EmailAuthCodeDomainJwtPayload = { emailAuthCode: true };
 
 export type EmailAuthCodeJwtPayload = CommonJwtPayload &
   EmailAuthCodeDomainJwtPayload;
