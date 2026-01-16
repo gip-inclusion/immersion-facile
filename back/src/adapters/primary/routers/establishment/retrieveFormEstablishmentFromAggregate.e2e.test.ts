@@ -4,7 +4,6 @@ import {
   authExpiredMessage,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
-  createConnectedUserJwtPayload,
   currentJwtVersions,
   displayRouteName,
   type EstablishmentRoutes,
@@ -30,6 +29,7 @@ import {
   buildTestApp,
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
+import { createConnectedUserJwtPayload } from "../../../../utils/jwt";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   const backofficeAdminUser = new ConnectedUserBuilder()
@@ -119,7 +119,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         authorization: generateConnectedUserJwt(
           createConnectedUserJwtPayload({
             userId: establishmentAdmin.id,
-            durationDays: 1,
+            durationHours: 1,
             now: new Date(),
           }),
         ),
@@ -305,8 +305,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           createConnectedUserJwtPayload({
             userId: establishmentAdmin.id,
             now: gateways.timeGateway.now(),
-            durationDays: 1,
-            exp:
+            durationHours: 1,
+            expOverride:
               Math.round(gateways.timeGateway.now().getTime() / 1000) -
               2 * 24 * 3600,
           }),

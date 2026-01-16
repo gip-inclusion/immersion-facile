@@ -1,7 +1,6 @@
 import {
   type AdminFormEstablishmentUserRight,
   ConnectedUserBuilder,
-  createConnectedUserJwtPayload,
   defaultCountryCode,
   defaultValidFormEstablishment,
   displayRouteName,
@@ -29,6 +28,7 @@ import {
   buildTestApp,
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
+import { createConnectedUserJwtPayload } from "../../../../utils/jwt";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Add form establishment", () => {
@@ -106,7 +106,7 @@ describe("Add form establishment", () => {
           authorization: generateConnectedUserJwt(
             createConnectedUserJwtPayload({
               userId: user.id,
-              durationDays: 1,
+              durationHours: 1,
               now: new Date(),
             }),
           ),
@@ -161,7 +161,7 @@ describe("Add form establishment", () => {
           authorization: generateConnectedUserJwt(
             createConnectedUserJwtPayload({
               userId: user.id,
-              durationDays: 1,
+              durationHours: 1,
               now: new Date(),
             }),
           ),

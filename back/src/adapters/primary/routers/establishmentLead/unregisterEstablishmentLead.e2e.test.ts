@@ -133,7 +133,7 @@ describe("Unregister establishment lead", () => {
               role: "establishment-representative",
               email: convention.signatories.establishmentRepresentative.email,
               now: new Date(),
-              exp: Math.round((Date.now() - 48 * 3600 * 1000) / 1000),
+              expOverride: Math.round((Date.now() - 48 * 3600 * 1000) / 1000),
             }),
           ),
         },

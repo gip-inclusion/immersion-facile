@@ -18,6 +18,7 @@ export const currentJwtVersions: Record<PayloadKind, number> = {
   convention: 1,
   connectedUser: 1,
   currentUser: 1, // useless, just for typecheck
+  emailAuthCode: 1,
 };
 
 export type JwtDto = {
