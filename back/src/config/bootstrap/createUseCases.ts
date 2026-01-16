@@ -43,7 +43,6 @@ import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
-import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -340,14 +339,14 @@ export const createUseCases = ({
         createNewEvent,
         gateways.timeGateway,
       ),
-      renewExpiredJwt: new RenewExpiredJwt(
+      renewExpiredJwt: new RenewExpiredJwt({
         uowPerformer,
-        createNewEvent,
-        generateConventionMagicLinkUrl,
         config,
-        gateways.timeGateway,
-        gateways.shortLinkGenerator,
-      ),
+        timeGateway: gateways.timeGateway,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        makeGenerateConventionMagicLinkUrl: generateConventionMagicLinkUrl,
+        saveNotificationAndRelatedEvent,
+      }),
       renewConvention: new RenewConvention(uowPerformer, addConvention),
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
@@ -526,10 +525,6 @@ export const createUseCases = ({
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      deliverRenewedMagicLink: new DeliverRenewedMagicLink(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-      ),
       notifyConfirmationEstablishmentCreated:
         new NotifyConfirmationEstablishmentCreated(
           uowPerformer,
