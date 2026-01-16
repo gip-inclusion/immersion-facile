@@ -163,23 +163,32 @@ export const ConventionForm = ({
   );
   const acquisitionParams = useGetAcquisitionParams();
 
-  const initialValues = useRef<CreateConventionPresentationInitialValues>({
-    ...conventionInitialValuesFromUrlOrDraft,
-    ...acquisitionParams,
-    signatories: {
-      ...conventionInitialValuesFromUrlOrDraft.signatories,
-      beneficiary: makeInitialBenefiaryForm(
-        conventionInitialValuesFromUrlOrDraft.signatories.beneficiary,
-        federatedIdentity,
-      ),
-    },
-    ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
-      ? {
-          agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
-          agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
-        }
-      : {}),
-  }).current;
+  const initialValues = useMemo<CreateConventionPresentationInitialValues>(
+    () => ({
+      ...conventionInitialValuesFromUrlOrDraft,
+      ...acquisitionParams,
+      signatories: {
+        ...conventionInitialValuesFromUrlOrDraft.signatories,
+        beneficiary: makeInitialBenefiaryForm(
+          conventionInitialValuesFromUrlOrDraft.signatories.beneficiary,
+          federatedIdentity,
+        ),
+      },
+      ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
+        ? {
+            agencyReferentFirstName:
+              federatedIdentity.payload.advisor.firstName,
+            agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
+          }
+        : {}),
+    }),
+    [
+      conventionInitialValuesFromUrlOrDraft,
+      acquisitionParams,
+      federatedIdentity,
+      mode,
+    ],
+  );
   useExistingSiret({
     siret: initialValues.siret,
     addressAutocompleteLocator: "convention-immersion-address",
@@ -198,6 +207,7 @@ export const ConventionForm = ({
 
   const methods = useForm<ConventionPresentation>({
     defaultValues,
+    values: defaultValues as ConventionPresentation,
     resolver: zodResolver(conventionPresentationSchema),
     mode: "onTouched",
   });
@@ -455,14 +465,19 @@ export const ConventionForm = ({
         }),
       );
     }
-  }, [defaultValues, dispatch]);
+  }, [
+    defaultValues,
+    dispatch,
+    establishmentAddressCountryCode,
+    establishmentAddressCountryCode,
+  ]);
 
   return (
-    <FormProvider {...methods}>
+    <>
       {conventionIsLoading && <Loader />}
       <ConventionFormLayout
         form={
-          <>
+          <FormProvider {...methods}>
             <div className={cx("fr-text")}>{t.intro.welcome}</div>
             {mode !== "edit" && (
               <Alert
@@ -677,7 +692,7 @@ export const ConventionForm = ({
                 </Button>
               </div>
             </form>
-          </>
+          </FormProvider>
         }
         sidebar={
           <ConventionFormSidebar
@@ -693,7 +708,7 @@ export const ConventionForm = ({
                   "fr-btns-group--icon-left",
                 )}
               >
-                <ShareConventionDraft />
+                <ShareConventionDraft conventionFormData={conventionValues} />
                 <Button
                   type="button"
                   id={
@@ -713,7 +728,7 @@ export const ConventionForm = ({
           />
         }
       />
-    </FormProvider>
+    </>
   );
 };
 

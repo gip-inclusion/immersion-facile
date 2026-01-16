@@ -1,13 +1,12 @@
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { createPortal } from "react-dom";
-import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { type ConventionPresentation, domElementIds } from "shared";
-import { Feedback } from "src/app/components/feedback/Feedback";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import {
-  buttonsToModalButtons,
-  createFormModal,
-} from "src/app/utils/createFormModal";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { createFormModal } from "src/app/utils/createFormModal";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { ShareForm } from "./ShareForm";
 
 const shareConventionDraftModalProps = {
@@ -19,10 +18,37 @@ const shareConventionDraftModal = createFormModal(
   shareConventionDraftModalProps,
 );
 
-export const ShareConventionDraft = () => {
-  const { getValues } = useFormContext<ConventionPresentation>();
-  const t = useConventionTexts(getValues().internshipKind);
+export const ShareConventionDraft = ({
+  conventionFormData,
+}: {
+  conventionFormData: ConventionPresentation;
+}) => {
+  const dispatch = useDispatch();
+  const t = useConventionTexts(conventionFormData.internshipKind);
   const shareLinkByEmail = t.shareConventionDraftByMail.share;
+  const conventionDraftFeedback = useFeedbackTopic("convention-draft");
+
+  const closeModalButton: ButtonProps = {
+    children: "Annuler",
+    type: "button",
+    priority: "secondary",
+    onClick: shareConventionDraftModal.close,
+    id: domElementIds.conventionImmersionRoute.shareConventionDraft
+      .shareFormCancelButton,
+  };
+
+  const submitConventionDraftButton: ButtonProps = {
+    children: "Envoyer le brouillon",
+    type: "submit",
+    id: domElementIds.conventionImmersionRoute.shareConventionDraft
+      .shareFormSubmitButton,
+  };
+
+  useIsModalOpen(shareConventionDraftModalProps, {
+    onConceal: () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    },
+  });
 
   return (
     <>
@@ -40,21 +66,16 @@ export const ShareConventionDraft = () => {
       >
         Partager la convention
       </Button>
-      <Feedback topics={["convention-draft"]} closable />
       {createPortal(
         <shareConventionDraftModal.Component
           title={shareLinkByEmail}
           doSubmitClosesModal={false}
-          buttons={buttonsToModalButtons([
-            {
-              children: "Envoyer le brouillon",
-              type: "submit",
-              id: domElementIds.conventionImmersionRoute.shareConventionDraft
-                .shareFormSubmitButton,
-            },
-          ])}
+          buttons={[
+            closeModalButton,
+            ...(!conventionDraftFeedback ? [submitConventionDraftButton] : []),
+          ]}
         >
-          <ShareForm conventionFormData={getValues()} />
+          <ShareForm conventionFormData={conventionFormData} />
         </shareConventionDraftModal.Component>,
         document.body,
       )}
