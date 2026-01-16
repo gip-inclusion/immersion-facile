@@ -2,13 +2,13 @@ import { decode, TokenExpiredError } from "jsonwebtoken";
 import {
   type AppSupportedDomainJwtPayload,
   type AppSupportedJwt,
-  type ConventionId,
+  type ConventionDto,
   type ConventionJwtPayload,
   type ConventionRole,
   errors,
   ForbiddenError,
   frontRoutes,
-  type InternshipKind,
+  type MagicLinkRenewalParams,
   type RenewExpiredJwtRequestDto,
   renewExpiredJwtRequestSchema,
 } from "shared";
@@ -20,7 +20,7 @@ import {
   conventionEmailsByRole,
 } from "../../../utils/convention";
 import { makeEmailHash } from "../../../utils/jwt";
-import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -34,7 +34,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
 > {
   protected inputSchema = renewExpiredJwtRequestSchema;
 
-  readonly #createNewEvent: CreateNewEvent;
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   readonly #makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
 
@@ -44,17 +44,24 @@ export class RenewExpiredJwt extends TransactionalUseCase<
 
   readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-    makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    config: AppConfig,
-    timeGateway: TimeGateway,
-    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-  ) {
+  constructor({
+    uowPerformer,
+    saveNotificationAndRelatedEvent,
+    makeGenerateConventionMagicLinkUrl,
+    config,
+    timeGateway,
+    shortLinkIdGeneratorGateway,
+  }: {
+    uowPerformer: UnitOfWorkPerformer;
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+    config: AppConfig;
+    timeGateway: TimeGateway;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+  }) {
     super(uowPerformer);
     this.#config = config;
-    this.#createNewEvent = createNewEvent;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#makeGenerateConventionMagicLinkUrl =
       makeGenerateConventionMagicLinkUrl;
     this.#timeGateway = timeGateway;
@@ -95,68 +102,76 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     );
 
     // Only renew the link if the email hash matches
-    await this.#onEmails(
+    await this.#onEmails({
       emails,
-      appSupportedJwtPayload.emailHash,
-      appSupportedJwtPayload.applicationId,
-      appSupportedJwtPayload.role,
-      this.#findRouteToRenew(originalUrl),
+      emailHash: appSupportedJwtPayload.emailHash,
+      role: appSupportedJwtPayload.role,
+      route: this.#findRouteToRenew(originalUrl),
       uow,
-      convention.internshipKind,
-    );
+      convention,
+    });
   }
 
-  async #onEmails(
-    emails: string[],
-    emailHash: string | undefined,
-    conventionId: ConventionId,
-    role: ConventionRole,
-    route: string,
+  async #onEmails({
+    emails,
+    emailHash,
+    role,
+    route,
+    uow,
+    convention,
+  }: {
+    emails: string[];
+    emailHash: string;
+    role: ConventionRole;
+    route: string;
+    uow: UnitOfWork;
+    convention: ConventionDto;
+  }) {
+    const emailMatchingEmailHash = emails.find(
+      (email) => makeEmailHash(email) === emailHash,
+    );
+    if (!emailMatchingEmailHash)
+      throw errors.convention.magicLinkNotAssociatedToConvention();
+
+    const makeConventionMagicShortLink = prepareConventionMagicShortLinkMaker({
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        role,
+        email: emailMatchingEmailHash,
+        now: this.#timeGateway.now(),
+      },
+      uow,
+      config: this.#config,
+      generateConventionMagicLinkUrl: this.#makeGenerateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
+    });
+
+    await this.sendTokenRenewal(uow, emailMatchingEmailHash, {
+      internshipKind: convention.internshipKind,
+      magicLink: await makeConventionMagicShortLink({
+        targetRoute: route,
+        lifetime: "short",
+      }),
+      conventionId: convention.id,
+    });
+  }
+
+  private async sendTokenRenewal(
     uow: UnitOfWork,
-    internshipKind: InternshipKind,
-  ) {
-    let foundHit = false;
-    for (const email of emails) {
-      if (!emailHash || makeEmailHash(email) === emailHash) {
-        foundHit = true;
-
-        const makeMagicShortLink = prepareConventionMagicShortLinkMaker({
-          conventionMagicLinkPayload: {
-            id: conventionId,
-            role,
-            email,
-            now: this.#timeGateway.now(),
-          },
-          uow,
-          config: this.#config,
-          generateConventionMagicLinkUrl:
-            this.#makeGenerateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-        });
-
-        await uow.outboxRepository.save(
-          this.#createNewEvent({
-            topic: "MagicLinkRenewalRequested",
-            payload: {
-              internshipKind,
-              emails,
-              magicLink: await makeMagicShortLink({
-                targetRoute: route,
-                lifetime: "short",
-              }),
-              conventionStatusLink: await makeMagicShortLink({
-                targetRoute: frontRoutes.conventionStatusDashboard,
-                lifetime: "long",
-              }),
-              conventionId,
-              triggeredBy: { kind: "convention-magic-link", role },
-            },
-          }),
-        );
-      }
-    }
-
-    if (!foundHit) throw errors.convention.magicLinkNotAssociatedToConvention();
+    email: string,
+    params: MagicLinkRenewalParams,
+  ): Promise<void> {
+    await this.#saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "MAGIC_LINK_RENEWAL",
+        recipients: [email],
+        params,
+      },
+      followedIds: {
+        conventionId: params.conventionId,
+      },
+    });
   }
 
   #findRouteToRenew(originalUrl: string) {
@@ -215,3 +230,5 @@ const extractConventionJwtPayloadFromExpiredJwt = (
   if (payloadToExtract) return payloadToExtract;
   throw errors.convention.malformedExpiredJwt();
 };
+
+///////// OK
