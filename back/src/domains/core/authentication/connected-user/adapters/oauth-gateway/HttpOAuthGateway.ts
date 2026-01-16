@@ -112,13 +112,6 @@ export class HttpOAuthGateway implements OAuthGateway {
       logger,
     });
 
-    logger.info({
-      message: `from ProConnect:
-       custom before parsing : ${JSON.stringify(tokenPayload.custom)},
-       sub: ${oAuthIdTokenPayload.sub},
-       custom after parsing: ${JSON.stringify(oAuthIdTokenPayload.custom)}`,
-    });
-
     return {
       accessToken: proConnectAccessTokenBody.access_token,
       idToken: proConnectAccessTokenBody.id_token,
