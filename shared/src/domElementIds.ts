@@ -383,6 +383,7 @@ export const domElementIds = {
       shareFormRecipientEmailInput:
         "im-convention-form__share-form-recipient-email-input",
       shareFormDetailsInput: "im-convention-form__share-form-details-input",
+      shareFormCancelButton: "im-convention-form__share-form-cancel-button",
       shareFormSubmitButton: "im-convention-form__share-form-submit-button",
     },
     deleteHoursButton: "im-convention-form__delete-hours-button",
