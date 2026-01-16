@@ -2,9 +2,12 @@ import { decode, TokenExpiredError } from "jsonwebtoken";
 import {
   type AppSupportedDomainJwtPayload,
   type AppSupportedJwt,
+  type ConnectedUserDomainJwtPayload,
+  type ConventionDomainJwtPayload,
   type ConventionDto,
   type ConventionJwtPayload,
   type ConventionRole,
+  type EmailAuthCodeDomainJwtPayload,
   errors,
   ForbiddenError,
   frontRoutes,
@@ -14,7 +17,10 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
-import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import type {
+  GenerateConnectedUserLoginUrl,
+  GenerateConventionMagicLinkUrl,
+} from "../../../config/bootstrap/magicLinkUrl";
 import {
   conventionDtoToConventionReadDto,
   conventionEmailsByRole,
@@ -22,7 +28,10 @@ import {
 import { makeEmailHash } from "../../../utils/jwt";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
+import {
+  prepareConnectedUserMagicShortLinkMaker,
+  prepareConventionMagicShortLinkMaker,
+} from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -34,9 +43,8 @@ export class RenewExpiredJwt extends TransactionalUseCase<
 > {
   protected inputSchema = renewExpiredJwtRequestSchema;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
   readonly #makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+  readonly #makeGenerateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
 
   readonly #config: AppConfig;
 
@@ -44,28 +52,33 @@ export class RenewExpiredJwt extends TransactionalUseCase<
 
   readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
 
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
   constructor({
     uowPerformer,
-    saveNotificationAndRelatedEvent,
     makeGenerateConventionMagicLinkUrl,
+    makeGenerateConnectedUserLoginUrl,
     config,
     timeGateway,
     shortLinkIdGeneratorGateway,
+    saveNotificationAndRelatedEvent,
   }: {
     uowPerformer: UnitOfWorkPerformer;
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+    makeGenerateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
     config: AppConfig;
     timeGateway: TimeGateway;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   }) {
     super(uowPerformer);
     this.#config = config;
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#makeGenerateConventionMagicLinkUrl =
       makeGenerateConventionMagicLinkUrl;
+    this.#makeGenerateConnectedUserLoginUrl = makeGenerateConnectedUserLoginUrl;
     this.#timeGateway = timeGateway;
     this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
   protected async _execute(
@@ -77,9 +90,65 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       expiredJwt,
     );
 
-    if (!("applicationId" in appSupportedJwtPayload))
+    if ("applicationId" in appSupportedJwtPayload)
+      return this.onConventionDomainJwtPayload(
+        uow,
+        appSupportedJwtPayload,
+        originalUrl,
+      );
+
+    if ("userId" in appSupportedJwtPayload)
+      return this.#onConnectedUserDomainJwtPayload(uow, appSupportedJwtPayload);
+
+    if ("id" in appSupportedJwtPayload)
       throw errors.user.unsupportedJwtPayload();
 
+    if ("emailAuthCode" in appSupportedJwtPayload)
+      return this.#onEmailAuthCodeDomainJwtPayload(appSupportedJwtPayload);
+
+    throw errors.user.unsupportedJwtPayload();
+  }
+
+  #onEmailAuthCodeDomainJwtPayload(
+    _emailAuthCodeDomainJwtPayload: EmailAuthCodeDomainJwtPayload,
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  async #onConnectedUserDomainJwtPayload(
+    uow: UnitOfWork,
+    { userId }: ConnectedUserDomainJwtPayload,
+  ): Promise<void> {
+    const user = await uow.userRepository.getById(userId);
+
+    if (!user) throw errors.user.notFound({ userId });
+
+    const ongoingOAuth = await uow.ongoingOAuthRepository.findByUserId(user.id);
+
+    if (!ongoingOAuth) throw errors.auth.missingOAuth({});
+    if (!ongoingOAuth.usedAt) throw errors.auth.unusedOAuth();
+    if (ongoingOAuth.provider !== "email")
+      throw errors.auth.otherRenewalNotSupported(ongoingOAuth.provider);
+
+    await this.sendTokenRenewal(uow, user.email, {
+      magicLink: await prepareConnectedUserMagicShortLinkMaker({
+        uow,
+        config: this.#config,
+        shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
+        generateConnectedUserLoginUrl: this.#makeGenerateConnectedUserLoginUrl,
+      })({
+        user,
+        accessToken: undefined,
+        ongoingOAuth,
+      }),
+    });
+  }
+
+  private async onConventionDomainJwtPayload(
+    uow: UnitOfWork,
+    appSupportedJwtPayload: ConventionDomainJwtPayload,
+    originalUrl: string,
+  ): Promise<void> {
     const convention = await uow.conventionRepository.getById(
       appSupportedJwtPayload.applicationId,
     );
@@ -93,21 +162,17 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       uow,
     );
 
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
-    if (!agency)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-
     const emails = conventionEmailsByRole(conventionRead)(
       appSupportedJwtPayload.role,
     );
 
     // Only renew the link if the email hash matches
     await this.#onEmails({
-      emails,
+      uow,
       emailHash: appSupportedJwtPayload.emailHash,
       role: appSupportedJwtPayload.role,
+      emails,
       route: this.#findRouteToRenew(originalUrl),
-      uow,
       convention,
     });
   }
@@ -230,5 +295,3 @@ const extractConventionJwtPayloadFromExpiredJwt = (
   if (payloadToExtract) return payloadToExtract;
   throw errors.convention.malformedExpiredJwt();
 };
-
-///////// OK
