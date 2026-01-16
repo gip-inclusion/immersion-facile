@@ -6,7 +6,6 @@ import {
   assessmentEmailSender,
   type ConventionDto,
   type ConventionId,
-  calculateDurationInSecondsFrom,
   castError,
   type DateRange,
   errors,
@@ -20,7 +19,6 @@ import {
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { createLogger } from "../../../utils/logger";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import type { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -34,8 +32,6 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-
-const logger = createLogger(__filename);
 
 type SendAssessmentNeededNotificationsOutput = {
   conventionsQtyWithImmersionEnding: number;
@@ -144,8 +140,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
     conventionsThatDontHaveAssessment: ConventionDto[];
     conventionsQtyWithAlreadyExistingAssessment: number;
   }> {
-    const start = this.#timeGateway.now();
-
     const conventionsEndingInRange =
       await this.#outOfTransaction.conventionQueries.getConventions({
         filters: {
@@ -192,12 +186,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
         ({ id }) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
       );
 
-    logger.info({
-      useCaseName: this.constructor.name,
-      durationInSeconds: calculateDurationInSecondsFrom(start),
-      message: `getConventionsToSendEmailTo - conventionsThatRequireAnAssessment: ${conventionsThatRequireAnAssessment.length} - conventionsThatDontHaveAssessment: ${conventionsThatDontHaveAssessment.length}`,
-    });
-
     return {
       conventionsQtyWithImmersionEnding:
         conventionsThatRequireAnAssessment.length,
@@ -211,8 +199,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
     uow: UnitOfWork,
     convention: ConventionDto,
   ): Promise<{ id: ConventionId }> {
-    const start = this.#timeGateway.now();
-
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
@@ -292,12 +278,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
           ]
         : []),
     ]);
-
-    logger.info({
-      useCaseName: this.constructor.name,
-      durationInSeconds: calculateDurationInSecondsFrom(start),
-      message: `sendAssessmentNotifications - convention ${convention.id} - isBeneficiaryNotificationNotSent ${isBeneficiaryNotificationNotSent} - isTutorNotificationNotSent ${isTutorNotificationNotSent}`,
-    });
 
     return { id: convention.id };
   }
