@@ -498,4 +498,7 @@ export const shareConventionDraftByEmail = async (page: Page) => {
     `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormSubmitButton}`,
   );
   await expectElementToBeVisible(page, ".fr-alert--success");
+  await page.click(
+    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormCancelButton}`,
+  );
 };

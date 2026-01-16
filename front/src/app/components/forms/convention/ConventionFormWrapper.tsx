@@ -221,8 +221,8 @@ export const ConventionFormWrapper = ({
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+      {isLoading && <Loader />}
       {match({
-        isLoading,
         showSummary,
         formSuccessfullySubmitted,
         isUpdateMode: mode === "edit",
@@ -248,9 +248,7 @@ export const ConventionFormWrapper = ({
           fetchedConvention?.status === "ACCEPTED_BY_COUNSELLOR" &&
           fetchedConvention?.agencyRefersTo &&
           !userRolesOnConvention.includes("counsellor"),
-        conventionDraftIsLoading,
       })
-        .with({ isLoading: true }, () => <Loader />)
         .with({ hasConventionUpdateConflict: true }, () => (
           <section className={fr.cx("fr-col-12")}>
             <Alert
