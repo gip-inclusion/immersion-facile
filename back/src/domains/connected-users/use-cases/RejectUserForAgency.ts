@@ -29,11 +29,18 @@ export const makeRejectUserForAgency = useCaseBuilder("RejectUserForAgency")
 
     const { [userToUpdate.id]: _, ...updatedUserRights } = agency.usersRights;
 
+    const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+      agency.phoneNumber,
+    );
+
     await Promise.all([
-      uow.agencyRepository.update({
-        id: agency.id,
-        usersRights: updatedUserRights,
-      }),
+      uow.agencyRepository.update(
+        {
+          id: agency.id,
+          usersRights: updatedUserRights,
+        },
+        phoneId,
+      ),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "ConnectedUserAgencyRightRejected",

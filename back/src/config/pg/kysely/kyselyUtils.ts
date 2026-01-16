@@ -28,8 +28,8 @@ type NullableToUndefined<A> = A extends null ? Exclude<A, null> | undefined : A;
 
 type StripNullRecursive<T> = {
   [K in keyof T]: T[K] extends Record<any, unknown>
-    ? StripNullRecursive<T[K]>
-    : NullableToUndefined<T[K]>;
+  ? StripNullRecursive<T[K]>
+  : NullableToUndefined<T[K]>;
 };
 
 export const jsonStripNulls = <T>(

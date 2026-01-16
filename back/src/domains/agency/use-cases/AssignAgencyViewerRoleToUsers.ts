@@ -65,23 +65,29 @@ export class AssignAgencyViewerRole extends TransactionalUseCase<
 
           updatedUsersRights[user.id] = existingRight
             ? {
-                roles: [...existingRight.roles, "agency-viewer"],
-                isNotifiedByEmail: existingRight.isNotifiedByEmail,
-              }
+              roles: [...existingRight.roles, "agency-viewer"],
+              isNotifiedByEmail: existingRight.isNotifiedByEmail,
+            }
             : {
-                roles: ["agency-viewer"],
-                isNotifiedByEmail: false,
-              };
+              roles: ["agency-viewer"],
+              isNotifiedByEmail: false,
+            };
 
           hasChanges = true;
         });
 
         if (hasChanges) {
+          const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+            agency.phoneNumber,
+          );
           return uow.agencyRepository
-            .update({
-              id: agency.id,
-              usersRights: updatedUsersRights,
-            })
+            .update(
+              {
+                id: agency.id,
+                usersRights: updatedUsersRights,
+              },
+              phoneId,
+            )
             .then(() => {
               agenciesSuccessfullyUpdated++;
             })

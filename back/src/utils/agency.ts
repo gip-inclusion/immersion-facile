@@ -63,14 +63,14 @@ export const agencyWithRightToAgencyDto = async (
         counsellorIds: [
           ...acc.counsellorIds,
           ...(userRights?.roles.includes("counsellor") &&
-          userRights?.isNotifiedByEmail
+            userRights?.isNotifiedByEmail
             ? [userId]
             : []),
         ],
         validatorIds: [
           ...acc.validatorIds,
           ...(userRights?.roles.includes("validator") &&
-          userRights?.isNotifiedByEmail
+            userRights?.isNotifiedByEmail
             ? [userId]
             : []),
         ],
@@ -128,13 +128,19 @@ export const updateRightsOnMultipleAgenciesForUser = async (
       async ({ agency: { id }, isNotifiedByEmail, roles }) => {
         const agency = await uow.agencyRepository.getById(id);
         if (!agency) throw errors.agency.notFound({ agencyId: id });
-        return uow.agencyRepository.update({
-          id: agency.id,
-          usersRights: {
-            ...agency.usersRights,
-            [userId]: { isNotifiedByEmail, roles },
+        const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+          agency.phoneNumber,
+        );
+        return uow.agencyRepository.update(
+          {
+            id: agency.id,
+            usersRights: {
+              ...agency.usersRights,
+              [userId]: { isNotifiedByEmail, roles },
+            },
           },
-        });
+          phoneId,
+        );
       },
     ),
   );

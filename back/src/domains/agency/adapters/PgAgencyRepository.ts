@@ -43,17 +43,22 @@ const logger = createLogger(__filename);
 const MAX_AGENCIES_RETURNED = 1500;
 
 export class PgAgencyRepository implements AgencyRepository {
-  constructor(private transaction: KyselyDb) {}
+  constructor(private transaction: KyselyDb) { }
 
   public async insert(
     agency: AgencyWithUsersRights,
+    phoneId: number,
     updatedAt?: DateString,
   ): Promise<void> {
-    await this.insertAgency(agency, updatedAt);
+    await this.#insertAgency(agency, phoneId, updatedAt);
     await this.#saveAgencyRights(agency.id, agency.usersRights);
   }
 
-  private insertAgency(agency: AgencyWithUsersRights, updatedAt?: DateString) {
+  async #insertAgency(
+    agency: AgencyWithUsersRights,
+    phoneId: number,
+    updatedAt?: DateString,
+  ) {
     return this.transaction
       .insertInto("agencies")
       .values(({ fn }) => ({
@@ -77,7 +82,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
-        phone_number: agency.phoneNumber,
+        phone_number_id: phoneId,
         status_justification: agency.statusJustification,
         delegation_info: agency.delegationAgencyInfo
           ? JSON.stringify(agency.delegationAgencyInfo)
@@ -99,7 +104,10 @@ export class PgAgencyRepository implements AgencyRepository {
       });
   }
 
-  public async update(agency: PartialAgencyWithUsersRights): Promise<void> {
+  public async update(
+    agency: PartialAgencyWithUsersRights,
+    newPhoneId: number,
+  ): Promise<void> {
     await this.transaction
       .updateTable("agencies")
       .set(({ fn }) => ({
@@ -110,8 +118,8 @@ export class PgAgencyRepository implements AgencyRepository {
         logo_url: agency.logoUrl,
         position: agency.position
           ? fn("ST_MakePoint", [
-              sql`${agency.position.lon}, ${agency.position.lat}`,
-            ])
+            sql`${agency.position.lon}, ${agency.position.lat}`,
+          ])
           : undefined,
         agency_siret: agency.agencySiret,
         code_safir: agency.codeSafir,
@@ -125,7 +133,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
         status_justification: agency.statusJustification,
-        phone_number: agency.phoneNumber,
+        phone_number_id: newPhoneId,
         delegation_info:
           agency.delegationAgencyInfo &&
           JSON.stringify(agency.delegationAgencyInfo),
@@ -243,10 +251,10 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) =>
         departmentCode
           ? b.where(
-              "agencies.covered_departments",
-              "@>",
-              `["${departmentCode}"]`,
-            )
+            "agencies.covered_departments",
+            "@>",
+            `["${departmentCode}"]`,
+          )
           : b,
       (b) =>
         nameIncludes
@@ -269,16 +277,16 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) =>
         position
           ? b.where(
-              ({ fn }) =>
-                fn("ST_Distance", [
-                  fn("ST_GeographyFromText", [
-                    sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
-                  ]),
-                  "agencies.position",
+            ({ fn }) =>
+              fn("ST_Distance", [
+                fn("ST_GeographyFromText", [
+                  sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
                 ]),
-              "<=",
-              position.distance_km * 1000,
-            )
+                "agencies.position",
+              ]),
+            "<=",
+            position.distance_km * 1000,
+          )
           : b,
       (b) =>
         b.limit(
@@ -385,6 +393,11 @@ export class PgAgencyRepository implements AgencyRepository {
         "refered_agencies.id",
       )
       .leftJoin("users__agencies", "agencies.id", "users__agencies.agency_id")
+      .leftJoin(
+        "phone_numbers as pn_agency",
+        "agencies.phone_number_id",
+        "pn_agency.id",
+      )
       .select(({ ref, fn }) => [
         jsonBuildObject({
           id: cast<AgencyId>(ref("agencies.id")),
@@ -419,7 +432,7 @@ export class PgAgencyRepository implements AgencyRepository {
           statusJustification: ref("agencies.status_justification"),
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),
-          phoneNumber: ref("agencies.phone_number"),
+          phoneNumber: sql<string>`${ref("pn_agency.phone_number")}`,
           delegationAgencyInfo: cast<DelegationAgencyInfo | null>(
             ref("agencies.delegation_info"),
           ),
@@ -455,20 +468,20 @@ export class PgAgencyRepository implements AgencyRepository {
   #pgAgencyToAgencyWithRights(
     result:
       | (OmitFromExistingKeys<
-          AgencyDto,
-          | "counsellorEmails"
-          | "validatorEmails"
-          | "acquisitionCampaign"
-          | "acquisitionKeyword"
-        > & {
-          acquisitionCampaign: string | null;
-          acquisitionKeyword: string | null;
-          usersRights: {
-            userId: string;
-            roles: AgencyRole[];
-            isNotifiedByEmail: boolean;
-          }[];
-        })
+        AgencyDto,
+        | "counsellorEmails"
+        | "validatorEmails"
+        | "acquisitionCampaign"
+        | "acquisitionKeyword"
+      > & {
+        acquisitionCampaign: string | null;
+        acquisitionKeyword: string | null;
+        usersRights: {
+          userId: string;
+          roles: AgencyRole[];
+          isNotifiedByEmail: boolean;
+        }[];
+      })
       | undefined,
   ): AgencyWithUsersRights | undefined {
     if (!result) return;
@@ -502,11 +515,11 @@ export class PgAgencyRepository implements AgencyRepository {
       .map(([userId, userRights]) =>
         userRights
           ? {
-              agency_id: agencyId,
-              user_id: userId,
-              is_notified_by_email: userRights.isNotifiedByEmail,
-              roles: JSON.stringify(userRights.roles),
-            }
+            agency_id: agencyId,
+            user_id: userId,
+            is_notified_by_email: userRights.isNotifiedByEmail,
+            roles: JSON.stringify(userRights.roles),
+          }
           : undefined,
       )
       .filter(isTruthy);

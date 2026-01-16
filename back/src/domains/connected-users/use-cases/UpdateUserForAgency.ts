@@ -82,11 +82,18 @@ export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
 
     validateAgencyRights(agency.id, updatedRights, agency.refersToAgencyId);
 
+    const phoneId = await uow.phoneNumberRepository.insertOrGetPhone(
+      agency.phoneNumber,
+    );
+
     await Promise.all([
-      uow.agencyRepository.update({
-        id: agency.id,
-        usersRights: updatedRights,
-      }),
+      uow.agencyRepository.update(
+        {
+          id: agency.id,
+          usersRights: updatedRights,
+        },
+        phoneId,
+      ),
       updateIfUserEmailChanged(
         userToUpdate,
         inputParams.email,
