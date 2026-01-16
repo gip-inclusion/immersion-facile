@@ -2,6 +2,8 @@ import type { Observable } from "rxjs";
 import type {
   ApiConsumerName,
   ConnectedUserJwt,
+  ConventionDraftDto,
+  ConventionDraftId,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -18,7 +20,7 @@ import type {
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   SendSignatureLinkRequestDto,
-  ShareLinkByEmailDto,
+  ShareConventionDraftByEmailDto,
   TransferConventionToAgencyRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
@@ -60,9 +62,9 @@ export interface ConventionGateway {
     conventionId: ConventionId,
     jwt: ConventionJwt | ConnectedUserJwt,
   ): Observable<void>;
-  shareConventionLinkByEmail(
-    shareLinkByEmailDto: ShareLinkByEmailDto,
-  ): Promise<boolean>;
+  shareConventionDraftByEmail(
+    shareDraftByEmailDto: ShareConventionDraftByEmailDto,
+  ): Observable<void>;
   sendSignatureLink$(
     params: SendSignatureLinkRequestDto,
     jwt: ConventionSupportedJwt,
@@ -100,4 +102,7 @@ export interface ConventionGateway {
     params: FlatGetConventionsWithErroredBroadcastFeedbackParams,
     jwt: string,
   ): Observable<DataWithPagination<ConventionWithBroadcastFeedback>>;
+  getConventionDraftById$(
+    conventionDraftId: ConventionDraftId,
+  ): Observable<ConventionDraftDto | undefined>;
 }

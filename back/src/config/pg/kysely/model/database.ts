@@ -1,12 +1,14 @@
 import type { ColumnType, Generated, JSONColumnType } from "kysely";
 import type {
   AbsoluteUrl,
+  AgencyKind,
   Attachment,
   BroadcastFeedbackResponse,
   ContactLevelOfEducation,
   ConventionBroadcastRequestParams,
   ConventionId,
   DateTimeIsoString,
+  DepartmentCode,
   DiscussionKind,
   DiscussionStatus,
   Email,
@@ -23,6 +25,7 @@ export interface Database {
   api_consumers: ApiConsumers;
   broadcast_feedbacks: BroadcastFeedbacks;
   convention_external_ids: ConventionExternalIds;
+  convention_drafts: ConventionDrafts;
   conventions_to_sync_with_pe: ConventionsToSyncWithPe;
   conventions: Conventions;
   conventions__ft_connect_users: ConventionsFtConnectUsers;
@@ -244,6 +247,40 @@ type ConventionStatusType =
 interface ConventionExternalIds {
   convention_id: string | null;
   external_id: Generated<number>;
+}
+
+interface ConventionDrafts {
+  id: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | Generated<Timestamp>;
+  agency_id: string | null;
+  agency_kind: AgencyKind | null;
+  agency_department: DepartmentCode | null;
+  date_start: Timestamp | null;
+  date_end: Timestamp | null;
+  siret: string | null;
+  business_name: string | null;
+  schedule: Json | null;
+  individual_protection: boolean | null;
+  individual_protection_description: string | null;
+  sanitary_prevention: boolean | null;
+  sanitary_prevention_description: string | null;
+  immersion_address: string | null;
+  immersion_objective: ConventionObjectiveType | null;
+  immersion_appellation: number | null;
+  immersion_activities: string | null;
+  immersion_skills: string | null;
+  work_conditions: string | null;
+  internship_kind: InternshipKind;
+  business_advantages: string | null;
+  acquisition_campaign: string | null;
+  acquisition_keyword: string | null;
+  establishment_number_employees: NumberEmployeesRange | null;
+  agency_referent_first_name: string | null;
+  agency_referent_last_name: string | null;
+  ft_connect_id: string | null;
+  establishment_tutor: Json | null;
+  signatories: Json | null;
 }
 
 interface Conventions extends WithAcquisition {

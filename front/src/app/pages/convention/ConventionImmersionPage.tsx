@@ -4,7 +4,7 @@ import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { loginFtConnect } from "shared";
+import { domElementIds, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   type ConventionFormMode,
@@ -39,9 +39,15 @@ const storeConventionRouteParamsOnDevice = (
     fedIdProvider: _2,
     fedIdToken: _3,
     jwt: _4,
+    conventionDraftId,
     ...partialConvention
   } = routeParams;
-  if (keys(partialConvention).length) {
+  if (conventionDraftId) {
+    outOfReduxDependencies.localDeviceRepository.set(
+      "conventionDraftId",
+      conventionDraftId,
+    );
+  } else if (keys(partialConvention).length) {
     outOfReduxDependencies.localDeviceRepository.set(
       "partialConventionInUrl",
       partialConvention,
@@ -57,6 +63,7 @@ export const ConventionImmersionPage = ({
     mtm_campaign: _,
     mtm_kwd: __,
     skipIntro,
+    conventionDraftId,
     ...routeParamsWithoutJwtAndTrackers
   } = route.params;
 
@@ -68,14 +75,12 @@ export const ConventionImmersionPage = ({
 
   const isSharedConvention = useMemo(
     () =>
-      keys(routeParamsWithoutJwtAndTrackers).length > 0 &&
-      !isPeConnected &&
-      !skipIntro,
-    [routeParamsWithoutJwtAndTrackers, isPeConnected, skipIntro],
+      keys(routeParamsWithoutJwtAndTrackers).length > 0 || !!conventionDraftId,
+    [routeParamsWithoutJwtAndTrackers, conventionDraftId],
   );
 
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
-    useState(isSharedConvention);
+    useState(isSharedConvention && !isPeConnected && !skipIntro);
 
   const getPageHeaderTitle = (
     jwt: string | undefined,
@@ -125,11 +130,13 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     jwt: _,
     mtm_campaign: __,
     mtm_kwd: ____,
+    conventionDraftId,
     ...routeParamsWithoutJwtAndTrackers
   } = initialRouteParams;
   const isSharedConvention = useMemo(
-    () => keys(routeParamsWithoutJwtAndTrackers).length > 0,
-    [routeParamsWithoutJwtAndTrackers],
+    () =>
+      keys(routeParamsWithoutJwtAndTrackers).length > 0 || !!conventionDraftId,
+    [routeParamsWithoutJwtAndTrackers, conventionDraftId],
   );
 
   const getMode = (): ConventionFormMode => {
@@ -215,6 +222,7 @@ const SharedConventionMessage = ({
         onClick={() => onClickContinue()}
         iconId="fr-icon-arrow-right-line"
         iconPosition="right"
+        id={domElementIds.conventionImmersionRoute.continueButton}
       >
         Continuer
       </Button>

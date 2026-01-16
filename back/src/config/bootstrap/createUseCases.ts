@@ -34,11 +34,13 @@ import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../dom
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
+import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
+import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
@@ -69,7 +71,7 @@ import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-ca
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
-import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
+import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
@@ -574,6 +576,7 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
         gateways.shortLinkGenerator,
+        gateways.timeGateway,
         config,
       ),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
@@ -997,6 +1000,8 @@ export const createUseCases = ({
         uowPerformer,
         deps: { saveNotificationsBatchAndRelatedEvent, config },
       }),
+    getConventionDraftById: makeGetConventionDraftById({ uowPerformer }),
+    deleteConventionDraft: makeDeleteConventionDraft({ uowPerformer }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

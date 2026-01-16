@@ -12,6 +12,7 @@ import {
   type SetStateAction,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -31,7 +32,10 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addressDtoToString,
   type Beneficiary,
+  type ConventionPresentation,
   type ConventionReadDto,
+  type CreateConventionPresentationInitialValues,
+  conventionPresentationSchema,
   conventionSchema,
   type DepartmentCode,
   defaultCountryCode,
@@ -46,6 +50,7 @@ import {
   isFtConnectIdentity,
   keys,
   makeListAgencyOptionsKindFilter,
+  undefinedIfEmptyString,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
 import {
@@ -57,12 +62,6 @@ import {
   creationFormModes,
   type SupportedConventionRoutes,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
-import {
-  type ConventionPresentation,
-  type CreateConventionPresentationInitialValues,
-  conventionPresentationSchema,
-  undefinedIfEmptyString,
-} from "src/app/components/forms/convention/conventionHelpers";
 import { BeneficiaryFormSection } from "src/app/components/forms/convention/sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";
@@ -85,7 +84,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useMatomo } from "src/app/hooks/useMatomo";
 import {
-  getConventionInitialValuesFromUrl,
+  getConventionInitialValuesFromUrl as getConventionInitialValuesFromUrlOrDraft,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
@@ -100,11 +99,12 @@ import {
   conventionSlice,
   type NumberOfSteps,
 } from "src/core-logic/domain/convention/convention.slice";
+import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { useStyles } from "tss-react/dsfr";
-import { ShareConventionLink } from "./ShareConventionLink";
+import { ShareConventionDraft } from "./ShareConventionDraft";
 
 type StepSeverity = "error" | "success" | "info";
 export type EmailValidationErrorsState = Partial<
@@ -133,6 +133,9 @@ export const ConventionForm = ({
   const route = useRoute() as SupportedConventionRoutes;
 
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
+  const fetchedConventionDraft = useAppSelector(
+    conventionDraftSelectors.conventionDraft,
+  );
 
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
@@ -149,29 +152,43 @@ export const ConventionForm = ({
   const establishmentAddressCountryCode = useAppSelector(
     siretSelectors.countryCode,
   );
-  const conventionInitialValuesFromUrl = getConventionInitialValuesFromUrl({
-    route,
-    internshipKind,
-  });
+  const conventionInitialValuesFromUrlOrDraft = useMemo(
+    () =>
+      getConventionInitialValuesFromUrlOrDraft({
+        route,
+        internshipKind,
+        conventionDraft: fetchedConventionDraft,
+      }),
+    [internshipKind, route, fetchedConventionDraft],
+  );
   const acquisitionParams = useGetAcquisitionParams();
 
-  const initialValues = useRef<CreateConventionPresentationInitialValues>({
-    ...conventionInitialValuesFromUrl,
-    ...acquisitionParams,
-    signatories: {
-      ...conventionInitialValuesFromUrl.signatories,
-      beneficiary: makeInitialBenefiaryForm(
-        conventionInitialValuesFromUrl.signatories.beneficiary,
-        federatedIdentity,
-      ),
-    },
-    ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
-      ? {
-          agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
-          agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
-        }
-      : {}),
-  }).current;
+  const initialValues = useMemo<CreateConventionPresentationInitialValues>(
+    () => ({
+      ...conventionInitialValuesFromUrlOrDraft,
+      ...acquisitionParams,
+      signatories: {
+        ...conventionInitialValuesFromUrlOrDraft.signatories,
+        beneficiary: makeInitialBenefiaryForm(
+          conventionInitialValuesFromUrlOrDraft.signatories.beneficiary,
+          federatedIdentity,
+        ),
+      },
+      ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
+        ? {
+            agencyReferentFirstName:
+              federatedIdentity.payload.advisor.firstName,
+            agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
+          }
+        : {}),
+    }),
+    [
+      conventionInitialValuesFromUrlOrDraft,
+      acquisitionParams,
+      federatedIdentity,
+      mode,
+    ],
+  );
   useExistingSiret({
     siret: initialValues.siret,
     addressAutocompleteLocator: "convention-immersion-address",
@@ -190,6 +207,7 @@ export const ConventionForm = ({
 
   const methods = useForm<ConventionPresentation>({
     defaultValues,
+    values: defaultValues as ConventionPresentation,
     resolver: zodResolver(conventionPresentationSchema),
     mode: "onTouched",
   });
@@ -260,6 +278,7 @@ export const ConventionForm = ({
       conventionSlice.actions.showSummaryChangeRequested({
         showSummary: true,
         convention: conventionToSave,
+        fromConventionDraftId: conventionValues.fromConventionDraftId,
       }),
     );
   };
@@ -362,12 +381,13 @@ export const ConventionForm = ({
     };
   };
 
-  useMatomo(conventionInitialValuesFromUrl.internshipKind);
+  useMatomo(conventionInitialValuesFromUrlOrDraft.internshipKind);
 
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(
       "partialConventionInUrl",
     );
+    outOfReduxDependencies.localDeviceRepository.delete("conventionDraftId");
     dispatch(conventionSlice.actions.setCurrentStep(1));
   }, [dispatch]);
 
@@ -445,13 +465,19 @@ export const ConventionForm = ({
         }),
       );
     }
-  }, [defaultValues, dispatch]);
+  }, [
+    defaultValues,
+    dispatch,
+    establishmentAddressCountryCode,
+    establishmentAddressCountryCode,
+  ]);
+
   return (
-    <FormProvider {...methods}>
+    <>
       {conventionIsLoading && <Loader />}
       <ConventionFormLayout
         form={
-          <>
+          <FormProvider {...methods}>
             <div className={cx("fr-text")}>{t.intro.welcome}</div>
             {mode !== "edit" && (
               <Alert
@@ -666,7 +692,7 @@ export const ConventionForm = ({
                 </Button>
               </div>
             </form>
-          </>
+          </FormProvider>
         }
         sidebar={
           <ConventionFormSidebar
@@ -682,7 +708,7 @@ export const ConventionForm = ({
                   "fr-btns-group--icon-left",
                 )}
               >
-                <ShareConventionLink />
+                <ShareConventionDraft conventionFormData={conventionValues} />
                 <Button
                   type="button"
                   id={
@@ -702,7 +728,7 @@ export const ConventionForm = ({
           />
         }
       />
-    </FormProvider>
+    </>
   );
 };
 

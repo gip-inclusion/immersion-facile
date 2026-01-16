@@ -4,6 +4,8 @@ import type {
   ApiConsumerName,
   AuthenticatedConventionRoutes,
   ConnectedUserJwt,
+  ConventionDraftDto,
+  ConventionDraftId,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -20,7 +22,7 @@ import type {
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   SendSignatureLinkRequestDto,
-  ShareLinkByEmailDto,
+  ShareConventionDraftByEmailDto,
   TransferConventionToAgencyRequestDto,
   UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
@@ -257,19 +259,37 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public shareConventionLinkByEmail(
-    conventionDto: ShareLinkByEmailDto,
-  ): Promise<boolean> {
-    return this.unauthenticatedHttpClient
-      .shareConvention({
-        body: conventionDto,
-      })
-      .then((response) =>
-        match(response)
-          .with({ status: 200 }, () => true)
-          .with({ status: 400 }, () => false)
-          .otherwise(otherwiseThrow),
-      );
+  public shareConventionDraftByEmail(
+    shareConventionDraftDto: ShareConventionDraftByEmailDto,
+  ): Observable<void> {
+    return from(
+      this.unauthenticatedHttpClient
+        .shareConvention({
+          body: shareConventionDraftDto,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: P.union(400, 409) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getConventionDraftById$(
+    conventionDraftId: ConventionDraftId,
+  ): Observable<ConventionDraftDto | undefined> {
+    return from(
+      this.unauthenticatedHttpClient
+        .getConventionDraft({ urlParams: { conventionDraftId } })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 404 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
   }
 
   public signConvention$(

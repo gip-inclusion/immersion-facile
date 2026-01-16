@@ -2,6 +2,7 @@ import { InMemoryAgencyGroupRepository } from "../../../agency/adapters/InMemory
 import { InMemoryAgencyRepository } from "../../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryDelegationContactRepository } from "../../../agency/adapters/InMemoryDelegationContactRepository";
 import { InMemoryAssessmentRepository } from "../../../convention/adapters/InMemoryAssessmentRepository";
+import { InMemoryConventionDraftRepository } from "../../../convention/adapters/InMemoryConventionDraftRepository";
 import { InMemoryConventionExternalIdRepository } from "../../../convention/adapters/InMemoryConventionExternalIdRepository";
 import { InMemoryConventionQueries } from "../../../convention/adapters/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../../convention/adapters/InMemoryConventionRepository";
@@ -72,6 +73,7 @@ export const createInMemoryUow = () => {
     featureFlagRepository: featureFlagRepository,
     featureFlagQueries: new InMemoryFeatureFlagQueries(featureFlagRepository),
     assessmentRepository,
+    conventionDraftRepository: new InMemoryConventionDraftRepository(),
     establishmentLeadRepository,
     establishmentLeadQueries: new InMemoryEstablishmentLeadQueries(
       establishmentLeadRepository,

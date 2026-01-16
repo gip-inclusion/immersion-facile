@@ -14,6 +14,7 @@ import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/con
 import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
@@ -52,6 +53,7 @@ const topics = [
   "convention-action-reject",
   "convention-action-renew",
   "convention-action-sign",
+  "convention-draft",
   "convention-form",
   "convention-status-dashboard",
   "conventions-with-broadcast-feedback",
@@ -577,6 +579,24 @@ export const feedbacks: Record<
         "Problème lors de la récupération du tableau de bord de la convention",
       message:
         "Une erreur est survenue lors de la récupération du tableau de bord de la convention",
+    },
+  },
+  "convention-draft": {
+    "create.success": {
+      action: conventionDraftSlice.actions.shareConventionDraftByEmailSucceeded,
+      title: "Partager ou enregistrer un brouillon",
+      message: "Cette demande de convention a bien été partagée par mail.",
+    },
+    "create.error": {
+      action: conventionDraftSlice.actions.shareConventionDraftByEmailFailed,
+      title: "Partager ou enregistrer un brouillon",
+      message: "Erreur lors de l'envoi de l'email",
+    },
+    "fetch.error": {
+      action: conventionDraftSlice.actions.fetchConventionDraftFailed,
+      title: "Problème lors de la récupération du brouillon de convention",
+      message:
+        "Une erreur est survenue lors de la récupération du brouillon de convention",
     },
   },
   "convention-form": {

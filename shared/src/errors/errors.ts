@@ -14,6 +14,7 @@ import type {
   ImmersionObjective,
   ReminderKind,
 } from "../convention/convention.dto";
+import type { ConventionDraftId } from "../convention/shareConventionDraftByEmail.dto";
 import type {
   DiscussionId,
   DiscussionKind,
@@ -487,6 +488,24 @@ export const errors = {
     validatorOfAgencyRefersToNotAllowed: () =>
       new ForbiddenError(
         `Les validateurs de l'agence référente ne sont pas autorisés à accéder à cette fonctionnalité.`,
+      ),
+  },
+  conventionDraft: {
+    conflict: ({
+      conventionDraftId,
+    }: {
+      conventionDraftId: ConventionDraftId;
+    }) =>
+      new ConflictError(
+        `Le brouillon de convention avec l'identifiant ${conventionDraftId} a déjà été modifié avant votre demande. Veuillez la relire et prendre connaissance des modifications.`,
+      ),
+    notFound: ({
+      conventionDraftId,
+    }: {
+      conventionDraftId: ConventionDraftId;
+    }) =>
+      new NotFoundError(
+        `Aucun brouillon de convention trouvé avec l'identifiant '${conventionDraftId}' : soit ce brouillon a expiré, soit une convention a été créée à partir de ce brouillon.`,
       ),
   },
   establishment: {

@@ -4,6 +4,8 @@ import {
   type AgencyOption,
   type ApiConsumerName,
   type ConnectedUserJwt,
+  type ConventionDraftDto,
+  type ConventionDraftId,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -20,7 +22,7 @@ import {
   type PaginationQueryParams,
   type RenewConventionParams,
   type SendSignatureLinkRequestDto,
-  type ShareLinkByEmailDto,
+  type ShareConventionDraftByEmailDto,
   sleep,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
@@ -41,6 +43,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   // For testing purpose
   public convention$ = new Subject<ConventionReadDto | undefined>();
+
+  public conventionDraft$ = new Subject<ConventionDraftDto | undefined>();
 
   public conventionDashboardUrl$ = new Subject<DashboardUrlAndName>();
 
@@ -67,6 +71,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public editConventionCounsellorNameResult$ = new Subject<void>();
 
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
+
+  public shareConventionDraftByEmailResult$ = new Subject<void>();
 
   public getConventionsForUserResult$ = new Subject<
     DataWithPagination<ConventionReadDto>
@@ -152,10 +158,16 @@ export class InMemoryConventionGateway implements ConventionGateway {
       : this.convention$;
   }
 
-  public async shareConventionLinkByEmail(
-    _shareLinkByEmailDTO: ShareLinkByEmailDto,
-  ): Promise<boolean> {
-    return true;
+  public shareConventionDraftByEmail(
+    _shareLinkByEmailDTO: ShareConventionDraftByEmailDto,
+  ): Observable<void> {
+    return this.shareConventionDraftByEmailResult$;
+  }
+
+  public getConventionDraftById$(
+    _conventionDraftId: ConventionDraftId,
+  ): Observable<ConventionDraftDto | undefined> {
+    return this.conventionDraft$;
   }
 
   public signConvention$(

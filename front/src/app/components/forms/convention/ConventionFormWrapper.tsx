@@ -23,14 +23,13 @@ import {
   type InternshipKind,
   isSignatory,
   type Role,
+  safeParseJson,
+  statusJustificationSchema,
   toDisplayedDate,
+  type WithStatusJustification,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
-import {
-  statusJustificationSchema,
-  type WithStatusJustification,
-} from "src/app/components/forms/convention/conventionHelpers";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -41,11 +40,18 @@ import type { ConventionImmersionPageRoute } from "src/app/pages/convention/Conv
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import {
+  FrontSpecificError,
+  HomeButton,
+} from "src/app/pages/error/front-errors";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
+import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
@@ -85,6 +91,7 @@ export const ConventionFormWrapper = ({
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const dispatch = useDispatch();
   const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const conventionDraftFormFeedback = useFeedbackTopic("convention-draft");
   const conventionActionEditFeedback = useFeedbackTopic(
     "convention-action-edit",
   );
@@ -92,11 +99,18 @@ export const ConventionFormWrapper = ({
     connectedUserSelectors.userRolesForFetchedConvention,
   );
   const conventionIsLoading = useAppSelector(conventionSelectors.isLoading);
+  const conventionDraftIsLoading = useAppSelector(
+    conventionDraftSelectors.isLoading,
+  );
   const currentUserIsLoading = useAppSelector(connectedUserSelectors.isLoading);
-  const isLoading = conventionIsLoading || currentUserIsLoading;
+  const isLoading =
+    conventionIsLoading || currentUserIsLoading || conventionDraftIsLoading;
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
+  const fetchConventionDraftError =
+    conventionDraftFormFeedback?.level === "error" &&
+    conventionDraftFormFeedback.on === "fetch";
 
   const formSuccessfullySubmitted =
     (conventionFormFeedback?.level === "success" &&
@@ -118,11 +132,21 @@ export const ConventionFormWrapper = ({
   const [userRolesOnConvention, setUserRolesOnConvention] = useState<Role[]>(
     userRolesForFetchedConvention,
   );
+  const conventionDraftId =
+    outOfReduxDependencies.localDeviceRepository.get("conventionDraftId") ??
+    route.params.conventionDraftId;
 
   useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
 
   useEffect(() => {
-    if (mode === "edit" && route.params.jwt) {
+    if (mode === "create-from-shared" && conventionDraftId) {
+      dispatch(
+        conventionDraftSlice.actions.fetchConventionDraftRequested({
+          conventionDraftId: conventionDraftId,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+    } else if (mode === "edit" && route.params.jwt) {
       dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
       const { applicationId } =
         decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
@@ -142,7 +166,7 @@ export const ConventionFormWrapper = ({
         }),
       );
     }
-  }, [dispatch, mode, route.params]);
+  }, [dispatch, mode, route.params, conventionDraftId]);
 
   useEffect(() => {
     if (route.params.jwt) {
@@ -183,6 +207,17 @@ export const ConventionFormWrapper = ({
     route,
     fetchedConvention,
   });
+
+  if (route.params.conventionDraftId && fetchConventionDraftError) {
+    const parsedMessage = safeParseJson(conventionDraftFormFeedback.message);
+    throw new FrontSpecificError({
+      title: conventionDraftFormFeedback?.title ?? "Erreur",
+      description:
+        parsedMessage?.message ??
+        "Une erreur est survenue lors de la récupération du brouillon de convention",
+      buttons: [HomeButton],
+    });
+  }
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -391,6 +426,7 @@ const ConventionSummarySection = ({
   const onConfirmSubmit = () => {
     dispatch(
       conventionSlice.actions.saveConventionRequested({
+        fromConventionDraftId: route.params.conventionDraftId,
         convention: {
           ...convention,
           statusJustification: getValues("statusJustification"),

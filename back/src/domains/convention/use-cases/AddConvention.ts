@@ -33,7 +33,7 @@ export class AddConvention extends TransactionalUseCase<
   }
 
   protected async _execute(
-    { convention, discussionId }: AddConventionInput,
+    { convention, discussionId, fromConventionDraftId }: AddConventionInput,
     uow: UnitOfWork,
   ): Promise<WithConventionIdLegacy> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
@@ -54,6 +54,7 @@ export class AddConvention extends TransactionalUseCase<
       payload: {
         convention,
         triggeredBy: null,
+        ...(fromConventionDraftId ? { fromConventionDraftId } : {}),
         ...(discussionId ? { discussionId } : {}),
       },
     });
