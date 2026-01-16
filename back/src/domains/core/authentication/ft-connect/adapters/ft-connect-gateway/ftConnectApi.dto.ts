@@ -43,6 +43,25 @@ export type ExternalFtConnectBirthDate = {
   dateDeNaissance: DateString;
 };
 
+// External contract from https://francetravail.io/produits-partages/catalogue/france-travail-connect/coordonnees/documentation#/api-reference/paths/coordonnees/get
+export type ExternalFtConnectContactDetails = {
+  adresse1?: string;
+  adresse2?: string;
+  adresse3?: string;
+  adresse4?: string;
+  codePostal?: string;
+  codeINSEE?: string;
+  libelleCommune?: string;
+  codePays?: string;
+  libellePays?: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone1?: string;
+  telephone2?: string;
+  statutValidationEmail: string;
+};
+
 // External contract from https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
 export type ExternalFtConnectOAuthGrantPayload = {
   response_type: string;

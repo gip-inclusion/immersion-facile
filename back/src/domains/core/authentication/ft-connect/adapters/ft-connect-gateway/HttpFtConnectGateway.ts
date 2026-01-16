@@ -39,6 +39,7 @@ import {
 import {
   externalFtConnectAdvisorsSchema,
   externalFtConnectBirthDateSchema,
+  externalFtConnectContactDetailsSchema,
   externalFtConnectUserSchema,
   externalFtConnectUserStatutSchema,
 } from "./ftConnectApi.schema";
@@ -50,6 +51,7 @@ type CounterType =
   | "getAdvisorsInfo"
   | "getUserInfo"
   | "getUserBirthDate"
+  | "getUserContactDetails"
   | "exchangeCodeForAccessToken";
 
 const counterApiKind = "peConnect";
@@ -87,6 +89,11 @@ const getAdvisorsInfoLogger = makeFtConnectLogger(logger, "getAdvisorsInfo");
 const getUserInfoLogger = makeFtConnectLogger(logger, "getUserInfo");
 
 const getUserBirthDateLogger = makeFtConnectLogger(logger, "getUserBirthDate");
+
+const getUserContactDetailsLogger = makeFtConnectLogger(
+  logger,
+  "getUserContactDetails",
+);
 
 const exchangeCodeForAccessTokenLogger = makeFtConnectLogger(
   logger,
@@ -176,6 +183,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
 
     const externalFtUser = await this.#getUserInfo(headers);
     const externalFtBirthDate = await this.#getUserBirthDate(headers);
+    const externalFtPhone = await this.#getUserContactPhone(headers);
     const isUserJobseeker = await this.#userIsJobseeker(
       headers,
       externalFtUser?.idIdentiteExterne,
@@ -187,6 +195,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
             ...externalFtUser,
             isUserJobseeker,
             birthdate: externalFtBirthDate,
+            phone: externalFtPhone,
           }),
           advisors: (isUserJobseeker
             ? await this.#getAdvisorsInfo(headers)
@@ -331,6 +340,51 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       if (error instanceof ZodError) return undefined;
 
       return manageFtConnectError(error, "getUserBirthDate", {
+        authorization: headers.Authorization,
+      });
+    }
+  }
+
+  async #getUserContactPhone(
+    headers: FtConnectHeaders,
+  ): Promise<string | undefined> {
+    const log = getUserContactDetailsLogger;
+    try {
+      log.total({});
+      const response = await this.#limiter.schedule(() =>
+        this.httpClient.getUserContactDetails({
+          headers,
+        }),
+      );
+      if (response.status !== 200) {
+        log.error({
+          sharedRouteResponse: response,
+          message: "getUserContactDetails -Response status is not 200.",
+        });
+        return undefined;
+      }
+      const externalFtConnectContactDetails = validateAndParseZodSchema({
+        schemaName: "externalFtConnectContactDetailsSchema",
+        inputSchema: externalFtConnectContactDetailsSchema,
+        schemaParsingInput: response.body,
+        logger,
+      });
+      log.success({});
+      return (
+        externalFtConnectContactDetails.telephone1 ??
+        externalFtConnectContactDetails.telephone2
+      );
+    } catch (error) {
+      errorChecker(
+        error,
+        (error) => {
+          log.error({ error });
+        },
+        (payload) => notifyTeamOnNotError(payload),
+      );
+      if (error instanceof ZodError) return undefined;
+
+      return manageFtConnectError(error, "getUserContactDetails", {
         authorization: headers.Authorization,
       });
     }

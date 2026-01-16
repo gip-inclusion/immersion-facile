@@ -143,8 +143,6 @@ export const ConnectedPrivateRoute = ({
       lastName = "",
       idToken = "",
     } = route.params;
-    const birthdate =
-      "birthdate" in route.params ? (route.params.birthdate ?? "") : "";
 
     if (token && provider && isFederatedIdentityProvider(provider)) {
       dispatch(
@@ -156,7 +154,6 @@ export const ConnectedPrivateRoute = ({
             lastName,
             firstName,
             idToken,
-            birthdate,
           },
           feedbackTopic: "auth-global",
         }),

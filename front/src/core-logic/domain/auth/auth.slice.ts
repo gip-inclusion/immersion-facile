@@ -6,6 +6,7 @@ import type {
   Email,
   FederatedIdentity,
   IdToken,
+  PhoneNumber,
   WithRedirectUri,
 } from "shared";
 import type {
@@ -17,7 +18,8 @@ export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;
   firstName: string;
   lastName: string;
-  birthdate: DateString;
+  birthdate?: DateString;
+  phone?: PhoneNumber;
   idToken: IdToken;
 };
 

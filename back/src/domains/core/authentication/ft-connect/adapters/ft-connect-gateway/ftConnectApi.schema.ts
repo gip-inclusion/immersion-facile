@@ -14,6 +14,7 @@ import {
 import type {
   ExternalFtConnectAdvisor,
   ExternalFtConnectBirthDate,
+  ExternalFtConnectContactDetails,
   ExternalFtConnectStatut,
   ExternalFtConnectUser,
   FtConnectHeaders,
@@ -67,6 +68,25 @@ export const externalFtConnectAdvisorsSchema: ZodSchemaWithInputMatchingOutput<
 export const externalFtConnectBirthDateSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectBirthDate> =
   z.object({
     dateDeNaissance: makeDateStringSchema(),
+  });
+
+export const externalFtConnectContactDetailsSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectContactDetails> =
+  z.object({
+    adresse1: z.string().optional(),
+    adresse2: z.string().optional(),
+    adresse3: z.string().optional(),
+    adresse4: z.string().optional(),
+    codePostal: z.string().optional(),
+    codeINSEE: z.string().optional(),
+    libelleCommune: z.string().optional(),
+    codePays: z.string().optional(),
+    libellePays: z.string().optional(),
+    nom: zStringMinLength1,
+    prenom: zStringMinLength1,
+    email: emailSchema,
+    telephone1: z.string().optional(),
+    telephone2: z.string().optional(),
+    statutValidationEmail: zStringMinLength1,
   });
 
 const bearerSchema = z
