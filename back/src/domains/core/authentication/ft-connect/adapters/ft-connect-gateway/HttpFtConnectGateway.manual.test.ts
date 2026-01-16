@@ -14,6 +14,7 @@ import { makeAxiosInstances } from "../../../../../../utils/axiosUtils";
 import type {
   ExternalAccessToken,
   ExternalFtConnectAdvisor,
+  ExternalFtConnectBirthDate,
   ExternalFtConnectUser,
 } from "./ftConnectApi.dto";
 import {
@@ -58,22 +59,31 @@ describe("HttpFtConnectGateway", () => {
     idIdentiteExterne: "617cd5a3-2cbd-477c-96a0-85d34381f815",
     sub: "617cd5a3-2cbd-477c-96a0-85d34381f815",
   };
+
+  const peExternalBirthDate: ExternalFtConnectBirthDate = {
+    dateDeNaissance: "1960-01-11",
+  };
+
   const ftExternalAdvisorCapemploi: ExternalFtConnectAdvisor = {
     type: "CAPEMPLOI",
     civilite: "1",
-    mail: "capEmploiAdvisor@pe.fr",
+    mail: "capemploiadvisor@pe.fr",
     nom: "prost",
     prenom: "alain",
   };
   const peExternalAdvisorPlacement: ExternalFtConnectAdvisor = {
     type: "PLACEMENT",
     civilite: "1",
-    mail: "placementAdvisor@pe.fr",
+    mail: "placementadvisor@pe.fr",
     nom: "prost",
     prenom: "alain",
   };
   const ftConnectUser = (isUserJobseeker: boolean) =>
-    toFtConnectUserDto({ ...peExternalUser, isUserJobseeker });
+    toFtConnectUserDto({
+      ...peExternalUser,
+      isUserJobseeker,
+      birthdate: peExternalBirthDate.dateDeNaissance,
+    });
   const ftConnectAdvisorPlacement = toFtConnectAdvisorDto(
     peExternalAdvisorPlacement,
   );
@@ -142,6 +152,8 @@ describe("HttpFtConnectGateway", () => {
           .reply(200, [peExternalAdvisorPlacement])
           .onGet(routes.getUserInfo.url)
           .reply(200, peExternalUser)
+          .onGet(routes.getUserBirthDate.url)
+          .reply(200, peExternalBirthDate)
           .onGet(routes.getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "1",
@@ -163,6 +175,8 @@ describe("HttpFtConnectGateway", () => {
           .reply(200, [ftExternalAdvisorCapemploi])
           .onGet(routes.getUserInfo.url)
           .reply(200, peExternalUser)
+          .onGet(routes.getUserBirthDate.url)
+          .reply(200, peExternalBirthDate)
           .onGet(routes.getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "1",
@@ -182,6 +196,8 @@ describe("HttpFtConnectGateway", () => {
         mock
           .onGet(routes.getUserInfo.url)
           .reply(200, peExternalUser)
+          .onGet(routes.getUserBirthDate.url)
+          .reply(200, peExternalBirthDate)
           .onGet(routes.getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "0",
@@ -241,6 +257,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [ftExternalAdvisorCapemploi])
             .onGet(routes.getUserInfo.url)
             .reply(unhandledStatusCode, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
@@ -314,6 +332,114 @@ describe("HttpFtConnectGateway", () => {
         });
       });
 
+      describe("Errors on getUserBirthDate", () => {
+        it("Zod Error -> OK with undefined", async () => {
+          mock
+            .onGet(routes.getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(routes.getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, "UNSUPPORTED RESPONSE")
+            .onGet(routes.getUserStatutInfo.url)
+            .reply(200, {
+              codeStatutIndividu: "1",
+              libelleStatutIndividu: "Demandeur d'emploi",
+            });
+          expect(
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
+          ).toBeUndefined();
+        });
+
+        it("Bad status code -> OK with undefined", async () => {
+          mock
+            .onGet(routes.getAdvisorsInfo.url)
+            .reply(200, [ftExternalAdvisorCapemploi])
+            .onGet(routes.getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(unhandledStatusCode, peExternalBirthDate)
+            .onGet(routes.getUserStatutInfo.url)
+            .reply(200, {
+              codeStatutIndividu: "1",
+              libelleStatutIndividu: "Demandeur d’emploi",
+            });
+          expect(
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
+          ).toBeUndefined();
+        });
+
+        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
+          mock
+            .onGet(routes.getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(routes.getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .abortRequest();
+          await expectPromiseToFailWithError(
+            ftConnectGateway.getUserAndAdvisors(accessToken),
+            new ManagedFTConnectError(
+              "peConnectConnectionAborted",
+              errors.generic.testError("Request aborted"),
+            ),
+          );
+        });
+
+        it("Network error -> RawRedirectError", async () => {
+          mock
+            .onGet(routes.getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(routes.getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .networkError();
+          await testRawFTConnectError(
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
+            new FTConnectError(
+              "Une erreur est survenue - Erreur réseau",
+              "Nous n’avons pas réussi à joindre pôle emploi connect.",
+              new Error(),
+            ),
+          );
+        });
+
+        it("Error 401 -> ManagedRedirectError kind peConnectGetUserBirthDateForbiddenAccess", async () => {
+          mock
+            .onGet(routes.getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(routes.getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(401);
+          await expectPromiseToFailWithError(
+            ftConnectGateway.getUserAndAdvisors(accessToken),
+            new ManagedFTConnectError(
+              "peConnectGetUserBirthDateForbiddenAccess",
+              new Error("Request failed with status code 401"),
+            ),
+          );
+        });
+
+        it("Error 500 -> RawRedirectError", async () => {
+          mock
+            .onGet(routes.getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(routes.getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(500);
+          await testRawFTConnectError(
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
+            new FTConnectError(
+              "Une erreur est survenue - 500",
+              "Nous n’avons pas réussi à récupérer votre date de naissance pôle emploi connect.",
+              new Error(),
+            ),
+          );
+        });
+      });
+
       describe("Errors on getAdvisorsInfo", () => {
         // it(`Timeout on getAdvisorsInfo -> Retry`, async () => {
         //   mock
@@ -360,6 +486,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(unhandledStatusCode, [ftExternalAdvisorCapemploi])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
@@ -380,6 +508,8 @@ describe("HttpFtConnectGateway", () => {
             .abortRequest()
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
@@ -400,6 +530,8 @@ describe("HttpFtConnectGateway", () => {
             .networkError()
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
@@ -421,6 +553,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(401)
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
@@ -439,6 +573,8 @@ describe("HttpFtConnectGateway", () => {
           mock
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
@@ -480,6 +616,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [ftExternalAdvisorCapemploi])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(unhandledStatusCode, {
               codeStatutIndividu: "1",
@@ -500,6 +638,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .abortRequest();
           await expectPromiseToFailWithError(
@@ -517,6 +657,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .networkError();
           await testRawFTConnectError(
@@ -535,6 +677,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(401);
           await expectPromiseToFailWithError(
@@ -552,6 +696,8 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
             .onGet(routes.getUserStatutInfo.url)
             .reply(500);
           await testRawFTConnectError(

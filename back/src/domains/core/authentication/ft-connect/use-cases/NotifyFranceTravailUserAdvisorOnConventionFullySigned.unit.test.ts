@@ -42,6 +42,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
       firstName: "",
       isJobseeker: true,
       lastName: "",
+      birthdate: "",
     },
   };
 
