@@ -451,7 +451,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         const userId = "userId";
         uuidGenerator.setNextUuid(userId);
         const result = await afterOAuthSuccessRedirection.execute({
-          code: generateEmailAuthCode({ version: 1 }),
+          code: generateEmailAuthCode({ version: 1, emailAuthCode: true }),
           state: initialOngoingOAuth.state,
         });
         expectToEqual(result, {
@@ -481,7 +481,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         await expectPromiseToFailWithError(
           afterOAuthSuccessRedirection.execute({
-            code: generateEmailAuthCode({ version: 1 }),
+            code: generateEmailAuthCode({ version: 1, emailAuthCode: true }),
             state: initialOngoingOAuth.state,
           }),
           errors.user.invalidJwt(),
@@ -499,6 +499,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             code: generateEmailAuthCode({
               version: 1,
               exp: subDays(timeGateway.now(), 1).getTime() / 1000,
+              emailAuthCode: true,
             }),
             state: initialOngoingOAuth.state,
           }),
@@ -533,7 +534,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         uuidGenerator.setNextUuid(userId);
 
         const redirectedUrl = await afterOAuthSuccessRedirection.execute({
-          code: generateEmailAuthCode({ version: 1 }),
+          code: generateEmailAuthCode({ version: 1, emailAuthCode: true }),
           state: initialOngoingOAuth.state,
         });
 

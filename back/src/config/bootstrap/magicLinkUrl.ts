@@ -4,6 +4,8 @@ import {
   type CreateConventionMagicLinkPayloadProperties,
   currentJwtVersions,
   decodeURIWithParams,
+  type Email,
+  type OAuthSuccessLoginParams,
   type OmitFromExistingKeys,
   queryParamsAsString,
   TWELVE_HOURS_IN_SECONDS,
@@ -14,6 +16,7 @@ import type { GetAccessTokenResult } from "../../domains/core/authentication/con
 import type {
   GenerateConnectedUserJwt,
   GenerateConventionJwt,
+  GenerateEmailAuthCodeJwt,
 } from "../../domains/core/jwt";
 import { createConventionMagicLinkPayload } from "../../utils/jwt";
 import type { AppConfig } from "./appConfig";
@@ -94,3 +97,28 @@ export const makeGenerateConnectedUserLoginUrl =
       },
     )}`;
   };
+
+export type GenerateEmailAuthCodeUrl = ReturnType<
+  typeof makeGenerateEmailAuthCodeUrl
+>;
+
+export type GenerateEmailAuthCodeUrlParams = {
+  uri: string;
+  state: string;
+  email: Email;
+};
+
+export type EmailAuthCodeUrlQueryParams = OAuthSuccessLoginParams & {
+  email: Email;
+};
+
+export const makeGenerateEmailAuthCodeUrl =
+  (config: AppConfig, generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt) =>
+  ({ email, state, uri }: GenerateEmailAuthCodeUrlParams): AbsoluteUrl =>
+    `${config.immersionFacileBaseUrl}/${uri}?${queryParamsAsString<EmailAuthCodeUrlQueryParams>(
+      {
+        code: generateEmailAuthCodeJwt({ version: 1, emailAuthCode: true }),
+        state,
+        email,
+      },
+    )}`;

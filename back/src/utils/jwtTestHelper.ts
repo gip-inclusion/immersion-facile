@@ -8,8 +8,10 @@ import {
   queryParamsAsString,
 } from "shared";
 import type {
+  EmailAuthCodeUrlQueryParams,
   GenerateConnectedUserLoginUrl,
   GenerateConventionMagicLinkUrl,
+  GenerateEmailAuthCodeUrl,
 } from "../config/bootstrap/magicLinkUrl";
 import type { GenerateApiConsumerJwt } from "../domains/core/jwt";
 
@@ -67,3 +69,16 @@ export const fakeGenerateConnectedUserUrlFn: GenerateConnectedUserLoginUrl = ({
     },
   )}`;
 };
+
+export const fakeGenerateEmailAuthCodeUrlFn: GenerateEmailAuthCodeUrl = ({
+  email,
+  state,
+  uri,
+}) =>
+  `http://fake-connected-user/${uri}?${queryParamsAsString<EmailAuthCodeUrlQueryParams>(
+    {
+      code: "EmailAuthCodeJwt",
+      email,
+      state,
+    },
+  )}`;
