@@ -22,16 +22,16 @@ import { emailAttachements } from "./email.content";
 import type { Email } from "./email.dto";
 import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 
-const defaultSignature = (internshipKind: InternshipKind) =>
-  internshipKind === "immersion"
+const defaultSignature = (internshipKind?: InternshipKind) =>
+  internshipKind === "mini-stage-cci"
     ? `
-    Bonne journée,
-    L'équipe Immersion Facilitée
-`
-    : `
     Bonne journée, 
     L’équipe de votre Chambre consulaire.
-`;
+    `
+    : `
+    Bonne journée,
+    L'équipe Immersion Facilitée
+    `;
 
 const displayDate = (date: string) => {
   return isStringDate(date)
