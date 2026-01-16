@@ -21,12 +21,8 @@ describe("Notify Team", () => {
       id: "000112256465465465456",
       occurredAt: new Date().toISOString(),
       payload: {
-        internshipKind: "immersion",
-        emails: ["test@mail.com"],
-        magicLink: "http://0000magicLink00000",
-        conventionStatusLink: "http://0000conventionStatusLink00000",
-        conventionId: "123",
-        triggeredBy: null,
+        agencyId: "0000",
+        triggeredBy: { kind: "connected-user", userId: "0001" },
       },
       status: "failed-but-will-retry",
       publications: [
@@ -40,7 +36,7 @@ describe("Notify Team", () => {
           ],
         },
       ],
-      topic: "MagicLinkRenewalRequested",
+      topic: "AgencyActivated",
       wasQuarantined: false,
     };
     notifyErrorObjectToTeam({

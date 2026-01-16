@@ -188,9 +188,6 @@ const getUseCasesByTopics = (
     useCases.updateMarketingEstablishmentContactList,
   ],
 
-  // Magic link renewal.
-  MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],
-
   // Agency related :
   NewAgencyAdded: [useCases.sendEmailWhenNewAgencyOfTypeOtherAdded],
   AgencyActivated: [useCases.sendEmailsWhenAgencyIsActivated],
