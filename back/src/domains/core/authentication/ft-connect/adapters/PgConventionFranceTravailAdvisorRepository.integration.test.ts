@@ -37,6 +37,7 @@ const user: FtConnectUserDto = {
   isJobseeker: true,
   lastName: "",
   peExternalId: userFtExternalId,
+  birthdate: "",
 };
 const placementAdvisor: FtConnectImmersionAdvisorDto = {
   firstName: "Jean",

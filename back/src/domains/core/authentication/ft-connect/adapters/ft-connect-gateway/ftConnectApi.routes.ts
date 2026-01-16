@@ -1,3 +1,4 @@
+import type { DateString } from "shared";
 import { type AbsoluteUrl, queryParamsAsString } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
@@ -59,6 +60,12 @@ export const makeFtConnectExternalRoutes = ({
       headersSchema: ftConnectHeadersSchema,
       responses: { 200: z.any() },
     }),
+    getUserBirthDate: defineRoute({
+      method: "get",
+      url: `${ftApiUrl}/partenaire/peconnect-datenaissance/v1/etat-civil`,
+      headersSchema: ftConnectHeadersSchema,
+      responses: { 200: z.any() },
+    }),
     getUserStatutInfo: defineRoute({
       method: "get",
       url: `${ftApiUrl}/partenaire/peconnect-statut/v1/statut`,
@@ -101,14 +108,20 @@ export const toFtConnectAdvisorDto = (
 });
 
 export const toFtConnectUserDto = (
-  externalFtConnectUser: ExternalFtConnectUser & { isUserJobseeker: boolean },
-): FtConnectUserDto => ({
-  isJobseeker: externalFtConnectUser.isUserJobseeker,
-  email: externalFtConnectUser.email,
-  firstName: externalFtConnectUser.given_name,
-  lastName: externalFtConnectUser.family_name,
-  peExternalId: externalFtConnectUser.idIdentiteExterne,
-});
+  externalFtConnectUser: ExternalFtConnectUser & {
+    isUserJobseeker: boolean;
+    birthdate: DateString;
+  },
+): FtConnectUserDto => {
+  return {
+    isJobseeker: externalFtConnectUser.isUserJobseeker,
+    email: externalFtConnectUser.email,
+    firstName: externalFtConnectUser.given_name,
+    lastName: externalFtConnectUser.family_name,
+    birthdate: externalFtConnectUser.birthdate,
+    peExternalId: externalFtConnectUser.idIdentiteExterne,
+  };
+};
 
 export const toAccessToken = (
   externalAccessToken: ExternalAccessToken,

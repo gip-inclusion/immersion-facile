@@ -96,7 +96,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${userFtExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&birthdate=1990-01-01&fedId=${userFtExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
       );
     });
   });
@@ -141,7 +141,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftNotJobseekerUser.peExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&birthdate=1990-01-01&fedId=${ftNotJobseekerUser.peExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
       );
       expectToEqual(
         uow.conventionFranceTravailAdvisorRepository
@@ -167,7 +167,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
       await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
     expect(urlWithQueryParams).toBe(
-      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftJobseekerUser.peExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
+      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&birthdate=1990-01-01&fedId=${ftJobseekerUser.peExternalId}&fedIdProvider=peConnect&fedIdToken=fake-id-token`,
     );
     expectToEqual(
       uow.conventionFranceTravailAdvisorRepository
@@ -191,6 +191,7 @@ const ftJobseekerUser: FtConnectUserDto = {
   lastName: "Doe",
   peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
   email: "john.doe@gmail.com",
+  birthdate: "1990-01-01",
 };
 const ftNotJobseekerUser: FtConnectUserDto = {
   isJobseeker: false,
@@ -198,6 +199,7 @@ const ftNotJobseekerUser: FtConnectUserDto = {
   lastName: "Doe",
   peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
   email: "john.doe@gmail.com",
+  birthdate: "1990-01-01",
 };
 
 const ftPlacementAdvisor: FtConnectImmersionAdvisorDto = {

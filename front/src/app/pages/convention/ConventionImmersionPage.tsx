@@ -4,7 +4,7 @@ import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { loginFtConnect } from "shared";
+import { type DateString, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   type ConventionFormMode,
@@ -162,7 +162,8 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
       initialRouteParams.fedIdToken &&
       initialRouteParams.email &&
       initialRouteParams.firstName &&
-      initialRouteParams.lastName
+      initialRouteParams.lastName &&
+      initialRouteParams.birthdate
     ) {
       const {
         fedId: _,
@@ -180,6 +181,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
               email: initialRouteParams.email,
               firstName: initialRouteParams.firstName,
               lastName: initialRouteParams.lastName,
+              birthdate: initialRouteParams.birthdate as DateString,
             },
             feedbackTopic: "auth-global",
           }),

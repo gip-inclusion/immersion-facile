@@ -1,6 +1,7 @@
 import Bottleneck from "bottleneck";
 import {
   type AbsoluteUrl,
+  type DateString,
   errors,
   HTTP_STATUS,
   queryParamsAsString,
@@ -37,6 +38,7 @@ import {
 } from "./ftConnectApi.routes";
 import {
   externalFtConnectAdvisorsSchema,
+  externalFtConnectBirthDateSchema,
   externalFtConnectUserSchema,
   externalFtConnectUserStatutSchema,
 } from "./ftConnectApi.schema";
@@ -47,6 +49,7 @@ type CounterType =
   | "getUserStatutInfo"
   | "getAdvisorsInfo"
   | "getUserInfo"
+  | "getUserBirthDate"
   | "exchangeCodeForAccessToken";
 
 const counterApiKind = "peConnect";
@@ -82,6 +85,8 @@ const getUserStatutInfoLogger = makeFtConnectLogger(
 const getAdvisorsInfoLogger = makeFtConnectLogger(logger, "getAdvisorsInfo");
 
 const getUserInfoLogger = makeFtConnectLogger(logger, "getUserInfo");
+
+const getUserBirthDateLogger = makeFtConnectLogger(logger, "getUserBirthDate");
 
 const exchangeCodeForAccessTokenLogger = makeFtConnectLogger(
   logger,
@@ -170,14 +175,19 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     };
 
     const externalFtUser = await this.#getUserInfo(headers);
+    const externalFtBirthDate = await this.#getUserBirthDate(headers);
     const isUserJobseeker = await this.#userIsJobseeker(
       headers,
       externalFtUser?.idIdentiteExterne,
     );
 
-    return externalFtUser
+    return externalFtUser && externalFtBirthDate
       ? {
-          user: toFtConnectUserDto({ ...externalFtUser, isUserJobseeker }),
+          user: toFtConnectUserDto({
+            ...externalFtUser,
+            isUserJobseeker,
+            birthdate: externalFtBirthDate,
+          }),
           advisors: (isUserJobseeker
             ? await this.#getAdvisorsInfo(headers)
             : []
@@ -279,6 +289,48 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       );
       if (error instanceof ZodError) return undefined;
       return manageFtConnectError(error, "getUserInfo", {
+        authorization: headers.Authorization,
+      });
+    }
+  }
+
+  async #getUserBirthDate(
+    headers: FtConnectHeaders,
+  ): Promise<DateString | undefined> {
+    const log = getUserBirthDateLogger;
+    try {
+      log.total({});
+      const response = await this.#limiter.schedule(() =>
+        this.httpClient.getUserBirthDate({
+          headers,
+        }),
+      );
+      if (response.status !== 200) {
+        log.error({
+          sharedRouteResponse: response,
+          message: "getUserBirthDate -Response status is not 200.",
+        });
+        return undefined;
+      }
+      const externalFtConnectBirthDate = validateAndParseZodSchema({
+        schemaName: "externalFtConnectBirthDateSchema",
+        inputSchema: externalFtConnectBirthDateSchema,
+        schemaParsingInput: response.body,
+        logger,
+      });
+      log.success({});
+      return externalFtConnectBirthDate.dateDeNaissance;
+    } catch (error) {
+      errorChecker(
+        error,
+        (error) => {
+          log.error({ error });
+        },
+        (payload) => notifyTeamOnNotError(payload),
+      );
+      if (error instanceof ZodError) return undefined;
+
+      return manageFtConnectError(error, "getUserBirthDate", {
         authorization: headers.Authorization,
       });
     }

@@ -611,6 +611,7 @@ describe("TransferConventionToAgency", () => {
           isJobseeker: true,
           lastName: "",
           peExternalId: userFtExternalId,
+          birthdate: "1990-01-01",
         };
         const ftAdvisor: FtConnectImmersionAdvisorDto = {
           firstName: "Jean",
@@ -924,6 +925,7 @@ describe("TransferConventionToAgency", () => {
           isJobseeker: true,
           lastName: "",
           peExternalId: userFtExternalId,
+          birthdate: "1990-01-01",
         };
         const ftAdvisor: FtConnectImmersionAdvisorDto = {
           firstName: "Jean",

@@ -5,6 +5,7 @@ const ftConnectErrorKinds = [
   "peConnectAdvisorForbiddenAccess",
   "peConnectGetUserInfoForbiddenAccess",
   "peConnectGetUserStatusInfoForbiddenAccess",
+  "peConnectGetUserBirthDateForbiddenAccess",
   "peConnectConnectionAborted",
 ] as const;
 
