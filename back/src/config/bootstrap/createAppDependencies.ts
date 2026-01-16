@@ -1,9 +1,9 @@
 import {
   type AbsoluteUrl,
   frontRoutes,
-  loginByEmailLinkDurationInSeconds,
   oneDayInSecond,
   oneHourInSeconds,
+  oneMinuteInSeconds,
 } from "shared";
 import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEventBus";
 import {
@@ -59,18 +59,18 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateConnectedUserJwt: GenerateConnectedUserJwt =
     makeGenerateJwtES256<"connectedUser">(
       config.jwtPrivateKey,
-      oneHourInSeconds,
+      config.connectedUserJwtDurationInHours * oneHourInSeconds,
     );
   const generateConventionJwt: GenerateConventionJwt =
     makeGenerateJwtES256<"convention">(
       config.jwtPrivateKey,
-      config.magicLinkShortDurationInDays * oneDayInSecond,
+      config.conventionJwtShortDurationInDays * oneDayInSecond,
     );
 
   const generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt =
     makeGenerateJwtES256<"emailAuthCode">(
       config.jwtPrivateKey,
-      loginByEmailLinkDurationInSeconds,
+      config.emailAuthCodeJwtDurationInMinutes * oneMinuteInSeconds,
     );
 
   const verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode"> =

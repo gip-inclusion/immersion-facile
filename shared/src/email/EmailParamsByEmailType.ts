@@ -366,6 +366,7 @@ export type EmailParamsByEmailType = {
   };
   IC_USER_RIGHTS_HAS_CHANGED: UserParamsForMail;
   LOGIN_BY_EMAIL_REQUESTED: {
+    validMinutes: number;
     fullname?: string;
     loginLink: AbsoluteUrl;
   };

@@ -17,7 +17,6 @@ import {
   markPartnersErroredConventionAsHandledRequestSchema,
   paginatedConventionReadSchema,
   renewConventionParamsSchema,
-  renewMagicLinkResponseSchema,
   sendSignatureLinkRequestSchema,
   transferConventionToAgencyRequestSchema,
   updateConventionRequestSchema,
@@ -36,6 +35,7 @@ import {
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import { renewExpiredJwtResponseSchema } from "../tokens/jwt.schema";
 import {
   expressEmptyResponseBody,
   expressEmptyResponseBodyOrEmptyObject,
@@ -91,7 +91,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
       200: conventionReadSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
-      403: renewMagicLinkResponseSchema.or(httpErrorSchema),
+      403: renewExpiredJwtResponseSchema.or(httpErrorSchema),
       404: httpErrorSchema,
     },
   }),

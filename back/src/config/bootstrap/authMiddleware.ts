@@ -7,7 +7,7 @@ import {
   currentJwtVersions,
   type ExtractFromExisting,
   errors,
-  expiredMagicLinkErrorMessage,
+  expiredJwtErrorMessage,
   type PayloadKind,
   unsupportedMagicLinkErrorMessage,
 } from "shared";
@@ -130,7 +130,7 @@ const sendNeedsRenewedLinkError = (res: Response, error: Error) => {
     ? res.json({
         message:
           error.message === "jwt expired"
-            ? expiredMagicLinkErrorMessage
+            ? expiredJwtErrorMessage
             : unsupportedMagicLinkErrorMessage,
         needsNewMagicLink: true,
       })

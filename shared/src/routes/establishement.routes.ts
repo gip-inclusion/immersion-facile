@@ -1,5 +1,4 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { renewMagicLinkResponseSchema } from "../convention/convention.schema";
 import {
   discussionExchangeForbiddenParamsSchema,
   discussionReadSchema,
@@ -13,6 +12,7 @@ import { establishmentNameAndAdminsSchema } from "../establishment/establishment
 import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import { renewExpiredJwtResponseSchema } from "../tokens/jwt.schema";
 import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
 export type EstablishmentRoutes = typeof establishmentRoutes;
@@ -37,7 +37,7 @@ export const establishmentRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,
-      403: renewMagicLinkResponseSchema,
+      403: renewExpiredJwtResponseSchema,
       409: httpErrorSchema,
     },
   }),
@@ -48,7 +48,7 @@ export const establishmentRoutes = defineRoutes({
     responses: {
       200: formEstablishmentSchema,
       401: httpErrorSchema,
-      403: renewMagicLinkResponseSchema,
+      403: renewExpiredJwtResponseSchema,
       404: httpErrorSchema,
     },
   }),
@@ -60,7 +60,7 @@ export const establishmentRoutes = defineRoutes({
       204: emptyObjectSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
-      403: renewMagicLinkResponseSchema,
+      403: renewExpiredJwtResponseSchema,
       404: httpErrorSchema,
     },
   }),

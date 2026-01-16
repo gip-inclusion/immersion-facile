@@ -7,7 +7,7 @@ import {
   errors,
   establishmentLeadRoutes,
   expectHttpResponseToEqual,
-  expiredMagicLinkErrorMessage,
+  expiredJwtErrorMessage,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -133,7 +133,7 @@ describe("Unregister establishment lead", () => {
               role: "establishment-representative",
               email: convention.signatories.establishmentRepresentative.email,
               now: new Date(),
-              exp: Math.round((Date.now() - 48 * 3600 * 1000) / 1000),
+              expOverride: Math.round((Date.now() - 48 * 3600 * 1000) / 1000),
             }),
           ),
         },
@@ -141,7 +141,7 @@ describe("Unregister establishment lead", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          message: expiredMagicLinkErrorMessage,
+          message: expiredJwtErrorMessage,
           needsNewMagicLink: true,
         },
         status: 403,

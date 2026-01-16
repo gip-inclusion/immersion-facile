@@ -40,10 +40,6 @@ import {
   numberOfEmployeesRangeSchema,
   siretSchema,
 } from "../siret/siret.schema";
-import {
-  expiredMagicLinkErrorMessage,
-  unsupportedMagicLinkErrorMessage,
-} from "../tokens/jwt.dto";
 import type { OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
@@ -100,7 +96,6 @@ import {
   type MarkPartnersErroredConventionAsHandledRequest,
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   type RenewConventionParams,
-  type RenewMagicLinkResponse,
   type SendSignatureLinkRequestDto,
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
   type Signatories,
@@ -680,14 +675,6 @@ export const generateMagicLinkRequestSchema: ZodSchemaWithInputMatchingOutput<Ge
       error: localization.invalidEnum,
     }),
     expired: z.boolean(), //< defaults to false
-  });
-
-export const renewMagicLinkResponseSchema: ZodSchemaWithInputMatchingOutput<RenewMagicLinkResponse> =
-  z.object({
-    message: z
-      .literal(expiredMagicLinkErrorMessage)
-      .or(z.literal(unsupportedMagicLinkErrorMessage)),
-    needsNewMagicLink: z.boolean(),
   });
 
 export const sendSignatureLinkRequestSchema: ZodSchemaWithInputMatchingOutput<SendSignatureLinkRequestDto> =

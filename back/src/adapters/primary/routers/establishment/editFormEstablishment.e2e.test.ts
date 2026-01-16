@@ -3,7 +3,6 @@ import {
   authExpiredMessage,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
-  createConnectedUserJwtPayload,
   currentJwtVersions,
   defaultCountryCode,
   type EstablishmentRoutes,
@@ -38,6 +37,7 @@ import {
   buildTestApp,
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
+import { createConnectedUserJwtPayload } from "../../../../utils/jwt";
 
 describe("Edit form establishments", () => {
   let httpClient: HttpClient<EstablishmentRoutes>;
@@ -102,7 +102,7 @@ describe("Edit form establishments", () => {
         authorization: generateConnectedUserJwt(
           createConnectedUserJwtPayload({
             now: gateways.timeGateway.now(),
-            durationDays: 30,
+            durationHours: 30,
             userId: establishmentAdminUser.id,
           }),
         ),
@@ -148,7 +148,7 @@ describe("Edit form establishments", () => {
           authorization: generateConnectedUserJwt(
             createConnectedUserJwtPayload({
               now: gateways.timeGateway.now(),
-              durationDays: 30,
+              durationHours: 30,
               userId: establishmentAdminUser.id,
             }),
           ),
@@ -247,7 +247,7 @@ describe("Edit form establishments", () => {
         authorization: generateJwtWithWrongKey(
           createConnectedUserJwtPayload({
             now: gateways.timeGateway.now(),
-            durationDays: 30,
+            durationHours: 30,
             userId: establishmentAdminUser.id,
           }),
         ),
@@ -282,7 +282,7 @@ describe("Edit form establishments", () => {
           createConnectedUserJwtPayload({
             userId: establishmentAdminUser.id,
             now: subYears(gateways.timeGateway.now(), 1),
-            durationDays: 30,
+            durationHours: 30,
           }),
         ),
       },
@@ -309,7 +309,7 @@ describe("Edit form establishments", () => {
         authorization: generateConnectedUserJwt(
           createConnectedUserJwtPayload({
             now: gateways.timeGateway.now(),
-            durationDays: 30,
+            durationHours: 30,
             userId: establishmentAdminUser.id,
           }),
         ),
