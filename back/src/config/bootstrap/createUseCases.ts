@@ -155,7 +155,10 @@ import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishmen
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import type { AppConfig } from "./appConfig";
 import type { Gateways } from "./createGateways";
-import { makeGenerateConventionMagicLinkUrl } from "./magicLinkUrl";
+import {
+  makeGenerateConnectedUserLoginUrl,
+  makeGenerateConventionMagicLinkUrl,
+} from "./magicLinkUrl";
 
 type CreateUsecasesParams = {
   config: AppConfig;
@@ -217,6 +220,10 @@ export const createUseCases = ({
   const generateConventionMagicLinkUrl = makeGenerateConventionMagicLinkUrl(
     config,
     generateConventionJwt,
+  );
+  const generateConnectedUserLoginUrl = makeGenerateConnectedUserLoginUrl(
+    config,
+    generateConnectedUserJwt,
   );
 
   const addConvention = new AddConvention(
@@ -285,16 +292,16 @@ export const createUseCases = ({
         uuidGenerator,
         gateways.oAuthGateway,
       ),
-      afterOAuthSuccessRedirection: new AfterOAuthSuccess(
+      afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
         createNewEvent,
-        gateways.oAuthGateway,
+        oAuthGateway: gateways.oAuthGateway,
         uuidGenerator,
-        generateConnectedUserJwt,
+        generateConnectedUserLoginUrl,
         verifyEmailAuthCodeJwt,
-        config.immersionFacileBaseUrl,
-        gateways.timeGateway,
-      ),
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+        timeGateway: gateways.timeGateway,
+      }),
       bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
         uowPerformer,
         createNewEvent,

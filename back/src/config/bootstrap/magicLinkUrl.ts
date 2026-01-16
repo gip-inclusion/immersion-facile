@@ -1,9 +1,20 @@
-import type {
-  AbsoluteUrl,
-  CreateConventionMagicLinkPayloadProperties,
-  OmitFromExistingKeys,
+import {
+  type AbsoluteUrl,
+  type ConnectedUserQueryParams,
+  type CreateConventionMagicLinkPayloadProperties,
+  currentJwtVersions,
+  decodeURIWithParams,
+  type OmitFromExistingKeys,
+  queryParamsAsString,
+  TWELVE_HOURS_IN_SECONDS,
+  type User,
 } from "shared";
-import type { GenerateConventionJwt } from "../../domains/core/jwt";
+import type { OngoingOAuth } from "../../domains/core/authentication/connected-user/entities/OngoingOAuth";
+import type { GetAccessTokenResult } from "../../domains/core/authentication/connected-user/port/OAuthGateway";
+import type {
+  GenerateConnectedUserJwt,
+  GenerateConventionJwt,
+} from "../../domains/core/jwt";
 import { createConventionMagicLinkPayload } from "../../utils/jwt";
 import type { AppConfig } from "./appConfig";
 
@@ -42,4 +53,44 @@ export const makeGenerateConventionMagicLinkUrl =
     });
 
     return `${config.immersionFacileBaseUrl}/${targetRoute}?${queryParams}`;
+  };
+
+export type GenerateConnectedUserLoginUrl = ReturnType<
+  typeof makeGenerateConnectedUserLoginUrl
+>;
+
+export type GenerateConnectedUserLoginUrlParams = {
+  user: User;
+  accessToken: GetAccessTokenResult | undefined;
+  ongoingOAuth: OngoingOAuth;
+};
+
+export const makeGenerateConnectedUserLoginUrl =
+  (config: AppConfig, generateConnectedUserJwt: GenerateConnectedUserJwt) =>
+  ({
+    user,
+    accessToken,
+    ongoingOAuth,
+  }: GenerateConnectedUserLoginUrlParams): AbsoluteUrl => {
+    const { uriWithoutParams, params } = decodeURIWithParams(
+      ongoingOAuth.fromUri,
+    );
+
+    return `${config.immersionFacileBaseUrl}${uriWithoutParams}?${queryParamsAsString<ConnectedUserQueryParams>(
+      {
+        ...params,
+        token: generateConnectedUserJwt(
+          {
+            userId: user.id,
+            version: currentJwtVersions.connectedUser,
+          },
+          TWELVE_HOURS_IN_SECONDS,
+        ),
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        idToken: accessToken?.idToken ?? "",
+        provider: ongoingOAuth.provider,
+      },
+    )}`;
   };
