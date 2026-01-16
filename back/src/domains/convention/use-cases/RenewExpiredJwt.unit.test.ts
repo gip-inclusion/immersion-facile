@@ -1,25 +1,34 @@
 import {
   AgencyDtoBuilder,
-  type BeneficiaryCurrentEmployer,
-  type BeneficiaryRepresentative,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionRole,
+  createConnectedUserJwtPayload,
+  type Email,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
   type RenewExpiredJwtRequestDto,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { createConventionMagicLinkPayload } from "../../../utils/jwt";
-import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
-import type { WithTriggeredBy } from "../../core/events/events";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import {
+  fakeGenerateConnectedUserUrlFn,
+  fakeGenerateMagicLinkUrlFn,
+} from "../../../utils/jwtTestHelper";
+import {
+  type ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import type { OngoingOAuth } from "../../core/authentication/connected-user/entities/OngoingOAuth";
 import { makeGenerateJwtES256 } from "../../core/jwt";
+import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -28,268 +37,496 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import type { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 import { RenewExpiredJwt } from "./RenewExpiredJwt";
 
-describe("RenewConventionMagicLink use case", () => {
-  const currentEmployer: BeneficiaryCurrentEmployer = {
-    email: "currentEmployer@mail.com",
-    businessName: "",
-    businessSiret: "",
-    firstName: "",
-    lastName: "",
-    job: "",
-    role: "beneficiary-current-employer",
-    phone: "",
-    businessAddress: "Rue des Bouchers 67065 Strasbourg",
-  };
-  const beneficiaryRepresentative: BeneficiaryRepresentative = {
-    email: "beneficiaryRepresentative@mail.com",
-    firstName: "",
-    lastName: "",
-    phone: "",
-    role: "beneficiary-representative",
-  };
+describe("RenewExpiredJwt use case", () => {
+  const validator = new ConnectedUserBuilder()
+    .withId(uuid())
+    .withEmail("validator@mail.com")
+    .buildUser();
+
+  const counsellor = new ConnectedUserBuilder()
+    .withId(uuid())
+    .withEmail("counsellor@mail.com")
+    .buildUser();
+
+  const defaultAgency = AgencyDtoBuilder.create().build();
+
   const validConvention: ConventionDto = new ConventionDtoBuilder()
-    .withBeneficiaryCurrentEmployer(currentEmployer)
-    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .withAgencyId(defaultAgency.id)
+    .withBeneficiaryCurrentEmployer({
+      email: "currentEmployer@mail.com",
+      businessName: "",
+      businessSiret: "",
+      firstName: "",
+      lastName: "",
+      job: "",
+      role: "beneficiary-current-employer",
+      phone: "",
+      businessAddress: "Rue des Bouchers 67065 Strasbourg",
+    })
+    .withBeneficiaryRepresentative({
+      email: "beneficiaryRepresentative@mail.com",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      role: "beneficiary-representative",
+    })
     .build();
 
-  const defaultAgency = AgencyDtoBuilder.create(
-    validConvention.agencyId,
-  ).build();
-  const email = "some email";
   const config: AppConfig = new AppConfigBuilder()
     .withTestPresetPreviousKeys()
     .build();
-  const generateConventionJwt = makeGenerateJwtES256<"convention">(
-    config.jwtPrivateKey,
-    undefined,
-  );
+
   const timeGateway = new CustomTimeGateway(new Date());
 
   let uow: InMemoryUnitOfWork;
   let useCase: RenewExpiredJwt;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
+    const uuidGenerator = new TestUuidGenerator();
     uow = createInMemoryUow();
-    uow.agencyRepository.agencies = [toAgencyWithRights(defaultAgency)];
-    uow.conventionRepository.setConventions([validConvention]);
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
-    useCase = new RenewExpiredJwt(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new TestUuidGenerator(),
-      }),
-      fakeGenerateMagicLinkUrlFn,
+    useCase = new RenewExpiredJwt({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      makeGenerateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+      makeGenerateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
       config,
       timeGateway,
       shortLinkIdGeneratorGateway,
-    );
+      saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+        uuidGenerator,
+        timeGateway,
+      ),
+    });
+
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(defaultAgency, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+      }),
+    ];
+    uow.conventionRepository.setConventions([validConvention]);
+    uow.userRepository.users = [validator, counsellor];
   });
 
-  describe("Right paths", () => {
-    it.each<[ConventionRole, string]>([
-      ["beneficiary", validConvention.signatories.beneficiary.email],
-      [
-        "beneficiary-current-employer",
-        // biome-ignore lint/style/noNonNullAssertion: provided
-        validConvention.signatories.beneficiaryCurrentEmployer!.email,
-      ],
-      [
-        "beneficiary-representative",
-        // biome-ignore lint/style/noNonNullAssertion: provided
-        validConvention.signatories.beneficiaryRepresentative!.email,
-      ],
-      [
-        "establishment-representative",
-        validConvention.signatories.establishmentRepresentative.email,
-      ],
-      ["establishment-tutor", validConvention.establishmentTutor.email],
-      ...defaultAgency.counsellorEmails.map(
-        (counsellorEmail): [ConventionRole, string] => [
-          "counsellor",
-          counsellorEmail,
-        ],
-      ),
-      ...defaultAgency.validatorEmails.map(
-        (validatorEmail): [ConventionRole, string] => [
-          "validator",
-          validatorEmail,
-        ],
-      ),
-    ])("Posts an event to deliver a correct JWT for correct responses for role %s", async (expectedRole, expectedEmails) => {
-      const expiredPayload = createConventionMagicLinkPayload({
-        id: validConvention.id,
-        role: expectedRole,
-        email: expectedEmails,
-        now: timeGateway.now(),
-      });
+  describe("With convention JWT", () => {
+    const generateConventionJwt = makeGenerateJwtES256<"convention">(
+      config.jwtPrivateKey,
+      undefined,
+    );
 
-      const request: RenewExpiredJwtRequestDto = {
-        originalUrl: "http://immersionfacile.fr/verifier-et-signer",
-
-        expiredJwt: generateConventionJwt(expiredPayload),
-      };
-
-      const shortLinks = ["shortLink1", "shortLink2"];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
-
-      await useCase.execute(request);
-
-      expect(uow.outboxRepository.events).toHaveLength(1);
-
-      const renewalEvent = uow.outboxRepository.events[0];
-      expect(renewalEvent.topic).toBe("MagicLinkRenewalRequested");
-
-      const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload &
-        WithTriggeredBy;
-      expect(dispatchedPayload.emails).toEqual([expectedEmails]);
-      expectToEqual(dispatchedPayload.triggeredBy, {
-        kind: "convention-magic-link",
-        role: expectedRole,
-      });
-
-      expectToEqual(
-        [dispatchedPayload.magicLink, dispatchedPayload.conventionStatusLink],
+    describe("Right paths", () => {
+      it.each<[ConventionRole, Email]>([
+        ["beneficiary", validConvention.signatories.beneficiary.email],
         [
-          `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
-          `${config.immersionFacileBaseUrl}/api/to/${shortLinks[1]}`,
+          "beneficiary-current-employer",
+          // biome-ignore lint/style/noNonNullAssertion: provided
+          validConvention.signatories.beneficiaryCurrentEmployer!.email,
         ],
-      );
-
-      expectToEqual(
-        uow.shortLinkQuery.getShortLinks()[shortLinks[0]],
-        fakeGenerateMagicLinkUrlFn({
+        [
+          "beneficiary-representative",
+          // biome-ignore lint/style/noNonNullAssertion: provided
+          validConvention.signatories.beneficiaryRepresentative!.email,
+        ],
+        [
+          "establishment-representative",
+          validConvention.signatories.establishmentRepresentative.email,
+        ],
+        ["establishment-tutor", validConvention.establishmentTutor.email],
+        ["counsellor", counsellor.email],
+        ["validator", validator.email],
+      ])("Posts an event to deliver a correct JWT for correct responses for role %s", async (expectedRole, expectedEmail) => {
+        const expiredPayload = createConventionMagicLinkPayload({
           id: validConvention.id,
           role: expectedRole,
-          email: expectedEmails,
+          email: expectedEmail,
           now: timeGateway.now(),
-          targetRoute: frontRoutes.conventionToSign,
-        }),
-      );
-    });
+        });
 
-    it("Also work when using encoded Url", async () => {
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds([
-        "shortLink1",
-        "shortLink2",
-      ]);
-      const expiredPayload = createConventionMagicLinkPayload({
-        id: validConvention.id,
-        role: "beneficiary",
-        email: validConvention.signatories.beneficiary.email,
-        now: timeGateway.now(),
+        const shortLinks = ["shortLink1", "shortLink2"];
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
+
+        await useCase.execute({
+          originalUrl: "http://immersionfacile.fr/verifier-et-signer",
+          expiredJwt: generateConventionJwt(expiredPayload),
+        });
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "MAGIC_LINK_RENEWAL",
+              params: {
+                conventionId: validConvention.id,
+                internshipKind: validConvention.internshipKind,
+                magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+              },
+              recipients: [expectedEmail],
+            },
+          ],
+        });
+
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+          [shortLinks[0]]: fakeGenerateMagicLinkUrlFn({
+            id: validConvention.id,
+            role: expectedRole,
+            email: expectedEmail,
+            now: timeGateway.now(),
+            targetRoute: frontRoutes.conventionToSign,
+          }),
+        });
       });
 
-      const request: RenewExpiredJwtRequestDto = {
-        originalUrl: encodeURIComponent(
-          "http://immersionfacile.fr/verifier-et-signer",
-        ),
-        expiredJwt: generateConventionJwt(expiredPayload),
-      };
+      it("Also work when using encoded Url", async () => {
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([
+          "shortLink1",
+          "shortLink2",
+        ]);
+        const expiredPayload = createConventionMagicLinkPayload({
+          id: validConvention.id,
+          role: "beneficiary",
+          email: validConvention.signatories.beneficiary.email,
+          now: timeGateway.now(),
+        });
 
-      await useCase.execute(request);
-      // should not throw error
-      expect(uow.outboxRepository.events).toHaveLength(1);
+        await useCase.execute({
+          originalUrl: encodeURIComponent(
+            "http://immersionfacile.fr/verifier-et-signer",
+          ),
+          expiredJwt: generateConventionJwt(expiredPayload),
+        });
+
+        expect(uow.outboxRepository.events).toHaveLength(1);
+      });
+    });
+
+    describe("Wrong paths", () => {
+      const email = "some email";
+
+      it("requires a valid application id", async () => {
+        const invalidConventionId: ConventionId = "not-a-valid-id";
+
+        const request: RenewExpiredJwtRequestDto = {
+          originalUrl: "https://immersionfacile.com/%jwt%",
+          expiredJwt: generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: invalidConventionId,
+              role: "counsellor",
+              email,
+              now: timeGateway.now(),
+            }),
+          ),
+        };
+
+        await expectPromiseToFailWithError(
+          useCase.execute(request),
+          errors.convention.notFound({ conventionId: invalidConventionId }),
+        );
+      });
+
+      it("requires a known agency id", async () => {
+        const storedUnknownId = "some unknown agency id";
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(storedUnknownId)
+          .build();
+        uow.conventionRepository.setConventions([convention]);
+
+        const request: RenewExpiredJwtRequestDto = {
+          originalUrl: "https://immersionfacile.com/%jwt%",
+          expiredJwt: generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: convention.id,
+              role: "counsellor",
+              email,
+              now: timeGateway.now(),
+            }),
+          ),
+        };
+
+        await expectPromiseToFailWithError(
+          useCase.execute(request),
+          errors.agency.notFound({ agencyId: storedUnknownId }),
+        );
+      });
+
+      // Admins use non-magic-link based authentication, so no need to renew these.
+      it("Refuses to generate backoffice magic links", async () => {
+        await expectPromiseToFailWithError(
+          useCase.execute({
+            originalUrl: "http://immersionfacile.fr/verifier-et-signer",
+            expiredJwt: generateConventionJwt(
+              createConventionMagicLinkPayload({
+                id: validConvention.id,
+                role: "back-office" as ConventionRole,
+                email,
+                now: timeGateway.now(),
+              }),
+            ),
+          }),
+          errors.convention.roleHasNoMagicLink({ role: "back-office" }),
+        );
+      });
+
+      it("does not accept to renew links from url that are not supported", async () => {
+        const request: RenewExpiredJwtRequestDto = {
+          originalUrl: "immersionfacile.com/",
+          expiredJwt: generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: validConvention.id,
+              role: "counsellor",
+              email,
+              now: timeGateway.now(),
+            }),
+          ),
+        };
+
+        await expectPromiseToFailWithError(
+          useCase.execute(request),
+          errors.convention.unsupportedRenewRoute({
+            originalUrl: request.originalUrl,
+            supportedRenewRoutes: [
+              "demande-immersion",
+              "verifier-et-signer",
+              "pilotage-convention",
+              "bilan-immersion",
+              "bilan-document",
+            ],
+          }),
+        );
+      });
     });
   });
 
-  describe("Wrong paths", () => {
-    it("requires a valid application id", async () => {
-      const invalidConventionId: ConventionId = "not-a-valid-id";
+  describe("With ConnectedUser Jwt", () => {
+    const generateConnectedUserJwt = makeGenerateJwtES256<"connectedUser">(
+      config.jwtPrivateKey,
+      undefined,
+    );
+    const user = new ConnectedUserBuilder().buildUser();
+    const onGoingOAuthFromUri =
+      "/tableau-de-bord-etablissement/discussions/00000000-0000-0000-0000-000000000000";
 
-      const request: RenewExpiredJwtRequestDto = {
-        originalUrl: "https://immersionfacile.com/%jwt%",
-        expiredJwt: generateConventionJwt(
-          createConventionMagicLinkPayload({
-            id: invalidConventionId,
-            role: "counsellor",
-            email,
-            now: timeGateway.now(),
-          }),
-        ),
-      };
-
-      await expectPromiseToFailWithError(
-        useCase.execute(request),
-        errors.convention.notFound({ conventionId: invalidConventionId }),
-      );
+    const expiredPayload = createConnectedUserJwtPayload({
+      userId: user.id,
+      durationDays: 1,
+      now: timeGateway.now(),
     });
 
-    it("requires a known agency id", async () => {
-      const storedUnknownId = "some unknown agency id";
-      const convention = new ConventionDtoBuilder()
-        .withAgencyId(storedUnknownId)
-        .build();
-      uow.conventionRepository.setConventions([convention]);
+    const emailUsedOnGoingOAuth: OngoingOAuth = {
+      email: user.email,
+      userId: user.id,
+      fromUri: onGoingOAuthFromUri,
+      nonce: "fake-nonce",
+      provider: "email",
+      state: "fake-state",
+      usedAt: new Date(),
+    };
 
-      const request: RenewExpiredJwtRequestDto = {
-        originalUrl: "https://immersionfacile.com/%jwt%",
-        expiredJwt: generateConventionJwt(
-          createConventionMagicLinkPayload({
-            id: convention.id,
-            role: "counsellor",
-            email,
-            now: timeGateway.now(),
-          }),
-        ),
-      };
-
-      await expectPromiseToFailWithError(
-        useCase.execute(request),
-        errors.agency.notFound({ agencyId: storedUnknownId }),
-      );
+    beforeEach(() => {
+      uow.userRepository.users = [user];
+      uow.ongoingOAuthRepository.ongoingOAuths = [emailUsedOnGoingOAuth];
     });
 
-    // Admins use non-magic-link based authentication, so no need to renew these.
-    it("Refuses to generate backoffice magic links", async () => {
-      const request: RenewExpiredJwtRequestDto = {
-        originalUrl: "https://immersionfacile.com/verification",
-        expiredJwt: generateConventionJwt(
-          createConventionMagicLinkPayload({
-            id: validConvention.id,
-            role: "back-office" as ConventionRole,
-            email,
-            now: timeGateway.now(),
-          }),
-        ),
-      };
+    it("Sends a magiclink renewal email including a shortlink mapped to ConnectedUserUrl with renewed JWT", async () => {
+      const shortLinks = ["shortLink1"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
 
-      await expectPromiseToFailWithError(
-        useCase.execute(request),
-        errors.convention.roleHasNoMagicLink({ role: "back-office" }),
-      );
-    });
+      await useCase.execute({
+        originalUrl: "",
+        expiredJwt: generateConnectedUserJwt(expiredPayload),
+      });
 
-    it("does not accept to renew links from url that are not supported", async () => {
-      const request: RenewExpiredJwtRequestDto = {
-        originalUrl: "immersionfacile.com/",
-        expiredJwt: generateConventionJwt(
-          createConventionMagicLinkPayload({
-            id: validConvention.id,
-            role: "counsellor",
-            email,
-            now: timeGateway.now(),
-          }),
-        ),
-      };
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "MAGIC_LINK_RENEWAL",
+            params: {
+              magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+            },
+            recipients: [user.email],
+          },
+        ],
+      });
 
-      await expectPromiseToFailWithError(
-        useCase.execute(request),
-        errors.convention.unsupportedRenewRoute({
-          originalUrl: request.originalUrl,
-          supportedRenewRoutes: [
-            "demande-immersion",
-            "verifier-et-signer",
-            "pilotage-convention",
-            "bilan-immersion",
-            "bilan-document",
-          ],
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinks[0]]: fakeGenerateConnectedUserUrlFn({
+          accessToken: undefined,
+          user,
+          ongoingOAuth: emailUsedOnGoingOAuth,
         }),
-      );
+      });
+    });
+
+    describe("Wrong paths", () => {
+      it("with missing user", async () => {
+        uow.userRepository.users = [];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            originalUrl: "",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.user.notFound({ userId: user.id }),
+        );
+      });
+
+      it("with unused ongoingOAuth", () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [
+          {
+            ...emailUsedOnGoingOAuth,
+            usedAt: null,
+          },
+        ];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            originalUrl: "",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.auth.unusedOAuth(),
+        );
+      });
+
+      it("with ongoingOAuth that have a unsupported provider : ProConnect", () => {
+        const unsupportedOngoingOAuth: OngoingOAuth = {
+          ...emailUsedOnGoingOAuth,
+          provider: "proConnect",
+        };
+
+        uow.ongoingOAuthRepository.ongoingOAuths = [unsupportedOngoingOAuth];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            originalUrl: "",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.auth.otherRenewalNotSupported(
+            unsupportedOngoingOAuth.provider,
+          ),
+        );
+      });
+
+      it("with missing onGoingOAuth", () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            originalUrl: "",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.auth.missingOAuth({}),
+        );
+      });
     });
   });
+
+  // describe("With EmailAuthCode Jwt", () => {
+  //   const generateEmailAuthCodeJwt = makeGenerateJwtES256<"emailAuthCode">(
+  //     config.jwtPrivateKey,
+  //     undefined,
+  //   );
+  //   const user = new ConnectedUserBuilder().buildUser();
+  //   const onGoingOAuthFromUri =
+  //     "/tableau-de-bord-etablissement/discussions/00000000-0000-0000-0000-000000000000";
+
+  //   const expiredPayload = createE({
+  //     userId: user.id,
+  //     durationDays: 1,
+  //     now: timeGateway.now(),
+  //   });
+
+  //   const emailUnusedOnGoingOAuth: OngoingOAuth = {
+  //     email: user.email,
+  //     userId: user.id,
+  //     fromUri: onGoingOAuthFromUri,
+  //     nonce: "fake-nonce",
+  //     provider: "email",
+  //     state: "fake-state",
+  //     usedAt: null,
+  //   };
+
+  //   beforeEach(() => {
+  //     uow.userRepository.users = [user];
+  //     uow.ongoingOAuthRepository.ongoingOAuths = [emailUnusedOnGoingOAuth];
+  //   });
+
+  //   it("Sends a magiclink renewal email including a shortlink mapped to ConnectedUserUrl with renewed JWT", async () => {
+  //     const shortLinks = ["shortLink1"];
+  //     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
+
+  //     await useCase.execute({
+  //       originalUrl: "",
+  //       expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+  //     });
+
+  //     expectSavedNotificationsAndEvents({
+  //       emails: [
+  //         {
+  //           kind: "MAGIC_LINK_RENEWAL",
+  //           params: {
+  //             magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+  //           },
+  //           recipients: [user.email],
+  //         },
+  //       ],
+  //     });
+
+  //     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+  //       [shortLinks[0]]: fakeGenerateConnectedUserUrlFn({
+  //         accessToken: undefined,
+  //         user,
+  //         ongoingOAuth: emailUnusedOnGoingOAuth,
+  //       }),
+  //     });
+  //   });
+
+  //   describe("Wrong paths", () => {
+  //     it("missing user", async () => {
+  //       uow.userRepository.users = [];
+
+  //       expectPromiseToFailWithError(
+  //         useCase.execute({
+  //           originalUrl: "",
+  //           expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+  //         }),
+  //         errors.user.notFound({ userId: user.id }),
+  //       );
+  //     });
+
+  //     it("unused oauth", () => {
+  //       uow.ongoingOAuthRepository.ongoingOAuths = [
+  //         {
+  //           ...emailUnusedOnGoingOAuth,
+  //           usedAt: null,
+  //         },
+  //       ];
+
+  //       expectPromiseToFailWithError(
+  //         useCase.execute({
+  //           originalUrl: "",
+  //           expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+  //         }),
+  //         errors.auth.unusedOAuth(),
+  //       );
+  //     });
+
+  //     it("missing oauth", () => {
+  //       uow.ongoingOAuthRepository.ongoingOAuths = [];
+
+  //       expectPromiseToFailWithError(
+  //         useCase.execute({
+  //           originalUrl: "",
+  //           expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+  //         }),
+  //         errors.auth.missingOAuth({}),
+  //       );
+  //     });
+  //   });
+  // });
 });

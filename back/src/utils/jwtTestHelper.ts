@@ -1,9 +1,18 @@
 import {
   type AbsoluteUrl,
+  type ConnectedUserJwt,
+  type ConnectedUserQueryParams,
   type CreateConventionMagicLinkPayloadProperties,
+  decodeURIWithParams,
   filterNotFalsy,
+  queryParamsAsString,
 } from "shared";
-import type { GenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
+import type {
+  EmailAuthCodeUrlQueryParams,
+  GenerateConnectedUserLoginUrl,
+  GenerateConventionMagicLinkUrl,
+  GenerateEmailAuthCodeUrl,
+} from "../config/bootstrap/magicLinkUrl";
 import type { GenerateApiConsumerJwt } from "../domains/core/jwt";
 
 export const generateApiConsumerJwtTestFn: GenerateApiConsumerJwt = ({ id }) =>
@@ -38,3 +47,38 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
     ...(queryParams.length ? [queryParams.join("&")] : []),
   ].join("/") as AbsoluteUrl;
 };
+
+export const fakeGenerateConnectedUserUrlFn: GenerateConnectedUserLoginUrl = ({
+  accessToken,
+  user,
+  ongoingOAuth,
+}) => {
+  const { uriWithoutParams, params } = decodeURIWithParams(
+    ongoingOAuth.fromUri,
+  );
+
+  return `${"http://fake-connected-user"}${uriWithoutParams}?${queryParamsAsString<ConnectedUserQueryParams>(
+    {
+      ...params,
+      token: user.id as ConnectedUserJwt,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      idToken: accessToken?.idToken ?? "",
+      provider: ongoingOAuth.provider,
+    },
+  )}`;
+};
+
+export const fakeGenerateEmailAuthCodeUrlFn: GenerateEmailAuthCodeUrl = ({
+  email,
+  state,
+  uri,
+}) =>
+  `http://fake-connected-user/${uri}?${queryParamsAsString<EmailAuthCodeUrlQueryParams>(
+    {
+      code: "EmailAuthCodeJwt",
+      email,
+      state,
+    },
+  )}`;

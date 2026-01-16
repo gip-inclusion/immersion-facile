@@ -59,7 +59,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateConnectedUserJwt: GenerateConnectedUserJwt =
     makeGenerateJwtES256<"connectedUser">(
       config.jwtPrivateKey,
-      oneHourInSeconds,
+      oneHourInSeconds, // change to local test
     );
   const generateConventionJwt: GenerateConventionJwt =
     makeGenerateJwtES256<"convention">(
@@ -70,7 +70,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt =
     makeGenerateJwtES256<"emailAuthCode">(
       config.jwtPrivateKey,
-      fiveMinutesInSeconds,
+      fiveMinutesInSeconds, // change to local test
     );
 
   const verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode"> =
