@@ -6,6 +6,7 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { generateES256KeyPair } from "../../../../../utils/jwt";
+import { fakeGenerateConnectedUserUrlFn } from "../../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { makeVerifyJwtES256 } from "../../../jwt";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
@@ -23,7 +24,6 @@ import type { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
 
 describe("AfterOAuthSuccess use case", () => {
-  const correctToken = "my-correct-token";
   const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
   const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
     nonce: "nounce",
@@ -48,19 +48,21 @@ describe("AfterOAuthSuccess use case", () => {
     const uuidGenerator = new UuidV4Generator();
     oAuthGateway = new InMemoryOAuthGateway(fakeProviderConfig);
     timeGateway = new CustomTimeGateway();
-    afterOAuthSuccessRedirection = new AfterOAuthSuccess(
-      new PgUowPerformer(db, createPgUow),
-      makeCreateNewEvent({
+    afterOAuthSuccessRedirection = new AfterOAuthSuccess({
+      uowPerformer: new PgUowPerformer(db, createPgUow),
+      createNewEvent: makeCreateNewEvent({
         timeGateway,
         uuidGenerator,
       }),
       oAuthGateway,
       uuidGenerator,
-      () => correctToken,
-      makeVerifyJwtES256<"emailAuthCode">(generateES256KeyPair().publicKey),
-      immersionBaseUrl,
+      generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+      verifyEmailAuthCodeJwt: makeVerifyJwtES256<"emailAuthCode">(
+        generateES256KeyPair().publicKey,
+      ),
+      immersionFacileBaseUrl: immersionBaseUrl,
       timeGateway,
-    );
+    });
   });
 
   afterAll(async () => {
