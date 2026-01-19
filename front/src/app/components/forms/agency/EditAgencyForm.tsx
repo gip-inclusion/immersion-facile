@@ -98,9 +98,9 @@ export const EditAgencyForm = ({
 
   const formValues = getValues();
 
-  const [status] = useWatch({
+  const [status, kind] = useWatch({
     control,
-    name: ["status"],
+    name: ["status", "kind"],
   });
 
   return (
@@ -192,7 +192,7 @@ export const EditAgencyForm = ({
             </>
           )}
 
-          {agency.kind === "autre" && (
+          {kind === "autre" && !refersToOtherAgency && (
             <>
               <h2 className={fr.cx("fr-h6", "fr-mt-4w")}>
                 Convention de délégation
