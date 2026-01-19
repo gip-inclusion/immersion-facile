@@ -1,19 +1,15 @@
 import {
   type AbsoluteUrl,
   type AfterOAuthSuccessRedirectionResponse,
-  type ConnectedUserQueryParams,
-  currentJwtVersions,
-  decodeURIWithParams,
   type EmailAuthCodeJwt,
   errors,
   type OAuthCode,
   type OAuthSuccessLoginParams,
   oAuthSuccessLoginParamsSchema,
-  queryParamsAsString,
-  TWELVE_HOURS_IN_SECONDS,
   type UserId,
   type UserWithAdminRights,
 } from "shared";
+import type { GenerateConnectedUserLoginUrl } from "../../../../../config/bootstrap/magicLinkUrl";
 import { makeThrowIfIncorrectJwt } from "../../../../../utils/jwt";
 import {
   type AgencyRightOfUser,
@@ -21,7 +17,7 @@ import {
   updateAgencyRightsForUser,
 } from "../../../../agency/ports/AgencyRepository";
 import type { CreateNewEvent } from "../../../events/ports/EventBus";
-import type { GenerateConnectedUserJwt, VerifyJwtFn } from "../../../jwt";
+import type { VerifyJwtFn } from "../../../jwt";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
@@ -50,7 +46,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
 
   readonly #uuidGenerator: UuidGenerator;
 
-  readonly #generateConnectedUserJwt: GenerateConnectedUserJwt;
+  readonly #generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
 
   readonly #immersionFacileBaseUrl: AbsoluteUrl;
 
@@ -58,21 +54,30 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
 
   #throwIfIncorrectJwt: (jwt: string) => void;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-    oAuthGateway: OAuthGateway,
-    uuidGenerator: UuidGenerator,
-    generateConnectedUserJwt: GenerateConnectedUserJwt,
-    verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode">,
-    immersionFacileBaseUrl: AbsoluteUrl,
-    timeGateway: TimeGateway,
-  ) {
+  constructor({
+    uowPerformer,
+    createNewEvent,
+    oAuthGateway,
+    uuidGenerator,
+    generateConnectedUserLoginUrl,
+    verifyEmailAuthCodeJwt,
+    immersionFacileBaseUrl,
+    timeGateway,
+  }: {
+    uowPerformer: UnitOfWorkPerformer;
+    createNewEvent: CreateNewEvent;
+    oAuthGateway: OAuthGateway;
+    uuidGenerator: UuidGenerator;
+    generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
+    verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode">;
+    immersionFacileBaseUrl: AbsoluteUrl;
+    timeGateway: TimeGateway;
+  }) {
     super(uowPerformer);
     this.#createNewEvent = createNewEvent;
     this.#oAuthGateway = oAuthGateway;
     this.#uuidGenerator = uuidGenerator;
-    this.#generateConnectedUserJwt = generateConnectedUserJwt;
+    this.#generateConnectedUserLoginUrl = generateConnectedUserLoginUrl;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
     this.#timeGateway = timeGateway;
     this.#throwIfIncorrectJwt = makeThrowIfIncorrectJwt(
@@ -102,32 +107,17 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       };
     }
 
-    const { newOrUpdatedUser, accessToken } = await (ongoingOAuth.provider ===
-    "email"
-      ? this.#onEmailProvider(uow, ongoingOAuth, code as EmailAuthCodeJwt)
-      : this.#onProConnectProvider(uow, ongoingOAuth, code));
-
-    const updatedOnGoingAuth: OngoingOAuth = {
-      ...ongoingOAuth,
-      userId: newOrUpdatedUser.id,
-      usedAt: this.#timeGateway.now(),
-      ...(ongoingOAuth.provider === "proConnect"
-        ? {
-            externalId: newOrUpdatedUser.proConnect?.externalId,
-            accessToken: accessToken?.accessToken,
-          }
-        : {}),
-      ...(ongoingOAuth.provider === "email"
-        ? { email: ongoingOAuth.email }
-        : {}),
-    };
+    const { newOrUpdatedUser, updatedOngoingOAuth, accessToken } =
+      await (ongoingOAuth.provider === "email"
+        ? this.#onEmailProvider(uow, ongoingOAuth, code as EmailAuthCodeJwt)
+        : this.#onProConnectProvider(uow, ongoingOAuth, code as OAuthCode));
 
     await Promise.all([
       uow.userRepository.save({
         ...newOrUpdatedUser,
         lastLoginAt: this.#timeGateway.now().toISOString(),
       }),
-      uow.ongoingOAuthRepository.save(updatedOnGoingAuth),
+      uow.ongoingOAuthRepository.save(updatedOngoingOAuth),
       uow.outboxRepository.save(
         this.#createNewEvent({
           topic: "UserAuthenticatedSuccessfully",
@@ -143,38 +133,24 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       ),
     ]);
 
-    const { uriWithoutParams, params } = decodeURIWithParams(
-      ongoingOAuth.fromUri,
-    );
-
     return {
       provider: ongoingOAuth.provider,
-      redirectUri: `${this.#immersionFacileBaseUrl}${
-        uriWithoutParams
-      }?${queryParamsAsString<ConnectedUserQueryParams>({
-        ...params,
-        token: this.#generateConnectedUserJwt(
-          {
-            userId: newOrUpdatedUser.id,
-            version: currentJwtVersions.connectedUser,
-          },
-          TWELVE_HOURS_IN_SECONDS,
-        ),
-        firstName: newOrUpdatedUser.firstName,
-        lastName: newOrUpdatedUser.lastName,
-        email: newOrUpdatedUser.email,
-        idToken: accessToken?.idToken ?? "",
-        provider: ongoingOAuth.provider,
-      })}`,
+      redirectUri: this.#generateConnectedUserLoginUrl({
+        user: newOrUpdatedUser,
+        accessToken,
+        ongoingOAuth,
+        now: this.#timeGateway.now(),
+      }),
     };
   }
 
   async #onProConnectProvider(
     uow: UnitOfWork,
     ongoingOAuth: ProConnectOngoingAuth,
-    code: EmailAuthCodeJwt | OAuthCode,
+    code: OAuthCode,
   ): Promise<{
     newOrUpdatedUser: UserWithAdminRights;
+    updatedOngoingOAuth: OngoingOAuth;
     accessToken?: GetAccessTokenResult;
   }> {
     const accessToken = await this.#oAuthGateway.getAccessToken({
@@ -184,11 +160,20 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     if (accessToken.payload.nonce !== ongoingOAuth.nonce)
       throw errors.auth.nonceMismatch();
 
+    const newOrUpdatedUser = await this.#makeNewOrUpdatedProConnectedUser(
+      uow,
+      accessToken.payload,
+    );
+
     return {
-      newOrUpdatedUser: await this.#makeNewOrUpdatedProConnectedUser(
-        uow,
-        accessToken.payload,
-      ),
+      newOrUpdatedUser,
+      updatedOngoingOAuth: {
+        ...ongoingOAuth,
+        userId: newOrUpdatedUser.id,
+        usedAt: this.#timeGateway.now(),
+        externalId: newOrUpdatedUser.proConnect?.externalId,
+        accessToken: accessToken.accessToken,
+      },
       accessToken,
     };
   }
@@ -199,6 +184,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     code: EmailAuthCodeJwt,
   ): Promise<{
     newOrUpdatedUser: UserWithAdminRights;
+    updatedOngoingOAuth: OngoingOAuth;
     accessToken?: GetAccessTokenResult;
   }> {
     this.#throwIfIncorrectJwt(code);
@@ -207,14 +193,21 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       ongoingOAuth.email,
     );
 
+    const newOrUpdatedUser = existingUser ?? {
+      id: this.#uuidGenerator.new(),
+      createdAt: this.#timeGateway.now().toISOString(),
+      email: ongoingOAuth.email,
+      firstName: "",
+      lastName: "",
+      proConnect: null,
+    };
+
     return {
-      newOrUpdatedUser: existingUser ?? {
-        id: this.#uuidGenerator.new(),
-        createdAt: this.#timeGateway.now().toISOString(),
-        email: ongoingOAuth.email,
-        firstName: "",
-        lastName: "",
-        proConnect: null,
+      newOrUpdatedUser: newOrUpdatedUser,
+      updatedOngoingOAuth: {
+        ...ongoingOAuth,
+        userId: newOrUpdatedUser.id,
+        usedAt: this.#timeGateway.now(),
       },
     };
   }
