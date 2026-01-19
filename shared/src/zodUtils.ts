@@ -122,9 +122,7 @@ export type ZodSchemaWithInputMatchingOutput<T> = z.ZodType<
   z.core.$ZodTypeInternals<T, T>
 >;
 
-export const deepPartialSchema = <T extends z.ZodTypeAny>(
-  schema: T,
-): z.ZodTypeAny => {
+export const deepPartialSchema = (schema: z.ZodTypeAny): z.ZodTypeAny => {
   if (schema.def.type === "object") {
     const newShape: Record<string, z.ZodTypeAny> = {};
     for (const [key, value] of Object.entries(

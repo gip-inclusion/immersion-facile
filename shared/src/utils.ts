@@ -159,6 +159,12 @@ export type DotNestedKeys<T> = (
   ? Extract<D, string>
   : never;
 
+export const getNestedValue = (
+  obj: Record<string, unknown>,
+  ...keys: string[]
+): unknown =>
+  keys.reduce<unknown>((acc, key) => isObject(acc) && acc[key], obj);
+
 export const calculateDurationInSecondsFrom = (start: Date): number => {
   const end = new Date();
   return (end.getTime() - start.getTime()) / 1000;
@@ -234,6 +240,9 @@ export const isFunction = <T>(
   value: unknown,
 ): value is (...args: unknown[]) => T => typeof value === "function";
 
+export const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
 export type DeepPartial<T> = T extends
   | string
   | number
@@ -249,3 +258,19 @@ export type DeepPartial<T> = T extends
         [P in keyof T]?: DeepPartial<T[P]>;
       }
     : T;
+
+export const replaceEmptyValuesByUndefinedFromObject = <T>(obj: T): T => {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === "string") return (obj === "" ? undefined : obj) as T;
+  if (Array.isArray(obj))
+    return obj.map(replaceEmptyValuesByUndefinedFromObject) as T;
+  if (typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key,
+        replaceEmptyValuesByUndefinedFromObject(value),
+      ]),
+    ) as T;
+  }
+  return obj;
+};

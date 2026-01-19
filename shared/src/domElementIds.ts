@@ -275,7 +275,8 @@ export const domElementIds = {
   conventionImmersionRoute: {
     form: (params) =>
       `im-convention-${params.internshipKind}-form--${params.mode}`,
-    continueButton: "im-convention-form__continue-button",
+    fromSharedConventionContinueButton:
+      "im-convention-form__from-shared-convention-continue-button",
     copyLinkButton: "im-convention-form__copy-link-button",
     showFormButton: "im-convention-form__show-form-button",
     submitFormButton: "im-convention-form__submit-form-button",

@@ -10,12 +10,12 @@ import {
 } from "../zodUtils";
 import { conventionSchema } from "./convention.schema";
 import type {
-  ConventionPresentation,
+  CreateConventionPresentationInitialValues,
   WithStatusJustification,
 } from "./conventionPresentation.dto";
 import { conventionDraftIdSchema } from "./shareConventionDraftByEmail.schema";
 
-export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<ConventionPresentation> =
+export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<CreateConventionPresentationInitialValues> =
   conventionSchema.and(
     z.object({
       fromConventionDraftId: conventionDraftIdSchema.optional(),

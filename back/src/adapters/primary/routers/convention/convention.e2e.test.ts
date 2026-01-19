@@ -278,8 +278,10 @@ describe("convention e2e", () => {
     });
 
     it("400 - Returns error when conventionDraftId is not a valid UUID", async () => {
+      const notValidId: ConventionDraftId = "invalid-uuid";
+
       const response = await unauthenticatedRequest.getConventionDraft({
-        urlParams: { conventionDraftId: "invalid-uuid" as ConventionDraftId },
+        urlParams: { conventionDraftId: notValidId },
       });
 
       expectHttpResponseToEqual(response, {

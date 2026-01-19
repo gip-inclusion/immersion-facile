@@ -23,7 +23,6 @@ import {
   type InternshipKind,
   isSignatory,
   type Role,
-  safeParseJson,
   statusJustificationSchema,
   toDisplayedDate,
   type WithStatusJustification,
@@ -40,10 +39,6 @@ import type { ConventionImmersionPageRoute } from "src/app/pages/convention/Conv
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
-import {
-  FrontSpecificError,
-  HomeButton,
-} from "src/app/pages/error/front-errors";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -139,10 +134,10 @@ export const ConventionFormWrapper = ({
   useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
 
   useEffect(() => {
-    if (mode === "create-from-shared" && conventionDraftId) {
+    if (conventionDraftId) {
       dispatch(
         conventionDraftSlice.actions.fetchConventionDraftRequested({
-          conventionDraftId: conventionDraftId,
+          conventionDraftId,
           feedbackTopic: "convention-draft",
         }),
       );
@@ -209,13 +204,8 @@ export const ConventionFormWrapper = ({
   });
 
   if (route.params.conventionDraftId && fetchConventionDraftError) {
-    const parsedMessage = safeParseJson(conventionDraftFormFeedback.message);
-    throw new FrontSpecificError({
-      title: conventionDraftFormFeedback?.title ?? "Erreur",
-      description:
-        parsedMessage?.message ??
-        "Une erreur est survenue lors de la récupération du brouillon de convention",
-      buttons: [HomeButton],
+    throw errors.conventionDraft.notFound({
+      conventionDraftId: route.params.conventionDraftId,
     });
   }
 

@@ -2,7 +2,10 @@ import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import { type ConventionPresentation, domElementIds } from "shared";
+import {
+  type CreateConventionPresentationInitialValues,
+  domElementIds,
+} from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { createFormModal } from "src/app/utils/createFormModal";
@@ -21,7 +24,7 @@ const shareConventionDraftModal = createFormModal(
 export const ShareConventionDraft = ({
   conventionFormData,
 }: {
-  conventionFormData: ConventionPresentation;
+  conventionFormData: CreateConventionPresentationInitialValues;
 }) => {
   const dispatch = useDispatch();
   const t = useConventionTexts(conventionFormData.internshipKind);
@@ -29,7 +32,7 @@ export const ShareConventionDraft = ({
   const conventionDraftFeedback = useFeedbackTopic("convention-draft");
 
   const closeModalButton: ButtonProps = {
-    children: "Annuler",
+    children: "Fermer",
     type: "button",
     priority: "secondary",
     onClick: shareConventionDraftModal.close,

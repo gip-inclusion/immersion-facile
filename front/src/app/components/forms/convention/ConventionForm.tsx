@@ -205,9 +205,9 @@ export const ConventionForm = ({
       ? initialValues
       : fetchedConvention || initialValues;
 
-  const methods = useForm<ConventionPresentation>({
+  const methods = useForm<CreateConventionPresentationInitialValues>({
     defaultValues,
-    values: defaultValues as ConventionPresentation,
+    values: defaultValues,
     resolver: zodResolver(conventionPresentationSchema),
     mode: "onTouched",
   });
@@ -247,15 +247,19 @@ export const ConventionForm = ({
     conventionValues.internshipKind ?? "immersion",
   );
 
-  const onSubmit: SubmitHandler<ConventionPresentation> = (convention) => {
+  const onSubmit: SubmitHandler<CreateConventionPresentationInitialValues> = (
+    convention,
+  ) => {
     const selectedAgency = agencyOptions.find(
       (agencyOption) => agencyOption.id === convention.agencyId,
     );
-    if (!selectedAgency)
-      throw errorMessage.agency.notFound({ agencyId: convention.agencyId });
+    if (!selectedAgency || !convention.agencyId)
+      throw errorMessage.agency.notFound({
+        agencyId: convention.agencyId ?? "",
+      });
     const conventionToSave: ConventionReadDto = {
       ...conventionSchema.parse(convention),
-      agencyDepartment: convention.agencyDepartment,
+      agencyDepartment: convention.agencyDepartment ?? "",
       workConditions: undefinedIfEmptyString(convention.workConditions),
       agencyReferent: {
         firstname: undefinedIfEmptyString(convention.agencyReferent?.firstname),
@@ -465,12 +469,7 @@ export const ConventionForm = ({
         }),
       );
     }
-  }, [
-    defaultValues,
-    dispatch,
-    establishmentAddressCountryCode,
-    establishmentAddressCountryCode,
-  ]);
+  }, [defaultValues, dispatch]);
 
   return (
     <>

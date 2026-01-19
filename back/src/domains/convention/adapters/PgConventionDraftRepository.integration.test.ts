@@ -267,5 +267,13 @@ describe("PgConventionDraftRepository", () => {
       );
       expect(result).toBeUndefined();
     });
+
+    it("do nothing when convention draft is not found", async () => {
+      const nonExistentConventionDraftId = uuid();
+
+      await expect(
+        pgConventionDraftRepository.delete([nonExistentConventionDraftId]),
+      ).resolves.not.toThrow();
+    });
   });
 });
