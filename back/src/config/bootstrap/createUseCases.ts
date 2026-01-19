@@ -162,6 +162,7 @@ import type { Gateways } from "./createGateways";
 import {
   makeGenerateConnectedUserLoginUrl,
   makeGenerateConventionMagicLinkUrl,
+  makeGenerateEmailAuthCodeUrl,
 } from "./magicLinkUrl";
 
 type CreateUsecasesParams = {
@@ -228,6 +229,10 @@ export const createUseCases = ({
   const generateConnectedUserLoginUrl = makeGenerateConnectedUserLoginUrl(
     config,
     generateConnectedUserJwt,
+  );
+  const generateEmailAuthCodeUrl = makeGenerateEmailAuthCodeUrl(
+    config,
+    generateEmailAuthCodeJwt,
   );
 
   const addConvention = new AddConvention(
@@ -1033,10 +1038,11 @@ export const createUseCases = ({
     initiateLoginByEmail: makeInitiateLoginByEmail({
       uowPerformer,
       deps: {
+        config,
+        timeGateway: gateways.timeGateway,
         uuidGenerator,
         saveNotificationAndRelatedEvent,
-        appConfig: config,
-        generateEmailAuthCodeJwt,
+        generateEmailAuthCodeUrl,
       },
     }),
     getDiscussions: makeGetDiscussionsForUser({
