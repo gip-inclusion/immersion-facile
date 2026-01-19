@@ -373,7 +373,7 @@ describe("PgAgencyRepository", () => {
         phoneNumber: "0610101010",
       };
       await agencyRepository.update({
-        partialAgency: {
+        partialAgencyToUpdate: {
           id: agency1.id,
           ...updatedFields,
         },
@@ -1858,7 +1858,7 @@ describe("PgAgencyRepository", () => {
           {
             agencyId: agency2WithValidator1AndCounsellor1Rights.id,
             ...agency2WithValidator1AndCounsellor1Rights.usersRights[
-              validator1.id
+            validator1.id
             ],
           },
         ],
@@ -1872,13 +1872,13 @@ describe("PgAgencyRepository", () => {
           {
             agencyId: agency2WithValidator1AndCounsellor1Rights.id,
             ...agency2WithValidator1AndCounsellor1Rights.usersRights[
-              counsellor1.id
+            counsellor1.id
             ],
           },
           {
             agencyId: agencyNeedsReviewWithCounsellor1Rights.id,
             ...agencyNeedsReviewWithCounsellor1Rights.usersRights[
-              counsellor1.id
+            counsellor1.id
             ],
           },
         ],

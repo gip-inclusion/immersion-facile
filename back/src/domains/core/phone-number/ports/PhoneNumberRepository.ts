@@ -1,3 +1,5 @@
+import type { PhoneNumber, PhoneNumberId } from "shared";
+
 export interface PhoneNumberRepository {
-  getIdByPhoneNumber(phone: string, now: Date): Promise<number>;
+  getIdByPhoneNumber(phone: PhoneNumber, now: Date): Promise<PhoneNumberId>;
 }

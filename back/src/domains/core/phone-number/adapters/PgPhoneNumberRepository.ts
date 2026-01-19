@@ -1,9 +1,13 @@
+import type { PhoneNumber, PhoneNumberId } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import type { PhoneNumberRepository } from "../ports/PhoneNumberRepository";
 
 export class PgPhoneNumberRepository implements PhoneNumberRepository {
-  constructor(private transaction: KyselyDb) {}
-  public async getIdByPhoneNumber(phone: string, now: Date): Promise<number> {
+  constructor(private transaction: KyselyDb) { }
+  public async getIdByPhoneNumber(
+    phone: PhoneNumber,
+    now: Date,
+  ): Promise<PhoneNumberId> {
     const result = await this.transaction
       .selectFrom("phone_numbers")
       .select("id")
@@ -16,7 +20,7 @@ export class PgPhoneNumberRepository implements PhoneNumberRepository {
 
     return result.id;
   }
-  async #save(phone: string, now: Date): Promise<number> {
+  async #save(phone: PhoneNumber, now: Date): Promise<PhoneNumberId> {
     const result = await this.transaction
       .insertInto("phone_numbers")
       .values({

@@ -43,7 +43,7 @@ const logger = createLogger(__filename);
 const MAX_AGENCIES_RETURNED = 1500;
 
 export class PgAgencyRepository implements AgencyRepository {
-  constructor(private transaction: KyselyDb) {}
+  constructor(private transaction: KyselyDb) { }
 
   public async insert(params: {
     agency: AgencyWithUsersRights;
@@ -105,10 +105,10 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async update(params: {
-    partialAgency: PartialAgencyWithUsersRights;
+    partialAgencyToUpdate: PartialAgencyWithUsersRights;
     newPhoneId: number;
   }): Promise<void> {
-    const { partialAgency, newPhoneId } = params;
+    const { partialAgencyToUpdate: partialAgency, newPhoneId } = params;
     await this.transaction
       .updateTable("agencies")
       .set(({ fn }) => ({
@@ -119,8 +119,8 @@ export class PgAgencyRepository implements AgencyRepository {
         logo_url: partialAgency.logoUrl,
         position: partialAgency.position
           ? fn("ST_MakePoint", [
-              sql`${partialAgency.position.lon}, ${partialAgency.position.lat}`,
-            ])
+            sql`${partialAgency.position.lon}, ${partialAgency.position.lat}`,
+          ])
           : undefined,
         agency_siret: partialAgency.agencySiret,
         code_safir: partialAgency.codeSafir,
@@ -253,10 +253,10 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) =>
         departmentCode
           ? b.where(
-              "agencies.covered_departments",
-              "@>",
-              `["${departmentCode}"]`,
-            )
+            "agencies.covered_departments",
+            "@>",
+            `["${departmentCode}"]`,
+          )
           : b,
       (b) =>
         nameIncludes
@@ -279,16 +279,16 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) =>
         position
           ? b.where(
-              ({ fn }) =>
-                fn("ST_Distance", [
-                  fn("ST_GeographyFromText", [
-                    sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
-                  ]),
-                  "agencies.position",
+            ({ fn }) =>
+              fn("ST_Distance", [
+                fn("ST_GeographyFromText", [
+                  sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
                 ]),
-              "<=",
-              position.distance_km * 1000,
-            )
+                "agencies.position",
+              ]),
+            "<=",
+            position.distance_km * 1000,
+          )
           : b,
       (b) =>
         b.limit(
@@ -470,20 +470,20 @@ export class PgAgencyRepository implements AgencyRepository {
   #pgAgencyToAgencyWithRights(
     result:
       | (OmitFromExistingKeys<
-          AgencyDto,
-          | "counsellorEmails"
-          | "validatorEmails"
-          | "acquisitionCampaign"
-          | "acquisitionKeyword"
-        > & {
-          acquisitionCampaign: string | null;
-          acquisitionKeyword: string | null;
-          usersRights: {
-            userId: string;
-            roles: AgencyRole[];
-            isNotifiedByEmail: boolean;
-          }[];
-        })
+        AgencyDto,
+        | "counsellorEmails"
+        | "validatorEmails"
+        | "acquisitionCampaign"
+        | "acquisitionKeyword"
+      > & {
+        acquisitionCampaign: string | null;
+        acquisitionKeyword: string | null;
+        usersRights: {
+          userId: string;
+          roles: AgencyRole[];
+          isNotifiedByEmail: boolean;
+        }[];
+      })
       | undefined,
   ): AgencyWithUsersRights | undefined {
     if (!result) return;
@@ -517,11 +517,11 @@ export class PgAgencyRepository implements AgencyRepository {
       .map(([userId, userRights]) =>
         userRights
           ? {
-              agency_id: agencyId,
-              user_id: userId,
-              is_notified_by_email: userRights.isNotifiedByEmail,
-              roles: JSON.stringify(userRights.roles),
-            }
+            agency_id: agencyId,
+            user_id: userId,
+            is_notified_by_email: userRights.isNotifiedByEmail,
+            roles: JSON.stringify(userRights.roles),
+          }
           : undefined,
       )
       .filter(isTruthy);

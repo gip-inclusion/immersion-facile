@@ -1261,10 +1261,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withRefersToAgencyInfo(
         withRefersToAgency
           ? {
-              refersToAgencyId: withRefersToAgency.id,
-              refersToAgencyName: withRefersToAgency.name,
-              refersToAgencyContactEmail: withRefersToAgency.contactEmail,
-            }
+            refersToAgencyId: withRefersToAgency.id,
+            refersToAgencyName: withRefersToAgency.name,
+            refersToAgencyContactEmail: withRefersToAgency.contactEmail,
+          }
           : null,
       )
       .build();
@@ -1863,7 +1863,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
       // Update the agency with the new user rights
       await agencyRepo.update({
-        partialAgency: {
+        partialAgencyToUpdate: {
           ...existingAgency,
           usersRights: {
             ...existingAgency.usersRights,
