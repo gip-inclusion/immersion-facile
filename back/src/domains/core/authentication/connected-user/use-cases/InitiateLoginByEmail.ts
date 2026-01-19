@@ -1,16 +1,14 @@
 import {
-  type Email,
   frontRoutes,
   getFormattedFirstnameAndLastname,
   type InitiateLoginByEmailParams,
   immersionFacileNoReplyEmailSender,
   initiateLoginByEmailParamsSchema,
-  type OAuthSuccessLoginParams,
-  queryParamsAsString,
 } from "shared";
 import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
-import type { GenerateEmailAuthCodeJwt } from "../../../jwt";
+import type { GenerateEmailAuthCodeUrl } from "../../../../../config/bootstrap/magicLinkUrl";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
+import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../useCaseBuilder";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 
@@ -19,10 +17,11 @@ export const makeInitiateLoginByEmail = useCaseBuilder("InitiateLoginByEmail")
   .withInput<InitiateLoginByEmailParams>(initiateLoginByEmailParamsSchema)
   .withOutput<void>()
   .withDeps<{
+    config: AppConfig;
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     uuidGenerator: UuidGenerator;
-    appConfig: AppConfig;
-    generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt;
+    generateEmailAuthCodeUrl: GenerateEmailAuthCodeUrl;
+    timeGateway: TimeGateway;
   }>()
   .build(async ({ inputParams: { email, redirectUri }, uow, deps }) => {
     const nonce = deps.uuidGenerator.new();
@@ -49,21 +48,17 @@ export const makeInitiateLoginByEmail = useCaseBuilder("InitiateLoginByEmail")
           recipients: [email],
           sender: immersionFacileNoReplyEmailSender,
           params: {
-            loginLink: `${
-              deps.appConfig.immersionFacileBaseUrl
-            }/${frontRoutes.magicLinkInterstitial}?${queryParamsAsString<
-              OAuthSuccessLoginParams & {
-                email: Email;
-              }
-            >({
-              code: deps.generateEmailAuthCodeJwt({ version: 1 }),
+            validMinutes: deps.config.emailAuthCodeJwtDurationInMinutes,
+            loginLink: deps.generateEmailAuthCodeUrl({
               state,
+              now: deps.timeGateway.now(),
+              uri: frontRoutes.magicLinkInterstitial,
               email,
-            })}`,
-            fullname:
-              user?.firstName && user.lastName
-                ? `${getFormattedFirstnameAndLastname({ firstname: user.firstName, lastname: user.lastName })}`
-                : "",
+            }),
+            fullname: getFormattedFirstnameAndLastname({
+              firstname: user?.firstName,
+              lastname: user?.lastName,
+            }),
           },
         },
         followedIds: { userId: user?.id },

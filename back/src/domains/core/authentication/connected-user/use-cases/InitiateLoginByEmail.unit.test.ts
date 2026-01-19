@@ -9,11 +9,11 @@ import {
   type UserWithAdminRights,
 } from "shared";
 import { AppConfigBuilder } from "../../../../../utils/AppConfigBuilder";
+import { fakeGenerateEmailAuthCodeUrlFn } from "../../../../../utils/jwtTestHelper";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import type { GenerateEmailAuthCodeJwt } from "../../../jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
@@ -29,14 +29,14 @@ import {
 } from "./InitiateLoginByEmail";
 
 describe("RequestLoginByEmail usecase", () => {
+  const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
+
   let initiateLoginByEmail: InitiateLoginByEmail;
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
   let uuidGenerator: TestUuidGenerator;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
-  const fakeJwt = "fake-email-auth-jwt";
-  const fakeGenerateEmailAuthCode: GenerateEmailAuthCodeJwt = () => fakeJwt;
   const redirectUri = // must be allowed by the schema
     "/tableau-de-bord-etablissement/discussions?discussionId=any-discussion-id";
 
@@ -48,11 +48,12 @@ describe("RequestLoginByEmail usecase", () => {
     createdAt: new Date().toISOString(),
     proConnect: null,
   };
-  const testDomain = "after-login.com";
+
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
+
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -60,17 +61,14 @@ describe("RequestLoginByEmail usecase", () => {
     initiateLoginByEmail = makeInitiateLoginByEmail({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
+        config,
         saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
           uuidGenerator,
           timeGateway,
         ),
+        timeGateway,
         uuidGenerator,
-        generateEmailAuthCodeJwt: fakeGenerateEmailAuthCode,
-        appConfig: new AppConfigBuilder()
-          .withConfigParams({
-            DOMAIN: testDomain,
-          })
-          .build(),
+        generateEmailAuthCodeUrl: fakeGenerateEmailAuthCodeUrlFn,
       },
     });
   });
@@ -127,7 +125,8 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}&email=${user.email}`,
+            validMinutes: config.emailAuthCodeJwtDurationInMinutes,
+            loginLink: `http://fake-connected-user/${frontRoutes.magicLinkInterstitial}?code=EmailAuthCodeJwt&email=${user.email}&state=${state}`,
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,
@@ -171,7 +170,8 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}&email=${user.email}`,
+            validMinutes: config.emailAuthCodeJwtDurationInMinutes,
+            loginLink: `http://fake-connected-user/${frontRoutes.magicLinkInterstitial}?code=EmailAuthCodeJwt&email=${user.email}&state=${state}`,
             fullname: "",
           },
           recipients: [user.email],
@@ -196,7 +196,8 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `https://${testDomain}/${frontRoutes.magicLinkInterstitial}?code=${fakeJwt}&state=${state}&email=${user.email}`,
+            validMinutes: config.emailAuthCodeJwtDurationInMinutes,
+            loginLink: `http://fake-connected-user/${frontRoutes.magicLinkInterstitial}?code=EmailAuthCodeJwt&email=${user.email}&state=${state}`,
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,
