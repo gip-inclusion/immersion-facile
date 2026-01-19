@@ -438,8 +438,8 @@ describe("Admin router", () => {
         .withId("two-steps-validation-agency")
         .build();
 
-      inMemoryUow.agencyRepository.insert(
-        toAgencyWithRights(agency, {
+      inMemoryUow.agencyRepository.insert({
+        agency: toAgencyWithRights(agency, {
           [validatorInAgency.id]: {
             roles: ["validator"],
             isNotifiedByEmail: true,
@@ -450,7 +450,11 @@ describe("Admin router", () => {
           },
           [toReviewUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
-      );
+        phoneId: await inMemoryUow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          new Date(),
+        ),
+      });
       inMemoryUow.userRepository.users = [
         toReviewUser,
         validatorInAgency,
@@ -508,15 +512,19 @@ describe("Admin router", () => {
       ];
 
       const agencyWithOneStep = new AgencyDtoBuilder().build();
-      inMemoryUow.agencyRepository.insert(
-        toAgencyWithRights(agencyWithOneStep, {
+      inMemoryUow.agencyRepository.insert({
+        agency: toAgencyWithRights(agencyWithOneStep, {
           [validatorInAgency.id]: {
             roles: ["validator"],
             isNotifiedByEmail: true,
           },
           [toReviewUser.id]: { roles: ["to-review"], isNotifiedByEmail: true },
         }),
-      );
+        phoneId: await inMemoryUow.phoneNumberRepository.getIdByPhoneNumber(
+          agencyWithOneStep.phoneNumber,
+          new Date(),
+        ),
+      });
 
       const updatedRole: AgencyRole = "counsellor";
 

@@ -75,7 +75,24 @@ describe("BroadcastConventionAgain", () => {
       },
     });
     uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-    await uow.conventionRepository.save(convention);
+    await uow.conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
   });
 
   describe("Wrong paths", () => {

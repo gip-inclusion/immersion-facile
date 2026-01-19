@@ -120,7 +120,16 @@ export class ContactEstablishment extends TransactionalUseCase<CreateDiscussionD
       uow,
     });
 
-    await uow.discussionRepository.insert(discussion);
+    const potentialBeneficiaryPhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        discussion.potentialBeneficiary.phone,
+        now,
+      );
+
+    await uow.discussionRepository.insert({
+      discussion: discussion,
+      potentialBeneficiaryPhoneId: potentialBeneficiaryPhoneId,
+    });
 
     await this.#markEstablishmentAsNotSearchableIfLimitReached({
       uow,

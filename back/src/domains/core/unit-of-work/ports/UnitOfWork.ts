@@ -25,6 +25,7 @@ import type { FeatureFlagQueries } from "../../feature-flags/ports/FeatureFlagQu
 import type { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
 import type { NafRepository } from "../../naf/port/NafRepository";
 import type { NotificationRepository } from "../../notifications/ports/NotificationRepository";
+import type { PhoneNumberRepository } from "../../phone-number/ports/PhoneNumberRepository";
 import type { RomeRepository } from "../../rome/ports/RomeRepository";
 import type { BroadcastFeedbacksRepository } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import type { ShortLinkQuery } from "../../short-link/ports/ShortLinkQuery";
@@ -55,6 +56,7 @@ export type UnitOfWork = {
   nafRepository: NafRepository;
   notificationRepository: NotificationRepository;
   npsRepository: NpsRepository;
+  phoneNumberRepository: PhoneNumberRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;
   outboxQueries: OutboxQueries;
   outboxRepository: OutboxRepository;

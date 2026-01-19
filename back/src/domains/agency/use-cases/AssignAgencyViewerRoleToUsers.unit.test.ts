@@ -6,6 +6,7 @@ import {
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -134,6 +135,7 @@ describe("AssignAgencyViewerRoleToUsers", () => {
     uow = createInMemoryUow();
     assignAgencyViewerRole = new AssignAgencyViewerRole(
       new InMemoryUowPerformer(uow),
+      new CustomTimeGateway(),
     );
 
     uow.agencyRepository.agencies = [

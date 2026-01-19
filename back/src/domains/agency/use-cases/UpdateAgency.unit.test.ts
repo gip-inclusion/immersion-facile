@@ -61,6 +61,7 @@ describe("Update agency", () => {
     updateAgency = makeUpdateAgency({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
+        timeGateway: new CustomTimeGateway(),
         createNewEvent: makeCreateNewEvent({
           timeGateway: new CustomTimeGateway(),
           uuidGenerator: new TestUuidGenerator(),

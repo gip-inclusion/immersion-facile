@@ -72,10 +72,133 @@ export const conventionSeed = async (
 
   conventionSchema.parse(conventionWithAssessmentReadyToFill);
 
+  const peConventionBeneficiaryPhoneNumber = "+33500000000";
+  const peConventionEstablishmentTutorPhoneNumber = "+33500000001";
+  const peConventionEstablishmentRepresentativePhoneNumber = "+33500000002";
+  const peConventionBeneficiaryRepresentativePhoneNumber = "+33500000003";
+  const peConventionBeneficiaryCurrentEmployerPhoneNumber = "+33500000004";
+
+  const cciConventionBeneficiaryPhoneNumber = "+33500000010";
+  const cciConventionEstablishmentTutorPhoneNumber = "+33500000011";
+  const cciConventionEstablishmentRepresentativePhoneNumber = "+33500000012";
+  const cciConventionBeneficiaryRepresentativePhoneNumber = "+33500000013";
+  const cciConventionBeneficiaryCurrentEmployerPhoneNumber = "+33500000014";
+
+  const conventionWithAssessmentReadyToFillBeneficiaryPhoneNumber =
+    "+33500000020";
+  const conventionWithAssessmentReadyToFillEstablishmentTutorPhoneNumber =
+    "+33500000021";
+  const conventionWithAssessmentReadyToFillEstablishmentRepresentativePhoneNumber =
+    "+33500000022";
+  const conventionWithAssessmentReadyToFillBeneficiaryRepresentativePhoneNumber =
+    "+33500000023";
+  const conventionWithAssessmentReadyToFillBeneficiaryCurrentEmployerPhoneNumber =
+    "+33500000024";
+
+  const peConventionPhoneNumberIds = await Promise.all([
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      peConventionBeneficiaryPhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      peConventionEstablishmentTutorPhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      peConventionEstablishmentRepresentativePhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      peConventionBeneficiaryRepresentativePhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      peConventionBeneficiaryCurrentEmployerPhoneNumber,
+      new Date(),
+    ),
+  ]);
+
+  const cciConventionPhoneNumberIds = await Promise.all([
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      cciConventionBeneficiaryPhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      cciConventionEstablishmentTutorPhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      cciConventionEstablishmentRepresentativePhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      cciConventionBeneficiaryRepresentativePhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      cciConventionBeneficiaryCurrentEmployerPhoneNumber,
+      new Date(),
+    ),
+  ]);
+
+  const conventionWithAssessmentReadyToFillPhoneNumberIds = await Promise.all([
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      conventionWithAssessmentReadyToFillBeneficiaryPhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      conventionWithAssessmentReadyToFillEstablishmentTutorPhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      conventionWithAssessmentReadyToFillEstablishmentRepresentativePhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      conventionWithAssessmentReadyToFillBeneficiaryRepresentativePhoneNumber,
+      new Date(),
+    ),
+    uow.phoneNumberRepository.getIdByPhoneNumber(
+      conventionWithAssessmentReadyToFillBeneficiaryCurrentEmployerPhoneNumber,
+      new Date(),
+    ),
+  ]);
+
   await Promise.all([
-    uow.conventionRepository.save(peConvention),
-    uow.conventionRepository.save(cciConvention),
-    uow.conventionRepository.save(conventionWithAssessmentReadyToFill),
+    uow.conventionRepository.save({
+      conventionDto: peConvention,
+      phoneIds: {
+        beneficiary: peConventionPhoneNumberIds[0],
+        establishmentTutor: peConventionPhoneNumberIds[1],
+        establishmentRepresentative: peConventionPhoneNumberIds[2],
+        beneficiaryRepresentative: peConventionPhoneNumberIds[3],
+        beneficiaryCurrentEmployer: peConventionPhoneNumberIds[4],
+      },
+    }),
+    uow.conventionRepository.save({
+      conventionDto: cciConvention,
+      phoneIds: {
+        beneficiary: cciConventionPhoneNumberIds[0],
+        establishmentTutor: cciConventionPhoneNumberIds[1],
+        establishmentRepresentative: cciConventionPhoneNumberIds[2],
+        beneficiaryRepresentative: cciConventionPhoneNumberIds[3],
+        beneficiaryCurrentEmployer: cciConventionPhoneNumberIds[4],
+      },
+    }),
+    uow.conventionRepository.save({
+      conventionDto: conventionWithAssessmentReadyToFill,
+      phoneIds: {
+        beneficiary: conventionWithAssessmentReadyToFillPhoneNumberIds[0],
+        establishmentTutor:
+          conventionWithAssessmentReadyToFillPhoneNumberIds[1],
+        establishmentRepresentative:
+          conventionWithAssessmentReadyToFillPhoneNumberIds[2],
+        beneficiaryRepresentative:
+          conventionWithAssessmentReadyToFillPhoneNumberIds[3],
+        beneficiaryCurrentEmployer:
+          conventionWithAssessmentReadyToFillPhoneNumberIds[4],
+      },
+    }),
   ]);
 
   await uow.notificationRepository.save({

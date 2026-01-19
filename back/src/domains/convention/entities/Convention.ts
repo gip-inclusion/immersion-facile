@@ -355,7 +355,40 @@ export const signConvention = async ({
     conventionRead: convention,
     hasAssessment: false,
   });
-  const signedId = await uow.conventionRepository.update(signedConvention);
+
+  const nowDate = new Date(now);
+  const signedId = await uow.conventionRepository.update({
+    conventionDto: signedConvention,
+    phoneIds: {
+      beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+        signedConvention.signatories.beneficiary.phone,
+        nowDate,
+      ),
+      establishmentRepresentative:
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          signedConvention.signatories.establishmentRepresentative.phone,
+          nowDate,
+        ),
+      establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+        signedConvention.establishmentTutor.phone,
+        nowDate,
+      ),
+      beneficiaryRepresentative: signedConvention.signatories
+        .beneficiaryRepresentative
+        ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+            signedConvention.signatories.beneficiaryRepresentative.phone,
+            nowDate,
+          )
+        : undefined,
+      beneficiaryCurrentEmployer: signedConvention.signatories
+        .beneficiaryCurrentEmployer
+        ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+            signedConvention.signatories.beneficiaryCurrentEmployer.phone,
+            nowDate,
+          )
+        : undefined,
+    },
+  });
   if (!signedId)
     throw errors.convention.notFound({ conventionId: signedConvention.id });
 

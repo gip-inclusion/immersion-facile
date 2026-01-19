@@ -29,6 +29,7 @@ import {
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { GeoParams } from "../entities/SearchMadeEntity";
 import {
@@ -3867,7 +3868,10 @@ describe("PgEstablishmentAggregateRepository", () => {
     const now = new Date();
     const sinceOneWeekAgo = subDays(now, 7);
     const sinceOneMonthAgo = subDays(now, 30);
-
+    let pgPhoneNumberRepository: PgPhoneNumberRepository;
+    beforeEach(async () => {
+      pgPhoneNumberRepository = new PgPhoneNumberRepository(makeKyselyDb(pool));
+    });
     const establishmentNotSearchable = new EstablishmentAggregateBuilder()
       .withUserRights([osefUserRight])
       .withIsMaxDiscussionsForPeriodReached(true)
@@ -3934,7 +3938,14 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withCreatedAt(addMilliseconds(sinceOneMonthAgo, 1))
           .build();
 
-        await pgDiscussionRepository.insert(discussionForEstablishment8);
+        await pgDiscussionRepository.insert({
+          discussion: discussionForEstablishment8,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussionForEstablishment8.potentialBeneficiary.phone,
+              now,
+            ),
+        });
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
@@ -3986,7 +3997,14 @@ describe("PgEstablishmentAggregateRepository", () => {
           establishmentIsNotSearchableAndMaxContactPerMonth1,
         );
 
-        await pgDiscussionRepository.insert(discussionAtOneMonthSinceDate);
+        await pgDiscussionRepository.insert({
+          discussion: discussionAtOneMonthSinceDate,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussionAtOneMonthSinceDate.potentialBeneficiary.phone,
+              now,
+            ),
+        });
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
@@ -4051,10 +4069,38 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withCreatedAt(addMilliseconds(sinceThreeWeeksAgo, 10))
           .build();
 
-        await pgDiscussionRepository.insert(discussion1ForEstablishment8);
-        await pgDiscussionRepository.insert(discussion2ForEstablishment8);
-        await pgDiscussionRepository.insert(discussion3ForEstablishment8);
-        await pgDiscussionRepository.insert(discussion4ForEstablishment8);
+        await pgDiscussionRepository.insert({
+          discussion: discussion1ForEstablishment8,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion1ForEstablishment8.potentialBeneficiary.phone,
+              now,
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: discussion2ForEstablishment8,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion2ForEstablishment8.potentialBeneficiary.phone,
+              now,
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: discussion3ForEstablishment8,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion3ForEstablishment8.potentialBeneficiary.phone,
+              now,
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: discussion4ForEstablishment8,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion4ForEstablishment8.potentialBeneficiary.phone,
+              now,
+            ),
+        });
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
@@ -4101,7 +4147,14 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentIsNotSearchableAndMaxContactPerMonth0,
         );
-        await pgDiscussionRepository.insert(discussionAfterSinceOneMonthDate);
+        await pgDiscussionRepository.insert({
+          discussion: discussionAfterSinceOneMonthDate,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussionAfterSinceOneMonthDate.potentialBeneficiary.phone,
+              now,
+            ),
+        });
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
@@ -4120,7 +4173,14 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentIsNotSearchableAndMaxContactPerMonth1,
         );
-        await pgDiscussionRepository.insert(discussionAfterSinceAWeekDate);
+        await pgDiscussionRepository.insert({
+          discussion: discussionAfterSinceAWeekDate,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussionAfterSinceAWeekDate.potentialBeneficiary.phone,
+              now,
+            ),
+        });
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
@@ -4149,7 +4209,14 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withCreatedAt(addMilliseconds(sinceOneWeekAgo, 1))
           .build();
 
-        await pgDiscussionRepository.insert(discussionForEstablishment4);
+        await pgDiscussionRepository.insert({
+          discussion: discussionForEstablishment4,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussionForEstablishment4.potentialBeneficiary.phone,
+              now,
+            ),
+        });
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
         );

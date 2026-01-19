@@ -15,6 +15,7 @@ import {
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { getUserWithRights } from "../helpers/userRights.helper";
@@ -40,6 +41,7 @@ export const makeLinkFranceTravailUsersToTheirAgencies = useCaseBuilder(
   .withOutput<void>()
   .withDeps<{
     createNewEvent: CreateNewEvent;
+    timeGateway: TimeGateway;
   }>()
   .build(async ({ uow, deps, inputParams: { userId, codeSafir } }) => {
     if (!codeSafir) return;
@@ -52,12 +54,10 @@ export const makeLinkFranceTravailUsersToTheirAgencies = useCaseBuilder(
     if (agenciesWithSafir.length) {
       await Promise.all(
         agenciesWithSafir.map(async (agencyWithSafir) => {
-          return updateActiveAgencyWithSafir(
-            uow,
-            agencyWithSafir,
+          return updateActiveAgencyWithSafir(uow, deps, {
             userId,
-            deps.createNewEvent,
-          );
+            agencyWithSafir,
+          });
         }),
       );
       return;
@@ -65,7 +65,8 @@ export const makeLinkFranceTravailUsersToTheirAgencies = useCaseBuilder(
 
     const groupWithSafir =
       await uow.agencyGroupRepository.getByCodeSafir(codeSafir);
-    if (groupWithSafir) return updateAgenciesOfGroup(uow, groupWithSafir, user);
+    if (groupWithSafir)
+      return updateAgenciesOfGroup(uow, groupWithSafir, user, deps);
   });
 
 const isIcUserAlreadyHasValidRight = (
@@ -79,23 +80,35 @@ const isIcUserAlreadyHasValidRight = (
 
 const updateActiveAgencyWithSafir = async (
   uow: UnitOfWork,
-  agencyWithSafir: AgencyWithUsersRights,
-  userId: string,
-  createNewEvent: CreateNewEvent,
+  deps: {
+    timeGateway: TimeGateway;
+    createNewEvent: CreateNewEvent;
+  },
+  payload: {
+    userId: string;
+    agencyWithSafir: AgencyWithUsersRights;
+  },
 ): Promise<void> => {
+  const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+    payload.agencyWithSafir.phoneNumber,
+    deps.timeGateway.now(),
+  );
   await Promise.all([
     uow.agencyRepository.update({
-      id: agencyWithSafir.id,
-      usersRights: {
-        ...agencyWithSafir.usersRights,
-        [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+      partialAgency: {
+        id: payload.agencyWithSafir.id,
+        usersRights: {
+          ...payload.agencyWithSafir.usersRights,
+          [payload.userId]: { roles: ["validator"], isNotifiedByEmail: false },
+        },
       },
+      newPhoneId: phoneId,
     }),
     uow.outboxRepository.save(
-      createNewEvent({
+      deps.createNewEvent({
         topic: "AgencyUpdated",
         payload: {
-          agencyId: agencyWithSafir.id,
+          agencyId: payload.agencyWithSafir.id,
           triggeredBy: {
             kind: "crawler",
           },
@@ -109,6 +122,9 @@ const updateAgenciesOfGroup = async (
   uow: UnitOfWork,
   agencyGroupWithSafir: AgencyGroup,
   user: UserWithRights,
+  deps: {
+    timeGateway: TimeGateway;
+  },
 ): Promise<void> => {
   const agenciesRelatedToGroup = await uow.agencyRepository.getByIds(
     agencyGroupWithSafir.agencyIds,
@@ -154,9 +170,10 @@ const updateAgenciesOfGroup = async (
     ...otherAgencyRights,
   ];
 
-  return updateRightsOnMultipleAgenciesForUser(
+  return updateRightsOnMultipleAgenciesForUser({
     uow,
-    user.id,
-    agencyRightsForUser,
-  );
+    userId: user.id,
+    agenciesRightForUser: agencyRightsForUser,
+    now: deps.timeGateway.now(),
+  });
 };

@@ -178,7 +178,11 @@ export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
     );
   }
 
-  public async save(apiConsumer: ApiConsumer): Promise<void> {
+  public async save(params: {
+    apiConsumer: ApiConsumer;
+    phoneId: number;
+  }): Promise<void> {
+    const { apiConsumer } = params;
     this.#consumers[apiConsumer.id] = apiConsumer;
   }
 }

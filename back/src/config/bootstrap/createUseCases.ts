@@ -224,6 +224,7 @@ export const createUseCases = ({
     uowPerformer,
     createNewEvent,
     gateways.siret,
+    gateways.timeGateway,
   );
 
   const broadcastToFranceTravailOnConventionUpdates =
@@ -569,7 +570,10 @@ export const createUseCases = ({
         uuidGenerator,
         gateways.timeGateway,
       ),
-      deleteSubscription: new DeleteSubscription(uowPerformer),
+      deleteSubscription: new DeleteSubscription(
+        uowPerformer,
+        gateways.timeGateway,
+      ),
       shareConventionByEmail: new ShareConventionLinkByEmail(
         uowPerformer,
         saveNotificationAndRelatedEvent,
@@ -706,6 +710,7 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         createNewEvent,
+        timeGateway: gateways.timeGateway,
       },
     }),
 
@@ -714,6 +719,7 @@ export const createUseCases = ({
         uowPerformer,
         deps: {
           createNewEvent,
+          timeGateway: gateways.timeGateway,
         },
       }),
 
@@ -742,6 +748,7 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         createNewEvent,
+        timeGateway: gateways.timeGateway,
       },
     }),
 
@@ -749,6 +756,7 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         createNewEvent,
+        timeGateway: gateways.timeGateway,
       },
     }),
 
@@ -757,6 +765,7 @@ export const createUseCases = ({
         uowPerformer,
         deps: {
           createNewEvent,
+          timeGateway: gateways.timeGateway,
         },
       }),
 
@@ -764,6 +773,7 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         createNewEvent,
+        timeGateway: gateways.timeGateway,
       },
     }),
 
@@ -788,6 +798,7 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         createNewEvent,
+        timeGateway: gateways.timeGateway,
       },
     }),
 
@@ -865,7 +876,7 @@ export const createUseCases = ({
     }),
     removeUserFromAgency: makeRemoveUserFromAgency({
       uowPerformer,
-      deps: { createNewEvent },
+      deps: { createNewEvent, timeGateway: gateways.timeGateway },
     }),
     broadcastConventionAgain: makeBroadcastConventionAgain({
       uowPerformer,
@@ -965,7 +976,7 @@ export const createUseCases = ({
     }),
     editConventionCounsellorName: makeEditConventionCounsellorName({
       uowPerformer,
-      deps: { createNewEvent },
+      deps: { createNewEvent, timeGateway: gateways.timeGateway },
     }),
     warnSenderThatMessageCouldNotBeDelivered:
       makeWarnSenderThatMessageCouldNotBeDelivered({

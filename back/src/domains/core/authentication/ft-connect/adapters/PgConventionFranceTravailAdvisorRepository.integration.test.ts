@@ -17,6 +17,7 @@ import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
+import { PgPhoneNumberRepository } from "../../../phone-number/adapters/PgPhoneNumberRepository";
 import { PgUserRepository } from "../../connected-user/adapters/PgUserRepository";
 import type {
   ConventionFtUserAdvisorEntity,
@@ -69,6 +70,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
   let pool: Pool;
   let conventionFranceTravailAdvisorRepository: PgConventionFranceTravailAdvisorRepository;
   let conventionRepository: PgConventionRepository;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -87,17 +89,40 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
 
     const validator = makeUniqueUserForTest(uuid());
     await new PgUserRepository(db).save(validator);
-    await agencyRepository.insert(
-      toAgencyWithRights(AgencyDtoBuilder.create().build(), {
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-      }),
-    );
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
+    const agency = toAgencyWithRights(AgencyDtoBuilder.create().build(), {
+      [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+    });
+    await agencyRepository.insert({
+      agency,
+      phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+        agency.phoneNumber,
+        new Date(),
+      ),
+    });
 
     conventionRepository = new PgConventionRepository(db);
     const conventionExternalIdRepository = new PgConventionExternalIdRepository(
       db,
     );
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          convention.signatories.beneficiary.phone,
+          new Date(),
+        ),
+        establishmentRepresentative:
+          await pgPhoneNumberRepository.getIdByPhoneNumber(
+            convention.signatories.establishmentRepresentative.phone,
+            new Date(),
+          ),
+        establishmentTutor: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          convention.establishmentTutor.phone,
+          new Date(),
+        ),
+      },
+    });
     await conventionExternalIdRepository.save(convention.id);
   });
 
@@ -285,7 +310,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           conventionId,
         );
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: franceTravailFirstUserAdvisor.advisor,
         peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,
@@ -307,7 +332,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           conventionId,
         );
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: undefined,
         peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,

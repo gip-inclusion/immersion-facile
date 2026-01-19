@@ -14,6 +14,7 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
 import { PgAgencyGroupRepository } from "./PgAgencyGroupRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
@@ -25,6 +26,7 @@ describe("PgAgencyGroupRepository", () => {
   let pgAgencyGroupRepository: PgAgencyGroupRepository;
   let pgAgencyRepository: PgAgencyRepository;
   let pgUserRepository: PgUserRepository;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
 
   beforeAll(async () => {
     pool = makeTestPgPool();
@@ -40,6 +42,7 @@ describe("PgAgencyGroupRepository", () => {
     pgAgencyGroupRepository = new PgAgencyGroupRepository(db);
     pgAgencyRepository = new PgAgencyRepository(db);
     pgUserRepository = new PgUserRepository(db);
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
   });
 
   afterAll(async () => {
@@ -71,6 +74,7 @@ describe("PgAgencyGroupRepository", () => {
         db,
         pgAgencyRepository,
         pgUserRepository,
+        pgPhoneNumberRepository,
         agencyGroup,
       });
 
@@ -88,10 +92,12 @@ const insertAgencyGroup = async ({
   pgAgencyRepository,
   pgUserRepository,
   agencyGroup,
+  pgPhoneNumberRepository,
 }: {
   db: KyselyDb;
   pgAgencyRepository: PgAgencyRepository;
   pgUserRepository: PgUserRepository;
+  pgPhoneNumberRepository: PgPhoneNumberRepository;
   agencyGroup: AgencyGroup;
 }) => {
   if (
@@ -104,11 +110,15 @@ const insertAgencyGroup = async ({
 
   await pgUserRepository.save(validator);
 
-  await pgAgencyRepository.insert(
-    toAgencyWithRights(agency, {
+  await pgAgencyRepository.insert({
+    agency: toAgencyWithRights(agency, {
       [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
     }),
-  );
+    phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+      agency.phoneNumber,
+      new Date(),
+    ),
+  });
 
   const [{ id: agencyGroupId }] = await db
     .insertInto("agency_groups")

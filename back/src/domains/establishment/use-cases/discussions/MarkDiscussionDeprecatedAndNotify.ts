@@ -67,12 +67,21 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
           }
         : null;
 
+    const potentialBeneficiaryPhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        discussion.potentialBeneficiary.phone,
+        deps.timeGateway.now(),
+      );
+
     await Promise.all([
       uow.discussionRepository.update({
-        ...discussion,
-        updatedAt: deps.timeGateway.now().toISOString(),
-        status: "REJECTED",
-        rejectionKind: "DEPRECATED",
+        discussion: {
+          ...discussion,
+          updatedAt: deps.timeGateway.now().toISOString(),
+          status: "REJECTED",
+          rejectionKind: "DEPRECATED",
+        },
+        potentialBeneficiaryPhoneId: potentialBeneficiaryPhoneId,
       }),
       deps.saveNotificationsBatchAndRelatedEvent(uow, [
         ...(establishmentNotification ? [establishmentNotification] : []),

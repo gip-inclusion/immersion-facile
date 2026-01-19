@@ -67,6 +67,7 @@ describe("RemoveUserFromAgency", () => {
     removeUserFromAgency = makeRemoveUserFromAgency({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
+        timeGateway: new CustomTimeGateway(),
         createNewEvent: makeCreateNewEvent({
           uuidGenerator: new TestUuidGenerator(),
           timeGateway: new CustomTimeGateway(),

@@ -10,6 +10,7 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
+import { PgPhoneNumberRepository } from "../../phone-number/adapters/PgPhoneNumberRepository";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
@@ -51,11 +52,12 @@ describe("PgApiConsumerRepository", () => {
   let pool: Pool;
   let db: KyselyDb;
   let apiConsumerRepository: PgApiConsumerRepository;
-
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
   beforeAll(async () => {
     pool = makeTestPgPool();
     db = makeKyselyDb(pool);
     apiConsumerRepository = new PgApiConsumerRepository(db);
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
   });
 
   afterAll(async () => {
@@ -72,7 +74,13 @@ describe("PgApiConsumerRepository", () => {
       undefined,
     );
 
-    await apiConsumerRepository.save(apiConsumer);
+    await apiConsumerRepository.save({
+      apiConsumer: apiConsumer,
+      phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+        apiConsumer.contact.phone,
+        new Date(),
+      ),
+    });
     expectToEqual(
       await apiConsumerRepository.getById(apiConsumer.id),
       apiConsumer,
@@ -111,7 +119,13 @@ describe("PgApiConsumerRepository", () => {
       },
     };
 
-    await apiConsumerRepository.save(updatedApiConsumer);
+    await apiConsumerRepository.save({
+      apiConsumer: updatedApiConsumer,
+      phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+        updatedApiConsumer.contact.phone,
+        new Date(),
+      ),
+    });
     expectToEqual(
       await apiConsumerRepository.getById(apiConsumer.id),
       updatedApiConsumer,
@@ -152,13 +166,37 @@ describe("PgApiConsumerRepository", () => {
     };
 
     beforeEach(async () => {
-      await apiConsumerRepository.save(apiConsumer);
-      await apiConsumerRepository.save(apiConsumerWithAgencyIdRight);
-      await apiConsumerRepository.save(apiConsumerWithAgencyKindRight);
+      await apiConsumerRepository.save({
+        apiConsumer: apiConsumer,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          apiConsumer.contact.phone,
+          new Date(),
+        ),
+      });
+      await apiConsumerRepository.save({
+        apiConsumer: apiConsumerWithAgencyIdRight,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          apiConsumerWithAgencyIdRight.contact.phone,
+          new Date(),
+        ),
+      });
+      await apiConsumerRepository.save({
+        apiConsumer: apiConsumerWithAgencyKindRight,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          apiConsumerWithAgencyKindRight.contact.phone,
+          new Date(),
+        ),
+      });
     });
 
     it("returns all api consumers when no filters are provided", async () => {
-      await apiConsumerRepository.save(apiConsumer);
+      await apiConsumerRepository.save({
+        apiConsumer: apiConsumer,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          apiConsumer.contact.phone,
+          new Date(),
+        ),
+      });
 
       expectArraysToEqualIgnoringOrder(
         await apiConsumerRepository.getByFilters({}),
@@ -265,7 +303,13 @@ describe("PgApiConsumerRepository", () => {
     });
 
     it("returns all api consumers", async () => {
-      await apiConsumerRepository.save(apiConsumer);
+      await apiConsumerRepository.save({
+        apiConsumer: apiConsumer,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          apiConsumer.contact.phone,
+          new Date(),
+        ),
+      });
       expectToEqual(await apiConsumerRepository.getAll(), [apiConsumer]);
     });
   });
@@ -273,7 +317,13 @@ describe("PgApiConsumerRepository", () => {
   describe("addSubscription", () => {
     it("add first subscription", async () => {
       expect(apiConsumer.rights.convention.subscriptions).toEqual([]);
-      await apiConsumerRepository.save(apiConsumer);
+      await apiConsumerRepository.save({
+        apiConsumer: apiConsumer,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          apiConsumer.contact.phone,
+          new Date(),
+        ),
+      });
 
       const subscription: WebhookSubscription = {
         callbackUrl: "https://partner-callback-url",
@@ -297,7 +347,13 @@ describe("PgApiConsumerRepository", () => {
         },
       };
 
-      await apiConsumerRepository.save(updatedConsumer);
+      await apiConsumerRepository.save({
+        apiConsumer: updatedConsumer,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          updatedConsumer.contact.phone,
+          new Date(),
+        ),
+      });
 
       const updatedConsumerInRepo = await apiConsumerRepository.getById(
         updatedConsumer.id,

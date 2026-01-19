@@ -20,6 +20,7 @@ import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
@@ -37,6 +38,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
   let pgConventionRepository: PgConventionRepository;
   let pgAgencyRepository: PgAgencyRepository;
   let pgUserRepository: PgUserRepository;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
   let testUser: User;
   let establishment: EstablishmentAggregate;
 
@@ -60,6 +62,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
     pgConventionRepository = new PgConventionRepository(db);
     pgAgencyRepository = new PgAgencyRepository(db);
     pgUserRepository = new PgUserRepository(db);
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
 
     testUser = new UserBuilder()
       .withId("11111111-1111-4444-1111-111111111111")
@@ -95,11 +98,16 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       await new PgUserRepository(db).save(validator);
 
       const agency = new AgencyDtoBuilder().build();
-      await pgAgencyRepository.insert(
-        toAgencyWithRights(agency, {
+      const phoneId = await pgPhoneNumberRepository.getIdByPhoneNumber(
+        agency.phoneNumber,
+        new Date(),
+      );
+      await pgAgencyRepository.insert({
+        agency: toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
-      );
+        phoneId,
+      });
 
       const convention = new ConventionDtoBuilder()
         .withSiret(establishment.establishment.siret)
@@ -107,8 +115,26 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
         .withAgencyId(agency.id)
         .withDateSubmission(new Date().toISOString())
         .build();
+      const now = new Date();
 
-      await pgConventionRepository.save(convention);
+      await pgConventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+            convention.signatories.beneficiary.phone,
+            now,
+          ),
+          establishmentTutor: await pgPhoneNumberRepository.getIdByPhoneNumber(
+            convention.establishmentTutor.phone,
+            now,
+          ),
+          establishmentRepresentative:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              convention.signatories.establishmentRepresentative.phone,
+              now,
+            ),
+        },
+      });
 
       const initialExchange: Exchange = {
         subject: "Hello",
@@ -167,7 +193,17 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
           discussionWithoutResponse,
           discussionWithResponse,
           discussionWithResponseButTooOld,
-        ].map((discussion) => pgDiscussionRepository.insert(discussion)),
+        ].map(async (discussion) => {
+          const potentialBeneficiaryPhoneId =
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion.potentialBeneficiary.phone,
+              new Date(),
+            );
+          return pgDiscussionRepository.insert({
+            discussion: discussion,
+            potentialBeneficiaryPhoneId,
+          });
+        }),
       );
 
       await updateAllEstablishmentScoresQuery(db);
@@ -195,11 +231,16 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       await new PgUserRepository(db).save(validator);
 
       agency = new AgencyDtoBuilder().build();
-      await pgAgencyRepository.insert(
-        toAgencyWithRights(agency, {
+      const phoneId = await pgPhoneNumberRepository.getIdByPhoneNumber(
+        agency.phoneNumber,
+        new Date(),
+      );
+      await pgAgencyRepository.insert({
+        agency: toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
-      );
+        phoneId,
+      });
 
       const discussions = Array.from({ length: 50 }, (_, i) =>
         new DiscussionBuilder()
@@ -219,7 +260,16 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       );
 
       await Promise.all(
-        discussions.map((d) => pgDiscussionRepository.insert(d)),
+        discussions.map(async (d) =>
+          pgDiscussionRepository.insert({
+            discussion: d,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                d.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+        ),
       );
     });
 
@@ -261,7 +311,24 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
         .withDateStart(new Date().toISOString())
         .build();
 
-      await pgConventionRepository.save(convention);
+      await pgConventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+            convention.signatories.beneficiary.phone,
+            new Date(),
+          ),
+          establishmentTutor: await pgPhoneNumberRepository.getIdByPhoneNumber(
+            convention.establishmentTutor.phone,
+            new Date(),
+          ),
+          establishmentRepresentative:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              convention.signatories.establishmentRepresentative.phone,
+              new Date(),
+            ),
+        },
+      });
 
       const updatedEstablishments =
         await deactivateUnresponsiveEstablishmentsQuery(db);

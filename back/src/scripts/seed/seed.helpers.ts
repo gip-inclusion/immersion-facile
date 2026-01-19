@@ -53,9 +53,16 @@ export const insertAgencySeed = async ({
     },
   };
 
-  await uow.agencyRepository.insert(
-    toAgencyWithRights(agency, connectedValidator),
+  const phoneNumber = "+33584875487";
+  const phoneNumberId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+    phoneNumber,
+    new Date(),
   );
+
+  await uow.agencyRepository.insert({
+    agency: toAgencyWithRights(agency, connectedValidator),
+    phoneId: phoneNumberId,
+  });
 
   return agencyId;
 };
@@ -112,18 +119,50 @@ export const insertSpecificAgenciesWithUserRight = async ({
     },
   };
 
-  await uow.agencyRepository.insert(
-    toAgencyWithRights(peAgency, connectedValidator),
-  );
-  await uow.agencyRepository.insert(
-    toAgencyWithRights(cciAgency, connectedValidator),
-  );
-  await uow.agencyRepository.insert(
-    toAgencyWithRights(capEmploiAgency, connectedValidator),
-  );
-  await uow.agencyRepository.insert(
-    toAgencyWithRights(missionLocaleAgency, connectedValidator),
-  );
+  const peAgencyPhoneNumber = "+33584875487";
+  const peAgencyPhoneNumberId =
+    await uow.phoneNumberRepository.getIdByPhoneNumber(
+      peAgencyPhoneNumber,
+      new Date(),
+    );
+
+  const cciAgencyPhoneNumberr = "+33584875488";
+  const cciAgencyPhoneNumberId =
+    await uow.phoneNumberRepository.getIdByPhoneNumber(
+      cciAgencyPhoneNumberr,
+      new Date(),
+    );
+
+  const capEmploiAgencyPhoneNumber = "+33584875490";
+  const capEmploiAgencyPhoneNumberId =
+    await uow.phoneNumberRepository.getIdByPhoneNumber(
+      capEmploiAgencyPhoneNumber,
+      new Date(),
+    );
+
+  const missionLocaleAgencyPhoneNumber = "+33584875419";
+  const missionLocaleAgencyPhoneNumberId =
+    await uow.phoneNumberRepository.getIdByPhoneNumber(
+      missionLocaleAgencyPhoneNumber,
+      new Date(),
+    );
+
+  await uow.agencyRepository.insert({
+    agency: toAgencyWithRights(peAgency, connectedValidator),
+    phoneId: peAgencyPhoneNumberId,
+  });
+  await uow.agencyRepository.insert({
+    agency: toAgencyWithRights(cciAgency, connectedValidator),
+    phoneId: cciAgencyPhoneNumberId,
+  });
+  await uow.agencyRepository.insert({
+    agency: toAgencyWithRights(capEmploiAgency, connectedValidator),
+    phoneId: capEmploiAgencyPhoneNumberId,
+  });
+  await uow.agencyRepository.insert({
+    agency: toAgencyWithRights(missionLocaleAgency, connectedValidator),
+    phoneId: missionLocaleAgencyPhoneNumberId,
+  });
 
   return {
     ...agencyIds,

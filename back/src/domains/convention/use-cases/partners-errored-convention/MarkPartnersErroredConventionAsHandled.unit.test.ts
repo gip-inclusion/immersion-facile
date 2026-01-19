@@ -93,7 +93,24 @@ describe("mark partners errored convention as handled", () => {
       handledByAgency: false,
     };
 
-    await uow.conventionRepository.save(convention);
+    await uow.conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
     await uow.broadcastFeedbacksRepository.save(savedErrorConvention);
 
     uow.userRepository.users = [user];
@@ -131,7 +148,24 @@ describe("mark partners errored convention as handled", () => {
   it("Throw when convention is not errored", async () => {
     const conventionRepository = uow.conventionRepository;
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
 
     uow.userRepository.users = [user];
     uow.agencyRepository.agencies = [agencyWithRights];
@@ -167,7 +201,24 @@ describe("mark partners errored convention as handled", () => {
       handledByAgency: true,
     };
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
     await broadcastFeedbacksRepository.save(savedHandledErrorConvention);
     userRepository.users = [user];
     uow.agencyRepository.agencies = [agencyWithRights];
@@ -209,7 +260,24 @@ describe("mark partners errored convention as handled", () => {
   it("Throw when no user was found", async () => {
     const conventionRepository = uow.conventionRepository;
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
@@ -224,7 +292,24 @@ describe("mark partners errored convention as handled", () => {
     const conventionRepository = uow.conventionRepository;
     const userRepository = uow.userRepository;
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
     userRepository.users = [user];
 
     await expectPromiseToFailWithError(

@@ -150,14 +150,20 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
     );
   }
 
-  public async insert(discussion: DiscussionDto) {
-    this._discussions[discussion.id] = discussion;
+  public async insert(params: {
+    discussion: DiscussionDto;
+    potentialBeneficiaryPhoneId: number;
+  }) {
+    this._discussions[params.discussion.id] = params.discussion;
   }
 
-  public async update(discussion: DiscussionDto) {
-    if (!this._discussions[discussion.id])
+  public async update(params: {
+    discussion: DiscussionDto;
+    potentialBeneficiaryPhoneId: number;
+  }) {
+    if (!this._discussions[params.discussion.id])
       throw new Error("Discussion not found");
-    this._discussions[discussion.id] = discussion;
+    this._discussions[params.discussion.id] = params.discussion;
   }
 
   // For test purposes

@@ -23,7 +23,13 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
-import type { AgencyWithoutRights } from "../ports/AgencyRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import {
+  type AgencyWithoutRights,
+  toAgencyInsertParams,
+  toAgencyUpdateParams,
+} from "../ports/AgencyRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
 describe("PgAgencyRepository", () => {
@@ -106,6 +112,8 @@ describe("PgAgencyRepository", () => {
   let agencyRepository: PgAgencyRepository;
   let userRepository: PgUserRepository;
   let db: KyselyDb;
+  let timeGateway: CustomTimeGateway;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
 
   beforeAll(async () => {
     pool = makeTestPgPool();
@@ -125,8 +133,11 @@ describe("PgAgencyRepository", () => {
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("users").execute();
 
-    agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
-    userRepository = new PgUserRepository(makeKyselyDb(pool));
+    const kyselyDb = makeKyselyDb(pool);
+    agencyRepository = new PgAgencyRepository(kyselyDb);
+    userRepository = new PgUserRepository(kyselyDb);
+    timeGateway = new CustomTimeGateway();
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(kyselyDb);
 
     await userRepository.save(validator1);
     await userRepository.save(validator2);
@@ -153,10 +164,22 @@ describe("PgAgencyRepository", () => {
     it("inserts unknown agencies", async () => {
       expectToEqual(await agencyRepository.getAgencies({}), []);
 
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       expectToEqual(await agencyRepository.getAgencies({}), [agency1]);
 
-      await agencyRepository.insert(agency2);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency2,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       expectToEqual(await agencyRepository.getAgencies({}), [agency1, agency2]);
     });
 
@@ -172,8 +195,13 @@ describe("PgAgencyRepository", () => {
           },
         },
       );
-      await agencyRepository.insert(agencyWithSameCounsellorAndValidator);
-
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agencyWithSameCounsellorAndValidator,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       expectToEqual(await agencyRepository.getAgencies({}), [
         agencyWithSameCounsellorAndValidator,
       ]);
@@ -192,7 +220,13 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(agency);
+      await agencyRepository.insert({
+        agency: agency,
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      });
 
       expectToEqual(await agencyRepository.getAgencies({}), [agency]);
     });
@@ -217,11 +251,23 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(agency1a);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1a,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       expectToEqual(await agencyRepository.getAgencies({}), [agency1a]);
 
       await expectPromiseToFailWithError(
-        agencyRepository.insert(agency1b),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency1b,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
         errors.agency.alreadyExist(agency1b.id),
       );
 
@@ -236,7 +282,13 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(agencyWithNullDelegation);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agencyWithNullDelegation,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       const retrievedAgency = await agencyRepository.getById(
         agencyWithNullDelegation.id,
@@ -256,7 +308,14 @@ describe("PgAgencyRepository", () => {
     it("updates the entire entity", async () => {
       expectToEqual(await agencyRepository.getAgencies({}), []);
 
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+
       expectToEqual(await agencyRepository.getAgencies({}), [agency1]);
 
       const updatedAgency1 = toAgencyWithRights(
@@ -285,14 +344,27 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.update(updatedAgency1);
+      await agencyRepository.update(
+        await toAgencyUpdateParams(
+          updatedAgency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       expectToEqual(await agencyRepository.getAgencies({}), [updatedAgency1]);
     });
 
     it("updates the only some fields", async () => {
       expectToEqual(await agencyRepository.getAgencies({}), []);
 
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+
       expectToEqual(await agencyRepository.getAgencies({}), [agency1]);
 
       const updatedFields: Partial<AgencyWithoutRights> = {
@@ -301,8 +373,14 @@ describe("PgAgencyRepository", () => {
         phoneNumber: "0610101010",
       };
       await agencyRepository.update({
-        id: agency1.id,
-        ...updatedFields,
+        partialAgency: {
+          id: agency1.id,
+          ...updatedFields,
+        },
+        newPhoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          "0610101010",
+          timeGateway.now(),
+        ),
       });
       expectToEqual(await agencyRepository.getAgencies({}), [
         { ...agency1, ...updatedFields },
@@ -320,7 +398,14 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(agencyWithTwoStepValidation);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agencyWithTwoStepValidation,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+
       expectToEqual(await agencyRepository.getAgencies({}), [
         agencyWithTwoStepValidation,
       ]);
@@ -335,10 +420,14 @@ describe("PgAgencyRepository", () => {
         },
       };
 
-      await agencyRepository.update({
-        id: agencyWithTwoStepValidation.id,
-        ...updatedAgencyRights,
-      });
+      await agencyRepository.update(
+        await toAgencyUpdateParams(
+          agencyWithTwoStepValidation,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+
       expectToEqual(await agencyRepository.getAgencies({}), [
         { ...agencyWithTwoStepValidation, ...updatedAgencyRights },
       ]);
@@ -352,7 +441,13 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(agencyWithoutDelegationInfo);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agencyWithoutDelegationInfo,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       const delegationInfo = {
         delegationEndDate: new Date("2029-12-31").toISOString(),
@@ -360,10 +455,13 @@ describe("PgAgencyRepository", () => {
         delegationAgencyKind: "mission-locale" as const,
       };
 
-      await agencyRepository.update({
-        id: agencyWithoutDelegationInfo.id,
-        delegationAgencyInfo: delegationInfo,
-      });
+      await agencyRepository.update(
+        await toAgencyUpdateParams(
+          agencyWithoutDelegationInfo,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       const retrievedAgency = await agencyRepository.getById(
         agencyWithoutDelegationInfo.id,
@@ -396,12 +494,24 @@ describe("PgAgencyRepository", () => {
         delegationAgencyKind: "pole-emploi",
       };
 
-      await agencyRepository.insert(agencyWithDelegation);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agencyWithDelegation,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
-      await agencyRepository.update({
-        id: agencyWithDelegation.id,
-        delegationAgencyInfo: updatedDelegationInfo,
-      });
+      await agencyRepository.update(
+        await toAgencyUpdateParams(
+          {
+            ...agencyWithDelegation,
+            delegationAgencyInfo: updatedDelegationInfo,
+          },
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       const retrievedAgency = await agencyRepository.getById(
         agencyWithDelegation.id,
@@ -434,15 +544,33 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns existing agency", async () => {
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       const retrievedAgency = await agencyRepository.getById(agency1.id);
       expectToEqual(retrievedAgency, agency1);
     });
 
     it("returns existing agency, with link to a refering one if it exists", async () => {
-      await agencyRepository.insert(agency1);
-      await agencyRepository.insert(agency2WithRefersToAgency1);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency2WithRefersToAgency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       expectToEqual(
         await agencyRepository.getById(agency2WithRefersToAgency1.id),
@@ -467,7 +595,13 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(agencyWithDelegation);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agencyWithDelegation,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       const retrievedAgency = await agencyRepository.getById(
         agencyWithDelegation.id,
@@ -508,9 +642,27 @@ describe("PgAgencyRepository", () => {
 
     it("returns all agencies with number of number to review", async () => {
       await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
-        agencyRepository.insert(agency3),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency1,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency2,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency3,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
       ]);
 
       expectArraysToEqualIgnoringOrder(
@@ -544,7 +696,13 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns existing active agencies with provided safir code", async () => {
-      await agencyRepository.insert(agency1WithSafir);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1WithSafir,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       expectToEqual(
         await agencyRepository.getBySafirAndActiveStatus(safirCode),
         [agency1WithSafir],
@@ -552,10 +710,16 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns empty array when agency is not active", async () => {
-      await agencyRepository.insert({
-        ...agency1WithSafir,
-        status: "closed",
-      });
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          {
+            ...agency1WithSafir,
+            status: "closed",
+          },
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       expectToEqual(
         await agencyRepository.getBySafirAndActiveStatus(safirCode),
         [],
@@ -569,8 +733,20 @@ describe("PgAgencyRepository", () => {
           [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
         },
       );
-      await agencyRepository.insert(agency1WithSafir);
-      await agencyRepository.insert(agency2WithSafir);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1WithSafir,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency2WithSafir,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       const agencies =
         await agencyRepository.getBySafirAndActiveStatus(safirCode);
@@ -597,9 +773,27 @@ describe("PgAgencyRepository", () => {
 
     beforeEach(async () => {
       await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
-        agencyRepository.insert(agency3),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency1,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency2,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency3,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
       ]);
     });
 
@@ -743,16 +937,38 @@ describe("PgAgencyRepository", () => {
     describe("filter by agency status", () => {
       it("returns all agencies filtered on activeAgencyStatuses (active and from-api-PE).", async () => {
         await Promise.all([
-          agencyRepository.insert(agency1PEVitrySurSeine),
-          agencyRepository.insert(agencyMissionLocale),
-          agencyRepository.insert(agencyAddedFromPeReferenciel),
           agencyRepository.insert(
-            toAgencyWithRights(needsReviewAgency, {
-              [validator1.id]: {
-                isNotifiedByEmail: false,
-                roles: ["validator"],
-              },
-            }),
+            await toAgencyInsertParams(
+              agency1PEVitrySurSeine,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyMissionLocale,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyAddedFromPeReferenciel,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              toAgencyWithRights(needsReviewAgency, {
+                [validator1.id]: {
+                  isNotifiedByEmail: false,
+                  roles: ["validator"],
+                },
+              }),
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
           ),
         ]);
 
@@ -768,17 +984,45 @@ describe("PgAgencyRepository", () => {
 
       it("returns all agencies filtered on statuses, respecting provided limit and position", async () => {
         await Promise.all([
-          agencyRepository.insert(agency1PEVitrySurSeine),
-          agencyRepository.insert(agency2PEVitryLeFrancois),
-          agencyRepository.insert(agencyMissionLocale),
-          agencyRepository.insert(agencyAddedFromPeReferenciel),
           agencyRepository.insert(
-            toAgencyWithRights(needsReviewAgency, {
-              [validator1.id]: {
-                isNotifiedByEmail: false,
-                roles: ["validator"],
-              },
-            }),
+            await toAgencyInsertParams(
+              agency1PEVitrySurSeine,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency2PEVitryLeFrancois,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyMissionLocale,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyAddedFromPeReferenciel,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              toAgencyWithRights(needsReviewAgency, {
+                [validator1.id]: {
+                  isNotifiedByEmail: false,
+                  roles: ["validator"],
+                },
+              }),
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
           ),
         ]);
 
@@ -813,10 +1057,34 @@ describe("PgAgencyRepository", () => {
         );
 
         await Promise.all([
-          agencyRepository.insert(agency1PEVitrySurSeine),
-          agencyRepository.insert(agencyMissionLocale),
-          agencyRepository.insert(agencyAddedFromPeReferenciel),
-          agencyRepository.insert(closedAgency),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency1PEVitrySurSeine,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyMissionLocale,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyAddedFromPeReferenciel,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              closedAgency,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
         ]);
 
         const agencies = await agencyRepository.getAgencies({
@@ -829,10 +1097,34 @@ describe("PgAgencyRepository", () => {
     describe("filter agency kinds", () => {
       beforeEach(async () => {
         await Promise.all([
-          agencyRepository.insert(agencyParisCci),
-          agencyRepository.insert(agency1PEVitrySurSeine),
-          agencyRepository.insert(agencyParisChambreAgriculture),
-          agencyRepository.insert(agencyParisCma),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyParisCci,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency1PEVitrySurSeine,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyParisChambreAgriculture,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyParisCma,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
         ]);
       });
 
@@ -860,9 +1152,27 @@ describe("PgAgencyRepository", () => {
     describe("filter nameIncludes", () => {
       beforeEach(async () => {
         await Promise.all([
-          agencyRepository.insert(agency1PEVitrySurSeine),
-          agencyRepository.insert(agency2PEVitryLeFrancois),
-          agencyRepository.insert(agency3PEVitrolles),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency1PEVitrySurSeine,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency2PEVitryLeFrancois,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency3PEVitrolles,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
         ]);
       });
 
@@ -886,8 +1196,20 @@ describe("PgAgencyRepository", () => {
     describe("filter sirets", () => {
       beforeEach(async () => {
         await Promise.all([
-          agencyRepository.insert(agency1PEVitrySurSeine),
-          agencyRepository.insert(agency2PEVitryLeFrancois),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency1PEVitrySurSeine,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency2PEVitryLeFrancois,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
         ]);
       });
 
@@ -935,11 +1257,41 @@ describe("PgAgencyRepository", () => {
 
       beforeEach(async () => {
         await Promise.all([
-          agencyRepository.insert(agency1PEVitrySurSeine),
-          agencyRepository.insert(agency2PEVitryLeFrancois),
-          agencyRepository.insert(agency3PEVitrolles),
-          agencyRepository.insert(agencyParisCci),
-          agencyRepository.insert(agencyWithParisInCoveredDepartments),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency1PEVitrySurSeine,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency2PEVitryLeFrancois,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agency3PEVitrolles,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyParisCci,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyWithParisInCoveredDepartments,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
         ]);
       });
 
@@ -1009,8 +1361,20 @@ describe("PgAgencyRepository", () => {
           );
 
           await Promise.all([
-            agencyRepository.insert(parisAgency),
-            agencyRepository.insert(cergyAgency),
+            agencyRepository.insert(
+              await toAgencyInsertParams(
+                parisAgency,
+                pgPhoneNumberRepository,
+                timeGateway,
+              ),
+            ),
+            agencyRepository.insert(
+              await toAgencyInsertParams(
+                cergyAgency,
+                pgPhoneNumberRepository,
+                timeGateway,
+              ),
+            ),
           ]);
 
           expectToEqual(
@@ -1063,16 +1427,38 @@ describe("PgAgencyRepository", () => {
         );
 
         await Promise.all([
-          agencyRepository.insert(nancyAgency),
-          agencyRepository.insert(epinalAgency),
-          agencyRepository.insert(dijonAgency),
           agencyRepository.insert(
-            toAgencyWithRights(needsReviewAgency, {
-              [validator1.id]: {
-                isNotifiedByEmail: false,
-                roles: ["validator"],
-              },
-            }),
+            await toAgencyInsertParams(
+              nancyAgency,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              epinalAgency,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              dijonAgency,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              toAgencyWithRights(needsReviewAgency, {
+                [validator1.id]: {
+                  isNotifiedByEmail: false,
+                  roles: ["validator"],
+                },
+              }),
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
           ),
         ]);
 
@@ -1108,8 +1494,20 @@ describe("PgAgencyRepository", () => {
       );
 
       beforeEach(async () => {
-        await agencyRepository.insert(agency1);
-        await agencyRepository.insert(agency2WithRefersToAgency1);
+        await agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency1,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        );
+        await agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency2WithRefersToAgency1,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        );
       });
 
       it("should not return refered agencies when the filter is provided with true", async () => {
@@ -1161,9 +1559,27 @@ describe("PgAgencyRepository", () => {
 
       beforeEach(async () => {
         await Promise.all([
-          agencyRepository.insert(agencyCreatedBefore),
-          agencyRepository.insert(agencyCreatedOnDate),
-          agencyRepository.insert(agencyCreatedAfter),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyCreatedBefore,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyCreatedOnDate,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
+          agencyRepository.insert(
+            await toAgencyInsertParams(
+              agencyCreatedAfter,
+              pgPhoneNumberRepository,
+              timeGateway,
+            ),
+          ),
         ]);
       });
 
@@ -1228,8 +1644,20 @@ describe("PgAgencyRepository", () => {
     );
 
     it("found related agencies", async () => {
-      await agencyRepository.insert(agency1);
-      await agencyRepository.insert(agency2WithRefersToAgency1);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency2WithRefersToAgency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       expectToEqual(
         await agencyRepository.getAgenciesRelatedToAgency(agency1.id),
@@ -1238,7 +1666,13 @@ describe("PgAgencyRepository", () => {
     });
 
     it("empty when there is no related agencies", async () => {
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          agency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       expectToEqual(
         await agencyRepository.getAgenciesRelatedToAgency(agency1.id),
@@ -1262,7 +1696,13 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(immersionFacileAgency);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          immersionFacileAgency,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
 
       expectToEqual(
         await agencyRepository.getImmersionFacileAgencyId(),
@@ -1297,8 +1737,20 @@ describe("PgAgencyRepository", () => {
 
     beforeEach(async () => {
       await Promise.all([
-        agencyRepository.insert(agency1WithValidatorAndCounsellorRights),
-        agencyRepository.insert(agency2WithValidator2Rights),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency1WithValidatorAndCounsellorRights,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency2WithValidator2Rights,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
       ]);
     });
 
@@ -1371,9 +1823,27 @@ describe("PgAgencyRepository", () => {
 
     beforeEach(async () => {
       await Promise.all([
-        agencyRepository.insert(agency1WithValidator1Rights),
-        agencyRepository.insert(agency2WithValidator1AndCounsellor1Rights),
-        agencyRepository.insert(agencyNeedsReviewWithCounsellor1Rights),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency1WithValidator1Rights,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agency2WithValidator1AndCounsellor1Rights,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agencyNeedsReviewWithCounsellor1Rights,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
       ]);
     });
 
@@ -1448,7 +1918,13 @@ describe("PgAgencyRepository", () => {
           [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       );
-      await agencyRepository.insert(activeAgencyAlreadyInDb);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          activeAgencyAlreadyInDb,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       const hasAlreadySimilarAgency =
         await agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
           address: activeAgencyAlreadyInDb.address,
@@ -1466,7 +1942,13 @@ describe("PgAgencyRepository", () => {
           [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       );
-      await agencyRepository.insert(closedAgencyAlreadyInDb);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          closedAgencyAlreadyInDb,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       const newAgencyId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
       const hasAlreadySimilarAgency =
         await agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
@@ -1488,7 +1970,13 @@ describe("PgAgencyRepository", () => {
           [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       );
-      await agencyRepository.insert(activeAgencyAlreadyInDb);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          activeAgencyAlreadyInDb,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
       const newAgencyId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
       const hasAlreadySimilarAgency =
         await agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
@@ -1522,8 +2010,20 @@ describe("PgAgencyRepository", () => {
     });
 
     beforeEach(async () => {
-      await agencyRepository.insert(activeAgencyWithRights);
-      await agencyRepository.insert(closedAgencyWithRights);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          activeAgencyWithRights,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          closedAgencyWithRights,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      );
     });
 
     it("returns empty array if requested sirets do not exist or an not active", async () => {
@@ -1604,18 +2104,60 @@ describe("PgAgencyRepository", () => {
 
     it("deletes agencies with status closed or rejected, updated_at older than given date, and without conventions", async () => {
       await Promise.all([
-        agencyRepository.insert(closedAgency1, oldDate),
-        agencyRepository.insert(rejectedAgency, oldDate),
-        agencyRepository.insert(closedAgency2, recentDate),
-        agencyRepository.insert(activeAgency, oldDate),
-        agencyRepository.insert(closedAgency3, oldDate),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            closedAgency1,
+            pgPhoneNumberRepository,
+            timeGateway,
+            oldDate,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            rejectedAgency,
+            pgPhoneNumberRepository,
+            timeGateway,
+            oldDate,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            closedAgency2,
+            pgPhoneNumberRepository,
+            timeGateway,
+            recentDate,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            activeAgency,
+            pgPhoneNumberRepository,
+            timeGateway,
+            oldDate,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            closedAgency3,
+            pgPhoneNumberRepository,
+            timeGateway,
+            oldDate,
+          ),
+        ),
       ]);
       const convention = new ConventionDtoBuilder()
         .withId("cccccccc-cccc-4ccc-9ccc-cccccccccccc")
         .withAgencyId(closedAgency3.id)
         .build();
 
-      await conventionRepository.save(convention);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: 1,
+          establishmentTutor: 2,
+          establishmentRepresentative: 3,
+        },
+      });
 
       const deletedAgencyIds =
         await agencyRepository.deleteOldClosedAgenciesWithoutConventions({
@@ -1669,10 +2211,29 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(closedAgency1, oldDate);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          closedAgency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+          oldDate,
+        ),
+      );
       await Promise.all([
-        agencyRepository.insert(agencyReferringToAgencyThatShouldBeDeleted),
-        agencyRepository.insert(agencyNotReferringToDeletedAgency),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agencyReferringToAgencyThatShouldBeDeleted,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
+        agencyRepository.insert(
+          await toAgencyInsertParams(
+            agencyNotReferringToDeletedAgency,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        ),
       ]);
 
       const deletedAgencyIds =
@@ -1709,10 +2270,21 @@ describe("PgAgencyRepository", () => {
           [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       );
-      await agencyRepository.insert(closedAgency1, oldDate);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          closedAgency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+          oldDate,
+        ),
+      );
 
       await agencyRepository.insert(
-        agencyReferringToDeletedAgencyWithConvention,
+        await toAgencyInsertParams(
+          agencyReferringToDeletedAgencyWithConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
       );
 
       const convention = new ConventionDtoBuilder()
@@ -1720,7 +2292,15 @@ describe("PgAgencyRepository", () => {
         .withAgencyId(agencyReferringToDeletedAgencyWithConvention.id)
         .build();
 
-      await conventionRepository.save(convention);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: 1,
+          establishmentTutor: 2,
+          establishmentRepresentative: 3,
+        },
+        now: timeGateway.now().toISOString(),
+      });
 
       const deletedAgencyIds =
         await agencyRepository.deleteOldClosedAgenciesWithoutConventions({
@@ -1758,8 +2338,22 @@ describe("PgAgencyRepository", () => {
         },
       );
 
-      await agencyRepository.insert(closedAgency1, oldDate);
-      await agencyRepository.insert(oldClosedAgencyReferrer, oldDate);
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          closedAgency1,
+          pgPhoneNumberRepository,
+          timeGateway,
+          oldDate,
+        ),
+      );
+      await agencyRepository.insert(
+        await toAgencyInsertParams(
+          oldClosedAgencyReferrer,
+          pgPhoneNumberRepository,
+          timeGateway,
+          oldDate,
+        ),
+      );
 
       const deletedAgencyIds =
         await agencyRepository.deleteOldClosedAgenciesWithoutConventions({

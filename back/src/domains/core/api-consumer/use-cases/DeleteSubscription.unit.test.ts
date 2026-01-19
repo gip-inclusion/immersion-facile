@@ -4,6 +4,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -22,7 +23,10 @@ describe("DeleteSubscription", () => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
 
-    deleteSubscription = new DeleteSubscription(uowPerformer);
+    deleteSubscription = new DeleteSubscription(
+      uowPerformer,
+      new CustomTimeGateway(),
+    );
   });
 
   it("throws error when apiConsumer does not have the rights", async () => {

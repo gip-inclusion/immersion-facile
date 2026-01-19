@@ -22,7 +22,7 @@ import {
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import type {
   AgencyRepository,
-  AgencyRightOfUser,
+  AgencyRightForUser,
   AgencyWithNumberOfUsersToReview,
   GetAgenciesFilters,
   PartialAgencyWithUsersRights,
@@ -54,22 +54,28 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     });
   }
 
-  public async insert(
-    agency: AgencyWithUsersRights,
-    _updatedAt?: DateString,
-  ): Promise<void> {
+  public async insert(params: {
+    agency: AgencyWithUsersRights;
+    phoneId: number;
+    updatedAt?: DateString;
+  }): Promise<void> {
+    const { agency } = params;
     if (this.#agencies[agency.id]) throw errors.agency.alreadyExist(agency.id);
     if (!values(agency.usersRights).length)
       throw errors.agency.noUsers(agency.id);
     this.#agencies[agency.id] = agency;
   }
 
-  public async update(agency: PartialAgencyWithUsersRights) {
-    const agencyToUdpate = this.#agencies[agency.id];
+  public async update(params: {
+    partialAgency: PartialAgencyWithUsersRights;
+    newPhoneId: number;
+  }): Promise<void> {
+    const { partialAgency } = params;
+    const agencyToUdpate = this.#agencies[partialAgency.id];
     if (!agencyToUdpate) {
-      throw errors.agency.notFound({ agencyId: agency.id });
+      throw errors.agency.notFound({ agencyId: partialAgency.id });
     }
-    this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
+    this.#agencies[partialAgency.id] = { ...agencyToUdpate, ...partialAgency };
   }
 
   public async getById(
@@ -200,21 +206,24 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 
   public async getAgenciesRightsByUserId(
     id: UserId,
-  ): Promise<AgencyRightOfUser[]> {
-    return values(this.#agencies).reduce<AgencyRightOfUser[]>((acc, agency) => {
-      const userRights = agency?.usersRights[id];
-      return [
-        ...acc,
-        ...(userRights
-          ? [
-              {
-                agencyId: agency.id,
-                ...userRights,
-              } satisfies AgencyRightOfUser,
-            ]
-          : []),
-      ];
-    }, []);
+  ): Promise<AgencyRightForUser[]> {
+    return values(this.#agencies).reduce<AgencyRightForUser[]>(
+      (acc, agency) => {
+        const userRights = agency?.usersRights[id];
+        return [
+          ...acc,
+          ...(userRights
+            ? [
+                {
+                  agencyId: agency.id,
+                  ...userRights,
+                } satisfies AgencyRightForUser,
+              ]
+            : []),
+        ];
+      },
+      [],
+    );
   }
 
   public async alreadyHasActiveAgencyWithSameAddressAndKind({

@@ -301,7 +301,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .where("created_at", ">=", since)
       .executeTakeFirst();
 
-    return result ? Number.parseInt(result.count) : 0;
+    return result ? Number.parseInt(result.count, 10) : 0;
   }
 
   public async deleteOldMessages(endedSince: Date) {
@@ -354,6 +354,11 @@ export class PgDiscussionRepository implements DiscussionRepository {
         .selectFrom("establishments__users as eu")
         .innerJoin("discussions", "eu.siret", "discussions.siret")
         .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
+        .leftJoin(
+          "phone_numbers as pn_beneficiary",
+          "discussions.potential_beneficiary_phone_id",
+          "pn_beneficiary.id",
+        )
         .innerJoin(
           "public_appellations_data as pad",
           "discussions.appellation_code",
@@ -413,7 +418,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
           "discussions.business_name",
           "discussions.potential_beneficiary_first_name",
           "discussions.potential_beneficiary_last_name",
-          "discussions.potential_beneficiary_phone",
+          "pn_beneficiary.phone_number",
           "pad.ogr_appellation",
           "pad.libelle_appellation_long",
           "prd.code_rome",
@@ -439,7 +444,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
           jsonBuildObject({
             firstName: ref("potential_beneficiary_first_name"),
             lastName: ref("potential_beneficiary_last_name"),
-            phone: ref("potential_beneficiary_phone"),
+            phone: sql<string>`COALESCE(${ref("pn_beneficiary.phone_number")}, '')`,
           }).as("potentialBeneficiary"),
           fn
             .coalesce(
@@ -533,19 +538,36 @@ export class PgDiscussionRepository implements DiscussionRepository {
     return !!result?.exists;
   }
 
-  public async insert(discussion: DiscussionDto) {
+  public async insert(params: {
+    discussion: DiscussionDto;
+    potentialBeneficiaryPhoneId: number;
+  }) {
     await this.transaction
       .insertInto("discussions")
-      .values(discussionToPg(discussion))
+      .values(
+        await discussionToPg(
+          params.discussion,
+          params.potentialBeneficiaryPhoneId,
+        ),
+      )
       .execute();
 
-    await this.#insertAllExchanges(discussion.id, discussion.exchanges);
+    await this.#insertAllExchanges(
+      params.discussion.id,
+      params.discussion.exchanges,
+    );
   }
 
-  public async update(discussion: DiscussionDto) {
+  public async update({
+    discussion,
+    potentialBeneficiaryPhoneId,
+  }: {
+    discussion: DiscussionDto;
+    potentialBeneficiaryPhoneId: number;
+  }) {
     await this.transaction
       .updateTable("discussions")
-      .set(discussionToPg(discussion))
+      .set(await discussionToPg(discussion, potentialBeneficiaryPhoneId))
       .where("id", "=", discussion.id)
       .execute();
     await this.#clearAllExistingExchanges(discussion);
@@ -605,6 +627,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
 const discussionToPg = (
   discussion: DiscussionDto,
+  phoneId: number,
 ): InsertObject<Database, "discussions"> => ({
   id: discussion.id,
   appellation_code: +discussion.appellationCode,
@@ -618,7 +641,7 @@ const discussionToPg = (
   potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
   kind: discussion.kind,
   immersion_objective: discussion.potentialBeneficiary.immersionObjective,
-  potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
+  potential_beneficiary_phone_id: phoneId,
   potential_beneficiary_date_preferences:
     discussion.potentialBeneficiary.datePreferences,
   ...(discussion.kind === "IF"
@@ -911,7 +934,12 @@ const executeGetDiscussions = (
       (join) => join.onRef("d.id", "=", "filtered_discussions.id"),
     )
     .leftJoin("exchanges as e", "d.id", "e.discussion_id")
-    .groupBy(["d.id", "d.created_at", "d.siret"])
+    .leftJoin(
+      "phone_numbers as pn_d",
+      "d.potential_beneficiary_phone_id",
+      "pn_d.id",
+    )
+    .groupBy(["d.id", "d.created_at", "d.siret", "pn_d.phone_number"])
     .orderBy("d.created_at", "desc")
     .orderBy("d.siret", "asc")
     .orderBy("d.updated_at", "desc")
@@ -932,7 +960,7 @@ const executeGetDiscussions = (
             firstName: ref("d.potential_beneficiary_first_name"),
             lastName: ref("d.potential_beneficiary_last_name"),
             email: ref("d.potential_beneficiary_email"),
-            phone: ref("d.potential_beneficiary_phone"),
+            phone: sql<string>`COALESCE(${ref("pn_d.phone_number")}, '')`,
             resumeLink: ref("d.potential_beneficiary_resume_link"),
             experienceAdditionalInformation: ref(
               "potential_beneficiary_experience_additional_information",

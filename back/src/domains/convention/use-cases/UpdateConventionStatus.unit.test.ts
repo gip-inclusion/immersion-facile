@@ -227,6 +227,7 @@ describe("UpdateConventionStatus", () => {
       });
 
       it("keeps date approval when going to status ACCEPTED_BY_VALIDATOR", async () => {
+        const timeGateway = new CustomTimeGateway();
         const { uow, updateConventionStatusUseCase } =
           prepareUseCaseForStandAloneTests();
         const user = new ConnectedUserBuilder()
@@ -243,7 +244,13 @@ describe("UpdateConventionStatus", () => {
           .build();
 
         uow.userRepository.users = [user];
-        await uow.agencyRepository.insert(agency);
+        await uow.agencyRepository.insert({
+          agency: agency,
+          phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        });
         uow.conventionRepository.setConventions([convention]);
 
         const validatorJwtPayload = createConventionMagicLinkPayload({

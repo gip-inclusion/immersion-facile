@@ -35,7 +35,7 @@ describe("PgScriptsQueries", () => {
     db = makeKyselyDb(pool);
     pgNotificationRepository = new PgNotificationRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      db,
+      makeKyselyDb(pool),
     );
   });
 

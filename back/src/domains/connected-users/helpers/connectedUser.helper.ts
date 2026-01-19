@@ -14,7 +14,7 @@ import {
   type UserWithRights,
   type WithDashboards,
 } from "shared";
-import type { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
+import type { AgencyRightForUser } from "../../agency/ports/AgencyRepository";
 import { emptyName } from "../../core/authentication/connected-user/entities/user.helper";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
@@ -55,7 +55,7 @@ export const getConnectedUsersByUserIds = async (
         rights: await uow.agencyRepository.getAgenciesRightsByUserId(userId),
       })),
     )
-  ).reduce<Record<UserId, AgencyRightOfUser[]>>(
+  ).reduce<Record<UserId, AgencyRightForUser[]>>(
     (acc, current) => ({ ...acc, [current.userId]: current.rights }),
     {},
   );
@@ -90,7 +90,7 @@ export const getConnectedUsersByUserIds = async (
 };
 
 const makeAgencyRights = (
-  userRights: AgencyRightOfUser[],
+  userRights: AgencyRightForUser[],
   agenciesRelatedToUsersByAgencyId: Record<AgencyId, AgencyWithUsersRights>,
   uow: UnitOfWork,
 ): Promise<AgencyRight[]> => {

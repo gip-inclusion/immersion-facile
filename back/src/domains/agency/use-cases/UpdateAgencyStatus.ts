@@ -6,13 +6,14 @@ import {
 } from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type UpdateAgencyStatus = ReturnType<typeof makeUpdateAgencyStatus>;
 export const makeUpdateAgencyStatus = useCaseBuilder("UpdateAgencyStatus")
   .withInput(updateAgencyStatusParamsSchema)
   .withCurrentUser<ConnectedUser>()
-  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .withDeps<{ createNewEvent: CreateNewEvent; timeGateway: TimeGateway }>()
   .build(async ({ uow, currentUser, deps, inputParams }) => {
     throwIfNotAdmin(currentUser);
     const existingAgency = await uow.agencyRepository.getById(inputParams.id);
@@ -29,7 +30,14 @@ export const makeUpdateAgencyStatus = useCaseBuilder("UpdateAgencyStatus")
           ? inputParams.statusJustification
           : null,
     };
-    await uow.agencyRepository.update(updatedAgencyParams);
+    const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+      existingAgency.phoneNumber,
+      deps.timeGateway.now(),
+    );
+    await uow.agencyRepository.update({
+      partialAgency: updatedAgencyParams,
+      newPhoneId: phoneId,
+    });
 
     if (inputParams.status === "active" || inputParams.status === "rejected") {
       await uow.outboxRepository.save(

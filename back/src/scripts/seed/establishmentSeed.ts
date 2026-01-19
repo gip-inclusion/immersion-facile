@@ -1,4 +1,4 @@
-import { DiscussionBuilder } from "shared";
+import { DiscussionBuilder, defaultDiscussion } from "shared";
 import { v4 as uuid } from "uuid";
 import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -100,7 +100,7 @@ const decathlon = new EstablishmentAggregateBuilder()
   .build();
 
 export const establishmentSeed = async (uow: UnitOfWork) => {
-  // biome-ignore lint/suspicious/noConsole: <explanation>
+  // biome-ignore lint/suspicious/noConsole: script log
   console.log("establishmentSeed start ...");
 
   await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -124,8 +124,15 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
   });
 
   const discussionId = "aaaaaaaa-9c0a-1aaa-aa6d-aaaaaaaaaaaa";
-  await uow.discussionRepository.insert(
-    new DiscussionBuilder()
+  const potentialBeneficiaryPhone =
+    defaultDiscussion.potentialBeneficiary.phone;
+  const potentialBeneficiaryPhoneId =
+    await uow.phoneNumberRepository.getIdByPhoneNumber(
+      potentialBeneficiaryPhone,
+      new Date(),
+    );
+  await uow.discussionRepository.insert({
+    discussion: new DiscussionBuilder()
       .withId(discussionId)
       .withSiret(franceMerguez.establishment.siret)
       .withPotentialBeneficiaryResumeLink(
@@ -154,9 +161,10 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
         },
       ])
       .build(),
-  );
-  await uow.discussionRepository.insert(
-    new DiscussionBuilder()
+    potentialBeneficiaryPhoneId: potentialBeneficiaryPhoneId,
+  });
+  await uow.discussionRepository.insert({
+    discussion: new DiscussionBuilder()
       .withId(uuid())
       .withSiret(franceMerguez.establishment.siret)
       .withPotentialBeneficiaryResumeLink(
@@ -186,7 +194,8 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
       ])
       .withStatus({ status: "REJECTED", rejectionKind: "DEPRECATED" })
       .build(),
-  );
+    potentialBeneficiaryPhoneId: potentialBeneficiaryPhoneId,
+  });
 
   // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("establishmentSeed done");

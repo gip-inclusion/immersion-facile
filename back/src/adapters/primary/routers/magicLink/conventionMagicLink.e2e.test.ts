@@ -583,11 +583,15 @@ describe("Magic link router", () => {
         validator,
       ];
       inMemoryUow.conventionRepository.setConventions([convention]);
-      inMemoryUow.agencyRepository.insert(
-        toAgencyWithRights(agency, {
+      inMemoryUow.agencyRepository.insert({
+        agency: toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
-      );
+        phoneId: await inMemoryUow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          new Date(),
+        ),
+      });
 
       const response = await request
         .post(`/auth/sign-application/${convention.id}`)

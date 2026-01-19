@@ -86,6 +86,7 @@ describe("EditCounsellorName", () => {
     usecase = makeEditConventionCounsellorName({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
+        timeGateway: new CustomTimeGateway(),
         createNewEvent: makeCreateNewEvent({
           timeGateway: new CustomTimeGateway(),
           uuidGenerator: new TestUuidGenerator(),

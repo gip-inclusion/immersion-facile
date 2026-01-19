@@ -29,7 +29,10 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
-import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
 import {
@@ -105,7 +108,7 @@ export class PgEstablishmentAggregateRepository
       .insertInto("immersion_offers")
       .values(
         offersWithSiret.map((offerWithSiret) => ({
-          appellation_code: Number.parseInt(offerWithSiret.appellationCode),
+          appellation_code: Number.parseInt(offerWithSiret.appellationCode, 10),
           remote_work_mode: offerWithSiret.remoteWorkMode,
           siret: offerWithSiret.siret,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
@@ -622,20 +625,37 @@ export class PgEstablishmentAggregateRepository
     const { userRights } = aggregate;
     if (!userRights.length) return;
 
+    const userRightsWithPhoneIds: (EstablishmentUserRight & {
+      phoneId: number | undefined;
+    })[] = await Promise.all(
+      userRights.map(async (userRight) => {
+        if (!userRight.phone) return { ...userRight, phoneId: undefined };
+        const phoneId = await this.transaction
+          .selectFrom("phone_numbers")
+          .select("id")
+          .where("phone_number", "=", userRight.phone)
+          .executeTakeFirst();
+        return { ...userRight, phoneId: phoneId?.id };
+      }),
+    );
+
     return this.transaction
       .insertInto("establishments__users")
       .values(
-        userRights.map((userRight) => ({
-          siret: aggregate.establishment.siret,
-          user_id: userRight.userId,
-          role: userRight.role,
-          job: userRight.job,
-          phone: userRight.phone,
-          should_receive_discussion_notifications:
-            userRight.shouldReceiveDiscussionNotifications,
-          is_main_contact_by_phone: userRight.isMainContactByPhone,
-          is_main_contact_in_person: userRight.isMainContactInPerson,
-        })),
+        userRightsWithPhoneIds.map((userRight, index) => {
+          const phoneId = userRightsWithPhoneIds[index].phoneId;
+          return {
+            siret: aggregate.establishment.siret,
+            user_id: userRight.userId,
+            role: userRight.role,
+            job: userRight.job,
+            phone_id: phoneId,
+            should_receive_discussion_notifications:
+              userRight.shouldReceiveDiscussionNotifications,
+            is_main_contact_by_phone: userRight.isMainContactByPhone,
+            is_main_contact_in_person: userRight.isMainContactInPerson,
+          };
+        }),
       )
       .execute()
       .then(() => {
@@ -669,7 +689,7 @@ export class PgEstablishmentAggregateRepository
         "ogr_appellation",
         "in",
         appellationCodes.map((appellationCode) =>
-          Number.parseInt(appellationCode),
+          Number.parseInt(appellationCode, 10),
         ),
       )
       .execute();
@@ -1032,7 +1052,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                   ? eb.where(
                       "immersion_offers.appellation_code",
                       "in",
-                      appellationCodes.map((code) => Number.parseInt(code)),
+                      appellationCodes.map((code) => Number.parseInt(code, 10)),
                     )
                   : eb,
             ).as("offer"),
@@ -1346,13 +1366,14 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
           userRights: jsonArrayFrom(
             eb
               .selectFrom("establishments__users as eu")
+              .leftJoin("phone_numbers as pn_eu", "eu.phone_id", "pn_eu.id")
               .whereRef("eu.siret", "=", "e.siret")
               .select(({ ref }) =>
                 jsonBuildObject({
                   userId: ref("eu.user_id"),
                   role: ref("eu.role"),
                   job: ref("eu.job"),
-                  phone: ref("eu.phone"),
+                  phone: sql<string>`COALESCE(${ref("pn_eu.phone_number")}, '')`,
                   shouldReceiveDiscussionNotifications: ref(
                     "eu.should_receive_discussion_notifications",
                   ),

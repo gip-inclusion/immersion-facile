@@ -80,6 +80,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
           createNewEvent,
+          timeGateway: new CustomTimeGateway(),
         },
       });
     uow.userRepository.users = [defaultUser];
