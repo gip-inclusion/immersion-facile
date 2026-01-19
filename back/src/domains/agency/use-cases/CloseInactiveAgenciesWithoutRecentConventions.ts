@@ -49,6 +49,18 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
     const activeAgencies = await uow.agencyRepository.getAgencies({
       filters: {
         status: ["active", "from-api-PE"],
+        kinds: [
+          "mission-locale",
+          "operateur-cep",
+          "cap-emploi",
+          "conseil-departemental",
+          "structure-IAE",
+          "fonction-publique",
+          "cci",
+          "cma",
+          "chambre-agriculture",
+          "autre",
+        ],
         createdAtBefore: noConventionSince,
       },
     });

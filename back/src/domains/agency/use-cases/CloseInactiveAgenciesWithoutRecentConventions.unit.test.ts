@@ -486,5 +486,65 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         ],
       });
     });
+
+    it("should not close agencies of kind pole-emploi even if they are considered inactive", async () => {
+      const poleEmploiAgency = AgencyDtoBuilder.create("pole-emploi-agency-id")
+        .withName("Pôle Emploi Agency")
+        .withStatus("active")
+        .withKind("pole-emploi")
+        .withCreatedAt(subMonths(defaultDate, 7).toISOString())
+        .build();
+
+      const poleEmploiAgencyWithRights = toAgencyWithRights(poleEmploiAgency, {
+        [admin1.id]: {
+          isNotifiedByEmail: true,
+          roles: ["agency-admin"],
+        },
+      });
+      const agency1WithRights = toAgencyWithRights(agency1, {
+        [admin2.id]: {
+          isNotifiedByEmail: true,
+          roles: ["agency-admin"],
+        },
+      });
+
+      uow.agencyRepository.agencies = [
+        poleEmploiAgencyWithRights,
+        agency1WithRights,
+      ];
+      uow.userRepository.users = [admin1, admin2];
+      uow.conventionRepository.setConventions([]);
+
+      const result =
+        await closeInactiveAgenciesWithoutRecentConventions.execute({
+          numberOfMonthsWithoutConvention,
+        });
+
+      expectToEqual(result, {
+        numberOfAgenciesClosed: 1,
+      });
+
+      expectToEqual(uow.agencyRepository.agencies, [
+        poleEmploiAgencyWithRights,
+        {
+          ...agency1WithRights,
+          status: "closed",
+          statusJustification: "Agence fermée automatiquement pour inactivité",
+        },
+      ]);
+
+      expectSavedNotificationsBatchAndEvent({
+        emails: [
+          {
+            kind: "AGENCY_CLOSED_FOR_INACTIVITY",
+            recipients: [admin2.email],
+            params: {
+              agencyName: agency1.name,
+              numberOfMonthsWithoutConvention,
+            },
+          },
+        ],
+      });
+    });
   });
 });
