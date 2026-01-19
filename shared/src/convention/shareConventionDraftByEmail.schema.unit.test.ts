@@ -45,7 +45,7 @@ describe("conventionDraftSchema schema validation", () => {
       internshipKind: "immersion",
       signatories: {
         establishmentRepresentative: {
-          phone: "",
+          phone: undefined,
         },
       },
     } satisfies ConventionDraftDto,
@@ -63,9 +63,53 @@ describe("conventionDraftSchema schema validation", () => {
         },
       },
     } satisfies ConventionDraftDto,
+    {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+      internshipKind: "mini-stage-cci",
+      signatories: {
+        beneficiary: {
+          schoolName: "Lycée Victor Hugo",
+        },
+      },
+    } satisfies ConventionDraftDto,
+    {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+      internshipKind: "mini-stage-cci",
+      signatories: {
+        beneficiary: {
+          schoolPostcode: "75000",
+        },
+      },
+    } satisfies ConventionDraftDto,
   ])("makes the schema partial", (convention: ConventionDraftDto) => {
-    const result = conventionDraftSchema.safeParse(convention);
+    expect(() => conventionDraftSchema.parse(convention)).not.toThrow();
+  });
 
-    expect(result.success).toBeTruthy();
+  it.each([
+    {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+      internshipKind: "immersion",
+      signatories: {
+        beneficiary: {
+          levelOfEducation: "1ère",
+        },
+      },
+    } satisfies ConventionDraftDto,
+    {
+      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+      internshipKind: "immersion",
+      signatories: {
+        beneficiary: {
+          address: {
+            streetNumberAndAddress: "17 rue de la paix, 75000 Paris",
+            postcode: "75000",
+            departmentCode: "75",
+            city: "Paris",
+          },
+        },
+      },
+    } satisfies ConventionDraftDto,
+  ])("throws on invalid data", (convention: ConventionDraftDto) => {
+    expect(() => conventionDraftSchema.parse(convention)).toThrow();
   });
 });

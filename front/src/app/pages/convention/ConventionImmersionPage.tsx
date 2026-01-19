@@ -31,6 +31,12 @@ interface ConventionImmersionPageProps {
   route: ConventionImmersionPageRoute;
 }
 
+const checkIsSharedConvention = (
+  routeParamsWithoutJwtAndTrackers: Record<string, unknown>,
+  conventionDraftId: string | undefined,
+): boolean =>
+  keys(routeParamsWithoutJwtAndTrackers).length > 0 || !!conventionDraftId;
+
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
 ) => {
@@ -47,25 +53,31 @@ const storeConventionRouteParamsOnDevice = (
       "conventionDraftId",
       conventionDraftId,
     );
-  } else if (keys(partialConvention).length) {
-    outOfReduxDependencies.localDeviceRepository.set(
-      "partialConventionInUrl",
-      partialConvention,
-    );
+    return;
   }
+  outOfReduxDependencies.localDeviceRepository.set(
+    "partialConventionInUrl",
+    partialConvention,
+  );
 };
 
 export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => {
-  const {
-    jwt,
-    mtm_campaign: _,
-    mtm_kwd: __,
-    skipIntro,
-    conventionDraftId,
-    ...routeParamsWithoutJwtAndTrackers
-  } = route.params;
+  const { jwt, skipIntro } = route.params;
+
+  const { conventionDraftId, routeParamsWithoutJwtAndTrackers } =
+    useMemo(() => {
+      const {
+        jwt: _,
+        mtm_campaign: __,
+        mtm_kwd: ___,
+        skipIntro: ____,
+        conventionDraftId,
+        ...routeParamsWithoutJwtAndTrackers
+      } = route.params;
+      return { conventionDraftId, routeParamsWithoutJwtAndTrackers };
+    }, [route.params]);
 
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
@@ -73,10 +85,9 @@ export const ConventionImmersionPage = ({
 
   useFederatedIdentityFromUrl(route);
 
-  const isSharedConvention = useMemo(
-    () =>
-      keys(routeParamsWithoutJwtAndTrackers).length > 0 || !!conventionDraftId,
-    [routeParamsWithoutJwtAndTrackers, conventionDraftId],
+  const isSharedConvention = checkIsSharedConvention(
+    routeParamsWithoutJwtAndTrackers,
+    conventionDraftId,
   );
 
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
@@ -126,17 +137,21 @@ export const ConventionImmersionPage = ({
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { isLoading } = useFeatureFlags();
   const initialRouteParams = useRef(route.params).current;
-  const {
-    jwt: _,
-    mtm_campaign: __,
-    mtm_kwd: ____,
+  const { conventionDraftId, routeParamsWithoutJwtAndTrackers } =
+    useMemo(() => {
+      const {
+        jwt: _,
+        mtm_campaign: __,
+        mtm_kwd: ____,
+        conventionDraftId,
+        ...routeParamsWithoutJwtAndTrackers
+      } = initialRouteParams;
+      return { conventionDraftId, routeParamsWithoutJwtAndTrackers };
+    }, [initialRouteParams]);
+
+  const isSharedConvention = checkIsSharedConvention(
+    routeParamsWithoutJwtAndTrackers,
     conventionDraftId,
-    ...routeParamsWithoutJwtAndTrackers
-  } = initialRouteParams;
-  const isSharedConvention = useMemo(
-    () =>
-      keys(routeParamsWithoutJwtAndTrackers).length > 0 || !!conventionDraftId,
-    [routeParamsWithoutJwtAndTrackers, conventionDraftId],
   );
 
   const getMode = (): ConventionFormMode => {
@@ -222,7 +237,10 @@ const SharedConventionMessage = ({
         onClick={() => onClickContinue()}
         iconId="fr-icon-arrow-right-line"
         iconPosition="right"
-        id={domElementIds.conventionImmersionRoute.continueButton}
+        id={
+          domElementIds.conventionImmersionRoute
+            .fromSharedConventionContinueButton
+        }
       >
         Continuer
       </Button>

@@ -6,24 +6,23 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type ConventionPresentation,
+  type CreateConventionPresentationInitialValues,
   domElementIds,
   type ShareConventionDraftByEmailDto,
   shareConventionDraftByEmailSchema,
   toConventionDraftDto,
 } from "shared";
-import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 
 type ShareFormProps = {
-  conventionFormData: ConventionPresentation;
+  conventionFormData: CreateConventionPresentationInitialValues;
 };
 
 const makeInitialValues = ({
   conventionFormData,
 }: {
-  conventionFormData: ConventionPresentation;
+  conventionFormData: CreateConventionPresentationInitialValues;
 }): ShareConventionDraftByEmailDto => ({
   senderEmail: "",
   conventionDraft: toConventionDraftDto({ convention: conventionFormData }),
@@ -52,12 +51,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   }, [conventionFormData, reset]);
 
   return (
-    <WithFeedbackReplacer
-      topic="convention-draft"
-      renderFeedback={() => {
-        return <Feedback topics={["convention-draft"]} />;
-      }}
-    >
+    <WithFeedbackReplacer topic="convention-draft">
       <form
         id={
           domElementIds.conventionImmersionRoute.shareConventionDraft.shareForm
@@ -83,20 +77,14 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
           label="Je souhaite uniquement enregistrer un brouillon pour moi"
           checked={isOnlyForSelf}
           onChange={(checked) => {
-            setValue(
-              "recipientEmail" as keyof ShareConventionDraftByEmailDto,
-              undefined,
-            );
-            setValue(
-              "details" as keyof ShareConventionDraftByEmailDto,
-              undefined,
-            );
+            setValue("recipientEmail", undefined);
+            setValue("details", undefined);
             setIsOnlyForSelf(checked);
           }}
         />
         <Input
           className={fr.cx("fr-mt-2w")}
-          label={`Adresse email du destinataire ${isOnlyForSelf ? "(facultatif)" : "*"}`}
+          label="Adresse email du destinataire *"
           nativeInputProps={{
             ...register("recipientEmail", {
               setValueAs: (v) => (v === "" ? undefined : v),

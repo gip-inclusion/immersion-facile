@@ -1,7 +1,11 @@
 import { v4 as uuidV4 } from "uuid";
 import type { Email } from "../email/email.dto";
 import type { Flavor } from "../typeFlavors";
-import type { DeepPartial, OmitFromExistingKeys } from "../utils";
+import {
+  type DeepPartial,
+  type OmitFromExistingKeys,
+  replaceEmptyValuesByUndefinedFromObject,
+} from "../utils";
 import type { InternshipKind } from "./convention.dto";
 import type { CreateConventionPresentationInitialValues } from "./conventionPresentation.dto";
 
@@ -21,26 +25,11 @@ export type ShareConventionDraftByEmailDto = {
   conventionDraft: ConventionDraftDto;
 };
 
-const replaceEmptyStringByUndefined = <T>(obj: T): T => {
-  if (obj === null || obj === undefined) return obj;
-  if (typeof obj === "string") return (obj === "" ? undefined : obj) as T;
-  if (Array.isArray(obj)) return obj.map(replaceEmptyStringByUndefined) as T;
-  if (typeof obj === "object") {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [
-        key,
-        replaceEmptyStringByUndefined(value),
-      ]),
-    ) as T;
-  }
-  return obj;
-};
-
 export const toConventionDraftDto = ({
   convention,
 }: {
   convention: CreateConventionPresentationInitialValues;
 }): ConventionDraftDto => ({
-  ...replaceEmptyStringByUndefined(convention),
+  ...replaceEmptyValuesByUndefinedFromObject(convention),
   id: convention.fromConventionDraftId ?? uuidV4(),
 });

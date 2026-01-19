@@ -38,7 +38,7 @@ test.describe("Convention can be created from shared draft", () => {
     if (!href) throw new Error("Convention draft magic link not found");
     await page.goto(href);
     await page.click(
-      `#${domElementIds.conventionImmersionRoute.continueButton}`,
+      `#${domElementIds.conventionImmersionRoute.fromSharedConventionContinueButton}`,
     );
     await confirmCreateConventionFormSubmit(page, tomorrowDateDisplayed);
   });

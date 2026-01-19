@@ -505,7 +505,7 @@ export const errors = {
       conventionDraftId: ConventionDraftId;
     }) =>
       new NotFoundError(
-        `Aucun brouillon de convention trouvé avec l'identifiant '${conventionDraftId}' : soit ce brouillon a expiré, soit une convention a été créée à partir de ce brouillon.`,
+        `Aucun brouillon de convention trouvé avec l'identifiant '${conventionDraftId}' : soit ce brouillon a expiré, soit une convention a déjà été créée à partir de ce brouillon.`,
       ),
   },
   establishment: {
