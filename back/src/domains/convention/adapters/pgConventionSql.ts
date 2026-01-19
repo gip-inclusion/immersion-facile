@@ -400,6 +400,7 @@ export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
           sql<DateTimeIsoString>`date_to_iso(bf.occurred_at)`.as("occurredAt"),
           eb.ref("bf.handled_by_agency").as("handledByAgency"),
           eb.ref("bf.response").as("response"),
+          eb.ref("c.date_submission").as("dateSubmission"),
         ])
         .where("c.agency_id", "in", userAgencyIds)
         .distinctOn("c.id")

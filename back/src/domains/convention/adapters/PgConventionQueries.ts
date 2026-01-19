@@ -394,6 +394,7 @@ export class PgConventionQueries implements ConventionQueries {
       filterBroadcastErrorKind(broadcastErrorKind),
       filterConventionStatus(conventionStatus),
       filterSearchForBroadcastFeedback(search),
+      filterBroadcastFeedbackWithConventionCreatedAfter(new Date("2025-01-01")),
       sortConventionsWithBroadcastFeedback(),
       applyPaginationToBroadcastFeedback(pagination),
     ).execute();
@@ -602,6 +603,13 @@ const filterSearchForBroadcastFeedback =
       ]),
     );
   };
+
+const filterBroadcastFeedbackWithConventionCreatedAfter =
+  (date: Date) =>
+  (
+    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
+  ): ConventionsWithErroredBroadcastFeedbackBuilder =>
+    builder.where("cf.dateSubmission", ">=", date);
 
 const sortConventionsWithBroadcastFeedback =
   () =>

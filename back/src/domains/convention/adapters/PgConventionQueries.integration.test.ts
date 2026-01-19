@@ -2508,6 +2508,105 @@ describe("Pg implementation of ConventionQueries", () => {
           },
         });
       });
+
+      it("should exclude conventions with date_submission before 2025", async () => {
+        const conventionBefore2025 = new ConventionDtoBuilder()
+          .withId("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+          .withAgencyId(agencyIdA)
+          .withStatus("READY_TO_SIGN")
+          .withDateSubmission("2024-12-31T23:59:59.000Z")
+          .build();
+        const conventionAfter2025 = new ConventionDtoBuilder()
+          .withId("eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
+          .withAgencyId(agencyIdA)
+          .withStatus("READY_TO_SIGN")
+          .withDateSubmission("2025-01-15T00:00:00.000Z")
+          .build();
+        const conventionOn2025 = new ConventionDtoBuilder()
+          .withId("ffffffff-ffff-4fff-8fff-ffffffffffff")
+          .withAgencyId(agencyIdA)
+          .withStatus("READY_TO_SIGN")
+          .withDateSubmission("2025-01-01T00:00:00.000Z")
+          .build();
+
+        const errorFeedbackWithConventionSubmitedBefore2025: BroadcastFeedback =
+          {
+            consumerId: null,
+            consumerName: "any-consumer-name",
+            serviceName:
+              "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+            occurredAt: "2024-07-01T00:00:00.000Z",
+            handledByAgency: false,
+            requestParams: {
+              conventionId: conventionBefore2025.id,
+              conventionStatus: "READY_TO_SIGN",
+            },
+            subscriberErrorFeedback: {
+              message: "any-error-message",
+              error: { code: "ANY_ERROR_CODE" },
+            },
+            response: {
+              httpStatus: 500,
+              body: { error: "ANY_ERROR_CODE" },
+            },
+          };
+
+        const errorFeedbackAfter2025: BroadcastFeedback = {
+          ...errorFeedbackWithConventionSubmitedBefore2025,
+          occurredAt: "2025-07-01T00:00:00.000Z",
+          requestParams: {
+            conventionId: conventionAfter2025.id,
+            conventionStatus: "READY_TO_SIGN",
+          },
+        };
+
+        await conventionRepository.save(conventionBefore2025);
+        await conventionRepository.save(conventionAfter2025);
+        await conventionRepository.save(conventionOn2025);
+        await broadcastFeedbacksRepository.save(
+          errorFeedbackWithConventionSubmitedBefore2025,
+        );
+        await broadcastFeedbacksRepository.save(errorFeedbackAfter2025);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: conventionAfter2025.id,
+              status: conventionAfter2025.status,
+              beneficiary: {
+                firstname:
+                  conventionAfter2025.signatories.beneficiary.firstName,
+                lastname: conventionAfter2025.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...errorFeedbackAfter2025,
+                subscriberErrorFeedback: {
+                  message:
+                    errorFeedbackAfter2025.subscriberErrorFeedback?.message ??
+                    "",
+                  error: JSON.stringify(
+                    errorFeedbackAfter2025.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
     });
   });
 });
