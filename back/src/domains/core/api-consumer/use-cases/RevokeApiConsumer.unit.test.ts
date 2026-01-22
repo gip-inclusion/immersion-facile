@@ -17,7 +17,10 @@ import {
   ApiConsumerBuilder,
   authorizedUnJeuneUneSolutionApiConsumer,
 } from "../adapters/InMemoryApiConsumerRepository";
-import { RevokeApiConsumer } from "./RevokeApiConsumer";
+import {
+  makeRevokeApiConsumer,
+  type RevokeApiConsumer,
+} from "./RevokeApiConsumer";
 
 const backofficeAdminBuilder = new ConnectedUserBuilder()
   .withId("backoffice-admin")
@@ -42,14 +45,16 @@ describe("RevokeApiConsumer", () => {
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
     uow.userRepository.users = [backofficeAdmin, simpleUser];
-    revokeApiConsumer = new RevokeApiConsumer(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
+    revokeApiConsumer = makeRevokeApiConsumer({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
         timeGateway,
-        uuidGenerator,
-      }),
-      timeGateway,
-    );
+      },
+    });
   });
 
   describe("Right paths", () => {
@@ -94,7 +99,10 @@ describe("RevokeApiConsumer", () => {
   describe("Wrong paths", () => {
     it("throws UnauthorizedError without JWT payload", async () => {
       await expectPromiseToFailWithError(
-        revokeApiConsumer.execute(authorizedUnJeuneUneSolutionApiConsumer.id),
+        revokeApiConsumer.execute(
+          authorizedUnJeuneUneSolutionApiConsumer.id,
+          undefined,
+        ),
         errors.user.unauthorized(),
       );
 

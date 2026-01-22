@@ -17,7 +17,10 @@ import {
   ApiConsumerBuilder,
   authorizedUnJeuneUneSolutionApiConsumer,
 } from "../adapters/InMemoryApiConsumerRepository";
-import { RenewApiConsumerKey } from "./RenewApiConsumerKey";
+import {
+  makeRenewApiConsumerKey,
+  type RenewApiConsumerKey,
+} from "./RenewApiConsumerKey";
 
 const backofficeAdminBuilder = new ConnectedUserBuilder()
   .withId("backoffice-admin")
@@ -42,15 +45,17 @@ describe("RenewApiConsumerKey", () => {
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
     uow.userRepository.users = [backofficeAdmin, simpleUser];
-    renewApiConsumerKey = new RenewApiConsumerKey(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
+    renewApiConsumerKey = makeRenewApiConsumerKey({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
+        generateApiConsumerJwt: generateApiConsumerJwtTestFn,
         timeGateway,
-        uuidGenerator,
-      }),
-      generateApiConsumerJwtTestFn,
-      timeGateway,
-    );
+      },
+    });
   });
 
   describe("Right paths", () => {
@@ -110,7 +115,10 @@ describe("RenewApiConsumerKey", () => {
   describe("Wrong paths", () => {
     it("throws UnauthorizedError without JWT payload", async () => {
       await expectPromiseToFailWithError(
-        renewApiConsumerKey.execute(authorizedUnJeuneUneSolutionApiConsumer.id),
+        renewApiConsumerKey.execute(
+          authorizedUnJeuneUneSolutionApiConsumer.id,
+          undefined,
+        ),
         errors.user.unauthorized(),
       );
 
