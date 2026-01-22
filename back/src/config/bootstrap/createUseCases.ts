@@ -79,8 +79,8 @@ import { LookupStreetAddress } from "../../domains/core/address/use-cases/Lookup
 import { BroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
 import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/DeleteSubscription";
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
-import { RenewApiConsumerKey } from "../../domains/core/api-consumer/use-cases/RenewApiConsumerKey";
-import { RevokeApiConsumer } from "../../domains/core/api-consumer/use-cases/RevokeApiConsumer";
+import { makeRenewApiConsumerKey } from "../../domains/core/api-consumer/use-cases/RenewApiConsumerKey";
+import { makeRevokeApiConsumer } from "../../domains/core/api-consumer/use-cases/RevokeApiConsumer";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
 import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccess";
@@ -585,17 +585,23 @@ export const createUseCases = ({
         generateApiConsumerJwt,
         gateways.timeGateway,
       ),
-      revokeApiConsumer: new RevokeApiConsumer(
-        uowPerformer,
+    }),
+
+    revokeApiConsumer: makeRevokeApiConsumer({
+      uowPerformer,
+      deps: {
         createNewEvent,
-        gateways.timeGateway,
-      ),
-      renewApiConsumerKey: new RenewApiConsumerKey(
-        uowPerformer,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
+
+    renewApiConsumerKey: makeRenewApiConsumerKey({
+      uowPerformer,
+      deps: {
         createNewEvent,
         generateApiConsumerJwt,
-        gateways.timeGateway,
-      ),
+        timeGateway: gateways.timeGateway,
+      },
     }),
 
     getFeatureFlags: useCaseBuilder("GetFeatureFlags")

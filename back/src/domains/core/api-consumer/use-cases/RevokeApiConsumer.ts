@@ -8,36 +8,20 @@ import {
 import { throwIfNotAdmin } from "../../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../UseCase";
-import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../useCaseBuilder";
 
-export class RevokeApiConsumer extends TransactionalUseCase<
-  ApiConsumerId,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = apiConsumerIdSchema;
+type Deps = {
+  createNewEvent: CreateNewEvent;
+  timeGateway: TimeGateway;
+};
 
-  #createNewEvent: CreateNewEvent;
-
-  #timeGateway: TimeGateway;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-    timeGateway: TimeGateway,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-    this.#timeGateway = timeGateway;
-  }
-
-  protected async _execute(
-    consumerId: ApiConsumerId,
-    uow: UnitOfWork,
-    currentUser: ConnectedUser,
-  ): Promise<void> {
+export type RevokeApiConsumer = ReturnType<typeof makeRevokeApiConsumer>;
+export const makeRevokeApiConsumer = useCaseBuilder("RevokeApiConsumer")
+  .withInput<ApiConsumerId>(apiConsumerIdSchema)
+  .withOutput<void>()
+  .withCurrentUser<ConnectedUser | undefined>()
+  .withDeps<Deps>()
+  .build(async ({ inputParams: consumerId, uow, currentUser, deps }) => {
     throwIfNotAdmin(currentUser);
 
     const existingApiConsumer =
@@ -53,22 +37,21 @@ export class RevokeApiConsumer extends TransactionalUseCase<
 
     const revokedApiConsumer = {
       ...existingApiConsumer,
-      revokedAt: this.#timeGateway.now().toISOString(),
+      revokedAt: deps.timeGateway.now().toISOString(),
     };
 
     await uow.apiConsumerRepository.save(revokedApiConsumer);
 
     await uow.outboxRepository.save(
-      this.#createNewEvent({
+      deps.createNewEvent({
         topic: "ApiConsumerRevoked",
         payload: {
           consumerId,
           triggeredBy: {
             kind: "connected-user",
-            userId: currentUser.id,
+            userId: currentUser!.id,
           },
         },
       }),
     );
-  }
-}
+  });
