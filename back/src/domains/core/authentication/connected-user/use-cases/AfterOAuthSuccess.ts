@@ -16,7 +16,7 @@ import {
 } from "shared";
 import { makeThrowIfIncorrectJwt } from "../../../../../utils/jwt";
 import {
-  type AgencyRightOfUser,
+  type AgencyRightForUser,
   removeAgencyRightsForUser,
   updateAgencyRightsForUser,
 } from "../../../../agency/ports/AgencyRepository";
@@ -280,7 +280,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       ]);
 
     const newAgenciesRightForUser = userToDeleteAgencyRights.reduce<
-      AgencyRightOfUser[]
+      AgencyRightForUser[]
     >((acc, userToDeleteAgencyRight) => {
       const existingUserToKeepAgencyRight = userToKeepAgencyRights.find(
         (newAgencyRight) =>
@@ -303,14 +303,20 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     }, []);
 
     await Promise.all(
-      newAgenciesRightForUser.map(async (agencyRightsForUser) =>
-        updateAgencyRightsForUser(uow, userToKeepId, agencyRightsForUser),
+      newAgenciesRightForUser.map(async (agencyRightForUser) =>
+        updateAgencyRightsForUser(uow, {
+          userId: userToKeepId,
+          agencyRightForUser,
+        }),
       ),
     );
 
     await Promise.all(
-      userToDeleteAgencyRights.map(async (agencyRightsForUser) =>
-        removeAgencyRightsForUser(uow, userToDeleteId, agencyRightsForUser),
+      userToDeleteAgencyRights.map(async (agencyRightForUser) =>
+        removeAgencyRightsForUser(uow, {
+          userId: userToDeleteId,
+          agencyRightForUser,
+        }),
       ),
     );
 

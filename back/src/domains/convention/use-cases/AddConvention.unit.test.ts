@@ -47,6 +47,7 @@ describe("Add Convention", () => {
       uowPerformer,
       createNewEvent,
       siretGateway,
+      timeGateway,
     );
   });
 
@@ -152,7 +153,14 @@ describe("Add Convention", () => {
   });
 
   it("rejects conventions where the ID is already in use", async () => {
-    await uow.conventionRepository.save(validConvention);
+    await uow.conventionRepository.save({
+      conventionDto: validConvention,
+      phoneIds: {
+        beneficiary: 1,
+        establishmentRepresentative: 2,
+        establishmentTutor: 3,
+      },
+    });
 
     await expectPromiseToFailWithError(
       addConvention.execute({ convention: validConvention }),

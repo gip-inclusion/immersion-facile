@@ -17,7 +17,10 @@ import {
   falsyToNull,
   type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import type { ConventionRepository } from "../ports/ConventionRepository";
+import type {
+  ConventionPhoneIds,
+  ConventionRepository,
+} from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
@@ -88,13 +91,15 @@ export class PgConventionRepository implements ConventionRepository {
     return dto;
   }
 
-  public async save(
-    convention: ConventionDto,
-    now?: DateString,
-  ): Promise<void> {
-    const alreadyExistingConvention = await this.getById(convention.id);
+  public async save(params: {
+    conventionDto: ConventionDto;
+    phoneIds: ConventionPhoneIds;
+    now?: DateString;
+  }): Promise<void> {
+    const { conventionDto, phoneIds, now } = params;
+    const alreadyExistingConvention = await this.getById(conventionDto.id);
     if (alreadyExistingConvention)
-      throw errors.convention.conflict({ conventionId: convention.id });
+      throw errors.convention.conflict({ conventionId: conventionDto.id });
 
     const {
       signatories: {
@@ -129,26 +134,40 @@ export class PgConventionRepository implements ConventionRepository {
       statusJustification,
       agencyReferent,
       renewed,
-    } = convention;
+    } = conventionDto;
 
     // Insert signatories and remember their id
-    const beneficiaryId = await this.#insertBeneficiary(beneficiary);
-    const establishmentTutorId =
-      await this.#insertEstablishmentTutor(establishmentTutor);
+    const beneficiaryId = await this.#insertBeneficiary(
+      beneficiary,
+      phoneIds.beneficiary,
+    );
+    const establishmentTutorId = await this.#insertEstablishmentTutor(
+      establishmentTutor,
+      phoneIds.establishmentTutor,
+    );
 
     const establishmentRepresentativeId =
-      isEstablishmentTutorIsEstablishmentRepresentative(convention)
+      isEstablishmentTutorIsEstablishmentRepresentative(conventionDto)
         ? establishmentTutorId
-        : await this.#insertSimpleActor(establishmentRepresentative);
+        : await this.#insertSimpleActor(
+            establishmentRepresentative,
+            phoneIds.establishmentRepresentative,
+          );
 
     const beneficiaryRepresentativeId =
       beneficiaryRepresentative &&
-      (await this.#insertSimpleActor(beneficiaryRepresentative));
+      phoneIds.beneficiaryRepresentative &&
+      (await this.#insertSimpleActor(
+        beneficiaryRepresentative,
+        phoneIds.beneficiaryRepresentative,
+      ));
 
     const beneficiaryCurrentEmployerId =
       beneficiaryCurrentEmployer &&
+      phoneIds.beneficiaryCurrentEmployer &&
       (await this.#insertBeneficiaryCurrentEmployer(
         beneficiaryCurrentEmployer,
+        phoneIds.beneficiaryCurrentEmployer,
       ));
 
     await this.transaction
@@ -186,20 +205,22 @@ export class PgConventionRepository implements ConventionRepository {
         status_justification: statusJustification,
         renewed_from: renewed?.from,
         renewed_justification: renewed?.justification,
-        validators: sql`${convention.validators}`,
-        acquisition_campaign: convention.acquisitionCampaign,
-        acquisition_keyword: convention.acquisitionKeyword,
+        validators: sql`${conventionDto.validators}`,
+        acquisition_campaign: conventionDto.acquisitionCampaign,
+        acquisition_keyword: conventionDto.acquisitionKeyword,
         establishment_number_employees:
-          convention.establishmentNumberEmployeesRange,
+          conventionDto.establishmentNumberEmployeesRange,
         updated_at: now ?? sql`now()`,
       })
       .execute();
   }
 
-  public async update(
-    convention: ConventionDto,
-    now?: DateString,
-  ): Promise<ConventionId | undefined> {
+  public async update(params: {
+    conventionDto: ConventionDto;
+    phoneIds: ConventionPhoneIds;
+    now?: DateString;
+  }): Promise<ConventionId | undefined> {
+    const { conventionDto, phoneIds, now } = params;
     const {
       signatories: {
         beneficiary,
@@ -208,41 +229,45 @@ export class PgConventionRepository implements ConventionRepository {
       },
       id,
       establishmentTutor,
-    } = convention;
+    } = conventionDto;
 
-    const establishment_tutor_id = await this.#updateEstablishmentTutor(
+    const establishmentTutorId = await this.#updateEstablishmentTutor(
       id,
       establishmentTutor,
+      phoneIds.establishmentTutor,
     );
 
     const beneficiaryCurrentEmployerId =
       await this.#insertOrUpdateBeneficiaryCurrentEmployerIfExists(
         beneficiaryCurrentEmployer,
         id,
+        phoneIds.beneficiaryCurrentEmployer,
       );
 
-    await this.#updateBeneficiary(id, beneficiary);
+    await this.#updateBeneficiary(id, beneficiary, phoneIds.beneficiary);
 
     const beneficiaryRepresentativeId =
       await this.#insertOrUpdateBeneficiaryRepresentativeIfExists(
         beneficiaryRepresentative,
         id,
+        phoneIds.beneficiaryRepresentative,
       );
 
     await this.#updateConvention({
-      convention,
-      establishment_tutor_id,
-      establishment_representative_id:
+      convention: conventionDto,
+      establishmentTutorId: establishmentTutorId,
+      establishmentRepresentativeId:
         await this.#getEstablishmentRepresentativeId({
-          convention,
-          establishment_tutor_id,
+          convention: conventionDto,
+          establishmentTutorId: establishmentTutorId,
+          phoneId: phoneIds.establishmentRepresentative,
         }),
-      beneficiary_current_employer_id: beneficiaryCurrentEmployerId,
-      beneficiary_representative_id: beneficiaryRepresentativeId,
+      beneficiaryCurrentEmployerId: beneficiaryCurrentEmployerId,
+      beneficiaryRepresentativeId: beneficiaryRepresentativeId,
       now,
     });
 
-    return convention.id;
+    return conventionDto.id;
   }
 
   async #establishmentTutorAndRepresentativeHaveSameId(
@@ -287,10 +312,12 @@ export class PgConventionRepository implements ConventionRepository {
 
   async #getEstablishmentRepresentativeId({
     convention,
-    establishment_tutor_id,
+    establishmentTutorId,
+    phoneId,
   }: {
     convention: ConventionDto;
-    establishment_tutor_id: number;
+    establishmentTutorId: number;
+    phoneId: number;
   }) {
     const {
       id,
@@ -306,22 +333,25 @@ export class PgConventionRepository implements ConventionRepository {
         ? this.#updateEstablishmentTutor(
             id,
             establishmentTutor,
+            phoneId,
             establishmentRepresentative.signedAt,
           )
-        : establishment_tutor_id;
+        : establishmentTutorId;
 
     if (await this.#establishmentTutorAndRepresentativeHaveSameId(id)) {
-      return this.#insertSimpleActor(establishmentRepresentative);
+      return this.#insertSimpleActor(establishmentRepresentative, phoneId);
     }
 
     return this.#updateEstablishmentRepresentative(
       id,
       establishmentRepresentative,
+      phoneId,
     );
   }
 
   async #insertBeneficiary(
     beneficiary: Beneficiary<InternshipKind>,
+    phoneId: number,
   ): Promise<number> {
     const studentFields = getStudentFields(beneficiary);
     const result = await this.transaction
@@ -330,7 +360,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: beneficiary.firstName,
         last_name: beneficiary.lastName,
         email: beneficiary.email,
-        phone: beneficiary.phone,
+        phone_id: phoneId,
         signed_at: falsyToNull(beneficiary.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'birthdate', ${beneficiary.birthdate}::text,
@@ -354,6 +384,7 @@ export class PgConventionRepository implements ConventionRepository {
 
   async #insertBeneficiaryCurrentEmployer(
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
+    newBeneficiaryCurrentEmployerPhoneId: number,
   ) {
     const result = await this.transaction
       .insertInto("actors")
@@ -361,7 +392,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: beneficiaryCurrentEmployer.firstName,
         last_name: beneficiaryCurrentEmployer.lastName,
         email: beneficiaryCurrentEmployer.email,
-        phone: beneficiaryCurrentEmployer.phone,
+        phone_id: newBeneficiaryCurrentEmployerPhoneId,
         signed_at: falsyToNull(beneficiaryCurrentEmployer.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'businessName', ${beneficiaryCurrentEmployer.businessName}::text,
@@ -379,6 +410,7 @@ export class PgConventionRepository implements ConventionRepository {
 
   async #insertSimpleActor(
     actor: EstablishmentRepresentative | BeneficiaryRepresentative,
+    phoneId: number,
   ) {
     const result = await this.transaction
       .insertInto("actors")
@@ -386,7 +418,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: actor.firstName,
         last_name: actor.lastName,
         email: actor.email,
-        phone: actor.phone,
+        phone_id: phoneId,
         signed_at: falsyToNull(actor.signedAt),
       })
       .returning("id")
@@ -398,6 +430,7 @@ export class PgConventionRepository implements ConventionRepository {
 
   async #insertEstablishmentTutor(
     establishmentTutor: EstablishmentTutor,
+    phoneId: number,
   ): Promise<number> {
     const result = await this.transaction
       .insertInto("actors")
@@ -405,7 +438,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: establishmentTutor.firstName,
         last_name: establishmentTutor.lastName,
         email: establishmentTutor.email,
-        phone: establishmentTutor.phone,
+        phone_id: phoneId,
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', ${establishmentTutor.job}::text))`,
       })
       .returning("id")
@@ -418,50 +451,66 @@ export class PgConventionRepository implements ConventionRepository {
   async #insertOrUpdateBeneficiaryCurrentEmployerIfExists(
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
     conventionId: ConventionId,
+    newBeneficiaryCurrentEmployerPhoneId: number | undefined,
   ): Promise<number | null> {
     if (!beneficiaryCurrentEmployer) return null;
 
     const beneficiaryCurrentEmployerIdInDb =
       await this.#getBeneficiaryCurrentEmployerId(conventionId);
 
+    if (!newBeneficiaryCurrentEmployerPhoneId)
+      throw errors.generic.missingPhoneId();
+
     return beneficiaryCurrentEmployerIdInDb === null
-      ? this.#insertBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+      ? this.#insertBeneficiaryCurrentEmployer(
+          beneficiaryCurrentEmployer,
+          newBeneficiaryCurrentEmployerPhoneId,
+        )
       : this.#updateBeneficiaryCurrentEmployer(
           conventionId,
           beneficiaryCurrentEmployer,
+          newBeneficiaryCurrentEmployerPhoneId,
         );
   }
 
   async #insertOrUpdateBeneficiaryRepresentativeIfExists(
     beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
     conventionId: ConventionId,
+    newBeneficiaryRepresentativePhoneId: number | undefined,
   ): Promise<number | null> {
     if (!beneficiaryRepresentative) return null;
 
     const beneficiaryRepresentativeId =
       await this.#getBeneficiaryRepresentativeId(conventionId);
 
+    if (!newBeneficiaryRepresentativePhoneId)
+      throw errors.generic.missingPhoneId();
+
     return beneficiaryRepresentativeId === null
-      ? this.#insertSimpleActor(beneficiaryRepresentative)
+      ? this.#insertSimpleActor(
+          beneficiaryRepresentative,
+          newBeneficiaryRepresentativePhoneId,
+        )
       : this.#updateBeneficiaryRepresentative(
           conventionId,
           beneficiaryRepresentative,
+          newBeneficiaryRepresentativePhoneId,
         );
   }
 
   async #updateBeneficiary(
     conventionId: ConventionId,
     beneficiary: Beneficiary<InternshipKind>,
+    phoneId: number,
   ) {
     const studentFields = getStudentFields(beneficiary);
-
     await this.transaction
       .updateTable("actors")
       .set({
         first_name: beneficiary.firstName,
         last_name: beneficiary.lastName,
         email: beneficiary.email,
-        phone: beneficiary.phone,
+        phone_id: phoneId,
         signed_at: falsyToNull(beneficiary.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'emergencyContact', ${beneficiary.emergencyContact}::text,
@@ -485,6 +534,7 @@ export class PgConventionRepository implements ConventionRepository {
   async #updateBeneficiaryCurrentEmployer(
     id: ConventionId,
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
+    phoneId: number,
   ): Promise<number> {
     const result = await this.transaction
       .updateTable("actors")
@@ -492,7 +542,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: beneficiaryCurrentEmployer.firstName,
         last_name: beneficiaryCurrentEmployer.lastName,
         email: beneficiaryCurrentEmployer.email,
-        phone: beneficiaryCurrentEmployer.phone,
+        phone_id: phoneId,
         signed_at: falsyToNull(beneficiaryCurrentEmployer.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
         'businessName', ${beneficiaryCurrentEmployer.businessName}::text,
@@ -516,6 +566,7 @@ export class PgConventionRepository implements ConventionRepository {
   async #updateBeneficiaryRepresentative(
     id: ConventionId,
     beneficiaryRepresentative: BeneficiaryRepresentative,
+    phoneId: number,
   ) {
     const result = await this.transaction
       .updateTable("actors")
@@ -523,7 +574,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: beneficiaryRepresentative.firstName,
         last_name: beneficiaryRepresentative.lastName,
         email: beneficiaryRepresentative.email,
-        phone: beneficiaryRepresentative.phone,
+        phone_id: phoneId,
         signed_at: falsyToNull(beneficiaryRepresentative.signedAt),
       })
       .from("conventions")
@@ -540,17 +591,17 @@ export class PgConventionRepository implements ConventionRepository {
 
   async #updateConvention({
     convention,
-    establishment_tutor_id,
-    establishment_representative_id,
-    beneficiary_current_employer_id,
-    beneficiary_representative_id,
+    establishmentTutorId,
+    establishmentRepresentativeId,
+    beneficiaryCurrentEmployerId,
+    beneficiaryRepresentativeId,
     now,
   }: {
     convention: ConventionDto;
-    establishment_tutor_id: number;
-    establishment_representative_id: number;
-    beneficiary_current_employer_id: number | null;
-    beneficiary_representative_id: number | null;
+    establishmentTutorId: number;
+    establishmentRepresentativeId: number;
+    beneficiaryCurrentEmployerId: number | null;
+    beneficiaryRepresentativeId: number | null;
     now?: DateString;
   }) {
     await this.transaction
@@ -583,10 +634,10 @@ export class PgConventionRepository implements ConventionRepository {
         work_conditions: convention.workConditions,
         status_justification: convention.statusJustification,
         updated_at: now ?? sql`now()`,
-        establishment_tutor_id,
-        establishment_representative_id,
-        beneficiary_current_employer_id,
-        beneficiary_representative_id,
+        establishment_tutor_id: establishmentTutorId,
+        establishment_representative_id: establishmentRepresentativeId,
+        beneficiary_current_employer_id: beneficiaryCurrentEmployerId,
+        beneficiary_representative_id: beneficiaryRepresentativeId,
         business_advantages: convention.businessAdvantages,
         validators: sql`${convention.validators}`,
         establishment_number_employees:
@@ -599,6 +650,7 @@ export class PgConventionRepository implements ConventionRepository {
   async #updateEstablishmentRepresentative(
     conventionId: ConventionId,
     establishmentRepresentative: EstablishmentRepresentative,
+    phoneId: number,
   ): Promise<number> {
     const result = await this.transaction
       .updateTable("actors")
@@ -606,7 +658,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: establishmentRepresentative.firstName,
         last_name: establishmentRepresentative.lastName,
         email: establishmentRepresentative.email,
-        phone: establishmentRepresentative.phone,
+        phone_id: phoneId,
         signed_at: falsyToNull(establishmentRepresentative.signedAt),
       })
       .from("conventions")
@@ -624,6 +676,7 @@ export class PgConventionRepository implements ConventionRepository {
   async #updateEstablishmentTutor(
     conventionId: ConventionId,
     establishmentTutor: EstablishmentTutor,
+    newTutorPhoneId: number | undefined,
     signedAt?: string, // in case establishment tutor is also establishment representative
   ): Promise<number> {
     const result = await this.transaction
@@ -632,7 +685,7 @@ export class PgConventionRepository implements ConventionRepository {
         first_name: establishmentTutor.firstName,
         last_name: establishmentTutor.lastName,
         email: establishmentTutor.email,
-        phone: establishmentTutor.phone,
+        phone_id: newTutorPhoneId,
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', ${establishmentTutor.job}::text))`,
         signed_at: falsyToNull(signedAt),
       })

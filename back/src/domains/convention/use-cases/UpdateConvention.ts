@@ -152,8 +152,45 @@ export class UpdateConvention extends TransactionalUseCase<
         now: this.timeGateway.now().toISOString(),
       });
 
+      const beneficiaryPhoneId =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          signedConvention.signatories.beneficiary.phone,
+          this.timeGateway.now(),
+        );
+      const establishmentRepresentativePhoneId =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          signedConvention.signatories.establishmentRepresentative.phone,
+          this.timeGateway.now(),
+        );
+      const establishmentTutorPhoneId =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          signedConvention.establishmentTutor.phone,
+          this.timeGateway.now(),
+        );
+
       await Promise.all([
-        uow.conventionRepository.update(signedConvention),
+        uow.conventionRepository.update({
+          conventionDto: signedConvention,
+          phoneIds: {
+            beneficiary: beneficiaryPhoneId,
+            establishmentRepresentative: establishmentRepresentativePhoneId,
+            establishmentTutor: establishmentTutorPhoneId,
+            beneficiaryRepresentative: signedConvention.signatories
+              .beneficiaryRepresentative
+              ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+                  signedConvention.signatories.beneficiaryRepresentative.phone,
+                  this.timeGateway.now(),
+                )
+              : undefined,
+            beneficiaryCurrentEmployer: signedConvention.signatories
+              .beneficiaryCurrentEmployer
+              ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+                  signedConvention.signatories.beneficiaryCurrentEmployer.phone,
+                  this.timeGateway.now(),
+                )
+              : undefined,
+          },
+        }),
         uow.outboxRepository.save(
           this.createNewEvent({
             topic: "ConventionModifiedAndSigned",
@@ -165,10 +202,53 @@ export class UpdateConvention extends TransactionalUseCase<
         ),
       ]);
     } else {
+      const beneficiaryPhoneId =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          conventionWithSignatoriesSignedAtAndDateApprovalCleared.signatories
+            .beneficiary.phone,
+          this.timeGateway.now(),
+        );
+      const establishmentRepresentativePhoneId =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          conventionWithSignatoriesSignedAtAndDateApprovalCleared.signatories
+            .establishmentRepresentative.phone,
+          this.timeGateway.now(),
+        );
+      const establishmentTutorPhoneId =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          conventionWithSignatoriesSignedAtAndDateApprovalCleared
+            .establishmentTutor.phone,
+          this.timeGateway.now(),
+        );
+
       await Promise.all([
-        uow.conventionRepository.update(
-          conventionWithSignatoriesSignedAtAndDateApprovalCleared,
-        ),
+        uow.conventionRepository.update({
+          conventionDto:
+            conventionWithSignatoriesSignedAtAndDateApprovalCleared,
+          phoneIds: {
+            beneficiary: beneficiaryPhoneId,
+            establishmentRepresentative: establishmentRepresentativePhoneId,
+            establishmentTutor: establishmentTutorPhoneId,
+            beneficiaryRepresentative:
+              conventionWithSignatoriesSignedAtAndDateApprovalCleared
+                .signatories.beneficiaryRepresentative
+                ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+                    conventionWithSignatoriesSignedAtAndDateApprovalCleared
+                      .signatories.beneficiaryRepresentative.phone,
+                    this.timeGateway.now(),
+                  )
+                : undefined,
+            beneficiaryCurrentEmployer:
+              conventionWithSignatoriesSignedAtAndDateApprovalCleared
+                .signatories.beneficiaryCurrentEmployer
+                ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+                    conventionWithSignatoriesSignedAtAndDateApprovalCleared
+                      .signatories.beneficiaryCurrentEmployer.phone,
+                    this.timeGateway.now(),
+                  )
+                : undefined,
+          },
+        }),
         uow.outboxRepository.save(
           this.createNewEvent({
             topic: "ConventionSubmittedAfterModification",

@@ -15,8 +15,11 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import { toAgencyInsertParams } from "../../agency/ports/AgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { PgEstablishmentLeadQueries } from "./PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";
@@ -100,6 +103,8 @@ describe("PgEstablishmentLeadQueries", () => {
   let pgUserRepository: PgUserRepository;
   let conventionRepository: PgConventionRepository;
   let agencyRepo: PgAgencyRepository;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
+  let timeGateway: CustomTimeGateway;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -119,6 +124,8 @@ describe("PgEstablishmentLeadQueries", () => {
     agencyRepo = new PgAgencyRepository(db);
     conventionRepository = new PgConventionRepository(db);
     pgUserRepository = new PgUserRepository(db);
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
+    timeGateway = new CustomTimeGateway();
   });
 
   afterAll(async () => {
@@ -141,12 +148,25 @@ describe("PgEstablishmentLeadQueries", () => {
 
       await pgUserRepository.save(validator);
       await agencyRepo.insert(
-        toAgencyWithRights(agency, {
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
+        await toAgencyInsertParams(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+          pgPhoneNumberRepository,
+          timeGateway,
+          anyConventionUpdatedAt,
+        ),
       );
       await Promise.all([
-        conventionRepository.save(convention1),
+        conventionRepository.save({
+          conventionDto: convention1,
+          phoneIds: {
+            beneficiary: 1,
+            establishmentTutor: 2,
+            establishmentRepresentative: 3,
+          },
+          now: anyConventionUpdatedAt,
+        }),
         establishmentLeadRepository.save(establishmentLead1),
       ]);
 
@@ -164,14 +184,43 @@ describe("PgEstablishmentLeadQueries", () => {
 
       await pgUserRepository.save(validator);
       await agencyRepo.insert(
-        toAgencyWithRights(agency, {
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
+        await toAgencyInsertParams(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+          pgPhoneNumberRepository,
+          timeGateway,
+          anyConventionUpdatedAt,
+        ),
       );
       await Promise.all([
-        conventionRepository.save(convention1, anyConventionUpdatedAt),
-        conventionRepository.save(convention2, anyConventionUpdatedAt),
-        conventionRepository.save(convention3, anyConventionUpdatedAt),
+        conventionRepository.save({
+          conventionDto: convention1,
+          phoneIds: {
+            beneficiary: 1,
+            establishmentTutor: 2,
+            establishmentRepresentative: 3,
+          },
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention2,
+          phoneIds: {
+            beneficiary: 1,
+            establishmentTutor: 2,
+            establishmentRepresentative: 3,
+          },
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention3,
+          phoneIds: {
+            beneficiary: 1,
+            establishmentTutor: 2,
+            establishmentRepresentative: 3,
+          },
+          now: anyConventionUpdatedAt,
+        }),
         establishmentLeadRepository.save(establishmentLead1),
         establishmentLeadRepository.save(establishmentLead2),
       ]);
@@ -202,13 +251,34 @@ describe("PgEstablishmentLeadQueries", () => {
 
       await pgUserRepository.save(validator);
       await agencyRepo.insert(
-        toAgencyWithRights(agency, {
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
+        await toAgencyInsertParams(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+          pgPhoneNumberRepository,
+          timeGateway,
+          anyConventionUpdatedAt,
+        ),
       );
       await Promise.all([
-        conventionRepository.save(convention1, anyConventionUpdatedAt),
-        conventionRepository.save(convention2, anyConventionUpdatedAt),
+        conventionRepository.save({
+          conventionDto: convention1,
+          phoneIds: {
+            beneficiary: 1,
+            establishmentTutor: 2,
+            establishmentRepresentative: 3,
+          },
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention2,
+          phoneIds: {
+            beneficiary: 1,
+            establishmentTutor: 2,
+            establishmentRepresentative: 3,
+          },
+          now: anyConventionUpdatedAt,
+        }),
         establishmentLeadRepository.save(establishmentLead1),
         establishmentLeadRepository.save(establishmentLeadForConvention2),
       ]);

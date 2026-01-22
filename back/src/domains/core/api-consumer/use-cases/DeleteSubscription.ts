@@ -6,8 +6,10 @@ import {
   findRightNameFromSubscriptionId,
   isApiConsumerAllowed,
 } from "shared";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 
 export class DeleteSubscription extends TransactionalUseCase<
   ApiConsumerSubscriptionId,
@@ -15,6 +17,13 @@ export class DeleteSubscription extends TransactionalUseCase<
   ApiConsumer
 > {
   protected inputSchema = apiConsumerSubscriptionIdSchema;
+
+  #timeGateway: TimeGateway;
+
+  constructor(uowPerformer: UnitOfWorkPerformer, timeGateway: TimeGateway) {
+    super(uowPerformer);
+    this.#timeGateway = timeGateway;
+  }
 
   protected async _execute(
     subscriptionId: ApiConsumerSubscriptionId,
@@ -48,15 +57,24 @@ export class DeleteSubscription extends TransactionalUseCase<
       (subscription) => subscription.id !== subscriptionId,
     );
 
+    const apiConsumerPhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        apiConsumer.contact.phone,
+        this.#timeGateway.now(),
+      );
+
     await uow.apiConsumerRepository.save({
-      ...apiConsumer,
-      rights: {
-        ...apiConsumer.rights,
-        [subscribedRightName]: {
-          ...apiConsumer.rights[subscribedRightName],
-          subscriptions: updatedSubscriptions,
+      apiConsumer: {
+        ...apiConsumer,
+        rights: {
+          ...apiConsumer.rights,
+          [subscribedRightName]: {
+            ...apiConsumer.rights[subscribedRightName],
+            subscriptions: updatedSubscriptions,
+          },
         },
       },
+      phoneId: apiConsumerPhoneId,
     });
   }
 }

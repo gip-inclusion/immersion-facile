@@ -15,6 +15,8 @@ import type {
   WithUserFilters,
 } from "shared";
 import { errors } from "shared";
+import type { PhoneNumberRepository } from "../../core/phone-number/ports/PhoneNumberRepository";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export type GetAgenciesFilters = {
@@ -36,7 +38,7 @@ export type AgencyWithoutRights = Omit<
 export type PartialAgencyWithUsersRights = Partial<AgencyWithUsersRights> & {
   id: AgencyId;
 };
-export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
+export type AgencyRightForUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
   agencyId: AgencyId;
 };
 
@@ -46,8 +48,15 @@ export type AgencyWithNumberOfUsersToReview = {
 };
 
 export interface AgencyRepository {
-  insert(agency: AgencyWithUsersRights, updatedAt?: DateString): Promise<void>;
-  update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
+  insert(params: {
+    agency: AgencyWithUsersRights;
+    phoneId: number;
+    updatedAt?: DateString;
+  }): Promise<void>;
+  update(params: {
+    partialAgency: PartialAgencyWithUsersRights;
+    newPhoneId?: number;
+  }): Promise<void>;
 
   getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
   getBySafirAndActiveStatus(
@@ -65,7 +74,7 @@ export interface AgencyRepository {
   getUserIdWithAgencyRightsByFilters(
     filters: WithUserFilters,
   ): Promise<UserId[]>;
-  getAgenciesRightsByUserId(id: UserId): Promise<AgencyRightOfUser[]>;
+  getAgenciesRightsByUserId(id: UserId): Promise<AgencyRightForUser[]>;
   alreadyHasActiveAgencyWithSameAddressAndKind(params: {
     address: AddressDto;
     kind: AgencyKind;
@@ -79,30 +88,79 @@ export interface AgencyRepository {
 
 export const updateAgencyRightsForUser = async (
   uow: UnitOfWork,
-  userId: UserId,
-  { agencyId, isNotifiedByEmail, roles }: AgencyRightOfUser,
+  params: {
+    userId: UserId;
+    agencyRightForUser: AgencyRightForUser;
+  },
 ): Promise<void> => {
+  const { userId, agencyRightForUser } = params;
+  const { agencyId, isNotifiedByEmail, roles } = agencyRightForUser;
   const agencyWithRights = await uow.agencyRepository.getById(agencyId);
   if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
   return uow.agencyRepository.update({
-    id: agencyId,
-    usersRights: {
-      ...agencyWithRights.usersRights,
-      [userId]: { isNotifiedByEmail, roles },
+    partialAgency: {
+      id: agencyId,
+      usersRights: {
+        ...agencyWithRights.usersRights,
+        [userId]: { isNotifiedByEmail, roles },
+      },
     },
   });
 };
 
 export const removeAgencyRightsForUser = async (
   uow: UnitOfWork,
-  userId: UserId,
-  { agencyId }: AgencyRightOfUser,
+  params: {
+    userId: UserId;
+    agencyRightForUser: AgencyRightForUser;
+  },
 ): Promise<void> => {
+  const { userId, agencyRightForUser } = params;
+  const { agencyId } = agencyRightForUser;
   const agencyWithRights = await uow.agencyRepository.getById(agencyId);
   if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
   const { [userId]: _, ...rightsToKeep } = agencyWithRights.usersRights;
   return uow.agencyRepository.update({
-    id: agencyId,
-    usersRights: rightsToKeep,
+    partialAgency: {
+      id: agencyId,
+      usersRights: rightsToKeep,
+    },
   });
+};
+
+export const toAgencyInsertParams = async (
+  agency: AgencyWithUsersRights,
+  phoneNumberRepository: PhoneNumberRepository,
+  timeGateway: TimeGateway,
+  updatedAt?: DateString,
+): Promise<{
+  agency: AgencyWithUsersRights;
+  phoneId: number;
+  updatedAt?: DateString;
+}> => {
+  return {
+    agency,
+    phoneId: await phoneNumberRepository.getIdByPhoneNumber(
+      agency.phoneNumber,
+      timeGateway.now(),
+    ),
+    updatedAt: updatedAt ?? timeGateway.now().toISOString(),
+  };
+};
+
+export const toAgencyUpdateParams = async (
+  agency: AgencyWithUsersRights,
+  phoneNumberRepository: PhoneNumberRepository,
+  timeGateway: TimeGateway,
+): Promise<{
+  partialAgency: PartialAgencyWithUsersRights;
+  newPhoneId: number;
+}> => {
+  return {
+    partialAgency: agency,
+    newPhoneId: await phoneNumberRepository.getIdByPhoneNumber(
+      agency.phoneNumber,
+      timeGateway.now(),
+    ),
+  };
 };

@@ -127,7 +127,14 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
         "Dates d’immersion envisagées non renseignées";
     }
 
-    await uow.discussionRepository.insert(discussion);
+    await uow.discussionRepository.insert({
+      discussion: discussion,
+      potentialBeneficiaryPhoneId:
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          discussion.potentialBeneficiary.phone,
+          now,
+        ),
+    });
 
     await this.#markEstablishmentAsNotSearchableIfLimitReached({
       uow,

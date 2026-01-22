@@ -118,22 +118,34 @@ export const getAgencyRightByUserId = async (
   );
 };
 
-export const updateRightsOnMultipleAgenciesForUser = async (
-  uow: UnitOfWork,
-  userId: UserId,
-  agenciesRightForUser: AgencyRight[],
-): Promise<void> => {
+export const updateRightsOnMultipleAgenciesForUser = async ({
+  uow,
+  userId,
+  agenciesRightForUser,
+  now,
+}: {
+  uow: UnitOfWork;
+  userId: UserId;
+  agenciesRightForUser: AgencyRight[];
+  now: Date;
+}): Promise<void> => {
   await Promise.all(
     agenciesRightForUser.map(
       async ({ agency: { id }, isNotifiedByEmail, roles }) => {
         const agency = await uow.agencyRepository.getById(id);
         if (!agency) throw errors.agency.notFound({ agencyId: id });
+        const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          now,
+        );
         return uow.agencyRepository.update({
-          id: agency.id,
-          usersRights: {
-            ...agency.usersRights,
-            [userId]: { isNotifiedByEmail, roles },
+          partialAgency: {
+            id: agency.id,
+            usersRights: {
+              [userId]: { isNotifiedByEmail, roles },
+            },
           },
+          newPhoneId: phoneId,
         });
       },
     ),

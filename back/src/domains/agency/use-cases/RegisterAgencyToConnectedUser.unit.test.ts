@@ -48,6 +48,7 @@ describe("RegisterAgencyToConnectedUser use case", () => {
     registerAgencyToConnectedUser = makeRegisterAgencyToConnectedUser({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
+        timeGateway: new CustomTimeGateway(),
         createNewEvent: makeCreateNewEvent({
           timeGateway: new CustomTimeGateway(),
           uuidGenerator: new TestUuidGenerator(),

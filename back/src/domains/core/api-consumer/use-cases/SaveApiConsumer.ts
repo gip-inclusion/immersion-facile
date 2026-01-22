@@ -59,7 +59,16 @@ export class SaveApiConsumer extends TransactionalUseCase<
       existingApiConsumer,
     );
 
-    await uow.apiConsumerRepository.save(apiConsumer);
+    const apiConsumerPhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        input.contact.phone,
+        this.#timeGateway.now(),
+      );
+
+    await uow.apiConsumerRepository.save({
+      apiConsumer,
+      phoneId: apiConsumerPhoneId,
+    });
 
     await uow.outboxRepository.save(
       this.#createNewEvent({

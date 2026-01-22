@@ -313,9 +313,16 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
 
     await Promise.all([
       uow.discussionRepository.update({
-        ...discussion,
-        updatedAt: this.#timeGateway.now().toISOString(),
-        exchanges: [...discussion.exchanges, exchange],
+        discussion: {
+          ...discussion,
+          updatedAt: this.#timeGateway.now().toISOString(),
+          exchanges: [...discussion.exchanges, exchange],
+        },
+        potentialBeneficiaryPhoneId:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            discussion.potentialBeneficiary.phone,
+            this.#timeGateway.now(),
+          ),
       }),
       uow.outboxRepository.save(
         this.#createNewEvent({

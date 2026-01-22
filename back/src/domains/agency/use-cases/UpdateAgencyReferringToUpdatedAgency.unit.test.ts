@@ -85,6 +85,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
           createNewEvent,
+          timeGateway: new CustomTimeGateway(),
         },
       });
   });

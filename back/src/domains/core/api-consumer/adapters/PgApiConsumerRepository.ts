@@ -118,18 +118,22 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     );
   }
 
-  public async save(apiConsumer: ApiConsumer): Promise<void> {
+  public async save(params: {
+    apiConsumer: ApiConsumer;
+    phoneId: number;
+  }): Promise<void> {
+    const { apiConsumer, phoneId } = params;
     logger.warn({
       message: debugDoubleBroadcastMessage(
         `Updated ApiConsumer : ${JSON.stringify(apiConsumer)}`,
       ),
     });
-    await this.#insertApiConsumer(apiConsumer);
+    await this.#insertApiConsumer(apiConsumer, phoneId);
     await this.#clearSubscriptionsOfConsumer(apiConsumer.id);
     await this.#insertSubscriptions(apiConsumer);
   }
 
-  async #insertApiConsumer(apiConsumer: ApiConsumer) {
+  async #insertApiConsumer(apiConsumer: ApiConsumer, phoneId: number) {
     const { rights, ...rest } = apiConsumer;
     const rightsWithoutSubscriptions = mapObjIndexed(
       ({ subscriptions: _, ...rest }) => rest,
@@ -147,7 +151,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       contact_first_name: rest.contact.firstName,
       contact_last_name: rest.contact.lastName,
       contact_job: rest.contact.job,
-      contact_phone: rest.contact.phone,
+      contact_phone_id: phoneId,
     };
 
     await this.#transaction
@@ -237,6 +241,11 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     return this.#transaction
       .selectFrom("api_consumers as c")
       .leftJoin("api_consumers_subscriptions as s", "s.consumer_id", "c.id")
+      .leftJoin(
+        "phone_numbers as pn_consumer",
+        "c.contact_phone_id",
+        "pn_consumer.id",
+      )
       .select((eb) =>
         jsonStripNulls(
           jsonBuildObject({
@@ -251,7 +260,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
               lastName: eb.ref("c.contact_last_name"),
               job: eb.ref("c.contact_job"),
               emails: cast<Email[]>(eb.ref("c.contact_emails")),
-              phone: eb.ref("c.contact_phone"),
+              phone: sql<string>`${eb.ref("pn_consumer.phone_number")}`,
             }),
             subscriptions: sql<
               WebhookSubscription[]

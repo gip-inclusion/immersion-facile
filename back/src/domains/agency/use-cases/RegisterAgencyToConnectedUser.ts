@@ -1,5 +1,6 @@
 import { agencyIdsSchema, type ConnectedUser, errors } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type RegisterAgencyToConnectedUser = ReturnType<
@@ -10,7 +11,7 @@ export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
 )
   .withInput(agencyIdsSchema)
   .withCurrentUser<ConnectedUser>()
-  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .withDeps<{ createNewEvent: CreateNewEvent; timeGateway: TimeGateway }>()
   .build(async ({ uow, currentUser, deps, inputParams: agencyIds }) => {
     const agencyRights = await uow.agencyRepository.getAgenciesRightsByUserId(
       currentUser.id,
@@ -27,18 +28,25 @@ export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
 
     await Promise.all([
-      ...agencies.map(({ id, usersRights }) =>
-        uow.agencyRepository.update({
-          id,
-          usersRights: {
-            ...usersRights,
-            [currentUser.id]: {
-              isNotifiedByEmail: false,
-              roles: ["to-review"],
+      ...agencies.map(async ({ id, usersRights, phoneNumber }) => {
+        const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+          phoneNumber,
+          deps.timeGateway.now(),
+        );
+        return uow.agencyRepository.update({
+          partialAgency: {
+            id,
+            usersRights: {
+              ...usersRights,
+              [currentUser.id]: {
+                isNotifiedByEmail: false,
+                roles: ["to-review"],
+              },
             },
           },
-        }),
-      ),
+          newPhoneId: phoneId,
+        });
+      }),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "AgencyRegisteredToConnectedUser",

@@ -1,6 +1,4 @@
 import {
-  type AgencyId,
-  backOfficeEmail,
   type ConventionDto,
   type ConventionId,
   type ConventionRelatedJwtPayload,
@@ -11,13 +9,11 @@ import {
   type Role,
   reviewedConventionStatuses,
   type UpdateConventionStatusRequestDto,
-  type UserId,
   type UserWithRights,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
   type WithConventionIdLegacy,
 } from "shared";
-import { getAgencyEmailFromEmailHash } from "../../../utils/emailHash";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -26,6 +22,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
+import type { ConventionPhoneIds } from "../ports/ConventionRepository";
 
 const domainTopicByTargetStatusMap: Record<
   ConventionStatus,
@@ -158,7 +155,46 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         : {}),
     };
 
-    const updatedId = await uow.conventionRepository.update(updatedConvention);
+    const beneficiaryPhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        updatedConvention.signatories.beneficiary.phone,
+        this.timeGateway.now(),
+      );
+    const establishmentRepresentativePhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        updatedConvention.signatories.establishmentRepresentative.phone,
+        this.timeGateway.now(),
+      );
+    const establishmentTutorPhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        updatedConvention.establishmentTutor.phone,
+        this.timeGateway.now(),
+      );
+
+    const phoneIds: ConventionPhoneIds = {
+      beneficiary: beneficiaryPhoneId,
+      establishmentRepresentative: establishmentRepresentativePhoneId,
+      establishmentTutor: establishmentTutorPhoneId,
+    };
+    if (updatedConvention.signatories.beneficiaryRepresentative) {
+      phoneIds.beneficiaryRepresentative =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          updatedConvention.signatories.beneficiaryRepresentative.phone,
+          this.timeGateway.now(),
+        );
+    }
+    if (updatedConvention.signatories.beneficiaryCurrentEmployer) {
+      phoneIds.beneficiaryCurrentEmployer =
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          updatedConvention.signatories.beneficiaryCurrentEmployer.phone,
+          this.timeGateway.now(),
+        );
+    }
+
+    const updatedId = await uow.conventionRepository.update({
+      conventionDto: updatedConvention,
+      phoneIds,
+    });
     if (!updatedId)
       throw errors.convention.notFound({
         conventionId: updatedConvention.id,
@@ -245,22 +281,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     return roles;
   }
 
-  async #agencyEmailFromUserIdAndAgencyId(
-    uow: UnitOfWork,
-    userId: UserId,
-    agencyId: AgencyId,
-  ): Promise<string> {
-    const userWithRights = await getUserWithRights(uow, userId);
-    if (!userWithRights) throw errors.user.notFound({ userId });
-    const userAgencyRights = userWithRights.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === agencyId,
-    );
-    if (!userAgencyRights)
-      throw errors.user.noRightsOnAgency({ agencyId, userId });
-
-    return userWithRights.email;
-  }
-
   #createEvent(
     updatedConventionDto: ConventionDto,
     domainTopic: DomainTopic,
@@ -274,27 +294,4 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       },
     });
   }
-
-  #getAgencyActorEmail = async (
-    uow: UnitOfWork,
-    payload: UpdateConventionStatusSupportedJwtPayload,
-    originalConvention: ConventionDto,
-  ): Promise<string> => {
-    if (!("role" in payload)) {
-      const agencyIcUserEmail = await this.#agencyEmailFromUserIdAndAgencyId(
-        uow,
-        payload.userId,
-        originalConvention.agencyId,
-      );
-      return agencyIcUserEmail;
-    }
-
-    return "emailHash" in payload
-      ? getAgencyEmailFromEmailHash(
-          uow,
-          originalConvention.agencyId,
-          payload.emailHash,
-        )
-      : backOfficeEmail;
-  };
 }

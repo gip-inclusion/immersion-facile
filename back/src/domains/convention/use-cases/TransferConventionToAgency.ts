@@ -91,7 +91,25 @@ export const makeTransferConventionToAgency = useCaseBuilder(
     };
 
     await Promise.all([
-      uow.conventionRepository.update(updatedConvention),
+      uow.conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: {
+          beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+            updatedConvention.signatories.beneficiary.phone,
+            new Date(),
+          ),
+          establishmentRepresentative:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              updatedConvention.signatories.establishmentRepresentative.phone,
+              new Date(),
+            ),
+          establishmentTutor:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              updatedConvention.establishmentTutor.phone,
+              new Date(),
+            ),
+        },
+      }),
       requestedAgency.kind !== "pole-emploi"
         ? uow.conventionFranceTravailAdvisorRepository.deleteByConventionId(
             convention.id,

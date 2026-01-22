@@ -30,11 +30,11 @@ const backofficeAdmin = backofficeAdminBuilder.buildUser();
 describe("Update agency status", () => {
   let updateAgencyStatus: UpdateAgencyStatus;
   let uow: InMemoryUnitOfWork;
-
+  let timeGateway: CustomTimeGateway;
   beforeEach(() => {
     uow = createInMemoryUow();
     const uuidGenerator = new TestUuidGenerator();
-    const timeGateway = new CustomTimeGateway();
+    timeGateway = new CustomTimeGateway();
     timeGateway.setNextDate(nextDate);
     uuidGenerator.setNextUuid(nextUuid);
 
@@ -49,6 +49,7 @@ describe("Update agency status", () => {
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
         createNewEvent,
+        timeGateway,
       },
     });
   });

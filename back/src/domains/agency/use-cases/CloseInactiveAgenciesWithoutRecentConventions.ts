@@ -72,11 +72,18 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
     );
 
     await Promise.all(
-      agenciesToClose.map((agency) =>
+      agenciesToClose.map(async (agency) =>
         uow.agencyRepository.update({
-          id: agency.id,
-          status: "closed",
-          statusJustification: "Agence fermée automatiquement pour inactivité",
+          partialAgency: {
+            id: agency.id,
+            status: "closed",
+            statusJustification:
+              "Agence fermée automatiquement pour inactivité",
+          },
+          newPhoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            deps.timeGateway.now(),
+          ),
         }),
       ),
     );

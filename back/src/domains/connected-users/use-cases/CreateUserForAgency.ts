@@ -73,10 +73,18 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
       agency.refersToAgencyId,
     );
 
+    const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+      agency.phoneNumber,
+      deps.timeGateway.now(),
+    );
+
     await Promise.all([
       uow.agencyRepository.update({
-        id: agency.id,
-        usersRights: updatedAgencyRights,
+        partialAgency: {
+          id: agency.id,
+          usersRights: updatedAgencyRights,
+        },
+        newPhoneId: phoneId,
       }),
       uow.outboxRepository.save(
         deps.createNewEvent({

@@ -21,6 +21,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,
@@ -64,6 +65,7 @@ describe("PgDiscussionRepository", () => {
   let pool: Pool;
   let pgDiscussionRepository: PgDiscussionRepository;
   let establishmentAggregateRepo: PgEstablishmentAggregateRepository;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
   let db: KyselyDb;
 
   const user = new UserBuilder().withId(new UuidV4Generator().new()).build();
@@ -82,7 +84,7 @@ describe("PgDiscussionRepository", () => {
     await db.deleteFrom("users").execute();
     pgDiscussionRepository = new PgDiscussionRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
-
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
     await new PgUserRepository(db).save(user);
   });
 
@@ -237,7 +239,14 @@ describe("PgDiscussionRepository", () => {
           },
         ];
         it.each(tests)("$title", async ({ discussion }) => {
-          await pgDiscussionRepository.insert(discussion);
+          await pgDiscussionRepository.insert({
+            discussion,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussion.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           expectToEqual(
             await pgDiscussionRepository.getById(discussion.id),
@@ -255,7 +264,14 @@ describe("PgDiscussionRepository", () => {
             .withStatus({ status: "PENDING" })
             .build();
 
-          await pgDiscussionRepository.insert(discussion);
+          await pgDiscussionRepository.insert({
+            discussion,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussion.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           const updatedDiscussion = new DiscussionBuilder(discussion)
             .withStatus({
@@ -266,7 +282,14 @@ describe("PgDiscussionRepository", () => {
             .withConventionId("some-other-convention-id")
             .build();
 
-          await pgDiscussionRepository.update(updatedDiscussion);
+          await pgDiscussionRepository.update({
+            discussion: updatedDiscussion,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                updatedDiscussion.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           expectToEqual(
             await db
@@ -295,7 +318,14 @@ describe("PgDiscussionRepository", () => {
             .withStatus({ status: "PENDING" })
             .build();
 
-          await pgDiscussionRepository.insert(discussion);
+          await pgDiscussionRepository.insert({
+            discussion,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussion.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           const updatedDiscussion = new DiscussionBuilder(discussion)
             .withStatus({
@@ -305,7 +335,14 @@ describe("PgDiscussionRepository", () => {
             })
             .build();
 
-          await pgDiscussionRepository.update(updatedDiscussion);
+          await pgDiscussionRepository.update({
+            discussion: updatedDiscussion,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                updatedDiscussion.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           expectToEqual(
             await db
@@ -327,13 +364,27 @@ describe("PgDiscussionRepository", () => {
             .withStatus({ status: "PENDING" })
             .build();
 
-          await pgDiscussionRepository.insert(discussion);
+          await pgDiscussionRepository.insert({
+            discussion,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussion.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           const updatedDiscussion = new DiscussionBuilder(discussion)
             .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
             .build();
 
-          await pgDiscussionRepository.update(updatedDiscussion);
+          await pgDiscussionRepository.update({
+            discussion: updatedDiscussion,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                updatedDiscussion.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           expectToEqual(
             await db
@@ -416,8 +467,22 @@ describe("PgDiscussionRepository", () => {
           .build();
 
         await Promise.all([
-          pgDiscussionRepository.insert(discussionWithRecentExchange),
-          pgDiscussionRepository.insert(discussionWithOldExchange),
+          pgDiscussionRepository.insert({
+            discussion: discussionWithRecentExchange,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionWithRecentExchange.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion: discussionWithOldExchange,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionWithOldExchange.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
         ]);
 
         const numberOfUpdatedMessages =
@@ -472,11 +537,11 @@ describe("PgDiscussionRepository", () => {
         .build();
 
       it("when no discussion ids, do nothing", async () => {
-        await insertDiscussions(pgDiscussionRepository, [
-          acceptedDiscussion,
-          pendingDiscussion,
-          rejectedDiscussion,
-        ]);
+        await insertDiscussions(
+          pgDiscussionRepository,
+          [acceptedDiscussion, pendingDiscussion, rejectedDiscussion],
+          pgPhoneNumberRepository,
+        );
 
         const initialStats: DiscussionsStat[] = [
           {
@@ -512,11 +577,11 @@ describe("PgDiscussionRepository", () => {
 
       describe("discussion deletion process", () => {
         it("when id provided and discussion exist, the discussion does not exist anymore", async () => {
-          await insertDiscussions(pgDiscussionRepository, [
-            acceptedDiscussion,
-            pendingDiscussion,
-            rejectedDiscussion,
-          ]);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            [acceptedDiscussion, pendingDiscussion, rejectedDiscussion],
+            pgPhoneNumberRepository,
+          );
 
           await pgDiscussionRepository.archiveDiscussions([
             acceptedDiscussion.id,
@@ -528,11 +593,11 @@ describe("PgDiscussionRepository", () => {
         });
 
         it("when ids provided and discussions exist, discussions do not exist anymore", async () => {
-          await insertDiscussions(pgDiscussionRepository, [
-            acceptedDiscussion,
-            pendingDiscussion,
-            rejectedDiscussion,
-          ]);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            [acceptedDiscussion, pendingDiscussion, rejectedDiscussion],
+            pgPhoneNumberRepository,
+          );
 
           await pgDiscussionRepository.archiveDiscussions([
             acceptedDiscussion.id,
@@ -556,7 +621,11 @@ describe("PgDiscussionRepository", () => {
         it("when ids provided and one discussion doesn't exist, throw an error", async () => {
           const missingDiscussionId = acceptedDiscussion.id;
 
-          await insertDiscussions(pgDiscussionRepository, [rejectedDiscussion]);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            [rejectedDiscussion],
+            pgPhoneNumberRepository,
+          );
 
           await expectPromiseToFailWithError(
             pgDiscussionRepository.archiveDiscussions([
@@ -618,7 +687,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -726,7 +799,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -826,7 +903,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -926,7 +1007,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -1025,7 +1110,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -1135,7 +1224,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -1235,7 +1328,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -1346,7 +1443,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -1463,7 +1564,11 @@ describe("PgDiscussionRepository", () => {
               .build(),
           ];
 
-          await insertDiscussions(pgDiscussionRepository, discussions);
+          await insertDiscussions(
+            pgDiscussionRepository,
+            discussions,
+            pgPhoneNumberRepository,
+          );
           await pgDiscussionRepository.__test_setDiscussionsStats([
             {
               appellation_code: Number(acceptedDiscussion.appellationCode),
@@ -1553,10 +1658,38 @@ describe("PgDiscussionRepository", () => {
         .build();
 
       beforeEach(async () => {
-        await pgDiscussionRepository.insert(pendingDiscussionUpdated20230101);
-        await pgDiscussionRepository.insert(acceptedDiscussionUpdated20230102);
-        await pgDiscussionRepository.insert(acceptedDiscussionUpdated20240101);
-        await pgDiscussionRepository.insert(rejectedDiscussionUpdated20250101);
+        await pgDiscussionRepository.insert({
+          discussion: pendingDiscussionUpdated20230101,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              pendingDiscussionUpdated20230101.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: acceptedDiscussionUpdated20230102,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              acceptedDiscussionUpdated20230102.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: acceptedDiscussionUpdated20240101,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              acceptedDiscussionUpdated20240101.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: rejectedDiscussionUpdated20250101,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              rejectedDiscussionUpdated20250101.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
       });
 
       describe("unit filter param & limit", () => {
@@ -1819,9 +1952,30 @@ describe("PgDiscussionRepository", () => {
             .withSiret("00000000000002")
             .build();
           beforeEach(async () => {
-            await pgDiscussionRepository.insert(discussionWithSiret1);
-            await pgDiscussionRepository.insert(discussionWithSiret2);
-            await pgDiscussionRepository.insert(discussionWithoutSiret);
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithSiret1,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithSiret1.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithSiret2,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithSiret2.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithoutSiret,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithoutSiret.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
           });
 
           it("exclude discussion that do not have siret in filter", async () => {
@@ -1895,15 +2049,30 @@ describe("PgDiscussionRepository", () => {
             .build();
 
           beforeEach(async () => {
-            await pgDiscussionRepository.insert(
-              discussionWithContactModeEmail1,
-            );
-            await pgDiscussionRepository.insert(
-              discussionWithContactModeEmail2,
-            );
-            await pgDiscussionRepository.insert(
-              discussionWithContactModeInPerson,
-            );
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithContactModeEmail1,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithContactModeEmail1.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithContactModeEmail2,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithContactModeEmail2.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithContactModeInPerson,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithContactModeInPerson.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
           });
 
           it.each([
@@ -1958,9 +2127,30 @@ describe("PgDiscussionRepository", () => {
             .build();
 
           beforeEach(async () => {
-            await pgDiscussionRepository.insert(discussionCreatedSince1);
-            await pgDiscussionRepository.insert(discussionCreatedSince2);
-            await pgDiscussionRepository.insert(discussionCreatedBefore);
+            await pgDiscussionRepository.insert({
+              discussion: discussionCreatedSince1,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionCreatedSince1.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionCreatedSince2,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionCreatedSince2.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionCreatedBefore,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionCreatedBefore.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
           });
 
           it("exclude discussions created before", async () => {
@@ -2021,10 +2211,38 @@ describe("PgDiscussionRepository", () => {
             .build();
 
           beforeEach(async () => {
-            await pgDiscussionRepository.insert(discussionCreatedBefore);
-            await pgDiscussionRepository.insert(discussionCreatedBetween1);
-            await pgDiscussionRepository.insert(discussionCreatedBetween2);
-            await pgDiscussionRepository.insert(discussionCreatedAfter);
+            await pgDiscussionRepository.insert({
+              discussion: discussionCreatedBefore,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionCreatedBefore.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionCreatedBetween1,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionCreatedBetween1.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionCreatedBetween2,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionCreatedBetween2.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionCreatedAfter,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionCreatedAfter.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
           });
 
           it("include discussion with created at exactly of created between ranges", async () => {
@@ -2101,12 +2319,23 @@ describe("PgDiscussionRepository", () => {
             .build();
 
           beforeEach(async () => {
-            await pgDiscussionRepository.insert(
-              discussionAnsweredByEstablishment,
-            );
-            await pgDiscussionRepository.insert(
-              discussionNotAnsweredByEstablishment,
-            );
+            await pgDiscussionRepository.insert({
+              discussion: discussionAnsweredByEstablishment,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionAnsweredByEstablishment.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionNotAnsweredByEstablishment,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionNotAnsweredByEstablishment.potentialBeneficiary
+                    .phone,
+                  new Date(),
+                ),
+            });
           });
 
           it("include only discussions answered by establishment", async () => {
@@ -2148,9 +2377,30 @@ describe("PgDiscussionRepository", () => {
             .build();
 
           beforeEach(async () => {
-            await pgDiscussionRepository.insert(discussionWithStatusPending);
-            await pgDiscussionRepository.insert(discussionWithStatusAccepted);
-            await pgDiscussionRepository.insert(discussionWithStatusRejected);
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithStatusPending,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithStatusPending.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithStatusAccepted,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithStatusAccepted.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
+            await pgDiscussionRepository.insert({
+              discussion: discussionWithStatusRejected,
+              potentialBeneficiaryPhoneId:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  discussionWithStatusRejected.potentialBeneficiary.phone,
+                  new Date(),
+                ),
+            });
           });
 
           it("include discussions with status PENDING", async () => {
@@ -2278,18 +2528,55 @@ describe("PgDiscussionRepository", () => {
             ])
             .build();
 
-          await pgDiscussionRepository.insert(
-            discussionToMatchWithLotOfExchanges,
-          );
-          await pgDiscussionRepository.insert(
-            discussionToMatchWithOneExchangeOfEach,
-          );
-          await pgDiscussionRepository.insert(discussionBadSiret);
-          await pgDiscussionRepository.insert(discussionCreatedAtBelowRange);
-          await pgDiscussionRepository.insert(discussionCreatedAfterRange);
-          await pgDiscussionRepository.insert(
-            discussionNotAnsweredByEstablishment,
-          );
+          await pgDiscussionRepository.insert({
+            discussion: discussionToMatchWithLotOfExchanges,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionToMatchWithLotOfExchanges.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
+          await pgDiscussionRepository.insert({
+            discussion: discussionToMatchWithOneExchangeOfEach,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionToMatchWithOneExchangeOfEach.potentialBeneficiary
+                  .phone,
+                new Date(),
+              ),
+          });
+          await pgDiscussionRepository.insert({
+            discussion: discussionBadSiret,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionBadSiret.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
+          await pgDiscussionRepository.insert({
+            discussion: discussionCreatedAtBelowRange,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionCreatedAtBelowRange.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
+          await pgDiscussionRepository.insert({
+            discussion: discussionCreatedAfterRange,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionCreatedAfterRange.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
+          await pgDiscussionRepository.insert({
+            discussion: discussionNotAnsweredByEstablishment,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionNotAnsweredByEstablishment.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          });
 
           expectToEqual(
             await pgDiscussionRepository.getDiscussions({
@@ -2395,9 +2682,30 @@ describe("PgDiscussionRepository", () => {
       };
 
       beforeEach(async () => {
-        await pgDiscussionRepository.insert(discussion1);
-        await pgDiscussionRepository.insert(discussion2);
-        await pgDiscussionRepository.insert(discussion3);
+        await pgDiscussionRepository.insert({
+          discussion: discussion1,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion1.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: discussion2,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion2.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
+        await pgDiscussionRepository.insert({
+          discussion: discussion3,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussion3.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
 
         await establishmentAggregateRepo.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
@@ -2828,7 +3136,14 @@ describe("PgDiscussionRepository", () => {
         params,
         result,
       }) => {
-        await pgDiscussionRepository.insert(discussionInRepo);
+        await pgDiscussionRepository.insert({
+          discussion: discussionInRepo,
+          potentialBeneficiaryPhoneId:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              discussionInRepo.potentialBeneficiary.phone,
+              new Date(),
+            ),
+        });
 
         expectToEqual(
           await pgDiscussionRepository.hasDiscussionMatching(params),
@@ -2893,9 +3208,30 @@ describe("PgDiscussionRepository", () => {
           .build();
 
         await Promise.all([
-          pgDiscussionRepository.insert(discussion1),
-          pgDiscussionRepository.insert(discussion2),
-          pgDiscussionRepository.insert(discussionToOld),
+          pgDiscussionRepository.insert({
+            discussion: discussion1,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussion1.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion: discussion2,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussion2.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion: discussionToOld,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionToOld.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
         ]);
       });
 
@@ -3041,22 +3377,60 @@ describe("PgDiscussionRepository", () => {
 
       beforeEach(async () => {
         await Promise.all([
-          pgDiscussionRepository.insert(
-            discussionFrom2YearsAgoWithoutExchangesResponse,
-          ),
-          pgDiscussionRepository.insert(
-            discussionFrom1YearAgoWithExchangesResponse,
-          ),
-          pgDiscussionRepository.insert(
-            discussionFrom6MonthsAgoWithoutExchangesResponse,
-          ),
-          pgDiscussionRepository.insert(
-            discussionFrom4MonthsAgoWithExchangesResponse,
-          ),
-          pgDiscussionRepository.insert(
-            discussionFrom6MonthsAgoWithoutExchangesResponseAndStatusAccepted,
-          ),
-          pgDiscussionRepository.insert(discussionFrom2MonthsAgo),
+          pgDiscussionRepository.insert({
+            discussion: discussionFrom2YearsAgoWithoutExchangesResponse,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionFrom2YearsAgoWithoutExchangesResponse
+                  .potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion: discussionFrom1YearAgoWithExchangesResponse,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionFrom1YearAgoWithExchangesResponse.potentialBeneficiary
+                  .phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion: discussionFrom6MonthsAgoWithoutExchangesResponse,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionFrom6MonthsAgoWithoutExchangesResponse
+                  .potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion: discussionFrom4MonthsAgoWithExchangesResponse,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionFrom4MonthsAgoWithExchangesResponse
+                  .potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion:
+              discussionFrom6MonthsAgoWithoutExchangesResponseAndStatusAccepted,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionFrom6MonthsAgoWithoutExchangesResponseAndStatusAccepted
+                  .potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
+          pgDiscussionRepository.insert({
+            discussion: discussionFrom2MonthsAgo,
+            potentialBeneficiaryPhoneId:
+              await pgPhoneNumberRepository.getIdByPhoneNumber(
+                discussionFrom2MonthsAgo.potentialBeneficiary.phone,
+                new Date(),
+              ),
+          }),
         ]);
       });
 
@@ -3079,8 +3453,16 @@ describe("PgDiscussionRepository", () => {
 const insertDiscussions = async (
   pgDiscussionRepository: PgDiscussionRepository,
   discussions: DiscussionDto[],
+  pgPhoneNumberRepository: PgPhoneNumberRepository,
 ): Promise<void> => {
   for (const discussion of discussions) {
-    await pgDiscussionRepository.insert(discussion);
+    await pgDiscussionRepository.insert({
+      discussion: discussion,
+      potentialBeneficiaryPhoneId:
+        await pgPhoneNumberRepository.getIdByPhoneNumber(
+          discussion.potentialBeneficiary.phone,
+          new Date(),
+        ),
+    });
   }
 };

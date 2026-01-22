@@ -32,7 +32,7 @@ import {
 import { createLogger } from "../../../utils/logger";
 import type {
   AgencyRepository,
-  AgencyRightOfUser,
+  AgencyRightForUser,
   AgencyWithNumberOfUsersToReview,
   GetAgenciesFilters,
   PartialAgencyWithUsersRights,
@@ -43,17 +43,22 @@ const logger = createLogger(__filename);
 const MAX_AGENCIES_RETURNED = 1500;
 
 export class PgAgencyRepository implements AgencyRepository {
-  constructor(private transaction: KyselyDb) {}
+  constructor(private transaction: KyselyDb) { }
 
-  public async insert(
-    agency: AgencyWithUsersRights,
-    updatedAt?: DateString,
-  ): Promise<void> {
-    await this.insertAgency(agency, updatedAt);
-    await this.#saveAgencyRights(agency.id, agency.usersRights);
+  public async insert(params: {
+    agency: AgencyWithUsersRights;
+    phoneId: number;
+    updatedAt?: DateString;
+  }): Promise<void> {
+    await this.#insertAgency(params.agency, params.phoneId, params.updatedAt);
+    await this.#saveAgencyRights(params.agency.id, params.agency.usersRights);
   }
 
-  private insertAgency(agency: AgencyWithUsersRights, updatedAt?: DateString) {
+  async #insertAgency(
+    agency: AgencyWithUsersRights,
+    phoneId: number,
+    updatedAt?: DateString,
+  ) {
     return this.transaction
       .insertInto("agencies")
       .values(({ fn }) => ({
@@ -77,7 +82,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
-        phone_number: agency.phoneNumber,
+        phone_number_id: phoneId,
         status_justification: agency.statusJustification,
         delegation_info: agency.delegationAgencyInfo
           ? JSON.stringify(agency.delegationAgencyInfo)
@@ -99,42 +104,47 @@ export class PgAgencyRepository implements AgencyRepository {
       });
   }
 
-  public async update(agency: PartialAgencyWithUsersRights): Promise<void> {
+  public async update(params: {
+    partialAgencyToUpdate: PartialAgencyWithUsersRights;
+    newPhoneId: number;
+  }): Promise<void> {
+    const { partialAgencyToUpdate: partialAgency, newPhoneId } = params;
     await this.transaction
       .updateTable("agencies")
       .set(({ fn }) => ({
-        name: agency.name,
-        status: agency.status,
-        kind: agency.kind,
-        email_signature: agency.signature,
-        logo_url: agency.logoUrl,
-        position: agency.position
+        name: partialAgency.name,
+        status: partialAgency.status,
+        kind: partialAgency.kind,
+        email_signature: partialAgency.signature,
+        logo_url: partialAgency.logoUrl,
+        position: partialAgency.position
           ? fn("ST_MakePoint", [
-              sql`${agency.position.lon}, ${agency.position.lat}`,
-            ])
+            sql`${partialAgency.position.lon}, ${partialAgency.position.lat}`,
+          ])
           : undefined,
-        agency_siret: agency.agencySiret,
-        code_safir: agency.codeSafir,
-        street_number_and_address: agency.address?.streetNumberAndAddress,
-        post_code: agency.address?.postcode,
-        city: agency.address?.city,
-        department_code: agency.address?.departmentCode,
+        agency_siret: partialAgency.agencySiret,
+        code_safir: partialAgency.codeSafir,
+        street_number_and_address:
+          partialAgency.address?.streetNumberAndAddress,
+        post_code: partialAgency.address?.postcode,
+        city: partialAgency.address?.city,
+        department_code: partialAgency.address?.departmentCode,
         covered_departments:
-          agency.coveredDepartments &&
-          JSON.stringify(agency.coveredDepartments),
-        refers_to_agency_id: agency.refersToAgencyId,
+          partialAgency.coveredDepartments &&
+          JSON.stringify(partialAgency.coveredDepartments),
+        refers_to_agency_id: partialAgency.refersToAgencyId,
         updated_at: sql`NOW()`,
-        status_justification: agency.statusJustification,
-        phone_number: agency.phoneNumber,
+        status_justification: partialAgency.statusJustification,
+        phone_number_id: newPhoneId,
         delegation_info:
-          agency.delegationAgencyInfo &&
-          JSON.stringify(agency.delegationAgencyInfo),
+          partialAgency.delegationAgencyInfo &&
+          JSON.stringify(partialAgency.delegationAgencyInfo),
       }))
-      .where("id", "=", agency.id)
+      .where("id", "=", partialAgency.id)
       .execute();
 
-    if (agency.usersRights)
-      await this.#saveAgencyRights(agency.id, agency.usersRights);
+    if (partialAgency.usersRights)
+      await this.#saveAgencyRights(partialAgency.id, partialAgency.usersRights);
   }
 
   public async getAllAgenciesWithUsersToReview(): Promise<
@@ -243,10 +253,10 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) =>
         departmentCode
           ? b.where(
-              "agencies.covered_departments",
-              "@>",
-              `["${departmentCode}"]`,
-            )
+            "agencies.covered_departments",
+            "@>",
+            `["${departmentCode}"]`,
+          )
           : b,
       (b) =>
         nameIncludes
@@ -269,16 +279,16 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) =>
         position
           ? b.where(
-              ({ fn }) =>
-                fn("ST_Distance", [
-                  fn("ST_GeographyFromText", [
-                    sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
-                  ]),
-                  "agencies.position",
+            ({ fn }) =>
+              fn("ST_Distance", [
+                fn("ST_GeographyFromText", [
+                  sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
                 ]),
-              "<=",
-              position.distance_km * 1000,
-            )
+                "agencies.position",
+              ]),
+            "<=",
+            position.distance_km * 1000,
+          )
           : b,
       (b) =>
         b.limit(
@@ -333,7 +343,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getAgenciesRightsByUserId(
     id: UserId,
-  ): Promise<AgencyRightOfUser[]> {
+  ): Promise<AgencyRightForUser[]> {
     const results = await this.transaction
       .selectFrom("users__agencies")
       .select(({ ref }) => [
@@ -385,6 +395,11 @@ export class PgAgencyRepository implements AgencyRepository {
         "refered_agencies.id",
       )
       .leftJoin("users__agencies", "agencies.id", "users__agencies.agency_id")
+      .leftJoin(
+        "phone_numbers as pn_agency",
+        "agencies.phone_number_id",
+        "pn_agency.id",
+      )
       .select(({ ref, fn }) => [
         jsonBuildObject({
           id: cast<AgencyId>(ref("agencies.id")),
@@ -419,7 +434,7 @@ export class PgAgencyRepository implements AgencyRepository {
           statusJustification: ref("agencies.status_justification"),
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),
-          phoneNumber: ref("agencies.phone_number"),
+          phoneNumber: sql<string>`${ref("pn_agency.phone_number")}`,
           delegationAgencyInfo: cast<DelegationAgencyInfo | null>(
             ref("agencies.delegation_info"),
           ),
@@ -455,20 +470,20 @@ export class PgAgencyRepository implements AgencyRepository {
   #pgAgencyToAgencyWithRights(
     result:
       | (OmitFromExistingKeys<
-          AgencyDto,
-          | "counsellorEmails"
-          | "validatorEmails"
-          | "acquisitionCampaign"
-          | "acquisitionKeyword"
-        > & {
-          acquisitionCampaign: string | null;
-          acquisitionKeyword: string | null;
-          usersRights: {
-            userId: string;
-            roles: AgencyRole[];
-            isNotifiedByEmail: boolean;
-          }[];
-        })
+        AgencyDto,
+        | "counsellorEmails"
+        | "validatorEmails"
+        | "acquisitionCampaign"
+        | "acquisitionKeyword"
+      > & {
+        acquisitionCampaign: string | null;
+        acquisitionKeyword: string | null;
+        usersRights: {
+          userId: string;
+          roles: AgencyRole[];
+          isNotifiedByEmail: boolean;
+        }[];
+      })
       | undefined,
   ): AgencyWithUsersRights | undefined {
     if (!result) return;
@@ -502,11 +517,11 @@ export class PgAgencyRepository implements AgencyRepository {
       .map(([userId, userRights]) =>
         userRights
           ? {
-              agency_id: agencyId,
-              user_id: userId,
-              is_notified_by_email: userRights.isNotifiedByEmail,
-              roles: JSON.stringify(userRights.roles),
-            }
+            agency_id: agencyId,
+            user_id: userId,
+            is_notified_by_email: userRights.isNotifiedByEmail,
+            roles: JSON.stringify(userRights.roles),
+          }
           : undefined,
       )
       .filter(isTruthy);

@@ -61,11 +61,15 @@ describe("Assessment routes", () => {
     );
 
     inMemoryUow.conventionRepository.setConventions([convention]);
-    inMemoryUow.agencyRepository.insert(
-      toAgencyWithRights(agency, {
+    inMemoryUow.agencyRepository.insert({
+      agency: toAgencyWithRights(agency, {
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
-    );
+      phoneId: await inMemoryUow.phoneNumberRepository.getIdByPhoneNumber(
+        agency.phoneNumber,
+        new Date(),
+      ),
+    });
     inMemoryUow.userRepository.users = [validator];
   });
 

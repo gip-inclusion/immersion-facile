@@ -10,6 +10,7 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -43,19 +44,42 @@ describe("PgConventionExternalIdRepository", () => {
 
   describe("save", () => {
     it("saves a conventionId and creates a corresponding conventionExternalId, then gets it by id", async () => {
+      const pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
       const convention = new ConventionDtoBuilder().withId(uuid()).build();
       const validator = makeUniqueUserForTest(uuid());
 
       await pgUserRepository.save(validator);
-      await pgAgencyRepository.insert(
-        toAgencyWithRights(
+      await pgAgencyRepository.insert({
+        agency: toAgencyWithRights(
           new AgencyDtoBuilder().withId(convention.agencyId).build(),
           {
             [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
           },
         ),
-      );
-      await pgConventionRepository.save(convention);
+        phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+          new AgencyDtoBuilder().withId(convention.agencyId).build()
+            .phoneNumber,
+          new Date(),
+        ),
+      });
+      await pgConventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+            convention.signatories.beneficiary.phone,
+            new Date(),
+          ),
+          establishmentRepresentative:
+            await pgPhoneNumberRepository.getIdByPhoneNumber(
+              convention.signatories.establishmentRepresentative.phone,
+              new Date(),
+            ),
+          establishmentTutor: await pgPhoneNumberRepository.getIdByPhoneNumber(
+            convention.establishmentTutor.phone,
+            new Date(),
+          ),
+        },
+      });
 
       expect(
         await pgConventionExternalIdRepository.getByConventionId(convention.id),

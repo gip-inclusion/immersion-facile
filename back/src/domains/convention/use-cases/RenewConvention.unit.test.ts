@@ -88,6 +88,7 @@ describe("RenewConvention", () => {
           uuidGenerator,
         }),
         new InMemorySiretGateway(),
+        new CustomTimeGateway(),
       ),
     );
     uow.conventionRepository.setConventions([existingValidatedConvention]);

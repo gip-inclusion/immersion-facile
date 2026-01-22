@@ -82,8 +82,16 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
     if (!siretEstablishmentDto)
       throw errors.agency.invalidSiret({ siret: agency.agencySiret });
 
+    const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+      agency.phoneNumber,
+      deps.timeGateway.now(),
+    );
+
     await Promise.all([
-      uow.agencyRepository.insert(agency),
+      uow.agencyRepository.insert({
+        agency,
+        phoneId,
+      }),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "NewAgencyAdded",

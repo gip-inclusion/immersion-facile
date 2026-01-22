@@ -3,9 +3,13 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
+  type DateString,
   errors,
 } from "shared";
-import type { ConventionRepository } from "../ports/ConventionRepository";
+import type {
+  ConventionPhoneIds,
+  ConventionRepository,
+} from "../ports/ConventionRepository";
 
 export class InMemoryConventionRepository implements ConventionRepository {
   #conventions: Record<string, ConventionDto> = {};
@@ -31,9 +35,18 @@ export class InMemoryConventionRepository implements ConventionRepository {
         )
         .map((convention) =>
           this.update({
-            ...convention,
-            status: "DEPRECATED",
-            statusJustification: `Devenu obsolète car statut ${convention.status} alors que la date de fin est dépassée depuis longtemps`,
+            conventionDto: {
+              ...convention,
+              status: "DEPRECATED",
+              statusJustification: `Devenu obsolète car statut ${convention.status} alors que la date de fin est dépassée depuis longtemps`,
+            },
+            phoneIds: {
+              beneficiary: 0,
+              establishmentTutor: 0,
+              establishmentRepresentative: 0,
+              beneficiaryRepresentative: 0,
+              beneficiaryCurrentEmployer: 0,
+            },
           }),
         ),
     );
@@ -50,11 +63,17 @@ export class InMemoryConventionRepository implements ConventionRepository {
     return this.#conventions[id];
   }
 
-  public async save(convention: ConventionDto): Promise<void> {
-    if (this.#conventions[convention.id])
-      throw errors.convention.conflict({ conventionId: convention.id });
+  public async save(params: {
+    conventionDto: ConventionDto;
+    phoneIds: ConventionPhoneIds;
+    now?: DateString;
+  }): Promise<void> {
+    const { conventionDto } = params;
+    const { id } = conventionDto;
+    if (this.#conventions[id])
+      throw errors.convention.conflict({ conventionId: id });
 
-    this.#conventions[convention.id] = dropConventionReadFields(convention);
+    this.#conventions[id] = dropConventionReadFields(conventionDto);
   }
 
   // for test purpose
@@ -68,11 +87,16 @@ export class InMemoryConventionRepository implements ConventionRepository {
     );
   }
 
-  public async update(convention: ConventionDto) {
-    const id = convention.id;
+  public async update(params: {
+    conventionDto: ConventionDto;
+    phoneIds?: Partial<ConventionPhoneIds>;
+    now?: DateString;
+  }): Promise<ConventionId | undefined> {
+    const { conventionDto } = params;
+    const { id } = conventionDto;
     if (!this.#conventions[id]) return;
 
-    this.#conventions[id] = dropConventionReadFields(convention);
+    this.#conventions[id] = dropConventionReadFields(conventionDto);
     return id;
   }
 }

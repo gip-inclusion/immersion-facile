@@ -1,8 +1,10 @@
 import type { AgencyKind, UserId } from "shared";
 import { agencyKindSchema, userIdSchema } from "shared";
 import { z } from "zod";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 type AssignAgencyViewerRoleInput = {
   userIds: UserId[];
@@ -25,6 +27,12 @@ export class AssignAgencyViewerRole extends TransactionalUseCase<
   AssignAgencyViewerRoleOutput
 > {
   protected inputSchema = assignAgencyViewerRoleInputSchema;
+  #timeGateway: TimeGateway;
+
+  constructor(uowPerformer: UnitOfWorkPerformer, timeGateway: TimeGateway) {
+    super(uowPerformer);
+    this.#timeGateway = timeGateway;
+  }
 
   protected async _execute(
     { userIds, agencyKinds }: AssignAgencyViewerRoleInput,
@@ -77,10 +85,17 @@ export class AssignAgencyViewerRole extends TransactionalUseCase<
         });
 
         if (hasChanges) {
+          const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            this.#timeGateway.now(),
+          );
           return uow.agencyRepository
             .update({
-              id: agency.id,
-              usersRights: updatedUsersRights,
+              partialAgency: {
+                id: agency.id,
+                usersRights: updatedUsersRights,
+              },
+              newPhoneId: phoneId,
             })
             .then(() => {
               agenciesSuccessfullyUpdated++;

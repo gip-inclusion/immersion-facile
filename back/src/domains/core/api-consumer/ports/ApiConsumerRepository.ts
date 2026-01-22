@@ -10,7 +10,7 @@ export type GetApiConsumerFilters = {
 };
 
 export interface ApiConsumerRepository {
-  save(apiConsumer: ApiConsumer): Promise<void>;
+  save(params: { apiConsumer: ApiConsumer; phoneId: number }): Promise<void>;
   getAll(): Promise<ApiConsumer[]>;
   getById: GetApiConsumerById;
   getByFilters(filters: GetApiConsumerFilters): Promise<ApiConsumer[]>;

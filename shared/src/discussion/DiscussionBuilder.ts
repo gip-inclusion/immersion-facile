@@ -28,7 +28,7 @@ import type {
 
 const createdAt = new Date("2023-06-23T12:00:00.000").toISOString();
 
-const defaultDiscussion = {
+export const defaultDiscussion = {
   id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
   appellationCode: "11704",
   siret: "12345671234567",

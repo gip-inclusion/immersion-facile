@@ -42,18 +42,27 @@ export class SubscribeToWebhook extends TransactionalUseCase<
       id: this.uuidGenerator.new(),
     };
 
+    const apiConsumerPhoneId =
+      await uow.phoneNumberRepository.getIdByPhoneNumber(
+        payload.contact.phone,
+        this.timeGateway.now(),
+      );
+
     await uow.apiConsumerRepository.save({
-      ...payload,
-      rights: {
-        ...payload.rights,
-        [rightName]: {
-          ...payload.rights[rightName],
-          subscriptions: [
-            ...payload.rights[rightName].subscriptions,
-            newSubscription,
-          ],
+      apiConsumer: {
+        ...payload,
+        rights: {
+          ...payload.rights,
+          [rightName]: {
+            ...payload.rights[rightName],
+            subscriptions: [
+              ...payload.rights[rightName].subscriptions,
+              newSubscription,
+            ],
+          },
         },
       },
+      phoneId: apiConsumerPhoneId,
     });
   }
 }

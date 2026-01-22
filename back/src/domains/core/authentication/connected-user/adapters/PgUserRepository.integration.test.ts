@@ -17,6 +17,7 @@ import { toAgencyWithRights } from "../../../../../utils/agency";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
+import { PgPhoneNumberRepository } from "../../../phone-number/adapters/PgPhoneNumberRepository";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 import { PgUserRepository } from "./PgUserRepository";
 
@@ -291,16 +292,21 @@ describe("PgAuthenticatedUserRepository", () => {
         await db.deleteFrom("establishments").execute();
 
         const agencyRepository = new PgAgencyRepository(db);
+        const pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
         const agency = new AgencyDtoBuilder().build();
 
-        await agencyRepository.insert(
-          toAgencyWithRights(agency, {
+        await agencyRepository.insert({
+          agency: toAgencyWithRights(agency, {
             [user1.id]: {
               roles: ["validator"],
               isNotifiedByEmail: true,
             },
           }),
-        );
+          phoneId: await pgPhoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            new Date(),
+          ),
+        });
 
         const establishmentRepository = new PgEstablishmentAggregateRepository(
           db,

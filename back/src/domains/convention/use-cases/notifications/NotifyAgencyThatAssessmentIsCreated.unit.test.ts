@@ -93,7 +93,24 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   });
 
   it("Throw when no agency were found", async () => {
-    await uow.conventionRepository.save(convention);
+    await uow.conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
 
     await expectPromiseToFailWithError(
       usecase.execute({ assessment }),
@@ -111,16 +128,37 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       .withId("validator2")
       .buildUser();
     uow.userRepository.users = [validator, validator2];
-    await uow.agencyRepository.insert(
-      toAgencyWithRights(agency, {
+    await uow.agencyRepository.insert({
+      agency: toAgencyWithRights(agency, {
         [validator.id]: {
           isNotifiedByEmail: true,
           roles: ["validator", "counsellor"],
         },
         [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
-    );
-    await uow.conventionRepository.save(convention);
+      phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+        agency.phoneNumber,
+        timeGateway.now(),
+      ),
+    });
+    await uow.conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
     await uow.assessmentRepository.save(
       createAssessmentEntity(assessment, convention),
     );
@@ -203,16 +241,37 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       .withId("validator2")
       .buildUser();
     uow.userRepository.users = [validator, validator2];
-    await uow.agencyRepository.insert(
-      toAgencyWithRights(agency, {
+    await uow.agencyRepository.insert({
+      agency: toAgencyWithRights(agency, {
         [validator.id]: {
           isNotifiedByEmail: true,
           roles: ["validator", "counsellor"],
         },
         [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
-    );
-    await uow.conventionRepository.save(convention);
+      phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+        agency.phoneNumber,
+        timeGateway.now(),
+      ),
+    });
+    await uow.conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: {
+        beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+        establishmentRepresentative:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+        establishmentTutor: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      },
+    });
     await uow.assessmentRepository.save(
       createAssessmentEntity(assessmentDidNotShow, convention),
     );
@@ -269,12 +328,34 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
     it("When beneficiary did the immersion, send an email to the advisor (and not to other agency users)", async () => {
       uow.userRepository.users = [validator];
-      await uow.agencyRepository.insert(
-        toAgencyWithRights(agency, {
+      await uow.agencyRepository.insert({
+        agency: toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
-      );
-      await uow.conventionRepository.save(convention);
+        phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      });
+      await uow.conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+          establishmentRepresentative:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              agency.phoneNumber,
+              timeGateway.now(),
+            ),
+          establishmentTutor:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              agency.phoneNumber,
+              timeGateway.now(),
+            ),
+        },
+      });
       await uow.assessmentRepository.save(
         createAssessmentEntity(assessment, convention),
       );
@@ -317,12 +398,34 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
     it("When assessment status is DID_NOT_SHOW, send an email to the advisor (and not to other agency users)", async () => {
       uow.userRepository.users = [validator];
-      await uow.agencyRepository.insert(
-        toAgencyWithRights(agency, {
+      await uow.agencyRepository.insert({
+        agency: toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
-      );
-      await uow.conventionRepository.save(convention);
+        phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          timeGateway.now(),
+        ),
+      });
+      await uow.conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+            agency.phoneNumber,
+            timeGateway.now(),
+          ),
+          establishmentRepresentative:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              agency.phoneNumber,
+              timeGateway.now(),
+            ),
+          establishmentTutor:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              agency.phoneNumber,
+              timeGateway.now(),
+            ),
+        },
+      });
       const assessmentDidNotShow: AssessmentDto = {
         conventionId: convention.id,
         status: "DID_NOT_SHOW",

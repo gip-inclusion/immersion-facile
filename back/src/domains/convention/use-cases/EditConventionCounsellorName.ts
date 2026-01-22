@@ -13,6 +13,7 @@ import {
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
@@ -30,6 +31,7 @@ export const makeEditConventionCounsellorName = useCaseBuilder(
   .withCurrentUser<ConventionRelatedJwtPayload>()
   .withDeps<{
     createNewEvent: CreateNewEvent;
+    timeGateway: TimeGateway;
   }>()
   .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
@@ -89,7 +91,39 @@ export const makeEditConventionCounsellorName = useCaseBuilder(
     };
 
     await Promise.all([
-      uow.conventionRepository.update(updatedConvention),
+      uow.conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: {
+          beneficiary: await uow.phoneNumberRepository.getIdByPhoneNumber(
+            updatedConvention.signatories.beneficiary.phone,
+            deps.timeGateway.now(),
+          ),
+          establishmentRepresentative:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              updatedConvention.signatories.establishmentRepresentative.phone,
+              deps.timeGateway.now(),
+            ),
+          establishmentTutor:
+            await uow.phoneNumberRepository.getIdByPhoneNumber(
+              updatedConvention.establishmentTutor.phone,
+              deps.timeGateway.now(),
+            ),
+          beneficiaryRepresentative: updatedConvention.signatories
+            .beneficiaryRepresentative
+            ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+                updatedConvention.signatories.beneficiaryRepresentative.phone,
+                deps.timeGateway.now(),
+              )
+            : undefined,
+          beneficiaryCurrentEmployer: updatedConvention.signatories
+            .beneficiaryCurrentEmployer
+            ? await uow.phoneNumberRepository.getIdByPhoneNumber(
+                updatedConvention.signatories.beneficiaryCurrentEmployer.phone,
+                deps.timeGateway.now(),
+              )
+            : undefined,
+        },
+      }),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "ConventionCounsellorNameEdited",

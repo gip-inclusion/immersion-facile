@@ -4,6 +4,7 @@ import {
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwIfNotAdmin } from "../helpers/authorization.helper";
 
@@ -14,6 +15,7 @@ export const makeRejectUserForAgency = useCaseBuilder("RejectUserForAgency")
   .withCurrentUser<ConnectedUser>()
   .withDeps<{
     createNewEvent: CreateNewEvent;
+    timeGateway: TimeGateway;
   }>()
   .build(async ({ uow, currentUser, deps, inputParams }) => {
     throwIfNotAdmin(currentUser);
@@ -29,10 +31,18 @@ export const makeRejectUserForAgency = useCaseBuilder("RejectUserForAgency")
 
     const { [userToUpdate.id]: _, ...updatedUserRights } = agency.usersRights;
 
+    const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+      agency.phoneNumber,
+      deps.timeGateway.now(),
+    );
+
     await Promise.all([
       uow.agencyRepository.update({
-        id: agency.id,
-        usersRights: updatedUserRights,
+        partialAgency: {
+          id: agency.id,
+          usersRights: updatedUserRights,
+        },
+        newPhoneId: phoneId,
       }),
       uow.outboxRepository.save(
         deps.createNewEvent({

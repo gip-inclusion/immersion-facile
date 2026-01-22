@@ -79,7 +79,14 @@ export const makeUpdateDiscussionStatus = useCaseBuilder(
     };
 
     await Promise.all([
-      uow.discussionRepository.update(updatedDiscussion),
+      uow.discussionRepository.update({
+        discussion: updatedDiscussion,
+        potentialBeneficiaryPhoneId:
+          await uow.phoneNumberRepository.getIdByPhoneNumber(
+            updatedDiscussion.potentialBeneficiary.phone,
+            deps.timeGateway.now(),
+          ),
+      }),
       uow.outboxRepository.save(
         deps.createNewEvent({
           topic: "DiscussionStatusManuallyUpdated",

@@ -7,6 +7,7 @@ import {
   withAgencyIdSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type UpdateAgencyReferringToUpdatedAgency = ReturnType<
@@ -16,7 +17,7 @@ export const makeUpdateAgencyReferringToUpdatedAgency = useCaseBuilder(
   "UpdateAgencyReferringToUpdatedAgency",
 )
   .withInput(withAgencyIdSchema)
-  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .withDeps<{ createNewEvent: CreateNewEvent; timeGateway: TimeGateway }>()
   .build(async ({ uow, deps, inputParams }) => {
     const updatedAgency = await uow.agencyRepository.getById(
       inputParams.agencyId,
@@ -28,10 +29,17 @@ export const makeUpdateAgencyReferringToUpdatedAgency = useCaseBuilder(
       await uow.agencyRepository.getAgenciesRelatedToAgency(updatedAgency.id);
 
     await Promise.all(
-      relatedAgencies.map(async ({ usersRights, id }) => {
+      relatedAgencies.map(async ({ usersRights, id, phoneNumber }) => {
+        const phoneId = await uow.phoneNumberRepository.getIdByPhoneNumber(
+          phoneNumber,
+          deps.timeGateway.now(),
+        );
         await uow.agencyRepository.update({
-          id,
-          usersRights: updateRights(usersRights, updatedAgency),
+          partialAgency: {
+            id,
+            usersRights: updateRights(usersRights, updatedAgency),
+          },
+          newPhoneId: phoneId,
         });
         await uow.outboxRepository.save(
           deps.createNewEvent({

@@ -28,7 +28,9 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import { toAgencyInsertParams } from "../../agency/ports/AgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../core/phone-number/adapters/PgPhoneNumberRepository";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -64,17 +66,23 @@ describe("PgConventionRepository", () => {
   let conventionRepository: PgConventionRepository;
   let db: KyselyDb;
   let timeGateway: CustomTimeGateway;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
 
   beforeAll(async () => {
     pool = makeTestPgPool();
     db = makeKyselyDb(pool);
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
 
     const validator = makeUniqueUserForTest(uuid());
     await new PgUserRepository(db).save(validator);
     await new PgAgencyRepository(db).insert(
-      toAgencyWithRights(new AgencyDtoBuilder().withId(uuid()).build(), {
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-      }),
+      await toAgencyInsertParams(
+        toAgencyWithRights(new AgencyDtoBuilder().withId(uuid()).build(), {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
     );
     timeGateway = new CustomTimeGateway();
   });
@@ -100,9 +108,13 @@ describe("PgConventionRepository", () => {
 
     await new PgUserRepository(db).save(validator);
     await new PgAgencyRepository(db).insert(
-      toAgencyWithRights(agency, {
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-      }),
+      await toAgencyInsertParams(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
     );
 
     conventionRepository = new PgConventionRepository(db);
@@ -117,17 +129,21 @@ describe("PgConventionRepository", () => {
 
     expect(await conventionRepository.getById(convention.id)).toBeUndefined();
 
-    const savedExternalId = await conventionRepository.save(
-      convention,
-      anyConventionUpdatedAt,
-    );
+    const savedExternalId = await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     expect(await conventionRepository.getById(convention.id)).toEqual(
       convention,
     );
     expect(savedExternalId).toBeUndefined();
   });
-
   it("fails to add a convention if it already exists", async () => {
     const convention = new ConventionDtoBuilder()
       .withInternshipKind("immersion")
@@ -139,10 +155,24 @@ describe("PgConventionRepository", () => {
       .withAgencyReferent({ firstname: "Fredy", lastname: "L'ACCOMPAGNATEUR" })
       .build();
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     await expectPromiseToFailWithError(
-      conventionRepository.save(convention),
+      conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      }),
       errors.convention.conflict({ conventionId: convention.id }),
     );
   });
@@ -157,7 +187,15 @@ describe("PgConventionRepository", () => {
       .withSchedule(reasonableSchedule)
       .build();
 
-    await conventionRepository.save(convention, anyConventionUpdatedAt);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     expect(await conventionRepository.getById(convention.id)).toEqual(
       convention,
@@ -169,10 +207,15 @@ describe("PgConventionRepository", () => {
       .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
-    await conventionRepository.update(
-      updatedConvention,
-      anyConventionUpdatedAt,
-    );
+    await conventionRepository.update({
+      conventionDto: updatedConvention,
+      phoneIds: await getConventionPhoneIds(
+        updatedConvention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
     expect(await conventionRepository.getById(updatedConvention.id)).toEqual(
       updatedConvention,
     );
@@ -184,7 +227,15 @@ describe("PgConventionRepository", () => {
       .notSigned()
       .build();
 
-    await conventionRepository.save(convention, anyConventionUpdatedAt);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     const fetchedConvention = await conventionRepository.getById(convention.id);
     expect(fetchedConvention).toEqual(convention);
@@ -204,7 +255,15 @@ describe("PgConventionRepository", () => {
       .notSigned()
       .build();
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     const result = await db
       .selectFrom("conventions")
@@ -226,7 +285,15 @@ describe("PgConventionRepository", () => {
       .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
 
-    await conventionRepository.save(existingConvention);
+    await conventionRepository.save({
+      conventionDto: existingConvention,
+      phoneIds: await getConventionPhoneIds(
+        existingConvention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     const renewedConvention = conventionStylisteBuilder
       .withId("22222222-2222-4222-9222-222222222222")
@@ -237,7 +304,15 @@ describe("PgConventionRepository", () => {
       })
       .build();
 
-    await conventionRepository.save(renewedConvention, anyConventionUpdatedAt);
+    await conventionRepository.save({
+      conventionDto: renewedConvention,
+      phoneIds: await getConventionPhoneIds(
+        renewedConvention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     const fetchedConvention = await conventionRepository.getById(
       renewedConvention.id,
@@ -263,7 +338,14 @@ describe("PgConventionRepository", () => {
       .withAgencyId(agency.id)
       .build();
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     const conventionRetreived = await conventionRepository.getById(
       convention.id,
@@ -292,7 +374,14 @@ describe("PgConventionRepository", () => {
       .withAgencyId(agency.id)
       .build();
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     const conventionRetreived = await conventionRepository.getById(
       convention.id,
@@ -343,7 +432,14 @@ describe("PgConventionRepository", () => {
       })
       .execute();
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     await db
       .insertInto("conventions__ft_connect_users")
@@ -407,7 +503,14 @@ describe("PgConventionRepository", () => {
       })
       .execute();
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     await db
       .insertInto("conventions__ft_connect_users")
@@ -457,7 +560,14 @@ describe("PgConventionRepository", () => {
     const results1 = await getEmailBuilder.execute();
     expectToEqual(results1, []);
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     const results2 = await getEmailBuilder.execute();
     expectToEqual(results2, [{ email }]);
@@ -479,13 +589,31 @@ describe("PgConventionRepository", () => {
       .signedByBeneficiary("2024-02-02")
       .signedByEstablishmentRepresentative("2024-02-03");
 
-    await conventionRepository.save(conventionBuilder.build());
+    const initialConvention = conventionBuilder.build();
+
+    await conventionRepository.save({
+      conventionDto: initialConvention,
+      phoneIds: await getConventionPhoneIds(
+        initialConvention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     const updatedConvention = conventionBuilder
       .withStatus("READY_TO_SIGN")
-      .notSigned();
+      .notSigned()
+      .build();
 
-    await conventionRepository.update(updatedConvention.build());
+    await conventionRepository.update({
+      conventionDto: updatedConvention,
+      phoneIds: await getConventionPhoneIds(
+        updatedConvention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     const conventionInDB = await conventionRepository.getById(conventionId);
 
@@ -528,7 +656,15 @@ describe("PgConventionRepository", () => {
       })
       .execute();
 
-    await conventionRepository.save(convention, anyConventionUpdatedAt);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     await db
       .insertInto("conventions__ft_connect_users")
@@ -551,7 +687,14 @@ describe("PgConventionRepository", () => {
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
-    await conventionRepository.save(convention);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+    });
 
     const updatedConvention = conventionStylisteBuilder
       .withId(idA)
@@ -563,10 +706,15 @@ describe("PgConventionRepository", () => {
       .withEstablishmentNumberOfEmployeesRange("200-249")
       .build();
 
-    await conventionRepository.update(
-      updatedConvention,
-      anyConventionUpdatedAt,
-    );
+    await conventionRepository.update({
+      conventionDto: updatedConvention,
+      phoneIds: await getConventionPhoneIds(
+        updatedConvention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
   });
@@ -577,7 +725,15 @@ describe("PgConventionRepository", () => {
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
 
-    await conventionRepository.save(convention, anyConventionUpdatedAt);
+    await conventionRepository.save({
+      conventionDto: convention,
+      phoneIds: await getConventionPhoneIds(
+        convention,
+        pgPhoneNumberRepository,
+        timeGateway,
+      ),
+      now: anyConventionUpdatedAt,
+    });
 
     expect(await conventionRepository.getById(convention.id)).toEqual(
       convention,
@@ -620,15 +776,36 @@ describe("PgConventionRepository", () => {
         .build();
 
       //SAVE CONVENTION WITH SAME TUTOR & REP
-      await conventionRepository.save(conventionWithSameTutorAndRep);
+      await conventionRepository.save({
+        conventionDto: conventionWithSameTutorAndRep,
+        phoneIds: await getConventionPhoneIds(
+          conventionWithSameTutorAndRep,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
       await expectTutorAndRepToHaveSameId(conventionId);
 
       //UPDATE CONVENTION WITH DIFFERENT TUTOR & REP"
-      await conventionRepository.update(conventionWithDiffTutorAndRep);
+      await conventionRepository.update({
+        conventionDto: conventionWithDiffTutorAndRep,
+        phoneIds: await getConventionPhoneIds(
+          conventionWithDiffTutorAndRep,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
       await expectTutorAndRepToHaveDifferentIds(conventionId);
 
       //UPDATE CONVENTION WITH SAME TUTOR & REP
-      await conventionRepository.update(conventionWithSameTutorAndRep);
+      await conventionRepository.update({
+        conventionDto: conventionWithSameTutorAndRep,
+        phoneIds: await getConventionPhoneIds(
+          conventionWithSameTutorAndRep,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
       await expectTutorAndRepToHaveSameId(conventionId);
     });
 
@@ -660,9 +837,14 @@ describe("PgConventionRepository", () => {
         .build();
 
       //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
-      await conventionRepository.save(
-        conventionWithoutBeneficiaryCurrentEmployer,
-      );
+      await conventionRepository.save({
+        conventionDto: conventionWithoutBeneficiaryCurrentEmployer,
+        phoneIds: await getConventionPhoneIds(
+          conventionWithoutBeneficiaryCurrentEmployer,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
 
       await expectConventionHaveBeneficiaryCurrentEmployer(
         conventionRepository,
@@ -671,9 +853,14 @@ describe("PgConventionRepository", () => {
       );
 
       //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER
-      await conventionRepository.update(
-        conventionWithBeneficiaryCurrentEmployer,
-      );
+      await conventionRepository.update({
+        conventionDto: conventionWithBeneficiaryCurrentEmployer,
+        phoneIds: await getConventionPhoneIds(
+          conventionWithBeneficiaryCurrentEmployer,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
 
       await expectConventionHaveBeneficiaryCurrentEmployer(
         conventionRepository,
@@ -694,11 +881,20 @@ describe("PgConventionRepository", () => {
         businessAddress: "Rue des Bouchers 67065 Strasbourg",
       };
 
-      await conventionRepository.update(
-        new ConventionDtoBuilder(conventionWithBeneficiaryCurrentEmployer)
-          .withBeneficiaryCurrentEmployer(newBeneficiaryCurrentEmployer)
-          .build(),
-      );
+      const updatedConvention = new ConventionDtoBuilder(
+        conventionWithBeneficiaryCurrentEmployer,
+      )
+        .withBeneficiaryCurrentEmployer(newBeneficiaryCurrentEmployer)
+        .build();
+
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
 
       await expectConventionHaveBeneficiaryCurrentEmployer(
         conventionRepository,
@@ -707,9 +903,14 @@ describe("PgConventionRepository", () => {
       );
 
       //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
-      await conventionRepository.update(
-        conventionWithoutBeneficiaryCurrentEmployer,
-      );
+      await conventionRepository.update({
+        conventionDto: conventionWithoutBeneficiaryCurrentEmployer,
+        phoneIds: await getConventionPhoneIds(
+          conventionWithoutBeneficiaryCurrentEmployer,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
 
       await expectConventionHaveBeneficiaryCurrentEmployer(
         conventionRepository,
@@ -724,7 +925,14 @@ describe("PgConventionRepository", () => {
         .withId(conventionId)
         .withStatus("ACCEPTED_BY_COUNSELLOR")
         .build();
-      await conventionRepository.save(convention);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
 
       const updatedConvention = conventionStylisteBuilder
         .withId(conventionId)
@@ -737,10 +945,15 @@ describe("PgConventionRepository", () => {
         .withDateEnd(new Date("2024-10-24").toISOString())
         .build();
 
-      await conventionRepository.update(
-        updatedConvention,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expect(await conventionRepository.getById(conventionId)).toEqual(
         updatedConvention,
@@ -775,7 +988,14 @@ describe("PgConventionRepository", () => {
         .notSigned()
         .build();
 
-      await conventionRepository.save(convention);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
 
       const updatedConvention: ConventionDto = new ConventionDtoBuilder(
         convention,
@@ -786,7 +1006,14 @@ describe("PgConventionRepository", () => {
         })
         .build();
 
-      await conventionRepository.update(updatedConvention);
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
       const updatedConventionStored = await conventionRepository.getById(
         updatedConvention.id,
       );
@@ -802,7 +1029,14 @@ describe("PgConventionRepository", () => {
         .withEstablishmentRepresentative(establishmentRepresentative)
         .build();
 
-      await conventionRepository.update(toDraftConvention);
+      await conventionRepository.update({
+        conventionDto: toDraftConvention,
+        phoneIds: await getConventionPhoneIds(
+          toDraftConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
       const toDraftConventionStored = await conventionRepository.getById(
         toDraftConvention.id,
       );
@@ -840,9 +1074,23 @@ describe("PgConventionRepository", () => {
           role: "establishment-tutor",
         })
         .build();
-      await conventionRepository.save(convention);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
 
-      await conventionRepository.update(updatedConvention);
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+      });
       const updatedConventionStored = await conventionRepository.getById(
         updatedConvention.id,
       );
@@ -858,7 +1106,15 @@ describe("PgConventionRepository", () => {
         .withId(idA)
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
-      await conventionRepository.save(convention, anyConventionUpdatedAt);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       const updatedConvention = conventionStylisteBuilder
         .withId(idA)
@@ -875,10 +1131,15 @@ describe("PgConventionRepository", () => {
         .withDateEnd(new Date("2024-10-24").toISOString())
         .build();
 
-      await conventionRepository.update(
-        updatedConvention,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expect(await conventionRepository.getById(idA)).toEqual(
         updatedConvention,
@@ -891,17 +1152,30 @@ describe("PgConventionRepository", () => {
         .withId(idA)
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
-      await conventionRepository.save(convention, anyConventionUpdatedAt);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       const updatedConvention = conventionStylisteBuilder
         .withId(idA)
         .withBeneficiaryRepresentative(undefined)
         .build();
 
-      await conventionRepository.update(
-        updatedConvention,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expect(await conventionRepository.getById(idA)).toEqual(
         updatedConvention,
@@ -914,17 +1188,30 @@ describe("PgConventionRepository", () => {
         .withId(idA)
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
-      await conventionRepository.save(convention, anyConventionUpdatedAt);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       const updatedConvention = conventionStylisteBuilder
         .withId(idA)
         .withAgencyReferent({ firstname: "New", lastname: "REFERENT" })
         .build();
 
-      await conventionRepository.update(
-        updatedConvention,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expect(await conventionRepository.getById(idA)).toEqual(
         updatedConvention,
@@ -937,7 +1224,15 @@ describe("PgConventionRepository", () => {
         .withId(idA)
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
-      await conventionRepository.save(convention, anyConventionUpdatedAt);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       const updatedConvention = new ConventionDtoBuilder()
         .withImmersionAppellation(styliste)
@@ -946,10 +1241,15 @@ describe("PgConventionRepository", () => {
         .withId(idA)
         .build();
 
-      await conventionRepository.update(
-        updatedConvention,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expect(await conventionRepository.getById(idA)).toEqual(
         updatedConvention,
@@ -959,17 +1259,30 @@ describe("PgConventionRepository", () => {
     it("Updates an already saved immersion without beneficiary representative with a beneficiary representative", async () => {
       const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
       const convention = conventionStylisteBuilder.withId(idA).build();
-      await conventionRepository.save(convention, anyConventionUpdatedAt);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       const updatedConvention = conventionStylisteBuilder
         .withId(idA)
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
 
-      await conventionRepository.update(
-        updatedConvention,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expect(await conventionRepository.getById(idA)).toEqual(
         updatedConvention,
@@ -982,7 +1295,15 @@ describe("PgConventionRepository", () => {
         .withId(conventionId)
         .withStatus("IN_REVIEW")
         .build();
-      await conventionRepository.save(convention, anyConventionUpdatedAt);
+      await conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: await getConventionPhoneIds(
+          convention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       const updatedConvention = conventionStylisteBuilder
         .withId(conventionId)
@@ -992,10 +1313,15 @@ describe("PgConventionRepository", () => {
         .withDateApproval(new Date("2024-10-15").toISOString())
         .build();
 
-      await conventionRepository.update(
-        updatedConvention,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: updatedConvention,
+        phoneIds: await getConventionPhoneIds(
+          updatedConvention,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expect(await conventionRepository.getById(conventionId)).toEqual(
         updatedConvention,
@@ -1007,10 +1333,15 @@ describe("PgConventionRepository", () => {
         dateApproval: undefined,
       };
 
-      await conventionRepository.update(
-        conventionBackToReadyToSign,
-        anyConventionUpdatedAt,
-      );
+      await conventionRepository.update({
+        conventionDto: conventionBackToReadyToSign,
+        phoneIds: await getConventionPhoneIds(
+          conventionBackToReadyToSign,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: anyConventionUpdatedAt,
+      });
 
       expectToEqual(
         await conventionRepository.getById(conventionId),
@@ -1079,42 +1410,79 @@ describe("PgConventionRepository", () => {
 
       const originalUpdatedAt = new Date("2022-01-01T00:00:00").toISOString();
       await Promise.all([
-        conventionRepository.save(
-          convention1ToMarkAsDeprecated,
-          originalUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention2ToKeepAsIs,
-          anyConventionUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention3ToKeepAsIs,
-          anyConventionUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention4ToKeepAsIs,
-          anyConventionUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention5ToKeepAsIs,
-          anyConventionUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention6ToKeepAsIs,
-          anyConventionUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention7ToMarkAsDeprecated,
-          anyConventionUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention8ToMarkAsDeprecated,
-          anyConventionUpdatedAt,
-        ),
-        conventionRepository.save(
-          convention9ToMarkAsDeprecated,
-          anyConventionUpdatedAt,
-        ),
+        conventionRepository.save({
+          conventionDto: convention1ToMarkAsDeprecated,
+          phoneIds: await getConventionPhoneIds(
+            convention1ToMarkAsDeprecated,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: originalUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention2ToKeepAsIs,
+          phoneIds: await getConventionPhoneIds(
+            convention2ToKeepAsIs,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention4ToKeepAsIs,
+          phoneIds: await getConventionPhoneIds(
+            convention4ToKeepAsIs,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention5ToKeepAsIs,
+          phoneIds: await getConventionPhoneIds(
+            convention5ToKeepAsIs,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention6ToKeepAsIs,
+          phoneIds: await getConventionPhoneIds(
+            convention6ToKeepAsIs,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention7ToMarkAsDeprecated,
+          phoneIds: await getConventionPhoneIds(
+            convention7ToMarkAsDeprecated,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention8ToMarkAsDeprecated,
+          phoneIds: await getConventionPhoneIds(
+            convention8ToMarkAsDeprecated,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: anyConventionUpdatedAt,
+        }),
+        conventionRepository.save({
+          conventionDto: convention9ToMarkAsDeprecated,
+          phoneIds: await getConventionPhoneIds(
+            convention9ToMarkAsDeprecated,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: anyConventionUpdatedAt,
+        }),
+        anyConventionUpdatedAt,
       ]);
 
       const updatedAt = timeGateway.now().toISOString();
@@ -1199,12 +1567,60 @@ describe("PgConventionRepository", () => {
         .build();
 
       await Promise.all([
-        conventionRepository.save(convention1ToDelete, oldDate),
-        conventionRepository.save(convention2ToDelete, oldDate),
-        conventionRepository.save(convention3ToDelete, oldDate),
-        conventionRepository.save(convention4ToKeep, recentDate),
-        conventionRepository.save(convention5ToKeep, oldDate),
-        conventionRepository.save(convention6ToKeep, oldDate),
+        conventionRepository.save({
+          conventionDto: convention1ToDelete,
+          phoneIds: await getConventionPhoneIds(
+            convention1ToDelete,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: oldDate,
+        }),
+        conventionRepository.save({
+          conventionDto: convention2ToDelete,
+          phoneIds: await getConventionPhoneIds(
+            convention2ToDelete,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: oldDate,
+        }),
+        conventionRepository.save({
+          conventionDto: convention3ToDelete,
+          phoneIds: await getConventionPhoneIds(
+            convention3ToDelete,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: oldDate,
+        }),
+        conventionRepository.save({
+          conventionDto: convention4ToKeep,
+          phoneIds: await getConventionPhoneIds(
+            convention4ToKeep,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: recentDate,
+        }),
+        conventionRepository.save({
+          conventionDto: convention5ToKeep,
+          phoneIds: await getConventionPhoneIds(
+            convention5ToKeep,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: oldDate,
+        }),
+        conventionRepository.save({
+          conventionDto: convention6ToKeep,
+          phoneIds: await getConventionPhoneIds(
+            convention6ToKeep,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: oldDate,
+        }),
       ]);
 
       const deletedConventionIds =
@@ -1271,11 +1687,42 @@ describe("PgConventionRepository", () => {
         .withUpdatedAt(subDays(new Date(), 5).toISOString())
         .build();
 
-      await conventionRepository.save(conventionReferencedByRenewed, oldDate);
+      await conventionRepository.save({
+        conventionDto: conventionReferencedByRenewed,
+        phoneIds: await getConventionPhoneIds(
+          conventionReferencedByRenewed,
+          pgPhoneNumberRepository,
+          timeGateway,
+        ),
+        now: oldDate,
+      });
       await Promise.all([
-        conventionRepository.save(conventionWithRenewedFrom),
-        conventionRepository.save(conventionToDelete, oldDate),
-        conventionRepository.save(conventionToKeep),
+        conventionRepository.save({
+          conventionDto: conventionWithRenewedFrom,
+          phoneIds: await getConventionPhoneIds(
+            conventionWithRenewedFrom,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: oldDate,
+        }),
+        conventionRepository.save({
+          conventionDto: conventionToDelete,
+          phoneIds: await getConventionPhoneIds(
+            conventionToDelete,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+          now: oldDate,
+        }),
+        conventionRepository.save({
+          conventionDto: conventionToKeep,
+          phoneIds: await getConventionPhoneIds(
+            conventionToKeep,
+            pgPhoneNumberRepository,
+            timeGateway,
+          ),
+        }),
       ]);
 
       const deletedConventionIds =
@@ -1345,3 +1792,38 @@ describe("PgConventionRepository", () => {
     });
   };
 });
+
+const getConventionPhoneIds = async (
+  convention: ConventionDto,
+  pgPhoneNumberRepository: PgPhoneNumberRepository,
+  timeGateway: CustomTimeGateway,
+) => {
+  return {
+    beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+      convention.signatories.beneficiary.phone,
+      timeGateway.now(),
+    ),
+    establishmentTutor: await pgPhoneNumberRepository.getIdByPhoneNumber(
+      convention.establishmentTutor.phone,
+      timeGateway.now(),
+    ),
+    establishmentRepresentative:
+      await pgPhoneNumberRepository.getIdByPhoneNumber(
+        convention.signatories.establishmentRepresentative.phone,
+        timeGateway.now(),
+      ),
+    beneficiaryRepresentative: convention.signatories.beneficiaryRepresentative
+      ? await pgPhoneNumberRepository.getIdByPhoneNumber(
+          convention.signatories.beneficiaryRepresentative.phone,
+          timeGateway.now(),
+        )
+      : undefined,
+    beneficiaryCurrentEmployer: convention.signatories
+      .beneficiaryCurrentEmployer
+      ? await pgPhoneNumberRepository.getIdByPhoneNumber(
+          convention.signatories.beneficiaryCurrentEmployer.phone,
+          timeGateway.now(),
+        )
+      : undefined,
+  };
+};

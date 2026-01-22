@@ -21,10 +21,17 @@ export const makeMarkDiscussionLinkedToConvention = useCaseBuilder(
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
     await uow.discussionRepository.update({
-      ...discussion,
-      updatedAt: deps.timeGateway.now().toISOString(),
-      conventionId: convention.id,
-      status: "ACCEPTED",
-      candidateWarnedMethod: null,
+      discussion: {
+        ...discussion,
+        updatedAt: deps.timeGateway.now().toISOString(),
+        conventionId: convention.id,
+        status: "ACCEPTED",
+        candidateWarnedMethod: null,
+      },
+      potentialBeneficiaryPhoneId:
+        await uow.phoneNumberRepository.getIdByPhoneNumber(
+          discussion.potentialBeneficiary.phone,
+          deps.timeGateway.now(),
+        ),
     });
   });

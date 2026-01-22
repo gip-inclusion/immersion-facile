@@ -22,6 +22,7 @@ import { PgEstablishmentAggregateRepository } from "../../../establishment/adapt
 import type { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { PgUserRepository } from "../../authentication/connected-user/adapters/PgUserRepository";
+import { PgPhoneNumberRepository } from "../../phone-number/adapters/PgPhoneNumberRepository";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgStatisticQueries } from "./PgStatisticQueries";
 
@@ -30,6 +31,7 @@ describe("PgStatisticQueries", () => {
   let pgConventionRepository: PgConventionRepository;
   let pgAgencyRepository: PgAgencyRepository;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
+  let pgPhoneNumberRepository: PgPhoneNumberRepository;
   let db: KyselyDb;
   let pool: Pool;
 
@@ -42,8 +44,9 @@ describe("PgStatisticQueries", () => {
     pgStatisticQueries = new PgStatisticQueries(db);
     pgConventionRepository = new PgConventionRepository(db);
     pgAgencyRepository = new PgAgencyRepository(db);
+    pgPhoneNumberRepository = new PgPhoneNumberRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      db,
+      makeKyselyDb(pool),
     );
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
@@ -127,11 +130,16 @@ describe("PgStatisticQueries", () => {
         const userRepository = new PgUserRepository(db);
         await userRepository.save(user);
         await userRepository.save(validator);
-        await pgAgencyRepository.insert(
-          toAgencyWithRights(agency, {
+        const phoneId = await pgPhoneNumberRepository.getIdByPhoneNumber(
+          agency.phoneNumber,
+          new Date(),
+        );
+        await pgAgencyRepository.insert({
+          agency: toAgencyWithRights(agency, {
             [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
           }),
-        );
+          phoneId: phoneId,
+        });
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregate,
         );
@@ -139,10 +147,88 @@ describe("PgStatisticQueries", () => {
           establishmentAggregateLinkedToNoConvention,
         );
         await Promise.all([
-          pgConventionRepository.save(conventionSiret1A),
-          pgConventionRepository.save(conventionSiret1B),
-          pgConventionRepository.save(convention2),
-          pgConventionRepository.save(convention3),
+          pgConventionRepository.save({
+            conventionDto: conventionSiret1A,
+            phoneIds: {
+              beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+                conventionSiret1A.signatories.beneficiary.phone,
+                new Date(),
+              ),
+              establishmentRepresentative:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  conventionSiret1A.signatories.establishmentRepresentative
+                    .phone,
+                  new Date(),
+                ),
+              establishmentTutor:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  conventionSiret1A.establishmentTutor.phone,
+                  new Date(),
+                ),
+            },
+            now: new Date().toISOString(),
+          }),
+          pgConventionRepository.save({
+            conventionDto: conventionSiret1B,
+            phoneIds: {
+              beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+                conventionSiret1B.signatories.beneficiary.phone,
+                new Date(),
+              ),
+              establishmentRepresentative:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  conventionSiret1B.signatories.establishmentRepresentative
+                    .phone,
+                  new Date(),
+                ),
+              establishmentTutor:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  conventionSiret1B.establishmentTutor.phone,
+                  new Date(),
+                ),
+            },
+            now: new Date().toISOString(),
+          }),
+          pgConventionRepository.save({
+            conventionDto: convention2,
+            phoneIds: {
+              beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+                convention2.signatories.beneficiary.phone,
+                new Date(),
+              ),
+              establishmentRepresentative:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  convention2.signatories.establishmentRepresentative.phone,
+                  new Date(),
+                ),
+              establishmentTutor:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  convention2.establishmentTutor.phone,
+                  new Date(),
+                ),
+            },
+            now: new Date().toISOString(),
+          }),
+          pgConventionRepository.save({
+            conventionDto: convention3,
+            phoneIds: {
+              beneficiary: await pgPhoneNumberRepository.getIdByPhoneNumber(
+                convention3.signatories.beneficiary.phone,
+                new Date(),
+              ),
+              establishmentRepresentative:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  convention3.signatories.establishmentRepresentative.phone,
+                  new Date(),
+                ),
+              establishmentTutor:
+                await pgPhoneNumberRepository.getIdByPhoneNumber(
+                  convention3.establishmentTutor.phone,
+                  new Date(),
+                ),
+            },
+            now: new Date().toISOString(),
+          }),
         ]);
       });
 

@@ -175,6 +175,7 @@ export const errors = {
           status
         } with body '${JSON.stringify(body, null, 2)}'`,
       ),
+    missingPhoneId: () => new BadRequestError("Missing phone id."),
   },
   file: {
     missingFileInParams: () => new BadRequestError("No file provided."),

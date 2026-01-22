@@ -62,6 +62,7 @@ describe("RejectUserForAgency", () => {
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
         createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+        timeGateway: timeGateway,
       },
     });
 

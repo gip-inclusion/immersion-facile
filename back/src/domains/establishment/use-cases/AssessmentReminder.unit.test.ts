@@ -84,7 +84,44 @@ describe("AssessmentReminder", () => {
         .withAgencyId(agency.id)
         .build();
 
-      await uow.conventionRepository.save(convention);
+      const beneficiaryPhoneNumber = "+33500000000";
+      const establishmentTutorPhoneNumber = "+33500000001";
+      const establishmentRepresentativePhoneNumber = "+33500000002";
+      const beneficiaryRepresentativePhoneNumber = "+33500000003";
+      const beneficiaryCurrentEmployerPhoneNumber = "+33500000004";
+      const conventionPhoneNumberIds = await Promise.all([
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryPhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          establishmentTutorPhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          establishmentRepresentativePhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryRepresentativePhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryCurrentEmployerPhoneNumber,
+          now,
+        ),
+      ]);
+
+      await uow.conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: conventionPhoneNumberIds[0],
+          establishmentTutor: conventionPhoneNumberIds[1],
+          establishmentRepresentative: conventionPhoneNumberIds[2],
+          beneficiaryRepresentative: conventionPhoneNumberIds[3],
+          beneficiaryCurrentEmployer: conventionPhoneNumberIds[4],
+        },
+      });
       uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
     });
 
@@ -152,7 +189,43 @@ describe("AssessmentReminder", () => {
         .withAgencyId(agency.id)
         .build();
 
-      await uow.conventionRepository.save(convention);
+      const beneficiaryPhoneNumber = "+33500000000";
+      const establishmentTutorPhoneNumber = "+33500000001";
+      const establishmentRepresentativePhoneNumber = "+33500000002";
+      const beneficiaryRepresentativePhoneNumber = "+33500000003";
+      const beneficiaryCurrentEmployerPhoneNumber = "+33500000004";
+      const conventionPhoneNumberIds = await Promise.all([
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryPhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          establishmentTutorPhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          establishmentRepresentativePhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryRepresentativePhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryCurrentEmployerPhoneNumber,
+          now,
+        ),
+      ]);
+      await uow.conventionRepository.save({
+        conventionDto: convention,
+        phoneIds: {
+          beneficiary: conventionPhoneNumberIds[0],
+          establishmentTutor: conventionPhoneNumberIds[1],
+          establishmentRepresentative: conventionPhoneNumberIds[2],
+          beneficiaryRepresentative: conventionPhoneNumberIds[3],
+          beneficiaryCurrentEmployer: conventionPhoneNumberIds[4],
+        },
+      });
       validator = new ConnectedUserBuilder()
         .withId("validator1")
         .withEmail("validator@mail.com")
@@ -433,7 +506,45 @@ describe("AssessmentReminder", () => {
         .withDateEnd(subMonths(now, 3).toISOString())
         .withAgencyId(agency.id)
         .build();
-      await uow.conventionRepository.save(miniStageConvention);
+
+      const beneficiaryPhoneNumber = "+33500000000";
+      const establishmentTutorPhoneNumber = "+33500000001";
+      const establishmentRepresentativePhoneNumber = "+33500000002";
+      const beneficiaryRepresentativePhoneNumber = "+33500000003";
+      const beneficiaryCurrentEmployerPhoneNumber = "+33500000004";
+      const miniStageConventionPhoneNumberIds = await Promise.all([
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryPhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          establishmentTutorPhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          establishmentRepresentativePhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryRepresentativePhoneNumber,
+          now,
+        ),
+        uow.phoneNumberRepository.getIdByPhoneNumber(
+          beneficiaryCurrentEmployerPhoneNumber,
+          now,
+        ),
+      ]);
+
+      await uow.conventionRepository.save({
+        conventionDto: miniStageConvention,
+        phoneIds: {
+          beneficiary: miniStageConventionPhoneNumberIds[0],
+          establishmentTutor: miniStageConventionPhoneNumberIds[1],
+          establishmentRepresentative: miniStageConventionPhoneNumberIds[2],
+          beneficiaryRepresentative: miniStageConventionPhoneNumberIds[3],
+          beneficiaryCurrentEmployer: miniStageConventionPhoneNumberIds[4],
+        },
+      });
       const initialEstablishmentNotification: Notification =
         buildEstablishmentNotificationFrom({
           convention: miniStageConvention,

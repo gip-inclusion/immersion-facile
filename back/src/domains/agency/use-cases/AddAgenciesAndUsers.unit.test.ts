@@ -108,8 +108,20 @@ describe("AddAgenciesAndUsers", () => {
       );
 
       await uow.userRepository.save(user1);
-      await uow.agencyRepository.insert(agency1);
-      await uow.agencyRepository.insert(agency2);
+      await uow.agencyRepository.insert({
+        agency: agency1,
+        phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency1.phoneNumber,
+          timeGateway.now(),
+        ),
+      });
+      await uow.agencyRepository.insert({
+        agency: agency2,
+        phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agency2.phoneNumber,
+          timeGateway.now(),
+        ),
+      });
 
       const newUserId = "10000000-0000-0000-0000-000000000022";
       uuidGenerator.setNextUuids([newUserId, newUserId]);
@@ -175,7 +187,13 @@ describe("AddAgenciesAndUsers", () => {
         },
       );
       await uow.userRepository.save(userAlreadyInDB);
-      await uow.agencyRepository.insert(agencyAlreadyInDB);
+      await uow.agencyRepository.insert({
+        agency: agencyAlreadyInDB,
+        phoneId: await uow.phoneNumberRepository.getIdByPhoneNumber(
+          agencyAlreadyInDB.phoneNumber,
+          timeGateway.now(),
+        ),
+      });
 
       const newUserId1 = "10000000-0000-0000-0000-000000000022";
       const newUserId2 = "10000000-0000-0000-0000-000000000023";

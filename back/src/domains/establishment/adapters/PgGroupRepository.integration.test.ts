@@ -78,7 +78,7 @@ describe("PgEstablishmentGroupRepository", () => {
     db = makeKyselyDb(pool);
     pgEstablishmentGroupRepository = new PgGroupRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      db,
+      makeKyselyDb(pool),
     );
   });
 
