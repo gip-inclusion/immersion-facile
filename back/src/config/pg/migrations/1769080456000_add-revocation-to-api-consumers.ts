@@ -15,12 +15,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     },
   });
 
-  pgm.sql(`
-    UPDATE ${tableName}
-    SET current_key_issued_at = created_at
-    WHERE current_key_issued_at IS NOT NULL
-  `);
-
   pgm.alterColumn(tableName, "current_key_issued_at", {
     default: null,
   });
