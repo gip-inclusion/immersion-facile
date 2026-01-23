@@ -14,6 +14,7 @@ import { match } from "ts-pattern";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 import {
   getDiscussionParamsFromEmail,
   getSubjectFromEmail,
@@ -139,7 +140,9 @@ export const createTechnicalRouter = (
       sendHttpResponse(req, res, () =>
         deps.useCases.htmlToPdf.execute(
           req.body,
-          req.payloads?.connectedUser ?? req.payloads?.convention,
+          getGenericAuthOrThrow(
+            req.payloads?.connectedUser ?? req.payloads?.convention,
+          ),
         ),
       ),
   );

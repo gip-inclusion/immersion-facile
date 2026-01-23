@@ -110,7 +110,7 @@ import {
 } from "../../domains/core/notifications/helpers/Notification";
 import { SendNotification } from "../../domains/core/notifications/useCases/SendNotification";
 import { SendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
-import { HtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
+import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
 import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
 import { makeGetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
@@ -303,7 +303,6 @@ export const createUseCases = ({
         createNewEvent,
       ),
       uploadFile: new UploadFile(gateways.documentGateway, uuidGenerator),
-      htmlToPdf: new HtmlToPdf(gateways.pdfGeneratorGateway),
 
       addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
 
@@ -595,6 +594,10 @@ export const createUseCases = ({
     // email validation
     validateEmail: makeValidateEmail({
       deps: { emailValidationGateway: gateways.emailValidationGateway },
+    }),
+
+    htmlToPdf: makeHtmlToPdf({
+      deps: { pdfGeneratorGateway: gateways.pdfGeneratorGateway },
     }),
 
     revokeApiConsumer: makeRevokeApiConsumer({
