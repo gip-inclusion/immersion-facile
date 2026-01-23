@@ -111,12 +111,12 @@ export const useCaseBuilder = <
           input: input,
           logger,
         }),
-        payload,
-        cb: ({ useCaseName, validInput, payload }) => {
+        identityPayload: payload,
+        cb: ({ useCaseName, validInput, identityPayload }) => {
           const commonCbParams = {
             inputParams: validInput,
             deps: (config as any).deps,
-            currentUser: payload,
+            currentUser: identityPayload,
           };
 
           return options.isTransactional

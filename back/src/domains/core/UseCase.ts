@@ -39,10 +39,10 @@ export abstract class UseCase<
         logger,
         useCaseName,
       }),
-      payload: payload,
-      cb: ({ useCaseName, validInput, payload }) =>
+      identityPayload: payload,
+      cb: ({ useCaseName, validInput, identityPayload }) =>
         Sentry.startSpan({ name: useCaseName }, () =>
-          this._execute(validInput, payload),
+          this._execute(validInput, identityPayload),
         ),
     });
   }
@@ -77,11 +77,11 @@ export abstract class TransactionalUseCase<
         inputSchema: this.inputSchema,
         logger,
       }),
-      payload,
-      cb: ({ useCaseName, validInput, payload }) =>
+      identityPayload: payload,
+      cb: ({ useCaseName, validInput, identityPayload }) =>
         this.uowPerformer.perform((uow) =>
           Sentry.startSpan({ name: useCaseName }, () =>
-            this._execute(validInput, uow, payload),
+            this._execute(validInput, uow, identityPayload),
           ),
         ),
     });
