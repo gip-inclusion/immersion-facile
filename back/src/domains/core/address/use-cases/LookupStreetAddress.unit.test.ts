@@ -5,15 +5,22 @@ import {
   type WithLookupAddressQueryParams,
 } from "shared";
 import { InMemoryAddressGateway } from "../adapters/InMemoryAddressGateway";
-import { LookupStreetAddress } from "./LookupStreetAddress";
+import {
+  type LookupStreetAddress,
+  makeLookupStreetAddress,
+} from "./LookupStreetAddress";
 
 describe("Lookup Street Address", () => {
   let useCase: LookupStreetAddress;
-  let addressApiGateway: InMemoryAddressGateway;
+  let addressGateway: InMemoryAddressGateway;
 
   beforeEach(() => {
-    addressApiGateway = new InMemoryAddressGateway();
-    useCase = new LookupStreetAddress(addressApiGateway);
+    addressGateway = new InMemoryAddressGateway();
+    useCase = makeLookupStreetAddress({
+      deps: {
+        addressGateway,
+      },
+    });
   });
 
   it("retrieve Street and Addresse from query ''", async () => {
@@ -39,7 +46,7 @@ describe("Lookup Street Address", () => {
         },
       },
     ];
-    addressApiGateway.setNextLookupStreetAndAddresses([
+    addressGateway.setNextLookupStreetAndAddresses([
       expectedStreetAndAddresses,
     ]);
 
