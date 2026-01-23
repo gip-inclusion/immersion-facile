@@ -120,9 +120,9 @@ export function cleanSpecialChars(input: string): string {
   return removeDiacritics(cleaned);
 }
 
-export const parseStringToJsonOrThrow = <T, P extends string>(
+export const parseStringToJsonOrThrow = <T>(
   raw: string,
-  paramName: P,
+  paramName: string,
 ): T => {
   try {
     return JSON.parse(raw);

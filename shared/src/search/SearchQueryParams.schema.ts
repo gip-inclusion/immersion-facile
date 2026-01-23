@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
+import { remoteWorkModes } from "../formEstablishment/FormEstablishment.dto";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { nafCodesSchema, withNafCodesSchema } from "../naf/naf.schema";
 import type { SortDirection } from "../pagination/pagination.dto";
@@ -97,6 +98,8 @@ const geoParamsAndSortSchema = z.discriminatedUnion("sortBy", [
   geoParamsByDistanceSchema,
 ]);
 
+export const remoteWorkModeSchema = z.enum(remoteWorkModes);
+
 export const getOffersFlatParamsSchema: z.ZodType<
   GetOffersFlatQueryParams,
   Omit<GetOffersFlatQueryParams, "sortOrder"> & {
@@ -108,6 +111,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
     fitForDisabledWorkers: z.array(fitForDisabledWorkersSchema).optional(),
     locationIds: z.array(zUuidLike).optional(),
     nafCodes: nafCodesSchema.optional(),
+    remoteWorkModes: z.array(z.enum(remoteWorkModes)).optional(),
     sirets: z.array(siretSchema).optional(),
     searchableBy: z
       .enum(["students", "jobSeekers"], {
@@ -115,6 +119,11 @@ export const getOffersFlatParamsSchema: z.ZodType<
       })
       .optional(),
   })
+  .and(
+    z.object({
+      remoteWorkModes: z.array(remoteWorkModeSchema).optional(),
+    }),
+  )
   .and(paginationQueryParamsSchema)
   .and(geoParamsAndSortSchema)
   .and(withAcquisitionSchema);

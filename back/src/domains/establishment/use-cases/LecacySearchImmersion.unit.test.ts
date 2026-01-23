@@ -1,6 +1,7 @@
 import {
   type ApiConsumer,
   type AppellationAndRomeDto,
+  type ExternalSearchResultDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -8,7 +9,6 @@ import {
   type LegacySearchQueryParamsWithGeoParams,
   type NafCode,
   type RomeDto,
-  type SearchResultDto,
 } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -208,30 +208,36 @@ describe("LegacySearchImmersionUseCase", () => {
         searchWithMinimalParams,
       );
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          secretariatOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          boulangerOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          secretariatOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          boulangerOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          secretariatOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          boulangerOffer.romeCode,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
       ]);
 
       expectToEqual(uow.searchMadeRepository.searchesMade, [
@@ -250,20 +256,23 @@ describe("LegacySearchImmersionUseCase", () => {
         appellationCodes: [secretariatOffer.appellationCode],
       });
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          secretariatOffer.romeCode,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
 
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          secretariatOffer.romeCode,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
 
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          secretariatOffer.romeCode,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
       ]);
 
       expectToEqual(uow.searchMadeRepository.searchesMade, [
@@ -282,30 +291,36 @@ describe("LegacySearchImmersionUseCase", () => {
         searchWithMinimalParams,
       );
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          secretariatOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          boulangerOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          secretariatOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          boulangerOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          secretariatOffer.romeCode,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          boulangerOffer.romeCode,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+        }),
       ]);
 
       expectToEqual(uow.searchMadeRepository.searchesMade, [
@@ -330,16 +345,18 @@ describe("LegacySearchImmersionUseCase", () => {
       await legacySearchImmersionUseCase.execute(searchInMetzParams);
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        boulangerOffer.romeCode,
-        606885,
-      ),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: secretariatOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: boulangerOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -371,16 +388,18 @@ describe("LegacySearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        boulangerOffer.romeCode,
-        606885,
-      ),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: secretariatOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: boulangerOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
       lbbToSearchResult(
         lbbCompanyVO,
         {
@@ -420,11 +439,12 @@ describe("LegacySearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: secretariatOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
       lbbToSearchResult(
         lbbCompanyVO,
         {
@@ -461,16 +481,18 @@ describe("LegacySearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        boulangerOffer.romeCode,
-        606885,
-      ),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: secretariatOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: boulangerOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -584,11 +606,12 @@ describe("LegacySearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: secretariatOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -667,11 +690,12 @@ describe("LegacySearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
+      establishmentAggregateToSearchResultByRomeForFirstLocation({
+        establishmentAggregate: establishment,
+        romeCode: secretariatOffer.romeCode,
+        remoteWorkMode: "NO_REMOTE",
+        distance_m: 606885,
+      }),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -704,26 +728,30 @@ describe("LegacySearchImmersionUseCase", () => {
       const response = await legacySearchImmersionUseCase.execute(searchParams);
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          secretariatOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          boulangerOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          secretariatOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          boulangerOffer.romeCode,
-          606885,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
       expectToEqual(uow.searchMadeRepository.searchesMade, [
         {
@@ -756,26 +784,30 @@ describe("LegacySearchImmersionUseCase", () => {
       const response = await legacySearchImmersionUseCase.execute(searchParams);
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          secretariatOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          boulangerOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          secretariatOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          boulangerOffer.romeCode,
-          606885,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
       expectToEqual(uow.searchMadeRepository.searchesMade, [
         {
@@ -807,36 +839,42 @@ describe("LegacySearchImmersionUseCase", () => {
       const response = await legacySearchImmersionUseCase.execute(searchParams);
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          secretariatOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          boulangerOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          secretariatOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyStudent,
-          boulangerOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          secretariatOffer.romeCode,
-          606885,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentAcceptingOnlyJobSeeker,
-          boulangerOffer.romeCode,
-          606885,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyStudent,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
+          romeCode: boulangerOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
 
       expectToEqual(uow.searchMadeRepository.searchesMade, [
@@ -894,11 +932,12 @@ describe("LegacySearchImmersionUseCase", () => {
         },
       ]);
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          displayableEstablishment,
-          secretariatOffer.romeCode,
-          606885,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: displayableEstablishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
     });
 
@@ -994,11 +1033,12 @@ describe("LegacySearchImmersionUseCase", () => {
           );
 
         expectToEqual(authenticatedResponse, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-          ),
+          establishmentAggregateToSearchResultByRomeForFirstLocation({
+            establishmentAggregate: establishment,
+            romeCode: secretariatOffer.romeCode,
+            remoteWorkMode: "NO_REMOTE",
+            distance_m: 606885,
+          }),
         ]);
       });
     });
@@ -1017,11 +1057,12 @@ describe("LegacySearchImmersionUseCase", () => {
           });
 
         expectToEqual(unauthenticatedResponse, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-          ),
+          establishmentAggregateToSearchResultByRomeForFirstLocation({
+            establishmentAggregate: establishment,
+            romeCode: secretariatOffer.romeCode,
+            remoteWorkMode: "NO_REMOTE",
+            distance_m: 606885,
+          }),
         ]);
       });
     });
@@ -1053,12 +1094,12 @@ describe("LegacySearchImmersionUseCase", () => {
       });
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentScore,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
       expectToEqual(uow.discussionRepository.discussionCallsCount, 0);
       expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 0);
@@ -1088,18 +1129,18 @@ describe("LegacySearchImmersionUseCase", () => {
       });
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment2,
-          secretariatOffer.romeCode,
-          606885,
-          establishment2.establishment.score,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishment1,
-          secretariatOffer.romeCode,
-          606885,
-          establishment1.establishment.score,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment2,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishment1,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
     });
   });
@@ -1137,26 +1178,26 @@ describe("LegacySearchImmersionUseCase", () => {
       });
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersNo,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithFitForDisabledWorkersNo.establishment.score,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersYesCertified,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithFitForDisabledWorkersYesCertified.establishment
-            .score,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersYesDeclaredOnly,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
-            .score,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithFitForDisabledWorkersNo,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate:
+            establishmentWithFitForDisabledWorkersYesCertified,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate:
+            establishmentWithFitForDisabledWorkersYesDeclaredOnly,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
     });
 
@@ -1167,12 +1208,12 @@ describe("LegacySearchImmersionUseCase", () => {
       });
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersNo,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithFitForDisabledWorkersNo.establishment.score,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithFitForDisabledWorkersNo,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
       ]);
     });
 
@@ -1183,20 +1224,26 @@ describe("LegacySearchImmersionUseCase", () => {
       });
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersYesCertified,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithFitForDisabledWorkersYesCertified.establishment
-            .score,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithFitForDisabledWorkersYesDeclaredOnly,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
-            .score,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate:
+            establishmentWithFitForDisabledWorkersYesCertified,
+          romeCode: secretariatOffer.romeCode,
+          distance_m: 606885,
+          customScore:
+            establishmentWithFitForDisabledWorkersYesCertified.establishment
+              .score,
+          remoteWorkMode: "NO_REMOTE",
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate:
+            establishmentWithFitForDisabledWorkersYesDeclaredOnly,
+          romeCode: secretariatOffer.romeCode,
+          distance_m: 606885,
+          customScore:
+            establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
+              .score,
+          remoteWorkMode: "NO_REMOTE",
+        }),
       ]);
     });
   });
@@ -1278,24 +1325,24 @@ describe("LegacySearchImmersionUseCase", () => {
       );
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithNafA,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithNafA.establishment.score,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithNafB,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithNafB.establishment.score,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithNafC,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithNafC.establishment.score,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithNafA,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithNafB,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithNafC,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
         lbbToSearchResult(
           lbbWithNafA,
           {
@@ -1330,12 +1377,12 @@ describe("LegacySearchImmersionUseCase", () => {
       });
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithNafA,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithNafA.establishment.score,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithNafA,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
         lbbToSearchResult(
           lbbWithNafA,
           {
@@ -1354,18 +1401,18 @@ describe("LegacySearchImmersionUseCase", () => {
       });
 
       expectToEqual(response, [
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithNafA,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithNafA.establishment.score,
-        ),
-        establishmentAggregateToSearchResultByRomeForFirstLocation(
-          establishmentWithNafB,
-          secretariatOffer.romeCode,
-          606885,
-          establishmentWithNafB.establishment.score,
-        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithNafA,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
+        establishmentAggregateToSearchResultByRomeForFirstLocation({
+          establishmentAggregate: establishmentWithNafB,
+          romeCode: secretariatOffer.romeCode,
+          remoteWorkMode: "NO_REMOTE",
+          distance_m: 606885,
+        }),
         lbbToSearchResult(
           lbbWithNafA,
           {
@@ -1431,7 +1478,7 @@ const lbbToSearchResult = (
   lbb: LaBonneBoiteCompanyDto,
   romeDto: RomeDto,
   { distance_m }: { distance_m: number | undefined },
-): SearchResultDto => ({
+): ExternalSearchResultDto => ({
   address: {
     city: lbb.props.city,
     postcode: lbb.props.postcode,

@@ -19,26 +19,33 @@ export type ImmersionContactInEstablishmentId = Flavor<
   "ImmersionContactInEstablishmentId"
 >;
 
-export const remoteWorkModes = ["HYBRID", "FULL_REMOTE", "NO_REMOTE"] as const;
+export const physicalWorkModes = ["HYBRID", "NO_REMOTE"] as const;
+
+export type PhysicalWorkMode = (typeof physicalWorkModes)[number];
+
+export const remoteWorkModes = ["FULL_REMOTE", ...physicalWorkModes] as const;
 
 export type RemoteWorkMode = (typeof remoteWorkModes)[number];
 
 export const remoteWorkModeLabels: Record<
   RemoteWorkMode,
-  { label: string; description: string }
+  { label: string; answerLabel: string; description: string }
 > = {
   HYBRID: {
-    label: "Oui, télétravail hybride",
+    label: "Télétravail hybride",
+    answerLabel: "Oui, télétravail hybride",
     description:
       "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
   },
   FULL_REMOTE: {
-    label: "Oui, 100% télétravail",
+    label: "100% télétravail",
+    answerLabel: "Oui, 100% télétravail",
     description:
       "Apparaîtra pour la France entière, quelle que soit la localisation du candidat",
   },
   NO_REMOTE: {
-    label: "Non, pas de télétravail",
+    label: "100% présentiel",
+    answerLabel: "Non, 100% en présentiel",
     description:
       "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
   },
@@ -237,4 +244,8 @@ export type FormEstablishmentReadDto = Omit<
   "contactMode"
 > & {
   contactMode: ContactMode | null;
+};
+
+export const isPhysicalWorkMode = (workMode: RemoteWorkMode) => {
+  return physicalWorkModes.includes(workMode as PhysicalWorkMode);
 };

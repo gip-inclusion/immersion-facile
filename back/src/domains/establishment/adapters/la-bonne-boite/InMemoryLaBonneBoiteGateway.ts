@@ -1,4 +1,4 @@
-import type { RomeDto, SearchResultDto, SiretDto } from "shared";
+import type { ExternalSearchResultDto, RomeDto, SiretDto } from "shared";
 import type {
   LaBonneBoiteGateway,
   SearchCompaniesParams,
@@ -18,7 +18,7 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lon,
     lat,
     nafCodes,
-  }: SearchCompaniesParams): Promise<SearchResultDto[]> {
+  }: SearchCompaniesParams): Promise<ExternalSearchResultDto[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
     return this._error
       ? []
@@ -44,7 +44,7 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
   public async fetchCompanyBySiret(
     siret: SiretDto,
     romeDto: RomeDto,
-  ): Promise<SearchResultDto | null> {
+  ): Promise<ExternalSearchResultDto | null> {
     if (this._error) throw this._error;
     const result = this._results.find((result) => result.siret === siret);
     return result ? result.toSearchResult(romeDto) : null;

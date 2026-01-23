@@ -42,6 +42,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "HYBRID",
   },
   {
     rome: "G1204",
@@ -75,6 +76,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "FULL_REMOTE",
   },
   {
     rome: "D1211",
@@ -108,6 +110,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "HYBRID",
   },
   {
     rome: "D1211",
@@ -141,6 +144,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     rome: "D1211",
@@ -174,6 +178,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     rome: "D1505",
@@ -207,6 +212,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     rome: "D1211",
@@ -241,6 +247,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     rome: "D1211",
@@ -274,6 +281,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     numberOfEmployeeRange: "+10000",
     locationId: "123",
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "FULL_REMOTE",
   },
   {
     rome: "N1103",
@@ -319,6 +327,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "NO_REMOTE",
   },
 ];
 
@@ -371,6 +380,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
+    remoteWorkMode: "HYBRID",
   },
   {
     rome: "A0001",
@@ -399,6 +409,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "HYBRID",
   },
   {
     rome: "A0003",
@@ -436,6 +447,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "FULL_REMOTE",
   },
   {
     rome: "A0002",
@@ -465,6 +477,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "HYBRID",
   },
   {
     rome: "A0003",
@@ -489,6 +502,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -521,6 +535,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -554,6 +569,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -587,6 +603,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -620,6 +637,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -652,6 +670,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "5610C",
@@ -685,6 +704,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -717,6 +737,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -750,6 +771,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -783,6 +805,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -815,6 +838,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -847,6 +871,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -880,6 +905,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -913,6 +939,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -946,6 +973,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -978,6 +1006,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1010,6 +1039,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "4724Z",
@@ -1043,6 +1073,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1076,6 +1107,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1109,6 +1141,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1141,6 +1174,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1173,6 +1207,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1206,6 +1241,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1239,6 +1275,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1272,6 +1309,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1304,6 +1342,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1336,6 +1375,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1369,6 +1409,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1402,6 +1443,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1435,6 +1477,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1467,6 +1510,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1499,6 +1543,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1532,6 +1577,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1564,6 +1610,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1601,6 +1648,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1633,6 +1681,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1666,6 +1715,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1698,6 +1748,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1731,6 +1782,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1764,6 +1816,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "5610C",
@@ -1797,6 +1850,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1830,6 +1884,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1863,6 +1918,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1896,6 +1952,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1929,6 +1986,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1961,6 +2019,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -1994,6 +2053,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2027,6 +2087,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2060,6 +2121,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2092,6 +2154,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "4724Z",
@@ -2125,6 +2188,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2157,6 +2221,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2190,6 +2255,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2223,6 +2289,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "4724Z",
@@ -2256,6 +2323,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2289,6 +2357,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2321,6 +2390,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2352,6 +2422,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2385,6 +2456,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "5610A",
@@ -2416,6 +2488,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "4724Z",
@@ -2449,6 +2522,7 @@ export const seedSearchResults: SearchResultDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "1071C",
@@ -2481,6 +2555,7 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
   {
     naf: "6820B",
@@ -2514,5 +2589,6 @@ export const seedSearchResults: SearchResultDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
+    remoteWorkMode: "NO_REMOTE",
   },
 ];

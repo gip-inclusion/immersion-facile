@@ -1,6 +1,6 @@
 import {
+  type ExternalSearchResultDto,
   errors,
-  type SearchResultDto,
   type SiretAndAppellationDto,
   siretAndAppellationSchema,
 } from "shared";
@@ -14,7 +14,7 @@ export const makeGetExternalSearchResult = useCaseBuilder(
   "GetExternalSearchResult",
 )
   .withInput<SiretAndAppellationDto>(siretAndAppellationSchema)
-  .withOutput<SearchResultDto>()
+  .withOutput<ExternalSearchResultDto>()
   .withCurrentUser<void>()
   .withDeps<{ laBonneBoiteGateway: LaBonneBoiteGateway }>()
   .build(
