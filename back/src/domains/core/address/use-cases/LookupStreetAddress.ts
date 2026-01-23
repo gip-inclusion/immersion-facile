@@ -1,29 +1,23 @@
 import {
   type AddressWithCountryCodeAndPosition,
-  type ConventionJwtPayload,
   type WithLookupAddressQueryParams,
   withLookupStreetAddressQueryParamsSchema,
 } from "shared";
-import { UseCase } from "../../UseCase";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import type { AddressGateway } from "../ports/AddressGateway";
 
-export class LookupStreetAddress extends UseCase<
-  WithLookupAddressQueryParams,
-  AddressWithCountryCodeAndPosition[]
-> {
-  protected inputSchema = withLookupStreetAddressQueryParamsSchema;
+export type LookupStreetAddress = ReturnType<typeof makeLookupStreetAddress>;
 
-  constructor(private addressApiGateway: AddressGateway) {
-    super();
-  }
-
-  protected _execute(
-    params: WithLookupAddressQueryParams,
-    _jwtPayload?: ConventionJwtPayload | undefined,
-  ): Promise<AddressWithCountryCodeAndPosition[]> {
-    return this.addressApiGateway.lookupStreetAddress(
-      params.lookup,
-      params.countryCode,
-    );
-  }
-}
+export const makeLookupStreetAddress = useCaseBuilder("LookupStreetAddress")
+  .notTransactional()
+  .withInput<WithLookupAddressQueryParams>(
+    withLookupStreetAddressQueryParamsSchema,
+  )
+  .withOutput<AddressWithCountryCodeAndPosition[]>()
+  .withDeps<{ addressGateway: AddressGateway }>()
+  .build(async ({ inputParams, deps }) =>
+    deps.addressGateway.lookupStreetAddress(
+      inputParams.lookup,
+      inputParams.countryCode,
+    ),
+  );
