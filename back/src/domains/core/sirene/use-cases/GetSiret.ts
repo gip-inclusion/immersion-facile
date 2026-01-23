@@ -3,26 +3,17 @@ import {
   getSiretRequestSchema,
   type SiretEstablishmentDto,
 } from "shared";
-import { UseCase } from "../../UseCase";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import { getSiretEstablishmentFromApi } from "../helpers/getSirenEstablishmentFromApi";
 import type { SiretGateway } from "../ports/SiretGateway";
 
-export class GetSiret extends UseCase<
-  GetSiretRequestDto,
-  SiretEstablishmentDto
-> {
-  protected inputSchema = getSiretRequestSchema;
+export type GetSiret = ReturnType<typeof makeGetSiret>;
 
-  readonly #siretGateway: SiretGateway;
-
-  constructor(siretGateway: SiretGateway) {
-    super();
-    this.#siretGateway = siretGateway;
-  }
-
-  public async _execute(
-    params: GetSiretRequestDto,
-  ): Promise<SiretEstablishmentDto> {
-    return getSiretEstablishmentFromApi(params, this.#siretGateway);
-  }
-}
+export const makeGetSiret = useCaseBuilder("GetSiret")
+  .notTransactional()
+  .withInput<GetSiretRequestDto>(getSiretRequestSchema)
+  .withOutput<SiretEstablishmentDto>()
+  .withDeps<{ siretGateway: SiretGateway }>()
+  .build(async ({ inputParams, deps }) =>
+    getSiretEstablishmentFromApi(inputParams, deps.siretGateway),
+  );
