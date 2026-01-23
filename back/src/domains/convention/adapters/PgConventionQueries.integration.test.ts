@@ -1656,6 +1656,7 @@ describe("Pg implementation of ConventionQueries", () => {
         const convention = new ConventionDtoBuilder()
           .withId(conventionIdA)
           .withAgencyId(agencyIdA)
+          .withDateSubmission("2025-01-02T00:00:00.000Z")
           .build();
         const firstBroadcast: BroadcastFeedback = {
           consumerId: null,
@@ -1760,10 +1761,12 @@ describe("Pg implementation of ConventionQueries", () => {
         const conventionA = new ConventionDtoBuilder()
           .withId(conventionIdA)
           .withAgencyId(agencyIdA)
+          .withDateSubmission("2025-01-02T00:00:00.000Z")
           .build();
         const conventionB = new ConventionDtoBuilder()
           .withId(conventionIdB)
           .withAgencyId(agencyIdA)
+          .withDateSubmission("2025-01-02T00:00:00.000Z")
           .build();
 
         const handledErrorFeedback: BroadcastFeedback = {
@@ -1917,14 +1920,17 @@ describe("Pg implementation of ConventionQueries", () => {
       const convention1 = new ConventionDtoBuilder()
         .withId(conventionIdA)
         .withAgencyId(agencyIdA)
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
         .build();
       const convention2 = new ConventionDtoBuilder()
         .withId(conventionIdB)
         .withAgencyId(agencyIdA)
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
         .build();
       const convention3 = new ConventionDtoBuilder()
         .withId("cccccccc-cccc-4ccc-8ccc-cccccccccccc")
         .withAgencyId(agencyIdA)
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
         .build();
       const broadcast1: BroadcastFeedback = {
         consumerId: null,
@@ -2124,16 +2130,19 @@ describe("Pg implementation of ConventionQueries", () => {
         .withId(conventionIdA)
         .withAgencyId(agencyIdA)
         .withStatus("READY_TO_SIGN")
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
         .build();
       const conventionWithUnmanagedError = new ConventionDtoBuilder()
         .withId(conventionIdB)
         .withAgencyId(agencyIdA)
         .withStatus("READY_TO_SIGN")
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
         .build();
       const conventionInReviewWithManagedError = new ConventionDtoBuilder()
         .withId("cccccccc-cccc-4ccc-8ccc-cccccccccccc")
         .withAgencyId(agencyIdA)
         .withStatus("IN_REVIEW")
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
         .build();
 
       const managedErrorFeedback: BroadcastFeedback = {
@@ -2598,12 +2607,77 @@ describe("Pg implementation of ConventionQueries", () => {
                 },
               },
             },
+            {
+              id: conventionInReviewWithManagedError.id,
+              status: conventionInReviewWithManagedError.status,
+              beneficiary: {
+                firstname:
+                  conventionInReviewWithManagedError.signatories.beneficiary
+                    .firstName,
+                lastname:
+                  conventionInReviewWithManagedError.signatories.beneficiary
+                    .lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedbackInReview,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedbackInReview.subscriberErrorFeedback
+                      ?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedbackInReview.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+            {
+              id: conventionWithUnmanagedError.id,
+              status: conventionWithUnmanagedError.status,
+              beneficiary: {
+                firstname:
+                  conventionWithUnmanagedError.signatories.beneficiary
+                    .firstName,
+                lastname:
+                  conventionWithUnmanagedError.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...unmanagedErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    unmanagedErrorFeedback.subscriberErrorFeedback?.message ??
+                    "",
+                  error: JSON.stringify(
+                    unmanagedErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+            {
+              id: conventionWithManagedError.id,
+              status: conventionWithManagedError.status,
+              beneficiary: {
+                firstname:
+                  conventionWithManagedError.signatories.beneficiary.firstName,
+                lastname:
+                  conventionWithManagedError.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...managedErrorFeedback,
+                subscriberErrorFeedback: {
+                  message:
+                    managedErrorFeedback.subscriberErrorFeedback?.message ?? "",
+                  error: JSON.stringify(
+                    managedErrorFeedback.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
           ],
           pagination: {
             currentPage: 1,
             totalPages: 1,
             numberPerPage: 10,
-            totalRecords: 1,
+            totalRecords: 4,
           },
         });
       });
