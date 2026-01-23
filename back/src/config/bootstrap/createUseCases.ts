@@ -74,7 +74,7 @@ import { SignConvention } from "../../domains/convention/use-cases/SignConventio
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
-import { LookupLocation } from "../../domains/core/address/use-cases/LookupLocation";
+import { makeLookupLocation } from "../../domains/core/address/use-cases/LookupLocation";
 import { makeLookupStreetAddress } from "../../domains/core/address/use-cases/LookupStreetAddress";
 import { BroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
 import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/DeleteSubscription";
@@ -306,9 +306,6 @@ export const createUseCases = ({
       htmlToPdf: new HtmlToPdf(gateways.pdfGeneratorGateway),
 
       addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
-
-      // Address
-      lookupLocation: new LookupLocation(gateways.addressApi),
 
       // Conventions
       addConvention,
@@ -584,6 +581,11 @@ export const createUseCases = ({
         generateApiConsumerJwt,
         gateways.timeGateway,
       ),
+    }),
+
+    // Address
+    lookupLocation: makeLookupLocation({
+      deps: { addressGateway: gateways.addressApi },
     }),
 
     lookupStreetAddress: makeLookupStreetAddress({
