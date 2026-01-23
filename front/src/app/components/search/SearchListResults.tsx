@@ -57,10 +57,7 @@ export const SearchListResults = ({
   const isSearchWithAppellationAndGeoParams =
     isSearchWithGeoParams && isSearchWithAppellation;
   const shouldShowLaBonneBoiteCTA =
-    !isExternal &&
-    hasResults &&
-    isLastPage &&
-    isSearchWithAppellationAndGeoParams;
+    !isExternal && isLastPage && isSearchWithAppellationAndGeoParams;
   return (
     <div className={fr.cx("fr-container", isExternal && "fr-mb-8w")}>
       <div
@@ -78,7 +75,7 @@ export const SearchListResults = ({
               !hasResults && "fr-grid-row--center",
             )}
           >
-            {!hasResults && (
+            {!hasResults && isExternal && (
               <div
                 className={cx(
                   fr.cx(
@@ -154,7 +151,10 @@ export const SearchListResults = ({
                 );
               })}
             {shouldShowLaBonneBoiteCTA && (
-              <LaBonneBoiteCallToAction searchParams={searchParams} />
+              <LaBonneBoiteCallToAction
+                searchParams={searchParams}
+                hasResults={hasResults}
+              />
             )}
           </div>
         </div>
@@ -283,8 +283,10 @@ const getFilteredSearchParamsForLBB = (
 
 const LaBonneBoiteCallToAction = ({
   searchParams,
+  hasResults,
 }: {
   searchParams: ReturnType<typeof searchSelectors.searchParams>;
+  hasResults: boolean;
 }) => {
   const filteredSearchParams = getFilteredSearchParamsForLBB(searchParams);
   return (
@@ -293,7 +295,11 @@ const LaBonneBoiteCallToAction = ({
         imageUrl={labonneboiteLogoUrl}
         imageAlt="Logo de LaBonneBoite"
         title="Découvrez d'autres entreprises"
-        desc="Explorez plus d'opportunités avec notre partenaire La Bonne Boite"
+        desc={
+          hasResults
+            ? "Explorez plus d'opportunités avec notre partenaire La Bonne Boite"
+            : "Nous n'avons pas trouvé d'entreprises actuellement disponibles sur Immersion Facilitée. Découvrez d'autres opportunités avec notre partenaire La Bonne Boîte"
+        }
         footer={
           <Button
             linkProps={routes.externalSearch(filteredSearchParams).link}
