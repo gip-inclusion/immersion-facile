@@ -1,11 +1,13 @@
 import {
   type ApiConsumer,
+  type ApiConsumerId,
   type ConnectedUser,
   type ConnectedUserDomainJwtPayload,
   type ConventionDomainJwtPayload,
   calculateDurationInSecondsFrom,
   castError,
   type LegacySearchQueryParamsDto,
+  type UserId,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { validateAndParseZodSchema } from "../../config/helpers/validateAndParseZodSchema";
@@ -55,24 +57,26 @@ export const useCaseLoggerWrapper = <
   startDate,
   logger,
   validInput,
-  payload,
+  identityPayload,
 }: {
   cb: (param: {
     useCaseName: string;
     validInput: Input;
-    payload: P;
+    identityPayload: P;
   }) => Promise<Output>;
   useCaseName: string;
   startDate: Date;
   logger: OpacifiedLogger;
   validInput: Input;
-  payload: P;
+  identityPayload: P;
 }): Promise<Output> =>
-  cb({ useCaseName, validInput, payload })
+  cb({ useCaseName, validInput, identityPayload })
     .then((result) => {
       logger.info({
         useCaseName,
         durationInSeconds: calculateDurationInSecondsFrom(startDate),
+        userId: extractConnectedUserId<P>(identityPayload),
+        apiConsumerId: extractApiConsumerId<P>(identityPayload),
         logStatus: "ok",
       });
 
@@ -84,7 +88,8 @@ export const useCaseLoggerWrapper = <
         useCaseName,
         durationInSeconds: calculateDurationInSecondsFrom(startDate),
         searchParams,
-        userId: payload && "userId" in payload ? payload.userId : undefined,
+        userId: extractConnectedUserId<P>(identityPayload),
+        apiConsumerId: extractApiConsumerId<P>(identityPayload),
         message: castError(error).message,
       });
       throw error;
@@ -108,3 +113,29 @@ export const validateUseCaseInput = <Input = void>({
     logger,
     id: extractValue("id", input) ?? extractValue("siret", input),
   });
+
+const extractApiConsumerId = <P extends UseCaseIdentityPayload = void>(
+  identityPayload: P,
+): ApiConsumerId | undefined => {
+  if (
+    identityPayload &&
+    "id" in identityPayload &&
+    "contact" in identityPayload
+  )
+    return identityPayload.id;
+  return undefined;
+};
+
+const extractConnectedUserId = <P extends UseCaseIdentityPayload = void>(
+  identityPayload: P,
+): UserId | undefined => {
+  if (identityPayload && "userId" in identityPayload)
+    return identityPayload.userId;
+  if (
+    identityPayload &&
+    "id" in identityPayload &&
+    !("contact" in identityPayload)
+  )
+    return identityPayload.id;
+  return undefined;
+};

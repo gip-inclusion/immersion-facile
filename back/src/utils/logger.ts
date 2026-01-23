@@ -6,6 +6,7 @@ import pino, { type Logger, type LoggerOptions } from "pino";
 import { complement, isNil, pickBy } from "ramda";
 import type {
   AgencyId,
+  ApiConsumerId,
   ConventionId,
   FtExternalId,
   LegacySearchQueryParamsDto,
@@ -146,6 +147,7 @@ type LoggerParams = Partial<{
   topic: DomainTopic;
   useCaseName: string;
   userId: UserId;
+  apiConsumerId: ApiConsumerId;
 }>;
 
 export type OpacifiedLogger = {
@@ -219,6 +221,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       reportTitle,
       sqlQuery,
       userId,
+      apiConsumerId,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
@@ -258,6 +261,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         cacheKey,
         crispTicket,
         userId,
+        apiConsumerId,
       };
 
       const opacifiedWithoutNullOrUndefined = pickBy(
