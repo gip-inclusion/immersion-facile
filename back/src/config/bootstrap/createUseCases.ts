@@ -91,7 +91,7 @@ import { BindConventionToFederatedIdentity } from "../../domains/core/authentica
 import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/core/authentication/ft-connect/use-cases/LinkFranceTravailAdvisorAndRedirectToConvention";
 import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
-import { GetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
+import { makeGetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { SetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFeatureFlag";
@@ -459,8 +459,7 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      // METABASE
-      ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
+
       // notifications
       notifySignatoriesThatConventionSubmittedNeedsSignature:
         new NotifySignatoriesThatConventionSubmittedNeedsSignature(
@@ -592,6 +591,9 @@ export const createUseCases = ({
     lookupStreetAddress: makeLookupStreetAddress({
       deps: { addressGateway: gateways.addressApi },
     }),
+
+    // METABASE
+    ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
 
     revokeApiConsumer: makeRevokeApiConsumer({
       uowPerformer,
@@ -1026,10 +1028,12 @@ export const createUseCases = ({
 };
 
 const dashboardUseCases = (
-  gateway: DashboardGateway,
+  dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
 ) => ({
-  getDashboard: new GetDashboardUrl(gateway, timeGateway),
+  getDashboard: makeGetDashboardUrl({
+    deps: { dashboardGateway, timeGateway },
+  }),
 });
 
 export type UseCases = ReturnType<typeof createUseCases>;
