@@ -113,7 +113,7 @@ import { SendNotificationInBatch } from "../../domains/core/notifications/useCas
 import { HtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
 import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
-import { GetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
+import { makeGetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
 import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";
 import { makeSendSupportTicketToCrisp } from "../../domains/core/support/use-cases/SendSupportTicketToCrisp";
@@ -429,8 +429,6 @@ export const createUseCases = ({
           gateways.passEmploiGateway,
         ),
 
-      // siret
-      getSiret: new GetSiret(gateways.siret),
       getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
         uowPerformer,
         gateways.siret,
@@ -582,6 +580,9 @@ export const createUseCases = ({
         gateways.timeGateway,
       ),
     }),
+
+    // siret
+    getSiret: makeGetSiret({ deps: { siretGateway: gateways.siret } }),
 
     // Address
     lookupLocation: makeLookupLocation({

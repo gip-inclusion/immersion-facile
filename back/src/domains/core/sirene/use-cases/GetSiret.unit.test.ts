@@ -5,7 +5,7 @@ import {
   type SiretEstablishmentDto,
 } from "shared";
 import { InMemorySiretGateway } from "../adapters/InMemorySiretGateway";
-import { GetSiret } from "./GetSiret";
+import { type GetSiret, makeGetSiret } from "./GetSiret";
 
 const validEstablishment: SiretEstablishmentDto = {
   siret: "12345678901234",
@@ -21,7 +21,7 @@ describe("GetSiret", () => {
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
-    getSiret = new GetSiret(siretGateway);
+    getSiret = makeGetSiret({ deps: { siretGateway } });
   });
 
   describe("checking for business being opened", () => {
