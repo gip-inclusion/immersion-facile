@@ -1,10 +1,5 @@
 import { Router } from "express";
-import {
-  adminRoutes,
-  agencyRoutes,
-  errors,
-  type GetDashboardParams,
-} from "shared";
+import { adminRoutes, agencyRoutes, errors } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
@@ -30,14 +25,12 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
         if (req.params.dashboardName === "agency" && !req.query.agencyId)
           throw errors.agency.missingParamAgencyId();
 
-        const useCaseParams: GetDashboardParams = {
-          name: req.params.dashboardName as any,
-          ...(req.query.agencyId ? req.query : {}),
-        };
-
         return deps.useCases.getDashboard.execute(
-          useCaseParams,
-          req.payloads?.currentUser,
+          {
+            name: req.params.dashboardName as any,
+            ...(req.query.agencyId ? req.query : {}),
+          },
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         );
       }),
   );
