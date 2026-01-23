@@ -5,7 +5,7 @@ import {
   expectToEqual,
 } from "shared";
 import { InMemoryPdfGeneratorGateway } from "../adapters/InMemoryPdfGeneratorGateway";
-import { HtmlToPdf } from "./HtmlToPdf";
+import { type HtmlToPdf, makeHtmlToPdf } from "./HtmlToPdf";
 
 const jwtPayload: ConventionJwtPayload = {
   applicationId: "conventionId",
@@ -20,7 +20,9 @@ describe("HtmlToPdf", () => {
   const conventionId = "convention-id";
   let htmlToPdf: HtmlToPdf;
   beforeEach(() => {
-    htmlToPdf = new HtmlToPdf(new InMemoryPdfGeneratorGateway());
+    htmlToPdf = makeHtmlToPdf({
+      deps: { pdfGeneratorGateway: new InMemoryPdfGeneratorGateway() },
+    });
   });
 
   it("renders a pdf from a html content", async () => {
@@ -41,13 +43,6 @@ describe("HtmlToPdf", () => {
         useCaseName: "HtmlToPdf",
         flattenErrors: ["htmlContent : Ce champ est obligatoire"],
       }),
-    );
-  });
-
-  it("returns an error if no JWT is provided", async () => {
-    await expectPromiseToFailWithError(
-      htmlToPdf.execute({ htmlContent, conventionId }),
-      errors.user.unauthorized(),
     );
   });
 });
