@@ -1,26 +1,20 @@
 import {
-  type ConventionJwtPayload,
   type LookupSearchResult,
   type WithLookupLocationInputQueryParams,
   withLookupLocationInputQueryParamsSchema,
 } from "shared";
-import { UseCase } from "../../UseCase";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import type { AddressGateway } from "../ports/AddressGateway";
 
-export class LookupLocation extends UseCase<
-  WithLookupLocationInputQueryParams,
-  LookupSearchResult[]
-> {
-  protected inputSchema = withLookupLocationInputQueryParamsSchema;
+export type LookupLocation = ReturnType<typeof makeLookupLocation>;
 
-  constructor(private addressApiGateway: AddressGateway) {
-    super();
-  }
-
-  protected _execute(
-    params: WithLookupLocationInputQueryParams,
-    _jwtPayload?: ConventionJwtPayload | undefined,
-  ): Promise<LookupSearchResult[]> {
-    return this.addressApiGateway.lookupLocationName(params.query);
-  }
-}
+export const makeLookupLocation = useCaseBuilder("LookupLocation")
+  .notTransactional()
+  .withInput<WithLookupLocationInputQueryParams>(
+    withLookupLocationInputQueryParamsSchema,
+  )
+  .withOutput<LookupSearchResult[]>()
+  .withDeps<{ addressGateway: AddressGateway }>()
+  .build(async ({ inputParams, deps }) =>
+    deps.addressGateway.lookupLocationName(inputParams.query),
+  );

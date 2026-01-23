@@ -3,15 +3,15 @@ import type {
   WithLookupLocationInputQueryParams,
 } from "shared";
 import { InMemoryAddressGateway } from "../adapters/InMemoryAddressGateway";
-import { LookupLocation } from "./LookupLocation";
+import { type LookupLocation, makeLookupLocation } from "./LookupLocation";
 
 describe("Lookup Street Address", () => {
   let useCase: LookupLocation;
-  let addressApiGateway: InMemoryAddressGateway;
+  let addressGateway: InMemoryAddressGateway;
 
   beforeEach(() => {
-    addressApiGateway = new InMemoryAddressGateway();
-    useCase = new LookupLocation(addressApiGateway);
+    addressGateway = new InMemoryAddressGateway();
+    useCase = makeLookupLocation({ deps: { addressGateway } });
   });
 
   it("retrieve location search result from query ''", async () => {
@@ -24,7 +24,7 @@ describe("Lookup Street Address", () => {
         },
       },
     ];
-    addressApiGateway.setLookupSearchResults(expectedLookupSearchResults);
+    addressGateway.setLookupSearchResults(expectedLookupSearchResults);
 
     const lookupLocationInput: WithLookupLocationInputQueryParams = {
       query: "Barb",
