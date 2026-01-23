@@ -92,7 +92,7 @@ import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/c
 import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { makeGetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
-import { ValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
+import { makeValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { SetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFeatureFlag";
 import { UploadFile } from "../../domains/core/file-storage/useCases/UploadFile";
@@ -441,9 +441,6 @@ export const createUseCases = ({
       ),
       romeSearch: new RomeSearch(uowPerformer),
 
-      // email validation
-      validateEmail: new ValidateEmail(gateways.emailValidationGateway),
-
       // agencies
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailsWhenAgencyIsActivated: new SendEmailsWhenAgencyIsActivated(
@@ -594,6 +591,11 @@ export const createUseCases = ({
 
     // METABASE
     ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
+
+    // email validation
+    validateEmail: makeValidateEmail({
+      deps: { emailValidationGateway: gateways.emailValidationGateway },
+    }),
 
     revokeApiConsumer: makeRevokeApiConsumer({
       uowPerformer,

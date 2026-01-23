@@ -3,22 +3,16 @@ import {
   type ValidateEmailInput,
   validateEmailInputSchema,
 } from "shared";
-import { UseCase } from "../../UseCase";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import type { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 
-export class ValidateEmail extends UseCase<
-  ValidateEmailInput,
-  ValidateEmailFeedback
-> {
-  protected inputSchema = validateEmailInputSchema;
+export type ValidateEmail = ReturnType<typeof makeValidateEmail>;
 
-  constructor(private emailValidationGateway: EmailValidationGetaway) {
-    super();
-  }
-
-  protected _execute({
-    email,
-  }: ValidateEmailInput): Promise<ValidateEmailFeedback> {
-    return this.emailValidationGateway.validateEmail(email);
-  }
-}
+export const makeValidateEmail = useCaseBuilder("ValidateEmail")
+  .notTransactional()
+  .withInput<ValidateEmailInput>(validateEmailInputSchema)
+  .withOutput<ValidateEmailFeedback>()
+  .withDeps<{ emailValidationGateway: EmailValidationGetaway }>()
+  .build(async ({ inputParams, deps }) =>
+    deps.emailValidationGateway.validateEmail(inputParams.email),
+  );

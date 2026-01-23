@@ -4,7 +4,7 @@ import {
   type ValidateEmailInput,
 } from "shared";
 import { InMemoryEmailValidationGateway } from "../adapters/InMemoryEmailValidationGateway";
-import { ValidateEmail } from "./ValidateEmail";
+import { makeValidateEmail, type ValidateEmail } from "./ValidateEmail";
 
 describe("Email validation status", () => {
   let validateEmail: ValidateEmail;
@@ -12,7 +12,7 @@ describe("Email validation status", () => {
 
   beforeEach(() => {
     emailValidationGateway = new InMemoryEmailValidationGateway();
-    validateEmail = new ValidateEmail(emailValidationGateway);
+    validateEmail = makeValidateEmail({ deps: { emailValidationGateway } });
   });
 
   it("retrieve email validation status from queried email", async () => {
