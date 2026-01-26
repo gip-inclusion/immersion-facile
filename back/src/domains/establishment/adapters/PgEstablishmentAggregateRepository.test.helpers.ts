@@ -38,13 +38,16 @@ export const makeExpectedSearchResult = ({
     throw new Error(
       "At least one offer is required to make an expected SearchResult",
     );
+  const matchingOffersForRemoteWorkMode = withOffers.filter(
+    (offer) => offer.remoteWorkMode === remoteWorkMode,
+  );
   return {
     additionalInformation:
       establishmentAggregate.establishment.additionalInformation,
     address: withLocationAndDistance.address,
-    appellations: withOffers.map(({ appellationCode, appellationLabel }) => ({
-      appellationCode,
-      appellationLabel,
+    appellations: matchingOffersForRemoteWorkMode.map((offer) => ({
+      appellationCode: offer.appellationCode,
+      appellationLabel: offer.appellationLabel,
     })),
     establishmentScore: establishmentAggregate.establishment.score,
     contactMode: establishmentAggregate.establishment.contactMode,

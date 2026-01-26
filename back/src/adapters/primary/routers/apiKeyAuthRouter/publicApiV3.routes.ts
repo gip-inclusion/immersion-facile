@@ -1,8 +1,8 @@
 import {
   getOffersFlatParamsSchema,
   httpErrorSchema,
+  internalOfferSchema,
   paginatedSearchResultsSchema,
-  searchResultSchema,
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
@@ -32,7 +32,7 @@ export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
     url: "/v3/offers/:siret/:appellationCode/:locationId",
     ...withAuthorizationHeaders,
     responses: {
-      200: searchResultSchema,
+      200: internalOfferSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

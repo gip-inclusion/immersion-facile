@@ -12,10 +12,9 @@ import {
 import {
   type AppellationCode,
   domElementIds,
-  type ExternalSearchResultDto,
   hasSearchGeoParams,
   isSuperEstablishment,
-  type SearchResultDto,
+  type OfferDto,
 } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -274,11 +273,7 @@ export const SearchListResults = ({
 
 const makeOfferLink = (
   route: SearchRoute,
-  {
-    siret,
-    locationId,
-    voluntaryToImmersion,
-  }: SearchResultDto | ExternalSearchResultDto,
+  { siret, locationId, voluntaryToImmersion }: OfferDto,
   appellationCode?: AppellationCode,
 ): Link => {
   const definedAppellationCode: AppellationCode = appellationCode ?? "";

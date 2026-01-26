@@ -2,13 +2,13 @@ import { values } from "ramda";
 import type {
   GroupSlug,
   GroupWithResults,
-  SearchResultDto,
+  InternalOfferDto,
   SiretDto,
 } from "shared";
 import type { GroupEntity } from "../entities/GroupEntity";
 import type { GroupRepository } from "../ports/GroupRepository";
 
-export const stubSearchResult: SearchResultDto = {
+export const stubSearchResult: InternalOfferDto = {
   rome: "D1101",
   siret: "11112222111122",
   distance_m: 0,

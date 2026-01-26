@@ -9,9 +9,9 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type InternalOfferDto,
   LocationBuilder,
   type NafCode,
-  type SearchResultDto,
   type SearchSortedBy,
   UserBuilder,
   type WithAcquisition,
@@ -981,25 +981,33 @@ describe("PgEstablishmentAggregateRepository", () => {
       describe("filters.remoteWorkModes", () => {
         const offerNoRemote = new OfferEntityBuilder()
           .withRomeCode("A1101")
-          .withAppellationLabel("Ouvrier / Ouvrière agricole")
+          .withAppellationLabel("Chauffeur / Chauffeuse de machines agricoles")
           .withAppellationCode("11987")
           .withRomeLabel("Conduite d'engins agricoles et forestiers")
           .withRemoteWorkMode("NO_REMOTE")
           .build();
 
         const offerHybrid = new OfferEntityBuilder()
-          .withRomeCode("M1805")
-          .withAppellationLabel("Développeur / Développeuse")
+          .withRomeCode("I1307")
+          .withRomeLabel(
+            "Installation et maintenance télécoms et courants faibles",
+          )
+          .withAppellationLabel(
+            "Technicien / Technicienne d'installation en domotique",
+          )
           .withAppellationCode("19999")
-          .withRomeLabel("Études et développement informatique")
           .withRemoteWorkMode("HYBRID")
           .build();
 
         const offerFullRemote = new OfferEntityBuilder()
-          .withRomeCode("M1805")
-          .withAppellationLabel("Ingénieur / Ingénieure logiciel")
+          .withRomeCode("I1307")
+          .withRomeLabel(
+            "Installation et maintenance télécoms et courants faibles",
+          )
+          .withAppellationLabel(
+            "Technicien / Technicienne d'installation en courants faibles",
+          )
           .withAppellationCode("19998")
-          .withRomeLabel("Études et développement informatique")
           .withRemoteWorkMode("FULL_REMOTE")
           .build();
 
@@ -1029,7 +1037,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const establishmentWithMixedRemoteOffers =
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("44444444444444")
-            .withOffers([offerHybrid, offerFullRemote])
+            .withOffers([offerFullRemote, offerHybrid])
             .withLocationId(uuid())
             .withUserRights([osefUserRight])
             .build();
@@ -1080,12 +1088,15 @@ describe("PgEstablishmentAggregateRepository", () => {
             totalRecords: 1,
           });
 
-          expectToEqual(result.data.length, 1);
-          expectToEqual(
-            result.data[0].siret,
-            establishmentWithNoRemoteOffer.establishment.siret,
-          );
-          expectToEqual(result.data[0].rome, offerNoRemote.romeCode);
+          expectToEqual(result.data, [
+            makeExpectedSearchResult({
+              establishment: establishmentWithNoRemoteOffer,
+              withOffers: establishmentWithNoRemoteOffer.offers,
+              withLocationAndDistance:
+                establishmentWithNoRemoteOffer.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+          ]);
         });
 
         it("filters by remoteWorkModes (single value: HYBRID)", async () => {
@@ -1102,13 +1113,24 @@ describe("PgEstablishmentAggregateRepository", () => {
             totalRecords: 2, // establishmentWithHybridOffer + establishmentWithMixedRemoteOffers
           });
 
-          expectArraysToEqual(
-            result.data.map((r) => r.siret),
-            [
-              establishmentWithHybridOffer.establishment.siret,
-              establishmentWithMixedRemoteOffers.establishment.siret,
-            ],
-          );
+          expectToEqual(result.data, [
+            makeExpectedSearchResult({
+              establishment: establishmentWithHybridOffer,
+              withOffers: establishmentWithHybridOffer.offers,
+              withLocationAndDistance:
+                establishmentWithHybridOffer.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "HYBRID",
+            }),
+            makeExpectedSearchResult({
+              establishment: establishmentWithMixedRemoteOffers,
+              withOffers: establishmentWithMixedRemoteOffers.offers,
+              withLocationAndDistance:
+                establishmentWithMixedRemoteOffers.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "HYBRID",
+            }),
+          ]);
         });
 
         it("filters by remoteWorkModes (single value: FULL_REMOTE)", async () => {
@@ -1122,16 +1144,27 @@ describe("PgEstablishmentAggregateRepository", () => {
             currentPage: 1,
             totalPages: 1,
             numberPerPage: 10,
-            totalRecords: 2, // establishmentWithFullRemoteOffer + establishmentWithMixedRemoteOffers
+            totalRecords: 2, // establishmentWithFullRemoteOffer + 1 of establishmentWithMixedRemoteOffers
           });
 
-          expectArraysToEqual(
-            result.data.map((r) => r.siret),
-            [
-              establishmentWithFullRemoteOffer.establishment.siret,
-              establishmentWithMixedRemoteOffers.establishment.siret,
-            ],
-          );
+          expectToEqual(result.data, [
+            makeExpectedSearchResult({
+              establishment: establishmentWithFullRemoteOffer,
+              withOffers: establishmentWithFullRemoteOffer.offers,
+              withLocationAndDistance:
+                establishmentWithFullRemoteOffer.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "FULL_REMOTE",
+            }),
+            makeExpectedSearchResult({
+              establishment: establishmentWithMixedRemoteOffers,
+              withOffers: establishmentWithMixedRemoteOffers.offers,
+              withLocationAndDistance:
+                establishmentWithMixedRemoteOffers.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "FULL_REMOTE",
+            }),
+          ]);
         });
 
         it("filters by remoteWorkModes (multiple values)", async () => {
@@ -1148,16 +1181,40 @@ describe("PgEstablishmentAggregateRepository", () => {
             totalRecords: 4, // 1 from establishmentWithHybridOffer + 1 from establishmentWithFullRemoteOffer + 2 from establishmentWithMixedRemoteOffers (one for each remoteWorkMode)
           });
 
-          const sirets = result.data.map((r) => r.siret);
-          expect(sirets).toContain(
-            establishmentWithHybridOffer.establishment.siret,
-          );
-          expect(sirets).toContain(
-            establishmentWithFullRemoteOffer.establishment.siret,
-          );
-          expect(sirets).toContain(
-            establishmentWithMixedRemoteOffers.establishment.siret,
-          );
+          expectToEqual(result.data, [
+            makeExpectedSearchResult({
+              establishment: establishmentWithHybridOffer,
+              withOffers: establishmentWithHybridOffer.offers,
+              withLocationAndDistance:
+                establishmentWithHybridOffer.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "HYBRID",
+            }),
+            makeExpectedSearchResult({
+              establishment: establishmentWithFullRemoteOffer,
+              withOffers: establishmentWithFullRemoteOffer.offers,
+              withLocationAndDistance:
+                establishmentWithFullRemoteOffer.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "FULL_REMOTE",
+            }),
+            makeExpectedSearchResult({
+              establishment: establishmentWithMixedRemoteOffers,
+              withOffers: establishmentWithMixedRemoteOffers.offers,
+              withLocationAndDistance:
+                establishmentWithMixedRemoteOffers.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "FULL_REMOTE",
+            }),
+            makeExpectedSearchResult({
+              establishment: establishmentWithMixedRemoteOffers,
+              withOffers: establishmentWithMixedRemoteOffers.offers,
+              withLocationAndDistance:
+                establishmentWithMixedRemoteOffers.establishment.locations[0],
+              nafLabel: "Activités des agences de travail temporaire",
+              remoteWorkMode: "HYBRID",
+            }),
+          ]);
         });
       });
 
@@ -3104,7 +3161,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         // Act
-        const searchResults: SearchResultDto[] =
+        const searchResults: InternalOfferDto[] =
           await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
             {
               searchMade: {
@@ -4411,7 +4468,7 @@ const toReadableSearchResult = ({
   address,
   rome,
   distance_m,
-}: SearchResultDto) => ({
+}: InternalOfferDto) => ({
   address: `${address?.streetNumberAndAddress} ${address?.postcode} ${address?.city}`,
   rome,
   distance_m,

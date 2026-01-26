@@ -16,7 +16,7 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import type { Group, GroupWithResults, SearchResultDto } from "shared";
+import type { Group, GroupWithResults, InternalOfferDto } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import type { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -32,7 +32,7 @@ const useStyles = makeStyles({ name: "GroupPage" });
 export const GroupPage = ({ route }: GroupPageProps) => {
   const { groupSlug } = route.params;
   const [error, setError] = useState<Error | null>(null);
-  const [initialResults, setInitialResults] = useState<SearchResultDto[]>([]);
+  const [initialResults, setInitialResults] = useState<InternalOfferDto[]>([]);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [group, setGroup] = useState<Group | null>(null);
@@ -83,12 +83,12 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
     },
   }))();
   const [displayedResults, setDisplayedResults] =
-    useState<SearchResultDto[]>(results);
+    useState<InternalOfferDto[]>(results);
 
   const filterResults = useCallback(
     (query: string) => {
       setDisplayedResults(
-        results.filter((displayedResult: SearchResultDto) => {
+        results.filter((displayedResult: InternalOfferDto) => {
           const appellationLabels = displayedResult.appellations
             .map(({ appellationLabel }) => appellationLabel)
             .join(" ");

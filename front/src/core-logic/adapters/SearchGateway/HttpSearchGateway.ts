@@ -2,12 +2,12 @@ import { from, type Observable } from "rxjs";
 import type {
   CreateDiscussionDto,
   DataWithPagination,
-  ExternalSearchResultDto,
+  ExternalOfferDto,
   GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
-  SearchResultDto,
+  InternalOfferDto,
   SearchResultQuery,
   SearchRoutes,
   SiretAndAppellationDto,
@@ -64,9 +64,7 @@ export class HttpSearchGateway implements SearchGateway {
       );
   }
 
-  public getSearchResult$(
-    params: SearchResultQuery,
-  ): Observable<SearchResultDto> {
+  public getOffer$(params: SearchResultQuery): Observable<InternalOfferDto> {
     return from(
       this.httpClient
         .getSearchResult({
@@ -84,7 +82,7 @@ export class HttpSearchGateway implements SearchGateway {
 
   public getOffers$(
     params: GetOffersFlatQueryParams,
-  ): Observable<DataWithPagination<SearchResultDto>> {
+  ): Observable<DataWithPagination<InternalOfferDto>> {
     return from(
       this.httpClient
         .getOffers({
@@ -101,7 +99,7 @@ export class HttpSearchGateway implements SearchGateway {
 
   public getExternalOffers$(
     params: GetExternalOffersFlatQueryParams,
-  ): Observable<DataWithPagination<ExternalSearchResultDto>> {
+  ): Observable<DataWithPagination<ExternalOfferDto>> {
     return from(
       this.httpClient
         .getExternalOffers({
@@ -129,9 +127,9 @@ export class HttpSearchGateway implements SearchGateway {
     );
   }
 
-  public getExternalSearchResult$(
+  public getExternalOffer$(
     params: SiretAndAppellationDto,
-  ): Observable<ExternalSearchResultDto> {
+  ): Observable<ExternalOfferDto> {
     return from(
       this.httpClient
         .getExternalSearchResult({

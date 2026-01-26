@@ -13,7 +13,7 @@ import { SimulatedFormCompletionGateway } from "src/core-logic/adapters/FormComp
 import { seedRomeDtos } from "src/core-logic/adapters/FormCompletionGateway/TestFormCompletionGateway";
 import { SimulatedNafGateway } from "src/core-logic/adapters/NafGateway/SimulatedNafGateway";
 import { SimulatedSearchGateway } from "src/core-logic/adapters/SearchGateway/SimulatedSearchGateway";
-import { seedSearchResults } from "src/core-logic/adapters/SearchGateway/simulatedSearchData";
+import { seedInternalResults } from "src/core-logic/adapters/SearchGateway/simulatedSearchData";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 
 const SIMULATED_LATENCY_MS = 400;
@@ -33,7 +33,7 @@ export const createInMemoryDependencies = (): Dependencies => ({
   establishmentLeadGateway: new SimulatedEstablishmentLeadGateway(),
   assessmentGateway: new SimulatedAssessmentGateway(),
   searchGateway: new SimulatedSearchGateway(
-    seedSearchResults,
+    seedInternalResults,
     SIMULATED_LATENCY_MS,
   ),
   formCompletionGateway: new SimulatedFormCompletionGateway(

@@ -5,10 +5,10 @@ import type {
   DateTimeIsoString,
   FitForDisableWorkerOption,
   GeoPositionDto,
+  InternalOfferDto,
   LocationId,
   RemoteWorkMode,
   RomeCode,
-  SearchResultDto,
   SiretDto,
 } from "shared";
 
@@ -39,5 +39,5 @@ export type SearchImmersionResultPublicV3 = {
 };
 
 export const domainToSearchImmersionResultPublicV3 = (
-  searchImmersionResult: SearchResultDto,
+  searchImmersionResult: InternalOfferDto,
 ): SearchImmersionResultPublicV3 => searchImmersionResult;

@@ -1,11 +1,11 @@
 import {
   type ApiConsumer,
   type AppellationCode,
-  type ExternalSearchResultDto,
+  type ExternalOfferDto,
   errors,
   type LegacySearchQueryParamsDto,
   legacySearchParamsSchema,
-  type SearchResultDto,
+  type OfferDto,
   type WithNafCodes,
 } from "shared";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -22,7 +22,7 @@ import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export class LegacySearchImmersion extends TransactionalUseCase<
   LegacySearchQueryParamsDto,
-  (SearchResultDto | ExternalSearchResultDto)[],
+  OfferDto[],
   ApiConsumer
 > {
   protected inputSchema = legacySearchParamsSchema;
@@ -54,7 +54,7 @@ export class LegacySearchImmersion extends TransactionalUseCase<
     }: LegacySearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
-  ): Promise<(SearchResultDto | ExternalSearchResultDto)[]> {
+  ): Promise<OfferDto[]> {
     const searchMade: SearchMade = {
       lat,
       lon,
@@ -135,7 +135,7 @@ export class LegacySearchImmersion extends TransactionalUseCase<
     uow: UnitOfWork;
     appellationCodes: AppellationCode[];
   } & GeoParams &
-    WithNafCodes): Promise<ExternalSearchResultDto[]> {
+    WithNafCodes): Promise<ExternalOfferDto[]> {
     const appellationsAndRomes =
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
         appellationCodes,

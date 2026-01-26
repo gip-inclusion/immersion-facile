@@ -1,5 +1,5 @@
 import {
-  type ExternalSearchResultDto,
+  type ExternalOfferDto,
   errors,
   getExternalOffersFlatParamsSchema,
 } from "shared";
@@ -14,7 +14,7 @@ export type GetExternalOffers = ReturnType<typeof makeGetExternalOffers>;
 export const makeGetExternalOffers = useCaseBuilder("GetExternalOffers")
   .withCurrentUser<undefined>()
   .withInput(getExternalOffersFlatParamsSchema)
-  .withOutput<ExternalSearchResultDto[]>()
+  .withOutput<ExternalOfferDto[]>()
   .withDeps<{
     uuidGenerator: UuidGenerator;
     laBonneBoiteGateway: LaBonneBoiteGateway;

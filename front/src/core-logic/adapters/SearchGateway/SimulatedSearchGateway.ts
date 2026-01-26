@@ -2,24 +2,28 @@ import { delay, type Observable, of } from "rxjs";
 import {
   type CreateDiscussionDto,
   type DataWithPagination,
+  type ExternalOfferDto,
   type GetExternalOffersFlatQueryParams,
   type GetOffersFlatQueryParams,
   type GroupSlug,
   type GroupWithResults,
-  type SearchResultDto,
+  type InternalOfferDto,
   type SiretAndAppellationDto,
   sleep,
 } from "shared";
 import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
-import { groupWithResultsStub, seedSearchResults } from "./simulatedSearchData";
+import {
+  groupWithResultsStub,
+  seedInternalResults,
+} from "./simulatedSearchData";
 
 export class SimulatedSearchGateway implements SearchGateway {
   #error: Error | null = null;
 
   #simulatedLatency: number;
 
-  #seedResultsWithPagination: DataWithPagination<SearchResultDto>;
-  #simulatedResponse: SearchResultDto = {
+  #seedInternalResultsWithPagination: DataWithPagination<InternalOfferDto>;
+  #simulatedResponse: InternalOfferDto = {
     rome: "A1201",
     romeLabel: "Aide agricole de production fruitière ou viticole",
     establishmentScore: 0,
@@ -63,11 +67,11 @@ export class SimulatedSearchGateway implements SearchGateway {
   };
 
   constructor(
-    seedResults: SearchResultDto[] = seedSearchResults,
+    seedResults: InternalOfferDto[] = seedInternalResults,
     simulatedLatency = 0,
   ) {
     this.#simulatedLatency = simulatedLatency;
-    this.#seedResultsWithPagination = {
+    this.#seedInternalResultsWithPagination = {
       data: seedResults,
       pagination: {
         totalRecords: seedResults.length,
@@ -93,39 +97,39 @@ export class SimulatedSearchGateway implements SearchGateway {
     return groupWithResultsStub;
   }
 
-  public getSearchResult$(
+  public getOffer$(
     _params: SiretAndAppellationDto,
-  ): Observable<SearchResultDto> {
+  ): Observable<InternalOfferDto> {
     return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
   }
 
   public getOffers$(
     _params: GetOffersFlatQueryParams,
-  ): Observable<DataWithPagination<SearchResultDto>> {
+  ): Observable<DataWithPagination<InternalOfferDto>> {
     if (this.#error) throw this.#error;
     return this.#simulateSearch();
   }
 
   public getExternalOffers$(
     _params: GetExternalOffersFlatQueryParams,
-  ): Observable<DataWithPagination<SearchResultDto>> {
+  ): Observable<DataWithPagination<ExternalOfferDto>> {
     if (this.#error) throw this.#error;
     return this.#simulateSearchExternal();
   }
 
-  public getExternalSearchResult$(
+  public getExternalOffer$(
     _params: SiretAndAppellationDto,
-  ): Observable<SearchResultDto> {
+  ): Observable<ExternalOfferDto> {
     return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
   }
 
   #simulateSearch() {
-    return of(this.#seedResultsWithPagination).pipe(
+    return of(this.#seedInternalResultsWithPagination).pipe(
       delay(this.#simulatedLatency),
     );
   }
   #simulateSearchExternal() {
-    return of(this.#seedResultsWithPagination).pipe(
+    return of(this.#seedInternalResultsWithPagination).pipe(
       delay(this.#simulatedLatency),
     );
   }
