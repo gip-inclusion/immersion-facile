@@ -154,7 +154,7 @@ import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establ
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
-import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { makeUpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import type { AppConfig } from "./appConfig";
 import type { Gateways } from "./createGateways";
@@ -360,16 +360,7 @@ export const createUseCases = ({
 
       retrieveFormEstablishmentFromAggregates:
         new RetrieveFormEstablishmentFromAggregates(uowPerformer),
-      updateEstablishmentAggregateFromForm:
-        new UpdateEstablishmentAggregateFromForm(
-          uowPerformer,
-          gateways.addressApi,
-          uuidGenerator,
-          gateways.timeGateway,
-          createNewEvent,
-          saveNotificationAndRelatedEvent,
-          config.immersionFacileBaseUrl,
-        ),
+
       insertEstablishmentAggregateFromForm,
       addEstablishmentLead: new AddEstablishmentLead(
         uowPerformer,
@@ -572,6 +563,19 @@ export const createUseCases = ({
     htmlToPdf: makeHtmlToPdf({
       deps: { pdfGeneratorGateway: gateways.pdfGeneratorGateway },
     }),
+
+    updateEstablishmentAggregateFromForm:
+      makeUpdateEstablishmentAggregateFromForm({
+        deps: {
+          addressGateway: gateways.addressApi,
+          uuidGenerator,
+          timeGateway: gateways.timeGateway,
+          createNewEvent,
+          immersionBaseUrl: config.immersionFacileBaseUrl,
+          saveNotificationAndRelatedEvent,
+        },
+        uowPerformer,
+      }),
 
     notifyConfirmationEstablishmentCreated:
       makeNotifyConfirmationEstablishmentCreated({

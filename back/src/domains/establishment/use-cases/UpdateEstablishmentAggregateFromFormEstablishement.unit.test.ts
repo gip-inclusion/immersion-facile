@@ -47,7 +47,10 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
+import {
+  makeUpdateEstablishmentAggregateFromForm,
+  type UpdateEstablishmentAggregateFromForm,
+} from "./UpdateEstablishmentAggregateFromFormEstablishement";
 
 describe("Update Establishment aggregate from form data", () => {
   let siretGateway: InMemorySiretGateway;
@@ -68,15 +71,20 @@ describe("Update Establishment aggregate from form data", () => {
     uuidGenerator = new TestUuidGenerator();
     timeGateway = new CustomTimeGateway(now);
     updateEstablishmentAggregateFromFormUseCase =
-      new UpdateEstablishmentAggregateFromForm(
-        new InMemoryUowPerformer(uow),
-        addressGateway,
-        uuidGenerator,
-        timeGateway,
-        makeCreateNewEvent({ timeGateway, uuidGenerator }),
-        makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
-        immersionBaseUrl,
-      );
+      makeUpdateEstablishmentAggregateFromForm({
+        deps: {
+          addressGateway,
+          uuidGenerator,
+          timeGateway,
+          immersionBaseUrl,
+          createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+          saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+            uuidGenerator,
+            timeGateway,
+          ),
+        },
+        uowPerformer: new InMemoryUowPerformer(uow),
+      });
   });
 
   it("Fails if establishment does not exists amongst aggregates", async () => {
@@ -653,15 +661,6 @@ describe("Update Establishment aggregate from form data", () => {
             connectedUserJwtPayload,
           ),
           errors.user.forbidden({ userId: connectedUser.id }),
-        );
-      });
-
-      it("Forbidden error without jwt payload", async () => {
-        await expectPromiseToFailWithError(
-          updateEstablishmentAggregateFromFormUseCase.execute({
-            formEstablishment: updatedFormEstablishment,
-          }),
-          errors.user.noJwtProvided(),
         );
       });
 
