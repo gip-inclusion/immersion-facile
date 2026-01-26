@@ -15,7 +15,7 @@ import { NanoIdShortLinkIdGeneratorGateway } from "../../domains/core/short-link
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendAssessmentNeededNotifications } from "../../domains/establishment/use-cases/SendAssessmentNeededNotifications";
+import { makeSendAssessmentNeededNotifications } from "../../domains/establishment/use-cases/SendAssessmentNeededNotifications";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
 import { getDateRangeFromScriptParams } from "../utils";
@@ -71,19 +71,24 @@ const sendAssessmentNeededNotificationsScript = async () => {
   );
 
   const sendAssessmentNeededNotifications =
-    new SendAssessmentNeededNotifications(
-      uowPerformer,
-      { conventionQueries, assessmentRepository },
-      saveNotificationAndRelatedEvent,
-      timeGateway,
-      makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
-      makeCreateNewEvent({
+    makeSendAssessmentNeededNotifications({
+      deps: {
+        config,
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator: new UuidV4Generator(),
+        }),
+        generateConventionMagicLinkUrl: makeGenerateConventionMagicLinkUrl(
+          config,
+          generateConventionJwt,
+        ),
+        outOfTransaction: { conventionQueries, assessmentRepository },
+        saveNotificationAndRelatedEvent,
+        shortLinkIdGeneratorGateway: new NanoIdShortLinkIdGeneratorGateway(),
         timeGateway,
-        uuidGenerator: new UuidV4Generator(),
-      }),
-      config,
-      new NanoIdShortLinkIdGeneratorGateway(),
-    );
+        uowPerformer,
+      },
+    });
 
   const result = await sendAssessmentNeededNotifications.execute({
     conventionEndDate: conventionFinishingRange,
