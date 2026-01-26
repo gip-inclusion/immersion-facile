@@ -57,7 +57,10 @@ export const SearchListResults = ({
   const isSearchWithAppellationAndGeoParams =
     isSearchWithGeoParams && isSearchWithAppellation;
   const shouldShowLaBonneBoiteCTA =
-    !isExternal && isLastPage && isSearchWithAppellationAndGeoParams;
+    !isExternal &&
+    hasResults &&
+    isLastPage &&
+    isSearchWithAppellationAndGeoParams;
   return (
     <div className={fr.cx("fr-container", isExternal && "fr-mb-8w")}>
       <div
@@ -97,6 +100,37 @@ export const SearchListResults = ({
                 </p>
               </div>
             )}
+            {!hasResults &&
+              !isExternal &&
+              isSearchWithAppellationAndGeoParams && (
+                <div
+                  className={cx(
+                    fr.cx("fr-col-6", "fr-py-6w"),
+                    classes["text-centered"],
+                  )}
+                >
+                  <p className={fr.cx("fr-h6")}>
+                    Nous n'avons pas trouvé d'entreprises actuellement
+                    disponibles correspondant à votre recherche 🥺
+                  </p>
+                  <p>
+                    Découvrez d'autres opportunités d'entreprise à fort
+                    potentiel d'embauche grâce à notre partenaire La Bonne Boîte
+                    !
+                  </p>
+                  <Button
+                    id={domElementIds.search.noResultsLbbButton}
+                    linkProps={
+                      routes.externalSearch(
+                        getFilteredSearchParamsForLBB(searchParams),
+                      ).link
+                    }
+                    priority="primary"
+                  >
+                    Rechercher sur La Bonne Boîte
+                  </Button>
+                </div>
+              )}
             {hasResults &&
               searchResults.map((searchResult, index) => {
                 const appellations = searchResult.appellations;
@@ -151,10 +185,7 @@ export const SearchListResults = ({
                 );
               })}
             {shouldShowLaBonneBoiteCTA && (
-              <LaBonneBoiteCallToAction
-                searchParams={searchParams}
-                hasResults={hasResults}
-              />
+              <LaBonneBoiteCallToAction searchParams={searchParams} />
             )}
           </div>
         </div>
@@ -283,23 +314,18 @@ const getFilteredSearchParamsForLBB = (
 
 const LaBonneBoiteCallToAction = ({
   searchParams,
-  hasResults,
 }: {
   searchParams: ReturnType<typeof searchSelectors.searchParams>;
-  hasResults: boolean;
 }) => {
   const filteredSearchParams = getFilteredSearchParamsForLBB(searchParams);
   return (
     <div className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-6")}>
       <Card
+        id={domElementIds.search.noResultsLbbCard}
         imageUrl={labonneboiteLogoUrl}
         imageAlt="Logo de LaBonneBoite"
         title="Découvrez d'autres entreprises"
-        desc={
-          hasResults
-            ? "Explorez plus d'opportunités avec notre partenaire La Bonne Boite"
-            : "Nous n'avons pas trouvé d'entreprises actuellement disponibles sur Immersion Facilitée. Découvrez d'autres opportunités avec notre partenaire La Bonne Boîte"
-        }
+        desc="Explorez plus d'opportunités avec notre partenaire La Bonne Boite"
         footer={
           <Button
             linkProps={routes.externalSearch(filteredSearchParams).link}
