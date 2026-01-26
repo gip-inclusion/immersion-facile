@@ -5,8 +5,8 @@ import {
   expectHttpResponseToEqual,
   type GetOffersFlatQueryParams,
   type Group,
+  type InternalOfferDto,
   type Pagination,
-  type SearchResultDto,
   type SearchRoutes,
   type SiretDto,
   searchImmersionRoutes,
@@ -46,7 +46,7 @@ const toSearchImmersionResults = (
     establishment: EstablishmentEntity;
   }[],
   withDistance: number | false,
-): SearchResultDto[] =>
+): InternalOfferDto[] =>
   params.map(({ siret, offer, establishment }) => ({
     naf: defaultNafCode,
     nafLabel: "NAFRev2",
@@ -555,15 +555,10 @@ describe("/offers route", () => {
                   false,
                 )[0],
                 remoteWorkMode: "FULL_REMOTE",
-                // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
                     appellationLabel: offerFullRemote.appellationLabel,
                     appellationCode: offerFullRemote.appellationCode,
-                  },
-                  {
-                    appellationLabel: offerHybrid.appellationLabel,
-                    appellationCode: offerHybrid.appellationCode,
                   },
                 ],
               },
@@ -596,15 +591,10 @@ describe("/offers route", () => {
                   false,
                 )[0],
                 remoteWorkMode: "FULL_REMOTE",
-                // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
                     appellationLabel: offerFullRemote.appellationLabel,
                     appellationCode: offerFullRemote.appellationCode,
-                  },
-                  {
-                    appellationLabel: offerHybrid.appellationLabel,
-                    appellationCode: offerHybrid.appellationCode,
                   },
                 ],
               },
@@ -614,12 +604,7 @@ describe("/offers route", () => {
                   false,
                 )[0],
                 remoteWorkMode: "HYBRID",
-                // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
-                  {
-                    appellationLabel: offerFullRemote.appellationLabel,
-                    appellationCode: offerFullRemote.appellationCode,
-                  },
                   {
                     appellationLabel: offerHybrid.appellationLabel,
                     appellationCode: offerHybrid.appellationCode,
@@ -682,15 +667,10 @@ describe("/offers route", () => {
                   false,
                 )[0],
                 remoteWorkMode: "FULL_REMOTE",
-                // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
                   {
                     appellationLabel: offerFullRemote.appellationLabel,
                     appellationCode: offerFullRemote.appellationCode,
-                  },
-                  {
-                    appellationLabel: offerHybrid.appellationLabel,
-                    appellationCode: offerHybrid.appellationCode,
                   },
                 ],
               },
@@ -700,12 +680,7 @@ describe("/offers route", () => {
                   false,
                 )[0],
                 remoteWorkMode: "HYBRID",
-                // When results are grouped by Rome, all appellations for that Rome are included
                 appellations: [
-                  {
-                    appellationLabel: offerFullRemote.appellationLabel,
-                    appellationCode: offerFullRemote.appellationCode,
-                  },
                   {
                     appellationLabel: offerHybrid.appellationLabel,
                     appellationCode: offerHybrid.appellationCode,

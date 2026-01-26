@@ -5,10 +5,10 @@ import type {
   DateTimeIsoString,
   EstablishmentSearchableByValue,
   FitForDisableWorkerOption,
+  InternalOfferDto,
   LocationId,
   NafCode,
   RemoteWorkMode,
-  SearchResultDto,
   SearchSortedBy,
   SiretDto,
   UserId,
@@ -20,13 +20,13 @@ import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
 import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 
-export type RepositorySearchResultDto = Omit<SearchResultDto, "urlOfPartner">;
+export type RepositorySearchResultDto = Omit<InternalOfferDto, "urlOfPartner">;
 export type RepositorySearchImmersionResult = Omit<
   SearchImmersionResult,
   "urlOfPartner"
 >;
 export type OfferWithSiret = OfferEntity & { siret: SiretDto };
-export type SearchImmersionResult = SearchResultDto & {
+export type SearchImmersionResult = InternalOfferDto & {
   isSearchable: boolean;
   nextAvailabilityDate?: DateTimeIsoString;
 };
@@ -96,7 +96,7 @@ export interface EstablishmentAggregateRepository {
   ): Promise<RepositorySearchImmersionResult[]>;
   getOffers(
     params: GetOffersParams,
-  ): Promise<DataWithPagination<SearchResultDto>>;
+  ): Promise<DataWithPagination<InternalOfferDto>>;
   //Sirets
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;
   getSiretOfEstablishmentsToSuggestUpdate(before: Date): Promise<SiretDto[]>;

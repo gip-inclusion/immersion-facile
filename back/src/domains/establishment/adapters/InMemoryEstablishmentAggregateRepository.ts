@@ -6,13 +6,13 @@ import {
   type DataWithPagination,
   errors,
   type GeoPositionDto,
+  type InternalOfferDto,
   type LocationId,
   path,
   pathEq,
   type RemoteWorkMode,
   type RomeCode,
   replaceArrayElement,
-  type SearchResultDto,
   type SiretDto,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
@@ -89,7 +89,7 @@ export class InMemoryEstablishmentAggregateRepository
     siret: SiretDto,
     appellationCode: AppellationCode,
     locationId: LocationId,
-  ): Promise<SearchResultDto | undefined> {
+  ): Promise<InternalOfferDto | undefined> {
     const aggregate = this.establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );
@@ -167,7 +167,7 @@ export class InMemoryEstablishmentAggregateRepository
 
   public async getOffers(
     params: GetOffersParams,
-  ): Promise<DataWithPagination<SearchResultDto>> {
+  ): Promise<DataWithPagination<InternalOfferDto>> {
     const { filters, pagination } = params;
 
     const allOffers = this.establishmentAggregates
@@ -432,7 +432,7 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = ({
   distance_m?: number;
   customScore?: number;
   remoteWorkMode: RemoteWorkMode;
-}): SearchResultDto => ({
+}): InternalOfferDto => ({
   rome: romeCode,
   establishmentScore: customScore ?? establishmentAggregate.establishment.score,
   naf: establishmentAggregate.establishment.nafDto.code,
@@ -454,7 +454,10 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = ({
   romeLabel: TEST_ROME_LABEL,
   website: establishmentAggregate.establishment.website,
   appellations: establishmentAggregate.offers
-    .filter((offer) => offer.romeCode === romeCode)
+    .filter(
+      (offer) =>
+        offer.romeCode === romeCode && offer.remoteWorkMode === remoteWorkMode,
+    )
     .map((offer) => ({
       appellationCode: offer.appellationCode,
       appellationLabel: offer.appellationLabel,

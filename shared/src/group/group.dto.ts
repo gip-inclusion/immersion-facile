@@ -1,5 +1,5 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
-import type { SearchResultDto } from "../search/SearchResult.dto";
+import type { InternalOfferDto } from "../search/Offer.dto";
 import type { Flavor } from "../typeFlavors";
 
 export type GroupName = Flavor<string, "GroupName">;
@@ -28,5 +28,5 @@ export type Group = {
 
 export type GroupWithResults = {
   group: Group;
-  results: SearchResultDto[];
+  results: InternalOfferDto[];
 };

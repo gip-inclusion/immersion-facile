@@ -2,9 +2,8 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AppellationAndRomeDto,
   DataWithPagination,
-  ExternalSearchResultDto,
   GetOffersFlatQueryParams,
-  SearchResultDto,
+  OfferDto,
   SearchResultQuery,
   SiretAndAppellationDto,
   WithAcquisition,
@@ -14,7 +13,7 @@ import type {
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
-export type SearchResultPayload = SearchResultQuery | SearchResultDto;
+export type SearchResultPayload = SearchResultQuery | OfferDto;
 
 export type GetOffersPayload = SearchPageParams & { isExternal?: boolean };
 
@@ -24,15 +23,13 @@ export type SearchPageParams = GetOffersFlatQueryParams & {
 } & WithAcquisition;
 
 type SearchState = {
-  searchResultsWithPagination: DataWithPagination<
-    SearchResultDto | ExternalSearchResultDto
-  >;
-  currentSearchResult: SearchResultDto | ExternalSearchResultDto | null;
+  searchResultsWithPagination: DataWithPagination<OfferDto>;
+  currentSearchResult: OfferDto | null;
   isLoading: boolean;
   searchParams: SearchPageParams;
 };
 
-const emptySearchResult: DataWithPagination<SearchResultDto> = {
+const emptySearchResult: DataWithPagination<OfferDto> = {
   data: [],
   pagination: {
     totalPages: 1,
@@ -71,9 +68,7 @@ export const searchSlice = createSlice({
     getOffersSucceeded: (
       state,
       action: PayloadAction<{
-        searchResultsWithPagination: DataWithPagination<
-          SearchResultDto | ExternalSearchResultDto
-        >;
+        searchResultsWithPagination: DataWithPagination<OfferDto>;
         searchParams: GetOffersFlatQueryParams;
       }>,
     ) => {
@@ -97,10 +92,7 @@ export const searchSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    fetchSearchResultSucceeded: (
-      state,
-      action: PayloadAction<ExternalSearchResultDto>,
-    ) => {
+    fetchSearchResultSucceeded: (state, action: PayloadAction<OfferDto>) => {
       state.currentSearchResult = action.payload;
       state.isLoading = false;
     },

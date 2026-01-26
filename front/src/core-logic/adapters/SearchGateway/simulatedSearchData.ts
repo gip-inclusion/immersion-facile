@@ -1,4 +1,4 @@
-import type { AddressDto, GroupWithResults, SearchResultDto } from "shared";
+import type { AddressDto, GroupWithResults, InternalOfferDto } from "shared";
 
 const defaultNaf = "MyNaf";
 const defaultAddress: AddressDto = {
@@ -8,7 +8,7 @@ const defaultAddress: AddressDto = {
   departmentCode: "75",
 };
 
-const groupSearchResultBySlugStub: SearchResultDto[] = [
+const groupSearchResultBySlugStub: InternalOfferDto[] = [
   {
     rome: "H1204",
     siret: "30613890003613",
@@ -349,7 +349,7 @@ export const groupWithResultsStub: GroupWithResults = {
   results: groupSearchResultBySlugStub,
 };
 
-export const seedSearchResults: SearchResultDto[] = [
+export const seedInternalResults: InternalOfferDto[] = [
   {
     rome: "A0000",
     naf: defaultNaf,

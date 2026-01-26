@@ -1,5 +1,5 @@
 import type {
-  ExternalSearchResultDto,
+  ExternalOfferDto,
   GeoPositionDto,
   RomeDto,
   SiretDto,
@@ -76,7 +76,7 @@ export class LaBonneBoiteCompanyDto {
   public toSearchResult(
     romeDto: RomeDto,
     searchedCoordinate?: GeoPositionDto,
-  ): ExternalSearchResultDto {
+  ): ExternalOfferDto {
     return {
       address: {
         city: this.props.city,

@@ -2,9 +2,10 @@ import {
   BadRequestError,
   type DataWithPagination,
   expectPromiseToFailWithError,
+  expectToEqual,
   type GetOffersFlatQueryParams,
   type GetOffersPerPageOption,
-  type SearchResultDto,
+  type InternalOfferDto,
 } from "shared";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import {
@@ -93,10 +94,8 @@ describe("GetOffers", () => {
       sirets: [establishment2.establishment.siret],
     };
 
-    const result: DataWithPagination<SearchResultDto> = await getOffers.execute(
-      searchParams,
-      undefined,
-    );
+    const result: DataWithPagination<InternalOfferDto> =
+      await getOffers.execute(searchParams, undefined);
 
     expect(result.data).toHaveLength(1);
     expect(result.data[0].siret).toBe(establishment2.establishment.siret);
@@ -172,9 +171,12 @@ describe("GetOffers", () => {
       .withUserRights(userRights)
       .build();
 
-    uow.establishmentAggregateRepository.establishmentAggregates.push(
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment1,
+      establishment2,
+      establishment3,
       establishment4,
-    );
+    ];
 
     const searchParams: GetOffersFlatQueryParams = {
       sortBy: "score",
@@ -182,16 +184,42 @@ describe("GetOffers", () => {
       remoteWorkModes: ["FULL_REMOTE"],
     };
 
-    const result: DataWithPagination<SearchResultDto> = await getOffers.execute(
-      searchParams,
-      undefined,
-    );
+    const result: DataWithPagination<InternalOfferDto> =
+      await getOffers.execute(searchParams, undefined);
 
     expect(result.data).toHaveLength(1);
-    expect(result.data[0].siret).toBe(establishment4.establishment.siret);
-    expect(result.data[0].appellations[0].appellationCode).toBe(
-      remoteOffer.appellationCode,
-    );
+    expectToEqual(result.data, [
+      {
+        siret: establishment4.establishment.siret,
+        appellations: [
+          {
+            appellationCode: remoteOffer.appellationCode,
+            appellationLabel: remoteOffer.appellationLabel,
+          },
+        ],
+        remoteWorkMode: "FULL_REMOTE",
+        establishmentScore: establishment4.establishment.score,
+        naf: establishment4.establishment.nafDto.code,
+        nafLabel: establishment4.establishment.nafDto.nomenclature,
+        name: establishment4.establishment.name,
+        customizedName: establishment4.establishment.customizedName,
+        numberOfEmployeeRange:
+          establishment4.establishment.numberEmployeesRange,
+        voluntaryToImmersion: establishment4.establishment.voluntaryToImmersion,
+        additionalInformation:
+          establishment4.establishment.additionalInformation,
+        fitForDisabledWorkers: "no",
+        position: establishment4.establishment.locations[0].position,
+        address: establishment4.establishment.locations[0].address,
+        locationId: establishment4.establishment.locations[0].id,
+        contactMode: establishment4.establishment.contactMode,
+        romeLabel: "test_rome_label",
+        rome: remoteOffer.romeCode,
+        website: establishment4.establishment.website,
+        updatedAt: establishment4.establishment.updatedAt.toISOString(),
+        createdAt: establishment4.establishment.createdAt.toISOString(),
+      },
+    ]);
   });
 
   it("should filter by multiple remoteWorkModes when provided", async () => {
@@ -227,15 +255,72 @@ describe("GetOffers", () => {
       remoteWorkModes: ["FULL_REMOTE", "HYBRID"],
     };
 
-    const result: DataWithPagination<SearchResultDto> = await getOffers.execute(
-      searchParams,
-      undefined,
-    );
+    const result: DataWithPagination<InternalOfferDto> =
+      await getOffers.execute(searchParams, undefined);
 
     expect(result.data).toHaveLength(2);
-    expect(
-      result.data.some((r) => r.siret === establishment4.establishment.siret),
-    ).toBe(true);
+    expectToEqual(result.data, [
+      {
+        siret: establishment4.establishment.siret,
+        appellations: [
+          {
+            appellationCode: remoteOffer.appellationCode,
+            appellationLabel: remoteOffer.appellationLabel,
+          },
+        ],
+        remoteWorkMode: "FULL_REMOTE",
+        establishmentScore: establishment4.establishment.score,
+        naf: establishment4.establishment.nafDto.code,
+        nafLabel: establishment4.establishment.nafDto.nomenclature,
+        name: establishment4.establishment.name,
+        customizedName: establishment4.establishment.customizedName,
+        numberOfEmployeeRange:
+          establishment4.establishment.numberEmployeesRange,
+        voluntaryToImmersion: establishment4.establishment.voluntaryToImmersion,
+        additionalInformation:
+          establishment4.establishment.additionalInformation,
+        fitForDisabledWorkers: "no",
+        position: establishment4.establishment.locations[0].position,
+        address: establishment4.establishment.locations[0].address,
+        locationId: establishment4.establishment.locations[0].id,
+        contactMode: establishment4.establishment.contactMode,
+        romeLabel: "test_rome_label",
+        rome: remoteOffer.romeCode,
+        website: establishment4.establishment.website,
+        updatedAt: establishment4.establishment.updatedAt.toISOString(),
+        createdAt: establishment4.establishment.createdAt.toISOString(),
+      },
+      {
+        siret: establishment4.establishment.siret,
+        appellations: [
+          {
+            appellationCode: hybridOffer.appellationCode,
+            appellationLabel: hybridOffer.appellationLabel,
+          },
+        ],
+        remoteWorkMode: "HYBRID",
+        establishmentScore: establishment4.establishment.score,
+        naf: establishment4.establishment.nafDto.code,
+        nafLabel: establishment4.establishment.nafDto.nomenclature,
+        name: establishment4.establishment.name,
+        customizedName: establishment4.establishment.customizedName,
+        numberOfEmployeeRange:
+          establishment4.establishment.numberEmployeesRange,
+        voluntaryToImmersion: establishment4.establishment.voluntaryToImmersion,
+        additionalInformation:
+          establishment4.establishment.additionalInformation,
+        fitForDisabledWorkers: "no",
+        position: establishment4.establishment.locations[0].position,
+        address: establishment4.establishment.locations[0].address,
+        locationId: establishment4.establishment.locations[0].id,
+        contactMode: establishment4.establishment.contactMode,
+        romeLabel: "test_rome_label",
+        rome: hybridOffer.romeCode,
+        website: establishment4.establishment.website,
+        updatedAt: establishment4.establishment.updatedAt.toISOString(),
+        createdAt: establishment4.establishment.createdAt.toISOString(),
+      },
+    ]);
   });
 
   describe("wrong path", () => {

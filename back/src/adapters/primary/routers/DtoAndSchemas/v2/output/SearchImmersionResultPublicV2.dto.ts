@@ -1,13 +1,13 @@
-import type {
-  AddressDto,
-  AppellationDto,
-  ContactMode,
-  ExternalSearchResultDto,
-  GeoPositionDto,
-  LocationId,
-  RomeCode,
-  SearchResultDto,
-  SiretDto,
+import {
+  type AddressDto,
+  type AppellationDto,
+  type ContactMode,
+  type GeoPositionDto,
+  isInternalOfferDto,
+  type LocationId,
+  type OfferDto,
+  type RomeCode,
+  type SiretDto,
 } from "shared";
 
 export type SearchImmersionResultPublicV2 = {
@@ -31,15 +31,27 @@ export type SearchImmersionResultPublicV2 = {
 };
 
 export const domainToSearchImmersionResultPublicV2 = (
-  searchImmersionResult: SearchResultDto | ExternalSearchResultDto,
+  searchImmersionResult: OfferDto,
 ): SearchImmersionResultPublicV2 => {
+  if (isInternalOfferDto(searchImmersionResult)) {
+    const {
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
+      fitForDisabledWorkers: _fitForDisabledWorkers,
+      customizedName: _customizedName,
+      remoteWorkMode: _remoteWorkMode,
+      ...searchImmersionResultPublicV2Data
+    } = searchImmersionResult;
+    return searchImmersionResultPublicV2Data;
+  }
+
   const {
     createdAt: _createdAt,
     updatedAt: _updatedAt,
     fitForDisabledWorkers: _fitForDisabledWorkers,
     customizedName: _customizedName,
-    remoteWorkMode: _remoteWorkMode,
     ...searchImmersionResultPublicV2Data
-  } = searchImmersionResult as SearchResultDto;
+  } = searchImmersionResult;
+
   return searchImmersionResultPublicV2Data;
 };

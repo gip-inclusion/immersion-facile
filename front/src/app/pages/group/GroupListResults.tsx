@@ -3,13 +3,13 @@ import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useState } from "react";
 import { Tag as ImTag, SearchResultIllustration } from "react-design-system";
-import { domElementIds, type SearchResultDto } from "shared";
+import { domElementIds, type InternalOfferDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
 
 type GroupListResultsProps = {
-  results: SearchResultDto[];
+  results: InternalOfferDto[];
 };
 
 export const GroupListResults = ({ results }: GroupListResultsProps) => {
@@ -28,7 +28,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
   );
   const resultsPerPageValue = Number.parseInt(resultsPerPage);
   const totalPages = Math.ceil(results.length / resultsPerPageValue);
-  const getSearchResultsForPage = (currentPage: number): SearchResultDto[] => {
+  const getSearchResultsForPage = (currentPage: number): InternalOfferDto[] => {
     const start = currentPage * resultsPerPageValue;
     const end = start + resultsPerPageValue;
     return results.slice(start, end);

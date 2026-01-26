@@ -15,15 +15,14 @@ import { useDispatch } from "react-redux";
 import {
   type AppellationDto,
   type ContactMode,
-  type ExternalSearchResultDto,
   getMapsLink,
+  isInternalOfferDto,
   isPhysicalWorkMode,
-  isSearchResultDto,
   makeAppellationInformationUrl,
   makeNafClassInformationUrl,
   makeSiretDescriptionLink,
+  type OfferDto,
   remoteWorkModeLabels,
-  type SearchResultDto,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
@@ -56,7 +55,7 @@ const SearchResultSection = ({
 );
 
 const getMetaForSearchResult = (
-  currentSearchResult: SearchResultDto | ExternalSearchResultDto | null,
+  currentSearchResult: OfferDto | null,
 ): {
   title: string;
   description: string;
@@ -159,7 +158,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
 
   const shouldShowPhysicalWorkModeInfos =
     currentSearchResult &&
-    isSearchResultDto(currentSearchResult) &&
+    isInternalOfferDto(currentSearchResult) &&
     isPhysicalWorkMode(currentSearchResult.remoteWorkMode);
 
   return (
@@ -230,7 +229,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
                 )}
               >
                 <SearchResultSection title="Adresse">
-                  {isSearchResultDto(currentSearchResult) &&
+                  {isInternalOfferDto(currentSearchResult) &&
                   !isPhysicalWorkMode(currentSearchResult.remoteWorkMode) ? (
                     <p>
                       France entière -{" "}
@@ -247,7 +246,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
                         {currentSearchResult.address.postcode}{" "}
                         {currentSearchResult.address.city}
                       </span>
-                      {isSearchResultDto(currentSearchResult) && (
+                      {isInternalOfferDto(currentSearchResult) && (
                         <>
                           {" "}
                           (

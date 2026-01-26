@@ -1,8 +1,6 @@
 import { addDays, startOfToday } from "date-fns";
 import {
   type AgencyKind,
-  type AppellationAndRomeDto,
-  type AppellationCode,
   addressDtoToString,
   addressStringToDto,
   type BeneficiaryCurrentEmployer,
@@ -16,17 +14,17 @@ import {
   keys,
   type LevelOfEducation,
   mergeObjectsExceptFalsyValues,
-  type NafCode,
-  parseStringToJsonOrThrow,
-  type RemoteWorkMode,
   reasonableSchedule,
-  type ScheduleDto,
   toDateUTCString,
 } from "shared";
 import type { CreateConventionPresentationInitialValues } from "src/app/components/forms/convention/conventionHelpers";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
+import {
+  appellationAndRomeDtoSerializer,
+  scheduleSerializer,
+} from "src/app/routes/valueSerializer";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { param, type ValueSerializer } from "type-route";
@@ -341,30 +339,6 @@ export const makeValuesToWatchInUrl = (
     {} as ConventionParamsInUrl,
   );
 };
-
-const makeValueSerializer = <T>(paramName: string): ValueSerializer<T> => ({
-  parse: (raw) => parseStringToJsonOrThrow<T>(raw, paramName),
-  stringify: (value) => JSON.stringify(value),
-});
-
-const scheduleSerializer: ValueSerializer<ScheduleDto> =
-  makeValueSerializer<ScheduleDto>("schedule");
-
-export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRomeDto> =
-  makeValueSerializer<AppellationAndRomeDto>("immersionAppellation");
-
-export const appellationAndRomeDtoArraySerializer: ValueSerializer<
-  AppellationAndRomeDto[]
-> = makeValueSerializer<AppellationAndRomeDto[]>("appellations");
-
-export const appellationStringSerializer: ValueSerializer<AppellationCode[]> =
-  makeValueSerializer<AppellationCode[]>("appellationCodes");
-
-export const nafCodeSerializer: ValueSerializer<NafCode[]> =
-  makeValueSerializer<NafCode[]>("nafCodes");
-
-export const remoteWorkModeSerializer: ValueSerializer<RemoteWorkMode[]> =
-  makeValueSerializer<RemoteWorkMode[]>("remoteWorkModes");
 
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
 type ConventionQueryParams = typeof conventionValuesFromUrl;

@@ -1,5 +1,5 @@
 import { filter, map, of, switchMap, take } from "rxjs";
-import { type SearchResultDto, searchResultSchema } from "shared";
+import { internalOfferSchema, type OfferDto } from "shared";
 import {
   type SearchResultPayload,
   searchSlice,
@@ -42,8 +42,8 @@ const getOffersEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   );
 
 const isSearchResultDto = (
-  payload: SearchResultPayload | SearchResultDto,
-): payload is SearchResultDto => searchResultSchema.safeParse(payload).success;
+  payload: SearchResultPayload | OfferDto,
+): payload is OfferDto => internalOfferSchema.safeParse(payload).success;
 
 const fetchSearchResultEpic: SearchEpic = (
   action$,
@@ -55,7 +55,7 @@ const fetchSearchResultEpic: SearchEpic = (
     switchMap(({ payload }) => {
       const searchResult$ = isSearchResultDto(payload.searchResult)
         ? of(payload.searchResult)
-        : searchGateway.getSearchResult$(payload.searchResult);
+        : searchGateway.getOffer$(payload.searchResult);
       return searchResult$.pipe(
         map(searchSlice.actions.fetchSearchResultSucceeded),
         catchEpicError((error) =>
@@ -76,7 +76,7 @@ const searchResultExternalProvidedEpic: SearchEpic = (
   action$.pipe(
     filter(searchSlice.actions.externalSearchResultRequested.match),
     switchMap(({ payload }) =>
-      searchGateway.getExternalSearchResult$(payload.siretAndAppellation).pipe(
+      searchGateway.getExternalOffer$(payload.siretAndAppellation).pipe(
         map(searchSlice.actions.fetchSearchResultSucceeded),
         catchEpicError((error) =>
           searchSlice.actions.fetchSearchResultFailed({

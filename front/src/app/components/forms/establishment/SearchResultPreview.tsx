@@ -3,7 +3,7 @@ import { Tag as ImTag, SearchResultIllustration } from "react-design-system";
 import {
   addressStringToDto,
   type FormEstablishmentDto,
-  type SearchResultDto,
+  type OfferDto,
 } from "shared";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import { useStyles } from "tss-react/dsfr";
@@ -19,7 +19,7 @@ const establishmentToSearchResultPreview = ({
   website,
   fitForDisabledWorkers,
   additionalInformation,
-}: FormEstablishmentDto): SearchResultDto => ({
+}: FormEstablishmentDto): OfferDto => ({
   establishmentScore: 0,
   rome: offers.length > 0 ? offers[0].romeCode : "",
   romeLabel: offers.length > 0 ? offers[0].romeLabel : "",

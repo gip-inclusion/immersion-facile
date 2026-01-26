@@ -13,14 +13,14 @@ import {
   param,
   type ValueSerializer,
 } from "type-route";
+import { conventionValuesFromUrl } from "./routeParams/convention";
+import { standardPagesSerializer } from "./routeParams/standardPage";
 import {
   appellationAndRomeDtoArraySerializer,
   appellationStringSerializer,
-  conventionValuesFromUrl,
   nafCodeSerializer,
   remoteWorkModeSerializer,
-} from "./routeParams/convention";
-import { standardPagesSerializer } from "./routeParams/standardPage";
+} from "./valueSerializer";
 
 export type AcquisitionParams = Partial<{
   [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<

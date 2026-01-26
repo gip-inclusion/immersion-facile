@@ -1,7 +1,7 @@
 import {
   type ApiConsumer,
   type AppellationAndRomeDto,
-  type ExternalSearchResultDto,
+  type ExternalOfferDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -1478,7 +1478,7 @@ const lbbToSearchResult = (
   lbb: LaBonneBoiteCompanyDto,
   romeDto: RomeDto,
   { distance_m }: { distance_m: number | undefined },
-): ExternalSearchResultDto => ({
+): ExternalOfferDto => ({
   address: {
     city: lbb.props.city,
     postcode: lbb.props.postcode,

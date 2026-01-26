@@ -2,6 +2,7 @@ import { expect, type Page } from "@playwright/test";
 import {
   domElementIds,
   type FormEstablishmentDto,
+  remoteWorkModeLabels,
   toDisplayedDate,
 } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
@@ -158,7 +159,9 @@ const checkEstablishment = async (
 
   await expect(firstOfferCardContent).toContain("routage");
 
-  await expect(firstOfferCardContent).toContain("100% PRÉSENTIEL");
+  await expect(firstOfferCardContent).toContain(
+    remoteWorkModeLabels.NO_REMOTE.label.toLocaleUpperCase(),
+  );
 
   await expect(
     await page.locator(

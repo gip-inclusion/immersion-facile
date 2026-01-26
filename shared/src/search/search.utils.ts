@@ -1,11 +1,6 @@
-import type {
-  ExternalSearchResultDto,
-  SearchResultDto,
-} from "./SearchResult.dto";
+import type { OfferDto } from "./Offer.dto";
 
-export const getMapsLink = (
-  searchResultData: SearchResultDto | ExternalSearchResultDto | undefined,
-) => {
+export const getMapsLink = (searchResultData: OfferDto | undefined) => {
   if (!searchResultData) return;
   const { address, name } = searchResultData;
   const queryString = `${address.streetNumberAndAddress} ${address.postcode} ${address.city} ${name}`;
