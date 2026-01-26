@@ -2,23 +2,24 @@ import { type Observable, Subject } from "rxjs";
 import type {
   CreateDiscussionDto,
   DataWithPagination,
+  ExternalOfferDto,
   GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   GroupSlug,
   GroupWithResults,
-  SearchResultDto,
+  InternalOfferDto,
   SiretAndAppellationDto,
 } from "shared";
 import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
 
 export class TestSearchGateway implements SearchGateway {
-  public currentSearchResult$ = new Subject<SearchResultDto>();
+  public currentInternalOffer$ = new Subject<InternalOfferDto>();
 
-  public searchResults$ = new Subject<DataWithPagination<SearchResultDto>>();
+  public internalOffers$ = new Subject<DataWithPagination<InternalOfferDto>>();
 
-  public externalSearchResults$ = new Subject<
-    DataWithPagination<SearchResultDto>
-  >();
+  public currentExternalOffer$ = new Subject<ExternalOfferDto>();
+
+  public externalOffers$ = new Subject<DataWithPagination<ExternalOfferDto>>();
 
   public contactEstablishment(
     _params: CreateDiscussionDto,
@@ -30,27 +31,27 @@ export class TestSearchGateway implements SearchGateway {
     throw new Error("Method not implemented.");
   }
 
-  public getSearchResult$(
+  public getOffer$(
     _params: SiretAndAppellationDto,
-  ): Observable<SearchResultDto> {
-    return this.currentSearchResult$;
+  ): Observable<InternalOfferDto> {
+    return this.currentInternalOffer$;
   }
 
   public getExternalOffers$(
     _params: GetExternalOffersFlatQueryParams,
-  ): Observable<DataWithPagination<SearchResultDto>> {
-    return this.externalSearchResults$;
+  ): Observable<DataWithPagination<ExternalOfferDto>> {
+    return this.externalOffers$;
   }
 
   public getOffers$(
     _params: GetOffersFlatQueryParams,
-  ): Observable<DataWithPagination<SearchResultDto>> {
-    return this.searchResults$;
+  ): Observable<DataWithPagination<InternalOfferDto>> {
+    return this.internalOffers$;
   }
 
-  public getExternalSearchResult$(
+  public getExternalOffer$(
     _params: SiretAndAppellationDto,
-  ): Observable<SearchResultDto> {
-    return this.currentSearchResult$;
+  ): Observable<ExternalOfferDto> {
+    return this.currentExternalOffer$;
   }
 }

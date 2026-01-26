@@ -12,7 +12,7 @@ import type {
 import type { SiretDto } from "../siret/siret";
 import type { DateTimeIsoString } from "../utils/date";
 
-type CommonSearchResultDto = {
+type CommonOfferDto = {
   rome: RomeCode;
   romeLabel: string;
   appellations: AppellationDto[];
@@ -37,15 +37,17 @@ type CommonSearchResultDto = {
   createdAt?: DateTimeIsoString;
 };
 
-export type SearchResultDto = CommonSearchResultDto & {
+export type ExternalOfferDto = CommonOfferDto;
+
+export type InternalOfferDto = CommonOfferDto & {
   remoteWorkMode: RemoteWorkMode;
 };
 
-export type ExternalSearchResultDto = CommonSearchResultDto;
+export type OfferDto = InternalOfferDto | ExternalOfferDto;
 
 export type GetOffersPerPageOption = (typeof getOffersPerPageOptions)[number];
 export const getOffersPerPageOptions = [6, 12, 24, 48] as const;
 
-export const isSearchResultDto = (
-  result: SearchResultDto | ExternalSearchResultDto,
-): result is SearchResultDto => "remoteWorkMode" in result;
+export const isInternalOfferDto = (
+  result: OfferDto,
+): result is InternalOfferDto => "remoteWorkMode" in result;

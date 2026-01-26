@@ -1,7 +1,7 @@
 import type {
   AbsoluteUrl,
   ConventionDraftId,
-  SearchResultDto,
+  ExternalOfferDto,
   WithAcquisition,
 } from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
@@ -18,7 +18,7 @@ export type LocalStoragePair =
   | GenericPair<"partialConventionInUrl", Partial<ConventionParamsInUrl>>
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>
-  | GenericPair<"searchResultExternal", SearchResultDto>
+  | GenericPair<"searchResultExternal", ExternalOfferDto>
   | GenericPair<"conventionDraftId", ConventionDraftId>;
 
 export type SessionStoragePair =

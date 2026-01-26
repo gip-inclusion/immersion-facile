@@ -1,8 +1,9 @@
 import {
   type DataWithPagination,
+  type ExternalOfferDto,
   expectToEqual,
+  type InternalOfferDto,
   type LocationId,
-  type SearchResultDto,
 } from "shared";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -20,23 +21,23 @@ const formSearchResult1 = {
   siret: "form1",
   rome: "A",
   voluntaryToImmersion: true,
-} as SearchResultDto;
+} as InternalOfferDto;
 
 const formSearchResult2 = {
   siret: "form2",
   rome: "A",
   voluntaryToImmersion: true,
-} as SearchResultDto;
+} as InternalOfferDto;
 
 const lbbSearchResult = {
   siret: "lbb1",
   rome: "A",
   voluntaryToImmersion: false,
-} as SearchResultDto;
+} as ExternalOfferDto;
 
 const locationId: LocationId = "123";
 
-const immersionOffer: SearchResultDto = {
+const immersionOffer: InternalOfferDto = {
   rome: "A1201",
   romeLabel: "Aide agricole de production fruitière ou viticole",
   establishmentScore: 0,
@@ -177,7 +178,7 @@ describe("search epic", () => {
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
 
-    dependencies.searchGateway.currentSearchResult$.next(immersionOffer);
+    dependencies.searchGateway.currentInternalOffer$.next(immersionOffer);
 
     expect(searchSelectors.isLoading(store.getState())).toBe(false);
 
@@ -203,7 +204,7 @@ describe("search epic", () => {
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
 
-    dependencies.searchGateway.currentSearchResult$.error(
+    dependencies.searchGateway.currentInternalOffer$.error(
       new Error(errorMessage),
     );
 
@@ -247,7 +248,7 @@ describe("search epic", () => {
         }),
       );
       expectIsLoading(true);
-      dependencies.searchGateway.currentSearchResult$.next(lbbSearchResult);
+      dependencies.searchGateway.currentExternalOffer$.next(lbbSearchResult);
       expectToEqual(
         searchSelectors.currentSearchResult(store.getState()),
         lbbSearchResult,
@@ -266,7 +267,9 @@ describe("search epic", () => {
         }),
       );
       expectIsLoading(true);
-      dependencies.searchGateway.currentSearchResult$.error(new Error("error"));
+      dependencies.searchGateway.currentExternalOffer$.error(
+        new Error("error"),
+      );
       expectIsLoading(false);
     });
   });
@@ -276,7 +279,7 @@ describe("search epic", () => {
   };
 
   const expectSearchResults = (
-    searchResults: DataWithPagination<SearchResultDto>,
+    searchResults: DataWithPagination<InternalOfferDto>,
   ) =>
     expectToEqual(
       searchSelectors.searchResultsWithPagination(store.getState()),
@@ -286,8 +289,8 @@ describe("search epic", () => {
   const expectIsLoading = (isLoading: boolean) =>
     expect(searchSelectors.isLoading(store.getState())).toBe(isLoading);
 
-  const feedWithSearchResults = (results: SearchResultDto[]) =>
-    dependencies.searchGateway.searchResults$.next({
+  const feedWithSearchResults = (results: InternalOfferDto[]) =>
+    dependencies.searchGateway.internalOffers$.next({
       data: results,
       pagination: {
         totalRecords: results.length,
@@ -296,8 +299,8 @@ describe("search epic", () => {
         numberPerPage: 12,
       },
     });
-  const feedWithExternalSearchResults = (results: SearchResultDto[]) =>
-    dependencies.searchGateway.externalSearchResults$.next({
+  const feedWithExternalSearchResults = (results: ExternalOfferDto[]) =>
+    dependencies.searchGateway.externalOffers$.next({
       data: results,
       pagination: {
         totalRecords: results.length,

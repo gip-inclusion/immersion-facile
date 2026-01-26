@@ -1,7 +1,7 @@
 import {
   type ApiConsumer,
   errors,
-  type SearchResultDto,
+  type InternalOfferDto,
   type SearchResultQuery,
   searchResultQuerySchema,
 } from "shared";
@@ -10,7 +10,7 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetSearchResultBySearchQuery extends TransactionalUseCase<
   SearchResultQuery,
-  SearchResultDto,
+  InternalOfferDto,
   ApiConsumer
 > {
   protected inputSchema = searchResultQuerySchema;
@@ -18,7 +18,7 @@ export class GetSearchResultBySearchQuery extends TransactionalUseCase<
   public async _execute(
     { siret, appellationCode, locationId }: SearchResultQuery,
     uow: UnitOfWork,
-  ): Promise<SearchResultDto> {
+  ): Promise<InternalOfferDto> {
     const searchResult =
       await uow.establishmentAggregateRepository.getSearchResultBySearchQuery(
         siret,

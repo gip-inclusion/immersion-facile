@@ -1,6 +1,6 @@
 import type { RedisClientType } from "redis";
 import {
-  type ExternalSearchResultDto,
+  type ExternalOfferDto,
   expectToEqual,
   type GeoPositionDto,
   type NafCode,
@@ -281,7 +281,7 @@ describe("HttpLaBonneBoiteGateway", () => {
         page: 2,
         perPage: 2,
       });
-      const expectedResultsOnPage1: ExternalSearchResultDto[] = [
+      const expectedResultsOnPage1: ExternalOfferDto[] = [
         {
           address: {
             city: "Paris",
@@ -337,7 +337,7 @@ describe("HttpLaBonneBoiteGateway", () => {
           voluntaryToImmersion: false,
         },
       ];
-      const expectedResultsOnPage2: ExternalSearchResultDto[] = [
+      const expectedResultsOnPage2: ExternalOfferDto[] = [
         {
           address: {
             city: "Paris",

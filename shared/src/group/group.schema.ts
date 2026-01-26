@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { searchResultSchema } from "../search/SearchResult.schema";
+import { internalOfferSchema } from "../search/Offer.schema";
 import {
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
@@ -41,5 +41,5 @@ export const groupSchema: ZodSchemaWithInputMatchingOutput<Group> = z.object({
 export const groupWithResultsSchema: ZodSchemaWithInputMatchingOutput<GroupWithResults> =
   z.object({
     group: groupSchema,
-    results: z.array(searchResultSchema),
+    results: z.array(internalOfferSchema),
   });

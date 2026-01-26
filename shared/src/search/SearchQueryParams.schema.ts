@@ -111,7 +111,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
     fitForDisabledWorkers: z.array(fitForDisabledWorkersSchema).optional(),
     locationIds: z.array(zUuidLike).optional(),
     nafCodes: nafCodesSchema.optional(),
-    remoteWorkModes: z.array(z.enum(remoteWorkModes)).optional(),
+    remoteWorkModes: z.array(remoteWorkModeSchema).optional(),
     sirets: z.array(siretSchema).optional(),
     searchableBy: z
       .enum(["students", "jobSeekers"], {
@@ -120,11 +120,6 @@ export const getOffersFlatParamsSchema: z.ZodType<
       .optional(),
     place: z.string().optional(),
   })
-  .and(
-    z.object({
-      remoteWorkModes: z.array(remoteWorkModeSchema).optional(),
-    }),
-  )
   .and(paginationQueryParamsSchema)
   .and(geoParamsAndSortSchema)
   .and(withAcquisitionSchema);

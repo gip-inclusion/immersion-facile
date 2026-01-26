@@ -2,7 +2,6 @@ import { addDays, startOfToday } from "date-fns";
 import {
   type AgencyKind,
   type AppellationAndRomeDto,
-  type AppellationCode,
   addressDtoToString,
   addressStringToDto,
   type BeneficiaryCurrentEmployer,
@@ -19,9 +18,6 @@ import {
   keys,
   type LevelOfEducation,
   mergeObjectsExceptFalsyValues,
-  type NafCode,
-  parseStringToJsonOrThrow,
-  type RemoteWorkMode,
   reasonableSchedule,
   type ScheduleDto,
   type Signatories,
@@ -30,6 +26,10 @@ import {
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
+import {
+  appellationAndRomeDtoSerializer,
+  scheduleSerializer,
+} from "src/app/routes/valueSerializer";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { param, type ValueSerializer } from "type-route";
@@ -56,14 +56,14 @@ export const getConventionInitialValuesFromUrl = ({
     route.params satisfies ConventionParamsInUrl,
   );
   const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
-    {
-      ...(conventionDraft
-        ? conventionPresentationFromConventionDraft(conventionDraft)
-        : conventionPresentationFromUrlParams(params)),
-      status: "READY_TO_SIGN",
-      dateSubmission: toDateUTCString(new Date()),
-      internshipKind,
-    };
+  {
+    ...(conventionDraft
+      ? conventionPresentationFromConventionDraft(conventionDraft)
+      : conventionPresentationFromUrlParams(params)),
+    status: "READY_TO_SIGN",
+    dateSubmission: toDateUTCString(new Date()),
+    internshipKind,
+  };
 
   return ENV.prefilledForms
     ? withDevPrefilledValues(initialFormWithStoredAndUrlParams)
@@ -174,11 +174,11 @@ const conventionToConventionInUrl = (
   } = convention;
   const beneficiarySchoolInformations = isBeneficiaryStudent(beneficiary)
     ? {
-        led: beneficiary.levelOfEducation,
-        schoolName: beneficiary.schoolName,
-        schoolPostcode: beneficiary.schoolPostcode,
-        address: beneficiary.address && addressDtoToString(beneficiary.address),
-      }
+      led: beneficiary.levelOfEducation,
+      schoolName: beneficiary.schoolName,
+      schoolPostcode: beneficiary.schoolPostcode,
+      address: beneficiary.address && addressDtoToString(beneficiary.address),
+    }
     : undefined;
 
   return {
@@ -348,30 +348,6 @@ export const makeValuesToWatchInUrl = (
   );
 };
 
-const makeValueSerializer = <T>(paramName: string): ValueSerializer<T> => ({
-  parse: (raw) => parseStringToJsonOrThrow<T>(raw, paramName),
-  stringify: (value) => JSON.stringify(value),
-});
-
-const scheduleSerializer: ValueSerializer<ScheduleDto> =
-  makeValueSerializer<ScheduleDto>("schedule");
-
-export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRomeDto> =
-  makeValueSerializer<AppellationAndRomeDto>("immersionAppellation");
-
-export const appellationAndRomeDtoArraySerializer: ValueSerializer<
-  AppellationAndRomeDto[]
-> = makeValueSerializer<AppellationAndRomeDto[]>("appellations");
-
-export const appellationStringSerializer: ValueSerializer<AppellationCode[]> =
-  makeValueSerializer<AppellationCode[]>("appellationCodes");
-
-export const nafCodeSerializer: ValueSerializer<NafCode[]> =
-  makeValueSerializer<NafCode[]>("nafCodes");
-
-export const remoteWorkModeSerializer: ValueSerializer<RemoteWorkMode[]> =
-  makeValueSerializer<RemoteWorkMode[]>("remoteWorkModes");
-
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
 type ConventionQueryParams = typeof conventionValuesFromUrl;
 
@@ -450,8 +426,8 @@ export type ConventionParamsInUrl = Partial<{
   [K in keyof ConventionQueryParams]: ConventionQueryParams[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
-    ? T
-    : never;
+  ? T
+  : never;
 }>;
 
 const beneficiaryRepresentativeFromParams = ({
@@ -467,12 +443,12 @@ const beneficiaryRepresentativeFromParams = ({
 }): BeneficiaryRepresentative | undefined =>
   email || phone || firstName || lastName
     ? {
-        role: "beneficiary-representative",
-        firstName: firstName ?? "",
-        lastName: lastName ?? "",
-        email: email ?? "",
-        phone: phone ?? "",
-      }
+      role: "beneficiary-representative",
+      firstName: firstName ?? "",
+      lastName: lastName ?? "",
+      email: email ?? "",
+      phone: phone ?? "",
+    }
     : undefined;
 
 const beneficiaryCurrentEmployerFromParams = ({
@@ -495,24 +471,24 @@ const beneficiaryCurrentEmployerFromParams = ({
   businessAddress?: string;
 }): BeneficiaryCurrentEmployer | undefined =>
   businessName ||
-  businessSiret ||
-  firstName ||
-  lastName ||
-  email ||
-  phone ||
-  job ||
-  businessAddress
+    businessSiret ||
+    firstName ||
+    lastName ||
+    email ||
+    phone ||
+    job ||
+    businessAddress
     ? {
-        businessSiret: businessSiret ?? "",
-        businessName: businessName ?? "",
-        firstName: firstName ?? "",
-        lastName: lastName ?? "",
-        email: email ?? "",
-        phone: phone ?? "",
-        job: job ?? "",
-        role: "beneficiary-current-employer",
-        businessAddress: businessAddress ?? "",
-      }
+      businessSiret: businessSiret ?? "",
+      businessName: businessName ?? "",
+      firstName: firstName ?? "",
+      lastName: lastName ?? "",
+      email: email ?? "",
+      phone: phone ?? "",
+      job: job ?? "",
+      role: "beneficiary-current-employer",
+      businessAddress: businessAddress ?? "",
+    }
     : undefined;
 
 const scheduleFromParams = ({
@@ -585,11 +561,11 @@ const conventionPresentationFromUrlParams = (
       isRqth: params.isRqth ?? false,
       ...(params.fedId && params.fedIdProvider
         ? {
-            federatedIdentity: {
-              provider: params.fedIdProvider as FtConnectIdentity["provider"],
-              token: params.fedId,
-            },
-          }
+          federatedIdentity: {
+            provider: params.fedIdProvider as FtConnectIdentity["provider"],
+            token: params.fedId,
+          },
+        }
         : {}),
     },
     establishmentRepresentative: {
@@ -709,16 +685,16 @@ const conventionPresentationFromConventionDraft = (
       isRqth: conventionDraft.signatories?.beneficiary?.isRqth ?? false,
       ...(conventionDraft.signatories?.beneficiary?.federatedIdentity
         ?.provider &&
-      conventionDraft.signatories?.beneficiary?.federatedIdentity?.token
+        conventionDraft.signatories?.beneficiary?.federatedIdentity?.token
         ? {
-            federatedIdentity: {
-              provider: conventionDraft.signatories?.beneficiary
-                ?.federatedIdentity?.provider as FtConnectIdentity["provider"],
-              token:
-                conventionDraft.signatories?.beneficiary?.federatedIdentity
-                  ?.token,
-            },
-          }
+          federatedIdentity: {
+            provider: conventionDraft.signatories?.beneficiary
+              ?.federatedIdentity?.provider as FtConnectIdentity["provider"],
+            token:
+              conventionDraft.signatories?.beneficiary?.federatedIdentity
+                ?.token,
+          },
+        }
         : {}),
     },
     establishmentRepresentative: {
@@ -795,11 +771,11 @@ const conventionPresentationFromConventionDraft = (
     | undefined,
   immersionAppellation: conventionDraft.immersionAppellation
     ? ({
-        appellationCode: conventionDraft.immersionAppellation.appellationCode,
-        appellationLabel: conventionDraft.immersionAppellation.appellationLabel,
-        romeCode: conventionDraft.immersionAppellation.romeCode,
-        romeLabel: conventionDraft.immersionAppellation.romeLabel,
-      } as AppellationAndRomeDto)
+      appellationCode: conventionDraft.immersionAppellation.appellationCode,
+      appellationLabel: conventionDraft.immersionAppellation.appellationLabel,
+      romeCode: conventionDraft.immersionAppellation.romeCode,
+      romeLabel: conventionDraft.immersionAppellation.romeLabel,
+    } as AppellationAndRomeDto)
     : undefined,
   immersionActivities: conventionDraft.immersionActivities ?? "",
   immersionSkills: conventionDraft.immersionSkills ?? "",

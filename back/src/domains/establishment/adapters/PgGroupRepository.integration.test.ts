@@ -6,9 +6,9 @@ import {
   expectToEqual,
   type Group,
   type GroupOptions,
+  type InternalOfferDto,
   type Location,
   type RemoteWorkMode,
-  type SearchResultDto,
   UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -215,7 +215,7 @@ describe("PgEstablishmentGroupRepository", () => {
       romeLabel: string;
       location: Location;
       remoteWorkMode: RemoteWorkMode;
-    }): SearchResultDto => ({
+    }): InternalOfferDto => ({
       appellations,
       romeLabel,
       rome,

@@ -9,17 +9,16 @@ import { memo, type ReactNode } from "react";
 import {
   type DateTimeIsoString,
   domElementIds,
-  type ExternalSearchResultDto,
   frenchEstablishmentKinds,
-  isSearchResultDto,
+  isInternalOfferDto,
+  type OfferDto,
   remoteWorkModeLabels,
-  type SearchResultDto,
 } from "shared";
 import type { Link } from "type-route";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
-  searchResult: SearchResultDto | ExternalSearchResultDto;
+  searchResult: OfferDto;
   linkProps: Link;
   illustration?: ReactNode;
   disableButton?: boolean;
@@ -93,7 +92,7 @@ const SearchResultComponent = ({
       start={
         <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
           {address.city} ({address.departmentCode}) -{" "}
-          {isSearchResultDto(searchResult) &&
+          {isInternalOfferDto(searchResult) &&
             remoteWorkModeLabels[searchResult.remoteWorkMode].label}
         </Tag>
       }

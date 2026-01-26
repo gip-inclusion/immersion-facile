@@ -7,8 +7,8 @@ import {
   getOffersFlatParamsSchema,
   getPaginationParamsForApiConsumer,
   getPaginationParamsForWeb,
+  type InternalOfferDto,
   pipeWithValue,
-  type SearchResultDto,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
@@ -23,7 +23,7 @@ const defaultPerPage: GetOffersPerPageOption = 12;
 export const makeGetOffers = useCaseBuilder("GetOffers")
   .withCurrentUser<ApiConsumer | undefined>()
   .withInput(getOffersFlatParamsSchema)
-  .withOutput<DataWithPagination<SearchResultDto>>()
+  .withOutput<DataWithPagination<InternalOfferDto>>()
   .withDeps<{
     uuidGenerator: UuidGenerator;
   }>()
