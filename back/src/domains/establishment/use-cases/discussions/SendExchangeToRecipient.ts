@@ -16,9 +16,8 @@ import {
 } from "../../../core/events/events";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { getNotifiedUsersFromEstablishmentUserRights } from "../../helpers/businessContact.helpers";
 
 type SendExchangeToRecipientParams = WithDiscussionId &
@@ -26,44 +25,37 @@ type SendExchangeToRecipientParams = WithDiscussionId &
     skipSendingEmail?: boolean;
   };
 
-export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeToRecipientParams> {
-  protected inputSchema = withDiscussionIdSchema.and(
-    z.object({
-      triggeredBy: triggeredBySchema.optional(),
-      skipSendingEmail: z.boolean().optional(),
-    }),
-  );
+export type SendExchangeToRecipient = ReturnType<
+  typeof makeSendExchangeToRecipient
+>;
 
-  readonly #replyDomain: string;
+type Deps = {
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  domain: string;
+  notificationGateway: NotificationGateway;
+};
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
-  readonly #notificationGateway: NotificationGateway;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    domain: string,
-    notificationGateway: NotificationGateway,
-  ) {
-    super(uowPerformer);
-    this.#replyDomain = `reply.${domain}`;
-
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#notificationGateway = notificationGateway;
-  }
-
-  protected async _execute(
-    {
-      discussionId,
-      triggeredBy,
-      skipSendingEmail,
-    }: SendExchangeToRecipientParams,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    if (skipSendingEmail) return;
-    const discussion = await uow.discussionRepository.getById(discussionId);
-    if (!discussion) throw errors.discussion.notFound({ discussionId });
+export const makeSendExchangeToRecipient = useCaseBuilder(
+  "SendExchangeToRecipient",
+)
+  .withInput<SendExchangeToRecipientParams>(
+    withDiscussionIdSchema.and(
+      z.object({
+        triggeredBy: triggeredBySchema.optional(),
+        skipSendingEmail: z.boolean().optional(),
+      }),
+    ),
+  )
+  .withDeps<Deps>()
+  .build(async ({ deps, inputParams, uow }) => {
+    if (inputParams.skipSendingEmail) return;
+    const discussion = await uow.discussionRepository.getById(
+      inputParams.discussionId,
+    );
+    if (!discussion)
+      throw errors.discussion.notFound({
+        discussionId: inputParams.discussionId,
+      });
 
     const lastExchange = discussion.exchanges.reduce<Exchange | undefined>(
       (acc, current) => (acc && acc.sentAt >= current.sentAt ? acc : current),
@@ -87,14 +79,14 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
       await Promise.all(
         lastExchange.attachments.map(async ({ name, link }) => ({
           name,
-          content: await this.#notificationGateway.getAttachmentContent(link),
+          content: await deps.notificationGateway.getAttachmentContent(link),
         })),
       )
     ).filter(
       (emailAttachment) => emailAttachment.content !== null,
     ) as EmailAttachment[];
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "DISCUSSION_EXCHANGE",
@@ -124,7 +116,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
         recipients:
           lastExchange.sender === "establishment"
             ? [discussion.potentialBeneficiary.email]
-            : await this.#getEstablishmentNotifiedContactEmails(
+            : await getEstablishmentNotifiedContactEmails(
                 uow,
                 discussion.siret,
               ),
@@ -142,7 +134,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
                   ? lastExchange.lastname
                   : discussion.potentialBeneficiary.lastName,
             },
-            replyDomain: this.#replyDomain,
+            replyDomain: `reply.${deps.domain}`,
           }),
           name:
             lastExchange.sender === "establishment"
@@ -152,29 +144,28 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
         attachments,
       },
       followedIds: {
-        ...(triggeredBy?.kind === "connected-user"
-          ? { userId: triggeredBy.userId }
+        ...(inputParams.triggeredBy?.kind === "connected-user"
+          ? { userId: inputParams.triggeredBy.userId }
           : undefined),
         establishmentSiret: discussion.siret,
       },
     });
-  }
+  });
 
-  async #getEstablishmentNotifiedContactEmails(
-    uow: UnitOfWork,
-    siret: SiretDto,
-  ): Promise<Email[]> {
-    const establishment =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
-      );
-    if (!establishment) throw errors.establishment.notFound({ siret });
+const getEstablishmentNotifiedContactEmails = async (
+  uow: UnitOfWork,
+  siret: SiretDto,
+): Promise<Email[]> => {
+  const establishment =
+    await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+      siret,
+    );
+  if (!establishment) throw errors.establishment.notFound({ siret });
 
-    return (
-      await getNotifiedUsersFromEstablishmentUserRights(
-        uow,
-        establishment.userRights,
-      )
-    ).map(({ email }) => email);
-  }
-}
+  return (
+    await getNotifiedUsersFromEstablishmentUserRights(
+      uow,
+      establishment.userRights,
+    )
+  ).map(({ email }) => email);
+};

@@ -27,7 +27,10 @@ import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemo
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import type { EstablishmentUserRight } from "../../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
-import { SendExchangeToRecipient } from "./SendExchangeToRecipient";
+import {
+  makeSendExchangeToRecipient,
+  type SendExchangeToRecipient,
+} from "./SendExchangeToRecipient";
 
 describe("SendExchangeToRecipient", () => {
   const now = new Date();
@@ -120,12 +123,17 @@ describe("SendExchangeToRecipient", () => {
     const notificationGateway = new InMemoryNotificationGateway();
     timeGateway = new CustomTimeGateway(now);
 
-    useCase = new SendExchangeToRecipient(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      "my-domain.com",
-      notificationGateway,
-    );
+    useCase = makeSendExchangeToRecipient({
+      deps: {
+        domain: "my-domain.com",
+        notificationGateway,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+      },
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
 
     notificationGateway.attachmentsByLinks = {
       [link]: base64RawContent,
