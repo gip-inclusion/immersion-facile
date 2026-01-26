@@ -6,7 +6,7 @@ import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTi
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SuggestEditEstablishment } from "../../domains/establishment/use-cases/SuggestEditEstablishment";
-import { SuggestEditEstablishmentsScript } from "../../domains/establishment/use-cases/SuggestEditEstablishmentsScript";
+import { makeSuggestEditEstablishmentsScript } from "../../domains/establishment/use-cases/SuggestEditEstablishmentsScript";
 import { handleCRONScript } from "../handleCRONScript";
 
 const config = AppConfig.createFromEnv();
@@ -18,22 +18,23 @@ type Report = {
 
 const startScript = async (): Promise<Report> => {
   const timeGateway = new RealTimeGateway();
-  const uuidGenerator = new UuidV4Generator();
+
   const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
   );
 
-  const suggestEditEstablishmentsScript = new SuggestEditEstablishmentsScript(
-    uowPerformer,
-    new SuggestEditEstablishment(
+  return makeSuggestEditEstablishmentsScript({
+    deps: {
+      suggestEditEstablishment: new SuggestEditEstablishment(
+        uowPerformer,
+        makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
+        config.immersionFacileBaseUrl,
+      ),
+      timeGateway,
       uowPerformer,
-      makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
-      config.immersionFacileBaseUrl,
-    ),
-    timeGateway,
-  );
-  return suggestEditEstablishmentsScript.execute();
+    },
+  }).execute();
 };
 
 export const triggerSuggestEditFormEstablishmentEvery6Months = ({
