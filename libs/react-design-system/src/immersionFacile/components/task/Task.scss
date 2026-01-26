@@ -1,11 +1,32 @@
 @import "../../../config/responsive";
 
 .im-task {
-  &__button {
-    align-self: center;
+  &__buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+
+    @include for-screen-min($bp-md) {
+      align-items: flex-end;
+    }
+  }
+
+  &__buttons-row {
+    display: flex;
+    gap: 0.5rem;
   }
   
   &__footer {
     color: var(--grey-425-625);
+  }
+  
+  &--with-background-color.fr-card {
+    border-color: var(--grey-975-100);
+    background-color: var(--grey-975-100);
+  }
+
+  &--with-background-color &__buttons .fr-btn:hover {
+    background-color: var(--background-default-grey);
   }
 }
