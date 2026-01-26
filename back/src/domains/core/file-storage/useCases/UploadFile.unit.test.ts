@@ -10,7 +10,7 @@ import { v4 as uuid } from "uuid";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { InMemoryDocumentGateway } from "../adapters/InMemoryDocumentGateway";
 import type { StoredFile } from "../entity/StoredFile";
-import { type FileInput, UploadFile } from "./UploadFile";
+import { type FileInput, makeUploadFile, type UploadFile } from "./UploadFile";
 
 describe("UploadFile use case", () => {
   let documentGateway: InMemoryDocumentGateway;
@@ -41,7 +41,7 @@ describe("UploadFile use case", () => {
   beforeEach(() => {
     documentGateway = new InMemoryDocumentGateway();
     uuidGenerator = new TestUuidGenerator();
-    uploadFile = new UploadFile(documentGateway, uuidGenerator);
+    uploadFile = makeUploadFile({ deps: { documentGateway, uuidGenerator } });
   });
 
   const file: FileInput = {
@@ -100,13 +100,6 @@ describe("UploadFile use case", () => {
   });
 
   describe("Wrong path", () => {
-    it("throws UnauthorizedError if no connected user provided", async () => {
-      await expectPromiseToFailWithError(
-        uploadFile.execute({ file }, undefined),
-        errors.user.unauthorized(),
-      );
-    });
-
     it("throws ForbiddenError if connected user is not admin nor agency-admin", async () => {
       await expectPromiseToFailWithError(
         uploadFile.execute({ file }, connectedRegularUser),

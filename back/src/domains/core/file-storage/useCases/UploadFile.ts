@@ -7,7 +7,8 @@ import {
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
-import { UseCase } from "../../UseCase";
+
+import { useCaseBuilder } from "../../useCaseBuilder";
 import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type { StoredFile } from "../entity/StoredFile";
 import type { DocumentGateway } from "../port/DocumentGateway";
@@ -30,30 +31,19 @@ const uploadFileInput: ZodSchemaWithInputMatchingOutput<UploadFileInput> =
     }),
   });
 
-export class UploadFile extends UseCase<
-  UploadFileInput,
-  AbsoluteUrl,
-  ConnectedUser
-> {
-  protected inputSchema = z.any();
+export type UploadFile = ReturnType<typeof makeUploadFile>;
 
-  readonly #documentGateway: DocumentGateway;
-
-  readonly #uuidGenerator: UuidGenerator;
-
-  constructor(documentGateway: DocumentGateway, uuidGenerator: UuidGenerator) {
-    super();
-    this.#documentGateway = documentGateway;
-    this.#uuidGenerator = uuidGenerator;
-  }
-
-  protected async _execute(
-    { file }: UploadFileInput,
-    connectedUser: ConnectedUser,
-  ): Promise<AbsoluteUrl> {
-    if (!connectedUser) throw errors.user.unauthorized();
-
-    throwIfUserIsNotAdminNorAgencyAdmin(connectedUser);
+export const makeUploadFile = useCaseBuilder("UploadFile")
+  .notTransactional()
+  .withInput<any>(z.any())
+  .withOutput<AbsoluteUrl>()
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{
+    documentGateway: DocumentGateway;
+    uuidGenerator: UuidGenerator;
+  }>()
+  .build(async ({ inputParams: { file }, deps, currentUser }) => {
+    throwIfUserIsNotAdminNorAgencyAdmin(currentUser);
 
     const validationResult = validateFile(
       {
@@ -67,24 +57,18 @@ export class UploadFile extends UseCase<
 
     const fileToSave: StoredFile = {
       ...file,
-      id: this.#replaceNameWithUuid(file),
+      id: replaceNameWithUuid(deps.uuidGenerator, file),
     };
 
-    const existingFileUrl = await this.#documentGateway.getUrl(fileToSave.id);
+    const existingFileUrl = await deps.documentGateway.getUrl(fileToSave.id);
     if (existingFileUrl) throw errors.file.fileAlreadyExist(fileToSave.id);
 
-    await this.#documentGateway.save(fileToSave);
+    await deps.documentGateway.save(fileToSave);
 
-    const savedFile = await this.#documentGateway.getUrl(fileToSave.id);
+    const savedFile = await deps.documentGateway.getUrl(fileToSave.id);
     if (!savedFile) throw errors.file.missingFile(fileToSave.id);
     return savedFile;
-  }
-
-  #replaceNameWithUuid(file: FileInput) {
-    const extension = file.name.split(".").at(-1);
-    return `${this.#uuidGenerator.new()}.${extension}`;
-  }
-}
+  });
 
 const throwIfUserIsNotAdminNorAgencyAdmin = (
   currentUser: ConnectedUser,
@@ -97,4 +81,12 @@ const throwIfUserIsNotAdminNorAgencyAdmin = (
   );
   if (!isAgencyAdmin) throw errors.user.forbidden({ userId: currentUser.id });
   return;
+};
+
+const replaceNameWithUuid = (
+  uuidGeneratorGateway: UuidGenerator,
+  file: FileInput,
+): string => {
+  const extension = file.name.split(".").at(-1);
+  return `${uuidGeneratorGateway.new()}.${extension}`;
 };

@@ -95,7 +95,7 @@ import { makeGetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDa
 import { makeValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { SetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFeatureFlag";
-import { UploadFile } from "../../domains/core/file-storage/useCases/UploadFile";
+import { makeUploadFile } from "../../domains/core/file-storage/useCases/UploadFile";
 import type {
   GenerateApiConsumerJwt,
   GenerateConnectedUserJwt,
@@ -302,7 +302,6 @@ export const createUseCases = ({
         uowPerformer,
         createNewEvent,
       ),
-      uploadFile: new UploadFile(gateways.documentGateway, uuidGenerator),
 
       addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
 
@@ -586,6 +585,10 @@ export const createUseCases = ({
 
     lookupStreetAddress: makeLookupStreetAddress({
       deps: { addressGateway: gateways.addressApi },
+    }),
+
+    uploadFile: makeUploadFile({
+      deps: { documentGateway: gateways.documentGateway, uuidGenerator },
     }),
 
     // METABASE

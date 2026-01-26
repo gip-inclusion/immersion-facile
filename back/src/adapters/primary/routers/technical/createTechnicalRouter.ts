@@ -52,7 +52,7 @@ export const createTechnicalRouter = (
                 mimetype: req.file.mimetype,
               },
             },
-            req.payloads?.currentUser,
+            getGenericAuthOrThrow(req.payloads?.currentUser),
           );
         }),
     );
