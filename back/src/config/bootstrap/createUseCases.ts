@@ -150,7 +150,7 @@ import { LegacySearchImmersion } from "../../domains/establishment/use-cases/Leg
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
-import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
+import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
@@ -500,11 +500,6 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      notifyConfirmationEstablishmentCreated:
-        new NotifyConfirmationEstablishmentCreated(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-        ),
 
       notifyFranceTravailUserAdvisorOnConventionFullySigned:
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
@@ -577,6 +572,12 @@ export const createUseCases = ({
     htmlToPdf: makeHtmlToPdf({
       deps: { pdfGeneratorGateway: gateways.pdfGeneratorGateway },
     }),
+
+    notifyConfirmationEstablishmentCreated:
+      makeNotifyConfirmationEstablishmentCreated({
+        deps: { saveNotificationAndRelatedEvent },
+        uowPerformer,
+      }),
 
     notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
       makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm({

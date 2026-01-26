@@ -13,7 +13,10 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
-import { NotifyConfirmationEstablishmentCreated } from "./NotifyConfirmationEstablishmentCreated";
+import {
+  makeNotifyConfirmationEstablishmentCreated,
+  type NotifyConfirmationEstablishmentCreated,
+} from "./NotifyConfirmationEstablishmentCreated";
 
 describe("NotifyConfirmationEstablishmentCreated", () => {
   let notifyConfirmationEstablishmentCreated: NotifyConfirmationEstablishmentCreated;
@@ -34,10 +37,10 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
       uow.outboxRepository,
     );
     notifyConfirmationEstablishmentCreated =
-      new NotifyConfirmationEstablishmentCreated(
+      makeNotifyConfirmationEstablishmentCreated({
+        deps: { saveNotificationAndRelatedEvent },
         uowPerformer,
-        saveNotificationAndRelatedEvent,
-      );
+      });
   });
 
   describe("When establishment is valid", () => {
