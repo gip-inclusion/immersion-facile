@@ -152,7 +152,7 @@ import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/estab
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
-import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
+import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
@@ -406,11 +406,6 @@ export const createUseCases = ({
         gateways.timeGateway,
         config.minimumNumberOfDaysBetweenSimilarContactRequests,
       ),
-      notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
-        new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
-          uowPerformer,
-          gateways.passEmploiGateway,
-        ),
 
       getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
         uowPerformer,
@@ -582,6 +577,14 @@ export const createUseCases = ({
     htmlToPdf: makeHtmlToPdf({
       deps: { pdfGeneratorGateway: gateways.pdfGeneratorGateway },
     }),
+
+    notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
+      makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm({
+        deps: {
+          passEmploiGateway: gateways.passEmploiGateway,
+        },
+        uowPerformer,
+      }),
 
     addExchangeToDiscussion: makeAddExchangeToDiscussion({
       deps: {

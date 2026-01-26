@@ -1,40 +1,38 @@
 import { errors, type WithSiretDto, withSiretSchema } from "shared";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import type {
   PassEmploiGateway,
   PassEmploiNotificationParams,
 } from "../../ports/PassEmploiGateway";
 
-export class NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm extends TransactionalUseCase<WithSiretDto> {
-  protected inputSchema = withSiretSchema;
+export type NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm =
+  ReturnType<
+    typeof makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm
+  >;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private passEmploiGateway: PassEmploiGateway,
-  ) {
-    super(uowPerformer);
-  }
+type Deps = {
+  passEmploiGateway: PassEmploiGateway;
+};
 
-  public async _execute(
-    { siret }: WithSiretDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    const establishmentAggregate =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
+export const makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm =
+  useCaseBuilder("NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm")
+    .withInput<WithSiretDto>(withSiretSchema)
+    .withDeps<Deps>()
+    .build(async ({ deps, inputParams, uow }) => {
+      const establishmentAggregate =
+        await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          inputParams.siret,
+        );
+      if (!establishmentAggregate)
+        throw errors.establishment.notFound({ siret: inputParams.siret });
+      const notificationParams: PassEmploiNotificationParams = {
+        immersions: establishmentAggregate.offers.map(({ romeCode }) => ({
+          rome: romeCode,
+          siret: establishmentAggregate.establishment.siret,
+          location: establishmentAggregate.establishment.locations[0].position,
+        })),
+      };
+      await deps.passEmploiGateway.notifyOnNewImmersionOfferCreatedFromForm(
+        notificationParams,
       );
-    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
-    const notificationParams: PassEmploiNotificationParams = {
-      immersions: establishmentAggregate.offers.map(({ romeCode }) => ({
-        rome: romeCode,
-        siret: establishmentAggregate.establishment.siret,
-        location: establishmentAggregate.establishment.locations[0].position,
-      })),
-    };
-    await this.passEmploiGateway.notifyOnNewImmersionOfferCreatedFromForm(
-      notificationParams,
-    );
-  }
-}
+    });
