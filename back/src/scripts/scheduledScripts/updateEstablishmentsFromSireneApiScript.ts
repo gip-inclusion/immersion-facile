@@ -14,7 +14,7 @@ import { InseeSiretGateway } from "../../domains/core/sirene/adapters/InseeSiret
 import { inseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
-import { UpdateEstablishmentsFromSirenApiScript } from "../../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
+import { makeUpdateEstablishmentsFromSirenApiScript } from "../../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
 import { makeAxiosInstances } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
@@ -63,15 +63,14 @@ const updateEstablishmentsFromSireneApi = async () => {
   );
 
   const updateEstablishmentsFromSirenAPI =
-    new UpdateEstablishmentsFromSirenApiScript(
-      uowPerformer,
-      siretGateway,
-      new RealTimeGateway(),
-      config.updateEstablishmentFromInseeConfig
-        .numberOfDaysAgoToCheckForInseeUpdates,
-      config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerBatch,
-      config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerFullRun,
-    );
+    makeUpdateEstablishmentsFromSirenApiScript({
+      deps: {
+        siretGateway,
+        timeGateway,
+        uowPerformer,
+        ...config.updateEstablishmentFromInseeConfig,
+      },
+    });
 
   const report = await updateEstablishmentsFromSirenAPI.execute();
 

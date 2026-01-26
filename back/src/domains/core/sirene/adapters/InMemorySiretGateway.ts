@@ -8,7 +8,10 @@ import {
   tooManySirenRequestsSiret,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import type { SiretGateway } from "../ports/SiretGateway";
+import type {
+  EstablishmentsFromSiretApi,
+  SiretGateway,
+} from "../ports/SiretGateway";
 
 const logger = createLogger(__filename);
 
@@ -120,7 +123,7 @@ export class InMemorySiretGateway implements SiretGateway {
     _fromDate: Date,
     _toDate: Date,
     sirets: SiretDto[],
-  ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
+  ): Promise<EstablishmentsFromSiretApi> {
     return this.siretEstablishmentsUpdateSince
       .filter((siretEstablishmentDto) =>
         sirets.includes(siretEstablishmentDto.siret),
