@@ -114,6 +114,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
         error: localization.invalidEnum,
       })
       .optional(),
+    place: z.string().optional(),
   })
   .and(paginationQueryParamsSchema)
   .and(geoParamsAndSortSchema)
