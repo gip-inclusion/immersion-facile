@@ -10,75 +10,74 @@ import {
 } from "shared";
 import { validateAndParseZodSchema } from "../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../utils/logger";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
-export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
-  DiscussionId,
-  DiscussionReadDto,
-  ConnectedUserDomainJwtPayload
-> {
-  inputSchema = discussionIdSchema;
-  protected async _execute(
-    discussionId: DiscussionId,
-    uow: UnitOfWork,
-    jwtPayload?: ConnectedUserDomainJwtPayload,
-  ): Promise<DiscussionReadDto> {
-    if (!jwtPayload) throw errors.user.unauthorized();
-    const user = await uow.userRepository.getById(jwtPayload.userId);
+export type GetDiscussionByIdForEstablishment = ReturnType<
+  typeof makeGetDiscussionByIdForEstablishment
+>;
 
-    if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
+export const makeGetDiscussionByIdForEstablishment = useCaseBuilder(
+  "GetDiscussionByIdForEstablishment",
+)
+  .withInput<DiscussionId>(discussionIdSchema)
+  .withOutput<DiscussionReadDto>()
+  .withCurrentUser<ConnectedUserDomainJwtPayload>()
+  .build(async ({ inputParams, uow, currentUser }) => {
+    const user = await uow.userRepository.getById(currentUser.userId);
 
-    const discussion = await uow.discussionRepository.getById(discussionId);
+    if (!user) throw errors.user.notFound({ userId: currentUser.userId });
 
-    if (!discussion) throw errors.discussion.notFound({ discussionId });
+    const discussion = await uow.discussionRepository.getById(inputParams);
 
-    if (!(await this.#hasUserRightToAccessDiscussion(uow, user, discussion)))
+    if (!discussion)
+      throw errors.discussion.notFound({ discussionId: inputParams });
+
+    if (!(await hasUserRightToAccessDiscussion(uow, user, discussion)))
       throw errors.discussion.accessForbidden({
-        discussionId,
-        userId: jwtPayload.userId,
+        discussionId: inputParams,
+        userId: currentUser.userId,
       });
-    return this.makeDiscussionRead(discussion, uow);
-  }
+    return makeDiscussionRead(discussion, uow);
+  });
 
-  private async makeDiscussionRead(
-    discussion: DiscussionDto,
-    uow: UnitOfWork,
-  ): Promise<DiscussionReadDto> {
-    const { appellationCode, ...rest } = discussion;
+const makeDiscussionRead = async (
+  discussion: DiscussionDto,
+  uow: UnitOfWork,
+): Promise<DiscussionReadDto> => {
+  const { appellationCode, ...rest } = discussion;
 
-    const appellation = (
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-        [appellationCode],
-      )
-    ).at(0);
+  const appellation = (
+    await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+      [appellationCode],
+    )
+  ).at(0);
 
-    if (!appellation) throw errors.rome.missingAppellation({ appellationCode });
-    const discussionRead = {
-      ...rest,
-      appellation,
-    };
+  if (!appellation) throw errors.rome.missingAppellation({ appellationCode });
+  const discussionRead = {
+    ...rest,
+    appellation,
+  };
 
-    return validateAndParseZodSchema({
-      schemaName: "discussionReadSchema",
-      inputSchema: discussionReadSchema,
-      schemaParsingInput: discussionRead,
-      logger: createLogger(__filename),
-    });
-  }
+  return validateAndParseZodSchema({
+    schemaName: "discussionReadSchema",
+    inputSchema: discussionReadSchema,
+    schemaParsingInput: discussionRead,
+    logger: createLogger(__filename),
+  });
+};
 
-  async #hasUserRightToAccessDiscussion(
-    uow: UnitOfWork,
-    user: User,
-    discussion: DiscussionDto,
-  ): Promise<boolean> {
-    const establishment =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        discussion.siret,
-      );
+const hasUserRightToAccessDiscussion = async (
+  uow: UnitOfWork,
+  user: User,
+  discussion: DiscussionDto,
+): Promise<boolean> => {
+  const establishment =
+    await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+      discussion.siret,
+    );
 
-    if (!establishment)
-      throw errors.establishment.notFound({ siret: discussion.siret });
-    return establishment.userRights.some((right) => right.userId === user.id);
-  }
-}
+  if (!establishment)
+    throw errors.establishment.notFound({ siret: discussion.siret });
+  return establishment.userRights.some((right) => right.userId === user.id);
+};

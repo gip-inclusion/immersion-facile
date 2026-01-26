@@ -130,7 +130,7 @@ import { ContactEstablishment } from "../../domains/establishment/use-cases/Cont
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { AddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
-import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
+import { makeGetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
 import { makeMarkDiscussionDeprecatedAndNotify } from "../../domains/establishment/use-cases/discussions/MarkDiscussionDeprecatedAndNotify";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
@@ -255,9 +255,6 @@ export const createUseCases = ({
         createNewEvent,
         saveNotificationAndRelatedEvent,
         gateways.timeGateway,
-      ),
-      getDiscussionByIdForEstablishment: new GetDiscussionByIdForEstablishment(
-        uowPerformer,
       ),
       sendNotification: new SendNotification(
         uowPerformer,
@@ -590,6 +587,10 @@ export const createUseCases = ({
 
     htmlToPdf: makeHtmlToPdf({
       deps: { pdfGeneratorGateway: gateways.pdfGeneratorGateway },
+    }),
+
+    getDiscussionByIdForEstablishment: makeGetDiscussionByIdForEstablishment({
+      uowPerformer,
     }),
 
     sendExchangeToRecipient: makeSendExchangeToRecipient({
