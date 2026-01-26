@@ -11,9 +11,8 @@ import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type {
   EstablishmentAggregate,
@@ -21,64 +20,39 @@ import type {
 } from "../entities/EstablishmentAggregate";
 import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregate";
 
-export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
-  WithFormEstablishmentDto,
-  void,
-  ConnectedUserDomainJwtPayload
-> {
-  protected inputSchema = withFormEstablishmentSchema;
+export type UpdateEstablishmentAggregateFromForm = ReturnType<
+  typeof makeUpdateEstablishmentAggregateFromForm
+>;
 
-  readonly #addressGateway: AddressGateway;
+type Deps = {
+  addressGateway: AddressGateway;
+  uuidGenerator: UuidGenerator;
+  timeGateway: TimeGateway;
+  createNewEvent: CreateNewEvent;
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  immersionBaseUrl: AbsoluteUrl;
+};
 
-  readonly #uuidGenerator: UuidGenerator;
-
-  readonly #timeGateway: TimeGateway;
-
-  readonly #createNewEvent: CreateNewEvent;
-
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
-  readonly #immersionBaseUrl: AbsoluteUrl;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    addressAPI: AddressGateway,
-    uuidGenerator: UuidGenerator,
-    timeGateway: TimeGateway,
-    createNewEvent: CreateNewEvent,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    immersionBaseUrl: AbsoluteUrl,
-  ) {
-    super(uowPerformer);
-
-    this.#addressGateway = addressAPI;
-    this.#timeGateway = timeGateway;
-    this.#uuidGenerator = uuidGenerator;
-    this.#createNewEvent = createNewEvent;
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#immersionBaseUrl = immersionBaseUrl;
-  }
-
-  public async _execute(
-    { formEstablishment }: WithFormEstablishmentDto,
-    uow: UnitOfWork,
-    jwtPayload: ConnectedUserDomainJwtPayload,
-  ): Promise<void> {
-    if (!jwtPayload) throw errors.user.noJwtProvided();
-
+export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
+  "UpdateEstablishmentAggregateFromForm",
+)
+  .withInput<WithFormEstablishmentDto>(withFormEstablishmentSchema)
+  .withCurrentUser<ConnectedUserDomainJwtPayload>()
+  .withDeps<Deps>()
+  .build(async ({ deps, inputParams, uow, currentUser }) => {
     const initialEstablishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        formEstablishment.siret,
+        inputParams.formEstablishment.siret,
       );
 
     if (!initialEstablishmentAggregate)
       throw errors.establishment.notFound({
-        siret: formEstablishment.siret,
+        siret: inputParams.formEstablishment.siret,
       });
 
-    const triggeredBy = await this.#getTriggeredBy(
+    const triggeredBy = await getTriggeredBy(
       uow,
-      jwtPayload,
+      currentUser,
       initialEstablishmentAggregate,
     );
 
@@ -91,11 +65,11 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     const establishmentAggregate = await makeEstablishmentAggregate({
       uow,
-      timeGateway: this.#timeGateway,
-      addressGateway: this.#addressGateway,
-      uuidGenerator: this.#uuidGenerator,
+      timeGateway: deps.timeGateway,
+      addressGateway: deps.addressGateway,
+      uuidGenerator: deps.uuidGenerator,
       existingEntity: initialEstablishmentAggregate.establishment,
-      formEstablishment,
+      formEstablishment: inputParams.formEstablishment,
       // Rien touché mais étonnant qu'on maj pas le naf ni le nombre d'employés
       nafAndNumberOfEmployee: {
         nafDto: initialEstablishmentAggregate.establishment.nafDto,
@@ -105,11 +79,11 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       score: initialEstablishmentAggregate.establishment.score,
     });
 
-    const userRightsAdded = this.#getUserRightsAdded(
+    const userRightsAdded = getUserRightsAdded(
       establishmentAggregate,
       initialEstablishmentAggregate,
     );
-    const userRightsUpdated = this.#getUserRightsUpdated(
+    const userRightsUpdated = getUserRightsUpdated(
       establishmentAggregate,
       initialEstablishmentAggregate,
     );
@@ -118,7 +92,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       userRightsAdded.map(async (userRight) => {
         const user = await uow.userRepository.getById(userRight.userId);
         if (!user) throw errors.user.notFound({ userId: userRight.userId });
-        return this.#saveNotificationAndRelatedEvent(uow, {
+        return deps.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "ESTABLISHMENT_USER_RIGHTS_ADDED",
@@ -132,7 +106,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
               triggeredByUserFirstName: triggeredByUser.firstName,
               triggeredByUserLastName: triggeredByUser.lastName,
               role: userRight.role,
-              immersionBaseUrl: this.#immersionBaseUrl,
+              immersionBaseUrl: deps.immersionBaseUrl,
             },
           },
           followedIds: {
@@ -146,7 +120,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       userRightsUpdated.map(async (userRight) => {
         const user = await uow.userRepository.getById(userRight.userId);
         if (!user) throw errors.user.notFound({ userId: userRight.userId });
-        return this.#saveNotificationAndRelatedEvent(uow, {
+        return deps.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "ESTABLISHMENT_USER_RIGHTS_UPDATED",
@@ -176,11 +150,11 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
       establishmentAggregate,
-      this.#timeGateway.now(),
+      deps.timeGateway.now(),
     );
 
     return uow.outboxRepository.save(
-      this.#createNewEvent({
+      deps.createNewEvent({
         topic: "UpdatedEstablishmentAggregateInsertedFromForm",
         payload: {
           siret: establishmentAggregate.establishment.siret,
@@ -188,54 +162,53 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
         },
       }),
     );
-  }
+  });
 
-  #getUserRightsAdded(
-    updatedFormEstablishment: EstablishmentAggregate,
-    initialEstablishmentAggregate: EstablishmentAggregate,
-  ): EstablishmentUserRight[] {
-    return updatedFormEstablishment.userRights.filter(
-      (userRight) =>
-        !initialEstablishmentAggregate.userRights.some(
-          (existingUserRight) => existingUserRight.userId === userRight.userId,
-        ),
-    );
-  }
-
-  #getUserRightsUpdated(
-    updatedEstablishmentAggregate: EstablishmentAggregate,
-    initialEstablishmentAggregate: EstablishmentAggregate,
-  ): EstablishmentUserRight[] {
-    return updatedEstablishmentAggregate.userRights.filter((userRight) =>
-      initialEstablishmentAggregate.userRights.some(
-        (existingUserRight) =>
-          existingUserRight.userId === userRight.userId &&
-          !equals(existingUserRight, userRight),
+const getUserRightsAdded = (
+  updatedFormEstablishment: EstablishmentAggregate,
+  initialEstablishmentAggregate: EstablishmentAggregate,
+): EstablishmentUserRight[] => {
+  return updatedFormEstablishment.userRights.filter(
+    (userRight) =>
+      !initialEstablishmentAggregate.userRights.some(
+        (existingUserRight) => existingUserRight.userId === userRight.userId,
       ),
-    );
-  }
+  );
+};
 
-  async #getTriggeredBy(
-    uow: UnitOfWork,
-    jwtPayload: ConnectedUserDomainJwtPayload,
-    establishmentAggregate: EstablishmentAggregate,
-  ): Promise<TriggeredBy> {
-    const user = await uow.userRepository.getById(jwtPayload.userId);
-    if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
+const getUserRightsUpdated = (
+  updatedEstablishmentAggregate: EstablishmentAggregate,
+  initialEstablishmentAggregate: EstablishmentAggregate,
+): EstablishmentUserRight[] => {
+  return updatedEstablishmentAggregate.userRights.filter((userRight) =>
+    initialEstablishmentAggregate.userRights.some(
+      (existingUserRight) =>
+        existingUserRight.userId === userRight.userId &&
+        !equals(existingUserRight, userRight),
+    ),
+  );
+};
 
-    if (
-      establishmentAggregate.userRights.some(
-        ({ userId }) => userId === user.id,
-      ) ||
-      user.isBackofficeAdmin
-    )
-      return {
-        kind: "connected-user",
-        userId: user.id,
-      };
+const getTriggeredBy = async (
+  uow: UnitOfWork,
+  jwtPayload: ConnectedUserDomainJwtPayload,
+  establishmentAggregate: EstablishmentAggregate,
+): Promise<TriggeredBy> => {
+  const user = await uow.userRepository.getById(jwtPayload.userId);
+  if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 
-    throw errors.user.forbidden({
+  if (
+    establishmentAggregate.userRights.some(
+      ({ userId }) => userId === user.id,
+    ) ||
+    user.isBackofficeAdmin
+  )
+    return {
+      kind: "connected-user",
       userId: user.id,
-    });
-  }
-}
+    };
+
+  throw errors.user.forbidden({
+    userId: user.id,
+  });
+};

@@ -68,7 +68,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.updateEstablishmentAggregateFromForm.execute(
           { formEstablishment: req.body },
-          req.payloads?.connectedUser,
+          getGenericAuthOrThrow(req.payloads?.connectedUser),
         ),
       ),
   );
