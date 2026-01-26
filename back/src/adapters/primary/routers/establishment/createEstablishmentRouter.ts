@@ -90,7 +90,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.getDiscussionByIdForEstablishment.execute(
           req.params.discussionId,
-          req.payloads?.connectedUser,
+          getGenericAuthOrThrow(req.payloads?.connectedUser),
         ),
       ),
   );

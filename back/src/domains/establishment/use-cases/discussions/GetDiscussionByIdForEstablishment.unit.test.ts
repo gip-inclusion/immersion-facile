@@ -12,7 +12,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
-import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstablishment";
+import {
+  type GetDiscussionByIdForEstablishment,
+  makeGetDiscussionByIdForEstablishment,
+} from "./GetDiscussionByIdForEstablishment";
 
 describe("GetDiscussionByIdForEstablishment use case", () => {
   const establishmentAdmin = new ConnectedUserBuilder()
@@ -28,9 +31,9 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getDiscussionByIdForEstablishment = new GetDiscussionByIdForEstablishment(
-      new InMemoryUowPerformer(uow),
-    );
+    getDiscussionByIdForEstablishment = makeGetDiscussionByIdForEstablishment({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
     uow.userRepository.users = [establishmentAdmin, establishmentContact];
     uow.discussionRepository.discussions = [discussion];
     uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -56,13 +59,6 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
   });
 
   describe("Wrong paths", () => {
-    it("throws unauthorized if no jwt provided", async () => {
-      await expectPromiseToFailWithError(
-        getDiscussionByIdForEstablishment.execute(uuid()),
-        errors.user.unauthorized(),
-      );
-    });
-
     describe("throws NotFound", () => {
       it("when user cannot be found", async () => {
         uow.userRepository.users = [];
