@@ -162,6 +162,8 @@ export const domElementIds = {
     lbbSearchResultButton: "im-search-result__lbb-contact-button",
     locationFilterTag: "im-search-page__location-filter-tag",
     nafAutocomplete: "im-search-page__naf-autocomplete",
+    noResultsLbbButton: "im-search-page__no-results-lbb-button",
+    noResultsLbbCard: "im-search-page__no-results-lbb-card",
     placeAutocompleteInput: "im-search-page__address-autocomplete",
     resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
     searchForm: "im-search-page__search-form",
