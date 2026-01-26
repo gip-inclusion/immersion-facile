@@ -13,8 +13,8 @@ export const SearchInfoSection = () => (
   >
     <div className={fr.cx("fr-col-lg-8", "fr-col-12", "fr-pr-4w")}>
       <h2>
-        Le saviez-vous ? En février 2024, il fallait envoyer en moyenne 3
-        candidatures pour obtenir 1 réponse !
+        Expliquez votre projet dans votre candidature : vous augmentez vos
+        chances d’avoir un retour.
       </h2>
       <p>
         Les entreprises ne répondent pas à 100% des sollicitations, cela n’a
