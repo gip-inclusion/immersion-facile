@@ -1,6 +1,5 @@
-import z, { ZodError } from "zod";
+import { ZodError } from "zod";
 import {
-  deepPartialSchema,
   makePersonNameSchema,
   zStringCanBeEmpty,
   zStringMinLength1,
@@ -275,97 +274,6 @@ describe("zodUtils", () => {
       expect(() => makePersonNameSchema("lastname").parse(name)).toThrow(
         "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
       );
-    });
-  });
-
-  describe("deepPartialSchema", () => {
-    it("makes the object deeply partial", () => {
-      const withPersonSchema = z.object({
-        person: z.object({
-          name: z.string(),
-          age: z.number(),
-        }),
-      });
-
-      const canHaveOptionalRootKey = deepPartialSchema(
-        withPersonSchema,
-      ).safeParse({});
-
-      expect(canHaveOptionalRootKey.success).toBeTruthy();
-
-      const canHaveOptionalDeepKey = deepPartialSchema(
-        withPersonSchema,
-      ).safeParse({
-        person: {
-          age: 30,
-        },
-      });
-
-      expect(canHaveOptionalDeepKey.success).toBeTruthy();
-    });
-
-    it("makes the array deeply partial", () => {
-      const withPeopleSchema = z.object({
-        person: z.object({
-          books: z.array(z.string()),
-        }),
-      });
-
-      const canHaveOptionalArray = deepPartialSchema(
-        withPeopleSchema,
-      ).safeParse({
-        person: {},
-      });
-
-      expect(canHaveOptionalArray.success).toBeTruthy();
-
-      const canHaveEmptyArray = deepPartialSchema(withPeopleSchema).safeParse({
-        person: {
-          books: [],
-        },
-      });
-
-      expect(canHaveEmptyArray.success).toBeTruthy();
-    });
-
-    it("makes deep partial work with union", () => {
-      const unionSchema = deepPartialSchema(
-        z.object({
-          person: z.object({
-            name: z.string(),
-          }),
-        }),
-      ).or(
-        z.object({
-          otherInfo: z.string(),
-        }),
-      );
-
-      const result = unionSchema.safeParse({
-        person: {},
-      });
-
-      expect(result.success).toBeTruthy();
-    });
-
-    it("makes deep partial work with intersection", () => {
-      const intersectionSchema = deepPartialSchema(
-        z.object({
-          person: z.object({
-            name: z.string(),
-          }),
-        }),
-      ).and(
-        z.object({
-          otherInfo: z.string(),
-        }),
-      );
-
-      const result = intersectionSchema.safeParse({
-        otherInfo: "Other info",
-      });
-
-      expect(result.success).toBeTruthy();
     });
   });
 });
