@@ -1,5 +1,9 @@
 import type { SiretDto, SiretEstablishmentDto } from "shared";
 
+export type EstablishmentsFromSiretApi = Partial<
+  Record<SiretDto, SiretEstablishmentDto>
+>;
+
 export interface SiretGateway {
   getEstablishmentBySiret(
     siret: SiretDto,
@@ -9,5 +13,5 @@ export interface SiretGateway {
     fromDate: Date,
     toDate: Date,
     sirets: SiretDto[],
-  ): Promise<Partial<Record<SiretDto, SiretEstablishmentDto>>>;
+  ): Promise<EstablishmentsFromSiretApi>;
 }

@@ -11,7 +11,10 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
+import {
+  makeUpdateEstablishmentsFromSirenApiScript,
+  type UpdateEstablishmentsFromSirenApiScript,
+} from "./UpdateEstablishmentsFromSirenApiScript";
 
 // This use case is kept as inspiration for when we'll need to update establishments from SIREN API (ours not LBB)
 
@@ -32,14 +35,16 @@ describe("Update establishments from Sirene API", () => {
     const uowPerformer = new InMemoryUowPerformer(uow);
     timeGateway = new CustomTimeGateway();
     timeGateway.setNextDate(now);
-    updateEstablishmentsScript = new UpdateEstablishmentsFromSirenApiScript(
-      uowPerformer,
-      siretGateway,
-      timeGateway,
-      numberOfDaysAgoToCheckForInseeUpdates,
-      maxEstablishmentsPerBatch,
-      maxEstablishmentsPerFullRun,
-    );
+    updateEstablishmentsScript = makeUpdateEstablishmentsFromSirenApiScript({
+      deps: {
+        siretGateway,
+        timeGateway,
+        uowPerformer,
+        numberOfDaysAgoToCheckForInseeUpdates,
+        maxEstablishmentsPerBatch,
+        maxEstablishmentsPerFullRun,
+      },
+    });
   });
 
   it("when there is no establishment which needs an update", async () => {

@@ -16,7 +16,10 @@ import { createLogger } from "../../../../utils/logger";
 import type { WithCache } from "../../caching-gateway/port/WithCache";
 import type { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import type { SiretGateway } from "../ports/SiretGateway";
+import type {
+  EstablishmentsFromSiretApi,
+  SiretGateway,
+} from "../ports/SiretGateway";
 import {
   type InseeExternalRoutes,
   inseeExternalRoutes,
@@ -120,7 +123,7 @@ export class InseeSiretGateway implements SiretGateway {
     fromDate: Date,
     toDate: Date,
     sirets: SiretDto[],
-  ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
+  ): Promise<EstablishmentsFromSiretApi> {
     const formattedFromDate = format(fromDate, "yyyy-MM-dd");
     const formattedToDate = format(toDate, "yyyy-MM-dd");
 
