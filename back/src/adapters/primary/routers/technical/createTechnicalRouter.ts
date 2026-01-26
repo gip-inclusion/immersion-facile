@@ -92,25 +92,28 @@ export const createTechnicalRouter = (
     async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.addExchangeToDiscussion
-          .execute({
-            source: "inbound-parsing",
-            messageInputs: req.body.items.map((brevoEmailItem) => ({
-              senderEmail: brevoEmailItem.From.Address,
-              message: processInboundParsingEmailMessage(brevoEmailItem),
-              ...getDiscussionParamsFromEmail(
-                brevoEmailItem.To[0].Address,
-                `reply.${deps.config.immersionFacileDomain}`,
-              ),
-              sentAt: new Date(brevoEmailItem.SentAtDate).toISOString(),
-              attachments: (brevoEmailItem.Attachments || []).map(
-                (attachment) => ({
-                  name: attachment.Name,
-                  link: attachment.DownloadToken,
-                }),
-              ),
-              subject: getSubjectFromEmail(brevoEmailItem),
-            })),
-          })
+          .execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: req.body.items.map((brevoEmailItem) => ({
+                senderEmail: brevoEmailItem.From.Address,
+                message: processInboundParsingEmailMessage(brevoEmailItem),
+                ...getDiscussionParamsFromEmail(
+                  brevoEmailItem.To[0].Address,
+                  `reply.${deps.config.immersionFacileDomain}`,
+                ),
+                sentAt: new Date(brevoEmailItem.SentAtDate).toISOString(),
+                attachments: (brevoEmailItem.Attachments || []).map(
+                  (attachment) => ({
+                    name: attachment.Name,
+                    link: attachment.DownloadToken,
+                  }),
+                ),
+                subject: getSubjectFromEmail(brevoEmailItem),
+              })),
+            },
+            undefined,
+          )
           .then((_result) => {}),
       ),
   );

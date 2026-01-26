@@ -23,7 +23,10 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
-import { AddExchangeToDiscussion } from "./AddExchangeToDiscussion";
+import {
+  type AddExchangeToDiscussion,
+  makeAddExchangeToDiscussion,
+} from "./AddExchangeToDiscussion";
 
 describe("AddExchangeToDiscussion", () => {
   const replyDomain = "reply.my-domain.com";
@@ -135,15 +138,21 @@ describe("AddExchangeToDiscussion", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    addExchangeToDiscussion = new AddExchangeToDiscussion(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
-        uuidGenerator: new UuidV4Generator(),
-        timeGateway: timeGateway,
-      }),
-      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      timeGateway,
-    );
+
+    addExchangeToDiscussion = makeAddExchangeToDiscussion({
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          uuidGenerator: new UuidV4Generator(),
+          timeGateway: timeGateway,
+        }),
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+        timeGateway,
+      },
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
 
     uow.discussionRepository.discussions = [
       pendingDiscussion1,
@@ -173,43 +182,46 @@ describe("AddExchangeToDiscussion", () => {
               `firstname2_lastname2__${pendingDiscussion2.id}_e@${replyDomain}`,
             ]).items;
 
-          await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
-            messageInputs: [
-              {
-                // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                message: firstInboundParsingItem.RawHtmlBody!,
-                discussionId: pendingDiscussion1.id,
-                recipientRole: "potentialBeneficiary",
-                senderEmail: contactUserEstablishment1.email,
-                sentAt: new Date(
-                  firstInboundParsingItem.SentAtDate,
-                ).toISOString(),
-                attachments:
-                  firstInboundParsingItem.Attachments?.map((attachment) => ({
-                    name: attachment.Name,
-                    link: attachment.DownloadToken,
-                  })) ?? [],
-                subject: firstInboundParsingItem.Subject,
-              },
-              {
-                // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                message: secondInboundParsingItem.RawHtmlBody!,
-                discussionId: pendingDiscussion2.id,
-                recipientRole: "establishment",
-                senderEmail: pendingDiscussion2.potentialBeneficiary.email,
-                sentAt: new Date(
-                  secondInboundParsingItem.SentAtDate,
-                ).toISOString(),
-                attachments:
-                  secondInboundParsingItem.Attachments?.map((attachment) => ({
-                    name: attachment.Name,
-                    link: attachment.DownloadToken,
-                  })) ?? [],
-                subject: secondInboundParsingItem.Subject,
-              },
-            ],
-          });
+          await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: firstInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  senderEmail: contactUserEstablishment1.email,
+                  sentAt: new Date(
+                    firstInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                  attachments:
+                    firstInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: firstInboundParsingItem.Subject,
+                },
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: secondInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion2.id,
+                  recipientRole: "establishment",
+                  senderEmail: pendingDiscussion2.potentialBeneficiary.email,
+                  sentAt: new Date(
+                    secondInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                  attachments:
+                    secondInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: secondInboundParsingItem.Subject,
+                },
+              ],
+            },
+            undefined,
+          );
 
           expectToEqual(uow.discussionRepository.discussions, [
             {
@@ -320,43 +332,46 @@ describe("AddExchangeToDiscussion", () => {
               "",
             ).items;
 
-          await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
-            messageInputs: [
-              {
-                // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                message: firstInboundParsingItem.RawHtmlBody!,
-                discussionId: pendingDiscussion1.id,
-                recipientRole: "potentialBeneficiary",
-                senderEmail: contactUserEstablishment1.email,
-                attachments:
-                  firstInboundParsingItem.Attachments?.map((attachment) => ({
-                    name: attachment.Name,
-                    link: attachment.DownloadToken,
-                  })) ?? [],
-                subject: "",
-                sentAt: new Date(
-                  firstInboundParsingItem.SentAtDate,
-                ).toISOString(),
-              },
-              {
-                // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                message: secondInboundParsingItem.RawHtmlBody!,
-                discussionId: pendingDiscussion2.id,
-                recipientRole: "establishment",
-                senderEmail: pendingDiscussion2.potentialBeneficiary.email,
-                attachments:
-                  secondInboundParsingItem.Attachments?.map((attachment) => ({
-                    name: attachment.Name,
-                    link: attachment.DownloadToken,
-                  })) ?? [],
-                subject: "",
-                sentAt: new Date(
-                  secondInboundParsingItem.SentAtDate,
-                ).toISOString(),
-              },
-            ],
-          });
+          await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: firstInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  senderEmail: contactUserEstablishment1.email,
+                  attachments:
+                    firstInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: "",
+                  sentAt: new Date(
+                    firstInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                },
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: secondInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion2.id,
+                  recipientRole: "establishment",
+                  senderEmail: pendingDiscussion2.potentialBeneficiary.email,
+                  attachments:
+                    secondInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: "",
+                  sentAt: new Date(
+                    secondInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                },
+              ],
+            },
+            undefined,
+          );
 
           expectToEqual(uow.discussionRepository.discussions, [
             {
@@ -488,29 +503,32 @@ describe("AddExchangeToDiscussion", () => {
             };
 
             expectToEqual(
-              await addExchangeToDiscussion.execute({
-                source: "inbound-parsing",
-                messageInputs: [
-                  {
-                    // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                    message: firstInboundParsingItem.RawHtmlBody!,
-                    discussionId: discussionAccepted.id,
-                    recipientRole: "potentialBeneficiary",
-                    senderEmail: adminUserEstablishment1.email,
-                    sentAt: new Date(
-                      firstInboundParsingItem.SentAtDate,
-                    ).toISOString(),
-                    attachments:
-                      firstInboundParsingItem.Attachments?.map(
-                        (attachment) => ({
-                          name: attachment.Name,
-                          link: attachment.DownloadToken,
-                        }),
-                      ) ?? [],
-                    subject: firstInboundParsingItem.Subject,
-                  },
-                ],
-              }),
+              await addExchangeToDiscussion.execute(
+                {
+                  source: "inbound-parsing",
+                  messageInputs: [
+                    {
+                      // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                      message: firstInboundParsingItem.RawHtmlBody!,
+                      discussionId: discussionAccepted.id,
+                      recipientRole: "potentialBeneficiary",
+                      senderEmail: adminUserEstablishment1.email,
+                      sentAt: new Date(
+                        firstInboundParsingItem.SentAtDate,
+                      ).toISOString(),
+                      attachments:
+                        firstInboundParsingItem.Attachments?.map(
+                          (attachment) => ({
+                            name: attachment.Name,
+                            link: attachment.DownloadToken,
+                          }),
+                        ) ?? [],
+                      subject: firstInboundParsingItem.Subject,
+                    },
+                  ],
+                },
+                undefined,
+              ),
               expectedNewExchange,
             );
 
@@ -612,29 +630,33 @@ describe("AddExchangeToDiscussion", () => {
               subject: firstInboundParsingItem.Subject,
             };
             expectToEqual(
-              await addExchangeToDiscussion.execute({
-                source: "inbound-parsing",
-                messageInputs: [
-                  {
-                    // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                    message: firstInboundParsingItem.RawHtmlBody!,
-                    discussionId: discussionAccepted.id,
-                    recipientRole: "establishment",
-                    senderEmail: discussionAccepted.potentialBeneficiary.email,
-                    sentAt: new Date(
-                      firstInboundParsingItem.SentAtDate,
-                    ).toISOString(),
-                    attachments:
-                      firstInboundParsingItem.Attachments?.map(
-                        (attachment) => ({
-                          name: attachment.Name,
-                          link: attachment.DownloadToken,
-                        }),
-                      ) ?? [],
-                    subject: firstInboundParsingItem.Subject,
-                  },
-                ],
-              }),
+              await addExchangeToDiscussion.execute(
+                {
+                  source: "inbound-parsing",
+                  messageInputs: [
+                    {
+                      // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                      message: firstInboundParsingItem.RawHtmlBody!,
+                      discussionId: discussionAccepted.id,
+                      recipientRole: "establishment",
+                      senderEmail:
+                        discussionAccepted.potentialBeneficiary.email,
+                      sentAt: new Date(
+                        firstInboundParsingItem.SentAtDate,
+                      ).toISOString(),
+                      attachments:
+                        firstInboundParsingItem.Attachments?.map(
+                          (attachment) => ({
+                            name: attachment.Name,
+                            link: attachment.DownloadToken,
+                          }),
+                        ) ?? [],
+                      subject: firstInboundParsingItem.Subject,
+                    },
+                  ],
+                },
+                undefined,
+              ),
               expectedNewMessage,
             );
 
@@ -693,29 +715,32 @@ describe("AddExchangeToDiscussion", () => {
               ],
             };
             expectToEqual(
-              await addExchangeToDiscussion.execute({
-                source: "inbound-parsing",
-                messageInputs: [
-                  {
-                    // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                    message: firstInboundParsingItem.RawHtmlBody!,
-                    discussionId: discussionRejected.id,
-                    recipientRole: "potentialBeneficiary",
-                    senderEmail: adminUserEstablishment1.email,
-                    sentAt: new Date(
-                      firstInboundParsingItem.SentAtDate,
-                    ).toISOString(),
-                    attachments:
-                      firstInboundParsingItem.Attachments?.map(
-                        (attachment) => ({
-                          name: attachment.Name,
-                          link: attachment.DownloadToken,
-                        }),
-                      ) ?? [],
-                    subject: firstInboundParsingItem.Subject,
-                  },
-                ],
-              }),
+              await addExchangeToDiscussion.execute(
+                {
+                  source: "inbound-parsing",
+                  messageInputs: [
+                    {
+                      // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                      message: firstInboundParsingItem.RawHtmlBody!,
+                      discussionId: discussionRejected.id,
+                      recipientRole: "potentialBeneficiary",
+                      senderEmail: adminUserEstablishment1.email,
+                      sentAt: new Date(
+                        firstInboundParsingItem.SentAtDate,
+                      ).toISOString(),
+                      attachments:
+                        firstInboundParsingItem.Attachments?.map(
+                          (attachment) => ({
+                            name: attachment.Name,
+                            link: attachment.DownloadToken,
+                          }),
+                        ) ?? [],
+                      subject: firstInboundParsingItem.Subject,
+                    },
+                  ],
+                },
+                undefined,
+              ),
               expectedResult,
             );
 
@@ -788,27 +813,32 @@ describe("AddExchangeToDiscussion", () => {
               `firstname1_lastname1__${discussionRejected.id}_b@${replyDomain}`,
             ]).items;
 
-            const result = await addExchangeToDiscussion.execute({
-              source: "inbound-parsing",
-              messageInputs: [
-                {
-                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                  message: firstInboundParsingItem.RawHtmlBody!,
-                  discussionId: discussionRejected.id,
-                  recipientRole: "establishment",
-                  senderEmail: discussionRejected.potentialBeneficiary.email,
-                  sentAt: new Date(
-                    firstInboundParsingItem.SentAtDate,
-                  ).toISOString(),
-                  attachments:
-                    firstInboundParsingItem.Attachments?.map((attachment) => ({
-                      name: attachment.Name,
-                      link: attachment.DownloadToken,
-                    })) ?? [],
-                  subject: firstInboundParsingItem.Subject,
-                },
-              ],
-            });
+            const result = await addExchangeToDiscussion.execute(
+              {
+                source: "inbound-parsing",
+                messageInputs: [
+                  {
+                    // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                    message: firstInboundParsingItem.RawHtmlBody!,
+                    discussionId: discussionRejected.id,
+                    recipientRole: "establishment",
+                    senderEmail: discussionRejected.potentialBeneficiary.email,
+                    sentAt: new Date(
+                      firstInboundParsingItem.SentAtDate,
+                    ).toISOString(),
+                    attachments:
+                      firstInboundParsingItem.Attachments?.map(
+                        (attachment) => ({
+                          name: attachment.Name,
+                          link: attachment.DownloadToken,
+                        }),
+                      ) ?? [],
+                    subject: firstInboundParsingItem.Subject,
+                  },
+                ],
+              },
+              undefined,
+            );
 
             expectToEqual(result, {
               reason: "discussion_completed",
@@ -863,40 +893,46 @@ describe("AddExchangeToDiscussion", () => {
       const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
 
       await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute({
-          source: "inbound-parsing",
-          messageInputs: [
-            {
-              // biome-ignore lint/style/noNonNullAssertion: testing purpose
-              message: createInboundParsingResponse([
-                `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`,
-              ]).items[0].RawHtmlBody!,
-              discussionId: notFoundDiscussionId,
-              recipientRole: "establishment",
-              senderEmail: pendingDiscussion1.potentialBeneficiary.email,
-              attachments: [],
-              subject: "",
-              sentAt: new Date().toISOString(),
-            },
-          ],
-        }),
+        addExchangeToDiscussion.execute(
+          {
+            source: "inbound-parsing",
+            messageInputs: [
+              {
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                message: createInboundParsingResponse([
+                  `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`,
+                ]).items[0].RawHtmlBody!,
+                discussionId: notFoundDiscussionId,
+                recipientRole: "establishment",
+                senderEmail: pendingDiscussion1.potentialBeneficiary.email,
+                attachments: [],
+                subject: "",
+                sentAt: new Date().toISOString(),
+              },
+            ],
+          },
+          undefined,
+        ),
         errors.discussion.notFound({ discussionId: notFoundDiscussionId }),
       );
     });
 
     it("throws an error if the source is dashboard, but user is not connected", async () => {
       await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute({
-          source: "dashboard",
-          messageInputs: [
-            {
-              message: "Hello",
-              discussionId: "11111111-e89b-12d3-a456-426614174000",
-              recipientRole: "potentialBeneficiary",
-              attachments: [],
-            },
-          ],
-        }),
+        addExchangeToDiscussion.execute(
+          {
+            source: "dashboard",
+            messageInputs: [
+              {
+                message: "Hello",
+                discussionId: "11111111-e89b-12d3-a456-426614174000",
+                recipientRole: "potentialBeneficiary",
+                attachments: [],
+              },
+            ],
+          },
+          undefined,
+        ),
         errors.user.unauthorized(),
       );
     });
@@ -912,27 +948,30 @@ describe("AddExchangeToDiscussion", () => {
             `firstname1_lastname1__${pendingDiscussion1.id}_e@${replyDomain}`,
           ]).items;
 
-          const result = await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
-            messageInputs: [
-              {
-                // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                message: firstInboundParsingItem.RawHtmlBody!,
-                discussionId: pendingDiscussion1.id,
-                recipientRole: "potentialBeneficiary",
-                senderEmail: adminUserEstablishment1.email,
-                sentAt: new Date(
-                  firstInboundParsingItem.SentAtDate,
-                ).toISOString(),
-                attachments:
-                  firstInboundParsingItem.Attachments?.map((attachment) => ({
-                    name: attachment.Name,
-                    link: attachment.DownloadToken,
-                  })) ?? [],
-                subject: firstInboundParsingItem.Subject,
-              },
-            ],
-          });
+          const result = await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: firstInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  senderEmail: adminUserEstablishment1.email,
+                  sentAt: new Date(
+                    firstInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                  attachments:
+                    firstInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: firstInboundParsingItem.Subject,
+                },
+              ],
+            },
+            undefined,
+          );
 
           expectToEqual(result, {
             reason: "establishment_missing",
@@ -1009,27 +1048,30 @@ describe("AddExchangeToDiscussion", () => {
             `firstname1_lastname1__${pendingDiscussion1.id}_e@${replyDomain}`,
           ]).items;
 
-          const result = await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
-            messageInputs: [
-              {
-                // biome-ignore lint/style/noNonNullAssertion: testing purpose
-                message: firstInboundParsingItem.RawHtmlBody!,
-                discussionId: pendingDiscussion1.id,
-                recipientRole: "establishment",
-                senderEmail: pendingDiscussion1.potentialBeneficiary.email,
-                sentAt: new Date(
-                  firstInboundParsingItem.SentAtDate,
-                ).toISOString(),
-                attachments:
-                  firstInboundParsingItem.Attachments?.map((attachment) => ({
-                    name: attachment.Name,
-                    link: attachment.DownloadToken,
-                  })) ?? [],
-                subject: firstInboundParsingItem.Subject,
-              },
-            ],
-          });
+          const result = await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: firstInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "establishment",
+                  senderEmail: pendingDiscussion1.potentialBeneficiary.email,
+                  sentAt: new Date(
+                    firstInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                  attachments:
+                    firstInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: firstInboundParsingItem.Subject,
+                },
+              ],
+            },
+            undefined,
+          );
 
           expectToEqual(result, {
             reason: "establishment_missing",
@@ -1184,20 +1226,23 @@ describe("AddExchangeToDiscussion", () => {
 
       it("through inbound parsing, do not save the new exchange in the discussion and notify sender that user has no rights on establishment", async () => {
         expectToEqual(
-          await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
-            messageInputs: [
-              {
-                senderEmail: adminConnectedUserEstablishment2.email,
-                attachments: [],
-                discussionId: pendingDiscussion1.id,
-                message: "Hello",
-                recipientRole: "potentialBeneficiary",
-                sentAt: new Date().toISOString(),
-                subject: "OSEF",
-              },
-            ],
-          }),
+          await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  senderEmail: adminConnectedUserEstablishment2.email,
+                  attachments: [],
+                  discussionId: pendingDiscussion1.id,
+                  message: "Hello",
+                  recipientRole: "potentialBeneficiary",
+                  sentAt: new Date().toISOString(),
+                  subject: "OSEF",
+                },
+              ],
+            },
+            undefined,
+          ),
           {
             reason: "user_unknown_or_missing_rights_on_establishment",
             sender: "establishment",
@@ -1282,20 +1327,23 @@ describe("AddExchangeToDiscussion", () => {
 
       it("through inbound parsing, do not save the new exchange in the discussion and notify sender that user has no rights on establishment", async () => {
         expectToEqual(
-          await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
-            messageInputs: [
-              {
-                senderEmail: connectedUserWithNoRightsOnDiscussion.email,
-                attachments: [],
-                discussionId: pendingDiscussion1.id,
-                message: "Hello",
-                recipientRole: "potentialBeneficiary",
-                sentAt: new Date().toISOString(),
-                subject: "OSEF",
-              },
-            ],
-          }),
+          await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  senderEmail: connectedUserWithNoRightsOnDiscussion.email,
+                  attachments: [],
+                  discussionId: pendingDiscussion1.id,
+                  message: "Hello",
+                  recipientRole: "potentialBeneficiary",
+                  sentAt: new Date().toISOString(),
+                  subject: "OSEF",
+                },
+              ],
+            },
+            undefined,
+          ),
           {
             reason: "user_unknown_or_missing_rights_on_establishment",
             sender: "establishment",
@@ -1371,20 +1419,23 @@ describe("AddExchangeToDiscussion", () => {
 
       it("through inbound parsing, do not save the new exchange in the discussion and notify sender that user has no rights on establishment", async () => {
         expectToEqual(
-          await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
-            messageInputs: [
-              {
-                senderEmail: unknownUser.email,
-                attachments: [],
-                discussionId: pendingDiscussion1.id,
-                message: "Hello",
-                recipientRole: "establishment",
-                sentAt: new Date().toISOString(),
-                subject: "OSEF",
-              },
-            ],
-          }),
+          await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  senderEmail: unknownUser.email,
+                  attachments: [],
+                  discussionId: pendingDiscussion1.id,
+                  message: "Hello",
+                  recipientRole: "establishment",
+                  sentAt: new Date().toISOString(),
+                  subject: "OSEF",
+                },
+              ],
+            },
+            undefined,
+          ),
           {
             reason: "user_unknown_or_missing_rights_on_establishment",
             sender: "potentialBeneficiary",
