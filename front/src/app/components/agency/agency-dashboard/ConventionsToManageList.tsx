@@ -1,11 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
+import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import { useCallback, useMemo } from "react";
 import { HeadingSection, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
+  domElementIds,
   getDaysBetween,
   getFormattedFirstnameAndLastname,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
@@ -179,18 +181,27 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
       titleAs="h3"
       description={description}
       footer={footer}
-      buttonProps={{
-        children: "Piloter",
-        priority: "secondary",
-        size: "medium",
-        linkProps: {
-          target: "_blank",
-          rel: "noreferrer",
-          href: routes.manageConventionConnectedUser({
-            conventionId: convention.id,
-          }).link.href,
+      buttonsRows={[
+        {
+          id: domElementIds.manageConventionUserConnected
+            .pilotConventionToManageButton,
+          content: (
+            <Button
+              priority="secondary"
+              size="medium"
+              linkProps={{
+                target: "_blank",
+                rel: "noreferrer",
+                href: routes.manageConventionConnectedUser({
+                  conventionId: convention.id,
+                }).link.href,
+              }}
+            >
+              Piloter
+            </Button>
+          ),
         },
-      }}
+      ]}
     />
   );
 };
