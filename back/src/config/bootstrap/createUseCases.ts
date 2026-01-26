@@ -135,7 +135,7 @@ import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases
 import { makeMarkDiscussionDeprecatedAndNotify } from "../../domains/establishment/use-cases/discussions/MarkDiscussionDeprecatedAndNotify";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
 import { makeNotifyBeneficiaryToFollowUpContactRequest } from "../../domains/establishment/use-cases/discussions/NotifyBeneficiaryToFollowUpContactRequest";
-import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
+import { makeSendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
 import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
 import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import { makeGetEstablishmentNameAndAdmins } from "../../domains/establishment/use-cases/GetEstablishmentNameAndAdmins";
@@ -255,12 +255,6 @@ export const createUseCases = ({
         createNewEvent,
         saveNotificationAndRelatedEvent,
         gateways.timeGateway,
-      ),
-      sendExchangeToRecipient: new SendExchangeToRecipient(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-        config.immersionFacileDomain,
-        gateways.notification,
       ),
       getDiscussionByIdForEstablishment: new GetDiscussionByIdForEstablishment(
         uowPerformer,
@@ -596,6 +590,15 @@ export const createUseCases = ({
 
     htmlToPdf: makeHtmlToPdf({
       deps: { pdfGeneratorGateway: gateways.pdfGeneratorGateway },
+    }),
+
+    sendExchangeToRecipient: makeSendExchangeToRecipient({
+      deps: {
+        domain: config.immersionFacileDomain,
+        notificationGateway: gateways.notification,
+        saveNotificationAndRelatedEvent,
+      },
+      uowPerformer,
     }),
 
     revokeApiConsumer: makeRevokeApiConsumer({
