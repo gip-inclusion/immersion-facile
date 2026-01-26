@@ -151,7 +151,7 @@ import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/estab
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
-import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
+import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
@@ -525,12 +525,7 @@ export const createUseCases = ({
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      notifyContactRequest: new NotifyContactRequest(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-        config.immersionFacileDomain,
-        config.immersionFacileBaseUrl,
-      ),
+
       notifyFranceTravailUserAdvisorOnConventionFullySigned:
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
           uowPerformer,
@@ -618,6 +613,15 @@ export const createUseCases = ({
         generateApiConsumerJwt,
         timeGateway: gateways.timeGateway,
       },
+    }),
+
+    notifyContactRequest: makeNotifyContactRequest({
+      deps: {
+        domain: config.immersionFacileDomain,
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+        saveNotificationAndRelatedEvent,
+      },
+      uowPerformer,
     }),
 
     getFeatureFlags: useCaseBuilder("GetFeatureFlags")
