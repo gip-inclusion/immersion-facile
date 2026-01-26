@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import {
   activeAgencyStatuses,
   conventionStatuses,
+  domElementIds,
   type FlatGetConventionsWithErroredBroadcastFeedbackParams,
   getFormattedFirstnameAndLastname,
   isFunctionalBroadcastFeedbackError,
@@ -410,18 +411,31 @@ export const ConventionsWithBroadcastErrorList = ({
               conventionWithBroadcastFeedback.lastBroadcastFeedback
                 ?.subscriberErrorFeedback?.message ?? "",
             )}
-            buttonProps={{
-              children: "Piloter",
-              priority: "secondary",
-              size: "medium",
-              linkProps: {
-                target: "_blank",
-                rel: "noreferrer",
-                href: routes.manageConventionConnectedUser({
-                  conventionId: conventionWithBroadcastFeedback.id,
-                }).link.href,
+            buttonsRows={[
+              {
+                id: domElementIds.manageConventionUserConnected
+                  .pilotConventionWithBroadcastErrorButton,
+                content: (
+                  <Button
+                    key={
+                      domElementIds.manageConventionUserConnected
+                        .pilotConventionWithBroadcastErrorButton
+                    }
+                    priority="secondary"
+                    size="medium"
+                    linkProps={{
+                      target: "_blank",
+                      rel: "noreferrer",
+                      href: routes.manageConventionConnectedUser({
+                        conventionId: conventionWithBroadcastFeedback.id,
+                      }).link.href,
+                    }}
+                  >
+                    Piloter
+                  </Button>
+                ),
               },
-            }}
+            ]}
           />
         ),
       )}
