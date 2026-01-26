@@ -1,10 +1,9 @@
 import { subMonths } from "date-fns";
 import { castError, type SiretDto } from "shared";
-import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UseCase } from "../../core/UseCase";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { SuggestEditEstablishment } from "./SuggestEditEstablishment";
 
 const logger = createLogger(__filename);
@@ -16,35 +15,28 @@ type Report = {
   errors?: Record<SiretDto, Error>;
 };
 
-export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
-  protected inputSchema = z.void();
+export type SuggestEditEstablishmentsScript = ReturnType<
+  typeof makeSuggestEditEstablishmentsScript
+>;
 
-  readonly #uowPerformer: UnitOfWorkPerformer;
-
-  readonly #suggestEditEstablishment: SuggestEditEstablishment;
-
-  readonly #timeGateway: TimeGateway;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    suggestEditEstablishment: SuggestEditEstablishment,
-    timeGateway: TimeGateway,
-  ) {
-    super();
-
-    this.#suggestEditEstablishment = suggestEditEstablishment;
-    this.#timeGateway = timeGateway;
-    this.#uowPerformer = uowPerformer;
-  }
-
-  protected async _execute() {
+export const makeSuggestEditEstablishmentsScript = useCaseBuilder(
+  "SuggestEditEstablishmentsScript",
+)
+  .notTransactional()
+  .withOutput<Report>()
+  .withDeps<{
+    suggestEditEstablishment: SuggestEditEstablishment;
+    timeGateway: TimeGateway;
+    uowPerformer: UnitOfWorkPerformer;
+  }>()
+  .build(async ({ deps }) => {
     logger.info({
       message:
         "[triggerSuggestEditFormEstablishmentEvery6Months] Script started.",
     });
-    const since = subMonths(this.#timeGateway.now(), NB_MONTHS_BEFORE_SUGGEST);
+    const since = subMonths(deps.timeGateway.now(), NB_MONTHS_BEFORE_SUGGEST);
 
-    const siretsToContact = await this.#uowPerformer.perform(async (uow) =>
+    const siretsToContact = await deps.uowPerformer.perform(async (uow) =>
       uow.establishmentAggregateRepository.getSiretOfEstablishmentsToSuggestUpdate(
         since,
       ),
@@ -65,7 +57,7 @@ export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
 
     await Promise.all(
       siretsToContact.map(async (siret) => {
-        await this.#suggestEditEstablishment.execute(siret).catch((error) => {
+        await deps.suggestEditEstablishment.execute(siret).catch((error) => {
           errors[siret] = castError(error);
         });
       }),
@@ -75,5 +67,4 @@ export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
       numberOfEstablishmentsToContact: siretsToContact.length,
       errors,
     };
-  }
-}
+  });
