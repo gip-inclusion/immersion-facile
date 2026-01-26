@@ -3,7 +3,6 @@ import { agencyKindSchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
 import { getNestedValue, isObject } from "../utils";
 import {
-  deepPartialSchema,
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
@@ -17,6 +16,64 @@ import type {
   ConventionDraftId,
   ShareConventionDraftByEmailDto,
 } from "./shareConventionDraftByEmail.dto";
+
+export const makeConventionDeepPartialSchema = (
+  schema: z.ZodTypeAny,
+): z.ZodTypeAny => {
+  if (schema.def.type === "object") {
+    const newShape: Record<string, z.ZodTypeAny> = {};
+    for (const [key, value] of Object.entries(
+      (schema as unknown as z.ZodObject<any>).shape,
+    )) {
+      newShape[key] = makeConventionDeepPartialSchema(
+        value as z.ZodTypeAny,
+      ).optional();
+    }
+    return z.object(newShape);
+  }
+
+  if (schema.def.type === "array") {
+    return z.array(
+      makeConventionDeepPartialSchema(
+        (schema as unknown as z.ZodArray<any>).element,
+      ),
+    );
+  }
+
+  if (schema.def.type === "optional") {
+    return makeConventionDeepPartialSchema(
+      (schema as unknown as z.ZodOptional<any>).unwrap(),
+    ).optional();
+  }
+
+  if (schema.def.type === "nullable") {
+    return makeConventionDeepPartialSchema(
+      (schema as unknown as z.ZodNullable<any>).unwrap(),
+    ).nullable();
+  }
+
+  if (schema.def.type === "union") {
+    const unionSchema = schema as unknown as z.ZodUnion<any>;
+    return z.union(
+      unionSchema.options.map((option: z.ZodTypeAny) =>
+        makeConventionDeepPartialSchema(option),
+      ),
+    );
+  }
+
+  if (schema.def.type === "intersection") {
+    const def = schema.def as unknown as {
+      left: z.ZodTypeAny;
+      right: z.ZodTypeAny;
+    };
+    return z.intersection(
+      makeConventionDeepPartialSchema(def.left),
+      makeConventionDeepPartialSchema(def.right),
+    );
+  }
+
+  return schema;
+};
 
 export const conventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftId> =
   z.uuid(localization.invalidUuid);
@@ -48,8 +105,10 @@ const validateImmersionBeneficiary = (input: unknown): void => {
   }
 };
 
-const baseConventionDraftSchema = deepPartialSchema(immersionConventionSchema)
-  .or(deepPartialSchema(miniStageConventionSchema))
+const baseConventionDraftSchema = makeConventionDeepPartialSchema(
+  immersionConventionSchema,
+)
+  .or(makeConventionDeepPartialSchema(miniStageConventionSchema))
   .and(
     z.object({
       id: conventionDraftIdSchema,

@@ -1,3 +1,4 @@
+import z from "zod";
 import { expectToEqual } from "../test.helpers";
 import type {
   ConventionDraftDto,
@@ -5,6 +6,7 @@ import type {
 } from "./shareConventionDraftByEmail.dto";
 import {
   conventionDraftSchema,
+  makeConventionDeepPartialSchema,
   shareConventionDraftByEmailSchema,
 } from "./shareConventionDraftByEmail.schema";
 
@@ -111,5 +113,98 @@ describe("conventionDraftSchema schema validation", () => {
     } satisfies ConventionDraftDto,
   ])("throws on invalid data", (convention: ConventionDraftDto) => {
     expect(() => conventionDraftSchema.parse(convention)).toThrow();
+  });
+});
+
+describe("makeConventionDeepPartialSchema", () => {
+  it("makes the object deeply partial", () => {
+    const withPersonSchema = z.object({
+      person: z.object({
+        name: z.string(),
+        age: z.number(),
+      }),
+    });
+
+    const canHaveOptionalRootKey = makeConventionDeepPartialSchema(
+      withPersonSchema,
+    ).safeParse({});
+
+    expect(canHaveOptionalRootKey.success).toBeTruthy();
+
+    const canHaveOptionalDeepKey = makeConventionDeepPartialSchema(
+      withPersonSchema,
+    ).safeParse({
+      person: {
+        age: 30,
+      },
+    });
+
+    expect(canHaveOptionalDeepKey.success).toBeTruthy();
+  });
+
+  it("makes the array deeply partial", () => {
+    const withPeopleSchema = z.object({
+      person: z.object({
+        books: z.array(z.string()),
+      }),
+    });
+
+    const canHaveOptionalArray = makeConventionDeepPartialSchema(
+      withPeopleSchema,
+    ).safeParse({
+      person: {},
+    });
+
+    expect(canHaveOptionalArray.success).toBeTruthy();
+
+    const canHaveEmptyArray = makeConventionDeepPartialSchema(
+      withPeopleSchema,
+    ).safeParse({
+      person: {
+        books: [],
+      },
+    });
+
+    expect(canHaveEmptyArray.success).toBeTruthy();
+  });
+
+  it("makes deep partial work with union", () => {
+    const unionSchema = makeConventionDeepPartialSchema(
+      z.object({
+        person: z.object({
+          name: z.string(),
+        }),
+      }),
+    ).or(
+      z.object({
+        otherInfo: z.string(),
+      }),
+    );
+
+    const result = unionSchema.safeParse({
+      person: {},
+    });
+
+    expect(result.success).toBeTruthy();
+  });
+
+  it("makes deep partial work with intersection", () => {
+    const intersectionSchema = makeConventionDeepPartialSchema(
+      z.object({
+        person: z.object({
+          name: z.string(),
+        }),
+      }),
+    ).and(
+      z.object({
+        otherInfo: z.string(),
+      }),
+    );
+
+    const result = intersectionSchema.safeParse({
+      otherInfo: "Other info",
+    });
+
+    expect(result.success).toBeTruthy();
   });
 });

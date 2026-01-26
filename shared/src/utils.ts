@@ -243,22 +243,6 @@ export const isFunction = <T>(
 export const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
-export type DeepPartial<T> = T extends
-  | string
-  | number
-  | boolean
-  | bigint
-  | symbol
-  | null
-  | undefined
-  | Date
-  ? T
-  : T extends object
-    ? {
-        [P in keyof T]?: DeepPartial<T[P]>;
-      }
-    : T;
-
 export const replaceEmptyValuesByUndefinedFromObject = <T>(obj: T): T => {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === "string") return (obj === "" ? undefined : obj) as T;
