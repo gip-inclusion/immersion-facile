@@ -6,34 +6,29 @@ import {
 } from "shared";
 import { locationToRawAddress } from "../../../../utils/address";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
 
-export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase<WithSiretDto> {
-  protected inputSchema = withSiretSchema;
+export type NotifyConfirmationEstablishmentCreated = ReturnType<
+  typeof makeNotifyConfirmationEstablishmentCreated
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-  ) {
-    super(uowPerformer);
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-  }
-
-  public async _execute(
-    { siret }: WithSiretDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeNotifyConfirmationEstablishmentCreated = useCaseBuilder(
+  "NotifyConfirmationEstablishmentCreated",
+)
+  .withInput<WithSiretDto>(withSiretSchema)
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  }>()
+  .build(async ({ deps, inputParams, uow }) => {
     const establishment =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
+        inputParams.siret,
       );
 
-    if (!establishment) throw errors.establishment.notFound({ siret });
+    if (!establishment)
+      throw errors.establishment.notFound({ siret: inputParams.siret });
 
     const firstAdminUser = await getFirstAdminUser(uow, establishment);
     const establishmentContactUsers = await getEstablishmentContactUsers(
@@ -41,7 +36,7 @@ export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase
       establishment,
     );
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
@@ -61,8 +56,7 @@ export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase
         establishmentSiret: establishment.establishment.siret,
       },
     });
-  }
-}
+  });
 
 const getFirstAdminUser = async (
   uow: UnitOfWork,
