@@ -75,7 +75,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       establishmentSearchableBy: searchableBy,
       sortedBy: inputParams.sortBy,
       place,
-      ...validatedGeoParams,
+      ...(validatedGeoParams.geoParams ?? {}),
     };
 
     await uow.searchMadeRepository.insertSearchMade({
@@ -83,6 +83,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       id: deps.uuidGenerator.new(),
       needsToBeSearched: true, // this is useless (legacy TODO : remove this column)
       numberOfResults: result.pagination.totalRecords,
+      apiConsumerName: apiConsumer?.name,
     });
 
     return result;

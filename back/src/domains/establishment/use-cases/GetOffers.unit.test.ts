@@ -147,6 +147,60 @@ describe("GetOffers", () => {
     expect(resultWithoutFilters.pagination.numberPerPage).toBe(100);
   });
 
+  describe("stores searches made", () => {
+    it("stores geo params (lat, lon, distanceKm) when provided", async () => {
+      const searchParams: GetOffersFlatQueryParams = {
+        sortBy: "distance",
+        sortOrder: "asc",
+        latitude: 48.8566,
+        longitude: 2.3522,
+        distanceKm: 100,
+      };
+
+      await getOffers.execute(searchParams, undefined);
+
+      expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
+      const searchMade = uow.searchMadeRepository.searchesMade[0] as {
+        lat: number;
+        lon: number;
+        distanceKm: number;
+      };
+      expect(searchMade.lat).toBe(48.8566);
+      expect(searchMade.lon).toBe(2.3522);
+      expect(searchMade.distanceKm).toBe(100);
+    });
+
+    it("stores place (address) when provided", async () => {
+      const searchParams: GetOffersFlatQueryParams = {
+        sortBy: "score",
+        sortOrder: "desc",
+        place: "Paris, France",
+      };
+
+      await getOffers.execute(searchParams, undefined);
+
+      expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
+      expect(uow.searchMadeRepository.searchesMade[0].place).toBe(
+        "Paris, France",
+      );
+    });
+
+    it("stores apiConsumerName when API consumer makes request", async () => {
+      const apiConsumer = new ApiConsumerBuilder().build();
+      const searchParams: GetOffersFlatQueryParams = {
+        sortBy: "date",
+        sortOrder: "desc",
+      };
+
+      await getOffers.execute(searchParams, apiConsumer);
+
+      expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
+      expect(uow.searchMadeRepository.searchesMade[0].apiConsumerName).toBe(
+        apiConsumer.name,
+      );
+    });
+  });
+
   describe("wrong path", () => {
     it("should throw when sort is distance but no location is provided", async () => {
       await expectPromiseToFailWithError(
