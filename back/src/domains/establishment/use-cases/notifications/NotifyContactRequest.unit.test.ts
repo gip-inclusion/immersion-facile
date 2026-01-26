@@ -29,7 +29,10 @@ import {
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
 } from "../../helpers/EstablishmentBuilders";
-import { NotifyContactRequest } from "./NotifyContactRequest";
+import {
+  makeNotifyContactRequest,
+  type NotifyContactRequest,
+} from "./NotifyContactRequest";
 
 describe("NotifyContactRequest", () => {
   const domain = "reply.domain.com";
@@ -160,15 +163,17 @@ describe("NotifyContactRequest", () => {
       uow.outboxRepository,
     );
 
-    notifyContactRequest = new NotifyContactRequest(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        new CustomTimeGateway(),
-      ),
-      domain,
-      immersionFacileBaseUrl,
-    );
+    notifyContactRequest = makeNotifyContactRequest({
+      deps: {
+        domain,
+        immersionFacileBaseUrl,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          new CustomTimeGateway(),
+        ),
+      },
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
 
     uow.romeRepository.appellations = [
       {
