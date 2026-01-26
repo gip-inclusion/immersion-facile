@@ -129,7 +129,7 @@ import { makeAddFormEstablishmentBatch } from "../../domains/establishment/use-c
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
-import { AddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
+import { makeAddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
 import { makeGetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
 import { makeMarkDiscussionDeprecatedAndNotify } from "../../domains/establishment/use-cases/discussions/MarkDiscussionDeprecatedAndNotify";
@@ -250,12 +250,6 @@ export const createUseCases = ({
 
   return {
     ...instantiatedUseCasesFromClasses({
-      addExchangeToDiscussion: new AddExchangeToDiscussion(
-        uowPerformer,
-        createNewEvent,
-        saveNotificationAndRelatedEvent,
-        gateways.timeGateway,
-      ),
       sendNotification: new SendNotification(
         uowPerformer,
         gateways.notification,
@@ -587,6 +581,15 @@ export const createUseCases = ({
 
     htmlToPdf: makeHtmlToPdf({
       deps: { pdfGeneratorGateway: gateways.pdfGeneratorGateway },
+    }),
+
+    addExchangeToDiscussion: makeAddExchangeToDiscussion({
+      deps: {
+        createNewEvent,
+        saveNotificationAndRelatedEvent,
+        timeGateway: gateways.timeGateway,
+      },
+      uowPerformer,
     }),
 
     getDiscussionByIdForEstablishment: makeGetDiscussionByIdForEstablishment({
