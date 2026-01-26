@@ -36,7 +36,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendAssessmentNeededNotifications } from "./SendAssessmentNeededNotifications";
+import {
+  makeSendAssessmentNeededNotifications,
+  type SendAssessmentNeededNotifications,
+} from "./SendAssessmentNeededNotifications";
 
 describe("SendAssessmentNeededNotifications", () => {
   let uow: InMemoryUnitOfWork;
@@ -117,21 +120,25 @@ describe("SendAssessmentNeededNotifications", () => {
     );
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
 
-    sendEmailWithAssessmentCreationLink = new SendAssessmentNeededNotifications(
-      new InMemoryUowPerformer(uow),
+    sendEmailWithAssessmentCreationLink = makeSendAssessmentNeededNotifications(
       {
-        conventionQueries: uow.conventionQueries,
-        assessmentRepository: uow.assessmentRepository,
+        deps: {
+          config,
+          saveNotificationAndRelatedEvent,
+          timeGateway,
+          generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+          outOfTransaction: {
+            conventionQueries: uow.conventionQueries,
+            assessmentRepository: uow.assessmentRepository,
+          },
+          shortLinkIdGeneratorGateway,
+          createNewEvent: makeCreateNewEvent({
+            timeGateway,
+            uuidGenerator,
+          }),
+          uowPerformer: new InMemoryUowPerformer(uow),
+        },
       },
-      saveNotificationAndRelatedEvent,
-      timeGateway,
-      fakeGenerateMagicLinkUrlFn,
-      makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator,
-      }),
-      config,
-      shortLinkIdGeneratorGateway,
     );
 
     uow.agencyRepository.agencies = [
@@ -669,7 +676,7 @@ describe("SendAssessmentNeededNotifications", () => {
   ): TemplatedEmail => ({
     kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
     params: {
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: logo provided on agency
       agencyLogoUrl: agency.logoUrl!,
       beneficiaryFirstName: getFormattedFirstnameAndLastname({
         firstname: convention.signatories.beneficiary.firstName,
