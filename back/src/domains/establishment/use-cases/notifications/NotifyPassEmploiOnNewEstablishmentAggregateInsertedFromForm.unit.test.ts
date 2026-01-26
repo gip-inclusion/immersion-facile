@@ -11,7 +11,10 @@ import {
   OfferEntityBuilder,
 } from "../../helpers/EstablishmentBuilders";
 import type { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
-import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
+import {
+  makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
+  type NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
+} from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 
 describe("Notify pass-emploi", () => {
   let uow: InMemoryUnitOfWork;
@@ -21,11 +24,12 @@ describe("Notify pass-emploi", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     passEmploiGateway = new InMemoryPassEmploiGateway();
-    useCase = new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
-      new InMemoryUowPerformer(uow),
-      passEmploiGateway,
-    );
+    useCase = makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm({
+      deps: { passEmploiGateway },
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
   });
+
   it("Calls pass-emploi API with formatted immersion offers from just inserted aggregate", async () => {
     // Act
     const siret = "12345678901234";
