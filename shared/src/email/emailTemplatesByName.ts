@@ -1893,10 +1893,14 @@ Tél : ${beneficiaryPhone}`,
         content: `
         <strong>Une demande de convention ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } doit être complétée :</strong>
-
-        ${additionalDetails}
-        
+        } doit être complétée ${additionalDetails ? ":" : ""}</strong>
+        ${
+          additionalDetails
+            ? `
+          ${additionalDetails}
+        `
+            : ""
+        }
         Vous pouvez désormais accéder à la demande pendant 30 jours grâce au lien ci-dessous :
       `,
         buttons: [{ label: "Compléter la demande", url: conventionFormUrl }],
