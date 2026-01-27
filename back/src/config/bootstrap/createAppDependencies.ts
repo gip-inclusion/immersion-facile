@@ -1,7 +1,7 @@
 import {
   type AbsoluteUrl,
-  fiveMinutesInSeconds,
   frontRoutes,
+  loginByEmailLinkDurationInSeconds,
   oneDayInSecond,
   oneHourInSeconds,
 } from "shared";
@@ -70,7 +70,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt =
     makeGenerateJwtES256<"emailAuthCode">(
       config.jwtPrivateKey,
-      fiveMinutesInSeconds,
+      loginByEmailLinkDurationInSeconds,
     );
 
   const verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode"> =
