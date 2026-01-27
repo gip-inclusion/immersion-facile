@@ -2,6 +2,7 @@ import { keys, mergeRight } from "ramda";
 
 import type { ReactNode } from "react";
 import { domElementIds, type InternshipKind } from "shared";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import type { ConventionField } from "../../admin/types";
 import type { FormFieldAttributesForContent } from "../types";
 
@@ -698,10 +699,11 @@ type SidebarStepContent = {
 export const sidebarStepContent = (
   internshipKind: InternshipKind,
 ): SidebarStepContent[] => {
+  const conventionTexts = useConventionTexts(internshipKind);
   const contents = {
     immersion: [
       {
-        title: "Informations sur la structure d'accompagnement du candidat",
+        title: conventionTexts.agencySection.title,
         description: (
           <>
             <p>
@@ -718,7 +720,7 @@ export const sidebarStepContent = (
         ),
       },
       {
-        title: "Informations sur le candidat",
+        title: conventionTexts.beneficiarySection.title,
         description: (
           <>
             <p>
@@ -736,7 +738,7 @@ export const sidebarStepContent = (
         ),
       },
       {
-        title: "Informations sur l'entreprise",
+        title: conventionTexts.establishmentSection.title,
         description: (
           <>
             <p>
@@ -755,7 +757,7 @@ export const sidebarStepContent = (
         ),
       },
       {
-        title: "Lieu et heures de l'immersion professionnelle",
+        title: conventionTexts.immersionHourLocationSection.title,
         description: (
           <>
             <p>
@@ -772,7 +774,7 @@ export const sidebarStepContent = (
         ),
       },
       {
-        title: "Détails de l'immersion professionnelle",
+        title: conventionTexts.immersionDetailsSection.title,
         description: (
           <>
             <p>
@@ -800,7 +802,7 @@ export const sidebarStepContent = (
     ],
     "mini-stage-cci": [
       {
-        title: "Informations sur la structure d'accompagnement du candidat",
+        title: conventionTexts.agencySection.title,
         description: (
           <>
             <p>
@@ -827,7 +829,7 @@ export const sidebarStepContent = (
         ),
       },
       {
-        title: "Informations sur le candidat",
+        title: conventionTexts.beneficiarySection.title,
         description: (
           <>
             <p>
@@ -846,7 +848,7 @@ export const sidebarStepContent = (
         ),
       },
       {
-        title: "Informations sur l'entreprise",
+        title: conventionTexts.establishmentSection.title,
         description: (
           <>
             <p>
@@ -865,11 +867,11 @@ export const sidebarStepContent = (
         ),
       },
       {
-        title: "Lieu et heures de l'immersion professionnelle",
+        title: conventionTexts.immersionHourLocationSection.title,
         description: <></>,
       },
       {
-        title: "Détails de l'immersion professionnelle",
+        title: conventionTexts.immersionDetailsSection.title,
         description: <></>,
       },
     ],
