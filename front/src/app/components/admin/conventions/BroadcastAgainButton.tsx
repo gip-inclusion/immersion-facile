@@ -103,7 +103,7 @@ export const BroadcastAgainButton = ({
             },
           ]}
         >
-          Vous allez rediffuser aux SI ou système applicatifs suivant :
+          Vous allez rediffuser au SI ou système applicatif suivant :
           <ul>
             {consumerNames.map((consumerName) => (
               <li key={consumerName}>{consumerName}</li>
