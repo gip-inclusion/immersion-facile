@@ -275,6 +275,23 @@ export const AddEstablishmentsByBatch = () => {
                       {numberOfInvalidCandidateEstablishments} établissement(s)
                       en erreur et ne seront pas importés
                     </span>
+                    <ul>
+                      {candidateEstablishments
+                        .filter(
+                          (establishment) => establishment.zodErrors.length > 0,
+                        )
+                        .map((establishment) => (
+                          <li
+                            key={establishment.formEstablishment?.siret}
+                            className={fr.cx("fr-error-text", "fr-text--xs")}
+                          >
+                            {establishment.formEstablishment?.siret} :{" "}
+                            {establishment.zodErrors
+                              .map((error) => error.message)
+                              .join(", ")}
+                          </li>
+                        ))}
+                    </ul>
                   </li>
                 )}
               </ul>
