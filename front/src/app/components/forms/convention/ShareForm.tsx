@@ -3,6 +3,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -13,6 +14,12 @@ import {
   toConventionDraftDto,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import {
+  displayReadableError,
+  getFormContents,
+  toErrorsWithLabels,
+} from "src/app/hooks/formContents.hooks";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 
 type ShareFormProps = {
@@ -45,6 +52,11 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
     resolver: zodResolver(shareConventionDraftByEmailSchema),
   });
   const { register, handleSubmit, formState, reset, setValue } = methods;
+  const { errors, submitCount } = formState;
+
+  const { getFormErrors } = getFormContents(
+    formConventionFieldsLabels(conventionFormData.internshipKind),
+  );
 
   useEffect(() => {
     reset(makeInitialValues({ conventionFormData }));
@@ -111,6 +123,18 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
           state={formState.errors.details ? "error" : "default"}
           stateRelatedMessage={formState.errors.details?.message}
           disabled={isOnlyForSelf}
+        />
+        <ErrorNotifications
+          errorsWithLabels={toErrorsWithLabels({
+            errors: displayReadableError(errors),
+            labels: Object.fromEntries(
+              Object.entries(getFormErrors()).map(([key, value]) => [
+                `conventionDraft.${key}`,
+                value,
+              ]),
+            ),
+          })}
+          visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
       </form>
     </WithFeedbackReplacer>
