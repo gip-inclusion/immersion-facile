@@ -36,7 +36,14 @@ type AgencySelectorProps = {
   shouldFilterDelegationPrescriptionAgencyKind: boolean;
 };
 
-type AgencyKindForSelector = AllowedAgencyKindToAdd | "all";
+export const allAgencyKindsValue = "all" as const;
+type AgencyKindForSelector =
+  | AllowedAgencyKindToAdd
+  | typeof allAgencyKindsValue;
+
+export const isAllAgencyKinds = (
+  value: unknown,
+): value is typeof allAgencyKindsValue => value === allAgencyKindsValue;
 
 type SupportedFormsDto = ConventionReadDto | CreateAgencyDto;
 
@@ -280,7 +287,7 @@ const makeAgencyKindOptions = (
   const optionalAllKindOption: AgencyKindOptions =
     shouldFilterDelegationPrescriptionAgencyKind
       ? []
-      : [{ label: "Toutes", value: "all" }];
+      : [{ label: "Toutes", value: allAgencyKindsValue }];
 
   return [...optionalAllKindOption, ...sortedKinds];
 };

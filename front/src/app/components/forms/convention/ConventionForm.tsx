@@ -56,6 +56,7 @@ import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/a
 import {
   AgencySelector,
   departmentOptions,
+  isAllAgencyKinds,
 } from "src/app/components/forms/commons/AgencySelector";
 import {
   type ConventionFormMode,
@@ -469,7 +470,7 @@ export const ConventionForm = ({
         }),
       );
     }
-  }, [defaultValues, dispatch]);
+  }, [defaultValues, dispatch, establishmentAddressCountryCode]);
 
   return (
     <>
@@ -707,7 +708,14 @@ export const ConventionForm = ({
                   "fr-btns-group--icon-left",
                 )}
               >
-                <ShareConventionDraft conventionFormData={conventionValues} />
+                <ShareConventionDraft
+                  conventionFormData={{
+                    ...conventionValues,
+                    agencyKind: isAllAgencyKinds(conventionValues.agencyKind)
+                      ? undefined
+                      : conventionValues.agencyKind,
+                  }}
+                />
                 <Button
                   type="button"
                   id={
