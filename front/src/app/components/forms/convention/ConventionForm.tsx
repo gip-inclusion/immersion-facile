@@ -529,7 +529,7 @@ export const ConventionForm = ({
                 <Accordion
                   label={
                     <SectionTitle
-                      title={t.agencySection.title}
+                      title={`1. ${t.agencySection.title}`}
                       step={1}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
@@ -580,7 +580,7 @@ export const ConventionForm = ({
                 <Accordion
                   label={
                     <SectionTitle
-                      title={t.beneficiarySection.title}
+                      title={`2. ${t.beneficiarySection.title}`}
                       step={2}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
@@ -598,7 +598,7 @@ export const ConventionForm = ({
                 <Accordion
                   label={
                     <SectionTitle
-                      title={t.establishmentSection.title}
+                      title={`3. ${t.establishmentSection.title}`}
                       step={3}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
@@ -614,7 +614,7 @@ export const ConventionForm = ({
                 <Accordion
                   label={
                     <SectionTitle
-                      title={t.immersionHourLocationSection.title}
+                      title={`4. ${t.immersionHourLocationSection.title}`}
                       step={4}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
@@ -651,7 +651,7 @@ export const ConventionForm = ({
                 <Accordion
                   label={
                     <SectionTitle
-                      title={t.immersionDetailsSection.title}
+                      title={`5. ${t.immersionDetailsSection.title}`}
                       step={5}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
