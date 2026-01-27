@@ -138,11 +138,6 @@ export const AddAgencyForm = () => {
   }
   return (
     <>
-      <RadioButtons
-        id={domElementIds.addAgency.agencyRefersToInput}
-        legend={"Quel est votre rôle dans le parcours d’immersion ?"}
-        options={refersToOtherAgencyOptions}
-      />
       <Highlight className={fr.cx("fr-ml-0", "fr-pl-3w")} size="sm">
         <p className={fr.cx("fr-mb-1w")}>
           <strong>Vous ne savez encore quel est votre rôle ?</strong> Pas
@@ -152,16 +147,19 @@ export const AddAgencyForm = () => {
         <p>
           <a
             className={fr.cx("fr-link", "fr-text--sm")}
-            href={
-              "https://meet.brevo.com/immersion-facilit-e/referencer-mon-organisme"
-            }
+            href="https://app.livestorm.co/p/07e3d586-f2e0-42a3-babb-a9f0aff20b3a/live?s=2c76add6-7006-4ab3-a145-1cece3c86a38"
             target="_blank"
             rel="noreferrer"
           >
-            Prendre rendez-vous
+            Participer à un temps d'échange
           </a>
         </p>
       </Highlight>
+      <RadioButtons
+        id={domElementIds.addAgency.agencyRefersToInput}
+        legend={"Quel est votre rôle dans le parcours d'immersion ?"}
+        options={refersToOtherAgencyOptions}
+      />
 
       {match(refersToOtherAgency)
         .with(P.boolean, (refersToOtherAgency) => (
