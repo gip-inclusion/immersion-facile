@@ -267,6 +267,8 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   },
   "signatories.beneficiary.birthdate": {
     label: "Date de naissance du candidat",
+    hintText:
+      "Merci d’indiquer la vraie date de naissance. Cette information est indispensable pour identifier la personne en immersion et traiter la convention. Une erreur ou une date volontairement différente peut empêcher la validation de la convention.",
     id: beneficiarySectionIds.birthdate,
     required: true,
   },
