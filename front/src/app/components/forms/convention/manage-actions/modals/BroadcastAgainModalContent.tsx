@@ -48,7 +48,7 @@ export const BroadcastAgainModalContent = ({
 
   return (
     <>
-      <p>Vous allez rediffuser aux SI ou système applicatifs suivant :</p>
+      <p>Vous allez rediffuser au SI ou système applicatif suivant :</p>
       <ul>
         {consumerNames.map((consumerName) => (
           <li key={consumerName}>{consumerName}</li>
