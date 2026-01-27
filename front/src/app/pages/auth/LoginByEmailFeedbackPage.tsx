@@ -7,7 +7,7 @@ import {
   type AllowedLoginSource,
   displayDuration,
   domElementIds,
-  fiveMinutesInSeconds,
+  loginByEmailLinkDurationInSeconds,
 } from "shared";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
@@ -35,7 +35,10 @@ export const LoginByEmailFeedbackPage = ({
   const isRequestingLoginByEmail = useAppSelector(
     authSelectors.isRequestingLoginByEmail,
   );
-  const expiryDuration = displayDuration(fiveMinutesInSeconds, "minutes");
+  const expiryDuration = displayDuration(
+    loginByEmailLinkDurationInSeconds,
+    "minutes",
+  );
   const contents: Record<
     Mode,
     {
