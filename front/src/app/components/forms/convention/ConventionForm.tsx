@@ -712,16 +712,9 @@ export const ConventionForm = ({
             currentStep={currentStep}
             sidebarContent={sidebarContent}
             sidebarFooter={
-              <div
-                className={fr.cx(
-                  "fr-btns-group",
-                  "fr-btns-group--center",
-                  "fr-btns-group--inline",
-                  "fr-btns-group--sm",
-                  "fr-btns-group--icon-left",
-                )}
-              >
-                <ShareConventionDraft
+              <>
+                {mode !== "edit" && (
+                  <ShareConventionDraft
                   conventionFormData={{
                     ...conventionValues,
                     agencyKind: isAllAgencyKinds(conventionValues.agencyKind)
@@ -729,6 +722,7 @@ export const ConventionForm = ({
                       : conventionValues.agencyKind,
                   }}
                 />
+                )}
                 <Button
                   type="button"
                   id={
@@ -743,7 +737,7 @@ export const ConventionForm = ({
                 >
                   Vérifier la demande
                 </Button>
-              </div>
+              </>
             }
           />
         }
