@@ -31,12 +31,20 @@ export const ConventionFormSidebar = ({
       </div>
 
       {sidebarFooter && (
-        <>
+        <div
+          className={fr.cx(
+            "fr-btns-group",
+            "fr-btns-group--center",
+            "fr-btns-group--inline",
+            "fr-btns-group--sm",
+            "fr-btns-group--icon-left",
+          )}
+        >
           <hr className={cx(Styles.separator)} />
           <div className={cx(fr.cx("fr-mt-md-2w"), Styles.footer)}>
             {sidebarFooter}
           </div>
-        </>
+        </div>
       )}
     </aside>
   );
