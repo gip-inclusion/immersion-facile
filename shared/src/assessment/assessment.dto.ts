@@ -61,6 +61,11 @@ export type WithAssessmentDto = {
   assessment: AssessmentDto;
 };
 
+export type DeleteAssessmentRequestDto = {
+  conventionId: ConventionId;
+  deleteAssessmentJustification: string;
+};
+
 export type AssessmentMode = "CreateAssessment" | "GetAssessment";
 
 export type LegacyAssessmentDto = {
