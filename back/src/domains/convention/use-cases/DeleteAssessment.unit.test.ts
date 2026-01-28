@@ -22,7 +22,7 @@ import {
 } from "./DeleteAssessment";
 
 describe("DeleteAssessment", () => {
-  const convention = new ConventionDtoBuilder().withId("convention-id").build();
+  const convention = new ConventionDtoBuilder().build();
 
   const adminUser = new ConnectedUserBuilder()
     .withId("backoffice-user-id")
