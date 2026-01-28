@@ -52,7 +52,10 @@ const getButtonWithSubMenuIdAndLabels: (
       label: "Modifier la convention",
     },
     validationArea: { label: "" },
-    assessmentArea: { label: "" },
+    assessmentArea: {
+      id: domElementIds.manageConvention.assessmentActionsButton,
+      label: "Bilan de l'immersion",
+    },
     conventionArea: { label: "" },
     otherActionArea: otherActionLabel,
     signatureArea: { label: "" },
