@@ -30,6 +30,17 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
+  sharedRouter.deleteAssessment(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res.status(204), () =>
+        deps.useCases.deleteAssessment.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   sharedRouter.getAssessmentByConventionId(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>

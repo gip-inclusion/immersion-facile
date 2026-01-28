@@ -34,6 +34,7 @@ import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../dom
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
+import { makeDeleteAssessment } from "../../domains/convention/use-cases/DeleteAssessment";
 import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
@@ -886,6 +887,12 @@ export const createUseCases = ({
       uowPerformer,
       deps: { createNewEvent },
     }),
+    deleteAssessment: makeDeleteAssessment({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+      },
+    }),
     getAssessmentByConventionId: makeGetAssessmentByConventionId({
       uowPerformer,
     }),
@@ -898,6 +905,7 @@ export const createUseCases = ({
           timeGateway: gateways.timeGateway,
         },
       }),
+
     notifyAllActorsThatConventionHasBeenTransferred:
       makeNotifyAllActorsThatConventionTransferred({
         uowPerformer,
