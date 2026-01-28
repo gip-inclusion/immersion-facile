@@ -72,6 +72,8 @@ const deleteAssessmentEpic: AppEpic<AssessmentAction> = (
         .pipe(
           map(() =>
             assessmentSlice.actions.deleteAssessmentSucceeded({
+              conventionId: action.payload.params.conventionId,
+              jwt: action.payload.jwt,
               feedbackTopic: action.payload.feedbackTopic,
             }),
           ),
