@@ -59,4 +59,34 @@ const getAssessmentEpic: AppEpic<AssessmentAction> = (
     ),
   );
 
-export const assessmentEpics = [createAssessmentEpic, getAssessmentEpic];
+const deleteAssessmentEpic: AppEpic<AssessmentAction> = (
+  action$,
+  _,
+  { assessmentGateway },
+) =>
+  action$.pipe(
+    filter(assessmentSlice.actions.deleteAssessmentRequested.match),
+    switchMap((action) =>
+      assessmentGateway
+        .deleteAssessment$(action.payload.params, action.payload.jwt)
+        .pipe(
+          map(() =>
+            assessmentSlice.actions.deleteAssessmentSucceeded({
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            assessmentSlice.actions.deleteAssessmentFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
+export const assessmentEpics = [
+  createAssessmentEpic,
+  getAssessmentEpic,
+  deleteAssessmentEpic,
+];
