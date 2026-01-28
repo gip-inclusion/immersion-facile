@@ -22,6 +22,18 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
       : of(undefined).pipe(delay(this.latency));
   }
 
+  public deleteAssessment$({
+    conventionId,
+  }: {
+    conventionId: ConventionId;
+    deleteAssessmentJustification: string;
+    jwt: string;
+  }): Observable<void> {
+    return conventionId === failedId
+      ? throwError(failedIdError)
+      : of(undefined).pipe(delay(this.latency));
+  }
+
   public getAssessment$({
     conventionId,
   }: {

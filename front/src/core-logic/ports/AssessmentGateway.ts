@@ -1,8 +1,10 @@
 import type { Observable } from "rxjs";
 import type {
   AssessmentDto,
+  ConnectedUserJwt,
   ConventionId,
   ConventionSupportedJwt,
+  DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
   WithConventionId,
 } from "shared";
@@ -14,6 +16,10 @@ export type AssessmentAndJwt = {
 
 export interface AssessmentGateway {
   createAssessment$(params: AssessmentAndJwt): Observable<void>;
+  deleteAssessment$(
+    params: DeleteAssessmentRequestDto,
+    jwt: ConnectedUserJwt,
+  ): Observable<void>;
   getAssessment$(params: {
     conventionId: ConventionId;
     jwt: string;

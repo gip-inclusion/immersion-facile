@@ -46,6 +46,34 @@ export class HttpAssessmentGateway implements AssessmentGateway {
     );
   }
 
+  public deleteAssessment$({
+    conventionId,
+    deleteAssessmentJustification,
+    jwt,
+  }: {
+    conventionId: ConventionId;
+    deleteAssessmentJustification: string;
+    jwt: string;
+  }): Observable<void> {
+    return from(
+      this.httpClient
+        .deleteAssessment({
+          headers: { authorization: jwt },
+          body: {
+            conventionId,
+            deleteAssessmentJustification,
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 204 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
   public getAssessment$({
     conventionId,
     jwt,
