@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { conventionIdSchema } from "../convention/convention.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import {
   localization,
@@ -8,6 +9,7 @@ import {
 } from "../zodUtils";
 import {
   type AssessmentDto,
+  type DeleteAssessmentRequestDto,
   type FormAssessmentDto,
   type LegacyAssessmentDto,
   typeOfContracts,
@@ -87,4 +89,10 @@ export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyA
     }),
     conventionId: z.string(),
     establishmentFeedback: zStringMinLength1,
+  });
+
+export const deleteAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<DeleteAssessmentRequestDto> =
+  z.object({
+    conventionId: conventionIdSchema,
+    deleteAssessmentJustification: zStringMinLength1,
   });
