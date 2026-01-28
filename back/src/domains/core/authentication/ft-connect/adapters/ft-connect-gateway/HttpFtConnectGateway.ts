@@ -142,7 +142,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       if (response.status !== 200) {
         log.error({
           sharedRouteResponse: response,
-          message: "exchangeCodeForAccessToken - Response status is not 200.",
+          message: `exchangeCodeForAccessToken - Response status is ${response.status}`,
         });
         return undefined;
       }
@@ -231,7 +231,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         log.error({
           sharedRouteResponse: response,
           ftConnect: { peExternalId },
-          message: "getUserStatutInfo -Response status is not 200.",
+          message: `getUserStatutInfo - Response status is ${response.status}.`,
         });
         return false;
       }
@@ -276,7 +276,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       if (response.status !== 200) {
         log.error({
           sharedRouteResponse: response,
-          message: "getUserInfo -Response status is not 200.",
+          message: `getUserInfo - Response status is ${response.status}.`,
         });
         return undefined;
       }
@@ -317,7 +317,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       if (response.status !== 200) {
         log.error({
           sharedRouteResponse: response,
-          message: "getUserBirthDate -Response status is not 200.",
+          message: `getUserBirthDate - Response status is ${response.status}.`,
         });
         return undefined;
       }
@@ -359,7 +359,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       if (response.status !== 200) {
         log.error({
           sharedRouteResponse: response,
-          message: "getUserContactDetails -Response status is not 200.",
+          message: `getUserContactDetails - Response status is ${response.status}.`,
         });
         return undefined;
       }
@@ -404,7 +404,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       if (response.status !== 200) {
         log.error({
           sharedRouteResponse: response,
-          message: "getAdvisorsInfo - Response status is not 200.",
+          message: `getAdvisorsInfo - Response status is ${response.status}`,
         });
         return [];
       }
