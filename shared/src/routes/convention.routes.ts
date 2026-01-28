@@ -2,6 +2,7 @@ import { defineRoute, defineRoutes } from "shared-routes";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
 import {
   assessmentDtoSchema,
+  deleteAssessmentRequestDtoSchema,
   legacyAssessmentDtoSchema,
 } from "../assessment/assessment.schema";
 import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
@@ -48,6 +49,20 @@ export const conventionMagicLinkRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
+    },
+  }),
+
+  deleteAssessment: defineRoute({
+    url: "/auth/assessment",
+    method: "delete",
+    ...withAuthorizationHeaders,
+    requestBodySchema: deleteAssessmentRequestDtoSchema,
+    responses: {
+      204: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 
