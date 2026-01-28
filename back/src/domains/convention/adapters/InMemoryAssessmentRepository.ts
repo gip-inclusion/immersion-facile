@@ -34,6 +34,12 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
     this.#assessments.push(assessment);
   }
 
+  public async delete(conventionId: ConventionId): Promise<void> {
+    this.#assessments = this.#assessments.filter(
+      (assessment) => assessment.conventionId !== conventionId,
+    );
+  }
+
   public setAssessments(assessments: AssessmentEntity[]) {
     this.#assessments = assessments;
   }
