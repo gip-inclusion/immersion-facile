@@ -160,6 +160,67 @@ describe("Immersion Assessment slice", () => {
     });
   });
 
+  describe("immersion assessment delete requested", () => {
+    const feedGatewayWithDeleteError = (error: Error) => {
+      dependencies.assessmentGateway.deleteAssessmentResponse$.error(error);
+    };
+
+    const feedGatewayWithDeleteSuccess = () => {
+      dependencies.assessmentGateway.deleteAssessmentResponse$.next(undefined);
+    };
+
+    it("success", () => {
+      expectStateToMatchInitialState(store);
+      store.dispatch(
+        assessmentSlice.actions.deleteAssessmentRequested({
+          params: {
+            conventionId: "23465",
+            deleteAssessmentJustification: "Parce que…",
+          },
+          jwt: "my-jwt",
+          feedbackTopic: "delete-assessment",
+        }),
+      );
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithDeleteSuccess();
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "delete-assessment": {
+          title: "Bilan supprimé",
+          level: "success",
+          on: "delete",
+          message: "Le bilan a bien été supprimé",
+        },
+      });
+    });
+
+    it("error on backend", () => {
+      const backendError: Error = new Error("Backend Error");
+      expectStateToMatchInitialState(store);
+      store.dispatch(
+        assessmentSlice.actions.deleteAssessmentRequested({
+          params: {
+            conventionId: "23465  ",
+            deleteAssessmentJustification: "Parce que…",
+          },
+          jwt: "my-jwt",
+          feedbackTopic: "delete-assessment",
+        }),
+      );
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithDeleteError(backendError);
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "delete-assessment": {
+          title: "Problème lors de la suppression du bilan",
+          level: "error",
+          on: "delete",
+          message: "Backend Error",
+        },
+      });
+    });
+  });
+
   describe("clear fetched assessment", () => {
     it("Clear fetched assessment", () => {
       const conventionId = "11111111-1111-4111-1111-111111111111";
