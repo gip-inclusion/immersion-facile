@@ -201,7 +201,7 @@ const getUseCasesByTopics = (
       useCases.broadcastToFranceTravailOnAssessmentCreated,
     ),
   ],
-  AssessmentDeleted: [],
+  AssessmentDeleted: [useCases.notifyActorsThatAssessmentDeleted],
   EmailWithLinkToCreateAssessmentSent: [],
   BeneficiaryAssessmentEmailSent: [],
   AssessmentReminderManuallySent: [],
