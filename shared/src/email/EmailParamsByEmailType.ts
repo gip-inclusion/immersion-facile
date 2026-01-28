@@ -166,6 +166,18 @@ export type EmailParamsByEmailType = {
     conventionId: ConventionId;
     internshipKind: InternshipKind;
   };
+  ASSESSMENT_DELETED_ESTABLISHMENT_NOTIFICATION: {
+    assessmentCreationLink: string;
+    beneficiaryName: string;
+    establishmentTutorName: string;
+    justification: string;
+    internshipKind: InternshipKind;
+  };
+  ASSESSMENT_DELETED_BENEFICIARY_NOTIFICATION: {
+    beneficiaryName: string;
+    conventionId: ConventionId;
+    internshipKind: InternshipKind;
+  };
   CANCELLED_CONVENTION_NOTIFICATION: {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
