@@ -47,6 +47,7 @@ import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-ca
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
+import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -905,7 +906,16 @@ export const createUseCases = ({
           timeGateway: gateways.timeGateway,
         },
       }),
-
+    notifyActorsThatAssessmentDeleted: makeNotifyActorsThatAssessmentDeleted({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl,
+        timeGateway: gateways.timeGateway,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        config,
+      },
+    }),
     notifyAllActorsThatConventionHasBeenTransferred:
       makeNotifyAllActorsThatConventionTransferred({
         uowPerformer,
