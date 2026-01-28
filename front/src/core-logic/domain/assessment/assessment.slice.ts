@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AssessmentDto,
-  ConnectedUserJwt,
   ConventionId,
+  ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
 } from "shared";
@@ -44,7 +44,7 @@ export const assessmentSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{
         params: DeleteAssessmentRequestDto;
-        jwt: ConnectedUserJwt;
+        jwt: ConventionSupportedJwt;
       }>,
     ) => {
       state.isLoading = true;
