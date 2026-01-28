@@ -9,4 +9,5 @@ export interface AssessmentRepository {
   getByConventionIds(
     conventionIds: ConventionId[],
   ): Promise<AssessmentEntity[]>;
+  delete: (conventionId: ConventionId) => Promise<void>;
 }
