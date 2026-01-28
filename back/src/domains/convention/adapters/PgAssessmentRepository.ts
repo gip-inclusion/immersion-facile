@@ -56,6 +56,13 @@ const parseAssessmentEntitySchema = (assessment: any) =>
 export class PgAssessmentRepository implements AssessmentRepository {
   constructor(private transaction: KyselyDb) {}
 
+  public async delete(conventionId: ConventionId): Promise<void> {
+    await this.transaction
+      .deleteFrom("immersion_assessments")
+      .where("convention_id", "=", conventionId)
+      .execute();
+  }
+
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<AssessmentEntity | undefined> {

@@ -405,8 +405,10 @@ export const domElementIds = {
     transferToAgencySubmitButton:
       "im-manage-convention__transfer-to-agency-submit-button",
     abandonAssessmentButton: "im-manage-convention__abandon-assessment-button",
+    assessmentActionsButton: "im-manage-convention__assessment-actions-button",
     assessmentDocumentButton:
       "im-manage-convention__assessment-document-button",
+    deleteAssessmentButton: "im-manage-convention__delete-assessment-button",
     assessmentFullFillButton:
       "im-manage-convention__assessment-full-fill-button",
 
@@ -443,6 +445,12 @@ export const domElementIds = {
     validatorModal: "im-validator-modal",
     cancelModal: "im-cancel-modal",
     cancelModalForm: "im-cancel-modal__form",
+    deleteAssessmentModal: "im-delete-assessment-modal",
+    deleteAssessmentModalForm: "im-delete-assessment-modal__form",
+    deleteAssessmentModalSubmitButton:
+      "im-delete-assessment-modal__submit-button",
+    deleteAssessmentModalCancelButton:
+      "im-delete-assessment-modal__cancel-button",
     renewModal: "im-renew-modal",
     renewModalForm: "im-renew-modal__form",
     fillAssessmentInfoModal: "im-fill-assessment-info-modal",

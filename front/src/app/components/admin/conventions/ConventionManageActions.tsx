@@ -11,6 +11,7 @@ import {
   type ConnectedUserJwt,
   type ConventionJwt,
   type ConventionReadDto,
+  type DeleteAssessmentRequestDto,
   domElementIds,
   type EditConventionCounsellorNameRequestDto,
   type ExcludeFromExisting,
@@ -27,6 +28,7 @@ import type { VerificationAction } from "src/app/components/forms/convention/man
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { getConventionSubStatus } from "src/app/utils/conventionSubStatus";
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import type { Feedback as FeedbackType } from "src/core-logic/domain/feedback/feedback.slice";
@@ -106,6 +108,7 @@ export const ConventionManageActions = ({
     verificationAction: VerificationAction,
     params:
       | UpdateConventionStatusRequestDto
+      | DeleteAssessmentRequestDto
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
       | EditConventionCounsellorNameRequestDto
@@ -139,6 +142,23 @@ export const ConventionManageActions = ({
           jwt: jwtParams.jwt,
           conventionId: params.conventionId,
           feedbackTopic: "convention-action-sign",
+        }),
+      );
+      return;
+    }
+
+    if (
+      verificationAction === "DELETE_ASSESSMENT" &&
+      "deleteAssessmentJustification" in params
+    ) {
+      dispatch(
+        assessmentSlice.actions.deleteAssessmentRequested({
+          params: {
+            conventionId: params.conventionId,
+            deleteAssessmentJustification: params.deleteAssessmentJustification,
+          },
+          jwt: jwtParams.jwt,
+          feedbackTopic: "delete-assessment",
         }),
       );
       return;
@@ -293,6 +313,7 @@ export const ConventionManageActions = ({
           "convention-action-cancel",
           "convention-action-renew",
           "convention-action-edit-counsellor-name",
+          "delete-assessment",
           "partner-conventions",
         ]}
         className={fr.cx("fr-mb-2w")}

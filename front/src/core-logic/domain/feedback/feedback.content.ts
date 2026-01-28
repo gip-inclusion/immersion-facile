@@ -42,6 +42,7 @@ const topics = [
   "api-consumer-renew",
   "api-consumer-revoke",
   "assessment",
+  "delete-assessment",
   "auth-global",
   "broadcast-convention-again",
   "connected-user-conventions",
@@ -468,6 +469,18 @@ export const feedbacks: Record<
       action: assessmentSlice.actions.getAssessmentFailed,
       title: "Problème lors de la récupération du bilan",
       message: "Un problème est survenu lors de la récupération du bilan",
+    },
+  },
+  "delete-assessment": {
+    "delete.success": {
+      action: assessmentSlice.actions.deleteAssessmentSucceeded,
+      title: "Bilan supprimé",
+      message: "Le bilan a bien été supprimé",
+    },
+    "delete.error": {
+      action: assessmentSlice.actions.deleteAssessmentFailed,
+      title: "Problème lors de la suppression du bilan",
+      message: "Une erreur est survenue lors de la suppression du bilan",
     },
   },
   "transfer-convention-to-agency": {

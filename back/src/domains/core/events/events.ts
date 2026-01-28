@@ -3,6 +3,7 @@ import {
   type ContactEstablishmentEventPayload,
   type ConventionId,
   type DateString,
+  type DeleteAssessmentRequestDto,
   type Flavor,
   type RejectConnectedUserRoleForAgencyParams,
   type Role,
@@ -139,6 +140,7 @@ export type DomainEvent =
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", WithConventionDto & WithAssessmentDto & WithTriggeredBy>
+  | GenericEvent<"AssessmentDeleted", DeleteAssessmentRequestDto & WithTriggeredBy>
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 

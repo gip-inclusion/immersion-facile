@@ -3,6 +3,7 @@ import type {
   AssessmentDto,
   ConventionId,
   ConventionSupportedJwt,
+  DeleteAssessmentRequestDto,
   WithConventionId,
 } from "shared";
 import type {
@@ -13,11 +14,19 @@ import type {
 export class TestAssessmentGateway implements AssessmentGateway {
   // test purpose
   public creationResponse$ = new Subject<void>();
+  public deleteAssessmentResponse$ = new Subject<void>();
   public getResponse$ = new Subject<AssessmentDto>();
   public sendAssessmentLinkResponse$ = new Subject<void>();
 
   public createAssessment$(_params: AssessmentAndJwt): Observable<void> {
     return this.creationResponse$;
+  }
+
+  public deleteAssessment$(
+    _params: DeleteAssessmentRequestDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return this.deleteAssessmentResponse$;
   }
 
   public getAssessment$(_input: {
