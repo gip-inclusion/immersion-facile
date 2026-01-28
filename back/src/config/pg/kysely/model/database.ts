@@ -126,6 +126,7 @@ interface Discussions extends WithAcquisition {
   potential_beneficiary_last_name: string;
   potential_beneficiary_email: string;
   potential_beneficiary_phone_id: number;
+  old__potential_beneficiary_phone: string | null;
   potential_beneficiary_resume_link: string | null;
   potential_beneficiary_experience_additional_information: string | null;
   potential_beneficiary_date_preferences: string;
@@ -336,6 +337,7 @@ interface Actors {
   last_name: string;
   email: string;
   phone_id: number;
+  old__phone: string | null;
   signed_at: Timestamp | null;
   extra_fields: Json | null;
   id: Generated<number>;
@@ -392,6 +394,7 @@ interface ApiConsumers {
   contact_last_name: string;
   contact_job: string;
   contact_phone_id: number;
+  old__contact_phone: string | null;
   rights: Generated<Json>;
   revoked_at: Timestamp | null;
   current_key_issued_at: Timestamp;
@@ -520,6 +523,7 @@ interface EstablishmentsUsers {
   role: string;
   job: string | null;
   phone_id: number | null;
+  old__phone: string | null;
   should_receive_discussion_notifications: boolean;
   is_main_contact_by_phone: boolean | null;
   is_main_contact_in_person: boolean | null;
