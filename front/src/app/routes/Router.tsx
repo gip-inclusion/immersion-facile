@@ -62,6 +62,7 @@ import {
   standardPageSlugs,
 } from "./routeParams/standardPage";
 import { routes, useRoute } from "./routes";
+import { ConventionTemplatePage } from "src/app/pages/convention/ConventionTemplate";
 
 const OpenApiDocV2Page = lazy(
   () => import("src/app/pages/open-api-doc/OpenApiDocV2Page"),
@@ -231,6 +232,7 @@ const getPageByRouteName: {
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />
   ),
+  conventionTemplate: (route) => <ConventionTemplatePage route={route} />,
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   establishmentDashboard: (route) => (
     <RedirectTo

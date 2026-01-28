@@ -5,7 +5,6 @@ import {
   adminTabs,
   type ConnectedUserQueryParams,
   frontRoutes,
-  type ValueOf,
 } from "shared";
 import {
   createRouter,
@@ -13,9 +12,11 @@ import {
   param,
   type ValueSerializer,
 } from "type-route";
+
 import {
   appellationAndRomeDtoArraySerializer,
   appellationStringSerializer,
+  conventionTemplateFromRouteSerializer,
   conventionValuesFromUrl,
   nafCodeSerializer,
 } from "./routeParams/convention";
@@ -84,9 +85,6 @@ export const searchParams = {
   nafLabel: param.query.optional.string,
   ...acquisitionParams,
 };
-
-export type FrontRouteUnion = ValueOf<typeof routes>;
-export type FrontRouteKeys = keyof typeof routes;
 
 const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
 
@@ -183,6 +181,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.query.optional.string,
     },
     () => `/${frontRoutes.conventionDocument}`,
+  ),
+  conventionTemplate: defineRoute(
+    { fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer) },
+    () => `/${frontRoutes.conventionTemplate}`,
   ),
   initiateConvention: defineRoute(
     {

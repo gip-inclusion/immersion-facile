@@ -389,6 +389,13 @@ export const nafCodeSerializer: ValueSerializer<NafCode[]> = {
   stringify: (nafCode) => JSON.stringify(nafCode),
 };
 
+export const conventionTemplateFromRouteSerializer: ValueSerializer<
+  "agencyDashboard" | "establishmentDashboard"
+> = {
+  parse: (raw) => raw as "agencyDashboard" | "establishmentDashboard",
+  stringify: (route) => route,
+};
+
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
 type ConventionQueryParams = typeof conventionValuesFromUrl;
 
