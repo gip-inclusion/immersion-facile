@@ -1,0 +1,579 @@
+# OpenSecKit System Model - Architecture
+# Phase 2: Architecture
+# Generated: 2026-01-28
+
+metadata:
+  section: "architecture"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+architecture:
+  style: "monorepo-monolith"
+  description: |
+    Application web full-stack en architecture monorepo avec séparation claire
+    entre frontend React et backend Express. Le backend suit une architecture
+    hexagonale (ports & adapters) avec Domain-Driven Design et event sourcing
+    via le pattern Outbox. Communication synchrone REST entre front et back.
+
+  tech_stack:
+    languages:
+      - name: "TypeScript"
+        version: "5.8.3"
+        usage: "Backend, Frontend, Shared"
+
+    frameworks:
+      - name: "Express.js"
+        version: "4.21.0"
+        usage: "Backend REST API"
+      - name: "React"
+        version: "18.0.0"
+        usage: "Frontend SPA"
+      - name: "Redux Toolkit"
+        version: "latest"
+        usage: "Frontend state management"
+      - name: "Redux Observable (RxJS)"
+        version: "7.5.5"
+        usage: "Frontend async side-effects"
+
+    databases:
+      - name: "PostgreSQL"
+        version: "13+"
+        usage: "Primary data store"
+        extension: "PostGIS (geospatial)"
+      - name: "Redis"
+        version: "4.7.0"
+        usage: "Caching"
+
+    infrastructure:
+      - name: "Scalingo"
+        usage: "PaaS hosting (France-based)"
+        certifications_ref: "index.yaml#infrastructure_certifications"
+      - name: "Docker"
+        usage: "Containerization"
+      - name: "Nginx"
+        usage: "Reverse proxy, SSL termination"
+      - name: "S3 (Cellar)"
+        usage: "File storage"
+
+components:
+  - id: "comp-frontend"
+    name: "Frontend"
+    type: "web-application"
+    description: "Single Page Application React pour les utilisateurs finaux"
+    technology:
+      - "React 18"
+      - "Vite"
+      - "Redux Toolkit"
+      - "Redux Observable"
+      - "DSFR"
+      - "React Router (type-route)"
+      - "React Hook Form"
+      - "Zod"
+      - "Leaflet"
+    location: "front/"
+    interfaces:
+      - type: "ui"
+        protocol: "HTTPS"
+        port: 3000
+        authentication: "JWT (cookies)"
+        authorization: "Role-based"
+    data_stored: []
+    data_processed:
+      - "User input forms"
+      - "Search queries"
+      - "Convention data"
+    dependencies:
+      - component: "comp-backend"
+        type: "runtime"
+      - component: "comp-shared"
+        type: "build"
+    owner: "team-core"
+    security_notes:
+      - "PWA avec service worker"
+      - "Sourcemaps uploadés sur Sentry"
+
+  - id: "comp-backend"
+    name: "Backend API"
+    type: "api-server"
+    description: "API REST Express.js avec architecture hexagonale"
+    technology:
+      - "Node.js 22"
+      - "Express.js"
+      - "Kysely"
+      - "Pino"
+      - "Zod"
+      - "JWT"
+    location: "back/"
+    interfaces:
+      - type: "rest-api"
+        protocol: "HTTPS"
+        port: 1234
+        authentication: "JWT, Magic Links, API Keys"
+        authorization: "Role-based, Resource-based"
+    data_stored: []
+    data_processed:
+      - "Conventions"
+      - "User data"
+      - "Establishments"
+      - "Agencies"
+    dependencies:
+      - component: "comp-database"
+        type: "runtime"
+      - component: "comp-redis"
+        type: "runtime"
+      - component: "comp-shared"
+        type: "build"
+    owner: "team-core"
+    security_notes:
+      - "Rate limiting via Bottleneck"
+      - "HTML injection detection middleware"
+      - "JWT rotation support"
+
+  - id: "comp-shared"
+    name: "Shared Library"
+    type: "library"
+    description: "Types, schemas Zod et utilitaires partagés entre front et back"
+    technology:
+      - "TypeScript"
+      - "Zod"
+    location: "shared/"
+    interfaces: []
+    data_stored: []
+    data_processed: []
+    dependencies: []
+    owner: "team-core"
+    security_notes:
+      - "Single source of truth pour les DTOs"
+      - "Validation schemas centralisés"
+
+  - id: "comp-database"
+    name: "PostgreSQL Database"
+    type: "database"
+    description: "Base de données relationnelle principale avec extension PostGIS"
+    technology:
+      - "PostgreSQL 13"
+      - "PostGIS"
+    location: "managed-service"
+    interfaces:
+      - type: "database"
+        protocol: "PostgreSQL"
+        port: 5432
+        authentication: "Connection string"
+        authorization: "Database roles"
+    data_stored:
+      - "conventions"
+      - "users"
+      - "agencies"
+      - "establishments"
+      - "discussions"
+      - "outbox (events)"
+      - "notifications"
+    data_processed: []
+    dependencies: []
+    owner: "team-platform"
+    security_notes:
+      - "Encryption at rest (provider managed)"
+      - "SSL connections required"
+
+  - id: "comp-redis"
+    name: "Redis Cache"
+    type: "cache"
+    description: "Cache pour sessions et données temporaires"
+    technology:
+      - "Redis"
+    location: "managed-service"
+    interfaces:
+      - type: "cache"
+        protocol: "Redis"
+        port: 6379
+        authentication: "Password"
+    data_stored:
+      - "Session data"
+      - "Rate limiting counters"
+      - "Temporary tokens"
+    data_processed: []
+    dependencies: []
+    owner: "team-platform"
+    security_notes:
+      - "SSL connections"
+      - "Password authentication"
+
+  - id: "comp-pipelines"
+    name: "Background Jobs"
+    type: "worker"
+    description: "Scripts batch et tâches planifiées (cron jobs)"
+    technology:
+      - "Node.js"
+      - "TypeScript"
+    location: "back/src/scripts/scheduledScripts/"
+    interfaces: []
+    data_stored: []
+    data_processed:
+      - "Establishment updates from INSEE"
+      - "Email notifications"
+      - "Event processing"
+    dependencies:
+      - component: "comp-database"
+        type: "runtime"
+      - component: "comp-backend"
+        type: "runtime"
+    owner: "team-core"
+    security_notes:
+      - "Runs with same privileges as backend"
+
+  - id: "comp-event-crawler"
+    name: "Event Crawler"
+    type: "worker"
+    description: "Processeur d'événements asynchrone (Outbox pattern)"
+    technology:
+      - "Node.js"
+      - "TypeScript"
+    location: "back/src/domains/core/events/"
+    interfaces: []
+    data_stored: []
+    data_processed:
+      - "Domain events"
+      - "Notifications"
+      - "Partner broadcasts"
+    dependencies:
+      - component: "comp-database"
+        type: "runtime"
+    owner: "team-core"
+    security_notes:
+      - "Event quarantine for problematic topics"
+      - "Retry with exponential backoff"
+
+  - id: "comp-html-templates"
+    name: "HTML Templates Library"
+    type: "library"
+    description: "Génération de contenus HTML pour emails"
+    technology:
+      - "TypeScript"
+    location: "libs/html-templates/"
+    interfaces: []
+    data_stored: []
+    data_processed:
+      - "Email templates"
+    dependencies: []
+    owner: "team-core"
+
+  - id: "comp-react-design-system"
+    name: "React Design System"
+    type: "library"
+    description: "Composants UI spécifiques hors DSFR"
+    technology:
+      - "React"
+      - "TypeScript"
+    location: "libs/react-design-system/"
+    interfaces: []
+    data_stored: []
+    data_processed: []
+    dependencies: []
+    owner: "team-core"
+
+  - id: "comp-adminer"
+    name: "Adminer"
+    type: "admin-tool"
+    description: "Interface d'administration de base de données (Adminer) connectée à PostgreSQL production"
+    technology:
+      - "Adminer"
+      - "PHP"
+    location: "managed-service"
+    interfaces:
+      - type: "web-ui"
+        protocol: "HTTPS"
+        port: 443
+        authentication: "Scalingo credentials"
+        authorization: "Platform Team only"
+    data_stored: []
+    data_processed:
+      - "All database data (read/write)"
+    dependencies:
+      - component: "comp-database"
+        type: "runtime"
+    owner: "team-platform"
+    security_notes:
+      - "Accès restreint à l'équipe plateforme"
+      - "Authentification Scalingo requise"
+      - "Hébergé sur zone SecNumCloud (osc-secnum-fr1)"
+      - "Audit logging des accès"
+    _note: "Outil d'administration BDD pour opérations de maintenance"
+
+data_flows:
+  - id: "flow-user-to-frontend"
+    name: "User Browser to Frontend"
+    from: "external-user"
+    to: "comp-frontend"
+    data:
+      - "User interactions"
+      - "Form submissions"
+    protocol: "HTTPS"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+      version: "1.2+"
+    authentication: "Session cookies"
+
+  - id: "flow-frontend-to-backend"
+    name: "Frontend to Backend API"
+    from: "comp-frontend"
+    to: "comp-backend"
+    data:
+      - "API requests"
+      - "JWT tokens"
+    protocol: "HTTPS"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+      version: "1.2+"
+    authentication: "JWT Bearer token"
+
+  - id: "flow-backend-to-db"
+    name: "Backend to Database"
+    from: "comp-backend"
+    to: "comp-database"
+    data:
+      - "All application data"
+    protocol: "PostgreSQL/SSL"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+    authentication: "Connection credentials"
+
+  - id: "flow-backend-to-redis"
+    name: "Backend to Redis"
+    from: "comp-backend"
+    to: "comp-redis"
+    data:
+      - "Cache data"
+      - "Session data"
+    protocol: "Redis/TLS"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+    authentication: "Password"
+
+  - id: "flow-backend-to-s3"
+    name: "Backend to S3 Storage"
+    from: "comp-backend"
+    to: "external-s3"
+    data:
+      - "PDF documents"
+      - "Uploaded files"
+    protocol: "HTTPS"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+    authentication: "AWS credentials"
+
+  - id: "flow-backend-to-brevo"
+    name: "Backend to Brevo (Notifications)"
+    from: "comp-backend"
+    to: "external-brevo"
+    integration_ref: "int-brevo"  # Détails dans integrations.yaml
+    data:
+      - "Email content"
+      - "SMS content"
+      - "Recipient data"
+    protocol: "HTTPS"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+
+  - id: "flow-backend-to-ft"
+    name: "Backend to France Travail APIs"
+    from: "comp-backend"
+    to: "external-france-travail"
+    integration_ref: "int-france-travail"  # Détails dans integrations.yaml
+    data:
+      - "Convention data"
+      - "User authentication"
+    protocol: "HTTPS"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+
+  - id: "flow-backend-to-insee"
+    name: "Backend to INSEE SIRENE"
+    from: "comp-backend"
+    to: "external-insee"
+    integration_ref: "int-insee-sirene"  # Détails dans integrations.yaml
+    data:
+      - "SIRET lookups"
+      - "Business information"
+    protocol: "HTTPS"
+    encryption:
+      enabled: true
+      protocol: "TLS"
+
+api_inventory:
+  - id: "api-main"
+    name: "Immersion Facile API"
+    version: "1.0"
+    type: "REST"
+    base_path: "/api"
+    authentication: "JWT, Magic Links, API Keys"
+    authorization: "Role-based"
+    documentation: "/api/swagger"
+    consumers:
+      - name: "Frontend"
+        type: "internal"
+      - name: "API Consumers (partners)"
+        type: "external"
+    deprecation_status: "none"
+    rate_limiting:
+      enabled: true
+      limit: "5 req/sec per consumer"
+    versioning_strategy: "header-based"
+
+  - id: "api-v2"
+    name: "Partner API v2"
+    version: "2.0"
+    type: "REST"
+    base_path: "/api/v2"
+    authentication: "API Key"
+    authorization: "Consumer-based scopes"
+    documentation: "/api/v2/docs"
+    consumers:
+      - name: "External partners"
+        type: "external"
+    deprecation_status: "none"
+    rate_limiting:
+      enabled: true
+      limit: "Configurable per consumer"
+    versioning_strategy: "path-based"
+
+  - id: "api-v3"
+    name: "Partner API v3"
+    version: "3.0"
+    type: "REST"
+    base_path: "/api/v3"
+    authentication: "API Key"
+    authorization: "Consumer-based scopes"
+    documentation: "/api/v3/docs"
+    consumers:
+      - name: "External partners"
+        type: "external"
+    deprecation_status: "none"
+    rate_limiting:
+      enabled: true
+    versioning_strategy: "path-based"
+
+resilience:
+  backup_strategy:
+    databases:
+      - name: "PostgreSQL"
+        frequency: "daily"
+        retention: "30 days"
+        encryption: true
+        location: "Scalingo managed"
+    files:
+      - name: "S3 Documents"
+        frequency: "continuous"
+        retention: "indefinite"
+        encryption: true
+
+  disaster_recovery:
+    rto: "4 hours"
+    rpo: "24 hours"
+    failover_type: "manual"
+    last_test: "unknown"
+    runbook_location: "N/A"
+    _note: "Scalingo provides automatic failover for managed services"
+
+  high_availability:
+    load_balancing:
+      enabled: true
+      type: "Scalingo Router"
+    auto_scaling:
+      enabled: true
+      min_instances: 1
+      max_instances: 10
+      trigger: "CPU/Memory"
+    multi_region:
+      enabled: false
+    health_checks:
+      - endpoint: "/api/health"
+        interval: "30s"
+
+adrs:
+  - id: "adr-001"
+    title: "File Organization"
+    date: "2024-02-27"
+    status: "accepted"
+    context: "Organisation des fichiers dans le projet"
+    decision: |
+      Structure en domains avec sous-dossiers adapters/ports/domain.
+      Core contient les éléments partagés entre domaines.
+      Racine de domains = ce qui pourrait être un micro-service.
+    consequences:
+      - "Séparation claire des responsabilités"
+      - "Facilite une éventuelle migration vers microservices"
+    location: "doc/adr/file-organisation.md"
+
+  - id: "adr-002"
+    title: "Development Team Organisation"
+    date: "2024-02-27"
+    status: "accepted"
+    context: "Organisation du travail d'équipe"
+    decision: "Pair/mob programming, PR reviews"
+    location: "doc/adr/dev-team-organisation.md"
+
+  - id: "adr-003"
+    title: "Review and Deployment Process"
+    date: "2024-02-27"
+    status: "accepted"
+    context: "Processus de review et déploiement"
+    decision: "PR-based workflow with CI/CD"
+    location: "doc/adr/review-and-deployment-process.md"
+
+architectural_patterns:
+  - name: "Hexagonal Architecture (Ports & Adapters)"
+    description: |
+      Le backend utilise une architecture hexagonale avec des ports (interfaces)
+      et des adapters (implémentations). Les use-cases sont au centre et
+      communiquent avec l'extérieur via des ports abstraits.
+    components:
+      - "back/src/domains/**/ports/"
+      - "back/src/domains/**/adapters/"
+
+  - name: "Domain-Driven Design"
+    description: |
+      Organisation du code par domaines métier (convention, agency, establishment)
+      avec des bounded contexts, aggregates, et domain events.
+    components:
+      - "back/src/domains/"
+      - "shared/src/"
+
+  - name: "Transactional Outbox"
+    description: |
+      Les événements métier sont persistés dans une table outbox dans la même
+      transaction que les données métier, puis traités de manière asynchrone
+      par le Event Crawler.
+    components:
+      - "back/src/domains/core/events/"
+      - "comp-event-crawler"
+
+  - name: "Unit of Work"
+    description: |
+      Pattern coordonnant les opérations de persistence dans une transaction.
+      Fournit l'accès à tous les repositories et gère le rollback automatique.
+    components:
+      - "back/src/domains/core/unit-of-work/"
+
+  - name: "Redux Observable (Frontend)"
+    description: |
+      Gestion des side-effects asynchrones côté frontend via des epics RxJS.
+      Chaque slice Redux a ses epics associés.
+    components:
+      - "front/src/core-logic/domain/**/*.epics.ts"
+      - "front/src/core-logic/storeConfig/"
+
+  - name: "Gateway Pattern"
+    description: |
+      Abstraction des services externes via des interfaces Gateway avec
+      plusieurs implémentations (InMemory pour tests, HTTP pour production).
+    components:
+      - "back/src/domains/**/ports/"
+      - "back/src/config/bootstrap/createGateways.ts"

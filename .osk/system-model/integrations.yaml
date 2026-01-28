@@ -1,0 +1,447 @@
+# OpenSecKit System Model - External Integrations
+# Phase 4: Ecosystem
+# Generated: 2026-01-28
+
+metadata:
+  section: "integrations"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+integrations:
+  - id: "int-france-travail"
+    name: "France Travail APIs"
+    vendor: "France Travail (ex-Pôle Emploi)"
+    type: "government-api"
+    description: |
+      Intégration bidirectionnelle avec France Travail pour l'authentification des demandeurs
+      d'emploi (France Travail Connect) et la synchronisation des conventions validées.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://api.francetravail.io"
+      authentication: "OAuth2 Client Credentials"
+    data_flow: "bidirectional"
+    data_exchange:
+      - id: "ft-auth"
+        direction: "inbound"
+        purpose: "Authentification des demandeurs d'emploi"
+        data: ["User identity", "Employment status"]
+      - id: "ft-convention-broadcast"
+        direction: "outbound"
+        purpose: "Notification des conventions validées"
+        data: ["Convention details", "Beneficiary info"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "2022-01-01"
+      subprocessor_url: null
+      data_residency: "France"
+      certifications: []
+      _note: "Partenariat inter-administrations"
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A (no data stored)"
+      audit_logging: true
+      incident_notification: "24h"
+      penetration_testing: "unknown"
+    criticality: "high"
+    fallback: "Queue conventions for retry"
+
+  - id: "int-proconnect"
+    name: "ProConnect"
+    vendor: "DINUM (État français)"
+    type: "authentication"
+    description: |
+      Service d'authentification unique (SSO) pour les agents de l'administration française.
+      Utilisé pour l'authentification des conseillers et administrateurs.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://proconnect.gouv.fr"
+      authentication: "OAuth2 / OpenID Connect"
+    data_flow: "inbound"
+    data_exchange:
+      - id: "pc-auth"
+        direction: "inbound"
+        purpose: "Authentification des agents publics"
+        data: ["User identity", "Email", "Organization SIRET"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "2023-01-01"
+      subprocessor_url: null
+      data_residency: "France"
+      certifications:
+        - "RGS"
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A"
+      audit_logging: true
+      incident_notification: "24h"
+      penetration_testing: "government standards"
+    criticality: "high"
+    fallback: "None - authentication required"
+
+  - id: "int-brevo"
+    name: "Brevo (ex-Sendinblue)"
+    vendor: "Brevo"
+    type: "notification-service"
+    description: |
+      Service de marketing et de transactionnel pour l'envoi d'emails et SMS.
+      Utilisé pour toutes les notifications de la plateforme.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://api.brevo.com"
+      authentication: "API Key"
+    data_flow: "outbound"
+    data_exchange:
+      - id: "brevo-email"
+        direction: "outbound"
+        purpose: "Envoi d'emails transactionnels"
+        data: ["Recipient email", "Email content"]
+      - id: "brevo-sms"
+        direction: "outbound"
+        purpose: "Envoi de SMS"
+        data: ["Phone number", "SMS content"]
+      - id: "brevo-marketing"
+        direction: "outbound"
+        purpose: "Marketing établissements"
+        data: ["Contact list management"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "2021-01-01"
+      subprocessor_url: "https://www.brevo.com/fr/legal/politique-de-confidentialite/"
+      data_residency: "EU"
+      certifications:
+        - "ISO 27001"
+        - "SOC 2"
+    security:
+      encryption_transit: true
+      encryption_rest: true
+      audit_logging: true
+      incident_notification: "72h"
+      penetration_testing: "annual"
+    criticality: "high"
+    fallback: "Queue notifications for retry"
+
+  - id: "int-insee-sirene"
+    name: "INSEE SIRENE API"
+    vendor: "INSEE"
+    type: "government-api"
+    description: |
+      API officielle de l'INSEE pour la vérification et l'enrichissement des données
+      d'entreprise via leur numéro SIRET.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://api.insee.fr/entreprises/sirene/V3.11"
+      authentication: "OAuth2 Client Credentials"
+    data_flow: "inbound"
+    data_exchange:
+      - id: "sirene-lookup"
+        direction: "inbound"
+        purpose: "Vérification et enrichissement données entreprise"
+        data: ["Company name", "Address", "NAF code", "Status"]
+    compliance:
+      dpa_signed: false
+      dpa_date: null
+      subprocessor_url: null
+      data_residency: "France"
+      certifications: []
+      _note: "Données publiques - pas de DPA requis"
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A"
+      audit_logging: true
+      incident_notification: "N/A"
+      penetration_testing: "government standards"
+    criticality: "medium"
+    fallback: "Annuaire des Entreprises API as backup"
+
+  - id: "int-annuaire-entreprises"
+    name: "Annuaire des Entreprises"
+    vendor: "DINUM"
+    type: "government-api"
+    description: |
+      API alternative pour les données entreprise, utilisée en backup de l'INSEE.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://recherche-entreprises.api.gouv.fr"
+      authentication: "None (public API)"
+    data_flow: "inbound"
+    data_exchange:
+      - id: "ae-lookup"
+        direction: "inbound"
+        purpose: "Backup pour vérification données entreprise"
+        data: ["Company name", "Address", "NAF code"]
+    compliance:
+      dpa_signed: false
+      data_residency: "France"
+      certifications: []
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A"
+      audit_logging: false
+      incident_notification: "N/A"
+      penetration_testing: "unknown"
+    criticality: "low"
+    fallback: "Manual entry"
+
+  - id: "int-opencage"
+    name: "OpenCage Geocoding"
+    vendor: "OpenCage"
+    type: "geocoding"
+    description: |
+      Service de géocodage pour convertir les adresses en coordonnées géographiques
+      et inversement (recherche géographique).
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://api.opencagedata.com"
+      authentication: "API Key"
+    data_flow: "bidirectional"
+    data_exchange:
+      - id: "oc-geocode"
+        direction: "outbound"
+        purpose: "Conversion adresse vers coordonnées"
+        data: ["Address strings"]
+      - id: "oc-reverse"
+        direction: "inbound"
+        purpose: "Coordonnées vers adresse"
+        data: ["Lat/Lng coordinates"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "2021-01-01"
+      subprocessor_url: "https://opencagedata.com/gdpr"
+      data_residency: "Global"
+      certifications: []
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A"
+      audit_logging: true
+      incident_notification: "72h"
+      penetration_testing: "unknown"
+    criticality: "medium"
+    fallback: "Cache previous results"
+
+  - id: "int-metabase"
+    name: "Metabase"
+    vendor: "Self-hosted"
+    type: "analytics"
+    description: |
+      Instance Metabase hébergée pour la génération de dashboards et statistiques.
+      Utilisée pour les tableaux de bord agences et admin.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://metabase.immersion-facile.beta.gouv.fr"
+      authentication: "API Key"
+    data_flow: "outbound"
+    data_exchange:
+      - id: "metabase-dashboards"
+        direction: "outbound"
+        purpose: "Génération d'URLs de dashboards personnalisés"
+        data: ["Dashboard parameters", "User context"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "self-hosted"
+      subprocessor_url: null
+      data_residency: "France (Scalingo)"
+      certifications: []
+    security:
+      encryption_transit: true
+      encryption_rest: true
+      audit_logging: true
+      incident_notification: "internal"
+      penetration_testing: "internal"
+    criticality: "low"
+    fallback: "Dashboards unavailable"
+
+  - id: "int-s3-cellar"
+    name: "Scalingo Cellar (S3)"
+    vendor: "Scalingo"
+    type: "storage"
+    description: |
+      Stockage d'objets compatible S3 fourni par Scalingo pour les documents
+      (PDFs, pièces jointes). Hébergé sur zone SecNumCloud.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "cellar-c2.services.clever-cloud.com"
+      authentication: "AWS S3 Signature v4"
+    data_flow: "bidirectional"
+    data_exchange:
+      - id: "s3-upload"
+        direction: "outbound"
+        purpose: "Upload de documents"
+        data: ["PDF files", "Attachments"]
+      - id: "s3-download"
+        direction: "inbound"
+        purpose: "Téléchargement de documents"
+        data: ["PDF files", "Attachments"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "Infrastructure contract"
+      subprocessor_url: "https://scalingo.com/fr/contrat-sous-traitance-donnees"
+      data_residency: "France"
+      certifications:
+        - "SecNumCloud"
+        - "ISO 27001"
+      hds: false
+    security:
+      encryption_transit: true
+      encryption_rest: true
+      audit_logging: true
+      incident_notification: "24h"
+      penetration_testing: "provider managed"
+    criticality: "medium"
+    fallback: "Documents unavailable"
+
+  - id: "int-sentry"
+    name: "Sentry"
+    vendor: "GIP Inclusion (self-hosted)"
+    type: "monitoring"
+    description: |
+      Instance Sentry auto-hébergée pour le suivi des erreurs et le monitoring
+      des performances.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://sentry.gip-inclusion.org"
+      authentication: "DSN"
+    data_flow: "outbound"
+    data_exchange:
+      - id: "sentry-errors"
+        direction: "outbound"
+        purpose: "Capture des erreurs et exceptions"
+        data: ["Stack traces", "User context (anonymized)", "Request info"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "internal"
+      subprocessor_url: null
+      data_residency: "France"
+      certifications: []
+    security:
+      encryption_transit: true
+      encryption_rest: true
+      audit_logging: true
+      incident_notification: "internal"
+      penetration_testing: "internal"
+    criticality: "low"
+    fallback: "Errors not captured"
+
+  - id: "int-diagoriente"
+    name: "Diagoriente API"
+    vendor: "Diagoriente"
+    type: "government-api"
+    description: |
+      API pour la récupération des appellations de métiers (codes ROME et intitulés).
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://api.beta.gouv.fr/diagoriente/v1"
+      authentication: "OAuth2 Client Credentials"
+    data_flow: "inbound"
+    data_exchange:
+      - id: "diag-appellations"
+        direction: "inbound"
+        purpose: "Récupération des appellations métiers"
+        data: ["ROME codes", "Job titles"]
+    compliance:
+      dpa_signed: false
+      data_residency: "France"
+      certifications: []
+      _note: "Données de référence publiques"
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A"
+      audit_logging: false
+      incident_notification: "N/A"
+      penetration_testing: "unknown"
+    criticality: "low"
+    fallback: "Use cached data"
+
+  - id: "int-emailable"
+    name: "Emailable"
+    vendor: "Emailable"
+    type: "email-validation"
+    description: |
+      Service de validation d'adresses email pour vérifier la délivrabilité
+      avant envoi.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://api.emailable.com"
+      authentication: "API Key"
+    data_flow: "bidirectional"
+    data_exchange:
+      - id: "emailable-validate"
+        direction: "bidirectional"
+        purpose: "Validation d'adresses email"
+        data: ["Email addresses"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "2021-01-01"
+      subprocessor_url: "https://emailable.com/privacy"
+      data_residency: "US"
+      certifications: []
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A"
+      audit_logging: true
+      incident_notification: "72h"
+      penetration_testing: "unknown"
+    criticality: "low"
+    fallback: "Skip validation"
+
+  - id: "int-crisp"
+    name: "Crisp"
+    vendor: "Crisp"
+    type: "customer-support"
+    description: |
+      Widget de support client pour le chat en direct et la gestion des tickets.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "https://api.crisp.chat"
+      authentication: "API Key"
+    data_flow: "bidirectional"
+    data_exchange:
+      - id: "crisp-chat"
+        direction: "bidirectional"
+        purpose: "Support utilisateur"
+        data: ["User messages", "Support context"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "2021-01-01"
+      subprocessor_url: "https://crisp.chat/privacy/"
+      data_residency: "EU"
+      certifications:
+        - "SOC 2"
+    security:
+      encryption_transit: true
+      encryption_rest: true
+      audit_logging: true
+      incident_notification: "72h"
+      penetration_testing: "annual"
+    criticality: "low"
+    fallback: "Email support"
+
+  - id: "int-pass-emploi"
+    name: "Pass Emploi API"
+    vendor: "GIP Inclusion"
+    type: "government-api"
+    description: |
+      API partenaire pour la synchronisation avec l'application Pass Emploi.
+    connection:
+      protocol: "HTTPS"
+      endpoint: "configurable"
+      authentication: "API Key"
+    data_flow: "outbound"
+    data_exchange:
+      - id: "pe-conventions"
+        direction: "outbound"
+        purpose: "Notification de conventions"
+        data: ["Convention data"]
+    compliance:
+      dpa_signed: true
+      dpa_date: "internal"
+      data_residency: "France"
+      certifications: []
+    security:
+      encryption_transit: true
+      encryption_rest: "N/A"
+      audit_logging: true
+      incident_notification: "internal"
+      penetration_testing: "internal"
+    criticality: "low"
+    fallback: "Queue for retry"

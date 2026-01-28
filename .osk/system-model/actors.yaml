@@ -1,0 +1,453 @@
+# OpenSecKit System Model - Actors
+# Phase 3: Domain Model
+# Generated: 2026-01-28
+
+metadata:
+  section: "actors"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+user_types:
+  - id: "user-beneficiary"
+    name: "Beneficiary"
+    description: "Personne effectuant une immersion (demandeur d'emploi, scolaire)"
+    authentication:
+      method: "magic-link"
+      mfa_required: false
+      session_duration: "31 days"
+      _note: "Authentification via lien magique envoyé par email"
+    alternative_authentication:
+      method: "france-travail-connect"
+      mfa_required: false
+      session_duration: "session"
+      _note: "Pour les demandeurs d'emploi inscrits France Travail"
+    authorization:
+      model: "convention-based"
+      default_permissions:
+        - "view own conventions"
+        - "sign own conventions"
+        - "create contact requests"
+        - "participate in discussions"
+    data_access:
+      - "data-beneficiary"
+      - "data-convention"
+      - "data-discussion"
+    feature_access:
+      - "search-establishments"
+      - "contact-establishments"
+      - "create-convention"
+      - "sign-convention"
+      - "view-assessment"
+    trust_level: "low"
+    _note: "Pas de compte persistant, accès via magic links"
+
+  - id: "user-establishment-contact"
+    name: "Establishment Contact"
+    description: "Personne de contact dans une entreprise (tuteur, responsable)"
+    authentication:
+      method: "magic-link"
+      mfa_required: false
+      session_duration: "31 days"
+    alternative_authentication:
+      method: "pro-connect"
+      mfa_required: false
+      session_duration: "session"
+    authorization:
+      model: "establishment-based"
+      default_permissions:
+        - "view establishment conventions"
+        - "sign conventions"
+        - "manage establishment profile"
+        - "respond to contact requests"
+    data_access:
+      - "data-establishment"
+      - "data-establishment-contact"
+      - "data-convention"
+      - "data-discussion"
+    feature_access:
+      - "establishment-dashboard"
+      - "manage-establishment"
+      - "respond-discussions"
+      - "sign-conventions"
+      - "create-assessments"
+    trust_level: "medium"
+
+  - id: "user-establishment-admin"
+    name: "Establishment Admin"
+    description: "Administrateur d'un établissement (gestion des droits)"
+    authentication:
+      method: "pro-connect"
+      mfa_required: false
+      session_duration: "8 hours"
+    authorization:
+      model: "establishment-role-based"
+      default_permissions:
+        - "all establishment contact permissions"
+        - "manage establishment users"
+        - "edit establishment settings"
+    data_access:
+      - "data-establishment"
+      - "data-establishment-contact"
+      - "data-convention"
+    feature_access:
+      - "establishment-admin-dashboard"
+      - "manage-establishment-users"
+    trust_level: "medium"
+
+  - id: "user-counsellor"
+    name: "Agency Counsellor"
+    description: "Conseiller d'une agence prescriptrice (France Travail, Mission Locale, etc.)"
+    authentication:
+      method: "pro-connect"
+      mfa_required: false
+      session_duration: "8 hours"
+    authorization:
+      model: "agency-role-based"
+      default_permissions:
+        - "view agency conventions"
+        - "review conventions"
+        - "modify conventions under review"
+        - "transfer conventions"
+    data_access:
+      - "data-user"
+      - "data-convention"
+      - "data-beneficiary"
+      - "data-agency"
+    feature_access:
+      - "agency-dashboard"
+      - "review-conventions"
+      - "modify-conventions"
+      - "view-statistics"
+    trust_level: "high"
+
+  - id: "user-validator"
+    name: "Agency Validator"
+    description: "Validateur habilité à approuver les conventions"
+    authentication:
+      method: "pro-connect"
+      mfa_required: false
+      session_duration: "8 hours"
+    authorization:
+      model: "agency-role-based"
+      default_permissions:
+        - "all counsellor permissions"
+        - "validate conventions"
+        - "reject conventions"
+    data_access:
+      - "data-user"
+      - "data-convention"
+      - "data-beneficiary"
+      - "data-agency"
+    feature_access:
+      - "agency-dashboard"
+      - "validate-conventions"
+      - "view-statistics"
+    trust_level: "high"
+
+  - id: "user-agency-admin"
+    name: "Agency Admin"
+    description: "Administrateur d'une agence (gestion des utilisateurs)"
+    authentication:
+      method: "pro-connect"
+      mfa_required: false
+      session_duration: "8 hours"
+    authorization:
+      model: "agency-role-based"
+      default_permissions:
+        - "all validator permissions"
+        - "manage agency users"
+        - "edit agency settings"
+    data_access:
+      - "data-user"
+      - "data-convention"
+      - "data-agency"
+    feature_access:
+      - "agency-admin-dashboard"
+      - "manage-agency-users"
+      - "agency-settings"
+    trust_level: "high"
+
+  - id: "user-backoffice-admin"
+    name: "Backoffice Admin"
+    description: "Administrateur de la plateforme (équipe Immersion Facilitée)"
+    authentication:
+      method: "pro-connect"
+      mfa_required: true
+      session_duration: "8 hours"
+    authorization:
+      model: "global-admin"
+      default_permissions:
+        - "all permissions"
+        - "manage all agencies"
+        - "manage all establishments"
+        - "manage all conventions"
+        - "manage users"
+        - "manage feature flags"
+        - "access admin dashboard"
+    data_access:
+      - "all data categories"
+    feature_access:
+      - "admin-dashboard"
+      - "manage-agencies"
+      - "manage-establishments"
+      - "manage-conventions"
+      - "manage-users"
+      - "feature-flags"
+      - "notifications-admin"
+      - "api-consumers-admin"
+    trust_level: "critical"
+
+system_access_roles:
+  - id: "role-beneficiary"
+    name: "Beneficiary"
+    description: "Rôle signataire pour le bénéficiaire"
+    permissions:
+      convention:
+        - "read:own"
+        - "sign:own"
+      discussion:
+        - "read:own"
+        - "write:own"
+    privilege_level: "user"
+    inherits_from: []
+
+  - id: "role-beneficiary-representative"
+    name: "Beneficiary Representative"
+    description: "Représentant légal du bénéficiaire (si mineur)"
+    permissions:
+      convention:
+        - "read:beneficiary"
+        - "sign:beneficiary"
+    privilege_level: "user"
+    inherits_from: []
+
+  - id: "role-beneficiary-current-employer"
+    name: "Beneficiary Current Employer"
+    description: "Employeur actuel du bénéficiaire (si applicable)"
+    permissions:
+      convention:
+        - "read:beneficiary"
+        - "sign:beneficiary"
+    privilege_level: "user"
+    inherits_from: []
+
+  - id: "role-establishment-representative"
+    name: "Establishment Representative"
+    description: "Représentant de l'entreprise (signataire)"
+    permissions:
+      convention:
+        - "read:establishment"
+        - "sign:establishment"
+      establishment:
+        - "read:own"
+    privilege_level: "user"
+    inherits_from: []
+
+  - id: "role-establishment-tutor"
+    name: "Establishment Tutor"
+    description: "Tuteur encadrant l'immersion"
+    permissions:
+      convention:
+        - "read:establishment"
+      assessment:
+        - "create"
+        - "update:own"
+    privilege_level: "user"
+    inherits_from: []
+
+  - id: "role-establishment-contact"
+    name: "Establishment Contact"
+    description: "Contact de l'établissement"
+    permissions:
+      establishment:
+        - "read:own"
+        - "update:own"
+      discussion:
+        - "read:establishment"
+        - "write:establishment"
+      convention:
+        - "read:establishment"
+    privilege_level: "user"
+    inherits_from: []
+
+  - id: "role-establishment-admin"
+    name: "Establishment Admin"
+    description: "Administrateur de l'établissement"
+    permissions:
+      establishment:
+        - "read:own"
+        - "update:own"
+        - "manage-users:own"
+      discussion:
+        - "read:establishment"
+        - "write:establishment"
+      convention:
+        - "read:establishment"
+    privilege_level: "admin"
+    inherits_from:
+      - "role-establishment-contact"
+
+  - id: "role-counsellor"
+    name: "Agency Counsellor"
+    description: "Conseiller agence"
+    permissions:
+      convention:
+        - "read:agency"
+        - "update:agency"
+        - "transfer:agency"
+      agency:
+        - "read:own"
+    privilege_level: "power-user"
+    inherits_from: []
+
+  - id: "role-validator"
+    name: "Agency Validator"
+    description: "Validateur agence"
+    permissions:
+      convention:
+        - "read:agency"
+        - "update:agency"
+        - "validate:agency"
+        - "reject:agency"
+        - "transfer:agency"
+      agency:
+        - "read:own"
+    privilege_level: "power-user"
+    inherits_from:
+      - "role-counsellor"
+
+  - id: "role-agency-admin"
+    name: "Agency Admin"
+    description: "Administrateur agence"
+    permissions:
+      agency:
+        - "read:own"
+        - "update:own"
+        - "manage-users:own"
+      convention:
+        - "read:agency"
+        - "update:agency"
+        - "validate:agency"
+    privilege_level: "admin"
+    inherits_from:
+      - "role-validator"
+
+  - id: "role-agency-viewer"
+    name: "Agency Viewer"
+    description: "Lecteur agence (consultation uniquement)"
+    permissions:
+      convention:
+        - "read:agency"
+      agency:
+        - "read:own"
+    privilege_level: "user"
+    inherits_from: []
+
+  - id: "role-to-review"
+    name: "To Review"
+    description: "Utilisateur en attente de validation de droits"
+    permissions:
+      agency:
+        - "read:own"
+    privilege_level: "pending"
+    inherits_from: []
+
+  - id: "role-back-office"
+    name: "Back Office Admin"
+    description: "Administrateur plateforme"
+    permissions:
+      all:
+        - "*"
+    privilege_level: "super-admin"
+    inherits_from: []
+
+service_accounts:
+  - id: "sa-event-crawler"
+    name: "Event Crawler"
+    purpose: "Traitement asynchrone des événements métier"
+    permissions:
+      - "read:outbox"
+      - "update:outbox"
+      - "execute:event-handlers"
+    credential_rotation:
+      frequency: "on-deploy"
+      method: "environment-variable"
+    owner: "team-platform"
+
+  - id: "sa-scheduled-jobs"
+    name: "Scheduled Jobs"
+    purpose: "Exécution des tâches planifiées (cron)"
+    permissions:
+      - "read:all"
+      - "update:establishments"
+      - "send:notifications"
+    credential_rotation:
+      frequency: "on-deploy"
+      method: "environment-variable"
+    owner: "team-platform"
+
+  - id: "sa-api-consumer"
+    name: "API Consumer (Partner)"
+    purpose: "Accès API pour partenaires externes"
+    permissions:
+      - "api:read"
+      - "api:write"
+      - "configured per consumer"
+    credential_rotation:
+      frequency: "manual"
+      method: "api-key"
+    owner: "partner"
+    _note: "Chaque partenaire a son propre API consumer avec permissions spécifiques"
+
+  - id: "sa-brevo"
+    name: "Brevo Integration"
+    purpose: "Envoi d'emails et SMS via Brevo"
+    permissions:
+      - "send:email"
+      - "send:sms"
+    credential_rotation:
+      frequency: "manual"
+      method: "api-key"
+    owner: "team-platform"
+
+  - id: "sa-france-travail"
+    name: "France Travail Integration"
+    purpose: "Synchronisation avec France Travail (conventions, authentification)"
+    permissions:
+      - "oauth:authenticate"
+      - "api:broadcast-conventions"
+    credential_rotation:
+      frequency: "on-demand"
+      method: "oauth-client-credentials"
+    owner: "team-platform"
+
+  - id: "sa-insee"
+    name: "INSEE SIRENE Integration"
+    purpose: "Vérification et mise à jour des données entreprise"
+    permissions:
+      - "api:read-sirene"
+    credential_rotation:
+      frequency: "annual"
+      method: "oauth-client-credentials"
+    owner: "team-platform"
+
+  - id: "sa-proconnect"
+    name: "ProConnect Integration"
+    purpose: "Authentification des agents publics"
+    permissions:
+      - "oauth:authenticate"
+    credential_rotation:
+      frequency: "on-demand"
+      method: "oauth-client-credentials"
+    owner: "team-platform"
+
+  - id: "sa-metabase"
+    name: "Metabase Integration"
+    purpose: "Génération des dashboards et statistiques"
+    permissions:
+      - "api:generate-dashboard-urls"
+    credential_rotation:
+      frequency: "manual"
+      method: "api-key"
+    owner: "team-platform"

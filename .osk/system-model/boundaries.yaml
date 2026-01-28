@@ -1,0 +1,379 @@
+# OpenSecKit System Model - Trust Boundaries
+# Phase 3: Domain Model
+# Generated: 2026-01-28
+
+metadata:
+  section: "boundaries"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+trust_zones:
+  - id: "zone-public"
+    name: "Public Zone"
+    description: "Zone accessible sans authentification"
+    trust_level: "untrusted"
+    components:
+      - "comp-frontend"
+    network_segment: "internet"
+    access_restrictions:
+      - "Rate limiting on all endpoints"
+      - "No sensitive data exposed"
+    security_controls:
+      - "ctrl-rate-limiting"
+      - "ctrl-input-validation"
+
+  - id: "zone-authenticated"
+    name: "Authenticated User Zone"
+    description: "Zone accessible aux utilisateurs authentifiés"
+    trust_level: "low"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+    network_segment: "internet"
+    access_restrictions:
+      - "Valid JWT required"
+      - "Magic link or OAuth authentication"
+    security_controls:
+      - "ctrl-jwt-auth"
+      - "ctrl-session-management"
+      - "ctrl-rate-limiting"
+
+  - id: "zone-agency"
+    name: "Agency Zone"
+    description: "Zone pour les conseillers et validateurs des agences"
+    trust_level: "medium"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+    network_segment: "internet"
+    access_restrictions:
+      - "ProConnect authentication required"
+      - "Agency role membership"
+    security_controls:
+      - "ctrl-proconnect-auth"
+      - "ctrl-rbac"
+      - "ctrl-audit-logging"
+
+  - id: "zone-admin"
+    name: "Admin Zone"
+    description: "Zone pour les administrateurs de la plateforme"
+    trust_level: "high"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+    network_segment: "internet"
+    access_restrictions:
+      - "ProConnect authentication with MFA"
+      - "Backoffice admin role"
+    security_controls:
+      - "ctrl-proconnect-auth"
+      - "ctrl-mfa"
+      - "ctrl-rbac"
+      - "ctrl-audit-logging"
+
+  - id: "zone-backend"
+    name: "Backend Services Zone"
+    description: "Zone des services backend internes"
+    trust_level: "high"
+    components:
+      - "comp-backend"
+      - "comp-pipelines"
+      - "comp-event-crawler"
+    network_segment: "private"
+    access_restrictions:
+      - "Internal network only"
+      - "Service authentication"
+    security_controls:
+      - "ctrl-network-isolation"
+      - "ctrl-service-auth"
+
+  - id: "zone-data"
+    name: "Data Zone"
+    description: "Zone de stockage des données"
+    trust_level: "critical"
+    components:
+      - "comp-database"
+      - "comp-redis"
+      - "comp-adminer"
+    network_segment: "private"
+    access_restrictions:
+      - "Internal network only"
+      - "Connection credentials required"
+      - "SSL/TLS required"
+      - "Adminer: Platform Team only"
+    security_controls:
+      - "ctrl-encryption-transit"
+      - "ctrl-encryption-rest"
+      - "ctrl-network-isolation"
+      - "ctrl-credential-management"
+
+  - id: "zone-external"
+    name: "External Services Zone"
+    description: "Zone des services tiers"
+    trust_level: "medium"
+    components:
+      - "external-brevo"
+      - "external-france-travail"
+      - "external-insee"
+      - "external-proconnect"
+      - "external-s3"
+      - "external-metabase"
+    network_segment: "internet"
+    access_restrictions:
+      - "API authentication required"
+      - "TLS required"
+    security_controls:
+      - "ctrl-api-auth"
+      - "ctrl-encryption-transit"
+
+trust_boundaries:
+  - id: "boundary-internet-public"
+    name: "Internet to Public Zone"
+    from: "internet"
+    to: "zone-public"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-rate-limiting"
+      - "ctrl-input-validation"
+      - "ctrl-waf"
+    data_crossing:
+      - "Public search queries"
+      - "Unauthenticated page requests"
+    threats:
+      - "DDoS attacks"
+      - "Web scraping"
+      - "Injection attacks"
+    risk_assessment:
+      impact: "medium"
+      likelihood: "high"
+      risk_score: 45
+
+  - id: "boundary-public-authenticated"
+    name: "Public to Authenticated Zone"
+    from: "zone-public"
+    to: "zone-authenticated"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-jwt-auth"
+      - "ctrl-magic-link"
+      - "ctrl-oauth"
+    data_crossing:
+      - "Authentication tokens"
+      - "User credentials (via OAuth)"
+    threats:
+      - "Credential theft"
+      - "Session hijacking"
+      - "Token replay"
+    risk_assessment:
+      impact: "high"
+      likelihood: "medium"
+      risk_score: 54
+
+  - id: "boundary-authenticated-agency"
+    name: "Authenticated to Agency Zone"
+    from: "zone-authenticated"
+    to: "zone-agency"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-proconnect-auth"
+      - "ctrl-rbac"
+      - "ctrl-audit-logging"
+    data_crossing:
+      - "Agency-scoped convention data"
+      - "User agency rights"
+    threats:
+      - "Privilege escalation"
+      - "Unauthorized data access"
+    risk_assessment:
+      impact: "high"
+      likelihood: "low"
+      risk_score: 36
+
+  - id: "boundary-agency-admin"
+    name: "Agency to Admin Zone"
+    from: "zone-agency"
+    to: "zone-admin"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-mfa"
+      - "ctrl-rbac"
+      - "ctrl-audit-logging"
+    data_crossing:
+      - "Administrative functions"
+      - "Cross-agency data"
+    threats:
+      - "Admin account compromise"
+      - "Insider threat"
+    risk_assessment:
+      impact: "critical"
+      likelihood: "low"
+      risk_score: 48
+
+  - id: "boundary-backend-data"
+    name: "Backend to Data Zone"
+    from: "zone-backend"
+    to: "zone-data"
+    protocol: "PostgreSQL/TLS"
+    port: 5432
+    controls:
+      - "ctrl-encryption-transit"
+      - "ctrl-credential-management"
+      - "ctrl-connection-pooling"
+    data_crossing:
+      - "All application data"
+    threats:
+      - "SQL injection"
+      - "Data exfiltration"
+      - "Connection credential leak"
+    risk_assessment:
+      impact: "critical"
+      likelihood: "low"
+      risk_score: 48
+
+  - id: "boundary-backend-redis"
+    name: "Backend to Redis"
+    from: "zone-backend"
+    to: "zone-data"
+    protocol: "Redis/TLS"
+    port: 6379
+    controls:
+      - "ctrl-encryption-transit"
+      - "ctrl-credential-management"
+    data_crossing:
+      - "Session data"
+      - "Cache data"
+    threats:
+      - "Session hijacking"
+      - "Cache poisoning"
+    risk_assessment:
+      impact: "medium"
+      likelihood: "low"
+      risk_score: 27
+
+  - id: "boundary-backend-external-brevo"
+    name: "Backend to Brevo"
+    from: "zone-backend"
+    to: "zone-external"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-api-auth"
+      - "ctrl-encryption-transit"
+    data_crossing:
+      - "Email recipient addresses"
+      - "Email content"
+      - "SMS phone numbers"
+    threats:
+      - "Data leak to third party"
+      - "API key compromise"
+    risk_assessment:
+      impact: "high"
+      likelihood: "low"
+      risk_score: 36
+
+  - id: "boundary-backend-external-ft"
+    name: "Backend to France Travail"
+    from: "zone-backend"
+    to: "zone-external"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-oauth"
+      - "ctrl-encryption-transit"
+    data_crossing:
+      - "Convention data"
+      - "User authentication"
+    threats:
+      - "OAuth token leak"
+      - "Data synchronization issues"
+    risk_assessment:
+      impact: "high"
+      likelihood: "low"
+      risk_score: 36
+
+  - id: "boundary-backend-external-insee"
+    name: "Backend to INSEE"
+    from: "zone-backend"
+    to: "zone-external"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-oauth"
+      - "ctrl-encryption-transit"
+    data_crossing:
+      - "SIRET queries"
+      - "Business information responses"
+    threats:
+      - "API availability"
+    risk_assessment:
+      impact: "low"
+      likelihood: "medium"
+      risk_score: 18
+
+  - id: "boundary-backend-external-s3"
+    name: "Backend to S3 Storage"
+    from: "zone-backend"
+    to: "zone-external"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-api-auth"
+      - "ctrl-encryption-transit"
+      - "ctrl-encryption-rest"
+    data_crossing:
+      - "PDF documents"
+      - "Uploaded files"
+    threats:
+      - "Data exfiltration"
+      - "Credential leak"
+    risk_assessment:
+      impact: "medium"
+      likelihood: "low"
+      risk_score: 27
+
+  - id: "boundary-user-proconnect"
+    name: "User to ProConnect"
+    from: "zone-public"
+    to: "zone-external"
+    protocol: "HTTPS"
+    port: 443
+    controls:
+      - "ctrl-oauth"
+      - "ctrl-encryption-transit"
+    data_crossing:
+      - "User credentials (to ProConnect)"
+      - "Authentication tokens"
+    threats:
+      - "Phishing"
+      - "OAuth flow interception"
+    risk_assessment:
+      impact: "high"
+      likelihood: "medium"
+      risk_score: 54
+
+network_perimeters:
+  - id: "perimeter-scalingo"
+    name: "Scalingo Platform"
+    description: "Hébergement PaaS Scalingo"
+    zones:
+      - "zone-backend"
+      - "zone-data"
+    provider: "Scalingo"
+    location: "France"
+    infrastructure_ref: "index.yaml#infrastructure_certifications"
+
+  - id: "perimeter-internet"
+    name: "Internet Perimeter"
+    description: "Accès public via internet"
+    zones:
+      - "zone-public"
+      - "zone-authenticated"
+      - "zone-agency"
+      - "zone-admin"
+    provider: "Various ISPs"
+    location: "Global"
