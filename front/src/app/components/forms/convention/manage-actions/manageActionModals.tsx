@@ -69,6 +69,26 @@ const {
   close: closeCancelModal,
 } = createFormModal(createCancelModalParams);
 
+const createDeleteAssessmentModalParams = {
+  id: domElementIds.manageConvention.deleteAssessmentModal,
+  isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.deleteAssessmentModalForm,
+  submitButton: {
+    id: domElementIds.manageConvention.deleteAssessmentModalSubmitButton,
+    children: "Supprimer le bilan",
+  },
+  cancelButton: {
+    id: domElementIds.manageConvention.deleteAssessmentModalCancelButton,
+    children: "Annuler",
+  },
+  doSubmitClosesModal: false,
+};
+const {
+  Component: DeleteAssessmentModal,
+  open: openDeleteAssessmentModal,
+  close: closeDeleteAssessmentModal,
+} = createFormModal(createDeleteAssessmentModalParams);
+
 const createDeprecatedModalParams = {
   id: domElementIds.manageConvention.deprecatedModal,
   isOpenedByDefault: false,
@@ -228,6 +248,12 @@ export const modalByAction = (
       openModal: openDeprecateModal,
       closeModal: closeDeprecateModal,
       createModalParams: createDeprecatedModalParams,
+    },
+    DELETE_ASSESSMENT: {
+      modal: DeleteAssessmentModal,
+      openModal: openDeleteAssessmentModal,
+      closeModal: closeDeleteAssessmentModal,
+      createModalParams: createDeleteAssessmentModalParams,
     },
     ACCEPT_COUNSELLOR: {
       modal: ValidatorModal,

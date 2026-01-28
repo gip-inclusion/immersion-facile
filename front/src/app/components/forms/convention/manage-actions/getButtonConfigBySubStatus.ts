@@ -171,6 +171,7 @@ export const getButtonConfigBySubStatus = (
     .with("acceptedByValidatorWithAssessmentWithoutBroadcastError", () => [
       buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
       buttonPropsByVerificationAction["ACCESS_ASSESSMENT"],
+      buttonPropsByVerificationAction["DELETE_ASSESSMENT"],
       buttonPropsByVerificationAction["ACCESS_CONVENTION"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
       buttonPropsByVerificationAction["RENEW"],
@@ -178,6 +179,7 @@ export const getButtonConfigBySubStatus = (
     .with("acceptedByValidatorWithAssessmentWithBroadcastError", () => [
       buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
       buttonPropsByVerificationAction["ACCESS_ASSESSMENT"],
+      buttonPropsByVerificationAction["DELETE_ASSESSMENT"],
       buttonPropsByVerificationAction["ACCESS_CONVENTION"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
       buttonPropsByVerificationAction["RENEW"],
@@ -311,6 +313,9 @@ const createButtonPropsByVerificationAction = (
   const shouldShowAssessmentDocumentAction =
     !!convention.assessment &&
     hasAllowedRoleOnAssessment(requesterRoles, "GetAssessment", convention);
+
+  const shouldShowDeleteAssessmentAction =
+    !!convention.assessment && !!currentUser?.isBackofficeAdmin;
 
   const shouldShowAssessmentAbandonAction =
     canAssessmentBeFilled(convention) &&
@@ -630,6 +635,22 @@ const createButtonPropsByVerificationAction = (
         iconPosition: "left",
       }),
       isVisibleForUserRights: shouldShowAssessmentDocumentAction,
+      buttonArea: "assessmentArea",
+    },
+    DELETE_ASSESSMENT: {
+      props: getVerificationActionProps({
+        verificationAction: "DELETE_ASSESSMENT",
+        children: "Supprimer le bilan",
+        modalTitle: "Supprimer le bilan",
+        initialStatus: convention.status,
+        currentSignatoryRoles: requesterRoles,
+        onSubmit: createOnSubmitWithFeedbackKind,
+        convention,
+        buttonId: domElementIds.manageConvention.deleteAssessmentButton,
+        iconId: "fr-icon-delete-bin-line",
+        iconPosition: "left",
+      }),
+      isVisibleForUserRights: shouldShowDeleteAssessmentAction,
       buttonArea: "assessmentArea",
     },
     FILL_ASSESSMENT: {
