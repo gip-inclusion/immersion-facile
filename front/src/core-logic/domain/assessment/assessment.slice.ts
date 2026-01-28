@@ -51,7 +51,10 @@ export const assessmentSlice = createSlice({
     },
     deleteAssessmentSucceeded: (
       state,
-      _action: PayloadActionWithFeedbackTopic,
+      _action: PayloadActionWithFeedbackTopic<{
+        conventionId: ConventionId;
+        jwt: ConventionSupportedJwt;
+      }>,
     ) => {
       state.isLoading = false;
     },
