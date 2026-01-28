@@ -7,7 +7,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(phoneNumbersTable, {
     id: { type: "serial", primaryKey: true },
     phone_number: { type: "text", notNull: true },
-    verified_at: { type: "timestamp", notNull: false },
+    verified_at: { type: "timestamp", notNull: false, default: null },
     created_at: {
       type: "timestamp",
       notNull: true,
@@ -41,8 +41,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // Step 3: Migrate data from discussions table
   pgm.sql(`
     -- Insert unique phone numbers from discussions
-    INSERT INTO ${phoneNumbersTable} (phone_number, verified_at, created_at)
-    SELECT DISTINCT potential_beneficiary_phone, NULL, NOW()
+    INSERT INTO ${phoneNumbersTable} (phone_number, created_at)
+    SELECT DISTINCT potential_beneficiary_phone, NOW()
     FROM discussions
     WHERE potential_beneficiary_phone IS NOT NULL 
       AND potential_beneficiary_phone != ''
@@ -63,8 +63,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // Step 4: Migrate data from agencies table
   pgm.sql(`
     -- Insert unique phone numbers from agencies
-    INSERT INTO ${phoneNumbersTable} (phone_number, verified_at, created_at)
-    SELECT DISTINCT phone_number, NULL, NOW()
+    INSERT INTO ${phoneNumbersTable} (phone_number, created_at)
+    SELECT DISTINCT phone_number, NOW()
     FROM agencies
     WHERE phone_number IS NOT NULL 
       AND phone_number != ''
@@ -85,8 +85,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // Step 5: Migrate data from actors table
   pgm.sql(`
     -- Insert unique phone numbers from actors
-    INSERT INTO ${phoneNumbersTable} (phone_number, verified_at, created_at)
-    SELECT DISTINCT phone, NULL, NOW()
+    INSERT INTO ${phoneNumbersTable} (phone_number, created_at)
+    SELECT DISTINCT phone, NOW()
     FROM actors
     WHERE phone IS NOT NULL 
       AND phone != ''
@@ -107,8 +107,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // Step 6: Migrate data from api_consumers table
   pgm.sql(`
     -- Insert unique phone numbers from api_consumers
-    INSERT INTO ${phoneNumbersTable} (phone_number, verified_at, created_at)
-    SELECT DISTINCT contact_phone, NULL, NOW()
+    INSERT INTO ${phoneNumbersTable} (phone_number, created_at)
+    SELECT DISTINCT contact_phone, NOW()
     FROM api_consumers
     WHERE contact_phone IS NOT NULL 
       AND contact_phone != ''
@@ -129,8 +129,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // Step 7: Migrate data from establishments__users table
   pgm.sql(`
     -- Insert unique phone numbers from establishments__users
-    INSERT INTO ${phoneNumbersTable} (phone_number, verified_at, created_at)
-    SELECT DISTINCT phone, NULL, NOW()
+    INSERT INTO ${phoneNumbersTable} (phone_number, created_at)
+    SELECT DISTINCT phone, NOW()
     FROM establishments__users
     WHERE phone IS NOT NULL 
       AND phone != ''
@@ -156,59 +156,36 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createIndex("establishments__users", "phone_id");
 
   // Step 9: Drop old phone columns (no longer needed)
-  pgm.dropColumn("discussions", "potential_beneficiary_phone");
-  pgm.dropColumn("agencies", "phone_number");
-  pgm.dropColumn("actors", "phone");
-  pgm.dropColumn("api_consumers", "contact_phone");
-  pgm.dropColumn("establishments__users", "phone");
+  pgm.renameColumn(
+    "discussions",
+    "potential_beneficiary_phone",
+    "old__potential_beneficiary_phone",
+  );
+  pgm.renameColumn("agencies", "phone_number", "old__phone_number");
+  pgm.renameColumn("actors", "phone", "old__phone");
+  pgm.renameColumn("api_consumers", "contact_phone", "old__contact_phone");
+  pgm.renameColumn("establishments__users", "phone", "old__phone");
+
+  // Step 10: Make old columns nullable
+
+  pgm.alterColumn("discussions", "old__potential_beneficiary_phone", {
+    notNull: false,
+  });
+  pgm.alterColumn("agencies", "old__phone_number", {
+    notNull: false,
+  });
+  pgm.alterColumn("actors", "old__phone", {
+    notNull: false,
+  });
+  pgm.alterColumn("api_consumers", "old__contact_phone", {
+    notNull: false,
+  });
+  pgm.alterColumn("establishments__users", "old__phone", {
+    notNull: false,
+  });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  // Step 1: Re-add old phone columns
-  pgm.addColumn("discussions", {
-    potential_beneficiary_phone: { type: "text", notNull: true, default: "" },
-  });
-  pgm.addColumn("agencies", {
-    phone_number: { type: "text", notNull: true, default: "" },
-  });
-  pgm.addColumn("actors", {
-    phone: { type: "text", notNull: true, default: "" },
-  });
-  pgm.addColumn("api_consumers", {
-    contact_phone: { type: "text", notNull: true, default: "" },
-  });
-  pgm.addColumn("establishments__users", {
-    phone: { type: "text", notNull: false },
-  });
-
-  // Step 2: Restore data from phone_numbers table to old columns
-  pgm.sql(`
-    UPDATE discussions d
-    SET potential_beneficiary_phone = pn.phone_number
-    FROM ${phoneNumbersTable} pn
-    WHERE d.potential_beneficiary_phone_id = pn.id;
-
-    UPDATE agencies a
-    SET phone_number = pn.phone_number
-    FROM ${phoneNumbersTable} pn
-    WHERE a.phone_number_id = pn.id;
-
-    UPDATE actors a
-    SET phone = pn.phone_number
-    FROM ${phoneNumbersTable} pn
-    WHERE a.phone_id = pn.id;
-
-    UPDATE api_consumers ac
-    SET contact_phone = pn.phone_number
-    FROM ${phoneNumbersTable} pn
-    WHERE ac.contact_phone_id = pn.id;
-
-    UPDATE establishments__users eu
-    SET phone = pn.phone_number
-    FROM ${phoneNumbersTable} pn
-    WHERE eu.phone_id = pn.id;
-  `);
-
   // Step 3: Drop indexes on foreign key columns
   pgm.dropIndex("establishments__users", "phone_id");
   pgm.dropIndex("api_consumers", "contact_phone_id");
@@ -223,6 +200,34 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumn("agencies", "phone_number_id");
   pgm.dropColumn("discussions", "potential_beneficiary_phone_id");
 
-  // Step 5: Drop the phone_numbers table
+  // Step 5: Rename old phone number column
+  pgm.renameColumn(
+    "discussions",
+    "old__potential_beneficiary_phone",
+    "potential_beneficiary_phone",
+  );
+  pgm.renameColumn("agencies", "old__phone_number", "phone_number");
+  pgm.renameColumn("actors", "old__phone", "phone");
+  pgm.renameColumn("api_consumers", "old__contact_phone", "contact_phone");
+  pgm.renameColumn("establishments__users", "old__phone", "phone");
+
+  // Step 6: Reset not null to true
+  pgm.alterColumn("discussions", "potential_beneficiary_phone", {
+    notNull: true,
+  });
+  pgm.alterColumn("agencies", "phone_number", {
+    notNull: true,
+  });
+  pgm.alterColumn("actors", "phone", {
+    notNull: true,
+  });
+  pgm.alterColumn("api_consumers", "contact_phone", {
+    notNull: true,
+  });
+  pgm.alterColumn("establishments__users", "phone", {
+    notNull: true,
+  });
+
+  // Step 7: Drop the phone_numbers table
   pgm.dropTable(phoneNumbersTable);
 }
