@@ -3,6 +3,7 @@ import type {
   AssessmentDto,
   ConventionId,
   ConventionSupportedJwt,
+  DeleteAssessmentRequestDto,
   WithConventionId,
 } from "shared";
 import type {
@@ -22,14 +23,11 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
       : of(undefined).pipe(delay(this.latency));
   }
 
-  public deleteAssessment$({
-    conventionId,
-  }: {
-    conventionId: ConventionId;
-    deleteAssessmentJustification: string;
-    jwt: string;
-  }): Observable<void> {
-    return conventionId === failedId
+  public deleteAssessment$(
+    params: DeleteAssessmentRequestDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return params.conventionId === failedId
       ? throwError(failedIdError)
       : of(undefined).pipe(delay(this.latency));
   }

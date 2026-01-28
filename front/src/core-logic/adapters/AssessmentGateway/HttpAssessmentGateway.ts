@@ -4,6 +4,7 @@ import {
   type ConventionId,
   type ConventionMagicLinkRoutes,
   type ConventionSupportedJwt,
+  type DeleteAssessmentRequestDto,
   errors,
   type LegacyAssessmentDto,
   type WithConventionId,
@@ -46,23 +47,15 @@ export class HttpAssessmentGateway implements AssessmentGateway {
     );
   }
 
-  public deleteAssessment$({
-    conventionId,
-    deleteAssessmentJustification,
-    jwt,
-  }: {
-    conventionId: ConventionId;
-    deleteAssessmentJustification: string;
-    jwt: string;
-  }): Observable<void> {
+  public deleteAssessment$(
+    params: DeleteAssessmentRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
     return from(
       this.httpClient
         .deleteAssessment({
           headers: { authorization: jwt },
-          body: {
-            conventionId,
-            deleteAssessmentJustification,
-          },
+          body: params,
         })
         .then((response) =>
           match(response)

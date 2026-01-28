@@ -3,6 +3,7 @@ import type {
   AssessmentDto,
   ConventionId,
   ConventionSupportedJwt,
+  DeleteAssessmentRequestDto,
   WithConventionId,
 } from "shared";
 import type {
@@ -21,11 +22,10 @@ export class TestAssessmentGateway implements AssessmentGateway {
     return this.creationResponse$;
   }
 
-  public deleteAssessment$(_params: {
-    conventionId: ConventionId;
-    deleteAssessmentJustification: string;
-    jwt: string;
-  }): Observable<void> {
+  public deleteAssessment$(
+    _params: DeleteAssessmentRequestDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
     return this.deleteAssessmentResponse$;
   }
 
