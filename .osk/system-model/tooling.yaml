@@ -1,0 +1,330 @@
+# OpenSecKit System Model - Development & Operations Tooling
+# Phase 5: Operations
+# Generated: 2026-01-28
+
+metadata:
+  section: "tooling"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+source_control:
+  platform: "GitHub"
+  organization: "gip-inclusion"
+  repository: "immersion-facile"
+  visibility: "public"
+  branch_protection:
+    main:
+      required_reviews: 1
+      require_status_checks: true
+      enforce_admins: false
+      required_checks:
+        - "fullcheck / validation"
+        - "fullcheck / back-integration-tests"
+        - "verify-migration-order"
+  authentication:
+    sso_required: false
+    mfa_required: true
+
+ci_cd:
+  platform: "GitHub Actions"
+  configuration_location: ".github/workflows/"
+
+  pipelines:
+    - name: "validation-pr"
+      trigger: "pull_request"
+      stages:
+        - "fullcheck (lint, typecheck, tests)"
+        - "integration tests"
+        - "migration order verification"
+        - "playwright e2e tests"
+      security_gates:
+        - "All tests must pass"
+        - "No merge without review"
+
+    - name: "continous-delivery"
+      trigger: "push to main"
+      stages:
+        - "Build artifacts"
+        - "Deploy to staging"
+        - "Deploy to production (manual)"
+      security_gates:
+        - "Successful build"
+        - "All tests passed"
+
+    - name: "review-app"
+      trigger: "manual"
+      stages:
+        - "Deploy PR to review environment"
+      security_gates:
+        - "PR validation passed"
+
+  environments:
+    - name: "development"
+      approval_required: false
+    - name: "staging"
+      approval_required: false
+    - name: "production"
+      approval_required: true
+      approvers:
+        - "Tech Lead"
+
+artifacts:
+  package_registry:
+    type: "npm"
+    location: "npmjs.com"
+    private_packages: false
+    vulnerability_scanning: true
+    signing: false
+
+  container_registry:
+    type: "Scalingo"
+    location: "registry.scalingo.com"
+    vulnerability_scanning: true
+    image_signing: false
+
+security_tools:
+  static_analysis:
+    - name: "Biome"
+      type: "linter-formatter"
+      version: "2.3.8"
+      enforcement: "blocking"
+      pipeline_integration: true
+      configuration: "biome.json"
+
+    - name: "TypeScript"
+      type: "type-checker"
+      version: "5.8.3"
+      enforcement: "blocking"
+      pipeline_integration: true
+      configuration: "tsconfig.json"
+
+    - name: "CodeQL"
+      type: "SAST"
+      vendor: "GitHub"
+      enforcement: "blocking"
+      pipeline_integration: true
+      coverage:
+        - "Security vulnerabilities"
+        - "Code quality issues"
+        - "Injection flaws"
+      _note: "GitHub Advanced Security - SAST actif dans la CI"
+
+  dependency_scanning:
+    - name: "Dependabot"
+      type: "dependency-scanner"
+      vendor: "GitHub"
+      enforcement: "advisory"
+      pipeline_integration: true
+      features:
+        - "Vulnerability alerts"
+        - "Automated PRs for updates"
+        - "Security advisories"
+      _note: "Alertes automatiques + PRs de mise à jour"
+
+    - name: "pnpm audit"
+      type: "vulnerability-scanner"
+      enforcement: "advisory"
+      pipeline_integration: false
+      _note: "Complément manuel, security patches via overrides"
+
+  secrets_detection:
+    - name: "GitGuardian"
+      type: "secrets-scanner"
+      vendor: "GitGuardian"
+      enforcement: "blocking"
+      pipeline_integration: true
+      coverage:
+        - "API keys"
+        - "Credentials"
+        - "Private keys"
+        - "Tokens"
+      _note: "Scan automatique dans la CI GitHub"
+
+  container_scanning:
+    - name: "Scalingo built-in"
+      type: "container-scanner"
+      enforcement: "blocking"
+      pipeline_integration: true
+
+observability:
+  apm:
+    - name: "Sentry (Backend)"
+      type: "error-tracking"
+      coverage: "Backend exceptions, performance"
+      retention: "90 days"
+
+    - name: "Sentry (Frontend)"
+      type: "error-tracking"
+      coverage: "Frontend errors, crashes"
+      retention: "90 days"
+
+    - name: "Datadog"
+      type: "log-management"
+      region: "EU"
+      coverage: "All production logs"
+      retention: "15 days"
+      integration: "Scalingo log drain"
+      features:
+        - "Log aggregation"
+        - "Search and filtering"
+        - "Alerting"
+        - "Dashboards"
+      _note: "SIEM-like capabilities for incident detection"
+
+  logging:
+    - name: "Pino"
+      type: "structured-logging"
+      format: "JSON"
+      destination: "stdout (Scalingo logs → Datadog)"
+      pii_filtering: "partial"
+      retention:
+        scalingo: "Archivé (réintégrable)"
+        datadog: "15 jours"
+
+  alerting:
+    - name: "Scalingo Alerts"
+      type: "infrastructure-alerts"
+      channels:
+        - "Email"
+      policies:
+        - "High memory usage"
+        - "High CPU usage"
+        - "App restart"
+
+    - name: "Discord Webhook"
+      type: "custom-alerts"
+      channels:
+        - "Discord"
+      policies:
+        - "Critical errors"
+        - "Partner sync failures"
+
+infrastructure:
+  infrastructure_as_code:
+    - name: "Scalingo Configuration"
+      type: "paas-config"
+      location: "scalingo.json"
+      _note: "Minimal IaC - mostly platform-managed"
+
+  container_orchestration:
+    platform: "Scalingo Containers"
+    type: "managed"
+
+  cloud_providers:
+    - name: "Scalingo"
+      type: "paas"
+      region: "France (Paris)"
+      services:
+        - "App hosting"
+        - "PostgreSQL"
+        - "Redis"
+        - "S3 (Cellar)"
+
+development:
+  ide:
+    recommended: "VS Code"
+    extensions:
+      - "Biome"
+      - "TypeScript"
+      - "GitLens"
+
+  code_quality:
+    formatter: "Biome"
+    linter: "Biome"
+    enforcement: "pre-commit"
+
+  pre_commit:
+    enabled: true
+    tool: "Husky"
+    hooks:
+      - "pre-commit: lint-staged (biome)"
+      - "pre-push: typecheck, test"
+    configuration: ".husky/"
+
+testing:
+  unit_tests:
+    framework: "Jest"
+    coverage_threshold: "N/A"
+    location: "**/*.unit.test.ts"
+
+  integration_tests:
+    framework: "Jest + Supertest"
+    location: "**/*.integration.test.ts"
+    database: "PostgreSQL (CI service)"
+
+  e2e_tests:
+    framework: "Playwright"
+    location: "playwright/tests/"
+    browser: "Chromium"
+    ci_integration: true
+
+collaboration:
+  documentation:
+    - name: "GitHub README"
+      type: "markdown"
+      location: "README.md, doc/"
+
+  communication:
+    - name: "Mattermost / Slack"
+      type: "instant-messaging"
+      _note: "Assumed - verify with team"
+
+    - name: "Discord"
+      type: "alerts"
+      usage: "Automated notifications"
+
+  project_management:
+    - name: "GitHub Issues"
+      type: "issue-tracking"
+
+    - name: "GitHub Projects"
+      type: "project-board"
+      _note: "Assumed - verify with team"
+
+secrets_management:
+  production:
+    storage: "Scalingo Environment Variables"
+    rotation: "Manual"
+    audit_logging: false
+    _note: "Consider dedicated secrets manager"
+
+  development:
+    storage: ".env files (gitignored)"
+    rotation: "N/A"
+
+  ci_cd:
+    storage: "GitHub Secrets"
+    rotation: "Manual"
+    audit_logging: true
+
+governance:
+  tool_ownership:
+    - tool: "CI/CD (GitHub Actions)"
+      primary_owner: "Tech Lead"
+      backup_owner: "Development Team"
+
+    - tool: "Infrastructure (Scalingo)"
+      primary_owner: "Platform Team"
+      backup_owner: "Tech Lead"
+
+    - tool: "Security Tools"
+      primary_owner: "Tech Lead"
+      backup_owner: "Development Team"
+
+  access_management:
+    request_process: "GitHub access request"
+    approval_workflow: "Tech Lead approval"
+    audit_frequency: "quarterly"
+    _note: "Process not formalized"
+
+  change_management:
+    ci_cd_changes:
+      approval_required: true
+      approvers:
+        - "Tech Lead"
+
+    infrastructure_changes:
+      approval_required: true
+      approvers:
+        - "Platform Team"

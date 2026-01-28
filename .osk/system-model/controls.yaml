@@ -1,0 +1,434 @@
+# OpenSecKit System Model - Security Controls
+# Phase 5: Operations
+# Generated: 2026-01-28
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: All security controls (auth, authz, encryption, logging, network)     │
+# │                                                                             │
+# │ REFERENCE (do not duplicate):                                               │
+# │   - Security tools (SAST, DAST) → tooling.yaml                              │
+# │   - Trust zones → boundaries.yaml                                           │
+# │   - User types → actors.yaml                                                │
+# └─────────────────────────────────────────────────────────────────────────────┘
+
+metadata:
+  section: "controls"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+authentication:
+  - id: "ctrl-jwt-auth"
+    name: "JWT Authentication"
+    description: |
+      Authentification basée sur des tokens JWT signés avec clés EC (ECDSA).
+      Utilisé pour les API internes et les magic links.
+    type: "token-based"
+    implementation:
+      library: "jsonwebtoken"
+      algorithm: "ES256"
+      expiration: "31 days (magic links) / 8 hours (sessions)"
+      refresh: "On login"
+    components:
+      - "comp-backend"
+    effectiveness: "high"
+
+  - id: "ctrl-magic-link"
+    name: "Magic Link Authentication"
+    description: |
+      Liens magiques envoyés par email pour l'authentification sans mot de passe.
+      Utilisés pour les bénéficiaires et les signataires de conventions.
+    type: "passwordless"
+    implementation:
+      token_type: "JWT"
+      delivery: "Email via Brevo"
+      single_use: false
+      expiration: "31 days"
+    components:
+      - "comp-backend"
+      - "external-brevo"
+    effectiveness: "medium"
+    _note: "Risque si email compromis"
+
+  - id: "ctrl-proconnect-auth"
+    name: "ProConnect OAuth"
+    description: |
+      Authentification fédérée via ProConnect (SSO État français) pour les agents publics.
+    type: "oauth2-oidc"
+    implementation:
+      provider: "ProConnect"
+      protocol: "OpenID Connect"
+      scopes: "openid, given_name, usual_name, email, custom, siret"
+    components:
+      - "comp-backend"
+      - "external-proconnect"
+    effectiveness: "high"
+
+  - id: "ctrl-ft-connect-auth"
+    name: "France Travail Connect OAuth"
+    description: |
+      Authentification fédérée via France Travail Connect pour les demandeurs d'emploi.
+    type: "oauth2"
+    implementation:
+      provider: "France Travail"
+      protocol: "OAuth2"
+    components:
+      - "comp-backend"
+      - "external-france-travail"
+    effectiveness: "high"
+
+  - id: "ctrl-api-key-auth"
+    name: "API Key Authentication"
+    description: |
+      Authentification par clé API pour les partenaires externes (API v2/v3).
+    type: "api-key"
+    implementation:
+      storage: "Database (hashed)"
+      header: "Authorization"
+      rotation: "Manual"
+    components:
+      - "comp-backend"
+    effectiveness: "medium"
+
+  - id: "ctrl-session-management"
+    name: "Session Management"
+    description: |
+      Gestion des sessions utilisateur via JWT et Redis.
+    type: "stateless-with-cache"
+    implementation:
+      token: "JWT"
+      cache: "Redis"
+      expiration: "8 hours (ProConnect) / 31 days (magic link)"
+    components:
+      - "comp-backend"
+      - "comp-redis"
+    effectiveness: "high"
+
+  - id: "ctrl-token-rotation"
+    name: "JWT Key Rotation Support"
+    description: |
+      Support de rotation des clés JWT avec validation de l'ancienne clé.
+    type: "key-rotation"
+    implementation:
+      method: "Previous key in config"
+      grace_period: "Until manual deprecation"
+    components:
+      - "comp-backend"
+    effectiveness: "medium"
+
+authorization:
+  - id: "ctrl-rbac"
+    name: "Role-Based Access Control"
+    description: |
+      Contrôle d'accès basé sur les rôles utilisateur et les droits sur les agences/établissements.
+    model: "RBAC"
+    implementation:
+      roles_ref: "actors.yaml#system_access_roles"  # 13 rôles définis dans actors.yaml
+      scope: "Per agency / Per establishment"
+    components:
+      - "comp-backend"
+    effectiveness: "high"
+
+  - id: "ctrl-resource-auth"
+    name: "Resource-Based Authorization"
+    description: |
+      Vérification des droits d'accès aux ressources spécifiques (conventions, établissements).
+    model: "Resource-based"
+    implementation:
+      checks:
+        - "Convention ownership/agency membership"
+        - "Establishment ownership"
+        - "Agency membership"
+    components:
+      - "comp-backend"
+    effectiveness: "high"
+
+  - id: "ctrl-api-consumer-auth"
+    name: "API Consumer Authorization"
+    description: |
+      Contrôle d'accès pour les consommateurs d'API avec permissions granulaires.
+    model: "Consumer-based"
+    implementation:
+      scopes: "Per-consumer configuration"
+      rate_limiting: true
+    components:
+      - "comp-backend"
+    effectiveness: "high"
+
+encryption:
+  - id: "ctrl-encryption-transit"
+    name: "Encryption in Transit"
+    description: |
+      Chiffrement de toutes les communications via TLS 1.2+.
+    scope: "all-communications"
+    implementation:
+      protocol: "TLS 1.2+"
+      certificate: "Let's Encrypt via Scalingo"
+      enforcement: "HTTPS redirect"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+      - "comp-database"
+    effectiveness: "high"
+
+  - id: "ctrl-encryption-rest"
+    name: "Encryption at Rest"
+    description: |
+      Chiffrement des données au repos géré par l'infrastructure Scalingo.
+    scope: "database, storage"
+    implementation:
+      method: "Provider-managed"
+      provider: "Scalingo"
+      infrastructure_ref: "index.yaml#infrastructure_certifications"
+    components:
+      - "comp-database"
+      - "external-s3"
+    effectiveness: "high"
+
+  - id: "ctrl-jwt-signing"
+    name: "JWT Cryptographic Signing"
+    description: |
+      Signature cryptographique des tokens JWT avec clés EC.
+    scope: "authentication-tokens"
+    implementation:
+      algorithm: "ES256"
+      key_rotation: "Manual with previous key support"
+    components:
+      - "comp-backend"
+    effectiveness: "high"
+
+logging:
+  - id: "ctrl-request-logging"
+    name: "HTTP Request Logging"
+    description: |
+      Logging structuré de toutes les requêtes HTTP via Pino.
+      Drain vers Datadog EU pour centralisation et analyse.
+    events_captured:
+      - "HTTP requests"
+      - "Response codes"
+      - "Request duration"
+      - "User context"
+    implementation:
+      library: "pino-http"
+      format: "JSON structured"
+      drain: "Scalingo → Datadog EU"
+    components:
+      - "comp-backend"
+    retention:
+      datadog: "15 jours"
+      scalingo_archive: "Réintégrable à la demande"
+    siem_integrated: true
+    siem_provider: "Datadog EU"
+    effectiveness: "high"
+
+  - id: "ctrl-error-tracking"
+    name: "Error Tracking (Sentry)"
+    description: |
+      Capture et suivi des erreurs et exceptions via Sentry.
+    events_captured:
+      - "Exceptions"
+      - "Unhandled rejections"
+      - "Performance spans"
+    implementation:
+      service: "Sentry (self-hosted)"
+      pii_scrubbing: true
+    components:
+      - "comp-backend"
+      - "comp-frontend"
+    retention: "90 days"
+    siem_integrated: false
+    effectiveness: "high"
+
+  - id: "ctrl-audit-logging"
+    name: "Audit Trail"
+    description: |
+      Logging des événements métier significatifs via le système d'events.
+    events_captured:
+      - "Convention status changes"
+      - "User authentication"
+      - "Admin actions"
+      - "Data modifications"
+    implementation:
+      storage: "Database (outbox)"
+      format: "Domain events"
+    components:
+      - "comp-backend"
+      - "comp-database"
+    retention: "1 year"
+    siem_integrated: false
+    effectiveness: "high"
+
+network:
+  - id: "ctrl-rate-limiting"
+    name: "Rate Limiting"
+    description: |
+      Limitation du nombre de requêtes par utilisateur/IP via Bottleneck.
+    type: "rate-limiting"
+    implementation:
+      library: "Bottleneck"
+      limits:
+        - "5 req/sec per API consumer"
+        - "Custom limits per endpoint"
+    scope: "API endpoints"
+    components:
+      - "comp-backend"
+    effectiveness: "high"
+
+  - id: "ctrl-network-isolation"
+    name: "Network Isolation"
+    description: |
+      Isolation réseau des composants internes (base de données, Redis).
+    type: "network-segmentation"
+    implementation:
+      method: "Scalingo private networking"
+      access: "Internal only"
+    scope: "Data layer"
+    components:
+      - "comp-database"
+      - "comp-redis"
+    effectiveness: "high"
+
+  - id: "ctrl-ip-filtering"
+    name: "IP Filtering"
+    description: |
+      Filtrage d'IP pour certains endpoints sensibles (webhooks entrants).
+    type: "ip-whitelist"
+    implementation:
+      library: "express-ipfilter"
+      config: "Environment variable"
+    scope: "Webhook endpoints"
+    components:
+      - "comp-backend"
+    effectiveness: "medium"
+
+  - id: "ctrl-security-headers"
+    name: "Security Headers"
+    description: |
+      En-têtes de sécurité HTTP configurés sur toutes les réponses.
+    type: "http-headers"
+    implementation:
+      headers:
+        - "Strict-Transport-Security: max-age=31536000; includeSubDomains"
+        - "X-Content-Type-Options: nosniff"
+        - "X-Frame-Options: DENY"
+        - "Content-Security-Policy: configured"
+    scope: "All responses"
+    components:
+      - "comp-backend"
+      - "comp-frontend"
+    effectiveness: "high"
+
+input_validation:
+  - id: "ctrl-input-validation"
+    name: "Input Validation (Zod)"
+    description: |
+      Validation des entrées utilisateur via schémas Zod typés.
+    type: "schema-validation"
+    implementation:
+      library: "Zod"
+      location: "shared package + API layer"
+    components:
+      - "comp-backend"
+      - "comp-frontend"
+      - "comp-shared"
+    effectiveness: "high"
+
+  - id: "ctrl-html-detection"
+    name: "HTML Injection Detection"
+    description: |
+      Middleware de détection des tentatives d'injection HTML dans les paramètres.
+    type: "injection-prevention"
+    implementation:
+      method: "Custom middleware"
+      action: "Block request"
+    components:
+      - "comp-backend"
+    effectiveness: "medium"
+
+  - id: "ctrl-sql-injection"
+    name: "SQL Injection Prevention"
+    description: |
+      Prévention des injections SQL via queries paramétrées (Kysely).
+    type: "parameterized-queries"
+    implementation:
+      library: "Kysely"
+      method: "Query builder"
+    components:
+      - "comp-backend"
+    effectiveness: "high"
+
+security_processes:
+  - id: "proc-dependency-updates"
+    process: "Dependency Updates"
+    description: "Mise à jour des dépendances avec patches de sécurité via pnpm overrides"
+    frequency: "On discovery"
+    last_performed: "Continuous"
+    owner: "team-core"
+    owner_contact: "tech-lead"
+    documented: true
+
+  - id: "proc-code-review"
+    process: "Code Review"
+    description: "Review obligatoire de toutes les Pull Requests"
+    frequency: "Per PR"
+    last_performed: "Continuous"
+    owner: "team-core"
+    owner_contact: "tech-lead"
+    documented: true
+
+  - id: "proc-automated-testing"
+    process: "Automated Testing"
+    description: "Tests unitaires, intégration et E2E sur chaque PR"
+    frequency: "Per commit"
+    last_performed: "Continuous"
+    owner: "team-core"
+    owner_contact: "tech-lead"
+    documented: true
+
+  - id: "proc-database-backup"
+    process: "Database Backup"
+    description: |
+      Sauvegarde automatique de la base de données PostgreSQL via Scalingo (Starter Plan).
+      Inclut Point-in-Time Recovery (PiTR) permettant une restauration à la seconde près
+      sur les 7 derniers jours.
+    frequency: "Daily"
+    last_performed: "Continuous (automatique)"
+    owner: "team-platform"
+    owner_contact: "ops-team"
+    documented: true
+    provider: "Scalingo"
+    plan: "Starter"
+    capabilities:
+      daily_backups:
+        retention: "7 jours glissants"
+        frequency: "Quotidienne"
+      weekly_backups:
+        retention: "4 semaines glissantes"
+        frequency: "Dimanche"
+      manual_backups:
+        limit: 10
+        retention: "Indéfinie (1 mois après suppression BDD)"
+      point_in_time_recovery:
+        enabled: true
+        window: "7 jours"
+        granularity: "À la seconde"
+        method: "Backup hebdo + Write-Ahead Logs"
+    encryption: true
+    rpo_with_pitr: "< 1 minute"
+    rpo_without_pitr: "24 heures"
+    restoration_tested: false
+    _note: "Test de restauration requis (GAP-006)"
+
+  - id: "proc-incident-response"
+    process: "Incident Response"
+    description: |
+      Procédure de réponse aux incidents de sécurité gérée au niveau de la
+      Plateforme de l'inclusion. Le RSSI assume les rôles de Security Champion
+      et Incident Responder en chef pour tous les produits de la plateforme.
+    frequency: "On incident"
+    last_performed: "Unknown"
+    owner: "RSSI Plateforme Inclusion"
+    owner_contact: "rssi@inclusion.beta.gouv.fr"
+    documented: true
+    policy_level: "Plateforme Inclusion"
+    _note: "GAP-001 résolu - politique existante au niveau Plateforme"

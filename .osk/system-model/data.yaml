@@ -1,0 +1,675 @@
+# OpenSecKit System Model - Data Inventory
+# Phase 3: Domain Model
+# Generated: 2026-01-28
+
+metadata:
+  section: "data"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+data_categories:
+  - id: "data-user"
+    name: "User Data"
+    description: "Données des utilisateurs de la plateforme (conseillers, admins, contacts entreprise)"
+    classification: "personal"
+    fields:
+      - name: "id"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "email"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "firstName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "lastName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "createdAt"
+        type: "datetime"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "lastLoginAt"
+        type: "datetime"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "proConnectInfos"
+        type: "json"
+        pii: true
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "5 years after last activity"
+      legal_basis: "Contrat de service public"
+      deletion_method: "Anonymization"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Authentication"
+      - "Authorization"
+      - "Audit trail"
+    legal_basis: "article-6-1-b"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "medium"
+
+  - id: "data-beneficiary"
+    name: "Beneficiary Data"
+    description: "Données des bénéficiaires d'immersion (demandeurs d'emploi, scolaires)"
+    classification: "personal-sensitive"
+    fields:
+      - name: "firstName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "lastName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "email"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "phone"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "birthdate"
+        type: "date"
+        pii: true
+        sensitive: true
+        encryption_required: false
+      - name: "isRqth"
+        type: "boolean"
+        pii: true
+        sensitive: true
+        encryption_required: true
+        _note: "Reconnaissance travailleur handicapé - donnée de santé"
+      - name: "emergencyContact"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "emergencyContactPhone"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "emergencyContactEmail"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "federatedIdentity"
+        type: "json"
+        pii: true
+        sensitive: false
+        encryption_required: false
+        _note: "France Travail Connect identity"
+      - name: "levelOfEducation"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+        _note: "Pour mini-stages scolaires uniquement"
+      - name: "schoolName"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "schoolPostcode"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "5 years after convention end"
+      legal_basis: "Obligation légale (Code du Travail)"
+      deletion_method: "Anonymization"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Convention management"
+      - "Contact with establishment"
+      - "Regulatory compliance"
+    legal_basis: "article-6-1-c"
+    cross_border: false
+    dpia_required: true
+    dpia_status: "validated"
+    dpia_date: "2026-01-28"
+    impact_if_breached: "high"
+    infrastructure_ref: "index.yaml#infrastructure_certifications"
+    _note: "Données de santé (RQTH). AIPD validée 2026-01-28."
+
+  - id: "data-convention"
+    name: "Convention Data"
+    description: "Données des conventions d'immersion"
+    classification: "business-sensitive"
+    fields:
+      - name: "id"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "status"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "dateStart"
+        type: "date"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "dateEnd"
+        type: "date"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "dateSubmission"
+        type: "datetime"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "dateValidation"
+        type: "datetime"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "schedule"
+        type: "json"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "immersionObjective"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "immersionAppellation"
+        type: "json"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "immersionActivities"
+        type: "text"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "immersionSkills"
+        type: "text"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "workConditions"
+        type: "text"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "individualProtection"
+        type: "boolean"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "sanitaryPrevention"
+        type: "boolean"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "signatories"
+        type: "json"
+        pii: true
+        sensitive: false
+        encryption_required: false
+        _note: "Contient les données des signataires (bénéficiaire, représentant entreprise, etc.)"
+    retention:
+      period: "10 years"
+      legal_basis: "Obligation légale (Code du Travail)"
+      deletion_method: "Archival then deletion"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Convention lifecycle management"
+      - "Regulatory compliance"
+      - "Statistics"
+    legal_basis: "article-6-1-c"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "medium"
+
+  - id: "data-establishment"
+    name: "Establishment Data"
+    description: "Données des entreprises et structures d'accueil"
+    classification: "business"
+    fields:
+      - name: "siret"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "businessName"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "address"
+        type: "json"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "position"
+        type: "geopoint"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "naf"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "numberEmployeesRange"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "isSearchable"
+        type: "boolean"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "website"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "Until establishment removal or 3 years inactive"
+      legal_basis: "Consentement"
+      deletion_method: "Hard delete"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Establishment directory"
+      - "Search and matching"
+      - "Convention association"
+    legal_basis: "article-6-1-a"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "low"
+
+  - id: "data-establishment-contact"
+    name: "Establishment Contact Data"
+    description: "Données de contact des personnes dans les entreprises"
+    classification: "personal"
+    fields:
+      - name: "id"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "firstName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "lastName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "email"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "phone"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "job"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "contactMode"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "Until contact removal or establishment removal"
+      legal_basis: "Consentement"
+      deletion_method: "Hard delete"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Contact for immersion requests"
+      - "Convention management"
+    legal_basis: "article-6-1-a"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "medium"
+
+  - id: "data-agency"
+    name: "Agency Data"
+    description: "Données des agences prescriptrices"
+    classification: "business"
+    fields:
+      - name: "id"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "name"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "kind"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "status"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "address"
+        type: "json"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "position"
+        type: "geopoint"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "coveredDepartments"
+        type: "array"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "agencySiret"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "codeSafir"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "counsellorEmails"
+        type: "array"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "validatorEmails"
+        type: "array"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "contactEmail"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "Until agency closure"
+      legal_basis: "Mission de service public"
+      deletion_method: "Archival"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Agency management"
+      - "Convention validation workflow"
+    legal_basis: "article-6-1-e"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "low"
+
+  - id: "data-discussion"
+    name: "Discussion Data"
+    description: "Échanges entre bénéficiaires et établissements"
+    classification: "personal"
+    fields:
+      - name: "id"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "potentialBeneficiaryFirstName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "potentialBeneficiaryLastName"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "potentialBeneficiaryEmail"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "potentialBeneficiaryPhone"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "exchanges"
+        type: "array"
+        pii: true
+        sensitive: false
+        encryption_required: false
+        _note: "Messages between parties"
+    retention:
+      period: "2 years"
+      legal_basis: "Intérêt légitime"
+      deletion_method: "Hard delete"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Facilitate contact between parties"
+      - "Lead to convention creation"
+    legal_basis: "article-6-1-f"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "medium"
+
+  - id: "data-assessment"
+    name: "Assessment Data"
+    description: "Bilans d'immersion post-convention"
+    classification: "personal"
+    fields:
+      - name: "conventionId"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "status"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "endedWithAJob"
+        type: "boolean"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "assessmentDetails"
+        type: "json"
+        pii: false
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "Same as convention (10 years)"
+      legal_basis: "Obligation légale"
+      deletion_method: "Archival with convention"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Track immersion outcomes"
+      - "Statistics and reporting"
+    legal_basis: "article-6-1-c"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "low"
+
+  - id: "data-notification"
+    name: "Notification Data"
+    description: "Logs des emails et SMS envoyés"
+    classification: "operational"
+    fields:
+      - name: "id"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "recipientEmail"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "recipientPhone"
+        type: "string"
+        pii: true
+        sensitive: false
+        encryption_required: false
+      - name: "templateId"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "sentAt"
+        type: "datetime"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "status"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "1 year"
+      legal_basis: "Intérêt légitime (audit)"
+      deletion_method: "Hard delete"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Notification tracking"
+      - "Audit trail"
+    legal_basis: "article-6-1-f"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "low"
+
+  - id: "data-outbox-events"
+    name: "Domain Events"
+    description: "Événements métier pour traitement asynchrone"
+    classification: "operational"
+    fields:
+      - name: "id"
+        type: "uuid"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "topic"
+        type: "string"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "payload"
+        type: "json"
+        pii: true
+        sensitive: false
+        encryption_required: false
+        _note: "May contain PII depending on event type"
+      - name: "status"
+        type: "enum"
+        pii: false
+        sensitive: false
+        encryption_required: false
+      - name: "publishedAt"
+        type: "datetime"
+        pii: false
+        sensitive: false
+        encryption_required: false
+    retention:
+      period: "30 days"
+      legal_basis: "Intérêt légitime (reliability)"
+      deletion_method: "Hard delete"
+    storage_locations:
+      - "comp-database"
+    processing_purposes:
+      - "Async event processing"
+      - "Reliability"
+    legal_basis: "article-6-1-f"
+    cross_border: false
+    dpia_required: false
+    impact_if_breached: "low"
+
+data_subjects:
+  - type: "beneficiary"
+    description: "Bénéficiaires d'immersion (demandeurs d'emploi, scolaires)"
+    data_categories:
+      - "data-beneficiary"
+      - "data-convention"
+      - "data-discussion"
+      - "data-assessment"
+    rights_applicable:
+      - "access"
+      - "rectification"
+      - "erasure"
+      - "portability"
+      - "restriction"
+      - "objection"
+    _note: "Données sensibles (RQTH) - droits renforcés"
+
+  - type: "establishment-contact"
+    description: "Contacts dans les entreprises"
+    data_categories:
+      - "data-establishment-contact"
+      - "data-discussion"
+    rights_applicable:
+      - "access"
+      - "rectification"
+      - "erasure"
+      - "objection"
+
+  - type: "agency-user"
+    description: "Conseillers et validateurs des agences"
+    data_categories:
+      - "data-user"
+      - "data-agency"
+    rights_applicable:
+      - "access"
+      - "rectification"
+    _note: "Données professionnelles dans cadre fonction publique"
+
+  - type: "platform-admin"
+    description: "Administrateurs de la plateforme"
+    data_categories:
+      - "data-user"
+    rights_applicable:
+      - "access"
+      - "rectification"

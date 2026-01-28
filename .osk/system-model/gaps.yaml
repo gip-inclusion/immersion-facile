@@ -1,0 +1,489 @@
+# OpenSecKit System Model - Gaps Analysis
+# Phase 6: Synthesis
+# Generated: 2026-01-28
+
+metadata:
+  section: "gaps"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+summary:
+  total_gaps: 16
+  critical: 1
+  high: 3
+  medium: 7
+  low: 3
+  health_score: 87
+  resolved_gaps: 4
+  in_progress: 1
+  _note: "GAP-001, GAP-003, GAP-005, GAP-008 résolus. GAP-018 en cours."
+
+gaps:
+  # CRITICAL GAPS (GAP-001 RESOLVED)
+  - id: "GAP-001"
+    title: "Absence de procédure de réponse aux incidents"
+    category: "operations"
+    severity: "resolved"
+    status: "resolved"
+    resolved_date: "2026-01-28"
+    resolution: |
+      Politique de gestion des incidents existante à l'échelle de la Plateforme de l'inclusion.
+      Le RSSI assume les rôles de :
+      - Security Champion
+      - Incident Responder en chef
+      Cette politique couvre l'ensemble des produits de la plateforme, incluant Immersion Facilitée.
+    description: |
+      Aucune procédure documentée pour la réponse aux incidents de sécurité.
+      En cas d'incident (fuite de données, compromission), l'équipe n'a pas
+      de guide clair sur les actions à entreprendre.
+    affected_components:
+      - "All"
+    affected_data:
+      - "All"
+    impact: |
+      - Réponse lente et désorganisée en cas d'incident
+      - Non-conformité potentielle RGPD (notification 72h)
+      - Dommages amplifiés par manque de préparation
+    remediation:
+      action: "Créer et documenter une procédure de réponse aux incidents"
+      priority: "immediate"
+      effort: "medium"
+      owner: "team-platform"
+    compliance_impact:
+      - "RGPD Article 33 (notification violation) ✓"
+      - "RGS ✓"
+    risk_score: 0
+    _original_risk_score: 80
+
+  - id: "GAP-002"
+    title: "Données de santé (RQTH) sans protection renforcée"
+    category: "data"
+    severity: "critical"
+    description: |
+      Le champ isRqth (Reconnaissance Travailleur Handicapé) constitue une donnée
+      de santé au sens du RGPD. Ces données sensibles ne bénéficient pas de
+      protections supplémentaires (chiffrement applicatif, logs d'accès dédiés).
+
+      Note : L'infrastructure est hébergée sur zone SecNumCloud (osc-secnum-fr1)
+      mais n'est PAS certifiée HDS (Hébergement de Données de Santé).
+    affected_components:
+      - "comp-database"
+      - "comp-backend"
+    affected_data:
+      - "data-beneficiary"
+    impact: |
+      - Non-conformité RGPD Article 9 (données sensibles)
+      - Risque accru en cas de fuite
+      - Absence de certification HDS (non bloquant si volume faible et AIPD validée)
+    remediation:
+      action: "Implémenter des contrôles renforcés pour les données de santé"
+      priority: "immediate"
+      effort: "high"
+      owner: "team-core"
+      steps:
+        - "Audit des accès au champ isRqth"
+        - "Chiffrement applicatif du champ"
+        - "Logs d'accès dédiés"
+        - "DPIA formalisé ✓ (complété 2026-01-28)"
+      completed_steps:
+        - "DPIA formalisé (2026-01-28)"
+    compliance_impact:
+      - "RGPD Article 9"
+      - "RGPD Article 35 (DPIA) ✓"
+    infrastructure_ref: "index.yaml#infrastructure_certifications"
+    risk_score: 72
+    _note: "Score réduit suite à la validation de l'AIPD."
+
+  # HIGH GAPS (GAP-003 RESOLVED)
+  - id: "GAP-003"
+    title: "Absence de DPIA documenté"
+    category: "compliance"
+    severity: "resolved"
+    status: "resolved"
+    resolved_date: "2026-01-28"
+    resolution: |
+      AIPD réalisée et validée par l'équipe. Le document couvre :
+      - Traitement des données de santé (RQTH)
+      - Traitement des données de mineurs (mini-stages)
+      - Mesures de sécurité en place
+      - Risques résiduels acceptés
+    description: |
+      Aucune Analyse d'Impact relative à la Protection des Données (DPIA)
+      n'est documentée malgré le traitement de données sensibles (santé, mineurs).
+    affected_data:
+      - "data-beneficiary"
+      - "data-convention"
+    impact: |
+      - Non-conformité RGPD Article 35
+      - Risques non identifiés/non mitigés
+    remediation:
+      action: "Réaliser et documenter une DPIA"
+      priority: "high"
+      effort: "medium"
+      owner: "team-product"
+    compliance_impact:
+      - "RGPD Article 35"
+    risk_score: 0
+    _original_risk_score: 64
+
+  - id: "GAP-004"
+    title: "Runbooks opérationnels non documentés"
+    category: "operations"
+    severity: "high"
+    description: |
+      Les procédures opérationnelles critiques (déploiement, rollback,
+      récupération base de données, rotation des secrets) ne sont pas documentées.
+    affected_components:
+      - "All"
+    impact: |
+      - Dépendance aux connaissances individuelles
+      - Temps de récupération allongé
+      - Erreurs potentielles en situation de stress
+    remediation:
+      action: "Documenter les runbooks opérationnels"
+      priority: "high"
+      effort: "medium"
+      owner: "team-platform"
+      runbooks_needed:
+        - "Deployment"
+        - "Rollback"
+        - "Database Recovery"
+        - "Secrets Rotation"
+        - "Incident Response"
+    risk_score: 54
+
+  - id: "GAP-005"
+    title: "Scanning automatisé des secrets"
+    category: "security"
+    severity: "resolved"
+    status: "resolved"
+    resolved_date: "2026-01-28"
+    resolution: |
+      GitGuardian actif dans la CI GitHub Actions.
+      Scan automatique de tous les commits pour détecter :
+      - Clés API
+      - Credentials
+      - Clés privées
+      - Tokens
+    description: |
+      Pas d'outil automatisé pour détecter les secrets commités accidentellement
+      dans le code source (secrets dans .env, clés API, etc.).
+    affected_components:
+      - "source-control"
+      - "ci-cd"
+    impact: |
+      - Secrets potentiellement exposés dans l'historique Git
+      - Compromission possible de comptes/services
+    remediation:
+      action: "Implémenter un scanner de secrets dans le CI"
+      priority: "high"
+      effort: "low"
+      owner: "team-core"
+      implemented_solution: "GitGuardian"
+    risk_score: 0
+    _original_risk_score: 54
+
+  - id: "GAP-006"
+    title: "Test de restauration de backup non effectué"
+    category: "operations"
+    severity: "high"
+    description: |
+      Les backups de base de données n'ont jamais été testés pour vérifier
+      qu'ils peuvent être restaurés correctement.
+    affected_components:
+      - "comp-database"
+    impact: |
+      - Backup potentiellement inutilisable
+      - RTO non garanti
+    remediation:
+      action: "Planifier et exécuter un test de restauration"
+      priority: "high"
+      effort: "low"
+      owner: "team-platform"
+    risk_score: 48
+
+  - id: "GAP-007"
+    title: "MFA non obligatoire pour tous les admins"
+    category: "authentication"
+    severity: "high"
+    description: |
+      L'authentification MFA n'est pas systématiquement requise pour tous
+      les utilisateurs avec privilèges élevés (agency-admin, back-office).
+    affected_components:
+      - "comp-backend"
+    affected_data:
+      - "data-user"
+    impact: |
+      - Comptes admin vulnérables au phishing
+      - Compromission possible avec identifiants seuls
+    remediation:
+      action: "Exiger MFA pour tous les rôles d'administration"
+      priority: "high"
+      effort: "medium"
+      owner: "team-core"
+      _note: "ProConnect supporte MFA, vérifier son activation obligatoire"
+    risk_score: 45
+
+  # MEDIUM GAPS (GAP-008 RESOLVED)
+  - id: "GAP-008"
+    title: "Centralisation des logs (SIEM)"
+    category: "monitoring"
+    severity: "resolved"
+    status: "resolved"
+    resolved_date: "2026-01-28"
+    resolution: |
+      Drain des logs Scalingo vers Datadog EU en production.
+      - Rétention Datadog : 15 jours
+      - Logs archivés Scalingo : réintégrables à tout moment
+      - Région : EU (conformité RGPD)
+    description: |
+      Les logs applicatifs ne sont pas centralisés dans un SIEM pour
+      la détection d'incidents et l'analyse de sécurité.
+    affected_components:
+      - "comp-backend"
+    impact: |
+      - Détection d'incidents retardée
+      - Analyse forensique difficile
+    remediation:
+      action: "Évaluer l'intégration d'un SIEM"
+      priority: "medium"
+      effort: "high"
+      owner: "team-platform"
+      implemented_solution:
+        provider: "Datadog EU"
+        drain: "Scalingo log drain"
+        retention: "15 jours (Datadog) + archives Scalingo"
+    risk_score: 0
+    _original_risk_score: 36
+
+  - id: "GAP-009"
+    title: "Absence de politique de rotation des secrets"
+    category: "security"
+    severity: "medium"
+    description: |
+      Pas de politique formelle pour la rotation régulière des secrets
+      (clés API, credentials de service).
+    affected_components:
+      - "integrations"
+      - "comp-backend"
+    impact: |
+      - Secrets potentiellement compromis non renouvelés
+      - Augmentation de la fenêtre d'exposition
+    remediation:
+      action: "Définir et implémenter une politique de rotation"
+      priority: "medium"
+      effort: "medium"
+      owner: "team-platform"
+    risk_score: 36
+
+  - id: "GAP-010"
+    title: "Magic links réutilisables"
+    category: "authentication"
+    severity: "medium"
+    description: |
+      Les magic links ne sont pas à usage unique et restent valides pendant
+      31 jours, augmentant le risque de réutilisation malveillante.
+    affected_components:
+      - "comp-backend"
+    impact: |
+      - Lien forwarded peut être réutilisé
+      - Accès prolongé en cas de compromission email
+    remediation:
+      action: "Implémenter des magic links à usage unique"
+      priority: "medium"
+      effort: "medium"
+      owner: "team-core"
+    risk_score: 36
+
+  - id: "GAP-011"
+    title: "PII dans les logs potentiellement exposé"
+    category: "privacy"
+    severity: "medium"
+    description: |
+      Le filtrage PII dans les logs n'est que partiel, des données personnelles
+      peuvent apparaître dans les logs applicatifs.
+    affected_components:
+      - "comp-backend"
+    affected_data:
+      - "data-user"
+      - "data-beneficiary"
+    impact: |
+      - Exposition de données personnelles
+      - Non-conformité potentielle RGPD
+    remediation:
+      action: "Audit et amélioration du filtrage PII dans les logs"
+      priority: "medium"
+      effort: "medium"
+      owner: "team-core"
+    risk_score: 36
+
+  - id: "GAP-012"
+    title: "Pas de gestionnaire de secrets dédié"
+    category: "security"
+    severity: "medium"
+    description: |
+      Les secrets sont stockés dans les variables d'environnement Scalingo
+      sans gestionnaire dédié (Vault, AWS Secrets Manager, etc.).
+    affected_components:
+      - "infrastructure"
+    impact: |
+      - Rotation manuelle complexe
+      - Audit des accès limité
+      - Pas de versioning des secrets
+    remediation:
+      action: "Évaluer l'adoption d'un gestionnaire de secrets"
+      priority: "medium"
+      effort: "high"
+      owner: "team-platform"
+    risk_score: 27
+
+  - id: "GAP-013"
+    title: "Dépendances npm avec vulnérabilités non corrigées"
+    category: "supply-chain"
+    severity: "medium"
+    description: |
+      Certaines dépendances npm ont des vulnérabilités connues nécessitant
+      une mise à jour via pnpm overrides.
+    affected_components:
+      - "comp-backend"
+      - "comp-frontend"
+    impact: |
+      - Vulnérabilités exploitables
+    remediation:
+      action: "Revue et mise à jour des overrides de sécurité"
+      priority: "medium"
+      effort: "low"
+      owner: "team-core"
+    risk_score: 27
+
+  - id: "GAP-014"
+    title: "Formation sécurité non formalisée"
+    category: "people"
+    severity: "medium"
+    description: |
+      Pas de programme de formation à la sécurité pour les développeurs.
+    impact: |
+      - Vulnérabilités introduites par méconnaissance
+      - Mauvaises pratiques non corrigées
+    remediation:
+      action: "Mettre en place un programme de formation sécurité"
+      priority: "medium"
+      effort: "medium"
+      owner: "team-core"
+    risk_score: 27
+
+  - id: "GAP-015"
+    title: "Absence de WAF"
+    category: "network"
+    severity: "medium"
+    description: |
+      Pas de Web Application Firewall en frontal pour filtrer les attaques
+      communes (injection, XSS, etc.).
+    affected_components:
+      - "comp-frontend"
+      - "comp-backend"
+    impact: |
+      - Attaques web non filtrées en amont
+    remediation:
+      action: "Évaluer l'ajout d'un WAF"
+      priority: "medium"
+      effort: "medium"
+      owner: "team-platform"
+      _note: "Scalingo propose Scalingo WAF add-on"
+    risk_score: 27
+
+  # LOW GAPS
+  - id: "GAP-016"
+    title: "Documentation d'onboarding incomplète"
+    category: "documentation"
+    severity: "low"
+    description: |
+      La documentation pour l'onboarding des nouveaux développeurs pourrait
+      être plus complète, notamment sur les aspects sécurité.
+    impact: |
+      - Temps d'onboarding allongé
+      - Pratiques sécurité non transmises
+    remediation:
+      action: "Enrichir la documentation d'onboarding"
+      priority: "low"
+      effort: "low"
+      owner: "team-core"
+    risk_score: 18
+
+  - id: "GAP-017"
+    title: "Provenance SLSA non implémentée"
+    category: "supply-chain"
+    severity: "low"
+    description: |
+      Les artefacts de build n'ont pas d'attestation de provenance SLSA.
+    affected_components:
+      - "ci-cd"
+    impact: |
+      - Intégrité des builds non vérifiable
+    remediation:
+      action: "Implémenter SLSA provenance"
+      priority: "low"
+      effort: "medium"
+      owner: "team-platform"
+    risk_score: 18
+
+  - id: "GAP-018"
+    title: "Tests de pénétration - programme en place"
+    category: "security"
+    severity: "low"
+    status: "in_progress"
+    description: |
+      Programme de bug bounty et tests de pénétration en cours de déploiement.
+      Environnement dédié disponible : pentest.immersion-facile.beta.gouv.fr
+    infrastructure:
+      pentest_env: "https://pentest.immersion-facile.beta.gouv.fr"
+      data: "Données synthétiques"
+      isolation: true
+    impact: |
+      - Vulnérabilités non découvertes (risque réduit avec bug bounty)
+    remediation:
+      action: "Formaliser le programme de bug bounty et planifier des pentests réguliers"
+      priority: "low"
+      effort: "medium"
+      owner: "team-platform"
+      completed_steps:
+        - "Environnement pentest déployé"
+        - "Programme bug bounty initié"
+      remaining_steps:
+        - "Formaliser les règles du programme"
+        - "Planifier pentests annuels externes"
+    risk_score: 12
+    _note: "Score réduit - environnement pentest et bug bounty en place"
+
+remediation_priorities:
+  immediate:
+    # GAP-001: Procédure incident - RÉSOLU (politique Plateforme Inclusion)
+    - "GAP-002: Protection données santé (AIPD complétée, reste chiffrement + logs)"
+
+  short_term:
+    - "GAP-004: Runbooks"
+    - "GAP-006: Test backup"
+    - "GAP-007: MFA admins"
+
+  resolved:
+    - "GAP-001: Procédure incident (résolu 2026-01-28 - politique Plateforme Inclusion, RSSI)"
+    - "GAP-003: DPIA (résolu 2026-01-28)"
+    - "GAP-005: Secret scanning (résolu 2026-01-28 - GitGuardian actif)"
+    - "GAP-008: SIEM (résolu 2026-01-28 - Datadog EU via drain Scalingo)"
+
+  medium_term:
+    - "GAP-009: Rotation secrets"
+    - "GAP-010: Magic links unique"
+    - "GAP-011: PII logs"
+    - "GAP-012: Secrets manager"
+    - "GAP-013: Dependencies"
+    - "GAP-014: Formation"
+    - "GAP-015: WAF"
+
+  long_term:
+    - "GAP-016: Documentation"
+    - "GAP-017: SLSA"
+
+  in_progress:
+    - "GAP-018: Pentest (env déployé, bug bounty initié)"

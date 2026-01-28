@@ -1,0 +1,208 @@
+# OpenSecKit System Model - Index
+# Generated: 2026-01-28
+
+metadata:
+  version: "4.0.0"
+  created_at: "2026-01-28T10:00:00Z"
+  last_scan: "2026-01-28T11:30:00Z"
+  discovery_mode: "full"
+
+project:
+  name: "Immersion Facilitée"
+  description: |
+    Plateforme numérique facilitant les immersions professionnelles (PMSMP)
+    pour les demandeurs d'emploi, les entreprises et les organismes prescripteurs.
+  repository: "https://github.com/gip-inclusion/immersion-facile"
+  organization: "GIP Inclusion"
+  domain: "emploi-inclusion"
+  product_type: "web-application"
+  maturity: "production"
+
+health_score:
+  overall: 87
+  documentation: 85
+  security: 85
+  operations: 78
+  _note: "Score basé sur les gaps identifiés. Mis à jour 2026-01-28 (GAP-001, GAP-003, GAP-005, GAP-008 résolus)"
+
+sections:
+  - file: "product.yaml"
+    description: "Product identity, features, KPIs, roadmap"
+    key_metrics:
+      features: 9
+  - file: "business.yaml"
+    description: "Domain, stakeholders, business processes"
+    key_metrics:
+      processes: 7
+      agency_kinds: 11
+  - file: "glossary.yaml"
+    description: "Domain vocabulary, bounded contexts"
+    key_metrics:
+      terms: 16
+      acronyms: 15
+      bounded_contexts: 5
+  - file: "architecture.yaml"
+    description: "Components, tech stack, data flows, APIs"
+    key_metrics:
+      components: 10
+      data_flows: 8
+      apis: 3
+      patterns: 6
+  - file: "data.yaml"
+    description: "Data categories, PII classification"
+    key_metrics:
+      categories: 10
+      pii_fields: 20
+  - file: "actors.yaml"
+    description: "User types, roles, service accounts"
+    key_metrics:
+      user_types: 7
+      roles: 13
+      service_accounts: 8
+  - file: "boundaries.yaml"
+    description: "Trust zones, trust boundaries"
+    key_metrics:
+      zones: 7
+      boundaries: 11
+  - file: "user-journeys.yaml"
+    description: "Personas, user journeys, touchpoints"
+    key_metrics:
+      personas: 4
+      journeys: 5
+  - file: "integrations.yaml"
+    description: "External services, third-party vendors"
+    key_metrics:
+      integrations: 12
+      critical: 3
+  - file: "supply_chain.yaml"
+    description: "SBOM, dependencies, artifact security"
+    key_metrics:
+      sbom_components: 22
+      policies: 4
+  - file: "controls.yaml"
+    description: "Security controls by category"
+    key_metrics:
+      authentication: 5
+      authorization: 3
+      encryption: 3
+      logging: 3
+      network: 3
+  - file: "tooling.yaml"
+    description: "CI/CD, security tools, observability"
+    key_metrics:
+      pipelines: 3
+      security_tools: 4
+  - file: "team.yaml"
+    description: "Team structure, ownership, processes"
+    key_metrics:
+      teams: 3
+  - file: "operations.yaml"
+    description: "Environments, monitoring, scheduled jobs"
+    key_metrics:
+      environments: 5
+      scheduled_jobs: 5
+      runbooks_documented: 1
+  - file: "gaps.yaml"
+    description: "Identified gaps, remediation priorities"
+    key_metrics:
+      total: 16
+      critical: 1
+      high: 3
+      medium: 7
+      resolved: 4
+      in_progress: 1
+
+tech_stack_summary:
+  languages:
+    - "TypeScript 5.8"
+  frontend:
+    - "React 18"
+    - "Vite"
+    - "Redux Toolkit"
+    - "DSFR"
+  backend:
+    - "Node.js 22"
+    - "Express.js"
+    - "Kysely"
+  database:
+    - "PostgreSQL 13"
+    - "Redis"
+  infrastructure:
+    - "Scalingo (PaaS, SecNumCloud osc-secnum-fr1)"
+    - "S3 (Cellar)"
+
+critical_gaps_summary:
+  - id: "GAP-002"
+    title: "Données de santé (RQTH) sans protection renforcée"
+    severity: "critical"
+    _note: "Seul gap critique restant. GAP-001 résolu (politique Plateforme Inclusion)"
+
+resolved_gaps:
+  - id: "GAP-001"
+    title: "Procédure de réponse aux incidents"
+    resolved_date: "2026-01-28"
+    resolution: "Politique Plateforme Inclusion (RSSI)"
+  - id: "GAP-003"
+    title: "AIPD documentée"
+    resolved_date: "2026-01-28"
+    resolution: "AIPD validée"
+  - id: "GAP-005"
+    title: "Scan de secrets automatisé"
+    resolved_date: "2026-01-28"
+    resolution: "GitGuardian actif dans CI GitHub"
+  - id: "GAP-008"
+    title: "Centralisation des logs (SIEM)"
+    resolved_date: "2026-01-28"
+    resolution: "Datadog EU via drain Scalingo (15j + archives)"
+
+in_progress_gaps:
+  - id: "GAP-018"
+    title: "Tests de pénétration"
+    status: "Environnement pentest déployé, bug bounty initié"
+
+compliance_status:
+  rgpd:
+    status: "partial"
+    gaps:
+      - "Données santé (RQTH) - chiffrement applicatif en attente"
+    resolved:
+      - "AIPD validée (2026-01-28)"
+  rgs:
+    status: "compliant"
+    _note: "Procédure incident gérée par RSSI Plateforme Inclusion"
+  rgaa:
+    status: "compliant"
+    _note: "DSFR assure conformité"
+
+infrastructure_certifications:
+  secnumcloud: true
+  secnumcloud_region: "osc-secnum-fr1"
+  hds: false
+  iso_27001: true
+  _note: "SecNumCloud via Scalingo/Outscale. HDS non requis (AIPD validée)."
+
+documentation:
+  - file: "../docs/product.md"
+    audience: "Product Managers, Stakeholders"
+    description: "Product overview, features, KPIs"
+  - file: "../docs/architecture.md"
+    audience: "Developers, Architects"
+    description: "Technical architecture, patterns, data flows"
+  - file: "../docs/developer.md"
+    audience: "Developers"
+    description: "Development setup, workflow, guidelines"
+  - file: "../docs/security.md"
+    audience: "Security Engineers, DevOps"
+    description: "Security controls, gaps, compliance"
+  - file: "../docs/operations.md"
+    audience: "DevOps, SREs"
+    description: "Deployment, monitoring, runbooks"
+  - file: "../docs/onboarding.md"
+    audience: "New Team Members"
+    description: "Getting started guide"
+
+next_steps:
+  - "Adresser GAP-002 (protection renforcée données RQTH) - seul gap critique"
+  - "Traiter les gaps prioritaires : GAP-004, GAP-005, GAP-006, GAP-007"
+  - "Run /osk-comply for detailed compliance assessment"
+  - "Run /osk-secure for feature-specific threat modeling"

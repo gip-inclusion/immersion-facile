@@ -1,0 +1,347 @@
+# OpenSecKit System Model - Product
+# Phase 1: Product Context
+# Generated: 2026-01-28
+
+metadata:
+  section: "product"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+product:
+  name: "Immersion Facilitée"
+  tagline: "Faciliter les immersions professionnelles"
+  version: "1.0.0"
+  repository: "https://github.com/gip-inclusion/immersion-facile"
+
+  vision: |
+    Moderniser et dématérialiser entièrement le processus des immersions professionnelles
+    pour les bénéficiaires, les entreprises et les organismes d'accompagnement (Pôle Emploi,
+    Missions Locales, Cap Emploi, etc.).
+
+  value_proposition:
+    for_users: |
+      Les bénéficiaires peuvent rechercher des entreprises, initier des demandes d'immersion
+      et suivre le processus de convention entièrement en ligne. Les entreprises gèrent
+      facilement leurs offres et les conventions. Les conseillers ont une vision centralisée
+      des conventions à valider.
+    for_business: |
+      Réduction du temps administratif, meilleure traçabilité des immersions,
+      amélioration du taux de placement, conformité réglementaire automatisée.
+    differentiators:
+      - "Plateforme unifiée pour tous les acteurs de l'immersion"
+      - "Intégration avec France Travail (ex-Pôle Emploi) et ProConnect"
+      - "Conformité DSFR (Design System de l'État français)"
+      - "Gestion des conventions dématérialisées avec signature électronique"
+      - "Annuaire des entreprises accueillant en immersion"
+
+  target_audience:
+    primary: "Demandeurs d'emploi et personnes en reconversion professionnelle"
+    secondary:
+      - "Entreprises et structures d'accueil proposant des immersions"
+      - "Conseillers des agences (France Travail, Missions Locales, Cap Emploi)"
+      - "Administrateurs de la plateforme"
+    anti_personas:
+      - "Entreprises ne souhaitant pas accueillir d'immersion"
+      - "Personnes sans projet professionnel défini"
+
+  product_type: "web-application"
+  business_model: "public-service"
+  maturity: "production"
+
+features:
+  - id: "feat-convention"
+    name: "Gestion des conventions"
+    description: "Création, suivi et signature dématérialisée des conventions d'immersion"
+    status: "active"
+    introduced: "2021-01"
+    owner: "team-core"
+    user_value: "Processus entièrement dématérialisé, gain de temps"
+    business_value: "Traçabilité complète, conformité réglementaire"
+    entry_points:
+      - path: "/convention"
+        method: "GET/POST"
+    dependencies:
+      components: ["comp-backend", "comp-frontend", "comp-shared"]
+      integrations: []
+    metrics:
+      - name: "conventions_created"
+        target: "continuous growth"
+        tracking: "database"
+    documentation:
+      user_docs: "/docs/conventions"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-establishment-search"
+    name: "Recherche d'entreprises"
+    description: "Annuaire searchable des entreprises accueillant en immersion"
+    status: "active"
+    introduced: "2021-01"
+    owner: "team-core"
+    user_value: "Trouver facilement des entreprises par métier et localisation"
+    business_value: "Augmentation des demandes d'immersion"
+    entry_points:
+      - path: "/recherche"
+        method: "GET"
+    dependencies:
+      components: ["comp-backend", "comp-frontend", "comp-shared"]
+      integrations: ["insee-sirene", "rome-appellations"]
+    metrics:
+      - name: "search_to_contact_rate"
+        target: "increase"
+        tracking: "analytics"
+    documentation:
+      user_docs: "/docs/recherche"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-establishment-form"
+    name: "Inscription des entreprises"
+    description: "Formulaire d'inscription pour les entreprises souhaitant accueillir"
+    status: "active"
+    introduced: "2021-01"
+    owner: "team-core"
+    user_value: "Inscription simple et guidée"
+    business_value: "Croissance de l'annuaire"
+    entry_points:
+      - path: "/establishment"
+        method: "POST"
+    dependencies:
+      components: ["comp-backend", "comp-frontend", "comp-shared"]
+      integrations: ["insee-sirene"]
+    metrics:
+      - name: "establishments_registered"
+        target: "continuous growth"
+        tracking: "database"
+    documentation:
+      user_docs: "/docs/etablissement"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-agency-dashboard"
+    name: "Dashboard Agences"
+    description: "Tableau de bord pour les conseillers des agences prescriptrices"
+    status: "active"
+    introduced: "2022-01"
+    owner: "team-core"
+    user_value: "Vision centralisée des conventions à traiter"
+    business_value: "Efficacité des conseillers"
+    entry_points:
+      - path: "/agence"
+        method: "GET"
+    dependencies:
+      components: ["comp-backend", "comp-frontend"]
+      integrations: ["metabase"]
+    metrics:
+      - name: "convention_processing_time"
+        target: "decrease"
+        tracking: "analytics"
+    documentation:
+      user_docs: "/docs/agence"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-assessment"
+    name: "Bilans d'immersion"
+    description: "Création et suivi des bilans post-immersion"
+    status: "active"
+    introduced: "2022-06"
+    owner: "team-core"
+    user_value: "Capitaliser sur l'expérience d'immersion"
+    business_value: "Mesure des résultats"
+    entry_points:
+      - path: "/assessment"
+        method: "GET/POST"
+    dependencies:
+      components: ["comp-backend", "comp-frontend", "comp-shared"]
+      integrations: []
+    metrics:
+      - name: "assessments_completed"
+        target: "increase completion rate"
+        tracking: "database"
+    documentation:
+      user_docs: "/docs/bilan"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-discussion"
+    name: "Messagerie"
+    description: "Système de discussion entre bénéficiaires et entreprises"
+    status: "active"
+    introduced: "2023-01"
+    owner: "team-core"
+    user_value: "Communication directe avant l'immersion"
+    business_value: "Amélioration du taux de conversion"
+    entry_points:
+      - path: "/discussion"
+        method: "GET/POST"
+    dependencies:
+      components: ["comp-backend", "comp-frontend", "comp-shared"]
+      integrations: []
+    metrics:
+      - name: "discussion_to_convention_rate"
+        target: "increase"
+        tracking: "analytics"
+    documentation:
+      user_docs: "/docs/messagerie"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-mini-stage-cci"
+    name: "Mini-stages CCI"
+    description: "Gestion des mini-stages pour les Chambres de Commerce et d'Industrie"
+    status: "active"
+    introduced: "2023-06"
+    owner: "team-core"
+    user_value: "Découverte métiers pour les scolaires"
+    business_value: "Extension de l'offre"
+    entry_points:
+      - path: "/mini-stage"
+        method: "GET/POST"
+    dependencies:
+      components: ["comp-backend", "comp-frontend", "comp-shared"]
+      integrations: []
+    metrics:
+      - name: "mini_stages_created"
+        target: "continuous growth"
+        tracking: "database"
+    documentation:
+      user_docs: "/docs/mini-stage"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-auth-proconnect"
+    name: "Authentification ProConnect"
+    description: "Connexion via ProConnect pour les agents publics"
+    status: "active"
+    introduced: "2024-01"
+    owner: "team-core"
+    user_value: "Connexion simplifiée pour agents"
+    business_value: "Conformité SSO État"
+    entry_points:
+      - path: "/api/auth/proconnect"
+        method: "GET/POST"
+    dependencies:
+      components: ["comp-backend"]
+      integrations: ["proconnect"]
+    metrics:
+      - name: "proconnect_logins"
+        target: "adoption"
+        tracking: "logs"
+    documentation:
+      user_docs: "/docs/connexion"
+      technical_docs: "/doc/adr/"
+
+  - id: "feat-auth-ft-connect"
+    name: "Authentification France Travail Connect"
+    description: "Connexion via France Travail Connect pour les demandeurs d'emploi"
+    status: "active"
+    introduced: "2022-06"
+    owner: "team-core"
+    user_value: "Connexion simplifiée pour demandeurs d'emploi"
+    business_value: "Intégration France Travail"
+    entry_points:
+      - path: "/api/auth/pe-connect"
+        method: "GET/POST"
+    dependencies:
+      components: ["comp-backend"]
+      integrations: ["france-travail"]
+    metrics:
+      - name: "ft_connect_logins"
+        target: "adoption"
+        tracking: "logs"
+    documentation:
+      user_docs: "/docs/connexion"
+      technical_docs: "/doc/adr/"
+
+kpis:
+  business:
+    - name: "Conventions validées"
+      description: "Nombre de conventions d'immersion validées"
+      current: "N/A"
+      target: "croissance continue"
+      tracking: "database"
+      owner: "team-product"
+
+    - name: "Entreprises inscrites"
+      description: "Nombre d'entreprises dans l'annuaire"
+      current: "N/A"
+      target: "croissance continue"
+      tracking: "database"
+      owner: "team-product"
+
+    - name: "Taux de conversion recherche vers contact"
+      description: "Pourcentage de recherches menant à une demande de contact"
+      current: "N/A"
+      target: "increase"
+      tracking: "analytics"
+      owner: "team-product"
+
+  technical:
+    - name: "Disponibilité"
+      description: "Uptime de la plateforme"
+      current: "99%+"
+      target: "99.5%"
+      tracking: "monitoring"
+      sla: true
+
+    - name: "Temps de réponse API"
+      description: "Latence moyenne des endpoints API"
+      current: "N/A"
+      target: "<500ms"
+      tracking: "monitoring"
+      sla: true
+
+  user_experience:
+    - name: "Taux de complétion des conventions"
+      description: "Pourcentage de conventions démarrées qui sont validées"
+      current: "N/A"
+      target: "increase"
+      measurement_method: "funnel analysis"
+
+roadmap:
+  current_quarter:
+    name: "Q1 2026"
+    theme: "Amélioration de l'expérience utilisateur"
+    priorities:
+      - "Optimisation des performances de recherche"
+      - "Amélioration du parcours de convention"
+    key_deliverables:
+      - name: "Convention draft sharing"
+        status: "in_progress"
+        owner: "team-core"
+      - name: "FT Connect user contact details"
+        status: "completed"
+        owner: "team-core"
+
+  future:
+    - quarter: "Q2 2026"
+      theme: "Intégrations et API"
+      items:
+        - "API v3 enhancements"
+        - "New partner integrations"
+    - quarter: "Q3 2026"
+      theme: "Scalabilité"
+      items:
+        - "Performance optimizations"
+        - "Infrastructure improvements"
+
+  tech_debt:
+    - id: "debt-001"
+      description: "Migration agency kind PE vers FT"
+      impact: "medium"
+      priority: "medium"
+      estimated_effort: "medium"
+    - id: "debt-002"
+      description: "Unification des gateways IN_MEMORY"
+      impact: "low"
+      priority: "low"
+      estimated_effort: "high"
+
+competitive_context:
+  market_category: "Public employment services"
+
+  competitors:
+    - name: "Processus papier traditionnel"
+      type: "legacy"
+      our_advantage: "Entièrement dématérialisé, traçabilité complète"
+      their_advantage: "Familiarité pour certains utilisateurs"
+
+  positioning: |
+    Immersion Facilitée est le seul service numérique officiel permettant de gérer
+    intégralement le processus d'immersion professionnelle en France, avec une intégration
+    native aux systèmes France Travail et une conformité RGPD garantie.

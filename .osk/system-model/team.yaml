@@ -1,0 +1,206 @@
+# OpenSecKit System Model - Team Structure
+# Phase 5: Operations
+# Generated: 2026-01-28
+
+metadata:
+  section: "team"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+organization:
+  name: "GIP Inclusion"
+  type: "Public Interest Group (GIP)"
+  parent: "Ministry of Labor"
+
+teams:
+  - id: "team-core"
+    name: "Core Development Team"
+    description: "Équipe principale de développement de la plateforme Immersion Facilitée"
+    responsibilities:
+      - "Feature development"
+      - "Bug fixes"
+      - "Code reviews"
+      - "Testing"
+      - "Documentation"
+    members:
+      _note: "Composition à renseigner manuellement"
+
+  - id: "team-platform"
+    name: "Platform Team"
+    description: "Équipe infrastructure et opérations"
+    responsibilities:
+      - "Infrastructure management"
+      - "Deployments"
+      - "Monitoring"
+      - "Incident response"
+    members:
+      _note: "Composition à renseigner manuellement"
+
+  - id: "team-product"
+    name: "Product Team"
+    description: "Équipe produit et design"
+    responsibilities:
+      - "Product strategy"
+      - "User research"
+      - "UX design"
+      - "Prioritization"
+    members:
+      _note: "Composition à renseigner manuellement"
+
+ownership:
+  components:
+    - component: "comp-backend"
+      owner: "team-core"
+      backup: "team-platform"
+
+    - component: "comp-frontend"
+      owner: "team-core"
+      backup: null
+
+    - component: "comp-shared"
+      owner: "team-core"
+      backup: null
+
+    - component: "comp-database"
+      owner: "team-platform"
+      backup: "team-core"
+
+    - component: "comp-pipelines"
+      owner: "team-core"
+      backup: "team-platform"
+
+  integrations:
+    - integration: "int-france-travail"
+      owner: "team-core"
+      backup: "team-platform"
+
+    - integration: "int-proconnect"
+      owner: "team-core"
+      backup: null
+
+    - integration: "int-brevo"
+      owner: "team-core"
+      backup: "team-platform"
+
+on_call:
+  schedule: "Business hours (9h-18h)"
+  rotation: "N/A"
+  escalation_path:
+    - "Development Team"
+    - "Tech Lead"
+    - "Platform Team"
+  _note: "No 24/7 on-call - service non-critique"
+
+incident_response:
+  policy_owner: "Plateforme de l'inclusion"
+  security_champion: "RSSI Plateforme Inclusion"
+  incident_responder: "RSSI Plateforme Inclusion"
+
+  coverage:
+    business_hours: "Lun-Ven 9h-18h"
+    on_call: false
+    sla_guaranteed: "Jours ouvrés uniquement"
+    outside_hours: "SLA non garanti"
+    _note: "Pas d'astreinte - réponse best effort hors jours ouvrés"
+
+  severity_levels:
+    - level: "critical"
+      description: "Service complètement indisponible"
+      response_time: "1h (jours ouvrés)"
+      resolution_target: "4h (jours ouvrés)"
+      outside_hours: "Best effort"
+
+    - level: "high"
+      description: "Fonctionnalité majeure impactée"
+      response_time: "4h (jours ouvrés)"
+      resolution_target: "1 jour ouvré"
+      outside_hours: "Best effort"
+
+    - level: "medium"
+      description: "Fonctionnalité mineure impactée"
+      response_time: "1 jour ouvré"
+      resolution_target: "3 jours ouvrés"
+      outside_hours: "Prochain jour ouvré"
+
+    - level: "low"
+      description: "Impact cosmétique"
+      response_time: "3 jours ouvrés"
+      resolution_target: "5 jours ouvrés"
+      outside_hours: "Prochain jour ouvré"
+
+  contacts:
+    key_contacts:
+      - role: "RSSI"
+        organization: "Plateforme de l'inclusion"
+      - role: "DPO"
+        organization: "Plateforme de l'inclusion"
+    escalation_matrix: "Définie dans la politique de gestion des incidents Plateforme Inclusion"
+    _note: "Matrice d'escalade et procédures détaillées dans la politique PI"
+
+training:
+  security_awareness:
+    required: true
+    frequency: "annual"
+    last_completed: "unknown"
+    _note: "Gap - programme de formation à établir"
+
+  onboarding:
+    documentation: "README.md, doc/"
+    mentoring: true
+    duration: "1-2 weeks"
+
+  technical_skills:
+    - "TypeScript"
+    - "React"
+    - "Express.js"
+    - "PostgreSQL"
+    - "Domain-Driven Design"
+
+communication:
+  channels:
+    - name: "Internal chat"
+      type: "instant-messaging"
+      usage: "Daily communication"
+
+    - name: "Email"
+      type: "email"
+      usage: "Formal communication"
+
+    - name: "GitHub Issues"
+      type: "issue-tracker"
+      usage: "Bug reports, feature requests"
+
+    - name: "GitHub PRs"
+      type: "code-review"
+      usage: "Code discussions"
+
+  meetings:
+    - name: "Daily standup"
+      frequency: "daily"
+      participants: "Development Team"
+
+    - name: "Sprint planning"
+      frequency: "bi-weekly"
+      participants: "All teams"
+
+    - name: "Retrospective"
+      frequency: "bi-weekly"
+      participants: "All teams"
+
+development_practices:
+  methodology: "Agile / Scrum"
+  sprint_duration: "2 weeks"
+
+  code_review:
+    required: true
+    minimum_approvers: 1
+    guidelines: "doc/adr/dev-process-PR.md"
+
+  pair_programming:
+    encouraged: true
+    guidelines: "doc/adr/pair-mob-programming.md"
+
+  documentation:
+    required: "For significant changes"
+    location: "doc/, README.md"

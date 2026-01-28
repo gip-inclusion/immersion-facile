@@ -28,3 +28,15 @@ bi/dbt_packages/
 bi/logs/
 bi/dbt-build.tar.gz
 bi/dbt-build/
+
+# Claude Code
+.claude/
+
+# OpenSecKit - track only generated .md and .yaml files
+.osk/*
+!.osk/docs/
+!.osk/system-model/
+.osk/docs/*
+!.osk/docs/*.md
+.osk/system-model/*
+!.osk/system-model/*.yaml

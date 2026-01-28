@@ -1,0 +1,443 @@
+# OpenSecKit System Model - Glossary
+# Phase 1: Product Context
+# Generated: 2026-01-28
+
+metadata:
+  section: "glossary"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+terms:
+  - term: "Convention"
+    definition: |
+      Document contractuel formalisant une période de mise en situation en milieu professionnel (PMSMP).
+      Elle définit les modalités de l'immersion : dates, horaires, objectifs, encadrement.
+    context: "Processus métier principal de l'application"
+    category: "core-domain"
+    aliases:
+      - "Convention d'immersion"
+      - "PMSMP"
+    related_terms:
+      - "Immersion"
+      - "Signataires"
+      - "Bénéficiaire"
+    code_references:
+      - file: "shared/src/convention/convention.dto.ts"
+        entity: "ConventionDto"
+        type: "type"
+    examples:
+      - "Une convention d'immersion de 2 semaines chez un boulanger"
+
+  - term: "Immersion"
+    definition: |
+      Période de mise en situation professionnelle permettant à un bénéficiaire de découvrir
+      un métier, confirmer un projet professionnel ou initier une démarche de recrutement.
+    context: "Concept métier central"
+    category: "core-domain"
+    related_terms:
+      - "Convention"
+      - "PMSMP"
+      - "Mini-stage"
+    code_references:
+      - file: "shared/src/convention/convention.dto.ts"
+        entity: "InternshipKind"
+        type: "type"
+
+  - term: "Bénéficiaire"
+    definition: |
+      Personne effectuant l'immersion professionnelle. Peut être un demandeur d'emploi
+      ou un scolaire (dans le cas des mini-stages CCI).
+    context: "Acteur principal du processus"
+    category: "actor"
+    related_terms:
+      - "Signataire"
+      - "Convention"
+    code_references:
+      - file: "shared/src/convention/convention.dto.ts"
+        entity: "Beneficiary"
+        type: "type"
+
+  - term: "Établissement"
+    definition: |
+      Entreprise ou structure d'accueil proposant des immersions professionnelles.
+      Identifié par son SIRET dans le référentiel SIRENE.
+    context: "Structure d'accueil"
+    category: "core-domain"
+    aliases:
+      - "Entreprise"
+      - "Structure d'accueil"
+    related_terms:
+      - "SIRET"
+      - "Offre d'immersion"
+    code_references:
+      - file: "shared/src/establishment/establishment.ts"
+        entity: "EstablishmentData"
+        type: "type"
+
+  - term: "Agence"
+    definition: |
+      Organisme prescripteur habilité à valider les conventions d'immersion.
+      Peut être France Travail, une Mission Locale, Cap Emploi, etc.
+    context: "Organisme prescripteur"
+    category: "core-domain"
+    aliases:
+      - "Agence prescriptrice"
+      - "Organisme d'accompagnement"
+    related_terms:
+      - "Conseiller"
+      - "Validateur"
+    code_references:
+      - file: "shared/src/agency/agency.dto.ts"
+        entity: "AgencyDto"
+        type: "type"
+
+  - term: "Signataire"
+    definition: |
+      Personne devant apposer sa signature électronique sur la convention.
+      Inclut le bénéficiaire, le représentant de l'entreprise, et éventuellement
+      le représentant légal (si mineur) ou l'employeur actuel.
+    context: "Processus de signature"
+    category: "core-domain"
+    related_terms:
+      - "Convention"
+      - "Bénéficiaire"
+      - "Représentant"
+    code_references:
+      - file: "shared/src/role/role.dto.ts"
+        entity: "SignatoryRole"
+        type: "type"
+      - file: "shared/src/convention/convention.dto.ts"
+        entity: "Signatories"
+        type: "type"
+
+  - term: "Tuteur"
+    definition: |
+      Personne de l'entreprise encadrant le bénéficiaire pendant l'immersion.
+      Responsable de l'accompagnement quotidien et de la rédaction du bilan.
+    context: "Encadrement de l'immersion"
+    category: "actor"
+    aliases:
+      - "Tuteur entreprise"
+      - "Encadrant"
+    code_references:
+      - file: "shared/src/convention/convention.dto.ts"
+        entity: "EstablishmentTutor"
+        type: "type"
+
+  - term: "Conseiller"
+    definition: |
+      Agent de l'agence prescriptrice effectuant un premier examen de la convention
+      avant transmission au validateur.
+    context: "Workflow de validation"
+    category: "actor"
+    aliases:
+      - "Counsellor"
+    code_references:
+      - file: "shared/src/role/role.dto.ts"
+        entity: "agencyModifierRoles"
+        type: "const"
+
+  - term: "Validateur"
+    definition: |
+      Agent de l'agence ayant autorité pour approuver définitivement une convention.
+    context: "Workflow de validation"
+    category: "actor"
+    aliases:
+      - "Validator"
+    code_references:
+      - file: "shared/src/role/role.dto.ts"
+        entity: "agencyModifierRoles"
+        type: "const"
+
+  - term: "Code ROME"
+    definition: |
+      Répertoire Opérationnel des Métiers et des Emplois. Code de 5 caractères
+      (lettre + 4 chiffres) identifiant un métier ou groupe de métiers.
+    context: "Classification des métiers"
+    category: "reference-data"
+    related_terms:
+      - "Appellation"
+    code_references:
+      - file: "shared/src/rome.ts"
+        entity: "romeCodeSchema"
+        type: "schema"
+
+  - term: "Appellation"
+    definition: |
+      Intitulé précis d'un métier, rattaché à un code ROME.
+      Plusieurs appellations peuvent correspondre à un même code ROME.
+    context: "Classification des métiers"
+    category: "reference-data"
+    related_terms:
+      - "Code ROME"
+    code_references:
+      - file: "shared/src/romeAndAppellationDtos/romeAndAppellation.dto.ts"
+        entity: "AppellationAndRomeDto"
+        type: "type"
+
+  - term: "SIRET"
+    definition: |
+      Système d'Identification du Répertoire des Établissements.
+      Numéro unique de 14 chiffres identifiant un établissement en France.
+    context: "Identification entreprise"
+    category: "reference-data"
+    related_terms:
+      - "Établissement"
+      - "SIRENE"
+    code_references:
+      - file: "shared/src/siret/siret.ts"
+        entity: "SiretDto"
+        type: "type"
+
+  - term: "Mini-stage CCI"
+    definition: |
+      Immersion courte (max 5 jours) destinée aux scolaires, organisée par
+      les Chambres de Commerce et d'Industrie.
+    context: "Type d'immersion spécifique"
+    category: "core-domain"
+    related_terms:
+      - "Immersion"
+      - "CCI"
+    code_references:
+      - file: "shared/src/convention/convention.dto.ts"
+        entity: "InternshipKind"
+        type: "type"
+
+  - term: "Magic Link"
+    definition: |
+      Lien unique et temporaire envoyé par email permettant d'accéder à une action
+      sans authentification traditionnelle (signature, modification de convention).
+    context: "Authentification"
+    category: "technical"
+    aliases:
+      - "Lien magique"
+    code_references:
+      - file: "shared/src/tokens/jwt.dto.ts"
+        entity: "expiredMagicLinkErrorMessage"
+        type: "const"
+
+  - term: "Bilan"
+    definition: |
+      Évaluation réalisée à la fin de l'immersion par le tuteur.
+      Documente les compétences observées et les suites données.
+    context: "Suivi post-immersion"
+    category: "core-domain"
+    aliases:
+      - "Assessment"
+    code_references:
+      - file: "shared/src/assessment/assessment.dto.ts"
+        entity: "AssessmentDto"
+        type: "type"
+
+  - term: "Discussion"
+    definition: |
+      Échange de messages entre un bénéficiaire et un contact d'établissement,
+      généralement suite à une demande de contact.
+    context: "Communication"
+    category: "core-domain"
+    code_references:
+      - file: "shared/src/discussion/discussion.dto.ts"
+        entity: "DiscussionDto"
+        type: "type"
+
+acronyms:
+  - acronym: "PMSMP"
+    expansion: "Période de Mise en Situation en Milieu Professionnel"
+    context: "Cadre légal de l'immersion"
+    category: "legal"
+
+  - acronym: "ROME"
+    expansion: "Répertoire Opérationnel des Métiers et des Emplois"
+    context: "Classification des métiers"
+    category: "reference-data"
+
+  - acronym: "SIRET"
+    expansion: "Système d'Identification du Répertoire des Établissements"
+    context: "Identification entreprise"
+    category: "reference-data"
+
+  - acronym: "SIRENE"
+    expansion: "Système Informatisé du Répertoire National des Entreprises et des Établissements"
+    context: "Base de données entreprises INSEE"
+    category: "reference-data"
+
+  - acronym: "NAF"
+    expansion: "Nomenclature d'Activités Française"
+    context: "Code d'activité économique"
+    category: "reference-data"
+
+  - acronym: "CCI"
+    expansion: "Chambre de Commerce et d'Industrie"
+    context: "Type d'agence pour mini-stages"
+    category: "organization"
+
+  - acronym: "CMA"
+    expansion: "Chambre des Métiers et de l'Artisanat"
+    context: "Type d'agence pour mini-stages"
+    category: "organization"
+
+  - acronym: "IAE"
+    expansion: "Insertion par l'Activité Économique"
+    context: "Type de structure d'accompagnement"
+    category: "organization"
+
+  - acronym: "CEP"
+    expansion: "Conseil en Évolution Professionnelle"
+    context: "Service d'accompagnement"
+    category: "organization"
+
+  - acronym: "RQTH"
+    expansion: "Reconnaissance de la Qualité de Travailleur Handicapé"
+    context: "Statut bénéficiaire"
+    category: "legal"
+
+  - acronym: "DSFR"
+    expansion: "Design System de l'État Français"
+    context: "Framework UI"
+    category: "technical"
+
+  - acronym: "RGPD"
+    expansion: "Règlement Général sur la Protection des Données"
+    context: "Conformité données personnelles"
+    category: "legal"
+
+  - acronym: "RGAA"
+    expansion: "Référentiel Général d'Amélioration de l'Accessibilité"
+    context: "Accessibilité numérique"
+    category: "legal"
+
+  - acronym: "JWT"
+    expansion: "JSON Web Token"
+    context: "Authentification et autorisation"
+    category: "technical"
+
+bounded_contexts:
+  - name: "Convention"
+    description: |
+      Contexte principal gérant le cycle de vie des conventions d'immersion,
+      de la création à la validation en passant par les signatures.
+    owner: "team-core"
+    entities:
+      - name: "Convention"
+        type: "aggregate-root"
+        description: "Entité principale représentant une convention d'immersion"
+      - name: "Signatories"
+        type: "value-object"
+        description: "Ensemble des signataires d'une convention"
+      - name: "Schedule"
+        type: "value-object"
+        description: "Planning horaire de l'immersion"
+    aggregates:
+      - name: "ConventionAggregate"
+        root: "Convention"
+        entities:
+          - "Signatories"
+          - "Schedule"
+          - "Assessment"
+    domain_events:
+      - name: "ConventionSubmitted"
+        trigger: "Soumission d'une nouvelle convention"
+        subscribers: ["NotificationService", "AgencyDashboard"]
+      - name: "ConventionSigned"
+        trigger: "Signature par un signataire"
+        subscribers: ["ConventionService", "NotificationService"]
+      - name: "ConventionValidated"
+        trigger: "Validation finale par un validateur"
+        subscribers: ["NotificationService", "PEGateway", "PDFGenerator"]
+
+  - name: "Establishment"
+    description: |
+      Contexte gérant les établissements, leurs offres d'immersion
+      et les contacts associés.
+    owner: "team-core"
+    entities:
+      - name: "Establishment"
+        type: "aggregate-root"
+        description: "Entreprise proposant des immersions"
+      - name: "ImmersionOffer"
+        type: "entity"
+        description: "Offre d'immersion pour un métier spécifique"
+      - name: "EstablishmentContact"
+        type: "entity"
+        description: "Personne de contact dans l'établissement"
+    domain_events:
+      - name: "EstablishmentRegistered"
+        trigger: "Inscription d'une nouvelle entreprise"
+        subscribers: ["MarketingService", "SearchIndex"]
+      - name: "EstablishmentUpdated"
+        trigger: "Modification des informations établissement"
+        subscribers: ["SearchIndex"]
+
+  - name: "Agency"
+    description: |
+      Contexte gérant les agences prescriptrices, leurs utilisateurs
+      et leurs droits.
+    owner: "team-core"
+    entities:
+      - name: "Agency"
+        type: "aggregate-root"
+        description: "Agence prescriptrice"
+      - name: "AgencyUser"
+        type: "entity"
+        description: "Utilisateur associé à une agence"
+    domain_events:
+      - name: "AgencyActivated"
+        trigger: "Activation d'une agence après validation"
+        subscribers: ["NotificationService"]
+
+  - name: "Search"
+    description: |
+      Contexte gérant la recherche d'établissements et d'offres d'immersion.
+    owner: "team-core"
+    entities:
+      - name: "SearchResult"
+        type: "value-object"
+        description: "Résultat de recherche d'établissement"
+    relationships:
+      - context: "Establishment"
+        type: "consumer"
+        description: "Consomme les données d'établissement pour l'indexation"
+
+  - name: "Discussion"
+    description: |
+      Contexte gérant les échanges entre bénéficiaires et établissements.
+    owner: "team-core"
+    entities:
+      - name: "Discussion"
+        type: "aggregate-root"
+        description: "Fil de discussion entre deux parties"
+      - name: "Message"
+        type: "entity"
+        description: "Message dans une discussion"
+
+language_rules:
+  naming_conventions:
+    - context: "Code TypeScript"
+      rule: "Utiliser PascalCase pour les types et interfaces"
+      example: "ConventionDto, AgencyStatus"
+
+    - context: "Code TypeScript"
+      rule: "Utiliser camelCase pour les variables et fonctions"
+      example: "getConventionById, updateStatus"
+
+    - context: "Statuts convention"
+      rule: "Utiliser SCREAMING_SNAKE_CASE en anglais"
+      example: "READY_TO_SIGN, IN_REVIEW, ACCEPTED_BY_VALIDATOR"
+
+    - context: "IDs techniques"
+      rule: "Utiliser kebab-case pour les identifiants métier"
+      example: "pole-emploi, mission-locale, mini-stage-cci"
+
+  anti_patterns:
+    - avoid: "PE ou Pôle Emploi"
+      use_instead: "France Travail (ou FT dans le code)"
+      reason: "Changement de nom officiel en janvier 2024"
+
+    - avoid: "Candidat"
+      use_instead: "Bénéficiaire"
+      reason: "Terme officiel du dispositif PMSMP"
+
+    - avoid: "Stage"
+      use_instead: "Immersion"
+      reason: "Distinction légale avec les stages étudiants"

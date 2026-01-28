@@ -1,0 +1,450 @@
+# OpenSecKit System Model - User Journeys
+# Phase 3: Domain Model
+# Generated: 2026-01-28
+
+metadata:
+  section: "user-journeys"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+personas:
+  - id: "persona-job-seeker"
+    name: "Marie - Demandeuse d'emploi"
+    description: |
+      Marie, 35 ans, est demandeuse d'emploi depuis 6 mois. Elle souhaite se reconvertir
+      dans la pâtisserie et veut valider son projet via une immersion professionnelle.
+    goals:
+      - "Trouver une pâtisserie pour faire une immersion"
+      - "Créer et signer une convention rapidement"
+      - "Obtenir une attestation de son immersion"
+    frustrations:
+      - "Processus administratif complexe"
+      - "Délais de validation longs"
+      - "Difficulté à trouver des entreprises accueillantes"
+    tech_savviness: "medium"
+    user_type: "user-beneficiary"
+
+  - id: "persona-student"
+    name: "Lucas - Collégien en 3ème"
+    description: |
+      Lucas, 14 ans, doit effectuer un mini-stage de découverte dans le cadre de son
+      parcours d'orientation scolaire.
+    goals:
+      - "Découvrir un métier qui l'intéresse"
+      - "Faire une immersion courte et encadrée"
+    frustrations:
+      - "Ne sait pas comment trouver une entreprise"
+      - "Ses parents doivent signer pour lui"
+    tech_savviness: "high"
+    user_type: "user-beneficiary"
+
+  - id: "persona-baker"
+    name: "Jean-Pierre - Artisan boulanger"
+    description: |
+      Jean-Pierre, 52 ans, tient une boulangerie artisanale et souhaite accueillir
+      des personnes en immersion pour potentiellement recruter un apprenti.
+    goals:
+      - "Inscrire son entreprise sur la plateforme"
+      - "Recevoir des demandes de personnes motivées"
+      - "Gérer simplement les conventions"
+    frustrations:
+      - "Peu de temps pour les démarches administratives"
+      - "Inquiétude sur les responsabilités légales"
+    tech_savviness: "low"
+    user_type: "user-establishment-contact"
+
+  - id: "persona-counsellor"
+    name: "Sophie - Conseillère Pôle Emploi"
+    description: |
+      Sophie est conseillère à France Travail. Elle accompagne quotidiennement
+      des demandeurs d'emploi et utilise les immersions comme outil de validation
+      de projet professionnel.
+    goals:
+      - "Suivre les conventions de ses bénéficiaires"
+      - "Valider rapidement les conventions conformes"
+      - "Avoir une vision globale de son portefeuille"
+    frustrations:
+      - "Volume important de conventions à traiter"
+      - "Conventions incomplètes ou incorrectes"
+    tech_savviness: "medium"
+    user_type: "user-counsellor"
+
+user_journeys:
+  - id: "journey-search-and-contact"
+    name: "Recherche et contact d'une entreprise"
+    persona: "persona-job-seeker"
+    description: "Parcours d'un bénéficiaire recherchant une entreprise pour une immersion"
+    steps:
+      - order: 1
+        name: "Accès à la recherche"
+        description: "L'utilisateur accède à la page de recherche d'immersion"
+        touchpoint: "Page /recherche"
+        components:
+          - "comp-frontend"
+        data_accessed: []
+        authentication_required: false
+
+      - order: 2
+        name: "Saisie des critères"
+        description: "Saisie du métier recherché et de la localisation"
+        touchpoint: "Formulaire de recherche"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_accessed:
+          - "data-establishment"
+        authentication_required: false
+
+      - order: 3
+        name: "Consultation des résultats"
+        description: "Visualisation des entreprises disponibles sur la carte et la liste"
+        touchpoint: "Résultats de recherche"
+        components:
+          - "comp-frontend"
+        data_accessed:
+          - "data-establishment"
+        authentication_required: false
+
+      - order: 4
+        name: "Demande de contact"
+        description: "L'utilisateur remplit le formulaire de contact pour une entreprise"
+        touchpoint: "Formulaire de contact"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_accessed:
+          - "data-discussion"
+          - "data-establishment-contact"
+        authentication_required: false
+        data_created:
+          - "Discussion"
+          - "Contact request notification"
+
+      - order: 5
+        name: "Confirmation"
+        description: "Email de confirmation envoyé au bénéficiaire"
+        touchpoint: "Email"
+        components:
+          - "comp-backend"
+          - "external-brevo"
+        authentication_required: false
+
+  - id: "journey-create-convention"
+    name: "Création d'une convention"
+    persona: "persona-job-seeker"
+    description: "Parcours de création d'une convention d'immersion"
+    steps:
+      - order: 1
+        name: "Initiation de la convention"
+        description: "Accès au formulaire de convention (via lien ou suite à une discussion)"
+        touchpoint: "Page /convention"
+        components:
+          - "comp-frontend"
+        authentication_required: false
+
+      - order: 2
+        name: "Saisie des informations bénéficiaire"
+        description: "Remplissage des données personnelles du bénéficiaire"
+        touchpoint: "Formulaire étape 1"
+        components:
+          - "comp-frontend"
+        data_created:
+          - "data-beneficiary"
+        authentication_required: false
+
+      - order: 3
+        name: "Saisie des informations entreprise"
+        description: "Recherche et validation du SIRET, informations tuteur"
+        touchpoint: "Formulaire étape 2"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_accessed:
+          - "data-establishment"
+        integrations:
+          - "external-insee"
+        authentication_required: false
+
+      - order: 4
+        name: "Définition du planning"
+        description: "Saisie des dates et horaires de l'immersion"
+        touchpoint: "Formulaire étape 3"
+        components:
+          - "comp-frontend"
+        authentication_required: false
+
+      - order: 5
+        name: "Sélection de l'agence"
+        description: "Choix de l'agence prescriptrice"
+        touchpoint: "Formulaire étape 4"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_accessed:
+          - "data-agency"
+        authentication_required: false
+
+      - order: 6
+        name: "Soumission"
+        description: "Validation et soumission de la convention"
+        touchpoint: "Bouton de soumission"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_created:
+          - "data-convention"
+          - "data-outbox-events"
+        authentication_required: false
+
+      - order: 7
+        name: "Notifications de signature"
+        description: "Envoi des liens de signature à tous les signataires"
+        touchpoint: "Emails"
+        components:
+          - "comp-backend"
+          - "comp-event-crawler"
+          - "external-brevo"
+        authentication_required: false
+
+  - id: "journey-sign-convention"
+    name: "Signature d'une convention"
+    persona: "persona-job-seeker"
+    description: "Parcours de signature électronique d'une convention"
+    steps:
+      - order: 1
+        name: "Réception du lien"
+        description: "Le signataire reçoit un email avec un lien magique"
+        touchpoint: "Email"
+        authentication_required: false
+
+      - order: 2
+        name: "Accès à la convention"
+        description: "Clic sur le lien et affichage de la convention"
+        touchpoint: "Page /convention/:id"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_accessed:
+          - "data-convention"
+        authentication_required: true
+        authentication_method: "magic-link"
+
+      - order: 3
+        name: "Vérification"
+        description: "Lecture et vérification des informations de la convention"
+        touchpoint: "Récapitulatif convention"
+        components:
+          - "comp-frontend"
+        authentication_required: true
+
+      - order: 4
+        name: "Signature"
+        description: "Clic sur le bouton de signature"
+        touchpoint: "Bouton signer"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_modified:
+          - "data-convention"
+        data_created:
+          - "data-outbox-events"
+        authentication_required: true
+
+      - order: 5
+        name: "Confirmation"
+        description: "Affichage de la confirmation et notification aux autres parties"
+        touchpoint: "Page confirmation"
+        components:
+          - "comp-frontend"
+          - "comp-event-crawler"
+          - "external-brevo"
+        authentication_required: true
+
+  - id: "journey-validate-convention"
+    name: "Validation d'une convention par l'agence"
+    persona: "persona-counsellor"
+    description: "Parcours de validation d'une convention par un conseiller/validateur"
+    steps:
+      - order: 1
+        name: "Connexion"
+        description: "Authentification via ProConnect"
+        touchpoint: "Page de connexion"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+          - "external-proconnect"
+        authentication_required: true
+        authentication_method: "proconnect"
+
+      - order: 2
+        name: "Dashboard agence"
+        description: "Accès au tableau de bord avec les conventions à traiter"
+        touchpoint: "Page /agence"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_accessed:
+          - "data-convention"
+          - "data-agency"
+        authentication_required: true
+
+      - order: 3
+        name: "Sélection convention"
+        description: "Clic sur une convention en attente de validation"
+        touchpoint: "Liste des conventions"
+        components:
+          - "comp-frontend"
+        authentication_required: true
+
+      - order: 4
+        name: "Examen"
+        description: "Lecture et vérification de la convention"
+        touchpoint: "Détail convention"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_accessed:
+          - "data-convention"
+          - "data-beneficiary"
+          - "data-establishment"
+        authentication_required: true
+
+      - order: 5
+        name: "Décision"
+        description: "Validation ou rejet de la convention"
+        touchpoint: "Boutons d'action"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_modified:
+          - "data-convention"
+        data_created:
+          - "data-outbox-events"
+        authentication_required: true
+
+      - order: 6
+        name: "Notifications"
+        description: "Envoi des notifications aux parties concernées"
+        touchpoint: "Automatique"
+        components:
+          - "comp-event-crawler"
+          - "external-brevo"
+          - "external-france-travail"
+        authentication_required: false
+
+  - id: "journey-register-establishment"
+    name: "Inscription d'une entreprise"
+    persona: "persona-baker"
+    description: "Parcours d'inscription d'une entreprise sur la plateforme"
+    steps:
+      - order: 1
+        name: "Accès au formulaire"
+        description: "Accès à la page d'inscription entreprise"
+        touchpoint: "Page /establishment/register"
+        components:
+          - "comp-frontend"
+        authentication_required: false
+
+      - order: 2
+        name: "Saisie SIRET"
+        description: "Entrée du numéro SIRET pour pré-remplissage"
+        touchpoint: "Champ SIRET"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        integrations:
+          - "external-insee"
+        authentication_required: false
+
+      - order: 3
+        name: "Informations entreprise"
+        description: "Complément des informations (contacts, offres)"
+        touchpoint: "Formulaire multi-étapes"
+        components:
+          - "comp-frontend"
+        data_created:
+          - "data-establishment"
+          - "data-establishment-contact"
+        authentication_required: false
+
+      - order: 4
+        name: "Définition des offres"
+        description: "Sélection des métiers proposés en immersion"
+        touchpoint: "Sélecteur d'appellations"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        authentication_required: false
+
+      - order: 5
+        name: "Soumission"
+        description: "Validation et enregistrement de l'entreprise"
+        touchpoint: "Bouton de soumission"
+        components:
+          - "comp-frontend"
+          - "comp-backend"
+        data_created:
+          - "data-establishment"
+          - "data-outbox-events"
+        authentication_required: false
+
+      - order: 6
+        name: "Confirmation et accès"
+        description: "Email de confirmation avec lien d'accès au dashboard"
+        touchpoint: "Email"
+        components:
+          - "comp-event-crawler"
+          - "external-brevo"
+        authentication_required: false
+
+touchpoints:
+  - id: "touchpoint-web"
+    name: "Application Web"
+    type: "web"
+    channel: "Browser"
+    components:
+      - "comp-frontend"
+
+  - id: "touchpoint-email"
+    name: "Email"
+    type: "notification"
+    channel: "Email (Brevo)"
+    components:
+      - "comp-backend"
+      - "external-brevo"
+
+  - id: "touchpoint-sms"
+    name: "SMS"
+    type: "notification"
+    channel: "SMS (Brevo)"
+    components:
+      - "comp-backend"
+      - "external-brevo"
+
+  - id: "touchpoint-magic-link"
+    name: "Magic Link"
+    type: "authentication"
+    channel: "Email"
+    components:
+      - "comp-backend"
+      - "external-brevo"
+    _note: "Lien unique envoyé par email pour accéder à une convention"
+
+  - id: "touchpoint-proconnect"
+    name: "ProConnect SSO"
+    type: "authentication"
+    channel: "OAuth redirect"
+    components:
+      - "comp-backend"
+      - "external-proconnect"
+    _note: "Authentification des agents publics"
+
+  - id: "touchpoint-ft-connect"
+    name: "France Travail Connect"
+    type: "authentication"
+    channel: "OAuth redirect"
+    components:
+      - "comp-backend"
+      - "external-france-travail"
+    _note: "Authentification des demandeurs d'emploi"
