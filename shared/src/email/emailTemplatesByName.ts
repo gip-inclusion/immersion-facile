@@ -720,6 +720,67 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         `,
       }),
     },
+    ASSESSMENT_DELETED_ESTABLISHMENT_NOTIFICATION: {
+      niceName: "Bilan - Entreprise - Bilan supprimé",
+      tags: ["bilan", "entreprise", "tuteur", "bilanSupprimé"],
+      createEmailVariables: ({
+        assessmentCreationLink,
+        beneficiaryName,
+        establishmentTutorName,
+        justification,
+        internshipKind,
+      }) => ({
+        subject: `Le bilan d’immersion de ${beneficiaryName} a été supprimé.`,
+        greetings: `Bonjour ${establishmentTutorName},`,
+        content: `
+        Le bilan ${
+          internshipKind === "immersion" ? "de l’immersion" : "du mini-stage"
+        } de ${beneficiaryName} a été supprimé par l’équipe Immersion Facilitée.
+
+        <strong>Motif indiqué :</strong>
+        <p>${justification}</p>
+
+        <p> Un nouveau bilan peut désormais être complété :
+        `,
+        buttons: [
+          {
+            label: "Compléter à nouveau le bilan",
+            url: assessmentCreationLink,
+          },
+        ],
+        subContent: `Si besoin, l’équipe Immersion Facilitée reste disponible pour vous accompagner dans cette nouvelle saisie.
+
+        ${defaultSignature(internshipKind)}`,
+      }),
+    },
+    ASSESSMENT_DELETED_BENEFICIARY_NOTIFICATION: {
+      niceName: "Bilan - Bénéficiaire - Bilan supprimé",
+      tags: ["bilan", "bénéficiaire", "bilanSupprimé"],
+      createEmailVariables: ({
+        beneficiaryName,
+        conventionId,
+        internshipKind,
+      }) => ({
+        subject:
+          "Immersion Facilitée - Le bilan de votre immersion va être mis à jour",
+        greetings: `Bonjour ${beneficiaryName},`,
+        content: `
+        Suite à une demande adressée à notre support, le bilan de votre ${internshipKind === "immersion" ? "immersion liée" : "mini-stage lié"}  à la convention ${conventionId} a été supprimé par l’équipe Immersion Facilitée.
+        
+        Cette suppression permet de corriger ou mettre à jour les informations du bilan. Un nouveau bilan vous sera transmis prochainement.
+        `,
+        highlight: {
+          content: `
+          Si vous avez déjà téléchargé votre bilan en PDF, nous vous invitons à ne pas en tenir compte, celui-ci n’étant plus valide.
+          `,
+        },
+        subContent: `Vous serez informé(e) dès que le nouveau bilan sera disponible.
+        
+        Si besoin, notre équipe reste bien entendu à votre disposition pour vous accompagner.
+
+        ${defaultSignature(internshipKind)}`,
+      }),
+    },
     CANCELLED_CONVENTION_NOTIFICATION: {
       niceName: "Convention - Annulée",
       tags: ["annulation demande d'immersion"],
