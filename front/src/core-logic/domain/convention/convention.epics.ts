@@ -4,6 +4,7 @@ import type { ConventionReadDto } from "shared";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -134,7 +135,10 @@ const getConventionEpic: ConventionEpic = (
         conventionActionSlice.actions.editCounsellorNameSucceeded.match(
           action,
         ) ||
-        assessmentSlice.actions.deleteAssessmentSucceeded.match(action),
+        assessmentSlice.actions.deleteAssessmentSucceeded.match(action) ||
+        editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateSucceeded.match(
+          action,
+        ),
     ),
     switchMap((action): Observable<ConventionAction> => {
       if ("updateStatusParams" in action.payload) {
