@@ -429,6 +429,19 @@ export const domElementIds = {
       "im-edit-counsellor-name-modal__submit-button",
     editCounsellorNameModalCancelButton:
       "im-edit-counsellor-name-modal__cancel-button",
+    editBeneficiaryBirthdateButton:
+      "im-convention-validation__edit-beneficiary-birthdate-button",
+    editBeneficiaryBirthdateModal: "im-edit-beneficiary-birthdate-modal",
+    editBeneficiaryBirthdateModalForm:
+      "im-edit-beneficiary-birthdate-modal__form",
+    editBeneficiaryBirthdateModalCurrentDateInput:
+      "im-edit-beneficiary-birthdate-modal__current-date-input",
+    editBeneficiaryBirthdateModalNewDateInput:
+      "im-edit-beneficiary-birthdate-modal__new-date-input",
+    editBeneficiaryBirthdateModalSubmitButton:
+      "im-edit-beneficiary-birthdate-modal__submit-button",
+    editBeneficiaryBirthdateModalCancelButton:
+      "im-edit-beneficiary-birthdate-modal__cancel-button",
     rejectedModalCancelButton: "im-rejected-modal__cancel-button",
     cancelModalCancelButton: "im-cancel-modal__cancel-button",
     deprecatedModalCancelButton: "im-deprecated-modal__cancel-button",
