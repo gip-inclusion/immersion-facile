@@ -32,6 +32,17 @@ describe("GetApiConsumersByConvention", () => {
   const uuidGenerator = new TestUuidGenerator();
 
   const ftAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
+  const otherAgencyWithRefersToFt = new AgencyDtoBuilder()
+    .withKind("autre")
+    .withRefersToAgencyInfo({
+      refersToAgencyId: ftAgency.id,
+      refersToAgencyName: "France Travail",
+      refersToAgencyContactEmail: "ft@example.com",
+    })
+    .build();
+  const conventionWithAgencyRefersToFt = new ConventionDtoBuilder()
+    .withAgencyId(otherAgencyWithRefersToFt.id)
+    .build();
   const conventionWithFtAgency = new ConventionDtoBuilder()
     .withAgencyId(ftAgency.id)
     .build();
@@ -216,5 +227,125 @@ describe("GetApiConsumersByConvention", () => {
       ),
       [apiConsumer.name, "France Travail"],
     );
+  });
+
+  describe("when convention agency has refersToAgencyId", () => {
+    it("returns API consumers scoped to the referred agency (by agency id)", async () => {
+      const apiConsumerScopedToFt = new ApiConsumerBuilder()
+        .withName("si-ft-production")
+        .withConventionRight({
+          kinds: ["SUBSCRIPTION"],
+          scope: { agencyIds: [ftAgency.id] },
+          subscriptions: [
+            {
+              id: uuidGenerator.new(),
+              createdAt: new Date("2024-07-22").toISOString(),
+              callbackHeaders: {},
+              callbackUrl: "https://ft.example.com",
+              subscribedEvent: "convention.updated",
+            },
+          ],
+        })
+        .build();
+
+      uow.conventionRepository.setConventions([conventionWithAgencyRefersToFt]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(otherAgencyWithRefersToFt, {
+          [connectedUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor", "validator"],
+          },
+        }),
+        toAgencyWithRights(ftAgency, {
+          [connectedUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor", "validator"],
+          },
+        }),
+      ];
+      uow.userRepository.users = [user];
+      uow.apiConsumerRepository.consumers = [apiConsumerScopedToFt];
+
+      expectToEqual(
+        await getApiConsumersByConvention.execute(
+          { conventionId: conventionWithAgencyRefersToFt.id },
+          connectedUser,
+        ),
+        [apiConsumerScopedToFt.name, "France Travail"],
+      );
+    });
+
+    it("returns API consumers scoped to the referred agency (by agency kind)", async () => {
+      const apiConsumerScopedToPeKind = new ApiConsumerBuilder()
+        .withName("si-pole-emploi-kind")
+        .withConventionRight({
+          kinds: ["SUBSCRIPTION"],
+          scope: { agencyKinds: ["pole-emploi"] },
+          subscriptions: [
+            {
+              id: uuidGenerator.new(),
+              createdAt: new Date("2024-07-22").toISOString(),
+              callbackHeaders: {},
+              callbackUrl: "https://pe.example.com",
+              subscribedEvent: "convention.updated",
+            },
+          ],
+        })
+        .build();
+
+      uow.conventionRepository.setConventions([conventionWithAgencyRefersToFt]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(otherAgencyWithRefersToFt, {
+          [connectedUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor", "validator"],
+          },
+        }),
+        toAgencyWithRights(ftAgency, {
+          [connectedUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor", "validator"],
+          },
+        }),
+      ];
+      uow.userRepository.users = [user];
+      uow.apiConsumerRepository.consumers = [apiConsumerScopedToPeKind];
+
+      expectToEqual(
+        await getApiConsumersByConvention.execute(
+          { conventionId: conventionWithAgencyRefersToFt.id },
+          connectedUser,
+        ),
+        [apiConsumerScopedToPeKind.name, "France Travail"],
+      );
+    });
+
+    it("includes France Travail when referred agency is pole-emploi (main agency is mission-locale)", async () => {
+      uow.conventionRepository.setConventions([conventionWithAgencyRefersToFt]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(otherAgencyWithRefersToFt, {
+          [connectedUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor", "validator"],
+          },
+        }),
+        toAgencyWithRights(ftAgency, {
+          [connectedUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor", "validator"],
+          },
+        }),
+      ];
+      uow.userRepository.users = [user];
+      uow.apiConsumerRepository.consumers = [];
+
+      expectToEqual(
+        await getApiConsumersByConvention.execute(
+          { conventionId: conventionWithAgencyRefersToFt.id },
+          connectedUser,
+        ),
+        ["France Travail"],
+      );
+    });
   });
 });
