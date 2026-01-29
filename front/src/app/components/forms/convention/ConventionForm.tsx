@@ -762,8 +762,12 @@ const useWaitForReduxFormUiReadyBeforeInitialisation = (
 ) => {
   const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     dispatch(
       conventionSlice.actions.isMinorChanged(
         isBeneficiaryMinor({
