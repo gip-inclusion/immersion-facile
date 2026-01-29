@@ -58,13 +58,12 @@ export const makeGetApiConsumersByConvention = useCaseBuilder(
       ? await uow.agencyRepository.getById(agency.refersToAgencyId)
       : undefined;
 
-    const agencyIds: AgencyId[] = [agency.id];
-    const agencyKinds: AgencyKind[] = [agency.kind];
-
-    if (agencyRefersTo) {
-      agencyIds.push(agencyRefersTo.id);
-      agencyKinds.push(agencyRefersTo.kind);
-    }
+    const agencyIds: AgencyId[] = agencyRefersTo
+      ? [agency.id, agencyRefersTo.id]
+      : [agency.id];
+    const agencyKinds: AgencyKind[] = agencyRefersTo
+      ? [agency.kind, agencyRefersTo.kind]
+      : [agency.kind];
 
     const conventionApiConsurmers = (
       await uow.apiConsumerRepository.getByFilters({
