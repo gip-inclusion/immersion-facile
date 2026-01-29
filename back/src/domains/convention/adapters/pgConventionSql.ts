@@ -86,7 +86,7 @@ const createConventionSelection = <
             firstName: ref("b.first_name"),
             lastName: ref("b.last_name"),
             email: ref("b.email"),
-            phone: ref("b.phone"),
+            phone: ref("phone_numbers.phone_number"),
             signedAt: sql`date_to_iso(b.signed_at)`,
             isRqth: eb
               .case()
@@ -177,7 +177,7 @@ const createConventionSelection = <
                 firstName: ref("bce.first_name"),
                 lastName: ref("bce.last_name"),
                 email: ref("bce.email"),
-                phone: ref("bce.phone"),
+                phone: ref("phone_numbers_bce.phone_number"),
                 job: sql`bce.extra_fields ->> 'job'`.$castTo<string>(),
                 businessSiret: sql`bce.extra_fields ->> 'businessSiret'`,
                 businessName: sql`bce.extra_fields ->> 'businessName'`,
@@ -191,7 +191,7 @@ const createConventionSelection = <
             firstName: ref("er.first_name"),
             lastName: ref("er.last_name"),
             email: ref("er.email"),
-            phone: ref("er.phone"),
+            phone: ref("phone_numbers_er.phone_number"),
             signedAt: sql`date_to_iso(er.signed_at)`,
           }),
           beneficiaryRepresentative: eb
@@ -204,7 +204,7 @@ const createConventionSelection = <
                 firstName: ref("br.first_name"),
                 lastName: ref("br.last_name"),
                 email: ref("br.email"),
-                phone: ref("br.phone"),
+                phone: ref("phone_numbers_br.phone_number"),
                 signedAt: sql`date_to_iso(br.signed_at)`,
               }),
             )
@@ -261,7 +261,7 @@ const createConventionSelection = <
           firstName: ref("et.first_name"),
           lastName: ref("et.last_name"),
           email: cast<Email>(ref("et.email")),
-          phone: cast<string>(ref("et.phone")),
+          phone: ref("phone_numbers_et.phone_number"),
           job: sql`et.extra_fields ->> 'job'`.$castTo<string>(),
         }),
         validators: ref("conventions.validators"),
@@ -321,6 +321,27 @@ const withActorsAndAppellationsAndPartnerPeJoin = <
       "view_appellations_dto as vad",
       "vad.appellation_code",
       "conventions.immersion_appellation",
+    )
+    .leftJoin("phone_numbers", "phone_numbers.id", "b.phone_id")
+    .leftJoin(
+      "phone_numbers as phone_numbers_er",
+      "phone_numbers_er.id",
+      "er.phone_id",
+    )
+    .leftJoin(
+      "phone_numbers as phone_numbers_et",
+      "phone_numbers_et.id",
+      "et.phone_id",
+    )
+    .leftJoin(
+      "phone_numbers as phone_numbers_br",
+      "phone_numbers_br.id",
+      "br.phone_id",
+    )
+    .leftJoin(
+      "phone_numbers as phone_numbers_bce",
+      "phone_numbers_bce.id",
+      "bce.phone_id",
     ) as QB;
 };
 
