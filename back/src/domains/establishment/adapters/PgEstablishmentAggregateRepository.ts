@@ -30,6 +30,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
+import { getOrCreatePhoneId } from "../../core/phone-number/phoneHelper";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
@@ -625,15 +626,24 @@ export class PgEstablishmentAggregateRepository
     const { userRights } = aggregate;
     if (!userRights.length) return;
 
+    const phoneIds = await Promise.all(
+      userRights.map((userRight) => {
+        if (!userRight.phone) {
+          return null;
+        }
+        return getOrCreatePhoneId(this.transaction, userRight.phone);
+      }),
+    );
+
     return this.transaction
       .insertInto("establishments__users")
       .values(
-        userRights.map((userRight) => ({
+        userRights.map((userRight, index) => ({
           siret: aggregate.establishment.siret,
           user_id: userRight.userId,
           role: userRight.role,
           job: userRight.job,
-          phone: userRight.phone,
+          phone_id: phoneIds[index],
           should_receive_discussion_notifications:
             userRight.shouldReceiveDiscussionNotifications,
           is_main_contact_by_phone: userRight.isMainContactByPhone,
@@ -1375,13 +1385,14 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
           userRights: jsonArrayFrom(
             eb
               .selectFrom("establishments__users as eu")
+              .leftJoin("phone_numbers", "phone_numbers.id", "eu.phone_id")
               .whereRef("eu.siret", "=", "e.siret")
               .select(({ ref }) =>
                 jsonBuildObject({
                   userId: ref("eu.user_id"),
                   role: ref("eu.role"),
                   job: ref("eu.job"),
-                  phone: ref("eu.phone"),
+                  phone: ref("phone_numbers.phone_number"),
                   shouldReceiveDiscussionNotifications: ref(
                     "eu.should_receive_discussion_notifications",
                   ),
