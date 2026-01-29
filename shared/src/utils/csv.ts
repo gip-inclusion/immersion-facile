@@ -7,7 +7,7 @@ export const establishmentOffersFromCSVToDto = (
     .replaceAll(" ", "")
     .split(",")
     .map((appellationCode) => ({
-      remoteWorkMode: "NO_REMOTE",
+      remoteWorkMode: "ON_SITE",
       appellationCode,
       appellationLabel: "Should be mapped by backend", // to refacto with Rome 4
       romeCode: "A1101", // to refacto with Rome 4
