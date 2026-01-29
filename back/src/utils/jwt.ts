@@ -48,7 +48,7 @@ export const makeThrowIfIncorrectJwt =
         );
         if (expiredSinceSeconds) {
           throw errors.user.expiredJwt(
-            `${Math.ceil(expiredSinceSeconds / oneMinuteInSeconds)} minutes`,
+            Math.ceil(expiredSinceSeconds / oneMinuteInSeconds),
           );
         }
       }

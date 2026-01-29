@@ -67,7 +67,6 @@ import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases
 import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
-import { RenewExpiredJwt } from "../../domains/convention/use-cases/RenewExpiredJwt";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
@@ -91,6 +90,7 @@ import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-u
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
 import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
 import { InitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
+import { RenewExpiredJwt } from "../../domains/core/authentication/connected-user/use-cases/RenewExpiredJwt";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
 import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/core/authentication/ft-connect/use-cases/LinkFranceTravailAdvisorAndRedirectToConvention";
 import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
@@ -342,7 +342,9 @@ export const createUseCases = ({
         config,
         timeGateway: gateways.timeGateway,
         shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        makeGenerateConnectedUserLoginUrl: generateConnectedUserLoginUrl,
         makeGenerateConventionMagicLinkUrl: generateConventionMagicLinkUrl,
+        makeGenerateEmailAuthCodeUrl: generateEmailAuthCodeUrl,
         saveNotificationAndRelatedEvent,
       }),
       renewConvention: new RenewConvention(uowPerformer, addConvention),

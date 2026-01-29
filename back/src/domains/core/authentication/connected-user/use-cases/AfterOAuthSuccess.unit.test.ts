@@ -506,8 +506,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           errors.user.expiredJwt(
             (timeGateway.now().getTime() - expirationDate.getTime()) /
               1000 /
-              60 +
-              " minutes",
+              60,
           ),
         );
       });

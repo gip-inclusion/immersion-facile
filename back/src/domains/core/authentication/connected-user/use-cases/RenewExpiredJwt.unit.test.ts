@@ -13,25 +13,34 @@ import {
   type RenewExpiredJwtRequestDto,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import type { AppConfig } from "../../../config/bootstrap/appConfig";
-import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
-import { toAgencyWithRights } from "../../../utils/agency";
-import { createConventionMagicLinkPayload } from "../../../utils/jwt";
-import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
+import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
+import { AppConfigBuilder } from "../../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../../utils/agency";
+import {
+  createConnectedUserJwtPayload,
+  createConventionMagicLinkPayload,
+  createEmailAuthCodeJwtPayload,
+} from "../../../../../utils/jwt";
+import {
+  fakeGenerateConnectedUserUrlFn,
+  fakeGenerateEmailAuthCodeUrlFn,
+  fakeGenerateMagicLinkUrlFn,
+} from "../../../../../utils/jwtTestHelper";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
-} from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { makeGenerateJwtES256 } from "../../core/jwt";
-import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
-import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+} from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { makeGenerateJwtES256 } from "../../../jwt";
+import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
-} from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
+import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import { RenewExpiredJwt } from "./RenewExpiredJwt";
 
 describe("RenewExpiredJwt use case", () => {
@@ -91,6 +100,8 @@ describe("RenewExpiredJwt use case", () => {
     useCase = new RenewExpiredJwt({
       uowPerformer: new InMemoryUowPerformer(uow),
       makeGenerateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+      makeGenerateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+      makeGenerateEmailAuthCodeUrl: fakeGenerateEmailAuthCodeUrlFn,
       config,
       timeGateway,
       shortLinkIdGeneratorGateway,
@@ -148,6 +159,7 @@ describe("RenewExpiredJwt use case", () => {
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
 
         await useCase.execute({
+          kind: "convention",
           originalUrl: "http://immersionfacile.fr/verifier-et-signer",
           expiredJwt: generateConventionJwt(expiredPayload),
         });
@@ -190,6 +202,7 @@ describe("RenewExpiredJwt use case", () => {
         });
 
         await useCase.execute({
+          kind: "convention",
           originalUrl: encodeURIComponent(
             "http://immersionfacile.fr/verifier-et-signer",
           ),
@@ -201,18 +214,17 @@ describe("RenewExpiredJwt use case", () => {
     });
 
     describe("Wrong paths", () => {
-      const email = "some email";
-
       it("requires a valid application id", async () => {
         const invalidConventionId: ConventionId = "not-a-valid-id";
 
         const request: RenewExpiredJwtRequestDto = {
+          kind: "convention",
           originalUrl: "https://immersionfacile.com/%jwt%",
           expiredJwt: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: invalidConventionId,
               role: "counsellor",
-              email,
+              email: counsellor.email,
               now: timeGateway.now(),
             }),
           ),
@@ -232,12 +244,13 @@ describe("RenewExpiredJwt use case", () => {
         uow.conventionRepository.setConventions([convention]);
 
         const request: RenewExpiredJwtRequestDto = {
+          kind: "convention",
           originalUrl: "https://immersionfacile.com/%jwt%",
           expiredJwt: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: convention.id,
               role: "counsellor",
-              email,
+              email: counsellor.email,
               now: timeGateway.now(),
             }),
           ),
@@ -253,12 +266,13 @@ describe("RenewExpiredJwt use case", () => {
       it("Refuses to generate backoffice magic links", async () => {
         await expectPromiseToFailWithError(
           useCase.execute({
+            kind: "convention",
             originalUrl: "http://immersionfacile.fr/verifier-et-signer",
             expiredJwt: generateConventionJwt(
               createConventionMagicLinkPayload({
                 id: validConvention.id,
                 role: "back-office" as ConventionRole,
-                email,
+                email: counsellor.email,
                 now: timeGateway.now(),
               }),
             ),
@@ -269,12 +283,13 @@ describe("RenewExpiredJwt use case", () => {
 
       it("does not accept to renew links from url that are not supported", async () => {
         const request: RenewExpiredJwtRequestDto = {
+          kind: "convention",
           originalUrl: "immersionfacile.com/",
           expiredJwt: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: validConvention.id,
               role: "counsellor",
-              email,
+              email: counsellor.email,
               now: timeGateway.now(),
             }),
           ),
@@ -292,6 +307,245 @@ describe("RenewExpiredJwt use case", () => {
               "bilan-document",
             ],
           }),
+        );
+      });
+    });
+  });
+
+  describe("With ConnectedUser Jwt", () => {
+    const generateConnectedUserJwt = makeGenerateJwtES256<"connectedUser">(
+      config.jwtPrivateKey,
+      undefined,
+    );
+    const user = new ConnectedUserBuilder().buildUser();
+    const onGoingOAuthFromUri =
+      "/tableau-de-bord-etablissement/discussions/00000000-0000-0000-0000-000000000000";
+
+    const expiredPayload = createConnectedUserJwtPayload({
+      userId: user.id,
+      durationHours: 1,
+      now: timeGateway.now(),
+    });
+
+    const emailUsedOnGoingOAuth: OngoingOAuth = {
+      email: user.email,
+      userId: user.id,
+      fromUri: onGoingOAuthFromUri,
+      nonce: "fake-nonce",
+      provider: "email",
+      state: "fake-state",
+      usedAt: new Date(),
+    };
+
+    beforeEach(() => {
+      uow.userRepository.users = [user];
+      uow.ongoingOAuthRepository.ongoingOAuths = [emailUsedOnGoingOAuth];
+    });
+
+    it("Sends a magiclink renewal email including a shortlink mapped to ConnectedUserUrl with renewed JWT", async () => {
+      const shortLinks = ["shortLink1"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
+
+      await useCase.execute({
+        kind: "connectedUser",
+        expiredJwt: generateConnectedUserJwt(expiredPayload),
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "MAGIC_LINK_RENEWAL",
+            params: {
+              magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+            },
+            recipients: [user.email],
+          },
+        ],
+      });
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinks[0]]: fakeGenerateConnectedUserUrlFn({
+          accessToken: undefined,
+          user,
+          ongoingOAuth: emailUsedOnGoingOAuth,
+          now: timeGateway.now(),
+        }),
+      });
+    });
+
+    describe("Wrong paths", () => {
+      it("with missing user", async () => {
+        uow.userRepository.users = [];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "connectedUser",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.user.notFound({ userId: user.id }),
+        );
+      });
+
+      it("with unused ongoingOAuth", () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [
+          {
+            ...emailUsedOnGoingOAuth,
+            usedAt: null,
+          },
+        ];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "connectedUser",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.auth.unusedOAuth(),
+        );
+      });
+
+      it("with ongoingOAuth that have a unsupported provider : ProConnect", () => {
+        const unsupportedOngoingOAuth: OngoingOAuth = {
+          ...emailUsedOnGoingOAuth,
+          provider: "proConnect",
+        };
+
+        uow.ongoingOAuthRepository.ongoingOAuths = [unsupportedOngoingOAuth];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "connectedUser",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.auth.otherRenewalNotSupported(
+            unsupportedOngoingOAuth.provider,
+          ),
+        );
+      });
+
+      it("with missing onGoingOAuth", () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "connectedUser",
+            expiredJwt: generateConnectedUserJwt(expiredPayload),
+          }),
+          errors.auth.missingOAuth({}),
+        );
+      });
+    });
+  });
+
+  describe("With EmailAuthCode Jwt", () => {
+    const generateEmailAuthCodeJwt = makeGenerateJwtES256<"emailAuthCode">(
+      config.jwtPrivateKey,
+      undefined,
+    );
+
+    const user = new ConnectedUserBuilder().buildUser();
+    const onGoingOAuthFromUri =
+      "/tableau-de-bord-etablissement/discussions/00000000-0000-0000-0000-000000000000";
+
+    const expiredPayload = createEmailAuthCodeJwtPayload({
+      emailAuthCode: true,
+      durationMinutes: 1,
+      now: timeGateway.now(),
+    });
+
+    const emailUnusedOnGoingOAuth: OngoingOAuth = {
+      email: user.email,
+      userId: user.id,
+      fromUri: onGoingOAuthFromUri,
+      nonce: "fake-nonce",
+      provider: "email",
+      state: "fake-state",
+      usedAt: null,
+    };
+
+    beforeEach(() => {
+      uow.userRepository.users = [user];
+      uow.ongoingOAuthRepository.ongoingOAuths = [emailUnusedOnGoingOAuth];
+    });
+
+    it("Sends a magiclink renewal email including a shortlink mapped to ConnectedUserUrl with renewed JWT", async () => {
+      const shortLinks = ["shortLink1"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
+
+      await useCase.execute({
+        kind: "emailAuthCode",
+        state: emailUnusedOnGoingOAuth.state,
+        expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "MAGIC_LINK_RENEWAL",
+            params: {
+              magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+            },
+            recipients: [user.email],
+          },
+        ],
+      });
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinks[0]]: fakeGenerateEmailAuthCodeUrlFn({
+          email: user.email,
+          state: emailUnusedOnGoingOAuth.state,
+          uri: frontRoutes.magicLinkInterstitial,
+          now: timeGateway.now(),
+        }),
+      });
+    });
+
+    describe("Wrong paths", () => {
+      it("unused oauth", () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [
+          {
+            ...emailUnusedOnGoingOAuth,
+            usedAt: new Date(),
+          },
+        ];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "emailAuthCode",
+            state: emailUnusedOnGoingOAuth.state,
+            expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+          }),
+          errors.auth.alreadyUsedAuthentication(),
+        );
+      });
+
+      it("unsupported oauth provider", () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [
+          {
+            ...emailUnusedOnGoingOAuth,
+            provider: "proConnect",
+          },
+        ];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "emailAuthCode",
+            state: emailUnusedOnGoingOAuth.state,
+            expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+          }),
+          errors.auth.otherRenewalNotSupported("proConnect"),
+        );
+      });
+
+      it("missing oauth", () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [];
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "emailAuthCode",
+            state: emailUnusedOnGoingOAuth.state,
+            expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
+          }),
+          errors.auth.missingOAuth({ state: emailUnusedOnGoingOAuth.state }),
         );
       });
     });

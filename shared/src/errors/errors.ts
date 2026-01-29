@@ -6,7 +6,11 @@ import type {
   ApiConsumerSubscriptionId,
 } from "../apiConsumer/ApiConsumer";
 import type { AssessmentMode } from "../assessment/assessment.dto";
-import { authExpiredMessage, type OAuthState } from "../auth/auth.dto";
+import {
+  authExpiredMessage,
+  type IdentityProvider,
+  type OAuthState,
+} from "../auth/auth.dto";
 import type {
   ConventionDto,
   ConventionId,
@@ -249,9 +253,17 @@ export const errors = {
       ),
   },
   auth: {
+    otherRenewalNotSupported: (provider: IdentityProvider) =>
+      new ForbiddenError(
+        `Le renouvellement d'une connexion du type ${provider} n'est pas supportée. Veuillez vous reconnecter manuellement.`,
+      ),
     missingOAuth: ({ state }: { state?: OAuthState }) =>
       new ForbiddenError(
-        `Il n'y a pas d'OAuth en cours ${state ? `avec l'état '${state}'` : ""}}`,
+        `Il n'y a pas d'OAuth en cours ${state ? `avec l'état '${state}'` : ""}.`,
+      ),
+    unusedOAuth: () =>
+      new ForbiddenError(
+        "Le renouvellement d'une connexion non utilisée n'est pas autorisé.",
       ),
     nonceMismatch: () =>
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
@@ -259,7 +271,7 @@ export const errors = {
       new BadRequestError(
         `Impossible de récupérer les infos ProConnect : ${message}`,
       ),
-    missingOAuthState: (state: OAuthState) =>
+    missingUserId: (state: OAuthState) =>
       new BadRequestError(
         `La connexion en cours (state: ${state}) n'est pas affectée à un identifiant d'utilisateur.`,
       ),
