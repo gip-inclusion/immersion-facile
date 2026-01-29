@@ -7,6 +7,7 @@
           "CREATE INDEX IF NOT EXISTS idx_agencies_name ON {{ this }} (name)",
           "CREATE INDEX IF NOT EXISTS idx_agencies_kind ON {{ this }} (kind)",
           "CREATE INDEX IF NOT EXISTS idx_agencies_status ON {{ this }} (status)",
+          "CREATE INDEX IF NOT EXISTS idx_agencies_phone_number_id ON {{ this }} (phone_number_id)",
     ]
   )
 }}
@@ -40,9 +41,12 @@ select
     a.covered_departments,
     a.acquisition_campaign,
     a.acquisition_keyword,
-    a.phone_number
+    a.phone_number_id,
+    pn.phone_number
 from {{ source('immersion', 'agencies') }} as a
 left join {{ source('immersion', 'public_department_region') }} as pdr
     on pdr.department_code = a.department_code
 left join {{ source('immersion', 'agencies') }} as refersToAgencies
     on refersToAgencies.id = a.refers_to_agency_id
+left join {{ source('immersion', 'phone_numbers') }} as pn
+    on pn.id = a.phone_number_id

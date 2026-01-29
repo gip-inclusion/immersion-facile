@@ -18,7 +18,8 @@ select
     concat(u.first_name, ' ', u.last_name) as user_full_name,
     eu.role,
     eu.job,
-    eu.phone,
+    eu.phone_id,
+    pn.phone_number,
     eu.should_receive_discussion_notifications,
     eu.is_main_contact_by_phone,
     eu.is_main_contact_in_person,
@@ -30,3 +31,5 @@ select
 from {{ source('immersion', 'establishments__users') }} as eu
 inner join {{ source('immersion', 'users') }} as u
     on u.id = eu.user_id
+left join {{ source('immersion', 'phone_numbers') }} as pn
+    on pn.id = eu.phone_id
