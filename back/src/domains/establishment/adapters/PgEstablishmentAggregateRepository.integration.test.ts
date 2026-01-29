@@ -984,7 +984,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withAppellationLabel("Chauffeur / Chauffeuse de machines agricoles")
           .withAppellationCode("11987")
           .withRomeLabel("Conduite d'engins agricoles et forestiers")
-          .withRemoteWorkMode("NO_REMOTE")
+          .withRemoteWorkMode("ON_SITE")
           .build();
 
         const offerHybrid = new OfferEntityBuilder()
@@ -1074,11 +1074,11 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
         });
 
-        it("filters by remoteWorkModes (single value: NO_REMOTE)", async () => {
+        it("filters by remoteWorkModes (single value: ON_SITE)", async () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { remoteWorkModes: ["NO_REMOTE"] },
+            filters: { remoteWorkModes: ["ON_SITE"] },
           });
 
           expectToEqual(result.pagination, {
