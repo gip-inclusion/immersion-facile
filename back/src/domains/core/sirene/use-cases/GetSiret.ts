@@ -12,7 +12,7 @@ export type GetSiret = ReturnType<typeof makeGetSiret>;
 export const makeGetSiret = useCaseBuilder("GetSiret")
   .notTransactional()
   .withInput<GetSiretRequestDto>(getSiretRequestSchema)
-  .withOutput<SiretEstablishmentDto>()
+  .withOutput<SiretEstablishmentDto | null>()
   .withDeps<{ siretGateway: SiretGateway }>()
   .build(async ({ inputParams, deps }) =>
     getSiretEstablishmentFromApi(inputParams, deps.siretGateway),
