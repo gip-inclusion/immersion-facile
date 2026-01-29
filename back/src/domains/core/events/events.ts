@@ -4,6 +4,7 @@ import {
   type ConventionId,
   type DateString,
   type DeleteAssessmentRequestDto,
+  type EditBeneficiaryBirthdateRequestDto,
   type Flavor,
   type RejectConnectedUserRoleForAgencyParams,
   type Role,
@@ -108,6 +109,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionBroadcastRequested", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionTransferredToAgency", TransferConventionToAgencyPayload & WithTriggeredBy>
   | GenericEvent<"ConventionCounsellorNameEdited", WithConventionId & WithOptionalFirstnameAndLastname & WithTriggeredBy>
+  | GenericEvent<"ConventionBeneficiaryBirthdateEdited", EditBeneficiaryBirthdateRequestDto & WithTriggeredBy>
   | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
   | GenericEvent<"AssessmentReminderManuallySent", WithConventionDto & { transport: "sms" } & WithTriggeredBy>
   // UNHAPPY PATHS
