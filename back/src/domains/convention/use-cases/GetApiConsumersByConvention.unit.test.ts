@@ -32,17 +32,7 @@ describe("GetApiConsumersByConvention", () => {
   const uuidGenerator = new TestUuidGenerator();
 
   const ftAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
-  const otherAgencyWithRefersToFt = new AgencyDtoBuilder()
-    .withKind("autre")
-    .withRefersToAgencyInfo({
-      refersToAgencyId: ftAgency.id,
-      refersToAgencyName: "France Travail",
-      refersToAgencyContactEmail: "ft@example.com",
-    })
-    .build();
-  const conventionWithAgencyRefersToFt = new ConventionDtoBuilder()
-    .withAgencyId(otherAgencyWithRefersToFt.id)
-    .build();
+
   const conventionWithFtAgency = new ConventionDtoBuilder()
     .withAgencyId(ftAgency.id)
     .build();
@@ -230,8 +220,19 @@ describe("GetApiConsumersByConvention", () => {
   });
 
   describe("when convention agency has refersToAgencyId", () => {
-    it("returns API consumers scoped to the referred agency (by agency id)", async () => {
-      const apiConsumerScopedToFt = new ApiConsumerBuilder()
+    const otherAgencyWithRefersToFt = new AgencyDtoBuilder()
+      .withKind("autre")
+      .withRefersToAgencyInfo({
+        refersToAgencyId: ftAgency.id,
+        refersToAgencyName: "France Travail",
+        refersToAgencyContactEmail: "ft@example.com",
+      })
+      .build();
+    const conventionWithAgencyRefersToFt = new ConventionDtoBuilder()
+      .withAgencyId(otherAgencyWithRefersToFt.id)
+      .build();
+    it("returns API consumers of the referred agency (filtered by agency id)", async () => {
+      const apiConsumerScopedToSpecificFtAgency = new ApiConsumerBuilder()
         .withName("si-ft-production")
         .withConventionRight({
           kinds: ["SUBSCRIPTION"],
@@ -248,6 +249,9 @@ describe("GetApiConsumersByConvention", () => {
         })
         .build();
 
+      uow.apiConsumerRepository.consumers = [
+        apiConsumerScopedToSpecificFtAgency,
+      ];
       uow.conventionRepository.setConventions([conventionWithAgencyRefersToFt]);
       uow.agencyRepository.agencies = [
         toAgencyWithRights(otherAgencyWithRefersToFt, {
@@ -264,20 +268,19 @@ describe("GetApiConsumersByConvention", () => {
         }),
       ];
       uow.userRepository.users = [user];
-      uow.apiConsumerRepository.consumers = [apiConsumerScopedToFt];
 
       expectToEqual(
         await getApiConsumersByConvention.execute(
           { conventionId: conventionWithAgencyRefersToFt.id },
           connectedUser,
         ),
-        [apiConsumerScopedToFt.name, "France Travail"],
+        [apiConsumerScopedToSpecificFtAgency.name, "France Travail"],
       );
     });
 
-    it("returns API consumers scoped to the referred agency (by agency kind)", async () => {
-      const apiConsumerScopedToPeKind = new ApiConsumerBuilder()
-        .withName("si-pole-emploi-kind")
+    it("returns API consumers of the referred agency (filtered by agency kind)", async () => {
+      const apiConsumerScopedToFTKind = new ApiConsumerBuilder()
+        .withName("si-ft-kind")
         .withConventionRight({
           kinds: ["SUBSCRIPTION"],
           scope: { agencyKinds: ["pole-emploi"] },
@@ -286,13 +289,14 @@ describe("GetApiConsumersByConvention", () => {
               id: uuidGenerator.new(),
               createdAt: new Date("2024-07-22").toISOString(),
               callbackHeaders: {},
-              callbackUrl: "https://pe.example.com",
+              callbackUrl: "https://ft.example.com",
               subscribedEvent: "convention.updated",
             },
           ],
         })
         .build();
 
+      uow.apiConsumerRepository.consumers = [apiConsumerScopedToFTKind];
       uow.conventionRepository.setConventions([conventionWithAgencyRefersToFt]);
       uow.agencyRepository.agencies = [
         toAgencyWithRights(otherAgencyWithRefersToFt, {
@@ -309,18 +313,34 @@ describe("GetApiConsumersByConvention", () => {
         }),
       ];
       uow.userRepository.users = [user];
-      uow.apiConsumerRepository.consumers = [apiConsumerScopedToPeKind];
 
       expectToEqual(
         await getApiConsumersByConvention.execute(
           { conventionId: conventionWithAgencyRefersToFt.id },
           connectedUser,
         ),
-        [apiConsumerScopedToPeKind.name, "France Travail"],
+        [apiConsumerScopedToFTKind.name, "France Travail"],
       );
     });
 
-    it("includes France Travail when referred agency is pole-emploi (main agency is mission-locale)", async () => {
+    it("returns only France Travail when referred agency is pole-emploi and no API consumer matches the main agency", async () => {
+      const apiConsumerScopedToOtherAgency = new ApiConsumerBuilder()
+        .withName("si-another-agency")
+        .withConventionRight({
+          kinds: ["SUBSCRIPTION"],
+          scope: { agencyIds: ["another-agency-id"] },
+          subscriptions: [
+            {
+              id: uuidGenerator.new(),
+              createdAt: new Date("2024-07-22").toISOString(),
+              callbackHeaders: {},
+              callbackUrl: "https://other.example.com",
+              subscribedEvent: "convention.updated",
+            },
+          ],
+        })
+        .build();
+      uow.apiConsumerRepository.consumers = [apiConsumerScopedToOtherAgency];
       uow.conventionRepository.setConventions([conventionWithAgencyRefersToFt]);
       uow.agencyRepository.agencies = [
         toAgencyWithRights(otherAgencyWithRefersToFt, {
@@ -337,7 +357,6 @@ describe("GetApiConsumersByConvention", () => {
         }),
       ];
       uow.userRepository.users = [user];
-      uow.apiConsumerRepository.consumers = [];
 
       expectToEqual(
         await getApiConsumersByConvention.execute(
