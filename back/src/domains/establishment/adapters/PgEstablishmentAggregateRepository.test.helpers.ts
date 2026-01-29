@@ -38,8 +38,8 @@ export const makeExpectedSearchResult = ({
     throw new Error(
       "At least one offer is required to make an expected SearchResult",
     );
-  const matchingOffersForRemoteWorkMode = withOffers.filter(
-    (offer) => offer.remoteWorkMode === remoteWorkMode,
+  const matchingOffersForRemoteWorkMode = withOffers.filter((offer) =>
+    remoteWorkMode ? offer.remoteWorkMode === remoteWorkMode : true,
   );
   return {
     additionalInformation:

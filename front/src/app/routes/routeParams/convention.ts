@@ -56,14 +56,14 @@ export const getConventionInitialValuesFromUrl = ({
     route.params satisfies ConventionParamsInUrl,
   );
   const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
-  {
-    ...(conventionDraft
-      ? conventionPresentationFromConventionDraft(conventionDraft)
-      : conventionPresentationFromUrlParams(params)),
-    status: "READY_TO_SIGN",
-    dateSubmission: toDateUTCString(new Date()),
-    internshipKind,
-  };
+    {
+      ...(conventionDraft
+        ? conventionPresentationFromConventionDraft(conventionDraft)
+        : conventionPresentationFromUrlParams(params)),
+      status: "READY_TO_SIGN",
+      dateSubmission: toDateUTCString(new Date()),
+      internshipKind,
+    };
 
   return ENV.prefilledForms
     ? withDevPrefilledValues(initialFormWithStoredAndUrlParams)
@@ -174,11 +174,11 @@ const conventionToConventionInUrl = (
   } = convention;
   const beneficiarySchoolInformations = isBeneficiaryStudent(beneficiary)
     ? {
-      led: beneficiary.levelOfEducation,
-      schoolName: beneficiary.schoolName,
-      schoolPostcode: beneficiary.schoolPostcode,
-      address: beneficiary.address && addressDtoToString(beneficiary.address),
-    }
+        led: beneficiary.levelOfEducation,
+        schoolName: beneficiary.schoolName,
+        schoolPostcode: beneficiary.schoolPostcode,
+        address: beneficiary.address && addressDtoToString(beneficiary.address),
+      }
     : undefined;
 
   return {
@@ -426,8 +426,8 @@ export type ConventionParamsInUrl = Partial<{
   [K in keyof ConventionQueryParams]: ConventionQueryParams[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
-  ? T
-  : never;
+    ? T
+    : never;
 }>;
 
 const beneficiaryRepresentativeFromParams = ({
@@ -443,12 +443,12 @@ const beneficiaryRepresentativeFromParams = ({
 }): BeneficiaryRepresentative | undefined =>
   email || phone || firstName || lastName
     ? {
-      role: "beneficiary-representative",
-      firstName: firstName ?? "",
-      lastName: lastName ?? "",
-      email: email ?? "",
-      phone: phone ?? "",
-    }
+        role: "beneficiary-representative",
+        firstName: firstName ?? "",
+        lastName: lastName ?? "",
+        email: email ?? "",
+        phone: phone ?? "",
+      }
     : undefined;
 
 const beneficiaryCurrentEmployerFromParams = ({
@@ -471,24 +471,24 @@ const beneficiaryCurrentEmployerFromParams = ({
   businessAddress?: string;
 }): BeneficiaryCurrentEmployer | undefined =>
   businessName ||
-    businessSiret ||
-    firstName ||
-    lastName ||
-    email ||
-    phone ||
-    job ||
-    businessAddress
+  businessSiret ||
+  firstName ||
+  lastName ||
+  email ||
+  phone ||
+  job ||
+  businessAddress
     ? {
-      businessSiret: businessSiret ?? "",
-      businessName: businessName ?? "",
-      firstName: firstName ?? "",
-      lastName: lastName ?? "",
-      email: email ?? "",
-      phone: phone ?? "",
-      job: job ?? "",
-      role: "beneficiary-current-employer",
-      businessAddress: businessAddress ?? "",
-    }
+        businessSiret: businessSiret ?? "",
+        businessName: businessName ?? "",
+        firstName: firstName ?? "",
+        lastName: lastName ?? "",
+        email: email ?? "",
+        phone: phone ?? "",
+        job: job ?? "",
+        role: "beneficiary-current-employer",
+        businessAddress: businessAddress ?? "",
+      }
     : undefined;
 
 const scheduleFromParams = ({
@@ -561,11 +561,11 @@ const conventionPresentationFromUrlParams = (
       isRqth: params.isRqth ?? false,
       ...(params.fedId && params.fedIdProvider
         ? {
-          federatedIdentity: {
-            provider: params.fedIdProvider as FtConnectIdentity["provider"],
-            token: params.fedId,
-          },
-        }
+            federatedIdentity: {
+              provider: params.fedIdProvider as FtConnectIdentity["provider"],
+              token: params.fedId,
+            },
+          }
         : {}),
     },
     establishmentRepresentative: {
@@ -685,16 +685,16 @@ const conventionPresentationFromConventionDraft = (
       isRqth: conventionDraft.signatories?.beneficiary?.isRqth ?? false,
       ...(conventionDraft.signatories?.beneficiary?.federatedIdentity
         ?.provider &&
-        conventionDraft.signatories?.beneficiary?.federatedIdentity?.token
+      conventionDraft.signatories?.beneficiary?.federatedIdentity?.token
         ? {
-          federatedIdentity: {
-            provider: conventionDraft.signatories?.beneficiary
-              ?.federatedIdentity?.provider as FtConnectIdentity["provider"],
-            token:
-              conventionDraft.signatories?.beneficiary?.federatedIdentity
-                ?.token,
-          },
-        }
+            federatedIdentity: {
+              provider: conventionDraft.signatories?.beneficiary
+                ?.federatedIdentity?.provider as FtConnectIdentity["provider"],
+              token:
+                conventionDraft.signatories?.beneficiary?.federatedIdentity
+                  ?.token,
+            },
+          }
         : {}),
     },
     establishmentRepresentative: {
@@ -771,11 +771,11 @@ const conventionPresentationFromConventionDraft = (
     | undefined,
   immersionAppellation: conventionDraft.immersionAppellation
     ? ({
-      appellationCode: conventionDraft.immersionAppellation.appellationCode,
-      appellationLabel: conventionDraft.immersionAppellation.appellationLabel,
-      romeCode: conventionDraft.immersionAppellation.romeCode,
-      romeLabel: conventionDraft.immersionAppellation.romeLabel,
-    } as AppellationAndRomeDto)
+        appellationCode: conventionDraft.immersionAppellation.appellationCode,
+        appellationLabel: conventionDraft.immersionAppellation.appellationLabel,
+        romeCode: conventionDraft.immersionAppellation.romeCode,
+        romeLabel: conventionDraft.immersionAppellation.romeLabel,
+      } as AppellationAndRomeDto)
     : undefined,
   immersionActivities: conventionDraft.immersionActivities ?? "",
   immersionSkills: conventionDraft.immersionSkills ?? "",
