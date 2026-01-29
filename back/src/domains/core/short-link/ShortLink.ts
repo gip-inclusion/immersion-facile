@@ -1,6 +1,12 @@
 import type { AbsoluteUrl, ShortLinkId } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
-import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import type {
+  GenerateConnectedUserLoginUrl,
+  GenerateConnectedUserLoginUrlParams,
+  GenerateConventionMagicLinkUrl,
+  GenerateEmailAuthCodeUrl,
+  GenerateEmailAuthCodeUrlParams,
+} from "../../../config/bootstrap/magicLinkUrl";
 import type { CreateConventionMagicLinkPayloadProperties } from "../../../utils/jwt";
 import type { UnitOfWork } from "../unit-of-work/ports/UnitOfWork";
 import type { ShortLinkIdGeneratorGateway } from "./ports/ShortLinkIdGeneratorGateway";
@@ -52,6 +58,46 @@ export const prepareConventionMagicShortLinkMaker =
         lifetime,
         extraQueryParams,
       }),
+    });
+
+export const prepareConnectedUserMagicShortLinkMaker =
+  ({
+    uow,
+    config,
+    shortLinkIdGeneratorGateway,
+    generateConnectedUserLoginUrl,
+  }: {
+    uow: UnitOfWork;
+    config: AppConfig;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+    generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
+  }) =>
+  (params: GenerateConnectedUserLoginUrlParams): Promise<AbsoluteUrl> =>
+    makeShortLink({
+      uow,
+      config,
+      shortLinkIdGeneratorGateway,
+      longLink: generateConnectedUserLoginUrl(params),
+    });
+
+export const prepareEmailAuthCodeShortLinkMaker =
+  ({
+    uow,
+    config,
+    shortLinkIdGeneratorGateway,
+    generateEmailAuthCodeLoginUrl,
+  }: {
+    uow: UnitOfWork;
+    config: AppConfig;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+    generateEmailAuthCodeLoginUrl: GenerateEmailAuthCodeUrl;
+  }) =>
+  (params: GenerateEmailAuthCodeUrlParams): Promise<AbsoluteUrl> =>
+    makeShortLink({
+      uow,
+      config,
+      shortLinkIdGeneratorGateway,
+      longLink: generateEmailAuthCodeLoginUrl(params),
     });
 
 export const makeShortLink = async ({
