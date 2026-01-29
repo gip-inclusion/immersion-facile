@@ -274,6 +274,15 @@ export const errors = {
       new BadRequestError(
         `Impossible de modifier le nom du conseiller pour les conventions ayant le statut "${status}".`,
       ),
+
+    editBeneficiaryBirthdateNotAllowedForStatus: ({
+      status,
+    }: {
+      status: ConventionStatus;
+    }) =>
+      new BadRequestError(
+        `Impossible de modifier la date de naissance pour les conventions ayant le statut "${status}".`,
+      ),
     emailNotLinkedToConvention: (role: Role) =>
       new BadRequestError(
         `L'email fournit n'est pas lié à la convention pour l'utilisateur ayant le role ${role}.`,

@@ -35,6 +35,7 @@ import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/conventi
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
+import { makeEditBeneficiaryBirthdate } from "../../domains/convention/use-cases/EditBeneficiaryBirthdate";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
@@ -1021,6 +1022,10 @@ export const createUseCases = ({
       deps: { createNewEvent },
     }),
     editConventionCounsellorName: makeEditConventionCounsellorName({
+      uowPerformer,
+      deps: { createNewEvent },
+    }),
+    editBeneficiaryBirthdate: makeEditBeneficiaryBirthdate({
       uowPerformer,
       deps: { createNewEvent },
     }),
