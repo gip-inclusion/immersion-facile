@@ -147,7 +147,7 @@ export class HttpConventionGateway implements ConventionGateway {
     jwt: ConnectedUserJwt,
   ): Observable<void> {
     return from(
-      this.magicLinkHttpClient
+      this.authenticatedHttpClient
         .editBeneficiaryBirthdate({
           body: params,
           headers: { authorization: jwt },
