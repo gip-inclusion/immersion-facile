@@ -10,6 +10,7 @@ import {
   type DateString,
   type DateTimeIsoString,
   type Email,
+  errors,
   eventToRightName,
   type WebhookSubscription,
 } from "shared";
@@ -21,6 +22,7 @@ import {
 } from "../../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";
+import { getOrCreatePhoneId } from "../../phone-number/phoneHelper";
 import type {
   ApiConsumerRepository,
   GetApiConsumerFilters,
@@ -49,7 +51,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
     const result = await this.#pgApiConsumerQueryBuild()
       .where("c.id", "=", id)
-      .executeTakeFirst();
+      .executeTakeFirst()
+      .then();
 
     return result && this.#rawPgToApiConsumer(result.raw_api_consumer);
   }
@@ -137,6 +140,11 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       rights,
     );
 
+    const phoneId = await getOrCreatePhoneId(
+      this.#transaction,
+      rest.contact.phone,
+    );
+
     const values = {
       id: rest.id,
       name: rest.name,
@@ -148,7 +156,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       contact_first_name: rest.contact.firstName,
       contact_last_name: rest.contact.lastName,
       contact_job: rest.contact.job,
-      contact_phone: rest.contact.phone,
+      contact_phone_id: phoneId,
       revoked_at: rest.revokedAt,
       current_key_issued_at: rest.currentKeyIssuedAt,
     };
@@ -219,8 +227,16 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       ) as ApiConsumerRights,
     };
 
+    if (!restWithEmptySubscription.contact.phone) {
+      throw errors.phoneNumber.notFound();
+    }
+
     const apiConsumer: ApiConsumer = {
       ...restWithEmptySubscription,
+      contact: {
+        ...restWithEmptySubscription.contact,
+        phone: restWithEmptySubscription.contact.phone,
+      },
       revokedAt: revokedAt ?? null,
       rights: (subscriptions || []).reduce((acc, subscription) => {
         const rightName = eventToRightName(subscription.subscribedEvent);
@@ -244,6 +260,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     return this.#transaction
       .selectFrom("api_consumers as c")
       .leftJoin("api_consumers_subscriptions as s", "s.consumer_id", "c.id")
+      .leftJoin("phone_numbers", "c.contact_phone_id", "phone_numbers.id")
       .select((eb) =>
         jsonStripNulls(
           jsonBuildObject({
@@ -260,7 +277,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
               lastName: eb.ref("c.contact_last_name"),
               job: eb.ref("c.contact_job"),
               emails: cast<Email[]>(eb.ref("c.contact_emails")),
-              phone: eb.ref("c.contact_phone"),
+              phone: eb.ref("phone_numbers.phone_number"),
             }),
             subscriptions: sql<
               WebhookSubscription[]
@@ -274,7 +291,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
           }),
         ).as("raw_api_consumer"),
       )
-      .groupBy("c.id");
+      .groupBy(["c.id", "phone_numbers.id"]);
   }
 }
 
@@ -287,6 +304,6 @@ type PgRawConsumerData = {
   expirationDate: DateString;
   revokedAt?: DateTimeIsoString;
   currentKeyIssuedAt: DateTimeIsoString;
-  contact: ApiConsumerContact;
+  contact: Omit<ApiConsumerContact, "phone"> & { phone: string | undefined };
   subscriptions: WebhookSubscription[];
 };
