@@ -42,11 +42,9 @@ type ConventionRoutes =
 
 export const getConventionInitialValuesFromUrl = ({
   route,
-  conventionDraft,
   internshipKind,
 }: {
   route: ConventionRoutes;
-  conventionDraft: ConventionDraftDto | null;
   internshipKind: InternshipKind;
 }): CreateConventionPresentationInitialValues => {
   const params = mergeObjectsExceptFalsyValues(
@@ -57,9 +55,7 @@ export const getConventionInitialValuesFromUrl = ({
   );
   const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
     {
-      ...(conventionDraft
-        ? conventionPresentationFromConventionDraft(conventionDraft)
-        : conventionPresentationFromUrlParams(params)),
+      ...conventionPresentationFromUrlParams(params),
       status: "READY_TO_SIGN",
       dateSubmission: toDateUTCString(new Date()),
       internshipKind,
@@ -618,12 +614,15 @@ const conventionPresentationFromUrlParams = (
   immersionSkills: params.immersionSkills ?? "",
 });
 
-const conventionPresentationFromConventionDraft = (
+export const conventionPresentationFromConventionDraft = (
   conventionDraft: ConventionDraftDto,
-): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
+): CreateConventionPresentationInitialValues => ({
   id: uuidV4(),
   fromConventionDraftId: conventionDraft.id,
   updatedAt: conventionDraft.updatedAt,
+  status: "READY_TO_SIGN",
+  dateSubmission: toDateUTCString(new Date()),
+  internshipKind: conventionDraft.internshipKind,
 
   // Agency
   agencyId: conventionDraft.agencyId,

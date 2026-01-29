@@ -85,7 +85,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useMatomo } from "src/app/hooks/useMatomo";
 import {
-  getConventionInitialValuesFromUrl as getConventionInitialValuesFromUrlOrDraft,
+  conventionPresentationFromConventionDraft,
+  getConventionInitialValuesFromUrl,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
@@ -153,43 +154,34 @@ export const ConventionForm = ({
   const establishmentAddressCountryCode = useAppSelector(
     siretSelectors.countryCode,
   );
-  const conventionInitialValuesFromUrlOrDraft = useMemo(
+  const conventionInitialValuesFromUrl = useMemo(
     () =>
-      getConventionInitialValuesFromUrlOrDraft({
+      getConventionInitialValuesFromUrl({
         route,
         internshipKind,
-        conventionDraft: fetchedConventionDraft,
       }),
-    [internshipKind, route, fetchedConventionDraft],
+    [internshipKind, route],
   );
   const acquisitionParams = useGetAcquisitionParams();
 
-  const initialValues = useMemo<CreateConventionPresentationInitialValues>(
-    () => ({
-      ...conventionInitialValuesFromUrlOrDraft,
-      ...acquisitionParams,
-      signatories: {
-        ...conventionInitialValuesFromUrlOrDraft.signatories,
-        beneficiary: makeInitialBenefiaryForm(
-          conventionInitialValuesFromUrlOrDraft.signatories.beneficiary,
-          federatedIdentity,
-        ),
-      },
-      ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
-        ? {
-            agencyReferentFirstName:
-              federatedIdentity.payload.advisor.firstName,
-            agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
-          }
-        : {}),
-    }),
-    [
-      conventionInitialValuesFromUrlOrDraft,
-      acquisitionParams,
-      federatedIdentity,
-      mode,
-    ],
-  );
+  const initialValues = useRef<CreateConventionPresentationInitialValues>({
+    ...conventionInitialValuesFromUrl,
+    ...acquisitionParams,
+    signatories: {
+      ...conventionInitialValuesFromUrl.signatories,
+      beneficiary: makeInitialBenefiaryForm(
+        conventionInitialValuesFromUrl.signatories.beneficiary,
+        federatedIdentity,
+      ),
+    },
+    ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
+      ? {
+          agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
+          agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
+        }
+      : {}),
+  }).current;
+
   useExistingSiret({
     siret: initialValues.siret,
     addressAutocompleteLocator: "convention-immersion-address",
@@ -199,12 +191,20 @@ export const ConventionForm = ({
     initialValues,
     mode,
   );
+
+  const conventionPresentationFromDraft = useMemo(
+    () =>
+      fetchedConventionDraft &&
+      conventionPresentationFromConventionDraft(fetchedConventionDraft),
+    [fetchedConventionDraft],
+  );
+
   const defaultValues: CreateConventionPresentationInitialValues =
     creationFormModes.includes(
       mode as ExcludeFromExisting<ConventionFormMode, "edit">,
     )
       ? initialValues
-      : fetchedConvention || initialValues;
+      : fetchedConvention || conventionPresentationFromDraft || initialValues;
 
   const methods = useForm<CreateConventionPresentationInitialValues>({
     defaultValues,
@@ -386,7 +386,7 @@ export const ConventionForm = ({
     };
   };
 
-  useMatomo(conventionInitialValuesFromUrlOrDraft.internshipKind);
+  useMatomo(conventionInitialValuesFromUrl.internshipKind);
 
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(
@@ -408,6 +408,12 @@ export const ConventionForm = ({
       reset({ ...fetchedConvention, status: "READY_TO_SIGN" });
     }
   }, [fetchedConvention, reset, mode]);
+
+  useEffect(() => {
+    if (conventionPresentationFromDraft) {
+      reset({ ...conventionPresentationFromDraft, status: "READY_TO_SIGN" });
+    }
+  }, [conventionPresentationFromDraft, reset]);
 
   useEffect(() => {
     if (defaultValues.siret) {
