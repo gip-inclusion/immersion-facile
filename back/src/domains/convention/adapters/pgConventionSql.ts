@@ -40,11 +40,11 @@ type ConventionQueryBuilderDb = Database & {
   b: Database["actors"];
   er: Database["actors"];
   et: Database["actors"];
-  br: Database["actors"] | null;
-  bce: Database["actors"] | null;
-  ftu: Database["ft_connect_users"] | null;
-  cftu: Database["conventions__ft_connect_users"] | null;
-  vad: Database["view_appellations_dto"] | null;
+  br: Database["actors"];
+  bce: Database["actors"];
+  ftu: Database["ft_connect_users"];
+  cftu: Database["conventions__ft_connect_users"];
+  vad: Database["view_appellations_dto"];
 };
 
 export type ConventionQueryBuilder = SelectQueryBuilder<
@@ -64,10 +64,12 @@ export type ConventionsWithErroredBroadcastFeedbackBuilder = ReturnType<
 >;
 
 // Function to create the common selection part with proper return type
-const createConventionSelection = <
-  QB extends SelectQueryBuilder<any, any, any>,
->(
-  builder: QB,
+const createConventionSelection = (
+  builder: SelectQueryBuilder<
+    ConventionQueryBuilderDb,
+    keyof ConventionQueryBuilderDb,
+    any
+  >,
 ): ConventionQueryBuilder => {
   return builder.select(({ ref, ...eb }) =>
     jsonStripNulls(
