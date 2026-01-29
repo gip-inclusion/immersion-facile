@@ -15,6 +15,7 @@ import type {
   ConventionSupportedJwt,
   DashboardUrlAndName,
   DataWithPagination,
+  EditBeneficiaryBirthdateRequestDto,
   EditConventionCounsellorNameRequestDto,
   FindSimilarConventionsParams,
   FlatGetConventionsForAgencyUserParams,
@@ -128,6 +129,26 @@ export class HttpConventionGateway implements ConventionGateway {
     return from(
       this.magicLinkHttpClient
         .editConventionCounsellorName({
+          body: params,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public editBeneficiaryBirthdate$(
+    params: EditBeneficiaryBirthdateRequestDto,
+    jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return from(
+      this.magicLinkHttpClient
+        .editBeneficiaryBirthdate({
           body: params,
           headers: { authorization: jwt },
         })

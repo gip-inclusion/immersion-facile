@@ -9,6 +9,7 @@ import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
 import {
   conventionReadSchema,
+  editBeneficiaryBirthdateRequestSchema,
   editConventionCounsellorNameRequestSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
@@ -192,6 +193,20 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/convention/edit-counsellor-name",
     method: "post",
     requestBodySchema: editConventionCounsellorNameRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
+
+  editBeneficiaryBirthdate: defineRoute({
+    url: "/auth/convention/edit-beneficiary-birthdate",
+    method: "post",
+    requestBodySchema: editBeneficiaryBirthdateRequestSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
