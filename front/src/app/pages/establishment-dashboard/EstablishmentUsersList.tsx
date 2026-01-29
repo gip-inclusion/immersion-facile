@@ -3,7 +3,6 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
@@ -26,19 +25,27 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { createFormModal, useFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 
-const establishmentUsersEditModal = createModal({
+const establishmentUsersEditModal = createFormModal({
   id: "establishment-users-edit-modal",
   isOpenedByDefault: false,
+  formId: "establishment-users-edit-form",
+  doSubmitClosesModal: false,
 });
 
-const establishmentUsersDeleteModal = createModal({
+const establishmentUsersDeleteModal = createFormModal({
   id: "establishment-users-delete-modal",
   isOpenedByDefault: false,
+  formId: "establishment-users-delete-form",
+  doSubmitClosesModal: false,
+  submitButton: {
+    children: "Supprimer",
+  },
 });
 
 export const EstablishmentUsersList = () => {
@@ -150,6 +157,7 @@ const EstablishmentUsersDeleteContent = ({
   const formEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
+  const { formId } = useFormModal();
   const removeUserRight = (
     userRights: FormEstablishmentUserRight[],
     userRightToRemove: FormEstablishmentUserRight,
@@ -184,7 +192,14 @@ const EstablishmentUsersDeleteContent = ({
     }
   };
   return (
-    <>
+    <form
+      id={formId}
+      onSubmit={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        onDeleteConfirm();
+      }}
+    >
       <p>
         Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
         <strong>{alreadyExistingUserRight?.email}</strong> ?
@@ -197,25 +212,7 @@ const EstablishmentUsersDeleteContent = ({
           </strong>
         </p>
       )}
-      <ButtonsGroup
-        alignment="right"
-        inlineLayoutWhen="always"
-        buttons={[
-          {
-            children: "Annuler",
-            priority: "secondary",
-            type: "button",
-            onClick: establishmentUsersDeleteModal.close,
-          },
-          {
-            children: "Supprimer",
-            priority: "primary",
-            type: "button",
-            onClick: onDeleteConfirm,
-          },
-        ]}
-      />
-    </>
+    </form>
   );
 };
 
@@ -251,7 +248,10 @@ const EstablishmentUsersEditForm = ({
     watch,
     reset,
     formState: { errors },
+    handleSubmit,
   } = methods;
+
+  const { formId } = useFormModal();
 
   const mergeUserRights = (
     userRights: FormEstablishmentUserRight[],
@@ -298,7 +298,13 @@ const EstablishmentUsersEditForm = ({
           <strong>{values.email}</strong>
         </p>
       )}
-      <form>
+      <form
+        id={formId}
+        onSubmit={(event) => {
+          event.stopPropagation();
+          handleSubmit(onSubmit)(event);
+        }}
+      >
         {!alreadyExistingUserRight?.email && (
           <Input
             label="Email"
@@ -349,23 +355,6 @@ const EstablishmentUsersEditForm = ({
             setValue("shouldReceiveDiscussionNotifications", checked);
           }}
           checked={values.shouldReceiveDiscussionNotifications}
-        />
-        <ButtonsGroup
-          alignment="right"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              children: "Annuler",
-              onClick: establishmentUsersEditModal.close,
-              priority: "secondary",
-              type: "button",
-            },
-            {
-              children: "Enregistrer",
-              onClick: () => onSubmit(values),
-              type: "button",
-            },
-          ]}
         />
       </form>
     </>
