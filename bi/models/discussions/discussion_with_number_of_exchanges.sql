@@ -30,7 +30,8 @@ select
   d.potential_beneficiary_first_name,
   d.potential_beneficiary_last_name,
   d.potential_beneficiary_email,
-  d.potential_beneficiary_phone,
+  d.potential_beneficiary_phone_id,
+  pn.phone_number as potential_beneficiary_phone,
   d.potential_beneficiary_resume_link,
   d.potential_beneficiary_experience_additional_information,
   d.potential_beneficiary_date_preferences,
@@ -56,6 +57,8 @@ select
 from {{ source('immersion', 'discussions') }} d
 left join exchange_counts ec
   on d.id = ec.discussion_id
+left join {{ source('immersion', 'phone_numbers') }} as pn
+  on pn.id = d.potential_beneficiary_phone_id
 inner join {{ source('immersion', 'public_appellations_data') }} as pad
     on pad.ogr_appellation = d.appellation_code
 inner join {{ source('immersion', 'public_romes_data') }} as prd

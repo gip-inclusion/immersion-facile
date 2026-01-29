@@ -688,6 +688,18 @@ sources:
           - name: type
             description: "Type of partner"
 
+      - name: phone_numbers
+        description: "Phone numbers table"
+        columns:
+          - name: id
+            description: "Primary key - ID of the phone number"
+          - name: phone_number
+            description: "Phone number value"
+          - name: verified_at
+            description: "Timestamp when the phone number was verified"
+          - name: created_at
+            description: "Timestamp when the phone number was created"
+
       - name: public_appellations_data
         description: "Job appellations reference data"
         columns:
