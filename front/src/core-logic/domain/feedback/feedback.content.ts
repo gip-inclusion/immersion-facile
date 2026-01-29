@@ -15,6 +15,7 @@ import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/con
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
+import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
@@ -53,6 +54,7 @@ const topics = [
   "convention-action-deprecate",
   "convention-action-edit",
   "convention-action-edit-counsellor-name",
+  "edit-beneficiary-birthdate",
   "convention-action-reject",
   "convention-action-renew",
   "convention-action-sign",
@@ -518,6 +520,21 @@ export const feedbacks: Record<
       title: "Problème lors de la modification du nom du conseiller",
       message:
         "Une erreur est survenue lors de la modification du nom du conseiller",
+    },
+  },
+  "edit-beneficiary-birthdate": {
+    "update.success": {
+      action:
+        editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateSucceeded,
+      title: "La date de naissance a bien été modifiée",
+      message: "La date de naissance a bien été modifiée",
+    },
+    "update.error": {
+      action:
+        editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateFailed,
+      title: "Problème lors de la modification de la date de naissance",
+      message:
+        "Une erreur est survenue lors de la modification de la date de naissance.",
     },
   },
   "convention-action-deprecate": {
