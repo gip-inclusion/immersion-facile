@@ -1,4 +1,5 @@
 import {
+  type AgencyId,
   type AgencyKind,
   type ApiConsumerName,
   type ConnectedUser,
@@ -53,10 +54,22 @@ export const makeGetApiConsumersByConvention = useCaseBuilder(
         userId: currentUser.id,
       });
 
+    const agencyRefersTo = agency.refersToAgencyId
+      ? await uow.agencyRepository.getById(agency.refersToAgencyId)
+      : undefined;
+
+    const agencyIds: AgencyId[] = [agency.id];
+    const agencyKinds: AgencyKind[] = [agency.kind];
+
+    if (agencyRefersTo) {
+      agencyIds.push(agencyRefersTo.id);
+      agencyKinds.push(agencyRefersTo.kind);
+    }
+
     const conventionApiConsurmers = (
       await uow.apiConsumerRepository.getByFilters({
-        agencyIds: [agency.id],
-        agencyKinds: [agency.kind],
+        agencyIds,
+        agencyKinds,
       })
     ).filter(
       (apiConsumer) => apiConsumer.rights.convention.subscriptions.length !== 0,
@@ -69,7 +82,9 @@ export const makeGetApiConsumersByConvention = useCaseBuilder(
     ];
     return [
       ...conventionApiConsurmers.map(({ name }) => name),
-      ...(agencyKindsAllowedToBroadcastToFT.includes(agency.kind)
+      ...(agencyKindsAllowedToBroadcastToFT.includes(agency.kind) ||
+      (agencyRefersTo &&
+        agencyKindsAllowedToBroadcastToFT.includes(agencyRefersTo.kind))
         ? ["France Travail"]
         : []),
     ];
