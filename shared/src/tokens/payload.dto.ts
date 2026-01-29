@@ -10,10 +10,16 @@ export type CommonJwtPayload = {
   version: number;
 };
 
-export type PayloadKind = "convention" | "connectedUser" | "currentUser";
+export type PayloadKind =
+  | "convention"
+  | "connectedUser"
+  | "currentUser"
+  | "emailAuthCode";
+
 export type JwtPayloads = {
   convention?: ConventionJwtPayload;
   connectedUser?: ConnectedUserJwtPayload;
+  emailAuthCode?: EmailAuthCodeJwtPayload;
   currentUser?: ConnectedUser;
 };
 
@@ -40,8 +46,7 @@ export type ApiConsumerDomainJwtPayload = {
   id: ApiConsumerId;
 };
 
-// biome-ignore lint/complexity/noBannedTypes: Empty domain payload
-export type EmailAuthCodeDomainJwtPayload = {};
+export type EmailAuthCodeDomainJwtPayload = { emailAuthCode: true };
 
 export type EmailAuthCodeJwtPayload = CommonJwtPayload &
   EmailAuthCodeDomainJwtPayload;
@@ -55,15 +60,3 @@ export type ConventionJwtPayload = CommonJwtPayload &
 export type ConventionRelatedJwtPayload =
   | ConventionDomainJwtPayload
   | ConnectedUserDomainJwtPayload;
-
-export type CreateConventionMagicLinkPayloadProperties = {
-  id: ConventionId;
-  role: ConventionRole;
-  email: string;
-  now: Date;
-  durationDays?: number;
-  iat?: number;
-  exp?: number;
-  version?: number;
-  sub?: string;
-};

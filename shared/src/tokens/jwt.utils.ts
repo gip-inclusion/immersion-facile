@@ -1,7 +1,5 @@
 import { decode } from "js-base64";
-import type { UserId } from "../user/user.dto";
 import { safeParseJson } from "../utils/json";
-import { currentJwtVersions } from "./jwt.dto";
 import type {
   ConnectedUserJwtPayload,
   ConventionJwtPayload,
@@ -26,25 +24,6 @@ export const decodeMagicLinkJwtWithoutSignatureCheck = <
 >(
   jwtToken: string,
 ): T => decodeJwtWithoutSignatureCheck<T>(jwtToken);
-
-export const createConnectedUserJwtPayload = ({
-  userId,
-  durationDays,
-  now,
-  iat = Math.round(now.getTime() / 1000),
-  exp = iat + durationDays * 24 * 3600,
-}: {
-  userId: UserId;
-  durationDays: number;
-  now: Date;
-  iat?: number;
-  exp?: number;
-}): ConnectedUserJwtPayload => ({
-  userId,
-  iat,
-  exp,
-  version: currentJwtVersions.connectedUser,
-});
 
 export const getJwtExpiredSinceInSeconds = (jwt: string, now: Date) => {
   const decoded = decodeJwtWithoutSignatureCheck<{ exp: number }>(jwt);

@@ -116,10 +116,13 @@ export class HttpAuthGateway implements AuthGateway {
     param: RenewExpiredJwtRequestDto,
   ): Promise<void> {
     await this.httpClient.renewExpiredJwt({
-      queryParams: {
-        expiredJwt: param.expiredJwt,
-        originalUrl: encodeURIComponent(param.originalUrl),
-      },
+      queryParams:
+        "originalUrl" in param
+          ? {
+              expiredJwt: param.expiredJwt,
+              originalUrl: encodeURIComponent(param.originalUrl),
+            }
+          : param,
     });
   }
 }

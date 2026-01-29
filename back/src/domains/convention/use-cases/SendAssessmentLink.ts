@@ -5,7 +5,6 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
-  type CreateConventionMagicLinkPayloadProperties,
   errors,
   frontRoutes,
   type UserId,
@@ -17,6 +16,7 @@ import {
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
+import type { CreateConventionMagicLinkPayloadProperties } from "../../../utils/jwt";
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";

@@ -7,7 +7,11 @@ import {
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
-import { ContactUsButton, HomeButton } from "src/app/pages/error/front-errors";
+import {
+  ContactUsButton,
+  HomeButton,
+  RenewMagicLinkButton,
+} from "src/app/pages/error/front-errors";
 import { type routes, useRoute } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -22,7 +26,16 @@ export const MagicLinkInterstitialPage = () => {
     return (
       <ErrorPage
         title="Lien expiré"
-        buttons={[HomeButton, ContactUsButton]}
+        buttons={[
+          HomeButton,
+          RenewMagicLinkButton({
+            renewExpiredJwtRequestDto: {
+              expiredJwt: "TODO",
+              originalUrl: "TODO",
+            },
+          }),
+          ContactUsButton,
+        ]}
         error={{
           message: authExpiredMessage(
             `${Math.ceil(expiredSinceSeconds / 60)} minutes`,
@@ -41,7 +54,16 @@ export const MagicLinkInterstitialPage = () => {
         return (
           <ErrorPage
             title={title ?? "Erreur de connexion"}
-            buttons={[HomeButton, ContactUsButton]}
+            buttons={[
+              HomeButton,
+              RenewMagicLinkButton({
+                renewExpiredJwtRequestDto: {
+                  expiredJwt: "TODO",
+                  originalUrl: "TODO",
+                },
+              }),
+              ContactUsButton,
+            ]}
             error={{
               message: messageText,
               name: title ?? "Erreur de connexion",

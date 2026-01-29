@@ -2,7 +2,6 @@ import { values } from "ramda";
 import {
   type AgencyDto,
   type ConventionDto,
-  type CreateConventionMagicLinkPayloadProperties,
   errors,
   filterNotFalsy,
   frontRoutes,
@@ -15,6 +14,7 @@ import {
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
+import type { CreateConventionMagicLinkPayloadProperties } from "../../../../utils/jwt";
 import { createLogger } from "../../../../utils/logger";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";

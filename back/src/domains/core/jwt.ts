@@ -9,6 +9,7 @@ import type {
   ConventionJwt,
   ConventionJwtPayload,
   EmailAuthCodeJwt,
+  EmailAuthCodeJwtPayload,
 } from "shared";
 
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;
@@ -30,7 +31,7 @@ type JwtMap =
   | JwtTokenMapping<"convention", ConventionJwt, ConventionJwtPayload>
   | JwtTokenMapping<"connectedUser", ConnectedUserJwt, ConnectedUserJwtPayload>
   | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>
-  | JwtTokenMapping<"emailAuthCode", EmailAuthCodeJwt, CommonJwtPayload>;
+  | JwtTokenMapping<"emailAuthCode", EmailAuthCodeJwt, EmailAuthCodeJwtPayload>;
 
 export type JwtKind = JwtMap["kind"];
 
