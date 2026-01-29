@@ -32,6 +32,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addressDtoToString,
   type Beneficiary,
+  type ConventionDraftId,
+  type ConventionId,
   type ConventionPresentation,
   type ConventionReadDto,
   type CreateConventionPresentationInitialValues,
@@ -386,6 +388,31 @@ export const ConventionForm = ({
     };
   };
 
+  const prevFetchedConventionIdRef = useRef<ConventionId | undefined>(
+    undefined,
+  );
+  const prevConventionDraftIdRef = useRef<ConventionDraftId | undefined>(
+    undefined,
+  );
+
+  if (
+    fetchedConvention &&
+    fetchedConvention.id !== prevFetchedConventionIdRef.current
+  ) {
+    prevFetchedConventionIdRef.current = fetchedConvention.id;
+    reset({ ...fetchedConvention, status: "READY_TO_SIGN" });
+  }
+
+  if (
+    conventionPresentationFromDraft &&
+    conventionPresentationFromDraft.fromConventionDraftId !==
+      prevConventionDraftIdRef.current
+  ) {
+    prevConventionDraftIdRef.current =
+      conventionPresentationFromDraft.fromConventionDraftId;
+    reset({ ...conventionPresentationFromDraft, status: "READY_TO_SIGN" });
+  }
+
   useMatomo(conventionInitialValuesFromUrl.internshipKind);
 
   useEffect(() => {
@@ -401,19 +428,6 @@ export const ConventionForm = ({
       validateSteps("clearAllErrors");
     }
   }, [conventionValues.id]);
-
-  //TODO: à placer dans ConventionFormFields ????
-  useEffect(() => {
-    if (fetchedConvention && mode === "edit") {
-      reset({ ...fetchedConvention, status: "READY_TO_SIGN" });
-    }
-  }, [fetchedConvention, reset, mode]);
-
-  useEffect(() => {
-    if (conventionPresentationFromDraft) {
-      reset({ ...conventionPresentationFromDraft, status: "READY_TO_SIGN" });
-    }
-  }, [conventionPresentationFromDraft, reset]);
 
   useEffect(() => {
     if (defaultValues.siret) {
