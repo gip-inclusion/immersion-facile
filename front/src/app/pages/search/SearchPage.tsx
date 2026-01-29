@@ -621,6 +621,7 @@ export const SearchPage = ({
                                   place: initialValues.place,
                                   latitude: initialValues.latitude,
                                   longitude: initialValues.longitude,
+                                  distanceKm: undefined,
                                 };
                           setTempValue(updatedInitialValues);
 
