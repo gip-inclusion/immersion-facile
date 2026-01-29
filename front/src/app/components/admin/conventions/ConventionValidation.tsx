@@ -39,6 +39,9 @@ import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-si
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { useStyles } from "tss-react/dsfr";
 import {
+  EditBeneficiaryBirthdateModalWrapper,
+  editBeneficiaryBirthdateModal,
+  editBirthdateButtonProps,
   makeConventionSections,
   SendAssessmentLinkModalWrapper,
   SendSignatureLinkModalWrapper,
@@ -80,6 +83,7 @@ export const ConventionValidation = ({
       "send-signature-link",
       "send-assessment-link",
       "convention-action-sign",
+      "edit-beneficiary-birthdate",
     ]).length > 0,
   );
 
@@ -128,6 +132,10 @@ export const ConventionValidation = ({
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
+
+  const showEditBirthdateButton =
+    currentUser?.isBackofficeAdmin === true &&
+    convention.status === "ACCEPTED_BY_VALIDATOR";
 
   const onSubmitSendSignatureLink = () => {
     if (signatoryToSendSignatureLink) {
@@ -198,6 +206,7 @@ export const ConventionValidation = ({
           "send-signature-link",
           "send-assessment-link",
           "convention-action-sign",
+          "edit-beneficiary-birthdate",
         ]}
         closable
         className={fr.cx("fr-my-4w")}
@@ -230,6 +239,11 @@ export const ConventionValidation = ({
                 },
               })
             : undefined,
+          showEditBirthdateButton
+            ? editBirthdateButtonProps({
+                onClick: () => editBeneficiaryBirthdateModal.open(),
+              })
+            : undefined,
         )}
         conventionId={convention.id}
       />
@@ -243,6 +257,14 @@ export const ConventionValidation = ({
         phone={convention.establishmentTutor.phone}
         onConfirm={onSubmitSendAssessmentLink}
       />
+      {jwtParams.kind !== "convention" && (
+        <EditBeneficiaryBirthdateModalWrapper
+          conventionId={convention.id}
+          currentBirthdate={convention.signatories.beneficiary.birthdate}
+          jwt={jwtParams.jwt}
+          feedbackTopic="edit-beneficiary-birthdate"
+        />
+      )}
     </>
   );
 };
