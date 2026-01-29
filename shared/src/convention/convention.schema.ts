@@ -82,6 +82,7 @@ import {
   conventionStatusesWithoutJustificationNorValidator,
   conventionStatusesWithValidator,
   DATE_CONSIDERED_OLD,
+  type EditBeneficiaryBirthdateRequestDto,
   type EditConventionCounsellorNameRequestDto,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
@@ -242,6 +243,12 @@ export const editConventionCounsellorNameRequestSchema: ZodSchemaWithInputMatchi
       conventionId: conventionIdSchema,
     }),
   );
+
+export const editBeneficiaryBirthdateRequestSchema: ZodSchemaWithInputMatchingOutput<EditBeneficiaryBirthdateRequestDto> =
+  z.object({
+    conventionId: conventionIdSchema,
+    updatedBeneficiaryBirthDate: makeDateStringSchema(),
+  });
 
 export const renewedSchema = z.object({
   from: conventionIdSchema,
