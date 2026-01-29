@@ -37,6 +37,12 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
     if (isEstablishmentWithProvidedSiretAlreadyInDb)
       throw errors.establishment.conflictError({ siret });
 
-    return getSiretEstablishmentFromApi(params, this.#siretGateway);
+    const siretEstablishment = await getSiretEstablishmentFromApi(
+      params,
+      this.#siretGateway,
+    );
+
+    if (siretEstablishment) return siretEstablishment;
+    throw errors.siretApi.notFound({ siret });
   }
 }

@@ -10,6 +10,7 @@ export const rejectsSiretIfNotAnOpenCompany = async (
     { siret, includeClosedEstablishments: true },
     siretGateway,
   );
+  if (!siretEstablishment) throw errors.siretApi.notFound({ siret });
 
   if (!siretEstablishment.isOpen)
     throw errors.establishment.missingOrClosed({ siret });
