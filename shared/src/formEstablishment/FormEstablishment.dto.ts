@@ -19,7 +19,7 @@ export type ImmersionContactInEstablishmentId = Flavor<
   "ImmersionContactInEstablishmentId"
 >;
 
-export const physicalWorkModes = ["HYBRID", "NO_REMOTE"] as const;
+export const physicalWorkModes = ["HYBRID", "ON_SITE"] as const;
 
 export type PhysicalWorkMode = (typeof physicalWorkModes)[number];
 
@@ -43,7 +43,7 @@ export const remoteWorkModeLabels: Record<
     description:
       "Apparaîtra pour la France entière, quelle que soit la localisation du candidat",
   },
-  NO_REMOTE: {
+  ON_SITE: {
     label: "100% présentiel",
     answerLabel: "Non, 100% en présentiel",
     description:

@@ -495,7 +495,7 @@ const defaultValidOfferEntity: OfferEntity = {
   romeCode: "B1805",
   appellationLabel: "Styliste",
   appellationCode: "19540",
-  remoteWorkMode: "NO_REMOTE",
+  remoteWorkMode: "ON_SITE",
   romeLabel: "Stylisme",
   createdAt: new Date("2022-05-15T12:00:00.000"),
 };

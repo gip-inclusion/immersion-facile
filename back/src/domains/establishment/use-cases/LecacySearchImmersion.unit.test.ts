@@ -211,32 +211,32 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
       ]);
 
@@ -259,19 +259,19 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
 
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
 
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
       ]);
 
@@ -294,32 +294,32 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
       ]);
 
@@ -348,13 +348,13 @@ describe("LegacySearchImmersionUseCase", () => {
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: secretariatOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: boulangerOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
     ]);
@@ -391,13 +391,13 @@ describe("LegacySearchImmersionUseCase", () => {
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: secretariatOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: boulangerOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
       lbbToSearchResult(
@@ -442,7 +442,7 @@ describe("LegacySearchImmersionUseCase", () => {
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: secretariatOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
       lbbToSearchResult(
@@ -484,13 +484,13 @@ describe("LegacySearchImmersionUseCase", () => {
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: secretariatOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: boulangerOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
     ]);
@@ -609,7 +609,7 @@ describe("LegacySearchImmersionUseCase", () => {
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: secretariatOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
     ]);
@@ -693,7 +693,7 @@ describe("LegacySearchImmersionUseCase", () => {
       establishmentAggregateToSearchResultByRomeForFirstLocation({
         establishmentAggregate: establishment,
         romeCode: secretariatOffer.romeCode,
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
         distance_m: 606885,
       }),
     ]);
@@ -731,25 +731,25 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -787,25 +787,25 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -842,37 +842,37 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyStudent,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentAcceptingOnlyJobSeeker,
           romeCode: boulangerOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -935,7 +935,7 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: displayableEstablishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -1036,7 +1036,7 @@ describe("LegacySearchImmersionUseCase", () => {
           establishmentAggregateToSearchResultByRomeForFirstLocation({
             establishmentAggregate: establishment,
             romeCode: secretariatOffer.romeCode,
-            remoteWorkMode: "NO_REMOTE",
+            remoteWorkMode: "ON_SITE",
             distance_m: 606885,
           }),
         ]);
@@ -1060,7 +1060,7 @@ describe("LegacySearchImmersionUseCase", () => {
           establishmentAggregateToSearchResultByRomeForFirstLocation({
             establishmentAggregate: establishment,
             romeCode: secretariatOffer.romeCode,
-            remoteWorkMode: "NO_REMOTE",
+            remoteWorkMode: "ON_SITE",
             distance_m: 606885,
           }),
         ]);
@@ -1097,7 +1097,7 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -1132,13 +1132,13 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment2,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishment1,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -1181,21 +1181,21 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithFitForDisabledWorkersNo,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate:
             establishmentWithFitForDisabledWorkersYesCertified,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate:
             establishmentWithFitForDisabledWorkersYesDeclaredOnly,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -1211,7 +1211,7 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithFitForDisabledWorkersNo,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
       ]);
@@ -1232,7 +1232,7 @@ describe("LegacySearchImmersionUseCase", () => {
           customScore:
             establishmentWithFitForDisabledWorkersYesCertified.establishment
               .score,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate:
@@ -1242,7 +1242,7 @@ describe("LegacySearchImmersionUseCase", () => {
           customScore:
             establishmentWithFitForDisabledWorkersYesDeclaredOnly.establishment
               .score,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
       ]);
     });
@@ -1328,19 +1328,19 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithNafA,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithNafB,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithNafC,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         lbbToSearchResult(
@@ -1380,7 +1380,7 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithNafA,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         lbbToSearchResult(
@@ -1404,13 +1404,13 @@ describe("LegacySearchImmersionUseCase", () => {
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithNafA,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         establishmentAggregateToSearchResultByRomeForFirstLocation({
           establishmentAggregate: establishmentWithNafB,
           romeCode: secretariatOffer.romeCode,
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
           distance_m: 606885,
         }),
         lbbToSearchResult(

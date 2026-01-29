@@ -254,7 +254,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment1.locations[0],
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         createSearchResult({
           establishment: establishment1,
@@ -271,7 +271,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment1.locations[0],
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         createSearchResult({
           establishment: establishment2,
@@ -284,7 +284,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment2.locations[0],
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
         createSearchResult({
           establishment: establishment2,
@@ -297,7 +297,7 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment2.locations[1],
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         }),
       ],
     });

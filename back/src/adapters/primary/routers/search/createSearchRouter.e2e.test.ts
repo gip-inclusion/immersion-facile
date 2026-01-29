@@ -79,13 +79,13 @@ const toSearchImmersionResults = (
 const offer1 = new OfferEntityBuilder()
   .withRomeCode("A1409")
   .withAppellationCode("14704")
-  .withRemoteWorkMode("NO_REMOTE")
+  .withRemoteWorkMode("ON_SITE")
   .build();
 
 const offer2 = new OfferEntityBuilder()
   .withRomeCode("A1203")
   .withAppellationCode("16067")
-  .withRemoteWorkMode("NO_REMOTE")
+  .withRemoteWorkMode("ON_SITE")
   .build();
 
 const score20 = 20;
@@ -95,7 +95,7 @@ const establishment = new EstablishmentEntityBuilder()
   .build();
 
 const immersionOffer = new OfferEntityBuilder()
-  .withRemoteWorkMode("NO_REMOTE")
+  .withRemoteWorkMode("ON_SITE")
   .build();
 const establishmentAggregate1 = new EstablishmentAggregateBuilder()
   .withEstablishment(
@@ -199,7 +199,7 @@ describe("/offers route", () => {
               establishmentAggregateToSearchResultByRomeForFirstLocation({
                 establishmentAggregate: establishmentAggregate2,
                 romeCode: immersionOffer.romeCode,
-                remoteWorkMode: "NO_REMOTE",
+                remoteWorkMode: "ON_SITE",
               }),
             ],
             pagination: getBasicPagination(),
@@ -239,7 +239,7 @@ describe("/offers route", () => {
               establishmentAggregateToSearchResultByRomeForFirstLocation({
                 establishmentAggregate: establishmentAggregate2,
                 romeCode: immersionOffer.romeCode,
-                remoteWorkMode: "NO_REMOTE",
+                remoteWorkMode: "ON_SITE",
                 distance_m: 0,
               }),
             ],
@@ -297,7 +297,7 @@ describe("/offers route", () => {
               establishmentAggregateToSearchResultByRomeForFirstLocation({
                 establishmentAggregate: establishmentAggregate2,
                 romeCode: immersionOffer.romeCode,
-                remoteWorkMode: "NO_REMOTE",
+                remoteWorkMode: "ON_SITE",
                 distance_m: 0,
               }),
             ],
@@ -481,7 +481,7 @@ describe("/offers route", () => {
         .withAppellationLabel("Ouvrier agricole")
         .withAppellationCode("14704")
         .withRomeLabel("Agriculture")
-        .withRemoteWorkMode("NO_REMOTE")
+        .withRemoteWorkMode("ON_SITE")
         .build();
 
       beforeEach(async () => {
@@ -616,7 +616,7 @@ describe("/offers route", () => {
         });
       });
 
-      it("with filter remoteWorkModes set to NO_REMOTE", async () => {
+      it("with filter remoteWorkModes set to ON_SITE", async () => {
         const result = await httpClient.getOffers({
           queryParams: {
             appellationCodes: [
@@ -625,7 +625,7 @@ describe("/offers route", () => {
               offerNoRemote.appellationCode,
             ],
             sortBy: "score",
-            remoteWorkModes: ["NO_REMOTE"],
+            remoteWorkModes: ["ON_SITE"],
           },
         });
 
@@ -638,7 +638,7 @@ describe("/offers route", () => {
               false,
             ).map((result) => ({
               ...result,
-              remoteWorkMode: "NO_REMOTE" as const,
+              remoteWorkMode: "ON_SITE" as const,
             })),
           },
         });
@@ -692,7 +692,7 @@ describe("/offers route", () => {
                   [{ siret: siret2, offer: offerNoRemote, establishment }],
                   false,
                 )[0],
-                remoteWorkMode: "NO_REMOTE",
+                remoteWorkMode: "ON_SITE",
               },
             ],
           },
@@ -973,7 +973,7 @@ describe("/offers route", () => {
           updatedAt: defaultUpdatedAt.toISOString(),
           createdAt: new Date("2024-08-08").toISOString(),
           fitForDisabledWorkers: "no",
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         },
       });
     });

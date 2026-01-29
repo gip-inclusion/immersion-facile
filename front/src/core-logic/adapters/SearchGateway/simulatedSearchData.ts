@@ -144,7 +144,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     rome: "D1211",
@@ -178,7 +178,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     rome: "D1505",
@@ -212,7 +212,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     rome: "D1211",
@@ -247,7 +247,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     rome: "D1211",
@@ -327,7 +327,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     locationId: "123",
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
 ];
 
@@ -502,7 +502,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -535,7 +535,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -569,7 +569,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -603,7 +603,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -637,7 +637,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -670,7 +670,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "5610C",
@@ -704,7 +704,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -737,7 +737,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -771,7 +771,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -805,7 +805,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -838,7 +838,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -871,7 +871,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -905,7 +905,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -939,7 +939,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -973,7 +973,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1006,7 +1006,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1039,7 +1039,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "4724Z",
@@ -1073,7 +1073,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1107,7 +1107,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1141,7 +1141,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1174,7 +1174,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1207,7 +1207,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1241,7 +1241,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1275,7 +1275,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1309,7 +1309,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1342,7 +1342,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1375,7 +1375,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1409,7 +1409,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1443,7 +1443,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1477,7 +1477,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1510,7 +1510,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1543,7 +1543,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1577,7 +1577,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1610,7 +1610,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1648,7 +1648,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1681,7 +1681,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1715,7 +1715,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1748,7 +1748,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1782,7 +1782,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1816,7 +1816,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "5610C",
@@ -1850,7 +1850,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1884,7 +1884,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1918,7 +1918,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1952,7 +1952,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -1986,7 +1986,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2019,7 +2019,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2053,7 +2053,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2087,7 +2087,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2121,7 +2121,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2154,7 +2154,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "4724Z",
@@ -2188,7 +2188,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2221,7 +2221,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2255,7 +2255,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2289,7 +2289,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "4724Z",
@@ -2323,7 +2323,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2357,7 +2357,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2390,7 +2390,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2422,7 +2422,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2456,7 +2456,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "5610A",
@@ -2488,7 +2488,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "4724Z",
@@ -2522,7 +2522,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "1071C",
@@ -2555,7 +2555,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
   {
     naf: "6820B",
@@ -2589,6 +2589,6 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
-    remoteWorkMode: "NO_REMOTE",
+    remoteWorkMode: "ON_SITE",
   },
 ];

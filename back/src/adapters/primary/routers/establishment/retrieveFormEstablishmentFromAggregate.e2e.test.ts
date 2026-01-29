@@ -152,7 +152,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             appellationLabel: establishmentAggregate.offers[0].appellationLabel,
             romeCode: establishmentAggregate.offers[0].romeCode,
             romeLabel: establishmentAggregate.offers[0].romeLabel,
-            remoteWorkMode: "NO_REMOTE",
+            remoteWorkMode: "ON_SITE",
           },
         ],
         maxContactsPerMonth:
@@ -220,7 +220,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             appellationLabel: establishmentAggregate.offers[0].appellationLabel,
             romeCode: establishmentAggregate.offers[0].romeCode,
             romeLabel: establishmentAggregate.offers[0].romeLabel,
-            remoteWorkMode: "NO_REMOTE",
+            remoteWorkMode: "ON_SITE",
           },
         ],
         fitForDisabledWorkers:
