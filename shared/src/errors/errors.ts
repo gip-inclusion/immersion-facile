@@ -1168,4 +1168,7 @@ export const errors = {
     notFromIFDomain: (url: string) =>
       new BadRequestError(`L'url ${url} ne provient pas d'Immersion Facilitée`),
   },
+  phoneNumber: {
+    notFound: () => new NotFoundError("Numéro de téléphone introuvable"),
+  },
 };
