@@ -202,20 +202,6 @@ export const conventionMagicLinkRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-
-  editBeneficiaryBirthdate: defineRoute({
-    url: "/auth/convention/edit-beneficiary-birthdate",
-    method: "post",
-    requestBodySchema: editBeneficiaryBirthdateRequestSchema,
-    ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
-      400: httpErrorSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-      404: httpErrorSchema,
-    },
-  }),
 });
 
 export type UnauthenticatedConventionRoutes =
@@ -340,6 +326,20 @@ export const authenticatedConventionRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: broadcastFeedbackSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
+
+  editBeneficiaryBirthdate: defineRoute({
+    url: "/inclusion-connected/edit-beneficiary-birthdate",
+    method: "post",
+    requestBodySchema: editBeneficiaryBirthdateRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

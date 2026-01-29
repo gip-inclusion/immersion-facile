@@ -36,6 +36,7 @@ import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/co
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { makeDeleteAssessment } from "../../domains/convention/use-cases/DeleteAssessment";
 import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
+import { makeEditBeneficiaryBirthdate } from "../../domains/convention/use-cases/EditBeneficiaryBirthdate";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
@@ -1039,6 +1040,10 @@ export const createUseCases = ({
       deps: { createNewEvent },
     }),
     editConventionCounsellorName: makeEditConventionCounsellorName({
+      uowPerformer,
+      deps: { createNewEvent },
+    }),
+    editBeneficiaryBirthdate: makeEditBeneficiaryBirthdate({
       uowPerformer,
       deps: { createNewEvent },
     }),

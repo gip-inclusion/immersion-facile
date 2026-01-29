@@ -747,6 +747,32 @@ describe("PgConventionRepository", () => {
       );
     });
 
+    it("Updates convention beneficiary birthdate", async () => {
+      const conventionId = "50500505-0000-4000-9000-6bb9bd38bbbb";
+      const initialBirthdate = "2002-10-05";
+      const newBirthdate = "1995-03-15";
+
+      const convention = conventionStylisteBuilder
+        .withId(conventionId)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withBeneficiaryBirthdate(initialBirthdate)
+        .build();
+
+      await conventionRepository.save(convention);
+
+      const updatedConvention = new ConventionDtoBuilder(convention)
+        .withBeneficiaryBirthdate(newBirthdate)
+        .build();
+
+      await conventionRepository.update(updatedConvention);
+
+      const conventionInDb = await conventionRepository.getById(conventionId);
+      expectToEqual(
+        conventionInDb?.signatories.beneficiary.birthdate,
+        newBirthdate,
+      );
+    });
+
     it("Updates the establisment representative", async () => {
       const commonFields = {
         firstName: "Rep",
