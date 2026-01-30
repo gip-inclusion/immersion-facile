@@ -32,6 +32,7 @@ import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImme
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
+import { ConventionTemplatePage } from "src/app/pages/convention/ConventionTemplate";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
@@ -231,6 +232,7 @@ const getPageByRouteName: {
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />
   ),
+  conventionTemplate: (route) => <ConventionTemplatePage route={route} />,
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   establishmentDashboard: (route) => (
     <RedirectTo

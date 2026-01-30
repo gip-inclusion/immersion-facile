@@ -948,6 +948,14 @@ export const domElementIds = {
       editAgencyRemoveUserButton:
         "im-agency-dashboard-form-edit-agency__remove-user-button",
     },
+    conventionTemplates: {
+      editConventionTemplateButton:
+        "im-manage-convention-user-connected__edit-convention-template-button",
+      deleteConventionTemplateButton:
+        "im-manage-convention-user-connected__delete-convention-template-button",
+      shareConventionTemplateButton:
+        "im-manage-convention-user-connected__share-convention-template-button",
+    },
   },
   manageConventionUserConnected: {
     login: {
@@ -964,6 +972,10 @@ export const domElementIds = {
     },
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
+    pilotConventionWithBroadcastErrorButton:
+      "im-manage-convention-user-connected__pilot-convention-with-broadcast-error-button",
+    pilotConventionToManageButton:
+      "im-manage-convention-user-connected__pilot-convention-to-manage-button",
   },
   establishmentDashboardDiscussions: {
     login: {
@@ -1071,4 +1083,5 @@ export const domElementIds = {
       "im-convention-form__initiate-dont-know-category-button",
   },
   beneficiaryDashboard: {},
+  conventionTemplate: {},
 } satisfies DomElementIds;

@@ -12,7 +12,7 @@ import { EmailValidationInput } from "src/app/components/forms/commons/EmailVali
 import type {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
-} from "src/app/components/forms/convention/ConventionForm";
+} from "src/app/components/forms/convention/conventionForm.helpers";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
   getFormContents,

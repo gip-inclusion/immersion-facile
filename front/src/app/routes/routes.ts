@@ -5,7 +5,6 @@ import {
   adminTabs,
   type ConnectedUserQueryParams,
   frontRoutes,
-  type ValueOf,
 } from "shared";
 import {
   createRouter,
@@ -86,9 +85,6 @@ export const searchParams = {
   remoteWorkModes: param.query.optional.ofType(remoteWorkModeSerializer),
   ...acquisitionParams,
 };
-
-export type FrontRouteUnion = ValueOf<typeof routes>;
-export type FrontRouteKeys = keyof typeof routes;
 
 const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
 
@@ -185,6 +181,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.query.optional.string,
     },
     () => `/${frontRoutes.conventionDocument}`,
+  ),
+  conventionTemplate: defineRoute(
+    { fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer) },
+    () => `/${frontRoutes.conventionTemplate}`,
   ),
   initiateConvention: defineRoute(
     {
