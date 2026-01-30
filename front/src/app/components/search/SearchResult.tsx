@@ -11,6 +11,7 @@ import {
   domElementIds,
   frenchEstablishmentKinds,
   isInternalOfferDto,
+  isPhysicalWorkMode,
   type OfferDto,
   remoteWorkModeLabels,
 } from "shared";
@@ -75,6 +76,13 @@ const SearchResultComponent = ({
   ].join("");
 
   const dateJobCreatedAt = getLastDate(createdAt, updatedAt);
+
+  const displayedLocation =
+    isInternalOfferDto(searchResult) &&
+    !isPhysicalWorkMode(searchResult.remoteWorkMode)
+      ? "France entière"
+      : `${address.city} (${address.departmentCode})`;
+
   return (
     <Card
       title={jobTitle}
@@ -91,7 +99,7 @@ const SearchResultComponent = ({
       endDetail={dateJobCreatedAt}
       start={
         <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
-          {address.city} ({address.departmentCode}) -{" "}
+          {displayedLocation} -{" "}
           {isInternalOfferDto(searchResult) &&
             remoteWorkModeLabels[searchResult.remoteWorkMode].label}
         </Tag>
