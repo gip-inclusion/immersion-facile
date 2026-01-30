@@ -136,7 +136,7 @@ const step2 = async (
   await page.click(`#${domElementIds.establishment.edit.editOfferButton}-0`);
 
   await page.click(
-    `[for='${domElementIds.establishment.edit.remoteWorkMode}-2']`, // NO_REMOTE
+    `[for='${domElementIds.establishment.edit.remoteWorkMode}-2']`, // ON_SITE
   );
 
   await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);

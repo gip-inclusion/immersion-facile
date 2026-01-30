@@ -97,7 +97,7 @@ const decathlon = new EstablishmentAggregateBuilder()
       .withAppellationCode("20552")
       .withAppellationLabel("Vendeur / Vendeuse en articles de sport")
       .withRomeCode("D1211")
-      .withRemoteWorkMode("NO_REMOTE")
+      .withRemoteWorkMode("ON_SITE")
       .build(),
     new OfferEntityBuilder()
       .withAppellationCode("11569")

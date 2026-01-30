@@ -160,7 +160,7 @@ const checkEstablishment = async (
   await expect(firstOfferCardContent).toContain("routage");
 
   await expect(firstOfferCardContent).toContain(
-    remoteWorkModeLabels.NO_REMOTE.label.toLocaleUpperCase(),
+    remoteWorkModeLabels.ON_SITE.label.toLocaleUpperCase(),
   );
 
   await expect(

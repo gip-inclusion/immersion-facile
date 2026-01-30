@@ -161,7 +161,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withOffers(
           appellations.map((appellation) => ({
             ...appellation,
-            remoteWorkMode: "NO_REMOTE",
+            remoteWorkMode: "ON_SITE",
           })),
         )
         .withNextAvailabilityDate(nextAvailabilityDate)
@@ -237,7 +237,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
               appellations.map((prof) =>
                 new OfferEntityBuilder({
                   ...prof,
-                  remoteWorkMode: "NO_REMOTE",
+                  remoteWorkMode: "ON_SITE",
                   createdAt: timeGateway.now(),
                 }).build(),
               ),
@@ -258,14 +258,14 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           appellationCode: "11717",
           romeLabel: "métier A",
           appellationLabel: "métier A.1",
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         },
         {
           romeCode: "A1102",
           appellationCode: "11716",
           romeLabel: "métier B",
           appellationLabel: "métier B.1",
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         },
       ];
       const nextAvailabilityDate = new Date();
@@ -589,7 +589,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           appellationCode: "22222",
           romeLabel: "Boulangerie",
           appellationLabel: "Boulanger",
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         },
       ])
       .withUserRights([formAdminRight])
@@ -845,7 +845,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           "une boulette, ca devrait être 'Coiffeur / Coiffeuse mixte'",
         romeCode: "A0000", // devrait être D1202
         romeLabel: "une autre boulette, ca devrait être 'Coiffure'",
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
       };
 
       const formEstablishmentWithWeirdAppellationDto =
@@ -859,7 +859,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         appellationLabel: "Coiffeur / Coiffeuse mixte",
         romeCode: "D1202",
         romeLabel: "Coiffure",
-        remoteWorkMode: "NO_REMOTE",
+        remoteWorkMode: "ON_SITE",
       };
       uow.romeRepository.appellations = [correctEstablishmentOffer];
 

@@ -136,7 +136,7 @@ describe("Edit form establishments", () => {
           appellationCode: "33333",
           romeLabel: "Boucherie",
           appellationLabel: "Boucher / Bouchère",
-          remoteWorkMode: "NO_REMOTE",
+          remoteWorkMode: "ON_SITE",
         },
       ],
     };

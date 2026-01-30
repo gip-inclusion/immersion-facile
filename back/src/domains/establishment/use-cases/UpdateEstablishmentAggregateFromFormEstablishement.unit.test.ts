@@ -186,7 +186,7 @@ describe("Update Establishment aggregate from form data", () => {
       appellationLabel: "Boulanger",
       romeCode: "A1101",
       appellationCode: "22222",
-      remoteWorkMode: "NO_REMOTE",
+      remoteWorkMode: "ON_SITE",
     };
     const nextAvailabilityDate = new Date();
     const updatedFormAdmin: AdminFormEstablishmentUserRight = {
