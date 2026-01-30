@@ -1,6 +1,5 @@
 import { subDays } from "date-fns";
 import {
-  type AbsoluteUrl,
   AgencyDtoBuilder,
   allowedLoginSources,
   type ExternalId,
@@ -16,6 +15,7 @@ import {
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../../../utils/agency";
 import { generateES256KeyPair } from "../../../../../utils/jwt";
+import { fakeGenerateConnectedUserUrlFn } from "../../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../../jwt";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
@@ -34,9 +34,7 @@ import type { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
 
 describe("AfterOAuthSuccessRedirection use case", () => {
-  const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
-  const correctToken = "my-correct-token";
-
+  const immersionFacileBaseUrl = "http://baseUrl";
   const { publicKey, privateKey } = generateES256KeyPair();
 
   const generateEmailAuthCode = makeGenerateJwtES256<"emailAuthCode">(
@@ -66,19 +64,19 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     timeGateway = new CustomTimeGateway();
     const verifyEmailAuthCode = makeVerifyJwtES256<"emailAuthCode">(publicKey);
 
-    afterOAuthSuccessRedirection = new AfterOAuthSuccess(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
+    afterOAuthSuccessRedirection = new AfterOAuthSuccess({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      createNewEvent: makeCreateNewEvent({
         timeGateway: timeGateway,
         uuidGenerator,
       }),
       oAuthGateway,
       uuidGenerator,
-      () => correctToken,
-      verifyEmailAuthCode,
-      immersionBaseUrl,
+      generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+      verifyEmailAuthCodeJwt: verifyEmailAuthCode,
+      immersionFacileBaseUrl,
       timeGateway,
-    );
+    });
   });
 
   describe("With OAuthGateway provider 'proConnect'", () => {
@@ -362,7 +360,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         it.each(
           allowedLoginSources,
         )("generates an app token and returns a redirection url which includes token and user data for %s", async (page) => {
-          const { initialOngoingOAuth, fromUri } =
+          const { initialOngoingOAuth, fromUri, userId } =
             makeSuccessfulAuthenticationConditions(
               `/${page}?discussionId=discussion0`,
             );
@@ -374,7 +372,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
           expectToEqual(response, {
             provider: "proConnect",
-            redirectUri: `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
+            redirectUri: `http://fake-connected-user${fromUri}&token=${userId}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
           });
         });
       });
@@ -450,13 +448,15 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       });
 
       it("validate that token is from server", async () => {
+        const userId = "userId";
+        uuidGenerator.setNextUuid(userId);
         const result = await afterOAuthSuccessRedirection.execute({
-          code: generateEmailAuthCode({ version: 1 }),
+          code: generateEmailAuthCode({ version: 1, emailAuthCode: true }),
           state: initialOngoingOAuth.state,
         });
         expectToEqual(result, {
           provider: "email",
-          redirectUri: `${immersionBaseUrl}/admin?token=${correctToken}&firstName=&lastName=&email=my-email@mail.com&idToken=&provider=email`,
+          redirectUri: `http://fake-connected-user/admin?token=${userId}&firstName=&lastName=&email=my-email@mail.com&idToken=&provider=email`,
         });
       });
 
@@ -465,23 +465,23 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         const verifyEmailAuthCode =
           makeVerifyJwtES256<"emailAuthCode">(otherPrivateKey);
 
-        afterOAuthSuccessRedirection = new AfterOAuthSuccess(
-          new InMemoryUowPerformer(uow),
-          makeCreateNewEvent({
+        afterOAuthSuccessRedirection = new AfterOAuthSuccess({
+          uowPerformer: new InMemoryUowPerformer(uow),
+          createNewEvent: makeCreateNewEvent({
             timeGateway: timeGateway,
             uuidGenerator,
           }),
           oAuthGateway,
           uuidGenerator,
-          () => correctToken,
-          verifyEmailAuthCode,
-          immersionBaseUrl,
+          generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+          verifyEmailAuthCodeJwt: verifyEmailAuthCode,
+          immersionFacileBaseUrl,
           timeGateway,
-        );
+        });
 
         await expectPromiseToFailWithError(
           afterOAuthSuccessRedirection.execute({
-            code: generateEmailAuthCode({ version: 1 }),
+            code: generateEmailAuthCode({ version: 1, emailAuthCode: true }),
             state: initialOngoingOAuth.state,
           }),
           errors.user.invalidJwt(),
@@ -499,6 +499,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             code: generateEmailAuthCode({
               version: 1,
               exp: subDays(timeGateway.now(), 1).getTime() / 1000,
+              emailAuthCode: true,
             }),
             state: initialOngoingOAuth.state,
           }),
@@ -533,7 +534,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         uuidGenerator.setNextUuid(userId);
 
         const redirectedUrl = await afterOAuthSuccessRedirection.execute({
-          code: generateEmailAuthCode({ version: 1 }),
+          code: generateEmailAuthCode({ version: 1, emailAuthCode: true }),
           state: initialOngoingOAuth.state,
         });
 
@@ -559,7 +560,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         expectToEqual(redirectedUrl, {
           provider: "email",
-          redirectUri: `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
+          redirectUri: `http://fake-connected-user/${page}?discussionId=discussion0&token=${userId}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
         });
       });
     });
@@ -606,7 +607,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       });
 
       expectToEqual(response, {
-        redirectUri: `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
+        redirectUri: `${immersionFacileBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
         provider: "proConnect",
       });
 

@@ -6,7 +6,6 @@ import {
   agencyModifierRoles,
   type ConventionDto,
   type ConventionRole,
-  type CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   type Email,
   errors,
@@ -21,6 +20,7 @@ import {
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
+import type { CreateConventionMagicLinkPayloadProperties } from "../../../../utils/jwt";
 import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
@@ -142,7 +142,8 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         role,
         email: recipient,
         now: this.#timeGateway.now(),
-        exp: this.#timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+        expOverride:
+          this.#timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
       };
     const shouldHaveAssessmentMagicLink =
       (isEstablishmentTutorIsEstablishmentRepresentative(convention) &&

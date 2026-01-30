@@ -94,6 +94,7 @@ describe("auth router", () => {
       technicalRoutes,
       request,
     );
+    gateways.timeGateway.setNextDate(new Date());
   });
 
   describe("user connexion flow", () => {
@@ -691,6 +692,7 @@ describe("auth router", () => {
 
           const response = await authRoutesClient.renewExpiredJwt({
             queryParams: {
+              kind: "convention",
               expiredJwt,
               originalUrl: encodeURIComponent(originalUrl),
             },
@@ -748,6 +750,7 @@ describe("auth router", () => {
 
           const response = await authRoutesClient.renewExpiredJwt({
             queryParams: {
+              kind: "convention",
               expiredJwt: generateConventionJwt(
                 createConventionMagicLinkPayload({
                   id: convention.id,

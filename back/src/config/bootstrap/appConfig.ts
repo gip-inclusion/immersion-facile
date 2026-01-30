@@ -262,12 +262,24 @@ export class AppConfig {
       : `https://${this.immersionFacileDomain}`;
   }
 
-  public get magicLinkShortDurationInDays(): number {
-    return 31; // 1 month
+  public get conventionJwtShortDurationInDays(): number {
+    // return 31; // 1 month
+    return 1 / 24 / 60;
   }
 
-  public get magicLinkLongDurationInDays(): number {
-    return 31 * 6; // 6 months
+  public get conventionJwtLongDurationInDays(): number {
+    // return 31 * 6; // 6 months
+    return 1 / 24 / 60;
+  }
+
+  public get connectedUserJwtDurationInHours(): number {
+    // return 12; // 12 hours
+    return 1 / 60;
+  }
+
+  public get emailAuthCodeJwtDurationInMinutes(): number {
+    // return loginByEmailLinkDurationInMinutes; // 15 minutes
+    return 1;
   }
 
   public get immersionFacileDomain(): string {

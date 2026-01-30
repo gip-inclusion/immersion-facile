@@ -1,4 +1,4 @@
-import type { Flavor } from "..";
+import type { Flavor, OAuthState } from "..";
 import type { PayloadKind } from "./payload.dto";
 
 export type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
@@ -18,6 +18,7 @@ export const currentJwtVersions: Record<PayloadKind, number> = {
   convention: 1,
   connectedUser: 1,
   currentUser: 1, // useless, just for typecheck
+  emailAuthCode: 1,
 };
 
 export type JwtDto = {
@@ -28,7 +29,14 @@ export const expiredMagicLinkErrorMessage = "Le lien magique est périmé";
 export const unsupportedMagicLinkErrorMessage =
   "Le lien magique est n'est pas valide";
 
-export type RenewExpiredJwtRequestDto = {
-  originalUrl: string;
-  expiredJwt: AppSupportedJwt;
-};
+export type RenewExpiredJwtRequestDto =
+  | {
+      kind: "convention";
+      originalUrl: string;
+      expiredJwt: ConventionJwt;
+    }
+  | {
+      kind: "connectedUser";
+      expiredJwt: ConnectedUserJwt;
+    }
+  | { kind: "emailAuthCode"; state: OAuthState; expiredJwt: EmailAuthCodeJwt };

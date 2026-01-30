@@ -45,7 +45,6 @@ import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
-import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -65,7 +64,6 @@ import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases
 import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
-import { RenewExpiredJwt } from "../../domains/convention/use-cases/RenewExpiredJwt";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
@@ -89,6 +87,7 @@ import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-u
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
 import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
 import { InitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
+import { RenewExpiredJwt } from "../../domains/core/authentication/connected-user/use-cases/RenewExpiredJwt";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
 import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/core/authentication/ft-connect/use-cases/LinkFranceTravailAdvisorAndRedirectToConvention";
 import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
@@ -160,7 +159,11 @@ import { makeUpdateEstablishmentAggregateFromForm } from "../../domains/establis
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import type { AppConfig } from "./appConfig";
 import type { Gateways } from "./createGateways";
-import { makeGenerateConventionMagicLinkUrl } from "./magicLinkUrl";
+import {
+  makeGenerateConnectedUserLoginUrl,
+  makeGenerateConventionMagicLinkUrl,
+  makeGenerateEmailAuthCodeUrl,
+} from "./magicLinkUrl";
 
 type CreateUsecasesParams = {
   config: AppConfig;
@@ -223,6 +226,14 @@ export const createUseCases = ({
     config,
     generateConventionJwt,
   );
+  const generateConnectedUserLoginUrl = makeGenerateConnectedUserLoginUrl(
+    config,
+    generateConnectedUserJwt,
+  );
+  const generateEmailAuthCodeUrl = makeGenerateEmailAuthCodeUrl(
+    config,
+    generateEmailAuthCodeJwt,
+  );
 
   const addConvention = new AddConvention(
     uowPerformer,
@@ -275,16 +286,16 @@ export const createUseCases = ({
         uuidGenerator,
         gateways.oAuthGateway,
       ),
-      afterOAuthSuccessRedirection: new AfterOAuthSuccess(
+      afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
         createNewEvent,
-        gateways.oAuthGateway,
+        oAuthGateway: gateways.oAuthGateway,
         uuidGenerator,
-        generateConnectedUserJwt,
+        generateConnectedUserLoginUrl,
         verifyEmailAuthCodeJwt,
-        config.immersionFacileBaseUrl,
-        gateways.timeGateway,
-      ),
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+        timeGateway: gateways.timeGateway,
+      }),
       bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
         uowPerformer,
         createNewEvent,
@@ -323,14 +334,16 @@ export const createUseCases = ({
         createNewEvent,
         gateways.timeGateway,
       ),
-      renewExpiredJwt: new RenewExpiredJwt(
+      renewExpiredJwt: new RenewExpiredJwt({
         uowPerformer,
-        createNewEvent,
-        generateConventionMagicLinkUrl,
         config,
-        gateways.timeGateway,
-        gateways.shortLinkGenerator,
-      ),
+        timeGateway: gateways.timeGateway,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        makeGenerateConnectedUserLoginUrl: generateConnectedUserLoginUrl,
+        makeGenerateConventionMagicLinkUrl: generateConventionMagicLinkUrl,
+        makeGenerateEmailAuthCodeUrl: generateEmailAuthCodeUrl,
+        saveNotificationAndRelatedEvent,
+      }),
       renewConvention: new RenewConvention(uowPerformer, addConvention),
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
@@ -489,11 +502,6 @@ export const createUseCases = ({
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      deliverRenewedMagicLink: new DeliverRenewedMagicLink(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-      ),
-
       notifyFranceTravailUserAdvisorOnConventionFullySigned:
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
           uowPerformer,
@@ -1032,10 +1040,11 @@ export const createUseCases = ({
     initiateLoginByEmail: makeInitiateLoginByEmail({
       uowPerformer,
       deps: {
+        config,
+        timeGateway: gateways.timeGateway,
         uuidGenerator,
         saveNotificationAndRelatedEvent,
-        appConfig: config,
-        generateEmailAuthCodeJwt,
+        generateEmailAuthCodeUrl,
       },
     }),
     getDiscussions: makeGetDiscussionsForUser({

@@ -30,6 +30,12 @@ export type UserParamsForMail = {
   email: Email;
 };
 
+export type MagicLinkRenewalParams = {
+  conventionId?: ConventionId;
+  internshipKind?: InternshipKind;
+  magicLink: string;
+};
+
 export type EmailParamsByEmailType = {
   AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
     firstName: string;
@@ -348,14 +354,11 @@ export type EmailParamsByEmailType = {
   };
   IC_USER_RIGHTS_HAS_CHANGED: UserParamsForMail;
   LOGIN_BY_EMAIL_REQUESTED: {
+    validMinutes: number;
     fullname?: string;
     loginLink: AbsoluteUrl;
   };
-  MAGIC_LINK_RENEWAL: {
-    conventionId: ConventionId | undefined;
-    internshipKind: InternshipKind;
-    magicLink: string;
-  };
+  MAGIC_LINK_RENEWAL: MagicLinkRenewalParams;
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyName: string;
