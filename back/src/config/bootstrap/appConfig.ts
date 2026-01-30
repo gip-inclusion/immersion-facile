@@ -5,7 +5,6 @@ import {
   authRoutes,
   environments,
   filterNotFalsy,
-  loginByEmailLinkDurationInMinutes,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefinedOrDefault,
@@ -264,19 +263,23 @@ export class AppConfig {
   }
 
   public get conventionJwtShortDurationInDays(): number {
-    return 31; // 1 month
+    // return 31; // 1 month
+    return 1 / 24 / 60;
   }
 
   public get conventionJwtLongDurationInDays(): number {
-    return 31 * 6; // 6 months
+    // return 31 * 6; // 6 months
+    return 1 / 24 / 60;
   }
 
   public get connectedUserJwtDurationInHours(): number {
-    return 12; // 12 hours
+    // return 12; // 12 hours
+    return 1 / 60;
   }
 
   public get emailAuthCodeJwtDurationInMinutes(): number {
-    return loginByEmailLinkDurationInMinutes; // 15 minutes
+    // return loginByEmailLinkDurationInMinutes; // 15 minutes
+    return 1;
   }
 
   public get immersionFacileDomain(): string {

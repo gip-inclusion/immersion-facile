@@ -109,7 +109,7 @@ export const ConventionManageContent = ({
       throw new Error(conventionFormFeedback?.message ?? "");
     }
     routes
-      .renewConventionMagicLink({
+      .renewJwt({
         expiredJwt: jwtParams.jwt,
         originalUrl: window.location.href,
       })

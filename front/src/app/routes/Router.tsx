@@ -290,7 +290,7 @@ const getPageByRouteName: {
   },
   magicLinkInterstitial: () => <MagicLinkInterstitialPage />,
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
-  renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
+  renewJwt: () => <RenewExpiredLinkPage />,
   search: (route) => (
     <SearchPage
       route={route}

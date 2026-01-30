@@ -119,17 +119,14 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     if (ongoingOAuth.provider !== "email")
       throw errors.auth.otherRenewalNotSupported(ongoingOAuth.provider);
 
-    const user = await uow.userRepository.findByEmail(ongoingOAuth.email);
-    if (!user) throw errors.user.notFoundByEmail({ email: ongoingOAuth.email });
-
-    return this.#sendTokenRenewal(uow, user.email, {
+    return this.#sendTokenRenewal(uow, ongoingOAuth.email, {
       magicLink: await prepareEmailAuthCodeShortLinkMaker({
         uow,
         config: this.#config,
         generateEmailAuthCodeLoginUrl: this.#makeGenerateEmailAuthCodeUrl,
         shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       })({
-        email: user.email,
+        email: ongoingOAuth.email,
         now: this.#timeGateway.now(),
         state: ongoingOAuth.state,
         uri: frontRoutes.magicLinkInterstitial,

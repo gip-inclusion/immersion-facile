@@ -4,6 +4,7 @@ import {
   getJwtExpiredSinceInSeconds,
   handleJWTStringPossiblyContainingJsonError,
 } from "shared";
+import { RenewMagicLinkButton } from "src/app/components/auth/RenewMagicLinkButton";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
@@ -22,7 +23,17 @@ export const MagicLinkInterstitialPage = () => {
     return (
       <ErrorPage
         title="Lien expiré"
-        buttons={[HomeButton, ContactUsButton]}
+        buttons={[
+          HomeButton,
+          RenewMagicLinkButton({
+            renewExpiredJwtRequestDto: {
+              kind: "emailAuthCode",
+              state,
+              expiredJwt: code,
+            },
+          }),
+          ContactUsButton,
+        ]}
         error={{
           message: authExpiredMessage(
             `${Math.ceil(expiredSinceSeconds / 60)} minutes`,
@@ -41,7 +52,17 @@ export const MagicLinkInterstitialPage = () => {
         return (
           <ErrorPage
             title={title ?? "Erreur de connexion"}
-            buttons={[HomeButton, ContactUsButton]}
+            buttons={[
+              HomeButton,
+              RenewMagicLinkButton({
+                renewExpiredJwtRequestDto: {
+                  kind: "emailAuthCode",
+                  state,
+                  expiredJwt: code,
+                },
+              }),
+              ContactUsButton,
+            ]}
             error={{
               message: messageText,
               name: title ?? "Erreur de connexion",
