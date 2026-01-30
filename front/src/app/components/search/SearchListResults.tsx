@@ -13,6 +13,7 @@ import {
   type AppellationCode,
   domElementIds,
   hasSearchGeoParams,
+  isPhysicalWorkMode,
   isSuperEstablishment,
   type OfferDto,
 } from "shared";
@@ -61,6 +62,11 @@ export const SearchListResults = ({
     hasResults &&
     isLastPage &&
     isSearchWithAppellationAndGeoParams;
+  const isFullRemoteSearch =
+    searchParams.remoteWorkModes?.length === 1 &&
+    !isPhysicalWorkMode(searchParams.remoteWorkModes[0]);
+  const numberOfColumns = isFullRemoteSearch ? 4 : 6;
+
   return (
     <div className={fr.cx("fr-container", isExternal && "fr-mb-8w")}>
       <div
@@ -70,7 +76,12 @@ export const SearchListResults = ({
           !hasResults && "fr-grid-row--center",
         )}
       >
-        <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
+        <div
+          className={fr.cx(
+            "fr-col-12",
+            isFullRemoteSearch ? "fr-col-lg-12" : "fr-col-lg-8",
+          )}
+        >
           <div
             className={fr.cx(
               "fr-grid-row",
@@ -142,7 +153,11 @@ export const SearchListResults = ({
                   searchParams.appellationCodes?.[0];
                 return (
                   <div
-                    className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-6")}
+                    className={fr.cx(
+                      "fr-col-12",
+                      `fr-col-md-${numberOfColumns}`,
+                      `fr-col-lg-${numberOfColumns}`,
+                    )}
                     key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                   >
                     <SearchResult
@@ -189,7 +204,7 @@ export const SearchListResults = ({
             )}
           </div>
         </div>
-        {hasResults && (
+        {hasResults && !isFullRemoteSearch && (
           <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
             <SearchMiniMap
               kind="list"
