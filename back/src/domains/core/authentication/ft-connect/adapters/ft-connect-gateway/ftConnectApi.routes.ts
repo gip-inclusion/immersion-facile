@@ -21,13 +21,15 @@ const ftConnectNeededScopesForAllUsedApi = (clientId: string): string =>
     "api_peconnect-individuv1",
     "api_peconnect-conseillersv1",
     "api_peconnect-statutv1",
-    "api_peconnect-datenaissancev1",
-    "api_peconnect-coordonneesv1",
     "individu",
     "openid",
     "profile",
     "email",
     "statut",
+    "api_peconnect-datenaissancev1",
+    "datenaissance",
+    "api_peconnect-coordonneesv1",
+    "coordonnees",
   ].join(" ");
 
 type FtConnectRoutesConfig = {
