@@ -30,6 +30,7 @@ import {
   type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
+import { getOrCreatePhoneId } from "../../core/phone-number/phoneHelper";
 import type {
   AgencyRepository,
   AgencyRightOfUser,
@@ -53,7 +54,15 @@ export class PgAgencyRepository implements AgencyRepository {
     await this.#saveAgencyRights(agency.id, agency.usersRights);
   }
 
-  private insertAgency(agency: AgencyWithUsersRights, updatedAt?: DateString) {
+  private async insertAgency(
+    agency: AgencyWithUsersRights,
+    updatedAt?: DateString,
+  ) {
+    const phoneId = await getOrCreatePhoneId(
+      this.transaction,
+      agency.phoneNumber,
+    );
+
     return this.transaction
       .insertInto("agencies")
       .values(({ fn }) => ({
@@ -77,7 +86,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
-        phone_number: agency.phoneNumber,
+        phone_number_id: phoneId,
         status_justification: agency.statusJustification,
         delegation_info: agency.delegationAgencyInfo
           ? JSON.stringify(agency.delegationAgencyInfo)
@@ -100,6 +109,10 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async update(agency: PartialAgencyWithUsersRights): Promise<void> {
+    const phoneId = agency.phoneNumber
+      ? await getOrCreatePhoneId(this.transaction, agency.phoneNumber)
+      : undefined;
+
     await this.transaction
       .updateTable("agencies")
       .set(({ fn }) => ({
@@ -125,7 +138,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
         status_justification: agency.statusJustification,
-        phone_number: agency.phoneNumber,
+        phone_number_id: phoneId,
         delegation_info:
           agency.delegationAgencyInfo &&
           JSON.stringify(agency.delegationAgencyInfo),
@@ -384,6 +397,7 @@ export class PgAgencyRepository implements AgencyRepository {
         "agencies.refers_to_agency_id",
         "refered_agencies.id",
       )
+      .leftJoin("phone_numbers", "agencies.phone_number_id", "phone_numbers.id")
       .leftJoin("users__agencies", "agencies.id", "users__agencies.agency_id")
       .select(({ ref, fn }) => [
         jsonBuildObject({
@@ -419,7 +433,7 @@ export class PgAgencyRepository implements AgencyRepository {
           statusJustification: ref("agencies.status_justification"),
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),
-          phoneNumber: ref("agencies.phone_number"),
+          phoneNumber: ref("phone_numbers.phone_number"),
           delegationAgencyInfo: cast<DelegationAgencyInfo | null>(
             ref("agencies.delegation_info"),
           ),
@@ -449,7 +463,7 @@ export class PgAgencyRepository implements AgencyRepository {
           ),
         }).as("agency"),
       ])
-      .groupBy(["agencies.id", "refered_agencies.id"]);
+      .groupBy(["agencies.id", "refered_agencies.id", "phone_numbers.id"]);
   }
 
   #pgAgencyToAgencyWithRights(
@@ -460,6 +474,7 @@ export class PgAgencyRepository implements AgencyRepository {
           | "validatorEmails"
           | "acquisitionCampaign"
           | "acquisitionKeyword"
+          | "phoneNumber"
         > & {
           acquisitionCampaign: string | null;
           acquisitionKeyword: string | null;
@@ -468,6 +483,7 @@ export class PgAgencyRepository implements AgencyRepository {
             roles: AgencyRole[];
             isNotifiedByEmail: boolean;
           }[];
+          phoneNumber: string | null;
         })
       | undefined,
   ): AgencyWithUsersRights | undefined {
@@ -475,10 +491,15 @@ export class PgAgencyRepository implements AgencyRepository {
     const { acquisitionCampaign, acquisitionKeyword, usersRights, ...rest } =
       result;
 
+    if (!rest.phoneNumber) {
+      throw errors.phoneNumber.notFound();
+    }
+
     return {
       ...rest,
       ...(acquisitionCampaign ? { acquisitionCampaign } : {}),
       ...(acquisitionKeyword ? { acquisitionKeyword } : {}),
+      phoneNumber: rest.phoneNumber,
       usersRights: usersRights.reduce<AgencyUsersRights>(
         (acc, { isNotifiedByEmail, roles, userId }) => ({
           ...acc,

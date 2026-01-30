@@ -54,6 +54,7 @@ export interface Database {
   outbox_failures: OutboxFailures;
   outbox_publications: OutboxPublications;
   outbox: Outbox;
+  phone_numbers: PhoneNumbers;
   public_appellations_data: PublicAppellationsData;
   public_department_region: PublicDepartmentRegion;
   public_naf_classes_2008_old: PublicNafClasses2008; // TO DELETE
@@ -124,7 +125,8 @@ interface Discussions extends WithAcquisition {
   potential_beneficiary_first_name: string;
   potential_beneficiary_last_name: string;
   potential_beneficiary_email: string;
-  potential_beneficiary_phone: string;
+  potential_beneficiary_phone_id: number;
+  old__potential_beneficiary_phone: string | null;
   potential_beneficiary_resume_link: string | null;
   potential_beneficiary_experience_additional_information: string | null;
   potential_beneficiary_date_preferences: string;
@@ -211,7 +213,7 @@ interface Agencies extends WithAcquisition {
   covered_departments: Json;
   refers_to_agency_id: string | null;
   status_justification: string | null;
-  phone_number: string;
+  phone_number_id: number;
   contact_email: string;
   delegation_info: Json | null;
 }
@@ -334,7 +336,8 @@ interface Actors {
   first_name: string;
   last_name: string;
   email: string;
-  phone: string;
+  phone_id: number;
+  old__phone: string | null;
   signed_at: Timestamp | null;
   extra_fields: Json | null;
   id: Generated<number>;
@@ -390,7 +393,8 @@ interface ApiConsumers {
   contact_first_name: string;
   contact_last_name: string;
   contact_job: string;
-  contact_phone: string;
+  contact_phone_id: number;
+  old__contact_phone: string | null;
   rights: Generated<Json>;
   revoked_at: Timestamp | null;
   current_key_issued_at: Timestamp;
@@ -518,7 +522,8 @@ interface EstablishmentsUsers {
   user_id: string;
   role: string;
   job: string | null;
-  phone: string | null;
+  phone_id: number | null;
+  old__phone: string | null;
   should_receive_discussion_notifications: boolean;
   is_main_contact_by_phone: boolean | null;
   is_main_contact_in_person: boolean | null;
@@ -788,4 +793,11 @@ interface MarketingEstablishmentContacts {
       createdAt: DateTimeIsoString;
     }[]
   >;
+}
+
+interface PhoneNumbers {
+  id: Generated<number>;
+  phone_number: string;
+  verified_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
 }
