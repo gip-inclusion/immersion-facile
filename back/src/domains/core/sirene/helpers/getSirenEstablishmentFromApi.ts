@@ -1,20 +1,14 @@
-import {
-  errors,
-  type GetSiretRequestDto,
-  type SiretEstablishmentDto,
-} from "shared";
+import type { GetSiretRequestDto, SiretEstablishmentDto } from "shared";
 import type { SiretGateway } from "../ports/SiretGateway";
 
 export const getSiretEstablishmentFromApi = async (
   { siret, includeClosedEstablishments }: GetSiretRequestDto,
   siretGateway: SiretGateway,
-): Promise<SiretEstablishmentDto> => {
+): Promise<SiretEstablishmentDto | null> => {
   const siretEstablishment = await siretGateway.getEstablishmentBySiret(
     siret,
     includeClosedEstablishments,
   );
 
-  if (!siretEstablishment) throw errors.siretApi.notFound({ siret });
-
-  return siretEstablishment;
+  return siretEstablishment ?? null;
 };

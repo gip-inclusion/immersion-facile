@@ -51,12 +51,10 @@ describe("GetSiret", () => {
     });
   });
 
-  it("throws NotFoundError where siret not found", async () => {
+  it("return null where siret not found", async () => {
     const siret = "40440440440400";
-    await expectPromiseToFailWithError(
-      getSiret.execute({ siret }),
-      errors.siretApi.notFound({ siret }),
-    );
+
+    expectToEqual(await getSiret.execute({ siret }), null);
   });
 
   it("returns unavailable Api error if it gets a 429 from API", async () => {

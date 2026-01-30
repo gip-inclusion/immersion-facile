@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { formCompletionRoutes } from "shared";
+import { errors, formCompletionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
@@ -24,7 +24,10 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
 
   formCompletionRouter.getSiretInfo((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.getSiret.execute(req.params),
+      deps.useCases.getSiret.execute(req.params).then((result) => {
+        if (result) return result;
+        throw errors.siretApi.notFound({ siret: req.params.siret });
+      }),
     ),
   );
 
