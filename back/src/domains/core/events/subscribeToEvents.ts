@@ -132,6 +132,12 @@ const getUseCasesByTopics = (
     useCases.broadcastToFranceTravailOnConventionUpdates,
   ],
   ConventionCounsellorNameEdited: [],
+  ConventionBeneficiaryBirthdateEdited: [
+    extractConventionIdFromConvention(
+      useCases.broadcastToFranceTravailOnConventionUpdates,
+    ),
+    useCases.broadcastToPartnersOnConventionUpdates,
+  ],
 
   // Edge cases for immersion application.
 

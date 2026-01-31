@@ -117,5 +117,16 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.editBeneficiaryBirthdate(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.editBeneficiaryBirthdate.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   return expressRouter;
 };

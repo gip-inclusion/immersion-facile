@@ -15,6 +15,7 @@ import {
   type ConventionSupportedJwt,
   type DashboardUrlAndName,
   type DataWithPagination,
+  type EditBeneficiaryBirthdateRequestDto,
   type EditConventionCounsellorNameRequestDto,
   type FindSimilarConventionsParams,
   type FlatGetConventionsForAgencyUserParams,
@@ -70,6 +71,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public editConventionCounsellorNameResult$ = new Subject<void>();
 
+  public editBeneficiaryBirthdateResult$ = new Subject<void>();
+
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
   public shareConventionDraftByEmailResult$ = new Subject<void>();
@@ -109,6 +112,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return this.editConventionCounsellorNameResult$;
+  }
+
+  public editBeneficiaryBirthdate$(
+    _params: EditBeneficiaryBirthdateRequestDto,
+    _jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return this.editBeneficiaryBirthdateResult$;
   }
 
   public getApiConsumersByConvention$(

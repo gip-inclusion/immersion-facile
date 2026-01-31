@@ -359,6 +359,10 @@ export type TransferConventionToAgencyRequestDto = WithConventionId & {
 export type EditConventionCounsellorNameRequestDto = WithConventionId &
   WithOptionalFirstnameAndLastname;
 
+export type EditBeneficiaryBirthdateRequestDto = WithConventionId & {
+  updatedBeneficiaryBirthDate: string;
+};
+
 export type UpdateConventionRequestDto = {
   convention: ConventionDto;
 };

@@ -3,6 +3,7 @@ import { concatMap, filter, map, switchMap } from "rxjs";
 import type { ConventionReadDto } from "shared";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -130,7 +131,12 @@ const getConventionEpic: ConventionEpic = (
         conventionActionSlice.actions.transferConventionToAgencySucceeded.match(
           action,
         ) ||
-        conventionActionSlice.actions.editCounsellorNameSucceeded.match(action),
+        conventionActionSlice.actions.editCounsellorNameSucceeded.match(
+          action,
+        ) ||
+        editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateSucceeded.match(
+          action,
+        ),
     ),
     switchMap((action): Observable<ConventionAction> => {
       if ("updateStatusParams" in action.payload) {

@@ -8,6 +8,7 @@ import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
 import {
   conventionReadSchema,
+  editBeneficiaryBirthdateRequestSchema,
   editConventionCounsellorNameRequestSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
@@ -307,6 +308,20 @@ export const authenticatedConventionRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: broadcastFeedbackSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
+
+  editBeneficiaryBirthdate: defineRoute({
+    url: "/inclusion-connected/edit-beneficiary-birthdate",
+    method: "post",
+    requestBodySchema: editBeneficiaryBirthdateRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
