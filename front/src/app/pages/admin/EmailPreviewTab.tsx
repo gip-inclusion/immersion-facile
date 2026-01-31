@@ -333,6 +333,18 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     linkToAssessment: "http://fake.url",
   },
+  ASSESSMENT_DELETED_BENEFICIARY_NOTIFICATION: {
+    internshipKind: "immersion",
+    beneficiaryName: "BENEFICIARY_NAME",
+    conventionId: "CONVENTION_ID",
+  },
+  ASSESSMENT_DELETED_ESTABLISHMENT_NOTIFICATION: {
+    assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
+    beneficiaryName: "BENEFICIARY_NAME",
+    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
+    justification: "JUSTIFICATION",
+    internshipKind: "immersion",
+  },
   CANCELLED_CONVENTION_NOTIFICATION: {
     agencyName: "AGENCY",
     agencyLogoUrl: defaultEmailPreviewUrl,

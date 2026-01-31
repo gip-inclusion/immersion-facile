@@ -8,6 +8,7 @@ import type {
   ConventionDto,
   ConventionReadDto,
   ConventionStatus,
+  DeleteAssessmentRequestDto,
   EditConventionCounsellorNameRequestDto,
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
@@ -34,6 +35,7 @@ type VerificationActionModalParams = {
     verificationAction: VerificationActionWithModal,
     params:
       | UpdateConventionStatusRequestDto
+      | DeleteAssessmentRequestDto
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
       | EditConventionCounsellorNameRequestDto
@@ -65,6 +67,7 @@ const verificationActionsWithModal = [
   "REJECT",
   "CANCEL",
   "DEPRECATE",
+  "DELETE_ASSESSMENT",
   "TRANSFER",
   "RENEW",
   "EDIT_COUNSELLOR_NAME",
@@ -102,6 +105,7 @@ export const newStatusByVerificationAction = {
 } satisfies Record<
   Exclude<
     VerificationActionWithModal,
+    | "DELETE_ASSESSMENT"
     | "TRANSFER"
     | "RENEW"
     | "EDIT_COUNSELLOR_NAME"

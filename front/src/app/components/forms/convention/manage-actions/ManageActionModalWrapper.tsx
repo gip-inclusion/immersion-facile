@@ -7,6 +7,7 @@ import {
   type ConventionStatus,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
+  type DeleteAssessmentRequestDto,
   doesStatusNeedsJustification,
   doesStatusNeedsValidators,
   type EditConventionCounsellorNameRequestDto,
@@ -23,6 +24,7 @@ import {
 } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
 import { modalByAction } from "src/app/components/forms/convention/manage-actions/manageActionModals";
 import { BroadcastAgainModalContent } from "src/app/components/forms/convention/manage-actions/modals/BroadcastAgainModalContent";
+import { DeleteAssessmentModalContent } from "src/app/components/forms/convention/manage-actions/modals/DeleteAssessmentModalContent";
 import { EditCounsellorNameModalContent } from "src/app/components/forms/convention/manage-actions/modals/EditCounsellorNameModalContent";
 import { JustificationModalContent } from "src/app/components/forms/convention/manage-actions/modals/JustificationModalContent";
 import { MarkConventionAsHandledModalContent } from "src/app/components/forms/convention/manage-actions/modals/MarkConventionAsHandledModalContent";
@@ -41,6 +43,7 @@ export type ModalWrapperProps = {
     verificationAction: VerificationActionWithModal,
     params:
       | UpdateConventionStatusRequestDto
+      | DeleteAssessmentRequestDto
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
       | EditConventionCounsellorNameRequestDto
@@ -80,6 +83,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   const showFillAssessmentInfoModal =
     verificationAction === "FILL_ASSESSMENT_INFO";
   const showSignModal = verificationAction === "SIGN";
+  const showDeleteAssessmentModal = verificationAction === "DELETE_ASSESSMENT";
   const showJustificationModal =
     verificationAction !== "TRANSFER" &&
     verificationAction !== "RENEW" &&
@@ -87,6 +91,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     verificationAction !== "BROADCAST_AGAIN" &&
     verificationAction !== "MARK_AS_HANDLED" &&
     verificationAction !== "FILL_ASSESSMENT_INFO" &&
+    verificationAction !== "DELETE_ASSESSMENT" &&
     verificationAction !== "SIGN" &&
     doesStatusNeedsJustification(
       newStatusByVerificationAction[verificationAction],
@@ -98,6 +103,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     verificationAction !== "BROADCAST_AGAIN" &&
     verificationAction !== "MARK_AS_HANDLED" &&
     verificationAction !== "FILL_ASSESSMENT_INFO" &&
+    verificationAction !== "DELETE_ASSESSMENT" &&
     verificationAction !== "SIGN" &&
     doesStatusNeedsValidators(
       initialStatus,
@@ -106,6 +112,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
 
   if (
     !showTransferModal &&
+    !showDeleteAssessmentModal &&
     !showJustificationModal &&
     !showValidatorModal &&
     !showRenewModal &&
@@ -125,6 +132,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     >
       {match({
         showTransferModal,
+        showDeleteAssessmentModal,
         showJustificationModal,
         showValidatorModal,
         showRenewModal,
@@ -141,10 +149,23 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
           verificationAction === "BROADCAST_AGAIN" ||
           verificationAction === "MARK_AS_HANDLED" ||
           verificationAction === "FILL_ASSESSMENT_INFO" ||
+          verificationAction === "DELETE_ASSESSMENT" ||
           verificationAction === "SIGN"
             ? null
             : newStatusByVerificationAction[verificationAction],
       })
+        .with(
+          {
+            showDeleteAssessmentModal: true,
+          },
+          () => (
+            <DeleteAssessmentModalContent
+              convention={convention}
+              onSubmit={(params) => onSubmit(verificationAction, params)}
+              closeModal={closeModal}
+            />
+          ),
+        )
         .with(
           {
             showEditCounsellorNameModal: true,

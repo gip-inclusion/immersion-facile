@@ -1,5 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { AssessmentDto, ConventionId, LegacyAssessmentDto } from "shared";
+import type {
+  AssessmentDto,
+  ConventionId,
+  ConventionSupportedJwt,
+  DeleteAssessmentRequestDto,
+  LegacyAssessmentDto,
+} from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -32,6 +38,30 @@ export const assessmentSlice = createSlice({
       state.isLoading = false;
     },
     creationFailed: (state, _action: PayloadActionWithFeedbackTopicError) => {
+      state.isLoading = false;
+    },
+    deleteAssessmentRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        params: DeleteAssessmentRequestDto;
+        jwt: ConventionSupportedJwt;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    deleteAssessmentSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        conventionId: ConventionId;
+        jwt: ConventionSupportedJwt;
+      }>,
+    ) => {
+      state.isLoading = false;
+    },
+    deleteAssessmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
     },
     getAssessmentRequested: (

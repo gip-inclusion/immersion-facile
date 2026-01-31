@@ -190,4 +190,26 @@ describe("PgAssessmentRepository", () => {
       );
     });
   });
+
+  describe("delete", () => {
+    it("deletes the assessment of the given conventionId", async () => {
+      await assessmentRepository.save(minimalAssessment);
+
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        ),
+        minimalAssessment,
+      );
+
+      await assessmentRepository.delete(minimalAssessment.conventionId);
+
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        ),
+        undefined,
+      );
+    });
+  });
 });

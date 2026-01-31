@@ -4,6 +4,7 @@ import {
   type ConventionId,
   type ConventionMagicLinkRoutes,
   type ConventionSupportedJwt,
+  type DeleteAssessmentRequestDto,
   errors,
   type LegacyAssessmentDto,
   type WithConventionId,
@@ -41,6 +42,26 @@ export class HttpAssessmentGateway implements AssessmentGateway {
             .with({ status: 201 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 403) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public deleteAssessment$(
+    params: DeleteAssessmentRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .deleteAssessment({
+          headers: { authorization: jwt },
+          body: params,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 204 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
