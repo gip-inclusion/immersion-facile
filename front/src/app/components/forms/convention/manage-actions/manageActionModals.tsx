@@ -108,6 +108,25 @@ const {
   close: closeDeprecateModal,
 } = createFormModal(createDeprecatedModalParams);
 
+const createCounsellorModalParams = {
+  id: domElementIds.manageConvention.counsellorModal,
+  isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.counsellorModalForm,
+  submitButton: {
+    id: domElementIds.manageConvention.counsellorModalSubmitButton,
+    children: "Pré-valider la demande",
+  },
+  cancelButton: {
+    id: domElementIds.manageConvention.counsellorModalCancelButton,
+    children: "Annuler et revenir en arrière",
+  },
+};
+const {
+  Component: CounsellorModal,
+  open: openCounsellorModal,
+  close: closeCounsellorModal,
+} = createFormModal(createCounsellorModalParams);
+
 const createValidatorModalParams = {
   id: domElementIds.manageConvention.validatorModal,
   isOpenedByDefault: false,
@@ -256,10 +275,10 @@ export const modalByAction = (
       createModalParams: createDeleteAssessmentModalParams,
     },
     ACCEPT_COUNSELLOR: {
-      modal: ValidatorModal,
-      openModal: openValidatorModal,
-      closeModal: closeValidatorModal,
-      createModalParams: createValidatorModalParams,
+      modal: CounsellorModal,
+      openModal: openCounsellorModal,
+      closeModal: closeCounsellorModal,
+      createModalParams: createCounsellorModalParams,
     },
     ACCEPT_VALIDATOR: {
       modal: ValidatorModal,
