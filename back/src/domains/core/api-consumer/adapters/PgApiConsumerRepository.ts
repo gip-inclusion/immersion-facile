@@ -10,7 +10,6 @@ import {
   type DateString,
   type DateTimeIsoString,
   type Email,
-  errors,
   eventToRightName,
   type WebhookSubscription,
 } from "shared";
@@ -22,7 +21,7 @@ import {
 } from "../../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";
-import { getOrCreatePhoneId } from "../../phone-number/phoneHelper";
+import { getOrCreatePhoneIds } from "../../phone-number/adapters/pgPhoneHelper";
 import type {
   ApiConsumerRepository,
   GetApiConsumerFilters,
@@ -51,8 +50,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
     const result = await this.#pgApiConsumerQueryBuild()
       .where("c.id", "=", id)
-      .executeTakeFirst()
-      .then();
+      .executeTakeFirst();
 
     return result && this.#rawPgToApiConsumer(result.raw_api_consumer);
   }
@@ -140,10 +138,9 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       rights,
     );
 
-    const phoneId = await getOrCreatePhoneId(
-      this.#transaction,
-      rest.contact.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.#transaction, [rest.contact.phone])
+    )[rest.contact.phone];
 
     const values = {
       id: rest.id,
@@ -227,10 +224,6 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       ) as ApiConsumerRights,
     };
 
-    if (!restWithEmptySubscription.contact.phone) {
-      throw errors.phoneNumber.notFound();
-    }
-
     const apiConsumer: ApiConsumer = {
       ...restWithEmptySubscription,
       contact: {
@@ -260,7 +253,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     return this.#transaction
       .selectFrom("api_consumers as c")
       .leftJoin("api_consumers_subscriptions as s", "s.consumer_id", "c.id")
-      .leftJoin("phone_numbers", "c.contact_phone_id", "phone_numbers.id")
+      .innerJoin("phone_numbers", "c.contact_phone_id", "phone_numbers.id")
       .select((eb) =>
         jsonStripNulls(
           jsonBuildObject({
@@ -304,6 +297,6 @@ type PgRawConsumerData = {
   expirationDate: DateString;
   revokedAt?: DateTimeIsoString;
   currentKeyIssuedAt: DateTimeIsoString;
-  contact: Omit<ApiConsumerContact, "phone"> & { phone: string | undefined };
+  contact: ApiConsumerContact;
   subscriptions: WebhookSubscription[];
 };
