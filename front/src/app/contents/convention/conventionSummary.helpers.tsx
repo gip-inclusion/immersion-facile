@@ -25,6 +25,7 @@ import {
   type EditBeneficiaryBirthdateRequestDto,
   editBeneficiaryBirthdateRequestSchema,
   getFormattedFirstnameAndLastname,
+  type InternshipKind,
   isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
@@ -996,11 +997,15 @@ export const editBeneficiaryBirthdateModal = createModal({
 export const EditBeneficiaryBirthdateModalWrapper = ({
   conventionId,
   currentBirthdate,
+  dateStart,
+  internshipKind,
   jwt,
   feedbackTopic,
 }: {
   conventionId: string;
   currentBirthdate: DateString;
+  dateStart: DateString;
+  internshipKind: InternshipKind;
   jwt: ConnectedUserJwt;
   feedbackTopic: "edit-beneficiary-birthdate";
 }) => {
@@ -1013,7 +1018,12 @@ export const EditBeneficiaryBirthdateModalWrapper = ({
     useForm<EditBeneficiaryBirthdateRequestDto>({
       resolver: zodResolver(editBeneficiaryBirthdateRequestSchema),
       mode: "onTouched",
-      defaultValues: { conventionId, updatedBeneficiaryBirthDate: "" },
+      defaultValues: {
+        conventionId,
+        updatedBeneficiaryBirthDate: "",
+        dateStart,
+        internshipKind,
+      },
     });
 
   const onFormSubmit: SubmitHandler<EditBeneficiaryBirthdateRequestDto> = (

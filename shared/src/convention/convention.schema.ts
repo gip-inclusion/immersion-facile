@@ -245,10 +245,39 @@ export const editConventionCounsellorNameRequestSchema: ZodSchemaWithInputMatchi
   );
 
 export const editBeneficiaryBirthdateRequestSchema: ZodSchemaWithInputMatchingOutput<EditBeneficiaryBirthdateRequestDto> =
-  z.object({
-    conventionId: conventionIdSchema,
-    updatedBeneficiaryBirthDate: makeDateStringSchema(),
-  });
+  z
+    .object({
+      conventionId: conventionIdSchema,
+      updatedBeneficiaryBirthDate: makeDateStringSchema(),
+      dateStart: makeDateStringSchema(),
+      internshipKind: z.enum(internshipKinds, {
+        error: localization.invalidEnum,
+      }),
+    })
+    .superRefine((data, ctx) => {
+      const beneficiaryAgeAtConventionStart = differenceInYears(
+        new Date(data.dateStart),
+        new Date(data.updatedBeneficiaryBirthDate),
+      );
+      const addIssue = (message: string, _path: string) =>
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message,
+          path: ["updatedBeneficiaryBirthDate"],
+        });
+      if (data.internshipKind === "mini-stage-cci")
+        addIssueIfAgeLessThanMinimumAge(
+          addIssue,
+          beneficiaryAgeAtConventionStart,
+          MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
+        );
+      if (data.internshipKind === "immersion")
+        addIssueIfAgeLessThanMinimumAge(
+          addIssue,
+          beneficiaryAgeAtConventionStart,
+          IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
+        );
+    });
 
 export const renewedSchema = z.object({
   from: conventionIdSchema,

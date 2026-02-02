@@ -71,6 +71,8 @@ describe("EditBeneficiaryBirthdate", () => {
           {
             conventionId: nonExistentConventionId,
             updatedBeneficiaryBirthDate: newBirthdate,
+            dateStart: convention.dateStart,
+            internshipKind: convention.internshipKind,
           },
           backOfficeAdmin,
         ),
@@ -93,6 +95,8 @@ describe("EditBeneficiaryBirthdate", () => {
           {
             conventionId,
             updatedBeneficiaryBirthDate: newBirthdate,
+            dateStart: conventionInReview.dateStart,
+            internshipKind: conventionInReview.internshipKind,
           },
           backOfficeAdmin,
         ),
@@ -112,6 +116,8 @@ describe("EditBeneficiaryBirthdate", () => {
           {
             conventionId,
             updatedBeneficiaryBirthDate: newBirthdate,
+            dateStart: convention.dateStart,
+            internshipKind: convention.internshipKind,
           },
           nonAdminUser,
         ),
@@ -130,6 +136,8 @@ describe("EditBeneficiaryBirthdate", () => {
         {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
+          dateStart: convention.dateStart,
+          internshipKind: convention.internshipKind,
         },
         backOfficeAdmin,
       );

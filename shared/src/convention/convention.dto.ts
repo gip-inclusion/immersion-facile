@@ -361,6 +361,8 @@ export type EditConventionCounsellorNameRequestDto = WithConventionId &
 
 export type EditBeneficiaryBirthdateRequestDto = WithConventionId & {
   updatedBeneficiaryBirthDate: string;
+  dateStart: DateString;
+  internshipKind: InternshipKind;
 };
 
 export type UpdateConventionRequestDto = {
