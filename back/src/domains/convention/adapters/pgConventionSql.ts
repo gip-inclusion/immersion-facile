@@ -286,7 +286,7 @@ const createConventionSelection = (
 };
 
 // Function to create the common joins for both query builders
-const withActorsAndAppellationsAndPartnerPeJoin = <
+const withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber = <
   QB extends SelectQueryBuilder<Database, any, any>,
 >(
   builder: QB,
@@ -352,7 +352,7 @@ export const createConventionQueryBuilder = (
   withAgencyJoin: boolean,
 ): ConventionQueryBuilder =>
   createConventionSelection(
-    withActorsAndAppellationsAndPartnerPeJoin(
+    withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber(
       transaction.selectFrom("conventions"),
     ),
   ).$if(withAgencyJoin, (qb) =>
@@ -379,7 +379,8 @@ export const createConventionQueryBuilderForAgencyUser = ({
       sql<boolean>`users__agencies.roles ? 'agency-viewer'`,
     ]));
 
-  const builderWithJoins = withActorsAndAppellationsAndPartnerPeJoin(builder);
+  const builderWithJoins =
+    withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber(builder);
   return createConventionSelection(builderWithJoins).select(
     sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"),
   );
