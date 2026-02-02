@@ -1,11 +1,13 @@
-import type {
-  Beneficiary,
-  FederatedIdentityProvider,
-  FtConnectToken,
-  FtExternalId,
-  IdToken,
-  InternshipKind,
-  PhoneNumber,
+import {
+  type Beneficiary,
+  type DateString,
+  dateRegExp,
+  type FederatedIdentityProvider,
+  type FtConnectToken,
+  type FtExternalId,
+  type IdToken,
+  type InternshipKind,
+  type PhoneNumber,
 } from "shared";
 import type { EntityFromDto } from "../../../../../utils/EntityFromDto";
 import type { FtConnectImmersionAdvisorDto } from "./FtConnectAdvisor.dto";
@@ -52,3 +54,11 @@ export const toPartialConventionDtoWithFtIdentity = (
   fedIdProvider: "peConnect",
   fedIdToken: ftConnectIdToken,
 });
+
+export const ftconnectBeneficiaryBirthdateToIfBeneficiaryBirthdate = (
+  birthdate: DateString,
+): DateString => {
+  const dateOnly = birthdate.split("T")[0];
+  if (!dateOnly.match(dateRegExp)) throw new Error("Invalid date value");
+  return dateOnly;
+};
