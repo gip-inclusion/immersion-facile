@@ -212,7 +212,7 @@ interface Agencies extends WithAcquisition {
   covered_departments: Json;
   refers_to_agency_id: string | null;
   status_justification: string | null;
-  phone_number_id: number;
+  phone_id: number;
   contact_email: string;
   delegation_info: Json | null;
 }

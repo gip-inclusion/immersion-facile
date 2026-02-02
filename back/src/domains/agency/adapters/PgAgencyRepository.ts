@@ -85,7 +85,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
-        phone_number_id: phoneId,
+        phone_id: phoneId,
         status_justification: agency.statusJustification,
         delegation_info: agency.delegationAgencyInfo
           ? JSON.stringify(agency.delegationAgencyInfo)
@@ -139,7 +139,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
         status_justification: agency.statusJustification,
-        phone_number_id: phoneId,
+        phone_id: phoneId,
         delegation_info:
           agency.delegationAgencyInfo &&
           JSON.stringify(agency.delegationAgencyInfo),
@@ -398,11 +398,7 @@ export class PgAgencyRepository implements AgencyRepository {
         "agencies.refers_to_agency_id",
         "refered_agencies.id",
       )
-      .innerJoin(
-        "phone_numbers",
-        "agencies.phone_number_id",
-        "phone_numbers.id",
-      )
+      .innerJoin("phone_numbers", "agencies.phone_id", "phone_numbers.id")
       .leftJoin("users__agencies", "agencies.id", "users__agencies.agency_id")
       .select(({ ref, fn }) => [
         jsonBuildObject({
