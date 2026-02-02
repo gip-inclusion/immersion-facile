@@ -82,6 +82,7 @@ describe("RenewApiConsumerKey", () => {
         generateApiConsumerJwtTestFn({
           id: apiConsumer.id,
           version: 1,
+          iat: now.getTime() / 1000,
         }),
       );
 
@@ -173,6 +174,7 @@ describe("RenewApiConsumerKey", () => {
         generateApiConsumerJwtTestFn({
           id: revokedConsumer.id,
           version: 1,
+          iat: now.getTime() / 1000,
         }),
       );
 

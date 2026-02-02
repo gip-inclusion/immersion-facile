@@ -6,8 +6,11 @@ import {
 import type { GenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import type { GenerateApiConsumerJwt } from "../domains/core/jwt";
 
-export const generateApiConsumerJwtTestFn: GenerateApiConsumerJwt = ({ id }) =>
-  `FAKE-API-CONSUMER-JWT-${id}`;
+export const generateApiConsumerJwtTestFn: GenerateApiConsumerJwt = ({
+  id,
+  iat,
+  version,
+}) => `FAKE-API-CONSUMER-JWT-${id}-version-${version}-iat-${iat}`;
 
 export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
   email,
