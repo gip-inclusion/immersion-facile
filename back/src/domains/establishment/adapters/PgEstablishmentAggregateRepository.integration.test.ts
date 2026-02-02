@@ -3819,6 +3819,25 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
           title: "remove optional values",
         },
+        {
+          originalEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentCustomizedName(
+              "Activités des agences de travail temporaire",
+            )
+            .withUserRights([osefUserRight])
+            .build(),
+          updatedEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentCustomizedName(undefined)
+            .withUserRights([
+              {
+                ...osefUserRight,
+                phone: "+33600000000",
+              },
+            ])
+            .withEstablishmentUpdatedAt(updatedAt)
+            .build(),
+          title: "update user right phone number",
+        },
       ] satisfies {
         originalEstablishment: EstablishmentAggregate;
         updatedEstablishment: EstablishmentAggregate;
