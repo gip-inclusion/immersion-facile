@@ -5,7 +5,6 @@ import {
   errors,
   HTTP_STATUS,
   queryParamsAsString,
-  toDateUTCString,
   type WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -20,6 +19,7 @@ import {
 } from "../../../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../../../utils/notifyTeam";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
+import { ftconnectBeneficiaryBirthdateToIfBeneficiaryBirthdate } from "../../dto/FtConnect.dto";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
 import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import { externalAccessTokenSchema } from "../../port/AccessToken.schema";
@@ -329,8 +329,8 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         logger,
       });
       log.success({});
-      return toDateUTCString(
-        new Date(externalFtConnectBirthDate.dateDeNaissance),
+      return ftconnectBeneficiaryBirthdateToIfBeneficiaryBirthdate(
+        externalFtConnectBirthDate.dateDeNaissance,
       );
     } catch (error) {
       errorChecker(
