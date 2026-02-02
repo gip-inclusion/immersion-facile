@@ -21,7 +21,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // Step 2: Add foreign key columns to all tables with phone numbers
   const tablesToMigrate = [
     { table: "discussions", column: "potential_beneficiary_phone_id" },
-    { table: "agencies", column: "phone_number_id" },
+    { table: "agencies", column: "phone_id" },
     { table: "actors", column: "phone_id" },
     { table: "api_consumers", column: "contact_phone_id" },
     { table: "establishments__users", column: "phone_id" },
@@ -75,7 +75,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
     -- Update foreign keys in agencies
     UPDATE agencies a
-    SET phone_number_id = pn.id
+    SET phone_id = pn.id
     FROM ${phoneNumbersTable} pn
     WHERE a.phone_number = pn.phone_number
       AND a.phone_number IS NOT NULL
@@ -150,7 +150,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
   // Step 8: Add indexes on foreign key columns for performance
   pgm.createIndex("discussions", "potential_beneficiary_phone_id");
-  pgm.createIndex("agencies", "phone_number_id");
+  pgm.createIndex("agencies", "phone_id");
   pgm.createIndex("actors", "phone_id");
   pgm.createIndex("api_consumers", "contact_phone_id");
   pgm.createIndex("establishments__users", "phone_id");
@@ -190,14 +190,14 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropIndex("establishments__users", "phone_id");
   pgm.dropIndex("api_consumers", "contact_phone_id");
   pgm.dropIndex("actors", "phone_id");
-  pgm.dropIndex("agencies", "phone_number_id");
+  pgm.dropIndex("agencies", "phone_id");
   pgm.dropIndex("discussions", "potential_beneficiary_phone_id");
 
   // Step 4: Drop foreign key columns from all tables
   pgm.dropColumn("establishments__users", "phone_id");
   pgm.dropColumn("api_consumers", "contact_phone_id");
   pgm.dropColumn("actors", "phone_id");
-  pgm.dropColumn("agencies", "phone_number_id");
+  pgm.dropColumn("agencies", "phone_id");
   pgm.dropColumn("discussions", "potential_beneficiary_phone_id");
 
   // Step 5: Rename old phone number column
