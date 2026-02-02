@@ -1136,6 +1136,11 @@ Tél : ${beneficiaryPhone}`,
             url: searchPageUrl,
           },
         ],
+        highlight: {
+          kind: "info",
+          content:
+            "Si vous avez signé une convention avec l'entreprise entre-temps, vous pouvez ne pas tenir compte de ce message.",
+        },
         subContent: `
         N'hésitez pas à nous contacter si vous avez des questions.
 
