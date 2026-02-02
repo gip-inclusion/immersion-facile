@@ -30,7 +30,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
-import { getOrCreatePhoneId } from "../../core/phone-number/phoneHelper";
+import { getOrCreatePhoneIds } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { OfferEntity } from "../entities/OfferEntity";
@@ -626,24 +626,24 @@ export class PgEstablishmentAggregateRepository
     const { userRights } = aggregate;
     if (!userRights.length) return;
 
-    const phoneIds = await Promise.all(
-      userRights.map((userRight) => {
-        if (!userRight.phone) {
-          return null;
-        }
-        return getOrCreatePhoneId(this.transaction, userRight.phone);
-      }),
+    const phonesToCreate = userRights
+      .map((userRight) => userRight.phone)
+      .filter((phone) => phone !== undefined);
+
+    const phoneIds = await getOrCreatePhoneIds(
+      this.transaction,
+      phonesToCreate,
     );
 
     return this.transaction
       .insertInto("establishments__users")
       .values(
-        userRights.map((userRight, index) => ({
+        userRights.map((userRight) => ({
           siret: aggregate.establishment.siret,
           user_id: userRight.userId,
           role: userRight.role,
           job: userRight.job,
-          phone_id: phoneIds[index],
+          phone_id: userRight.phone ? phoneIds[userRight.phone] : null,
           should_receive_discussion_notifications:
             userRight.shouldReceiveDiscussionNotifications,
           is_main_contact_by_phone: userRight.isMainContactByPhone,

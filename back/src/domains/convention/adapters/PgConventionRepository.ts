@@ -17,7 +17,7 @@ import {
   falsyToNull,
   type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { getOrCreatePhoneId } from "../../core/phone-number/phoneHelper";
+import { getOrCreatePhoneIds } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
 
@@ -325,10 +325,9 @@ export class PgConventionRepository implements ConventionRepository {
     beneficiary: Beneficiary<InternshipKind>,
   ): Promise<number> {
     const studentFields = getStudentFields(beneficiary);
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      beneficiary.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [beneficiary.phone])
+    )[beneficiary.phone];
 
     const result = await this.transaction
       .insertInto("actors")
@@ -361,10 +360,11 @@ export class PgConventionRepository implements ConventionRepository {
   async #insertBeneficiaryCurrentEmployer(
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
   ) {
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      beneficiaryCurrentEmployer.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [
+        beneficiaryCurrentEmployer.phone,
+      ])
+    )[beneficiaryCurrentEmployer.phone];
 
     const result = await this.transaction
       .insertInto("actors")
@@ -391,7 +391,9 @@ export class PgConventionRepository implements ConventionRepository {
   async #insertSimpleActor(
     actor: EstablishmentRepresentative | BeneficiaryRepresentative,
   ) {
-    const phoneId = await getOrCreatePhoneId(this.transaction, actor.phone);
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [actor.phone])
+    )[actor.phone];
 
     const result = await this.transaction
       .insertInto("actors")
@@ -412,10 +414,9 @@ export class PgConventionRepository implements ConventionRepository {
   async #insertEstablishmentTutor(
     establishmentTutor: EstablishmentTutor,
   ): Promise<number> {
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      establishmentTutor.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [establishmentTutor.phone])
+    )[establishmentTutor.phone];
 
     const result = await this.transaction
       .insertInto("actors")
@@ -472,10 +473,9 @@ export class PgConventionRepository implements ConventionRepository {
     beneficiary: Beneficiary<InternshipKind>,
   ) {
     const studentFields = getStudentFields(beneficiary);
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      beneficiary.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [beneficiary.phone])
+    )[beneficiary.phone];
 
     await this.transaction
       .updateTable("actors")
@@ -508,10 +508,11 @@ export class PgConventionRepository implements ConventionRepository {
     id: ConventionId,
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
   ): Promise<number> {
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      beneficiaryCurrentEmployer.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [
+        beneficiaryCurrentEmployer.phone,
+      ])
+    )[beneficiaryCurrentEmployer.phone];
 
     const result = await this.transaction
       .updateTable("actors")
@@ -544,10 +545,11 @@ export class PgConventionRepository implements ConventionRepository {
     id: ConventionId,
     beneficiaryRepresentative: BeneficiaryRepresentative,
   ) {
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      beneficiaryRepresentative.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [
+        beneficiaryRepresentative.phone,
+      ])
+    )[beneficiaryRepresentative.phone];
 
     const result = await this.transaction
       .updateTable("actors")
@@ -632,10 +634,11 @@ export class PgConventionRepository implements ConventionRepository {
     conventionId: ConventionId,
     establishmentRepresentative: EstablishmentRepresentative,
   ): Promise<number> {
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      establishmentRepresentative.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [
+        establishmentRepresentative.phone,
+      ])
+    )[establishmentRepresentative.phone];
 
     const result = await this.transaction
       .updateTable("actors")
@@ -663,10 +666,9 @@ export class PgConventionRepository implements ConventionRepository {
     establishmentTutor: EstablishmentTutor,
     signedAt?: string, // in case establishment tutor is also establishment representative
   ): Promise<number> {
-    const phoneId = await getOrCreatePhoneId(
-      this.transaction,
-      establishmentTutor.phone,
-    );
+    const phoneId = (
+      await getOrCreatePhoneIds(this.transaction, [establishmentTutor.phone])
+    )[establishmentTutor.phone];
 
     const result = await this.transaction
       .updateTable("actors")
