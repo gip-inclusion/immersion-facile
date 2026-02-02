@@ -116,10 +116,6 @@ const createCounsellorModalParams = {
     id: domElementIds.manageConvention.counsellorModalSubmitButton,
     children: "Pré-valider la demande",
   },
-  cancelButton: {
-    id: domElementIds.manageConvention.counsellorModalCancelButton,
-    children: "Annuler et revenir en arrière",
-  },
 };
 const {
   Component: CounsellorModal,
@@ -134,10 +130,6 @@ const createValidatorModalParams = {
   submitButton: {
     id: domElementIds.manageConvention.validatorModalSubmitButton,
     children: "Valider la demande",
-  },
-  cancelButton: {
-    id: domElementIds.manageConvention.validatorModalCancelButton,
-    children: "Annuler et revenir en arrière",
   },
 };
 const {
