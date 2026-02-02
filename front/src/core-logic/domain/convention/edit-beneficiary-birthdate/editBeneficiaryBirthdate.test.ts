@@ -28,6 +28,8 @@ describe("editBeneficiaryBirthdate slice", () => {
       editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateRequested({
         conventionId: "fake-convention-id",
         updatedBeneficiaryBirthDate: "1995-03-15",
+        dateStart: "2025-06-01",
+        internshipKind: "immersion",
         jwt: "fake-jwt",
         feedbackTopic: "edit-beneficiary-birthdate",
       }),
@@ -59,6 +61,8 @@ describe("editBeneficiaryBirthdate slice", () => {
       editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateRequested({
         conventionId: "fake-convention-id",
         updatedBeneficiaryBirthDate: "1995-03-15",
+        dateStart: "2025-06-01",
+        internshipKind: "immersion",
         jwt: "fake-jwt",
         feedbackTopic: "edit-beneficiary-birthdate",
       }),

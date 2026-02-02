@@ -32,6 +32,8 @@ const editBeneficiaryBirthdateEpic: EditBeneficiaryBirthdateEpic = (
             conventionId: action.payload.conventionId,
             updatedBeneficiaryBirthDate:
               action.payload.updatedBeneficiaryBirthDate,
+            dateStart: action.payload.dateStart,
+            internshipKind: action.payload.internshipKind,
           },
           action.payload.jwt,
         )

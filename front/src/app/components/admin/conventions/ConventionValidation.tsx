@@ -261,6 +261,8 @@ export const ConventionValidation = ({
         <EditBeneficiaryBirthdateModalWrapper
           conventionId={convention.id}
           currentBirthdate={convention.signatories.beneficiary.birthdate}
+          dateStart={convention.dateStart}
+          internshipKind={convention.internshipKind}
           jwt={jwtParams.jwt}
           feedbackTopic="edit-beneficiary-birthdate"
         />
