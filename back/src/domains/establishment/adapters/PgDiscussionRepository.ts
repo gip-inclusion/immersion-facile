@@ -32,7 +32,7 @@ import {
   type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
-import { getOrCreatePhoneId } from "../../core/phone-number/phoneHelper";
+import { getOrCreatePhoneIds } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type {
   DiscussionRepository,
   GetDiscussionIdsParams,
@@ -75,9 +75,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     return executeGetDiscussions(this.transaction, {
       filters: {},
       limit: 5000,
-    }).then(
-      async (results) => await makeDiscussionDtoFromPgDiscussion(results),
-    );
+    }).then((results) => makeDiscussionDtoFromPgDiscussion(results));
   }
 
   async __test_setDiscussionsStats(stats: DiscussionsStat[]) {
@@ -330,7 +328,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       id: discussionId,
     });
 
-    const discussions = await makeDiscussionDtoFromPgDiscussion(results);
+    const discussions = makeDiscussionDtoFromPgDiscussion(results);
     return discussions.at(0);
   }
 
@@ -338,7 +336,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     params: GetDiscussionsParams,
   ): Promise<DiscussionDto[]> {
     return executeGetDiscussions(this.transaction, params).then(
-      async (results) => await makeDiscussionDtoFromPgDiscussion(results),
+      async (results) => makeDiscussionDtoFromPgDiscussion(results),
     );
   }
 
@@ -423,7 +421,6 @@ export class PgDiscussionRepository implements DiscussionRepository {
           "discussions.business_name",
           "discussions.potential_beneficiary_first_name",
           "discussions.potential_beneficiary_last_name",
-          "discussions.potential_beneficiary_phone_id",
           "phone_numbers.phone_number",
           "pad.ogr_appellation",
           "pad.libelle_appellation_long",
@@ -431,7 +428,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
           "prd.libelle_rome",
         ])
         .select(({ ref, fn }) => [
-          ref("discussions.id").as("id"), // ✅ Use ref() instead of string
+          ref("discussions.id").as("id"),
           jsonBuildObject({
             romeCode: ref("prd.code_rome"),
             romeLabel: ref("prd.libelle_rome"),
@@ -442,10 +439,10 @@ export class PgDiscussionRepository implements DiscussionRepository {
           sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
             "createdAt",
           ),
-          ref("discussions.city").as("city"), // ✅
-          ref("discussions.siret").as("siret"), // ✅
-          ref("discussions.kind").as("kind"), // ✅
-          ref("discussions.status").as("status"), // ✅
+          ref("discussions.city").as("city"),
+          ref("discussions.siret").as("siret"),
+          ref("discussions.kind").as("kind"),
+          ref("discussions.status").as("status"),
           ref("discussions.immersion_objective").as("immersionObjective"),
           jsonBuildObject({
             firstName: ref("potential_beneficiary_first_name"),
@@ -545,7 +542,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 
   public async insert(discussion: DiscussionDto) {
-    const discussionToInsert = await discussionToPg(
+    const discussionToInsert = await discussionToPgAndPhoneInsert(
       this.transaction,
       discussion,
     );
@@ -559,7 +556,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 
   public async update(discussion: DiscussionDto) {
-    const discussionToUpdate = await discussionToPg(
+    const discussionToUpdate = await discussionToPgAndPhoneInsert(
       this.transaction,
       discussion,
     );
@@ -624,14 +621,15 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 }
 
-const discussionToPg = async (
+const discussionToPgAndPhoneInsert = async (
   transaction: KyselyDb,
   discussion: DiscussionDto,
 ): Promise<InsertObject<Database, "discussions">> => {
-  const phone_id = await getOrCreatePhoneId(
-    transaction,
-    discussion.potentialBeneficiary.phone,
-  );
+  const phoneId = (
+    await getOrCreatePhoneIds(transaction, [
+      discussion.potentialBeneficiary.phone,
+    ])
+  )[discussion.potentialBeneficiary.phone];
 
   return {
     id: discussion.id,
@@ -646,7 +644,7 @@ const discussionToPg = async (
     potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
     kind: discussion.kind,
     immersion_objective: discussion.potentialBeneficiary.immersionObjective,
-    potential_beneficiary_phone_id: phone_id,
+    potential_beneficiary_phone_id: phoneId,
     potential_beneficiary_date_preferences:
       discussion.potentialBeneficiary.datePreferences,
     ...(discussion.kind === "IF"
@@ -768,7 +766,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       firstName: discussion.potentialBeneficiary.firstName,
       lastName: discussion.potentialBeneficiary.lastName,
       email: discussion.potentialBeneficiary.email,
-      phone: discussion.potentialBeneficiary.phone as PhoneNumber,
+      phone: discussion.potentialBeneficiary.phone,
       datePreferences: discussion.potentialBeneficiary.datePreferences,
     };
 
@@ -966,7 +964,7 @@ const executeGetDiscussions = (
             firstName: ref("d.potential_beneficiary_first_name"),
             lastName: ref("d.potential_beneficiary_last_name"),
             email: ref("d.potential_beneficiary_email"),
-            phone: ref("pn.phone_number"),
+            phone: ref("pn.phone_number").$castTo<PhoneNumber>(),
             resumeLink: ref("d.potential_beneficiary_resume_link"),
             experienceAdditionalInformation: ref(
               "potential_beneficiary_experience_additional_information",
