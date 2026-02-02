@@ -370,6 +370,7 @@ export class PgNotificationRepository implements NotificationRepository {
           convention_id: notification.followedIds.conventionId,
           establishment_siret: notification.followedIds.establishmentSiret,
           agency_id: notification.followedIds.agencyId,
+          user_id: notification.followedIds.userId,
           params: JSON.stringify(notification.templatedContent.params),
           state: JSON.stringify(
             notification.state ?? getDefaultNotificationState(),
@@ -432,6 +433,7 @@ export class PgNotificationRepository implements NotificationRepository {
             created_at: createdAt,
             email_kind: templatedContent.kind,
             convention_id: followedIds.conventionId,
+            user_id: followedIds.userId,
             establishment_siret: followedIds.establishmentSiret,
             agency_id: followedIds.agencyId,
             params: JSON.stringify(templatedContent.params),
@@ -463,6 +465,7 @@ const getSmsNotificationBuilder = (transaction: KyselyDb) =>
         createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
         followedIds: jsonBuildObject({
           conventionId: eb.ref("convention_id"),
+          userId: eb.ref("user_id"),
           establishmentId: eb.ref("establishment_siret"),
           agencyId: eb.ref("agency_id"),
         }),
@@ -503,6 +506,7 @@ const getEmailsNotificationBuilder = (transaction: KyselyDb) =>
           createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
           followedIds: jsonBuildObject({
             conventionId: ref("convention_id"),
+            userId: ref("user_id"),
             establishmentId: ref("establishment_siret"),
             agencyId: ref("agency_id"),
           }),

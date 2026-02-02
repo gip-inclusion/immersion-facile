@@ -656,6 +656,7 @@ interface NotificationsEmail {
   email_kind: string;
   created_at: Timestamp;
   convention_id: string | null;
+  user_id: string | null;
   establishment_siret: string | null;
   agency_id: string | null;
   params: Json | null;
@@ -686,6 +687,7 @@ interface NotificationsSms {
   created_at: Timestamp;
   recipient_phone: string;
   convention_id: string | null;
+  user_id: string | null;
   establishment_siret: string | null;
   agency_id: string | null;
   params: Json | null;
