@@ -4,7 +4,10 @@
   "linter": {
     "rules": {
       "suspicious": {
-        "noConsole": "error"
+        "noConsole": {
+          "level": "error",
+          "fix": "none"
+        }
       },
       "correctness": {
         "useExhaustiveDependencies": "warn"

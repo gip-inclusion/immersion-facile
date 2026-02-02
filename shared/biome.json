@@ -8,7 +8,8 @@
           "level": "error",
           "options": {
             "allow": ["error", "time", "timeEnd"]
-          }
+          },
+          "fix": "none"
         }
       }
     }
