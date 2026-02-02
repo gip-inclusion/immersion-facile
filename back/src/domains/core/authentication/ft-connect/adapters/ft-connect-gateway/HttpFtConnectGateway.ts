@@ -5,6 +5,7 @@ import {
   errors,
   HTTP_STATUS,
   queryParamsAsString,
+  toDateUTCString,
   type WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -328,7 +329,9 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         logger,
       });
       log.success({});
-      return externalFtConnectBirthDate.dateDeNaissance;
+      return toDateUTCString(
+        new Date(externalFtConnectBirthDate.dateDeNaissance),
+      );
     } catch (error) {
       errorChecker(
         error,
