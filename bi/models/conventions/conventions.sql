@@ -124,7 +124,6 @@ concat(
     b.last_name
 ) as beneficiary_full_name,
 b.email as beneficiary_email,
-b.phone_id as beneficiary_phone_number_id,
 pn_b.phone_number as beneficiary_phone,
 b.signed_at as beneficiary_signed_at,
 case
@@ -159,7 +158,6 @@ concat(
     et.extra_fields ->> 'job'
 ) as establishment_tutor_full_name_with_job,
 et.email as establishment_tutor_email,
-et.phone_id as establishment_tutor_phone_number_id,
 pn_et.phone_number as establishment_tutor_phone,
 et.signed_at as establishment_tutor_signed_at,
 
@@ -173,7 +171,6 @@ concat(
     er.last_name
 ) as establishment_representative_full_name,
 er.email as establishment_representative_email,
-er.phone_id as establishment_representative_phone_number_id,
 pn_er.phone_number as establishment_representative_phone,
 er.signed_at as establishment_representative_signed_at,
 case
@@ -191,7 +188,6 @@ concat(
     br.last_name
 ) as beneficiary_representative_full_name,
 br.email as beneficiary_representative_email,
-br.phone_id as beneficiary_representative_phone_number_id,
 pn_br.phone_number as beneficiary_representative_phone,
 br.signed_at as beneficiary_representative_signed_at,
 case
@@ -210,7 +206,6 @@ concat(
     bce.last_name
 ) as beneficiary_current_employer_full_name,
 bce.email as beneficiary_current_employer_email,
-bce.phone_id as beneficiary_current_employer_phone_number_id,
 pn_bce.phone_number as beneficiary_current_employer_phone,
 bce.signed_at as beneficiary_current_employer_signed_at,
 case
