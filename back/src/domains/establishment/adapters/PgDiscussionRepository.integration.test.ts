@@ -345,6 +345,32 @@ describe("PgDiscussionRepository", () => {
             },
           );
         });
+
+        it("update with new phone number", async () => {
+          const siret = "01234567891011";
+          const phoneNumber = "+33606060606";
+
+          const discussion = new DiscussionBuilder()
+            .withSiret(siret)
+            .withCreatedAt(new Date("2023-07-07"))
+            .withStatus({ status: "PENDING" })
+            .withPotentialBeneficiaryEmail(phoneNumber)
+            .build();
+
+          await pgDiscussionRepository.insert(discussion);
+
+          const updatedPhoneNumber = "+33606060607";
+          const updatedDiscussion = new DiscussionBuilder(discussion)
+            .withPotentialBeneficiaryPhone(updatedPhoneNumber)
+            .build();
+
+          await pgDiscussionRepository.update(updatedDiscussion);
+
+          expectToEqual(
+            await pgDiscussionRepository.getById(discussion.id),
+            updatedDiscussion,
+          );
+        });
       });
 
       it("getById undefined when there is no discussion", async () => {
