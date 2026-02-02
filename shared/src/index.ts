@@ -159,4 +159,5 @@ export * from "./utils/queryParams";
 export * from "./utils/searchResult";
 export * from "./utils/string";
 export * from "./utils/toDotNotation";
+export * from "./utils/users";
 export * from "./zodUtils";

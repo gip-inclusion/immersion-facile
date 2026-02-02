@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  allAgencyRoles,
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   expiredMagicLinkErrorMessage,
   type Role,
+  userHasEnoughRightsOnConvention,
   type WithConventionId,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -43,6 +45,7 @@ export const ConventionManageContent = ({
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
+
   const roles: Role[] = match({
     name: route.name,
     userRolesForFetchedConvention,
@@ -71,6 +74,12 @@ export const ConventionManageContent = ({
     conventionId,
   });
 
+  const userHasRightToGetLastBroadcastFeedback =
+    currentUser &&
+    convention &&
+    userHasEnoughRightsOnConvention(currentUser, convention, [
+      ...allAgencyRoles,
+    ]);
   const dispatch = useDispatch();
 
   useEffect(
@@ -84,7 +93,7 @@ export const ConventionManageContent = ({
   );
 
   useEffect(() => {
-    if (convention && jwtParams.jwt) {
+    if (userHasRightToGetLastBroadcastFeedback) {
       dispatch(
         partnersErroredConventionSlice.actions.fetchConventionLastBroadcastFeedbackRequested(
           {
@@ -94,7 +103,12 @@ export const ConventionManageContent = ({
         ),
       );
     }
-  }, [convention, conventionId, jwtParams.jwt, dispatch]);
+  }, [
+    conventionId,
+    jwtParams.jwt,
+    userHasRightToGetLastBroadcastFeedback,
+    dispatch,
+  ]);
 
   if (fetchConventionError) {
     if (

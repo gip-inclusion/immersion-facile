@@ -1,9 +1,11 @@
 import {
+  allAgencyRoles,
   type ConnectedUser,
   type ConventionId,
   type ConventionLastBroadcastFeedbackResponse,
   conventionIdSchema,
   errors,
+  userHasEnoughRightsOnConvention,
 } from "shared";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -25,11 +27,12 @@ export const makeGetLastBroadcastFeedback = useCaseBuilder(
       });
 
     const userWithRights = await getUserWithRights(uow, currentUser.id);
-    const userAgencyRights = userWithRights.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === convention.agencyId,
-    );
 
-    if (userAgencyRights || currentUser.isBackofficeAdmin)
+    if (
+      userHasEnoughRightsOnConvention(userWithRights, convention, [
+        ...allAgencyRoles,
+      ])
+    )
       return uow.broadcastFeedbacksRepository.getLastBroadcastFeedback(
         inputParams,
       );
