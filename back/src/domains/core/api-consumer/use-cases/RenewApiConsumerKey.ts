@@ -32,7 +32,8 @@ export const makeRenewApiConsumerKey = useCaseBuilder("RenewApiConsumerKey")
     if (!existingApiConsumer)
       throw errors.apiConsumer.notFound({ id: consumerId });
 
-    const newKeyIssuedAt = deps.timeGateway.now().toISOString();
+    const now = deps.timeGateway.now();
+    const newKeyIssuedAt = now.toISOString();
 
     const updatedApiConsumer = {
       ...existingApiConsumer,
@@ -58,5 +59,6 @@ export const makeRenewApiConsumerKey = useCaseBuilder("RenewApiConsumerKey")
     return deps.generateApiConsumerJwt({
       id: consumerId,
       version: 1,
+      iat: now.getTime() / 1000,
     });
   });
