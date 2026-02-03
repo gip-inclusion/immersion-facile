@@ -9,12 +9,15 @@ import {
   defaultFrontErrorButtons,
   FrontSpecificError,
 } from "src/app/pages/error/front-errors";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { ErrorPageContent } from "./ErrorPageContent";
 
 type ErrorPageProperties = {
   error: FrontSpecificError | Error;
   title?: string;
   buttons?: ErrorButton[];
+} & {
+  feedbackTopic?: FeedbackTopic;
 };
 
 const getPageContentProps = (
@@ -35,11 +38,15 @@ export const ErrorPage = ({
   error,
   title,
   buttons,
+  feedbackTopic,
 }: ErrorPageProperties): ReactElement => {
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default">
-        <ErrorPageContent {...getPageContentProps(error, title, buttons)} />
+        <ErrorPageContent
+          {...getPageContentProps(error, title, buttons)}
+          feedbackTopic={feedbackTopic}
+        />
       </MainWrapper>
     </HeaderFooterLayout>
   );
