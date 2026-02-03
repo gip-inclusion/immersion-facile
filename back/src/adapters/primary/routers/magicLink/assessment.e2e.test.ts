@@ -1,11 +1,14 @@
+import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AssessmentDto,
   ConnectedUserBuilder,
+  type ConnectedUserJwtPayload,
   ConventionDtoBuilder,
   type ConventionJwt,
   type ConventionMagicLinkRoutes,
   conventionMagicLinkRoutes,
+  currentJwtVersions,
   displayRouteName,
   errors,
   expectArraysToMatch,
@@ -17,6 +20,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import type { AssessmentEntity } from "../../../../domains/convention/entities/AssessmentEntity";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
@@ -31,6 +35,16 @@ describe("Assessment routes", () => {
     .withEmail("validator@mail.com")
     .withId("validator")
     .buildUser();
+  const backofficeAdminUser = new ConnectedUserBuilder()
+    .withId("backoffice-admin")
+    .withIsAdmin(true)
+    .buildUser();
+  const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: backofficeAdminUser.id,
+  };
   const agency = new AgencyDtoBuilder().build();
   const convention = new ConventionDtoBuilder()
     .withAgencyId(agency.id)
@@ -42,10 +56,12 @@ describe("Assessment routes", () => {
   let eventCrawler: BasicEventCrawler;
   let gateways: InMemoryGateways;
   let jwt: ConventionJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   beforeEach(async () => {
     const testAppAndDeps = await buildTestApp();
-    ({ inMemoryUow, eventCrawler, gateways } = testAppAndDeps);
+    ({ inMemoryUow, eventCrawler, gateways, generateConnectedUserJwt } =
+      testAppAndDeps);
 
     jwt = testAppAndDeps.generateConventionJwt(
       createConventionMagicLinkPayload({
@@ -66,7 +82,7 @@ describe("Assessment routes", () => {
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     );
-    inMemoryUow.userRepository.users = [validator];
+    inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
   });
 
   describe(`${displayRouteName(
@@ -241,6 +257,121 @@ describe("Assessment routes", () => {
       expectHttpResponseToEqual(response, {
         status: 200,
         body: legacyAssessment,
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.deleteAssessment,
+  )} to delete assessment`, () => {
+    it("returns 204 when admin deletes existing assessment", async () => {
+      const assessment: AssessmentDto = {
+        conventionId: convention.id,
+        status: "COMPLETED",
+        establishmentFeedback: "Feedback",
+        endedWithAJob: false,
+        establishmentAdvices: "Conseil",
+      };
+      await httpClient.createAssessment({
+        body: assessment,
+        headers: { authorization: jwt },
+      });
+
+      const response = await httpClient.deleteAssessment({
+        body: {
+          conventionId: convention.id,
+          deleteAssessmentJustification: "Justification",
+        },
+        headers: {
+          authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 204,
+        body: {},
+      });
+      expectArraysToMatch(inMemoryUow.assessmentRepository.assessments, []);
+    });
+
+    it("fails with 401 if jwt is not valid", async () => {
+      const response = await httpClient.deleteAssessment({
+        body: {
+          conventionId: convention.id,
+          deleteAssessmentJustification: "Justification",
+        },
+        headers: { authorization: "invalid-jwt" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: { status: 401, message: invalidTokenMessage },
+      });
+    });
+
+    it("fails with 403 if user is not admin", async () => {
+      const response = await httpClient.deleteAssessment({
+        body: {
+          conventionId: convention.id,
+          deleteAssessmentJustification: "Justification",
+        },
+        headers: {
+          authorization: generateConnectedUserJwt({
+            ...backofficeAdminJwtPayload,
+            userId: validator.id,
+          }),
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: errors.user.forbidden({ userId: validator.id }).message,
+        },
+      });
+    });
+
+    it("fails with 404 when assessment does not exist", async () => {
+      const response = await httpClient.deleteAssessment({
+        body: {
+          conventionId: convention.id,
+          deleteAssessmentJustification: "Justification",
+        },
+        headers: {
+          authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message: errors.assessment.notFound(convention.id).message,
+        },
+      });
+    });
+
+    it("fails with 400 if request body is invalid", async () => {
+      const response = await httpClient.deleteAssessment({
+        body: {
+          conventionId: convention.id,
+          deleteAssessmentJustification: "",
+        },
+        headers: {
+          authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          issues: expect.arrayContaining([
+            expect.stringMatching(/deleteAssessmentJustification/),
+          ]),
+          message: expect.stringContaining("DELETE /auth/assessment"),
+          status: 400,
+        },
       });
     });
   });

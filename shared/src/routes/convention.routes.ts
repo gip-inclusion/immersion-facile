@@ -35,7 +35,10 @@ import {
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
-import { expressEmptyResponseBody } from "../zodUtils";
+import {
+  expressEmptyResponseBody,
+  expressEmptyResponseBodyOrEmptyObject,
+} from "../zodUtils";
 
 export type ConventionMagicLinkRoutes = typeof conventionMagicLinkRoutes;
 export const conventionMagicLinkRoutes = defineRoutes({
@@ -58,7 +61,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: deleteAssessmentRequestDtoSchema,
     responses: {
-      204: expressEmptyResponseBody,
+      204: expressEmptyResponseBodyOrEmptyObject,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

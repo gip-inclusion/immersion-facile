@@ -47,6 +47,7 @@ describe("PgAssessmentRepository", () => {
     db = makeKyselyDb(pool);
 
     await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("convention_drafts").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agency_groups").execute();
     await db.deleteFrom("agencies").execute();
@@ -200,6 +201,27 @@ describe("PgAssessmentRepository", () => {
           minimalAssessment.conventionId,
         ),
         minimalAssessment,
+      );
+
+      await assessmentRepository.delete(minimalAssessment.conventionId);
+
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        ),
+        undefined,
+      );
+    });
+
+    it("does not throw when assessment already deleted (idempotent)", async () => {
+      await assessmentRepository.save(minimalAssessment);
+      await assessmentRepository.delete(minimalAssessment.conventionId);
+
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        ),
+        undefined,
       );
 
       await assessmentRepository.delete(minimalAssessment.conventionId);
