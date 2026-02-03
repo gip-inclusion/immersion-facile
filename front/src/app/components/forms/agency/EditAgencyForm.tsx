@@ -121,11 +121,6 @@ export const EditAgencyForm = ({
             ? adminAgencyIds.editAgencyForm
             : agencyDashboardAgencyIds.editAgencyForm
         }
-        data-matomo-name={
-          isRouteAdmin
-            ? adminAgencyIds.editAgencyForm
-            : agencyDashboardAgencyIds.editAgencyForm
-        }
       >
         <div className={fr.cx("fr-mb-4w")}>
           <AgencyFormCommonFields

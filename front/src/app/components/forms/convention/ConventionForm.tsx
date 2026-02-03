@@ -85,7 +85,6 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
-import { useMatomo } from "src/app/hooks/useMatomo";
 import {
   conventionPresentationFromConventionDraft,
   getConventionInitialValuesFromUrl,
@@ -413,8 +412,6 @@ export const ConventionForm = ({
     reset({ ...conventionPresentationFromDraft, status: "READY_TO_SIGN" });
   }
 
-  useMatomo(conventionInitialValuesFromUrl.internshipKind);
-
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(
       "partialConventionInUrl",
@@ -513,10 +510,6 @@ export const ConventionForm = ({
 
             <form
               id={domElementIds.conventionImmersionRoute.form({
-                mode,
-                internshipKind,
-              })}
-              data-matomo-name={domElementIds.conventionImmersionRoute.form({
                 mode,
                 internshipKind,
               })}

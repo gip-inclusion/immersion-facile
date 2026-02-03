@@ -139,7 +139,6 @@ export const AssessmentForm = ({
         <form
           onSubmit={handleSubmit(onSubmit)}
           id={domElementIds.assessment.form}
-          data-matomo-name={domElementIds.assessment.form}
         >
           {match(currentStep)
             .with(1, () => (

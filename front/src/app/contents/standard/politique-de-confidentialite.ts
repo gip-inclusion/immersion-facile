@@ -200,7 +200,7 @@ Certaines des données sont envoyées à des sous-traitants pour réaliser certa
   <tbody>
     <tr>
       <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Scalingo</td>
-      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Hébergement du site web, de la base de données, de Matomo et de Metabase</td>
+      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Hébergement du site web, de la base de données et de Metabase</td>
       <td style="border: 1px solid #000; padding: 8px; vertical-align: top;"><a href="https://scalingo.com/fr/contrat-gestion-traitements-donnees-personnelles" target="_blank">https://scalingo.com/fr/contrat-gestion-traitements-donnees-personnelles</a></td>
     </tr>
     <tr>
@@ -263,7 +263,6 @@ La plateforme dépose des cookies tiers, notamment pour la mesure d’audience e
     <li>via le bandeau cookies ou</li>
     <li>via la présente politique de confidentialité</li>
 </ul>
-<p>Immersion Facilitée utilise Matomo configuré en mode exempté et ne nécessite donc pas le consentement des personnes concernées conformément aux recommandations de la CNIL.</p>
 
 <table style="border-collapse: collapse; width: 100%; border: 1px solid #000;">
   <thead>
@@ -276,13 +275,6 @@ La plateforme dépose des cookies tiers, notamment pour la mesure d’audience e
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Matomo</td>
-      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Exemption de consentement</td>
-      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Mesure d'audience</td>
-      <td rowspan="5" style="border: 1px solid #000; padding: 8px; vertical-align: top;">13 mois</td>
-      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;"><a href="https://fr.matomo.org/privacy-policy/" target="_blank">https://fr.matomo.org/privacy-policy/</a></td>
-    </tr>
     <tr>
       <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Crisp</td>
       <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Consentement</td>

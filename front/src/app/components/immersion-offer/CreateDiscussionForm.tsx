@@ -167,7 +167,6 @@ export const CreateDiscussionForm = ({
         // biome-ignore lint/suspicious/noConsole: debug purpose
         onSubmit={handleSubmit(onFormValid, console.error)}
         id={domElementIds[route.name].contactByMailForm}
-        data-matomo-name={domElementIds[route.name].contactByMailForm}
         ref={formRef}
       >
         <TranscientPreferencesDisplay

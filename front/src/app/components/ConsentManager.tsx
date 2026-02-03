@@ -8,27 +8,6 @@ export const { ConsentBannerAndConsentManagement, useConsent } =
         description:
           "Nous utilisons des cookies pour mesurer l’audience de notre site et améliorer son contenu.",
         subFinalities: {
-          matomo: {
-            title: "Matomo",
-            description: (
-              <>
-                <p>
-                  Matomo est un outil de mesure d'audience qui nous permet de
-                  suivre les visites de notre site et d'améliorer son contenu.
-                  Il peut déposer 7 cookies sur votre navigateur.
-                </p>
-                <p>
-                  <a
-                    href="https://matomo.org/faq/general/faq_146/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Voir le site officiel
-                  </a>
-                </p>
-              </>
-            ),
-          },
           metabase: {
             title: "Metabase",
             description: (
