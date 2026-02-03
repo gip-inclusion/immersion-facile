@@ -29,7 +29,7 @@
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts",
     "test:manual": "jest --runInBand --watchAll --testRegex=.manual.test.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
-    "test": "NODE_OPTIONS='--max_old_space_size=4096' jest --testRegex='^((?!(integration|manual)).)*.test.ts$'",
+    "test": "jest --testRegex='^((?!(integration|manual)).)*.test.ts$'",
     "trigger-evening-jobs": "ts-node src/scripts/triggerEveningJobs.ts",
     "trigger-early-morning-jobs": "ts-node src/scripts/triggerEarlyMorningJobs.ts",
     "trigger-morning-jobs": "ts-node src/scripts/triggerMorningJobs.ts",
