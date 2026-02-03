@@ -21,6 +21,8 @@ const defaultAddress: AddressDto = {
 
 export const DATE_CREATION = new Date("2025-02-02").toISOString();
 
+export const SEED_FT_AGENCY_ID = "40400c99-9c0b-bbbb-bb6d-6bb9bd300404";
+
 export const defaultValidatorEmail = "default.validator@mail.com";
 
 const emptyAgency: AgencyDto = {

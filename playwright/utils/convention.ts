@@ -7,6 +7,7 @@ import {
   domElementIds,
   executeInSequence,
   frontRoutes,
+  SEED_FT_AGENCY_ID,
   technicalRoutes,
 } from "shared";
 import { getMagicLinkFromEmail, goToAdminTab } from "./admin";
@@ -72,16 +73,10 @@ export const fillBasicConventionForm = async (
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
     "75",
   );
-  const firstAgencyInDropdown = await page.locator(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId} > option:nth-child(2)`,
-  );
-  const agencyId: AgencyId | null =
-    await firstAgencyInDropdown.getAttribute("value");
-  expect(agencyId).not.toBeFalsy();
-  if (!agencyId) return;
+
   await page.selectOption(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-    agencyId,
+    SEED_FT_AGENCY_ID,
   );
   await openConventionAccordionSection(page, 1); // Open Beneficiary section
   await page.fill(
@@ -183,7 +178,7 @@ export const fillBasicConventionForm = async (
     faker.word.words(8),
   );
 
-  return agencyId;
+  return "40400c99-9c0b-bbbb-bb6d-6bb9bd300404";
 };
 
 export const submitBasicConventionForm = async (

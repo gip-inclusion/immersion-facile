@@ -4,6 +4,7 @@ import {
   type AgencyKind,
   type AgencyUsersRights,
   type Email,
+  SEED_FT_AGENCY_ID,
   type UserId,
 } from "shared";
 import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
@@ -70,7 +71,7 @@ export const insertSpecificAgenciesWithUserRight = async ({
   agencyIds: Record<AgencyKind, AgencyId[]>;
 }): Promise<Record<AgencyKind, AgencyId[]>> => {
   const peAgency = new AgencyDtoBuilder()
-    .withId("40400c99-9c0b-bbbb-bb6d-6bb9bd300404")
+    .withId(SEED_FT_AGENCY_ID)
     .withName("PE Paris")
     .withSignature("PE agency signature")
     .withKind("pole-emploi")
