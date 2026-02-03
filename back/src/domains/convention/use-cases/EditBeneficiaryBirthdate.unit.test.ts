@@ -26,12 +26,13 @@ describe("EditBeneficiaryBirthdate", () => {
   const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
   const agency = new AgencyDtoBuilder().build();
   const newBirthdate = "1995-03-15";
+  const oldBeneficiaryBirthdate = "2002-10-05";
 
   const convention = new ConventionDtoBuilder()
     .withId(conventionId)
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .withAgencyId(agency.id)
-    .withBeneficiaryBirthdate("2002-10-05")
+    .withBeneficiaryBirthdate(oldBeneficiaryBirthdate)
     .build();
 
   const backOfficeAdmin = new ConnectedUserBuilder()
@@ -143,10 +144,16 @@ describe("EditBeneficiaryBirthdate", () => {
       );
 
       const updatedConvention = uow.conventionRepository.conventions[0];
-      expectToEqual(
-        updatedConvention.signatories.beneficiary.birthdate,
-        newBirthdate,
-      );
+      expectToEqual(updatedConvention, {
+        ...convention,
+        signatories: {
+          ...convention.signatories,
+          beneficiary: {
+            ...convention.signatories.beneficiary,
+            birthdate: newBirthdate,
+          },
+        },
+      });
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "ConventionBeneficiaryBirthdateEdited",

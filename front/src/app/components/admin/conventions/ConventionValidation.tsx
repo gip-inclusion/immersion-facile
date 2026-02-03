@@ -135,7 +135,8 @@ export const ConventionValidation = ({
 
   const showEditBirthdateButton =
     currentUser?.isBackofficeAdmin === true &&
-    convention.status === "ACCEPTED_BY_VALIDATOR";
+    convention.status === "ACCEPTED_BY_VALIDATOR" &&
+    jwtParams.kind === "connected user backoffice";
 
   const onSubmitSendSignatureLink = () => {
     if (signatoryToSendSignatureLink) {
@@ -257,7 +258,7 @@ export const ConventionValidation = ({
         phone={convention.establishmentTutor.phone}
         onConfirm={onSubmitSendAssessmentLink}
       />
-      {jwtParams.kind !== "convention" && (
+      {showEditBirthdateButton && (
         <EditBeneficiaryBirthdateModalWrapper
           conventionId={convention.id}
           currentBirthdate={convention.signatories.beneficiary.birthdate}
