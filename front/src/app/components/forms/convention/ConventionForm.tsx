@@ -6,10 +6,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type Dispatch,
   type ElementRef,
-  type ReactNode,
-  type SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -31,7 +28,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   addressDtoToString,
-  type Beneficiary,
   type ConventionDraftId,
   type ConventionId,
   type ConventionPresentation,
@@ -44,12 +40,8 @@ import {
   domElementIds,
   type ExcludeFromExisting,
   errors as errorMessage,
-  hasBeneficiaryCurrentEmployer,
   type InternshipKind,
-  isBeneficiaryMinor,
   isBeneficiaryStudent,
-  isEstablishmentTutorIsEstablishmentRepresentative,
-  isFtConnectIdentity,
   keys,
   makeListAgencyOptionsKindFilter,
   undefinedIfEmptyString,
@@ -65,6 +57,11 @@ import {
   creationFormModes,
   type SupportedConventionRoutes,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
+import {
+  type EmailValidationErrorsState,
+  makeInitialBenefiaryForm,
+  useWaitForReduxFormUiReadyBeforeInitialisation,
+} from "src/app/components/forms/convention/conventionForm.helpers";
 import { BeneficiaryFormSection } from "src/app/components/forms/convention/sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";
@@ -96,7 +93,6 @@ import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selec
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   conventionSlice,
@@ -110,19 +106,6 @@ import { useStyles } from "tss-react/dsfr";
 import { ShareConventionDraft } from "./ShareConventionDraft";
 
 type StepSeverity = "error" | "success" | "info";
-export type EmailValidationErrorsState = Partial<
-  Record<
-    | "Bénéficiaire"
-    | "Responsable d'entreprise"
-    | "Tuteur de l'entreprise"
-    | "Représentant légal du bénéficiaire"
-    | "Employeur actuel du bénéficiaire",
-    ReactNode
-  >
->;
-export type SetEmailValidationErrorsState = Dispatch<
-  SetStateAction<EmailValidationErrorsState>
->;
 
 export const ConventionForm = ({
   mode,
@@ -175,7 +158,8 @@ export const ConventionForm = ({
         federatedIdentity,
       ),
     },
-    ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
+    ...(federatedIdentity?.payload?.advisor &&
+    mode === "create-convention-from-scratch"
       ? {
           agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
           agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
@@ -202,7 +186,7 @@ export const ConventionForm = ({
 
   const defaultValues: CreateConventionPresentationInitialValues =
     creationFormModes.includes(
-      mode as ExcludeFromExisting<ConventionFormMode, "edit">,
+      mode as ExcludeFromExisting<ConventionFormMode, "edit-convention">,
     )
       ? initialValues
       : fetchedConvention || conventionPresentationFromDraft || initialValues;
@@ -421,7 +405,7 @@ export const ConventionForm = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (mode === "edit") {
+    if (mode === "edit-convention") {
       validateSteps("clearAllErrors");
     }
   }, [conventionValues.id]);
@@ -495,8 +479,13 @@ export const ConventionForm = ({
       <ConventionFormLayout
         form={
           <FormProvider {...methods}>
-            <div className={cx("fr-text")}>{t.intro.welcome}</div>
-            {mode !== "edit" && (
+            {mode === "create-convention-from-scratch" && (
+              <div className={cx("fr-text")}>
+                {t.intro.welcomeCongratulations}
+              </div>
+            )}
+            <div className={cx("fr-text")}>{t.intro.welcomeDescription}</div>
+            {mode !== "edit-convention" && (
               <Alert
                 severity="info"
                 small
@@ -713,7 +702,7 @@ export const ConventionForm = ({
             sidebarContent={sidebarContent}
             sidebarFooter={
               <>
-                {mode !== "edit" && (
+                {mode !== "edit-convention" && (
                   <ShareConventionDraft
                     conventionFormData={{
                       ...conventionValues,
@@ -744,59 +733,6 @@ export const ConventionForm = ({
       />
     </>
   );
-};
-
-const makeInitialBenefiaryForm = (
-  beneficiary: Beneficiary<"immersion" | "mini-stage-cci">,
-  federatedIdentityWithUser: FederatedIdentityWithUser | null,
-): Beneficiary<"immersion" | "mini-stage-cci"> => {
-  const { federatedIdentity, ...beneficiaryOtherProperties } = beneficiary;
-  const peConnectIdentity =
-    federatedIdentityWithUser && isFtConnectIdentity(federatedIdentityWithUser)
-      ? federatedIdentityWithUser
-      : undefined;
-  const federatedIdentityValue = federatedIdentity ?? peConnectIdentity;
-
-  return {
-    ...beneficiaryOtherProperties,
-    federatedIdentity: federatedIdentityValue,
-  };
-};
-
-const useWaitForReduxFormUiReadyBeforeInitialisation = (
-  initialValues: CreateConventionPresentationInitialValues,
-  mode: ConventionFormMode,
-) => {
-  const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(
-      conventionSlice.actions.isMinorChanged(
-        isBeneficiaryMinor({
-          beneficiaryRepresentative:
-            initialValues.signatories.beneficiaryRepresentative,
-          beneficiaryBirthdate: initialValues.signatories.beneficiary.birthdate,
-          conventionDateStart: initialValues.dateStart,
-        }),
-      ),
-    );
-    dispatch(
-      conventionSlice.actions.isCurrentEmployerChanged(
-        hasBeneficiaryCurrentEmployer(initialValues),
-      ),
-    );
-    if (mode !== "edit") {
-      dispatch(
-        conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
-          isEstablishmentTutorIsEstablishmentRepresentative(initialValues),
-        ),
-      );
-    }
-    setReduxFormUiReady(true);
-  }, [dispatch, initialValues, mode]);
-
-  return reduxFormUiReady;
 };
 
 const SectionTitle = ({
