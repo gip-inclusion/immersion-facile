@@ -21,6 +21,10 @@ const isRequestingLoginByEmail = createSelector(
   rootAuthSelector,
   (auth) => auth.isRequestingLoginByEmail,
 );
+const isRequestingRenewExpiredJwt = createSelector(
+  rootAuthSelector,
+  (auth) => auth.isRequestingRenewExpiredJwt,
+);
 const requestedEmail = createSelector(
   rootAuthSelector,
   (auth) => auth.requestedEmail,
@@ -83,5 +87,6 @@ export const authSelectors = {
   afterLoginRedirectionUrl,
   isLoading,
   isRequestingLoginByEmail,
+  isRequestingRenewExpiredJwt,
   requestedEmail,
 };

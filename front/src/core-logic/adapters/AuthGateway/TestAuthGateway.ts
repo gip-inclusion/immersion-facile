@@ -20,6 +20,8 @@ export class TestAuthGateway implements AuthGateway {
 
   public getConnectedUsersResponse$ = new Subject<ConnectedUser[]>();
 
+  public renewExpiredJwtResponse$ = new Subject<void>();
+
   public loginByEmail$(_params: InitiateLoginByEmailParams): Observable<void> {
     return this.loginByEmailResponse$;
   }
@@ -41,9 +43,7 @@ export class TestAuthGateway implements AuthGateway {
     return this.confirmLoginByMagicLinkResponse$;
   }
 
-  public async renewExpiredJwt(_: RenewExpiredJwtRequestDto): Promise<void> {
-    // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
-    // Since this operation makes no sense for local development, the implementation here is left empty.
-    throw new Error("500 Not Implemented In InMemory Gateway");
+  public renewExpiredJwt$(_: RenewExpiredJwtRequestDto): Observable<void> {
+    return this.renewExpiredJwtResponse$;
   }
 }

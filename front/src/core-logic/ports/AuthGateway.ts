@@ -24,7 +24,7 @@ export interface AuthGateway {
   confirmLoginByMagicLink$(
     params: OAuthSuccessLoginParams,
   ): Observable<AfterOAuthSuccessRedirectionResponse>;
-  renewExpiredJwt(
+  renewExpiredJwt$(
     renewMagicLinkRequestDto: RenewExpiredJwtRequestDto,
-  ): Promise<void>;
+  ): Observable<void>;
 }

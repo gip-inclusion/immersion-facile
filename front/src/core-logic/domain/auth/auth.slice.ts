@@ -7,6 +7,7 @@ import type {
   FederatedIdentity,
   IdToken,
   PhoneNumber,
+  RenewExpiredJwtRequestDto,
   WithRedirectUri,
 } from "shared";
 import type {
@@ -30,6 +31,7 @@ type WithUrl = {
 export interface AuthState {
   isLoading: boolean;
   isRequestingLoginByEmail: boolean;
+  isRequestingRenewExpiredJwt: boolean;
   requestedEmail: Email | null;
   federatedIdentityWithUser: FederatedIdentityWithUser | null;
   afterLoginRedirectionUrl: AbsoluteUrl | null;
@@ -38,6 +40,7 @@ export interface AuthState {
 export const initialAuthState: AuthState = {
   isLoading: true,
   isRequestingLoginByEmail: false,
+  isRequestingRenewExpiredJwt: false,
   federatedIdentityWithUser: null,
   afterLoginRedirectionUrl: null,
   requestedEmail: null,
@@ -131,6 +134,24 @@ export const authSlice = createSlice({
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isRequestingLoginByEmail = false;
+    },
+    renewExpiredJwtRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<RenewExpiredJwtRequestDto>,
+    ) => {
+      state.isRequestingRenewExpiredJwt = true;
+    },
+    renewExpiredJwtSucceded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isRequestingRenewExpiredJwt = false;
+    },
+    renewExpiredJwtFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isRequestingRenewExpiredJwt = false;
     },
     confirmLoginByMagicLinkRequested: (
       state,
