@@ -21,6 +21,7 @@ describe("rootApp epic", () => {
       auth: {
         isRequestingLoginByEmail: false,
         isLoading: false,
+        isRequestingRenewExpiredJwt: false,
         afterLoginRedirectionUrl: null,
         federatedIdentityWithUser: null,
         requestedEmail: null,

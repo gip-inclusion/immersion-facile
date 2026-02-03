@@ -93,6 +93,10 @@ export class SimulatedAuthGateway implements AuthGateway {
     });
   }
 
+  public renewExpiredJwt$(_: RenewExpiredJwtRequestDto): Observable<void> {
+    return of(undefined).pipe(delay(this.simulatedLatency));
+  }
+
   public async renewExpiredJwt(_: RenewExpiredJwtRequestDto): Promise<void> {
     // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
     // Since this operation makes no sense for local development, the implementation here is left empty.

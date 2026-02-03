@@ -235,6 +235,26 @@ const requestLoginByEmail: AuthEpic = (action$, _, { authGateway }) =>
     ),
   );
 
+const requestRenewExpiredJwt: AuthEpic = (action$, _, { authGateway }) =>
+  action$.pipe(
+    filter(authSlice.actions.renewExpiredJwtRequested.match),
+    switchMap((action) =>
+      authGateway.renewExpiredJwt$(action.payload).pipe(
+        map(() =>
+          authSlice.actions.renewExpiredJwtSucceded({
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          authSlice.actions.renewExpiredJwtFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
 const confirmLoginByMagicLink: AuthEpic = (
   action$,
   _,
@@ -276,6 +296,7 @@ export const authEpics = [
   clearAndRedirectAfterLoginFromDevice,
   checkRedirectionAfterLogin,
   requestLoginByEmail,
+  requestRenewExpiredJwt,
   confirmLoginByMagicLink,
   redirectToProviderLogoutPage,
 ];

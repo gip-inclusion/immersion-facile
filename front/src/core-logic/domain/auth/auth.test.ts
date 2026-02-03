@@ -4,6 +4,7 @@ import {
   type Email,
   expectToEqual,
   type FederatedIdentity,
+  type RenewExpiredJwtRequestDto,
 } from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -20,8 +21,9 @@ import {
   type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
-import { feedbacks } from "../feedback/feedback.content";
+import { type FeedbackTopic, feedbacks } from "../feedback/feedback.content";
 import { feedbacksSelectors } from "../feedback/feedback.selectors";
+import type { PayloadWithFeedbackTopic } from "../feedback/feedback.slice";
 
 describe("Auth slice", () => {
   const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
@@ -57,6 +59,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -72,6 +75,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: peConnectedFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -82,6 +86,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: peConnectedFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
   });
@@ -98,6 +103,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
+        isRequestingRenewExpiredJwt: false,
         federatedIdentityWithUser: federatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
@@ -133,6 +139,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -152,6 +159,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: null,
       },
       connectedUser: {
@@ -179,6 +187,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -191,6 +200,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
     expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
@@ -203,6 +213,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: peConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: null,
       },
       connectedUser: {
@@ -231,6 +242,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -243,6 +255,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
     expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
@@ -255,6 +268,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: peConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: null,
       },
       connectedUser: {
@@ -285,6 +299,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -307,6 +322,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -321,6 +337,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -346,6 +363,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
   });
@@ -357,6 +375,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -367,6 +386,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: false,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
@@ -377,6 +397,7 @@ describe("Auth slice", () => {
       federatedIdentityWithUser: null,
       isLoading: false,
       isRequestingLoginByEmail: false,
+      isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
   });
@@ -426,6 +447,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: null,
       });
 
@@ -442,6 +464,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: null,
         isLoading: true,
         isRequestingLoginByEmail: true,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: email,
       });
 
@@ -452,6 +475,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: email,
       });
 
@@ -474,6 +498,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: null,
       });
 
@@ -490,6 +515,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: null,
         isLoading: true,
         isRequestingLoginByEmail: true,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: email,
       });
 
@@ -503,6 +529,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
+        isRequestingRenewExpiredJwt: false,
         requestedEmail: email,
       });
       expectToEqual(
@@ -575,6 +602,72 @@ describe("Auth slice", () => {
           message: errorMessage,
         },
       });
+    });
+  });
+
+  describe("renew expired jwt", () => {
+    const feedbackTopic: FeedbackTopic = "renew-expired-jwt-convention";
+    const payload: RenewExpiredJwtRequestDto & PayloadWithFeedbackTopic = {
+      kind: "connectedUser",
+      expiredJwt: "jwt",
+      feedbackTopic,
+    };
+
+    it("should handle login by email successfully", () => {
+      expectAuthStateToBe(initialAuthState);
+
+      store.dispatch(authSlice.actions.renewExpiredJwtRequested(payload));
+
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isRequestingRenewExpiredJwt: true,
+      });
+
+      dependencies.authGateway.renewExpiredJwtResponse$.next();
+
+      expectAuthStateToBe(initialAuthState);
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[feedbackTopic],
+        {
+          on: "create",
+          level: "success",
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          title: feedbacks[feedbackTopic]["create.success"]!.title,
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          message: feedbacks[feedbackTopic]["create.success"]!.message,
+        },
+      );
+    });
+
+    it("should handle login by email failed", () => {
+      expectAuthStateToBe(initialAuthState);
+
+      store.dispatch(authSlice.actions.renewExpiredJwtRequested(payload));
+
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isRequestingRenewExpiredJwt: true,
+      });
+
+      const errorMessage = "Error message";
+
+      dependencies.authGateway.renewExpiredJwtResponse$.error(
+        new Error(errorMessage),
+      );
+
+      expectAuthStateToBe(initialAuthState);
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[feedbackTopic],
+        {
+          on: "create",
+          level: "error",
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          title: feedbacks[feedbackTopic]["create.error"]!.title,
+          message: errorMessage,
+        },
+      );
     });
   });
 

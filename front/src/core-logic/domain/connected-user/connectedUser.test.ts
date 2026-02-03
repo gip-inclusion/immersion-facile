@@ -196,6 +196,7 @@ describe("InclusionConnected", () => {
             birthdate: "",
           },
           isLoading: true,
+          isRequestingRenewExpiredJwt: false,
           afterLoginRedirectionUrl: null,
           requestedEmail: null,
         },
@@ -207,7 +208,7 @@ describe("InclusionConnected", () => {
       );
       expectIsLoadingToBe(true);
 
-      const errorMessage = `Something went wrong : ${authExpiredMessage} blah blah`;
+      const errorMessage = `Something went wrong : ${authExpiredMessage()} blah blah`;
       dependencies.authGateway.currentUser$.error(new Error(errorMessage));
       expectCurrentUserToBe(null);
       expectToEqual(authSelectors.federatedIdentity(store.getState()), null);
