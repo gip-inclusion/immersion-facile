@@ -12,37 +12,22 @@ export const getOrCreatePhoneIds = async (
   }
 
   const uniquePhoneNumbers = [...new Set(phoneNumbers)];
-  const existingPhones: Record<PhoneNumber, PhoneId> = await transaction
-    .selectFrom("phone_numbers")
-    .select(["id", "phone_number"])
-    .where("phone_number", "in", uniquePhoneNumbers)
-    .execute()
-    .then((result) =>
-      Object.fromEntries(result.map((p) => [p.phone_number, p.id])),
-    );
 
-  const phoneIdsToCreate = uniquePhoneNumbers.filter(
-    (num) => !existingPhones[num],
-  );
-  if (phoneIdsToCreate.length === 0) return existingPhones;
-
-  const createdPhones: Record<PhoneNumber, PhoneId> = {};
-  const newPhones = await createPhoneIds(transaction, phoneIdsToCreate);
-  newPhones.forEach((p) => {
-    createdPhones[p.phone_number] = p.id;
-  });
-
-  return { ...existingPhones, ...createdPhones };
-};
-
-const createPhoneIds = async (
-  transaction: KyselyDb,
-  phoneNumbers: PhoneNumber[],
-): Promise<Array<{ id: PhoneId; phone_number: PhoneNumber }>> =>
-  transaction
+  const phones = await transaction
     .insertInto("phone_numbers")
     .values(
-      phoneNumbers.map((phone_number) => ({ phone_number, verified_at: null })),
+      uniquePhoneNumbers.map((phone_number) => ({
+        phone_number,
+        verified_at: null,
+      })),
+    )
+    .onConflict((oc) =>
+      oc.column("phone_number").doUpdateSet({
+        phone_number: (eb) => eb.ref("excluded.phone_number"),
+      }),
     )
     .returning(["id", "phone_number"])
     .execute();
+
+  return Object.fromEntries(phones.map((p) => [p.phone_number, p.id]));
+};
