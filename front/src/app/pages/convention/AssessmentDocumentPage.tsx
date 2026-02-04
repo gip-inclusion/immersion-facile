@@ -20,7 +20,7 @@ import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
 import type { routes } from "src/app/routes/routes";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
@@ -78,11 +78,14 @@ export const AssessmentDocumentPage = ({
 
   if (fetchConventionError)
     return (
-      <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={conventionFormFeedback?.message}
-        jwt={jwt}
-      />
+      <MainWrapper layout="default">
+        <ShowConventionErrorOrRenewExpiredJwt
+          errorMessage={conventionFormFeedback.message}
+          jwt={jwt}
+        />
+      </MainWrapper>
     );
+
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!assessment) return <p>Pas de bilan correspondant trouvé</p>;
 

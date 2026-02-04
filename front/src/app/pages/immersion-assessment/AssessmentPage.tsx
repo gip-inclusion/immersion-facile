@@ -17,7 +17,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -67,10 +67,12 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
 
   if (fetchConventionError)
     return (
-      <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={conventionFormFeedback?.message}
-        jwt={route.params.jwt}
-      />
+      <MainWrapper layout="default" vSpacing={0}>
+        <ShowConventionErrorOrRenewExpiredJwt
+          errorMessage={conventionFormFeedback?.message}
+          jwt={route.params.jwt}
+        />
+      </MainWrapper>
     );
 
   if (isAssessmentSuccessfullySubmitted)

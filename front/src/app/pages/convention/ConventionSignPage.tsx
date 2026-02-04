@@ -29,7 +29,7 @@ import { useConventionTexts } from "../../contents/forms/convention/textSetup";
 import { useConvention } from "../../hooks/convention.hooks";
 import { useExistingSiret } from "../../hooks/siret.hooks";
 import type { routes } from "../../routes/routes";
-import { ShowErrorOrRedirectToRenewMagicLink } from "./ShowErrorOrRedirectToRenewMagicLink";
+import { ShowConventionErrorOrRenewExpiredJwt } from "./ShowErrorOrRenewExpiredJwt";
 
 interface ConventionSignPageProperties {
   route: Route<typeof routes.conventionToSign>;
@@ -106,10 +106,12 @@ const ConventionSignPageContent = ({
       })
         .with({ isLoading: true }, () => <Loader />)
         .with({ fetchConventionError: true }, () => (
-          <ShowErrorOrRedirectToRenewMagicLink
-            errorMessage={conventionFormFeedback?.message ?? ""}
-            jwt={jwt}
-          />
+          <MainWrapper layout={"default"}>
+            <ShowConventionErrorOrRenewExpiredJwt
+              errorMessage={conventionFormFeedback?.message ?? ""}
+              jwt={jwt}
+            />
+          </MainWrapper>
         ))
         .with({ hasConvention: false }, () => (
           <Alert

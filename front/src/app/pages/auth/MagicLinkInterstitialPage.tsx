@@ -1,16 +1,20 @@
 import { useDispatch } from "react-redux";
 import {
   authExpiredMessage,
+  expiredJwtErrorTitle,
   getJwtExpiredSinceInSeconds,
   handleJWTStringPossiblyContainingJsonError,
+  oneMinuteInSeconds,
 } from "shared";
+import { RenewExpiredJwtButton } from "src/app/components/auth/RenewExpiredJwtButton";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
-import { ContactUsButton, HomeButton } from "src/app/pages/error/front-errors";
+import { ContactUsButton } from "src/app/pages/error/front-errors";
 import { type routes, useRoute } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import type { Route } from "type-route";
 
 export const MagicLinkInterstitialPage = () => {
@@ -18,17 +22,27 @@ export const MagicLinkInterstitialPage = () => {
   const { code, state, email } = params;
   const dispatch = useDispatch();
   const expiredSinceSeconds = getJwtExpiredSinceInSeconds(code, new Date());
+  const feedbackTopic: FeedbackTopic = "renew-expired-jwt-email-auth-code";
+  const RenewJwtButton = (
+    <RenewExpiredJwtButton
+      expiredJwt={code}
+      feedbackTopic={feedbackTopic}
+      state={state}
+    />
+  );
+
   if (expiredSinceSeconds) {
     return (
       <ErrorPage
-        title="Lien expiré"
-        buttons={[HomeButton, ContactUsButton]}
+        title={expiredJwtErrorTitle}
+        buttons={[RenewJwtButton, ContactUsButton]}
         error={{
           message: authExpiredMessage(
-            `${Math.ceil(expiredSinceSeconds / 60)} minutes`,
+            Math.ceil(expiredSinceSeconds / oneMinuteInSeconds),
           ),
           name: "Erreur de connexion",
         }}
+        feedbackTopic={feedbackTopic}
       />
     );
   }
@@ -41,11 +55,12 @@ export const MagicLinkInterstitialPage = () => {
         return (
           <ErrorPage
             title={title ?? "Erreur de connexion"}
-            buttons={[HomeButton, ContactUsButton]}
+            buttons={[RenewJwtButton, ContactUsButton]}
             error={{
               message: messageText,
               name: title ?? "Erreur de connexion",
             }}
+            feedbackTopic={feedbackTopic}
           />
         );
       }}

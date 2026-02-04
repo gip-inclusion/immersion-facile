@@ -24,7 +24,6 @@ import { AdminPrivateRoute } from "src/app/pages/auth/AdminPrivateRoute";
 import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { DashboardPrivateRoute } from "src/app/pages/auth/DashboardPrivateRoute";
 import { MagicLinkInterstitialPage } from "src/app/pages/auth/MagicLinkInterstitialPage";
-import { RenewExpiredLinkPage } from "src/app/pages/auth/RenewExpiredLinkPage";
 import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
@@ -290,7 +289,6 @@ const getPageByRouteName: {
   },
   magicLinkInterstitial: () => <MagicLinkInterstitialPage />,
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
-  renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => (
     <SearchPage
       route={route}

@@ -105,10 +105,6 @@ export const defaultPageMetaContents: Partial<
     title: "Bilan d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
-  renewConventionMagicLink: {
-    title: "Rafraichir le lien",
-    description: "Faciliter la réalisation des immersions professionnelles.",
-  },
   stats: {
     title: "Statistiques",
     description:
