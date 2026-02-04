@@ -5,7 +5,7 @@ import {
   allAgencyRoles,
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  expiredMagicLinkErrorMessage,
+  expiredJwtErrorMessage,
   type Role,
   userHasEnoughRightsOnConvention,
   type WithConventionId,
@@ -15,12 +15,13 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { routes, useRoute } from "src/app/routes/routes";
+import { useRoute } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { match } from "ts-pattern";
+import { ShowConventionErrorOrRenewExpiredJwt } from "../../../pages/convention/ShowErrorOrRenewExpiredJwt";
 import { NpsSection } from "../../nps/NpsSection";
 import {
   ConventionManageActions,
@@ -112,22 +113,21 @@ export const ConventionManageContent = ({
 
   if (fetchConventionError) {
     if (
-      !conventionFormFeedback?.message.includes(expiredMagicLinkErrorMessage)
+      !conventionFormFeedback?.message.includes(expiredJwtErrorMessage) &&
+      currentUser?.email
     ) {
-      if (currentUser?.email) {
-        throw frontErrors.convention.noRightsOnConvention({
-          userEmail: currentUser.email,
-          conventionId: conventionId,
-        });
-      }
-      throw new Error(conventionFormFeedback?.message ?? "");
+      throw frontErrors.convention.noRightsOnConvention({
+        userEmail: currentUser.email,
+        conventionId: conventionId,
+      });
     }
-    routes
-      .renewConventionMagicLink({
-        expiredJwt: jwtParams.jwt,
-        originalUrl: window.location.href,
-      })
-      .replace();
+
+    return (
+      <ShowConventionErrorOrRenewExpiredJwt
+        errorMessage={conventionFormFeedback?.message}
+        jwt={jwtParams.jwt}
+      />
+    );
   }
 
   if (

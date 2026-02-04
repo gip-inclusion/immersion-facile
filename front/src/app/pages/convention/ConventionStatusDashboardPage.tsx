@@ -11,7 +11,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
 import type { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -47,7 +47,7 @@ const ConventionStatusDashboard = ({ jwt }: { jwt: ConventionJwt }) => {
 
   if (conventionStatusDashboardFeedback?.level === "error")
     return (
-      <ShowErrorOrRedirectToRenewMagicLink
+      <ShowConventionErrorOrRenewExpiredJwt
         errorMessage={conventionStatusDashboardFeedback.message}
         jwt={jwt}
       />

@@ -31,7 +31,7 @@ import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import type { routes } from "src/app/routes/routes";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
@@ -135,10 +135,12 @@ export const ConventionDocumentPage = ({
 
   if (fetchConventionError)
     return (
-      <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={conventionFormFeedback?.message}
-        jwt={jwt}
-      />
+      <MainWrapper layout="default">
+        <ShowConventionErrorOrRenewExpiredJwt
+          errorMessage={conventionFormFeedback?.message}
+          jwt={jwt}
+        />
+      </MainWrapper>
     );
 
   if (isLoading) return <Loader />;

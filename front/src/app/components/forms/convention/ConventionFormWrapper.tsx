@@ -38,7 +38,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -348,7 +348,7 @@ export const ConventionFormWrapper = ({
         .with({ shouldRedirectToError: true }, () => (
           <>
             {route.params.jwt && fetchConventionError && (
-              <ShowErrorOrRedirectToRenewMagicLink
+              <ShowConventionErrorOrRenewExpiredJwt
                 errorMessage={conventionFormFeedback?.message}
                 jwt={route.params.jwt}
               />
