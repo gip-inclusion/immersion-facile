@@ -243,6 +243,50 @@ describe("PgAgencyRepository", () => {
       );
       expectToEqual(retrievedAgency, agencyWithNullDelegation);
     });
+
+    it("inserts two agencies with the same phone number", async () => {
+      const phoneNumber = "0610101010";
+
+      const agency1 = toAgencyWithRights(
+        agency1builder
+          .withName("agency1")
+          .withAgencySiret("11110000111100")
+          .withAddress({
+            streetNumberAndAddress: "My new adress",
+            postcode: "64100",
+            departmentCode: "64",
+            city: "Bayonne",
+          })
+          .withPhoneNumber(phoneNumber)
+          .withKind("pole-emploi")
+          .build(),
+        {
+          [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+      const agency2 = toAgencyWithRights(
+        agency2builder
+          .withName("agency2")
+          .withAgencySiret("11110000111105")
+          .withAddress({
+            streetNumberAndAddress: "My new adress",
+            postcode: "64100",
+            departmentCode: "64",
+            city: "Bayonne",
+          })
+          .withPhoneNumber(phoneNumber)
+          .withKind("pole-emploi")
+          .build(),
+        {
+          [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+
+      expectToEqual(await agencyRepository.getAgencies({}), [agency1, agency2]);
+    });
   });
 
   describe("update()", () => {
