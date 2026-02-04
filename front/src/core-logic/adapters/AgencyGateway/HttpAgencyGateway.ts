@@ -5,6 +5,7 @@ import type {
   AgencyOption,
   AgencyPublicDisplayDto,
   AgencyRoutes,
+  CloseAgencyAndTransfertConventionsRequestDto,
   ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
@@ -252,6 +253,26 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Observable<void> {
     return from(
       this.validateOrRejectAgency(adminToken, updateAgencyStatusParams),
+    );
+  }
+
+  public closeAgencyAndTransfertConventions$(
+    payload: CloseAgencyAndTransfertConventionsRequestDto,
+    adminToken: ConnectedUserJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .closeAgencyAndTransfertConventions({
+          body: payload,
+          headers: { authorization: adminToken },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 }
