@@ -10,7 +10,7 @@ import type { ConventionDto, InternshipKind } from "shared";
 import type {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
-} from "src/app/components/forms/convention/ConventionForm";
+} from "src/app/components/forms/convention/conventionForm.helpers";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useTutorIsEstablishmentRepresentative } from "src/app/hooks/convention.hooks";

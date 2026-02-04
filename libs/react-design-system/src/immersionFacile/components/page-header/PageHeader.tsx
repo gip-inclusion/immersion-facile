@@ -11,6 +11,7 @@ export type PageHeaderProps = {
   classes?: Partial<Record<"root" | "description" | "inner" | "title", string>>;
   breadcrumbs?: ReactNode;
   badge?: ReactNode;
+  backButton?: ReactNode;
 };
 
 export const PageHeader = ({
@@ -21,6 +22,7 @@ export const PageHeader = ({
   classes = {},
   breadcrumbs,
   badge,
+  backButton,
 }: PageHeaderProps) => {
   const { cx } = useStyles();
   const textContent = (
@@ -46,6 +48,7 @@ export const PageHeader = ({
         <div className={cx(Styles.breadcrumbsWrapper)}>{breadcrumbs}</div>
       )}
       <div className={cx(fr.cx("fr-container", "fr-mt-8w"), classes.inner)}>
+        {backButton}
         {illustration && (
           <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
             <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>

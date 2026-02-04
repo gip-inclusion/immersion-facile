@@ -33,14 +33,14 @@ export const ConventionPageForExternals = ({
   return externalConsumer.isIframe ? (
     <ConventionFormWrapper
       internshipKind="immersion"
-      mode="create-from-scratch"
+      mode="create-convention-from-scratch"
     />
   ) : (
     <HeaderFooterLayout>
       <MainWrapper layout="default">
         <ConventionFormWrapper
           internshipKind="immersion"
-          mode="create-from-scratch"
+          mode="create-convention-from-scratch"
         />
       </MainWrapper>
     </HeaderFooterLayout>

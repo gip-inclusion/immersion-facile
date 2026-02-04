@@ -63,10 +63,12 @@ const {
 export const creationFormModes = [
   "create-convention-from-scratch",
   "create-convention-from-shared",
+  "create-convention-template",
 ] as const;
 const allConventionFormModes = [
   ...creationFormModes,
   "edit-convention",
+  "edit-convention-template",
 ] as const;
 export type ConventionFormMode = (typeof allConventionFormModes)[number];
 

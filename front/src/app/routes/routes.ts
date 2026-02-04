@@ -90,6 +90,11 @@ export const searchParams = {
 export type FrontRouteUnion = ValueOf<typeof routes>;
 export type FrontRouteKeys = keyof typeof routes;
 
+export type ConventionTemplateFromRoute = Extract<
+  FrontRouteKeys,
+  "agencyDashboard" | "establishmentDashboard"
+>;
+
 const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
 
 const agencyDashboard = defineRoute(
@@ -123,6 +128,28 @@ const { adminConventions, adminAgencies, adminUsers, ...restOfAdminRoutes } =
     }),
     {} as Record<AdminTabRouteName, typeof admin>,
   );
+
+const conventionTemplateFromRouteValues = [
+  "establishmentDashboard",
+  "agencyDashboard",
+] as const;
+
+const isConventionTemplateFromRoute = (
+  value: string,
+): value is "agencyDashboard" | "establishmentDashboard" =>
+  conventionTemplateFromRouteValues.some((v) => v === value);
+
+export const conventionTemplateFromRouteSerializer: ValueSerializer<
+  "agencyDashboard" | "establishmentDashboard"
+> = {
+  parse: (value) => {
+    if (isConventionTemplateFromRoute(value)) return value;
+    throw new Error(
+      `Invalid convention template fromRoute: expected one of ${conventionTemplateFromRouteValues.join(", ")}, got "${value}"`,
+    );
+  },
+  stringify: (value) => value,
+};
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(
@@ -185,6 +212,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.query.optional.string,
     },
     () => `/${frontRoutes.conventionDocument}`,
+  ),
+  conventionTemplate: defineRoute(
+    { fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer) },
+    () => `/${frontRoutes.conventionTemplate}`,
   ),
   initiateConvention: defineRoute(
     {

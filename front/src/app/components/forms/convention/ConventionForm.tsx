@@ -33,7 +33,6 @@ import {
   type ConventionPresentation,
   type ConventionReadDto,
   type CreateConventionPresentationInitialValues,
-  conventionPresentationSchema,
   conventionSchema,
   type DepartmentCode,
   defaultCountryCode,
@@ -43,6 +42,7 @@ import {
   type InternshipKind,
   isBeneficiaryStudent,
   keys,
+  makeConventionPresentationSchema,
   makeListAgencyOptionsKindFilter,
   undefinedIfEmptyString,
 } from "shared";
@@ -184,9 +184,19 @@ export const ConventionForm = ({
     [fetchedConventionDraft],
   );
 
+  const isTemplateForm = [
+    "create-convention-template",
+    "edit-convention-template",
+  ].includes(mode);
+  const shouldShowShareConventionDraftButton =
+    mode !== "edit-convention" && !isTemplateForm;
+
   const defaultValues: CreateConventionPresentationInitialValues =
     creationFormModes.includes(
-      mode as ExcludeFromExisting<ConventionFormMode, "edit-convention">,
+      mode as ExcludeFromExisting<
+        ConventionFormMode,
+        "edit-convention" | "edit-convention-template"
+      >,
     )
       ? initialValues
       : fetchedConvention || conventionPresentationFromDraft || initialValues;
@@ -194,7 +204,7 @@ export const ConventionForm = ({
   const methods = useForm<CreateConventionPresentationInitialValues>({
     defaultValues,
     values: defaultValues,
-    resolver: zodResolver(conventionPresentationSchema),
+    resolver: zodResolver(makeConventionPresentationSchema(isTemplateForm)),
     mode: "onTouched",
   });
 
@@ -264,13 +274,15 @@ export const ConventionForm = ({
       assessment: null,
     };
 
-    dispatch(
-      conventionSlice.actions.showSummaryChangeRequested({
-        showSummary: true,
-        convention: conventionToSave,
-        fromConventionDraftId: conventionValues.fromConventionDraftId,
-      }),
-    );
+    if (!isTemplateForm) {
+      dispatch(
+        conventionSlice.actions.showSummaryChangeRequested({
+          showSummary: true,
+          convention: conventionToSave,
+          fromConventionDraftId: conventionValues.fromConventionDraftId,
+        }),
+      );
+    }
   };
 
   const accordionsRef = useRef<Array<ElementRef<"div">>>([]);
@@ -377,6 +389,10 @@ export const ConventionForm = ({
   const prevConventionDraftIdRef = useRef<ConventionDraftId | undefined>(
     undefined,
   );
+
+  const submitButtonLabel = isTemplateForm
+    ? "Créer un modèle de convention"
+    : "Vérifier la demande";
 
   if (
     fetchedConvention &&
@@ -507,6 +523,14 @@ export const ConventionForm = ({
                 type="hidden"
                 {...formContents["signatories.beneficiary.federatedIdentity"]}
               />
+              {isTemplateForm && (
+                <Input
+                  label="Nom du modèle *"
+                  nativeInputProps={{
+                    ...register("conventionTemplateName"),
+                  }}
+                />
+              )}
               <div className={fr.cx("fr-accordions-group")}>
                 <Accordion
                   label={
@@ -682,7 +706,9 @@ export const ConventionForm = ({
                   iconPosition="left"
                   type="button"
                   nativeButtonProps={{
-                    id: domElementIds.conventionImmersionRoute.submitFormButton,
+                    id: isTemplateForm
+                      ? domElementIds.conventionTemplate.form.submitFormButton
+                      : domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
@@ -690,7 +716,7 @@ export const ConventionForm = ({
                     console.error(conventionValues, errors);
                   })}
                 >
-                  Vérifier la demande
+                  {submitButtonLabel}
                 </Button>
               </div>
             </form>
@@ -702,7 +728,7 @@ export const ConventionForm = ({
             sidebarContent={sidebarContent}
             sidebarFooter={
               <>
-                {mode !== "edit-convention" && (
+                {shouldShowShareConventionDraftButton && (
                   <ShareConventionDraft
                     conventionFormData={{
                       ...conventionValues,
@@ -715,8 +741,11 @@ export const ConventionForm = ({
                 <Button
                   type="button"
                   id={
-                    domElementIds.conventionImmersionRoute
-                      .submitFormButtonMobile
+                    isTemplateForm
+                      ? domElementIds.conventionTemplate.form
+                          .submitFormButtonMobile
+                      : domElementIds.conventionImmersionRoute
+                          .submitFormButtonMobile
                   }
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
@@ -724,7 +753,7 @@ export const ConventionForm = ({
                     console.error(conventionValues, errors);
                   })}
                 >
-                  Vérifier la demande
+                  {submitButtonLabel}
                 </Button>
               </>
             }

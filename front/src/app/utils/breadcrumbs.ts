@@ -5,6 +5,7 @@ import type {
   Breadcrumbs,
   BreadcrumbsItem,
 } from "src/app/contents/breadcrumbs/breadcrumbs";
+import type { FrontRouteKeys } from "src/app/routes/routes";
 import type { Route } from "type-route";
 
 type RoutesKeysFromBreadcrumbs<T extends Record<keyof T, BreadcrumbsItem>> = {
@@ -72,7 +73,7 @@ const formatToBreadcrumbsSegments = <T>(
   if (!children || ancestor.route.name === currentRouteKey)
     return [ancestorSegment];
   const childSegments = flatten(
-    keys(children).map((key) => {
+    (keys(children) as FrontRouteKeys[]).map((key) => {
       const child = children[key];
 
       if (!child) return;

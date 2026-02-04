@@ -26,7 +26,7 @@ import { ConventionEmailWarning } from "src/app/components/forms/convention/Conv
 import type {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
-} from "src/app/components/forms/convention/ConventionForm";
+} from "src/app/components/forms/convention/conventionForm.helpers";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
@@ -141,7 +141,13 @@ export const BeneficiaryFormSection = ({
       setIsMinorAccordingToAge(newIsMinor);
       dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
     },
-    [dispatch, values.dateStart, setValue],
+    [
+      dispatch,
+      values.dateStart,
+      setValue,
+      isMinorOrProtected,
+      isMinorOrProtected,
+    ],
   );
 
   useEffect(() => {
