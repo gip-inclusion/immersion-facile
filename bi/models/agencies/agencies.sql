@@ -47,4 +47,4 @@ left join {{ source('immersion', 'public_department_region') }} as pdr
 left join {{ source('immersion', 'agencies') }} as refersToAgencies
     on refersToAgencies.id = a.refers_to_agency_id
 left join {{ source('immersion', 'phone_numbers') }} as pn
-    on pn.id = a.phone_number_id
+    on pn.id = a.phone_id
