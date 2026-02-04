@@ -125,6 +125,61 @@ describe("EditBeneficiaryBirthdate", () => {
         errors.user.forbidden({ userId: nonAdminUser.id }),
       );
     });
+
+    it("throws when minor above 16 years old but without representative", async () => {
+      const conventionWithoutRepresentative = new ConventionDtoBuilder(
+        convention,
+      )
+        .withBeneficiaryRepresentative(undefined)
+        .build();
+      const minorAbove16YearsOldBirthdate = "2007-10-01";
+      uow.conventionRepository.setConventions([
+        conventionWithoutRepresentative,
+      ]);
+      uow.userRepository.users = [backOfficeAdmin];
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId,
+            updatedBeneficiaryBirthDate: minorAbove16YearsOldBirthdate,
+            dateStart: conventionWithoutRepresentative.dateStart,
+            internshipKind: conventionWithoutRepresentative.internshipKind,
+          },
+          backOfficeAdmin,
+        ),
+        errors.convention.invalidConventionAfterBirthdateUpdate({
+          message:
+            "Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait 17 ans au démarrage de la convention.",
+        }),
+      );
+    });
+
+    it("throws when beneficiary would be under 16 years old", async () => {
+      const beneficiaryUnder16YearsOldBirthdate = "2015-01-01";
+      uow.conventionRepository.setConventions([convention]);
+      uow.userRepository.users = [backOfficeAdmin];
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId,
+            updatedBeneficiaryBirthDate: beneficiaryUnder16YearsOldBirthdate,
+            dateStart: convention.dateStart,
+            internshipKind: convention.internshipKind,
+          },
+          backOfficeAdmin,
+        ),
+        errors.inputs.badSchema({
+          useCaseName: "EditBeneficiaryBirthdate",
+          flattenErrors: [
+            "updatedBeneficiaryBirthDate : L'âge du bénéficiaire doit être au minimum de 16ans",
+          ],
+        }),
+      );
+    });
   });
 
   describe("Right path", () => {
