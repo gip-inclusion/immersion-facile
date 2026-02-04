@@ -220,4 +220,8 @@ export class SimulatedAgencyGateway implements AgencyGateway {
         )
       : of(undefined).pipe(delay(this.simulatedLatency));
   }
+
+  public closeAgencyAndTransfertConventions$(): Observable<void> {
+    return of(undefined);
+  }
 }

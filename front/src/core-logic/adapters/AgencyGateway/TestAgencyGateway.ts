@@ -4,6 +4,7 @@ import type {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  CloseAgencyAndTransfertConventionsRequestDto,
   ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
@@ -35,6 +36,8 @@ export class TestAgencyGateway implements AgencyGateway {
   public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   public registerAgenciesToCurrentUserResponse$ = new Subject<undefined>();
+
+  public closeAgencyAndTransfertConventionsResponse$ = new Subject<undefined>();
 
   #agencies: Record<string, AgencyDto> = {};
 
@@ -111,5 +114,12 @@ export class TestAgencyGateway implements AgencyGateway {
     _token: string,
   ): Observable<void> {
     return this.registerAgenciesToCurrentUserResponse$;
+  }
+
+  public closeAgencyAndTransfertConventions$(
+    _payload: CloseAgencyAndTransfertConventionsRequestDto,
+    _adminToken: ConnectedUserJwt,
+  ): Observable<void> {
+    return this.closeAgencyAndTransfertConventionsResponse$;
   }
 }

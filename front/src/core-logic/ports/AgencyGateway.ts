@@ -4,6 +4,7 @@ import type {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  CloseAgencyAndTransfertConventionsRequestDto,
   ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
@@ -52,5 +53,9 @@ export interface AgencyGateway {
   validateOrRejectAgency$(
     adminToken: ConnectedUserJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
+  ): Observable<void>;
+  closeAgencyAndTransfertConventions$(
+    payload: CloseAgencyAndTransfertConventionsRequestDto,
+    adminToken: ConnectedUserJwt,
   ): Observable<void>;
 }
