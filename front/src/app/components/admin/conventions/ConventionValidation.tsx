@@ -260,6 +260,7 @@ export const ConventionValidation = ({
       />
       {showEditBirthdateButton && (
         <EditBeneficiaryBirthdateModalWrapper
+          convention={convention}
           conventionId={convention.id}
           currentBirthdate={convention.signatories.beneficiary.birthdate}
           dateStart={convention.dateStart}

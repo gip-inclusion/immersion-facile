@@ -19,6 +19,7 @@ import {
   addressDtoToString,
   type ConnectedUserJwt,
   type ConventionReadDto,
+  conventionSchema,
   convertLocaleDateToUtcTimezoneDate,
   type DateString,
   domElementIds,
@@ -995,6 +996,7 @@ export const editBeneficiaryBirthdateModal = createModal({
 });
 
 export const EditBeneficiaryBirthdateModalWrapper = ({
+  convention,
   conventionId,
   currentBirthdate,
   dateStart,
@@ -1002,6 +1004,7 @@ export const EditBeneficiaryBirthdateModalWrapper = ({
   jwt,
   feedbackTopic,
 }: {
+  convention: ConventionReadDto;
   conventionId: string;
   currentBirthdate: DateString;
   dateStart: DateString;
@@ -1014,7 +1017,7 @@ export const EditBeneficiaryBirthdateModalWrapper = ({
     date: convertLocaleDateToUtcTimezoneDate(new Date(currentBirthdate)),
   });
 
-  const { register, handleSubmit, formState } =
+  const { register, handleSubmit, formState, setError } =
     useForm<EditBeneficiaryBirthdateRequestDto>({
       resolver: zodResolver(editBeneficiaryBirthdateRequestSchema),
       mode: "onTouched",
@@ -1029,6 +1032,31 @@ export const EditBeneficiaryBirthdateModalWrapper = ({
   const onFormSubmit: SubmitHandler<EditBeneficiaryBirthdateRequestDto> = (
     values,
   ) => {
+    const conventionWithNewBirthdate = {
+      ...convention,
+      signatories: {
+        ...convention.signatories,
+        beneficiary: {
+          ...convention.signatories.beneficiary,
+          birthdate: values.updatedBeneficiaryBirthDate,
+        },
+      },
+    };
+    const result = conventionSchema.safeParse(conventionWithNewBirthdate);
+    if (!result.success) {
+      const birthdateOrRepresentativeIssue = result.error.issues.find(
+        (issue) =>
+          issue.path[0] === "signatories.beneficiary.birthdate" ||
+          issue.path[0] === "signatories.beneficiaryRepresentative",
+      );
+      if (birthdateOrRepresentativeIssue?.message) {
+        setError("updatedBeneficiaryBirthDate", {
+          type: "custom",
+          message: birthdateOrRepresentativeIssue.message,
+        });
+      }
+      return;
+    }
     dispatch(
       editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateRequested({
         ...values,
@@ -1060,8 +1088,8 @@ export const EditBeneficiaryBirthdateModalWrapper = ({
             .editBeneficiaryBirthdateModalSubmitButton,
           priority: "primary",
           children: "Corriger la date",
+          doClosesModal: false,
           onClick: () => handleSubmit(onFormSubmit)(),
-          disabled: !formState.isValid,
         },
       ]}
     >
