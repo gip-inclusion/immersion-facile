@@ -4,7 +4,6 @@ import {
   type ConventionId,
   type DateString,
   type DeleteAssessmentRequestDto,
-  type EditBeneficiaryBirthdateRequestDto,
   type Flavor,
   type RejectConnectedUserRoleForAgencyParams,
   type Role,
