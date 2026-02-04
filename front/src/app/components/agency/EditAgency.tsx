@@ -3,12 +3,14 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
+import { CloseAgencyAndTransfertConventions } from "src/app/components/agency/CloseAgencyAndTransfertConventions";
 import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { useDispatch } from "react-redux";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { connectedUsersAdminSelectors } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.selectors";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
 import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
@@ -19,6 +21,7 @@ export const EditAgency = () => {
   const agencyUsersById = useAppSelector(
     connectedUsersAdminSelectors.agencyUsers,
   );
+  const isBackOfficeadmin = useAppSelector(authSelectors.isAdminConnected);
   const dispatch = useDispatch();
   return (
     <BackofficeDashboardTabContent title="Editer une agence">
@@ -39,7 +42,21 @@ export const EditAgency = () => {
       {/* //Todo remove this from agency tab to redirect on agency detail admin page when select an agency in autocomplete */}
       {agency && (
         <>
-          <CopyAgencyId agencyId={agency.id} />
+          <div
+            className={fr.cx(
+              "fr-grid-row",
+              "fr-grid-row--middle",
+              "fr-mt-2w",
+              "fr-ml-1v",
+            )}
+          >
+            <CopyAgencyId agencyId={agency.id} />
+            {isBackOfficeadmin && (
+              <div className={fr.cx("fr-ml-auto")}>
+                <CloseAgencyAndTransfertConventions agency={agency} />
+              </div>
+            )}
+          </div>
           <AgencyTag
             refersToAgencyName={agency.refersToAgencyName}
             className={fr.cx("fr-my-4w")}
