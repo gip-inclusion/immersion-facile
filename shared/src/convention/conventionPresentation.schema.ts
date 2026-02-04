@@ -15,8 +15,10 @@ import type {
 } from "./conventionPresentation.dto";
 import { conventionDraftIdSchema } from "./shareConventionDraftByEmail.schema";
 
-export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<CreateConventionPresentationInitialValues> =
-  conventionSchema.and(
+export const makeConventionPresentationSchema = (
+  isTemplateForm: boolean,
+): ZodSchemaWithInputMatchingOutput<CreateConventionPresentationInitialValues> => {
+  const schema = conventionSchema.and(
     z.object({
       fromConventionDraftId: conventionDraftIdSchema.optional(),
       agencyDepartment: z.string(),
@@ -30,6 +32,15 @@ export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<Crea
         .optional(),
     }),
   );
+  if (isTemplateForm) {
+    return schema.and(
+      z.object({
+        conventionTemplateName: zStringMinLength1,
+      }),
+    );
+  }
+  return schema;
+};
 
 export const statusJustificationSchema: ZodSchemaWithInputMatchingOutput<WithStatusJustification> =
   z.object({

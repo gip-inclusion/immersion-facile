@@ -39,7 +39,12 @@ export type CreateConventionPresentationInitialValues = OmitFromExistingKeys<
   WithSignatures &
   WithEstablishmentTutor &
   WithIntershipKind &
-  WithFromPeConnectedUser;
+  WithFromPeConnectedUser &
+  Partial<WithConventionTemplateName>;
+
+type WithConventionTemplateName = {
+  conventionTemplateName: string;
+};
 
 export type WithFromConventionDraftId = {
   fromConventionDraftId: ConventionDraftId;

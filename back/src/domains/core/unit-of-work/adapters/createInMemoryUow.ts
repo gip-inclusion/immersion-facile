@@ -7,6 +7,7 @@ import { InMemoryConventionExternalIdRepository } from "../../../convention/adap
 import { InMemoryConventionQueries } from "../../../convention/adapters/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../../convention/adapters/InMemoryConventionRepository";
 import { InMemoryConventionsToSyncRepository } from "../../../convention/adapters/InMemoryConventionsToSyncRepository";
+import { InMemoryConventionTemplateQueries } from "../../../convention/adapters/InMemoryConventionTemplateQueries";
 import { InMemoryNpsRepository } from "../../../convention/adapters/InMemoryNpsRepository";
 import { InMemoryDeletedEstablishmentRepository } from "../../../establishment/adapters/InMemoryDeletedEstablishmentRepository";
 import { InMemoryDiscussionRepository } from "../../../establishment/adapters/InMemoryDiscussionRepository";
@@ -62,6 +63,7 @@ export const createInMemoryUow = () => {
     broadcastFeedbacksRepository,
     conventionQueries,
     conventionRepository,
+    conventionTemplateQueries: new InMemoryConventionTemplateQueries(),
     conventionFranceTravailAdvisorRepository:
       new InMemoryConventionFranceTravailAdvisorRepository(),
     conventionsToSyncRepository: new InMemoryConventionsToSyncRepository(),

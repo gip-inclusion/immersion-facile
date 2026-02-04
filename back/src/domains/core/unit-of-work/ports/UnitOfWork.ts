@@ -7,6 +7,7 @@ import type { ConventionExternalIdRepository } from "../../../convention/ports/C
 import type { ConventionQueries } from "../../../convention/ports/ConventionQueries";
 import type { ConventionRepository } from "../../../convention/ports/ConventionRepository";
 import type { ConventionsToSyncRepository } from "../../../convention/ports/ConventionsToSyncRepository";
+import type { ConventionTemplateQueries } from "../../../convention/ports/ConventionTemplateQueries";
 import type { NpsRepository } from "../../../convention/ports/NpsRepository";
 import type { DeletedEstablishmentRepository } from "../../../establishment/ports/DeletedEstablishmentRepository";
 import type { DiscussionRepository } from "../../../establishment/ports/DiscussionRepository";
@@ -40,6 +41,7 @@ export type UnitOfWork = {
   conventionDraftRepository: ConventionDraftRepository;
   conventionExternalIdRepository: ConventionExternalIdRepository;
   conventionFranceTravailAdvisorRepository: ConventionFranceTravailAdvisorRepository;
+  conventionTemplateQueries: ConventionTemplateQueries;
   conventionQueries: ConventionQueries;
   conventionRepository: ConventionRepository;
   conventionsToSyncRepository: ConventionsToSyncRepository;

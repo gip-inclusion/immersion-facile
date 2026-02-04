@@ -31,6 +31,7 @@ export const frontRoutes = {
   conventionDocument: "convention-immersion",
   conventionMiniStageRoute: "demande-mini-stage",
   conventionStatusDashboard: "statut-convention",
+  conventionTemplate: "modele-convention",
   conventionToSign: "verifier-et-signer",
   error: "error",
   group: "groupe",
