@@ -283,6 +283,10 @@ export const errors = {
       new BadRequestError(
         `Impossible de modifier la date de naissance pour les conventions ayant le statut "${status}".`,
       ),
+    invalidConventionAfterBirthdateUpdate: ({ message }: { message: string }) =>
+      new BadRequestError(
+        `La convention ne serait plus valide avec cette date de naissance : ${message}`,
+      ),
     emailNotLinkedToConvention: (role: Role) =>
       new BadRequestError(
         `L'email fournit n'est pas lié à la convention pour l'utilisateur ayant le role ${role}.`,

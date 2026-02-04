@@ -1,6 +1,7 @@
 import {
   type ConnectedUser,
   type ConventionDto,
+  conventionSchema,
   type EditBeneficiaryBirthdateRequestDto,
   editBeneficiaryBirthdateRequestSchema,
   errors,
@@ -66,6 +67,13 @@ export const makeEditBeneficiaryBirthdate = useCaseBuilder(
               },
             },
           };
+
+    const conventionValidation = conventionSchema.safeParse(updatedConvention);
+    if (!conventionValidation.success) {
+      throw errors.convention.invalidConventionAfterBirthdateUpdate({
+        message: conventionValidation.error.issues[0].message,
+      });
+    }
 
     await Promise.all([
       uow.conventionRepository.update(updatedConvention),
