@@ -596,6 +596,198 @@ describe("authenticatedConventionRoutes", () => {
     });
   });
 
+  describe(`${displayRouteName(
+    authenticatedConventionRoutes.editBeneficiaryBirthdate,
+  )}`, () => {
+    const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
+    const newBirthdate = "1995-03-15";
+    const oldBeneficiaryBirthdate = "2002-10-05";
+    const convention = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withAgencyId(agency.id)
+      .withBeneficiaryBirthdate(oldBeneficiaryBirthdate)
+      .build();
+
+    const adminUser = new ConnectedUserBuilder()
+      .withId("admin-user-id")
+      .withEmail("admin@mail.com")
+      .withIsAdmin(true)
+      .buildUser();
+
+    it("401 with bad token", async () => {
+      const response = await httpClient.editBeneficiaryBirthdate({
+        headers: { authorization: "wrong-token" },
+        body: {
+          conventionId,
+          updatedBeneficiaryBirthDate: newBirthdate,
+          dateStart: convention.dateStart,
+          internshipKind: convention.internshipKind,
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        body: { message: invalidTokenMessage, status: 401 },
+        status: 401,
+      });
+    });
+
+    it("401 with expired token", async () => {
+      const token = generateConnectedUserJwt(
+        { userId: adminUser.id, version: currentJwtVersions.connectedUser },
+        0,
+      );
+      const response = await httpClient.editBeneficiaryBirthdate({
+        headers: { authorization: token },
+        body: {
+          conventionId,
+          updatedBeneficiaryBirthDate: newBirthdate,
+          dateStart: convention.dateStart,
+          internshipKind: convention.internshipKind,
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        body: { message: authExpiredMessage(), status: 401 },
+        status: 401,
+      });
+    });
+
+    it("403 when user is not back-office admin", async () => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.userRepository.users = [validator];
+
+      const response = await httpClient.editBeneficiaryBirthdate({
+        headers: { authorization: validToken },
+        body: {
+          conventionId,
+          updatedBeneficiaryBirthDate: newBirthdate,
+          dateStart: convention.dateStart,
+          internshipKind: convention.internshipKind,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          status: 403,
+          message: errors.user.forbidden({ userId: validator.id }).message,
+        },
+        status: 403,
+      });
+    });
+
+    it("404 when convention is not found", async () => {
+      const unknownId = "00000000-0000-4000-8000-000000000001";
+      inMemoryUow.userRepository.users = [adminUser];
+      inMemoryUow.conventionRepository.setConventions([]);
+
+      const response = await httpClient.editBeneficiaryBirthdate({
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: adminUser.id,
+            version: currentJwtVersions.connectedUser,
+          }),
+        },
+        body: {
+          conventionId: unknownId,
+          updatedBeneficiaryBirthDate: newBirthdate,
+          dateStart: convention.dateStart,
+          internshipKind: convention.internshipKind,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          status: 404,
+          message: errors.convention.notFound({ conventionId: unknownId })
+            .message,
+        },
+        status: 404,
+      });
+    });
+
+    it("400 when convention status is not ACCEPTED_BY_VALIDATOR", async () => {
+      const conventionInReview = new ConventionDtoBuilder(convention)
+        .withStatus("IN_REVIEW")
+        .build();
+      inMemoryUow.conventionRepository.setConventions([conventionInReview]);
+      inMemoryUow.userRepository.users = [adminUser];
+
+      const response = await httpClient.editBeneficiaryBirthdate({
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: adminUser.id,
+            version: currentJwtVersions.connectedUser,
+          }),
+        },
+        body: {
+          conventionId,
+          updatedBeneficiaryBirthDate: newBirthdate,
+          dateStart: conventionInReview.dateStart,
+          internshipKind: conventionInReview.internshipKind,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          status: 400,
+          message:
+            errors.convention.editBeneficiaryBirthdateNotAllowedForStatus({
+              status: "IN_REVIEW",
+            }).message,
+        },
+        status: 400,
+      });
+    });
+
+    it("200 updates beneficiary birthdate and saves ConventionBeneficiaryBirthdateEdited event", async () => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.userRepository.users = [adminUser];
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+
+      const adminToken = generateConnectedUserJwt({
+        userId: adminUser.id,
+        version: currentJwtVersions.connectedUser,
+      });
+
+      const response = await httpClient.editBeneficiaryBirthdate({
+        headers: { authorization: adminToken },
+        body: {
+          conventionId,
+          updatedBeneficiaryBirthDate: newBirthdate,
+          dateStart: convention.dateStart,
+          internshipKind: convention.internshipKind,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+
+      const updatedConvention = inMemoryUow.conventionRepository.conventions[0];
+      expectToEqual(
+        updatedConvention?.signatories.beneficiary.birthdate,
+        newBirthdate,
+      );
+
+      expectArraysToMatch(inMemoryUow.outboxRepository.events, [
+        {
+          topic: "ConventionBeneficiaryBirthdateEdited",
+          payload: {
+            convention: updatedConvention,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: adminUser.id,
+            },
+          },
+        },
+      ]);
+    });
+  });
+
   describe("getConventionsWithErroredBroadcastFeedbackForAgencyUser", () => {
     it("200 - Successfully gets empty array oferrored conventions for agency user", async () => {
       const response =
