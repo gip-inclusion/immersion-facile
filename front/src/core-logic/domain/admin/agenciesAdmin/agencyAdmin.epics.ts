@@ -39,13 +39,13 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
     map(agencyAdminSlice.actions.setAgencyOptions),
   );
 
-const agencyAdminGetDetailsForStatusEpic: AgencyEpic = (
+const fetchAgencyNeedingReviewEpic: AgencyEpic = (
   action$,
   state$,
   dependencies,
 ) =>
   action$.pipe(
-    filter(agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId.match),
+    filter(agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested.match),
     switchMap((action: PayloadAction<AgencyId>) =>
       dependencies.agencyGateway.getAgencyById$(
         action.payload,
@@ -53,12 +53,12 @@ const agencyAdminGetDetailsForStatusEpic: AgencyEpic = (
       ),
     ),
     map((agency) =>
-      agencyAdminSlice.actions.setAgencyNeedingReview(agency ?? null),
+      agencyAdminSlice.actions.fetchAgencyNeedingReviewSucceeded(
+        agency ?? null,
+      ),
     ),
     catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.setSelectedAgencyNeedingReviewIdFailed(
-        error.message,
-      ),
+      agencyAdminSlice.actions.fetchAgencyNeedingReviewFailed(error.message),
     ),
   );
 
@@ -114,31 +114,10 @@ const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
         ),
     ),
     catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.updateAgencyStatusFailed(error.message),
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusFailed(
+        error.message,
+      ),
     ),
-  );
-
-const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
-  action$.pipe(
-    filter(
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded.match,
-    ),
-    map(({ payload }) => {
-      const agencyAdminState = state$.value.admin.agencyAdmin;
-      const agencyWasNeedingReviewIndex =
-        agencyAdminState.agencyNeedingReviewOptions.findIndex(
-          ({ id }) => id === payload,
-        );
-      if (agencyWasNeedingReviewIndex === -1) return { type: "do-nothing" };
-
-      return agencyAdminSlice.actions.agencyNeedingReviewChangedAfterAnUpdate({
-        agencyNeedingReviewOptions:
-          agencyAdminState.agencyNeedingReviewOptions.filter(
-            ({ id }) => id !== payload,
-          ),
-        agencyNeedingReview: null,
-      });
-    }),
   );
 
 const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
@@ -170,9 +149,8 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
   agencyAdminGetDetailsForUpdateEpic,
-  agencyAdminGetDetailsForStatusEpic,
+  fetchAgencyNeedingReviewEpic,
   updateAgencyEpic,
   updateAgencyNeedingReviewStatusEpic,
-  agencyDoesNotNeedReviewAnymoreEpic,
   fetchAgencyOnIcUserUpdatedEpic,
 ];
