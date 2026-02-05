@@ -26,7 +26,7 @@ export const useAgencyAdminAutocomplete = () => {
     updateSearchTerm: (searchTerm: string) =>
       dispatch(agencyAdminSlice.actions.setAgencySearchQuery(searchTerm)),
     selectOption: (agencyId: AgencyId) => {
-      dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId));
+      dispatch(agencyAdminSlice.actions.fetchAgencyRequested(agencyId));
       dispatch(
         connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
           agencyId,

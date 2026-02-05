@@ -25,7 +25,7 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
 
   useEffect(() => {
     dispatch(
-      agencyAdminSlice.actions.setSelectedAgencyId(route.params.agencyId),
+      agencyAdminSlice.actions.fetchAgencyRequested(route.params.agencyId),
     );
     dispatch(
       connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
@@ -33,7 +33,7 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
       }),
     );
     return () => {
-      dispatch(agencyAdminSlice.actions.setAgency(null));
+      dispatch(agencyAdminSlice.actions.clearAgencyRequested());
     };
   }, [dispatch, route.params.agencyId]);
 

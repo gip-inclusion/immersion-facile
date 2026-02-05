@@ -200,7 +200,7 @@ describe("agencyAdmin", () => {
         }));
 
         store.dispatch(
-          agencyAdminSlice.actions.setSelectedAgencyId(agencyDto.id),
+          agencyAdminSlice.actions.fetchAgencyRequested(agencyDto.id),
         );
 
         feedWithFetchedAgency(agencyDto);
@@ -309,7 +309,7 @@ describe("agencyAdmin", () => {
           },
         }),
       }));
-      store.dispatch(agencyAdminSlice.actions.setSelectedAgencyId("anything"));
+      store.dispatch(agencyAdminSlice.actions.fetchAgencyRequested("anything"));
       expectAgencyAdminStateToMatch({
         feedback: { kind: "idle" },
         agency: null,
@@ -347,7 +347,8 @@ describe("agencyAdmin", () => {
     };
     const agencyDto = new AgencyDtoBuilder().withAddress(address).build();
 
-    store.dispatch(agencyAdminSlice.actions.setAgency(agencyDto));
+    store.dispatch(agencyAdminSlice.actions.fetchAgencyRequested(agencyDto.id));
+    feedWithFetchedAgency(agencyDto);
     expectAgencyAdminStateToMatch({
       agency: agencyDto,
     });
