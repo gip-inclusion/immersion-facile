@@ -44,13 +44,18 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // Step 1: Create the phone_numbers table
   pgm.createTable(phoneNumbersTable, {
     id: { type: "serial", primaryKey: true },
-    phone_number: { type: "text", notNull: true, unique: true },
+    phone_number: { type: "varchar(16)", notNull: true, unique: true },
     verified_at: { type: "timestamp", notNull: false, default: null },
     created_at: {
       type: "timestamp",
       notNull: true,
       default: pgm.func("NOW()"),
     },
+  });
+
+  // Step 2: Add E.164 format constraint
+  pgm.addConstraint(phoneNumbersTable, "phone_number_e164_format", {
+    check: "phone_number ~ '^\\+[1-9][0-9]{6,14}$'",
   });
 
   // Step 2: Add index on phone_number for fast lookups
