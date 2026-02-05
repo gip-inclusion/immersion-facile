@@ -14,7 +14,6 @@ import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedS
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import {
   type AgencyAdminState,
-  type AgencyAdminSubmitFeedback,
   agencyAdminInitialState,
   agencyAdminSlice,
 } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -41,63 +40,6 @@ describe("agencyAdmin", () => {
 
   describe("Agency activate or reject", () => {
     describe("fetch agencies needing review", () => {
-      it("triggers fetch of agencies needing review, shows it is fetching", () => {
-        store.dispatch(
-          agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested(),
-        );
-
-        expectAgencyAdminStateToMatch({
-          isFetchingAgenciesNeedingReview: true,
-          agencyOptions: [],
-        });
-      });
-
-      it("after fetch agencies options are fetched", () => {
-        const expectedAgencies: AgencyOption[] = [
-          {
-            id: "my-id",
-            name: "My expected agency",
-            kind: "mission-locale",
-            status: "active",
-            address: {
-              streetNumberAndAddress: "",
-              postcode: "75002",
-              departmentCode: "75",
-              city: "Paris",
-            },
-            refersToAgencyName: null,
-          },
-        ];
-
-        store.dispatch(
-          agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested(),
-        );
-        feedWithAgencyOptions(expectedAgencies);
-        expectAgencyAdminStateToMatch({
-          isFetchingAgenciesNeedingReview: false,
-          agencyNeedingReviewOptions: expectedAgencies,
-        });
-      });
-
-      it("display feedback error on fetch failure", () => {
-        const expectedFeedback: AgencyAdminSubmitFeedback = {
-          kind: "errored",
-          errorMessage: "Ceci est mon erreur",
-        };
-
-        store.dispatch(
-          agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested(),
-        );
-
-        feedAgencyOptionsWithError(new Error(expectedFeedback.errorMessage));
-
-        expectAgencyAdminStateToMatch({
-          feedback: expectedFeedback,
-          isFetchingAgenciesNeedingReview: false,
-          agencyNeedingReviewOptions: [],
-        });
-      });
-
       it("display the agency to activate or reject on selection", () => {
         store.dispatch(
           agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
@@ -481,10 +423,6 @@ describe("agencyAdmin", () => {
 
   const feedWithAgencyOptions = (agencyOptions: AgencyOption[]) => {
     dependencies.agencyGateway.agencyOptions$.next(agencyOptions);
-  };
-
-  const feedAgencyOptionsWithError = (error: Error) => {
-    dependencies.agencyGateway.agencyOptions$.error(error);
   };
 
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {

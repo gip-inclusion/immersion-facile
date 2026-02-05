@@ -35,24 +35,6 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
     map(agencyAdminSlice.actions.setAgencyOptions),
   );
 
-const agencyAdminGetNeedingReviewEpic: AgencyEpic = (
-  action$,
-  state$,
-  { agencyGateway },
-) =>
-  action$.pipe(
-    filter(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested.match),
-    switchMap(() =>
-      agencyGateway.listAgencyOptionsNeedingReview$(
-        getAdminToken(state$.value),
-      ),
-    ),
-    map(agencyAdminSlice.actions.setAgencyNeedingReviewOptions),
-    catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.fetchAgenciesNeedingReviewFailed(error.message),
-    ),
-  );
-
 const agencyAdminGetDetailsForStatusEpic: AgencyEpic = (
   action$,
   state$,
@@ -178,7 +160,6 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
 
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
-  agencyAdminGetNeedingReviewEpic,
   agencyAdminGetDetailsForUpdateEpic,
   agencyAdminGetDetailsForStatusEpic,
   updateAgencyEpic,
