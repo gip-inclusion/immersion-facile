@@ -100,9 +100,10 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
     uow.agencyRepository.agencies = [toAgencyWithRights(previousAgency, {})];
     const input: TransferConventionToAgencyPayload = {
       agencyId: newAgency.id,
-      conventionId: convention.id,
+      convention,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
+      shouldNotifyActors: true,
     };
 
     await expectPromiseToFailWithError(
@@ -114,9 +115,10 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
   it("throw if previous agency not found", async () => {
     const input: TransferConventionToAgencyPayload = {
       agencyId: newAgency.id,
-      conventionId: convention.id,
+      convention,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
+      shouldNotifyActors: true,
     };
 
     await expectPromiseToFailWithError(
@@ -133,9 +135,10 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
 
     const input: TransferConventionToAgencyPayload = {
       agencyId: newAgency.id,
-      conventionId: convention.id,
+      convention: convention,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
+      shouldNotifyActors: true,
     };
 
     await expectPromiseToFailWithError(
@@ -161,9 +164,10 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
 
     await usecase.execute({
       agencyId: newAgency.id,
-      conventionId: convention.id,
+      convention,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
+      shouldNotifyActors: true,
     });
 
     expectSavedNotificationsAndEvents({
@@ -244,5 +248,23 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
         },
       ],
     });
+  });
+
+  it("does not notify when shouldNotifyActors is false", async () => {
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(previousAgency, {}),
+      toAgencyWithRights(newAgency, {}),
+    ];
+    uow.conventionRepository.setConventions([convention]);
+
+    await usecase.execute({
+      agencyId: newAgency.id,
+      convention,
+      justification: "agency change",
+      previousAgencyId: previousAgency.id,
+      shouldNotifyActors: false,
+    });
+
+    expectSavedNotificationsAndEvents({ emails: [], sms: [] });
   });
 });

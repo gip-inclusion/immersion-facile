@@ -105,7 +105,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
   | GenericEvent<"ConventionWithAssessmentBroadcastRequested", WithConventionDto & WithAssessmentDto & WithTriggeredBy>
   | GenericEvent<"ConventionBroadcastRequested", WithConventionDto & WithTriggeredBy>
-  | GenericEvent<"ConventionTransferredToAgency", TransferConventionToAgencyPayload & WithTriggeredBy>
+  | GenericEvent<"ConventionTransferredToAgency",  WithConventionDto & TransferConventionToAgencyPayload & WithTriggeredBy>
   | GenericEvent<"ConventionCounsellorNameEdited", WithConventionId & WithOptionalFirstnameAndLastname & WithTriggeredBy>
   | GenericEvent<"ConventionBeneficiaryBirthdateEdited", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
