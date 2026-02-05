@@ -12,7 +12,6 @@ import { makeAddAgenciesAndUsers } from "../../domains/agency/use-cases/AddAgenc
 import { makeAddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { makeListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
-import { makePrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
 import { makeRegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/RegisterAgencyToConnectedUser";
 import { makeUpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
@@ -836,9 +835,6 @@ export const createUseCases = ({
     }),
 
     listAgencyOptionsByFilter: makeListAgencyOptionsByFilter({
-      uowPerformer,
-    }),
-    privateListAgencies: makePrivateListAgencies({
       uowPerformer,
     }),
 
