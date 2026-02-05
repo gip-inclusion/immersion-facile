@@ -435,7 +435,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
             appellationCode: sql<string>`CAST(${ref("pad.ogr_appellation")} AS text)`,
             appellationLabel: ref("pad.libelle_appellation_long"),
           }).as("appellation"),
-          ref("discussions.business_name").as("businessName"), // ✅
+          ref("discussions.business_name").as("businessName"),
           sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
             "createdAt",
           ),
