@@ -12,6 +12,7 @@ export const getReferedAgency = async (
       name: referedAgency.name,
       contactEmail: referedAgency.contactEmail,
       kind: referedAgency.kind,
+      siret: referedAgency.agencySiret,
     };
   throw errors.agency.notFound({ agencyId });
 };

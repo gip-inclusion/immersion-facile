@@ -80,6 +80,7 @@ export const conventionDtoToConventionReadDto = async (
             name: agencyRefersTo.name,
             contactEmail: agencyRefersTo.contactEmail,
             kind: agencyRefersTo.kind,
+            siret: agencyRefersTo.kind,
           },
         }
       : {}),

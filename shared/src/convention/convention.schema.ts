@@ -571,6 +571,7 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
           name: zStringMinLength1,
           contactEmail: emailSchema,
           kind: agencyKindSchema,
+          siret: siretSchema,
         })
         .optional(),
       assessment: conventionAssessmentFieldsSchema,
