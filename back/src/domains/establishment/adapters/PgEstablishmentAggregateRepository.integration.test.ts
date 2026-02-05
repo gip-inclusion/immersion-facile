@@ -231,6 +231,61 @@ describe("PgEstablishmentAggregateRepository", () => {
             ),
           });
         });
+        it("also returns non available (according to max contact requests) establishment", async () => {
+          const unavailableEstablishment = new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("00000000000027")
+            .withIsMaxDiscussionsForPeriodReached(true)
+            .withOffers([cartographeImmersionOffer])
+            .withLocations([
+              new LocationBuilder(locationOfSearchPosition)
+                .withId(uuid())
+                .build(),
+            ])
+            .withUserRights([osefUserRight])
+            .build();
+          const establishmentSetWithUnavailableOne = [
+            ...baseTestEstablishmentAggregates,
+            unavailableEstablishment,
+          ];
+
+          await Promise.all(
+            establishmentSetWithUnavailableOne.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: {
+              searchableBy: undefined,
+              nafCodes: undefined,
+              locationIds: undefined,
+              sirets: undefined,
+              fitForDisabledWorkers: undefined,
+              appellationCodes: undefined,
+            },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 6,
+            },
+            data: baseTestEstablishmentAggregates.map(
+              (establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+            ),
+          });
+        });
       });
 
       describe("filters.searchableBy", () => {
@@ -3390,6 +3445,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentWithOfferA1101_AtPosition.establishment.updatedAt.toISOString(),
             remoteWorkMode:
               establishmentWithOfferA1101_AtPosition.offers[0].remoteWorkMode,
+            isAvailable: true,
           },
         );
       });

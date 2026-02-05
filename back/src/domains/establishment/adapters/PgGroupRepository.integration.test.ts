@@ -238,6 +238,7 @@ describe("PgEstablishmentGroupRepository", () => {
       updatedAt: establishment.updatedAt?.toISOString(),
       createdAt: establishment.createdAt.toISOString(),
       remoteWorkMode,
+      isAvailable: !establishment.isMaxDiscussionsForPeriodReached,
     });
 
     expectToEqual(groupWithResults, {

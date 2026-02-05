@@ -417,6 +417,8 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
     createdAt: establishmentAgg.establishment.createdAt.toISOString(),
     fitForDisabledWorkers: "no",
     remoteWorkMode: remoteWorkMode,
+    isAvailable:
+      !establishmentAgg.establishment.isMaxDiscussionsForPeriodReached,
   };
 };
 
@@ -466,4 +468,6 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = ({
   createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
   fitForDisabledWorkers: "no",
   remoteWorkMode: remoteWorkMode,
+  isAvailable:
+    !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached,
 });

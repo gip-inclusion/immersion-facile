@@ -73,6 +73,8 @@ export const makeExpectedSearchResult = ({
     updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
     createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
     remoteWorkMode: remoteWorkMode ?? firstOffer.remoteWorkMode,
+    isAvailable:
+      !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached,
   } as RepositorySearchResultDto; // d'où le as
 };
 

@@ -70,6 +70,7 @@ const searchImmersionResult: SearchImmersionResultPublicV3 = {
   locationId: "123",
   fitForDisabledWorkers: "no",
   remoteWorkMode: "ON_SITE",
+  isAvailable: true,
 };
 
 const withAuthorizationHeader = {
