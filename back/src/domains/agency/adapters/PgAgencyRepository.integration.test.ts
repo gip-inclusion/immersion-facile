@@ -23,6 +23,7 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { phoneNumberExist } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type { AgencyWithoutRights } from "../ports/AgencyRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
@@ -243,6 +244,50 @@ describe("PgAgencyRepository", () => {
       );
       expectToEqual(retrievedAgency, agencyWithNullDelegation);
     });
+
+    it("inserts two agencies with the same phone number", async () => {
+      const phoneNumber = "+33610101010";
+
+      const agency1 = toAgencyWithRights(
+        agency1builder
+          .withName("agency1")
+          .withAgencySiret("11110000111100")
+          .withAddress({
+            streetNumberAndAddress: "My new adress",
+            postcode: "64100",
+            departmentCode: "64",
+            city: "Bayonne",
+          })
+          .withPhoneNumber(phoneNumber)
+          .withKind("pole-emploi")
+          .build(),
+        {
+          [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+      const agency2 = toAgencyWithRights(
+        agency2builder
+          .withName("agency2")
+          .withAgencySiret("11110000111105")
+          .withAddress({
+            streetNumberAndAddress: "My new adress",
+            postcode: "64100",
+            departmentCode: "64",
+            city: "Bayonne",
+          })
+          .withPhoneNumber(phoneNumber)
+          .withKind("pole-emploi")
+          .build(),
+        {
+          [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+
+      expectToEqual(await agencyRepository.getAgencies({}), [agency1, agency2]);
+    });
   });
 
   describe("update()", () => {
@@ -272,7 +317,7 @@ describe("PgAgencyRepository", () => {
             departmentCode: "64",
             city: "Bayonne",
           })
-          .withPhoneNumber("0610101010")
+          .withPhoneNumber("+33610101010")
           .withKind("pole-emploi")
           .withStatusJustification("justification du rejet")
           .withSignature("new signature")
@@ -298,15 +343,19 @@ describe("PgAgencyRepository", () => {
       const updatedFields: Partial<AgencyWithoutRights> = {
         status: "rejected",
         statusJustification: "justification du rejet",
-        phoneNumber: "0610101010",
+        phoneNumber: "+33610101011",
       };
+
       await agencyRepository.update({
         id: agency1.id,
         ...updatedFields,
       });
+
       expectToEqual(await agencyRepository.getAgencies({}), [
         { ...agency1, ...updatedFields },
       ]);
+
+      expect(await phoneNumberExist(db, agency1.phoneNumber)).toBe(true);
     });
 
     it("switch the counsellor to validator", async () => {

@@ -74,7 +74,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
           role: "establishment-admin",
           userId: testUser.id,
           job: "",
-          phone: "",
+          phone: "+33600000000",
           shouldReceiveDiscussionNotifications: true,
           isMainContactByPhone: false,
         },

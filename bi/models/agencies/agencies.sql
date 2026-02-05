@@ -40,9 +40,11 @@ select
     a.covered_departments,
     a.acquisition_campaign,
     a.acquisition_keyword,
-    a.phone_number
+    pn.phone_number
 from {{ source('immersion', 'agencies') }} as a
 left join {{ source('immersion', 'public_department_region') }} as pdr
     on pdr.department_code = a.department_code
 left join {{ source('immersion', 'agencies') }} as refersToAgencies
     on refersToAgencies.id = a.refers_to_agency_id
+left join {{ source('immersion', 'phone_numbers') }} as pn
+    on pn.id = a.phone_id

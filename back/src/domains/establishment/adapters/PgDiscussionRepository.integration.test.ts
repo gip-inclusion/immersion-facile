@@ -21,6 +21,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { phoneNumberExist } from "../../core/phone-number/adapters/pgPhoneHelper";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,
@@ -80,6 +81,7 @@ describe("PgDiscussionRepository", () => {
     await db.deleteFrom("discussions_archives").execute();
     await db.deleteFrom("exchanges").execute();
     await db.deleteFrom("users").execute();
+
     pgDiscussionRepository = new PgDiscussionRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
 
@@ -345,6 +347,36 @@ describe("PgDiscussionRepository", () => {
             },
           );
         });
+
+        it("update with new phone number", async () => {
+          const siret = "01234567891011";
+          const phoneNumber = "+33606060606";
+
+          const discussion = new DiscussionBuilder()
+            .withSiret(siret)
+            .withCreatedAt(new Date("2023-07-07"))
+            .withStatus({ status: "PENDING" })
+            .withPotentialBeneficiaryEmail(phoneNumber)
+            .build();
+
+          await pgDiscussionRepository.insert(discussion);
+
+          const updatedPhoneNumber = "+33606060607";
+          const updatedDiscussion = new DiscussionBuilder(discussion)
+            .withPotentialBeneficiaryPhone(updatedPhoneNumber)
+            .build();
+
+          await pgDiscussionRepository.update(updatedDiscussion);
+
+          expectToEqual(
+            await pgDiscussionRepository.getById(discussion.id),
+            updatedDiscussion,
+          );
+
+          expect(
+            await phoneNumberExist(db, discussion.potentialBeneficiary.phone),
+          ).toBe(true);
+        });
       });
 
       it("getById undefined when there is no discussion", async () => {
@@ -365,7 +397,7 @@ describe("PgDiscussionRepository", () => {
                 role: "establishment-admin",
                 userId: user.id,
                 job: "",
-                phone: "",
+                phone: "+33600000000",
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
@@ -2407,7 +2439,7 @@ describe("PgDiscussionRepository", () => {
                 role: "establishment-admin",
                 userId: user.id,
                 job: "",
-                phone: "",
+                phone: "+33600000000",
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
@@ -2425,7 +2457,7 @@ describe("PgDiscussionRepository", () => {
                 role: "establishment-admin",
                 userId: user.id,
                 job: "",
-                phone: "",
+                phone: "+33600000000",
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
@@ -2861,7 +2893,7 @@ describe("PgDiscussionRepository", () => {
             role: "establishment-admin",
             userId: user.id,
             job: "",
-            phone: "",
+            phone: "+33600000000",
             shouldReceiveDiscussionNotifications: true,
             isMainContactByPhone: false,
           },

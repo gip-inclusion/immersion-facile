@@ -29,6 +29,7 @@ import {
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { phoneNumbersExist } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { GeoParams } from "../entities/SearchMadeEntity";
 import {
@@ -3819,6 +3820,25 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
           title: "remove optional values",
         },
+        {
+          originalEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentCustomizedName(
+              "Activités des agences de travail temporaire",
+            )
+            .withUserRights([osefUserRight])
+            .build(),
+          updatedEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentCustomizedName(undefined)
+            .withUserRights([
+              {
+                ...osefUserRight,
+                phone: "+33600000001",
+              },
+            ])
+            .withEstablishmentUpdatedAt(updatedAt)
+            .build(),
+          title: "update user right phone number",
+        },
       ] satisfies {
         originalEstablishment: EstablishmentAggregate;
         updatedEstablishment: EstablishmentAggregate;
@@ -3846,6 +3866,12 @@ describe("PgEstablishmentAggregateRepository", () => {
           await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [updatedEstablishment],
         );
+
+        const oldPhones = originalEstablishment.userRights
+          .map((userRight) => userRight.phone)
+          .filter((phone) => phone !== undefined);
+
+        expect(await phoneNumbersExist(kyselyDb, oldPhones)).toBe(true);
       });
     });
   });

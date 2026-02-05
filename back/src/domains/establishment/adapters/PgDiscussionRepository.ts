@@ -18,6 +18,7 @@ import {
   type ExchangeRole,
   errors,
   type ImmersionObjective,
+  type PhoneNumber,
   type PotentialBeneficiaryCommonProps,
   pipeWithValue,
   type RejectionKind,
@@ -31,6 +32,7 @@ import {
   type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
+import { getOrCreatePhoneIds } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type {
   DiscussionRepository,
   GetDiscussionIdsParams,
@@ -326,7 +328,8 @@ export class PgDiscussionRepository implements DiscussionRepository {
       id: discussionId,
     });
 
-    return makeDiscussionDtoFromPgDiscussion(results).at(0);
+    const discussions = makeDiscussionDtoFromPgDiscussion(results);
+    return discussions.at(0);
   }
 
   public async getDiscussions(
@@ -354,6 +357,11 @@ export class PgDiscussionRepository implements DiscussionRepository {
         .selectFrom("establishments__users as eu")
         .innerJoin("discussions", "eu.siret", "discussions.siret")
         .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
+        .leftJoin(
+          "phone_numbers",
+          "discussions.potential_beneficiary_phone_id",
+          "phone_numbers.id",
+        )
         .innerJoin(
           "public_appellations_data as pad",
           "discussions.appellation_code",
@@ -413,33 +421,33 @@ export class PgDiscussionRepository implements DiscussionRepository {
           "discussions.business_name",
           "discussions.potential_beneficiary_first_name",
           "discussions.potential_beneficiary_last_name",
-          "discussions.potential_beneficiary_phone",
+          "phone_numbers.phone_number",
           "pad.ogr_appellation",
           "pad.libelle_appellation_long",
           "prd.code_rome",
           "prd.libelle_rome",
         ])
         .select(({ ref, fn }) => [
-          "discussions.id as id",
+          ref("discussions.id").as("id"),
           jsonBuildObject({
             romeCode: ref("prd.code_rome"),
             romeLabel: ref("prd.libelle_rome"),
             appellationCode: sql<string>`CAST(${ref("pad.ogr_appellation")} AS text)`,
             appellationLabel: ref("pad.libelle_appellation_long"),
           }).as("appellation"),
-          "business_name as businessName",
-          sql<string>`TO_CHAR(${ref("created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
+          ref("discussions.business_name").as("businessName"),
+          sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
             "createdAt",
           ),
-          "discussions.city as city",
-          "discussions.siret as siret",
-          "discussions.kind as kind",
-          "discussions.status as status",
-          "immersion_objective as immersionObjective",
+          ref("discussions.city").as("city"),
+          ref("discussions.siret").as("siret"),
+          ref("discussions.kind").as("kind"),
+          ref("discussions.status").as("status"),
+          ref("discussions.immersion_objective").as("immersionObjective"),
           jsonBuildObject({
             firstName: ref("potential_beneficiary_first_name"),
             lastName: ref("potential_beneficiary_last_name"),
-            phone: ref("potential_beneficiary_phone"),
+            phone: ref("phone_numbers.phone_number"),
           }).as("potentialBeneficiary"),
           fn
             .coalesce(
@@ -534,18 +542,28 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 
   public async insert(discussion: DiscussionDto) {
+    const discussionToInsert = await discussionToPgAndPhoneInsert(
+      this.transaction,
+      discussion,
+    );
+
     await this.transaction
       .insertInto("discussions")
-      .values(discussionToPg(discussion))
+      .values(discussionToInsert)
       .execute();
 
     await this.#insertAllExchanges(discussion.id, discussion.exchanges);
   }
 
   public async update(discussion: DiscussionDto) {
+    const discussionToUpdate = await discussionToPgAndPhoneInsert(
+      this.transaction,
+      discussion,
+    );
+
     await this.transaction
       .updateTable("discussions")
-      .set(discussionToPg(discussion))
+      .set(discussionToUpdate)
       .where("id", "=", discussion.id)
       .execute();
     await this.#clearAllExistingExchanges(discussion);
@@ -603,45 +621,54 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 }
 
-const discussionToPg = (
+const discussionToPgAndPhoneInsert = async (
+  transaction: KyselyDb,
   discussion: DiscussionDto,
-): InsertObject<Database, "discussions"> => ({
-  id: discussion.id,
-  appellation_code: +discussion.appellationCode,
-  business_name: discussion.businessName,
-  city: discussion.address.city,
-  created_at: discussion.createdAt,
-  updated_at: discussion.updatedAt,
-  department_code: discussion.address.departmentCode,
-  postcode: discussion.address.postcode,
-  potential_beneficiary_email: discussion.potentialBeneficiary.email,
-  potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
-  kind: discussion.kind,
-  immersion_objective: discussion.potentialBeneficiary.immersionObjective,
-  potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
-  potential_beneficiary_date_preferences:
-    discussion.potentialBeneficiary.datePreferences,
-  ...(discussion.kind === "IF"
-    ? {
-        potential_beneficiary_resume_link:
-          discussion.potentialBeneficiary.resumeLink,
-        potential_beneficiary_experience_additional_information:
-          discussion.potentialBeneficiary.experienceAdditionalInformation,
-      }
-    : {}),
-  potential_beneficiary_level_of_education:
-    discussion.kind === "1_ELEVE_1_STAGE"
-      ? discussion.potentialBeneficiary.levelOfEducation
-      : null,
-  street_number_and_address: discussion.address.streetNumberAndAddress,
-  siret: discussion.siret,
-  contact_method: discussion.contactMode,
-  potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
-  acquisition_campaign: discussion.acquisitionCampaign,
-  acquisition_keyword: discussion.acquisitionKeyword,
-  convention_id: discussion.conventionId,
-  ...discussionStatusWithRejectionToPg(discussion),
-});
+): Promise<InsertObject<Database, "discussions">> => {
+  const phoneId = (
+    await getOrCreatePhoneIds(transaction, [
+      discussion.potentialBeneficiary.phone,
+    ])
+  )[discussion.potentialBeneficiary.phone];
+
+  return {
+    id: discussion.id,
+    appellation_code: +discussion.appellationCode,
+    business_name: discussion.businessName,
+    city: discussion.address.city,
+    created_at: discussion.createdAt,
+    updated_at: discussion.updatedAt,
+    department_code: discussion.address.departmentCode,
+    postcode: discussion.address.postcode,
+    potential_beneficiary_email: discussion.potentialBeneficiary.email,
+    potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
+    kind: discussion.kind,
+    immersion_objective: discussion.potentialBeneficiary.immersionObjective,
+    potential_beneficiary_phone_id: phoneId,
+    potential_beneficiary_date_preferences:
+      discussion.potentialBeneficiary.datePreferences,
+    ...(discussion.kind === "IF"
+      ? {
+          potential_beneficiary_resume_link:
+            discussion.potentialBeneficiary.resumeLink,
+          potential_beneficiary_experience_additional_information:
+            discussion.potentialBeneficiary.experienceAdditionalInformation,
+        }
+      : {}),
+    potential_beneficiary_level_of_education:
+      discussion.kind === "1_ELEVE_1_STAGE"
+        ? discussion.potentialBeneficiary.levelOfEducation
+        : null,
+    street_number_and_address: discussion.address.streetNumberAndAddress,
+    siret: discussion.siret,
+    contact_method: discussion.contactMode,
+    potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
+    acquisition_campaign: discussion.acquisitionCampaign,
+    acquisition_keyword: discussion.acquisitionKeyword,
+    convention_id: discussion.conventionId,
+    ...discussionStatusWithRejectionToPg(discussion),
+  };
+};
 
 const getWithDiscussionStatusFromPgDiscussion = (
   discussion: GetDiscussionsResults[number]["discussion"],
@@ -911,7 +938,12 @@ const executeGetDiscussions = (
       (join) => join.onRef("d.id", "=", "filtered_discussions.id"),
     )
     .leftJoin("exchanges as e", "d.id", "e.discussion_id")
-    .groupBy(["d.id", "d.created_at", "d.siret"])
+    .leftJoin(
+      "phone_numbers as pn",
+      "d.potential_beneficiary_phone_id",
+      "pn.id",
+    )
+    .groupBy(["d.id", "d.created_at", "d.siret", "pn.phone_number"])
     .orderBy("d.created_at", "desc")
     .orderBy("d.siret", "asc")
     .orderBy("d.updated_at", "desc")
@@ -932,7 +964,7 @@ const executeGetDiscussions = (
             firstName: ref("d.potential_beneficiary_first_name"),
             lastName: ref("d.potential_beneficiary_last_name"),
             email: ref("d.potential_beneficiary_email"),
-            phone: ref("d.potential_beneficiary_phone"),
+            phone: ref("pn.phone_number").$castTo<PhoneNumber>(),
             resumeLink: ref("d.potential_beneficiary_resume_link"),
             experienceAdditionalInformation: ref(
               "potential_beneficiary_experience_additional_information",
