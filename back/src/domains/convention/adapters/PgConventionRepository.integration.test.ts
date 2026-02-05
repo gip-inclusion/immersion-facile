@@ -436,7 +436,7 @@ describe("PgConventionRepository", () => {
       lastName: "Doe",
       job: "Chef",
       email,
-      phone: "0111223344",
+      phone: "+33111223344",
       role: "establishment-tutor",
     };
 
@@ -591,7 +591,7 @@ describe("PgConventionRepository", () => {
         lastName: "Doe",
         job: "Tutor",
         email: "tutor123w@mail.com",
-        phone: "0111223344",
+        phone: "+33111223344",
         role: "establishment-tutor",
       };
 
@@ -615,7 +615,7 @@ describe("PgConventionRepository", () => {
           firstName: "Rep",
           lastName: "Rep",
           email: "Rep@rep.com",
-          phone: "rep",
+          phone: "+33600000000",
         })
         .build();
 
@@ -844,7 +844,7 @@ describe("PgConventionRepository", () => {
         lastName: "Doe",
         job: "Tutor",
         email: "tutor123w@mail.com",
-        phone: "0111223344",
+        phone: "+33111223344",
         role: "establishment-tutor",
       };
 

@@ -29,6 +29,7 @@ import {
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { phoneNumbersExist } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { GeoParams } from "../entities/SearchMadeEntity";
 import {
@@ -3955,7 +3956,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withUserRights([
               {
                 ...osefUserRight,
-                phone: "+33600000000",
+                phone: "+33600000001",
               },
             ])
             .withEstablishmentUpdatedAt(updatedAt)
@@ -3989,6 +3990,12 @@ describe("PgEstablishmentAggregateRepository", () => {
           await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [updatedEstablishment],
         );
+
+        const oldPhones = originalEstablishment.userRights
+          .map((userRight) => userRight.phone)
+          .filter((phone) => phone !== undefined);
+
+        expect(await phoneNumbersExist(kyselyDb, oldPhones)).toBe(true);
       });
     });
   });
