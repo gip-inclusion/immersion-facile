@@ -119,6 +119,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
       })
       .optional(),
     place: z.string().optional(),
+    showOnlyAvailableOffers: zToBoolean.optional(),
   })
   .and(paginationQueryParamsSchema)
   .and(geoParamsAndSortSchema)
