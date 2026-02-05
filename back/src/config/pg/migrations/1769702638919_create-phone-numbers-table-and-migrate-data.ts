@@ -63,7 +63,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         type: "integer",
         notNull: false,
         references: phoneNumbersTable,
-        onDelete: "SET NULL",
       },
     });
   }
@@ -101,17 +100,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     }
   }
 
-  // Step 6: Add indexes on foreign key columns for performance
-  for (const { table, targetColumn } of migrations) {
-    pgm.createIndex(table, targetColumn);
-  }
-
-  // Step 7: Rename old phone columns
+  // Step 6: Rename old phone columns
   for (const { table, sourceColumn } of migrations) {
     pgm.renameColumn(table, sourceColumn, `old__${sourceColumn}`);
   }
 
-  // Step 8: Make old columns nullable
+  // Step 7: Make old columns nullable
   for (const { table, sourceColumn } of migrations) {
     pgm.alterColumn(table, `old__${sourceColumn}`, {
       notNull: false,
@@ -144,16 +138,11 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     }
   }
 
-  // Step 4: Drop indexes
-  for (const { table, targetColumn } of migrations) {
-    pgm.dropIndex(table, targetColumn);
-  }
-
-  // Step 5: Drop foreign key columns
+  // Step 4: Drop foreign key columns
   for (const { table, targetColumn } of migrations) {
     pgm.dropColumn(table, targetColumn);
   }
 
-  // Step 6: Drop the phone_numbers table
+  // Step 5: Drop the phone_numbers table
   pgm.dropTable(phoneNumbersTable);
 }
