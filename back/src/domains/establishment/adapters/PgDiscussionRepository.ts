@@ -335,8 +335,8 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getDiscussions(
     params: GetDiscussionsParams,
   ): Promise<DiscussionDto[]> {
-    return executeGetDiscussions(this.transaction, params).then(
-      async (results) => makeDiscussionDtoFromPgDiscussion(results),
+    return executeGetDiscussions(this.transaction, params).then((results) =>
+      makeDiscussionDtoFromPgDiscussion(results),
     );
   }
 
