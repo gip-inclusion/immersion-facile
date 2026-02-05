@@ -666,6 +666,7 @@ const filterSearch =
 
 const addFiltersToBuilder =
   ({
+    agencyId,
     ids,
     startDateGreater,
     startDateLessOrEqual,
@@ -679,6 +680,7 @@ const addFiltersToBuilder =
   (builder: ConventionQueryBuilder) =>
     pipeWithValue(
       builder,
+      (b) => (agencyId ? b.where("conventions.agency_id", "=", agencyId) : b),
       (b) => (ids && ids.length > 0 ? b.where("conventions.id", "in", ids) : b),
       (b) =>
         withStatuses && withStatuses.length > 0
