@@ -1,0 +1,104 @@
+# OpenSecKit Discovery Workflow State
+workflow:
+  status: "completed"
+  started_at: "2026-01-28T10:00:00Z"
+  completed_at: "2026-01-28T11:30:00Z"
+  current_phase: "synthesis"
+  mode: "full"
+
+phases:
+  product_context:
+    status: "completed"
+    started_at: "2026-01-28T10:00:00Z"
+    completed_at: "2026-01-28T10:15:00Z"
+    output:
+      - "product.yaml"
+      - "business.yaml"
+      - "glossary.yaml"
+    result:
+      domain: "emploi-inclusion"
+      product_name: "Immersion Facilitée"
+      feature_count: 9
+      term_count: 16
+      acronym_count: 15
+      bounded_context_count: 5
+
+  architecture:
+    status: "completed"
+    started_at: "2026-01-28T10:15:00Z"
+    completed_at: "2026-01-28T10:30:00Z"
+    output:
+      - "architecture.yaml"
+    result:
+      style: "monorepo-monolith"
+      components: 9
+      data_flows: 8
+      apis: 3
+      adrs: 3
+      patterns: 6
+
+  domain_model:
+    status: "completed"
+    started_at: "2026-01-28T10:30:00Z"
+    completed_at: "2026-01-28T10:45:00Z"
+    output:
+      - "data.yaml"
+      - "actors.yaml"
+      - "boundaries.yaml"
+      - "user-journeys.yaml"
+    result:
+      data_categories: 10
+      user_types: 7
+      service_accounts: 8
+      trust_zones: 7
+      trust_boundaries: 11
+      user_journeys: 5
+
+  ecosystem:
+    status: "completed"
+    started_at: "2026-01-28T10:45:00Z"
+    completed_at: "2026-01-28T11:00:00Z"
+    output:
+      - "integrations.yaml"
+      - "supply_chain.yaml"
+    result:
+      integrations: 12
+      sbom_components: 22
+      critical_dependencies: 4
+      supply_chain_threats: 4
+
+  operations:
+    status: "completed"
+    started_at: "2026-01-28T11:00:00Z"
+    completed_at: "2026-01-28T11:15:00Z"
+    output:
+      - "controls.yaml"
+      - "tooling.yaml"
+      - "team.yaml"
+      - "operations.yaml"
+    result:
+      security_controls: 22
+      environments: 4
+      scheduled_jobs: 5
+      runbooks_missing: 5
+
+  synthesis:
+    status: "completed"
+    started_at: "2026-01-28T11:15:00Z"
+    completed_at: "2026-01-28T11:30:00Z"
+    output:
+      - "gaps.yaml"
+      - "index.yaml"
+    result:
+      total_gaps: 16
+      critical_gaps: 1
+      resolved_gaps: 4
+      in_progress_gaps: 1
+      health_score: 87
+      _updated: "2026-01-28 - GAP-001, GAP-003, GAP-005, GAP-008 résolus. GAP-018 en cours."
+
+incremental:
+  enabled: false
+  base_commit: null
+  changed_files: []
+  affected_phases: []

@@ -1,0 +1,285 @@
+# OpenSecKit System Model - Business Context
+# Phase 1: Product Context
+# Generated: 2026-01-28
+
+metadata:
+  section: "business"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+business_context:
+  domain: "emploi-inclusion"
+  description: |
+    Immersion Facilitée opère dans le domaine de l'emploi et de l'inclusion professionnelle.
+    Le service facilite les "PMSMP" (Périodes de Mise en Situation en Milieu Professionnel),
+    permettant aux demandeurs d'emploi de découvrir un métier, confirmer un projet professionnel,
+    ou initier une démarche de recrutement.
+
+  regulatory_context:
+    - name: "RGPD"
+      description: "Règlement Général sur la Protection des Données"
+      relevance: "Traitement de données personnelles (identité, emploi, santé potentielle)"
+    - name: "Code du Travail"
+      description: "Articles L5135-1 à L5135-8 relatifs aux PMSMP"
+      relevance: "Cadre légal des immersions professionnelles"
+    - name: "RGS"
+      description: "Référentiel Général de Sécurité"
+      relevance: "Service public numérique"
+    - name: "RGAA"
+      description: "Référentiel Général d'Amélioration de l'Accessibilité"
+      relevance: "Accessibilité numérique obligatoire"
+
+  stakeholders:
+    - role: "GIP Inclusion"
+      type: "owner"
+      concerns:
+        - "Succès du déploiement national"
+        - "Conformité réglementaire"
+        - "Qualité du service"
+
+    - role: "France Travail (ex-Pôle Emploi)"
+      type: "partner"
+      concerns:
+        - "Intégration avec les SI existants"
+        - "Accompagnement des demandeurs d'emploi"
+        - "Validation des conventions"
+
+    - role: "Missions Locales"
+      type: "partner"
+      concerns:
+        - "Accompagnement des jeunes"
+        - "Utilisation simplifiée"
+
+    - role: "Cap Emploi"
+      type: "partner"
+      concerns:
+        - "Accompagnement des travailleurs handicapés"
+        - "Accessibilité de la plateforme"
+
+    - role: "Chambres de Commerce et d'Industrie"
+      type: "partner"
+      concerns:
+        - "Gestion des mini-stages"
+        - "Relation avec les entreprises locales"
+
+    - role: "Entreprises"
+      type: "user"
+      concerns:
+        - "Simplicité d'inscription"
+        - "Gestion des demandes"
+        - "Conformité des conventions"
+
+    - role: "Bénéficiaires"
+      type: "user"
+      concerns:
+        - "Facilité de recherche"
+        - "Rapidité du processus"
+        - "Protection des données personnelles"
+
+    - role: "DGEFP"
+      type: "regulator"
+      concerns:
+        - "Conformité au cadre légal des PMSMP"
+        - "Statistiques nationales"
+
+business_processes:
+  - id: "proc-convention-creation"
+    name: "Création de convention d'immersion"
+    description: |
+      Un bénéficiaire initie une demande d'immersion auprès d'une entreprise.
+      La convention passe par plusieurs étapes de validation avant d'être signée
+      par toutes les parties.
+    criticality: "high"
+    data_handled:
+      - "Identité bénéficiaire"
+      - "Coordonnées contact"
+      - "Dates et horaires immersion"
+      - "Informations entreprise"
+    actors_involved:
+      - "beneficiary"
+      - "establishment-representative"
+      - "establishment-tutor"
+      - "counsellor"
+      - "validator"
+    compliance_relevant:
+      - "RGPD (traitement données personnelles)"
+      - "Code du Travail (cadre PMSMP)"
+
+  - id: "proc-convention-validation"
+    name: "Validation de convention"
+    description: |
+      Les conseillers (counsellor) examinent les conventions soumises et les transmettent
+      aux validateurs pour approbation finale. Le statut évolue selon le workflow défini.
+    criticality: "high"
+    data_handled:
+      - "Convention complète"
+      - "Historique des modifications"
+      - "Justifications de décision"
+    actors_involved:
+      - "counsellor"
+      - "validator"
+      - "agency-admin"
+    compliance_relevant:
+      - "Traçabilité des décisions"
+
+  - id: "proc-convention-signature"
+    name: "Signature électronique"
+    description: |
+      Chaque signataire (bénéficiaire, représentant légal si mineur, représentant entreprise)
+      signe la convention via un lien magique personnalisé.
+    criticality: "high"
+    data_handled:
+      - "Identité signataires"
+      - "Horodatage signatures"
+    actors_involved:
+      - "beneficiary"
+      - "beneficiary-representative"
+      - "establishment-representative"
+      - "beneficiary-current-employer"
+    compliance_relevant:
+      - "Valeur légale de la signature"
+      - "RGPD (consentement)"
+
+  - id: "proc-establishment-registration"
+    name: "Inscription entreprise"
+    description: |
+      Une entreprise s'inscrit sur la plateforme pour proposer des immersions.
+      Les données SIRENE sont vérifiées et les offres d'immersion créées.
+    criticality: "medium"
+    data_handled:
+      - "SIRET entreprise"
+      - "Coordonnées contact"
+      - "Métiers proposés (codes ROME)"
+    actors_involved:
+      - "establishment-admin"
+      - "establishment-contact"
+    compliance_relevant:
+      - "RGPD (données entreprise)"
+      - "Vérification SIRENE"
+
+  - id: "proc-search"
+    name: "Recherche d'immersion"
+    description: |
+      Un bénéficiaire recherche des entreprises par métier (code ROME/appellation)
+      et localisation géographique.
+    criticality: "medium"
+    data_handled:
+      - "Critères de recherche"
+      - "Position géographique"
+    actors_involved:
+      - "beneficiary"
+    compliance_relevant:
+      - "RGPD (logs de recherche)"
+
+  - id: "proc-contact-request"
+    name: "Demande de contact"
+    description: |
+      Suite à une recherche, un bénéficiaire peut contacter une entreprise
+      pour initier une discussion et potentiellement une convention.
+    criticality: "medium"
+    data_handled:
+      - "Identité bénéficiaire"
+      - "Message de contact"
+    actors_involved:
+      - "beneficiary"
+      - "establishment-contact"
+    compliance_relevant:
+      - "RGPD (transmission données)"
+
+  - id: "proc-assessment"
+    name: "Bilan d'immersion"
+    description: |
+      À la fin de l'immersion, un bilan est rédigé par le tuteur
+      pour capitaliser sur l'expérience.
+    criticality: "medium"
+    data_handled:
+      - "Évaluation immersion"
+      - "Compétences observées"
+      - "Recommandations"
+    actors_involved:
+      - "establishment-tutor"
+      - "beneficiary"
+      - "counsellor"
+    compliance_relevant:
+      - "RGPD (données évaluatives)"
+
+business_rules:
+  - id: "rule-convention-duration"
+    rule: "Une convention d'immersion ne peut pas dépasser 30 jours de présence effective"
+    security_implication: "Validation automatique des dates dans le formulaire"
+
+  - id: "rule-mini-stage-duration"
+    rule: "Un mini-stage CCI est limité à 5 jours de présence et 8 jours calendaires"
+    security_implication: "Validation distincte selon le type d'immersion"
+
+  - id: "rule-minor-representative"
+    rule: "Si le bénéficiaire est mineur, un représentant légal doit signer la convention"
+    security_implication: "Vérification de l'âge et ajout automatique du signataire"
+
+  - id: "rule-signature-order"
+    rule: "Tous les signataires doivent signer pour que la convention passe en validation"
+    security_implication: "Workflow de statut strict avec vérification des signatures"
+
+  - id: "rule-agency-validation"
+    rule: "Seuls les conseillers et validateurs habilités peuvent valider les conventions"
+    security_implication: "Contrôle d'accès basé sur les rôles agence"
+
+  - id: "rule-establishment-siret"
+    rule: "Le SIRET de l'entreprise doit être valide et actif dans le référentiel SIRENE"
+    security_implication: "Vérification automatique via API INSEE/Annuaire des Entreprises"
+
+  - id: "rule-contact-throttling"
+    rule: "Un délai minimum est requis entre deux demandes de contact similaires"
+    security_implication: "Protection contre le spam et les abus"
+
+  - id: "rule-magic-link-expiry"
+    rule: "Les liens magiques de signature ont une durée de validité limitée"
+    security_implication: "Expiration automatique des tokens JWT"
+
+organization_types:
+  # Note: Actor definitions are in actors.yaml, but we reference agency types here
+  agency_kinds:
+    - id: "pole-emploi"
+      label: "France Travail (anciennement Pôle emploi)"
+      description: "Service public de l'emploi"
+
+    - id: "mission-locale"
+      label: "Mission Locale"
+      description: "Accompagnement des jeunes de 16 à 25 ans"
+
+    - id: "cap-emploi"
+      label: "Cap Emploi"
+      description: "Accompagnement des travailleurs handicapés"
+
+    - id: "operateur-cep"
+      label: "Opérateur du CEP"
+      description: "Conseil en Évolution Professionnelle"
+
+    - id: "conseil-departemental"
+      label: "Conseil Départemental"
+      description: "Accompagnement RSA"
+
+    - id: "structure-IAE"
+      label: "Structure IAE"
+      description: "Insertion par l'Activité Économique"
+
+    - id: "fonction-publique"
+      label: "Fonction publique"
+      description: "Administration publique"
+
+    - id: "cci"
+      label: "Chambres de Commerce et d'Industrie"
+      description: "Mini-stages CCI"
+
+    - id: "cma"
+      label: "Chambre des métiers de l'Artisanat"
+      description: "Mini-stages artisanat"
+
+    - id: "chambre-agriculture"
+      label: "Chambre d'agriculture"
+      description: "Mini-stages agriculture"
+
+    - id: "autre"
+      label: "Autre"
+      description: "Autre type de structure"

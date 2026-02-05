@@ -1,0 +1,357 @@
+# OpenSecKit System Model - Operations
+# Phase 5: Operations
+# Generated: 2026-01-28
+
+metadata:
+  section: "operations"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+environments:
+  - id: "env-local"
+    name: "Local Development"
+    type: "development"
+    url: "http://localhost:3000"
+    description: "Environnement de développement local avec docker-compose"
+    components:
+      - "comp-frontend (Vite dev server)"
+      - "comp-backend (ts-node-dev)"
+      - "comp-database (Docker PostgreSQL)"
+      - "comp-redis (Docker Redis)"
+    data:
+      source: "Seed data"
+      pii_scrubbed: false
+    access:
+      authentication: "None"
+      authorization: "None"
+
+  - id: "env-review"
+    name: "Review Apps"
+    type: "review"
+    url: "Dynamic per PR"
+    description: "Environnements temporaires pour review de PRs"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+      - "comp-database"
+    data:
+      source: "Seed data"
+      pii_scrubbed: true
+    access:
+      authentication: "Public URL"
+      authorization: "None"
+
+  - id: "env-staging"
+    name: "Staging"
+    type: "staging"
+    url: "https://staging.immersion-facile.beta.gouv.fr"
+    description: "Environnement de pré-production pour validation"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+      - "comp-database"
+      - "comp-redis"
+      - "comp-pipelines"
+    data:
+      source: "Production copy (anonymized)"
+      pii_scrubbed: true
+    access:
+      authentication: "ProConnect"
+      authorization: "Team members"
+
+  - id: "env-production"
+    name: "Production"
+    type: "production"
+    url: "https://immersion-facile.beta.gouv.fr"
+    description: "Environnement de production"
+    region: "osc-secnum-fr1"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+      - "comp-database"
+      - "comp-redis"
+      - "comp-pipelines"
+      - "comp-event-crawler"
+      - "comp-adminer"
+    data:
+      source: "Live data"
+      pii_scrubbed: false
+    access:
+      authentication: "ProConnect / Magic Links"
+      authorization: "Role-based"
+    sla:
+      availability: "99%"
+      response_time: "<500ms"
+
+  - id: "env-pentest"
+    name: "Pentest / Bug Bounty"
+    type: "pentest"
+    url: "https://pentest.immersion-facile.beta.gouv.fr"
+    description: "Environnement dédié au programme de bug bounty et tests de pénétration"
+    region: "osc-secnum-fr1"
+    components:
+      - "comp-frontend"
+      - "comp-backend"
+      - "comp-database"
+      - "comp-redis"
+    data:
+      source: "Synthetic data"
+      pii_scrubbed: true
+    access:
+      authentication: "Credentials bug bounty"
+      authorization: "Pentesters autorisés"
+    purpose:
+      - "Tests de pénétration"
+      - "Programme de bug bounty"
+      - "Évaluation de sécurité"
+    _note: "Environnement isolé avec données synthétiques pour tests de sécurité"
+
+monitoring:
+  health_checks:
+    - endpoint: "/api"
+      type: "http"
+      interval: "30s"
+      timeout: "10s"
+      alerts_to:
+        - "team-platform"
+
+  metrics:
+    - name: "Response Time"
+      type: "latency"
+      source: "Scalingo"
+      threshold: "500ms"
+      alert_on_breach: true
+
+    - name: "Error Rate"
+      type: "error-rate"
+      source: "Sentry"
+      threshold: "1%"
+      alert_on_breach: true
+
+    - name: "Memory Usage"
+      type: "resource"
+      source: "Scalingo"
+      threshold: "80%"
+      alert_on_breach: true
+
+    - name: "CPU Usage"
+      type: "resource"
+      source: "Scalingo"
+      threshold: "80%"
+      alert_on_breach: true
+
+  dashboards:
+    - name: "Metabase Analytics"
+      url: "https://metabase.immersion-facile.beta.gouv.fr"
+      access: "Team members"
+      content:
+        - "Business metrics"
+        - "Convention statistics"
+        - "Agency dashboards"
+
+    - name: "Scalingo Dashboard"
+      url: "https://dashboard.scalingo.com"
+      access: "Platform Team"
+      content:
+        - "Infrastructure metrics"
+        - "Logs"
+        - "Deployments"
+
+alerts:
+  channels:
+    - name: "Discord"
+      type: "webhook"
+      severity: "all"
+
+    - name: "Email"
+      type: "email"
+      severity: "critical, high"
+
+  rules:
+    - name: "High Error Rate"
+      condition: "error_rate > 1%"
+      severity: "high"
+      channels:
+        - "Discord"
+        - "Email"
+
+    - name: "App Restart"
+      condition: "container restart"
+      severity: "medium"
+      channels:
+        - "Discord"
+
+    - name: "High Memory"
+      condition: "memory > 80%"
+      severity: "medium"
+      channels:
+        - "Discord"
+
+scheduled_jobs:
+  - id: "job-morning"
+    name: "Morning Jobs"
+    schedule: "0 7 * * *"
+    description: "Tâches matinales (rappels, mises à jour)"
+    script: "trigger-morning-jobs"
+    environment: "production"
+    tasks:
+      - "Convention reminders"
+      - "Contact request reminders (3d, 7d)"
+      - "Assessment reminders"
+      - "Establishment update suggestions"
+
+  - id: "job-early-morning"
+    name: "Early Morning Jobs"
+    schedule: "0 5 * * *"
+    description: "Tâches de maintenance matinales"
+    script: "trigger-early-morning-jobs"
+    environment: "production"
+    tasks:
+      - "Refresh materialized views"
+      - "Update ROME data"
+
+  - id: "job-evening"
+    name: "Evening Jobs"
+    schedule: "0 20 * * *"
+    description: "Tâches de fin de journée"
+    script: "trigger-evening-jobs"
+    environment: "production"
+    tasks:
+      - "Mark old conventions as deprecated"
+      - "Archive discussions"
+      - "Delete old events"
+      - "Delete old notifications"
+      - "Delete email attachments"
+      - "Close inactive agencies"
+      - "Delete old users ongoing oauths"
+
+  - id: "job-establishment-update"
+    name: "Establishment Update from SIRENE"
+    schedule: "0 3 * * 0"
+    description: "Mise à jour des établissements depuis l'API SIRENE"
+    script: "trigger-update-establishments-from-sirene"
+    environment: "production"
+    tasks:
+      - "Update establishment data from INSEE"
+      - "Deactivate closed establishments"
+
+  - id: "job-pe-sync"
+    name: "France Travail Convention Sync"
+    schedule: "*/30 * * * *"
+    description: "Synchronisation des conventions avec France Travail"
+    script: "trigger-resync-old-conventions-to-pe"
+    environment: "production"
+    tasks:
+      - "Retry failed convention broadcasts"
+
+queues:
+  - id: "queue-events"
+    name: "Domain Events"
+    type: "database-outbox"
+    technology: "PostgreSQL + Event Crawler"
+    description: "File d'attente des événements métier pour traitement asynchrone"
+    consumers:
+      - "Event Crawler"
+    retry_policy:
+      max_retries: 5
+      backoff: "exponential"
+    dead_letter: "failed events table"
+
+  - id: "queue-notifications"
+    name: "Notifications"
+    type: "database"
+    technology: "PostgreSQL"
+    description: "File d'attente des notifications email/SMS"
+    consumers:
+      - "Event handlers"
+    retry_policy:
+      max_retries: 3
+      backoff: "fixed"
+
+runbooks:
+  - id: "runbook-deployment"
+    name: "Deployment Procedure"
+    location: "N/A"
+    last_updated: "unknown"
+    status: "not-documented"
+    _note: "Gap - procédure à documenter"
+
+  - id: "runbook-rollback"
+    name: "Rollback Procedure"
+    location: "N/A"
+    last_updated: "unknown"
+    status: "not-documented"
+    _note: "Gap - procédure à documenter"
+
+  - id: "runbook-incident"
+    name: "Incident Response"
+    location: "Politique Plateforme de l'inclusion"
+    last_updated: "2026-01-28"
+    status: "documented"
+    owner: "RSSI Plateforme Inclusion"
+    _note: "Politique au niveau Plateforme Inclusion, RSSI = Security Champion + Incident Responder"
+
+  - id: "runbook-database-recovery"
+    name: "Database Recovery"
+    location: "N/A"
+    last_updated: "unknown"
+    status: "not-documented"
+    _note: "Gap - procédure à documenter"
+
+  - id: "runbook-secrets-rotation"
+    name: "Secrets Rotation"
+    location: "N/A"
+    last_updated: "unknown"
+    status: "not-documented"
+    _note: "Gap - procédure à documenter"
+
+deployment:
+  strategy: "rolling"
+  zero_downtime: true
+  rollback:
+    automatic: false
+    procedure: "Manual via Scalingo dashboard"
+
+  pipelines:
+    - environment: "staging"
+      trigger: "push to main"
+      approval: false
+
+    - environment: "production"
+      trigger: "manual / GitHub workflow"
+      approval: true
+      approvers:
+        - "Tech Lead"
+
+backup_restore:
+  database:
+    provider: "Scalingo (Starter Plan)"
+    infrastructure_ref: "index.yaml#infrastructure_certifications"
+    frequency: "daily"
+    retention:
+      daily: "7 jours glissants"
+      weekly: "4 semaines glissantes"
+      manual: "10 backups max, indéfinie"
+    encryption: true
+    tested: false
+    last_test: "unknown"
+    point_in_time_recovery:
+      enabled: true
+      window: "7 jours"
+      granularity: "À la seconde"
+    _note: "GAP-006: Test de restauration à effectuer"
+
+  files:
+    provider: "S3 (Cellar)"
+    frequency: "continuous"
+    retention: "indefinite"
+    encryption: true
+    tested: false
+
+  restoration_procedure:
+    documented: true
+    documentation: "../docs/operations.md"
+    rto: "4 hours"
+    rpo_standard: "24 hours"
+    rpo_with_pitr: "< 1 minute"

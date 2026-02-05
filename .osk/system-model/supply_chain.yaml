@@ -1,0 +1,369 @@
+# OpenSecKit System Model - Supply Chain Security
+# Phase 4: Ecosystem
+# Generated: 2026-01-28
+
+metadata:
+  section: "supply_chain"
+  parent: "index.yaml"
+  version: "4.0.0"
+  last_updated: "2026-01-28"
+
+sbom:
+  generation:
+    enabled: true
+    format: "pnpm-lock.yaml"
+    frequency: "on-commit"
+    tool: "pnpm"
+
+  vulnerability_scanning:
+    enabled: true
+    tool: "pnpm audit"
+    frequency: "on-ci"
+    block_on_critical: true
+    block_on_high: false
+
+  key_components:
+    # Backend Runtime Dependencies
+    - name: "express"
+      type: "framework"
+      version: "4.21.0"
+      purl: "pkg:npm/express@4.21.0"
+      license: "MIT"
+      supplier: "Express.js"
+      vulnerability_status: "monitored"
+      criticality: "high"
+
+    - name: "kysely"
+      type: "library"
+      version: "0.27.4"
+      purl: "pkg:npm/kysely@0.27.4"
+      license: "MIT"
+      supplier: "Kysely"
+      vulnerability_status: "monitored"
+      criticality: "high"
+
+    - name: "pg"
+      type: "driver"
+      version: "8.11.1"
+      purl: "pkg:npm/pg@8.11.1"
+      license: "MIT"
+      supplier: "node-postgres"
+      vulnerability_status: "monitored"
+      criticality: "high"
+
+    - name: "jsonwebtoken"
+      type: "security"
+      version: "9.0.2"
+      purl: "pkg:npm/jsonwebtoken@9.0.2"
+      license: "MIT"
+      supplier: "Auth0"
+      vulnerability_status: "monitored"
+      criticality: "critical"
+
+    - name: "zod"
+      type: "validation"
+      version: "4.0.17"
+      purl: "pkg:npm/zod@4.0.17"
+      license: "MIT"
+      supplier: "Colin McDonnell"
+      vulnerability_status: "monitored"
+      criticality: "high"
+
+    - name: "axios"
+      type: "http-client"
+      version: "1.12.2"
+      purl: "pkg:npm/axios@1.12.2"
+      license: "MIT"
+      supplier: "Axios"
+      vulnerability_status: "monitored"
+      criticality: "high"
+
+    - name: "redis"
+      type: "driver"
+      version: "4.7.0"
+      purl: "pkg:npm/redis@4.7.0"
+      license: "MIT"
+      supplier: "Redis Ltd"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    - name: "aws-sdk"
+      type: "sdk"
+      version: "2.1213.0"
+      purl: "pkg:npm/aws-sdk@2.1213.0"
+      license: "Apache-2.0"
+      supplier: "Amazon Web Services"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    # Frontend Runtime Dependencies
+    - name: "react"
+      type: "framework"
+      version: "18.0.0"
+      purl: "pkg:npm/react@18.0.0"
+      license: "MIT"
+      supplier: "Meta (Facebook)"
+      vulnerability_status: "monitored"
+      criticality: "high"
+
+    - name: "@codegouvfr/react-dsfr"
+      type: "ui-library"
+      version: "1.30.2"
+      purl: "pkg:npm/@codegouvfr/react-dsfr@1.30.2"
+      license: "MIT"
+      supplier: "DINUM"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    - name: "@reduxjs/toolkit"
+      type: "state-management"
+      version: "1.8.1"
+      purl: "pkg:npm/@reduxjs/toolkit@1.8.1"
+      license: "MIT"
+      supplier: "Redux Team"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    - name: "redux-observable"
+      type: "middleware"
+      version: "2.0.0"
+      purl: "pkg:npm/redux-observable@2.0.0"
+      license: "MIT"
+      supplier: "Redux Observable"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    - name: "rxjs"
+      type: "library"
+      version: "7.5.5"
+      purl: "pkg:npm/rxjs@7.5.5"
+      license: "Apache-2.0"
+      supplier: "RxJS Team"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    - name: "leaflet"
+      type: "mapping"
+      version: "1.9.4"
+      purl: "pkg:npm/leaflet@1.9.4"
+      license: "BSD-2-Clause"
+      supplier: "Leaflet"
+      vulnerability_status: "monitored"
+      criticality: "low"
+
+    # Build & Development Tools
+    - name: "typescript"
+      type: "compiler"
+      version: "5.8.3"
+      purl: "pkg:npm/typescript@5.8.3"
+      license: "Apache-2.0"
+      supplier: "Microsoft"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    - name: "vite"
+      type: "bundler"
+      version: "5.4.21"
+      purl: "pkg:npm/vite@5.4.21"
+      license: "MIT"
+      supplier: "Evan You"
+      vulnerability_status: "monitored"
+      criticality: "low"
+
+    - name: "@biomejs/biome"
+      type: "linter"
+      version: "2.3.8"
+      purl: "pkg:npm/@biomejs/biome@2.3.8"
+      license: "MIT"
+      supplier: "Biome"
+      vulnerability_status: "monitored"
+      criticality: "low"
+
+    - name: "turbo"
+      type: "build-tool"
+      version: "1.4.6"
+      purl: "pkg:npm/turbo@1.4.6"
+      license: "MPL-2.0"
+      supplier: "Vercel"
+      vulnerability_status: "monitored"
+      criticality: "low"
+
+    # Monitoring & Observability
+    - name: "@sentry/node"
+      type: "monitoring"
+      version: "9.6.1"
+      purl: "pkg:npm/@sentry/node@9.6.1"
+      license: "MIT"
+      supplier: "Sentry"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+    - name: "pino"
+      type: "logging"
+      version: "10.1.0"
+      purl: "pkg:npm/pino@10.1.0"
+      license: "MIT"
+      supplier: "Pino"
+      vulnerability_status: "monitored"
+      criticality: "medium"
+
+dependency_policies:
+  license_compliance:
+    allowed:
+      - "MIT"
+      - "Apache-2.0"
+      - "BSD-2-Clause"
+      - "BSD-3-Clause"
+      - "ISC"
+      - "CC0-1.0"
+      - "MPL-2.0"
+    blocked:
+      - "GPL-3.0"
+      - "AGPL-3.0"
+    review_required:
+      - "LGPL-2.1"
+      - "LGPL-3.0"
+
+  vulnerability_policy:
+    critical:
+      action: "block"
+      grace_period: "0 days"
+    high:
+      action: "review"
+      grace_period: "7 days"
+    medium:
+      action: "monitor"
+      grace_period: "30 days"
+    low:
+      action: "accept"
+      grace_period: "90 days"
+
+  automated_updates:
+    enabled: true
+    tool: "pnpm overrides"
+    _note: "Security patches applied via pnpm overrides in root package.json"
+
+  new_dependency_approval:
+    required: true
+    approvers:
+      - "Tech Lead"
+    criteria:
+      - "License compatibility"
+      - "Maintenance status"
+      - "Security record"
+      - "Bundle size impact"
+
+artifact_security:
+  code_signing:
+    enabled: false
+    _note: "Not implemented - consider for production releases"
+
+  provenance:
+    enabled: false
+    slsa_level: 0
+    _note: "SLSA not implemented"
+
+  container_security:
+    base_image: "node:22-alpine"
+    registry_whitelist:
+      - "docker.io"
+      - "registry.scalingo.com"
+    image_scanning:
+      enabled: true
+      tool: "Scalingo built-in"
+      block_on_critical: true
+
+  build_pipeline:
+    ci_platform: "GitHub Actions"
+    protected_branches:
+      - "main"
+    required_reviews: 1
+    status_checks:
+      - "typecheck"
+      - "test"
+      - "check"
+
+third_party_risk:
+  vendor_assessment:
+    frequency: "annual"
+    criteria:
+      - "Security certifications"
+      - "DPA compliance"
+      - "Data residency"
+      - "Incident history"
+      - "SLA guarantees"
+
+  critical_dependencies:
+    - name: "Scalingo"
+      type: "infrastructure"
+      risk_level: "medium"
+      alternatives:
+        - "Clever Cloud"
+        - "OVH"
+      mitigation: "Infrastructure as code, regular backups"
+
+    - name: "Brevo"
+      type: "notification-service"
+      risk_level: "medium"
+      alternatives:
+        - "Mailjet"
+        - "AWS SES"
+      mitigation: "Queue system for retry, rate limiting"
+
+    - name: "France Travail APIs"
+      type: "government-partner"
+      risk_level: "low"
+      alternatives: []
+      mitigation: "Fallback to manual processes"
+
+    - name: "ProConnect"
+      type: "authentication"
+      risk_level: "low"
+      alternatives: []
+      mitigation: "None - required for compliance"
+
+  supply_chain_threats:
+    - threat: "Dependency confusion"
+      likelihood: "low"
+      impact: "high"
+      mitigation:
+        - "Use pnpm with strict lockfile"
+        - "Verify package integrity"
+        - "Review new dependencies"
+
+    - threat: "Compromised npm package"
+      likelihood: "medium"
+      impact: "critical"
+      mitigation:
+        - "Lock dependency versions"
+        - "Monitor security advisories"
+        - "Quick patching via overrides"
+
+    - threat: "CI/CD compromise"
+      likelihood: "low"
+      impact: "critical"
+      mitigation:
+        - "Protected branches"
+        - "Required reviews"
+        - "Secrets management"
+
+    - threat: "Third-party service breach"
+      likelihood: "medium"
+      impact: "high"
+      mitigation:
+        - "Minimal data sharing"
+        - "Encryption in transit"
+        - "DPA contracts"
+        - "Incident response plan"
+
+runtime_environment:
+  node_version: "22.14.0"
+  package_manager: "pnpm@10.9.0"
+  hosting_platform: "Scalingo"
+  region: "France (Paris)"
+
+  security_features:
+    - "Automatic SSL/TLS"
+    - "DDoS protection"
+    - "Automatic security updates"
+    - "Container isolation"
