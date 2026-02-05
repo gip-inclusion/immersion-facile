@@ -21,6 +21,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
+import { phoneNumberExist } from "../../core/phone-number/adapters/pgPhoneHelper";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,
@@ -80,6 +81,7 @@ describe("PgDiscussionRepository", () => {
     await db.deleteFrom("discussions_archives").execute();
     await db.deleteFrom("exchanges").execute();
     await db.deleteFrom("users").execute();
+
     pgDiscussionRepository = new PgDiscussionRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
 
@@ -370,6 +372,10 @@ describe("PgDiscussionRepository", () => {
             await pgDiscussionRepository.getById(discussion.id),
             updatedDiscussion,
           );
+
+          expect(
+            await phoneNumberExist(db, discussion.potentialBeneficiary.phone),
+          ).toBe(true);
         });
       });
 
@@ -391,7 +397,7 @@ describe("PgDiscussionRepository", () => {
                 role: "establishment-admin",
                 userId: user.id,
                 job: "",
-                phone: "",
+                phone: "+33600000000",
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
@@ -2433,7 +2439,7 @@ describe("PgDiscussionRepository", () => {
                 role: "establishment-admin",
                 userId: user.id,
                 job: "",
-                phone: "",
+                phone: "+33600000000",
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
@@ -2451,7 +2457,7 @@ describe("PgDiscussionRepository", () => {
                 role: "establishment-admin",
                 userId: user.id,
                 job: "",
-                phone: "",
+                phone: "+33600000000",
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
@@ -2887,7 +2893,7 @@ describe("PgDiscussionRepository", () => {
             role: "establishment-admin",
             userId: user.id,
             job: "",
-            phone: "",
+            phone: "+33600000000",
             shouldReceiveDiscussionNotifications: true,
             isMainContactByPhone: false,
           },
