@@ -10,6 +10,7 @@ import {
 import z from "zod";
 import { makeAddAgenciesAndUsers } from "../../domains/agency/use-cases/AddAgenciesAndUsers";
 import { makeAddAgency } from "../../domains/agency/use-cases/AddAgency";
+import { makeCloseAgencyAndTransfertConventions } from "../../domains/agency/use-cases/CloseAgencyAndTransfertConventions";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { makeListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { makePrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
@@ -818,6 +819,11 @@ export const createUseCases = ({
       deps: {
         createNewEvent,
       },
+    }),
+
+    closeAgencyAndTransfertConventions: makeCloseAgencyAndTransfertConventions({
+      uowPerformer,
+      deps: { createNewEvent },
     }),
 
     updateAgencyReferringToUpdatedAgency:
