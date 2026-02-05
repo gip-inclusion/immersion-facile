@@ -59,11 +59,12 @@ const commonOfferSchema = z.object({
   updatedAt: dateTimeIsoStringSchema.optional(),
   createdAt: dateTimeIsoStringSchema.optional(),
   locationId: zUuidLike.or(z.null()),
-  isAvailable: zBoolean,
 });
 
 export const internalOfferSchema: ZodSchemaWithInputMatchingOutput<InternalOfferDto> =
-  commonOfferSchema.extend(withRemoteWorkModeSchema.shape);
+  commonOfferSchema.extend(withRemoteWorkModeSchema.shape).extend({
+    isAvailable: zBoolean
+  });
 
 export const externalOfferSchema: ZodSchemaWithInputMatchingOutput<ExternalOfferDto> =
   commonOfferSchema;

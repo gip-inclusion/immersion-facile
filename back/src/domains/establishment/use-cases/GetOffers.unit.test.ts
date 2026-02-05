@@ -1,6 +1,7 @@
 import {
   BadRequestError,
   type DataWithPagination,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   type GetOffersFlatQueryParams,
@@ -62,6 +63,16 @@ describe("GetOffers", () => {
     .withUserRights(userRights)
     .build();
 
+  const unavailableEstablishment = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("98765432109877")
+    .withEstablishmentNaf({ code: "6201Z", nomenclature: "naf nomenclature" })
+    .withFitForDisabledWorkers("yes-declared-only")
+    .withScore(120)
+    .withOffers([boulangerOffer])
+    .withUserRights(userRights)
+    .withIsMaxDiscussionsForPeriodReached(true)
+    .build();
+
   let uow: InMemoryUnitOfWork;
   let uuidGenerator: TestUuidGenerator;
   let getOffers: ReturnType<typeof makeGetOffers>;
@@ -106,6 +117,53 @@ describe("GetOffers", () => {
     expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
     expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(
       result.pagination.totalRecords,
+    );
+  });
+
+  it("should also return offers from establishment that have reached max contact for period", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      ...uow.establishmentAggregateRepository.establishmentAggregates,
+      unavailableEstablishment
+    ];
+
+    const resultWithoutFilters = await getOffers.execute(
+      {
+        sortBy: "date",
+        sortOrder: "desc",
+      },
+      undefined,
+    );
+
+    expect(resultWithoutFilters.data).toHaveLength(5);
+    expect(resultWithoutFilters.pagination.totalRecords).toBe(5);
+    const defaultNumberPerPageForWeb: GetOffersPerPageOption = 12;
+    expect(resultWithoutFilters.pagination.numberPerPage).toBe(
+      defaultNumberPerPageForWeb,
+    );
+    expectObjectInArrayToMatch(
+      resultWithoutFilters.data,
+      [
+        {
+          isAvailable: true,
+        },
+        {
+          isAvailable: true,
+        },
+        {
+          isAvailable: true,
+        },
+        {
+          isAvailable: true,
+        },
+        {
+          isAvailable: false,
+        }
+      ]
+    )
+    expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
+    expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(5);
+    expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(
+      resultWithoutFilters.pagination.totalRecords,
     );
   });
 
