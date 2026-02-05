@@ -174,8 +174,10 @@ export const throwErrorOnConventionIdMismatch = ({
     "applicationId" in jwtPayload &&
     requestedConventionId !== jwtPayload.applicationId
   )
-    throw errors.convention.forbiddenMissingRights({
-      conventionId: requestedConventionId,
+    throw errors.convention.forbiddenConventionIdMismatch({
+      requestedConventionId,
+      jwtConventionId: jwtPayload.applicationId,
+      jwtRole: jwtPayload.role,
     });
 };
 
@@ -381,8 +383,10 @@ export const extractUserRolesOnConventionFromJwtPayload = async (
   const roles: Role[] = [];
   if ("role" in jwtPayload) {
     if (jwtPayload.applicationId !== initialConvention.id)
-      throw errors.convention.forbiddenMissingRights({
-        conventionId: initialConvention.id,
+      throw errors.convention.forbiddenConventionIdMismatch({
+        requestedConventionId: initialConvention.id,
+        jwtConventionId: jwtPayload.applicationId,
+        jwtRole: jwtPayload.role,
       });
     roles.push(jwtPayload.role);
   }

@@ -163,8 +163,10 @@ describe("SendAssessmentLink", () => {
           },
           { ...validatorJwtPayload, applicationId: wrongConventionId },
         ),
-        errors.convention.forbiddenMissingRights({
-          conventionId: convention.id,
+        errors.convention.forbiddenConventionIdMismatch({
+          jwtConventionId: wrongConventionId,
+          jwtRole: validatorJwtPayload.role,
+          requestedConventionId: convention.id,
         }),
       );
     });

@@ -232,16 +232,21 @@ describe("Update Convention", () => {
           uow.conventionRepository.setConventions([convention]);
 
           const requestedConventionId = "1dd5c20e-6dd2-45af-affe-927358005250";
+          const emailHash = "yolo";
+          const role = "beneficiary";
+
           const jwtPayload: ConventionDomainJwtPayload = {
             applicationId: requestedConventionId,
-            role: "beneficiary",
-            emailHash: "yolo",
+            role,
+            emailHash,
           };
 
           await expectPromiseToFailWithError(
             updateConvention.execute({ convention }, jwtPayload),
-            errors.convention.forbiddenMissingRights({
-              conventionId: convention.id,
+            errors.convention.forbiddenConventionIdMismatch({
+              jwtConventionId: jwtPayload.applicationId,
+              jwtRole: jwtPayload.role,
+              requestedConventionId: convention.id,
             }),
           );
         });

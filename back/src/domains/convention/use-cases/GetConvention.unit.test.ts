@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
   ConnectedUserBuilder,
+  type ConventionDomainJwtPayload,
   ConventionDtoBuilder,
   type ConventionRole,
   defaultProConnectInfos,
@@ -194,7 +195,7 @@ describe("Get Convention", () => {
             { conventionId: convention.id },
             { userId: johnDoe.id },
           ),
-          errors.convention.forbiddenMissingRights({
+          errors.convention.forbiddenMissingRightsUserId({
             conventionId: convention.id,
             userId: johnDoe.id,
           }),
@@ -203,17 +204,17 @@ describe("Get Convention", () => {
 
       describe("with ConventionJwtPayload", () => {
         it("When convention id in jwt token does not match provided one", async () => {
+          const jwtPayload: ConventionDomainJwtPayload = {
+            role: "establishment-representative",
+            applicationId: "not-matching-convention-id",
+            emailHash: "bad-hash",
+          };
           await expectPromiseToFailWithError(
-            getConvention.execute(
-              { conventionId: convention.id },
-              {
-                role: "establishment-representative",
-                applicationId: "not-matching-convention-id",
-                emailHash: "",
-              },
-            ),
-            errors.convention.forbiddenMissingRights({
-              conventionId: convention.id,
+            getConvention.execute({ conventionId: convention.id }, jwtPayload),
+            errors.convention.forbiddenConventionIdMismatch({
+              jwtConventionId: jwtPayload.applicationId,
+              jwtRole: jwtPayload.role,
+              requestedConventionId: convention.id,
             }),
           );
         });
@@ -241,16 +242,20 @@ describe("Get Convention", () => {
             }),
           ];
 
+          const emailHash = "thisHashDontMatch";
+
           await expectPromiseToFailWithError(
             getConvention.execute(
               { conventionId: convention.id },
               {
                 role,
-                emailHash: "thisHashDontMatch",
+                emailHash,
                 applicationId: convention.id,
               },
             ),
-            errors.convention.forbiddenMissingRights({
+            errors.convention.forbiddenMissingRightsEmailHash({
+              emailHash,
+              role,
               conventionId: convention.id,
             }),
           );
@@ -260,24 +265,28 @@ describe("Get Convention", () => {
           const anotherAgency = new AgencyDtoBuilder(agency)
             .withId("another")
             .build();
+          const role: ConventionRole = "validator";
 
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency),
             toAgencyWithRights(anotherAgency, {
-              [johnDoe.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+              [johnDoe.id]: { isNotifiedByEmail: false, roles: [role] },
             }),
           ];
 
+          const emailHash = makeEmailHash(johnDoe.email);
           await expectPromiseToFailWithError(
             getConvention.execute(
               { conventionId: convention.id },
               {
-                role: "validator",
-                emailHash: makeEmailHash(johnDoe.email),
+                role,
+                emailHash: emailHash,
                 applicationId: convention.id,
               },
             ),
-            errors.convention.forbiddenMissingRights({
+            errors.convention.forbiddenMissingRightsEmailHash({
+              emailHash,
+              role,
               conventionId: convention.id,
             }),
           );
