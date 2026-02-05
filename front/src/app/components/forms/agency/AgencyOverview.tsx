@@ -51,10 +51,14 @@ export const AgencyOverview = ({
             submitFeedback={feedback}
             messageByKind={agencyAdminSubmitMessageByKind}
           />
-          <Feedback topics={["close-agency-and-transfert-conventions"]} />
+          <Feedback
+            topics={["close-agency-and-transfert-conventions"]}
+            closable
+            className="fr-mb-2w"
+          />
         </>
       ) : (
-        <Feedback topics={["agency-for-dashboard"]} />
+        <Feedback topics={["agency-for-dashboard"]} closable />
       )}
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
         <CopyAgencyId agencyId={agency.id} />
