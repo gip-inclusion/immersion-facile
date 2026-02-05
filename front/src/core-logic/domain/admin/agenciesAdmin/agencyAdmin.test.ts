@@ -24,7 +24,6 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
-  AGENCY_NEEDING_REVIEW_1,
   AGENCY_NEEDING_REVIEW_2,
   PE_AGENCY_ACTIVE,
 } from "../../../adapters/AgencyGateway/SimulatedAgencyGateway";
@@ -42,7 +41,7 @@ describe("agencyAdmin", () => {
     describe("fetch agencies needing review", () => {
       it("display the agency to activate or reject on selection", () => {
         store.dispatch(
-          agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
+          agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested(
             AGENCY_NEEDING_REVIEW_2.id,
           ),
         );
@@ -57,24 +56,6 @@ describe("agencyAdmin", () => {
       describe("Needing review related", () => {
         const preloadedAgencyAdminState: AgencyAdminState = {
           ...agencyAdminInitialState,
-          agencyNeedingReviewOptions: [
-            {
-              id: AGENCY_NEEDING_REVIEW_1.id,
-              name: AGENCY_NEEDING_REVIEW_1.name,
-              kind: AGENCY_NEEDING_REVIEW_1.kind,
-              status: AGENCY_NEEDING_REVIEW_1.status,
-              address: AGENCY_NEEDING_REVIEW_1.address,
-              refersToAgencyName: AGENCY_NEEDING_REVIEW_1.refersToAgencyName,
-            },
-            {
-              id: AGENCY_NEEDING_REVIEW_2.id,
-              name: AGENCY_NEEDING_REVIEW_2.name,
-              kind: AGENCY_NEEDING_REVIEW_2.kind,
-              status: AGENCY_NEEDING_REVIEW_2.status,
-              address: AGENCY_NEEDING_REVIEW_2.address,
-              refersToAgencyName: AGENCY_NEEDING_REVIEW_2.refersToAgencyName,
-            },
-          ],
           agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
         };
 
@@ -89,7 +70,7 @@ describe("agencyAdmin", () => {
         it("shows when status update is ongoing", () => {
           store.dispatch(
             agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
-              id: preloadedAgencyAdminState.agencyNeedingReviewOptions[0].id,
+              id: AGENCY_NEEDING_REVIEW_2.id,
               status: "active",
             }),
           );
@@ -100,25 +81,21 @@ describe("agencyAdmin", () => {
           expectAgencyAdminStateToMatch(expectedAgencyAdminState);
         });
 
-        it("remove from agencyNeedingReviewOptions on update success and remove displayed agency", () => {
+        it("sets isUpdating false and feedback on status update success", () => {
+          store.dispatch(
+            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
+              id: AGENCY_NEEDING_REVIEW_2.id,
+              status: "active",
+            }),
+          );
           store.dispatch(
             agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded(
               AGENCY_NEEDING_REVIEW_2.id,
             ),
           );
-
           expectAgencyAdminStateToMatch({
-            agencyNeedingReviewOptions: [
-              {
-                id: AGENCY_NEEDING_REVIEW_1.id,
-                name: AGENCY_NEEDING_REVIEW_1.name,
-                kind: AGENCY_NEEDING_REVIEW_1.kind,
-                status: AGENCY_NEEDING_REVIEW_1.status,
-                address: AGENCY_NEEDING_REVIEW_1.address,
-                refersToAgencyName: AGENCY_NEEDING_REVIEW_1.refersToAgencyName,
-              },
-            ],
-            agencyNeedingReview: null,
+            ...preloadedAgencyAdminState,
+            isUpdating: false,
             feedback: { kind: "agencyUpdated" },
           });
         });
@@ -129,24 +106,6 @@ describe("agencyAdmin", () => {
           );
 
           expectAgencyAdminStateToMatch({
-            agencyNeedingReviewOptions: [
-              {
-                id: AGENCY_NEEDING_REVIEW_1.id,
-                name: AGENCY_NEEDING_REVIEW_1.name,
-                kind: AGENCY_NEEDING_REVIEW_1.kind,
-                status: AGENCY_NEEDING_REVIEW_1.status,
-                address: AGENCY_NEEDING_REVIEW_1.address,
-                refersToAgencyName: AGENCY_NEEDING_REVIEW_1.refersToAgencyName,
-              },
-              {
-                id: AGENCY_NEEDING_REVIEW_2.id,
-                name: AGENCY_NEEDING_REVIEW_2.name,
-                kind: AGENCY_NEEDING_REVIEW_2.kind,
-                status: AGENCY_NEEDING_REVIEW_2.status,
-                address: AGENCY_NEEDING_REVIEW_2.address,
-                refersToAgencyName: AGENCY_NEEDING_REVIEW_2.refersToAgencyName,
-              },
-            ],
             agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
             feedback: { kind: "agencyUpdated" },
           });
