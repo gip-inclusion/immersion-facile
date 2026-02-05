@@ -217,8 +217,6 @@ export type PrivateListAgenciesRequestDto = {
   status?: AgencyStatus;
 };
 
-export type WithAgencyStatus = { status: AgencyStatus };
-
 export type ActiveOrRejectedStatus = ExtractFromExisting<
   AgencyStatus,
   "active" | "rejected"

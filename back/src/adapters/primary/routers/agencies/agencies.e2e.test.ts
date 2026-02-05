@@ -52,7 +52,6 @@ describe("Agency routes", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let backofficeAdminToken: ConnectedUserJwt;
-  let nonAdminToken: ConnectedUserJwt;
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   beforeEach(async () => {
@@ -67,13 +66,6 @@ describe("Agency routes", () => {
 
     backofficeAdminToken = generateConnectedUserJwt({
       userId: backofficeAdminUser.id,
-      version: currentJwtVersions.connectedUser,
-      iat: Date.now(),
-      exp: addDays(new Date(), 5).getTime(),
-    });
-
-    nonAdminToken = generateConnectedUserJwt({
-      userId: nonAdminUser.id,
       version: currentJwtVersions.connectedUser,
       iat: Date.now(),
       exp: addDays(new Date(), 5).getTime(),
@@ -367,66 +359,6 @@ describe("Agency routes", () => {
   });
 
   describe("Private routes (for backoffice admin)", () => {
-    describe(`${displayRouteName(
-      agencyRoutes.listAgenciesOptionsWithStatus,
-    )} to get agencies full dto given filters`, () => {
-      it("Returns Forbidden if no token provided", async () => {
-        const response = await httpClient.listAgenciesOptionsWithStatus({
-          queryParams: { status: "needsReview" },
-          headers: { authorization: "" },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 401,
-          body: { status: 401, message: "Veuillez vous authentifier" },
-        });
-      });
-
-      it("403 - non-admin user cannot access agencies", async () => {
-        const response = await httpClient.listAgenciesOptionsWithStatus({
-          queryParams: { status: "needsReview" },
-          headers: { authorization: nonAdminToken },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 403,
-          body: {
-            status: 403,
-            message: errors.user.forbidden({ userId: nonAdminUser.id }).message,
-          },
-        });
-      });
-
-      it("Returns all agency dtos with a given status", async () => {
-        // Prepare
-        inMemoryUow.agencyRepository.agencies = [
-          toAgencyWithRights(agency1ActiveNearBy),
-          toAgencyWithRights(agency4NeedsReview, {
-            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
-          }),
-        ];
-
-        const response = await httpClient.listAgenciesOptionsWithStatus({
-          queryParams: { status: "needsReview" },
-          headers: { authorization: backofficeAdminToken },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 200,
-          body: [
-            {
-              id: agency4NeedsReview.id,
-              name: agency4NeedsReview.name,
-              kind: agency4NeedsReview.kind,
-              status: agency4NeedsReview.status,
-              address: agency4NeedsReview.address,
-              refersToAgencyName: agency4NeedsReview.refersToAgencyName,
-            },
-          ],
-        });
-      });
-    });
-
     describe(`${displayRouteName(
       agencyRoutes.updateAgencyStatus,
     )} to update an agency status`, () => {
