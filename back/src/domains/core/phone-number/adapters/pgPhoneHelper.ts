@@ -31,3 +31,35 @@ export const getOrCreatePhoneIds = async (
 
   return Object.fromEntries(phones.map((p) => [p.phone_number, p.id]));
 };
+
+export const phoneNumberExist = async (
+  transaction: KyselyDb,
+  phoneNumber: PhoneNumber,
+): Promise<boolean> => {
+  const result = await transaction
+    .selectFrom("phone_numbers")
+    .select("id")
+    .where("phone_number", "=", phoneNumber)
+    .executeTakeFirst();
+
+  return result !== undefined;
+};
+
+export const phoneNumbersExist = async (
+  transaction: KyselyDb,
+  phoneNumbers: PhoneNumber[],
+): Promise<boolean> => {
+  if (phoneNumbers.length === 0) {
+    return false;
+  }
+
+  const uniquePhoneNumbers = [...new Set(phoneNumbers)];
+
+  const results = await transaction
+    .selectFrom("phone_numbers")
+    .select("phone_number")
+    .where("phone_number", "in", uniquePhoneNumbers)
+    .execute();
+
+  return results.length === uniquePhoneNumbers.length;
+};
