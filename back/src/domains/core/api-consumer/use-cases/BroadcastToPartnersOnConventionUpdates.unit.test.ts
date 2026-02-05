@@ -465,6 +465,7 @@ describe("Broadcast to partners on updated convention", () => {
                 kind: agency1.kind,
                 name: agency1.name,
                 contactEmail: agency1.contactEmail,
+                siret: agency1.agencySiret,
               },
               assessment: {
                 status: assessment.status,
@@ -493,6 +494,7 @@ describe("Broadcast to partners on updated convention", () => {
                 kind: agency1.kind,
                 name: agency1.name,
                 contactEmail: agency1.contactEmail,
+                siret: agency1.agencySiret,
               },
               assessment: {
                 status: assessment.status,

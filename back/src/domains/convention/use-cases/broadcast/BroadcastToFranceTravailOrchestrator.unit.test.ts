@@ -70,6 +70,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       name: referredAgency.name,
       contactEmail: referredAgency.contactEmail,
       kind: referredAgency.kind,
+      siret: referredAgency.agencySiret,
     },
     agencyDepartment: agency.address.departmentCode,
     agencyValidatorEmails: [validator.email],

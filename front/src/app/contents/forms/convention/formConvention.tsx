@@ -523,6 +523,10 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  "agencyRefersTo.siret": {
+    label: "",
+    id: "",
+  },
   agencySiret: {
     label: "",
     id: "",

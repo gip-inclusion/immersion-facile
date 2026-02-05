@@ -45,6 +45,7 @@ describe("PgStatisticQueries", () => {
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       db,
     );
+    await db.deleteFrom("convention_drafts").execute();
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
