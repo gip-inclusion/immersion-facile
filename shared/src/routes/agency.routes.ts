@@ -10,7 +10,6 @@ import {
   listAgencyOptionsRequestSchema,
   updateAgencyStatusParamsWithoutIdSchema,
   withAgencyIdSchema,
-  withAgencyStatusSchema,
 } from "../agency/agency.schema";
 import { agencyPublicDisplaySchema } from "../agency/publicAgency.schema";
 import { withAuthorizationHeaders } from "../headers";
@@ -68,17 +67,7 @@ export const agencyRoutes = defineRoutes({
     url: "/immersion-facile-agency-id",
     responses: { 200: agencyIdResponseSchema },
   }),
-  listAgenciesOptionsWithStatus: defineRoute({
-    method: "get",
-    url: "/admin/agencies",
-    queryParamsSchema: withAgencyStatusSchema,
-    ...withAuthorizationHeaders,
-    responses: {
-      200: agencyOptionsSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-    },
-  }),
+
   updateAgency: defineRoute({
     method: "put",
     url: "/agencies/:agencyId",

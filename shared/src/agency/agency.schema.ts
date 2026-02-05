@@ -41,7 +41,6 @@ import {
   orderedAgencyKindList,
   type PrivateListAgenciesRequestDto,
   type WithAgencyId,
-  type WithAgencyStatus,
 } from "./agency.dto";
 
 export const agencyIdSchema: ZodSchemaWithInputMatchingOutput<AgencyId> =
@@ -272,11 +271,6 @@ export const updateAgencyStatusParamsWithoutIdSchema: ZodSchemaWithInputMatching
 
 export const updateAgencyStatusParamsSchema: ZodSchemaWithInputMatchingOutput<UpdateAgencyStatusParams> =
   updateAgencyStatusParamsWithoutIdSchema.and(z.object({ id: agencyIdSchema }));
-
-export const withAgencyStatusSchema: ZodSchemaWithInputMatchingOutput<WithAgencyStatus> =
-  z.object({
-    status: agencyStatusSchema,
-  });
 
 export const closeAgencyAndTransferConventionsRequestSchema: ZodSchemaWithInputMatchingOutput<CloseAgencyAndTransferConventionsRequestDto> =
   z.object({
