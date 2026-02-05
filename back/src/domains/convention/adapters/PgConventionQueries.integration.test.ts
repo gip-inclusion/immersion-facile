@@ -70,6 +70,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
   beforeEach(async () => {
     await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("convention_drafts").execute();
     await sql`TRUNCATE TABLE convention_external_ids RESTART IDENTITY;`.execute(
       db,
     );
@@ -319,6 +320,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff")
       .build();
 
+    const otherAgency = AgencyDtoBuilder.create()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aadd")
+      .build();
+
     const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
       .withSiret("11111111111111")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
@@ -366,13 +371,18 @@ describe("Pg implementation of ConventionQueries", () => {
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .validated()
       .withDateValidation(new Date("2024-06-29").toISOString())
-      .withAgencyId(agency.id)
+      .withAgencyId(otherAgency.id)
       .withUpdatedAt(new Date("2024-07-03").toISOString())
       .build();
 
     beforeEach(async () => {
       await agencyRepo.insert(
         toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+      await agencyRepo.insert(
+        toAgencyWithRights(otherAgency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
       );
@@ -390,6 +400,15 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it.each([
+      {
+        testName:
+          "with filter agencyId returns only conventions for that agency",
+        params: {
+          filters: { agencyId: otherAgency.id },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [secondValidatedConvention],
+      },
       {
         testName: "with filter ids",
         params: {

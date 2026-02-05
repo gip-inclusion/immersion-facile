@@ -19,6 +19,7 @@ import type {
 } from "shared";
 
 export type GetConventionsFilters = {
+  agencyId?: AgencyId;
   ids?: ConventionId[];
   startDateGreater?: Date;
   startDateLessOrEqual?: Date;
