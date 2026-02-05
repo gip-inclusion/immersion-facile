@@ -8,7 +8,6 @@ import {
   type OfferDto,
   type WithNafCodes,
 } from "shared";
-import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -31,7 +30,6 @@ export class LegacySearchImmersion extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly laBonneBoiteAPI: LaBonneBoiteGateway,
     private readonly uuidGenerator: UuidGenerator,
-    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }

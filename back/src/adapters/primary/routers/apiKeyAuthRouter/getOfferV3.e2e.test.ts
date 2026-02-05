@@ -164,7 +164,7 @@ describe("Route to get ImmersionSearchResultDto by siret, appellation code and l
       updatedAt: expect.any(String),
       fitForDisabledWorkers: "no",
       remoteWorkMode: "ON_SITE",
-      isAvailable: false,
+      isAvailable: true,
     } satisfies SearchImmersionResultPublicV3);
     expect(response.status).toBe(200);
   });

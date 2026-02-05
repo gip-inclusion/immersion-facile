@@ -173,6 +173,11 @@ export class InMemoryEstablishmentAggregateRepository
     const allOffers = this.establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
       .filter((aggregate) =>
+        filters.showOnlyAvailableOffers
+          ? aggregate.establishment.isMaxDiscussionsForPeriodReached === false
+          : true,
+      )
+      .filter((aggregate) =>
         filters.sirets?.length
           ? filters.sirets.includes(aggregate.establishment.siret)
           : true,
