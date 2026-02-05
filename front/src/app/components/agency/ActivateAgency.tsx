@@ -2,20 +2,15 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import {
-  type AgencyId,
-  domElementIds,
-  type UpdateAgencyStatusParams,
-  withAgencyIdSchema,
-  zStringMinLength1,
-} from "shared";
+import type { AgencyId, UpdateAgencyStatusParams, WithAgencyId } from "shared";
+import { domElementIds, withAgencyIdSchema, zStringMinLength1 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { createFormModal } from "src/app/utils/createFormModal";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -24,103 +19,45 @@ import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
 import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 
-type StatusJustificationForm = { statusJustification: string };
-type ManageAgencyToReviewAdminForm = {
-  agencyId: AgencyId;
-};
-
-const rejectAgencyModal = createModal({
+const createRejectAgencyModalParams = {
   id: domElementIds.admin.agencyTab.rejectAgencyModal,
   isOpenedByDefault: false,
-});
-
-const RejectAgencyModalContent = ({
-  onReject,
-}: {
-  onReject: (statusJustification: StatusJustificationForm) => void;
-}) => {
-  const methods = useForm<StatusJustificationForm>({
-    mode: "onTouched",
-    defaultValues: {
-      statusJustification: undefined,
-    },
-    resolver: zodResolver(z.object({ statusJustification: zStringMinLength1 })),
-  });
-  const { register, handleSubmit, formState, getValues } = methods;
-
-  const onSubmit = () => {
-    onReject(getValues());
-    rejectAgencyModal.close();
-  };
-
-  const formId = domElementIds.admin.agencyTab.rejectAgencyModalForm;
-
-  return (
-    <rejectAgencyModal.Component
-      title="Rejeter cette agence"
-      buttons={[
-        {
-          iconId: "fr-icon-alert-fill",
-          children: "Annuler",
-          priority: "secondary",
-          onClick: () => rejectAgencyModal.close(),
-        },
-        {
-          id: domElementIds.admin.agencyTab.rejectAgencyModalSubmitButton,
-          iconId: "fr-icon-checkbox-fill",
-          children: "Rejeter cette agence",
-          priority: "primary",
-          type: "submit",
-          doClosesModal: false,
-          disabled: !formState.isValid,
-          nativeButtonProps: {
-            form: formId,
-          },
-        },
-      ]}
-    >
-      <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-        <Input
-          textArea
-          label="Justification"
-          nativeTextAreaProps={{
-            id: domElementIds.admin.agencyTab
-              .rejectAgencyModalJustificationInput,
-            ...register("statusJustification"),
-          }}
-        />
-      </form>
-    </rejectAgencyModal.Component>
-  );
+  formId: domElementIds.admin.agencyTab.rejectAgencyModalForm,
+  submitButton: {
+    id: domElementIds.admin.agencyTab.rejectAgencyModalSubmitButton,
+    children: "Rejeter cette agence",
+  },
+  cancelButton: {
+    id: domElementIds.admin.agencyTab.rejectAgencyModalCancelButton,
+  },
+  doSubmitClosesModal: false,
 };
-
-const useFetchAgenciesNeedingReview = () => {
-  const { agencyNeedingReview } = useAppSelector(
-    agencyAdminSelectors.agencyState,
-  );
-
-  return {
-    agencyNeedingReview,
-  };
-};
+const {
+  Component: RejectAgencyModal,
+  open: openRejectAgencyModal,
+  close: closeRejectAgencyModal,
+} = createFormModal(createRejectAgencyModalParams);
 
 export const ActivateAgency = () => {
-  const { agencyNeedingReview } = useFetchAgenciesNeedingReview();
-
   const dispatch = useDispatch();
 
-  const methods = useForm<ManageAgencyToReviewAdminForm>({
+  const agencyNeedingReview = useAppSelector(
+    agencyAdminSelectors.agencyNeedingReview,
+  );
+
+  const methods = useForm<WithAgencyId>({
     mode: "onTouched",
     defaultValues: {
       agencyId: undefined,
     },
     resolver: zodResolver(withAgencyIdSchema),
   });
+
   const { register, handleSubmit, formState, reset } = methods;
 
   const getFieldError = makeFieldError(formState);
 
-  const updateAgencyStatus = (
+  const updateAgencyNeedingReviewStatus = (
     updateAgencyStatusParams: UpdateAgencyStatusParams,
   ) => {
     if (!agencyNeedingReview) return;
@@ -129,16 +66,16 @@ export const ActivateAgency = () => {
         updateAgencyStatusParams,
       ),
     );
-    dispatch(agencyAdminSlice.actions.setAgencyNeedingReview(null));
+    dispatch(agencyAdminSlice.actions.clearAgencyRequested());
     reset();
   };
 
-  const setSelectedAgencyNeedingReviewId = (values: {
+  const fetchAgencyNeedingReview = (values: {
     agencyId: AgencyId | undefined;
   }) => {
     if (!values.agencyId) return;
     dispatch(
-      agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
+      agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested(
         values.agencyId,
       ),
     );
@@ -150,7 +87,7 @@ export const ActivateAgency = () => {
       className={fr.cx("fr-mt-4w")}
     >
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
-        <form onSubmit={handleSubmit(setSelectedAgencyNeedingReviewId)}>
+        <form onSubmit={handleSubmit(fetchAgencyNeedingReview)}>
           <Input
             label="Id de l'agence *"
             nativeInputProps={{
@@ -185,7 +122,7 @@ export const ActivateAgency = () => {
                   children: "Activer cette agence",
                   priority: "primary",
                   onClick: () =>
-                    updateAgencyStatus({
+                    updateAgencyNeedingReviewStatus({
                       id: agencyNeedingReview.id,
                       status: "active",
                     }),
@@ -195,7 +132,7 @@ export const ActivateAgency = () => {
                   iconId: "fr-icon-alert-fill",
                   children: "Rejeter cette agence",
                   priority: "secondary",
-                  onClick: () => rejectAgencyModal.open(),
+                  onClick: () => openRejectAgencyModal(),
                 },
               ]}
             />
@@ -203,17 +140,59 @@ export const ActivateAgency = () => {
       </div>
       {agencyNeedingReview?.id &&
         createPortal(
-          <RejectAgencyModalContent
-            onReject={({ statusJustification }) =>
-              updateAgencyStatus({
-                id: agencyNeedingReview.id,
-                status: "rejected",
-                statusJustification,
-              })
-            }
-          />,
+          <RejectAgencyModal title="Rejeter cette agence">
+            <RejectAgencyModalContent
+              onReject={({ statusJustification }) =>
+                updateAgencyNeedingReviewStatus({
+                  id: agencyNeedingReview.id,
+                  status: "rejected",
+                  statusJustification,
+                })
+              }
+              onClose={closeRejectAgencyModal}
+            />
+          </RejectAgencyModal>,
           document.body,
         )}
     </BackofficeDashboardTabContent>
+  );
+};
+
+type RejectAgencyModalFormDto = { statusJustification: string };
+
+const RejectAgencyModalContent = ({
+  onReject,
+  onClose,
+}: {
+  onReject: (values: RejectAgencyModalFormDto) => void;
+  onClose: () => void;
+}) => {
+  const methods = useForm<RejectAgencyModalFormDto>({
+    mode: "onTouched",
+    defaultValues: {
+      statusJustification: undefined,
+    },
+    resolver: zodResolver(z.object({ statusJustification: zStringMinLength1 })),
+  });
+  const { register, handleSubmit } = methods;
+
+  const onSubmit = (values: RejectAgencyModalFormDto) => {
+    onReject(values);
+    onClose();
+  };
+
+  const formId = domElementIds.admin.agencyTab.rejectAgencyModalForm;
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} id={formId}>
+      <Input
+        textArea
+        label="Justification"
+        nativeTextAreaProps={{
+          id: domElementIds.admin.agencyTab.rejectAgencyModalJustificationInput,
+          ...register("statusJustification"),
+        }}
+      />
+    </form>
   );
 };
