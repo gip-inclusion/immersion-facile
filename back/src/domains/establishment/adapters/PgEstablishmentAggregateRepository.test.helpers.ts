@@ -436,6 +436,16 @@ export const closedEstablishment = new EstablishmentAggregateBuilder()
   .withUserRights([osefUserRight])
   .build();
 
+export const unavailableEstablishment = new EstablishmentAggregateBuilder()
+  .withEstablishmentSiret("00000000000027")
+  .withIsMaxDiscussionsForPeriodReached(true)
+  .withOffers([cartographeImmersionOffer])
+  .withLocations([
+    new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
+  ])
+  .withUserRights([osefUserRight])
+  .build();
+
 export const randomizeTestEstablishmentAggregates = (
   a: EstablishmentAggregate,
   b: EstablishmentAggregate,

@@ -36,6 +36,7 @@ import {
 const siret1 = "12345678901234";
 const siret2 = "11111111111111";
 const siret3 = "12341234123455";
+const unavailableEstablishmentSiret = "12341234123456";
 
 const defaultUpdatedAt = new Date("2024-08-10");
 
@@ -74,7 +75,7 @@ const toSearchImmersionResults = (
     createdAt: establishment.createdAt.toISOString(),
     fitForDisabledWorkers: "no",
     remoteWorkMode: offer.remoteWorkMode,
-    isAvailable: false,
+    isAvailable: !establishment.isMaxDiscussionsForPeriodReached,
   }));
 
 const offer1 = new OfferEntityBuilder()
@@ -84,6 +85,12 @@ const offer1 = new OfferEntityBuilder()
   .build();
 
 const offer2 = new OfferEntityBuilder()
+  .withRomeCode("A1203")
+  .withAppellationCode("16067")
+  .withRemoteWorkMode("ON_SITE")
+  .build();
+
+const unavailableEstablishmentOffer = new OfferEntityBuilder()
   .withRomeCode("A1203")
   .withAppellationCode("16067")
   .withRemoteWorkMode("ON_SITE")
@@ -140,6 +147,27 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       ])
       .withWebsite("https://www.jobs.fr")
       .withScore(score20)
+      .build(),
+  )
+  .withUserRights([
+    {
+      role: "establishment-admin",
+      userId: "osef",
+      job: "",
+      phone: "",
+      shouldReceiveDiscussionNotifications: true,
+      isMainContactByPhone: false,
+    },
+  ])
+  .build();
+
+const unavailableEstablishmentAggregate = new EstablishmentAggregateBuilder()
+  .withOffers([unavailableEstablishmentOffer])
+  .withEstablishment(
+    new EstablishmentEntityBuilder()
+      .withSiret(unavailableEstablishmentSiret)
+      .withIsMaxDiscussionsForPeriodReached(true)
+      .withWebsite("https://www.jobs.fr")
       .build(),
   )
   .withUserRights([
@@ -855,6 +883,40 @@ describe("/offers route", () => {
           },
         });
       });
+      it("should return also unavailable results if explicitly requested (showOnlyAvailableOffers is false)", async () => {
+        inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+          ...inMemoryUow.establishmentAggregateRepository
+            .establishmentAggregates,
+          unavailableEstablishmentAggregate,
+        ];
+        const results = await httpClient.getOffers({
+          queryParams: {
+            sortBy: "score",
+            showOnlyAvailableOffers: false,
+          },
+        });
+
+        expectHttpResponseToEqual(results, {
+          status: 200,
+          body: {
+            pagination: getBasicPagination({ totalRecords: 4 }),
+            data: toSearchImmersionResults(
+              [
+                { siret: siret1, offer: offer1, establishment },
+                { siret: siret2, offer: offer2, establishment },
+                { siret: siret3, offer: offer1, establishment },
+                {
+                  siret: unavailableEstablishmentSiret,
+                  offer: unavailableEstablishmentOffer,
+                  establishment:
+                    unavailableEstablishmentAggregate.establishment,
+                },
+              ],
+              false,
+            ),
+          },
+        });
+      });
       it("should return results if no geo params are set but appellations are supplied", async () => {
         const results = await httpClient.getOffers({
           queryParams: {
@@ -975,7 +1037,7 @@ describe("/offers route", () => {
           createdAt: new Date("2024-08-08").toISOString(),
           fitForDisabledWorkers: "no",
           remoteWorkMode: "ON_SITE",
-          isAvailable: false,
+          isAvailable: true,
         },
       });
     });

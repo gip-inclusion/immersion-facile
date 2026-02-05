@@ -28,7 +28,10 @@ const getOffersEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
             longitude: action.payload.longitude ?? 0,
             distanceKm: action.payload.distanceKm ?? 0,
           })
-        : searchGateway.getOffers$(action.payload)
+        : searchGateway.getOffers$({
+            ...action.payload,
+            showOnlyAvailableOffers: false,
+          })
       ).pipe(
         take(1),
         map((searchResultWithPagination) =>

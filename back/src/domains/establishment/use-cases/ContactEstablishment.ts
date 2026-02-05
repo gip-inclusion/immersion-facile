@@ -78,6 +78,7 @@ export class ContactEstablishment extends TransactionalUseCase<CreateDiscussionD
       establishmentAggregate.establishment.nextAvailabilityDate &&
       new Date(establishmentAggregate.establishment.nextAvailabilityDate) >
         this.#timeGateway.now()
+      // TODO Add is max contact for period reached check
     )
       throw errors.establishment.forbiddenUnavailable({ siret });
 

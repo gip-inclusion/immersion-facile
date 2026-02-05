@@ -40,6 +40,7 @@ export const domainToSearchImmersionResultPublicV2 = (
       fitForDisabledWorkers: _fitForDisabledWorkers,
       customizedName: _customizedName,
       remoteWorkMode: _remoteWorkMode,
+      isAvailable: _isAvailable,
       ...searchImmersionResultPublicV2Data
     } = searchImmersionResult;
     return searchImmersionResultPublicV2Data;

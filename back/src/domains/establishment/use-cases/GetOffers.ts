@@ -39,6 +39,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       searchableBy,
       sirets,
       place,
+      showOnlyAvailableOffers,
       ...sortAndPositionParams
     } = inputParams;
 
@@ -66,6 +67,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
         remoteWorkModes,
         searchableBy,
         sirets,
+        showOnlyAvailableOffers: showOnlyAvailableOffers ?? true,
         ...validatedGeoParams,
       },
       sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },

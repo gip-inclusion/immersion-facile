@@ -120,29 +120,69 @@ describe("GetOffers", () => {
     );
   });
 
-  it("should also return offers from establishment that have reached max contact for period", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      ...uow.establishmentAggregateRepository.establishmentAggregates,
-      unavailableEstablishment
-    ];
+  describe("showOnlyAvailableOffers", () => {
+    it("should return offers from establishment that have reached max contact for period and showOnlyAvailableOffers is default (true)", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        ...uow.establishmentAggregateRepository.establishmentAggregates,
+        unavailableEstablishment,
+      ];
 
-    const resultWithoutFilters = await getOffers.execute(
-      {
-        sortBy: "date",
-        sortOrder: "desc",
-      },
-      undefined,
-    );
+      const resultWithoutFilters = await getOffers.execute(
+        {
+          sortBy: "date",
+          sortOrder: "desc",
+        },
+        undefined,
+      );
 
-    expect(resultWithoutFilters.data).toHaveLength(5);
-    expect(resultWithoutFilters.pagination.totalRecords).toBe(5);
-    const defaultNumberPerPageForWeb: GetOffersPerPageOption = 12;
-    expect(resultWithoutFilters.pagination.numberPerPage).toBe(
-      defaultNumberPerPageForWeb,
-    );
-    expectObjectInArrayToMatch(
-      resultWithoutFilters.data,
-      [
+      expect(resultWithoutFilters.data).toHaveLength(4);
+      expect(resultWithoutFilters.pagination.totalRecords).toBe(4);
+      const defaultNumberPerPageForWeb: GetOffersPerPageOption = 12;
+      expect(resultWithoutFilters.pagination.numberPerPage).toBe(
+        defaultNumberPerPageForWeb,
+      );
+      expectObjectInArrayToMatch(resultWithoutFilters.data, [
+        {
+          isAvailable: true,
+        },
+        {
+          isAvailable: true,
+        },
+        {
+          isAvailable: true,
+        },
+        {
+          isAvailable: true,
+        },
+      ]);
+      expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
+      expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(4);
+      expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(
+        resultWithoutFilters.pagination.totalRecords,
+      );
+    });
+    it("should return offers from establishment that have reached max contact for period and showOnlyAvailableOffers is false", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        ...uow.establishmentAggregateRepository.establishmentAggregates,
+        unavailableEstablishment,
+      ];
+
+      const resultWithoutFilters = await getOffers.execute(
+        {
+          sortBy: "date",
+          sortOrder: "desc",
+          showOnlyAvailableOffers: false,
+        },
+        undefined,
+      );
+
+      expect(resultWithoutFilters.data).toHaveLength(5);
+      expect(resultWithoutFilters.pagination.totalRecords).toBe(5);
+      const defaultNumberPerPageForWeb: GetOffersPerPageOption = 12;
+      expect(resultWithoutFilters.pagination.numberPerPage).toBe(
+        defaultNumberPerPageForWeb,
+      );
+      expectObjectInArrayToMatch(resultWithoutFilters.data, [
         {
           isAvailable: true,
         },
@@ -157,14 +197,14 @@ describe("GetOffers", () => {
         },
         {
           isAvailable: false,
-        }
-      ]
-    )
-    expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
-    expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(5);
-    expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(
-      resultWithoutFilters.pagination.totalRecords,
-    );
+        },
+      ]);
+      expect(uow.searchMadeRepository.searchesMade).toHaveLength(1);
+      expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(5);
+      expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(
+        resultWithoutFilters.pagination.totalRecords,
+      );
+    });
   });
 
   it("should return more results when no filters, and web user", async () => {
