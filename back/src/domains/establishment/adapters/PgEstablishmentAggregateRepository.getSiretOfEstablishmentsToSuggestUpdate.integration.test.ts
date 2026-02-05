@@ -19,7 +19,7 @@ describe("PgScriptsQueries", () => {
   const userRight: EstablishmentUserRight = {
     role: "establishment-admin",
     job: "osef",
-    phone: "3615-OSEF",
+    phone: "+33600000000",
     userId: user.id,
     shouldReceiveDiscussionNotifications: true,
     isMainContactByPhone: false,

@@ -10,6 +10,7 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
+import { phoneNumberExist } from "../../phone-number/adapters/pgPhoneHelper";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
@@ -120,6 +121,8 @@ describe("PgApiConsumerRepository", () => {
       await apiConsumerRepository.getById(apiConsumer.id),
       updatedApiConsumer,
     );
+
+    expect(await phoneNumberExist(db, apiConsumer.contact.phone)).toBe(true);
   });
 
   describe("getByFilters", () => {

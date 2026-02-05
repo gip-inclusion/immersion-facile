@@ -87,7 +87,7 @@ describe("PgStatisticQueries", () => {
         role: "establishment-admin",
         userId: user.id,
         job: "",
-        phone: "",
+        phone: "+33600000000",
         shouldReceiveDiscussionNotifications: true,
         isMainContactByPhone: false,
       };

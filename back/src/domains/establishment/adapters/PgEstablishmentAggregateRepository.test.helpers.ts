@@ -160,7 +160,7 @@ export const osefUser = new UserBuilder().withId(uuid()).build();
 export const osefUserRight: EstablishmentUserRight = {
   role: "establishment-admin",
   job: "osef",
-  phone: "3615-OSEF",
+  phone: "+33600000000",
   userId: osefUser.id,
   shouldReceiveDiscussionNotifications: true,
   isMainContactByPhone: false,
