@@ -782,6 +782,14 @@ export const errors = {
       ),
     notRejected: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(`L'agence ${agencyId} n'est pas rejetée.`),
+    targetAgencyMustBeActive: ({ agencyId }: { agencyId: AgencyId }) =>
+      new BadRequestError(
+        `L'agence vers laquelle transférer (${agencyId}) doit avoir un statut actif (active ou from-api-PE).`,
+      ),
+    targetAgencyMustNotReferToAnother: ({ agencyId }: { agencyId: AgencyId }) =>
+      new BadRequestError(
+        `L'agence vers laquelle transférer (${agencyId}) ne doit pas être une agence qui référence une autre agence.`,
+      ),
     invalidCounsellorRoleForFTAgency: () =>
       new BadRequestError(
         "Le rôle pré-valideur n'est pas autorisé pour une agence France Travail",
