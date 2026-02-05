@@ -1,5 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { CloseAgencyAndTransfertConventionsRequestDto } from "shared";
+import type {
+  AgencyId,
+  CloseAgencyAndTransfertConventionsRequestDto,
+} from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -26,7 +29,7 @@ export const closeAgencyAndTransfertConventionsSlice = createSlice({
     },
     closeAgencyAndTransfertConventionsSucceeded: (
       state,
-      _action: PayloadActionWithFeedbackTopic,
+      _action: PayloadActionWithFeedbackTopic<{ agencyId: AgencyId }>,
     ) => {
       state.isLoading = false;
     },
