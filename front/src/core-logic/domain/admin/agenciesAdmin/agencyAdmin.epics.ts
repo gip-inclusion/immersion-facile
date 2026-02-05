@@ -68,14 +68,17 @@ const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
   dependencies,
 ) =>
   action$.pipe(
-    filter(agencyAdminSlice.actions.setSelectedAgencyId.match),
+    filter(agencyAdminSlice.actions.fetchAgencyRequested.match),
     switchMap((action: PayloadAction<AgencyId>) =>
       dependencies.agencyGateway.getAgencyById$(
         action.payload,
         getAdminToken(state$.value),
       ),
     ),
-    map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
+    map((agency) => agencyAdminSlice.actions.fetchAgencySucceeded(agency)),
+    catchEpicError((error: Error) =>
+      agencyAdminSlice.actions.fetchAgencyFailed(error.message),
+    ),
   );
 
 const updateAgencyEpic: AgencyEpic = (action$, state$, { agencyGateway }) =>
@@ -142,7 +145,7 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
         ),
     ),
     map((action) =>
-      agencyAdminSlice.actions.setSelectedAgencyId(action.payload.agencyId),
+      agencyAdminSlice.actions.fetchAgencyRequested(action.payload.agencyId),
     ),
   );
 
