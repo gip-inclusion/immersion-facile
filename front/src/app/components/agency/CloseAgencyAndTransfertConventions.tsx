@@ -112,7 +112,7 @@ export const CloseAgencyAndTransfertConventions = ({
         id={
           domElementIds.admin.agencyTab.closeAgencyAndTransfertConventionsButton
         }
-        priority="secondary"
+        priority="primary"
         type="button"
         onClick={() => openTransferConventionsModal()}
       >
