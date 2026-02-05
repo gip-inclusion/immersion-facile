@@ -305,8 +305,10 @@ describe("TransferConventionToAgency", () => {
             },
             validatorJwtPayload,
           ),
-          errors.convention.forbiddenMissingRights({
-            conventionId: requestedConventionId,
+          errors.convention.forbiddenConventionIdMismatch({
+            jwtConventionId: validatorJwtPayload.applicationId,
+            jwtRole: validatorJwtPayload.role,
+            requestedConventionId,
           }),
         );
       });

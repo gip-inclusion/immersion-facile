@@ -274,8 +274,10 @@ describe("EditCounsellorName", () => {
             },
             validatorJwtPayload,
           ),
-          errors.convention.forbiddenMissingRights({
-            conventionId: requestedConventionId,
+          errors.convention.forbiddenConventionIdMismatch({
+            requestedConventionId,
+            jwtConventionId: validatorJwtPayload.applicationId,
+            jwtRole: validatorJwtPayload.role,
           }),
         );
       });

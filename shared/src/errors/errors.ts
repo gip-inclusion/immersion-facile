@@ -35,6 +35,7 @@ import type {
 import type {
   AgencyModifierRole,
   AgencyRole,
+  ConventionRole,
   Role,
   SignatoryRole,
 } from "../role/role.dto";
@@ -337,17 +338,39 @@ export const errors = {
       new ForbiddenError(
         `Actor with role ${requesterRole} is not allowed to request a modification`,
       ),
-    forbiddenMissingRights: ({
+    forbiddenMissingRightsUserId: ({
       conventionId,
       userId,
     }: {
       conventionId: ConventionId;
-      userId?: UserId;
+      userId: UserId;
     }) =>
       new ForbiddenError(
-        `L'utilisateur ${
-          userId ? `'${userId}' ` : ""
-        }n'a pas de droits sur la convention '${conventionId}'.`,
+        `L'utilisateur ${userId}n'a pas de droit sur la convention '${conventionId}'.`,
+      ),
+    forbiddenMissingRightsEmailHash: ({
+      conventionId,
+      emailHash,
+      role,
+    }: {
+      conventionId: ConventionId;
+      role: Role;
+      emailHash: string;
+    }) =>
+      new ForbiddenError(
+        `L'utilisateur ${role}-${emailHash} n'a pas de droit sur la convention '${conventionId}'.`,
+      ),
+    forbiddenConventionIdMismatch: ({
+      jwtConventionId,
+      jwtRole,
+      requestedConventionId,
+    }: {
+      jwtConventionId: ConventionId;
+      jwtRole: ConventionRole;
+      requestedConventionId: ConventionId;
+    }) =>
+      new ForbiddenError(
+        `Il y a un écart entre le numéro de convention demandée ${requestedConventionId} et le numéro de convention authentifiée ${jwtConventionId}. Actionné par ${jwtRole}`,
       ),
     badRoleStatusChange: ({
       roles,

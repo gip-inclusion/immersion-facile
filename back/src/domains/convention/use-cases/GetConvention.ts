@@ -1,9 +1,8 @@
 import {
   type AgencyWithUsersRights,
+  type ConventionDomainJwtPayload,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
-  type ConventionRole,
-  type EmailHash,
   errors,
   getConventionManageAllowedRoles,
   type UserId,
@@ -18,6 +17,7 @@ import {
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export class GetConvention extends TransactionalUseCase<
   WithConventionId,
@@ -32,6 +32,10 @@ export class GetConvention extends TransactionalUseCase<
     authPayload?: ConventionRelatedJwtPayload,
   ): Promise<ConventionReadDto> {
     if (!authPayload) throw errors.user.noJwtProvided();
+    throwErrorOnConventionIdMismatch({
+      jwtPayload: authPayload,
+      requestedConventionId: conventionId,
+    });
 
     const convention =
       await uow.conventionQueries.getConventionById(conventionId);
@@ -39,8 +43,7 @@ export class GetConvention extends TransactionalUseCase<
 
     return "emailHash" in authPayload
       ? this.#onConventionDomainPayload({
-          emailHash: authPayload.emailHash,
-          role: authPayload.role,
+          payload: authPayload,
           uow,
           convention,
         })
@@ -52,13 +55,11 @@ export class GetConvention extends TransactionalUseCase<
   }
 
   async #onConventionDomainPayload({
-    role,
-    emailHash,
+    payload,
     convention,
     uow,
   }: {
-    role: ConventionRole;
-    emailHash: EmailHash;
+    payload: ConventionDomainJwtPayload;
     convention: ConventionReadDto;
     uow: UnitOfWork;
   }): Promise<ConventionReadDto> {
@@ -67,15 +68,17 @@ export class GetConvention extends TransactionalUseCase<
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     const isMatchingEmailHash = await this.#isEmailHashMatch({
-      emailHash,
-      role,
+      payload,
       convention,
       agency,
       uow,
     });
+
     if (!isMatchingEmailHash) {
-      throw errors.convention.forbiddenMissingRights({
+      throw errors.convention.forbiddenMissingRightsEmailHash({
         conventionId: convention.id,
+        emailHash: payload.emailHash,
+        role: payload.role,
       });
     }
 
@@ -107,21 +110,19 @@ export class GetConvention extends TransactionalUseCase<
 
     if (hasSomeEstablishmentRights) return convention;
 
-    throw errors.convention.forbiddenMissingRights({
+    throw errors.convention.forbiddenMissingRightsUserId({
       conventionId: convention.id,
       userId: user.id,
     });
   }
 
   async #isEmailHashMatch({
-    emailHash,
-    role,
+    payload: { emailHash, role },
     convention,
     agency,
     uow,
   }: {
-    emailHash: EmailHash;
-    role: ConventionRole;
+    payload: ConventionDomainJwtPayload;
     convention: ConventionReadDto;
     agency: AgencyWithUsersRights;
     uow: UnitOfWork;
