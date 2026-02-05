@@ -5,6 +5,7 @@ import { ActivateAgency } from "src/app/components/agency/ActivateAgency";
 import { agencyAdminSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { EditAgency } from "src/app/components/agency/EditAgency";
 import { RegisterUsersToAgencies } from "src/app/components/agency/RegisterUsersToAgencies";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -20,6 +21,11 @@ export const AgencyTab = () => {
       <SubmitFeedbackNotification
         submitFeedback={feedback}
         messageByKind={agencyAdminSubmitMessageByKind}
+      />
+      <Feedback
+        className="fr-mb-2w"
+        topics={["close-agency-and-transfert-conventions"]}
+        closable
       />
       <EditAgency />
 
