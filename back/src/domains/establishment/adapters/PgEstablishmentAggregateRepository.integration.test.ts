@@ -231,7 +231,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             ),
           });
         });
-        it("also returns non available (according to max contact requests) establishment", async () => {
+        it("also returns non available (according to establishment max contact requests) offers", async () => {
           const unavailableEstablishment = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("00000000000027")
             .withIsMaxDiscussionsForPeriodReached(true)
@@ -267,14 +267,17 @@ describe("PgEstablishmentAggregateRepository", () => {
               appellationCodes: undefined,
             },
           });
+
+          expect(result.data[6].isAvailable).toBe(false);
+
           expectToEqual(result, {
             pagination: {
               currentPage: 1,
               totalPages: 1,
               numberPerPage: 10,
-              totalRecords: 6,
+              totalRecords: 7,
             },
-            data: baseTestEstablishmentAggregates.map(
+            data: establishmentSetWithUnavailableOne.map(
               (establishmentAggregate) =>
                 makeExpectedSearchResult({
                   establishment: establishmentAggregate,
@@ -963,7 +966,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   establishmentAggregate.establishment.locations[0],
                 nafLabel:
                   nafLabelByNafCode[
-                    establishmentAggregate.establishment.nafDto.code
+                  establishmentAggregate.establishment.nafDto.code
                   ] ?? "Activités des agences de travail temporaire",
               }),
             ),
@@ -1962,7 +1965,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .execute();
           await kyselyDb.deleteFrom("establishments").execute();
 
-          const INDEX_OF_UNSEARCHABLE_ESTABLISHMENT = 2;
+          const INDEX_OF_NOT_AVAILABLE_ESTABLISHMENT = 2;
           const INDEX_OF_CURRENTLY_UNAVAILABLE_ESTABLISHMENT = 3;
           const establishmentAggregatesByDateAndScoreDescending: EstablishmentAggregate[] =
             arrayFromNumber(10).map((i) => ({
@@ -1972,7 +1975,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 siret: `9999999999999${i}`,
                 updatedAt: addDays(new Date(), -i),
                 isMaxDiscussionsForPeriodReached:
-                  i === INDEX_OF_UNSEARCHABLE_ESTABLISHMENT,
+                  i === INDEX_OF_NOT_AVAILABLE_ESTABLISHMENT,
                 score: 10 - i,
                 nextAvailabilityDate:
                   i === INDEX_OF_CURRENTLY_UNAVAILABLE_ESTABLISHMENT
@@ -1986,7 +1989,9 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ],
               },
             }));
-          const displayedResults = [0, 1, 4, 5, 6];
+          // Index 3 is filtered out (future nextAvailabilityDate)
+          // Index 2 is NOT filtered out but marked isAvailable: false (isMaxDiscussionsForPeriodReached: true)
+          const displayedResults = [0, 1, 2, 4, 5];
 
           const expectedResults = displayedResults.map((i) =>
             makeExpectedSearchResult({
