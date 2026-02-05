@@ -268,6 +268,7 @@ describe("GetOffers", () => {
         website: establishment4.establishment.website,
         updatedAt: establishment4.establishment.updatedAt.toISOString(),
         createdAt: establishment4.establishment.createdAt.toISOString(),
+        isAvailable: true,
       },
     ]);
   });
@@ -339,6 +340,7 @@ describe("GetOffers", () => {
         website: establishment4.establishment.website,
         updatedAt: establishment4.establishment.updatedAt.toISOString(),
         createdAt: establishment4.establishment.createdAt.toISOString(),
+        isAvailable: true,
       },
       {
         siret: establishment4.establishment.siret,
@@ -369,6 +371,7 @@ describe("GetOffers", () => {
         website: establishment4.establishment.website,
         updatedAt: establishment4.establishment.updatedAt.toISOString(),
         createdAt: establishment4.establishment.createdAt.toISOString(),
+        isAvailable: true,
       },
     ]);
   });

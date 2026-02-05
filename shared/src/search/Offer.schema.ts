@@ -10,6 +10,7 @@ import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
+  zBoolean,
   zStringCanBeEmpty,
   zStringMinLength1,
   zUuidLike,
@@ -57,8 +58,8 @@ const commonOfferSchema = z.object({
   ),
   updatedAt: dateTimeIsoStringSchema.optional(),
   createdAt: dateTimeIsoStringSchema.optional(),
-  // locationId: zUuidLike,
   locationId: zUuidLike.or(z.null()),
+  isAvailable: zBoolean,
 });
 
 export const internalOfferSchema: ZodSchemaWithInputMatchingOutput<InternalOfferDto> =
