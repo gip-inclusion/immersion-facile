@@ -15,7 +15,6 @@ export type AgencyAdminSubmitFeedback =
 export interface AgencyAdminState {
   agencySearchQuery: string;
   agencyOptions: AgencyOption[];
-  agencyNeedingReviewOptions: AgencyOption[];
   agency: AgencyDto | null;
   agencyNeedingReview: AgencyDto | null;
 
@@ -29,7 +28,6 @@ export interface AgencyAdminState {
 }
 
 export const agencyAdminInitialState: AgencyAdminState = {
-  agencyNeedingReviewOptions: [],
   agencySearchQuery: "",
   agencyOptions: [],
   agency: null,
@@ -47,6 +45,23 @@ export const agencyAdminSlice = createSlice({
   name: "agencyAdmin",
   initialState: agencyAdminInitialState,
   reducers: {
+    fetchAgencyNeedingReviewRequested: (
+      state,
+      _action: PayloadAction<AgencyId>,
+    ) => {
+      state.feedback = { kind: "idle" };
+      state.agency = null;
+    },
+    fetchAgencyNeedingReviewSucceeded: (
+      state,
+      action: PayloadAction<AgencyDto | null>,
+    ) => {
+      state.agencyNeedingReview = action.payload ?? null;
+    },
+    fetchAgencyNeedingReviewFailed: (state, action: PayloadAction<string>) => {
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+
     setAgencySearchQuery: (state, action: PayloadAction<string>) => {
       state.agencySearchQuery = action.payload;
       state.isSearching = true;
@@ -60,28 +75,11 @@ export const agencyAdminSlice = createSlice({
       state.feedback = { kind: "idle" };
       state.agency = null;
     },
-    setSelectedAgencyNeedingReviewId: (
-      state,
-      _action: PayloadAction<AgencyId>,
-    ) => {
-      state.feedback = { kind: "idle" };
-      state.agency = null;
-    },
-    setSelectedAgencyNeedingReviewIdFailed: (
-      state,
-      action: PayloadAction<string>,
-    ) => {
-      state.feedback = { kind: "errored", errorMessage: action.payload };
-    },
+
     setAgency: (state, action: PayloadAction<AgencyDto | null>) => {
       state.agency = action.payload ?? null;
     },
-    setAgencyNeedingReview: (
-      state,
-      action: PayloadAction<AgencyDto | null>,
-    ) => {
-      state.agencyNeedingReview = action.payload ?? null;
-    },
+
     updateAgencyRequested: (state, _action: PayloadAction<AgencyDto>) => {
       state.isUpdating = true;
       state.feedback = { kind: "idle" };
@@ -90,6 +88,11 @@ export const agencyAdminSlice = createSlice({
       state.isUpdating = false;
       state.feedback = { kind: "agencyUpdated" };
     },
+    updateAgencyFailed: (state, action: PayloadAction<string>) => {
+      state.isUpdating = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+
     updateAgencyNeedingReviewStatusRequested: (
       state,
       _action: PayloadAction<UpdateAgencyStatusParams>,
@@ -104,25 +107,14 @@ export const agencyAdminSlice = createSlice({
       state.isUpdating = false;
       state.feedback = { kind: "agencyUpdated" };
     },
-    updateAgencyFailed: (state, action: PayloadAction<string>) => {
-      state.isUpdating = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
-    },
-    updateAgencyStatusFailed: (state, action: PayloadAction<string>) => {
-      state.isUpdating = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
-    },
-    agencyNeedingReviewChangedAfterAnUpdate: (
+    updateAgencyNeedingReviewStatusFailed: (
       state,
-      action: PayloadAction<{
-        agencyNeedingReviewOptions: AgencyOption[];
-        agencyNeedingReview: AgencyDto | null;
-      }>,
+      action: PayloadAction<string>,
     ) => {
-      state.agencyNeedingReviewOptions =
-        action.payload.agencyNeedingReviewOptions;
-      state.agencyNeedingReview = action.payload.agencyNeedingReview;
+      state.isUpdating = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
+
     clearAgencyRequested: (state) => {
       state.agency = null;
       state.agencyNeedingReview = null;
