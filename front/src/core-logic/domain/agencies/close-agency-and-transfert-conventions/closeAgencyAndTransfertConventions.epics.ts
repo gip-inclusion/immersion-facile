@@ -28,7 +28,10 @@ const closeAgencyAndTransfertConventionsEpic: AppEpic<
         .pipe(
           map(() =>
             closeAgencyAndTransfertConventionsSlice.actions.closeAgencyAndTransfertConventionsSucceeded(
-              { feedbackTopic: action.payload.feedbackTopic },
+              {
+                feedbackTopic: action.payload.feedbackTopic,
+                agencyId: action.payload.agencyToCloseId,
+              },
             ),
           ),
           catchEpicError((error) =>
