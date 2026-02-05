@@ -271,6 +271,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
             name: referedAgency.name,
             contactEmail: referedAgency.contactEmail,
             kind: referedAgency.kind,
+            siret: referedAgency.agencySiret,
           }
         : undefined,
       ...assesmentEntityToConventionAssessmentFields(assessment),

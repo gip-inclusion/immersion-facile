@@ -451,6 +451,9 @@ export const getConventionAgencyFieldsForAgencies = async (
                   "referred_agencies.contact_email",
                 ).$castTo<Email>(),
                 kind: ref("referred_agencies.kind").$castTo<AgencyKind>(),
+                siret: ref(
+                  "referred_agencies.agency_siret",
+                ).$castTo<SiretDto>(),
               }),
             )
             .else(null)

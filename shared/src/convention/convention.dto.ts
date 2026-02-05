@@ -312,6 +312,7 @@ export type AgencyRefersToInConvention = {
   name: string;
   contactEmail: Email;
   kind: AgencyKind;
+  siret: SiretDto;
 };
 
 export type ConventionAgencyFields = {
