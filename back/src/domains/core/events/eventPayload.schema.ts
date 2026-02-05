@@ -1,8 +1,8 @@
 import {
   agencyIdSchema,
-  conventionIdSchema,
   localization,
   reminderKinds,
+  withConventionSchema,
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
 } from "shared";
@@ -21,9 +21,11 @@ export const conventionReminderPayloadSchema: ZodSchemaWithInputMatchingOutput<C
   });
 
 export const transferConventionToAgencyPayloadSchema: ZodSchemaWithInputMatchingOutput<TransferConventionToAgencyPayload> =
-  z.object({
-    conventionId: conventionIdSchema,
-    justification: zStringMinLength1,
-    agencyId: agencyIdSchema,
-    previousAgencyId: agencyIdSchema,
-  });
+  withConventionSchema.and(
+    z.object({
+      justification: zStringMinLength1,
+      agencyId: agencyIdSchema,
+      previousAgencyId: agencyIdSchema,
+      shouldNotifyActors: z.boolean(),
+    }),
+  );

@@ -40,8 +40,14 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
     config: AppConfig;
   }>()
   .build(async ({ inputParams, uow, deps }) => {
-    const { agencyId, conventionId, justification, previousAgencyId } =
-      inputParams;
+    if (!inputParams.shouldNotifyActors) return;
+
+    const {
+      agencyId,
+      convention: transferredConvention,
+      justification,
+      previousAgencyId,
+    } = inputParams;
 
     const previousAgency = await uow.agencyRepository.getById(previousAgencyId);
     if (!previousAgency) {
@@ -55,9 +61,13 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
 
     const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
-    const convention = await uow.conventionRepository.getById(conventionId);
+    const convention = await uow.conventionRepository.getById(
+      transferredConvention.id,
+    );
     if (!convention) {
-      throw errors.convention.notFound({ conventionId });
+      throw errors.convention.notFound({
+        conventionId: transferredConvention.id,
+      });
     }
 
     const signatoriesRecipientsRoleAndEmail: {

@@ -129,7 +129,10 @@ const getUseCasesByTopics = (
   ],
   ConventionTransferredToAgency: [
     useCases.notifyAllActorsThatConventionHasBeenTransferred,
-    useCases.broadcastToFranceTravailOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToFranceTravailOnConventionUpdates,
+    ),
+    useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionCounsellorNameEdited: [],
   ConventionBeneficiaryBirthdateEdited: [
