@@ -235,22 +235,25 @@ export const geocodingSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(agencyAdminSlice.actions.setAgency, (state, action) => {
-      if (!action.payload) return;
-      state.data["agency-address"] = {
-        ...initialAutocompleteItem,
-        value: {
-          address: {
-            ...action.payload.address,
-            countryCode: defaultCountryCode,
+    builder.addCase(
+      agencyAdminSlice.actions.fetchAgencySucceeded,
+      (state, action) => {
+        if (!action.payload) return;
+        state.data["agency-address"] = {
+          ...initialAutocompleteItem,
+          value: {
+            address: {
+              ...action.payload.address,
+              countryCode: defaultCountryCode,
+            },
+            position: {
+              lat: action.payload.position.lat,
+              lon: action.payload.position.lon,
+            },
           },
-          position: {
-            lat: action.payload.position.lat,
-            lon: action.payload.position.lon,
-          },
-        },
-      };
-    });
+        };
+      },
+    );
   },
 });
 

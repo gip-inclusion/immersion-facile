@@ -71,13 +71,16 @@ export const agencyAdminSlice = createSlice({
       state.isSearching = false;
       state.isFetchingAgenciesNeedingReview = false;
     },
-    setSelectedAgencyId: (state, _action: PayloadAction<AgencyId>) => {
+    fetchAgencyRequested: (state, _action: PayloadAction<AgencyId>) => {
       state.feedback = { kind: "idle" };
       state.agency = null;
     },
-
-    setAgency: (state, action: PayloadAction<AgencyDto | null>) => {
+    fetchAgencySucceeded: (state, action: PayloadAction<AgencyDto>) => {
       state.agency = action.payload ?? null;
+    },
+    fetchAgencyFailed: (state, action: PayloadAction<string>) => {
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+      state.agency = null;
     },
 
     updateAgencyRequested: (state, _action: PayloadAction<AgencyDto>) => {
