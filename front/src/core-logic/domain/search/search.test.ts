@@ -74,6 +74,7 @@ const immersionOffer: InternalOfferDto = {
   updatedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
   remoteWorkMode: "HYBRID",
+  isAvailable: true,
 };
 
 describe("search epic", () => {

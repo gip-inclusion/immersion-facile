@@ -43,6 +43,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "HYBRID",
+    isAvailable: false,
   },
   {
     rome: "G1204",
@@ -77,6 +78,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "FULL_REMOTE",
+    isAvailable: true,
   },
   {
     rome: "D1211",
@@ -111,6 +113,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "HYBRID",
+    isAvailable: true,
   },
   {
     rome: "D1211",
@@ -145,6 +148,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     rome: "D1211",
@@ -179,6 +183,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     rome: "D1505",
@@ -213,6 +218,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     rome: "D1211",
@@ -248,6 +254,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "ON_SITE",
+    isAvailable: false,
   },
   {
     rome: "D1211",
@@ -282,6 +289,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     locationId: "123",
     createdAt: new Date().toISOString(),
     remoteWorkMode: "FULL_REMOTE",
+    isAvailable: true,
   },
   {
     rome: "N1103",
@@ -328,6 +336,7 @@ const groupSearchResultBySlugStub: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
 ];
 
@@ -381,6 +390,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "HYBRID",
+    isAvailable: true,
   },
   {
     rome: "A0001",
@@ -410,6 +420,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "HYBRID",
+    isAvailable: false,
   },
   {
     rome: "A0003",
@@ -448,6 +459,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "FULL_REMOTE",
+    isAvailable: true,
   },
   {
     rome: "A0002",
@@ -478,6 +490,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "HYBRID",
+    isAvailable: true,
   },
   {
     rome: "A0003",
@@ -503,6 +516,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -536,6 +550,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -570,6 +585,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -604,6 +620,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -638,6 +655,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -671,6 +689,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "5610C",
@@ -705,6 +724,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -738,6 +758,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -772,6 +793,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -806,6 +828,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -839,6 +862,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -872,6 +896,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -906,6 +931,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -940,6 +966,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -974,6 +1001,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1007,6 +1035,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1040,6 +1069,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "4724Z",
@@ -1074,6 +1104,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1108,6 +1139,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1142,6 +1174,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1175,6 +1208,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1208,6 +1242,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1242,6 +1277,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1276,6 +1312,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1310,6 +1347,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1343,6 +1381,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1376,6 +1415,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1410,6 +1450,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1444,6 +1485,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1478,6 +1520,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1511,6 +1554,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1544,6 +1588,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1578,6 +1623,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1611,6 +1657,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1649,6 +1696,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1682,6 +1730,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1716,6 +1765,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1749,6 +1799,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1783,6 +1834,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1817,6 +1869,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "5610C",
@@ -1851,6 +1904,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1885,6 +1939,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1919,6 +1974,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1953,6 +2009,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -1987,6 +2044,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2020,6 +2078,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2054,6 +2113,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2088,6 +2148,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2122,6 +2183,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2155,6 +2217,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "4724Z",
@@ -2189,6 +2252,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2222,6 +2286,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2256,6 +2321,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2290,6 +2356,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "4724Z",
@@ -2324,6 +2391,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2358,6 +2426,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2391,6 +2460,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2423,6 +2493,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2457,6 +2528,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "5610A",
@@ -2489,6 +2561,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "4724Z",
@@ -2523,6 +2596,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "1071C",
@@ -2556,6 +2630,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
   {
     naf: "6820B",
@@ -2590,5 +2665,6 @@ export const seedInternalResults: InternalOfferDto[] = [
     createdAt: new Date().toISOString(),
     fitForDisabledWorkers: null,
     remoteWorkMode: "ON_SITE",
+    isAvailable: true,
   },
 ];

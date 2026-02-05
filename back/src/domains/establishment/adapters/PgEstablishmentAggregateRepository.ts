@@ -106,7 +106,7 @@ export class PgEstablishmentAggregateRepository
       .insertInto("immersion_offers")
       .values(
         offersWithSiret.map((offerWithSiret) => ({
-          appellation_code: Number.parseInt(offerWithSiret.appellationCode),
+          appellation_code: Number.parseInt(offerWithSiret.appellationCode, 10),
           remote_work_mode: offerWithSiret.remoteWorkMode,
           siret: offerWithSiret.siret,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
@@ -670,7 +670,7 @@ export class PgEstablishmentAggregateRepository
         "ogr_appellation",
         "in",
         appellationCodes.map((appellationCode) =>
-          Number.parseInt(appellationCode),
+          Number.parseInt(appellationCode, 10),
         ),
       )
       .execute();
@@ -1036,7 +1036,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                   ? eb.where(
                       "immersion_offers.appellation_code",
                       "in",
-                      appellationCodes.map((code) => Number.parseInt(code)),
+                      appellationCodes.map((code) => Number.parseInt(code, 10)),
                     )
                   : eb,
               (eb) =>
@@ -1216,6 +1216,7 @@ const searchImmersionResultsQuery = async (
         numberOfEmployeeRange: result.numberOfEmployeeRange,
         updatedAt: result.updatedAt,
         website: result.website,
+        isAvailable: true, // hardcoded to fix typing
       };
     }),
   };

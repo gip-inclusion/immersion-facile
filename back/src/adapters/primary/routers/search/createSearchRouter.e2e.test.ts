@@ -74,6 +74,7 @@ const toSearchImmersionResults = (
     createdAt: establishment.createdAt.toISOString(),
     fitForDisabledWorkers: "no",
     remoteWorkMode: offer.remoteWorkMode,
+    isAvailable: false,
   }));
 
 const offer1 = new OfferEntityBuilder()
@@ -974,6 +975,7 @@ describe("/offers route", () => {
           createdAt: new Date("2024-08-08").toISOString(),
           fitForDisabledWorkers: "no",
           remoteWorkMode: "ON_SITE",
+          isAvailable: false,
         },
       });
     });
