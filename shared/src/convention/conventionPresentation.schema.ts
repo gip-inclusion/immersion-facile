@@ -4,6 +4,7 @@ import {
   refersToAgencyIdSchema,
 } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
+import { siretSchema } from "../siret/siret.schema";
 import {
   type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
@@ -26,6 +27,7 @@ export const conventionPresentationSchema: ZodSchemaWithInputMatchingOutput<Crea
           name: zStringMinLength1,
           contactEmail: emailSchema,
           kind: agencyKindSchema,
+          siret: siretSchema,
         })
         .optional(),
     }),

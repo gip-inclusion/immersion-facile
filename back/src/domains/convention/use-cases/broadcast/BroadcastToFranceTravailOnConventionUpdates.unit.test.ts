@@ -51,6 +51,7 @@ const conventionReadDtoFrom = ({
     name: referredAgency.name,
     contactEmail: referredAgency.contactEmail,
     kind: referredAgency.kind,
+    siret: referredAgency.agencySiret,
   },
   agencyCounsellorEmails: agency.counsellorEmails,
   agencyValidatorEmails: agency.validatorEmails,
