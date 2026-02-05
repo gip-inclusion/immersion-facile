@@ -47,10 +47,6 @@ export const agencyAdminSlice = createSlice({
   name: "agencyAdmin",
   initialState: agencyAdminInitialState,
   reducers: {
-    fetchAgenciesNeedingReviewRequested: (state) => {
-      state.isFetchingAgenciesNeedingReview = true;
-      state.agencyNeedingReviewOptions = [];
-    },
     setAgencySearchQuery: (state, action: PayloadAction<string>) => {
       state.agencySearchQuery = action.payload;
       state.isSearching = true;
@@ -58,13 +54,6 @@ export const agencyAdminSlice = createSlice({
     setAgencyOptions: (state, action: PayloadAction<AgencyOption[]>) => {
       state.agencyOptions = action.payload;
       state.isSearching = false;
-      state.isFetchingAgenciesNeedingReview = false;
-    },
-    setAgencyNeedingReviewOptions: (
-      state,
-      action: PayloadAction<AgencyOption[]>,
-    ) => {
-      state.agencyNeedingReviewOptions = action.payload;
       state.isFetchingAgenciesNeedingReview = false;
     },
     setSelectedAgencyId: (state, _action: PayloadAction<AgencyId>) => {
@@ -92,13 +81,6 @@ export const agencyAdminSlice = createSlice({
       action: PayloadAction<AgencyDto | null>,
     ) => {
       state.agencyNeedingReview = action.payload ?? null;
-    },
-    fetchAgenciesNeedingReviewFailed: (
-      state,
-      action: PayloadAction<string>,
-    ) => {
-      state.isFetchingAgenciesNeedingReview = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
     updateAgencyRequested: (state, _action: PayloadAction<AgencyDto>) => {
       state.isUpdating = true;
