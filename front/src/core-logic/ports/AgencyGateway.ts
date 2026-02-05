@@ -31,9 +31,6 @@ export interface AgencyGateway {
   listAgencyOptionsByFilter$(
     filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]>;
-  listAgencyOptionsNeedingReview$(
-    adminToken: ConnectedUserJwt,
-  ): Observable<AgencyOption[]>;
   updateAgency$(
     agencyDto: AgencyDto,
     adminToken: ConnectedUserJwt,

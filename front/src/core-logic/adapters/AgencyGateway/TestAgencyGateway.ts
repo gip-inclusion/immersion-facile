@@ -71,12 +71,6 @@ export class TestAgencyGateway implements AgencyGateway {
     return this.agencyOptions$;
   }
 
-  public listAgencyOptionsNeedingReview$(
-    _adminToken: ConnectedUserJwt,
-  ): Observable<AgencyOption[]> {
-    return this.agencyOptions$;
-  }
-
   public updateAgency$(
     _agencyDto: AgencyDto,
     _adminToken: ConnectedUserJwt,

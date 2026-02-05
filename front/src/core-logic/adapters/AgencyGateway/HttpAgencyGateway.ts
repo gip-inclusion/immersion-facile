@@ -133,26 +133,6 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
-  // TODO Mieux identifier l'admin
-
-  public listAgencyOptionsNeedingReview$(
-    adminToken: ConnectedUserJwt,
-  ): Observable<AgencyOption[]> {
-    return from(
-      this.httpClient
-        .listAgenciesOptionsWithStatus({
-          queryParams: { status: "needsReview" },
-          headers: { authorization: adminToken },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, ({ body }) => body)
-            .with({ status: P.union(401, 403) }, logBodyAndThrow)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
-
   public updateAgency$(
     agencyDto: AgencyDto,
     adminToken: ConnectedUserJwt,

@@ -154,23 +154,6 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     return of(values(this.#agencies));
   }
 
-  public listAgencyOptionsNeedingReview$(
-    _adminToken: ConnectedUserJwt,
-  ): Observable<AgencyOption[]> {
-    return of(
-      values(this.#agencies)
-        .filter((agency) => agency.status === "needsReview")
-        .map((agency) => ({
-          id: agency.id,
-          name: agency.name,
-          kind: agency.kind,
-          status: agency.status,
-          address: agency.address,
-          refersToAgencyName: agency.refersToAgencyName,
-        })),
-    );
-  }
-
   public updateAgency$(): Observable<void> {
     return of(undefined);
   }
