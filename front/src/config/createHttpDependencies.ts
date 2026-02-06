@@ -27,6 +27,7 @@ import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpCo
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/HttpEstablishmentLeadGateway";
 import { HttpFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/HttpFormCompletionGateway";
+import { DecodeJwtDecoder } from "src/core-logic/adapters/JwtDecoder/DecodeJwtDecoder";
 import { HttpNafGateway } from "src/core-logic/adapters/NafGateway/HttpNafGateway";
 import { HttpSearchGateway } from "src/core-logic/adapters/SearchGateway/HttpSearchGateway";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
@@ -86,5 +87,6 @@ export const createHttpDependencies = (): Dependencies => {
       axiosOnSlashApi,
     ),
     nafGateway: new HttpNafGateway(createAxiosHttpClientOnSlashApi(nafRoutes)),
+    jwtDecoder: new DecodeJwtDecoder(),
   };
 };

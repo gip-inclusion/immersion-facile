@@ -11,6 +11,7 @@ import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/Establish
 import { SimulatedEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/SimulatedEstablishmentLeadGateway";
 import { SimulatedFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/SimulatedFormCompletionGateway";
 import { seedRomeDtos } from "src/core-logic/adapters/FormCompletionGateway/TestFormCompletionGateway";
+import { TestJwtDecoder } from "src/core-logic/adapters/JwtDecoder/TestJwtDecoder";
 import { SimulatedNafGateway } from "src/core-logic/adapters/NafGateway/SimulatedNafGateway";
 import { SimulatedSearchGateway } from "src/core-logic/adapters/SearchGateway/SimulatedSearchGateway";
 import { seedInternalResults } from "src/core-logic/adapters/SearchGateway/simulatedSearchData";
@@ -63,5 +64,6 @@ export const createInMemoryDependencies = (): Dependencies => ({
   ),
   technicalGateway: new SimulatedTechnicalGateway(),
   nafGateway: new SimulatedNafGateway(SIMULATED_LATENCY_MS),
+  jwtDecoder: new TestJwtDecoder(),
   ...createCommonDependencies(),
 });

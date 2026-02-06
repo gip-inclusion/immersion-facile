@@ -28,7 +28,7 @@ const getPageContentProps = (
   if (error instanceof FrontSpecificError) return error.props;
 
   return {
-    title: title ?? "Erreur inattendue",
+    title: title ?? "Erreur",
     description: error.message,
     buttons: buttons ?? defaultFrontErrorButtons,
   };
