@@ -16,6 +16,7 @@ import type {
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import type { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
 import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
+import type { JwtDecoder } from "src/core-logic/ports/JwtDecoder";
 import type { NafGateway } from "src/core-logic/ports/NafGateway";
 import type { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
@@ -23,6 +24,7 @@ import type { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
 
 export type Dependencies = {
+  jwtDecoder: JwtDecoder;
   adminGateway: AdminGateway;
   assessmentGateway: AssessmentGateway;
   authGateway: AuthGateway;

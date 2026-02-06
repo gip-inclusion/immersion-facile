@@ -14,6 +14,7 @@ import { TestAssessmentGateway } from "../adapters/AssessmentGateway/TestAssessm
 import { TestAuthGateway } from "../adapters/AuthGateway/TestAuthGateway";
 import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
 import { TestFormCompletionGateway } from "../adapters/FormCompletionGateway/TestFormCompletionGateway";
+import { TestJwtDecoder } from "../adapters/JwtDecoder/TestJwtDecoder";
 import { TestSearchGateway } from "../adapters/SearchGateway/TestSearchGateway";
 
 export type TestDependencies = ReturnType<typeof createTestDependencies>;
@@ -37,6 +38,7 @@ const createTestDependencies = () =>
     searchGateway: new TestSearchGateway(),
     technicalGateway: new TestTechnicalGateway(),
     nafGateway: new TestNafGateway(),
+    jwtDecoder: new TestJwtDecoder(),
   }) satisfies Dependencies;
 
 export const createTestStore = (preloadedState?: Partial<RootState>) => {

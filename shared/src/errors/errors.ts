@@ -374,7 +374,7 @@ export const errors = {
       emailHash: string;
     }) =>
       new ForbiddenError(
-        `L'utilisateur ${role}-${emailHash} n'a pas de droit sur la convention '${conventionId}'.`,
+        `L'utilisateur ${role}-${emailHash} n'a pas de droit sur la convention '${conventionId}'. L'email saisi dans la convention a été modifié. Vous ne pouvez plus accéder à cette convention avec l'email que vous venez d'utiliser.`,
       ),
     forbiddenConventionIdMismatch: ({
       jwtConventionId,
