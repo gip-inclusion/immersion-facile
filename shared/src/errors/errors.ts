@@ -790,6 +790,14 @@ export const errors = {
       new BadRequestError(
         `L'agence vers laquelle transférer (${agencyId}) ne doit pas être une agence qui référence une autre agence.`,
       ),
+    sourceAndTargetAgencyMustBeDifferent: ({
+      agencyId,
+    }: {
+      agencyId: AgencyId;
+    }) =>
+      new BadRequestError(
+        `L'agence à fermer et l'agence cible doivent être différentes (${agencyId}).`,
+      ),
     invalidCounsellorRoleForFTAgency: () =>
       new BadRequestError(
         "Le rôle pré-valideur n'est pas autorisé pour une agence France Travail",

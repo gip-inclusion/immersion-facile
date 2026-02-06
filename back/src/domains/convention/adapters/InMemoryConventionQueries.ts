@@ -415,7 +415,7 @@ const makeApplyFiltersToGetConventionIds =
 
 const makeApplyFiltersToConventions =
   ({
-    agencyId,
+    agencyIds,
     ids,
     startDateLessOrEqual,
     startDateGreater,
@@ -430,7 +430,9 @@ const makeApplyFiltersToConventions =
     (
       [
         ({ agencyId: conventionAgencyId }) =>
-          agencyId ? conventionAgencyId === agencyId : true,
+          agencyIds && agencyIds.length > 0
+            ? agencyIds.includes(conventionAgencyId)
+            : true,
         ({ id }) => (ids && ids.length > 0 ? ids.includes(id) : true),
         ({ dateEnd }) => (endDate?.to ? new Date(dateEnd) <= endDate.to : true),
         ({ dateEnd }) =>

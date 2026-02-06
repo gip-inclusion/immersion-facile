@@ -1,6 +1,6 @@
 import { filter, map, switchMap } from "rxjs";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
-import { closeAgencyAndTransfertConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransfertConventions.slice";
+import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -8,7 +8,7 @@ import type {
 } from "src/core-logic/storeConfig/redux.helpers";
 
 export type CloseAgencyAndTransfertConventionsAction = ActionOfSlice<
-  typeof closeAgencyAndTransfertConventionsSlice
+  typeof closeAgencyAndTransferConventionsSlice
 >;
 
 const closeAgencyAndTransfertConventionsEpic: AppEpic<
@@ -16,8 +16,8 @@ const closeAgencyAndTransfertConventionsEpic: AppEpic<
 > = (action$, state$, { agencyGateway }) =>
   action$.pipe(
     filter(
-      closeAgencyAndTransfertConventionsSlice.actions
-        .closeAgencyAndTransfertConventionsRequested.match,
+      closeAgencyAndTransferConventionsSlice.actions
+        .closeAgencyAndTransferConventionsRequested.match,
     ),
     switchMap((action) =>
       agencyGateway
@@ -27,7 +27,7 @@ const closeAgencyAndTransfertConventionsEpic: AppEpic<
         )
         .pipe(
           map(() =>
-            closeAgencyAndTransfertConventionsSlice.actions.closeAgencyAndTransfertConventionsSucceeded(
+            closeAgencyAndTransferConventionsSlice.actions.closeAgencyAndTransferConventionsSucceeded(
               {
                 feedbackTopic: action.payload.feedbackTopic,
                 agencyId: action.payload.agencyToCloseId,
@@ -35,7 +35,7 @@ const closeAgencyAndTransfertConventionsEpic: AppEpic<
             ),
           ),
           catchEpicError((error) =>
-            closeAgencyAndTransfertConventionsSlice.actions.closeAgencyAndTransfertConventionsFailed(
+            closeAgencyAndTransferConventionsSlice.actions.closeAgencyAndTransferConventionsFailed(
               {
                 errorMessage: error.message,
                 feedbackTopic: action.payload.feedbackTopic,

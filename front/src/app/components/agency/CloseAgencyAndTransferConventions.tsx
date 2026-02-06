@@ -7,27 +7,27 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import type { AgencyDto } from "shared";
 import {
-  type CloseAgencyAndTransfertConventionsRequestDto,
-  closeAgencyAndTransfertConventionsRequestSchema,
+  type CloseAgencyAndTransferConventionsRequestDto,
+  closeAgencyAndTransferConventionsRequestSchema,
   domElementIds,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import "src/assets/admin.css";
 import { createFormModal, useFormModal } from "src/app/utils/createFormModal";
-import { closeAgencyAndTransfertConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransfertConventions.slice";
+import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 
 const createTransferConventionsModalParams = {
-  id: domElementIds.admin.agencyTab.closeAgencyAndTransfertConventionsModal,
+  id: domElementIds.admin.agencyTab.closeAgencyAndTransferConventionsModal,
   isOpenedByDefault: false,
-  formId: domElementIds.admin.agencyTab.closeAgencyAndTransfertConventionsForm,
+  formId: domElementIds.admin.agencyTab.closeAgencyAndTransferConventionsForm,
   submitButton: {
     id: domElementIds.admin.agencyTab
-      .closeAgencyAndTransfertConventionsSubmitButton,
+      .closeAgencyAndTransferConventionsSubmitButton,
     children: "Confirmer le transfert",
   },
   cancelButton: {
     id: domElementIds.admin.agencyTab
-      .closeAgencyAndTransfertConventionsCancelButton,
+      .closeAgencyAndTransferConventionsCancelButton,
   },
   doSubmitClosesModal: false,
 };
@@ -38,20 +38,20 @@ const {
   close: closeTransferConventionsModal,
 } = createFormModal(createTransferConventionsModalParams);
 
-type CloseAgencyAndTransfertConventionsProps = {
+type CloseAgencyAndTransferConventionsProps = {
   agency: AgencyDto;
 };
 
-const CloseAgencyAndTransfertConventionsModalContent = ({
+const CloseAgencyAndTransferConventionsModalContent = ({
   agency,
   onSubmit,
 }: {
   agency: AgencyDto;
-  onSubmit: (payload: CloseAgencyAndTransfertConventionsRequestDto) => void;
+  onSubmit: (payload: CloseAgencyAndTransferConventionsRequestDto) => void;
 }) => {
   const { formId } = useFormModal();
-  const methods = useForm<CloseAgencyAndTransfertConventionsRequestDto>({
-    resolver: zodResolver(closeAgencyAndTransfertConventionsRequestSchema),
+  const methods = useForm<CloseAgencyAndTransferConventionsRequestDto>({
+    resolver: zodResolver(closeAgencyAndTransferConventionsRequestSchema),
     mode: "onTouched",
     defaultValues: {
       agencyToCloseId: agency.id,
@@ -62,7 +62,7 @@ const CloseAgencyAndTransfertConventionsModalContent = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormSubmit = (
-    values: CloseAgencyAndTransfertConventionsRequestDto,
+    values: CloseAgencyAndTransferConventionsRequestDto,
   ) => {
     onSubmit(values);
     closeTransferConventionsModal();
@@ -83,7 +83,7 @@ const CloseAgencyAndTransfertConventionsModalContent = ({
           label="Id de l'agence vers laquelle transférer les conventions"
           nativeInputProps={{
             id: domElementIds.admin.agencyTab
-              .closeAgencyAndTransfertConventionsTargetAgencyIdInput,
+              .closeAgencyAndTransferConventionsTargetAgencyIdInput,
             ...register("agencyToTransferConventionsToId"),
           }}
           {...getFieldError("agencyToTransferConventionsToId")}
@@ -93,15 +93,15 @@ const CloseAgencyAndTransfertConventionsModalContent = ({
   );
 };
 
-export const CloseAgencyAndTransfertConventions = ({
+export const CloseAgencyAndTransferConventions = ({
   agency,
-}: CloseAgencyAndTransfertConventionsProps) => {
+}: CloseAgencyAndTransferConventionsProps) => {
   const dispatch = useDispatch();
 
-  const onSubmit = (payload: CloseAgencyAndTransfertConventionsRequestDto) => {
+  const onSubmit = (payload: CloseAgencyAndTransferConventionsRequestDto) => {
     dispatch(
-      closeAgencyAndTransfertConventionsSlice.actions.closeAgencyAndTransfertConventionsRequested(
-        { ...payload, feedbackTopic: "close-agency-and-transfert-conventions" },
+      closeAgencyAndTransferConventionsSlice.actions.closeAgencyAndTransferConventionsRequested(
+        { ...payload, feedbackTopic: "close-agency-and-transfer-conventions" },
       ),
     );
   };
@@ -110,7 +110,7 @@ export const CloseAgencyAndTransfertConventions = ({
     <>
       <Button
         id={
-          domElementIds.admin.agencyTab.closeAgencyAndTransfertConventionsButton
+          domElementIds.admin.agencyTab.closeAgencyAndTransferConventionsButton
         }
         priority="primary"
         type="button"
@@ -120,7 +120,7 @@ export const CloseAgencyAndTransfertConventions = ({
       </Button>
       {createPortal(
         <TransferConventionsModal title="Transférer les conventions">
-          <CloseAgencyAndTransfertConventionsModalContent
+          <CloseAgencyAndTransferConventionsModalContent
             agency={agency}
             onSubmit={onSubmit}
           />

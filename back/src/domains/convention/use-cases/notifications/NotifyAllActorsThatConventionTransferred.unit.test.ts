@@ -135,7 +135,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
 
     const input: TransferConventionToAgencyPayload = {
       agencyId: newAgency.id,
-      convention: convention,
+      convention,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
       shouldNotifyActors: true,

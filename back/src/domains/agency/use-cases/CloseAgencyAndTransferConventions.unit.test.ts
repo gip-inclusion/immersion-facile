@@ -17,9 +17,9 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  type CloseAgencyAndTransfertConventions,
-  makeCloseAgencyAndTransfertConventions,
-} from "./CloseAgencyAndTransfertConventions";
+  type CloseAgencyAndTransferConventions,
+  makeCloseAgencyAndTransferConventions,
+} from "./CloseAgencyAndTransferConventions";
 
 describe("CloseAgencyAndTransfertConventions", () => {
   const agencyToClose = toAgencyWithRights(
@@ -66,7 +66,7 @@ describe("CloseAgencyAndTransfertConventions", () => {
     .build();
 
   let uow: InMemoryUnitOfWork;
-  let useCase: CloseAgencyAndTransfertConventions;
+  let useCase: CloseAgencyAndTransferConventions;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -75,7 +75,7 @@ describe("CloseAgencyAndTransfertConventions", () => {
       timeGateway: new CustomTimeGateway(),
       uuidGenerator,
     });
-    useCase = makeCloseAgencyAndTransfertConventions({
+    useCase = makeCloseAgencyAndTransferConventions({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: { createNewEvent },
     });
@@ -147,6 +147,23 @@ describe("CloseAgencyAndTransfertConventions", () => {
       ),
       errors.agency.targetAgencyMustBeActive({
         agencyId: closedAgencyTarget.id,
+      }),
+    );
+  });
+
+  it("throws when agency to close and agency to transfer to are the same", async () => {
+    uow.agencyRepository.agencies = [agencyToClose];
+
+    await expectPromiseToFailWithError(
+      useCase.execute(
+        {
+          agencyToCloseId: agencyToClose.id,
+          agencyToTransferConventionsToId: agencyToClose.id,
+        },
+        backOfficeUser,
+      ),
+      errors.agency.sourceAndTargetAgencyMustBeDifferent({
+        agencyId: agencyToClose.id,
       }),
     );
   });
