@@ -11,13 +11,15 @@ import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNot
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 
 export const AgencyTab = () => {
-  const agency = useAppSelector(agencyAdminSelectors.agency);
+  const agency = useAppSelector(fetchAgencySelectors.agency);
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
   const { url, error } = useAdminDashboard({ name: "adminAgencies" });
   return (
     <>
+      <Feedback topics={["agency-admin"]} />
       <SubmitFeedbackNotification
         submitFeedback={feedback}
         messageByKind={agencyAdminSubmitMessageByKind}

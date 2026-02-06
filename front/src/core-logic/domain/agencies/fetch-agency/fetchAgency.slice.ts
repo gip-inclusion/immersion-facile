@@ -32,6 +32,7 @@ export const fetchAgencySlice = createSlice({
       _action: PayloadActionWithFeedbackTopic<WithAgencyId>,
     ) => {
       state.agency = null;
+      state.isLoading = true;
     },
 
     fetchAgencySucceeded: (state, action: PayloadAction<AgencyDto>) => {

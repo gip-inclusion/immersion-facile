@@ -8,16 +8,16 @@ import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { useDispatch } from "react-redux";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { connectedUsersAdminSelectors } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.selectors";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
 import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
 
 export const EditAgency = () => {
-  const agency = useAppSelector(agencyAdminSelectors.agency);
+  const agency = useAppSelector(fetchAgencySelectors.agency);
   const agencyUsersById = useAppSelector(
     connectedUsersAdminSelectors.agencyUsers,
   );
