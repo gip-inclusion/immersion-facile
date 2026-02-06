@@ -1,4 +1,4 @@
-import { from, type Observable, Subject } from "rxjs";
+import { type Observable, Subject } from "rxjs";
 import type {
   AgencyDto,
   AgencyId,
@@ -30,13 +30,13 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
+  public validateOrRejectAgencyResponse$ = new Subject<void>();
+
   public updateUserAgencyRightResponse$ = new Subject<undefined>();
 
   public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   public registerAgenciesToCurrentUserResponse$ = new Subject<undefined>();
-
-  #agencies: Record<string, AgencyDto> = {};
 
   addAgency$(_agency: CreateAgencyDto): Observable<void> {
     return this.addAgencyResponse$;
@@ -88,16 +88,9 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public validateOrRejectAgency$(
     _: ConnectedUserJwt,
-    updateAgencyStatusParams: UpdateAgencyStatusParams,
+    _updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
-    return from(this.#validateOrRejectAgency(_, updateAgencyStatusParams.id));
-  }
-
-  async #validateOrRejectAgency(
-    _: ConnectedUserJwt,
-    agencyId: AgencyId,
-  ): Promise<void> {
-    this.#agencies[agencyId].status = "active";
+    return this.validateOrRejectAgencyResponse$;
   }
 
   public registerAgenciesToCurrentUser$(
