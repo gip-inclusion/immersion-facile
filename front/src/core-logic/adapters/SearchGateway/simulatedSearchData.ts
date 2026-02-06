@@ -399,7 +399,7 @@ export const seedInternalResults: InternalOfferDto[] = [
     siret: "12345678901234",
     name: "Mega Corp",
     customizedName: "Mega Corp nom personnalisé",
-    voluntaryToImmersion: false,
+    voluntaryToImmersion: true,
     position: { lat: 48.8666, lon: 2.3333 },
     address: defaultAddress,
     romeLabel:

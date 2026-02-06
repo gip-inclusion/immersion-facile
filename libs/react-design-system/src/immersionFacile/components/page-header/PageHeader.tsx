@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
+import type { TitleLevel } from "../../utils";
 import Styles from "./PageHeader.styles";
 
 export type PageHeaderProps = {
@@ -11,10 +12,14 @@ export type PageHeaderProps = {
   classes?: Partial<Record<"root" | "description" | "inner" | "title", string>>;
   breadcrumbs?: ReactNode;
   badge?: ReactNode;
+  titleAs?: TitleLevel;
+  titleClassName?: string;
 };
 
 export const PageHeader = ({
   title,
+  titleAs = "h1",
+  titleClassName,
   className,
   children,
   illustration,
@@ -23,12 +28,19 @@ export const PageHeader = ({
   badge,
 }: PageHeaderProps) => {
   const { cx } = useStyles();
+  const Title = titleAs;
   const textContent = (
     <>
       {badge}
-      <h1 className={cx(children ? "" : "fr-my-auto", classes.title)}>
+      <Title
+        className={cx(
+          children ? "" : "fr-my-auto",
+          titleClassName,
+          classes.title,
+        )}
+      >
         {title}
-      </h1>
+      </Title>
       {children}
     </>
   );
