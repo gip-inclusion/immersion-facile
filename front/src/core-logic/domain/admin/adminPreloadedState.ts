@@ -1,5 +1,5 @@
 import { agencyNeedingReviewInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
-import { agencyAdminInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { agencyAdminInitialState } from "src/core-logic/domain/admin/agenciesAdmin/fetch-agency-options/fetchAgencyOptions.slice";
 import { connectedUsersAdminInitialState } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { dashboardInitialState } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { fetchUserInitialState } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";

@@ -3,6 +3,7 @@ import { map, switchMap } from "rxjs/operators";
 import type { WithAgencyId } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { normalizeUsers } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.epics";
+import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -20,7 +21,19 @@ type FetchAgencyEpic = AppEpic<FetchAgencyAction | { type: "do-nothing" }>;
 
 const getAgencyEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
   action$.pipe(
-    filter(fetchAgencySlice.actions.fetchAgencyRequested.match),
+    filter(
+      (action) =>
+        fetchAgencySlice.actions.fetchAgencyRequested.match(action) ||
+        connectedUsersAdminSlice.actions.updateUserOnAgencySucceeded.match(
+          action,
+        ) ||
+        connectedUsersAdminSlice.actions.removeUserFromAgencySucceeded.match(
+          action,
+        ) ||
+        connectedUsersAdminSlice.actions.createUserOnAgencySucceeded.match(
+          action,
+        ),
+    ),
     switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
       dependencies.agencyGateway
         .getAgencyById$(action.payload.agencyId, getAdminToken(state$.value))
