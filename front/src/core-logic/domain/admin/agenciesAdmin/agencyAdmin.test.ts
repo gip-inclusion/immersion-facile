@@ -84,7 +84,7 @@ describe("agencyAdmin", () => {
           );
           const expectedAgencyAdminState: AgencyAdminState = {
             ...preloadedAgencyAdminState,
-            isUpdating: true,
+            isLoading: true,
           };
           expectAgencyAdminStateToMatch(expectedAgencyAdminState);
         });
@@ -103,7 +103,7 @@ describe("agencyAdmin", () => {
           );
           expectAgencyAdminStateToMatch({
             ...preloadedAgencyAdminState,
-            isUpdating: false,
+            isLoading: false,
             feedback: { kind: "agencyUpdated" },
           });
         });
@@ -132,7 +132,7 @@ describe("agencyAdmin", () => {
           agencyAdminSlice.actions.setAgencySearchQuery(searchedText),
         );
         expectAgencyAdminStateToMatch({
-          isSearching: true,
+          isLoading: true,
           agencySearchQuery: searchedText,
         });
       });
@@ -140,9 +140,9 @@ describe("agencyAdmin", () => {
       it("does not trigger call api before debounce time is reached, then triggers search and gets results", () => {
         const searchedText = "agen";
         whenSearchTextIsProvided(searchedText);
-        expectIsSearchingToBe(true);
+        expectIsLoadingToBe(true);
         fastForwardObservables();
-        expectIsSearchingToBe(true);
+        expectIsLoadingToBe(true);
         const agencies: AgencyOption[] = [
           {
             id: "my-id",
@@ -161,7 +161,7 @@ describe("agencyAdmin", () => {
         feedWithAgencyOptions(agencies);
         expectAgencyAdminStateToMatch({
           agencySearchQuery: searchedText,
-          isSearching: false,
+          isLoading: false,
           agencyOptions: agencies,
         });
       });
@@ -219,7 +219,7 @@ describe("agencyAdmin", () => {
         feedWithFetchedAgency(agencyDto);
 
         expectAgencyAdminStateToMatch({
-          isSearching: false,
+          isLoading: false,
           agencyOptions,
           agencySearchQuery: agencySearchText,
         });
@@ -414,9 +414,9 @@ describe("agencyAdmin", () => {
     });
   };
 
-  const expectIsSearchingToBe = (isSearching: boolean) =>
-    expect(agencyAdminSelectors.agencyState(store.getState()).isSearching).toBe(
-      isSearching,
+  const expectIsLoadingToBe = (isLoading: boolean) =>
+    expect(agencyAdminSelectors.agencyState(store.getState()).isLoading).toBe(
+      isLoading,
     );
 
   const fastForwardObservables = () => dependencies.scheduler.flush();
