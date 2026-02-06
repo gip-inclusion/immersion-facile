@@ -2,9 +2,9 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { allAgencyStatuses, looksLikeSiret } from "shared";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
-import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
+
 import type {
   ActionOfSlice,
   AppEpic,
@@ -40,35 +40,6 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
     map(agencyAdminSlice.actions.setAgencyOptions),
   );
 
-const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
-  action$,
-  state$,
-  { agencyGateway },
-) =>
-  action$.pipe(
-    filter(
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested.match,
-    ),
-    switchMap(({ payload }) =>
-      agencyGateway
-        .validateOrRejectAgency$(getAdminToken(state$.value), payload)
-        .pipe(
-          map(() =>
-            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded({
-              agencyId: payload.id,
-              feedbackTopic: "agency-admin-needing-review",
-            }),
-          ),
-        ),
-    ),
-    catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusFailed({
-        errorMessage: error.message,
-        feedbackTopic: "agency-admin-needing-review",
-      }),
-    ),
-  );
-
 const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
   | ConnectedUsersAdminAction
   | AgencyAction
@@ -100,6 +71,5 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
 
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
-  updateAgencyNeedingReviewStatusEpic,
   fetchAgencyOnIcUserUpdatedEpic,
 ];

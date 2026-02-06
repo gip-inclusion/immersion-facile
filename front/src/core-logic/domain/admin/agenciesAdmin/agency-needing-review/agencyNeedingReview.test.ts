@@ -30,7 +30,17 @@ describe("agencyNeedingReview", () => {
       }),
     );
 
+    expectToEqual(
+      agencyNeedingReviewSelectors.isLoading(store.getState()),
+      true,
+    );
+
     feedWithFetchedAgency(AGENCY_NEEDING_REVIEW_2);
+
+    expectToEqual(
+      agencyNeedingReviewSelectors.isLoading(store.getState()),
+      false,
+    );
 
     expectToEqual(
       agencyNeedingReviewSelectors.agencyNeedingReview(store.getState()),
@@ -45,9 +55,21 @@ describe("agencyNeedingReview", () => {
         feedbackTopic: "agency-admin-needing-review",
       }),
     );
+
+    expectToEqual(
+      agencyNeedingReviewSelectors.isLoading(store.getState()),
+      true,
+    );
+
     const errorMessage =
       "Une erreur est survenue lors de la récupération des données de cette agence";
+
     dependencies.agencyGateway.fetchedAgency$.error(new Error(errorMessage));
+
+    expectToEqual(
+      agencyNeedingReviewSelectors.isLoading(store.getState()),
+      false,
+    );
 
     expectToEqual(
       feedbacksSelectors.feedbacks(store.getState())[
@@ -81,7 +103,94 @@ describe("agencyNeedingReview", () => {
     );
   });
 
+  describe("update agency needing review status", () => {
+    beforeEach(() => {
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          agencyNeedingReview: {
+            ...agencyNeedingReviewInitialState,
+            agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
+          },
+        }),
+      }));
+    });
+
+    it("when update succeeds", () => {
+      store.dispatch(
+        agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusRequested(
+          {
+            id: AGENCY_NEEDING_REVIEW_2.id,
+            status: "active",
+            feedbackTopic: "agency-admin-needing-review",
+          },
+        ),
+      );
+
+      expectToEqual(
+        agencyNeedingReviewSelectors.isLoading(store.getState()),
+        true,
+      );
+
+      feedWithValidateOrRejectSuccess();
+
+      expectToEqual(
+        agencyNeedingReviewSelectors.isLoading(store.getState()),
+        false,
+      );
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[
+          "agency-admin-needing-review"
+        ],
+        {
+          on: "update",
+          level: "success",
+          title: "Statut de l'agence mis à jour",
+          message: "L'agence a été activée ou rejetée avec succès.",
+        },
+      );
+    });
+
+    it("when update fails", () => {
+      store.dispatch(
+        agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusRequested(
+          {
+            id: AGENCY_NEEDING_REVIEW_2.id,
+            status: "active",
+            feedbackTopic: "agency-admin-needing-review",
+          },
+        ),
+      );
+      const errorMessage = "Network error";
+      feedWithValidateOrRejectError(errorMessage);
+      expectToEqual(
+        agencyNeedingReviewSelectors.isLoading(store.getState()),
+        false,
+      );
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[
+          "agency-admin-needing-review"
+        ],
+        {
+          on: "update",
+          level: "error",
+          title: "Problème lors de la mise à jour du statut de l'agence",
+          message: errorMessage,
+        },
+      );
+    });
+  });
+
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {
     dependencies.agencyGateway.fetchedAgency$.next(agencyDto);
+  };
+
+  const feedWithValidateOrRejectSuccess = () => {
+    dependencies.agencyGateway.validateOrRejectAgencyResponse$.next(undefined);
+  };
+
+  const feedWithValidateOrRejectError = (msg: string) => {
+    dependencies.agencyGateway.validateOrRejectAgencyResponse$.error(
+      new Error(msg),
+    );
   };
 });

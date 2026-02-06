@@ -4,7 +4,7 @@ import {
   loginByEmailLinkDurationInMinutes,
 } from "shared";
 import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
@@ -378,12 +378,15 @@ export const feedbacks: Record<
         "Une erreur est survenue lors de la récupération des données de cette agence",
     },
     "update.success": {
-      action: agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded,
+      action:
+        agencyNeedingReviewSlice.actions
+          .updateAgencyNeedingReviewStatusSucceeded,
       title: "Statut de l'agence mis à jour",
       message: "L'agence a été activée ou rejetée avec succès.",
     },
     "update.error": {
-      action: agencyAdminSlice.actions.updateAgencyNeedingReviewStatusFailed,
+      action:
+        agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusFailed,
       title: "Problème lors de la mise à jour du statut de l'agence",
       message:
         "Une erreur est survenue lors de l'activation ou du rejet de l'agence",
