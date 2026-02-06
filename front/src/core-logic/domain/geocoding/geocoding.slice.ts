@@ -6,7 +6,7 @@ import {
   type LookupAddress,
   type SupportedCountryCode,
 } from "shared";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import {
   type AutocompleteItem,
   type AutocompleteState,
@@ -235,22 +235,25 @@ export const geocodingSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(agencyAdminSlice.actions.setAgency, (state, action) => {
-      if (!action.payload) return;
-      state.data["agency-address"] = {
-        ...initialAutocompleteItem,
-        value: {
-          address: {
-            ...action.payload.address,
-            countryCode: defaultCountryCode,
+    builder.addCase(
+      fetchAgencySlice.actions.fetchAgencySucceeded,
+      (state, action) => {
+        if (!action.payload) return;
+        state.data["agency-address"] = {
+          ...initialAutocompleteItem,
+          value: {
+            address: {
+              ...action.payload.address,
+              countryCode: defaultCountryCode,
+            },
+            position: {
+              lat: action.payload.position.lat,
+              lon: action.payload.position.lon,
+            },
           },
-          position: {
-            lat: action.payload.position.lat,
-            lon: action.payload.position.lon,
-          },
-        },
-      };
-    });
+        };
+      },
+    );
   },
 });
 

@@ -14,9 +14,11 @@ import {
 } from "shared";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/fetch-agency-options/fetchAgencyOptions.selectors";
+import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/fetch-agency-options/fetchAgencyOptions.slice";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { useStyles } from "tss-react/dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
@@ -24,17 +26,23 @@ export const useAgencyAdminAutocomplete = () => {
 
   return {
     updateSearchTerm: (searchTerm: string) =>
-      dispatch(agencyAdminSlice.actions.setAgencySearchQuery(searchTerm)),
+      dispatch(
+        agencyAdminSlice.actions.fetchAgencyOptionsRequested(searchTerm),
+      ),
     selectOption: (agencyId: AgencyId) => {
-      dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId));
+      dispatch(
+        fetchAgencySlice.actions.fetchAgencyRequested({
+          agencyId,
+          feedbackTopic: "agency-admin",
+        }),
+      );
       dispatch(
         connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
           agencyId,
         }),
       );
     },
-    clearOption: () =>
-      dispatch(agencyAdminSlice.actions.clearAgencyRequested()),
+    clearOption: () => dispatch(fetchAgencySlice.actions.clearAgencyAndUsers()),
   };
 };
 
@@ -53,17 +61,14 @@ export const AgencyAdminAutocomplete = ({
   onAgencySelected,
 }: AgencyAdminAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
-  const {
-    agencySearchQuery: agencySearchText,
-    isSearching,
-    agencyOptions,
-    agency: selectedAgency,
-  } = useAppSelector(agencyAdminSelectors.agencyState);
+  const isLoading = useAppSelector(agencyAdminSelectors.isLoading);
+  const agencyOptions = useAppSelector(agencyAdminSelectors.agencyOptions);
+  const selectedAgency = useAppSelector(fetchAgencySelectors.agency);
   const { updateSearchTerm, selectOption, clearOption } =
     useAgencyAdminAutocomplete();
-  const [inputValue, setInputValue] = useState(agencySearchText);
+  const [inputValue, setInputValue] = useState("");
   const noOptionText =
-    isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";
+    isLoading || !inputValue ? "..." : "Aucune agence trouvée";
 
   const sortedAgencyOptions: AgencyOption[] = [...agencyOptions].sort((a, b) =>
     a.name.localeCompare(b.name),
@@ -87,7 +92,7 @@ export const AgencyAdminAutocomplete = ({
             }
           : undefined,
         noOptionsMessage: () => noOptionText,
-        isLoading: isSearching,
+        isLoading,
         inputValue,
         loadingMessage: () => "Recherche d'agence en cours...",
         placeholder: "Rechercher une agence",

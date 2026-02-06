@@ -211,16 +211,5 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
-  sharedAgencyRouter.listAgenciesOptionsWithStatus(
-    deps.connectedUserAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.privateListAgencies.execute(
-          req.query,
-          getGenericAuthOrThrow(req.payloads?.currentUser),
-        ),
-      ),
-  );
-
   return expressRouter;
 };

@@ -10,8 +10,8 @@ import type {
   WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
-import type { AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import type { AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/fetch-agency-options/fetchAgencyOptions.epics";
+import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -25,6 +25,7 @@ import {
 export type ConnectedUsersAdminAction = ActionOfSlice<
   typeof connectedUsersAdminSlice
 >;
+type UpdateAgencyAction = ActionOfSlice<typeof updateAgencySlice>;
 type ConnectedUsersAdminActionEpic = AppEpic<ConnectedUsersAdminAction>;
 
 const fetchConnectedUsersWithAgencyNeedingReviewEpic: ConnectedUsersAdminActionEpic =
@@ -219,10 +220,11 @@ const removeAgencyUserRequestedEpic: ConnectedUsersAdminActionEpic = (
   );
 
 const fetchConnectedUserOnAgencyUpdateEpic: AppEpic<
-  ConnectedUsersAdminAction | AgencyAction
+  ConnectedUsersAdminAction | AgencyAction | UpdateAgencyAction
 > = (action$) =>
   action$.pipe(
-    filter(agencyAdminSlice.actions.updateAgencySucceeded.match),
+    filter(updateAgencySlice.actions.updateAgencySucceeded.match),
+    filter((action) => action.payload.feedbackTopic === "agency-admin"),
     map((action) =>
       connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
         agencyId: action.payload.id,
