@@ -9,7 +9,7 @@ export const makeDeleteConventionDraft = useCaseBuilder("DeleteConventionDraft")
   .withOutput<void>()
   .build(async ({ inputParams, uow }) => {
     if (!inputParams.fromConventionDraftId) return;
-    await uow.conventionDraftRepository.delete([
-      inputParams.fromConventionDraftId,
-    ]);
+    await uow.conventionDraftRepository.delete({
+      ids: [inputParams.fromConventionDraftId],
+    });
   });
