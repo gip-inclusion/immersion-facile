@@ -61,7 +61,7 @@ export const AgencyAdminAutocomplete = ({
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
   const {
     agencySearchQuery: agencySearchText,
-    isSearching,
+    isLoading,
     agencyOptions,
   } = useAppSelector(agencyAdminSelectors.agencyState);
   const selectedAgency = useAppSelector(fetchAgencySelectors.agency);
@@ -69,7 +69,7 @@ export const AgencyAdminAutocomplete = ({
     useAgencyAdminAutocomplete();
   const [inputValue, setInputValue] = useState(agencySearchText);
   const noOptionText =
-    isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";
+    isLoading || !agencySearchText ? "..." : "Aucune agence trouvée";
 
   const sortedAgencyOptions: AgencyOption[] = [...agencyOptions].sort((a, b) =>
     a.name.localeCompare(b.name),
@@ -93,7 +93,7 @@ export const AgencyAdminAutocomplete = ({
             }
           : undefined,
         noOptionsMessage: () => noOptionText,
-        isLoading: isSearching,
+        isLoading,
         inputValue,
         loadingMessage: () => "Recherche d'agence en cours...",
         placeholder: "Rechercher une agence",

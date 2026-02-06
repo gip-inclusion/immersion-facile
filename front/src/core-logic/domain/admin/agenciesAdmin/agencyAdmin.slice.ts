@@ -16,12 +16,8 @@ export interface AgencyAdminState {
   agencySearchQuery: string;
   agencyOptions: AgencyOption[];
   agencyNeedingReview: AgencyDto | null;
-
-  isSearching: boolean;
   isFetchingAgenciesNeedingReview: boolean;
-
-  isUpdating: boolean; //todo merge isUpdating and isSearching in isLoading
-
+  isLoading: boolean;
   error: string | null;
   feedback: AgencyAdminSubmitFeedback; //todo merge feedback and error in submitFeedback
 }
@@ -30,11 +26,8 @@ export const agencyAdminInitialState: AgencyAdminState = {
   agencySearchQuery: "",
   agencyOptions: [],
   agencyNeedingReview: null,
-
-  isSearching: false,
   isFetchingAgenciesNeedingReview: false,
-  isUpdating: false,
-
+  isLoading: false,
   feedback: { kind: "idle" },
   error: null,
 };
@@ -61,32 +54,32 @@ export const agencyAdminSlice = createSlice({
 
     setAgencySearchQuery: (state, action: PayloadAction<string>) => {
       state.agencySearchQuery = action.payload;
-      state.isSearching = true;
+      state.isLoading = true;
     },
     setAgencyOptions: (state, action: PayloadAction<AgencyOption[]>) => {
       state.agencyOptions = action.payload;
-      state.isSearching = false;
+      state.isLoading = false;
       state.isFetchingAgenciesNeedingReview = false;
     },
     updateAgencyNeedingReviewStatusRequested: (
       state,
       _action: PayloadAction<UpdateAgencyStatusParams>,
     ) => {
-      state.isUpdating = true;
+      state.isLoading = true;
       state.feedback = { kind: "idle" };
     },
     updateAgencyNeedingReviewStatusSucceeded: (
       state,
       _action: PayloadAction<AgencyId>,
     ) => {
-      state.isUpdating = false;
+      state.isLoading = false;
       state.feedback = { kind: "agencyUpdated" };
     },
     updateAgencyNeedingReviewStatusFailed: (
       state,
       action: PayloadAction<string>,
     ) => {
-      state.isUpdating = false;
+      state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
