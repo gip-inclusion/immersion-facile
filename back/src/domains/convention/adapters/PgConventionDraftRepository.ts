@@ -12,7 +12,10 @@ import type {
 } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
-import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
+import type {
+  ConventionDraftRepository,
+  DeleteConventionDraftFilters,
+} from "../ports/ConventionDraftRepository";
 
 const dateToIsoString = (date: Date | string): string => {
   return date instanceof Date
@@ -118,12 +121,32 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
       .execute();
   }
 
-  public async delete(ids: ConventionDraftId[]): Promise<void> {
-    if (ids.length === 0) return;
-    await this.transaction
+  public async delete(
+    filters: DeleteConventionDraftFilters,
+  ): Promise<ConventionDraftId[]> {
+    const { ids, endedSince } = filters;
+
+    if (!ids?.length && !endedSince) return [];
+
+    const deletedConventionDraftIds = await this.transaction
       .deleteFrom("convention_drafts")
-      .where("id", "in", ids)
+      .where((eb) => {
+        const conditions = [];
+
+        if (ids?.length) {
+          conditions.push(eb("id", "in", ids));
+        }
+
+        if (endedSince) {
+          conditions.push(eb("updated_at", "<=", endedSince));
+        }
+
+        return eb.or(conditions);
+      })
+      .returning("id")
       .execute();
+
+    return deletedConventionDraftIds.map((row) => row.id);
   }
 }
 

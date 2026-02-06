@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { type ConventionDraftDto, expectToEqual } from "shared";
+import { type ConventionDraftDto, expectToEqual, oneDayInSecond } from "shared";
 import { v4 as uuid } from "uuid";
 import {
   type KyselyDb,
@@ -8,8 +8,11 @@ import {
 import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { PgConventionDraftRepository } from "./PgConventionDraftRepository";
 
+const thirtyDaysInSeconds = Date.now() - 30 * oneDayInSecond * 1000;
+
 describe("PgConventionDraftRepository", () => {
-  const now = "2024-10-08T00:00:00.000Z";
+  const now = new Date(Date.now()).toISOString();
+  const thirtyDaysBefore = new Date(thirtyDaysInSeconds).toISOString();
   let pool: Pool;
   let pgConventionDraftRepository: PgConventionDraftRepository;
   let db: KyselyDb;
@@ -75,6 +78,78 @@ describe("PgConventionDraftRepository", () => {
         email: "rep@example.com",
         firstName: "Pierre",
         lastName: "Bernard",
+      },
+    },
+  };
+
+  const conventionDraft2: ConventionDraftDto = {
+    id: uuid(),
+    dateStart: "2024-12-02T00:00:00.000Z",
+    dateEnd: "2024-12-13T00:00:00.000Z",
+    siret: "45678912345678",
+    businessName: "Crêperie de la Pointe du Raz",
+    individualProtection: true,
+    individualProtectionDescription:
+      "tablier, charlotte et chaussures antidérapantes",
+    sanitaryPrevention: true,
+    sanitaryPreventionDescription:
+      "formation hygiène alimentaire et équipements de lavage",
+    immersionAddress: "1 route de la Pointe du Raz, 29770 Plogoff",
+    immersionObjective: "Initier une démarche de recrutement",
+    immersionActivities: "Préparation de crêpes et galettes, service en salle",
+    immersionSkills:
+      "Techniques de crêperie, gestion des commandes, accueil client",
+    workConditions:
+      "Travail debout, horaires variables selon affluence touristique",
+    internshipKind: "immersion",
+    businessAdvantages: "Repas fournis et vue sur l'océan",
+    acquisitionCampaign: "campaign-2024",
+    acquisitionKeyword: "restauration",
+    establishmentNumberEmployeesRange: "3-5",
+    agencyReferent: {
+      firstname: "Morgane",
+      lastname: "Le Goff",
+    },
+    immersionAppellation: {
+      appellationCode: "13241",
+      appellationLabel: "Crêpier / Crêpière",
+      romeCode: "G1603",
+      romeLabel: "Personnel polyvalent en restauration",
+    },
+    schedule: {
+      totalHours: 35,
+      workedDays: 5,
+      isSimple: true,
+      complexSchedule: [
+        {
+          date: "2024-12-02",
+          timePeriods: [
+            { start: "10:00", end: "14:00" },
+            { start: "18:00", end: "22:00" },
+          ],
+        },
+      ],
+    },
+    establishmentTutor: {
+      role: "establishment-tutor",
+      email: "yann.morzadec@creperie-pointeduraz.fr",
+      phone: "+33298706543",
+      firstName: "Yann",
+      lastName: "Morzadec",
+      job: "Maître crêpier",
+    },
+    signatories: {
+      beneficiary: {
+        role: "beneficiary",
+        email: "annaig.kergoat@email.fr",
+        firstName: "Annaïg",
+        lastName: "Kergoat",
+      },
+      establishmentRepresentative: {
+        role: "establishment-representative",
+        email: "direction@creperie-pointeduraz.fr",
+        firstName: "Rozenn",
+        lastName: "Morzadec",
       },
     },
   };
@@ -257,10 +332,10 @@ describe("PgConventionDraftRepository", () => {
   });
 
   describe("delete", () => {
-    it("deletes a convention draft", async () => {
+    it("deletes a convention draft by id", async () => {
       await pgConventionDraftRepository.save(conventionDraft, now);
 
-      await pgConventionDraftRepository.delete([conventionDraft.id]);
+      await pgConventionDraftRepository.delete({ ids: [conventionDraft.id] });
 
       const result = await pgConventionDraftRepository.getById(
         conventionDraft.id,
@@ -268,12 +343,65 @@ describe("PgConventionDraftRepository", () => {
       expect(result).toBeUndefined();
     });
 
-    it("do nothing when convention draft is not found", async () => {
+    it("deletes a convention draft by date", async () => {
+      await pgConventionDraftRepository.save(conventionDraft, thirtyDaysBefore);
+
+      await pgConventionDraftRepository.delete({
+        endedSince: new Date(thirtyDaysBefore),
+      });
+
+      const result = await pgConventionDraftRepository.getById(
+        conventionDraft.id,
+      );
+      expect(result).toBeUndefined();
+    });
+
+    it("deletes convention drafts by id and date", async () => {
+      await pgConventionDraftRepository.save(conventionDraft, now);
+      await pgConventionDraftRepository.save(
+        conventionDraft2,
+        thirtyDaysBefore,
+      );
+
+      const deletedConventionDrafts = await pgConventionDraftRepository.delete({
+        ids: [conventionDraft.id],
+        endedSince: new Date(thirtyDaysBefore),
+      });
+
+      expectToEqual(deletedConventionDrafts, [
+        conventionDraft.id,
+        conventionDraft2.id,
+      ]);
+
+      expect(
+        await pgConventionDraftRepository.getById(conventionDraft.id),
+      ).toBeUndefined();
+
+      expect(
+        await pgConventionDraftRepository.getById(conventionDraft2.id),
+      ).toBeUndefined();
+    });
+
+    it("do nothing when convention draft id is not found", async () => {
       const nonExistentConventionDraftId = uuid();
 
       await expect(
-        pgConventionDraftRepository.delete([nonExistentConventionDraftId]),
+        pgConventionDraftRepository.delete({
+          ids: [nonExistentConventionDraftId],
+        }),
       ).resolves.not.toThrow();
+    });
+
+    it("do not delete when no old convention draft found", async () => {
+      await pgConventionDraftRepository.save(conventionDraft, now);
+      await pgConventionDraftRepository.delete({
+        endedSince: new Date(thirtyDaysBefore),
+      });
+
+      await expectToEqual(
+        await pgConventionDraftRepository.getById(conventionDraft.id),
+        { ...conventionDraft, updatedAt: now },
+      );
     });
   });
 });
