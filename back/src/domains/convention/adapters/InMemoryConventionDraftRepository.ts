@@ -1,5 +1,8 @@
 import type { ConventionDraftDto, ConventionDraftId, DateString } from "shared";
-import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
+import type {
+  ConventionDraftRepository,
+  DeleteConventionDraftFilters,
+} from "../ports/ConventionDraftRepository";
 
 export class InMemoryConventionDraftRepository
   implements ConventionDraftRepository
@@ -29,9 +32,32 @@ export class InMemoryConventionDraftRepository
     };
   }
 
-  public async delete(ids: ConventionDraftId[]): Promise<void> {
-    for (const id of ids) {
+  public async delete(
+    filters: DeleteConventionDraftFilters,
+  ): Promise<ConventionDraftId[]> {
+    const conventionDraftsIdsToDelete = Object.entries(this.#conventionDrafts)
+      .filter(
+        ([id, draft]) =>
+          shouldDeleteById(id, filters.ids) ||
+          shouldDeleteByDate(draft, filters.endedSince),
+      )
+      .map(([id]) => id);
+
+    conventionDraftsIdsToDelete.forEach((id) => {
       delete this.#conventionDrafts[id];
-    }
+    });
+
+    return conventionDraftsIdsToDelete;
   }
 }
+
+const shouldDeleteById = (
+  id: ConventionDraftId,
+  idsToDelete?: ConventionDraftId[],
+): boolean => !idsToDelete || idsToDelete.includes(id);
+
+const shouldDeleteByDate = (
+  draft: ConventionDraftDto,
+  endedSince?: Date,
+): boolean =>
+  !endedSince || (!!draft.updatedAt && new Date(draft.updatedAt) <= endedSince);
