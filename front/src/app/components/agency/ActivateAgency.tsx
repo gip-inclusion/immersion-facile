@@ -15,7 +15,6 @@ import "src/assets/admin.css";
 
 import { agencyNeedingReviewSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.selectors";
 import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { z } from "zod";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
@@ -64,10 +63,12 @@ export const ActivateAgency = () => {
   ) => {
     if (!agencyNeedingReview) return;
     dispatch(
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
-        ...updateAgencyStatusParams,
-        feedbackTopic: "agency-admin-needing-review",
-      }),
+      agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusRequested(
+        {
+          ...updateAgencyStatusParams,
+          feedbackTopic: "agency-admin-needing-review",
+        },
+      ),
     );
     dispatch(agencyNeedingReviewSlice.actions.clearAgencyNeedingReview());
     reset();

@@ -9,4 +9,8 @@ export const agencyNeedingReviewSelectors = {
     agencyNeedingReviewState,
     ({ agencyNeedingReview }) => agencyNeedingReview ?? null,
   ),
+  isLoading: createSelector(
+    agencyNeedingReviewState,
+    ({ isLoading }) => isLoading,
+  ),
 };

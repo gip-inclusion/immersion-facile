@@ -8,12 +8,12 @@ import type {
 } from "src/core-logic/storeConfig/redux.helpers";
 import { agencyNeedingReviewSlice } from "./agencyNeedingReview.slice";
 
-export type agencyNeedingReviewAction = ActionOfSlice<
+export type AgencyNeedingReviewAction = ActionOfSlice<
   typeof agencyNeedingReviewSlice
 >;
 
 export const fetchAgencyNeedingReviewEpic: AppEpic<
-  agencyNeedingReviewAction | { type: "do-nothing" }
+  AgencyNeedingReviewAction | { type: "do-nothing" }
 > = (action$, state$, dependencies) =>
   action$.pipe(
     filter(
@@ -38,4 +38,39 @@ export const fetchAgencyNeedingReviewEpic: AppEpic<
     ),
   );
 
-export const agencyNeedingReviewEpics = [fetchAgencyNeedingReviewEpic];
+const updateAgencyNeedingReviewStatusEpic: AppEpic<
+  AgencyNeedingReviewAction | { type: "do-nothing" }
+> = (action$, state$, { agencyGateway }) =>
+  action$.pipe(
+    filter(
+      agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusRequested
+        .match,
+    ),
+    switchMap(({ payload }) =>
+      agencyGateway
+        .validateOrRejectAgency$(getAdminToken(state$.value), payload)
+        .pipe(
+          map(() =>
+            agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusSucceeded(
+              {
+                agencyId: payload.id,
+                feedbackTopic: "agency-admin-needing-review",
+              },
+            ),
+          ),
+          catchEpicError((error: Error) =>
+            agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusFailed(
+              {
+                errorMessage: error.message,
+                feedbackTopic: payload.feedbackTopic,
+              },
+            ),
+          ),
+        ),
+    ),
+  );
+
+export const agencyNeedingReviewEpics = [
+  fetchAgencyNeedingReviewEpic,
+  updateAgencyNeedingReviewStatusEpic,
+];

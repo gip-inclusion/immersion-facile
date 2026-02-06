@@ -1,13 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type {
-  AgencyOption,
-  UpdateAgencyStatusParams,
-  WithAgencyId,
-} from "shared";
-import type {
-  PayloadActionWithFeedbackTopic,
-  PayloadActionWithFeedbackTopicError,
-} from "src/core-logic/domain/feedback/feedback.slice";
+import type { AgencyOption } from "shared";
 
 export interface AgencyAdminState {
   agencySearchQuery: string;
@@ -31,24 +23,6 @@ export const agencyAdminSlice = createSlice({
     },
     setAgencyOptions: (state, action: PayloadAction<AgencyOption[]>) => {
       state.agencyOptions = action.payload;
-      state.isLoading = false;
-    },
-    updateAgencyNeedingReviewStatusRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<UpdateAgencyStatusParams>,
-    ) => {
-      state.isLoading = true;
-    },
-    updateAgencyNeedingReviewStatusSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<WithAgencyId>,
-    ) => {
-      state.isLoading = false;
-    },
-    updateAgencyNeedingReviewStatusFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
       state.isLoading = false;
     },
   },
