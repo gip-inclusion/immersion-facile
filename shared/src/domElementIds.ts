@@ -855,6 +855,18 @@ export const domElementIds = {
       rejectAgencyModalSubmitButton: "im-reject-agency-modal__submit-button",
       userRegistrationToAgencyModal:
         "im-register-user-to-agency__user-registration-modal",
+      closeAgencyAndTransferConventionsModal:
+        "im-close-agency-and-transfer-conventions__modal",
+      closeAgencyAndTransferConventionsButton:
+        "im-close-agency-and-transfer-conventions__open-button",
+      closeAgencyAndTransferConventionsForm:
+        "im-close-agency-and-transfer-conventions__form",
+      closeAgencyAndTransferConventionsTargetAgencyIdInput:
+        "im-close-agency-and-transfer-conventions__target-agency-id-input",
+      closeAgencyAndTransferConventionsCancelButton:
+        "im-close-agency-and-transfer-conventions__cancel-button",
+      closeAgencyAndTransferConventionsSubmitButton:
+        "im-close-agency-and-transfer-conventions__submit-button",
     },
     usersTab: {
       usersTable: "im-users__users-table",

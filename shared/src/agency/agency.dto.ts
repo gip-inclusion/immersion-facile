@@ -97,6 +97,11 @@ export type WithAgencyId = {
   agencyId: AgencyId;
 };
 
+export type CloseAgencyAndTransferConventionsRequestDto = {
+  agencyToCloseId: AgencyId;
+  agencyToTransferConventionsToId: AgencyId;
+};
+
 export const miniStageAgencyKinds: AgencyKind[] = [
   "cci",
   "cma",

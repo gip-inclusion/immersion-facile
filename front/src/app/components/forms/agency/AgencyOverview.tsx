@@ -5,6 +5,7 @@ import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { agencyAdminSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
+import { CloseAgencyAndTransferConventions } from "src/app/components/agency/CloseAgencyAndTransferConventions";
 import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { EditAgencyForm } from "src/app/components/forms/agency/EditAgencyForm";
@@ -16,6 +17,7 @@ import type { routes } from "src/app/routes/routes";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 
 import type { ConnectedUsersWithNormalizedAgencyRightsById } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";
 
 export type AgencyOverviewRouteName = Route<
@@ -37,21 +39,36 @@ export const AgencyOverview = ({
   routeName,
 }: AgencyOverviewProps) => {
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
+  const isBackOfficeadmin = useAppSelector(authSelectors.isAdminConnected);
 
   return (
     <div>
       <h1 className={fr.cx("fr-h1")}>{agency.name}</h1>
-      <CopyAgencyId agencyId={agency.id} />
-
       {/* //Todo remove after feedback refactor */}
-      {routeName === "adminAgencies" || routeName === "adminAgencyDetail" ? (
-        <SubmitFeedbackNotification
-          submitFeedback={feedback}
-          messageByKind={agencyAdminSubmitMessageByKind}
-        />
-      ) : (
-        <Feedback topics={["agency-for-dashboard"]} />
-      )}
+      {routeName === "adminAgencies" ||
+        (routeName === "adminAgencyDetail" && (
+          <SubmitFeedbackNotification
+            submitFeedback={feedback}
+            messageByKind={agencyAdminSubmitMessageByKind}
+          />
+        ))}
+      <Feedback
+        topics={[
+          "agency-for-dashboard",
+          "close-agency-and-transfer-conventions",
+        ]}
+        className="fr-mb-2w"
+        closable
+      />
+      <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
+        <CopyAgencyId agencyId={agency.id} />
+        {(routeName === "adminAgencies" || routeName === "adminAgencyDetail") &&
+          isBackOfficeadmin && (
+            <div className={fr.cx("fr-ml-auto")}>
+              <CloseAgencyAndTransferConventions agency={agency} />
+            </div>
+          )}
+      </div>
       {agency && (
         <>
           <AgencyTag

@@ -6,6 +6,7 @@ import {
   agencyRoutes,
   ConnectedUserBuilder,
   type ConnectedUserJwt,
+  ConventionDtoBuilder,
   type CreateAgencyDto,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -457,6 +458,176 @@ describe("Agency routes", () => {
 
         await processEventsForEmailToBeSent(eventCrawler);
         expect(gateways.notification.getSentEmails()).toHaveLength(1);
+      });
+    });
+
+    describe(`${displayRouteName(
+      agencyRoutes.closeAgencyAndTransfertConventions,
+    )} to close an agency and transfer its conventions`, () => {
+      const agencyToClose = AgencyDtoBuilder.create("agency-to-close-id")
+        .withName("Agency to close")
+        .withStatus("active")
+        .withAddress(defaultAddress)
+        .build();
+
+      const agencyToTransferTo = AgencyDtoBuilder.create("target-agency-id")
+        .withName("Target agency")
+        .withStatus("active")
+        .withAddress(defaultAddress)
+        .withRefersToAgencyInfo(null)
+        .build();
+
+      it("401 - Returns Unauthorized if no token provided", async () => {
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyToClose),
+          toAgencyWithRights(agencyToTransferTo),
+        ];
+
+        const response = await httpClient.closeAgencyAndTransfertConventions({
+          headers: { authorization: "" },
+          body: {
+            agencyToCloseId: agencyToClose.id,
+            agencyToTransferConventionsToId: agencyToTransferTo.id,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 401,
+          body: { status: 401, message: "Veuillez vous authentifier" },
+        });
+      });
+
+      it("403 - non-admin user cannot close agency and transfer conventions", async () => {
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyToClose),
+          toAgencyWithRights(agencyToTransferTo),
+        ];
+
+        const response = await httpClient.closeAgencyAndTransfertConventions({
+          headers: { authorization: nonAdminToken },
+          body: {
+            agencyToCloseId: agencyToClose.id,
+            agencyToTransferConventionsToId: agencyToTransferTo.id,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 403,
+          body: {
+            status: 403,
+            message: errors.user.forbidden({ userId: nonAdminUser.id }).message,
+          },
+        });
+      });
+
+      it("404 - agency to close not found", async () => {
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyToTransferTo),
+        ];
+
+        const response = await httpClient.closeAgencyAndTransfertConventions({
+          headers: { authorization: backofficeAdminToken },
+          body: {
+            agencyToCloseId: "non-existent-agency",
+            agencyToTransferConventionsToId: agencyToTransferTo.id,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 404,
+          body: {
+            status: 404,
+            message: errors.agency.notFound({
+              agencyId: "non-existent-agency",
+            }).message,
+          },
+        });
+      });
+
+      it("404 - agency to transfer conventions to not found", async () => {
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyToClose),
+        ];
+
+        const response = await httpClient.closeAgencyAndTransfertConventions({
+          headers: { authorization: backofficeAdminToken },
+          body: {
+            agencyToCloseId: agencyToClose.id,
+            agencyToTransferConventionsToId: "non-existent-target-agency",
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 404,
+          body: {
+            status: 404,
+            message: errors.agency.notFound({
+              agencyId: "non-existent-target-agency",
+            }).message,
+          },
+        });
+      });
+
+      it("200 - closes agency, transfers conventions and updates referring agencies", async () => {
+        const referringAgency = new AgencyDtoBuilder()
+          .withId("referring-agency-id")
+          .withName("Referring agency")
+          .withStatus("active")
+          .withRefersToAgencyInfo({
+            refersToAgencyId: agencyToClose.id,
+            refersToAgencyName: agencyToClose.name,
+            refersToAgencyContactEmail: agencyToClose.contactEmail,
+          })
+          .build();
+
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agencyToClose.id)
+          .build();
+
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyToClose),
+          toAgencyWithRights(agencyToTransferTo),
+          toAgencyWithRights(referringAgency),
+        ];
+        inMemoryUow.conventionRepository.setConventions([convention]);
+
+        const response = await httpClient.closeAgencyAndTransfertConventions({
+          headers: { authorization: backofficeAdminToken },
+          body: {
+            agencyToCloseId: agencyToClose.id,
+            agencyToTransferConventionsToId: agencyToTransferTo.id,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: "",
+        });
+
+        const closedAgency = await inMemoryUow.agencyRepository.getById(
+          agencyToClose.id,
+        );
+        expectToEqual(closedAgency?.status, "closed");
+        expectToEqual(
+          closedAgency?.statusJustification,
+          "Agence fermée suite à un transfert de convention",
+        );
+
+        const transferredConvention =
+          await inMemoryUow.conventionRepository.getById(convention.id);
+        expectToEqual(transferredConvention?.agencyId, agencyToTransferTo.id);
+
+        const updatedReferring = await inMemoryUow.agencyRepository.getById(
+          referringAgency.id,
+        );
+        expectToEqual(
+          updatedReferring?.refersToAgencyId,
+          agencyToTransferTo.id,
+        );
+        expectToEqual(
+          updatedReferring?.refersToAgencyName,
+          agencyToTransferTo.name,
+        );
       });
     });
 

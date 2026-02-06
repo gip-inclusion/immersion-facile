@@ -30,6 +30,7 @@ import {
   activeAgencyStatuses,
   agencyKindFilters,
   allAgencyStatuses,
+  type CloseAgencyAndTransferConventionsRequestDto,
   type CreateAgencyDto,
   type CreateAgencyInitialValues,
   closedOrRejectedAgencyStatuses,
@@ -275,4 +276,10 @@ export const updateAgencyStatusParamsSchema: ZodSchemaWithInputMatchingOutput<Up
 export const withAgencyStatusSchema: ZodSchemaWithInputMatchingOutput<WithAgencyStatus> =
   z.object({
     status: agencyStatusSchema,
+  });
+
+export const closeAgencyAndTransferConventionsRequestSchema: ZodSchemaWithInputMatchingOutput<CloseAgencyAndTransferConventionsRequestDto> =
+  z.object({
+    agencyToCloseId: agencyIdSchema,
+    agencyToTransferConventionsToId: agencyIdSchema,
   });

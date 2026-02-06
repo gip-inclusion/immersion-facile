@@ -3,7 +3,7 @@ import type {
   ConventionId,
   ReminderKind,
   WithAgencyId,
-  WithConventionId,
+  WithConventionDto,
 } from "shared";
 
 export type ConventionReminderPayload = {
@@ -11,8 +11,9 @@ export type ConventionReminderPayload = {
   conventionId: ConventionId;
 };
 
-export type TransferConventionToAgencyPayload = WithConventionId &
+export type TransferConventionToAgencyPayload = WithConventionDto &
   WithAgencyId & {
     justification: string;
     previousAgencyId: AgencyId;
+    shouldNotifyActors: boolean;
   };

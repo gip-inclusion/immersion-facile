@@ -222,5 +222,16 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
+  sharedAgencyRouter.closeAgencyAndTransfertConventions(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.closeAgencyAndTransfertConventions.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   return expressRouter;
 };

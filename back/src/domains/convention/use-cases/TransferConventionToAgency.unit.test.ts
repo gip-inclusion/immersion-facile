@@ -436,10 +436,11 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              conventionId: transferredConvention.id,
+              convention: transferredConvention,
               agencyId: otherAgency.id,
               justification: "change of agency",
               previousAgencyId: convention.agencyId,
+              shouldNotifyActors: true,
               triggeredBy: {
                 kind: "connected-user",
                 userId: user.id,
@@ -487,9 +488,10 @@ describe("TransferConventionToAgency", () => {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferredConvention.id,
+              convention: transferredConvention,
               justification: "change of agency",
               previousAgencyId: initialConvention.agencyId,
+              shouldNotifyActors: true,
               triggeredBy: {
                 kind: "connected-user",
                 userId: connectedUser.id,
@@ -538,9 +540,10 @@ describe("TransferConventionToAgency", () => {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferredConvention.id,
+              convention: transferredConvention,
               justification: "change of agency",
               previousAgencyId: conventionWithAgencyRefersTo.agencyId,
+              shouldNotifyActors: true,
               triggeredBy: {
                 kind: "connected-user",
                 userId: backofficeAdmin.id,
@@ -593,9 +596,10 @@ describe("TransferConventionToAgency", () => {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferredConvention.id,
+              convention: transferredConvention,
               justification: "change of agency",
               previousAgencyId: conventionWithAgencyRefersTo.agencyId,
+              shouldNotifyActors: true,
               triggeredBy: {
                 kind: "connected-user",
                 userId: counsellor.id,
@@ -683,10 +687,11 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferredConvention.id,
+                convention: transferredConvention,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
+                shouldNotifyActors: true,
                 triggeredBy: {
                   kind: "connected-user",
                   userId: connectedUser.id,
@@ -736,10 +741,11 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferredConvention.id,
+                convention: transferredConvention,
                 agencyId: otherAgency.id,
                 justification: "change of agency kind",
                 previousAgencyId: convention.agencyId,
+                shouldNotifyActors: true,
                 triggeredBy: {
                   kind: "connected-user",
                   userId: connectedUser.id,
@@ -800,10 +806,11 @@ describe("TransferConventionToAgency", () => {
           {
             topic: "ConventionTransferredToAgency",
             payload: {
-              conventionId: transferredConvention.id,
+              convention: transferredConvention,
               agencyId: otherAgency.id,
               justification: "change of agency",
               previousAgencyId: convention.agencyId,
+              shouldNotifyActors: true,
               triggeredBy: {
                 kind: "convention-magic-link",
                 role: jwtPayload.role,
@@ -851,9 +858,10 @@ describe("TransferConventionToAgency", () => {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferredConvention.id,
+              convention: transferredConvention,
               justification: "change of agency",
               previousAgencyId: initialConvention.agencyId,
+              shouldNotifyActors: true,
               triggeredBy: {
                 kind: "convention-magic-link",
                 role: validatorJwtPayload.role,
@@ -907,9 +915,10 @@ describe("TransferConventionToAgency", () => {
             topic: "ConventionTransferredToAgency",
             payload: {
               agencyId: otherAgency.id,
-              conventionId: transferredConvention.id,
+              convention: transferredConvention,
               justification: "change of agency",
               previousAgencyId: conventionWithAgencyRefersTo.agencyId,
+              shouldNotifyActors: true,
               triggeredBy: {
                 kind: "convention-magic-link",
                 role: "counsellor",
@@ -1005,10 +1014,11 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferredConvention.id,
+                convention: transferredConvention,
                 agencyId: otherAgency.id,
                 justification: "change of agency",
                 previousAgencyId: convention.agencyId,
+                shouldNotifyActors: true,
                 triggeredBy: {
                   kind: "convention-magic-link",
                   role: jwtPayload.role,
@@ -1064,10 +1074,11 @@ describe("TransferConventionToAgency", () => {
             {
               topic: "ConventionTransferredToAgency",
               payload: {
-                conventionId: transferredConvention.id,
+                convention: transferredConvention,
                 agencyId: otherAgency.id,
                 justification: "change of agency kind",
                 previousAgencyId: convention.agencyId,
+                shouldNotifyActors: true,
                 triggeredBy: {
                   kind: "convention-magic-link",
                   role: jwtPayload.role,

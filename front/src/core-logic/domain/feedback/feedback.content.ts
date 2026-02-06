@@ -4,6 +4,7 @@ import {
   loginByEmailLinkDurationInMinutes,
 } from "shared";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
+import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
@@ -84,6 +85,7 @@ const topics = [
   "send-signature-link",
   "send-assessment-link",
   "siret-input",
+  "close-agency-and-transfer-conventions",
   "transfer-convention-to-agency",
   "unused",
   "user",
@@ -489,6 +491,24 @@ export const feedbacks: Record<
       action: assessmentSlice.actions.deleteAssessmentFailed,
       title: "Problème lors de la suppression du bilan",
       message: "Une erreur est survenue lors de la suppression du bilan",
+    },
+  },
+  "close-agency-and-transfer-conventions": {
+    "update.success": {
+      action:
+        closeAgencyAndTransferConventionsSlice.actions
+          .closeAgencyAndTransferConventionsSucceeded,
+      title: "Transfert des conventions effectué",
+      message:
+        "L'agence a été fermée et les conventions ont été transférées vers la nouvelle agence.",
+    },
+    "update.error": {
+      action:
+        closeAgencyAndTransferConventionsSlice.actions
+          .closeAgencyAndTransferConventionsFailed,
+      title: "Problème lors du transfert des conventions",
+      message:
+        "Une erreur est survenue lors de la fermeture de l'agence et du transfert des conventions.",
     },
   },
   "transfer-convention-to-agency": {
