@@ -1,14 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import { MainWrapper, PageHeader } from "react-design-system";
-import { Breadcrumbs } from "src/app/components/Breadcrumbs";
+import { MainWrapper } from "react-design-system";
+import {
+  FeedbackContent,
+  type FeedbackContentProps,
+} from "src/app/components/feedback/FeedbackContent";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 
-type FullPageFeedbackProps = {
-  title: string;
-  illustration: string;
-  content: React.ReactNode;
-  buttonProps: ButtonProps;
+type FullPageFeedbackProps = FeedbackContentProps & {
   includeWrapper?: boolean;
 };
 
@@ -20,16 +18,12 @@ export const FullPageFeedback = ({
   includeWrapper = true,
 }: FullPageFeedbackProps) => {
   const feedbackContent = (
-    <PageHeader
-      title={title}
+    <FeedbackContent
+      buttonProps={buttonProps}
       illustration={illustration}
-      breadcrumbs={<Breadcrumbs />}
-    >
-      {content}
-      <div>
-        <Button {...buttonProps} className={fr.cx("fr-mt-2w")} />
-      </div>
-    </PageHeader>
+      title={title}
+      content={content}
+    />
   );
   return includeWrapper ? (
     <HeaderFooterLayout>

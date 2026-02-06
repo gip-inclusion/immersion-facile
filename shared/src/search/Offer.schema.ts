@@ -63,7 +63,7 @@ const commonOfferSchema = z.object({
 
 export const internalOfferSchema: ZodSchemaWithInputMatchingOutput<InternalOfferDto> =
   commonOfferSchema.extend(withRemoteWorkModeSchema.shape).extend({
-    isAvailable: zBoolean
+    isAvailable: zBoolean,
   });
 
 export const externalOfferSchema: ZodSchemaWithInputMatchingOutput<ExternalOfferDto> =

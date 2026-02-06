@@ -64,7 +64,7 @@ export class SimulatedSearchGateway implements SearchGateway {
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     remoteWorkMode: "HYBRID",
-    isAvailable: true,
+    isAvailable: false,
   };
 
   constructor(

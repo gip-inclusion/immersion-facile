@@ -15,7 +15,13 @@ export const ErrorPageContent = ({
   buttons,
   feedbackTopic,
 }: ErrorPageContentProps) => (
-  <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+  <div
+    className={fr.cx(
+      "fr-grid-row",
+      "fr-grid-row--gutters",
+      "fr-grid-row--middle",
+    )}
+  >
     <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
       <h1>{title}</h1>
       <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{subtitle}</p>

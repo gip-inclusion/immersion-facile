@@ -60,6 +60,9 @@ const SearchResultComponent = ({
     customizedName.length > 0 &&
     !frenchEstablishmentKinds.includes(customizedName.toUpperCase().trim());
 
+  const isNotAvailableOffer =
+    isInternalOfferDto(searchResult) && !searchResult.isAvailable;
+
   const establishmentRawName = isCustomizedNameValidToDisplay
     ? customizedName
     : name;
@@ -82,13 +85,28 @@ const SearchResultComponent = ({
     !isPhysicalWorkMode(searchResult.remoteWorkMode)
       ? "France entière"
       : `${address.city} (${address.departmentCode})`;
+  const linkPropsHandlingNotAvailable:
+    | Link
+    | {
+        disabled: true;
+        title: string;
+      } = isNotAvailableOffer
+    ? {
+        disabled: true,
+        title:
+          "Cette entreprise a reçu le nombre de candidatures qu’elle peut traiter pour le moment. Elle redeviendra disponible pour les candidatures prochainement.",
+      }
+    : linkProps;
 
   return (
     <Card
+      nativeDivProps={{
+        "aria-disabled": true,
+      }}
       title={jobTitle}
       desc={establishmentName}
       linkProps={{
-        ...linkProps,
+        ...linkPropsHandlingNotAvailable,
         id: voluntaryToImmersion
           ? `${domElementIds.search.searchResultButton}-${siret}`
           : `${domElementIds.search.lbbSearchResultButton}-${siret}`,
@@ -97,6 +115,19 @@ const SearchResultComponent = ({
       titleAs="h2"
       imageComponent={illustration}
       endDetail={dateJobCreatedAt}
+      detail={
+        isInternalOfferDto(searchResult) && !searchResult.isAvailable ? (
+          <span className={fr.cx("fr-icon-close-circle-line")}>
+            {" "}
+            Mise en relation temporairement indisponible
+          </span>
+        ) : (
+          <span className={fr.cx("fr-icon-checkbox-circle-line")}>
+            {" "}
+            Mise en relation disponibles
+          </span>
+        )
+      }
       start={
         <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
           {displayedLocation} -{" "}
