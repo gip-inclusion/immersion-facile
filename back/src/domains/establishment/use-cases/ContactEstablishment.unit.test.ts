@@ -936,5 +936,27 @@ describe("ContactEstablishment", () => {
         }),
       );
     });
+
+    it("throws ForbidenError when establishment is not currently available", async () => {
+      const establishmentAggregate = new EstablishmentAggregateBuilder(
+        establishmentAggregateWithEmail,
+      )
+        .withIsMaxDiscussionsForPeriodReached(true)
+        .withOffers([immersionOffer])
+        .build();
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validEmailRequest,
+        }),
+        errors.establishment.forbiddenUnavailable({
+          siret: validEmailRequest.siret,
+        }),
+      );
+    });
   });
 });
