@@ -3,6 +3,7 @@ import {
   expiredJwtErrorTitle,
   loginByEmailLinkDurationInMinutes,
 } from "shared";
+import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
@@ -370,7 +371,7 @@ export const feedbacks: Record<
   },
   "agency-admin-needing-review": {
     "fetch.error": {
-      action: agencyAdminSlice.actions.fetchAgencyNeedingReviewFailed,
+      action: agencyNeedingReviewSlice.actions.fetchAgencyNeedingReviewFailed,
       title:
         "Problème rencontré lors de la récupération des données de l'agence à valider",
       message:
