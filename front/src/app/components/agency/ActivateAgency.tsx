@@ -62,9 +62,10 @@ export const ActivateAgency = () => {
   ) => {
     if (!agencyNeedingReview) return;
     dispatch(
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested(
-        updateAgencyStatusParams,
-      ),
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
+        ...updateAgencyStatusParams,
+        feedbackTopic: "agency-admin-needing-review",
+      }),
     );
     dispatch(agencyAdminSlice.actions.clearAgencyNeedingReview());
     reset();
@@ -75,9 +76,10 @@ export const ActivateAgency = () => {
   }) => {
     if (!values.agencyId) return;
     dispatch(
-      agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested(
-        values.agencyId,
-      ),
+      agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested({
+        agencyId: values.agencyId,
+        feedbackTopic: "agency-admin-needing-review",
+      }),
     );
   };
 

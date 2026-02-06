@@ -1,17 +1,6 @@
 import type { ReactNode } from "react";
 import { immersionFacileDelegationEmail } from "shared";
-import type { AgencyAdminSuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import type { AgenciesFeedbackKind } from "src/core-logic/domain/agencies/agencies.slice";
-
-export const agencyAdminSubmitMessageByKind: Record<
-  AgencyAdminSuccessFeedbackKind,
-  { title: string; message: NonNullable<ReactNode> }
-> = {
-  agencyUpdated: {
-    title: "Succès",
-    message: "Agence éditée avec succès",
-  },
-};
 
 export const agenciesSubmitMessageByKind: Record<
   AgenciesFeedbackKind,
