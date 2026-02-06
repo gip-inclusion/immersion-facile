@@ -1,10 +1,12 @@
 import {
   type AddressWithCountryCodeAndPosition,
+  AgencyDtoBuilder,
   defaultCountryCode,
   expectArraysToEqual,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import {
   type AutocompleteItem,
   initialAutocompleteItem,
@@ -424,4 +426,35 @@ describe("Geocoding epic", () => {
       expected,
     );
   };
+  it("populates agency-address when agency is fetched", () => {
+    const address = {
+      streetNumberAndAddress: "1 rue de la paix",
+      postcode: "75016",
+      departmentCode: "75",
+      city: "Paris",
+    };
+    const agencyDto = new AgencyDtoBuilder().withAddress(address).build();
+
+    store.dispatch(
+      fetchAgencySlice.actions.fetchAgencyRequested({
+        agencyId: agencyDto.id,
+        feedbackTopic: "agency-admin",
+      }),
+    );
+    dependencies.agencyGateway.fetchedAgency$.next(agencyDto);
+
+    expectToEqual(
+      makeGeocodingLocatorSelector("agency-address")(store.getState())?.value,
+      {
+        address: {
+          ...address,
+          countryCode: defaultCountryCode,
+        },
+        position: {
+          lat: agencyDto.position.lat,
+          lon: agencyDto.position.lon,
+        },
+      },
+    );
+  });
 });
