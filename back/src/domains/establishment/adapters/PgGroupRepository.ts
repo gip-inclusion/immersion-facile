@@ -111,6 +111,7 @@ export class PgGroupRepository implements GroupRepository {
             createdAt: sql<DateTimeIsoString>`date_to_iso(e.created_at)`,
             updatedAt: sql<DateTimeIsoString>`date_to_iso(e.update_date)`,
             remoteWorkMode: sql`MIN(io.remote_work_mode)`,
+            isAvailable: sql`NOT(e.is_max_discussions_for_period_reached)`,
           }),
         ).as("search_result_dto"),
       )
