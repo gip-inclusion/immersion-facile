@@ -12,7 +12,9 @@ import { domElementIds, withAgencyIdSchema, zStringMinLength1 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { createFormModal } from "src/app/utils/createFormModal";
 import "src/assets/admin.css";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
+
+import { agencyNeedingReviewSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.selectors";
+import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { z } from "zod";
 import { useAppSelector } from "../../hooks/reduxHooks";
@@ -42,7 +44,7 @@ export const ActivateAgency = () => {
   const dispatch = useDispatch();
 
   const agencyNeedingReview = useAppSelector(
-    agencyAdminSelectors.agencyNeedingReview,
+    agencyNeedingReviewSelectors.agencyNeedingReview,
   );
 
   const methods = useForm<WithAgencyId>({
@@ -67,7 +69,7 @@ export const ActivateAgency = () => {
         feedbackTopic: "agency-admin-needing-review",
       }),
     );
-    dispatch(agencyAdminSlice.actions.clearAgencyNeedingReview());
+    dispatch(agencyNeedingReviewSlice.actions.clearAgencyNeedingReview());
     reset();
   };
 
@@ -76,7 +78,7 @@ export const ActivateAgency = () => {
   }) => {
     if (!values.agencyId) return;
     dispatch(
-      agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested({
+      agencyNeedingReviewSlice.actions.fetchAgencyNeedingReviewRequested({
         agencyId: values.agencyId,
         feedbackTopic: "agency-admin-needing-review",
       }),

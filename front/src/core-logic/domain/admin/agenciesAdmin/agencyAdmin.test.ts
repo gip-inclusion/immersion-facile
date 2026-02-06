@@ -11,6 +11,8 @@ import {
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
+import { agencyNeedingReviewSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.selectors";
+import { agencyNeedingReviewInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import {
   type AgencyAdminState,
@@ -44,33 +46,47 @@ describe("agencyAdmin", () => {
   });
 
   describe("Agency activate or reject", () => {
-    describe("fetch agencies needing review", () => {
-      it("successfully fetches agency needing review", () => {
-        store.dispatch(
-          agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested({
-            agencyId: AGENCY_NEEDING_REVIEW_2.id,
-            feedbackTopic: "agency-admin-needing-review",
+    describe("update agency needing review status", () => {
+      const preloadedAgencyAdminState: AgencyAdminState = {
+        ...agencyAdminInitialState,
+      };
+
+      beforeEach(() => {
+        ({ store, dependencies } = createTestStore({
+          admin: adminPreloadedState({
+            agencyAdmin: { ...preloadedAgencyAdminState },
+            agencyNeedingReview: {
+              ...agencyNeedingReviewInitialState,
+              agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
+            },
           }),
-        );
-
-        feedWithFetchedAgency(AGENCY_NEEDING_REVIEW_2);
-
-        expectAgencyAdminStateToMatch({
-          agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
-        });
+        }));
       });
 
-      it("fails to fetch agency needing review", () => {
+      it("successfully updates agency needing review status", () => {
         store.dispatch(
-          agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested({
-            agencyId: AGENCY_NEEDING_REVIEW_2.id,
+          agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
+            id: AGENCY_NEEDING_REVIEW_2.id,
+            status: "active",
             feedbackTopic: "agency-admin-needing-review",
           }),
         );
-        const errorMessage =
-          "Une erreur est survenue lors de la récupération des données de cette agence";
-        dependencies.agencyGateway.fetchedAgency$.error(
-          new Error(errorMessage),
+
+        expectAgencyAdminStateToMatch({
+          ...preloadedAgencyAdminState,
+          isLoading: true,
+        });
+
+        feedWithValidateOrRejectSuccess();
+
+        expectAgencyAdminStateToMatch({
+          ...preloadedAgencyAdminState,
+          isLoading: false,
+        });
+
+        expectToEqual(
+          agencyNeedingReviewSelectors.agencyNeedingReview(store.getState()),
+          null,
         );
 
         expectToEqual(
@@ -78,90 +94,39 @@ describe("agencyAdmin", () => {
             "agency-admin-needing-review"
           ],
           {
-            on: "fetch",
-            level: "error",
-            title:
-              "Problème rencontré lors de la récupération des données de l'agence à valider",
-            message: errorMessage,
+            on: "update",
+            level: "success",
+            title: "Statut de l'agence mis à jour",
+            message: "L'agence a été activée ou rejetée avec succès.",
           },
         );
       });
 
-      describe("update agency needing review status", () => {
-        const preloadedAgencyAdminState: AgencyAdminState = {
-          ...agencyAdminInitialState,
-          agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
-        };
-
-        beforeEach(() => {
-          ({ store, dependencies } = createTestStore({
-            admin: adminPreloadedState({
-              agencyAdmin: { ...preloadedAgencyAdminState },
-            }),
-          }));
+      it("stores update error in feedback slice when update agency needing review status fails", () => {
+        store.dispatch(
+          agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
+            id: AGENCY_NEEDING_REVIEW_2.id,
+            status: "active",
+            feedbackTopic: "agency-admin-needing-review",
+          }),
+        );
+        const errorMessage = "Network error";
+        feedWithValidateOrRejectError(errorMessage);
+        expectAgencyAdminStateToMatch({
+          ...preloadedAgencyAdminState,
+          isLoading: false,
         });
-
-        it("successfully updates agency needing review status", () => {
-          store.dispatch(
-            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
-              id: AGENCY_NEEDING_REVIEW_2.id,
-              status: "active",
-              feedbackTopic: "agency-admin-needing-review",
-            }),
-          );
-
-          expectAgencyAdminStateToMatch({
-            ...preloadedAgencyAdminState,
-            isLoading: true,
-          });
-
-          feedWithValidateOrRejectSuccess();
-
-          expectAgencyAdminStateToMatch({
-            ...preloadedAgencyAdminState,
-            isLoading: false,
-            agencyNeedingReview: null,
-          });
-
-          expectToEqual(
-            feedbacksSelectors.feedbacks(store.getState())[
-              "agency-admin-needing-review"
-            ],
-            {
-              on: "update",
-              level: "success",
-              title: "Statut de l'agence mis à jour",
-              message: "L'agence a été activée ou rejetée avec succès.",
-            },
-          );
-        });
-
-        it("stores update error in feedback slice when update agency needing review status fails", () => {
-          store.dispatch(
-            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
-              id: AGENCY_NEEDING_REVIEW_2.id,
-              status: "active",
-              feedbackTopic: "agency-admin-needing-review",
-            }),
-          );
-          const errorMessage = "Network error";
-          feedWithValidateOrRejectError(errorMessage);
-          expectAgencyAdminStateToMatch({
-            ...preloadedAgencyAdminState,
-            isLoading: false,
-          });
-          expectToEqual(
-            feedbacksSelectors.feedbacks(store.getState())[
-              "agency-admin-needing-review"
-            ],
-            {
-              on: "update",
-              level: "error",
-              title: "Problème lors de la mise à jour du statut de l'agence",
-              message: errorMessage,
-            },
-          );
-        });
+        expectToEqual(
+          feedbacksSelectors.feedbacks(store.getState())[
+            "agency-admin-needing-review"
+          ],
+          {
+            on: "update",
+            level: "error",
+            title: "Problème lors de la mise à jour du statut de l'agence",
+            message: errorMessage,
+          },
+        );
       });
     });
   });
@@ -379,32 +344,6 @@ describe("agencyAdmin", () => {
       );
       expectAgencyAdminStateToMatch({ agencyOptions });
       expectToEqual(fetchAgencySelectors.agency(store.getState()), null);
-    });
-  });
-
-  it("clear agency", () => {
-    const agencyDto = new AgencyDtoBuilder().withId("1").build();
-    const agencyNeedingReviewDto = new AgencyDtoBuilder().withId("2").build();
-
-    ({ store, dependencies } = createTestStore({
-      ...{
-        admin: adminPreloadedState({
-          agencyAdmin: {
-            ...agencyAdminInitialState,
-            agencyNeedingReview: agencyNeedingReviewDto,
-          },
-        }),
-        agency: agenciesPreloadedState({
-          fetchAgency: {
-            ...fetchAgencyInitialState,
-            agency: agencyDto,
-          },
-        }),
-      },
-    }));
-    store.dispatch(agencyAdminSlice.actions.clearAgencyNeedingReview());
-    expectAgencyAdminStateToMatch({
-      agencyNeedingReview: null,
     });
   });
 
