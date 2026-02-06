@@ -36,6 +36,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
+import type { GetOffersParams } from "../ports/EstablishmentAggregateRepository";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
@@ -78,6 +79,7 @@ import {
   searchMadeDistanceWithoutRome,
   sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
   tourDeLaChaineLaRochelleLocation,
+  unavailableEstablishment,
   veauxLocation,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
@@ -121,6 +123,9 @@ describe("PgEstablishmentAggregateRepository", () => {
       direction: "desc",
     };
     describe("getOffers", () => {
+      const defaultFilters: GetOffersParams["filters"] = {
+        showOnlyAvailableOffers: false,
+      };
       const baseTestEstablishmentAggregates: EstablishmentAggregate[] = [
         establishmentWithOfferA1101_AtPosition,
         establishmentWithOfferA1101_close,
@@ -145,7 +150,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 20 },
               sort: defaultSort,
-              filters: {},
+              filters: defaultFilters,
             }),
             {
               pagination: {
@@ -170,7 +175,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 20 },
             sort: defaultSort,
-            filters: {},
+            filters: defaultFilters,
           });
 
           expectToEqual(result.pagination, {
@@ -204,6 +209,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
             filters: {
+              ...defaultFilters,
               searchableBy: undefined,
               nafCodes: undefined,
               locationIds: undefined,
@@ -220,6 +226,54 @@ describe("PgEstablishmentAggregateRepository", () => {
               totalRecords: 6,
             },
             data: baseTestEstablishmentAggregates.map(
+              (establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+            ),
+          });
+        });
+        it("also returns non available (according to establishment max contact requests) offers", async () => {
+          const establishmentSetWithUnavailableOne = [
+            ...baseTestEstablishmentAggregates,
+            unavailableEstablishment,
+          ];
+
+          await Promise.all(
+            establishmentSetWithUnavailableOne.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: {
+              ...defaultFilters,
+              searchableBy: undefined,
+              nafCodes: undefined,
+              locationIds: undefined,
+              sirets: undefined,
+              fitForDisabledWorkers: undefined,
+              appellationCodes: undefined,
+            },
+          });
+
+          expect(result.data[6].isAvailable).toBe(false);
+
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 7,
+            },
+            data: establishmentSetWithUnavailableOne.map(
               (establishmentAggregate) =>
                 makeExpectedSearchResult({
                   establishment: establishmentAggregate,
@@ -248,6 +302,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
             filters: {
+              ...defaultFilters,
               searchableBy: "students",
             },
           });
@@ -283,6 +338,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
             filters: {
+              ...defaultFilters,
               searchableBy: "jobSeekers",
             },
           });
@@ -327,7 +383,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { sirets: [] },
+            filters: { ...defaultFilters, sirets: [] },
           });
           expectToEqual(result.pagination, {
             currentPage: 1,
@@ -353,7 +409,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { sirets: [siret] },
+            filters: { ...defaultFilters, sirets: [siret] },
           });
 
           expectToEqual(result.data, [
@@ -388,7 +444,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { locationIds: [] },
+            filters: { ...defaultFilters, locationIds: [] },
           });
           expectToEqual(result.pagination, {
             currentPage: 1,
@@ -415,7 +471,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { locationIds: [locId] },
+            filters: { ...defaultFilters, locationIds: [locId] },
           });
 
           expectToEqual(result.pagination, {
@@ -445,7 +501,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { locationIds: locIds },
+            filters: { ...defaultFilters, locationIds: locIds },
           });
           expectToEqual(result, {
             pagination: {
@@ -486,6 +542,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
             filters: {
+              ...defaultFilters,
               locationIds: locIds,
               geoParams: {
                 lat: establishmentCuvisteAtSaintesAndVeaux.establishment
@@ -538,7 +595,10 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { fitForDisabledWorkers: ["yes-ft-certified"] },
+            filters: {
+              ...defaultFilters,
+              fitForDisabledWorkers: ["yes-ft-certified"],
+            },
           });
           expectToEqual(result, {
             pagination: {
@@ -565,7 +625,10 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { fitForDisabledWorkers: ["yes-declared-only"] },
+            filters: {
+              ...defaultFilters,
+              fitForDisabledWorkers: ["yes-declared-only"],
+            },
           });
           expectToEqual(result, {
             pagination: {
@@ -592,7 +655,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { fitForDisabledWorkers: ["no"] },
+            filters: { ...defaultFilters, fitForDisabledWorkers: ["no"] },
           });
           expectToEqual(result, {
             pagination: {
@@ -635,7 +698,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { appellationCodes: [] },
+            filters: { ...defaultFilters, appellationCodes: [] },
           });
           expectToEqual(result, {
             pagination: {
@@ -729,7 +792,10 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { appellationCodes: [cuvisteOffer.appellationCode] },
+            filters: {
+              ...defaultFilters,
+              appellationCodes: [cuvisteOffer.appellationCode],
+            },
           });
 
           expectToEqual(result.pagination, {
@@ -778,6 +844,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
             filters: {
+              ...defaultFilters,
               appellationCodes: [
                 cuvisteOffer.appellationCode,
                 cartographeImmersionOffer.appellationCode,
@@ -885,7 +952,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { nafCodes: [] },
+            filters: { ...defaultFilters, nafCodes: [] },
           });
           const nafLabelByNafCode: Record<NafCode, string> = {
             "0145Z": "Élevage d'ovins et de caprins",
@@ -918,7 +985,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { nafCodes: ["0145Z"] },
+            filters: { ...defaultFilters, nafCodes: ["0145Z"] },
           });
 
           const expectedEstablishments = [
@@ -948,7 +1015,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { nafCodes: ["0145Z", "4741Z"] },
+            filters: { ...defaultFilters, nafCodes: ["0145Z", "4741Z"] },
           });
           const expectedEstablishments = [
             establishment0145Z_A,
@@ -1063,7 +1130,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { remoteWorkModes: [] },
+            filters: { ...defaultFilters, remoteWorkModes: [] },
           });
 
           expectToEqual(result.pagination, {
@@ -1078,7 +1145,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { remoteWorkModes: ["ON_SITE"] },
+            filters: { ...defaultFilters, remoteWorkModes: ["ON_SITE"] },
           });
 
           expectToEqual(result.pagination, {
@@ -1103,7 +1170,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { remoteWorkModes: ["HYBRID"] },
+            filters: { ...defaultFilters, remoteWorkModes: ["HYBRID"] },
           });
 
           expectToEqual(result.pagination, {
@@ -1137,7 +1204,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { remoteWorkModes: ["FULL_REMOTE"] },
+            filters: { ...defaultFilters, remoteWorkModes: ["FULL_REMOTE"] },
           });
 
           expectToEqual(result.pagination, {
@@ -1171,7 +1238,10 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: defaultSort,
-            filters: { remoteWorkModes: ["HYBRID", "FULL_REMOTE"] },
+            filters: {
+              ...defaultFilters,
+              remoteWorkModes: ["HYBRID", "FULL_REMOTE"],
+            },
           });
 
           expectToEqual(result.pagination, {
@@ -1239,7 +1309,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 10 },
               sort: { by: "distance", direction: "asc" },
-              filters: {},
+              filters: defaultFilters,
             }),
             errors.establishment.invalidGeoParams(),
           );
@@ -1252,6 +1322,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               pagination: { page: 1, perPage: 10 },
               sort: { by: "distance", direction: "asc" },
               filters: {
+                ...defaultFilters,
                 geoParams: {
                   lat: 0,
                   lon: 0,
@@ -1270,6 +1341,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               pagination: { page: 1, perPage: 10 },
               sort: { by: "distance", direction: "asc" },
               filters: {
+                ...defaultFilters,
                 geoParams: {
                   lat: 0,
                   lon: 0,
@@ -1287,6 +1359,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               pagination: { page: 1, perPage: 10 },
               sort: { by: "distance", direction: "asc" },
               filters: {
+                ...defaultFilters,
                 geoParams: {
                   lat: 0,
                   lon: 45,
@@ -1302,6 +1375,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pagination: { page: 1, perPage: 10 },
             sort: { by: "distance", direction: "asc" },
             filters: {
+              ...defaultFilters,
               geoParams: {
                 lat: locationOfSearchPosition.position.lat,
                 lon: locationOfSearchPosition.position.lon,
@@ -1382,6 +1456,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               pagination: { page: 1, perPage: 10 },
               sort: { by: "distance", direction: "asc" },
               filters: {
+                ...defaultFilters,
                 geoParams: {
                   lat: locationOfSearchPosition.position.lat,
                   lon: locationOfSearchPosition.position.lon,
@@ -1405,6 +1480,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               pagination: { page: 1, perPage: 1 },
               sort: { by: "distance", direction: "asc" },
               filters: {
+                ...defaultFilters,
                 geoParams: {
                   lat: locationOfSearchPosition.position.lat,
                   lon: locationOfSearchPosition.position.lon,
@@ -1428,6 +1504,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               pagination: { page: 2, perPage: 1 },
               sort: { by: "distance", direction: "asc" },
               filters: {
+                ...defaultFilters,
                 geoParams: {
                   lat: locationOfSearchPosition.position.lat,
                   lon: locationOfSearchPosition.position.lon,
@@ -1451,7 +1528,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 5 },
             sort: { by: "date", direction: "desc" },
-            filters: { sirets: ["NO_SUCH_SIRET"] },
+            filters: { ...defaultFilters, sirets: ["NO_SUCH_SIRET"] },
           });
 
           expectToEqual(result, {
@@ -1493,7 +1570,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: { by: "date", direction: "asc" },
-            filters: {},
+            filters: defaultFilters,
           });
           const expectedSortedResults = [
             ...testEstablishmentAggregates.sort(
@@ -1542,7 +1619,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: { by: "date", direction: "desc" },
-            filters: {},
+            filters: defaultFilters,
           });
 
           expectToEqual(result, {
@@ -1597,7 +1674,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: { by: "score", direction: "asc" },
-            filters: {},
+            filters: defaultFilters,
           });
 
           expectToEqual(result, {
@@ -1624,7 +1701,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const result = await pgEstablishmentAggregateRepository.getOffers({
             pagination: { page: 1, perPage: 10 },
             sort: { by: "score", direction: "desc" },
-            filters: {},
+            filters: defaultFilters,
           });
           expectToEqual(result, {
             pagination: {
@@ -1674,31 +1751,32 @@ describe("PgEstablishmentAggregateRepository", () => {
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 10 },
               sort: { by: "date", direction: "desc" },
-              filters: {},
+              filters: defaultFilters,
             });
           const resultsByDateAsc =
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 10 },
               sort: { by: "date", direction: "asc" },
-              filters: {},
+              filters: defaultFilters,
             });
           const resultsByScoreDesc =
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 10 },
               sort: { by: "score", direction: "desc" },
-              filters: {},
+              filters: defaultFilters,
             });
           const resultsByScoreAsc =
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 10 },
               sort: { by: "score", direction: "asc" },
-              filters: {},
+              filters: defaultFilters,
             });
           const resultsByDistanceDesc =
             await pgEstablishmentAggregateRepository.getOffers({
               pagination: { page: 1, perPage: 10 },
               sort: { by: "distance", direction: "desc" },
               filters: {
+                ...defaultFilters,
                 geoParams,
               },
             });
@@ -1707,6 +1785,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               pagination: { page: 1, perPage: 10 },
               sort: { by: "distance", direction: "asc" },
               filters: {
+                ...defaultFilters,
                 geoParams,
               },
             });
@@ -1744,6 +1823,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             pagination: { page: 1, perPage: 10 },
             sort: { by: "distance", direction: "asc" },
             filters: {
+              ...defaultFilters,
               appellationCodes: [
                 cuvisteOffer.appellationCode,
                 artisteCirqueOffer.appellationCode,
@@ -1907,7 +1987,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .execute();
           await kyselyDb.deleteFrom("establishments").execute();
 
-          const INDEX_OF_UNSEARCHABLE_ESTABLISHMENT = 2;
+          const INDEX_OF_NOT_AVAILABLE_ESTABLISHMENT = 2;
           const INDEX_OF_CURRENTLY_UNAVAILABLE_ESTABLISHMENT = 3;
           const establishmentAggregatesByDateAndScoreDescending: EstablishmentAggregate[] =
             arrayFromNumber(10).map((i) => ({
@@ -1917,7 +1997,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 siret: `9999999999999${i}`,
                 updatedAt: addDays(new Date(), -i),
                 isMaxDiscussionsForPeriodReached:
-                  i === INDEX_OF_UNSEARCHABLE_ESTABLISHMENT,
+                  i === INDEX_OF_NOT_AVAILABLE_ESTABLISHMENT,
                 score: 10 - i,
                 nextAvailabilityDate:
                   i === INDEX_OF_CURRENTLY_UNAVAILABLE_ESTABLISHMENT
@@ -1931,6 +2011,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ],
               },
             }));
+
           const displayedResults = [0, 1, 4, 5, 6];
 
           const expectedResults = displayedResults.map((i) =>
@@ -2464,6 +2545,48 @@ describe("PgEstablishmentAggregateRepository", () => {
               ].sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
             );
           });
+        });
+      });
+
+      describe("only available offers", () => {
+        it("doesn't show unavailable establishement (legacy behavior)", async () => {
+          const establishmentsTestSet = [
+            searchableByAllEstablishment,
+            searchableByJobSeekerEstablishment,
+            unavailableEstablishment,
+          ];
+          await Promise.all(
+            establishmentsTestSet.map((establishmentAgg) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAgg,
+              ),
+            ),
+          );
+          const results =
+            await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
+              {
+                searchMade: {},
+              },
+            );
+          expectToEqual(results, [
+            makeExpectedSearchResult({
+              establishment: searchableByAllEstablishment,
+              withOffers: searchableByAllEstablishment.offers,
+              withLocationAndDistance: {
+                ...searchableByAllEstablishment.establishment.locations[0],
+              },
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+            makeExpectedSearchResult({
+              establishment: searchableByJobSeekerEstablishment,
+              withOffers: searchableByJobSeekerEstablishment.offers,
+              withLocationAndDistance: {
+                ...searchableByJobSeekerEstablishment.establishment
+                  .locations[0],
+              },
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+          ]);
         });
       });
 
@@ -3390,6 +3513,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentWithOfferA1101_AtPosition.establishment.updatedAt.toISOString(),
             remoteWorkMode:
               establishmentWithOfferA1101_AtPosition.offers[0].remoteWorkMode,
+            isAvailable: true,
           },
         );
       });

@@ -173,6 +173,11 @@ export class InMemoryEstablishmentAggregateRepository
     const allOffers = this.establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
       .filter((aggregate) =>
+        filters.showOnlyAvailableOffers
+          ? aggregate.establishment.isMaxDiscussionsForPeriodReached === false
+          : true,
+      )
+      .filter((aggregate) =>
         filters.sirets?.length
           ? filters.sirets.includes(aggregate.establishment.siret)
           : true,
@@ -417,6 +422,8 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
     createdAt: establishmentAgg.establishment.createdAt.toISOString(),
     fitForDisabledWorkers: "no",
     remoteWorkMode: remoteWorkMode,
+    isAvailable:
+      !establishmentAgg.establishment.isMaxDiscussionsForPeriodReached,
   };
 };
 
@@ -466,4 +473,6 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = ({
   createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
   fitForDisabledWorkers: "no",
   remoteWorkMode: remoteWorkMode,
+  isAvailable:
+    !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached,
 });

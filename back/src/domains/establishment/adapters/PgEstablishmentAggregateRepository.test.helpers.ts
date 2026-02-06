@@ -73,6 +73,8 @@ export const makeExpectedSearchResult = ({
     updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
     createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
     remoteWorkMode: remoteWorkMode ?? firstOffer.remoteWorkMode,
+    isAvailable:
+      !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached,
   } as RepositorySearchResultDto; // d'où le as
 };
 
@@ -431,6 +433,16 @@ export const closedEstablishment = new EstablishmentAggregateBuilder()
     },
   ])
   .withEstablishmentOpen(false)
+  .withUserRights([osefUserRight])
+  .build();
+
+export const unavailableEstablishment = new EstablishmentAggregateBuilder()
+  .withEstablishmentSiret("00000000000027")
+  .withIsMaxDiscussionsForPeriodReached(true)
+  .withOffers([cartographeImmersionOffer])
+  .withLocations([
+    new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
+  ])
   .withUserRights([osefUserRight])
   .build();
 

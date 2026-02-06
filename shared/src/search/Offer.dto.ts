@@ -37,11 +37,16 @@ type CommonOfferDto = {
   createdAt?: DateTimeIsoString;
 };
 
+export type WithIsAvailable = {
+  isAvailable: boolean;
+};
+
 export type ExternalOfferDto = CommonOfferDto;
 
-export type InternalOfferDto = CommonOfferDto & {
-  remoteWorkMode: RemoteWorkMode;
-};
+export type InternalOfferDto = CommonOfferDto &
+  WithIsAvailable & {
+    remoteWorkMode: RemoteWorkMode;
+  };
 
 export type OfferDto = InternalOfferDto | ExternalOfferDto;
 

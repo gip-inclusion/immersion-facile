@@ -87,6 +87,7 @@ type GetOffersFlatParamsCommon = WithAcquisition & {
   nafCodes?: NafCode[];
   searchableBy?: EstablishmentSearchableByValue;
   sirets?: SiretDto[];
+  showOnlyAvailableOffers?: boolean;
 } & Partial<WithAppellationCodes> &
   Partial<WithRemoteWorkModes>;
 

@@ -106,7 +106,7 @@ export class PgEstablishmentAggregateRepository
       .insertInto("immersion_offers")
       .values(
         offersWithSiret.map((offerWithSiret) => ({
-          appellation_code: Number.parseInt(offerWithSiret.appellationCode),
+          appellation_code: Number.parseInt(offerWithSiret.appellationCode, 10),
           remote_work_mode: offerWithSiret.remoteWorkMode,
           siret: offerWithSiret.siret,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
@@ -390,6 +390,7 @@ export class PgEstablishmentAggregateRepository
           : await this.#getRomeCodeFromAppellationCodes(
               searchMade.appellationCodes,
             ),
+        showOnlyAvailableOffers: true,
       },
       sort: searchMade.sortedBy
         ? { by: searchMade.sortedBy, direction: "desc" }
@@ -413,6 +414,7 @@ export class PgEstablishmentAggregateRepository
         sirets: [siret],
         appellationCodes: [appellationCode],
         locationIds: [locationId],
+        showOnlyAvailableOffers: false,
       },
       shouldCountAll: false,
     });
@@ -670,7 +672,7 @@ export class PgEstablishmentAggregateRepository
         "ogr_appellation",
         "in",
         appellationCodes.map((appellationCode) =>
-          Number.parseInt(appellationCode),
+          Number.parseInt(appellationCode, 10),
         ),
       )
       .execute();
@@ -874,6 +876,7 @@ type SearchImmersionFilters = {
   sirets?: SiretDto[];
   appellationCodes?: AppellationCode[];
   locationIds?: LocationId[];
+  showOnlyAvailableOffers: boolean;
 };
 
 type SearchImmersionResultsParams = {
@@ -897,6 +900,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
     romeCodes,
     searchableBy,
     sirets,
+    showOnlyAvailableOffers,
   } = filters;
 
   return (qb: QueryCreator<Database>) =>
@@ -908,13 +912,21 @@ const makeGetFilteredResultsSubQueryBuilder = ({
               .selectFrom("establishments")
               .select(["siret", "score", "update_date"])
               .where("is_open", "=", true)
-              .where("is_max_discussions_for_period_reached", "is", false)
+
               .where((eb) =>
                 eb.or([
                   eb("next_availability_date", "<=", new Date()),
                   eb("next_availability_date", "is", null),
                 ]),
               ),
+            (qb) =>
+              showOnlyAvailableOffers === true
+                ? qb.whereRef(
+                    "establishments.is_max_discussions_for_period_reached",
+                    "is",
+                    sql`FALSE`,
+                  )
+                : qb,
             (qb) =>
               nafCodes?.length
                 ? qb.where("establishments.naf_code", "in", nafCodes)
@@ -1036,7 +1048,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                   ? eb.where(
                       "immersion_offers.appellation_code",
                       "in",
-                      appellationCodes.map((code) => Number.parseInt(code)),
+                      appellationCodes.map((code) => Number.parseInt(code, 10)),
                     )
                   : eb,
               (eb) =>
@@ -1138,9 +1150,9 @@ const searchImmersionResultsQuery = async (
           naf: ref("e.naf_code"),
           siret: ref("e.siret"),
           establishmentScore: ref("r.score"),
-          isSearchable: sql`NOT ${ref(
+          isMaxDiscussionsForPeriodReached: ref(
             "e.is_max_discussions_for_period_reached",
-          )}`,
+          ),
           nextAvailabilityDate: ref("e.next_availability_date"),
           name: ref("e.name"),
           website: ref("e.website"),
@@ -1206,7 +1218,7 @@ const searchImmersionResultsQuery = async (
         remoteWorkMode: result.remoteWorkMode,
         siret: result.siret,
         voluntaryToImmersion: Boolean(result.voluntaryToImmersion),
-        isSearchable: Boolean(result.isSearchable),
+        isSearchable: !result.isMaxDiscussionsForPeriodReached,
         customizedName: result.customizedName,
         distance_m: result.distance_m,
         fitForDisabledWorkers: result.fitForDisabledWorkers,
@@ -1216,6 +1228,7 @@ const searchImmersionResultsQuery = async (
         numberOfEmployeeRange: result.numberOfEmployeeRange,
         updatedAt: result.updatedAt,
         website: result.website,
+        isAvailable: !result.isMaxDiscussionsForPeriodReached,
       };
     }),
   };

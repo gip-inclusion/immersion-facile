@@ -10,7 +10,6 @@ import {
   type NafCode,
   type RomeDto,
 } from "shared";
-import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -131,8 +130,6 @@ describe("LegacySearchImmersionUseCase", () => {
   let uuidGenerator: TestUuidGenerator;
   let legacySearchImmersionUseCase: LegacySearchImmersion;
   let laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
-  let timeGateway: CustomTimeGateway;
-  const now = new Date("2024-04-10");
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -147,12 +144,10 @@ describe("LegacySearchImmersionUseCase", () => {
         romeLabel: boulangerOffer.romeLabel,
       },
     ];
-    timeGateway = new CustomTimeGateway(now);
     legacySearchImmersionUseCase = new LegacySearchImmersion(
       new InMemoryUowPerformer(uow),
       laBonneBoiteGateway,
       uuidGenerator,
-      timeGateway,
     );
     uuidGenerator.setNextUuid("searchMadeUuid");
   });

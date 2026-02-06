@@ -12,6 +12,7 @@ import {
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import type { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { unavailableEstablishment } from "../../../../domains/establishment/adapters/PgEstablishmentAggregateRepository.test.helpers";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -137,6 +138,70 @@ describe("GET /v3/offers", () => {
       authorizedUnJeuneUneSolutionApiConsumer.name,
     );
   });
+
+  it("returns only available offers as default behavior", async () => {
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      ...inMemoryUow.establishmentAggregateRepository.establishmentAggregates,
+      unavailableEstablishment,
+    ];
+    const response = await sharedRequest.getOffers({
+      headers: { authorization: authToken },
+      queryParams: {
+        sortBy: "date",
+      },
+    });
+    expectHttpResponseToEqual(response, {
+      status: 200,
+      body: {
+        data: [
+          {
+            additionalInformation: "",
+            address: {
+              city: "Paris",
+              departmentCode: "75",
+              postcode: "75017",
+              streetNumberAndAddress: "30 avenue des champs Elysées",
+            },
+            appellations: [
+              {
+                appellationCode: "19540",
+                appellationLabel: "Styliste",
+              },
+            ],
+            contactMode: "EMAIL",
+            createdAt: "2024-08-08T00:00:00.000Z",
+            establishmentScore: 15,
+            fitForDisabledWorkers: "no",
+            isAvailable: true,
+            locationId: "11111111-1111-4444-1111-111111111111",
+            naf: "7820Z",
+            nafLabel: "NAFRev2",
+            name: "Company inside repository",
+            numberOfEmployeeRange: "10-19",
+            position: {
+              lat: 43.8666,
+              lon: 8.3333,
+            },
+            remoteWorkMode: "ON_SITE",
+            rome: "B1805",
+            romeLabel: "test_rome_label",
+            siret: "78000403200019",
+            updatedAt: "2024-08-10T00:00:00.000Z",
+            voluntaryToImmersion: true,
+            website: "",
+          },
+        ],
+        pagination: {
+          currentPage: 1,
+          numberPerPage: 100,
+          totalPages: 1,
+          totalRecords: 1,
+        },
+      },
+    });
+  });
+
+  it.skip("stores showOnlyAvailableOffers in search made", () => {});
 
   it("stores geo params when provided", async () => {
     const response = await sharedRequest.getOffers({

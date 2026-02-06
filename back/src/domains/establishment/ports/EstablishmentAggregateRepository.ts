@@ -46,6 +46,7 @@ type GetOffersFilters = {
   remoteWorkModes?: RemoteWorkMode[];
   searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
   sirets?: SiretDto[];
+  showOnlyAvailableOffers: boolean;
 };
 
 export type GetOffersParams = WithRequiredPagination &
