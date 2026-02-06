@@ -4,7 +4,7 @@ import {
   loginByEmailLinkDurationInMinutes,
 } from "shared";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
-import { closeAgencyAndTransfertConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransfertConventions.slice";
+import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
@@ -85,7 +85,7 @@ const topics = [
   "send-signature-link",
   "send-assessment-link",
   "siret-input",
-  "close-agency-and-transfert-conventions",
+  "close-agency-and-transfer-conventions",
   "transfer-convention-to-agency",
   "unused",
   "user",
@@ -493,19 +493,19 @@ export const feedbacks: Record<
       message: "Une erreur est survenue lors de la suppression du bilan",
     },
   },
-  "close-agency-and-transfert-conventions": {
+  "close-agency-and-transfer-conventions": {
     "update.success": {
       action:
-        closeAgencyAndTransfertConventionsSlice.actions
-          .closeAgencyAndTransfertConventionsSucceeded,
+        closeAgencyAndTransferConventionsSlice.actions
+          .closeAgencyAndTransferConventionsSucceeded,
       title: "Transfert des conventions effectué",
       message:
         "L'agence a été fermée et les conventions ont été transférées vers la nouvelle agence.",
     },
     "update.error": {
       action:
-        closeAgencyAndTransfertConventionsSlice.actions
-          .closeAgencyAndTransfertConventionsFailed,
+        closeAgencyAndTransferConventionsSlice.actions
+          .closeAgencyAndTransferConventionsFailed,
       title: "Problème lors du transfert des conventions",
       message:
         "Une erreur est survenue lors de la fermeture de l'agence et du transfert des conventions.",

@@ -97,7 +97,7 @@ export type WithAgencyId = {
   agencyId: AgencyId;
 };
 
-export type CloseAgencyAndTransfertConventionsRequestDto = {
+export type CloseAgencyAndTransferConventionsRequestDto = {
   agencyToCloseId: AgencyId;
   agencyToTransferConventionsToId: AgencyId;
 };

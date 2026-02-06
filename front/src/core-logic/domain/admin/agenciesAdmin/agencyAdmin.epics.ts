@@ -8,14 +8,14 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { closeAgencyAndTransfertConventionsSlice } from "../../agencies/close-agency-and-transfert-conventions/closeAgencyAndTransfertConventions.slice";
+import { closeAgencyAndTransferConventionsSlice } from "../../agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import type { ConnectedUsersAdminAction } from "../connectedUsersAdmin/connectedUsersAdmin.epics";
 import { connectedUsersAdminSlice } from "../connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agencyAdminSlice } from "./agencyAdmin.slice";
 
 export type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
 type CloseAgencyAndTransfertConventionsAction = ActionOfSlice<
-  typeof closeAgencyAndTransfertConventionsSlice
+  typeof closeAgencyAndTransferConventionsSlice
 >;
 
 type AgencyEpic = AppEpic<AgencyAction | { type: "do-nothing" }>;
@@ -176,7 +176,7 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
         connectedUsersAdminSlice.actions.createUserOnAgencySucceeded.match(
           action,
         ) ||
-        closeAgencyAndTransfertConventionsSlice.actions.closeAgencyAndTransfertConventionsSucceeded.match(
+        closeAgencyAndTransferConventionsSlice.actions.closeAgencyAndTransferConventionsSucceeded.match(
           action,
         ),
     ),

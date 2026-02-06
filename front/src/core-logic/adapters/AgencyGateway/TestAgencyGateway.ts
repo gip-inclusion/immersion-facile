@@ -4,7 +4,7 @@ import type {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
-  CloseAgencyAndTransfertConventionsRequestDto,
+  CloseAgencyAndTransferConventionsRequestDto,
   ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
@@ -117,7 +117,7 @@ export class TestAgencyGateway implements AgencyGateway {
   }
 
   public closeAgencyAndTransfertConventions$(
-    _payload: CloseAgencyAndTransfertConventionsRequestDto,
+    _payload: CloseAgencyAndTransferConventionsRequestDto,
     _adminToken: ConnectedUserJwt,
   ): Observable<void> {
     return this.closeAgencyAndTransfertConventionsResponse$;

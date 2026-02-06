@@ -2,7 +2,7 @@ import {
   activeAgencyStatuses,
   type ConnectedUser,
   type ConventionDto,
-  closeAgencyAndTransfertConventionsRequestSchema,
+  closeAgencyAndTransferConventionsRequestSchema,
   errors,
   executeInSequence,
 } from "shared";
@@ -12,18 +12,26 @@ import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export type CloseAgencyAndTransfertConventions = ReturnType<
-  typeof makeCloseAgencyAndTransfertConventions
+export type CloseAgencyAndTransferConventions = ReturnType<
+  typeof makeCloseAgencyAndTransferConventions
 >;
 
-export const makeCloseAgencyAndTransfertConventions = useCaseBuilder(
-  "CloseAgencyAndTransfertConventions",
+export const makeCloseAgencyAndTransferConventions = useCaseBuilder(
+  "CloseAgencyAndTransferConventions",
 )
-  .withInput(closeAgencyAndTransfertConventionsRequestSchema)
+  .withInput(closeAgencyAndTransferConventionsRequestSchema)
   .withCurrentUser<ConnectedUser>()
   .withDeps<{ createNewEvent: CreateNewEvent }>()
   .build(async ({ uow, deps, inputParams, currentUser }) => {
     throwIfNotAdmin(currentUser);
+
+    if (
+      inputParams.agencyToCloseId ===
+      inputParams.agencyToTransferConventionsToId
+    )
+      throw errors.agency.sourceAndTargetAgencyMustBeDifferent({
+        agencyId: inputParams.agencyToCloseId,
+      });
 
     await throwErrorIfAgencyNotFound({
       agencyId: inputParams.agencyToCloseId,
@@ -51,7 +59,7 @@ export const makeCloseAgencyAndTransfertConventions = useCaseBuilder(
     };
 
     const conventionsToTransfer = await uow.conventionQueries.getConventions({
-      filters: { agencyId: inputParams.agencyToCloseId },
+      filters: { agencyIds: [inputParams.agencyToCloseId] },
       sortBy: "dateStart",
     });
 

@@ -5,7 +5,7 @@ import type {
   AgencyOption,
   AgencyPublicDisplayDto,
   AgencyRoutes,
-  CloseAgencyAndTransfertConventionsRequestDto,
+  CloseAgencyAndTransferConventionsRequestDto,
   ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
@@ -257,7 +257,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public closeAgencyAndTransfertConventions$(
-    payload: CloseAgencyAndTransfertConventionsRequestDto,
+    payload: CloseAgencyAndTransferConventionsRequestDto,
     adminToken: ConnectedUserJwt,
   ): Observable<void> {
     return from(

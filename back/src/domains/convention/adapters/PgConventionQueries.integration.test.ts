@@ -401,10 +401,9 @@ describe("Pg implementation of ConventionQueries", () => {
 
     it.each([
       {
-        testName:
-          "with filter agencyId returns only conventions for that agency",
+        testName: "with filter agencyIds",
         params: {
-          filters: { agencyId: otherAgency.id },
+          filters: { agencyIds: [otherAgency.id] },
           sortBy: "dateStart",
         },
         expectedConventions: [secondValidatedConvention],

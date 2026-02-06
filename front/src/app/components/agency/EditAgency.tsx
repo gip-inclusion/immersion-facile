@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
-import { CloseAgencyAndTransfertConventions } from "src/app/components/agency/CloseAgencyAndTransfertConventions";
+import { CloseAgencyAndTransferConventions } from "src/app/components/agency/CloseAgencyAndTransferConventions";
 import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
@@ -53,7 +53,7 @@ export const EditAgency = () => {
             <CopyAgencyId agencyId={agency.id} />
             {isBackOfficeadmin && (
               <div className={fr.cx("fr-ml-auto")}>
-                <CloseAgencyAndTransfertConventions agency={agency} />
+                <CloseAgencyAndTransferConventions agency={agency} />
               </div>
             )}
           </div>

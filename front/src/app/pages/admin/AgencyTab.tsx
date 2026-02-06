@@ -24,7 +24,7 @@ export const AgencyTab = () => {
       />
       <Feedback
         className="fr-mb-2w"
-        topics={["close-agency-and-transfert-conventions"]}
+        topics={["close-agency-and-transfer-conventions"]}
         closable
       />
       <EditAgency />

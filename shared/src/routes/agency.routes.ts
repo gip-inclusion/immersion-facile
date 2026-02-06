@@ -5,7 +5,7 @@ import {
   agencyIdsSchema,
   agencyOptionsSchema,
   agencySchema,
-  closeAgencyAndTransfertConventionsRequestSchema,
+  closeAgencyAndTransferConventionsRequestSchema,
   createAgencySchema,
   listAgencyOptionsRequestSchema,
   updateAgencyStatusParamsWithoutIdSchema,
@@ -105,7 +105,7 @@ export const agencyRoutes = defineRoutes({
   closeAgencyAndTransfertConventions: defineRoute({
     method: "post",
     url: "/admin/agencies/close-and-transfer-conventions",
-    requestBodySchema: closeAgencyAndTransfertConventionsRequestSchema,
+    requestBodySchema: closeAgencyAndTransferConventionsRequestSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

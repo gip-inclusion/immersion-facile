@@ -17,8 +17,8 @@ import { listUsersEpics } from "src/core-logic/domain/admin/listUsers/listUsers.
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsEpics } from "src/core-logic/domain/admin/notifications/notifications.epics";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
-import { closeAgencyAndTransfertConventionsEpics } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransfertConventions.epics";
-import { closeAgencyAndTransfertConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransfertConventions.slice";
+import { closeAgencyAndTransfertConventionsEpics } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.epics";
+import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import { createUserOnAgencyEpics } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.epics";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencyEpics } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.epics";
@@ -141,8 +141,8 @@ const appReducer = combineReducers({
     [fetchUserSlice.name]: fetchUserSlice.reducer,
   }),
   agency: combineReducers({
-    [closeAgencyAndTransfertConventionsSlice.name]:
-      closeAgencyAndTransfertConventionsSlice.reducer,
+    [closeAgencyAndTransferConventionsSlice.name]:
+      closeAgencyAndTransferConventionsSlice.reducer,
     [updateUserOnAgencySlice.name]: updateUserOnAgencySlice.reducer,
     [fetchAgencySlice.name]: fetchAgencySlice.reducer,
     [updateAgencySlice.name]: updateAgencySlice.reducer,

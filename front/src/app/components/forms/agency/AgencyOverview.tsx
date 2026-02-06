@@ -5,7 +5,7 @@ import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { agencyAdminSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
-import { CloseAgencyAndTransfertConventions } from "src/app/components/agency/CloseAgencyAndTransfertConventions";
+import { CloseAgencyAndTransferConventions } from "src/app/components/agency/CloseAgencyAndTransferConventions";
 import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { EditAgencyForm } from "src/app/components/forms/agency/EditAgencyForm";
@@ -45,27 +45,27 @@ export const AgencyOverview = ({
     <div>
       <h1 className={fr.cx("fr-h1")}>{agency.name}</h1>
       {/* //Todo remove after feedback refactor */}
-      {routeName === "adminAgencies" || routeName === "adminAgencyDetail" ? (
-        <>
+      {routeName === "adminAgencies" ||
+        (routeName === "adminAgencyDetail" && (
           <SubmitFeedbackNotification
             submitFeedback={feedback}
             messageByKind={agencyAdminSubmitMessageByKind}
           />
-          <Feedback
-            topics={["close-agency-and-transfert-conventions"]}
-            closable
-            className="fr-mb-2w"
-          />
-        </>
-      ) : (
-        <Feedback topics={["agency-for-dashboard"]} closable />
-      )}
+        ))}
+      <Feedback
+        topics={[
+          "agency-for-dashboard",
+          "close-agency-and-transfer-conventions",
+        ]}
+        className="fr-mb-2w"
+        closable
+      />
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
         <CopyAgencyId agencyId={agency.id} />
         {(routeName === "adminAgencies" || routeName === "adminAgencyDetail") &&
           isBackOfficeadmin && (
             <div className={fr.cx("fr-ml-auto")}>
-              <CloseAgencyAndTransfertConventions agency={agency} />
+              <CloseAgencyAndTransferConventions agency={agency} />
             </div>
           )}
       </div>

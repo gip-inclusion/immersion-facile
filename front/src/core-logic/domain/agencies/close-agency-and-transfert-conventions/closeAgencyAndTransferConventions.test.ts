@@ -2,7 +2,7 @@ import { expectToEqual } from "shared";
 import type { TestAgencyGateway } from "src/core-logic/adapters/AgencyGateway/TestAgencyGateway";
 
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
-import { closeAgencyAndTransfertConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransfertConventions.slice";
+import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
@@ -11,7 +11,7 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
-describe("closeAgencyAndTransfertConventions", () => {
+describe("closeAgencyAndTransferConventions", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
   let agencyGateway: TestAgencyGateway;
@@ -25,24 +25,24 @@ describe("closeAgencyAndTransfertConventions", () => {
 
   it("success ", () => {
     store.dispatch(
-      closeAgencyAndTransfertConventionsSlice.actions.closeAgencyAndTransfertConventionsRequested(
+      closeAgencyAndTransferConventionsSlice.actions.closeAgencyAndTransferConventionsRequested(
         {
           agencyToCloseId: "agency-to-close-id",
           agencyToTransferConventionsToId: "agency-target-id",
-          feedbackTopic: "close-agency-and-transfert-conventions",
+          feedbackTopic: "close-agency-and-transfer-conventions",
         },
       ),
     );
     agencyGateway.closeAgencyAndTransfertConventionsResponse$.next(undefined);
 
     expectToEqual(
-      store.getState().agency.closeAgencyAndTransfertConventions.isLoading,
+      store.getState().agency.closeAgencyAndTransferConventions.isLoading,
       false,
     );
 
     expectToEqual(
       feedbacksSelectors.feedbacks(store.getState())[
-        "close-agency-and-transfert-conventions"
+        "close-agency-and-transfer-conventions"
       ],
       {
         level: "success",
@@ -56,17 +56,17 @@ describe("closeAgencyAndTransfertConventions", () => {
 
   it("error on backend", () => {
     store.dispatch(
-      closeAgencyAndTransfertConventionsSlice.actions.closeAgencyAndTransfertConventionsRequested(
+      closeAgencyAndTransferConventionsSlice.actions.closeAgencyAndTransferConventionsRequested(
         {
           agencyToCloseId: "agency-to-close-id",
           agencyToTransferConventionsToId: "agency-target-id",
-          feedbackTopic: "close-agency-and-transfert-conventions",
+          feedbackTopic: "close-agency-and-transfer-conventions",
         },
       ),
     );
 
     expectToEqual(
-      store.getState().agency.closeAgencyAndTransfertConventions.isLoading,
+      store.getState().agency.closeAgencyAndTransferConventions.isLoading,
       true,
     );
 
@@ -75,12 +75,12 @@ describe("closeAgencyAndTransfertConventions", () => {
     );
 
     expectToEqual(
-      store.getState().agency.closeAgencyAndTransfertConventions.isLoading,
+      store.getState().agency.closeAgencyAndTransferConventions.isLoading,
       false,
     );
 
     expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-      "close-agency-and-transfert-conventions": {
+      "close-agency-and-transfer-conventions": {
         title: "Problème lors du transfert des conventions",
         level: "error",
         on: "update",
