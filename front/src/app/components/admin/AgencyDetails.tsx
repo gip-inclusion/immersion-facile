@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { type AgencyDto, type AgencyStatus, keys } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
+import { agencyNeedingReviewSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.selectors";
 import { TextCell } from "./TextCell";
 
 type AgencyField = keyof AgencyDto;
@@ -38,7 +38,7 @@ const formatAgencyStatus = (status: AgencyStatus) => {
 
 export const AgencyDetails = () => {
   const agency: AgencyDto | null = useAppSelector(
-    agencyAdminSelectors.agencyNeedingReview,
+    agencyNeedingReviewSelectors.agencyNeedingReview,
   );
   if (!agency) return null;
   const buildContent = (field: AgencyField): ReactNode => {

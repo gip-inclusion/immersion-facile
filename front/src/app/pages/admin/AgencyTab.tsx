@@ -15,7 +15,10 @@ export const AgencyTab = () => {
   const { url, error } = useAdminDashboard({ name: "adminAgencies" });
   return (
     <>
-      <Feedback topics={["agency-admin", "agency-admin-needing-review"]} />
+      <Feedback
+        topics={["agency-admin", "agency-admin-needing-review"]}
+        closable
+      />
       <EditAgency />
 
       {agency && <AgencyDashboard agency={agency} />}
