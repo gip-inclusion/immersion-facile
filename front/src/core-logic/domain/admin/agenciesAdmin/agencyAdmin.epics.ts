@@ -3,6 +3,7 @@ import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { type AgencyId, allAgencyStatuses, looksLikeSiret } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -62,40 +63,6 @@ const fetchAgencyNeedingReviewEpic: AgencyEpic = (
     ),
   );
 
-const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
-  action$,
-  state$,
-  dependencies,
-) =>
-  action$.pipe(
-    filter(agencyAdminSlice.actions.fetchAgencyRequested.match),
-    switchMap((action: PayloadAction<AgencyId>) =>
-      dependencies.agencyGateway.getAgencyById$(
-        action.payload,
-        getAdminToken(state$.value),
-      ),
-    ),
-    map((agency) => agencyAdminSlice.actions.fetchAgencySucceeded(agency)),
-    catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.fetchAgencyFailed(error.message),
-    ),
-  );
-
-const updateAgencyEpic: AgencyEpic = (action$, state$, { agencyGateway }) =>
-  action$.pipe(
-    filter(agencyAdminSlice.actions.updateAgencyRequested.match),
-    switchMap(({ payload }) =>
-      agencyGateway
-        .updateAgency$(payload, getAdminToken(state$.value))
-        .pipe(
-          map(() => agencyAdminSlice.actions.updateAgencySucceeded(payload)),
-        ),
-    ),
-    catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.updateAgencyFailed(error.message),
-    ),
-  );
-
 const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
   action$,
   state$,
@@ -145,15 +112,16 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
         ),
     ),
     map((action) =>
-      agencyAdminSlice.actions.fetchAgencyRequested(action.payload.agencyId),
+      fetchAgencySlice.actions.fetchAgencyRequested({
+        agencyId: action.payload.agencyId,
+        feedbackTopic: "agency-admin",
+      }),
     ),
   );
 
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
-  agencyAdminGetDetailsForUpdateEpic,
   fetchAgencyNeedingReviewEpic,
-  updateAgencyEpic,
   updateAgencyNeedingReviewStatusEpic,
   fetchAgencyOnIcUserUpdatedEpic,
 ];

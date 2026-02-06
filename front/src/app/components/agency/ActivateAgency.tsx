@@ -66,7 +66,7 @@ export const ActivateAgency = () => {
         updateAgencyStatusParams,
       ),
     );
-    dispatch(agencyAdminSlice.actions.clearAgencyRequested());
+    dispatch(agencyAdminSlice.actions.clearAgencyNeedingReview());
     reset();
   };
 

@@ -40,6 +40,7 @@ type FeedbackWithActionName = {
 };
 
 const topics = [
+  "agency-admin",
   "agency-for-dashboard",
   "agency-user-for-dashboard",
   "agency-user",
@@ -363,6 +364,25 @@ export const feedbacks: Record<
         "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
       message:
         "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur.",
+    },
+  },
+  "agency-admin": {
+    "fetch.error": {
+      action: fetchAgencySlice.actions.fetchAgencyFailed,
+      title:
+        "Problème rencontré lors de la récupération des données de l'agence",
+      message:
+        "Une erreur est survenue lors de la récupération des données de cette agence",
+    },
+    "update.success": {
+      action: updateAgencySlice.actions.updateAgencySucceeded,
+      title: "L'agence a été mis à jour",
+      message: "Les données de l'agence ont été mises à jour.",
+    },
+    "update.error": {
+      action: updateAgencySlice.actions.updateAgencyFailed,
+      title: "Problème lors de la mise à jour de l'agence",
+      message: "Une erreur est survenue lors de la mise à jour de l'agence",
     },
   },
   "agency-for-dashboard": {

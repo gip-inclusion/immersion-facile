@@ -17,6 +17,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { useStyles } from "tss-react/dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
@@ -26,15 +28,19 @@ export const useAgencyAdminAutocomplete = () => {
     updateSearchTerm: (searchTerm: string) =>
       dispatch(agencyAdminSlice.actions.setAgencySearchQuery(searchTerm)),
     selectOption: (agencyId: AgencyId) => {
-      dispatch(agencyAdminSlice.actions.fetchAgencyRequested(agencyId));
+      dispatch(
+        fetchAgencySlice.actions.fetchAgencyRequested({
+          agencyId,
+          feedbackTopic: "agency-admin",
+        }),
+      );
       dispatch(
         connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
           agencyId,
         }),
       );
     },
-    clearOption: () =>
-      dispatch(agencyAdminSlice.actions.clearAgencyRequested()),
+    clearOption: () => dispatch(fetchAgencySlice.actions.clearAgencyAndUsers()),
   };
 };
 
@@ -57,8 +63,8 @@ export const AgencyAdminAutocomplete = ({
     agencySearchQuery: agencySearchText,
     isSearching,
     agencyOptions,
-    agency: selectedAgency,
   } = useAppSelector(agencyAdminSelectors.agencyState);
+  const selectedAgency = useAppSelector(fetchAgencySelectors.agency);
   const { updateSearchTerm, selectOption, clearOption } =
     useAgencyAdminAutocomplete();
   const [inputValue, setInputValue] = useState(agencySearchText);

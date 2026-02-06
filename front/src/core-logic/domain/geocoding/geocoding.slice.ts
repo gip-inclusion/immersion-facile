@@ -6,7 +6,7 @@ import {
   type LookupAddress,
   type SupportedCountryCode,
 } from "shared";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import {
   type AutocompleteItem,
   type AutocompleteState,
@@ -236,7 +236,7 @@ export const geocodingSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(
-      agencyAdminSlice.actions.fetchAgencySucceeded,
+      fetchAgencySlice.actions.fetchAgencySucceeded,
       (state, action) => {
         if (!action.payload) return;
         state.data["agency-address"] = {
