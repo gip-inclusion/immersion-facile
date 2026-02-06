@@ -1,9 +1,10 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { type AgencyId, allAgencyStatuses, looksLikeSiret } from "shared";
+import { allAgencyStatuses, looksLikeSiret, type WithAgencyId } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -47,9 +48,9 @@ const fetchAgencyNeedingReviewEpic: AgencyEpic = (
 ) =>
   action$.pipe(
     filter(agencyAdminSlice.actions.fetchAgencyNeedingReviewRequested.match),
-    switchMap((action: PayloadAction<AgencyId>) =>
+    switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
       dependencies.agencyGateway.getAgencyById$(
-        action.payload,
+        action.payload.agencyId,
         getAdminToken(state$.value),
       ),
     ),
@@ -59,7 +60,10 @@ const fetchAgencyNeedingReviewEpic: AgencyEpic = (
       ),
     ),
     catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.fetchAgencyNeedingReviewFailed(error.message),
+      agencyAdminSlice.actions.fetchAgencyNeedingReviewFailed({
+        errorMessage: error.message,
+        feedbackTopic: "agency-admin-needing-review",
+      }),
     ),
   );
 
@@ -77,16 +81,18 @@ const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
         .validateOrRejectAgency$(getAdminToken(state$.value), payload)
         .pipe(
           map(() =>
-            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded(
-              payload.id,
-            ),
+            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded({
+              agencyId: payload.id,
+              feedbackTopic: "agency-admin-needing-review",
+            }),
           ),
         ),
     ),
     catchEpicError((error: Error) =>
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusFailed(
-        error.message,
-      ),
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusFailed({
+        errorMessage: error.message,
+        feedbackTopic: "agency-admin-needing-review",
+      }),
     ),
   );
 

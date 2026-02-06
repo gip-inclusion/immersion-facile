@@ -9,5 +9,4 @@ export const agencyAdminSelectors = {
     agencyState,
     ({ agencyNeedingReview }) => agencyNeedingReview,
   ),
-  feedback: createSelector(agencyState, ({ feedback }) => feedback),
 };
