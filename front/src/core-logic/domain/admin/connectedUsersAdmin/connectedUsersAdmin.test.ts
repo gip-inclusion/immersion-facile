@@ -13,13 +13,15 @@ import {
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { connectedUsersAdminSelectors } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.selectors";
+import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
+import { fetchAgencyInitialState } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import {
   createTestStore,
   type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { feedbacksSelectors } from "../../feedback/feedback.selectors";
-import { agencyAdminSelectors } from "../agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminInitialState } from "../agenciesAdmin/agencyAdmin.slice";
 import {
   type ConnectedUsersAdminFeedback,
@@ -552,15 +554,20 @@ describe("Agency registration for authenticated users", () => {
 
       ({ store, dependencies } = createTestStore({
         admin: adminPreloadedState({
-          agencyAdmin: {
-            ...agencyAdminInitialState,
-            agency,
-          },
+          agencyAdmin: { ...agencyAdminInitialState },
           connectedUsersAdmin: {
             ...connectedUsersAdminInitialState,
             agencyUsers: testUserSet,
           },
         }),
+        agency: {
+          ...agenciesPreloadedState({
+            fetchAgency: {
+              ...fetchAgencyInitialState,
+              agency,
+            },
+          }),
+        },
       }));
 
       store.dispatch(
@@ -585,7 +592,7 @@ describe("Agency registration for authenticated users", () => {
       };
       dependencies.agencyGateway.fetchedAgency$.next(expectedAgency);
       expectToEqual(
-        agencyAdminSelectors.agency(store.getState()),
+        fetchAgencySelectors.agency(store.getState()),
         expectedAgency,
       );
     });

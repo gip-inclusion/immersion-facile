@@ -17,6 +17,14 @@ import {
   agencyAdminInitialState,
   agencyAdminSlice,
 } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
+import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
+import {
+  fetchAgencyInitialState,
+  fetchAgencySlice,
+} from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { updateAgencySelectors } from "src/core-logic/domain/agencies/update-agency/updateAgency.selectors";
+import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import {
   createTestStore,
@@ -81,7 +89,7 @@ describe("agencyAdmin", () => {
           expectAgencyAdminStateToMatch(expectedAgencyAdminState);
         });
 
-        it("sets isUpdating false and feedback on status update success", () => {
+        it("sets isUpdatingNeedingReviewStatus false and feedback on status update success", () => {
           store.dispatch(
             agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
               id: AGENCY_NEEDING_REVIEW_2.id,
@@ -102,12 +110,14 @@ describe("agencyAdmin", () => {
 
         it("editing an agency which is not needing review, should not impact the one needing review", () => {
           store.dispatch(
-            agencyAdminSlice.actions.updateAgencySucceeded(PE_AGENCY_ACTIVE),
+            updateAgencySlice.actions.updateAgencySucceeded({
+              ...PE_AGENCY_ACTIVE,
+              feedbackTopic: "agency-admin",
+            }),
           );
 
           expectAgencyAdminStateToMatch({
             agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
-            feedback: { kind: "agencyUpdated" },
           });
         });
       });
@@ -200,30 +210,36 @@ describe("agencyAdmin", () => {
         }));
 
         store.dispatch(
-          agencyAdminSlice.actions.fetchAgencyRequested(agencyDto.id),
+          fetchAgencySlice.actions.fetchAgencyRequested({
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-admin",
+          }),
         );
 
         feedWithFetchedAgency(agencyDto);
 
         expectAgencyAdminStateToMatch({
           isSearching: false,
-          agency: agencyDto,
           agencyOptions,
           agencySearchQuery: agencySearchText,
         });
+        expectToEqual(fetchAgencySelectors.agency(store.getState()), agencyDto);
       });
     });
 
     const agencyDto = new AgencyDtoBuilder().build();
 
     it("shows when update is ongoing", () => {
-      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
-      expectAgencyAdminStateToMatch({
-        isUpdating: true,
-      });
+      store.dispatch(
+        updateAgencySlice.actions.updateAgencyRequested({
+          ...agencyDto,
+          feedbackTopic: "agency-admin",
+        }),
+      );
+      expect(updateAgencySelectors.isLoading(store.getState())).toBe(true);
     });
 
-    it("reset feedback to idle when updating an agency", () => {
+    it("triggers update when updateAgencyRequested is dispatched with agency-admin topic", () => {
       ({ store, dependencies } = createTestStore({
         admin: adminPreloadedState({
           agencyAdmin: {
@@ -232,11 +248,13 @@ describe("agencyAdmin", () => {
           },
         }),
       }));
-      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
-      expectAgencyAdminStateToMatch({
-        isUpdating: true,
-        feedback: { kind: "idle" },
-      });
+      store.dispatch(
+        updateAgencySlice.actions.updateAgencyRequested({
+          ...agencyDto,
+          feedbackTopic: "agency-admin",
+        }),
+      );
+      expect(updateAgencySelectors.isLoading(store.getState())).toBe(true);
     });
 
     it("send request to update agency and shows feedback, and refetch agency users", () => {
@@ -245,14 +263,13 @@ describe("agencyAdmin", () => {
         validatorEmails: ["a@b.com", "c@d.com"],
       };
       store.dispatch(
-        agencyAdminSlice.actions.updateAgencyRequested(updatedAgency),
+        updateAgencySlice.actions.updateAgencyRequested({
+          ...updatedAgency,
+          feedbackTopic: "agency-admin",
+        }),
       );
 
       feedWithUpdateResponse();
-      expectAgencyAdminStateToMatch({
-        isUpdating: false,
-        feedback: { kind: "agencyUpdated" },
-      });
       const user = new ConnectedUserBuilder().build();
       feedWithIcUsers([user]);
       expectToEqual(
@@ -272,13 +289,15 @@ describe("agencyAdmin", () => {
       );
     });
 
-    it("when something goes wrong, shows error", () => {
-      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
+    it("when something goes wrong, update epic dispatches updateAgencyFailed", () => {
+      store.dispatch(
+        updateAgencySlice.actions.updateAgencyRequested({
+          ...agencyDto,
+          feedbackTopic: "agency-admin",
+        }),
+      );
       feedWithUpdateError("Something went wrong !");
-      expectAgencyAdminStateToMatch({
-        isUpdating: false,
-        feedback: { kind: "errored", errorMessage: "Something went wrong !" },
-      });
+      expect(updateAgencySelectors.isLoading(store.getState())).toBe(false);
     });
 
     it("clears feedback and agency on agency selection", () => {
@@ -300,21 +319,33 @@ describe("agencyAdmin", () => {
         },
       ];
       ({ store, dependencies } = createTestStore({
-        admin: adminPreloadedState({
-          agencyAdmin: {
-            ...agencyAdminInitialState,
-            feedback: { kind: "agencyUpdated" },
-            agencyOptions,
+        ...{
+          admin: adminPreloadedState({
+            agencyAdmin: {
+              ...agencyAdminInitialState,
+              feedback: { kind: "agencyUpdated" },
+              agencyOptions,
+            },
+          }),
+        },
+        agency: agenciesPreloadedState({
+          fetchAgency: {
+            ...fetchAgencyInitialState,
             agency: agencyDto1,
           },
         }),
       }));
-      store.dispatch(agencyAdminSlice.actions.fetchAgencyRequested("anything"));
+      store.dispatch(
+        fetchAgencySlice.actions.fetchAgencyRequested({
+          agencyId: "anything",
+          feedbackTopic: "agency-admin",
+        }),
+      );
       expectAgencyAdminStateToMatch({
-        feedback: { kind: "idle" },
-        agency: null,
         agencyOptions,
+        feedback: { kind: "agencyUpdated" },
       });
+      expectToEqual(fetchAgencySelectors.agency(store.getState()), null);
     });
   });
 
@@ -323,17 +354,23 @@ describe("agencyAdmin", () => {
     const agencyNeedingReviewDto = new AgencyDtoBuilder().withId("2").build();
 
     ({ store, dependencies } = createTestStore({
-      admin: adminPreloadedState({
-        agencyAdmin: {
-          ...agencyAdminInitialState,
-          agency: agencyDto,
-          agencyNeedingReview: agencyNeedingReviewDto,
-        },
-      }),
+      ...{
+        admin: adminPreloadedState({
+          agencyAdmin: {
+            ...agencyAdminInitialState,
+            agencyNeedingReview: agencyNeedingReviewDto,
+          },
+        }),
+        agency: agenciesPreloadedState({
+          fetchAgency: {
+            ...fetchAgencyInitialState,
+            agency: agencyDto,
+          },
+        }),
+      },
     }));
-    store.dispatch(agencyAdminSlice.actions.clearAgencyRequested());
+    store.dispatch(agencyAdminSlice.actions.clearAgencyNeedingReview());
     expectAgencyAdminStateToMatch({
-      agency: null,
       agencyNeedingReview: null,
     });
   });
@@ -347,11 +384,14 @@ describe("agencyAdmin", () => {
     };
     const agencyDto = new AgencyDtoBuilder().withAddress(address).build();
 
-    store.dispatch(agencyAdminSlice.actions.fetchAgencyRequested(agencyDto.id));
+    store.dispatch(
+      fetchAgencySlice.actions.fetchAgencyRequested({
+        agencyId: agencyDto.id,
+        feedbackTopic: "agency-admin",
+      }),
+    );
     feedWithFetchedAgency(agencyDto);
-    expectAgencyAdminStateToMatch({
-      agency: agencyDto,
-    });
+    expectToEqual(fetchAgencySelectors.agency(store.getState()), agencyDto);
     expectToEqual(
       makeGeocodingLocatorSelector("agency-address")(store.getState())?.value,
       {

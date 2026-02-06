@@ -39,8 +39,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { updateAgencySelectors } from "src/core-logic/domain/agencies/update-agency/updateAgency.selectors";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 
 type EditAgencyFormProperties = {
@@ -68,7 +67,7 @@ export const EditAgencyForm = ({
   routeName,
 }: EditAgencyFormProperties): JSX.Element => {
   const dispatch = useDispatch();
-  const agencyState = useAppSelector(agencyAdminSelectors.agencyState);
+  const isLoading = useAppSelector(updateAgencySelectors.isLoading);
   const { getFormErrors } = getFormContents(formAgencyFieldsLabels);
   const methods = useForm<AgencyDto>({
     resolver: zodResolver(editAgencySchema),
@@ -107,14 +106,14 @@ export const EditAgencyForm = ({
     <FormProvider {...methods}>
       <form
         onSubmit={handleSubmit((values) => {
-          isRouteAdmin
-            ? dispatch(agencyAdminSlice.actions.updateAgencyRequested(values))
-            : dispatch(
-                updateAgencySlice.actions.updateAgencyRequested({
-                  ...values,
-                  feedbackTopic: "agency-for-dashboard",
-                }),
-              );
+          dispatch(
+            updateAgencySlice.actions.updateAgencyRequested({
+              ...values,
+              feedbackTopic: isRouteAdmin
+                ? "agency-admin"
+                : "agency-for-dashboard",
+            }),
+          );
         })}
         id={
           isRouteAdmin
@@ -242,7 +241,7 @@ export const EditAgencyForm = ({
         <div className={fr.cx("fr-mt-4w")}>
           <Button
             type="submit"
-            disabled={agencyState.isUpdating}
+            disabled={isLoading}
             nativeButtonProps={{
               id: isRouteAdmin
                 ? adminAgencyIds.editAgencyFormEditSubmitButton
