@@ -2,6 +2,7 @@ import "./instrumentSentryCron";
 import { createLogger } from "../utils/logger";
 import { triggerDeactivateUnresponsiveEstablishments } from "./scheduledScripts/deactivateUnresponsiveEstablishments";
 import { triggerDeleteEmailAttachements } from "./scheduledScripts/deleteEmailAttachements";
+import { triggerDeleteOldConventionDrafts } from "./scheduledScripts/deleteOldConventionDrafts";
 import { triggerDeleteOldDiscussionMessages } from "./scheduledScripts/deleteOldDiscussionMessages";
 import { triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows } from "./scheduledScripts/markEstablishmentsAsSearchableWhenMaxContactsAllows";
 import { triggerMarkObsoleteDiscussionsAsDeprecated } from "./scheduledScripts/markObsoleteDiscussionsAsDeprecated";
@@ -24,6 +25,7 @@ const main = async () => {
   await triggerSuggestEditFormEstablishmentEvery6Months({
     exitOnFinish: false,
   });
+  await triggerDeleteOldConventionDrafts({ exitOnFinish: false });
 };
 
 main()
