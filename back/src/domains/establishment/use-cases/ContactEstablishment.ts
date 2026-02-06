@@ -75,10 +75,10 @@ export class ContactEstablishment extends TransactionalUseCase<CreateDiscussionD
       });
 
     if (
-      establishmentAggregate.establishment.nextAvailabilityDate &&
-      new Date(establishmentAggregate.establishment.nextAvailabilityDate) >
-        this.#timeGateway.now()
-      // TODO Add is max contact for period reached check
+      (establishmentAggregate.establishment.nextAvailabilityDate &&
+        new Date(establishmentAggregate.establishment.nextAvailabilityDate) >
+          this.#timeGateway.now()) ||
+      establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached
     )
       throw errors.establishment.forbiddenUnavailable({ siret });
 
