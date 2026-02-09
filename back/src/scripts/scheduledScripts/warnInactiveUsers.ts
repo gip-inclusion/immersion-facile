@@ -11,7 +11,7 @@ import { handleCRONScript } from "../handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const warnInactiveUsersScript = async () => {
+const _warnInactiveUsersScript = async () => {
   const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
@@ -41,7 +41,14 @@ export const triggerWarnInactiveUsers = ({
   handleCRONScript({
     name: "warnInactiveUsers",
     config,
-    script: warnInactiveUsersScript,
+    // script: _warnInactiveUsersScript,
+    script: async () => {
+      logger.warn({
+        message:
+          "warnInactiveUsers is not yet activated in production, uncomment to enable",
+      });
+      return { numberOfWarningsSent: 0 };
+    },
     handleResults: ({ numberOfWarningsSent }) =>
       `Number of account deletion warnings sent : ${numberOfWarningsSent}`,
     logger,
