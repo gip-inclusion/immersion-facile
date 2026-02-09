@@ -4,6 +4,7 @@ import type { WithAgencyId } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { normalizeUsers } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.epics";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
+import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -31,6 +32,9 @@ const getAgencyEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
           action,
         ) ||
         connectedUsersAdminSlice.actions.createUserOnAgencySucceeded.match(
+          action,
+        ) ||
+        closeAgencyAndTransferConventionsSlice.actions.closeAgencyAndTransferConventionsSucceeded.match(
           action,
         ),
     ),

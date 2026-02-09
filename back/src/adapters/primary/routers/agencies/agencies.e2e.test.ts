@@ -52,6 +52,7 @@ describe("Agency routes", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let backofficeAdminToken: ConnectedUserJwt;
+  let nonAdminToken: ConnectedUserJwt;
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   beforeEach(async () => {
@@ -66,6 +67,12 @@ describe("Agency routes", () => {
 
     backofficeAdminToken = generateConnectedUserJwt({
       userId: backofficeAdminUser.id,
+      version: currentJwtVersions.connectedUser,
+      iat: Date.now(),
+      exp: addDays(new Date(), 5).getTime(),
+    });
+    nonAdminToken = generateConnectedUserJwt({
+      userId: nonAdminUser.id,
       version: currentJwtVersions.connectedUser,
       iat: Date.now(),
       exp: addDays(new Date(), 5).getTime(),
