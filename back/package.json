@@ -57,6 +57,7 @@
     "trigger-assign-agency-viewer-role-to-users": "ts-node src/scripts/triggerAssignAgencyViewerRoleToUsers.ts",
     "trigger-remind-agency-admin-that-new-user-request-agency-right": "ts-node src/scripts/triggerRemindAgencyAdminThatNewUserRequestAgencyRight.ts",
     "trigger-warn-inactive-users": "ts-node src/scripts/triggerWarnInactiveUsers.ts",
+    "trigger-delete-inactive-users": "ts-node src/scripts/triggerDeleteInactiveUsers.ts",
     "trigger-sending-assessment-needed-notifications": "ts-node src/scripts/triggerSendAssessmentNeededNotifications.ts",
     "trigger-refresh-most-frequent-searches-materialized-view": "ts-node src/scripts/triggerRefreshMostFrequentSearchesMaterializedView.ts",
     "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/scripts/triggerSuggestEditFormEstablishmentEvery6Months.ts",

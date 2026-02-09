@@ -192,7 +192,10 @@ export class PgUserRepository implements UserRepository {
 
   public async getInactiveUsers(
     since: Date,
-    options?: { excludeWarnedSince?: Date },
+    options?: {
+      excludeWarnedSince?: Date;
+      onlyWarnedBetween?: { from: Date; to: Date };
+    },
   ): Promise<UserWithAdminRights[]> {
     const query = this.#getUserQueryBuilder()
       .where("users.last_login_at", "<", since)
@@ -246,6 +249,7 @@ export class PgUserRepository implements UserRepository {
       );
 
     const excludeWarnedSince = options?.excludeWarnedSince;
+    const onlyWarnedBetween = options?.onlyWarnedBetween;
 
     const usersInDb = await pipeWithValue(
       query,
@@ -269,6 +273,32 @@ export class PgUserRepository implements UserRepository {
                       excludeWarnedSince,
                     ),
                 ),
+              ),
+            )
+          : b,
+      (b) =>
+        onlyWarnedBetween
+          ? b.where(({ eb, exists }) =>
+              exists(
+                eb
+                  .selectFrom("notifications_email")
+                  .select("notifications_email.id")
+                  .where(
+                    "notifications_email.email_kind",
+                    "=",
+                    "ACCOUNT_DELETION_WARNING",
+                  )
+                  .whereRef("notifications_email.user_id", "=", "users.id")
+                  .where(
+                    "notifications_email.created_at",
+                    ">=",
+                    onlyWarnedBetween.from,
+                  )
+                  .where(
+                    "notifications_email.created_at",
+                    "<=",
+                    onlyWarnedBetween.to,
+                  ),
               ),
             )
           : b,
