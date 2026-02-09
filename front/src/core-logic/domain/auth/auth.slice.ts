@@ -2,12 +2,15 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AbsoluteUrl,
   AfterOAuthSuccessRedirectionResponse,
+  ConnectedUserJwt,
+  ConventionJwt,
   DateString,
   Email,
+  EmailAuthCodeJwt,
   FederatedIdentity,
   IdToken,
+  OAuthState,
   PhoneNumber,
-  RenewExpiredJwtRequestDto,
   WithRedirectUri,
 } from "shared";
 import type {
@@ -26,6 +29,12 @@ export type FederatedIdentityWithUser = FederatedIdentity & {
 
 type WithUrl = {
   url: AbsoluteUrl;
+};
+
+export type RenewJwtPayload = {
+  expiredJwt: ConventionJwt | ConnectedUserJwt | EmailAuthCodeJwt;
+  originalUrl?: string;
+  state?: OAuthState;
 };
 
 export interface AuthState {
@@ -137,7 +146,7 @@ export const authSlice = createSlice({
     },
     renewExpiredJwtRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<RenewExpiredJwtRequestDto>,
+      _action: PayloadActionWithFeedbackTopic<RenewJwtPayload>,
     ) => {
       state.isRequestingRenewExpiredJwt = true;
     },
