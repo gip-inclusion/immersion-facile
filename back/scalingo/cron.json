@@ -71,6 +71,10 @@
     {
       "command": "0 5 * * * pnpm back run trigger-warn-inactive-users",
       "size": "M"
+    },
+    {
+      "command": "30 6 * * * pnpm back run trigger-delete-inactive-users",
+      "size": "M"
     }
   ]
 }

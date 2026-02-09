@@ -109,7 +109,10 @@ export class InMemoryUserRepository implements UserRepository {
 
   public async getInactiveUsers(
     since: Date,
-    _options?: { excludeWarnedSince?: Date },
+    _options?: {
+      excludeWarnedSince?: Date;
+      onlyWarnedBetween?: { from: Date; to: Date };
+    },
   ): Promise<UserWithAdminRights[]> {
     return this.users.filter(
       (user) => !user.lastLoginAt || new Date(user.lastLoginAt) < since,
