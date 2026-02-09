@@ -201,8 +201,6 @@ describe("GET /v3/offers", () => {
     });
   });
 
-  it.skip("stores showOnlyAvailableOffers in search made", () => {});
-
   it("stores geo params when provided", async () => {
     const response = await sharedRequest.getOffers({
       headers: { authorization: authToken },
