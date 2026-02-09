@@ -2,7 +2,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import { isInternalOfferDto, type OfferDto } from "shared";
 import { FeedbackContent } from "src/app/components/feedback/FeedbackContent";
-import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { match, P } from "ts-pattern";
 import { CreateDiscussionForm } from "../immersion-offer/CreateDiscussionForm";
@@ -11,10 +10,12 @@ export const SearchResultContactSection = ({
   formContactRef,
   onFormSubmitSuccess,
   currentSearchResult,
+  onButtonClick,
 }: {
   onFormSubmitSuccess: () => void;
   formContactRef: React.RefObject<HTMLDivElement>;
   currentSearchResult: OfferDto;
+  onButtonClick: () => void;
 }) => (
   <div className={fr.cx("fr-card", "fr-p-4w", "fr-mt-8w")} ref={formContactRef}>
     {match({
@@ -50,7 +51,7 @@ export const SearchResultContactSection = ({
             }
             buttonProps={{
               children: "Rechercher une autre entreprise",
-              ...routes.search({}).link,
+              onClick: onButtonClick,
               iconId: "fr-icon-search-line",
             }}
             illustration={commonIllustrations.error}

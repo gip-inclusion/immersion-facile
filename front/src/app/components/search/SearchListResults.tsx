@@ -273,7 +273,7 @@ export const SearchListResults = ({
                       triggerSearch(
                         {
                           ...searchParams,
-                          perPage: Number.parseInt(value),
+                          perPage: Number.parseInt(value, 10),
                         },
                         isExternal,
                       );

@@ -117,14 +117,14 @@ const SearchResultComponent = ({
       endDetail={dateJobCreatedAt}
       detail={
         isNotAvailableOffer ? (
-          <span className={fr.cx("fr-icon-close-circle-line")}>
+          <span className={fr.cx("fr-icon-stop-circle-fill", "fr-icon--sm")}>
             {" "}
             Mise en relation temporairement indisponible
           </span>
         ) : (
-          <span className={fr.cx("fr-icon-checkbox-circle-line")}>
+          <span className={fr.cx("fr-icon-success-fill", "fr-icon--sm")}>
             {" "}
-            Mise en relation disponibles
+            Mise en relation disponible
           </span>
         )
       }

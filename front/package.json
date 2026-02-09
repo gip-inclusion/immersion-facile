@@ -6,7 +6,7 @@
     "test:manual": "jest --runInBand --watchAll --testRegex=.manual.test.ts",
     "setup-env-vars": "chmod +x ./env.sh && ./env.sh",
     "setup-env-vars-build": "chmod +x ./env.sh && ./env.sh ./dist/env-config.js",
-    "dev-in-memory": "VITE_GATEWAY=IN_MEMORY pnpm setup-env-vars && vite",
+    "dev-in-memory": "react-dsfr update-icons && VITE_GATEWAY=IN_MEMORY pnpm setup-env-vars && vite",
     "dev": "export $(cat .env | grep 'VITE_' | xargs) && pnpm setup-env-vars && vite",
     "dev:no-typecheck": "export $(cat .env | grep 'VITE_' | xargs) && pnpm setup-env-vars && vite",
     "make-styles": "scss-to-ts update",
