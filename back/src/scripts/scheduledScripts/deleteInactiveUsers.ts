@@ -11,7 +11,7 @@ import { handleCRONScript } from "../handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const triggerEventsToDeleteInactiveUsersScript = async () => {
+const _triggerEventsToDeleteInactiveUsersScript = async () => {
   const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
@@ -40,7 +40,14 @@ export const triggerDeleteInactiveUsers = ({
   handleCRONScript({
     name: "triggerEventsToDeleteInactiveUsers",
     config,
-    script: triggerEventsToDeleteInactiveUsersScript,
+    // script: _triggerEventsToDeleteInactiveUsersScript,
+    script: async () => {
+      logger.warn({
+        message:
+          "triggerEventsToDeleteInactiveUsers is not yet activated in production, uncomment to enable",
+      });
+      return { numberOfDeletionsTriggered: 0 };
+    },
     handleResults: ({ numberOfDeletionsTriggered }) =>
       `Number of deletions triggered: ${numberOfDeletionsTriggered}`,
     logger,
