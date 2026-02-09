@@ -19,4 +19,8 @@ export interface UserRepository {
     externalId: string,
   ): Promise<UserWithAdminRights | undefined>;
   findByEmail(email: Email): Promise<UserWithAdminRights | undefined>;
+  getInactiveUsers(
+    since: Date,
+    options?: { excludeWarnedSince?: Date },
+  ): Promise<UserWithAdminRights[]>;
 }

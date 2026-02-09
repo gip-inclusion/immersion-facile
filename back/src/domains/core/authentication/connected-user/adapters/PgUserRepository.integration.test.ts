@@ -1,11 +1,16 @@
+import { subDays, subYears } from "date-fns";
 import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  DiscussionBuilder,
   errors,
+  expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
   type User,
   type UserId,
+  type UserWithAdminRights,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -14,7 +19,10 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
+import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
+import { PgDiscussionRepository } from "../../../../establishment/adapters/PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
@@ -360,6 +368,253 @@ describe("PgAuthenticatedUserRepository", () => {
         expect(response).toBeUndefined();
       });
     });
+  });
+});
+
+describe("PgUserRepository - getInactiveUsers", () => {
+  const now = new Date("2026-01-15T10:00:00.000Z");
+  const twoYearsAgo = subYears(now, 2);
+  const threeYearsAgo = subYears(now, 3);
+  const oneYearAgo = subYears(now, 1);
+  const threeYearsAgoIso = threeYearsAgo.toISOString();
+  const updatedAt = new Date("2022-05-20T12:43:11").toISOString();
+
+  let pool: Pool;
+  let db: KyselyDb;
+  let userRepository: PgUserRepository;
+  let conventionRepository: PgConventionRepository;
+  let discussionRepository: PgDiscussionRepository;
+  let agencyId: string;
+
+  const makeUserWithOldLogin = (
+    overrides: Partial<UserWithAdminRights> & { id: string; email: string },
+  ): UserWithAdminRights => ({
+    id: overrides.id,
+    email: overrides.email,
+    firstName: overrides.firstName ?? "Jean",
+    lastName: overrides.lastName ?? "Dupont",
+    createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
+    proConnect: null,
+    lastLoginAt: overrides.lastLoginAt ?? threeYearsAgoIso,
+  });
+
+  beforeAll(async () => {
+    pool = makeTestPgPool();
+    db = makeKyselyDb(pool);
+  });
+
+  beforeEach(async () => {
+    await db.deleteFrom("notifications_email_recipients").execute();
+    await db.deleteFrom("notifications_email_attachments").execute();
+    await db.deleteFrom("notifications_email").execute();
+    await db.deleteFrom("exchanges").execute();
+    await db.deleteFrom("discussions").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("actors").execute();
+    await db.deleteFrom("convention_external_ids").execute();
+    await db.deleteFrom("users__agencies").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users_admins").execute();
+    await db.deleteFrom("users").execute();
+
+    userRepository = new PgUserRepository(db);
+    conventionRepository = new PgConventionRepository(db);
+    discussionRepository = new PgDiscussionRepository(db);
+
+    const validatorId = uuid();
+    const validator = makeUniqueUserForTest(validatorId);
+    await userRepository.save(validator);
+
+    agencyId = uuid();
+    const agency = new AgencyDtoBuilder().withId(agencyId).build();
+    await new PgAgencyRepository(db).insert(
+      toAgencyWithRights(agency, {
+        [validatorId]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
+  });
+
+  afterAll(async () => {
+    await pool.end();
+  });
+
+  it("returns only truly inactive users, excluding those with recent activity", async () => {
+    const inactiveNoActivity = makeUserWithOldLogin({
+      id: uuid(),
+      email: "inactive@test.fr",
+    });
+    const inactiveWithOldConvention = makeUserWithOldLogin({
+      id: uuid(),
+      email: "old-convention@test.fr",
+    });
+    const inactiveWithOldDiscussion = makeUserWithOldLogin({
+      id: uuid(),
+      email: "old-discussion@test.fr",
+    });
+    const activeAsBeneficiary = makeUserWithOldLogin({
+      id: uuid(),
+      email: "beneficiary@test.fr",
+    });
+    const activeAsTutor = makeUserWithOldLogin({
+      id: uuid(),
+      email: "tutor@test.fr",
+    });
+    const activeAsRepresentative = makeUserWithOldLogin({
+      id: uuid(),
+      email: "representative@test.fr",
+    });
+    const activeWithRecentDiscussion = makeUserWithOldLogin({
+      id: uuid(),
+      email: "discusser@test.fr",
+    });
+    const neverLoggedIn = makeUserWithOldLogin({
+      id: uuid(),
+      email: "never-logged@test.fr",
+      lastLoginAt: undefined,
+    });
+
+    await userRepository.save(inactiveNoActivity);
+    await userRepository.save(inactiveWithOldConvention);
+    await userRepository.save(inactiveWithOldDiscussion);
+    await userRepository.save(activeAsBeneficiary);
+    await userRepository.save(activeAsTutor);
+    await userRepository.save(activeAsRepresentative);
+    await userRepository.save(activeWithRecentDiscussion);
+    await userRepository.save(neverLoggedIn);
+
+    const recentConventionForBeneficiary = new ConventionDtoBuilder()
+      .withId(uuid())
+      .withAgencyId(agencyId)
+      .withBeneficiaryEmail("beneficiary@test.fr")
+      .withDateEnd(subDays(now, 30).toISOString())
+      .withUpdatedAt(updatedAt)
+      .build();
+    const recentConventionForTutor = new ConventionDtoBuilder()
+      .withId(uuid())
+      .withAgencyId(agencyId)
+      .withEstablishmentTutorEmail("tutor@test.fr")
+      .withDateEnd(subDays(now, 30).toISOString())
+      .withUpdatedAt(updatedAt)
+      .build();
+    const recentConventionForRepresentative = new ConventionDtoBuilder()
+      .withId(uuid())
+      .withAgencyId(agencyId)
+      .withEstablishmentRepresentativeEmail("representative@test.fr")
+      .withDateEnd(subDays(now, 30).toISOString())
+      .withUpdatedAt(updatedAt)
+      .build();
+    const oldConvention = new ConventionDtoBuilder()
+      .withId(uuid())
+      .withAgencyId(agencyId)
+      .withBeneficiaryEmail("old-convention@test.fr")
+      .withDateEnd(subDays(threeYearsAgo, 10).toISOString())
+      .withUpdatedAt(updatedAt)
+      .build();
+    await conventionRepository.save(recentConventionForBeneficiary, updatedAt);
+    await conventionRepository.save(recentConventionForTutor, updatedAt);
+    await conventionRepository.save(
+      recentConventionForRepresentative,
+      updatedAt,
+    );
+    await conventionRepository.save(oldConvention, updatedAt);
+
+    const recentDiscussion = new DiscussionBuilder()
+      .withId(uuid())
+      .withPotentialBeneficiaryEmail("discusser@test.fr")
+      .withExchanges([
+        {
+          subject: "Recent",
+          message: "Recent exchange",
+          sentAt: oneYearAgo.toISOString(),
+          sender: "potentialBeneficiary",
+          attachments: [],
+        },
+      ])
+      .build();
+    const oldDiscussion = new DiscussionBuilder()
+      .withId(uuid())
+      .withPotentialBeneficiaryEmail("old-discussion@test.fr")
+      .withExchanges([
+        {
+          subject: "Old",
+          message: "Old exchange",
+          sentAt: subDays(threeYearsAgo, 10).toISOString(),
+          sender: "potentialBeneficiary",
+          attachments: [],
+        },
+      ])
+      .build();
+    await discussionRepository.insert(recentDiscussion);
+    await discussionRepository.insert(oldDiscussion);
+
+    const result = await userRepository.getInactiveUsers(twoYearsAgo);
+
+    expectArraysToEqualIgnoringOrder(result, [
+      inactiveNoActivity,
+      inactiveWithOldConvention,
+      inactiveWithOldDiscussion,
+      neverLoggedIn,
+    ]);
+  });
+
+  it("excludes users warned within excludeWarnedSince window", async () => {
+    const excludeWarnedSince = subDays(now, 9);
+
+    const recentlyWarned = makeUserWithOldLogin({
+      id: uuid(),
+      email: "recently-warned@test.fr",
+    });
+    const warnedLongAgo = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-long-ago@test.fr",
+    });
+    const notWarned = makeUserWithOldLogin({
+      id: uuid(),
+      email: "not-warned@test.fr",
+    });
+
+    await userRepository.save(recentlyWarned);
+    await userRepository.save(warnedLongAgo);
+    await userRepository.save(notWarned);
+
+    await db
+      .insertInto("notifications_email")
+      .values([
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 8).toISOString(),
+          user_id: recentlyWarned.id,
+        },
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 10).toISOString(),
+          user_id: warnedLongAgo.id,
+        },
+      ])
+      .execute();
+
+    const resultWithExclude = await userRepository.getInactiveUsers(
+      twoYearsAgo,
+      { excludeWarnedSince },
+    );
+
+    expectArraysToEqualIgnoringOrder(resultWithExclude, [
+      warnedLongAgo,
+      notWarned,
+    ]);
+
+    const resultWithoutExclude =
+      await userRepository.getInactiveUsers(twoYearsAgo);
+
+    expectArraysToEqualIgnoringOrder(resultWithoutExclude, [
+      recentlyWarned,
+      warnedLongAgo,
+      notWarned,
+    ]);
   });
 });
 
