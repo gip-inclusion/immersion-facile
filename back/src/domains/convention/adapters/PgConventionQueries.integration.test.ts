@@ -71,6 +71,7 @@ describe("Pg implementation of ConventionQueries", () => {
   beforeEach(async () => {
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("convention_drafts").execute();
+    await db.deleteFrom("convention_templates").execute();
     await sql`TRUNCATE TABLE convention_external_ids RESTART IDENTITY;`.execute(
       db,
     );

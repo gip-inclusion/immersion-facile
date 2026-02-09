@@ -1,26 +1,68 @@
 import { sql } from "kysely";
 import type { InsertExpression } from "kysely/dist/cjs/parser/insert-values-parser";
-import {
-  type ConventionTemplate,
-  type ConventionTemplateId,
-  type DateTimeIsoString,
-  dateToIsoString,
-  type EstablishmentTutor,
-  type ScheduleDto,
-  type Signatories,
-  type SiretDto,
+import type {
+  AgencyKind,
+  ConventionTemplate,
+  ConventionTemplateId,
+  DateTimeIsoString,
+  DepartmentCode,
+  EstablishmentTutor,
+  ImmersionObjective,
+  NumberEmployeesRange,
+  ScheduleDto,
+  Signatories,
+  SiretDto,
+  UserId,
 } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
-import type { ConventionTemplateQueries } from "../ports/ConventionTemplateQueries";
+import type {
+  ConventionTemplateQueries,
+  GetConventionTemplatesParams,
+} from "../ports/ConventionTemplateQueries";
+
+type ConventionTemplateRow = {
+  id: ConventionTemplateId;
+  user_id: UserId;
+  name: string;
+  updated_at: Date | null;
+  agency_id: string | null;
+  agency_kind: AgencyKind | null;
+  agency_department: DepartmentCode | null;
+  date_start: Date | null;
+  date_end: Date | null;
+  siret: SiretDto | null;
+  business_name: string | null;
+  schedule: ScheduleDto | null;
+  individual_protection: boolean | null;
+  individual_protection_description: string | null;
+  sanitary_prevention: boolean | null;
+  sanitary_prevention_description: string | null;
+  immersion_address: string | null;
+  immersion_objective: string | null;
+  ogr_appellation: string | null;
+  libelle_appellation_long: string | null;
+  code_rome: string | null;
+  libelle_rome: string | null;
+  immersion_activities: string | null;
+  immersion_skills: string | null;
+  work_conditions: string | null;
+  internship_kind: ConventionTemplate["internshipKind"];
+  business_advantages: string | null;
+  establishment_number_employees: string | null;
+  agency_referent_first_name: string | null;
+  agency_referent_last_name: string | null;
+  establishment_tutor: EstablishmentTutor | null;
+  signatories: Signatories | null;
+};
 
 export class PgConventionTemplateQueries implements ConventionTemplateQueries {
   constructor(private transaction: KyselyDb) {}
 
-  public async getById(
-    id: ConventionTemplateId,
-  ): Promise<ConventionTemplate | undefined> {
-    const row = await this.transaction
+  public async get(
+    params: GetConventionTemplatesParams,
+  ): Promise<ConventionTemplate[]> {
+    let query = this.transaction
       .selectFrom("convention_templates")
       .leftJoin(
         "public_appellations_data",
@@ -38,59 +80,19 @@ export class PgConventionTemplateQueries implements ConventionTemplateQueries {
         "public_appellations_data.libelle_appellation_long",
         "public_appellations_data.code_rome",
         "public_romes_data.libelle_rome",
-      ])
-      .where("convention_templates.id", "=", id)
-      .executeTakeFirst();
+      ]);
 
-    if (!row) return undefined;
+    if (params.ids?.length) {
+      query = query.where("convention_templates.id", "in", params.ids);
+    }
+    if (params.userIds?.length) {
+      query = query.where("convention_templates.user_id", "in", params.userIds);
+    }
 
-    return {
-      id: row.id,
-      userId: row.user_id,
-      name: row.name,
-      updatedAt: row.updated_at
-        ? dateToIsoString(row.updated_at as Date | string)
-        : undefined,
-      agencyId: row.agency_id ?? undefined,
-      dateStart: row.date_start?.toISOString() ?? undefined,
-      dateEnd: row.date_end?.toISOString() ?? undefined,
-      siret: (row.siret as SiretDto) ?? undefined,
-      businessName: row.business_name ?? undefined,
-      schedule: (row.schedule as ScheduleDto) ?? undefined,
-      individualProtection: row.individual_protection ?? undefined,
-      individualProtectionDescription:
-        row.individual_protection_description ?? undefined,
-      sanitaryPrevention: row.sanitary_prevention ?? undefined,
-      sanitaryPreventionDescription:
-        row.sanitary_prevention_description ?? undefined,
-      immersionAddress: row.immersion_address ?? undefined,
-      immersionObjective: row.immersion_objective ?? undefined,
-      immersionAppellation: row.ogr_appellation
-        ? {
-            appellationCode: String(row.ogr_appellation),
-            appellationLabel: row.libelle_appellation_long ?? "",
-            romeCode: row.code_rome ?? "",
-            romeLabel: row.libelle_rome ?? "",
-          }
-        : undefined,
-      immersionActivities: row.immersion_activities ?? undefined,
-      immersionSkills: row.immersion_skills ?? undefined,
-      workConditions: row.work_conditions ?? undefined,
-      internshipKind: row.internship_kind,
-      businessAdvantages: row.business_advantages ?? undefined,
-      establishmentNumberEmployeesRange:
-        row.establishment_number_employees ?? undefined,
-      agencyReferent:
-        row.agency_referent_first_name || row.agency_referent_last_name
-          ? {
-              firstname: row.agency_referent_first_name ?? undefined,
-              lastname: row.agency_referent_last_name ?? undefined,
-            }
-          : undefined,
-      establishmentTutor:
-        (row.establishment_tutor as EstablishmentTutor) ?? undefined,
-      signatories: (row.signatories as Signatories) ?? undefined,
-    };
+    const rows = await query.execute();
+    return rows.map((row) =>
+      mapRowToConventionTemplate(row as ConventionTemplateRow),
+    );
   }
 
   public async upsert(
@@ -101,7 +103,7 @@ export class PgConventionTemplateQueries implements ConventionTemplateQueries {
     const { id: _id, ...valuesForUpdate } = values as Omit<
       typeof values,
       "id"
-    > & { id: any };
+    > & { id: ConventionTemplateId };
 
     await this.transaction
       .insertInto("convention_templates")
@@ -110,6 +112,59 @@ export class PgConventionTemplateQueries implements ConventionTemplateQueries {
       .execute();
   }
 }
+
+const mapRowToConventionTemplate = (
+  row: ConventionTemplateRow,
+): ConventionTemplate => ({
+  id: row.id,
+  userId: row.user_id,
+  name: row.name,
+  updatedAt: row.updated_at ? row.updated_at.toISOString() : undefined,
+  agencyId: row.agency_id ?? undefined,
+  agencyKind: row.agency_kind ?? undefined,
+  agencyDepartment: row.agency_department ?? undefined,
+  dateStart: row.date_start?.toISOString() ?? undefined,
+  dateEnd: row.date_end?.toISOString() ?? undefined,
+  siret: row.siret ?? undefined,
+  businessName: row.business_name ?? undefined,
+  schedule: row.schedule ?? undefined,
+  individualProtection: row.individual_protection ?? undefined,
+  individualProtectionDescription:
+    row.individual_protection_description ?? undefined,
+  sanitaryPrevention: row.sanitary_prevention ?? undefined,
+  sanitaryPreventionDescription:
+    row.sanitary_prevention_description ?? undefined,
+  immersionAddress: row.immersion_address ?? undefined,
+  immersionObjective: (row.immersion_objective ?? undefined) as
+    | ImmersionObjective
+    | undefined,
+  immersionAppellation: row.ogr_appellation
+    ? {
+        appellationCode: row.ogr_appellation.toString(),
+        appellationLabel: row.libelle_appellation_long ?? "",
+        romeCode: row.code_rome ?? "",
+        romeLabel: row.libelle_rome ?? "",
+      }
+    : undefined,
+  immersionActivities: row.immersion_activities ?? undefined,
+  immersionSkills: row.immersion_skills ?? undefined,
+  workConditions: row.work_conditions ?? undefined,
+  internshipKind: row.internship_kind,
+  businessAdvantages: row.business_advantages ?? undefined,
+  establishmentNumberEmployeesRange: (row.establishment_number_employees ??
+    undefined) as NumberEmployeesRange | undefined,
+  agencyReferent:
+    row.agency_referent_first_name || row.agency_referent_last_name
+      ? {
+          firstname: row.agency_referent_first_name ?? undefined,
+          lastname: row.agency_referent_last_name ?? undefined,
+        }
+      : undefined,
+  establishmentTutor:
+    (row.establishment_tutor as EstablishmentTutor) ?? undefined,
+  signatories: (row.signatories as Signatories) ?? undefined,
+});
+
 const mapConventionTemplateToEntity = (
   template: ConventionTemplate,
   now: DateTimeIsoString,
@@ -119,6 +174,8 @@ const mapConventionTemplateToEntity = (
   name: template.name,
   updated_at: now,
   agency_id: template.agencyId,
+  agency_kind: template.agencyKind,
+  agency_department: template.agencyDepartment,
   date_start: template.dateStart,
   date_end: template.dateEnd,
   siret: template.siret,
