@@ -1,10 +1,14 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { filter, map, type Observable, of, tap, throwError } from "rxjs";
+import { defer, filter, map, type Observable, of, tap, throwError } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import {
   type AbsoluteUrl,
+  type ConnectedUserJwt,
+  type ConventionJwt,
+  type EmailAuthCodeJwt,
   errors,
   isFederatedIdentityProviderWithLogoutCallback,
+  type RenewExpiredJwtRequestDto,
 } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
@@ -12,12 +16,13 @@ import type {
   DeviceRepository,
   LocalStoragePair,
 } from "src/core-logic/ports/DeviceRepository";
+import type { JwtValidator } from "src/core-logic/ports/JwtDecoder";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { type AuthState, authSlice } from "./auth.slice";
+import { type AuthState, authSlice, type RenewJwtPayload } from "./auth.slice";
 
 export type AuthAction = ActionOfSlice<typeof authSlice>;
 type AuthEpic = AppEpic<AuthAction>;
@@ -235,11 +240,19 @@ const requestLoginByEmail: AuthEpic = (action$, _, { authGateway }) =>
     ),
   );
 
-const requestRenewExpiredJwt: AuthEpic = (action$, _, { authGateway }) =>
+const requestRenewExpiredJwt: AuthEpic = (
+  action$,
+  _,
+  { authGateway, jwtValidator },
+) =>
   action$.pipe(
     filter(authSlice.actions.renewExpiredJwtRequested.match),
     switchMap((action) =>
-      authGateway.renewExpiredJwt$(action.payload).pipe(
+      defer(() =>
+        authGateway.renewExpiredJwt$(
+          makeExpiredJwtParams(jwtValidator, action.payload),
+        ),
+      ).pipe(
         map(() =>
           authSlice.actions.renewExpiredJwtSucceded({
             feedbackTopic: action.payload.feedbackTopic,
@@ -300,3 +313,31 @@ export const authEpics = [
   confirmLoginByMagicLink,
   redirectToProviderLogoutPage,
 ];
+
+const makeExpiredJwtParams = (
+  jwtValidator: JwtValidator,
+  { expiredJwt, originalUrl, state }: RenewJwtPayload,
+): RenewExpiredJwtRequestDto => {
+  const jwtPayload = jwtValidator.decodeJwt(expiredJwt);
+  if ("userId" in jwtPayload)
+    return {
+      kind: "connectedUser",
+      expiredJwt: expiredJwt as ConnectedUserJwt,
+    };
+
+  if ("applicationId" in jwtPayload && originalUrl)
+    return {
+      kind: "convention",
+      expiredJwt: expiredJwt as ConventionJwt,
+      originalUrl: originalUrl,
+    };
+
+  if ("emailAuthCode" in jwtPayload && state)
+    return {
+      kind: "emailAuthCode",
+      expiredJwt: expiredJwt as EmailAuthCodeJwt,
+      state: state,
+    };
+
+  throw errors.user.unsupportedJwtPayload();
+};

@@ -1,10 +1,12 @@
 import {
   type ConnectedUser,
   ConnectedUserBuilder,
+  currentJwtVersions,
   type Email,
+  type EmailAuthCodeJwtPayload,
+  errors,
   expectToEqual,
   type FederatedIdentity,
-  type RenewExpiredJwtRequestDto,
 } from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -13,6 +15,7 @@ import {
   authSlice,
   type FederatedIdentityWithUser,
   initialAuthState,
+  type RenewJwtPayload,
 } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
@@ -607,14 +610,18 @@ describe("Auth slice", () => {
 
   describe("renew expired jwt", () => {
     const feedbackTopic: FeedbackTopic = "renew-expired-jwt-convention";
-    const payload: RenewExpiredJwtRequestDto & PayloadWithFeedbackTopic = {
-      kind: "connectedUser",
+    const payload: RenewJwtPayload & PayloadWithFeedbackTopic = {
       expiredJwt: "jwt",
       feedbackTopic,
     };
 
-    it("should handle login by email successfully", () => {
+    it("should renew expired jwt successfully", () => {
       expectAuthStateToBe(initialAuthState);
+
+      dependencies.jwtValidator.nextDecodeJwtResult = {
+        userId: "",
+        version: currentJwtVersions.connectedUser,
+      };
 
       store.dispatch(authSlice.actions.renewExpiredJwtRequested(payload));
 
@@ -640,8 +647,13 @@ describe("Auth slice", () => {
       );
     });
 
-    it("should handle login by email failed", () => {
+    it("should renew expired jwt failed on error response", () => {
       expectAuthStateToBe(initialAuthState);
+
+      dependencies.jwtValidator.nextDecodeJwtResult = {
+        userId: "",
+        version: currentJwtVersions.connectedUser,
+      };
 
       store.dispatch(authSlice.actions.renewExpiredJwtRequested(payload));
 
@@ -666,6 +678,63 @@ describe("Auth slice", () => {
           // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
           title: feedbacks[feedbackTopic]["create.error"]!.title,
           message: errorMessage,
+        },
+      );
+    });
+
+    it("should renew expired jwt failed on jwtDecoder Error", () => {
+      expectAuthStateToBe(initialAuthState);
+
+      const errorMessage = "Bad JWT";
+      dependencies.jwtValidator.nextDecodeJwtResult = new Error(errorMessage);
+
+      store.dispatch(authSlice.actions.renewExpiredJwtRequested(payload));
+
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isRequestingRenewExpiredJwt: false,
+      });
+
+      expectAuthStateToBe(initialAuthState);
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[feedbackTopic],
+        {
+          on: "create",
+          level: "error",
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          title: feedbacks[feedbackTopic]["create.error"]!.title,
+          message: errorMessage,
+        },
+      );
+    });
+
+    it("should renew expired jwt failed on unsupported JWT payload", () => {
+      expectAuthStateToBe(initialAuthState);
+
+      const unsupportedJwtPayload = {
+        version: currentJwtVersions.emailAuthCode,
+      } as unknown as EmailAuthCodeJwtPayload;
+
+      dependencies.jwtValidator.nextDecodeJwtResult = unsupportedJwtPayload;
+
+      store.dispatch(authSlice.actions.renewExpiredJwtRequested(payload));
+
+      expectAuthStateToBe({
+        ...initialAuthState,
+        isRequestingRenewExpiredJwt: false,
+      });
+
+      expectAuthStateToBe(initialAuthState);
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[feedbackTopic],
+        {
+          on: "create",
+          level: "error",
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          title: feedbacks[feedbackTopic]["create.error"]!.title,
+          message: errors.user.unsupportedJwtPayload().message,
         },
       );
     });
