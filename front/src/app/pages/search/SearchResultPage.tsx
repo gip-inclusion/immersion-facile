@@ -407,6 +407,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
               onFormSubmitSuccess={onFormSubmitSuccess}
               formContactRef={formContactRef}
               currentSearchResult={currentSearchResult}
+              onButtonClick={onGoBackClick}
             />
           </>
         )}
