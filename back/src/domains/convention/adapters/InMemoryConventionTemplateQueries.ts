@@ -1,9 +1,8 @@
+import type { ConventionTemplate, DateTimeIsoString } from "shared";
 import type {
-  ConventionTemplate,
-  ConventionTemplateId,
-  DateTimeIsoString,
-} from "shared";
-import type { ConventionTemplateQueries } from "../ports/ConventionTemplateQueries";
+  ConventionTemplateQueries,
+  GetConventionTemplatesParams,
+} from "../ports/ConventionTemplateQueries";
 
 export class InMemoryConventionTemplateQueries
   implements ConventionTemplateQueries
@@ -24,10 +23,14 @@ export class InMemoryConventionTemplateQueries
     return Object.values(this.#conventionTemplates);
   }
 
-  public async getById(
-    id: ConventionTemplateId,
-  ): Promise<ConventionTemplate | undefined> {
-    return this.#conventionTemplates[id];
+  public async get(
+    params: GetConventionTemplatesParams,
+  ): Promise<ConventionTemplate[]> {
+    return this.conventionTemplates.filter(
+      (t) =>
+        (!params.ids?.length || params.ids.includes(t.id)) &&
+        (!params.userIds?.length || params.userIds.includes(t.userId)),
+    );
   }
 
   public async upsert(

@@ -128,6 +128,17 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.getConventionTemplatesForCurrentUser(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getConventionTemplatesForCurrentUser.execute(
+          undefined,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   authenticatedConventionSharedRouter.createOrUpdateConventionTemplate(
     deps.connectedUserAuthMiddleware,
     (req, res) =>

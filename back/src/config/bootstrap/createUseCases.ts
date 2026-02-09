@@ -47,6 +47,7 @@ import { makeGetConventionDraftById } from "../../domains/convention/use-cases/G
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
+import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
@@ -1061,6 +1062,8 @@ export const createUseCases = ({
       uowPerformer,
       deps: { timeGateway: gateways.timeGateway },
     }),
+    getConventionTemplatesForCurrentUser:
+      makeGetConventionTemplatesForCurrentUser({ uowPerformer }),
     warnSenderThatMessageCouldNotBeDelivered:
       makeWarnSenderThatMessageCouldNotBeDelivered({
         uowPerformer,

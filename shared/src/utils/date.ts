@@ -110,9 +110,3 @@ export const getDaysBetween = (from: Date, to: Date) =>
     convertLocaleDateToUtcTimezoneDate(to),
     convertLocaleDateToUtcTimezoneDate(from),
   );
-
-export const dateToIsoString = (date: Date | string): string => {
-  return date instanceof Date
-    ? date.toISOString()
-    : new Date(date).toISOString();
-};

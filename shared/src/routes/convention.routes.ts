@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import z from "zod";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
 import {
   assessmentDtoSchema,
@@ -345,6 +346,18 @@ export const authenticatedConventionRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+    },
+  }),
+
+  getConventionTemplatesForCurrentUser: defineRoute({
+    url: "/convention-templates",
+    method: "get",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: z.array(conventionTemplateSchema),
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
 

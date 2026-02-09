@@ -44,19 +44,21 @@ describe("CreateOrUpdateConventionTemplate", () => {
   });
 
   it("upserts the convention template when user is authenticated", async () => {
-    const resultBeforeCreation =
-      await uow.conventionTemplateQueries.getById(templateId);
-    expect(resultBeforeCreation).toBeUndefined();
+    const resultBeforeCreation = await uow.conventionTemplateQueries.get({
+      ids: [templateId],
+    });
+    expect(resultBeforeCreation).toHaveLength(0);
 
     await createOrUpdateConventionTemplate.execute(
       conventionTemplate,
       currentUser,
     );
 
-    const resultAfterCreation =
-      await uow.conventionTemplateQueries.getById(templateId);
-    expect(resultAfterCreation).toBeDefined();
-    expectToEqual(resultAfterCreation, {
+    const resultAfterCreation = await uow.conventionTemplateQueries.get({
+      ids: [templateId],
+    });
+    expect(resultAfterCreation).toHaveLength(1);
+    expectToEqual(resultAfterCreation[0], {
       ...conventionTemplate,
       userId: currentUser.id,
     });

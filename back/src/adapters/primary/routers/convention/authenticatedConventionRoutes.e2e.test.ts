@@ -882,6 +882,77 @@ describe("authenticatedConventionRoutes", () => {
   });
 
   describe(`${displayRouteName(
+    authenticatedConventionRoutes.getConventionTemplatesForCurrentUser,
+  )}`, () => {
+    it("401 with bad token", async () => {
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: "wrong-token" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: invalidTokenMessage, status: 401 },
+        status: 401,
+      });
+    });
+
+    it("401 with expired token", async () => {
+      const token = generateConnectedUserJwt(
+        { userId: validator.id, version: currentJwtVersions.connectedUser },
+        0,
+      );
+
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: token },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: authExpiredMessage(), status: 401 },
+        status: 401,
+      });
+    });
+
+    it("200 returns convention templates for authenticated user", async () => {
+      const template1: ConventionTemplate = {
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        name: "Mon modèle 1",
+        internshipKind: "immersion" as const,
+        userId: validator.id,
+      };
+      const template2: ConventionTemplate = {
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        name: "Mon modèle 2",
+        internshipKind: "immersion" as const,
+        userId: validator.id,
+      };
+      inMemoryUow.conventionTemplateQueries.conventionTemplates = [
+        template1,
+        template2,
+      ];
+
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: validToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: [template1, template2],
+      });
+      expect((response.body as ConventionTemplate[]).length).toBe(2);
+    });
+
+    it("200 returns empty array when user has no templates", async () => {
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: validToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: [],
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
     authenticatedConventionRoutes.createOrUpdateConventionTemplate,
   )}`, () => {
     const validConventionTemplate: ConventionTemplate = {

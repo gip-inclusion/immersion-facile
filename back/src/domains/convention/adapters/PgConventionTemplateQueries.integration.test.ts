@@ -52,13 +52,94 @@ describe("PgConventionTemplateQueries", () => {
     await pool.end();
   });
 
-  describe("getById", () => {
-    it("returns undefined when id does not exist", async () => {
-      const result = await pgConventionTemplateQueries.getById(
-        uuid() as ConventionTemplate["id"],
-      );
+  describe("get", () => {
+    it("returns empty array when ids do not exist", async () => {
+      const result = await pgConventionTemplateQueries.get({
+        ids: [uuid() as ConventionTemplate["id"]],
+      });
 
-      expect(result).toBeUndefined();
+      expect(result).toHaveLength(0);
+    });
+
+    it("returns empty array when user has no templates", async () => {
+      const result = await pgConventionTemplateQueries.get({
+        userIds: [validator.id],
+      });
+
+      expectToEqual(result, []);
+    });
+
+    it("returns only templates for the given ids", async () => {
+      const template1: ConventionTemplate = {
+        ...conventionTemplate,
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        name: "Template 1",
+        userId: validator.id,
+      };
+      const template2: ConventionTemplate = {
+        ...conventionTemplate,
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        name: "Template 2",
+        userId: validator.id,
+      };
+      await pgConventionTemplateQueries.upsert(template1, now);
+      await pgConventionTemplateQueries.upsert(template2, now);
+
+      const result = await pgConventionTemplateQueries.get({
+        ids: [template1.id],
+      });
+
+      expectToEqual(result, [{ ...template1, updatedAt: now }]);
+    });
+
+    it("returns only templates for the given userIds", async () => {
+      const otherUser = makeUniqueUserForTest(uuid());
+      await new PgUserRepository(db).save(otherUser);
+
+      const templateForValidator: ConventionTemplate = {
+        ...conventionTemplate,
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        name: "Validator template",
+        userId: validator.id,
+      };
+      const templateForOther: ConventionTemplate = {
+        ...conventionTemplate,
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        name: "Other user template",
+        userId: otherUser.id,
+      };
+      await pgConventionTemplateQueries.upsert(templateForValidator, now);
+      await pgConventionTemplateQueries.upsert(templateForOther, now);
+
+      const result = await pgConventionTemplateQueries.get({
+        userIds: [validator.id],
+      });
+
+      expectToEqual(result, [{ ...templateForValidator, updatedAt: now }]);
+    });
+
+    it("returns templates for the given id and userId", async () => {
+      const template1: ConventionTemplate = {
+        ...conventionTemplate,
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        name: "Template 1",
+        userId: validator.id,
+      };
+      const template2: ConventionTemplate = {
+        ...conventionTemplate,
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        name: "Template 2",
+        userId: validator.id,
+      };
+      await pgConventionTemplateQueries.upsert(template1, now);
+      await pgConventionTemplateQueries.upsert(template2, now);
+
+      const result = await pgConventionTemplateQueries.get({
+        ids: [template1.id],
+        userIds: [validator.id],
+      });
+
+      expectToEqual(result, [{ ...template1, updatedAt: now }]);
     });
   });
 
@@ -66,14 +147,16 @@ describe("PgConventionTemplateQueries", () => {
     it("creates a row when id does not exist", async () => {
       await pgConventionTemplateQueries.upsert(conventionTemplate, now);
 
-      const result = await pgConventionTemplateQueries.getById(
-        conventionTemplate.id,
-      );
-
-      expectToEqual(result, {
-        ...conventionTemplate,
-        updatedAt: now,
+      const result = await pgConventionTemplateQueries.get({
+        ids: [conventionTemplate.id],
       });
+
+      expectToEqual(result, [
+        {
+          ...conventionTemplate,
+          updatedAt: now,
+        },
+      ]);
     });
 
     it("updates the row when id already exists", async () => {
@@ -101,10 +184,10 @@ describe("PgConventionTemplateQueries", () => {
         now,
       );
 
-      const result = await pgConventionTemplateQueries.getById(
-        conventionTemplate.id,
-      );
-      expectToEqual(result, {
+      const result = await pgConventionTemplateQueries.get({
+        ids: [conventionTemplate.id],
+      });
+      expectToEqual(result[0], {
         ...conventionTemplate,
         name: "Updated name",
         updatedAt: now,

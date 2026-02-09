@@ -2,10 +2,16 @@ import type {
   ConventionTemplate,
   ConventionTemplateId,
   DateTimeIsoString,
+  UserId,
 } from "shared";
 
+export type GetConventionTemplatesParams = {
+  ids?: ConventionTemplateId[];
+  userIds?: UserId[];
+};
+
 export interface ConventionTemplateQueries {
-  getById(id: ConventionTemplateId): Promise<ConventionTemplate | undefined>;
+  get(params: GetConventionTemplatesParams): Promise<ConventionTemplate[]>;
 
   upsert(
     conventionTemplate: ConventionTemplate,
