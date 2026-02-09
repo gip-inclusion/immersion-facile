@@ -4,6 +4,7 @@ import {
   errors,
   type GetUsersFilters,
   isTruthy,
+  pipeWithValue,
   type SiretDto,
   type User,
   type UserId,
@@ -187,6 +188,96 @@ export class PgUserRepository implements UserRepository {
       .limit(50)
       .execute();
     return usersInDb;
+  }
+
+  public async getInactiveUsers(
+    since: Date,
+    options?: { excludeWarnedSince?: Date },
+  ): Promise<UserWithAdminRights[]> {
+    const query = this.#getUserQueryBuilder()
+      .where("users.last_login_at", "<", since)
+      .where(({ eb, not, exists }) =>
+        not(
+          exists(
+            eb
+              .selectFrom("conventions")
+              .innerJoin("actors", (join) =>
+                join.on((eb) =>
+                  eb.or([
+                    eb("actors.id", "=", eb.ref("conventions.beneficiary_id")),
+                    eb(
+                      "actors.id",
+                      "=",
+                      eb.ref("conventions.establishment_tutor_id"),
+                    ),
+                    eb(
+                      "actors.id",
+                      "=",
+                      eb.ref("conventions.establishment_representative_id"),
+                    ),
+                  ]),
+                ),
+              )
+              .select("conventions.id")
+              .where("conventions.date_end", ">=", since)
+              .whereRef("actors.email", "=", "users.email"),
+          ),
+        ),
+      )
+      .where(({ eb, not, exists }) =>
+        not(
+          exists(
+            eb
+              .selectFrom("discussions")
+              .innerJoin(
+                "exchanges",
+                "exchanges.discussion_id",
+                "discussions.id",
+              )
+              .select("discussions.id")
+              .where("exchanges.sent_at", ">=", since)
+              .whereRef(
+                "discussions.potential_beneficiary_email",
+                "=",
+                "users.email",
+              ),
+          ),
+        ),
+      );
+
+    const excludeWarnedSince = options?.excludeWarnedSince;
+
+    const usersInDb = await pipeWithValue(
+      query,
+      (b) =>
+        excludeWarnedSince
+          ? b.where(({ eb, not, exists }) =>
+              not(
+                exists(
+                  eb
+                    .selectFrom("notifications_email")
+                    .select("notifications_email.id")
+                    .where(
+                      "notifications_email.email_kind",
+                      "=",
+                      "ACCOUNT_DELETION_WARNING",
+                    )
+                    .whereRef("notifications_email.user_id", "=", "users.id")
+                    .where(
+                      "notifications_email.created_at",
+                      ">=",
+                      excludeWarnedSince,
+                    ),
+                ),
+              ),
+            )
+          : b,
+      (b) => b.execute(),
+    );
+
+    return usersInDb
+      .map((userInDb) => this.#toAuthenticatedUser(userInDb))
+      .filter(isTruthy);
   }
 
   public async findByExternalId(

@@ -516,6 +516,11 @@ export type EmailParamsByEmailType = {
     assessmentMagicLink: string | undefined;
     validatorName: string;
   };
+  ACCOUNT_DELETION_WARNING: {
+    fullName: string;
+    deletionDate: string;
+    loginUrl: AbsoluteUrl;
+  };
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: string[];
     errorMessage: string;
