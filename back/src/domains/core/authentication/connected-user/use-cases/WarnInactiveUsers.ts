@@ -7,10 +7,11 @@ import type {
 } from "../../../notifications/helpers/Notification";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../useCaseBuilder";
-
-const accountInactivityDelayInYears = 2;
-const deletionWarningDelayInDays = 7;
-const deletionWarningDedupInDays = 9;
+import {
+  accountInactivityDelayInYears,
+  deletionWarningDedupInDays,
+  deletionWarningDelayInDays,
+} from "./inactiveUserConstants";
 
 export type WarnInactiveUsersResult = {
   numberOfWarningsSent: number;

@@ -616,6 +616,65 @@ describe("PgUserRepository - getInactiveUsers", () => {
       notWarned,
     ]);
   });
+
+  it("returns only users warned between onlyWarnedBetween dates", async () => {
+    const onlyWarnedBetween = {
+      from: subDays(now, 10),
+      to: subDays(now, 7),
+    };
+
+    const warnedInsideWindow = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-8-days@test.fr",
+    });
+    const warnedTooRecently = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-6-days@test.fr",
+    });
+    const warnedTooLongAgo = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-11-days@test.fr",
+    });
+    const notWarnedAtAll = makeUserWithOldLogin({
+      id: uuid(),
+      email: "not-warned@test.fr",
+    });
+
+    await userRepository.save(warnedInsideWindow);
+    await userRepository.save(warnedTooRecently);
+    await userRepository.save(warnedTooLongAgo);
+    await userRepository.save(notWarnedAtAll);
+
+    await db
+      .insertInto("notifications_email")
+      .values([
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 8).toISOString(),
+          user_id: warnedInsideWindow.id,
+        },
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 6).toISOString(),
+          user_id: warnedTooRecently.id,
+        },
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 11).toISOString(),
+          user_id: warnedTooLongAgo.id,
+        },
+      ])
+      .execute();
+
+    const result = await userRepository.getInactiveUsers(twoYearsAgo, {
+      onlyWarnedBetween,
+    });
+
+    expectArraysToEqualIgnoringOrder(result, [warnedInsideWindow]);
+  });
 });
 
 const insertUser = async (
