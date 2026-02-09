@@ -2217,6 +2217,29 @@ L'équipe d'Immersion Facilitée`,
         agencyLogoUrl,
       }),
     },
+    ACCOUNT_DELETION_WARNING: {
+      niceName: "Compte - Avertissement de suppression pour inactivité",
+      tags: ["suppressionCompte", "suppressionCompteInactivité"],
+      createEmailVariables: ({ fullName, deletionDate, loginUrl }) => ({
+        subject: "Suppression prochaine de votre compte Immersion Facilitée",
+        greetings: `Bonjour ${fullName},`,
+        content: `Nous n'avons pas constaté de connexion à votre compte Immersion Facilitée depuis bientôt deux ans.
+
+        Conformément à nos règles de conservation des données, votre compte et vos données personnelles vont être supprimés le <strong>${deletionDate}</strong>.
+
+        Pour conserver votre compte, il suffit de vous connecter avant la suppression.`,
+        buttons: [
+          {
+            label: "Se connecter à mon espace",
+            url: loginUrl,
+          },
+        ],
+        subContent: `Sans action de votre part, le compte sera supprimé automatiquement et l'accès ne sera plus possible.
+
+        Bien cordialement,
+        L'équipe Immersion Facilitée`,
+      }),
+    },
     WARN_DISCUSSION_DELIVERY_FAILED: {
       niceName:
         "Établissement - Alerte de problème d'envoi d'un échange dans une discussion",
