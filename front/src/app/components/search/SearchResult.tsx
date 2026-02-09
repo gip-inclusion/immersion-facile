@@ -97,13 +97,11 @@ const SearchResultComponent = ({
           "Cette entreprise a reçu le nombre de candidatures qu’elle peut traiter pour le moment. Elle redeviendra disponible pour les candidatures prochainement.",
       }
     : linkProps;
-  const isCardDisabled =
-    isInternalOfferDto(searchResult) && !searchResult.isAvailable;
 
   return (
     <Card
       nativeDivProps={{
-        "aria-disabled": isCardDisabled,
+        "aria-disabled": isNotAvailableOffer,
       }}
       title={jobTitle}
       desc={establishmentName}
@@ -118,7 +116,7 @@ const SearchResultComponent = ({
       imageComponent={illustration}
       endDetail={dateJobCreatedAt}
       detail={
-        isCardDisabled ? (
+        isNotAvailableOffer ? (
           <span className={fr.cx("fr-icon-close-circle-line")}>
             {" "}
             Mise en relation temporairement indisponible
