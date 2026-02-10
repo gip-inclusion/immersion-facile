@@ -76,7 +76,7 @@ export const makeKyselyDb = (pool: Pool, options?: KyselyOptions): KyselyDb => {
         });
         return;
       }
-      if (!options?.isDev)
+      if (!options?.isDev && event.queryDurationMillis > 100)
         logger.info({
           message: `${messagePrefix}done`,
           durationInSeconds,
