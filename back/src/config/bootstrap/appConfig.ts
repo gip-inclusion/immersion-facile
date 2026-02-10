@@ -110,6 +110,16 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("BREVO_API_KEY");
   }
 
+  public get ftConnectMaxRequestsPerInterval(): number {
+    return Number.parseInt(
+      this.#throwIfNotDefinedOrDefault(
+        "FT_CONNECT_MAX_REQUESTS_PER_INTERVAL",
+        "1",
+      ),
+      10,
+    );
+  }
+
   public get brevoEstablishmentContactListId(): number {
     return Number.parseInt(
       this.#throwIfNotDefinedOrDefault("BREVO_ESTABLISHMENT_CONTACT_LIST_ID"),
