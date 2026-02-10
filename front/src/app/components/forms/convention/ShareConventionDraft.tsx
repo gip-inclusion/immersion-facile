@@ -57,7 +57,7 @@ export const ShareConventionDraft = ({
     <>
       <Button
         type="button"
-        iconId="fr-icon-mail-line"
+        iconId="fr-icon-draft-line"
         onClick={() => {
           shareConventionDraftModal.open();
         }}
@@ -67,7 +67,7 @@ export const ShareConventionDraft = ({
         }}
         priority="secondary"
       >
-        Partager la convention
+        Partager ou enregistrer un brouillon
       </Button>
       {createPortal(
         <shareConventionDraftModal.Component
