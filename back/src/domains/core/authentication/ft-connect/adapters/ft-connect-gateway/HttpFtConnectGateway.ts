@@ -101,23 +101,23 @@ const exchangeCodeForAccessTokenLogger = makeFtConnectLogger(
   "exchangeCodeForAccessToken",
 );
 
-const ftConnectMaxRequestsPerInterval = 1;
 const rate_ms = 1250;
 
 // TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS FT
 export class HttpFtConnectGateway implements FtConnectGateway {
   // FT Connect limit rate at 1 call per 1.2s
   #limiter = new Bottleneck({
-    reservoir: ftConnectMaxRequestsPerInterval,
+    reservoir: this.ftConnectMaxRequestsPerInterval,
     reservoirRefreshInterval: rate_ms, // number of ms
-    reservoirRefreshAmount: ftConnectMaxRequestsPerInterval,
+    reservoirRefreshAmount: this.ftConnectMaxRequestsPerInterval,
     maxConcurrent: 1,
-    minTime: Math.ceil(rate_ms / ftConnectMaxRequestsPerInterval),
+    minTime: Math.ceil(rate_ms / this.ftConnectMaxRequestsPerInterval),
   });
 
   constructor(
     private httpClient: HttpClient<FtConnectExternalRoutes>,
     private configs: FtConnectOauthConfig,
+    private ftConnectMaxRequestsPerInterval: number,
   ) {}
 
   public async getAccessToken(

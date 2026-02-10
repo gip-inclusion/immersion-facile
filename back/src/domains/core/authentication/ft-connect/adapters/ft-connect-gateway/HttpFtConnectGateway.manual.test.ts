@@ -48,6 +48,7 @@ describe("HttpFtConnectGateway", () => {
       franceTravailClientSecret: "pe-client-secret",
       ftAuthCandidatUrl: "https://fake-ft-candidat.fr",
     },
+    2,
   );
 
   const mock = new MockAdapter(axiosWithoutValidateStatus);

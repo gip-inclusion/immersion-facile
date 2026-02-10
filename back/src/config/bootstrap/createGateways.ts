@@ -191,6 +191,7 @@ export const createGateways = async (
             franceTravailClientSecret: config.franceTravailClientSecret,
             ftAuthCandidatUrl: config.ftAuthCandidatUrl,
           },
+          config.ftConnectMaxRequestsPerInterval,
         )
       : new InMemoryFtConnectGateway();
 
