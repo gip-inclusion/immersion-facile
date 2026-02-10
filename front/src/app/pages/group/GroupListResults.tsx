@@ -3,11 +3,7 @@ import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useState } from "react";
 import { Tag as ImTag, SearchResultIllustration } from "react-design-system";
-import {
-  domElementIds,
-  type InternalOfferDto,
-  isInternalOfferDto,
-} from "shared";
+import { domElementIds, type InternalOfferDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
@@ -55,10 +51,6 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                   illustration={
                     <SearchResultIllustration
                       illustration={searchIllustrations[0]}
-                      isFaded={
-                        isInternalOfferDto(searchResult) &&
-                        !searchResult.isAvailable
-                      }
                     >
                       <div className={fr.cx("fr-p-1v")}>
                         {searchResult.fitForDisabledWorkers && (

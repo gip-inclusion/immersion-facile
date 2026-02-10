@@ -5,18 +5,16 @@ import Styles from "./SearchResultIllustration.styles";
 type SearchResultIllustrationProps = {
   children: ReactNode;
   illustration: string;
-  isFaded: boolean;
 };
 
 export const SearchResultIllustration = ({
   children,
   illustration,
-  isFaded,
 }: SearchResultIllustrationProps) => {
   const { cx } = useStyles();
   return (
     <div
-      className={cx(Styles.root, isFaded ? Styles.isFaded : null)}
+      className={cx(Styles.root)}
       style={{
         backgroundImage: `url(${illustration})`,
       }}

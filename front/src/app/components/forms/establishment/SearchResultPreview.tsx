@@ -66,10 +66,7 @@ export const SearchResultPreview = ({
         <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
           <SearchResult
             illustration={
-              <SearchResultIllustration
-                isFaded={false}
-                illustration={searchIllustrations[0]}
-              >
+              <SearchResultIllustration illustration={searchIllustrations[0]}>
                 <div className={fr.cx("fr-p-1v")}>
                   {establishment.fitForDisabledWorkers && (
                     <ImTag theme="rqth" />

@@ -17,6 +17,7 @@ import {
 } from "shared";
 import type { Link } from "type-route";
 import "./SearchResult.scss";
+import { useStyles } from "tss-react/dsfr";
 
 export type EnterpriseSearchResultProps = {
   searchResult: OfferDto;
@@ -39,11 +40,14 @@ const getLastDate = (
   return;
 };
 
+const componentRootClassName = "im-search-result";
+
 const SearchResultComponent = ({
   linkProps,
   searchResult,
   illustration,
 }: EnterpriseSearchResultProps) => {
+  const { cx } = useStyles();
   const {
     siret,
     name,
@@ -103,6 +107,10 @@ const SearchResultComponent = ({
       nativeDivProps={{
         "aria-disabled": isNotAvailableOffer,
       }}
+      className={cx(
+        componentRootClassName,
+        isNotAvailableOffer && `${componentRootClassName}--unavailable`,
+      )}
       title={jobTitle}
       desc={establishmentName}
       linkProps={{
@@ -117,12 +125,22 @@ const SearchResultComponent = ({
       endDetail={dateJobCreatedAt}
       detail={
         isNotAvailableOffer ? (
-          <span className={fr.cx("fr-icon-stop-circle-fill", "fr-icon--sm")}>
+          <span
+            className={cx(
+              fr.cx("fr-icon-stop-circle-fill", "fr-icon--sm"),
+              `${componentRootClassName}__availability-indicator`,
+            )}
+          >
             {" "}
             Mise en relation temporairement indisponible
           </span>
         ) : (
-          <span className={fr.cx("fr-icon-success-fill", "fr-icon--sm")}>
+          <span
+            className={cx(
+              fr.cx("fr-icon-success-fill", "fr-icon--sm"),
+              `${componentRootClassName}__availability-indicator`,
+            )}
+          >
             {" "}
             Mise en relation disponible
           </span>

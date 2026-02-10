@@ -1,11 +1,27 @@
 .im-search-result {
-  &__location-link {
-    text-transform: capitalize;
+  &__availability-indicator {
+    &:before {
+      background-color: var(--background-flat-success);
+    }
   }
-}
 
-.im-search-result-card {
-  &__title {
-    text-transform: capitalize;
+  &--unavailable {
+    .im-search-result__availability-indicator {
+      &:before {
+        background-color: var(--background-flat-error);
+      }
+    }
+
+    .im-search-result-illustration {
+      &:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, .7)
+      }
+    }
   }
 }

@@ -13,7 +13,6 @@ import {
   type AppellationCode,
   domElementIds,
   hasSearchGeoParams,
-  isInternalOfferDto,
   isPhysicalWorkMode,
   isSuperEstablishment,
   type OfferDto,
@@ -165,10 +164,6 @@ export const SearchListResults = ({
                       searchResult={searchResult}
                       illustration={
                         <SearchResultIllustration
-                          isFaded={
-                            isInternalOfferDto(searchResult) &&
-                            !searchResult.isAvailable
-                          }
                           illustration={
                             searchIllustrations[
                               index % searchIllustrations.length
