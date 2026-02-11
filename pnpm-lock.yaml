@@ -36,7 +36,6 @@ overrides:
   tar@< 7.5.7: 7.5.7
   tar-fs@>= 2.0.0 < 2.1.4: ^2.1.4
   xml2js@< 0.5.0: ^0.5.0
-  webpack@>= 5.49.0 <= 5.104.0: 5.104.1
   ws@>= 6.0.0 < 6.2.3: ^6.2.3
   ws@>= 8.0.0 < 8.17.1: ^8.17.1
 
@@ -506,7 +505,7 @@ importers:
         version: 3.13.1
       babel-loader:
         specifier: ^10.0.0
-        version: 10.0.0(@babel/core@7.28.0)(webpack@5.104.1(esbuild@0.25.10))
+        version: 10.0.0(@babel/core@7.28.0)(webpack@5.104.0(esbuild@0.25.10))
       classnames:
         specifier: ^2.3.1
         version: 2.5.1
@@ -547,8 +546,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       webpack:
-        specifier: 5.104.1
-        version: 5.104.1(esbuild@0.25.10)
+        specifier: 5.104.0
+        version: 5.104.0(esbuild@0.25.10)
 
   libs/scss-mapper:
     dependencies:
@@ -4530,7 +4529,7 @@ packages:
     engines: {node: ^18.20.0 || ^20.10.0 || >=22.0.0}
     peerDependencies:
       '@babel/core': ^7.12.0
-      webpack: 5.104.1
+      webpack: '>=5.61.0'
 
   babel-plugin-istanbul@6.1.1:
     resolution: {integrity: sha512-Y1IQok9821cC9onCx5otgFfRm7Lm+I+wwxOx738M/WLPZ9Q42m4IG5W0FNX8WLL2gYMZo3JkuXIH2DOpWM+qwA==}
@@ -8526,7 +8525,7 @@ packages:
       '@swc/core': '*'
       esbuild: '*'
       uglify-js: '*'
-      webpack: 5.104.1
+      webpack: ^5.1.0
     peerDependenciesMeta:
       '@swc/core':
         optional: true
@@ -9151,8 +9150,8 @@ packages:
   webpack-virtual-modules@0.6.2:
     resolution: {integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==}
 
-  webpack@5.104.1:
-    resolution: {integrity: sha512-Qphch25abbMNtekmEGJmeRUhLDbe+QfiWTiqpKYkpCOWY64v9eyl+KRRLmqOFA2AvKPpc9DC6+u2n76tQLBoaA==}
+  webpack@5.104.0:
+    resolution: {integrity: sha512-5DeICTX8BVgNp6afSPYXAFjskIgWGlygQH58bcozPOXgo2r/6xx39Y1+cULZ3gTxUYQP88jmwLj2anu4Xaq84g==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     peerDependencies:
@@ -14941,11 +14940,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  babel-loader@10.0.0(@babel/core@7.28.0)(webpack@5.104.1(esbuild@0.25.10)):
+  babel-loader@10.0.0(@babel/core@7.28.0)(webpack@5.104.0(esbuild@0.25.10)):
     dependencies:
       '@babel/core': 7.28.0
       find-up: 5.0.0
-      webpack: 5.104.1(esbuild@0.25.10)
+      webpack: 5.104.0(esbuild@0.25.10)
 
   babel-plugin-istanbul@6.1.1:
     dependencies:
@@ -20224,14 +20223,14 @@ snapshots:
       type-fest: 0.16.0
       unique-string: 2.0.0
 
-  terser-webpack-plugin@5.3.16(esbuild@0.25.10)(webpack@5.104.1(esbuild@0.25.10)):
+  terser-webpack-plugin@5.3.16(esbuild@0.25.10)(webpack@5.104.0(esbuild@0.25.10)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       serialize-javascript: 6.0.2
       terser: 5.44.1
-      webpack: 5.104.1(esbuild@0.25.10)
+      webpack: 5.104.0(esbuild@0.25.10)
     optionalDependencies:
       esbuild: 0.25.10
 
@@ -20826,7 +20825,7 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  webpack@5.104.1(esbuild@0.25.10):
+  webpack@5.104.0(esbuild@0.25.10):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.8
@@ -20850,7 +20849,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
-      terser-webpack-plugin: 5.3.16(esbuild@0.25.10)(webpack@5.104.1(esbuild@0.25.10))
+      terser-webpack-plugin: 5.3.16(esbuild@0.25.10)(webpack@5.104.0(esbuild@0.25.10))
       watchpack: 2.4.4
       webpack-sources: 3.3.3
     transitivePeerDependencies:
