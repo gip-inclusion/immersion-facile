@@ -36,9 +36,9 @@ export const ConventionMiniStagePage = ({
   const isFTConnected = federatedIdentity?.provider === "peConnect";
 
   const getMode = (): ConventionFormMode => {
-    if ("jwt" in initialRouteParams) return "edit";
-    if (isSharedConvention) return "create-from-shared";
-    return "create-from-scratch";
+    if ("jwt" in initialRouteParams) return "edit-convention";
+    if (isSharedConvention) return "create-convention-from-shared";
+    return "create-convention-from-scratch";
   };
   const mode = getMode();
 

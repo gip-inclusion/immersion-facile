@@ -5,7 +5,11 @@ import type {
   InternshipKind,
   Signatories,
 } from "./convention.dto";
-import type { ConventionDraftId } from "./shareConventionDraftByEmail.dto";
+import type { ConventionTemplateId } from "./conventionTemplate.dto";
+import type {
+  ConventionDraftDto,
+  ConventionDraftId,
+} from "./shareConventionDraftByEmail.dto";
 
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;
@@ -27,6 +31,17 @@ type WithIntershipKind = {
 type WithFromPeConnectedUser = {
   fromPeConnectedUser?: boolean;
 };
+
+export type CreateConventionTemplatePresentationInitialValues =
+  ConventionDraftDto & { id: ConventionTemplateId; name: string };
+
+export type ConventionFormInitialValues =
+  | CreateConventionPresentationInitialValues
+  | CreateConventionTemplatePresentationInitialValues;
+
+export const isCreateConventionPresentationInitialValues = (
+  v: ConventionFormInitialValues,
+): v is CreateConventionPresentationInitialValues => !("name" in v);
 
 export type CreateConventionPresentationInitialValues = OmitFromExistingKeys<
   Partial<ConventionReadDto>,

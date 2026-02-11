@@ -69,6 +69,7 @@ export const agencyDashboardRoutes = [
   "agencyDashboardOnboarding",
   "agencyDashboardStatsAgencies",
   "agencyDashboardStatsActivitiesByEstablishment",
+  "agencyDashboardConventionTemplate",
 ] satisfies AgencyDashboardRouteName[];
 
 export type EstablishmentDashboardRouteName =
@@ -96,7 +97,8 @@ export type FrontAgencyDashboardRoute =
   | Route<typeof routes.agencyDashboardAgencies>
   | Route<typeof routes.agencyDashboardAgencyDetails>
   | Route<typeof routes.agencyDashboardStatsAgencies>
-  | Route<typeof routes.agencyDashboardStatsActivitiesByEstablishment>;
+  | Route<typeof routes.agencyDashboardStatsActivitiesByEstablishment>
+  | Route<typeof routes.agencyDashboardConventionTemplate>;
 
 export type FrontDashboardRoute =
   | FrontAgencyDashboardRoute
@@ -485,6 +487,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       description: "Pour la super team IF 😉",
       withEmailLogin: true,
     },
+    agencyDashboardConventionTemplate: agencyDashboardContent,
 
     default: {
       title: "Se connecter avec ProConnect",
