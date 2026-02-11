@@ -57,20 +57,6 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
       titleAs="h2"
       title="Marquer une convention comme traitée"
       className={fr.cx("fr-mb-4w")}
-      titleAction={
-        isPeUser && (
-          <Button
-            priority="secondary"
-            linkProps={{
-              href: "https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/Documents/Immersion_facilitee/Immersion_facilitee/Guide_de_gestion_des_conventions_en_erreur.pptx?d=w489a3c6b6e5148e6bea287ddfadba8c7&csf=1&web=1&e=i1GD5H",
-              target: "_blank",
-              rel: "noreferrer",
-            }}
-          >
-            Guide de gestion des conventions en erreur
-          </Button>
-        )
-      }
     >
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <div className={fr.cx("fr-grid-row")}>
