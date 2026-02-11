@@ -1,20 +1,21 @@
 import { sql } from "kysely";
 import type { InsertExpression } from "kysely/dist/cjs/parser/insert-values-parser";
-import type {
-  AgencyKind,
-  ConventionDraftDto,
-  ConventionDraftId,
-  DateString,
-  DepartmentCode,
-  EstablishmentTutor,
-  ScheduleDto,
-  Signatories,
+import {
+  type AgencyKind,
+  type ConventionDraftDto,
+  type ConventionDraftId,
+  type DateString,
+  type DepartmentCode,
+  type EstablishmentTutor,
+  pipeWithValue,
+  type ScheduleDto,
+  type Signatories,
 } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import type {
   ConventionDraftRepository,
-  DeleteConventionDraftFilters,
+  GetConventionDraftFilters,
 } from "../ports/ConventionDraftRepository";
 
 const dateToIsoString = (date: Date | string): string => {
@@ -104,6 +105,27 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
     };
   }
 
+  public async getConventionDraftIdsByFilters(
+    filters: GetConventionDraftFilters,
+  ): Promise<ConventionDraftId[]> {
+    const { ids, lastUpdatedAt } = filters;
+
+    const conventionDraftIds: {
+      id: string;
+    }[] = await pipeWithValue(
+      this.transaction
+        .selectFrom("convention_drafts")
+        .select("convention_drafts.id"),
+      (qb) => (ids ? qb.where("convention_drafts.id", "in", ids) : qb),
+      (qb) =>
+        lastUpdatedAt
+          ? qb.where("convention_drafts.updated_at", "<=", lastUpdatedAt)
+          : qb,
+    ).execute();
+
+    return conventionDraftIds.map(({ id }) => id);
+  }
+
   public async save(
     conventionDraft: ConventionDraftDto,
     now: DateString,
@@ -121,32 +143,12 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
       .execute();
   }
 
-  public async delete(
-    filters: DeleteConventionDraftFilters,
-  ): Promise<ConventionDraftId[]> {
-    const { ids, endedSince } = filters;
-
-    if (!ids?.length && !endedSince) return [];
-
-    const deletedConventionDraftIds = await this.transaction
+  public async delete(ids: ConventionDraftId[]): Promise<void> {
+    if (ids.length === 0) return;
+    await this.transaction
       .deleteFrom("convention_drafts")
-      .where((eb) => {
-        const conditions = [];
-
-        if (ids?.length) {
-          conditions.push(eb("id", "in", ids));
-        }
-
-        if (endedSince) {
-          conditions.push(eb("updated_at", "<=", endedSince));
-        }
-
-        return eb.or(conditions);
-      })
-      .returning("id")
+      .where("id", "in", ids)
       .execute();
-
-    return deletedConventionDraftIds.map((row) => row.id);
   }
 }
 
