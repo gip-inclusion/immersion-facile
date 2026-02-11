@@ -1,8 +1,10 @@
-import { subDays } from "date-fns";
 import { AppConfig } from "../../config/bootstrap/appConfig";
-import { makeKyselyDb } from "../../config/pg/kysely/kyselyUtils";
-import { createMakeScriptPgPool } from "../../config/pg/pgPool";
-import { PgConventionDraftRepository } from "../../domains/convention/adapters/PgConventionDraftRepository";
+import { makeGetOldConventionDraftsAndEmitDeleteEvent } from "../../domains/convention/use-cases/GetOldConventionDraftsAndEmitDeleteEvent";
+import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
+import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
+import { createInMemoryUow } from "../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../domains/core/unit-of-work/adapters/InMemoryUowPerformer";
+import { TestUuidGenerator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
 import { monitoredAsUseCase } from "../utils";
@@ -14,24 +16,28 @@ const numberOfDaysBeforeDeletion = 30;
 const deleteOldConventionDrafts = async (): Promise<{
   numberOfConventionDraftsDeleted: number;
 }> => {
-  const pool = createMakeScriptPgPool(config)();
-  const transaction = makeKyselyDb(pool);
-  const pgConventionDraftRepository = new PgConventionDraftRepository(
-    transaction,
-  );
-  const deleteAllConventionDraftsAfter = subDays(
-    new Date(),
-    numberOfDaysBeforeDeletion,
-  );
+  const uow = createInMemoryUow();
+  const timeGateway = new CustomTimeGateway();
+  const uuidGenerator = new TestUuidGenerator();
+  const createNewEvent = makeCreateNewEvent({
+    timeGateway,
+    uuidGenerator,
+  });
 
-  const deletedOldConventionDraftIds = await pgConventionDraftRepository.delete(
-    {
-      endedSince: deleteAllConventionDraftsAfter,
-    },
-  );
+  const getOldConventionDraftsAndEmitDeleteEvent =
+    makeGetOldConventionDraftsAndEmitDeleteEvent({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
+        createNewEvent,
+      },
+    });
+
+  const { numberOfOldConventionDraftIds } =
+    await getOldConventionDraftsAndEmitDeleteEvent.execute();
 
   return {
-    numberOfConventionDraftsDeleted: deletedOldConventionDraftIds.length,
+    numberOfConventionDraftsDeleted: numberOfOldConventionDraftIds,
   };
 };
 
