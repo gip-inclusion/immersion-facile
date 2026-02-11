@@ -34,6 +34,7 @@ import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../dom
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
+import { makeCreateOrUpdateConventionTemplate } from "../../domains/convention/use-cases/CreateOrUpdateConventionTemplate";
 import { makeDeleteAssessment } from "../../domains/convention/use-cases/DeleteAssessment";
 import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
 import { makeEditBeneficiaryBirthdate } from "../../domains/convention/use-cases/EditBeneficiaryBirthdate";
@@ -1055,6 +1056,10 @@ export const createUseCases = ({
     editBeneficiaryBirthdate: makeEditBeneficiaryBirthdate({
       uowPerformer,
       deps: { createNewEvent },
+    }),
+    createOrUpdateConventionTemplate: makeCreateOrUpdateConventionTemplate({
+      uowPerformer,
+      deps: { timeGateway: gateways.timeGateway },
     }),
     warnSenderThatMessageCouldNotBeDelivered:
       makeWarnSenderThatMessageCouldNotBeDelivered({

@@ -1,24 +1,20 @@
 import { sql } from "kysely";
 import type { InsertExpression } from "kysely/dist/cjs/parser/insert-values-parser";
-import type {
-  AgencyKind,
-  ConventionDraftDto,
-  ConventionDraftId,
-  DateString,
-  DepartmentCode,
-  EstablishmentTutor,
-  ScheduleDto,
-  Signatories,
+import {
+  type AgencyKind,
+  type ConventionDraftDto,
+  type ConventionDraftId,
+  type DateString,
+  type DepartmentCode,
+  dateToIsoString,
+  type EstablishmentTutor,
+  type ScheduleDto,
+  type Signatories,
 } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
 
-const dateToIsoString = (date: Date | string): string => {
-  return date instanceof Date
-    ? date.toISOString()
-    : new Date(date).toISOString();
-};
 export class PgConventionDraftRepository implements ConventionDraftRepository {
   constructor(private transaction: KyselyDb) {}
 

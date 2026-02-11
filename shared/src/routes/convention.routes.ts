@@ -24,6 +24,7 @@ import {
   withConventionIdLegacySchema,
   withConventionIdSchema,
 } from "../convention/convention.schema";
+import { conventionTemplateSchema } from "../convention/conventionTemplate.schema";
 import {
   flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
   paginatedConventionWithBroadcastFeedbackSchema,
@@ -344,6 +345,19 @@ export const authenticatedConventionRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+    },
+  }),
+
+  createOrUpdateConventionTemplate: defineRoute({
+    url: "/convention-templates",
+    method: "post",
+    requestBodySchema: conventionTemplateSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
 });
