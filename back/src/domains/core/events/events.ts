@@ -14,6 +14,7 @@ import {
   type WithAgencyId,
   type WithAgencyIdAndUserId,
   type WithAssessmentDto,
+  type WithConventionDraftId,
   type WithConventionDto,
   type WithConventionId,
   type WithConventionIdLegacy,
@@ -95,7 +96,7 @@ export type DomainEvent =
   | NotificationBatchAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
-  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto & Partial<WithDiscussionId> & WithTriggeredBy>
+  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto & Partial<WithDiscussionId> & Partial<WithConventionDraftId> & WithTriggeredBy>
   | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionPartiallySigned", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionFullySigned", WithConventionDto & WithTriggeredBy>
@@ -114,6 +115,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionDrafToDelete", WithConventionDraftId & WithTriggeredBy>
 
   // FORM ESTABLISHMENT RELATED
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>

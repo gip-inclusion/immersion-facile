@@ -1,5 +1,6 @@
 import {
   keys,
+  type WithConventionDraftId,
   type WithConventionDto,
   type WithConventionId,
   type WithSiretDto,
@@ -57,7 +58,9 @@ const getUseCasesByTopics = (
   ConventionSubmittedByBeneficiary: [
     useCases.bindConventionToFederatedIdentity,
     useCases.markDiscussionLinkedToConvention,
-    useCases.deleteConventionDraft,
+    extractWithConventionDraftIdFromAddConventionInput(
+      useCases.deleteConventionDraft,
+    ),
   ],
 
   // Convention Federated Identities
@@ -167,6 +170,7 @@ const getUseCasesByTopics = (
   ],
   ConventionSignatureLinkManuallySent: [],
   ConventionReminderRequired: [useCases.notifyConventionReminder],
+  ConventionDrafToDelete: [useCases.deleteConventionDraft],
 
   // Establishment form related
   UpdatedEstablishmentAggregateInsertedFromForm: [
@@ -290,5 +294,17 @@ const extractConventionIdFromConvention = <
   execute: (params) =>
     useCase.execute({
       conventionId: params.convention.id,
+    }),
+});
+
+const extractWithConventionDraftIdFromAddConventionInput = <
+  UC extends InstantiatedUseCase<Partial<WithConventionDraftId>, void, any>,
+>(
+  useCase: UC,
+): InstantiatedUseCase<Partial<WithConventionDraftId>, void, any> => ({
+  useCaseName: useCase.useCaseName,
+  execute: (params) =>
+    useCase.execute({
+      conventionDraftId: params.conventionDraftId,
     }),
 });
