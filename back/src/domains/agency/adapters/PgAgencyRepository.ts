@@ -118,6 +118,7 @@ export class PgAgencyRepository implements AgencyRepository {
       .updateTable("agencies")
       .set(({ fn }) => ({
         name: agency.name,
+        contact_email: agency.contactEmail,
         status: agency.status,
         kind: agency.kind,
         email_signature: agency.signature,

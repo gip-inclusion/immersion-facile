@@ -119,6 +119,7 @@ describe("PgAgencyRepository", () => {
 
   beforeEach(async () => {
     await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("convention_drafts").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agency_groups").execute();
     await db.deleteFrom("users_ongoing_oauths").execute();
@@ -458,6 +459,30 @@ describe("PgAgencyRepository", () => {
       expectToEqual(retrievedAgency, {
         ...agencyWithDelegation,
         delegationAgencyInfo: updatedDelegationInfo,
+      });
+    });
+
+    it("updates contactEmail", async () => {
+      const agency = toAgencyWithRights(
+        agency1builder.withStatus("active").build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      await agencyRepository.insert(agency);
+
+      const newContactEmail = "new.contact@agency.fr";
+
+      await agencyRepository.update({
+        id: agency.id,
+        contactEmail: newContactEmail,
+      });
+
+      const retrievedAgency = await agencyRepository.getById(agency.id);
+      expectToEqual(retrievedAgency, {
+        ...agency,
+        contactEmail: newContactEmail,
       });
     });
   });
