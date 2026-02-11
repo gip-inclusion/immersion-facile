@@ -1,7 +1,7 @@
 import type { ConventionDraftDto, ConventionDraftId, DateString } from "shared";
 import type {
   ConventionDraftRepository,
-  DeleteConventionDraftFilters,
+  GetConventionDraftFilters,
 } from "../ports/ConventionDraftRepository";
 
 export class InMemoryConventionDraftRepository
@@ -22,6 +22,14 @@ export class InMemoryConventionDraftRepository
     return this.#conventionDrafts[id];
   }
 
+  public async getConventionDraftIdsByFilters(
+    filters: GetConventionDraftFilters,
+  ): Promise<ConventionDraftId[]> {
+    return Object.values(this.#conventionDrafts)
+      .filter(makeApplyFiltersToConventionDrafts(filters))
+      .map((conventionDraft) => conventionDraft.id);
+  }
+
   public async save(
     conventionDraft: ConventionDraftDto,
     updatedAt: DateString,
@@ -32,32 +40,24 @@ export class InMemoryConventionDraftRepository
     };
   }
 
-  public async delete(
-    filters: DeleteConventionDraftFilters,
-  ): Promise<ConventionDraftId[]> {
-    const conventionDraftsIdsToDelete = Object.entries(this.#conventionDrafts)
-      .filter(
-        ([id, draft]) =>
-          shouldDeleteById(id, filters.ids) ||
-          shouldDeleteByDate(draft, filters.endedSince),
-      )
-      .map(([id]) => id);
-
-    conventionDraftsIdsToDelete.forEach((id) => {
+  public async delete(ids: ConventionDraftId[]): Promise<void> {
+    for (const id of ids) {
       delete this.#conventionDrafts[id];
-    });
-
-    return conventionDraftsIdsToDelete;
+    }
   }
 }
 
-const shouldDeleteById = (
-  id: ConventionDraftId,
-  idsToDelete?: ConventionDraftId[],
-): boolean => !idsToDelete || idsToDelete.includes(id);
-
-const shouldDeleteByDate = (
-  draft: ConventionDraftDto,
-  endedSince?: Date,
-): boolean =>
-  !endedSince || (!!draft.updatedAt && new Date(draft.updatedAt) <= endedSince);
+const makeApplyFiltersToConventionDrafts =
+  ({ ids, lastUpdatedAt }: GetConventionDraftFilters) =>
+  (draft: ConventionDraftDto): boolean =>
+    (
+      [
+        ({ id }) => (!ids || ids.length === 0 ? true : ids.includes(id)),
+        ({ updatedAt }) =>
+          !lastUpdatedAt
+            ? true
+            : updatedAt
+              ? new Date(updatedAt) <= lastUpdatedAt
+              : false,
+      ] satisfies Array<(draft: ConventionDraftDto) => boolean>
+    ).every((filter) => filter(draft));
