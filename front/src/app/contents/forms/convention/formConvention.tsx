@@ -768,11 +768,7 @@ export const sidebarStepContent = (
               Définir précisément le lieu et les horaires de l’immersion permet
               de garantir la couverture du candidat pendant cette période.
             </p>
-            <p>
-              Assurez-vous que ces informations sont exactes et reflètent les
-              horaires réels de l’immersion, car elles sont essentielles pour la
-              couverture du candidat et le suivi des allocations si applicable.
-            </p>
+
             <p>Pour toute question, contactez la structure d’accueil.</p>
           </>
         ),
