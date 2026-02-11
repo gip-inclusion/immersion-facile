@@ -14,6 +14,7 @@ export const allowedLoginSources = [
   "establishmentDashboard",
   "establishmentDashboardDiscussions",
   "agencyDashboard",
+  "agencyDashboardConventionTemplate",
   "addAgency",
   "manageConventionUserConnected",
 ] as const;

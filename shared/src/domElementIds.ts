@@ -988,11 +988,30 @@ export const domElementIds = {
     },
     conventionTemplate: {
       editConventionTemplateButton:
-        "im-manage-convention-user-connected__edit-convention-template-button",
+        "im-manage-convention-template__edit-convention-template-button",
       deleteConventionTemplateButton:
-        "im-manage-convention-user-connected__delete-convention-template-button",
+        "im-manage-convention-template__delete-convention-template-button",
       shareConventionTemplateButton:
-        "im-manage-convention-user-connected__share-convention-template-button",
+        "im-manage-convention-template__share-convention-template-button",
+    },
+  },
+  agencyDashboardConventionTemplate: {
+    login: {
+      proConnectButton:
+        "im-login-form__pro-connect-button--agency-dashboard-convention-template",
+      byEmailButton:
+        "im-login-form__connect-button--agency-dashboard-convention-template-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--agency-dashboard-convention-template",
+      retryButton:
+        "im-login-form__retry-login-button--agency-dashboard-convention-template",
+      contactSupport:
+        "im-login-form__contact-support-link--agency-dashboard-convention-template",
+    },
+    form: {
+      submitFormButton: "im-convention-template-form__submit-form-button",
+      submitFormButtonMobile:
+        "im-convention-template-form__submit-form-button--mobile",
     },
   },
   manageConventionUserConnected: {
@@ -1121,11 +1140,4 @@ export const domElementIds = {
       "im-convention-form__initiate-dont-know-category-button",
   },
   beneficiaryDashboard: {},
-  conventionTemplate: {
-    form: {
-      submitFormButton: "im-convention-template-form__submit-form-button",
-      submitFormButtonMobile:
-        "im-convention-template-form__submit-form-button--mobile",
-    },
-  },
 } satisfies DomElementIds;

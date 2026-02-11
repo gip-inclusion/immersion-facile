@@ -1,6 +1,13 @@
+import { v4 as uuidV4 } from "uuid";
+import type { AgencyKind } from "../agency/agency.dto";
+import type { NumberEmployeesRange } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import type { UserId } from "../user/user.dto";
 import type { OmitFromExistingKeys } from "../utils";
+import {
+  type CreateConventionTemplatePresentationInitialValues,
+  undefinedIfEmptyString,
+} from "./conventionPresentation.dto";
 import type { ConventionDraftDto } from "./shareConventionDraftByEmail.dto";
 
 export type ConventionTemplateId = Flavor<string, "ConventionTemplateId">;
@@ -12,4 +19,35 @@ export type ConventionTemplate = OmitFromExistingKeys<
   id: ConventionTemplateId;
   name: string;
   userId: UserId;
+};
+
+export const toConventionTemplate = ({
+  convention,
+  userId,
+  establishmentNumberEmployeesRange,
+  selectedAgencyKind,
+}: {
+  selectedAgencyKind: AgencyKind | undefined;
+  convention: CreateConventionTemplatePresentationInitialValues;
+  userId: UserId;
+  establishmentNumberEmployeesRange: NumberEmployeesRange | undefined;
+}): ConventionTemplate => {
+  return {
+    ...convention,
+    id: uuidV4(),
+    userId,
+    agencyDepartment: convention.agencyDepartment ?? "",
+    workConditions: undefinedIfEmptyString(convention.workConditions),
+    agencyReferent: {
+      firstname: undefinedIfEmptyString(convention.agencyReferent?.firstname),
+      lastname: undefinedIfEmptyString(convention.agencyReferent?.lastname),
+    },
+    establishmentNumberEmployeesRange:
+      establishmentNumberEmployeesRange === ""
+        ? undefined
+        : establishmentNumberEmployeesRange,
+    agencyKind: selectedAgencyKind,
+    agencyContactEmail: "",
+    assessment: null,
+  };
 };
