@@ -11,7 +11,6 @@ import { monitoredAsUseCase } from "../utils";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
-const numberOfDaysBeforeDeletion = 30;
 
 const deleteOldConventionDrafts = async (): Promise<{
   numberOfConventionDraftsDeleted: number;
@@ -54,7 +53,7 @@ export const triggerDeleteOldConventionDrafts = ({
       cb: deleteOldConventionDrafts,
     }),
     handleResults: ({ numberOfConventionDraftsDeleted }) =>
-      `${numberOfConventionDraftsDeleted} convention drafts were deleted, because they were more than ${numberOfDaysBeforeDeletion} days old`,
+      `${numberOfConventionDraftsDeleted} convention drafts were deleted`,
     logger,
     exitOnFinish,
   });
