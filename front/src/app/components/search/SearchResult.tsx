@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Card from "@codegouvfr/react-dsfr/Card";
-import { Tag } from "@codegouvfr/react-dsfr/Tag";
 import { formatDistance } from "date-fns";
 import { fr as frLocale } from "date-fns/locale";
 import { equals } from "ramda";
@@ -17,6 +16,7 @@ import {
 } from "shared";
 import type { Link } from "type-route";
 import "./SearchResult.scss";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 import { useStyles } from "tss-react/dsfr";
 
 export type EnterpriseSearchResultProps = {
@@ -127,7 +127,7 @@ const SearchResultComponent = ({
         isNotAvailableOffer ? (
           <span
             className={cx(
-              fr.cx("fr-icon-stop-circle-fill", "fr-icon--sm"),
+              fr.cx("fr-icon-stop-circle-fill", "fr-icon--sm", "fr-mt-1w"),
               `${componentRootClassName}__availability-indicator`,
             )}
           >
@@ -137,7 +137,7 @@ const SearchResultComponent = ({
         ) : (
           <span
             className={cx(
-              fr.cx("fr-icon-success-fill", "fr-icon--sm"),
+              fr.cx("fr-icon-success-fill", "fr-icon--sm", "fr-mt-1w"),
               `${componentRootClassName}__availability-indicator`,
             )}
           >
@@ -147,11 +147,16 @@ const SearchResultComponent = ({
         )
       }
       start={
-        <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
-          {displayedLocation} -{" "}
-          {isInternalOfferDto(searchResult) &&
-            remoteWorkModeLabels[searchResult.remoteWorkMode].label}
-        </Tag>
+        <>
+          <Badge className={fr.cx("fr-mb-2v", "fr-mr-2v")}>
+            {displayedLocation}
+          </Badge>
+          {isInternalOfferDto(searchResult) && (
+            <Badge className={fr.cx("fr-mb-2v")}>
+              {remoteWorkModeLabels[searchResult.remoteWorkMode].label}
+            </Badge>
+          )}
+        </>
       }
     />
   );
