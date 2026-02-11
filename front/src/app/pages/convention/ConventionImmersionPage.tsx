@@ -228,13 +228,12 @@ const SharedConventionMessage = ({
 }) => (
   <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
     <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
-      <h1>
-        Quelqu'un a partagé une demande de convention d'immersion avec vous
-      </h1>
+      <h1>Convention d’immersion en cours de complétion</h1>
       <p>
-        Une entreprise ou un candidat a rempli ses informations dans le
-        formulaire de demande de convention. Vous n'avez plus qu'à remplir vos
-        informations et à valider le formulaire en quelques clics.
+        Une demande de convention d’immersion vous attend. Il manque certaines
+        informations de votre part pour compléter le document. Cliquez sur le
+        bouton ci-dessous pour remplir les sections qui vous concernent et
+        finaliser la convention en quelques minutes.
       </p>
       <Button
         onClick={() => onClickContinue()}
@@ -245,11 +244,11 @@ const SharedConventionMessage = ({
             .fromSharedConventionContinueButton
         }
       >
-        Continuer
+        Compléter la demande de convention
       </Button>
 
       <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
-        {/* biome-ignore lint/a11y/useValidAnchor: This is a trusted source */}
+        Vous êtes inscrits à France Travail en tant que bénéficiaire ?{" "}
         <a
           href={`/api/${loginFtConnect}`}
           onClick={() => {
@@ -257,12 +256,11 @@ const SharedConventionMessage = ({
           }}
           className={fr.cx(
             "fr-link",
-            "fr-icon-arrow-right-line",
-            "fr-link--icon-right",
+            // "fr-icon-arrow-right-line",
+            // "fr-link--icon-right",
           )}
         >
-          Ou continuer avec mes identifiants France Travail (candidats inscrits
-          à France Travail)
+          Connectez-vous avec vos identifiants
         </a>
       </p>
     </div>
