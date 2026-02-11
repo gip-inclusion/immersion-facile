@@ -6,6 +6,7 @@ import {
   ConnectedUserBuilder,
   type ConnectedUserJwt,
   ConventionDtoBuilder,
+  type ConventionTemplate,
   currentJwtVersions,
   defaultProConnectInfos,
   displayRouteName,
@@ -876,6 +877,78 @@ describe("authenticatedConventionRoutes", () => {
       expectHttpResponseToEqual(response, {
         body: { message: authExpiredMessage(), status: 401 },
         status: 401,
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    authenticatedConventionRoutes.createOrUpdateConventionTemplate,
+  )}`, () => {
+    const validConventionTemplate: ConventionTemplate = {
+      id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      name: "Mon modèle",
+      internshipKind: "immersion" as const,
+      userId: validator.id,
+    };
+
+    it("401 with bad token", async () => {
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: "wrong-token" },
+        body: validConventionTemplate,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: invalidTokenMessage, status: 401 },
+        status: 401,
+      });
+    });
+
+    it("401 with expired token", async () => {
+      const token = generateConnectedUserJwt(
+        { userId: validator.id, version: currentJwtVersions.connectedUser },
+        0,
+      );
+
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: token },
+        body: validConventionTemplate,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: authExpiredMessage(), status: 401 },
+        status: 401,
+      });
+    });
+
+    it("400 when request body is invalid", async () => {
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: validToken },
+        body: {
+          id: validConventionTemplate.id,
+          name: "",
+          internshipKind: "immersion",
+          userId: validator.id,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: expect.objectContaining({
+          status: 400,
+          issues: expect.any(Array),
+        }),
+      });
+    });
+
+    it("200 creates or updates convention template when authenticated", async () => {
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: validToken },
+        body: validConventionTemplate,
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
       });
     });
   });

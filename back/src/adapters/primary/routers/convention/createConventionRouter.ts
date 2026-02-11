@@ -128,5 +128,16 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.createOrUpdateConventionTemplate(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.createOrUpdateConventionTemplate.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   return expressRouter;
 };

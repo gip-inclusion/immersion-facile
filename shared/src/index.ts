@@ -39,6 +39,8 @@ export * from "./convention/convention.schema";
 export * from "./convention/conventionPresentation.dto";
 export * from "./convention/conventionPresentation.schema";
 export * from "./convention/conventionStatusTransitions";
+export * from "./convention/conventionTemplate.dto";
+export * from "./convention/conventionTemplate.schema";
 export * from "./convention/conventionWithBroadcastFeedback.dto";
 export * from "./convention/conventionWithBroadcastFeedback.schema";
 export * from "./convention/shareConventionDraftByEmail.dto";
