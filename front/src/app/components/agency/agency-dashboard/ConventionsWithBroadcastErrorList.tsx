@@ -17,6 +17,7 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  activeAgencyStatuses,
   conventionStatuses,
   type FlatGetConventionsWithErroredBroadcastFeedbackParams,
   getFormattedFirstnameAndLastname,
@@ -28,6 +29,7 @@ import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSe
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionsWithBroadcastFeedbackSelectors } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.selectors";
 import {
   conventionsWithBroadcastFeedbackSlice,
@@ -43,6 +45,7 @@ export const ConventionsWithBroadcastErrorList = ({
   const dispatch = useDispatch();
   const { cx } = useStyles();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const {
     data: conventionsWithBroadcastFeedback,
     pagination,
@@ -227,11 +230,31 @@ export const ConventionsWithBroadcastErrorList = ({
     };
   }, [dispatch, connectedUserJwt]);
 
+  const isPeUser = currentUser?.agencyRights.some(
+    (agencyRight) =>
+      agencyRight.agency.kind === "pole-emploi" &&
+      activeAgencyStatuses.includes(agencyRight.agency.status),
+  );
+
   return (
     <HeadingSection
       title={title}
       titleAs="h2"
       className={fr.cx("fr-mt-2w", "fr-mb-4w")}
+      titleAction={
+        isPeUser && (
+          <Button
+            priority="secondary"
+            linkProps={{
+              href: "https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/Documents/Immersion_facilitee/Immersion_facilitee/Guide_de_gestion_des_conventions_en_erreur.pptx?d=w489a3c6b6e5148e6bea287ddfadba8c7&csf=1&web=1&e=i1GD5H",
+              target: "_blank",
+              rel: "noreferrer",
+            }}
+          >
+            Guide de gestion des conventions en erreur
+          </Button>
+        )
+      }
     >
       <form
         onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
