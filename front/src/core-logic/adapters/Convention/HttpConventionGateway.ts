@@ -13,6 +13,7 @@ import type {
   ConventionMagicLinkRoutes,
   ConventionReadDto,
   ConventionSupportedJwt,
+  ConventionTemplate,
   DashboardUrlAndName,
   DataWithPagination,
   EditBeneficiaryBirthdateRequestDto,
@@ -308,6 +309,44 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 404 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public createOrUpdateConventionTemplate$(
+    conventionTemplate: ConventionTemplate,
+    jwt: string,
+  ): Observable<void> {
+    return from(
+      this.authenticatedHttpClient
+        .createOrUpdateConventionTemplate({
+          body: conventionTemplate,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getConventionTemplatesForCurrentUser$(
+    jwt: string,
+  ): Observable<ConventionTemplate[]> {
+    return from(
+      this.authenticatedHttpClient
+        .getConventionTemplatesForCurrentUser({
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

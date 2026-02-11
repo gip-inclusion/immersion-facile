@@ -54,6 +54,8 @@ import { editBeneficiaryBirthdateEpics } from "src/core-logic/domain/convention/
 import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
 import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
+import { conventionTemplateEpics } from "src/core-logic/domain/convention-template/conventionTemplate.epics";
+import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishment/establishment.epics";
 import { establishmentLeadEpics } from "src/core-logic/domain/establishmentLead/establishmentLead.epics";
 import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
@@ -102,6 +104,7 @@ const allEpics: AppEpic<any>[] = [
   ...conventionActionEpics,
   ...conventionDraftEpics,
   ...conventionEpics,
+  ...conventionTemplateEpics,
   ...connectedUserConventionsEpics,
   ...connectedUserConventionListEpics,
   ...conventionsWithBroadcastFeedbackEpics,
@@ -160,6 +163,7 @@ const appReducer = combineReducers({
   [authSlice.name]: authSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
   [conventionDraftSlice.name]: conventionDraftSlice.reducer,
+  [conventionTemplateSlice.name]: conventionTemplateSlice.reducer,
   [discussionSlice.name]: discussionSlice.reducer,
   [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
   [establishmentLeadSlice.name]: establishmentLeadSlice.reducer,

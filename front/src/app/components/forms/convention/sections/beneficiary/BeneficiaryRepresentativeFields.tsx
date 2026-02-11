@@ -72,7 +72,7 @@ export const BeneficiaryRepresentativeFields = ({
       "signatories.beneficiary.emergencyContactEmail",
       beneficiaryRepresentativeEmail || "",
     );
-  }, [beneficiaryRepresentativeEmail]);
+  }, [beneficiaryRepresentativeEmail, setValue]);
 
   const formContents = getFormFields();
   return (

@@ -570,6 +570,10 @@ export const errors = {
         `Aucun brouillon de convention trouvé avec l'identifiant '${conventionDraftId}' : soit ce brouillon a expiré, soit une convention a déjà été créée à partir de ce brouillon.`,
       ),
   },
+  conventionTemplate: {
+    forbiddenMissingName: () =>
+      new ForbiddenError("Le nom du modèle de convention est requis."),
+  },
   establishment: {
     badPagination: ({
       page,

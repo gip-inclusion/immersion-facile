@@ -13,6 +13,7 @@ import {
   type ConventionLastBroadcastFeedbackResponse,
   type ConventionReadDto,
   type ConventionSupportedJwt,
+  type ConventionTemplate,
   type DashboardUrlAndName,
   type DataWithPagination,
   type EditBeneficiaryBirthdateRequestDto,
@@ -76,6 +77,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
   public shareConventionDraftByEmailResult$ = new Subject<void>();
+
+  public createOrUpdateConventionTemplateResult$ = new Subject<void>();
+
+  public getConventionTemplatesForCurrentUserResult$ = new Subject<
+    ConventionTemplate[]
+  >();
 
   public getConventionsForUserResult$ = new Subject<
     DataWithPagination<ConventionReadDto>
@@ -178,6 +185,19 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _conventionDraftId: ConventionDraftId,
   ): Observable<ConventionDraftDto | undefined> {
     return this.conventionDraft$;
+  }
+
+  public createOrUpdateConventionTemplate$(
+    _conventionTemplate: ConventionTemplate,
+    _jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return this.createOrUpdateConventionTemplateResult$;
+  }
+
+  public getConventionTemplatesForCurrentUser$(
+    _jwt: string,
+  ): Observable<ConventionTemplate[]> {
+    return this.getConventionTemplatesForCurrentUserResult$;
   }
 
   public signConvention$(

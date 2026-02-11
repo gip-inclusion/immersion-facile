@@ -13,6 +13,7 @@ import {
 } from "shared";
 import { AgencyTasks } from "src/app/components/agency/agency-dashboard/AgencyTasks";
 import { ConventionList } from "src/app/components/agency/agency-dashboard/ConventionList";
+import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -109,6 +110,8 @@ export const ConventionTabContent = ({
         }}
       />
       <ConventionList />
+
+      <ConventionTemplatesList fromRoute={routes.agencyDashboard()} />
 
       {createPortal(
         <selectAgencyToInitiateConventionModal.Component
