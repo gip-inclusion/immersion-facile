@@ -175,7 +175,8 @@ export const ConventionForm = ({
         federatedIdentity,
       ),
     },
-    ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
+    ...(federatedIdentity?.payload?.advisor &&
+    mode === "create-convention-from-scratch"
       ? {
           agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
           agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
@@ -202,7 +203,7 @@ export const ConventionForm = ({
 
   const defaultValues: CreateConventionPresentationInitialValues =
     creationFormModes.includes(
-      mode as ExcludeFromExisting<ConventionFormMode, "edit">,
+      mode as ExcludeFromExisting<ConventionFormMode, "edit-convention">,
     )
       ? initialValues
       : fetchedConvention || conventionPresentationFromDraft || initialValues;
@@ -421,7 +422,7 @@ export const ConventionForm = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (mode === "edit") {
+    if (mode === "edit-convention") {
       validateSteps("clearAllErrors");
     }
   }, [conventionValues.id]);
@@ -495,8 +496,13 @@ export const ConventionForm = ({
       <ConventionFormLayout
         form={
           <FormProvider {...methods}>
-            <div className={cx("fr-text")}>{t.intro.welcome}</div>
-            {mode !== "edit" && (
+            {mode === "create-convention-from-scratch" && (
+              <div className={cx("fr-text")}>
+                {t.intro.welcomeCongratulations}
+              </div>
+            )}
+            <div className={cx("fr-text")}>{t.intro.welcomeDescription}</div>
+            {mode !== "edit-convention" && (
               <Alert
                 severity="info"
                 small
@@ -520,6 +526,7 @@ export const ConventionForm = ({
               />
               <div className={fr.cx("fr-accordions-group")}>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`1. ${t.agencySection.title}`}
@@ -571,6 +578,7 @@ export const ConventionForm = ({
                 </Accordion>
 
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`2. ${t.beneficiarySection.title}`}
@@ -589,6 +597,7 @@ export const ConventionForm = ({
                   />
                 </Accordion>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`3. ${t.establishmentSection.title}`}
@@ -605,6 +614,7 @@ export const ConventionForm = ({
                   />
                 </Accordion>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`4. ${t.immersionHourLocationSection.title}`}
@@ -642,6 +652,7 @@ export const ConventionForm = ({
                   />
                 </Accordion>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`5. ${t.immersionDetailsSection.title}`}
@@ -713,7 +724,7 @@ export const ConventionForm = ({
             sidebarContent={sidebarContent}
             sidebarFooter={
               <>
-                {mode !== "edit" && (
+                {mode !== "edit-convention" && (
                   <ShareConventionDraft
                     conventionFormData={{
                       ...conventionValues,
@@ -786,7 +797,7 @@ const useWaitForReduxFormUiReadyBeforeInitialisation = (
         hasBeneficiaryCurrentEmployer(initialValues),
       ),
     );
-    if (mode !== "edit") {
+    if (mode !== "edit-convention") {
       dispatch(
         conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
           isEstablishmentTutorIsEstablishmentRepresentative(initialValues),
