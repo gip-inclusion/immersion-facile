@@ -213,6 +213,7 @@ const sendSignatoriesEmail = (
     const shortLink = await makeShortMagicLink({
       targetRoute: frontRoutes.manageConvention,
       lifetime: "short",
+      singleUse: false,
     });
 
     return deps.saveNotificationAndRelatedEvent(uow, {

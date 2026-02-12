@@ -89,6 +89,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           email: convention.signatories.beneficiary.email,
           now: timeGateway.now(),
           targetRoute: frontRoutes.conventionToSign,
+          lifetime: "2Days",
           extraQueryParams: {
             mtm_source: "email-signature-link-after-modification",
           },
@@ -99,6 +100,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           email: convention.signatories.establishmentRepresentative.email,
           now: timeGateway.now(),
           targetRoute: frontRoutes.conventionToSign,
+          lifetime: "2Days",
           extraQueryParams: {
             mtm_source: "email-signature-link-after-modification",
           },

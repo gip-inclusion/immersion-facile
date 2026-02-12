@@ -281,6 +281,10 @@ export class AppConfig {
     return 31 * 6; // 6 months
   }
 
+  public get conventionJwtTwoDaysDuration(): number {
+    return 2; // 2 days
+  }
+
   public get connectedUserJwtDurationInHours(): number {
     return 12; // 12 hours
   }

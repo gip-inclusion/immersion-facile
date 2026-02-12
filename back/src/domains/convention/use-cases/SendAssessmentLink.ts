@@ -194,6 +194,7 @@ const sendSms = async ({
   const shortLink = await makeShortMagicLink({
     targetRoute: frontRoutes.assessment,
     lifetime: "short",
+    singleUse: false,
     extraQueryParams: { mtm_source: "sms-assessment-link" },
   });
 

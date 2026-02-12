@@ -499,6 +499,7 @@ describe("Send signature link", () => {
           email: convention.signatories.establishmentRepresentative.email,
           now: timeGateway.now(),
           targetRoute: frontRoutes.conventionToSign,
+          lifetime: "2Days",
           extraQueryParams: { mtm_source: "sms-signature-link" },
         }),
       });
