@@ -2,17 +2,25 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useState } from "react";
-import { Tag as ImTag, SearchResultIllustration } from "react-design-system";
+import {
+  Tag as ImTag,
+  SearchResultIllustration,
+  useScrollToTop,
+} from "react-design-system";
 import { domElementIds, type InternalOfferDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
 
 type GroupListResultsProps = {
+  parentContainerIdToScrollToTop: string;
   results: InternalOfferDto[];
 };
 
-export const GroupListResults = ({ results }: GroupListResultsProps) => {
+export const GroupListResults = ({
+  results,
+  parentContainerIdToScrollToTop,
+}: GroupListResultsProps) => {
   const resultsPerPageOptions = ["6", "12", "24", "48"] as const;
   type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
 
@@ -33,6 +41,9 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
     const end = start + resultsPerPageValue;
     return results.slice(start, end);
   };
+
+  useScrollToTop(currentPage + 1, parentContainerIdToScrollToTop);
+
   return (
     <>
       <div className={fr.cx("fr-container")}>

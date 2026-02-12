@@ -82,6 +82,8 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
       background: group.options.heroHeader.backgroundColor,
     },
   }))();
+  const parentContainerIdToScrollToTop = "group-result-parent-container";
+
   const [displayedResults, setDisplayedResults] =
     useState<InternalOfferDto[]>(results);
 
@@ -154,6 +156,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
         </div>
       </section>
       <section
+        id={parentContainerIdToScrollToTop}
         ref={searchBarRef}
         className={cx(fr.cx("fr-py-6w"), classes.searchBar)}
       >
@@ -184,7 +187,10 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
         </div>
       </section>
       <div className={fr.cx("fr-mt-6w")}>
-        <GroupListResults results={displayedResults} />
+        <GroupListResults
+          results={displayedResults}
+          parentContainerIdToScrollToTop={parentContainerIdToScrollToTop}
+        />
         <SectionAccordion />
         <SectionTextEmbed
           videoUrl=" https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
