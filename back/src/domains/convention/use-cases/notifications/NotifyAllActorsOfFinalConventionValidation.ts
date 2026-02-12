@@ -169,6 +169,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       : await makeShortMagicLink({
           targetRoute: frontRoutes.conventionDocument,
           lifetime: "long",
+          singleUse: false,
         });
 
     return {
@@ -203,6 +204,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           ? await makeShortMagicLink({
               targetRoute: frontRoutes.assessment,
               lifetime: "long",
+              singleUse: false,
             })
           : undefined,
         validatorName: convention.validators?.agencyValidator
