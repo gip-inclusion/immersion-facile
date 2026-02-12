@@ -111,6 +111,18 @@ export class PgConventionTemplateQueries implements ConventionTemplateQueries {
       .onConflict((oc) => oc.column("id").doUpdateSet(valuesForUpdate))
       .execute();
   }
+
+  public async delete(
+    conventionTemplateId: ConventionTemplateId,
+  ): Promise<ConventionTemplateId | null> {
+    const response = await this.transaction
+      .deleteFrom("convention_templates")
+      .where("id", "=", conventionTemplateId)
+      .returning("id")
+      .executeTakeFirst();
+
+    return response?.id ?? null;
+  }
 }
 
 const mapRowToConventionTemplate = (

@@ -1,4 +1,8 @@
-import type { ConventionTemplate, DateTimeIsoString } from "shared";
+import type {
+  ConventionTemplate,
+  ConventionTemplateId,
+  DateTimeIsoString,
+} from "shared";
 import type {
   ConventionTemplateQueries,
   GetConventionTemplatesParams,
@@ -38,5 +42,15 @@ export class InMemoryConventionTemplateQueries
     _now: DateTimeIsoString,
   ): Promise<void> {
     this.#conventionTemplates[conventionTemplate.id] = conventionTemplate;
+  }
+
+  public async delete(
+    conventionTemplateId: ConventionTemplateId,
+  ): Promise<ConventionTemplateId | null> {
+    const conventionTemplate = this.#conventionTemplates[conventionTemplateId];
+    if (!conventionTemplate) return null;
+
+    delete this.#conventionTemplates[conventionTemplateId];
+    return conventionTemplateId;
   }
 }

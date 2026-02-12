@@ -75,7 +75,40 @@ const fetchConventionTemplatesEpic: ConventionTemplateEpic = (
     ),
   );
 
+const deleteConventionTemplateEpic: ConventionTemplateEpic = (
+  action$,
+  _state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(
+      conventionTemplateSlice.actions.deleteConventionTemplateRequested.match,
+    ),
+    switchMap((action) =>
+      conventionGateway
+        .deleteConventionTemplate$(
+          action.payload.conventionTemplateId,
+          action.payload.jwt,
+        )
+        .pipe(
+          map(() =>
+            conventionTemplateSlice.actions.deleteConventionTemplateSucceeded({
+              conventionTemplateId: action.payload.conventionTemplateId,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error: Error) =>
+            conventionTemplateSlice.actions.deleteConventionTemplateFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const conventionTemplateEpics = [
   createOrUpdateConventionTemplateEpic,
   fetchConventionTemplatesEpic,
+  deleteConventionTemplateEpic,
 ];

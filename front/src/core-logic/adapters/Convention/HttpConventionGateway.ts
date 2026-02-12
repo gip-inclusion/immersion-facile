@@ -14,6 +14,7 @@ import type {
   ConventionReadDto,
   ConventionSupportedJwt,
   ConventionTemplate,
+  ConventionTemplateId,
   DashboardUrlAndName,
   DataWithPagination,
   EditBeneficiaryBirthdateRequestDto,
@@ -347,6 +348,26 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 403) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public deleteConventionTemplate$(
+    conventionTemplateId: ConventionTemplateId,
+    jwt: string,
+  ): Observable<void> {
+    return from(
+      this.authenticatedHttpClient
+        .deleteConventionTemplate({
+          urlParams: { conventionTemplateId },
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

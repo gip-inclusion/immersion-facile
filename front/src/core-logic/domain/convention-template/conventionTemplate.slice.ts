@@ -1,5 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { ConnectedUserJwt, ConventionTemplate } from "shared";
+import type {
+  ConnectedUserJwt,
+  ConventionTemplate,
+  ConventionTemplateId,
+} from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -63,6 +67,32 @@ export const conventionTemplateSlice = createSlice({
       state.conventionTemplates = action.payload.conventionTemplates;
     },
     fetchConventionTemplatesFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    deleteConventionTemplateRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        conventionTemplateId: ConventionTemplateId;
+        jwt: ConnectedUserJwt;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    deleteConventionTemplateSucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        conventionTemplateId: ConventionTemplateId;
+      }>,
+    ) => {
+      state.isLoading = false;
+      state.conventionTemplates = state.conventionTemplates.filter(
+        (t) => t.id !== action.payload.conventionTemplateId,
+      );
+    },
+    deleteConventionTemplateFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {

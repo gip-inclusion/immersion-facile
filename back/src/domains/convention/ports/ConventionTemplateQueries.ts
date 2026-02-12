@@ -17,4 +17,8 @@ export interface ConventionTemplateQueries {
     conventionTemplate: ConventionTemplate,
     now: DateTimeIsoString,
   ): Promise<void>;
+
+  delete(
+    conventionTemplateId: ConventionTemplateId,
+  ): Promise<ConventionTemplateId | null>;
 }

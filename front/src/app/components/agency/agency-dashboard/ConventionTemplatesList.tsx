@@ -3,7 +3,8 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { useEffect } from "react";
 import { HeadingSection, Loader, Task } from "react-design-system";
 import { useDispatch, useSelector } from "react-redux";
-import { domElementIds } from "shared";
+import { type ConventionTemplateId, domElementIds, errors } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -24,6 +25,21 @@ export const ConventionTemplatesList = ({
   const conventionTemplates = useSelector(
     conventionTemplateSelectors.conventionTemplates,
   );
+
+  const onDeleteConventionTemplateClicked = ({
+    conventionTemplateId,
+  }: {
+    conventionTemplateId: ConventionTemplateId;
+  }) => {
+    if (!connectedUserJwt) throw errors.user.unauthorized();
+    dispatch(
+      conventionTemplateSlice.actions.deleteConventionTemplateRequested({
+        conventionTemplateId,
+        jwt: connectedUserJwt,
+        feedbackTopic: "convention-template",
+      }),
+    );
+  };
 
   useEffect(() => {
     if (connectedUserJwt) {
@@ -57,6 +73,7 @@ export const ConventionTemplatesList = ({
       }
     >
       {isLoading && <Loader />}
+      <Feedback topics={["convention-template"]} closable />
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-1w")}>
         {conventionTemplates.length === 0 && (
           <div className={fr.cx("fr-col-12")}>
@@ -104,6 +121,11 @@ export const ConventionTemplatesList = ({
                         priority="tertiary"
                         iconId="fr-icon-delete-bin-line"
                         title="Supprimer"
+                        onClick={() =>
+                          onDeleteConventionTemplateClicked({
+                            conventionTemplateId: template.id,
+                          })
+                        }
                       />
                     </>
                   ),

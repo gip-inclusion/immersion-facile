@@ -34,6 +34,16 @@ describe("PgConventionTemplateQueries", () => {
   beforeAll(async () => {
     pool = makeTestPgPool();
     db = makeKyselyDb(pool);
+    pgConventionTemplateQueries = new PgConventionTemplateQueries(db);
+  });
+
+  beforeEach(async () => {
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("convention_drafts").execute();
+    await db.deleteFrom("users__agencies").execute();
+    await db.deleteFrom("convention_templates").execute();
+    await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("users").execute();
 
     await new PgUserRepository(db).save(validator);
     await new PgAgencyRepository(db).insert(
@@ -41,11 +51,6 @@ describe("PgConventionTemplateQueries", () => {
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     );
-  });
-
-  beforeEach(async () => {
-    await db.deleteFrom("convention_templates").execute();
-    pgConventionTemplateQueries = new PgConventionTemplateQueries(db);
   });
 
   afterAll(async () => {
@@ -162,35 +167,9 @@ describe("PgConventionTemplateQueries", () => {
     it("updates the row when id already exists", async () => {
       await pgConventionTemplateQueries.upsert(conventionTemplate, now);
 
-      await pgConventionTemplateQueries.upsert(
-        {
-          ...conventionTemplate,
-          name: "Updated name",
-          signatories: {
-            beneficiary: {
-              role: "beneficiary",
-              email: "beneficiary@example.com",
-              firstName: "Marie",
-              lastName: "Martin",
-            },
-            establishmentRepresentative: {
-              role: "establishment-representative",
-              email: "rep@example.com",
-              firstName: "Pierre",
-              lastName: "Bernard",
-            },
-          },
-        },
-        now,
-      );
-
-      const result = await pgConventionTemplateQueries.get({
-        ids: [conventionTemplate.id],
-      });
-      expectToEqual(result[0], {
+      const updatedConventionTemplate: ConventionTemplate = {
         ...conventionTemplate,
         name: "Updated name",
-        updatedAt: now,
         signatories: {
           beneficiary: {
             role: "beneficiary",
@@ -205,7 +184,43 @@ describe("PgConventionTemplateQueries", () => {
             lastName: "Bernard",
           },
         },
+      };
+      await pgConventionTemplateQueries.upsert(updatedConventionTemplate, now);
+
+      const result = await pgConventionTemplateQueries.get({
+        ids: [conventionTemplate.id],
       });
+      expectToEqual(result, [{ ...updatedConventionTemplate, updatedAt: now }]);
+    });
+  });
+
+  describe("delete", () => {
+    it("removes the row when id exists", async () => {
+      await pgConventionTemplateQueries.upsert(conventionTemplate, now);
+
+      const deletedId = await pgConventionTemplateQueries.delete(
+        conventionTemplate.id,
+      );
+
+      const result = await pgConventionTemplateQueries.get({
+        ids: [conventionTemplate.id],
+      });
+      expect(result).toHaveLength(0);
+      expect(deletedId).toBe(conventionTemplate.id);
+    });
+
+    it("does nothing when id does not exist", async () => {
+      await pgConventionTemplateQueries.upsert(conventionTemplate, now);
+
+      const deletedId = await pgConventionTemplateQueries.delete(
+        "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      );
+
+      const result = await pgConventionTemplateQueries.get({
+        userIds: [validator.id],
+      });
+      expect(deletedId).toBeNull();
+      expectToEqual(result, [{ ...conventionTemplate, updatedAt: now }]);
     });
   });
 });
