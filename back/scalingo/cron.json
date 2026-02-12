@@ -33,11 +33,19 @@
       "size": "M"
     },
     {
-      "command": "00 6 * * * pnpm back run trigger-establishment-leads-reminders",
+      "command": "0 5 * * * pnpm back run trigger-warn-inactive-users",
       "size": "M"
     },
     {
       "command": "30 5 * * * pnpm back run trigger-morning-jobs",
+      "size": "M"
+    },
+    {
+      "command": "00 6 * * * pnpm back run trigger-establishment-leads-reminders",
+      "size": "M"
+    },
+    {
+      "command": "30 6 * * * pnpm back run trigger-delete-inactive-users",
       "size": "M"
     },
     {
