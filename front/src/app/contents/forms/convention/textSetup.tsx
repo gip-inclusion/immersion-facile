@@ -25,31 +25,31 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Signer la convention d'immersion"
         : "Signer la convention de stage",
-    welcome:
+    welcomeCongratulations:
       internshipKind === "immersion" ? (
-        <>
-          <h2 className={fr.cx("fr-text--md")}>
-            Bravo, la mise en relation entre candidat et entreprise s’est bien
-            passée !
-          </h2>
-          <p className="fr-text">
-            Complétez ce formulaire pour réaliser votre immersion
-            professionnelle. <br /> Il vaut équivalence du CERFA 13912 * 05.
-          </p>
-        </>
+        <h2 className={fr.cx("fr-text--md")}>
+          Bravo, la mise en relation entre candidat et entreprise s’est bien
+          passée !
+        </h2>
       ) : (
-        <>
-          <strong>Bravo !</strong>
-          <p className="fr-text">
-            Vous avez trouvé une entreprise pour vous accueillir en stage et
-            découvrir un ou plusieurs métiers.
-            <br />
-            Avant tout, vous devez faire établir une convention de stage pendant
-            les vacances scolaires et bien c'est ici que ça se passe. <br />
-            En quelques minutes, complétez ce formulaire de convention avec
-            l'entreprise qui vous accueillera.
-          </p>
-        </>
+        <strong>Bravo !</strong>
+      ),
+    welcomeDescription:
+      internshipKind === "immersion" ? (
+        <p className="fr-text">
+          Complétez ce formulaire pour réaliser votre immersion professionnelle.{" "}
+          <br /> Il vaut équivalence du CERFA 13912 * 05.
+        </p>
+      ) : (
+        <p className="fr-text">
+          Vous avez trouvé une entreprise pour vous accueillir en stage et
+          découvrir un ou plusieurs métiers.
+          <br />
+          Avant tout, vous devez faire établir une convention de stage pendant
+          les vacances scolaires et bien c'est ici que ça se passe. <br />
+          En quelques minutes, complétez ce formulaire de convention avec
+          l'entreprise qui vous accueillera.
+        </p>
       ),
     conventionCreationNotification:
       internshipKind === "immersion" ? (
