@@ -23,7 +23,7 @@ import type {
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   SendSignatureLinkRequestDto,
-  ShareConventionDraftByEmailDto,
+  ShareConventionDraftByEmailFromConventionDto,
   TransferConventionToAgencyRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
@@ -66,7 +66,7 @@ export interface ConventionGateway {
     jwt: ConventionJwt | ConnectedUserJwt,
   ): Observable<void>;
   shareConventionDraftByEmail(
-    shareDraftByEmailDto: ShareConventionDraftByEmailDto,
+    shareDraftByEmailDto: ShareConventionDraftByEmailFromConventionDto,
   ): Observable<void>;
   sendSignatureLink$(
     params: SendSignatureLinkRequestDto,

@@ -33,9 +33,15 @@ export type ConventionDraftDto = ConventionDeepPartial<
   internshipKind: InternshipKind;
 };
 
-export type ShareConventionDraftByEmailDto = {
+export type ShareConventionDraftByEmailFromConventionDto = {
   senderEmail: Email;
   recipientEmail?: Email;
+  details?: string;
+  conventionDraft: ConventionDraftDto;
+};
+
+export type ShareConventionDraftByEmailFromConventionTemplateDto = {
+  recipientEmail: Email;
   details?: string;
   conventionDraft: ConventionDraftDto;
 };

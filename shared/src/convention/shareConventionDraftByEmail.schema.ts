@@ -14,7 +14,8 @@ import {
 import type {
   ConventionDraftDto,
   ConventionDraftId,
-  ShareConventionDraftByEmailDto,
+  ShareConventionDraftByEmailFromConventionDto,
+  ShareConventionDraftByEmailFromConventionTemplateDto,
 } from "./shareConventionDraftByEmail.dto";
 
 export const makeConventionDeepPartialSchema = (
@@ -123,10 +124,24 @@ export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionD
     return input;
   }, baseConventionDraftSchema) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDraftDto>;
 
-export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailDto> =
+export const shareConventionDraftByEmailFromConventionSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailFromConventionDto> =
   z.object({
     senderEmail: emailSchema,
     recipientEmail: emailSchema.optional(),
     details: zStringMinLength1.optional(),
     conventionDraft: conventionDraftSchema,
   });
+
+export const shareConventionDraftByEmailFromConventionTemplateSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailFromConventionTemplateDto> =
+  z.object({
+    recipientEmail: emailSchema,
+    details: zStringMinLength1.optional(),
+    conventionDraft: conventionDraftSchema,
+  });
+
+export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<
+  | ShareConventionDraftByEmailFromConventionDto
+  | ShareConventionDraftByEmailFromConventionTemplateDto
+> = shareConventionDraftByEmailFromConventionSchema.or(
+  shareConventionDraftByEmailFromConventionTemplateSchema,
+);
