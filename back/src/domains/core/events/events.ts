@@ -143,6 +143,7 @@ export type DomainEvent =
       "ConventionTemplateDeleted",
       { conventionTemplateId: ConventionTemplateId } & WithTriggeredBy
     >
+  | GenericEvent<"ConventionTemplateCreatedOrUpdated", { conventionTemplateId: ConventionTemplateId } & WithTriggeredBy>
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
