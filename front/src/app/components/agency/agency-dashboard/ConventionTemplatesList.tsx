@@ -3,7 +3,12 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { useEffect } from "react";
 import { HeadingSection, Loader, Task } from "react-design-system";
 import { useDispatch, useSelector } from "react-redux";
-import { type ConventionTemplateId, domElementIds, errors } from "shared";
+import {
+  type ConventionTemplateId,
+  domElementIds,
+  errors,
+  toDisplayedDate,
+} from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -95,7 +100,7 @@ export const ConventionTemplatesList = ({
             <Task
               title={template.name}
               titleAs="h4"
-              description={template.internshipKind}
+              footer={`Mise à jour le ${template.updatedAt ? toDisplayedDate({ date: new Date(template.updatedAt), withHours: true }) : ""}`}
               hasBackgroundColor={true}
               buttonsRows={[
                 {
