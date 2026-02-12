@@ -3,7 +3,6 @@ import {
   type ConventionDraftDto,
   errors,
   frontRoutes,
-  type ShareConventionDraftByEmailDto,
   shareConventionDraftByEmailSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -11,87 +10,8 @@ import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/h
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { makeShortLink } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
-
-export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConventionDraftByEmailDto> {
-  protected inputSchema = shareConventionDraftByEmailSchema;
-
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
-  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
-
-  readonly #timeGateway: TimeGateway;
-
-  readonly #config: AppConfig;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    timeGateway: TimeGateway,
-    config: AppConfig,
-  ) {
-    super(uowPerformer);
-    this.#config = config;
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
-    this.#timeGateway = timeGateway;
-  }
-
-  public async _execute(
-    params: ShareConventionDraftByEmailDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    const now = this.#timeGateway.now().toISOString();
-
-    await throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave({
-      conventionDraftRepository: uow.conventionDraftRepository,
-      conventionDraftUpdated: params.conventionDraft,
-    });
-
-    await uow.conventionDraftRepository.save(params.conventionDraft, now);
-
-    const shortLink = await makeShortLink({
-      uow,
-      longLink:
-        `${this.#config.immersionFacileBaseUrl}/${params.conventionDraft.internshipKind === "immersion" ? frontRoutes.conventionImmersionRoute : frontRoutes.conventionMiniStageRoute}?conventionDraftId=${params.conventionDraft.id}` as AbsoluteUrl,
-      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      config: this.#config,
-    });
-
-    await this.#saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "SHARE_CONVENTION_DRAFT_SELF",
-        recipients: [params.senderEmail],
-        params: {
-          conventionFormUrl: shortLink,
-          internshipKind: params.conventionDraft.internshipKind,
-        },
-      },
-      followedIds: {},
-    });
-
-    if (params.recipientEmail) {
-      await this.#saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: {
-          kind: "SHARE_CONVENTION_DRAFT_RECIPIENT",
-          recipients: [params.recipientEmail],
-          params: {
-            additionalDetails: params.details,
-            conventionFormUrl: shortLink,
-            internshipKind: params.conventionDraft.internshipKind,
-          },
-        },
-        followedIds: {},
-      });
-    }
-  }
-}
 
 const throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave =
   async ({
@@ -115,3 +35,65 @@ const throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave =
       });
     }
   };
+
+export type ShareConventionLinkByEmail = ReturnType<
+  typeof makeShareConventionDraftByEmail
+>;
+
+export const makeShareConventionDraftByEmail = useCaseBuilder(
+  "ShareConventionLinkByEmail",
+)
+  .withInput(shareConventionDraftByEmailSchema)
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+    timeGateway: TimeGateway;
+    config: AppConfig;
+  }>()
+  .build(async ({ inputParams, uow, deps }) => {
+    const now = deps.timeGateway.now().toISOString();
+
+    await throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave({
+      conventionDraftRepository: uow.conventionDraftRepository,
+      conventionDraftUpdated: inputParams.conventionDraft,
+    });
+
+    await uow.conventionDraftRepository.save(inputParams.conventionDraft, now);
+
+    const shortLink = await makeShortLink({
+      uow,
+      longLink:
+        `${deps.config.immersionFacileBaseUrl}/${inputParams.conventionDraft.internshipKind === "immersion" ? frontRoutes.conventionImmersionRoute : frontRoutes.conventionMiniStageRoute}?conventionDraftId=${inputParams.conventionDraft.id}` as AbsoluteUrl,
+      shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+      config: deps.config,
+    });
+
+    await deps.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "SHARE_CONVENTION_DRAFT_SELF",
+        recipients: [inputParams.senderEmail],
+        params: {
+          conventionFormUrl: shortLink,
+          internshipKind: inputParams.conventionDraft.internshipKind,
+        },
+      },
+      followedIds: {},
+    });
+
+    if (inputParams.recipientEmail) {
+      await deps.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "SHARE_CONVENTION_DRAFT_RECIPIENT",
+          recipients: [inputParams.recipientEmail],
+          params: {
+            additionalDetails: inputParams.details,
+            conventionFormUrl: shortLink,
+            internshipKind: inputParams.conventionDraft.internshipKind,
+          },
+        },
+        followedIds: {},
+      });
+    }
+  });
