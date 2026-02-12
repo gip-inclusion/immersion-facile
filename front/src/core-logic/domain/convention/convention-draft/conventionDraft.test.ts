@@ -128,7 +128,7 @@ describe("ConventionDraft slice", () => {
         feedbacksSelectors.feedbacks(store.getState())["convention-draft"],
         {
           level: "success",
-          message: "Cette demande de convention a bien été partagée par mail.",
+          message: "Ce brouillon a bien été partagé par mail.",
           on: "create",
           title: "Partager ou enregistrer un brouillon",
         },

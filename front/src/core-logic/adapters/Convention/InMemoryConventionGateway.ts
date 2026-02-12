@@ -25,7 +25,7 @@ import {
   type PaginationQueryParams,
   type RenewConventionParams,
   type SendSignatureLinkRequestDto,
-  type ShareConventionDraftByEmailFromConventionDto,
+  type ShareConventionDraftByEmailDto,
   sleep,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
@@ -179,7 +179,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   public shareConventionDraftByEmail(
-    _shareLinkByEmailDTO: ShareConventionDraftByEmailFromConventionDto,
+    _shareLinkByEmailDTO: ShareConventionDraftByEmailDto,
   ): Observable<void> {
     return this.shareConventionDraftByEmailResult$;
   }

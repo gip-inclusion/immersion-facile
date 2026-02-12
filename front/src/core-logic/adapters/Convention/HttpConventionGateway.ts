@@ -25,7 +25,7 @@ import type {
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   SendSignatureLinkRequestDto,
-  ShareConventionDraftByEmailFromConventionDto,
+  ShareConventionDraftByEmailDto,
   TransferConventionToAgencyRequestDto,
   UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
@@ -283,7 +283,7 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public shareConventionDraftByEmail(
-    shareConventionDraftDto: ShareConventionDraftByEmailFromConventionDto,
+    shareConventionDraftDto: ShareConventionDraftByEmailDto,
   ): Observable<void> {
     return from(
       this.unauthenticatedHttpClient

@@ -993,6 +993,18 @@ export const domElementIds = {
         "im-manage-convention-template__delete-convention-template-button",
       shareConventionTemplateButton:
         "im-manage-convention-template__share-convention-template-button",
+      shareAsConventionDraftModal:
+        "im-manage-convention-template__share-as-convention-draft-modal",
+      shareAsConventionDraftModalForm:
+        "im-manage-convention-template__share-as-convention-draft-modal-form",
+      shareAsConventionDraftModalEmailInput:
+        "im-manage-convention-template__share-as-convention-draft-email-input",
+      shareAsConventionDraftModalMessageInput:
+        "im-manage-convention-template__share-as-convention-draft-message-input",
+      shareAsConventionDraftModalCancelButton:
+        "im-manage-convention-template__share-as-convention-draft-cancel-button",
+      shareAsConventionDraftModalSubmitButton:
+        "im-manage-convention-template__share-as-convention-draft-submit-button",
     },
   },
   agencyDashboardConventionTemplate: {
