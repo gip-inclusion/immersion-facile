@@ -42,12 +42,13 @@ describe("PgShortLinkQuery", () => {
 
   describe("getById", () => {
     it("success", async () => {
-      await insertShortLinkQuery(db, testShortLinkId, originalUrl);
+      await insertShortLinkQuery(db, testShortLinkId, originalUrl, false);
 
-      expectToEqual(
-        await pgShortLinkQuery.getById(testShortLinkId),
-        originalUrl,
-      );
+      expectToEqual(await pgShortLinkQuery.getById(testShortLinkId), {
+        url: originalUrl,
+        singleUse: false,
+        lastUsedAt: null,
+      });
     });
 
     it("error: not found", async () => {

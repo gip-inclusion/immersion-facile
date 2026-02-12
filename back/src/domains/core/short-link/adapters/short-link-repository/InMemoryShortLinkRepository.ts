@@ -11,7 +11,7 @@ export class InMemoryShortLinkRepository
     url: AbsoluteUrl,
     singleUse: boolean,
   ): Promise<void> {
-    this.shortLinksData[shortLinkId] = {
+    this.shortLinks[shortLinkId] = {
       url,
       singleUse,
       lastUsedAt: null,
@@ -22,7 +22,7 @@ export class InMemoryShortLinkRepository
     shortLinkId: ShortLinkId,
     lastUsedAt: Date,
   ): Promise<void> {
-    const data = this.shortLinksData[shortLinkId];
+    const data = this.shortLinks[shortLinkId];
     if (!data) throw errors.shortLink.notFound({ shortLinkId });
     data.lastUsedAt = lastUsedAt;
   }
