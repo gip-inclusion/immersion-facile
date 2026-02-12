@@ -243,6 +243,7 @@ const sendTutorAssessmentReminder = async ({
   const assessmentCreationLink = await makeShortMagicLink({
     targetRoute: frontRoutes.assessment,
     lifetime: "short",
+    singleUse: false,
     extraQueryParams: { mtm_source: "assessment-reminder" },
   });
 

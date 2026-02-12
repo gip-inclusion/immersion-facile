@@ -93,6 +93,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
         email: validConvention.signatories.beneficiary.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
+        lifetime: "2Days",
         extraQueryParams: { mtm_source: "email-signature-link" },
       }),
       [deterministicShortLinks[1]]: fakeGenerateMagicLinkUrlFn({
@@ -103,6 +104,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
         email: validConvention.signatories.establishmentRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
+        lifetime: "2Days",
         extraQueryParams: { mtm_source: "email-signature-link" },
       }),
       [deterministicShortLinks[2]]: fakeGenerateMagicLinkUrlFn({
@@ -113,6 +115,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
         email: validConvention.signatories.beneficiaryRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
+        lifetime: "2Days",
         extraQueryParams: { mtm_source: "email-signature-link" },
       }),
     });
