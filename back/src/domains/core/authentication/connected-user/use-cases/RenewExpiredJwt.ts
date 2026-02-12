@@ -206,6 +206,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       magicLink: await makeConventionMagicShortLink({
         targetRoute: this.#findRouteToRenew(originalUrl),
         lifetime: "short",
+        singleUse: false,
       }),
       conventionId: convention.id,
     });
