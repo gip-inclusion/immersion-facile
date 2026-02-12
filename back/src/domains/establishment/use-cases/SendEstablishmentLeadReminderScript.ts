@@ -128,6 +128,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
         convention,
         acquisitionCampaign: "transactionnel-etablissement-rappel-inscription",
       }),
+      singleUse: false,
     });
 
     const unsubscribeToEmailLink = this.#generateConventionMagicLinkUrl({
@@ -143,6 +144,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       config: this.#config,
       longLink: unsubscribeToEmailLink,
+      singleUse: false,
     });
 
     const notification = await this.#saveNotificationAndRelatedEvent(uow, {

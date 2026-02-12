@@ -186,15 +186,20 @@ describe("SendEstablishmentLeadReminder", () => {
         errors: {},
       });
 
-      expect(
-        await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
-      ).toBe(
+      const establishmentFormShortLink = await uow.shortLinkRepository.getById(
+        "addEstablishmentFormShortLink",
+      );
+
+      expectToEqual(
+        establishmentFormShortLink.url,
         "http://localhost/establishment?siret=12345678901235&bcLastName=Idol&bcFirstName=Billy&bcPhone=+33602010203&bcEmail=newestConvention.establishment@email.fr&mtm_campaign=transactionnel-etablissement-rappel-inscription",
       );
 
-      expect(
-        await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
-      ).toBe(
+      const unsubscribeToEmailShortLink = await uow.shortLinkRepository.getById(
+        "addUnsubscribeToEmailShortLink",
+      );
+      expectToEqual(
+        unsubscribeToEmailShortLink.url,
         "http://fake-magic-link/desinscription-prospect/11111111-ee70-4c90-b3f4-668d492f7395/establishment-representative/2021-05-15T08:00:00.000Z/newestConvention.establishment@email.fr/short",
       );
 
@@ -297,15 +302,19 @@ describe("SendEstablishmentLeadReminder", () => {
         errors: {},
       });
 
-      expect(
-        await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
-      ).toBe(
+      const establishmentFormShortLink = await uow.shortLinkRepository.getById(
+        "addEstablishmentFormShortLink",
+      );
+      expectToEqual(
+        establishmentFormShortLink.url,
         "http://localhost/establishment?siret=12345678901236&bcLastName=Idol&bcFirstName=Billy&bcPhone=+33602010203&bcEmail=establishment@example.com&mtm_campaign=transactionnel-etablissement-rappel-inscription",
       );
 
-      expect(
-        await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
-      ).toBe(
+      const unsubscribeToEmailShortLink = await uow.shortLinkRepository.getById(
+        "addUnsubscribeToEmailShortLink",
+      );
+      expectToEqual(
+        unsubscribeToEmailShortLink.url,
         "http://fake-magic-link/desinscription-prospect/45664444-1234-4000-4444-123456789012/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com/short",
       );
 

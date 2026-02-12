@@ -117,6 +117,7 @@ import { SendNotificationInBatch } from "../../domains/core/notifications/useCas
 import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
 import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
+import { makeGetLink } from "../../domains/core/short-link/use-cases/GetLink";
 import { makeGetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
 import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";
@@ -656,10 +657,13 @@ export const createUseCases = ({
       .notTransactional()
       .build(() => queries.featureFlag.getAll())({}),
 
-    getLink: useCaseBuilder("GetLink")
-      .withInput(z.string())
-      .notTransactional()
-      .build(({ inputParams }) => queries.shortLink.getById(inputParams))({}),
+    getLink: makeGetLink({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+      },
+    }),
 
     getApiConsumerById: useCaseBuilder("GetApiConsumerById")
       .withInput(z.string())
