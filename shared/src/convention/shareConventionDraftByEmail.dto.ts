@@ -46,6 +46,10 @@ export type ShareConventionDraftByEmailFromConventionTemplateDto = {
   conventionDraft: ConventionDraftDto;
 };
 
+export type ShareConventionDraftByEmailDto =
+  | ShareConventionDraftByEmailFromConventionDto
+  | ShareConventionDraftByEmailFromConventionTemplateDto;
+
 export const toConventionDraftDto = ({
   convention,
 }: {

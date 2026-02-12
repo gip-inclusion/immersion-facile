@@ -3,7 +3,7 @@ import {
   type ConventionDraftDto,
   errors,
   frontRoutes,
-  shareConventionDraftByEmailFromConventionSchema,
+  shareConventionDraftByEmailSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -43,7 +43,7 @@ export type ShareConventionDraftByEmail = ReturnType<
 export const makeShareConventionDraftByEmail = useCaseBuilder(
   "ShareConventionDraftByEmail",
 )
-  .withInput(shareConventionDraftByEmailFromConventionSchema)
+  .withInput(shareConventionDraftByEmailSchema)
   .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
@@ -68,18 +68,20 @@ export const makeShareConventionDraftByEmail = useCaseBuilder(
       config: deps.config,
     });
 
-    await deps.saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "SHARE_CONVENTION_DRAFT_SELF",
-        recipients: [inputParams.senderEmail],
-        params: {
-          conventionFormUrl: shortLink,
-          internshipKind: inputParams.conventionDraft.internshipKind,
+    if ("senderEmail" in inputParams && inputParams.senderEmail) {
+      await deps.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "SHARE_CONVENTION_DRAFT_SELF",
+          recipients: [inputParams.senderEmail],
+          params: {
+            conventionFormUrl: shortLink,
+            internshipKind: inputParams.conventionDraft.internshipKind,
+          },
         },
-      },
-      followedIds: {},
-    });
+        followedIds: {},
+      });
+    }
 
     if (inputParams.recipientEmail) {
       await deps.saveNotificationAndRelatedEvent(uow, {
