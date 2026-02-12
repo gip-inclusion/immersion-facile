@@ -33,7 +33,10 @@ type WithFromPeConnectedUser = {
 };
 
 export type CreateConventionTemplatePresentationInitialValues =
-  ConventionDraftDto & { id: ConventionTemplateId; name: string };
+  OmitFromExistingKeys<ConventionDraftDto, "id"> & {
+    id: ConventionTemplateId;
+    name: string;
+  };
 
 export type ConventionFormInitialValues =
   | CreateConventionPresentationInitialValues

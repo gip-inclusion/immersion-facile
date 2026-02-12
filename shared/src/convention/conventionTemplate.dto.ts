@@ -26,15 +26,17 @@ export const toConventionTemplate = ({
   userId,
   establishmentNumberEmployeesRange,
   selectedAgencyKind,
+  fromConventionTemplateId,
 }: {
-  selectedAgencyKind: AgencyKind | undefined;
   convention: CreateConventionTemplatePresentationInitialValues;
   userId: UserId;
   establishmentNumberEmployeesRange: NumberEmployeesRange | undefined;
+  selectedAgencyKind: AgencyKind | undefined;
+  fromConventionTemplateId: ConventionTemplateId | undefined;
 }): ConventionTemplate => {
   return {
     ...convention,
-    id: uuidV4(),
+    id: fromConventionTemplateId ?? uuidV4(),
     userId,
     agencyDepartment: convention.agencyDepartment ?? "",
     workConditions: undefinedIfEmptyString(convention.workConditions),

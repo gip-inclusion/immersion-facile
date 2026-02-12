@@ -9,7 +9,9 @@ import {
   type ConventionDraftDto,
   type ConventionDto,
   type ConventionReadDto,
+  type ConventionTemplate,
   type CreateConventionPresentationInitialValues,
+  type CreateConventionTemplatePresentationInitialValues,
   type DateString,
   type FtConnectIdentity,
   type ImmersionObjective,
@@ -426,7 +428,7 @@ export type ConventionParamsInUrl = Partial<{
     : never;
 }>;
 
-const beneficiaryRepresentativeFromParams = ({
+export const beneficiaryRepresentativeFromParams = ({
   email,
   phone,
   firstName,
@@ -779,6 +781,20 @@ export const conventionPresentationFromConventionDraft = (
   immersionActivities: conventionDraft.immersionActivities ?? "",
   immersionSkills: conventionDraft.immersionSkills ?? "",
 });
+
+export const makeConventionPresentationFromConventionTemplate = (
+  conventionTemplate: ConventionTemplate,
+): CreateConventionTemplatePresentationInitialValues => {
+  const { id, name, userId: _, ...conventionDraft } = conventionTemplate;
+  return {
+    ...conventionPresentationFromConventionDraft({
+      ...conventionDraft,
+      id: uuidV4(),
+    }),
+    id,
+    name,
+  };
+};
 
 const getMiniStageSignatoryProperty = <
   S extends keyof Signatories<"mini-stage-cci">,

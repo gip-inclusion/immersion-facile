@@ -185,7 +185,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     "/stats-activites-par-entreprise",
   ),
   agencyDashboardConventionTemplate: agencyDashboard.extend(
-    { fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer) },
+    {
+      fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer),
+      conventionTemplateId: param.query.optional.string,
+    },
     () => "/modele-convention",
   ),
   myProfile,
