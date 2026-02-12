@@ -718,7 +718,7 @@ export const feedbacks: Record<
     "create.success": {
       action: conventionDraftSlice.actions.shareConventionDraftByEmailSucceeded,
       title: "Partager ou enregistrer un brouillon",
-      message: "Cette demande de convention a bien été partagée par mail.",
+      message: "Ce brouillon a bien été partagé par mail.",
     },
     "create.error": {
       action: conventionDraftSlice.actions.shareConventionDraftByEmailFailed,
