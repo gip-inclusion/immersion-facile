@@ -124,7 +124,7 @@ test.describe("Convention creation and modification workflow", () => {
           page.locator(
             `#${domElementIds.conventionImmersionRoute.form({
               internshipKind: "immersion",
-              mode: "edit",
+              mode: "edit-convention",
             })}`,
           ),
         ).toBeVisible();
@@ -154,7 +154,7 @@ test.describe("Convention creation and modification workflow", () => {
           page.locator(
             `#${domElementIds.conventionImmersionRoute.form({
               internshipKind: "immersion",
-              mode: "edit",
+              mode: "edit-convention",
             })}`,
           ),
         ).toBeVisible();
