@@ -106,13 +106,26 @@ export type ConventionField = DotNestedKeys<ConventionDto>;
 
 export const getConventionFieldName = (name: ConventionField) => name;
 
-export const isEstablishmentTutorIsEstablishmentRepresentative = (
-  convention: Pick<ConventionDto, "signatories" | "establishmentTutor">,
-): boolean => {
-  const establishmentTutor = convention.establishmentTutor;
+export const isEstablishmentTutorIsEstablishmentRepresentative = (convention?: {
+  establishmentTutor?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  };
+  signatories?: {
+    establishmentRepresentative?: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      phone?: string;
+    };
+  };
+}): boolean => {
+  const establishmentTutor = convention?.establishmentTutor;
   const establishmentRepresentative =
-    convention.signatories.establishmentRepresentative;
-
+    convention?.signatories?.establishmentRepresentative;
+  if (!establishmentTutor || !establishmentRepresentative) return false;
   return (
     establishmentTutor.firstName === establishmentRepresentative.firstName &&
     establishmentTutor.lastName === establishmentRepresentative.lastName &&
@@ -147,10 +160,6 @@ export const isBeneficiaryMinor = ({
       conventionDateStart,
       beneficiaryBirthdate,
     ));
-
-export const hasBeneficiaryCurrentEmployer = (
-  convention: Pick<ConventionDto, "signatories">,
-): boolean => !!convention.signatories.beneficiaryCurrentEmployer;
 
 export const clearSignaturesAndValidationDate = <C extends ConventionDto>(
   convention: C,

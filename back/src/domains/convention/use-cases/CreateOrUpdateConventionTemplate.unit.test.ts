@@ -5,6 +5,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import {
@@ -12,7 +13,11 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { makeCreateOrUpdateConventionTemplate } from "./CreateOrUpdateConventionTemplate";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import {
+  type CreateOrUpdateConventionTemplate,
+  makeCreateOrUpdateConventionTemplate,
+} from "./CreateOrUpdateConventionTemplate";
 
 describe("CreateOrUpdateConventionTemplate", () => {
   const templateId =
@@ -20,6 +25,10 @@ describe("CreateOrUpdateConventionTemplate", () => {
   const currentUser = new ConnectedUserBuilder()
     .withId("user-id")
     .withEmail("user@example.com")
+    .build();
+  const otherUser = new ConnectedUserBuilder()
+    .withId("other-user-id")
+    .withEmail("other@example.com")
     .build();
   const conventionTemplate: ConventionTemplate = {
     id: templateId,
@@ -29,9 +38,7 @@ describe("CreateOrUpdateConventionTemplate", () => {
   };
 
   let uow: InMemoryUnitOfWork;
-  let createOrUpdateConventionTemplate: ReturnType<
-    typeof makeCreateOrUpdateConventionTemplate
-  >;
+  let createOrUpdateConventionTemplate: CreateOrUpdateConventionTemplate;
   let timeGateway: TimeGateway;
 
   beforeEach(() => {
@@ -39,7 +46,13 @@ describe("CreateOrUpdateConventionTemplate", () => {
     timeGateway = new CustomTimeGateway();
     createOrUpdateConventionTemplate = makeCreateOrUpdateConventionTemplate({
       uowPerformer: new InMemoryUowPerformer(uow),
-      deps: { timeGateway },
+      deps: {
+        timeGateway,
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator: new TestUuidGenerator(),
+        }),
+      },
     });
   });
 
@@ -71,6 +84,27 @@ describe("CreateOrUpdateConventionTemplate", () => {
         undefined as unknown as typeof currentUser,
       ),
       errors.user.unauthorized(),
+    );
+  });
+
+  it("throws forbidden when updating a template owned by another user", async () => {
+    uow.conventionTemplateQueries.conventionTemplates = [
+      {
+        id: templateId,
+        name: "Mon modèle",
+        internshipKind: "immersion",
+        userId: otherUser.id,
+      },
+    ];
+
+    await expectPromiseToFailWithError(
+      createOrUpdateConventionTemplate.execute(
+        { ...conventionTemplate, name: "Updated name" },
+        currentUser,
+      ),
+      errors.conventionTemplate.forbiddenToDeleteNotOwnedTemplate({
+        conventionTemplateId: templateId,
+      }),
     );
   });
 });

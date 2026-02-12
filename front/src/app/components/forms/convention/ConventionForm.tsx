@@ -39,6 +39,7 @@ import {
   type ConventionPresentation,
   type ConventionReadDto,
   type ConventionTemplate,
+  type ConventionTemplateId,
   type CreateConventionPresentationInitialValues,
   conventionSchema,
   type DepartmentCode,
@@ -46,10 +47,8 @@ import {
   domElementIds,
   type ExcludeFromExisting,
   errors as errorMessage,
-  hasBeneficiaryCurrentEmployer,
   type InternshipKind,
   isBeneficiaryMinor,
-  isBeneficiaryStudent,
   isCreateConventionPresentationInitialValues,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isFtConnectIdentity,
@@ -94,6 +93,7 @@ import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import {
   conventionPresentationFromConventionDraft,
   getConventionInitialValuesFromUrl,
+  makeConventionPresentationFromConventionTemplate,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
@@ -110,6 +110,7 @@ import {
   type NumberOfSteps,
 } from "src/core-logic/domain/convention/convention.slice";
 import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
+import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
 import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
@@ -135,9 +136,11 @@ export type SetEmailValidationErrorsState = Dispatch<
 export const ConventionForm = ({
   mode,
   internshipKind,
+  fromConventionTemplateId,
 }: {
   internshipKind: InternshipKind;
   mode: ConventionFormMode;
+  fromConventionTemplateId?: ConventionTemplateId;
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
@@ -146,6 +149,11 @@ export const ConventionForm = ({
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
     conventionDraftSelectors.conventionDraft,
+  );
+  const fetchedConventionTemplate = useAppSelector(
+    conventionTemplateSelectors.getConventionTemplateById(
+      fromConventionTemplateId,
+    ),
   );
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
@@ -211,6 +219,15 @@ export const ConventionForm = ({
     [fetchedConventionDraft],
   );
 
+  const conventionPresentationFromConventionTemplate = useMemo(
+    () =>
+      fetchedConventionTemplate &&
+      makeConventionPresentationFromConventionTemplate(
+        fetchedConventionTemplate,
+      ),
+    [fetchedConventionTemplate],
+  );
+
   const isTemplateForm =
     ["create-convention-template", "edit-convention-template"].includes(mode) &&
     !!connectedUserJwt &&
@@ -232,7 +249,10 @@ export const ConventionForm = ({
       return initialValues;
     }
     return (
-      fetchedConvention || conventionPresentationFromDraft || initialValues
+      fetchedConvention ||
+      conventionPresentationFromDraft ||
+      conventionPresentationFromConventionTemplate ||
+      initialValues
     );
   };
   const defaultValues: ConventionFormInitialValues = makeDefaultValues({
@@ -352,6 +372,7 @@ export const ConventionForm = ({
       userId: currentUser.id,
       establishmentNumberEmployeesRange,
       selectedAgencyKind: selectedAgency?.kind,
+      fromConventionTemplateId,
     });
 
     dispatch(
@@ -371,6 +392,7 @@ export const ConventionForm = ({
     );
     if (!isTemplateForm) {
       saveConvention(convention, selectedAgency);
+      return;
     }
 
     saveConventionTemplate(convention, selectedAgency);
@@ -480,10 +502,18 @@ export const ConventionForm = ({
   const prevConventionDraftIdRef = useRef<ConventionDraftId | undefined>(
     undefined,
   );
+  const prevConventionTemplateIdRef = useRef<ConventionTemplateId | undefined>(
+    undefined,
+  );
 
-  const submitButtonLabel = isTemplateForm
-    ? "Créer un modèle de convention"
-    : "Vérifier la demande";
+  const submitButtonLabel = useMemo(() => {
+    if (isTemplateForm) {
+      return mode === "create-convention-template"
+        ? "Créer un modèle de convention"
+        : "Modifier le modèle de convention";
+    }
+    return "Vérifier la demande";
+  }, [isTemplateForm, mode]);
 
   if (
     fetchedConvention &&
@@ -501,6 +531,19 @@ export const ConventionForm = ({
     prevConventionDraftIdRef.current =
       conventionPresentationFromDraft.fromConventionDraftId;
     reset({ ...conventionPresentationFromDraft, status: "READY_TO_SIGN" });
+  }
+
+  if (
+    conventionPresentationFromConventionTemplate &&
+    conventionPresentationFromConventionTemplate.id !==
+      prevConventionTemplateIdRef.current
+  ) {
+    prevConventionTemplateIdRef.current =
+      conventionPresentationFromConventionTemplate.id;
+    reset({
+      ...conventionPresentationFromConventionTemplate,
+      status: "READY_TO_SIGN",
+    });
   }
 
   useEffect(() => {
@@ -528,7 +571,12 @@ export const ConventionForm = ({
       );
     }
 
-    if (defaultValues.immersionAppellation) {
+    if (
+      defaultValues.immersionAppellation?.appellationCode &&
+      defaultValues.immersionAppellation?.appellationLabel &&
+      defaultValues.immersionAppellation?.romeCode &&
+      defaultValues.immersionAppellation?.romeLabel
+    ) {
       dispatch(
         appellationSlice.actions.selectSuggestionRequested({
           item: {
@@ -547,7 +595,9 @@ export const ConventionForm = ({
       );
     }
 
-    if (defaultValues.signatories.beneficiaryCurrentEmployer) {
+    if (
+      defaultValues.signatories?.beneficiaryCurrentEmployer?.businessAddress
+    ) {
       dispatch(
         geocodingSlice.actions.fetchSuggestionsRequested({
           lookup:
@@ -562,14 +612,25 @@ export const ConventionForm = ({
 
     if (
       defaultValues.internshipKind === "mini-stage-cci" &&
-      isBeneficiaryStudent(defaultValues.signatories.beneficiary) &&
-      defaultValues.signatories.beneficiary.address
+      defaultValues.signatories?.beneficiary &&
+      "levelOfEducation" in defaultValues.signatories.beneficiary &&
+      defaultValues.signatories.beneficiary.address?.streetNumberAndAddress !=
+        null &&
+      defaultValues.signatories.beneficiary.address.postcode != null &&
+      defaultValues.signatories.beneficiary.address.departmentCode != null &&
+      defaultValues.signatories.beneficiary.address.city != null
     ) {
       dispatch(
         geocodingSlice.actions.selectSuggestionRequested({
           item: {
             address: {
-              ...defaultValues.signatories.beneficiary.address,
+              streetNumberAndAddress:
+                defaultValues.signatories.beneficiary.address
+                  .streetNumberAndAddress,
+              postcode: defaultValues.signatories.beneficiary.address.postcode,
+              departmentCode:
+                defaultValues.signatories.beneficiary.address.departmentCode,
+              city: defaultValues.signatories.beneficiary.address.city,
               countryCode: establishmentAddressCountryCode ?? "FR",
             },
             position: { lat: 0, lon: 0 },
@@ -900,7 +961,7 @@ const useWaitForReduxFormUiReadyBeforeInitialisation = (
     );
     dispatch(
       conventionSlice.actions.isCurrentEmployerChanged(
-        hasBeneficiaryCurrentEmployer(initialValues),
+        !!initialValues.signatories?.beneficiaryCurrentEmployer,
       ),
     );
     if (mode !== "edit-convention") {

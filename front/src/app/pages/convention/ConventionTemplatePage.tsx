@@ -1,9 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { useEffect } from "react";
+import { Loader } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { errors } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ErrorPageContent } from "src/app/pages/error/ErrorPageContent";
 import { routes } from "src/app/routes/routes";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
+import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
 import type { Route } from "type-route";
 
 export const ConventionTemplatePage = ({
@@ -11,19 +20,59 @@ export const ConventionTemplatePage = ({
 }: {
   route: Route<typeof routes.agencyDashboardConventionTemplate>;
 }) => {
-  const { fromRoute } = route.params;
+  const { fromRoute, conventionTemplateId } = route.params;
+  const dispatch = useDispatch();
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const fetchedConventionTemplate = useAppSelector(
+    conventionTemplateSelectors.getConventionTemplateById(conventionTemplateId),
+  );
+  const isConventionTemplateLoading = useAppSelector(
+    conventionTemplateSelectors.isLoading,
+  );
+
+  const backButtonProps: ButtonProps = {
+    priority: "tertiary",
+    iconId: "fr-icon-arrow-left-line",
+    linkProps: routes[fromRoute]().link,
+    className: fr.cx("fr-mb-4w"),
+    children: "Retour",
+  };
+
+  useEffect(() => {
+    if (!connectedUserJwt) {
+      throw errors.user.unauthorized();
+    }
+
+    dispatch(
+      conventionTemplateSlice.actions.fetchConventionTemplatesRequested({
+        jwt: connectedUserJwt,
+        feedbackTopic: "convention-template",
+      }),
+    );
+  }, [dispatch, connectedUserJwt]);
+
+  if (
+    !isConventionTemplateLoading &&
+    conventionTemplateId &&
+    !fetchedConventionTemplate
+  ) {
+    return (
+      <ErrorPageContent
+        title="Problème d'accès"
+        description="Vous n'avez pas accès au modèle de convention demandé. Êtes-vous propriétaire de ce modèle ?"
+        buttons={[<Button key="back" {...backButtonProps} />]}
+      />
+    );
+  }
 
   return (
     <>
-      <h1>Créer un modèle de convention</h1>
-      <Button
-        priority="tertiary"
-        iconId="fr-icon-arrow-left-line"
-        linkProps={routes[fromRoute]().link}
-        className={fr.cx("fr-mb-4w")}
-      >
-        Retour
-      </Button>
+      <h1>
+        {fetchedConventionTemplate?.name
+          ? "Modifier un modèle de convention"
+          : "Créer un modèle de convention"}
+      </h1>
+      <Button {...backButtonProps} />
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
         <WithFeedbackReplacer
           topic="convention-template"
@@ -31,10 +80,19 @@ export const ConventionTemplatePage = ({
             return <Feedback topics={["convention-template"]} />;
           }}
         >
-          <ConventionForm
-            internshipKind="immersion"
-            mode="create-convention-template"
-          />
+          {isConventionTemplateLoading ? (
+            <Loader />
+          ) : (
+            <ConventionForm
+              internshipKind="immersion"
+              mode={
+                conventionTemplateId
+                  ? "edit-convention-template"
+                  : "create-convention-template"
+              }
+              fromConventionTemplateId={conventionTemplateId}
+            />
+          )}
         </WithFeedbackReplacer>
       </div>
     </>

@@ -110,6 +110,12 @@ export const ConventionTemplatesList = ({
                         priority="tertiary"
                         iconId="fr-icon-edit-line"
                         iconPosition="right"
+                        linkProps={
+                          routes.agencyDashboardConventionTemplate({
+                            fromRoute: fromRoute.name,
+                            conventionTemplateId: template.id,
+                          }).link
+                        }
                       >
                         Modifier
                       </Button>
