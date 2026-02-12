@@ -373,4 +373,17 @@ export const authenticatedConventionRoutes = defineRoutes({
       403: httpErrorSchema,
     },
   }),
+
+  deleteConventionTemplate: defineRoute({
+    url: "/convention-templates/:conventionTemplateId",
+    method: "delete",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
 });

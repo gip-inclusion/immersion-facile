@@ -14,6 +14,7 @@ import {
   type ConventionReadDto,
   type ConventionSupportedJwt,
   type ConventionTemplate,
+  type ConventionTemplateId,
   type DashboardUrlAndName,
   type DataWithPagination,
   type EditBeneficiaryBirthdateRequestDto,
@@ -83,6 +84,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public getConventionTemplatesForCurrentUserResult$ = new Subject<
     ConventionTemplate[]
   >();
+
+  public deleteConventionTemplateResult$ = new Subject<void>();
 
   public getConventionsForUserResult$ = new Subject<
     DataWithPagination<ConventionReadDto>
@@ -198,6 +201,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: string,
   ): Observable<ConventionTemplate[]> {
     return this.getConventionTemplatesForCurrentUserResult$;
+  }
+
+  public deleteConventionTemplate$(
+    _conventionTemplateId: ConventionTemplateId,
+    _jwt: string,
+  ): Observable<void> {
+    return this.deleteConventionTemplateResult$;
   }
 
   public signConvention$(
