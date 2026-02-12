@@ -753,6 +753,17 @@ export const feedbacks: Record<
       message:
         "Une erreur est survenue lors de la récupération des modèles de convention.",
     },
+    "delete.success": {
+      action: conventionTemplateSlice.actions.deleteConventionTemplateSucceeded,
+      title: "Suppression du modèle de convention",
+      message: "Le modèle de convention a bien été supprimé.",
+    },
+    "delete.error": {
+      action: conventionTemplateSlice.actions.deleteConventionTemplateFailed,
+      title: "Suppression du modèle de convention du modèle de convention",
+      message:
+        "Une erreur est survenue lors de la suppression du modèle de convention.",
+    },
   },
   "convention-form": {
     "create.success": {

@@ -37,6 +37,7 @@ import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateA
 import { makeCreateOrUpdateConventionTemplate } from "../../domains/convention/use-cases/CreateOrUpdateConventionTemplate";
 import { makeDeleteAssessment } from "../../domains/convention/use-cases/DeleteAssessment";
 import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
+import { makeDeleteConventionTemplate } from "../../domains/convention/use-cases/DeleteConventionTemplate";
 import { makeEditBeneficiaryBirthdate } from "../../domains/convention/use-cases/EditBeneficiaryBirthdate";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
@@ -1060,7 +1061,11 @@ export const createUseCases = ({
     }),
     createOrUpdateConventionTemplate: makeCreateOrUpdateConventionTemplate({
       uowPerformer,
-      deps: { timeGateway: gateways.timeGateway },
+      deps: { timeGateway: gateways.timeGateway, createNewEvent },
+    }),
+    deleteConventionTemplate: makeDeleteConventionTemplate({
+      uowPerformer,
+      deps: { createNewEvent },
     }),
     getConventionTemplatesForCurrentUser:
       makeGetConventionTemplatesForCurrentUser({ uowPerformer }),

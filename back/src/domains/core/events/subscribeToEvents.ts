@@ -208,6 +208,8 @@ const getUseCasesByTopics = (
     ),
   ],
   AssessmentDeleted: [useCases.notifyActorsThatAssessmentDeleted],
+  ConventionTemplateDeleted: [],
+  ConventionTemplateCreatedOrUpdated: [],
   EmailWithLinkToCreateAssessmentSent: [],
   BeneficiaryAssessmentEmailSent: [],
   AssessmentReminderManuallySent: [],

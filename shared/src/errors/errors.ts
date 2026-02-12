@@ -18,6 +18,7 @@ import type {
   ImmersionObjective,
   ReminderKind,
 } from "../convention/convention.dto";
+import type { ConventionTemplateId } from "../convention/conventionTemplate.dto";
 import type { ConventionDraftId } from "../convention/shareConventionDraftByEmail.dto";
 import type {
   DiscussionId,
@@ -573,6 +574,22 @@ export const errors = {
   conventionTemplate: {
     forbiddenMissingName: () =>
       new ForbiddenError("Le nom du modèle de convention est requis."),
+    forbiddenToDeleteNotOwnedTemplate: ({
+      conventionTemplateId,
+    }: {
+      conventionTemplateId: ConventionTemplateId;
+    }) =>
+      new ForbiddenError(
+        `Vous n'avez pas les droits nécessaires pour supprimer le modèle de convention '${conventionTemplateId}'.`,
+      ),
+    notFound: ({
+      conventionTemplateId,
+    }: {
+      conventionTemplateId: ConventionTemplateId;
+    }) =>
+      new NotFoundError(
+        `Aucun modèle de convention trouvé avec l'identifiant '${conventionTemplateId}'.`,
+      ),
   },
   establishment: {
     badPagination: ({
