@@ -23,12 +23,14 @@ export const insertShortLinkQuery = async (
   db: KyselyDb,
   shortLinkId: ShortLinkId,
   url: AbsoluteUrl,
+  singleUse: boolean,
 ): Promise<void> => {
   await db
     .insertInto("short_links")
     .values({
       short_link_id: shortLinkId,
       url,
+      single_use: singleUse,
     })
     .execute();
 };
