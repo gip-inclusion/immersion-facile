@@ -344,4 +344,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,
   ),
   stats: defineRoute("/stats"),
+  linkAlreadyUsed: defineRoute(
+    { jwt: param.query.optional.string },
+    () => `/${frontRoutes.linkAlreadyUsed}`,
+  ),
 });
