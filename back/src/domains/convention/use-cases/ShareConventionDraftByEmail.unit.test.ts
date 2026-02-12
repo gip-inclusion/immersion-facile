@@ -23,7 +23,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ShareConventionLinkByEmail } from "./ShareConventionDraftByEmail";
+import {
+  makeShareConventionDraftByEmail,
+  type ShareConventionLinkByEmail,
+} from "./ShareConventionDraftByEmail";
 
 describe("ShareConventionLinkByEmail", () => {
   const email = "fake-email@yahoo.com";
@@ -53,13 +56,15 @@ describe("ShareConventionLinkByEmail", () => {
     );
     shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
-    usecase = new ShareConventionLinkByEmail(
-      new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
-      shortLinkIdGeneratorGateway,
-      timeGateway,
-      config,
-    );
+    usecase = makeShareConventionDraftByEmail({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent,
+        shortLinkIdGeneratorGateway,
+        timeGateway,
+        config,
+      },
+    });
   });
 
   it("sends an email to the sender only", async () => {
