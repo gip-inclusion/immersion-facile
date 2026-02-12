@@ -2,27 +2,105 @@ import z from "zod";
 import { expectToEqual } from "../test.helpers";
 import type {
   ConventionDraftDto,
-  ShareConventionDraftByEmailDto,
+  ShareConventionDraftByEmailFromConventionDto,
+  ShareConventionDraftByEmailFromConventionTemplateDto,
 } from "./shareConventionDraftByEmail.dto";
 import {
   conventionDraftSchema,
   makeConventionDeepPartialSchema,
-  shareConventionDraftByEmailSchema,
+  shareConventionDraftByEmailFromConventionSchema,
+  shareConventionDraftByEmailFromConventionTemplateSchema,
 } from "./shareConventionDraftByEmail.schema";
 
-describe("shareConventionLinkByEmailSchema schema validation", () => {
-  it("accepts valid data", () => {
-    const convention: ConventionDraftDto = {
-      id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
-      internshipKind: "immersion",
-    };
-
-    const data: ShareConventionDraftByEmailDto = {
+describe("shareConventionDraftByEmailFromConventionSchema schema validation", () => {
+  it.each<ShareConventionDraftByEmailFromConventionDto>([
+    {
       senderEmail: "test@test.com",
-      conventionDraft: convention,
-    };
+      conventionDraft: {
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+        internshipKind: "immersion",
+      },
+    },
+    {
+      senderEmail: "sender@example.com",
+      recipientEmail: "recipient@example.com",
+      details: "Some details",
+      conventionDraft: {
+        id: "bbbbbc99-9c0b-1aaa-aa6d-6bb9bd38bbbb",
+        internshipKind: "mini-stage-cci",
+      },
+    },
+  ])("accepts valid data", (data) => {
+    expectToEqual(
+      shareConventionDraftByEmailFromConventionSchema.parse(data),
+      data,
+    );
+  });
 
-    expectToEqual(shareConventionDraftByEmailSchema.parse(data), data);
+  it.each([
+    {
+      senderEmail: "not-an-email",
+    } as ShareConventionDraftByEmailFromConventionDto,
+    {
+      senderEmail: "not-an-email",
+      conventionDraft: {
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+        internshipKind: "immersion",
+      },
+    },
+    {
+      recipientEmail: "test@email.com",
+      conventionDraft: {
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+        internshipKind: "immersion",
+      },
+    } as ShareConventionDraftByEmailFromConventionDto,
+  ])("fails on invalid data", (data) => {
+    expect(() =>
+      shareConventionDraftByEmailFromConventionSchema.parse(data),
+    ).toThrow();
+  });
+});
+
+describe("shareConventionDraftByEmailFromConventionTemplateSchema schema validation", () => {
+  it.each<ShareConventionDraftByEmailFromConventionTemplateDto>([
+    {
+      recipientEmail: "test@test.com",
+      conventionDraft: {
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+        internshipKind: "immersion",
+      },
+    },
+    {
+      recipientEmail: "test@example.com",
+      details: "Some details",
+      conventionDraft: {
+        id: "bbbbbc99-9c0b-1aaa-aa6d-6bb9bd38bbbb",
+        internshipKind: "mini-stage-cci",
+      },
+    },
+  ])("accepts valid data", (data) => {
+    expectToEqual(
+      shareConventionDraftByEmailFromConventionTemplateSchema.parse(data),
+      data,
+    );
+  });
+
+  it.each([
+    {
+      recipientEmail: "not-an-email",
+    } as ShareConventionDraftByEmailFromConventionTemplateDto,
+    {
+      recipientEmail: "not-an-email",
+      conventionDraft: {
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+        internshipKind: "immersion",
+      },
+    },
+  ])("fails on invalid data", (data) => {
+    expect(() =>
+      shareConventionDraftByEmailFromConventionTemplateSchema.parse(data),
+    ).toThrow();
   });
 });
 

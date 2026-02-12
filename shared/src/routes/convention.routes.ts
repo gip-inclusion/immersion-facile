@@ -32,7 +32,7 @@ import {
 } from "../convention/conventionWithBroadcastFeedback.schema";
 import {
   conventionDraftSchema,
-  shareConventionDraftByEmailSchema,
+  shareConventionDraftByEmailFromConventionSchema,
 } from "../convention/shareConventionDraftByEmail.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
@@ -223,7 +223,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
   shareConvention: defineRoute({
     url: "/convention-drafts",
     method: "post",
-    requestBodySchema: shareConventionDraftByEmailSchema,
+    requestBodySchema: shareConventionDraftByEmailFromConventionSchema,
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,

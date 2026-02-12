@@ -25,10 +25,10 @@ import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryU
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   makeShareConventionDraftByEmail,
-  type ShareConventionLinkByEmail,
+  type ShareConventionDraftByEmail,
 } from "./ShareConventionDraftByEmail";
 
-describe("ShareConventionLinkByEmail", () => {
+describe("ShareConventionDraftByEmail", () => {
   const email = "fake-email@yahoo.com";
   const internshipKind: InternshipKind = "immersion";
   const messageContent = "message content";
@@ -36,7 +36,7 @@ describe("ShareConventionLinkByEmail", () => {
   const config = new AppConfigBuilder().build();
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
-  let usecase: ShareConventionLinkByEmail;
+  let usecase: ShareConventionDraftByEmail;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   let timeGateway: TimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
