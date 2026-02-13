@@ -75,7 +75,7 @@ describe("DeleteConventionTemplate", () => {
     );
   });
 
-  it("throws notFound when template belongs to another user", async () => {
+  it("throws forbidden when template belongs to another user", async () => {
     uow.conventionTemplateQueries.conventionTemplates = [
       {
         id: templateId,
@@ -90,7 +90,7 @@ describe("DeleteConventionTemplate", () => {
         { conventionTemplateId: templateId },
         currentUser,
       ),
-      errors.conventionTemplate.forbiddenToDeleteNotOwnedTemplate({
+      errors.conventionTemplate.forbidden({
         conventionTemplateId: templateId,
       }),
     );

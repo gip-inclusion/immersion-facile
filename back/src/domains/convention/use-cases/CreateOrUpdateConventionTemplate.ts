@@ -29,7 +29,7 @@ export const makeCreateOrUpdateConventionTemplate = useCaseBuilder(
     });
 
     if (templates.at(0) && templates.at(0)?.userId !== currentUser.id)
-      throw errors.conventionTemplate.forbiddenToDeleteNotOwnedTemplate({
+      throw errors.conventionTemplate.forbidden({
         conventionTemplateId: inputParams.id,
       });
 

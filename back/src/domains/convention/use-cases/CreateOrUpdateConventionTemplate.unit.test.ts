@@ -1,4 +1,8 @@
-import type { ConventionTemplate, ConventionTemplateId } from "shared";
+import type {
+  ConnectedUser,
+  ConventionTemplate,
+  ConventionTemplateId,
+} from "shared";
 import {
   ConnectedUserBuilder,
   errors,
@@ -81,7 +85,7 @@ describe("CreateOrUpdateConventionTemplate", () => {
     await expectPromiseToFailWithError(
       createOrUpdateConventionTemplate.execute(
         conventionTemplate,
-        undefined as unknown as typeof currentUser,
+        undefined as unknown as ConnectedUser,
       ),
       errors.user.unauthorized(),
     );
@@ -102,7 +106,7 @@ describe("CreateOrUpdateConventionTemplate", () => {
         { ...conventionTemplate, name: "Updated name" },
         currentUser,
       ),
-      errors.conventionTemplate.forbiddenToDeleteNotOwnedTemplate({
+      errors.conventionTemplate.forbidden({
         conventionTemplateId: templateId,
       }),
     );

@@ -1086,7 +1086,7 @@ describe("authenticatedConventionRoutes", () => {
       expectHttpResponseToEqual(response, {
         status: 403,
         body: {
-          message: `Vous n'avez pas les droits nécessaires pour supprimer le modèle de convention '${templateOwnedByOther.id}'.`,
+          message: `Vous n'avez pas les droits nécessaires sur le modèle de convention '${templateOwnedByOther.id}'.`,
           status: 403,
         },
       });

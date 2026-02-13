@@ -365,7 +365,7 @@ export const ConventionForm = ({
       throw errorMessage.user.unauthorized();
     }
     if (isCreateConventionPresentationInitialValues(convention)) {
-      throw errorMessage.conventionTemplate.forbiddenMissingName();
+      throw new Error("Le nom du modèle de convention est requis.");
     }
     const conventionToSave: ConventionTemplate = toConventionTemplate({
       convention,
