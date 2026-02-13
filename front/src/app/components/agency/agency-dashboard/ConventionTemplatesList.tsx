@@ -29,8 +29,8 @@ import { v4 as uuid } from "uuid";
 
 const shareConventionTemplateModal = createModal({
   isOpenedByDefault: false,
-  id: domElementIds.agencyDashboard.conventionTemplate
-    .shareAsConventionDraftModal,
+  id: domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft
+    .modal,
 });
 
 const makeConventionDraftDtoFromConventionTemplate = (
@@ -131,7 +131,8 @@ export const ConventionTemplatesList = ({
         titleAction={
           <Button
             id={
-              domElementIds.agencyDashboard.dashboard.initiateConventionButton
+              domElementIds.agencyDashboardConventionTemplate
+                .createConventionTemplateButton
             }
             priority="primary"
             iconId="fr-icon-add-line"
@@ -172,6 +173,7 @@ export const ConventionTemplatesList = ({
           {conventionTemplates.map((template) => (
             <div
               key={template.id}
+              id={`convention-template-${template.id}`}
               className={fr.cx("fr-col-12", "fr-col-lg-6")}
             >
               <Task
@@ -185,10 +187,7 @@ export const ConventionTemplatesList = ({
                     content: (
                       <>
                         <Button
-                          key={
-                            domElementIds.agencyDashboard.conventionTemplate
-                              .editConventionTemplateButton
-                          }
+                          id={`${domElementIds.agencyDashboardConventionTemplate.editConventionTemplateButton}-${template.id}`}
                           priority="tertiary"
                           iconId="fr-icon-edit-line"
                           iconPosition="right"
@@ -202,10 +201,7 @@ export const ConventionTemplatesList = ({
                           Modifier
                         </Button>
                         <Button
-                          key={
-                            domElementIds.agencyDashboard.conventionTemplate
-                              .deleteConventionTemplateButton
-                          }
+                          id={`${domElementIds.agencyDashboardConventionTemplate.deleteConventionTemplateButton}-${template.id}`}
                           priority="tertiary"
                           iconId="fr-icon-delete-bin-line"
                           title="Supprimer"
@@ -222,11 +218,7 @@ export const ConventionTemplatesList = ({
                     id: "share",
                     content: (
                       <Button
-                        key={`share-${template.id}`}
-                        id={
-                          domElementIds.agencyDashboard.conventionTemplate
-                            .shareConventionTemplateButton
-                        }
+                        id={`${domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft.button}-${template.id}`}
                         priority="tertiary no outline"
                         iconId="fr-icon-send-plane-line"
                         iconPosition="right"
@@ -247,29 +239,29 @@ export const ConventionTemplatesList = ({
           title="Partager ce modèle en brouillon"
           buttons={[
             {
-              id: domElementIds.agencyDashboard.conventionTemplate
-                .shareAsConventionDraftModalCancelButton,
-              doClosesModal: true,
+              id: domElementIds.agencyDashboardConventionTemplate
+                .shareAsConventionDraft.cancelButton,
               children: "Annuler",
               priority: "secondary",
+              onClick: shareConventionTemplateModal.close,
             },
             {
-              id: domElementIds.agencyDashboard.conventionTemplate
-                .shareAsConventionDraftModalSubmitButton,
+              id: domElementIds.agencyDashboardConventionTemplate
+                .shareAsConventionDraft.submitButton,
               doClosesModal: false,
               children: "Envoyer le brouillon",
+              type: "submit",
               nativeButtonProps: {
-                form: domElementIds.agencyDashboard.conventionTemplate
-                  .shareAsConventionDraftModalForm,
-                type: "submit",
+                form: domElementIds.agencyDashboardConventionTemplate
+                  .shareAsConventionDraft.form,
               },
             },
           ]}
         >
           <form
             id={
-              domElementIds.agencyDashboard.conventionTemplate
-                .shareAsConventionDraftModalForm
+              domElementIds.agencyDashboardConventionTemplate
+                .shareAsConventionDraft.form
             }
             onSubmit={handleSubmit(onShareFormSubmit)}
             noValidate
@@ -287,8 +279,8 @@ export const ConventionTemplatesList = ({
               label="Adresse e-mail *"
               nativeInputProps={{
                 ...register("recipientEmail"),
-                id: domElementIds.agencyDashboard.conventionTemplate
-                  .shareAsConventionDraftModalEmailInput,
+                id: domElementIds.agencyDashboardConventionTemplate
+                  .shareAsConventionDraft.emailInput,
                 type: "email",
                 placeholder: "nom@exemple.com",
               }}
@@ -302,8 +294,8 @@ export const ConventionTemplatesList = ({
                 ...register("details", {
                   setValueAs: (v) => (v === "" ? undefined : v),
                 }),
-                id: domElementIds.agencyDashboard.conventionTemplate
-                  .shareAsConventionDraftModalMessageInput,
+                id: domElementIds.agencyDashboardConventionTemplate
+                  .shareAsConventionDraft.messageInput,
               }}
               textArea
               state={formState.errors.details ? "error" : "default"}
