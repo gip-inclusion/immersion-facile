@@ -107,9 +107,6 @@
     "zod-to-json-schema": "^3.21.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
-    "@babel/preset-typescript": "^7.27.1",
     "@faker-js/faker": "^8.3.1",
     "@types/body-parser": "^1.19.2",
     "@types/express": "^4.17.17",
@@ -125,9 +122,10 @@
     "@types/ramda": "^0.30.2",
     "@types/request": "^2.48.8",
     "@types/supertest": "^2.0.12",
+    "@swc/core": "^1.15.11",
+    "@swc/jest": "^0.2.39",
     "@types/uuid": "^8.3.4",
     "axios-mock-adapter": "^1.21.2",
-    "babel-jest": "^29.7.0",
     "extract-zip": "^2.0.1",
     "jest": "^29.7.0",
     "libphonenumber-js": "^1.11.1",

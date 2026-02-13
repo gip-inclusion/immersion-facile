@@ -1,0 +1,13 @@
+{
+  "jsc": {
+    "target": "es2022",
+    "parser": {
+      "syntax": "typescript",
+      "tsx": false,
+      "decorators": true
+    }
+  },
+  "module": {
+    "type": "commonjs"
+  }
+}

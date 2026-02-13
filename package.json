@@ -25,6 +25,7 @@
     "playwright:test": "pnpm back db:seed && pnpm playwright test:local",
     "react-design-system": "pnpm --dir libs/react-design-system",
     "html-templates": "pnpm --dir libs/html-templates",
+    "scss-mapper": "pnpm --dir libs/scss-mapper",
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
     "includecheck": "turbo run includecheck",
     "check": "turbo run check",
