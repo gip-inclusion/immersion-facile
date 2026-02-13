@@ -28,6 +28,8 @@ type UseCaseSubscriptionsByTopics = {
 const getUseCasesByTopics = (
   useCases: UseCases,
 ): UseCaseSubscriptionsByTopics => ({
+  UserDeleted: [],
+  InactiveUserAccountDeletionTriggered: [useCases.deleteUser],
   NotificationAdded: [useCases.sendNotification],
   ExchangeAddedToDiscussion: [
     useCases.sendExchangeToRecipient,

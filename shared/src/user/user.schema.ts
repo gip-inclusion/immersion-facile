@@ -27,10 +27,16 @@ import type {
   UserId,
   UserWithNumberOfAgenciesAndEstablishments,
   WithOptionalUserId,
+  WithUserId,
 } from "./user.dto";
 
 export const userIdSchema: ZodSchemaWithInputMatchingOutput<UserId> =
   zStringMinLength1;
+
+export const withUserIdSchema: ZodSchemaWithInputMatchingOutput<WithUserId> =
+  z.object({
+    userId: userIdSchema,
+  });
 
 export const withOptionalUserIdSchema: ZodSchemaWithInputMatchingOutput<WithOptionalUserId> =
   z.object({
