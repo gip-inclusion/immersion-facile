@@ -11,6 +11,7 @@ import {
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
 } from "shared";
+import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
 import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
 import { DiscussionManageContent } from "src/app/components/establishment/establishment-dashboard/DiscussionManageContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -154,6 +155,9 @@ const makeEstablishmentDashboardTabs = (
           ) : (
             <p> Aucune convention trouvée pour votre compte</p>
           )}
+          <ConventionTemplatesList
+            fromRoute={routes.establishmentDashboard()}
+          />
         </>
       ),
     },
