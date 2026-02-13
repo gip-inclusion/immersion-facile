@@ -10,16 +10,14 @@
     "fullcheck": "pnpm -w fullcheck --filter=shared"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
-    "@babel/preset-typescript": "^7.27.1",
     "@types/geojson": "^7946.0.10",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.19.8",
     "@types/ramda": "^0.30.2",
+    "@swc/core": "^1.15.11",
+    "@swc/jest": "^0.2.39",
     "@types/uuid": "^8.3.4",
     "axios": "^1.12.2",
-    "babel-jest": "^29.7.0",
     "date-fns": "2.28.0",
     "html-templates": "workspace:*",
     "jest": "^29.7.0",
