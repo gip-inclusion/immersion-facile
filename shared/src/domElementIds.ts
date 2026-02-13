@@ -986,33 +986,13 @@ export const domElementIds = {
       editAgencyRemoveUserButton:
         "im-agency-dashboard-form-edit-agency__remove-user-button",
     },
-    conventionTemplate: {
-      editConventionTemplateButton:
-        "im-manage-convention-template__edit-convention-template-button",
-      deleteConventionTemplateButton:
-        "im-manage-convention-template__delete-convention-template-button",
-      shareConventionTemplateButton:
-        "im-manage-convention-template__share-convention-template-button",
-      shareAsConventionDraftModal:
-        "im-manage-convention-template__share-as-convention-draft-modal",
-      shareAsConventionDraftModalForm:
-        "im-manage-convention-template__share-as-convention-draft-modal-form",
-      shareAsConventionDraftModalEmailInput:
-        "im-manage-convention-template__share-as-convention-draft-email-input",
-      shareAsConventionDraftModalMessageInput:
-        "im-manage-convention-template__share-as-convention-draft-message-input",
-      shareAsConventionDraftModalCancelButton:
-        "im-manage-convention-template__share-as-convention-draft-cancel-button",
-      shareAsConventionDraftModalSubmitButton:
-        "im-manage-convention-template__share-as-convention-draft-submit-button",
-    },
   },
   agencyDashboardConventionTemplate: {
     login: {
       proConnectButton:
         "im-login-form__pro-connect-button--agency-dashboard-convention-template",
       byEmailButton:
-        "im-login-form__connect-button--agency-dashboard-convention-template-email",
+        "im-login-form__pro-connect-button--agency-dashboard-convention-template-email",
       navigateToHome:
         "im-login-form__navigate-to-home-button--agency-dashboard-convention-template",
       retryButton:
@@ -1021,9 +1001,29 @@ export const domElementIds = {
         "im-login-form__contact-support-link--agency-dashboard-convention-template",
     },
     form: {
-      submitFormButton: "im-convention-template-form__submit-form-button",
+      nameInput: "im-convention-template-form__name-input",
+      submitFormButton: "im-convention-template-form__submit-button",
       submitFormButtonMobile:
         "im-convention-template-form__submit-form-button--mobile",
+    },
+    createConventionTemplateButton:
+      "im-agency-dashboard__create-convention-template-button",
+    editConventionTemplateButton:
+      "im-manage-convention-template__edit-convention-template-button",
+    deleteConventionTemplateButton:
+      "im-manage-convention-template__delete-convention-template-button",
+    shareAsConventionDraft: {
+      button: "im-manage-convention-template__share-as-convention-draft-button",
+      modal: "im-manage-convention-template__share-as-convention-draft-modal",
+      form: "im-manage-convention-template__share-as-convention-draft-modal-form",
+      emailInput:
+        "im-manage-convention-template__share-as-convention-draft-email-input",
+      messageInput:
+        "im-manage-convention-template__share-as-convention-draft-message-input",
+      cancelButton:
+        "im-manage-convention-template__share-as-convention-draft-cancel-button",
+      submitButton:
+        "im-manage-convention-template__share-as-convention-draft-submit-button",
     },
   },
   manageConventionUserConnected: {

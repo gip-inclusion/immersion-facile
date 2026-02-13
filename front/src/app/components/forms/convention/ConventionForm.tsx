@@ -677,6 +677,8 @@ export const ConventionForm = ({
                   label="Nom du modèle *"
                   nativeInputProps={{
                     ...register("name"),
+                    id: domElementIds.agencyDashboardConventionTemplate.form
+                      .nameInput,
                   }}
                 />
               )}
