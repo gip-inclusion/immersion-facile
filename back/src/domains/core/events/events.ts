@@ -21,6 +21,7 @@ import {
   type WithDiscussionId,
   type WithOptionalFirstnameAndLastname,
   type WithSiretDto,
+  type WithUserId,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
@@ -147,6 +148,9 @@ export type DomainEvent =
   // USER CONNECTED related.
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
+  // INACTIVE USER ACCOUNT DELETION
+  | GenericEvent<"InactiveUserAccountDeletionTriggered", WithUserId>
+  | GenericEvent<"UserDeleted", WithUserId& WithTriggeredBy>
 
 
   // Est-ce que les deux events au final c'est pas la même chose ???????!!!!!!! De quoi péter un gros boulard!
