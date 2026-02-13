@@ -1,8 +1,10 @@
+import { faker } from "@faker-js/faker";
 import test, { expect } from "@playwright/test";
-import { type AgencyId, domElementIds } from "shared";
+import { type AgencyId, domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAndSubmitBasicAgencyForm } from "../../utils/agency";
+import { fillConventionForm } from "../../utils/convention";
 import { goToDashboard } from "../../utils/dashboard";
 
 test.describe.configure({ mode: "serial" });
@@ -170,6 +172,95 @@ test.describe("Agency dashboard workflow", () => {
           `#${domElementIds.agencyDashboard.dashboard.tabContainer}`,
         ),
       ).toBeVisible();
+    });
+  });
+
+  test.describe("Manage convention templates", () => {
+    test.use({ storageState: testConfig.agencyAuthFile });
+
+    test("IC user can create a new convention template", async ({ page }) => {
+      await page.goto("/");
+      await goToDashboard(page, "agency");
+
+      await page.click(
+        `#${domElementIds.agencyDashboardConventionTemplate.createConventionTemplateButton}`,
+      );
+      await page.waitForURL(
+        `${frontRoutes.agencyDashboardConventionTemplate}**`,
+      );
+
+      await page.fill(
+        `#${domElementIds.agencyDashboardConventionTemplate.form.nameInput}`,
+        "Mon premier modèle de convention",
+      );
+      await fillConventionForm(page);
+
+      await page.click(
+        `#${domElementIds.agencyDashboardConventionTemplate.form.submitFormButton}`,
+      );
+      await expect(page.locator(".fr-alert--success")).toBeVisible();
+
+      await goToDashboard(page, "agency");
+      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+    });
+
+    test("IC user can update a convention template", async ({ page }) => {
+      const newConventionTemplateName = "Modèle de convention modifié";
+      await page.goto("/");
+      await goToDashboard(page, "agency");
+      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+
+      await page.click(
+        `[id^="${domElementIds.agencyDashboardConventionTemplate.editConventionTemplateButton}-"]`,
+      );
+      await page.fill(
+        `#${domElementIds.agencyDashboardConventionTemplate.form.nameInput}`,
+        newConventionTemplateName,
+      );
+
+      await page.click(
+        `#${domElementIds.agencyDashboardConventionTemplate.form.submitFormButton}`,
+      );
+      await expect(page.locator(".fr-alert--success")).toBeVisible();
+
+      await goToDashboard(page, "agency");
+      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+      await expect(page.locator('[id^="convention-template-"]')).toContainText(
+        newConventionTemplateName,
+      );
+    });
+
+    test("IC user can share a convention template as a draft", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await goToDashboard(page, "agency");
+      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+
+      await page.click(
+        `[id^="${domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft.button}-"]`,
+      );
+
+      await page.fill(
+        `#${domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft.emailInput}`,
+        faker.internet.email(),
+      );
+      await page.click(
+        `#${domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft.submitButton}`,
+      );
+      await expect(page.locator(".fr-alert--success")).toBeVisible();
+    });
+
+    test("IC user can delete a convention template", async ({ page }) => {
+      await page.goto("/");
+      await goToDashboard(page, "agency");
+      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+
+      await page.click(
+        `[id^="${domElementIds.agencyDashboardConventionTemplate.deleteConventionTemplateButton}-"]`,
+      );
+      await expect(page.locator(".fr-alert--success")).toBeVisible();
+      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(0);
     });
   });
 });

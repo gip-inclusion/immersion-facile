@@ -53,22 +53,7 @@ export const updatedEndDateDisplayed = format(
   "dd/MM/yyyy",
 );
 
-export const fillBasicConventionForm = async (
-  page: Page,
-): Promise<AgencyId | undefined> => {
-  await page.goto(frontRoutes.initiateConvention);
-  await expect(
-    await page.request.get(technicalRoutes.featureFlags.url),
-  ).toBeOK();
-  const formButton = await page.locator(
-    `#${domElementIds.initiateConvention.navCards.candidate}`,
-  );
-  await formButton.waitFor();
-  await formButton.click();
-  await page
-    .locator(`#${domElementIds.initiateConvention.otherStructureButton}`)
-    .click();
-  await page.waitForURL(`${frontRoutes.conventionImmersionRoute}**`);
+export const fillConventionForm = async (page: Page) => {
   await page.selectOption(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
     "75",
@@ -177,6 +162,26 @@ export const fillBasicConventionForm = async (
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
     faker.word.words(8),
   );
+};
+
+export const goToFormPageAndFillConventionForm = async (
+  page: Page,
+): Promise<AgencyId | undefined> => {
+  await page.goto(frontRoutes.initiateConvention);
+  await expect(
+    await page.request.get(technicalRoutes.featureFlags.url),
+  ).toBeOK();
+  const formButton = await page.locator(
+    `#${domElementIds.initiateConvention.navCards.candidate}`,
+  );
+  await formButton.waitFor();
+  await formButton.click();
+  await page
+    .locator(`#${domElementIds.initiateConvention.otherStructureButton}`)
+    .click();
+  await page.waitForURL(`${frontRoutes.conventionImmersionRoute}**`);
+
+  await fillConventionForm(page);
 
   return "40400c99-9c0b-bbbb-bb6d-6bb9bd300404";
 };
@@ -184,7 +189,7 @@ export const fillBasicConventionForm = async (
 export const submitBasicConventionForm = async (
   page: Page,
 ): Promise<ConventionSubmitted | void> => {
-  const agencyId = await fillBasicConventionForm(page);
+  const agencyId = await goToFormPageAndFillConventionForm(page);
   expect(agencyId).not.toBeFalsy();
   if (!agencyId) return;
   await confirmCreateConventionFormSubmit(page, tomorrowDateDisplayed);
