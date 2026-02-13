@@ -29,6 +29,7 @@ import {
   type UserId,
   type WithSort,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
@@ -270,6 +271,12 @@ export class PgConventionQueries implements ConventionQueries {
     pagination: Required<PaginationQueryParams>;
     filters?: GetPaginatedConventionsFilters;
   }): Promise<DataWithPagination<ConventionReadDto>> {
+    const callId = uuid();
+    const start = Date.now();
+    logger.info({
+      message: `getPaginatedConventionsForAgencyUser - ${callId} - Start`,
+    });
+
     const {
       search,
       statuses,
@@ -301,6 +308,11 @@ export class PgConventionQueries implements ConventionQueries {
       applyPagination(pagination),
     ).execute();
 
+    const afterExecuteConventionQB = Date.now();
+    logger.info({
+      message: `getPaginatedConventionsForAgencyUser - ${callId} - After createConventionQueryBuilderForAgencyUser.execute() - duration: ${afterExecuteConventionQB - start} ms`,
+    });
+
     const totalRecords = data.at(0)?.total_count ?? 0;
 
     if (data.length === 0) {
@@ -321,6 +333,11 @@ export class PgConventionQueries implements ConventionQueries {
       uniqAgencyIds,
     );
 
+    const afterGetConventionAgencyFields = Date.now();
+    logger.info({
+      message: `getPaginatedConventionsForAgencyUser - ${callId} - After getConventionAgencyFieldsForAgencies() - duration: ${afterGetConventionAgencyFields - afterExecuteConventionQB} ms`,
+    });
+
     const assessmentPromises = data.map(async ({ dto }) => {
       const assessment = await getAssessmentFieldsByConventionId(
         this.transaction,
@@ -337,6 +354,11 @@ export class PgConventionQueries implements ConventionQueries {
       },
       {} as Record<string, ConventionAssessmentFields>,
     );
+
+    const afterGetAssesmentFields = Date.now();
+    logger.info({
+      message: `getPaginatedConventionsForAgencyUser - ${callId} - After getAssessmentFieldsByConventionId() - duration: ${afterGetAssesmentFields - afterGetConventionAgencyFields} ms`,
+    });
 
     const conventionsReadDto = data.map(({ dto }) => {
       const agencyFields = agencyFieldsByAgencyIds[dto.agencyId];
@@ -357,9 +379,18 @@ export class PgConventionQueries implements ConventionQueries {
       });
     });
 
+    const paginationResult = calculatePaginationResult({
+      ...pagination,
+      totalRecords,
+    });
+
+    const end = Date.now();
+    logger.info({
+      message: `getPaginatedConventionsForAgencyUser - ${callId} - End - Total duration: ${end - start} ms`,
+    });
     return {
       data: conventionsReadDto,
-      pagination: calculatePaginationResult({ ...pagination, totalRecords }),
+      pagination: paginationResult,
     };
   }
 
@@ -372,6 +403,12 @@ export class PgConventionQueries implements ConventionQueries {
     pagination: Required<PaginationQueryParams>;
     filters?: ConventionsWithErroredBroadcastFeedbackFilters;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>> {
+    const callId = uuid();
+    const start = Date.now();
+    logger.info({
+      message: `getConventionsWithErroredBroadcastFeedbackForAgencyUser - ${callId} - Start`,
+    });
+
     if (userAgencyIds.length === 0)
       return {
         data: [],
@@ -398,6 +435,11 @@ export class PgConventionQueries implements ConventionQueries {
       sortConventionsWithBroadcastFeedback(),
       applyPaginationToBroadcastFeedback(pagination),
     ).execute();
+
+    const afterExecuteQuery = Date.now();
+    logger.info({
+      message: `getConventionsWithErroredBroadcastFeedbackForAgencyUser - ${callId} - After query execution - duration: ${afterExecuteQuery - start} ms`,
+    });
 
     const totalRecords = result.at(0)?.total_count ?? 0;
 
@@ -430,9 +472,18 @@ export class PgConventionQueries implements ConventionQueries {
         }),
       );
 
+    const paginationResult = calculatePaginationResult({
+      ...pagination,
+      totalRecords,
+    });
+
+    const end = Date.now();
+    logger.info({
+      message: `getConventionsWithErroredBroadcastFeedbackForAgencyUser - ${callId} - End - Total duration: ${end - start} ms`,
+    });
     return {
       data: conventionsWithErroredBroadcastFeedback,
-      pagination: calculatePaginationResult({ ...pagination, totalRecords }),
+      pagination: paginationResult,
     };
   }
 }
