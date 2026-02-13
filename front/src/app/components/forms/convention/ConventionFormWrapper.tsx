@@ -61,10 +61,15 @@ const {
 });
 
 export const creationFormModes = [
-  "create-from-scratch",
-  "create-from-shared",
+  "create-convention-from-scratch",
+  "create-convention-from-shared",
+  "create-convention-template",
 ] as const;
-const allConventionFormModes = [...creationFormModes, "edit"] as const;
+const allConventionFormModes = [
+  ...creationFormModes,
+  "edit-convention",
+  "edit-convention-template",
+] as const;
 export type ConventionFormMode = (typeof allConventionFormModes)[number];
 
 type ConventionFormWrapperProps = {
@@ -141,7 +146,7 @@ export const ConventionFormWrapper = ({
           feedbackTopic: "convention-draft",
         }),
       );
-    } else if (mode === "edit" && route.params.jwt) {
+    } else if (mode === "edit-convention" && route.params.jwt) {
       dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
       const { applicationId } =
         decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
@@ -215,15 +220,15 @@ export const ConventionFormWrapper = ({
       {match({
         showSummary,
         formSuccessfullySubmitted,
-        isUpdateMode: mode === "edit",
+        isUpdateMode: mode === "edit-convention",
         shouldRedirectToError: !!(route.params.jwt && fetchConventionError),
         hasAllowedRoleToEditConvention:
-          mode === "edit" &&
+          mode === "edit-convention" &&
           route.params.jwt &&
           fetchedConvention &&
           hasAllowedRolesToEditConvention(userRolesOnConvention),
         conventionCantBeEdited:
-          mode === "edit" &&
+          mode === "edit-convention" &&
           route.params.jwt &&
           fetchedConvention &&
           !conventionStatusesAllowedForModification.includes(
@@ -232,7 +237,7 @@ export const ConventionFormWrapper = ({
         fetchedConvention,
         hasConventionUpdateConflict,
         conventionCantBeEditedAfterAcceptanceByCounsellor:
-          mode === "edit" &&
+          mode === "edit-convention" &&
           route.params.jwt &&
           fetchedConvention &&
           fetchedConvention?.status === "ACCEPTED_BY_COUNSELLOR" &&
@@ -332,8 +337,8 @@ export const ConventionFormWrapper = ({
             if (!fetchedConvention) return null;
 
             if (
-              mode === "create-from-scratch" ||
-              mode === "create-from-shared"
+              mode === "create-convention-from-scratch" ||
+              mode === "create-convention-from-shared"
             ) {
               routes
                 .conventionConfirmation({
@@ -424,7 +429,9 @@ const ConventionSummarySection = ({
         },
         discussionId: route.params.discussionId,
         feedbackTopic:
-          mode === "edit" ? "convention-action-edit" : "convention-form",
+          mode === "edit-convention"
+            ? "convention-action-edit"
+            : "convention-form",
       }),
     );
   };
@@ -463,7 +470,7 @@ const ConventionSummarySection = ({
         />
       )}
 
-      {mode === "edit" ? (
+      {mode === "edit-convention" ? (
         <>
           {!conventionSuccessfullySubmitted && (
             <Feedback
@@ -661,7 +668,7 @@ const getRouteToRedirectAfterSubmit = ({
     .with({ fetchedConvention: null }, () => undefined)
     .with(
       {
-        mode: "edit",
+        mode: "edit-convention",
         userRolesOnConvention: P.when((roles) =>
           roles.some((role) => isSignatory(role)),
         ),
@@ -688,7 +695,7 @@ const getRouteToRedirectAfterSubmit = ({
     )
     .with(
       {
-        mode: "edit",
+        mode: "edit-convention",
         userRolesOnConvention: P.when((roles) => roles.includes("back-office")),
         fetchedConvention: { id: P.string },
       },
@@ -699,7 +706,7 @@ const getRouteToRedirectAfterSubmit = ({
     )
     .with(
       {
-        mode: "edit",
+        mode: "edit-convention",
         userRolesOnConvention: P.when(
           (roles) => intersection(roles, agencyModifierRoles).length > 0,
         ),

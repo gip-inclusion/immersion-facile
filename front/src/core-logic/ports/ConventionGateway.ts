@@ -10,6 +10,8 @@ import type {
   ConventionLastBroadcastFeedbackResponse,
   ConventionReadDto,
   ConventionSupportedJwt,
+  ConventionTemplate,
+  ConventionTemplateId,
   DashboardUrlAndName,
   DataWithPagination,
   DiscussionId,
@@ -110,4 +112,15 @@ export interface ConventionGateway {
   getConventionDraftById$(
     conventionDraftId: ConventionDraftId,
   ): Observable<ConventionDraftDto | undefined>;
+  createOrUpdateConventionTemplate$(
+    conventionTemplate: ConventionTemplate,
+    jwt: string,
+  ): Observable<void>;
+  getConventionTemplatesForCurrentUser$(
+    jwt: string,
+  ): Observable<ConventionTemplate[]>;
+  deleteConventionTemplate$(
+    conventionTemplateId: ConventionTemplateId,
+    jwt: string,
+  ): Observable<void>;
 }

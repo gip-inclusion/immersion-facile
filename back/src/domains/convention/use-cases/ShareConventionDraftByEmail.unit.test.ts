@@ -23,9 +23,12 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ShareConventionLinkByEmail } from "./ShareConventionDraftByEmail";
+import {
+  makeShareConventionDraftByEmail,
+  type ShareConventionDraftByEmail,
+} from "./ShareConventionDraftByEmail";
 
-describe("ShareConventionLinkByEmail", () => {
+describe("ShareConventionDraftByEmail", () => {
   const email = "fake-email@yahoo.com";
   const internshipKind: InternshipKind = "immersion";
   const messageContent = "message content";
@@ -33,7 +36,7 @@ describe("ShareConventionLinkByEmail", () => {
   const config = new AppConfigBuilder().build();
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
-  let usecase: ShareConventionLinkByEmail;
+  let usecase: ShareConventionDraftByEmail;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   let timeGateway: TimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
@@ -53,13 +56,15 @@ describe("ShareConventionLinkByEmail", () => {
     );
     shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
-    usecase = new ShareConventionLinkByEmail(
-      new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
-      shortLinkIdGeneratorGateway,
-      timeGateway,
-      config,
-    );
+    usecase = makeShareConventionDraftByEmail({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent,
+        shortLinkIdGeneratorGateway,
+        timeGateway,
+        config,
+      },
+    });
   });
 
   it("sends an email to the sender only", async () => {

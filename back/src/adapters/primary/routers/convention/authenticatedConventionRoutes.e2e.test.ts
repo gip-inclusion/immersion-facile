@@ -6,6 +6,7 @@ import {
   ConnectedUserBuilder,
   type ConnectedUserJwt,
   ConventionDtoBuilder,
+  type ConventionTemplate,
   currentJwtVersions,
   defaultProConnectInfos,
   displayRouteName,
@@ -877,6 +878,265 @@ describe("authenticatedConventionRoutes", () => {
         body: { message: authExpiredMessage(), status: 401 },
         status: 401,
       });
+    });
+  });
+
+  describe(`${displayRouteName(
+    authenticatedConventionRoutes.getConventionTemplatesForCurrentUser,
+  )}`, () => {
+    it("401 with bad token", async () => {
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: "wrong-token" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: invalidTokenMessage, status: 401 },
+        status: 401,
+      });
+    });
+
+    it("401 with expired token", async () => {
+      const token = generateConnectedUserJwt(
+        { userId: validator.id, version: currentJwtVersions.connectedUser },
+        0,
+      );
+
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: token },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: authExpiredMessage(), status: 401 },
+        status: 401,
+      });
+    });
+
+    it("200 returns convention templates for authenticated user", async () => {
+      const template1: ConventionTemplate = {
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        name: "Mon modèle 1",
+        internshipKind: "immersion" as const,
+        userId: validator.id,
+      };
+      const template2: ConventionTemplate = {
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        name: "Mon modèle 2",
+        internshipKind: "immersion" as const,
+        userId: validator.id,
+      };
+      inMemoryUow.conventionTemplateQueries.conventionTemplates = [
+        template1,
+        template2,
+      ];
+
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: validToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: [template1, template2],
+      });
+      expect((response.body as ConventionTemplate[]).length).toBe(2);
+    });
+
+    it("200 returns empty array when user has no templates", async () => {
+      const response = await httpClient.getConventionTemplatesForCurrentUser({
+        headers: { authorization: validToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: [],
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    authenticatedConventionRoutes.createOrUpdateConventionTemplate,
+  )}`, () => {
+    const validConventionTemplate: ConventionTemplate = {
+      id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      name: "Mon modèle",
+      internshipKind: "immersion" as const,
+      userId: validator.id,
+    };
+
+    it("401 with bad token", async () => {
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: "wrong-token" },
+        body: validConventionTemplate,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: invalidTokenMessage, status: 401 },
+        status: 401,
+      });
+    });
+
+    it("401 with expired token", async () => {
+      const token = generateConnectedUserJwt(
+        { userId: validator.id, version: currentJwtVersions.connectedUser },
+        0,
+      );
+
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: token },
+        body: validConventionTemplate,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: authExpiredMessage(), status: 401 },
+        status: 401,
+      });
+    });
+
+    it("400 when request body is invalid", async () => {
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: validToken },
+        body: {
+          id: validConventionTemplate.id,
+          name: "",
+          internshipKind: "immersion",
+          userId: validator.id,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          message:
+            "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /convention-templates",
+          status: 400,
+          issues: ["name : Ce champ est obligatoire"],
+        },
+      });
+    });
+
+    it("200 creates or updates convention template when authenticated", async () => {
+      const response = await httpClient.createOrUpdateConventionTemplate({
+        headers: { authorization: validToken },
+        body: validConventionTemplate,
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    authenticatedConventionRoutes.deleteConventionTemplate,
+  )}`, () => {
+    const templateId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+
+    it("400 when conventionTemplateId is not a valid UUID", async () => {
+      const response = await httpClient.deleteConventionTemplate({
+        headers: { authorization: validToken },
+        urlParams: { conventionTemplateId: "not-a-valid-uuid" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          message:
+            "Schema validation failed in usecase DeleteConventionTemplate. See issues for details.",
+          status: 400,
+          issues: [
+            "conventionTemplateId : Le format de l'identifiant est invalide",
+          ],
+        },
+      });
+    });
+
+    it("401 with bad token", async () => {
+      const response = await httpClient.deleteConventionTemplate({
+        headers: { authorization: "wrong-token" },
+        urlParams: { conventionTemplateId: templateId },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { message: invalidTokenMessage, status: 401 },
+        status: 401,
+      });
+    });
+
+    it("403 when template belongs to another user", async () => {
+      const otherUser = new ConnectedUserBuilder()
+        .withId("other-user-id")
+        .withEmail("other@example.com")
+        .buildUser();
+      const templateOwnedByOther: ConventionTemplate = {
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        name: "Template d'un autre utilisateur",
+        internshipKind: "immersion" as const,
+        userId: otherUser.id,
+      };
+      inMemoryUow.userRepository.users = [validator, otherUser];
+      inMemoryUow.conventionTemplateQueries.conventionTemplates = [
+        templateOwnedByOther,
+      ];
+
+      const response = await httpClient.deleteConventionTemplate({
+        headers: { authorization: validToken },
+        urlParams: { conventionTemplateId: templateOwnedByOther.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          message: `Vous n'avez pas les droits nécessaires sur le modèle de convention '${templateOwnedByOther.id}'.`,
+          status: 403,
+        },
+      });
+      expectToEqual(
+        await inMemoryUow.conventionTemplateQueries.get({
+          ids: [templateOwnedByOther.id],
+        }),
+        [templateOwnedByOther],
+      );
+    });
+
+    it("404 when template does not exist", async () => {
+      const response = await httpClient.deleteConventionTemplate({
+        headers: { authorization: validToken },
+        urlParams: { conventionTemplateId: templateId },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          message: `Aucun modèle de convention trouvé avec l'identifiant '${templateId}'.`,
+          status: 404,
+        },
+      });
+    });
+
+    it("200 deletes convention template when it belongs to current user", async () => {
+      const template: ConventionTemplate = {
+        id: templateId,
+        name: "Mon modèle",
+        internshipKind: "immersion" as const,
+        userId: validator.id,
+      };
+      inMemoryUow.conventionTemplateQueries.conventionTemplates = [template];
+
+      const response = await httpClient.deleteConventionTemplate({
+        headers: { authorization: validToken },
+        urlParams: { conventionTemplateId: templateId },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+      expectToEqual(
+        await inMemoryUow.conventionTemplateQueries.get({
+          ids: [templateId],
+        }),
+        [],
+      );
     });
   });
 });

@@ -14,11 +14,6 @@ import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
 
-const dateToIsoString = (date: Date | string): string => {
-  return date instanceof Date
-    ? date.toISOString()
-    : new Date(date).toISOString();
-};
 export class PgConventionDraftRepository implements ConventionDraftRepository {
   constructor(private transaction: KyselyDb) {}
 
@@ -52,7 +47,7 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
     return {
       id: row.id,
       updatedAt: row.updated_at
-        ? dateToIsoString(row.updated_at as Date | string)
+        ? (row.updated_at as Date).toISOString()
         : undefined,
       agencyId: row.agency_id ?? undefined,
       agencyKind: (row.agency_kind as AgencyKind) ?? undefined,

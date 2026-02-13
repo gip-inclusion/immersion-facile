@@ -24,6 +24,7 @@ import { conventionActionSlice } from "src/core-logic/domain/convention/conventi
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
+import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -69,6 +70,7 @@ const topics = [
   "convention-action-sign",
   "convention-draft",
   "convention-form",
+  "convention-template",
   "convention-status-dashboard",
   "conventions-with-broadcast-feedback",
   "dashboard-agency-register-user",
@@ -716,7 +718,7 @@ export const feedbacks: Record<
     "create.success": {
       action: conventionDraftSlice.actions.shareConventionDraftByEmailSucceeded,
       title: "Partager ou enregistrer un brouillon",
-      message: "Cette demande de convention a bien été partagée par mail.",
+      message: "Ce brouillon a bien été partagé par mail.",
     },
     "create.error": {
       action: conventionDraftSlice.actions.shareConventionDraftByEmailFailed,
@@ -728,6 +730,39 @@ export const feedbacks: Record<
       title: "Problème lors de la récupération du brouillon de convention",
       message:
         "Une erreur est survenue lors de la récupération du brouillon de convention",
+    },
+  },
+  "convention-template": {
+    "create.success": {
+      action:
+        conventionTemplateSlice.actions
+          .createOrUpdateConventionTemplateSucceeded,
+      title: "Le modèle de convention a bien été enregistré",
+      message: "Le modèle de convention a bien été enregistré.",
+    },
+    "create.error": {
+      action:
+        conventionTemplateSlice.actions.createOrUpdateConventionTemplateFailed,
+      title: "Problème lors de l'enregistrement du modèle de convention",
+      message:
+        "Une erreur est survenue lors de l'enregistrement du modèle de convention.",
+    },
+    "fetch.error": {
+      action: conventionTemplateSlice.actions.fetchConventionTemplatesFailed,
+      title: "Récupération des modèles de convention",
+      message:
+        "Une erreur est survenue lors de la récupération des modèles de convention.",
+    },
+    "delete.success": {
+      action: conventionTemplateSlice.actions.deleteConventionTemplateSucceeded,
+      title: "Suppression du modèle de convention",
+      message: "Le modèle de convention a bien été supprimé.",
+    },
+    "delete.error": {
+      action: conventionTemplateSlice.actions.deleteConventionTemplateFailed,
+      title: "Suppression du modèle de convention du modèle de convention",
+      message:
+        "Une erreur est survenue lors de la suppression du modèle de convention.",
     },
   },
   "convention-form": {

@@ -987,6 +987,45 @@ export const domElementIds = {
         "im-agency-dashboard-form-edit-agency__remove-user-button",
     },
   },
+  agencyDashboardConventionTemplate: {
+    login: {
+      proConnectButton:
+        "im-login-form__pro-connect-button--agency-dashboard-convention-template",
+      byEmailButton:
+        "im-login-form__pro-connect-button--agency-dashboard-convention-template-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--agency-dashboard-convention-template",
+      retryButton:
+        "im-login-form__retry-login-button--agency-dashboard-convention-template",
+      contactSupport:
+        "im-login-form__contact-support-link--agency-dashboard-convention-template",
+    },
+    form: {
+      nameInput: "im-convention-template-form__name-input",
+      submitFormButton: "im-convention-template-form__submit-button",
+      submitFormButtonMobile:
+        "im-convention-template-form__submit-form-button--mobile",
+    },
+    createConventionTemplateButton:
+      "im-agency-dashboard__create-convention-template-button",
+    editConventionTemplateButton:
+      "im-manage-convention-template__edit-convention-template-button",
+    deleteConventionTemplateButton:
+      "im-manage-convention-template__delete-convention-template-button",
+    shareAsConventionDraft: {
+      button: "im-manage-convention-template__share-as-convention-draft-button",
+      modal: "im-manage-convention-template__share-as-convention-draft-modal",
+      form: "im-manage-convention-template__share-as-convention-draft-modal-form",
+      emailInput:
+        "im-manage-convention-template__share-as-convention-draft-email-input",
+      messageInput:
+        "im-manage-convention-template__share-as-convention-draft-message-input",
+      cancelButton:
+        "im-manage-convention-template__share-as-convention-draft-cancel-button",
+      submitButton:
+        "im-manage-convention-template__share-as-convention-draft-submit-button",
+    },
+  },
   manageConventionUserConnected: {
     login: {
       proConnectButton:
@@ -1002,6 +1041,10 @@ export const domElementIds = {
     },
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
+    pilotConventionWithBroadcastErrorButton:
+      "im-manage-convention-user-connected__pilot-convention-with-broadcast-error-button",
+    pilotConventionToManageButton:
+      "im-manage-convention-user-connected__pilot-convention-to-manage-button",
   },
   establishmentDashboardDiscussions: {
     login: {

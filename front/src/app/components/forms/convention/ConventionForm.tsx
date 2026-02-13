@@ -30,28 +30,33 @@ import {
 } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  type AgencyOption,
   addressDtoToString,
   type Beneficiary,
   type ConventionDraftId,
+  type ConventionFormInitialValues,
   type ConventionId,
   type ConventionPresentation,
   type ConventionReadDto,
+  type ConventionTemplate,
+  type ConventionTemplateId,
   type CreateConventionPresentationInitialValues,
-  conventionPresentationSchema,
   conventionSchema,
   type DepartmentCode,
   defaultCountryCode,
   domElementIds,
   type ExcludeFromExisting,
   errors as errorMessage,
-  hasBeneficiaryCurrentEmployer,
   type InternshipKind,
   isBeneficiaryMinor,
-  isBeneficiaryStudent,
+  isCreateConventionPresentationInitialValues,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isFtConnectIdentity,
   keys,
+  makeConventionPresentationSchemaWithNormalizedInput,
   makeListAgencyOptionsKindFilter,
+  replaceEmptyValuesByUndefinedFromObject,
+  toConventionTemplate,
   undefinedIfEmptyString,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
@@ -88,6 +93,7 @@ import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import {
   conventionPresentationFromConventionDraft,
   getConventionInitialValuesFromUrl,
+  makeConventionPresentationFromConventionTemplate,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
@@ -97,12 +103,15 @@ import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   conventionSlice,
   type NumberOfSteps,
 } from "src/core-logic/domain/convention/convention.slice";
 import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
+import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
+import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
@@ -127,9 +136,11 @@ export type SetEmailValidationErrorsState = Dispatch<
 export const ConventionForm = ({
   mode,
   internshipKind,
+  fromConventionTemplateId,
 }: {
   internshipKind: InternshipKind;
   mode: ConventionFormMode;
+  fromConventionTemplateId?: ConventionTemplateId;
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
@@ -139,6 +150,13 @@ export const ConventionForm = ({
   const fetchedConventionDraft = useAppSelector(
     conventionDraftSelectors.conventionDraft,
   );
+  const fetchedConventionTemplate = useAppSelector(
+    conventionTemplateSelectors.getConventionTemplateById(
+      fromConventionTemplateId,
+    ),
+  );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
 
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
@@ -175,7 +193,8 @@ export const ConventionForm = ({
         federatedIdentity,
       ),
     },
-    ...(federatedIdentity?.payload?.advisor && mode === "create-from-scratch"
+    ...(federatedIdentity?.payload?.advisor &&
+    mode === "create-convention-from-scratch"
       ? {
           agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
           agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
@@ -200,17 +219,56 @@ export const ConventionForm = ({
     [fetchedConventionDraft],
   );
 
-  const defaultValues: CreateConventionPresentationInitialValues =
-    creationFormModes.includes(
-      mode as ExcludeFromExisting<ConventionFormMode, "edit">,
-    )
-      ? initialValues
-      : fetchedConvention || conventionPresentationFromDraft || initialValues;
+  const conventionPresentationFromConventionTemplate = useMemo(
+    () =>
+      fetchedConventionTemplate &&
+      makeConventionPresentationFromConventionTemplate(
+        fetchedConventionTemplate,
+      ),
+    [fetchedConventionTemplate],
+  );
 
-  const methods = useForm<CreateConventionPresentationInitialValues>({
+  const isTemplateForm =
+    ["create-convention-template", "edit-convention-template"].includes(mode) &&
+    !!connectedUserJwt &&
+    !!currentUser;
+  const shouldShowShareConventionDraftButton =
+    mode !== "edit-convention" && !isTemplateForm;
+
+  const makeDefaultValues = ({ mode }: { mode: ConventionFormMode }) => {
+    const isCreationMode = creationFormModes.includes(
+      mode as ExcludeFromExisting<
+        ConventionFormMode,
+        "edit-convention" | "edit-convention-template"
+      >,
+    );
+    if (isCreationMode) {
+      if (isTemplateForm) {
+        return replaceEmptyValuesByUndefinedFromObject(initialValues);
+      }
+      return initialValues;
+    }
+    return (
+      fetchedConvention ||
+      conventionPresentationFromDraft ||
+      conventionPresentationFromConventionTemplate ||
+      initialValues
+    );
+  };
+  const defaultValues: ConventionFormInitialValues = makeDefaultValues({
+    mode,
+  });
+
+  const presentationSchema = useMemo(
+    () =>
+      makeConventionPresentationSchemaWithNormalizedInput({ isTemplateForm }),
+    [isTemplateForm],
+  );
+
+  const methods = useForm<ConventionFormInitialValues>({
     defaultValues,
     values: defaultValues,
-    resolver: zodResolver(conventionPresentationSchema),
+    resolver: zodResolver(presentationSchema),
     mode: "onTouched",
   });
 
@@ -231,10 +289,17 @@ export const ConventionForm = ({
   const conventionValues = getValues();
 
   useUpdateConventionValuesInUrl(
-    makeValuesToWatchInUrl({
-      ...conventionValues,
-      fromPeConnectedUser: route.params.fromPeConnectedUser,
-    }),
+    makeValuesToWatchInUrl(
+      isCreateConventionPresentationInitialValues(conventionValues)
+        ? {
+            ...conventionValues,
+            fromPeConnectedUser: route.params.fromPeConnectedUser,
+          }
+        : {
+            ...initialValues,
+            fromPeConnectedUser: route.params.fromPeConnectedUser,
+          },
+    ),
   );
 
   const { getFormFields, getFormErrors } = getFormContents(
@@ -249,16 +314,15 @@ export const ConventionForm = ({
     conventionValues.internshipKind ?? "immersion",
   );
 
-  const onSubmit: SubmitHandler<CreateConventionPresentationInitialValues> = (
-    convention,
+  const saveConvention = (
+    convention: ConventionFormInitialValues,
+    selectedAgency: AgencyOption | undefined,
   ) => {
-    const selectedAgency = agencyOptions.find(
-      (agencyOption) => agencyOption.id === convention.agencyId,
-    );
-    if (!selectedAgency || !convention.agencyId)
+    if (!selectedAgency || !convention.agencyId) {
       throw errorMessage.agency.notFound({
         agencyId: convention.agencyId ?? "",
       });
+    }
     const conventionToSave: ConventionReadDto = {
       ...conventionSchema.parse(convention),
       agencyDepartment: convention.agencyDepartment ?? "",
@@ -279,7 +343,6 @@ export const ConventionForm = ({
       agencyValidatorEmails: [],
       assessment: null,
     };
-
     dispatch(
       conventionSlice.actions.showSummaryChangeRequested({
         showSummary: true,
@@ -287,6 +350,52 @@ export const ConventionForm = ({
         fromConventionDraftId: conventionValues.fromConventionDraftId,
       }),
     );
+  };
+
+  const saveConventionTemplate = (
+    convention: ConventionFormInitialValues,
+    selectedAgency: AgencyOption | undefined,
+  ) => {
+    if (!selectedAgency && convention.agencyId) {
+      throw errorMessage.agency.notFound({
+        agencyId: convention.agencyId ?? "",
+      });
+    }
+    if (!connectedUserJwt || !currentUser) {
+      throw errorMessage.user.unauthorized();
+    }
+    if (isCreateConventionPresentationInitialValues(convention)) {
+      throw new Error("Le nom du modèle de convention est requis.");
+    }
+    const conventionToSave: ConventionTemplate = toConventionTemplate({
+      convention,
+      userId: currentUser.id,
+      establishmentNumberEmployeesRange,
+      selectedAgencyKind: selectedAgency?.kind,
+      fromConventionTemplateId,
+    });
+
+    dispatch(
+      conventionTemplateSlice.actions.createOrUpdateConventionTemplateRequested(
+        {
+          conventionTemplate: conventionToSave,
+          jwt: connectedUserJwt,
+          feedbackTopic: "convention-template",
+        },
+      ),
+    );
+  };
+
+  const onSubmit: SubmitHandler<ConventionFormInitialValues> = (convention) => {
+    const selectedAgency = agencyOptions.find(
+      (agencyOption) => agencyOption.id === convention.agencyId,
+    );
+    if (!isTemplateForm) {
+      saveConvention(convention, selectedAgency);
+      return;
+    }
+
+    saveConventionTemplate(convention, selectedAgency);
   };
 
   const accordionsRef = useRef<Array<ElementRef<"div">>>([]);
@@ -393,6 +502,18 @@ export const ConventionForm = ({
   const prevConventionDraftIdRef = useRef<ConventionDraftId | undefined>(
     undefined,
   );
+  const prevConventionTemplateIdRef = useRef<ConventionTemplateId | undefined>(
+    undefined,
+  );
+
+  const submitButtonLabel = useMemo(() => {
+    if (isTemplateForm) {
+      return mode === "create-convention-template"
+        ? "Créer un modèle de convention"
+        : "Modifier le modèle de convention";
+    }
+    return "Vérifier la demande";
+  }, [isTemplateForm, mode]);
 
   if (
     fetchedConvention &&
@@ -412,6 +533,19 @@ export const ConventionForm = ({
     reset({ ...conventionPresentationFromDraft, status: "READY_TO_SIGN" });
   }
 
+  if (
+    conventionPresentationFromConventionTemplate &&
+    conventionPresentationFromConventionTemplate.id !==
+      prevConventionTemplateIdRef.current
+  ) {
+    prevConventionTemplateIdRef.current =
+      conventionPresentationFromConventionTemplate.id;
+    reset({
+      ...conventionPresentationFromConventionTemplate,
+      status: "READY_TO_SIGN",
+    });
+  }
+
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(
       "partialConventionInUrl",
@@ -421,7 +555,7 @@ export const ConventionForm = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (mode === "edit") {
+    if (mode === "edit-convention") {
       validateSteps("clearAllErrors");
     }
   }, [conventionValues.id]);
@@ -437,7 +571,12 @@ export const ConventionForm = ({
       );
     }
 
-    if (defaultValues.immersionAppellation) {
+    if (
+      defaultValues.immersionAppellation?.appellationCode &&
+      defaultValues.immersionAppellation?.appellationLabel &&
+      defaultValues.immersionAppellation?.romeCode &&
+      defaultValues.immersionAppellation?.romeLabel
+    ) {
       dispatch(
         appellationSlice.actions.selectSuggestionRequested({
           item: {
@@ -456,7 +595,9 @@ export const ConventionForm = ({
       );
     }
 
-    if (defaultValues.signatories.beneficiaryCurrentEmployer) {
+    if (
+      defaultValues.signatories?.beneficiaryCurrentEmployer?.businessAddress
+    ) {
       dispatch(
         geocodingSlice.actions.fetchSuggestionsRequested({
           lookup:
@@ -471,14 +612,25 @@ export const ConventionForm = ({
 
     if (
       defaultValues.internshipKind === "mini-stage-cci" &&
-      isBeneficiaryStudent(defaultValues.signatories.beneficiary) &&
-      defaultValues.signatories.beneficiary.address
+      defaultValues.signatories?.beneficiary &&
+      "levelOfEducation" in defaultValues.signatories.beneficiary &&
+      defaultValues.signatories.beneficiary.address?.streetNumberAndAddress !=
+        null &&
+      defaultValues.signatories.beneficiary.address.postcode != null &&
+      defaultValues.signatories.beneficiary.address.departmentCode != null &&
+      defaultValues.signatories.beneficiary.address.city != null
     ) {
       dispatch(
         geocodingSlice.actions.selectSuggestionRequested({
           item: {
             address: {
-              ...defaultValues.signatories.beneficiary.address,
+              streetNumberAndAddress:
+                defaultValues.signatories.beneficiary.address
+                  .streetNumberAndAddress,
+              postcode: defaultValues.signatories.beneficiary.address.postcode,
+              departmentCode:
+                defaultValues.signatories.beneficiary.address.departmentCode,
+              city: defaultValues.signatories.beneficiary.address.city,
               countryCode: establishmentAddressCountryCode ?? "FR",
             },
             position: { lat: 0, lon: 0 },
@@ -495,8 +647,10 @@ export const ConventionForm = ({
       <ConventionFormLayout
         form={
           <FormProvider {...methods}>
-            <div className={cx("fr-text")}>{t.intro.welcome}</div>
-            {mode !== "edit" && (
+            <div className={cx("fr-text")}>
+              {t.intro.conventionFormDescription}
+            </div>
+            {mode !== "edit-convention" && (
               <Alert
                 severity="info"
                 small
@@ -518,8 +672,19 @@ export const ConventionForm = ({
                 type="hidden"
                 {...formContents["signatories.beneficiary.federatedIdentity"]}
               />
+              {isTemplateForm && (
+                <Input
+                  label="Nom du modèle *"
+                  nativeInputProps={{
+                    ...register("name"),
+                    id: domElementIds.agencyDashboardConventionTemplate.form
+                      .nameInput,
+                  }}
+                />
+              )}
               <div className={fr.cx("fr-accordions-group")}>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`1. ${t.agencySection.title}`}
@@ -571,6 +736,7 @@ export const ConventionForm = ({
                 </Accordion>
 
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`2. ${t.beneficiarySection.title}`}
@@ -589,6 +755,7 @@ export const ConventionForm = ({
                   />
                 </Accordion>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`3. ${t.establishmentSection.title}`}
@@ -605,6 +772,7 @@ export const ConventionForm = ({
                   />
                 </Accordion>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`4. ${t.immersionHourLocationSection.title}`}
@@ -642,6 +810,7 @@ export const ConventionForm = ({
                   />
                 </Accordion>
                 <Accordion
+                  titleAs="h2"
                   label={
                     <SectionTitle
                       title={`5. ${t.immersionDetailsSection.title}`}
@@ -693,7 +862,10 @@ export const ConventionForm = ({
                   iconPosition="left"
                   type="button"
                   nativeButtonProps={{
-                    id: domElementIds.conventionImmersionRoute.submitFormButton,
+                    id: isTemplateForm
+                      ? domElementIds.agencyDashboardConventionTemplate.form
+                          .submitFormButton
+                      : domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
@@ -701,7 +873,7 @@ export const ConventionForm = ({
                     console.error(conventionValues, errors);
                   })}
                 >
-                  Vérifier la demande
+                  {submitButtonLabel}
                 </Button>
               </div>
             </form>
@@ -713,21 +885,29 @@ export const ConventionForm = ({
             sidebarContent={sidebarContent}
             sidebarFooter={
               <>
-                {mode !== "edit" && (
-                  <ShareConventionDraft
-                    conventionFormData={{
-                      ...conventionValues,
-                      agencyKind: isAllAgencyKinds(conventionValues.agencyKind)
-                        ? undefined
-                        : conventionValues.agencyKind,
-                    }}
-                  />
-                )}
+                {shouldShowShareConventionDraftButton &&
+                  isCreateConventionPresentationInitialValues(
+                    conventionValues,
+                  ) && (
+                    <ShareConventionDraft
+                      conventionFormData={{
+                        ...conventionValues,
+                        agencyKind: isAllAgencyKinds(
+                          conventionValues.agencyKind,
+                        )
+                          ? undefined
+                          : conventionValues.agencyKind,
+                      }}
+                    />
+                  )}
                 <Button
                   type="button"
                   id={
-                    domElementIds.conventionImmersionRoute
-                      .submitFormButtonMobile
+                    isTemplateForm
+                      ? domElementIds.agencyDashboardConventionTemplate.form
+                          .submitFormButtonMobile
+                      : domElementIds.conventionImmersionRoute
+                          .submitFormButtonMobile
                   }
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
@@ -735,7 +915,7 @@ export const ConventionForm = ({
                     console.error(conventionValues, errors);
                   })}
                 >
-                  Vérifier la demande
+                  {submitButtonLabel}
                 </Button>
               </>
             }
@@ -783,10 +963,10 @@ const useWaitForReduxFormUiReadyBeforeInitialisation = (
     );
     dispatch(
       conventionSlice.actions.isCurrentEmployerChanged(
-        hasBeneficiaryCurrentEmployer(initialValues),
+        !!initialValues.signatories?.beneficiaryCurrentEmployer,
       ),
     );
-    if (mode !== "edit") {
+    if (mode !== "edit-convention") {
       dispatch(
         conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
           isEstablishmentTutorIsEstablishmentRepresentative(initialValues),

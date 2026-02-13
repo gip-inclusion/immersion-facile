@@ -11,7 +11,7 @@ import {
   allOtherSignatoriesSignConvention,
   type ConventionSubmitted,
   confirmCreateConventionFormSubmit,
-  fillBasicConventionForm,
+  goToFormPageAndFillConventionForm,
   shareConventionDraftByEmail,
   signConvention,
   submitBasicConventionForm,
@@ -26,7 +26,7 @@ test.describe("Convention can be created from shared draft", () => {
   test.use({ storageState: testConfig.adminAuthFile });
 
   test("creates a new convention from shared draft", async ({ page }) => {
-    await fillBasicConventionForm(page);
+    await goToFormPageAndFillConventionForm(page);
     await shareConventionDraftByEmail(page);
     await goToAdminTab(page, "adminNotifications");
     const href = await getMagicLinkFromEmail({
@@ -124,7 +124,7 @@ test.describe("Convention creation and modification workflow", () => {
           page.locator(
             `#${domElementIds.conventionImmersionRoute.form({
               internshipKind: "immersion",
-              mode: "edit",
+              mode: "edit-convention",
             })}`,
           ),
         ).toBeVisible();
@@ -154,7 +154,7 @@ test.describe("Convention creation and modification workflow", () => {
           page.locator(
             `#${domElementIds.conventionImmersionRoute.form({
               internshipKind: "immersion",
-              mode: "edit",
+              mode: "edit-convention",
             })}`,
           ),
         ).toBeVisible();

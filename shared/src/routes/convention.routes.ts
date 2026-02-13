@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import z from "zod";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
 import {
   assessmentDtoSchema,
@@ -24,6 +25,7 @@ import {
   withConventionIdLegacySchema,
   withConventionIdSchema,
 } from "../convention/convention.schema";
+import { conventionTemplateSchema } from "../convention/conventionTemplate.schema";
 import {
   flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
   paginatedConventionWithBroadcastFeedbackSchema,
@@ -337,6 +339,44 @@ export const authenticatedConventionRoutes = defineRoutes({
     url: "/inclusion-connected/edit-beneficiary-birthdate",
     method: "post",
     requestBodySchema: editBeneficiaryBirthdateRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
+
+  getConventionTemplatesForCurrentUser: defineRoute({
+    url: "/convention-templates",
+    method: "get",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: z.array(conventionTemplateSchema),
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+    },
+  }),
+
+  createOrUpdateConventionTemplate: defineRoute({
+    url: "/convention-templates",
+    method: "post",
+    requestBodySchema: conventionTemplateSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+    },
+  }),
+
+  deleteConventionTemplate: defineRoute({
+    url: "/convention-templates/:conventionTemplateId",
+    method: "delete",
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

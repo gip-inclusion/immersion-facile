@@ -128,5 +128,38 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.getConventionTemplatesForCurrentUser(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getConventionTemplatesForCurrentUser.execute(
+          undefined,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
+  authenticatedConventionSharedRouter.createOrUpdateConventionTemplate(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.createOrUpdateConventionTemplate.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
+  authenticatedConventionSharedRouter.deleteConventionTemplate(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.deleteConventionTemplate.execute(
+          { conventionTemplateId: req.params.conventionTemplateId },
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   return expressRouter;
 };

@@ -1,17 +1,22 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { dashboardTitleToClassName, type TitleLevel } from "../../utils";
 import { taskStyles } from "./Task.styles";
 
+type ButtonsRow = {
+  id: string;
+  content: ReactNode;
+};
+
 export type TaskProps = {
   className?: string;
   title: ReactNode;
   titleAs: TitleLevel;
-  description: ReactNode;
-  buttonProps?: ButtonProps;
+  description?: ReactNode;
   footer?: ReactNode;
+  hasBackgroundColor?: boolean;
+  buttonsRows?: ButtonsRow[];
 };
 
 export const Task = ({
@@ -19,8 +24,9 @@ export const Task = ({
   titleAs,
   description,
   className,
-  buttonProps,
   footer,
+  hasBackgroundColor = false,
+  buttonsRows,
 }: TaskProps) => {
   const { cx } = useStyles();
   const Title = titleAs;
@@ -28,12 +34,19 @@ export const Task = ({
   return (
     <article
       className={cx(
-        fr.cx("fr-card", "fr-container", "fr-mb-2v", "fr-p-4v"),
+        fr.cx(
+          "fr-card",
+          "fr-container",
+          "fr-mb-2v",
+          "fr-p-4v",
+          hasBackgroundColor && "fr-card--no-border",
+        ),
+        hasBackgroundColor && taskStyles.withBackgroundColor,
         className ? className : "",
       )}
     >
       <div className={fr.cx("fr-grid-row")}>
-        <div className={fr.cx("fr-col-12", "fr-col-md-10")}>
+        <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
           <Title
             className={cx(
               fr.cx("fr-grid-row", "fr-mb-1w"),
@@ -51,13 +64,20 @@ export const Task = ({
             </footer>
           )}
         </div>
-        <div
-          className={fr.cx("fr-col-md-2", "fr-grid-row", "fr-grid-row--right")}
-        >
-          {buttonProps && (
-            <Button {...buttonProps} className={cx(taskStyles.button)} />
-          )}
-        </div>
+        {buttonsRows && buttonsRows.length > 0 && (
+          <div
+            className={cx(
+              fr.cx("fr-col-12", "fr-col-md-4"),
+              taskStyles.buttons,
+            )}
+          >
+            {buttonsRows.map((row) => (
+              <div key={row.id} className={taskStyles.buttonsRow}>
+                {row.content}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </article>
   );

@@ -9,8 +9,8 @@ import { useDispatch } from "react-redux";
 import {
   type CreateConventionPresentationInitialValues,
   domElementIds,
-  type ShareConventionDraftByEmailDto,
-  shareConventionDraftByEmailSchema,
+  type ShareConventionDraftByEmailFromConventionDto,
+  shareConventionDraftByEmailFromConventionSchema,
   toConventionDraftDto,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -30,7 +30,7 @@ const makeInitialValues = ({
   conventionFormData,
 }: {
   conventionFormData: CreateConventionPresentationInitialValues;
-}): ShareConventionDraftByEmailDto => ({
+}): ShareConventionDraftByEmailFromConventionDto => ({
   senderEmail: "",
   conventionDraft: toConventionDraftDto({ convention: conventionFormData }),
 });
@@ -38,7 +38,7 @@ const makeInitialValues = ({
 export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   const dispatch = useDispatch();
   const [isOnlyForSelf, setIsOnlyForSelf] = useState(false);
-  const onSubmit = (values: ShareConventionDraftByEmailDto) => {
+  const onSubmit = (values: ShareConventionDraftByEmailFromConventionDto) => {
     dispatch(
       conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
         ...values,
@@ -46,10 +46,10 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
       }),
     );
   };
-  const methods = useForm<ShareConventionDraftByEmailDto>({
+  const methods = useForm<ShareConventionDraftByEmailFromConventionDto>({
     mode: "onTouched",
     defaultValues: makeInitialValues({ conventionFormData }),
-    resolver: zodResolver(shareConventionDraftByEmailSchema),
+    resolver: zodResolver(shareConventionDraftByEmailFromConventionSchema),
   });
   const { register, handleSubmit, formState, reset, setValue } = methods;
   const { errors, submitCount } = formState;

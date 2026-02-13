@@ -18,6 +18,7 @@ import type {
   ImmersionObjective,
   ReminderKind,
 } from "../convention/convention.dto";
+import type { ConventionTemplateId } from "../convention/conventionTemplate.dto";
 import type { ConventionDraftId } from "../convention/shareConventionDraftByEmail.dto";
 import type {
   DiscussionId,
@@ -558,6 +559,24 @@ export const errors = {
     }) =>
       new NotFoundError(
         `Aucun brouillon de convention trouvé avec l'identifiant '${conventionDraftId}' : soit ce brouillon a expiré, soit une convention a déjà été créée à partir de ce brouillon.`,
+      ),
+  },
+  conventionTemplate: {
+    forbidden: ({
+      conventionTemplateId,
+    }: {
+      conventionTemplateId: ConventionTemplateId;
+    }) =>
+      new ForbiddenError(
+        `Vous n'avez pas les droits nécessaires sur le modèle de convention '${conventionTemplateId}'.`,
+      ),
+    notFound: ({
+      conventionTemplateId,
+    }: {
+      conventionTemplateId: ConventionTemplateId;
+    }) =>
+      new NotFoundError(
+        `Aucun modèle de convention trouvé avec l'identifiant '${conventionTemplateId}'.`,
       ),
   },
   establishment: {

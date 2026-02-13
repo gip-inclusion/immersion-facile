@@ -34,8 +34,10 @@ import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../dom
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
+import { makeCreateOrUpdateConventionTemplate } from "../../domains/convention/use-cases/CreateOrUpdateConventionTemplate";
 import { makeDeleteAssessment } from "../../domains/convention/use-cases/DeleteAssessment";
 import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/DeleteConventionDraft";
+import { makeDeleteConventionTemplate } from "../../domains/convention/use-cases/DeleteConventionTemplate";
 import { makeEditBeneficiaryBirthdate } from "../../domains/convention/use-cases/EditBeneficiaryBirthdate";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
@@ -46,6 +48,7 @@ import { makeGetConventionDraftById } from "../../domains/convention/use-cases/G
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
+import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
@@ -72,7 +75,7 @@ import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-ca
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
-import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
+import { makeShareConventionDraftByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
@@ -533,13 +536,6 @@ export const createUseCases = ({
         gateways.timeGateway,
       ),
       deleteSubscription: new DeleteSubscription(uowPerformer),
-      shareConventionByEmail: new ShareConventionLinkByEmail(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-        gateways.shortLinkGenerator,
-        gateways.timeGateway,
-        config,
-      ),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
       saveApiConsumer: new SaveApiConsumer(
         uowPerformer,
@@ -547,6 +543,16 @@ export const createUseCases = ({
         generateApiConsumerJwt,
         gateways.timeGateway,
       ),
+    }),
+
+    shareConventionByEmail: makeShareConventionDraftByEmail({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        timeGateway: gateways.timeGateway,
+        config,
+      },
     }),
 
     // siret
@@ -1056,6 +1062,16 @@ export const createUseCases = ({
       uowPerformer,
       deps: { createNewEvent },
     }),
+    createOrUpdateConventionTemplate: makeCreateOrUpdateConventionTemplate({
+      uowPerformer,
+      deps: { timeGateway: gateways.timeGateway, createNewEvent },
+    }),
+    deleteConventionTemplate: makeDeleteConventionTemplate({
+      uowPerformer,
+      deps: { createNewEvent },
+    }),
+    getConventionTemplatesForCurrentUser:
+      makeGetConventionTemplatesForCurrentUser({ uowPerformer }),
     warnSenderThatMessageCouldNotBeDelivered:
       makeWarnSenderThatMessageCouldNotBeDelivered({
         uowPerformer,

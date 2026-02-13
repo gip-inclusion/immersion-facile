@@ -31,6 +31,7 @@ import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImme
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
+import { ConventionTemplatePage } from "src/app/pages/convention/ConventionTemplatePage";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
@@ -213,6 +214,11 @@ const getPageByRouteName: {
   agencyDashboardStatsActivitiesByEstablishment: (route) => (
     <DashboardPrivateRoute route={route}>
       <AgencyDashboardPage route={route} />
+    </DashboardPrivateRoute>
+  ),
+  agencyDashboardConventionTemplate: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <ConventionTemplatePage route={route} />
     </DashboardPrivateRoute>
   ),
   assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
