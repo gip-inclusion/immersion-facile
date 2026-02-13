@@ -572,15 +572,13 @@ export const errors = {
       ),
   },
   conventionTemplate: {
-    forbiddenMissingName: () =>
-      new ForbiddenError("Le nom du modèle de convention est requis."),
-    forbiddenToDeleteNotOwnedTemplate: ({
+    forbidden: ({
       conventionTemplateId,
     }: {
       conventionTemplateId: ConventionTemplateId;
     }) =>
       new ForbiddenError(
-        `Vous n'avez pas les droits nécessaires pour supprimer le modèle de convention '${conventionTemplateId}'.`,
+        `Vous n'avez pas les droits nécessaires sur le modèle de convention '${conventionTemplateId}'.`,
       ),
     notFound: ({
       conventionTemplateId,
