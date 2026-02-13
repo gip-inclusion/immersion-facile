@@ -71,6 +71,7 @@ describe("AfterOAuthSuccess use case", () => {
 
   describe("when user had never connected before", () => {
     beforeEach(async () => {
+      await db.deleteFrom("convention_templates").execute();
       await db.deleteFrom("feature_flags").execute();
       await db.deleteFrom("users_ongoing_oauths").execute();
       await db.deleteFrom("users").execute();

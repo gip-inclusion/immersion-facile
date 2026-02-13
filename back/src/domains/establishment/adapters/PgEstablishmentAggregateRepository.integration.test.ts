@@ -97,6 +97,7 @@ describe("PgEstablishmentAggregateRepository", () => {
   });
 
   beforeEach(async () => {
+    await kyselyDb.deleteFrom("convention_templates").execute();
     await kyselyDb.deleteFrom("establishments__users").execute();
     await kyselyDb.deleteFrom("immersion_offers").execute();
     await kyselyDb.deleteFrom("discussions").execute();

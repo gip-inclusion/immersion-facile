@@ -44,6 +44,7 @@ describe("PgOngoingOAuthRepository", () => {
   };
 
   beforeEach(async () => {
+    await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("users_ongoing_oauths").execute();
     await db.deleteFrom("users").execute();
     await pgUserRepository.save(user);
