@@ -1012,6 +1012,13 @@ export const domElementIds = {
       "im-manage-convention-template__edit-convention-template-button",
     deleteConventionTemplateButton:
       "im-manage-convention-template__delete-convention-template-button",
+    deleteConventionTemplate: {
+      modal: "im-manage-convention-template__delete-convention-template-modal",
+      cancelButton:
+        "im-manage-convention-template__delete-convention-template-cancel-button",
+      confirmButton:
+        "im-manage-convention-template__delete-convention-template-confirm-button",
+    },
     shareAsConventionDraft: {
       button: "im-manage-convention-template__share-as-convention-draft-button",
       modal: "im-manage-convention-template__share-as-convention-draft-modal",

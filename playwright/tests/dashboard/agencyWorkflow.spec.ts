@@ -259,6 +259,9 @@ test.describe("Agency dashboard workflow", () => {
       await page.click(
         `[id^="${domElementIds.agencyDashboardConventionTemplate.deleteConventionTemplateButton}-"]`,
       );
+      await page.click(
+        `#${domElementIds.agencyDashboardConventionTemplate.deleteConventionTemplate.confirmButton}`,
+      );
       await expect(page.locator(".fr-alert--success")).toBeVisible();
       await expect(page.locator('[id^="convention-template-"]')).toHaveCount(0);
     });

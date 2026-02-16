@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { HeadingSection, Loader, Task } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
@@ -33,6 +33,12 @@ const shareConventionTemplateModal = createModal({
     .modal,
 });
 
+const deleteConventionTemplateModal = createModal({
+  isOpenedByDefault: false,
+  id: domElementIds.agencyDashboardConventionTemplate.deleteConventionTemplate
+    .modal,
+});
+
 const makeConventionDraftDtoFromConventionTemplate = (
   conventionTemplate: ConventionTemplate,
 ) => {
@@ -56,20 +62,29 @@ export const ConventionTemplatesList = ({
   const conventionTemplates = useSelector(
     conventionTemplateSelectors.conventionTemplates,
   );
+  const [conventionTemplateIdToDelete, setConventionTemplateIdToDelete] =
+    useState<ConventionTemplateId | null>(null);
 
-  const onDeleteConventionTemplateClicked = ({
-    conventionTemplateId,
-  }: {
-    conventionTemplateId: ConventionTemplateId;
-  }) => {
+  const openDeleteModal = (conventionTemplateId: ConventionTemplateId) => {
+    setConventionTemplateIdToDelete(conventionTemplateId);
+    deleteConventionTemplateModal.open();
+  };
+
+  const confirmDeleteConventionTemplate = () => {
+    if (!conventionTemplateIdToDelete) return;
     if (!connectedUserJwt) throw errors.user.unauthorized();
     dispatch(
       conventionTemplateSlice.actions.deleteConventionTemplateRequested({
-        conventionTemplateId,
+        conventionTemplateId: conventionTemplateIdToDelete,
         jwt: connectedUserJwt,
         feedbackTopic: "convention-template",
       }),
     );
+    setConventionTemplateIdToDelete(null);
+  };
+
+  const cancelDeleteConventionTemplate = () => {
+    setConventionTemplateIdToDelete(null);
   };
 
   const shareForm =
@@ -205,11 +220,7 @@ export const ConventionTemplatesList = ({
                           priority="tertiary"
                           iconId="fr-icon-delete-bin-line"
                           title="Supprimer"
-                          onClick={() =>
-                            onDeleteConventionTemplateClicked({
-                              conventionTemplateId: template.id,
-                            })
-                          }
+                          onClick={() => openDeleteModal(template.id)}
                         />
                       </>
                     ),
@@ -234,6 +245,32 @@ export const ConventionTemplatesList = ({
           ))}
         </div>
       </HeadingSection>
+      {createPortal(
+        <deleteConventionTemplateModal.Component
+          title="Supprimer ce modèle de convention ?"
+          buttons={[
+            {
+              id: domElementIds.agencyDashboardConventionTemplate
+                .deleteConventionTemplate.cancelButton,
+              children: "Annuler",
+              priority: "secondary",
+              onClick: cancelDeleteConventionTemplate,
+            },
+            {
+              id: domElementIds.agencyDashboardConventionTemplate
+                .deleteConventionTemplate.confirmButton,
+              children: "Supprimer",
+              priority: "primary",
+              onClick: confirmDeleteConventionTemplate,
+            },
+          ]}
+        >
+          <p className={fr.cx("fr-text--sm")}>
+            Le modèle sera définitivement supprimé.
+          </p>
+        </deleteConventionTemplateModal.Component>,
+        document.body,
+      )}
       {createPortal(
         <shareConventionTemplateModal.Component
           title="Partager ce modèle en brouillon"
