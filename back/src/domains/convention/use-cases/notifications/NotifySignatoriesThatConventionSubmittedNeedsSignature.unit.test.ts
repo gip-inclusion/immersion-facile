@@ -87,37 +87,49 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
     await useCase.execute({ convention: validConvention });
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-      [deterministicShortLinks[0]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: validConvention.signatories.beneficiary.role,
-        email: validConvention.signatories.beneficiary.email,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionToSign,
-        lifetime: "2Days",
-        extraQueryParams: { mtm_source: "email-signature-link" },
-      }),
-      [deterministicShortLinks[1]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        // biome-ignore lint/style/noNonNullAssertion: testing purpose
-        role: validConvention.signatories.establishmentRepresentative!.role,
-        // biome-ignore lint/style/noNonNullAssertion: testing purpose
-        email: validConvention.signatories.establishmentRepresentative!.email,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionToSign,
-        lifetime: "2Days",
-        extraQueryParams: { mtm_source: "email-signature-link" },
-      }),
-      [deterministicShortLinks[2]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        // biome-ignore lint/style/noNonNullAssertion: testing purpose
-        role: validConvention.signatories.beneficiaryRepresentative!.role,
-        // biome-ignore lint/style/noNonNullAssertion: testing purpose
-        email: validConvention.signatories.beneficiaryRepresentative!.email,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionToSign,
-        lifetime: "2Days",
-        extraQueryParams: { mtm_source: "email-signature-link" },
-      }),
+      [deterministicShortLinks[0]]: {
+        url: fakeGenerateMagicLinkUrlFn({
+          id: validConvention.id,
+          role: validConvention.signatories.beneficiary.role,
+          email: validConvention.signatories.beneficiary.email,
+          now: timeGateway.now(),
+          targetRoute: frontRoutes.conventionToSign,
+          lifetime: "2Days",
+          extraQueryParams: { mtm_source: "email-signature-link" },
+        }),
+        singleUse: true,
+        lastUsedAt: null,
+      },
+      [deterministicShortLinks[1]]: {
+        url: fakeGenerateMagicLinkUrlFn({
+          id: validConvention.id,
+          // biome-ignore lint/style/noNonNullAssertion: testing purpose
+          role: validConvention.signatories.establishmentRepresentative!.role,
+          // biome-ignore lint/style/noNonNullAssertion: testing purpose
+          email: validConvention.signatories.establishmentRepresentative!.email,
+          now: timeGateway.now(),
+          targetRoute: frontRoutes.conventionToSign,
+          lifetime: "2Days",
+          extraQueryParams: { mtm_source: "email-signature-link" },
+        }),
+        singleUse: true,
+        lastUsedAt: null,
+      },
+      [deterministicShortLinks[2]]: {
+        url: fakeGenerateMagicLinkUrlFn({
+          id: validConvention.id,
+          // biome-ignore lint/style/noNonNullAssertion: testing purpose
+          role: validConvention.signatories.beneficiaryRepresentative!.role,
+          // biome-ignore lint/style/noNonNullAssertion: testing purpose
+          email: validConvention.signatories.beneficiaryRepresentative!.email,
+          now: timeGateway.now(),
+          targetRoute: frontRoutes.conventionToSign,
+          lifetime: "2Days",
+          extraQueryParams: { mtm_source: "email-signature-link" },
+        }),
+        singleUse: true,
+        lastUsedAt: null,
+      },
     });
 
     const emailNotifications = uow.notificationRepository.notifications.filter(
