@@ -47,16 +47,25 @@ type ConventionQueryBuilderDb = Database & {
   vad: Database["view_appellations_dto"];
 };
 
+export type ConventionBaseQueryBuilder = SelectQueryBuilder<
+  ConventionQueryBuilderDb,
+  keyof ConventionQueryBuilderDb,
+  any
+>;
+
 export type ConventionQueryBuilder = SelectQueryBuilder<
   ConventionQueryBuilderDb,
   keyof ConventionQueryBuilderDb,
   { dto: ConventionDto }
 >;
 
-export type PaginatedConventionQueryBuilder = SelectQueryBuilder<
-  ConventionQueryBuilderDb,
-  keyof ConventionQueryBuilderDb,
-  { dto: ConventionDto; total_count: number }
+type InferSelectQueryBuilder<T> =
+  T extends SelectQueryBuilder<infer DB, infer TB, any>
+    ? SelectQueryBuilder<DB, TB, any>
+    : never;
+
+export type BroadcastFeedbackBaseQueryBuilder = InferSelectQueryBuilder<
+  ReturnType<typeof createBroadcastFeedbackBaseBuilder>
 >;
 
 export type ConventionsWithErroredBroadcastFeedbackBuilder = ReturnType<
@@ -285,13 +294,10 @@ const createConventionSelection = (
   );
 };
 
-// Function to create the common joins for both query builders
-const withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber = <
-  QB extends SelectQueryBuilder<Database, any, any>,
->(
+const withActorJoins = <QB extends SelectQueryBuilder<Database, any, any>>(
   builder: QB,
-): QB => {
-  return builder
+): QB =>
+  builder
     .innerJoin("actors as b", "b.id", "conventions.beneficiary_id")
     .innerJoin(
       "actors as er",
@@ -308,7 +314,14 @@ const withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber = <
       "actors as bce",
       "bce.id",
       "conventions.beneficiary_current_employer_id",
-    )
+    ) as QB;
+
+const withAppellationsAndPartnerPeJoinAndPhoneNumber = <
+  QB extends SelectQueryBuilder<Database, any, any>,
+>(
+  builder: QB,
+): QB =>
+  builder
     .leftJoin(
       "conventions__ft_connect_users as cftu",
       "cftu.convention_id",
@@ -345,15 +358,14 @@ const withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber = <
       "phone_numbers_bce.id",
       "bce.phone_id",
     ) as QB;
-};
 
 export const createConventionQueryBuilder = (
   transaction: KyselyDb,
   withAgencyJoin: boolean,
 ): ConventionQueryBuilder =>
   createConventionSelection(
-    withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber(
-      transaction.selectFrom("conventions"),
+    withAppellationsAndPartnerPeJoinAndPhoneNumber(
+      withActorJoins(transaction.selectFrom("conventions")),
     ),
   ).$if(withAgencyJoin, (qb) =>
     qb.leftJoin("agencies", "agencies.id", "conventions.agency_id"),
@@ -365,28 +377,33 @@ export const createConventionQueryBuilderForAgencyUser = ({
 }: {
   transaction: KyselyDb;
   agencyUserId: UserId;
-}): PaginatedConventionQueryBuilder => {
+}) => {
   // biome-ignore format: reads better without formatting
-  const builder = transaction
-    .selectFrom("users__agencies")
-    .innerJoin("conventions", "users__agencies.agency_id", "conventions.agency_id")
-    .leftJoin("agencies", "agencies.id", "conventions.agency_id")
-    .where("users__agencies.user_id", "=", agencyUserId)
-    .where(({ eb }) => eb.or([
-      sql<boolean>`users__agencies.roles ? 'counsellor'`,
-      sql<boolean>`users__agencies.roles ? 'validator'`,
-      sql<boolean>`users__agencies.roles ? 'agency-admin'`,
-      sql<boolean>`users__agencies.roles ? 'agency-viewer'`,
-    ]));
-
-  const builderWithJoins =
-    withActorsAndAppellationsAndPartnerPeJoinAndPhoneNumber(builder);
-  return createConventionSelection(builderWithJoins).select(
-    sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"),
+  const builder = withActorJoins(
+    transaction
+      .selectFrom("users__agencies")
+      .innerJoin("conventions", "users__agencies.agency_id", "conventions.agency_id")
+      .leftJoin("agencies", "agencies.id", "conventions.agency_id")
+      .where("users__agencies.user_id", "=", agencyUserId)
+      .where(({ eb }) => eb.or([
+        sql<boolean>`users__agencies.roles ? 'counsellor'`,
+        sql<boolean>`users__agencies.roles ? 'validator'`,
+        sql<boolean>`users__agencies.roles ? 'agency-admin'`,
+        sql<boolean>`users__agencies.roles ? 'agency-viewer'`,
+      ])),
   );
+
+  return {
+    dataQuery: createConventionSelection(
+      withAppellationsAndPartnerPeJoinAndPhoneNumber(builder),
+    ),
+    countQuery: builder.select((eb) =>
+      sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
+    ),
+  };
 };
 
-export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
+const createBroadcastFeedbackBaseBuilder = ({
   transaction,
   userAgencyIds,
 }: {
@@ -432,10 +449,31 @@ export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
         .orderBy("bf.occurred_at", "desc"),
     )
     .selectFrom("conventions_with_latest_feedback as cf")
-    .selectAll()
-    .select(sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"))
     .where("cf.subscriberErrorFeedback", "is not", null)
     .where("cf.handledByAgency", "=", false);
+
+export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
+  transaction,
+  userAgencyIds,
+}: {
+  transaction: KyselyDb;
+  userAgencyIds: AgencyId[];
+}) =>
+  createBroadcastFeedbackBaseBuilder({
+    transaction,
+    userAgencyIds,
+  }).selectAll();
+
+export const createBroadcastFeedbackCountBuilder = ({
+  transaction,
+  userAgencyIds,
+}: {
+  transaction: KyselyDb;
+  userAgencyIds: AgencyId[];
+}) =>
+  createBroadcastFeedbackBaseBuilder({ transaction, userAgencyIds }).select(
+    (eb) => sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
+  );
 
 export const getConventionAgencyFieldsForAgencies = async (
   transaction: KyselyDb,
