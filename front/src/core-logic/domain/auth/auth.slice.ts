@@ -11,6 +11,7 @@ import type {
   IdToken,
   OAuthState,
   PhoneNumber,
+  ShortLinkId,
   WithRedirectUri,
 } from "shared";
 import type {
@@ -34,6 +35,7 @@ type WithUrl = {
 export type RenewJwtPayload = {
   expiredJwt: ConventionJwt | ConnectedUserJwt | EmailAuthCodeJwt;
   originalUrl?: string;
+  shortLinkId?: ShortLinkId;
   state?: OAuthState;
 };
 

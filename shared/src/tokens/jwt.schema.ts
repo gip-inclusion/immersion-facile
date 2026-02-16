@@ -15,6 +15,11 @@ export const renewExpiredJwtRequestSchema: ZodSchemaWithInputMatchingOutput<Rene
       expiredJwt: z.string(),
     }),
     z.object({
+      kind: z.literal("conventionFromShortLink"),
+      shortLinkId: z.string(),
+      expiredJwt: z.string(),
+    }),
+    z.object({
       kind: z.literal("connectedUser"),
       expiredJwt: z.string(),
     }),
