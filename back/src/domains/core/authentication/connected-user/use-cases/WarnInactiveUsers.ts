@@ -33,10 +33,25 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
     const deletionDate = addDays(now, deletionWarningDelayInDays);
     const warningCutoff = subDays(now, deletionWarningDedupInDays);
 
-    const inactiveUsers = await uow.userRepository.getInactiveUsers(
-      twoYearsAgo,
-      { excludeWarnedSince: warningCutoff },
-    );
+    const userIdsWithNoRecentConnections =
+      await uow.userRepository.getUserIdsLoggedInLongAgo({
+        since: twoYearsAgo,
+        excludeWarnedSince: warningCutoff,
+      });
+
+    const afterConventionFilterIds =
+      await uow.conventionQueries.getUserIdsWithNoActiveConvention({
+        userIds: userIdsWithNoRecentConnections,
+        since: twoYearsAgo,
+      });
+
+    const inactiveUserIds =
+      await uow.discussionRepository.getUserIdsWithNoRecentExchange({
+        userIds: afterConventionFilterIds,
+        since: twoYearsAgo,
+      });
+
+    const inactiveUsers = await uow.userRepository.getByIds(inactiveUserIds);
 
     const deletionDateFormatted = deletionDate.toLocaleDateString("fr-FR", {
       day: "numeric",
