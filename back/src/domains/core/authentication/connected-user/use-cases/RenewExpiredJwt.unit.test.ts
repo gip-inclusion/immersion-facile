@@ -179,13 +179,17 @@ describe("RenewExpiredJwt use case", () => {
         });
 
         expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-          [shortLinks[0]]: fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
-            role: expectedRole,
-            email: expectedEmail,
-            now: timeGateway.now(),
-            targetRoute: frontRoutes.conventionToSign,
-          }),
+          [shortLinks[0]]: {
+            url: fakeGenerateMagicLinkUrlFn({
+              id: validConvention.id,
+              role: expectedRole,
+              email: expectedEmail,
+              now: timeGateway.now(),
+              targetRoute: frontRoutes.conventionToSign,
+            }),
+            singleUse: false,
+            lastUsedAt: null,
+          },
         });
       });
 
@@ -364,12 +368,16 @@ describe("RenewExpiredJwt use case", () => {
       });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinks[0]]: fakeGenerateConnectedUserUrlFn({
-          accessToken: undefined,
-          user,
-          ongoingOAuth: emailUsedOnGoingOAuth,
-          now: timeGateway.now(),
-        }),
+        [shortLinks[0]]: {
+          url: fakeGenerateConnectedUserUrlFn({
+            accessToken: undefined,
+            user,
+            ongoingOAuth: emailUsedOnGoingOAuth,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
       });
     });
 
@@ -490,12 +498,16 @@ describe("RenewExpiredJwt use case", () => {
       });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinks[0]]: fakeGenerateEmailAuthCodeUrlFn({
-          email: user.email,
-          state: emailUnusedOnGoingOAuth.state,
-          uri: frontRoutes.magicLinkInterstitial,
-          now: timeGateway.now(),
-        }),
+        [shortLinks[0]]: {
+          url: fakeGenerateEmailAuthCodeUrlFn({
+            email: user.email,
+            state: emailUnusedOnGoingOAuth.state,
+            uri: frontRoutes.magicLinkInterstitial,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
       });
     });
 
