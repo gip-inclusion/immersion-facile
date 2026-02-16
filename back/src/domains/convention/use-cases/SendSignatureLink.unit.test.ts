@@ -493,15 +493,19 @@ describe("Send signature link", () => {
       );
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkId]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.establishmentRepresentative.role,
-          email: convention.signatories.establishmentRepresentative.email,
-          now: timeGateway.now(),
-          targetRoute: frontRoutes.conventionToSign,
-          lifetime: "2Days",
-          extraQueryParams: { mtm_source: "sms-signature-link" },
-        }),
+        [shortLinkId]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+            targetRoute: frontRoutes.conventionToSign,
+            lifetime: "2Days",
+            extraQueryParams: { mtm_source: "sms-signature-link" },
+          }),
+          singleUse: true,
+          lastUsedAt: null,
+        },
       });
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
