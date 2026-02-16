@@ -41,15 +41,17 @@ import type {
   GetConventionsSortBy,
 } from "../ports/ConventionQueries";
 import {
+  type BroadcastFeedbackBaseQueryBuilder,
+  type ConventionBaseQueryBuilder,
   type ConventionQueryBuilder,
   type ConventionsWithErroredBroadcastFeedbackBuilder,
+  createBroadcastFeedbackCountBuilder,
   createConventionQueryBuilder,
   createConventionQueryBuilderForAgencyUser,
   createConventionsWithErroredBroadcastFeedbackBuilder,
   getAssessmentFieldsByConventionId,
   getConventionAgencyFieldsForAgencies,
   getReadConventionById,
-  type PaginatedConventionQueryBuilder,
 } from "./pgConventionSql";
 
 const logger = createLogger(__filename);
@@ -284,24 +286,38 @@ export class PgConventionQueries implements ConventionQueries {
 
     rest satisfies Record<string, never>;
 
-    const data = await pipeWithValue(
-      createConventionQueryBuilderForAgencyUser({
+    const trimmedSearch = search?.trim();
+
+    const { dataQuery, countQuery } = createConventionQueryBuilderForAgencyUser(
+      {
         transaction: this.transaction,
         agencyUserId,
-      }),
-      filterSearch(search?.trim()),
-      filterDate("date_start", dateStart),
-      filterDate("date_end", dateEnd),
-      filterDate("date_submission", dateSubmission),
-      filterInList("status", statuses),
-      filterInList("agency_id", agencyIds),
-      filterByAgencyDepartmentCodes(agencyDepartmentCodes),
-      filterAssessmentCompletionStatus(assessmentCompletionStatus),
-      sortConventions(sort),
-      applyPagination(pagination),
-    ).execute();
+      },
+    );
 
-    const totalRecords = data.at(0)?.total_count ?? 0;
+    const applyFilters = (qb: ConventionBaseQueryBuilder) =>
+      pipeWithValue(
+        qb,
+        filterSearch(trimmedSearch),
+        filterDate("date_start", dateStart),
+        filterDate("date_end", dateEnd),
+        filterDate("date_submission", dateSubmission),
+        filterInList("status", statuses),
+        filterInList("agency_id", agencyIds),
+        filterByAgencyDepartmentCodes(agencyDepartmentCodes),
+        filterAssessmentCompletionStatus(assessmentCompletionStatus),
+      );
+
+    const [data, countResult] = await Promise.all([
+      pipeWithValue(
+        applyFilters(dataQuery),
+        sortConventions(sort),
+        applyPagination(pagination),
+      ).execute(),
+      applyFilters(countQuery).executeTakeFirstOrThrow(),
+    ]);
+
+    const totalRecords = countResult.count;
 
     if (data.length === 0) {
       return {
@@ -386,20 +402,38 @@ export class PgConventionQueries implements ConventionQueries {
     const { broadcastErrorKind, conventionStatus, search, ...rest } = filters;
     rest satisfies Record<string, never>;
 
-    const result = await pipeWithValue(
-      createConventionsWithErroredBroadcastFeedbackBuilder({
-        transaction: this.transaction,
-        userAgencyIds,
-      }),
-      filterBroadcastErrorKind(broadcastErrorKind),
-      filterConventionStatus(conventionStatus),
-      filterSearchForBroadcastFeedback(search),
-      filterBroadcastFeedbackWithConventionCreatedAfter(new Date("2025-01-01")),
-      sortConventionsWithBroadcastFeedback(),
-      applyPaginationToBroadcastFeedback(pagination),
-    ).execute();
+    const broadcastFeedbackBuilderParams = {
+      transaction: this.transaction,
+      userAgencyIds,
+    };
 
-    const totalRecords = result.at(0)?.total_count ?? 0;
+    const applyBroadcastFilters = (qb: BroadcastFeedbackBaseQueryBuilder) =>
+      pipeWithValue(
+        qb,
+        filterBroadcastErrorKind(broadcastErrorKind),
+        filterConventionStatus(conventionStatus),
+        filterSearchForBroadcastFeedback(search),
+        filterBroadcastFeedbackWithConventionCreatedAfter(
+          new Date("2025-01-01"),
+        ),
+      );
+
+    const [result, countResult] = await Promise.all([
+      pipeWithValue(
+        applyBroadcastFilters(
+          createConventionsWithErroredBroadcastFeedbackBuilder(
+            broadcastFeedbackBuilderParams,
+          ),
+        ),
+        sortConventionsWithBroadcastFeedback(),
+        applyPaginationToBroadcastFeedback(pagination),
+      ).execute(),
+      applyBroadcastFilters(
+        createBroadcastFeedbackCountBuilder(broadcastFeedbackBuilderParams),
+      ).executeTakeFirstOrThrow(),
+    ]);
+
+    const totalRecords = countResult.count;
 
     const conventionsWithErroredBroadcastFeedback: ConventionWithBroadcastFeedback[] =
       result.map((row) =>
@@ -439,9 +473,7 @@ export class PgConventionQueries implements ConventionQueries {
 
 const applyPagination =
   (pagination: Required<PaginationQueryParams>) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
     const { page, perPage } = pagination;
     const offset = (page - 1) * perPage;
     return builder.limit(perPage).offset(offset);
@@ -449,9 +481,7 @@ const applyPagination =
 
 const sortConventions =
   (sort?: WithSort<GetPaginatedConventionsSortBy>["sort"]) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
     const sortByKey: Record<
       GetPaginatedConventionsSortBy,
       keyof Database["conventions"]
@@ -469,9 +499,7 @@ const sortConventions =
 
 const filterByAgencyDepartmentCodes =
   (agencyDepartmentCodes: NotEmptyArray<string> | undefined) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
+  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
     if (!agencyDepartmentCodes) return builder;
     return builder.where(
       "agencies.department_code",
@@ -482,9 +510,7 @@ const filterByAgencyDepartmentCodes =
 
 const filterAssessmentCompletionStatus =
   (assessmentCompletionStatus: AssessmentCompletionStatusFilter | undefined) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
+  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
     if (!assessmentCompletionStatus) {
       return builder;
     }
@@ -526,9 +552,7 @@ const filterDate =
     fieldName: keyof Database["conventions"],
     dateFilter: DateFilter | undefined,
   ) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
+  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
     if (!dateFilter) return builder;
     if (dateFilter.from && dateFilter.to)
       return builder
@@ -545,9 +569,7 @@ const filterInList =
     fieldName: keyof Database["conventions"],
     list: T[] | undefined,
   ) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
+  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
     if (!list) return builder;
     return builder.where(`conventions.${fieldName}`, "in", list);
   };
@@ -555,8 +577,8 @@ const filterInList =
 const filterBroadcastErrorKind =
   (broadcastErrorKind?: BroadcastErrorKind) =>
   (
-    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
-  ): ConventionsWithErroredBroadcastFeedbackBuilder => {
+    builder: BroadcastFeedbackBaseQueryBuilder,
+  ): BroadcastFeedbackBaseQueryBuilder => {
     if (!broadcastErrorKind) return builder;
 
     if (broadcastErrorKind === "functional") {
@@ -583,8 +605,8 @@ const filterBroadcastErrorKind =
 const filterConventionStatus =
   (conventionStatus?: ConventionStatus[]) =>
   (
-    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
-  ): ConventionsWithErroredBroadcastFeedbackBuilder => {
+    builder: BroadcastFeedbackBaseQueryBuilder,
+  ): BroadcastFeedbackBaseQueryBuilder => {
     if (!conventionStatus || conventionStatus.length === 0) return builder;
     return builder.where("cf.status", "in", conventionStatus);
   };
@@ -592,8 +614,8 @@ const filterConventionStatus =
 const filterSearchForBroadcastFeedback =
   (search: string | undefined) =>
   (
-    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
-  ): ConventionsWithErroredBroadcastFeedbackBuilder => {
+    builder: BroadcastFeedbackBaseQueryBuilder,
+  ): BroadcastFeedbackBaseQueryBuilder => {
     if (!search) return builder;
     const pattern = `%${search.toLowerCase()}%`;
 
@@ -607,8 +629,8 @@ const filterSearchForBroadcastFeedback =
 const filterBroadcastFeedbackWithConventionCreatedAfter =
   (date: Date) =>
   (
-    builder: ConventionsWithErroredBroadcastFeedbackBuilder,
-  ): ConventionsWithErroredBroadcastFeedbackBuilder =>
+    builder: BroadcastFeedbackBaseQueryBuilder,
+  ): BroadcastFeedbackBaseQueryBuilder =>
     builder.where("cf.dateSubmission", ">=", date);
 
 const sortConventionsWithBroadcastFeedback =
@@ -630,9 +652,7 @@ const applyPaginationToBroadcastFeedback =
 
 const filterSearch =
   (search: string | undefined) =>
-  (
-    builder: PaginatedConventionQueryBuilder,
-  ): PaginatedConventionQueryBuilder => {
+  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
     if (!search) return builder;
     const pattern = `%${search.toLowerCase()}%`;
 
