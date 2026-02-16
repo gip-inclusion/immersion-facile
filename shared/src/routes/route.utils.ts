@@ -53,6 +53,7 @@ export const frontRoutes = {
   searchDiagoriente: "recherche-diagoriente",
   standard: "pages",
   unsubscribeEstablishmentLead: "desinscription-prospect",
+  linkAlreadyUsed: "demande-de-nouveau-lien",
 };
 
 export const loginFtConnect = "login-pe-connect";

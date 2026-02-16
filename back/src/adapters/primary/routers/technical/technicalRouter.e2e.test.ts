@@ -9,6 +9,7 @@ import {
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
+  frontRoutes,
   type ShortLinkId,
   type TechnicalRoutes,
   technicalRoutes,
@@ -267,7 +268,11 @@ describe("technical router", () => {
     )} 302 - Redirect on existing short link`, async () => {
       const expectedLongLink: AbsoluteUrl = "http://longLink";
       inMemoryUow.shortLinkQuery.setShortLinks({
-        [expectedShortLinkId]: expectedLongLink,
+        [expectedShortLinkId]: {
+          url: expectedLongLink,
+          singleUse: false,
+          lastUsedAt: null,
+        },
       });
 
       const response = await httpClient.shortLink({
@@ -292,6 +297,57 @@ describe("technical router", () => {
       expectObjectsToMatch(response.body, {
         message: errors.shortLink.notFound({ shortLinkId: expectedShortLinkId })
           .message,
+      });
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.shortLink,
+    )} 302 - Redirect to long URL and mark as used when single-use link first use`, async () => {
+      const expectedLongLink: AbsoluteUrl = "https://example.com/sign?jwt=abc";
+      inMemoryUow.shortLinkQuery.setShortLinks({
+        [expectedShortLinkId]: {
+          url: expectedLongLink,
+          singleUse: true,
+          lastUsedAt: null,
+        },
+      });
+
+      const response = await httpClient.shortLink({
+        urlParams: { shortLinkId: expectedShortLinkId },
+      });
+      expectHttpResponseToEqual(response, {
+        body: {},
+        status: 302,
+        headers: { location: expectedLongLink },
+      });
+
+      const shortLink =
+        await inMemoryUow.shortLinkQuery.getById(expectedShortLinkId);
+      expect(shortLink.lastUsedAt).not.toBeNull();
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.shortLink,
+    )} 302 - Redirect to link already used page with jwt when single-use link already used`, async () => {
+      const expiredJwt = "eyJhbGciOiJIUzI1NiJ9";
+      const expectedLongLink: AbsoluteUrl = `https://example.com/test?jwt=${expiredJwt}`;
+      inMemoryUow.shortLinkQuery.setShortLinks({
+        [expectedShortLinkId]: {
+          url: expectedLongLink,
+          singleUse: true,
+          lastUsedAt: new Date("2026-02-11"),
+        },
+      });
+
+      const response = await httpClient.shortLink({
+        urlParams: { shortLinkId: expectedShortLinkId },
+      });
+
+      const expectedRedirectUrl = `${appConfig.immersionFacileBaseUrl}/${frontRoutes.linkAlreadyUsed}?jwt=${expiredJwt}`;
+      expectHttpResponseToEqual(response, {
+        body: {},
+        status: 302,
+        headers: { location: expectedRedirectUrl },
       });
     });
   });
