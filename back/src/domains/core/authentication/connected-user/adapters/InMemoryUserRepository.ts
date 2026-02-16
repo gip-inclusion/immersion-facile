@@ -107,15 +107,15 @@ export class InMemoryUserRepository implements UserRepository {
     this.#usersById[userId].email = email;
   }
 
-  public async getInactiveUsers(
-    since: Date,
-    _options?: {
-      excludeWarnedSince?: Date;
-      onlyWarnedBetween?: { from: Date; to: Date };
-    },
-  ): Promise<UserWithAdminRights[]> {
-    return this.users.filter(
-      (user) => !user.lastLoginAt || new Date(user.lastLoginAt) < since,
-    );
+  public async getUserIdsLoggedInLongAgo({
+    since,
+  }: {
+    since: Date;
+    excludeWarnedSince?: Date;
+    onlyWarnedBetween?: { from: Date; to: Date };
+  }): Promise<UserId[]> {
+    return this.users
+      .filter((user) => !user.lastLoginAt || new Date(user.lastLoginAt) < since)
+      .map((u) => u.id);
   }
 }

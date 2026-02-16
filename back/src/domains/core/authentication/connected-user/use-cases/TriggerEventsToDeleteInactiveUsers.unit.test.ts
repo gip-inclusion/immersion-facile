@@ -1,6 +1,8 @@
-import { subDays, subYears } from "date-fns";
+import { addDays, subDays, subMonths, subYears } from "date-fns";
 import {
   ConnectedUserBuilder,
+  ConventionDtoBuilder,
+  DiscussionBuilder,
   expectToEqual,
   type UserWithAdminRights,
 } from "shared";
@@ -86,5 +88,137 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
 
     expectToEqual(result, { numberOfDeletionsTriggered: 0 });
     expectToEqual(uow.outboxRepository.events.length, 0);
+  });
+
+  it("does not trigger deletion for user with convention ending within 2-year window (future or 23 months ago)", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const userWithFutureConvention = makeUser({
+      id: "future-convention-id",
+      email: "future-convention@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    const userWith23MonthOldConvention = makeUser({
+      id: "recent-convention-id",
+      email: "recent-convention@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    uow.userRepository.users = [
+      userWithFutureConvention,
+      userWith23MonthOldConvention,
+    ];
+
+    uow.conventionRepository.setConventions([
+      new ConventionDtoBuilder()
+        .withId("convention-future")
+        .withBeneficiaryEmail(userWithFutureConvention.email)
+        .withDateEnd(addDays(now, 30).toISOString())
+        .build(),
+      new ConventionDtoBuilder()
+        .withId("convention-23m")
+        .withBeneficiaryEmail(userWith23MonthOldConvention.email)
+        .withDateEnd(subMonths(now, 23).toISOString())
+        .build(),
+    ]);
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 0 });
+    expectToEqual(uow.outboxRepository.events.length, 0);
+  });
+
+  it("does not trigger deletion for user with exchange within 2-year window (30 days ago or 23 months ago)", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const userWithRecentExchange = makeUser({
+      id: "recent-exchange-id",
+      email: "recent-exchange@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    const userWith23MonthOldExchange = makeUser({
+      id: "old-exchange-id",
+      email: "old-exchange@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    uow.userRepository.users = [
+      userWithRecentExchange,
+      userWith23MonthOldExchange,
+    ];
+
+    uow.discussionRepository.discussions = [
+      new DiscussionBuilder()
+        .withId("discussion-recent")
+        .withPotentialBeneficiaryEmail(userWithRecentExchange.email)
+        .withExchanges([
+          {
+            subject: "Test",
+            message: "Hello",
+            sentAt: subDays(now, 30).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build(),
+      new DiscussionBuilder()
+        .withId("discussion-23m")
+        .withPotentialBeneficiaryEmail(userWith23MonthOldExchange.email)
+        .withExchanges([
+          {
+            subject: "Recent enough",
+            message: "Hello",
+            sentAt: subMonths(now, 23).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build(),
+    ];
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 0 });
+    expectToEqual(uow.outboxRepository.events.length, 0);
+  });
+
+  it("triggers deletion for user with expired convention and old discussion", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const inactiveUser = makeUser({
+      id: "inactive-id",
+      email: "inactive@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    uow.userRepository.users = [inactiveUser];
+
+    const oldConvention = new ConventionDtoBuilder()
+      .withId("old-convention-1")
+      .withBeneficiaryEmail(inactiveUser.email)
+      .withDateEnd(subDays(twoYearsAgo, 10).toISOString())
+      .build();
+    uow.conventionRepository.setConventions([oldConvention]);
+
+    const oldDiscussion = new DiscussionBuilder()
+      .withId("old-discussion-1")
+      .withPotentialBeneficiaryEmail(inactiveUser.email)
+      .withExchanges([
+        {
+          subject: "Old",
+          message: "Old exchange",
+          sentAt: subDays(twoYearsAgo, 10).toISOString(),
+          sender: "potentialBeneficiary",
+          attachments: [],
+        },
+      ])
+      .build();
+    uow.discussionRepository.discussions = [oldDiscussion];
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 1 });
+    expectToEqual(uow.outboxRepository.events.length, 1);
+    expectToEqual(
+      uow.outboxRepository.events[0].topic,
+      "InactiveUserAccountDeletionTriggered",
+    );
+    expectToEqual(uow.outboxRepository.events[0].payload, {
+      userId: inactiveUser.id,
+    });
   });
 });

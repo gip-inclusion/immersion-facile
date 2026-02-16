@@ -190,68 +190,21 @@ export class PgUserRepository implements UserRepository {
     return usersInDb;
   }
 
-  public async getInactiveUsers(
-    since: Date,
-    options?: {
-      excludeWarnedSince?: Date;
-      onlyWarnedBetween?: { from: Date; to: Date };
-    },
-  ): Promise<UserWithAdminRights[]> {
-    const query = this.#getUserQueryBuilder()
-      .where("users.last_login_at", "<", since)
-      .where(({ eb, not, exists }) =>
-        not(
-          exists(
-            eb
-              .selectFrom("conventions")
-              .innerJoin("actors", (join) =>
-                join.on((eb) =>
-                  eb.or([
-                    eb("actors.id", "=", eb.ref("conventions.beneficiary_id")),
-                    eb(
-                      "actors.id",
-                      "=",
-                      eb.ref("conventions.establishment_tutor_id"),
-                    ),
-                    eb(
-                      "actors.id",
-                      "=",
-                      eb.ref("conventions.establishment_representative_id"),
-                    ),
-                  ]),
-                ),
-              )
-              .select("conventions.id")
-              .where("conventions.date_end", ">=", since)
-              .whereRef("actors.email", "=", "users.email"),
-          ),
-        ),
-      )
-      .where(({ eb, not, exists }) =>
-        not(
-          exists(
-            eb
-              .selectFrom("discussions")
-              .innerJoin(
-                "exchanges",
-                "exchanges.discussion_id",
-                "discussions.id",
-              )
-              .select("discussions.id")
-              .where("exchanges.sent_at", ">=", since)
-              .whereRef(
-                "discussions.potential_beneficiary_email",
-                "=",
-                "users.email",
-              ),
-          ),
-        ),
-      );
+  public async getUserIdsLoggedInLongAgo({
+    since,
+    excludeWarnedSince,
+    onlyWarnedBetween,
+  }: {
+    since: Date;
+    excludeWarnedSince?: Date;
+    onlyWarnedBetween?: { from: Date; to: Date };
+  }): Promise<string[]> {
+    const query = this.transaction
+      .selectFrom("users")
+      .select("users.id")
+      .where("users.last_login_at", "<", since);
 
-    const excludeWarnedSince = options?.excludeWarnedSince;
-    const onlyWarnedBetween = options?.onlyWarnedBetween;
-
-    const usersInDb = await pipeWithValue(
+    const rows = await pipeWithValue(
       query,
       (b) =>
         excludeWarnedSince
@@ -305,9 +258,7 @@ export class PgUserRepository implements UserRepository {
       (b) => b.execute(),
     );
 
-    return usersInDb
-      .map((userInDb) => this.#toAuthenticatedUser(userInDb))
-      .filter(isTruthy);
+    return rows.map((r) => r.id);
   }
 
   public async findByExternalId(

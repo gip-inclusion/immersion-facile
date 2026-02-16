@@ -2,8 +2,6 @@ import { subDays, subYears } from "date-fns";
 import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
-  ConventionDtoBuilder,
-  DiscussionBuilder,
   errors,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
@@ -21,8 +19,6 @@ import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
-import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
-import { PgDiscussionRepository } from "../../../../establishment/adapters/PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
@@ -371,19 +367,15 @@ describe("PgAuthenticatedUserRepository", () => {
   });
 });
 
-describe("PgUserRepository - getInactiveUsers", () => {
+describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
   const now = new Date("2026-01-15T10:00:00.000Z");
   const twoYearsAgo = subYears(now, 2);
-  const threeYearsAgo = subYears(now, 3);
   const oneYearAgo = subYears(now, 1);
-  const threeYearsAgoIso = threeYearsAgo.toISOString();
-  const updatedAt = new Date("2022-05-20T12:43:11").toISOString();
+  const threeYearsAgoIso = subYears(now, 3).toISOString();
 
   let pool: Pool;
   let db: KyselyDb;
   let userRepository: PgUserRepository;
-  let conventionRepository: PgConventionRepository;
-  let discussionRepository: PgDiscussionRepository;
   let agencyId: string;
 
   const makeUserWithOldLogin = (
@@ -420,8 +412,6 @@ describe("PgUserRepository - getInactiveUsers", () => {
     await db.deleteFrom("users").execute();
 
     userRepository = new PgUserRepository(db);
-    conventionRepository = new PgConventionRepository(db);
-    discussionRepository = new PgDiscussionRepository(db);
 
     const validatorId = uuid();
     const validator = makeUniqueUserForTest(validatorId);
@@ -440,34 +430,15 @@ describe("PgUserRepository - getInactiveUsers", () => {
     await pool.end();
   });
 
-  it("returns only truly inactive users, excluding those with recent activity", async () => {
-    const inactiveNoActivity = makeUserWithOldLogin({
+  it("returns users with old login and never-logged-in users", async () => {
+    const inactiveUser = makeUserWithOldLogin({
       id: uuid(),
       email: "inactive@test.fr",
     });
-    const inactiveWithOldConvention = makeUserWithOldLogin({
+    const recentlyActiveUser = makeUserWithOldLogin({
       id: uuid(),
-      email: "old-convention@test.fr",
-    });
-    const inactiveWithOldDiscussion = makeUserWithOldLogin({
-      id: uuid(),
-      email: "old-discussion@test.fr",
-    });
-    const activeAsBeneficiary = makeUserWithOldLogin({
-      id: uuid(),
-      email: "beneficiary@test.fr",
-    });
-    const activeAsTutor = makeUserWithOldLogin({
-      id: uuid(),
-      email: "tutor@test.fr",
-    });
-    const activeAsRepresentative = makeUserWithOldLogin({
-      id: uuid(),
-      email: "representative@test.fr",
-    });
-    const activeWithRecentDiscussion = makeUserWithOldLogin({
-      id: uuid(),
-      email: "discusser@test.fr",
+      email: "recently-active@test.fr",
+      lastLoginAt: oneYearAgo.toISOString(),
     });
     const neverLoggedIn = makeUserWithOldLogin({
       id: uuid(),
@@ -475,87 +446,17 @@ describe("PgUserRepository - getInactiveUsers", () => {
       lastLoginAt: undefined,
     });
 
-    await userRepository.save(inactiveNoActivity);
-    await userRepository.save(inactiveWithOldConvention);
-    await userRepository.save(inactiveWithOldDiscussion);
-    await userRepository.save(activeAsBeneficiary);
-    await userRepository.save(activeAsTutor);
-    await userRepository.save(activeAsRepresentative);
-    await userRepository.save(activeWithRecentDiscussion);
+    await userRepository.save(inactiveUser);
+    await userRepository.save(recentlyActiveUser);
     await userRepository.save(neverLoggedIn);
 
-    const recentConventionForBeneficiary = new ConventionDtoBuilder()
-      .withId(uuid())
-      .withAgencyId(agencyId)
-      .withBeneficiaryEmail("beneficiary@test.fr")
-      .withDateEnd(subDays(now, 30).toISOString())
-      .withUpdatedAt(updatedAt)
-      .build();
-    const recentConventionForTutor = new ConventionDtoBuilder()
-      .withId(uuid())
-      .withAgencyId(agencyId)
-      .withEstablishmentTutorEmail("tutor@test.fr")
-      .withDateEnd(subDays(now, 30).toISOString())
-      .withUpdatedAt(updatedAt)
-      .build();
-    const recentConventionForRepresentative = new ConventionDtoBuilder()
-      .withId(uuid())
-      .withAgencyId(agencyId)
-      .withEstablishmentRepresentativeEmail("representative@test.fr")
-      .withDateEnd(subDays(now, 30).toISOString())
-      .withUpdatedAt(updatedAt)
-      .build();
-    const oldConvention = new ConventionDtoBuilder()
-      .withId(uuid())
-      .withAgencyId(agencyId)
-      .withBeneficiaryEmail("old-convention@test.fr")
-      .withDateEnd(subDays(threeYearsAgo, 10).toISOString())
-      .withUpdatedAt(updatedAt)
-      .build();
-    await conventionRepository.save(recentConventionForBeneficiary, updatedAt);
-    await conventionRepository.save(recentConventionForTutor, updatedAt);
-    await conventionRepository.save(
-      recentConventionForRepresentative,
-      updatedAt,
-    );
-    await conventionRepository.save(oldConvention, updatedAt);
-
-    const recentDiscussion = new DiscussionBuilder()
-      .withId(uuid())
-      .withPotentialBeneficiaryEmail("discusser@test.fr")
-      .withExchanges([
-        {
-          subject: "Recent",
-          message: "Recent exchange",
-          sentAt: oneYearAgo.toISOString(),
-          sender: "potentialBeneficiary",
-          attachments: [],
-        },
-      ])
-      .build();
-    const oldDiscussion = new DiscussionBuilder()
-      .withId(uuid())
-      .withPotentialBeneficiaryEmail("old-discussion@test.fr")
-      .withExchanges([
-        {
-          subject: "Old",
-          message: "Old exchange",
-          sentAt: subDays(threeYearsAgo, 10).toISOString(),
-          sender: "potentialBeneficiary",
-          attachments: [],
-        },
-      ])
-      .build();
-    await discussionRepository.insert(recentDiscussion);
-    await discussionRepository.insert(oldDiscussion);
-
-    const result = await userRepository.getInactiveUsers(twoYearsAgo);
+    const result = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+    });
 
     expectArraysToEqualIgnoringOrder(result, [
-      inactiveNoActivity,
-      inactiveWithOldConvention,
-      inactiveWithOldDiscussion,
-      neverLoggedIn,
+      inactiveUser.id,
+      neverLoggedIn.id,
     ]);
   });
 
@@ -597,23 +498,26 @@ describe("PgUserRepository - getInactiveUsers", () => {
       ])
       .execute();
 
-    const resultWithExclude = await userRepository.getInactiveUsers(
-      twoYearsAgo,
-      { excludeWarnedSince },
-    );
+    const resultWithExclude = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+      excludeWarnedSince,
+    });
 
     expectArraysToEqualIgnoringOrder(resultWithExclude, [
-      warnedLongAgo,
-      notWarned,
+      warnedLongAgo.id,
+      notWarned.id,
     ]);
 
-    const resultWithoutExclude =
-      await userRepository.getInactiveUsers(twoYearsAgo);
+    const resultWithoutExclude = await userRepository.getUserIdsLoggedInLongAgo(
+      {
+        since: twoYearsAgo,
+      },
+    );
 
     expectArraysToEqualIgnoringOrder(resultWithoutExclude, [
-      recentlyWarned,
-      warnedLongAgo,
-      notWarned,
+      recentlyWarned.id,
+      warnedLongAgo.id,
+      notWarned.id,
     ]);
   });
 
@@ -669,11 +573,12 @@ describe("PgUserRepository - getInactiveUsers", () => {
       ])
       .execute();
 
-    const result = await userRepository.getInactiveUsers(twoYearsAgo, {
+    const result = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
       onlyWarnedBetween,
     });
 
-    expectArraysToEqualIgnoringOrder(result, [warnedInsideWindow]);
+    expectArraysToEqualIgnoringOrder(result, [warnedInsideWindow.id]);
   });
 });
 

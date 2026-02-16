@@ -32,19 +32,33 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
     const warnedFrom = subDays(now, deletionWarningDedupInDays);
     const warnedTo = subDays(now, deletionWarningDelayInDays);
 
-    const usersToDelete = await uow.userRepository.getInactiveUsers(
-      twoYearsAgo,
-      { onlyWarnedBetween: { from: warnedFrom, to: warnedTo } },
+    const candidateUserIds = await uow.userRepository.getUserIdsLoggedInLongAgo(
+      {
+        since: twoYearsAgo,
+        onlyWarnedBetween: { from: warnedFrom, to: warnedTo },
+      },
     );
 
-    const events = usersToDelete.map((user) =>
+    const afterConventionFilterIds =
+      await uow.conventionQueries.getUserIdsWithNoActiveConvention({
+        userIds: candidateUserIds,
+        since: twoYearsAgo,
+      });
+
+    const userIdsToDelete =
+      await uow.discussionRepository.getUserIdsWithNoRecentExchange({
+        userIds: afterConventionFilterIds,
+        since: twoYearsAgo,
+      });
+
+    const events = userIdsToDelete.map((userId) =>
       deps.createNewEvent({
         topic: "InactiveUserAccountDeletionTriggered",
-        payload: { userId: user.id },
+        payload: { userId },
       }),
     );
 
     await uow.outboxRepository.saveNewEventsBatch(events);
 
-    return { numberOfDeletionsTriggered: usersToDelete.length };
+    return { numberOfDeletionsTriggered: userIdsToDelete.length };
   });

@@ -66,7 +66,7 @@ export const createInMemoryUow = () => {
       new InMemoryConventionFranceTravailAdvisorRepository(),
     conventionsToSyncRepository: new InMemoryConventionsToSyncRepository(),
     delegationContactRepository: new InMemoryDelegationContactRepository(),
-    discussionRepository: new InMemoryDiscussionRepository(),
+    discussionRepository: new InMemoryDiscussionRepository({}, userRepository),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
     groupRepository: new InMemoryGroupRepository(),

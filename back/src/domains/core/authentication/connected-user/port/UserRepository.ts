@@ -19,11 +19,9 @@ export interface UserRepository {
     externalId: string,
   ): Promise<UserWithAdminRights | undefined>;
   findByEmail(email: Email): Promise<UserWithAdminRights | undefined>;
-  getInactiveUsers(
-    since: Date,
-    options?: {
-      excludeWarnedSince?: Date;
-      onlyWarnedBetween?: { from: Date; to: Date };
-    },
-  ): Promise<UserWithAdminRights[]>;
+  getUserIdsLoggedInLongAgo(params: {
+    since: Date;
+    excludeWarnedSince?: Date;
+    onlyWarnedBetween?: { from: Date; to: Date };
+  }): Promise<UserId[]>;
 }
