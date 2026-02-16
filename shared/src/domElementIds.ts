@@ -1159,4 +1159,5 @@ export const domElementIds = {
         "im-manage-convention-template__share-as-convention-draft-submit-button",
     },
   },
+  linkAlreadyUsed: {},
 } satisfies DomElementIds;
