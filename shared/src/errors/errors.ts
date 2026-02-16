@@ -1104,6 +1104,8 @@ export const errors = {
   shortLink: {
     notFound: ({ shortLinkId }: { shortLinkId: ShortLinkId }) =>
       new NotFoundError(`Le lien court '${shortLinkId}' n'existe pas.`),
+    invalidUrl: ({ shortLinkId }: { shortLinkId: ShortLinkId }) =>
+      new BadRequestError(`Le lien court '${shortLinkId}' n'est pas valide.`),
   },
   notification: {
     notFound: ({ id, kind }: { id: NotificationId; kind: NotificationKind }) =>

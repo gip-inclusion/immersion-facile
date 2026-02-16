@@ -10,6 +10,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
   frontRoutes,
+  makeUrlWithQueryParams,
   type ShortLinkId,
   type TechnicalRoutes,
   technicalRoutes,
@@ -343,7 +344,10 @@ describe("technical router", () => {
         urlParams: { shortLinkId: expectedShortLinkId },
       });
 
-      const expectedRedirectUrl = `${appConfig.immersionFacileBaseUrl}/${frontRoutes.linkAlreadyUsed}?jwt=${expiredJwt}`;
+      const expectedRedirectUrl = `${appConfig.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        `/${frontRoutes.linkAlreadyUsed}`,
+        { shortLinkId: expectedShortLinkId, jwt: expiredJwt },
+      )}`;
       expectHttpResponseToEqual(response, {
         body: {},
         status: 302,

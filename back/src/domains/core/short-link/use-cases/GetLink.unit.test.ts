@@ -1,4 +1,9 @@
-import { type AbsoluteUrl, expectToEqual, frontRoutes } from "shared";
+import {
+  type AbsoluteUrl,
+  expectToEqual,
+  frontRoutes,
+  makeUrlWithQueryParams,
+} from "shared";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
@@ -57,9 +62,9 @@ describe("GetLink", () => {
     });
   });
 
-  it("redirects to link already used page with jwt when single-use link already used", async () => {
-    const expiredJwt = "eyJhbGciOiJIUzI1NiJ9";
-    const longUrl: AbsoluteUrl = `https://example.com/test?jwt=${expiredJwt}`;
+  it("redirects to link already used page with shortLinkId and jwt when single-use link already used", async () => {
+    const longUrl: AbsoluteUrl =
+      "https://example.com/test?jwt=eyJhbGciOiJIUzI1NiJ9";
     uow.shortLinkQuery.setShortLinks({
       [shortLinkId]: {
         url: longUrl,
@@ -70,9 +75,10 @@ describe("GetLink", () => {
 
     const result = await getLink.execute(shortLinkId);
 
-    expectToEqual(
-      result,
-      `${immersionFacileBaseUrl}/${frontRoutes.linkAlreadyUsed}?jwt=${expiredJwt}`,
-    );
+    const expectedUrl = `${immersionFacileBaseUrl}${makeUrlWithQueryParams(
+      `/${frontRoutes.linkAlreadyUsed}`,
+      { shortLinkId, jwt: "eyJhbGciOiJIUzI1NiJ9" },
+    )}`;
+    expectToEqual(result, expectedUrl);
   });
 });

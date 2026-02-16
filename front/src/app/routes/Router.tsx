@@ -320,7 +320,12 @@ const getPageByRouteName: {
       <ErrorPage error={frontErrors.generic.pageNotFound()} />
     ),
   stats: () => <StatsPage />,
-  linkAlreadyUsed: (route) => <LinkAlreadyUsedPage jwt={route.params.jwt} />,
+  linkAlreadyUsed: (route) => (
+    <LinkAlreadyUsedPage
+      shortLinkId={route.params.shortLinkId}
+      expiredJwt={route.params.jwt}
+    />
+  ),
   unregisterEstablishmentLead: (route) => (
     <EstablishmentLeadRegistrationRejectedPage route={route} />
   ),
