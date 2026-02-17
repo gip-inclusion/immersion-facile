@@ -65,6 +65,16 @@ import {
 } from "./httpErrors";
 
 export const errors = {
+  fetch: {
+    errorResponse: async (errorResponse: Response) => {
+      const textbody = await errorResponse
+        .text()
+        .catch((_error) => "no text in body");
+      return new Error(
+        `Fetch error response. Status code '${errorResponse.status}' '${errorResponse.statusText}'. Body:'${textbody}'`,
+      );
+    },
+  },
   email: {
     missingContentParts: (kind: keyof EmailParamsByEmailType) =>
       new BadRequestError(
