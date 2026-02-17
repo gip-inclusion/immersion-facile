@@ -168,7 +168,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         )}`
       : await makeShortMagicLink({
           targetRoute: frontRoutes.conventionDocument,
-          lifetime: "long",
+          lifetime: "short",
           singleUse: false,
         });
 
