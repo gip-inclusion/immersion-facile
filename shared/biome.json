@@ -29,7 +29,6 @@
       "src/**/*.json",
       "biome.json",
       "tsconfig.json",
-      "babel.config.js",
       "package.json",
       "jest.config.js"
     ]
