@@ -84,12 +84,15 @@ export const useCaseLoggerWrapper = <
     })
     .catch((error) => {
       const searchParams = getSearchParams(useCaseName, validInput);
+      const sqlQuery =
+        error instanceof Error ? (error as any)?.sqlQuery : undefined;
       logger.error({
         useCaseName,
         durationInSeconds: calculateDurationInSecondsFrom(startDate),
         searchParams,
         userId: extractConnectedUserId<P>(identityPayload),
         apiConsumerId: extractApiConsumerId<P>(identityPayload),
+        ...(sqlQuery && { sqlQuery }),
         message: castError(error).message,
       });
       throw error;
