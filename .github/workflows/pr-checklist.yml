@@ -1,0 +1,21 @@
+name: PR Checklist
+
+on:
+  pull_request:
+    types: [opened, edited, ready_for_review]
+
+jobs:
+  check-checklist:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier la checklist
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          UNCHECKED=$(echo "$PR_BODY" | grep -c '\- \[ \]' || true)
+          if [ "$UNCHECKED" -gt 0 ]; then
+            echo "::error::❌ $UNCHECKED case(s) non cochée(s) dans la checklist. Veuillez compléter la checklist avant de passer en RfR."
+            exit 1
+          fi
+          echo "✅ Toutes les cases de la checklist sont cochées."
