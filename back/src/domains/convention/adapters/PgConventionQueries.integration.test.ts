@@ -1208,6 +1208,28 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
+    it("should return correct data when accessing a non-first page", async () => {
+      const resultPage3 =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 3, perPage: 1 },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expectToEqual(resultPage3, {
+        data: [{ ...conventionB, ...agencyFields, assessment: null }],
+        pagination: {
+          currentPage: 3,
+          totalPages: 4,
+          numberPerPage: 1,
+          totalRecords: 4,
+        },
+      });
+    });
+
     it("should filter conventions by status", async () => {
       const result =
         await conventionQueries.getPaginatedConventionsForAgencyUser({

@@ -371,15 +371,15 @@ export const createConventionQueryBuilder = (
     qb.leftJoin("agencies", "agencies.id", "conventions.agency_id"),
   );
 
-export const createConventionQueryBuilderForAgencyUser = ({
+export const createAgencyUserConventionBaseBuilder = ({
   transaction,
   agencyUserId,
 }: {
   transaction: KyselyDb;
   agencyUserId: UserId;
-}) => {
+}) =>
   // biome-ignore format: reads better without formatting
-  const builder = withActorJoins(
+  withActorJoins(
     transaction
       .selectFrom("users__agencies")
       .innerJoin("conventions", "users__agencies.agency_id", "conventions.agency_id")
@@ -393,15 +393,24 @@ export const createConventionQueryBuilderForAgencyUser = ({
       ])),
   );
 
-  return {
-    dataQuery: createConventionSelection(
-      withAppellationsAndPartnerPeJoinAndPhoneNumber(builder),
-    ),
-    countQuery: builder.select((eb) =>
-      sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
-    ),
-  };
-};
+export const wrapInMaterializedCteWithEnrichment = ({
+  transaction,
+  filteredBuilder,
+}: {
+  transaction: KyselyDb;
+  filteredBuilder: SelectQueryBuilder<any, any, any>;
+}): ConventionQueryBuilder =>
+  pipeWithValue(
+    transaction
+      .with(
+        (cte) => cte("user_conventions").materialized(),
+        () => filteredBuilder.selectAll("conventions"),
+      )
+      .selectFrom("user_conventions as conventions"),
+    withActorJoins,
+    withAppellationsAndPartnerPeJoinAndPhoneNumber,
+    createConventionSelection,
+  );
 
 const createBroadcastFeedbackBaseBuilder = ({
   transaction,
