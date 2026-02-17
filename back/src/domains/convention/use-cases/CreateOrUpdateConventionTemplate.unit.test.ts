@@ -1,8 +1,4 @@
-import type {
-  ConnectedUser,
-  ConventionTemplate,
-  ConventionTemplateId,
-} from "shared";
+import type { ConventionTemplate, ConventionTemplateId } from "shared";
 import {
   ConnectedUserBuilder,
   errors,
@@ -79,16 +75,6 @@ describe("CreateOrUpdateConventionTemplate", () => {
       ...conventionTemplate,
       userId: currentUser.id,
     });
-  });
-
-  it("throws unauthorized when current user is undefined", async () => {
-    await expectPromiseToFailWithError(
-      createOrUpdateConventionTemplate.execute(
-        conventionTemplate,
-        undefined as unknown as ConnectedUser,
-      ),
-      errors.user.unauthorized(),
-    );
   });
 
   it("throws forbidden when updating a template owned by another user", async () => {

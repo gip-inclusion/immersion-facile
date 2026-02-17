@@ -1,4 +1,4 @@
-import { type ConnectedUser, type ConventionTemplate, errors } from "shared";
+import type { ConnectedUser, ConventionTemplate } from "shared";
 import z from "zod";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
@@ -9,7 +9,6 @@ export const makeGetConventionTemplatesForCurrentUser = useCaseBuilder(
   .withOutput<ConventionTemplate[]>()
   .withCurrentUser<ConnectedUser>()
   .build(async ({ uow, currentUser }) => {
-    if (!currentUser) throw errors.user.unauthorized();
     return uow.conventionTemplateQueries.get({
       userIds: [currentUser.id],
     });
