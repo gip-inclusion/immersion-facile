@@ -45,6 +45,6 @@
     "tss-react": "^4.5.2",
     "type-route": "^1.0.0",
     "typescript": "^5.8.3",
-    "webpack": "5.94.0"
+    "webpack": "5.104.1"
   }
 }
