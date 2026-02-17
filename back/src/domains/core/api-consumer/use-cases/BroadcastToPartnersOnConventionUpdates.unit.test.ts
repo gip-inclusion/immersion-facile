@@ -5,6 +5,8 @@ import {
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   cartographeAppellationAndRome,
+  errors,
+  expectPromiseToFailWithError,
   expectToEqual,
   type SubscriptionParams,
 } from "shared";
@@ -182,6 +184,17 @@ describe("Broadcast to partners on updated convention", () => {
     uow.agencyRepository.agencies = [agency1, agency2, agencyWithRefersTo];
   });
 
+  it("throws when convention is not found", async () => {
+    const unknownConventionId = "00000000-0000-0000-0000-000000000000";
+    uow.conventionRepository.setConventions([]);
+    uow.apiConsumerRepository.consumers = [apiConsumer1];
+
+    await expectPromiseToFailWithError(
+      broadcastUpdatedConvention.execute({ conventionId: unknownConventionId }),
+      errors.convention.notFound({ conventionId: unknownConventionId }),
+    );
+  });
+
   it("broadcast updated convention to agency only", async () => {
     uow.conventionRepository.setConventions([convention1, convention2]);
     uow.apiConsumerRepository.consumers = [
@@ -191,7 +204,7 @@ describe("Broadcast to partners on updated convention", () => {
       apiConsumerWithoutSubscription,
     ];
 
-    await broadcastUpdatedConvention.execute({ convention: convention1 });
+    await broadcastUpdatedConvention.execute({ conventionId: convention1.id });
 
     const expectedCallsAfterFirstExecute: CallbackParams[] = [
       {
@@ -217,7 +230,7 @@ describe("Broadcast to partners on updated convention", () => {
 
     expectToEqual(subscribersGateway.calls, expectedCallsAfterFirstExecute);
 
-    await broadcastUpdatedConvention.execute({ convention: convention2 });
+    await broadcastUpdatedConvention.execute({ conventionId: convention2.id });
 
     const expectedCallsAfterSecondExecute: CallbackParams[] = [
       ...expectedCallsAfterFirstExecute,
@@ -266,7 +279,7 @@ describe("Broadcast to partners on updated convention", () => {
     ];
     uow.apiConsumerRepository.consumers = [apiConsumer2];
 
-    await broadcastUpdatedConvention.execute({ convention });
+    await broadcastUpdatedConvention.execute({ conventionId: convention.id });
 
     expectToEqual(subscribersGateway.calls, [
       {
@@ -318,7 +331,7 @@ describe("Broadcast to partners on updated convention", () => {
 
     subscribersGateway.simulatedResponse = errorResponse;
 
-    await broadcastUpdatedConvention.execute({ convention: convention1 });
+    await broadcastUpdatedConvention.execute({ conventionId: convention1.id });
 
     const expectedBroadcastFeedback: BroadcastFeedback = {
       consumerId: apiConsumer1.id,
@@ -365,7 +378,7 @@ describe("Broadcast to partners on updated convention", () => {
 
     subscribersGateway.simulatedResponse = successResponse;
 
-    await broadcastUpdatedConvention.execute({ convention: convention1 });
+    await broadcastUpdatedConvention.execute({ conventionId: convention1.id });
 
     const expectedBroadcastFeedback: BroadcastFeedback = {
       consumerId: apiConsumer1.id,
@@ -443,7 +456,7 @@ describe("Broadcast to partners on updated convention", () => {
     ];
 
     await broadcastUpdatedConvention.execute({
-      convention: conventionFromAgencyWithRefersTo,
+      conventionId: conventionFromAgencyWithRefersTo.id,
     });
 
     const expectedCallsAfterFirstExecute: CallbackParams[] = [

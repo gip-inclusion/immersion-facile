@@ -68,7 +68,7 @@ export const makeBroadcastConventionAgain = useCaseBuilder(
         deps.createNewEvent({
           topic: "ConventionWithAssessmentBroadcastRequested",
           payload: {
-            convention,
+            conventionId: convention.id,
             assessment,
             triggeredBy: {
               kind: "connected-user",
@@ -84,7 +84,7 @@ export const makeBroadcastConventionAgain = useCaseBuilder(
       deps.createNewEvent({
         topic: "ConventionBroadcastRequested",
         payload: {
-          convention,
+          conventionId: convention.id,
           triggeredBy: {
             kind: "connected-user",
             userId: currentUser.id,

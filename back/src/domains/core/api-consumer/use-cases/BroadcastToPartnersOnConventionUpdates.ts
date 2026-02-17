@@ -6,8 +6,8 @@ import {
   errors,
   isApiConsumerAllowed,
   pipeWithValue,
-  type WithConventionDto,
-  withConventionSchema,
+  type WithConventionId,
+  withConventionIdSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
@@ -33,8 +33,8 @@ const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {
   return !!conventionUpdatedCallbackParams;
 };
 
-export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
-  protected inputSchema = withConventionSchema;
+export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<WithConventionId> {
+  protected inputSchema = withConventionIdSchema;
 
   readonly #subscribersGateway: SubscribersGateway;
 
@@ -54,7 +54,14 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     this.#consumerNamesUsingRomeV3 = consumerNamesUsingRomeV3;
   }
 
-  protected async _execute({ convention }: WithConventionDto, uow: UnitOfWork) {
+  protected async _execute(
+    { conventionId }: WithConventionId,
+    uow: UnitOfWork,
+  ) {
+    const convention = await uow.conventionRepository.getById(conventionId);
+    if (!convention) {
+      throw errors.convention.notFound({ conventionId });
+    }
     const agencyWithRights = await uow.agencyRepository.getById(
       convention.agencyId,
     );
