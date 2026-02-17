@@ -212,9 +212,9 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
                     expOverride:
                       timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
                     targetRoute: frontRoutes.assessment,
-                    lifetime: "long",
+                    lifetime: "2Days",
                   }),
-                  singleUse: false,
+                  singleUse: true,
                   lastUsedAt: null,
                 },
               }
@@ -337,9 +337,9 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
                     expOverride:
                       timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
                     targetRoute: frontRoutes.assessment,
-                    lifetime: "long",
+                    lifetime: "2Days",
                   }),
-                  singleUse: false,
+                  singleUse: true,
                   lastUsedAt: null,
                 },
               }
@@ -462,9 +462,9 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
                     expOverride:
                       timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
                     targetRoute: frontRoutes.assessment,
-                    lifetime: "long",
+                    lifetime: "2Days",
                   }),
-                  singleUse: false,
+                  singleUse: true,
                   lastUsedAt: null,
                 },
               }
@@ -587,9 +587,9 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
                     expOverride:
                       timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
                     targetRoute: frontRoutes.assessment,
-                    lifetime: "long",
+                    lifetime: "2Days",
                   }),
-                  singleUse: false,
+                  singleUse: true,
                   lastUsedAt: null,
                 },
               }
@@ -722,9 +722,9 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
                     expOverride:
                       timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
                     targetRoute: frontRoutes.assessment,
-                    lifetime: "long",
+                    lifetime: "2Days",
                   }),
-                  singleUse: false,
+                  singleUse: true,
                   lastUsedAt: null,
                 },
               }
@@ -845,9 +845,9 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
                     expOverride:
                       timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
                     targetRoute: frontRoutes.assessment,
-                    lifetime: "long",
+                    lifetime: "2Days",
                   }),
-                  singleUse: false,
+                  singleUse: true,
                   lastUsedAt: null,
                 },
               }
