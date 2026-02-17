@@ -25,7 +25,10 @@ import {
   InMemorySubscribersGateway,
 } from "../adapters/InMemorySubscribersGateway";
 import type { SubscriberResponse } from "../ports/SubscribersGateway";
-import { BroadcastToPartnersOnConventionUpdates } from "./BroadcastToPartnersOnConventionUpdates";
+import {
+  type BroadcastToPartnersOnConventionUpdates,
+  makeBroadcastToPartnersOnConventionUpdates,
+} from "./BroadcastToPartnersOnConventionUpdates";
 
 describe("Broadcast to partners on updated convention", () => {
   const counsellor1 = new ConnectedUserBuilder()
@@ -168,12 +171,14 @@ describe("Broadcast to partners on updated convention", () => {
     uowPerformer = new InMemoryUowPerformer(uow);
     subscribersGateway = new InMemorySubscribersGateway();
     timeGateway = new CustomTimeGateway();
-    broadcastUpdatedConvention = new BroadcastToPartnersOnConventionUpdates(
+    broadcastUpdatedConvention = makeBroadcastToPartnersOnConventionUpdates({
       uowPerformer,
-      subscribersGateway,
-      timeGateway,
-      [apiConsumer2.name],
-    );
+      deps: {
+        subscribersGateway,
+        timeGateway,
+        consumerNamesUsingRomeV3: [apiConsumer2.name],
+      },
+    });
     uow.userRepository.users = [
       counsellor1,
       counsellor2,
