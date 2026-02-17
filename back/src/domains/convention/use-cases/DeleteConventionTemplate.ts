@@ -23,8 +23,6 @@ export const makeDeleteConventionTemplate = useCaseBuilder(
     createNewEvent: CreateNewEvent;
   }>()
   .build(async ({ inputParams, uow, deps, currentUser }) => {
-    if (!currentUser) throw errors.user.unauthorized();
-
     const templates = await uow.conventionTemplateQueries.get({
       ids: [inputParams.conventionTemplateId],
     });
