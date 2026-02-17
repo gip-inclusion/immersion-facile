@@ -22,6 +22,9 @@ import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { broadcastToFtLegacyServiceName } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
 
+const someConventionId = "a07af28e-9c7b-4845-91ee-71020860faa8";
+const anotherConventionId = "b07af28e-9c7b-4845-91ee-71020860faa8";
+
 describe("PgBroadcastFeedbacksRepository", () => {
   let pool: Pool;
   let pgBroadcastFeedbacksRepository: PgBroadcastFeedbacksRepository;
@@ -44,7 +47,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
   });
 
   it("saves an axios response error in the repository", async () => {
-    const conventionId = "someId";
+    const conventionId = someConventionId;
     const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
       serviceName: "osef",
@@ -84,7 +87,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
   });
 
   it("saves an axios response success in the repository", async () => {
-    const conventionId = "someId";
+    const conventionId = someConventionId;
     const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
       serviceName: "osef",
@@ -118,7 +121,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
   });
 
   it("saves an axios timeout error in the repository", async () => {
-    const conventionId = "someId";
+    const conventionId = someConventionId;
     const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
       serviceName: "osef",
@@ -163,7 +166,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
   });
 
   it("saves a not axios error in the repository", async () => {
-    const conventionId = "someId";
+    const conventionId = someConventionId;
     const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
       serviceName: "osef",
@@ -203,10 +206,10 @@ describe("PgBroadcastFeedbacksRepository", () => {
   });
 
   describe("markPartnersErroredConventionAsHandled", () => {
-    const conventionId1 = "d07af28e-9c7b-4845-91ee-71020860faa8";
+    const conventionId1 = someConventionId;
 
     it("mark errored convention as handle when convention exist", async () => {
-      const conventionId2 = "someId";
+      const conventionId2 = anotherConventionId;
       const broadcastFeedback1 = await makeBroadcastFeedback({
         conventionId: conventionId1,
         serviceName: broadcastToFtLegacyServiceName,
@@ -332,7 +335,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
   describe("getLastBroadcastFeedback", () => {
     it("retrieve nothing if there is not last broadcast feedback", async () => {
-      const conventionId = "d07af28e-9c7b-4845-91ee-71020860faa8";
+      const conventionId = someConventionId;
 
       const result =
         await pgBroadcastFeedbacksRepository.getLastBroadcastFeedback(
@@ -343,7 +346,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
     });
 
     it("retrieve a broadcast feedback", async () => {
-      const conventionId = "d07af28e-9c7b-4845-91ee-71020860faa8";
+      const conventionId = someConventionId;
 
       const firstBroadcast = await makeBroadcastFeedback({
         conventionId,
