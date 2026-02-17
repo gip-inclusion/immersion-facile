@@ -120,7 +120,7 @@ describe("BroadcastConventionAgain", () => {
             topic: "ConventionBroadcastRequested",
             status: "never-published",
             payload: {
-              convention: convention,
+              conventionId: convention.id,
               triggeredBy: { kind: "connected-user", userId: user.id },
             },
           },
@@ -157,7 +157,7 @@ describe("BroadcastConventionAgain", () => {
             topic: "ConventionBroadcastRequested",
             status: "never-published",
             payload: {
-              convention,
+              conventionId: convention.id,
               triggeredBy: { kind: "connected-user", userId: user.id },
             },
           },
@@ -225,7 +225,7 @@ describe("BroadcastConventionAgain", () => {
             topic: "ConventionWithAssessmentBroadcastRequested",
             status: "never-published",
             payload: {
-              convention,
+              conventionId: convention.id,
               assessment,
               triggeredBy: { kind: "connected-user", userId: user.id },
             },
