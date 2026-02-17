@@ -66,8 +66,8 @@ export const makeNotifyActorsThatAssessmentDeleted = useCaseBuilder(
 
     const assessmentCreationLink = await makeShortMagicLink({
       targetRoute: frontRoutes.assessment,
-      lifetime: "short",
-      singleUse: false,
+      lifetime: "2Days",
+      singleUse: true,
     });
 
     const beneficiaryName = getFormattedFirstnameAndLastname({
