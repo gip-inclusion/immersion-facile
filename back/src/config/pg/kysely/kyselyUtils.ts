@@ -55,6 +55,7 @@ export const makeKyselyDb = (pool: Pool, options?: KyselyOptions): KyselyDb => {
       const sqlQuery = event.query.sql;
       if (event.level === "error") {
         const error: any = event.error;
+        if (error && typeof error === "object") error.sqlQuery = sqlQuery;
         const params = {
           message: `${messagePrefix}error`,
           durationInSeconds,
