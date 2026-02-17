@@ -45,13 +45,14 @@ import {
   type ConventionBaseQueryBuilder,
   type ConventionQueryBuilder,
   type ConventionsWithErroredBroadcastFeedbackBuilder,
+  createAgencyUserConventionBaseBuilder,
   createBroadcastFeedbackCountBuilder,
   createConventionQueryBuilder,
-  createConventionQueryBuilderForAgencyUser,
   createConventionsWithErroredBroadcastFeedbackBuilder,
   getAssessmentFieldsByConventionId,
   getConventionAgencyFieldsForAgencies,
   getReadConventionById,
+  wrapInMaterializedCteWithEnrichment,
 } from "./pgConventionSql";
 
 const logger = createLogger(__filename);
@@ -288,33 +289,40 @@ export class PgConventionQueries implements ConventionQueries {
 
     const trimmedSearch = search?.trim();
 
-    const { dataQuery, countQuery } = createConventionQueryBuilderForAgencyUser(
-      {
+    const filteredBuilder = pipeWithValue(
+      createAgencyUserConventionBaseBuilder({
         transaction: this.transaction,
         agencyUserId,
-      },
+      }),
+      filterSearch(trimmedSearch),
+      filterDate("date_start", dateStart),
+      filterDate("date_end", dateEnd),
+      filterDate("date_submission", dateSubmission),
+      filterInList("status", statuses),
+      filterInList("agency_id", agencyIds),
+      filterByAgencyDepartmentCodes(agencyDepartmentCodes),
+      filterAssessmentCompletionStatus(assessmentCompletionStatus),
     );
 
-    const applyFilters = (qb: ConventionBaseQueryBuilder) =>
-      pipeWithValue(
-        qb,
-        filterSearch(trimmedSearch),
-        filterDate("date_start", dateStart),
-        filterDate("date_end", dateEnd),
-        filterDate("date_submission", dateSubmission),
-        filterInList("status", statuses),
-        filterInList("agency_id", agencyIds),
-        filterByAgencyDepartmentCodes(agencyDepartmentCodes),
-        filterAssessmentCompletionStatus(assessmentCompletionStatus),
-      );
+    const countQuery = filteredBuilder.select((eb) =>
+      sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
+    );
+
+    const dataQuery = pipeWithValue(
+      wrapInMaterializedCteWithEnrichment({
+        transaction: this.transaction,
+        filteredBuilder: pipeWithValue(
+          filteredBuilder,
+          sortConventions(sort),
+          applyPagination(pagination),
+        ),
+      }),
+      sortConventions(sort),
+    );
 
     const [data, countResult] = await Promise.all([
-      pipeWithValue(
-        applyFilters(dataQuery),
-        sortConventions(sort),
-        applyPagination(pagination),
-      ).execute(),
-      applyFilters(countQuery).executeTakeFirstOrThrow(),
+      dataQuery.execute(),
+      countQuery.executeTakeFirstOrThrow(),
     ]);
 
     const totalRecords = countResult.count;
@@ -473,15 +481,15 @@ export class PgConventionQueries implements ConventionQueries {
 
 const applyPagination =
   (pagination: Required<PaginationQueryParams>) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  <T extends ConventionBaseQueryBuilder>(builder: T): T => {
     const { page, perPage } = pagination;
     const offset = (page - 1) * perPage;
-    return builder.limit(perPage).offset(offset);
+    return builder.limit(perPage).offset(offset) as T;
   };
 
 const sortConventions =
   (sort?: WithSort<GetPaginatedConventionsSortBy>["sort"]) =>
-  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+  <T extends ConventionBaseQueryBuilder>(builder: T): T => {
     const sortByKey: Record<
       GetPaginatedConventionsSortBy,
       keyof Database["conventions"]
@@ -492,9 +500,10 @@ const sortConventions =
       dateEnd: "date_end",
     };
 
-    if (!sort || !sort.by) return builder.orderBy(sortByKey.dateStart, "desc");
+    if (!sort || !sort.by)
+      return builder.orderBy(sortByKey.dateStart, "desc") as T;
 
-    return builder.orderBy(sortByKey[sort.by], sort.direction ?? "desc");
+    return builder.orderBy(sortByKey[sort.by], sort.direction ?? "desc") as T;
   };
 
 const filterByAgencyDepartmentCodes =
