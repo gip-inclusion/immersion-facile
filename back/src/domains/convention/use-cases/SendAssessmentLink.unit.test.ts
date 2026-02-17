@@ -480,9 +480,10 @@ describe("SendAssessmentLink", () => {
             email: convention.establishmentTutor.email,
             now: timeGateway.now(),
             targetRoute: frontRoutes.assessment,
+            lifetime: "2Days",
             extraQueryParams: { mtm_source: "sms-assessment-link" },
           }),
-          singleUse: false,
+          singleUse: true,
           lastUsedAt: null,
         },
       });

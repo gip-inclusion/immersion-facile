@@ -203,8 +203,8 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         assessmentMagicLink: shouldHaveAssessmentMagicLink
           ? await makeShortMagicLink({
               targetRoute: frontRoutes.assessment,
-              lifetime: "long",
-              singleUse: false,
+              lifetime: "2Days",
+              singleUse: true,
             })
           : undefined,
         validatorName: convention.validators?.agencyValidator
