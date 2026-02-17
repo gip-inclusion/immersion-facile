@@ -196,7 +196,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
               expOverride:
                 timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
               targetRoute: frontRoutes.conventionDocument,
-              lifetime: "long",
+              lifetime: "short",
             }),
             singleUse: false,
             lastUsedAt: null,
@@ -321,7 +321,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
               expOverride:
                 timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
               targetRoute: frontRoutes.conventionDocument,
-              lifetime: "long",
+              lifetime: "short",
             }),
             singleUse: false,
             lastUsedAt: null,
@@ -446,7 +446,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
               expOverride:
                 timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
               targetRoute: frontRoutes.conventionDocument,
-              lifetime: "long",
+              lifetime: "short",
             }),
             singleUse: false,
             lastUsedAt: null,
@@ -571,7 +571,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
               expOverride:
                 timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
               targetRoute: frontRoutes.conventionDocument,
-              lifetime: "long",
+              lifetime: "short",
             }),
             singleUse: false,
             lastUsedAt: null,
@@ -706,7 +706,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
               expOverride:
                 timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
               targetRoute: frontRoutes.conventionDocument,
-              lifetime: "long",
+              lifetime: "short",
             }),
             singleUse: false,
             lastUsedAt: null,
@@ -829,7 +829,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
               expOverride:
                 timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
               targetRoute: frontRoutes.conventionDocument,
-              lifetime: "long",
+              lifetime: "short",
             }),
             singleUse: false,
             lastUsedAt: null,
