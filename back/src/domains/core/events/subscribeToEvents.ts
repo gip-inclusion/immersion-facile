@@ -73,7 +73,9 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   FederatedIdentityNotBoundToConvention: [
     useCases.notifyToAgencyConventionSubmitted,
@@ -81,7 +83,9 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
 
   ConventionSubmittedAfterModification: [
@@ -89,7 +93,9 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionModifiedAndSigned: [
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification,
@@ -97,14 +103,18 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionPartiallySigned: [
     useCases.notifyLastSigneeThatConventionHasBeenSigned,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionFullySigned: [
     useCases.notifyLastSigneeThatConventionHasBeenSigned,
@@ -113,21 +123,27 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionAcceptedByCounsellor: [
     useCases.notifyNewConventionNeedsReview,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionAcceptedByValidator: [
     useCases.notifyAllActorsOfFinalConventionValidation,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
     useCases.addEstablishmentLead,
     extractSiretFromConvention(
       useCases.updateMarketingEstablishmentContactList,
@@ -138,14 +154,18 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionCounsellorNameEdited: [],
   ConventionBeneficiaryBirthdateEdited: [
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
 
   // Edge cases for immersion application.
@@ -155,21 +175,27 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionCancelled: [
     useCases.notifyAllActorsThatConventionIsCancelled,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionDeprecated: [
     useCases.notifyAllActorsThatConventionIsDeprecated,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    useCases.broadcastToPartnersOnConventionUpdates,
+    extractConventionIdFromConvention(
+      useCases.broadcastToPartnersOnConventionUpdates,
+    ),
   ],
   ConventionSignatureLinkManuallySent: [],
   ConventionReminderRequired: [useCases.notifyConventionReminder],
@@ -238,15 +264,11 @@ const getUseCasesByTopics = (
   //partnersConvention related
   PartnerErroredConventionMarkedAsHandled: [],
   ConventionWithAssessmentBroadcastRequested: [
-    extractConventionIdFromConvention(
-      useCases.broadcastToFranceTravailOnAssessmentCreated,
-    ),
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionBroadcastRequested: [
-    extractConventionIdFromConvention(
-      useCases.broadcastToFranceTravailOnConventionUpdates,
-    ),
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
 });
