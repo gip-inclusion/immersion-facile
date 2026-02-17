@@ -3106,6 +3106,84 @@ describe("PgDiscussionRepository", () => {
       });
     });
   });
+
+  describe("getUserIdsWithNoRecentExchange", () => {
+    it("returns empty array when given empty userIds", async () => {
+      expectToEqual(
+        await pgDiscussionRepository.getUserIdsWithNoRecentExchange({
+          userIds: [],
+          since: new Date("2024-01-01"),
+        }),
+        [],
+      );
+    });
+
+    it("returns only users with no recent exchange since the given date", async () => {
+      const since = new Date("2025-01-01");
+
+      const userA = new UserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000001")
+        .withEmail("userA-disc@test.com")
+        .build();
+      const userB = new UserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000002")
+        .withEmail("userB-disc@test.com")
+        .build();
+      const userC = new UserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000003")
+        .withEmail("userC-disc@test.com")
+        .build();
+
+      const userRepo = new PgUserRepository(db);
+      await Promise.all([
+        userRepo.save(userA),
+        userRepo.save(userB),
+        userRepo.save(userC),
+      ]);
+
+      const recentExchangeDiscussion = new DiscussionBuilder()
+        .withId("11111111-1111-4111-a111-111111111111")
+        .withPotentialBeneficiaryEmail("userA-disc@test.com")
+        .withExchanges([
+          {
+            subject: "Recent exchange",
+            message: "Hello",
+            sentAt: new Date("2025-06-01").toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build();
+
+      const oldExchangeDiscussion = new DiscussionBuilder()
+        .withId("22222222-2222-4222-a222-222222222222")
+        .withSiret("11111111111112")
+        .withPotentialBeneficiaryEmail("userB-disc@test.com")
+        .withExchanges([
+          {
+            subject: "Old exchange",
+            message: "Hello",
+            sentAt: new Date("2024-06-01").toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build();
+
+      await Promise.all([
+        pgDiscussionRepository.insert(recentExchangeDiscussion),
+        pgDiscussionRepository.insert(oldExchangeDiscussion),
+      ]);
+
+      const result =
+        await pgDiscussionRepository.getUserIdsWithNoRecentExchange({
+          userIds: [userA.id, userB.id, userC.id],
+          since,
+        });
+
+      expectToEqual(result.sort(), [userB.id, userC.id]);
+    });
+  });
 });
 
 const insertDiscussions = async (
