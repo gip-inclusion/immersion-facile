@@ -63,7 +63,6 @@
       "biome.json",
       "tsconfig.json",
       "turbo.json",
-      "babel.config.js",
       "package.json",
       "!!**/node_modules",
       "!!**/docker-data"

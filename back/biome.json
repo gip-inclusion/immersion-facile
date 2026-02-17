@@ -31,7 +31,6 @@
       "biome.json",
       "tsconfig.json",
       "tsconfig.prod.json",
-      "babel.config.js",
       "package.json"
     ]
   }
