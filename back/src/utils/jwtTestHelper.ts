@@ -28,7 +28,7 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
   now,
   role,
   targetRoute,
-  lifetime = "short",
+  lifetime = "1Month",
   extraQueryParams = {},
 }: CreateConventionMagicLinkPayloadProperties & {
   extraQueryParams?: Record<string, string>;

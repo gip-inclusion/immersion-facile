@@ -78,7 +78,7 @@ export const makeNotifyEstablishmentThatAssessmentWasCreated = useCaseBuilder(
                 role,
                 targetRoute: `${frontRoutes.assessmentDocument}`,
                 now: timeGateway.now(),
-                lifetime: "short",
+                lifetime: "1Month",
               }),
             },
           },

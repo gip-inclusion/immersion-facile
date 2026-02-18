@@ -200,7 +200,7 @@ describe("SendEstablishmentLeadReminder", () => {
       );
       expectToEqual(
         unsubscribeToEmailShortLink.url,
-        "http://fake-magic-link/desinscription-prospect/11111111-ee70-4c90-b3f4-668d492f7395/establishment-representative/2021-05-15T08:00:00.000Z/newestConvention.establishment@email.fr/short",
+        "http://fake-magic-link/desinscription-prospect/11111111-ee70-4c90-b3f4-668d492f7395/establishment-representative/2021-05-15T08:00:00.000Z/newestConvention.establishment@email.fr/1Month",
       );
 
       expectSavedNotificationsAndEvents({
@@ -315,7 +315,7 @@ describe("SendEstablishmentLeadReminder", () => {
       );
       expectToEqual(
         unsubscribeToEmailShortLink.url,
-        "http://fake-magic-link/desinscription-prospect/45664444-1234-4000-4444-123456789012/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com/short",
+        "http://fake-magic-link/desinscription-prospect/45664444-1234-4000-4444-123456789012/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com/1Month",
       );
 
       expectSavedNotificationsAndEvents({
