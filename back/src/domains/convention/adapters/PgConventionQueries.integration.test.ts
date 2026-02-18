@@ -2725,4 +2725,77 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
   });
+
+  describe("getUserIdsWithNoActiveConvention", () => {
+    it("returns empty array when given empty userIds", async () => {
+      expectToEqual(
+        await conventionQueries.getUserIdsWithNoActiveConvention({
+          userIds: [],
+          since: new Date("2024-01-01"),
+        }),
+        [],
+      );
+    });
+
+    it("returns only users with no active convention since the given date", async () => {
+      const since = new Date("2025-01-01");
+
+      const userA = new ConnectedUserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000001")
+        .withEmail("userA@test.com")
+        .buildUser();
+      const userB = new ConnectedUserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000002")
+        .withEmail("userB@test.com")
+        .buildUser();
+      const userC = new ConnectedUserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000003")
+        .withEmail("userC@test.com")
+        .buildUser();
+
+      const userRepo = new PgUserRepository(db);
+      await Promise.all([
+        userRepo.save(userA),
+        userRepo.save(userB),
+        userRepo.save(userC),
+      ]);
+
+      const agency = AgencyDtoBuilder.create(agencyIdA).build();
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+      );
+
+      const activeConvention = new ConventionDtoBuilder()
+        .withId("11111111-1111-4111-a111-111111111111")
+        .withAgencyId(agencyIdA)
+        .withBeneficiaryEmail(userA.email)
+        .withDateStart(new Date("2025-03-01").toISOString())
+        .withDateEnd(new Date("2025-03-10").toISOString())
+        .withSchedule(reasonableSchedule)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .build();
+      await conventionRepository.save(activeConvention);
+
+      const expiredConvention = new ConventionDtoBuilder()
+        .withId("22222222-2222-4222-a222-222222222222")
+        .withAgencyId(agencyIdA)
+        .withSiret("11111111111112")
+        .withBeneficiaryEmail(userB.email)
+        .withDateStart(new Date("2024-06-01").toISOString())
+        .withDateEnd(new Date("2024-06-10").toISOString())
+        .withSchedule(reasonableSchedule)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .build();
+      await conventionRepository.save(expiredConvention);
+
+      const result = await conventionQueries.getUserIdsWithNoActiveConvention({
+        userIds: [userA.id, userB.id, userC.id],
+        since,
+      });
+
+      expectToEqual(result.sort(), [userB.id, userC.id]);
+    });
+  });
 });

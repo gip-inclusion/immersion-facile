@@ -269,6 +269,11 @@ export const defaultEmailValueByEmailKind: {
     agencyLogoUrl: defaultEmailPreviewUrl,
     validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
   },
+  ACCOUNT_DELETION_WARNING: {
+    fullName: "FIRST_NAME LAST_NAME",
+    deletionDate: "22 janvier 2026",
+    loginUrl: "https://immersion-facile.beta.gouv.fr/mon-profil",
+  },
   AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
     firstName: "FIRST_NAME",
     lastName: "LAST_NAME",

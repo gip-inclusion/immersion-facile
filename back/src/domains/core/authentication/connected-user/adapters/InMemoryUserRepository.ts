@@ -106,4 +106,16 @@ export class InMemoryUserRepository implements UserRepository {
   public async updateEmail(userId: UserId, email: string): Promise<void> {
     this.#usersById[userId].email = email;
   }
+
+  public async getUserIdsLoggedInLongAgo({
+    since,
+  }: {
+    since: Date;
+    excludeWarnedSince?: Date;
+    onlyWarnedBetween?: { from: Date; to: Date };
+  }): Promise<UserId[]> {
+    return this.users
+      .filter((user) => !user.lastLoginAt || new Date(user.lastLoginAt) < since)
+      .map((u) => u.id);
+  }
 }

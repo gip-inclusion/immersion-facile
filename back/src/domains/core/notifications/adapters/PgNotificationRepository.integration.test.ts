@@ -30,13 +30,14 @@ import { PgNotificationRepository } from "./PgNotificationRepository";
 
 describe("PgNotificationRepository", () => {
   const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";
+  const userId = uuid();
   const now = new Date();
   const emailNotifications: EmailNotification[] = [
     {
       kind: "email",
       id: "11111111-1111-4000-1111-111111111111",
       createdAt: subHours(now, 2).toISOString(),
-      followedIds: { agencyId },
+      followedIds: { agencyId, userId },
       templatedContent: {
         replyTo: { email: "yolo@mail.com", name: "Yolo" },
         kind: "AGENCY_WAS_ACTIVATED",
@@ -79,7 +80,7 @@ describe("PgNotificationRepository", () => {
       kind: "email",
       id: "22222222-2222-4000-2222-222222222222",
       createdAt: subHours(now, 3).toISOString(),
-      followedIds: { agencyId },
+      followedIds: { agencyId, userId },
       templatedContent: {
         kind: "TEST_EMAIL",
         recipients: ["lulu@mail.com"],
@@ -100,7 +101,7 @@ describe("PgNotificationRepository", () => {
       kind: "email",
       id: "33333333-3333-4000-3333-333333333333",
       createdAt: now.toISOString(),
-      followedIds: { agencyId },
+      followedIds: { agencyId, userId },
       templatedContent: {
         kind: "AGENCY_LAST_REMINDER",
         recipients: ["yo@remind.com"],
@@ -128,7 +129,10 @@ describe("PgNotificationRepository", () => {
     id: smsNotificationId,
     kind: "sms",
     createdAt: new Date("2023-01-01").toISOString(),
-    followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
+    followedIds: {
+      conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
+      userId,
+    },
     templatedContent: sms,
   };
 
@@ -538,7 +542,10 @@ describe("PgNotificationRepository", () => {
       it("returns matching email when required filters + conventionId match", async () => {
         const emailNotification: EmailNotification = {
           createdAt: new Date().toISOString(),
-          followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
+          followedIds: {
+            conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
+            userId,
+          },
           id: "11111111-1111-4444-1111-111111111111",
           kind: "email",
           templatedContent: {

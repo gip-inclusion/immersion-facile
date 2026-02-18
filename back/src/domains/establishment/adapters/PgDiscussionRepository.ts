@@ -23,6 +23,7 @@ import {
   pipeWithValue,
   type RejectionKind,
   type SiretDto,
+  type UserId,
   type WithDiscussionStatus,
 } from "shared";
 import { match, P } from "ts-pattern";
@@ -70,6 +71,44 @@ type DeleteDiscussionResultPayload = {
 
 export class PgDiscussionRepository implements DiscussionRepository {
   constructor(private transaction: KyselyDb) {}
+
+  async getUserIdsWithNoRecentExchange({
+    userIds,
+    since,
+  }: {
+    userIds: UserId[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (userIds.length === 0) return [];
+
+    const results = await this.transaction
+      .selectFrom("users")
+      .select("users.id")
+      .where("users.id", "in", userIds)
+      .where(({ eb, not, exists }) =>
+        not(
+          exists(
+            eb
+              .selectFrom("discussions")
+              .innerJoin(
+                "exchanges",
+                "exchanges.discussion_id",
+                "discussions.id",
+              )
+              .select("discussions.id")
+              .where("exchanges.sent_at", ">=", since)
+              .whereRef(
+                "discussions.potential_beneficiary_email",
+                "=",
+                "users.email",
+              ),
+          ),
+        ),
+      )
+      .execute();
+
+    return results.map((r) => r.id);
+  }
 
   async __test_getAllDiscussions(): Promise<DiscussionDto[]> {
     return executeGetDiscussions(this.transaction, {

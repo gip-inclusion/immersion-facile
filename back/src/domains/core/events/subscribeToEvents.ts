@@ -217,6 +217,7 @@ const getUseCasesByTopics = (
   UserAuthenticatedSuccessfully: [
     useCases.linkFranceTravailUsersToTheirAgencies,
   ],
+  InactiveUserAccountDeletionTriggered: [],
   ConnectedUserAgencyRightChanged: [
     useCases.notifyUserAgencyRightChanged,
     useCases.updateAgencyReferringToUpdatedAgency,

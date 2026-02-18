@@ -60,6 +60,70 @@ const logger = createLogger(__filename);
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
 
+  public async getUserIdsWithNoActiveConvention({
+    userIds,
+    since,
+  }: {
+    userIds: UserId[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (userIds.length === 0) return [];
+
+    const results = await this.transaction
+      .selectFrom("users")
+      .select("users.id")
+      .where("users.id", "in", userIds)
+      .where(({ eb, not, exists }) =>
+        not(
+          exists(
+            eb
+              .selectFrom("conventions")
+              .innerJoin("actors", (join) =>
+                join.on((actorEb) =>
+                  actorEb.or([
+                    actorEb(
+                      "actors.id",
+                      "=",
+                      actorEb.ref("conventions.beneficiary_id"),
+                    ),
+                    actorEb(
+                      "actors.id",
+                      "=",
+                      actorEb.ref("conventions.establishment_tutor_id"),
+                    ),
+                    actorEb(
+                      "actors.id",
+                      "=",
+                      actorEb.ref(
+                        "conventions.establishment_representative_id",
+                      ),
+                    ),
+                    actorEb(
+                      "actors.id",
+                      "=",
+                      actorEb.ref("conventions.beneficiary_representative_id"),
+                    ),
+                    actorEb(
+                      "actors.id",
+                      "=",
+                      actorEb.ref(
+                        "conventions.beneficiary_current_employer_id",
+                      ),
+                    ),
+                  ]),
+                ),
+              )
+              .select("conventions.id")
+              .where("conventions.date_end", ">=", since)
+              .whereRef("actors.email", "=", "users.email"),
+          ),
+        ),
+      )
+      .execute();
+
+    return results.map((r) => r.id);
+  }
+
   public async getConventionIdsByFilters({
     filters: {
       withAppelationCodes,
