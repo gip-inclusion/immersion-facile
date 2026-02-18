@@ -18,16 +18,17 @@ import type {
 import type { InMemoryNotificationRepository } from "../domains/core/notifications/adapters/InMemoryNotificationRepository";
 import type { WithNotificationIdAndKind } from "../domains/core/notifications/helpers/Notification";
 
-export type ExpectSavedNotificationsAndEvents = ReturnType<
-  typeof makeExpectSavedNotificationsAndEvents
->;
+export type ExpectSavedNotificationsAndEvents = ({
+  emails,
+  sms,
+}: ExpectedNotifications) => void;
 
 export const makeExpectSavedNotificationsAndEvents =
   (
     notificationRepository: InMemoryNotificationRepository,
     outboxRepository: InMemoryOutboxRepository,
-  ) =>
-  ({ emails = [], sms = [] }: ExpectedNotifications) => {
+  ): ExpectSavedNotificationsAndEvents =>
+  ({ emails = [], sms = [] }) => {
     const paramsByKind = createParamsByKind(
       notificationRepository,
       emails,

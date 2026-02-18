@@ -19,6 +19,7 @@ import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/u
 import { makeUpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
 import { throwIfNotAdmin } from "../../domains/connected-users/helpers/authorization.helper";
 import { makeCreateUserForAgency } from "../../domains/connected-users/use-cases/CreateUserForAgency";
+import { makeDeleteUser } from "../../domains/connected-users/use-cases/DeleteUser";
 import { makeGetConnectedUser } from "../../domains/connected-users/use-cases/GetConnectedUser";
 import { makeGetConnectedUsers } from "../../domains/connected-users/use-cases/GetConnectedUsers";
 import { makeGetUsers } from "../../domains/connected-users/use-cases/GetUsers";
@@ -800,6 +801,11 @@ export const createUseCases = ({
 
     getConnectedUsers: makeGetConnectedUsers({
       uowPerformer,
+    }),
+
+    deleteUser: makeDeleteUser({
+      uowPerformer,
+      deps: { timeGateway: gateways.timeGateway, createNewEvent },
     }),
 
     getLastBroadcastFeedback: makeGetLastBroadcastFeedback({

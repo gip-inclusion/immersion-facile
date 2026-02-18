@@ -884,9 +884,17 @@ export const errors = {
       ),
     notFoundByEmail: ({ email }: { email: Email }) =>
       new NotFoundError(`Aucun utilisateur trouvé avec l'email '${email}'.`),
+    deleteForbiddenAgencyRights: (userId: UserId) =>
+      new ForbiddenError(
+        `Il n'est pas possible de supprimer l'utilisateur '${userId}' car il a des droits sur des agences prescriptrices.`,
+      ),
     forbidden: ({ userId }: { userId: UserId }) =>
       new ForbiddenError(
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas le droit d'accéder à cette ressource.`,
+      ),
+    forbiddenNotTriggeredByCrawler: () =>
+      new ForbiddenError(
+        "Seul le système événementiel peut executer cette fonctionnalité.",
       ),
     alreadyHaveAgencyRights: ({ userId }: { userId: UserId }) =>
       new BadRequestError(
