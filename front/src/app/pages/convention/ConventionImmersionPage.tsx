@@ -254,11 +254,7 @@ const SharedConventionMessage = ({
           onClick={() => {
             storeConventionRouteParamsOnDevice(route.params);
           }}
-          className={fr.cx(
-            "fr-link",
-            // "fr-icon-arrow-right-line",
-            // "fr-link--icon-right",
-          )}
+          className={fr.cx("fr-link")}
         >
           Connectez-vous avec vos identifiants
         </a>
