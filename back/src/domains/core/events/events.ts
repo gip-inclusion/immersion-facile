@@ -21,6 +21,7 @@ import {
   type WithDiscussionId,
   type WithOptionalFirstnameAndLastname,
   type WithSiretDto,
+  type WithUserId,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
@@ -85,6 +86,11 @@ export const triggeredBySchema: ZodSchemaWithInputMatchingOutput<TriggeredBy> =
     z.object({ kind: z.literal("crawler") }),
   ]);
 
+export const withTriggeredBySchema: ZodSchemaWithInputMatchingOutput<WithTriggeredBy> =
+  z.object({
+    triggeredBy: triggeredBySchema,
+  });
+
 export type WithTriggeredBy = {
   triggeredBy: TriggeredBy | null;
 };
@@ -115,17 +121,20 @@ export type DomainEvent =
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
 
-  // FORM ESTABLISHMENT RELATED
-  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
+  // ESTABLISHMENT RELATED
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
   | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
+  | GenericEvent<"AllEstablishmentUsersDeleted", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"EstablishmentDeleted", WithSiretDto & WithTriggeredBy>
-  | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
+
+  // CONTACT REQUEST RELATED
+  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
   | GenericEvent<"DiscussionExchangeDeliveryFailed", WarnSenderThatMessageCouldNotBeDeliveredParams>
   | GenericEvent<"DiscussionStatusManuallyUpdated", WithDiscussionDto & { skipSendingEmail?: boolean } & WithTriggeredBy>
   | GenericEvent<"DiscussionMarkedAsDeprecated", WithDiscussionId & WithTriggeredBy>
   | GenericEvent<"DiscussionBeneficiaryFollowUpRequested", WithDiscussionId & WithTriggeredBy>
-
+  | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
+  
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
 
@@ -147,6 +156,9 @@ export type DomainEvent =
   // USER CONNECTED related.
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
+  // INACTIVE USER ACCOUNT DELETION
+  | GenericEvent<"InactiveUserAccountDeletionTriggered", WithUserId& WithTriggeredBy>
+  | GenericEvent<"UserDeleted", WithUserId& WithTriggeredBy>
 
 
   // Est-ce que les deux events au final c'est pas la même chose ???????!!!!!!! De quoi péter un gros boulard!
