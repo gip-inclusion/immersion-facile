@@ -647,20 +647,24 @@ export const ConventionForm = ({
       <ConventionFormLayout
         form={
           <FormProvider {...methods}>
-            <div className={cx("fr-text")}>
-              {t.intro.conventionFormDescription}
-            </div>
-            {mode !== "edit-convention" && (
-              <Alert
-                severity="info"
-                small
-                description={t.intro.conventionCreationNotification}
-              />
+            {!isTemplateForm && (
+              <>
+                <div className={cx("fr-text")}>
+                  {t.intro.conventionFormDescription}
+                </div>
+                {mode !== "edit-convention" && (
+                  <Alert
+                    severity="info"
+                    small
+                    description={t.intro.conventionCreationNotification}
+                  />
+                )}
+                <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
+                  Tous les champs marqués d'une astérisque (*) sont
+                  obligatoires.
+                </p>
+              </>
             )}
-
-            <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
-              Tous les champs marqués d'une astérisque (*) sont obligatoires.
-            </p>
 
             <form
               id={domElementIds.conventionImmersionRoute.form({
