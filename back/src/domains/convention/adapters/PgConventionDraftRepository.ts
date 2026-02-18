@@ -1,18 +1,22 @@
 import { sql } from "kysely";
 import type { InsertExpression } from "kysely/dist/cjs/parser/insert-values-parser";
-import type {
-  AgencyKind,
-  ConventionDraftDto,
-  ConventionDraftId,
-  DateString,
-  DepartmentCode,
-  EstablishmentTutor,
-  ScheduleDto,
-  Signatories,
+import {
+  type AgencyKind,
+  type ConventionDraftDto,
+  type ConventionDraftId,
+  type DateString,
+  type DepartmentCode,
+  type EstablishmentTutor,
+  pipeWithValue,
+  type ScheduleDto,
+  type Signatories,
 } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
-import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
+import type {
+  ConventionDraftRepository,
+  GetConventionDraftFilters,
+} from "../ports/ConventionDraftRepository";
 
 const dateToIsoString = (date: Date | string): string => {
   return date instanceof Date
@@ -99,6 +103,27 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
         (row.establishment_tutor as EstablishmentTutor) ?? undefined,
       signatories: (row.signatories as Signatories) ?? undefined,
     };
+  }
+
+  public async getConventionDraftIdsByFilters(
+    filters: GetConventionDraftFilters,
+  ): Promise<ConventionDraftId[]> {
+    const { ids, lastUpdatedAt } = filters;
+
+    const conventionDraftIds: {
+      id: string;
+    }[] = await pipeWithValue(
+      this.transaction
+        .selectFrom("convention_drafts")
+        .select("convention_drafts.id"),
+      (qb) => (ids ? qb.where("convention_drafts.id", "in", ids) : qb),
+      (qb) =>
+        lastUpdatedAt
+          ? qb.where("convention_drafts.updated_at", "<=", lastUpdatedAt)
+          : qb,
+    ).execute();
+
+    return conventionDraftIds.map(({ id }) => id);
   }
 
   public async save(

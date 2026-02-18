@@ -33,6 +33,10 @@ export type ConventionDraftDto = ConventionDeepPartial<
   internshipKind: InternshipKind;
 };
 
+export type WithConventionDraftId = {
+  conventionDraftId: ConventionDraftId;
+};
+
 export type ShareConventionDraftByEmailDto = {
   senderEmail: Email;
   recipientEmail?: Email;

@@ -1,5 +1,8 @@
 import type { ConventionDraftDto, ConventionDraftId, DateString } from "shared";
-import type { ConventionDraftRepository } from "../ports/ConventionDraftRepository";
+import type {
+  ConventionDraftRepository,
+  GetConventionDraftFilters,
+} from "../ports/ConventionDraftRepository";
 
 export class InMemoryConventionDraftRepository
   implements ConventionDraftRepository
@@ -19,6 +22,14 @@ export class InMemoryConventionDraftRepository
     return this.#conventionDrafts[id];
   }
 
+  public async getConventionDraftIdsByFilters(
+    filters: GetConventionDraftFilters,
+  ): Promise<ConventionDraftId[]> {
+    return Object.values(this.#conventionDrafts)
+      .filter(makeApplyFiltersToConventionDrafts(filters))
+      .map((conventionDraft) => conventionDraft.id);
+  }
+
   public async save(
     conventionDraft: ConventionDraftDto,
     updatedAt: DateString,
@@ -35,3 +46,18 @@ export class InMemoryConventionDraftRepository
     }
   }
 }
+
+const makeApplyFiltersToConventionDrafts =
+  ({ ids, lastUpdatedAt }: GetConventionDraftFilters) =>
+  (draft: ConventionDraftDto): boolean =>
+    (
+      [
+        ({ id }) => (!ids || ids.length === 0 ? true : ids.includes(id)),
+        ({ updatedAt }) =>
+          !lastUpdatedAt
+            ? true
+            : updatedAt
+              ? new Date(updatedAt) <= lastUpdatedAt
+              : false,
+      ] satisfies Array<(draft: ConventionDraftDto) => boolean>
+    ).every((filter) => filter(draft));

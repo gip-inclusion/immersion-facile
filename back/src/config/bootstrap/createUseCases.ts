@@ -47,6 +47,7 @@ import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
+import { makeGetOldConventionDraftsAndEmitDeleteEvent } from "../../domains/convention/use-cases/GetOldConventionDraftsAndEmitDeleteEvent";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
@@ -1089,6 +1090,11 @@ export const createUseCases = ({
       }),
     getConventionDraftById: makeGetConventionDraftById({ uowPerformer }),
     deleteConventionDraft: makeDeleteConventionDraft({ uowPerformer }),
+    getOldConventionDraftsAndEmitDeleteEvent:
+      makeGetOldConventionDraftsAndEmitDeleteEvent({
+        uowPerformer,
+        deps: { createNewEvent, timeGateway: gateways.timeGateway },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
