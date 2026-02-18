@@ -2,11 +2,9 @@ import {
   addressDtoToString,
   type ConnectedUser,
   errors,
-  type SiretDto,
-  siretSchema,
-  type ZodSchemaWithInputMatchingOutput,
+  type WithSiretDto,
+  withSiretSchema,
 } from "shared";
-import { z } from "zod";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -15,21 +13,12 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-type DeleteEstablishmentPayload = {
-  siret: SiretDto;
-};
-
-const deleteEstablishmentPayloadSchema: ZodSchemaWithInputMatchingOutput<DeleteEstablishmentPayload> =
-  z.object({
-    siret: siretSchema,
-  });
-
 export class DeleteEstablishment extends TransactionalUseCase<
-  DeleteEstablishmentPayload,
+  WithSiretDto,
   void,
   ConnectedUser
 > {
-  protected inputSchema = deleteEstablishmentPayloadSchema;
+  protected inputSchema = withSiretSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -41,7 +30,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
   }
 
   public async _execute(
-    { siret }: DeleteEstablishmentPayload,
+    { siret }: WithSiretDto,
     uow: UnitOfWork,
     currentUser: ConnectedUser,
   ): Promise<void> {
@@ -58,6 +47,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
+
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
     await Promise.all([
