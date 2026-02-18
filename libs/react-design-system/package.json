@@ -40,6 +40,7 @@
     "react-player": "^2.11.0",
     "react-select": "^5.9.0",
     "require-from-string": "^2.0.2",
+    "sass": "^1.77.0",
     "scss-mapper": "workspace:*",
     "storybook": "7.6.21",
     "tss-react": "^4.5.2",

@@ -6,14 +6,6 @@ module.exports = {
     getAbsolutePath("@storybook/addon-links"),
     getAbsolutePath("@storybook/addon-essentials"),
     getAbsolutePath("@storybook/addon-interactions"),
-    {
-      name: "@storybook/addon-styling",
-      options: {
-        sass: {
-          implementation: require("sass"),
-        },
-      },
-    },
     getAbsolutePath("@storybook/addon-mdx-gfm"),
   ],
   framework: {
