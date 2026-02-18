@@ -79,7 +79,7 @@ import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConve
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeLookupLocation } from "../../domains/core/address/use-cases/LookupLocation";
 import { makeLookupStreetAddress } from "../../domains/core/address/use-cases/LookupStreetAddress";
-import { BroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
+import { makeBroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
 import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/DeleteSubscription";
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { makeRenewApiConsumerKey } from "../../domains/core/api-consumer/use-cases/RenewApiConsumerKey";
@@ -520,13 +520,7 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      broadcastToPartnersOnConventionUpdates:
-        new BroadcastToPartnersOnConventionUpdates(
-          uowPerformer,
-          gateways.subscribersGateway,
-          gateways.timeGateway,
-          config.apiConsumerNamesUsingRomeV3,
-        ),
+
       subscribeToWebhook: new SubscribeToWebhook(
         uowPerformer,
         uuidGenerator,
@@ -874,6 +868,16 @@ export const createUseCases = ({
         broadcastToFranceTravailOnConventionUpdates,
         broadcastToFranceTravailOnConventionUpdatesLegacy,
         eventType: "ASSESSMENT_CREATED",
+      }),
+
+    broadcastToPartnersOnConventionUpdates:
+      makeBroadcastToPartnersOnConventionUpdates({
+        uowPerformer,
+        deps: {
+          subscribersGateway: gateways.subscribersGateway,
+          timeGateway: gateways.timeGateway,
+          consumerNamesUsingRomeV3: config.apiConsumerNamesUsingRomeV3,
+        },
       }),
     notifyEstablishmentThatAssessmentWasCreated:
       makeNotifyEstablishmentThatAssessmentWasCreated({

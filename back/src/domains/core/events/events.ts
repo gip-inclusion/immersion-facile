@@ -103,8 +103,8 @@ export type DomainEvent =
   | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionAcceptedByValidator", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
-  | GenericEvent<"ConventionWithAssessmentBroadcastRequested", WithConventionDto & WithAssessmentDto & WithTriggeredBy>
-  | GenericEvent<"ConventionBroadcastRequested", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionWithAssessmentBroadcastRequested", WithConventionId & WithAssessmentDto & WithTriggeredBy>
+  | GenericEvent<"ConventionBroadcastRequested", WithConventionId & WithTriggeredBy>
   | GenericEvent<"ConventionTransferredToAgency",  WithConventionDto & TransferConventionToAgencyPayload & WithTriggeredBy>
   | GenericEvent<"ConventionCounsellorNameEdited", WithConventionId & WithOptionalFirstnameAndLastname & WithTriggeredBy>
   | GenericEvent<"ConventionBeneficiaryBirthdateEdited", WithConventionDto & WithTriggeredBy>
