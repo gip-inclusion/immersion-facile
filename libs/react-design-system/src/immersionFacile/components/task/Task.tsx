@@ -46,7 +46,7 @@ export const Task = ({
       )}
     >
       <div className={fr.cx("fr-grid-row")}>
-        <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+        <div className={fr.cx("fr-col-12", "fr-col-md-7")}>
           <Title
             className={cx(
               fr.cx("fr-grid-row", "fr-mb-1w"),
@@ -67,7 +67,7 @@ export const Task = ({
         {buttonsRows && buttonsRows.length > 0 && (
           <div
             className={cx(
-              fr.cx("fr-col-12", "fr-col-md-4"),
+              fr.cx("fr-col-12", "fr-col-md-5"),
               taskStyles.buttons,
             )}
           >
