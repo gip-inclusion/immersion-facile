@@ -1,4 +1,4 @@
-import { type AbsoluteUrl, castError, type ShortLinkId } from "shared";
+import { type AbsoluteUrl, castError, errors, type ShortLinkId } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../../../utils/logger";
 import type { ShortLinkRepository } from "../../ports/ShortLinkRepository";
@@ -11,13 +11,18 @@ export class PgShortLinkRepository
   extends PgShortLinkQuery
   implements ShortLinkRepository
 {
-  public async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
+  public async save(
+    shortLinkId: ShortLinkId,
+    url: AbsoluteUrl,
+    singleUse: boolean,
+  ): Promise<void> {
     logger.info({ message: `pgShortLinkRepositorySave ${shortLinkId}` });
     return this.transaction
       .insertInto("short_links")
       .values({
         short_link_id: shortLinkId,
         url,
+        single_use: singleUse,
       })
       .returningAll()
       .execute()
@@ -37,5 +42,19 @@ export class PgShortLinkRepository
         });
         throw error;
       });
+  }
+
+  public async markAsUsed(
+    shortLinkId: ShortLinkId,
+    lastUsedAt: Date,
+  ): Promise<void> {
+    const result = await this.transaction
+      .updateTable("short_links")
+      .set({ last_used_at: lastUsedAt })
+      .where("short_link_id", "=", shortLinkId)
+      .returning("short_link_id")
+      .executeTakeFirst();
+
+    if (!result) throw errors.shortLink.notFound({ shortLinkId });
   }
 }

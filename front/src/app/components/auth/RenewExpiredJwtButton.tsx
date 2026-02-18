@@ -6,6 +6,7 @@ import {
   domElementIds,
   type EmailAuthCodeJwt,
   type OAuthState,
+  type ShortLinkId,
 } from "shared";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -18,11 +19,13 @@ export const RenewExpiredJwtButton = ({
   feedbackTopic,
   state,
   originalUrl,
+  shortLinkId,
 }: {
   expiredJwt: ConventionJwt | ConnectedUserJwt | EmailAuthCodeJwt;
   feedbackTopic: FeedbackTopic;
   state?: OAuthState;
   originalUrl?: string;
+  shortLinkId?: ShortLinkId;
 }): React.JSX.Element => {
   const dispatch = useDispatch();
   const onClick = async () => {
@@ -30,6 +33,7 @@ export const RenewExpiredJwtButton = ({
       authSlice.actions.renewExpiredJwtRequested({
         expiredJwt,
         originalUrl,
+        shortLinkId,
         state,
         feedbackTopic,
       }),

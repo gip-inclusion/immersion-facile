@@ -1,6 +1,7 @@
 import type { AbsoluteUrl, ShortLinkId } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type {
+  ConventionMagicLinkLifetime,
   GenerateConnectedUserLoginUrl,
   GenerateConnectedUserLoginUrlParams,
   GenerateConventionMagicLinkUrl,
@@ -29,6 +30,7 @@ type ProvidesShortLinkProperties = {
   shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   config: AppConfig;
   longLink: AbsoluteUrl;
+  singleUse: boolean;
 };
 
 export const prepareConventionMagicShortLinkMaker =
@@ -43,10 +45,12 @@ export const prepareConventionMagicShortLinkMaker =
     targetRoute,
     lifetime,
     extraQueryParams,
+    singleUse,
   }: {
     extraQueryParams?: Record<string, string>;
     targetRoute: string;
-    lifetime: "short" | "long";
+    lifetime: ConventionMagicLinkLifetime;
+    singleUse: boolean;
   }): Promise<AbsoluteUrl> =>
     makeShortLink({
       uow,
@@ -58,6 +62,7 @@ export const prepareConventionMagicShortLinkMaker =
         lifetime,
         extraQueryParams,
       }),
+      singleUse,
     });
 
 export const prepareConnectedUserMagicShortLinkMaker =
@@ -78,6 +83,7 @@ export const prepareConnectedUserMagicShortLinkMaker =
       config,
       shortLinkIdGeneratorGateway,
       longLink: generateConnectedUserLoginUrl(params),
+      singleUse: false,
     });
 
 export const prepareEmailAuthCodeShortLinkMaker =
@@ -98,6 +104,7 @@ export const prepareEmailAuthCodeShortLinkMaker =
       config,
       shortLinkIdGeneratorGateway,
       longLink: generateEmailAuthCodeLoginUrl(params),
+      singleUse: false,
     });
 
 export const makeShortLink = async ({
@@ -105,10 +112,11 @@ export const makeShortLink = async ({
   shortLinkIdGeneratorGateway,
   config,
   longLink,
+  singleUse,
 }: ProvidesShortLinkProperties): Promise<AbsoluteUrl> => {
   const shortlinkId: ShortLinkId = shortLinkIdGeneratorGateway.generate();
 
-  await uow.shortLinkRepository.save(shortlinkId, longLink);
+  await uow.shortLinkRepository.save(shortlinkId, longLink, singleUse);
 
   return makeShortLinkUrl(config, shortlinkId);
 };

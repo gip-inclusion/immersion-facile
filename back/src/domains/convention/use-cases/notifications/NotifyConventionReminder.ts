@@ -144,6 +144,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
           ? await makeShortMagicLink({
               targetRoute: frontRoutes.conventionToSign,
               lifetime: "short",
+              singleUse: false,
             })
           : undefined,
       },
@@ -267,6 +268,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     const shortLink = await makeShortMagicLink({
       targetRoute: frontRoutes.conventionToSign,
       lifetime: "short",
+      singleUse: false,
     });
 
     return {

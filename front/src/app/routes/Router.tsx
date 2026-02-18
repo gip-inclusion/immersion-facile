@@ -33,6 +33,7 @@ import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage"
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
+import { LinkAlreadyUsedPage } from "src/app/pages/error/LinkAlreadyUsedPage";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
 import { StatsPage } from "src/app/pages/StatsPage";
@@ -319,6 +320,12 @@ const getPageByRouteName: {
       <ErrorPage error={frontErrors.generic.pageNotFound()} />
     ),
   stats: () => <StatsPage />,
+  linkAlreadyUsed: (route) => (
+    <LinkAlreadyUsedPage
+      shortLinkId={route.params.shortLinkId}
+      expiredJwt={route.params.jwt}
+    />
+  ),
   unregisterEstablishmentLead: (route) => (
     <EstablishmentLeadRegistrationRejectedPage route={route} />
   ),

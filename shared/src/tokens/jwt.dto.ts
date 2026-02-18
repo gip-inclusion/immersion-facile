@@ -1,4 +1,4 @@
-import type { Flavor, OAuthState } from "..";
+import type { Flavor, OAuthState, ShortLinkId } from "..";
 import type { PayloadKind } from "./payload.dto";
 
 export type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
@@ -34,6 +34,11 @@ export type RenewExpiredJwtRequestDto =
   | {
       kind: "convention";
       originalUrl: string;
+      expiredJwt: ConventionJwt;
+    }
+  | {
+      kind: "conventionFromShortLink";
+      shortLinkId: ShortLinkId;
       expiredJwt: ConventionJwt;
     }
   | {

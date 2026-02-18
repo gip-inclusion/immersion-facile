@@ -193,7 +193,8 @@ const sendSms = async ({
 
   const shortLink = await makeShortMagicLink({
     targetRoute: frontRoutes.assessment,
-    lifetime: "short",
+    lifetime: "2Days",
+    singleUse: true,
     extraQueryParams: { mtm_source: "sms-assessment-link" },
   });
 

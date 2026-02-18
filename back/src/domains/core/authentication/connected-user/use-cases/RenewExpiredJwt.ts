@@ -11,6 +11,7 @@ import {
   type OAuthState,
   type RenewExpiredJwtRequestDto,
   renewExpiredJwtRequestSchema,
+  type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../../../config/bootstrap/authMiddleware";
@@ -85,6 +86,13 @@ export class RenewExpiredJwt extends TransactionalUseCase<
   }
 
   protected async _execute(input: RenewExpiredJwtRequestDto, uow: UnitOfWork) {
+    if (input.kind === "conventionFromShortLink")
+      return this.#onConventionFromShortLink(
+        uow,
+        input.shortLinkId,
+        input.expiredJwt,
+      );
+
     const appSupportedJwtPayload = extractJwtPayloadFromExpiredJwt(
       this.#config,
       input.expiredJwt,
@@ -106,6 +114,25 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       return this.#onConnectedUserDomainJwtPayload(uow, appSupportedJwtPayload);
 
     throw errors.user.unsupportedJwtPayload();
+  }
+
+  async #onConventionFromShortLink(
+    uow: UnitOfWork,
+    shortLinkId: ShortLinkId,
+    expiredJwt: string,
+  ): Promise<void> {
+    const shortLink = await uow.shortLinkQuery.getById(shortLinkId);
+    const appSupportedJwtPayload = extractJwtPayloadFromExpiredJwt(
+      this.#config,
+      expiredJwt,
+    );
+    if (!("applicationId" in appSupportedJwtPayload))
+      throw errors.user.unsupportedJwtPayload();
+    return this.onConventionDomainJwtPayload(
+      uow,
+      appSupportedJwtPayload,
+      shortLink.url,
+    );
   }
 
   async #onEmailAuthCodeDomainJwtPayload(
@@ -206,6 +233,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       magicLink: await makeConventionMagicShortLink({
         targetRoute: this.#findRouteToRenew(originalUrl),
         lifetime: "short",
+        singleUse: false,
       }),
       conventionId: convention.id,
     });

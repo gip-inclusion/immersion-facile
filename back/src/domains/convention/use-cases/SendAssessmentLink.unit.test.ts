@@ -473,14 +473,19 @@ describe("SendAssessmentLink", () => {
       );
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkId]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.establishmentTutor.role,
-          email: convention.establishmentTutor.email,
-          now: timeGateway.now(),
-          targetRoute: frontRoutes.assessment,
-          extraQueryParams: { mtm_source: "sms-assessment-link" },
-        }),
+        [shortLinkId]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.establishmentTutor.role,
+            email: convention.establishmentTutor.email,
+            now: timeGateway.now(),
+            targetRoute: frontRoutes.assessment,
+            lifetime: "2Days",
+            extraQueryParams: { mtm_source: "sms-assessment-link" },
+          }),
+          singleUse: true,
+          lastUsedAt: null,
+        },
       });
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [

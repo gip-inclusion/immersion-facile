@@ -187,28 +187,36 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       const expectedShorlinks = actorsWithShortlinks.reduce(
         (acc, actor) => ({
           ...acc,
-          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentative.id,
-            role: actor.role,
-            email: actor.email,
-            now: timeGateway.now(),
-            expOverride:
-              timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-            targetRoute: frontRoutes.conventionDocument,
-            lifetime: "long",
-          }),
+          [actor.conventionShortlinkId]: {
+            url: fakeGenerateMagicLinkUrlFn({
+              id: validConventionWithSameTutorAndRepresentative.id,
+              role: actor.role,
+              email: actor.email,
+              now: timeGateway.now(),
+              expOverride:
+                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+              targetRoute: frontRoutes.conventionDocument,
+              lifetime: "short",
+            }),
+            singleUse: false,
+            lastUsedAt: null,
+          },
           ...(actor.assessmentCreationLinkId
             ? {
-                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentative.id,
-                  role: actor.role,
-                  email: actor.email,
-                  now: timeGateway.now(),
-                  expOverride:
-                    timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                  targetRoute: frontRoutes.assessment,
-                  lifetime: "long",
-                }),
+                [actor.assessmentCreationLinkId]: {
+                  url: fakeGenerateMagicLinkUrlFn({
+                    id: validConventionWithSameTutorAndRepresentative.id,
+                    role: actor.role,
+                    email: actor.email,
+                    now: timeGateway.now(),
+                    expOverride:
+                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                    targetRoute: frontRoutes.assessment,
+                    lifetime: "2Days",
+                  }),
+                  singleUse: true,
+                  lastUsedAt: null,
+                },
               }
             : {}),
         }),
@@ -304,28 +312,36 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
-          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentative.id,
-            role: actor.role,
-            email: actor.email,
-            now: timeGateway.now(),
-            expOverride:
-              timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-            targetRoute: frontRoutes.conventionDocument,
-            lifetime: "long",
-          }),
+          [actor.conventionShortlinkId]: {
+            url: fakeGenerateMagicLinkUrlFn({
+              id: validConventionWithSameTutorAndRepresentative.id,
+              role: actor.role,
+              email: actor.email,
+              now: timeGateway.now(),
+              expOverride:
+                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+              targetRoute: frontRoutes.conventionDocument,
+              lifetime: "short",
+            }),
+            singleUse: false,
+            lastUsedAt: null,
+          },
           ...(actor.assessmentCreationLinkId
             ? {
-                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentative.id,
-                  role: actor.role,
-                  email: actor.email,
-                  now: timeGateway.now(),
-                  expOverride:
-                    timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                  targetRoute: frontRoutes.assessment,
-                  lifetime: "long",
-                }),
+                [actor.assessmentCreationLinkId]: {
+                  url: fakeGenerateMagicLinkUrlFn({
+                    id: validConventionWithSameTutorAndRepresentative.id,
+                    role: actor.role,
+                    email: actor.email,
+                    now: timeGateway.now(),
+                    expOverride:
+                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                    targetRoute: frontRoutes.assessment,
+                    lifetime: "2Days",
+                  }),
+                  singleUse: true,
+                  lastUsedAt: null,
+                },
               }
             : {}),
         }),
@@ -421,28 +437,36 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
-          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentative.id,
-            role: actor.role,
-            email: actor.email,
-            now: timeGateway.now(),
-            expOverride:
-              timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-            targetRoute: frontRoutes.conventionDocument,
-            lifetime: "long",
-          }),
+          [actor.conventionShortlinkId]: {
+            url: fakeGenerateMagicLinkUrlFn({
+              id: validConventionWithSameTutorAndRepresentative.id,
+              role: actor.role,
+              email: actor.email,
+              now: timeGateway.now(),
+              expOverride:
+                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+              targetRoute: frontRoutes.conventionDocument,
+              lifetime: "short",
+            }),
+            singleUse: false,
+            lastUsedAt: null,
+          },
           ...(actor.assessmentCreationLinkId
             ? {
-                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentative.id,
-                  role: actor.role,
-                  email: actor.email,
-                  now: timeGateway.now(),
-                  expOverride:
-                    timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                  targetRoute: frontRoutes.assessment,
-                  lifetime: "long",
-                }),
+                [actor.assessmentCreationLinkId]: {
+                  url: fakeGenerateMagicLinkUrlFn({
+                    id: validConventionWithSameTutorAndRepresentative.id,
+                    role: actor.role,
+                    email: actor.email,
+                    now: timeGateway.now(),
+                    expOverride:
+                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                    targetRoute: frontRoutes.assessment,
+                    lifetime: "2Days",
+                  }),
+                  singleUse: true,
+                  lastUsedAt: null,
+                },
               }
             : {}),
         }),
@@ -538,28 +562,36 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
-          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
-            role: actor.role,
-            email: actor.email,
-            now: timeGateway.now(),
-            expOverride:
-              timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-            targetRoute: frontRoutes.conventionDocument,
-            lifetime: "long",
-          }),
+          [actor.conventionShortlinkId]: {
+            url: fakeGenerateMagicLinkUrlFn({
+              id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
+              role: actor.role,
+              email: actor.email,
+              now: timeGateway.now(),
+              expOverride:
+                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+              targetRoute: frontRoutes.conventionDocument,
+              lifetime: "short",
+            }),
+            singleUse: false,
+            lastUsedAt: null,
+          },
           ...(actor.assessmentCreationLinkId
             ? {
-                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
-                  role: actor.role,
-                  email: actor.email,
-                  now: timeGateway.now(),
-                  expOverride:
-                    timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                  targetRoute: frontRoutes.assessment,
-                  lifetime: "long",
-                }),
+                [actor.assessmentCreationLinkId]: {
+                  url: fakeGenerateMagicLinkUrlFn({
+                    id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
+                    role: actor.role,
+                    email: actor.email,
+                    now: timeGateway.now(),
+                    expOverride:
+                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                    targetRoute: frontRoutes.assessment,
+                    lifetime: "2Days",
+                  }),
+                  singleUse: true,
+                  lastUsedAt: null,
+                },
               }
             : {}),
         }),
@@ -665,28 +697,36 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
-          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentative.id,
-            role: actor.role,
-            email: actor.email,
-            now: timeGateway.now(),
-            expOverride:
-              timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-            targetRoute: frontRoutes.conventionDocument,
-            lifetime: "long",
-          }),
+          [actor.conventionShortlinkId]: {
+            url: fakeGenerateMagicLinkUrlFn({
+              id: validConventionWithSameTutorAndRepresentative.id,
+              role: actor.role,
+              email: actor.email,
+              now: timeGateway.now(),
+              expOverride:
+                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+              targetRoute: frontRoutes.conventionDocument,
+              lifetime: "short",
+            }),
+            singleUse: false,
+            lastUsedAt: null,
+          },
           ...(actor.assessmentCreationLinkId
             ? {
-                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentative.id,
-                  role: actor.role,
-                  email: actor.email,
-                  now: timeGateway.now(),
-                  expOverride:
-                    timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                  targetRoute: frontRoutes.assessment,
-                  lifetime: "long",
-                }),
+                [actor.assessmentCreationLinkId]: {
+                  url: fakeGenerateMagicLinkUrlFn({
+                    id: validConventionWithSameTutorAndRepresentative.id,
+                    role: actor.role,
+                    email: actor.email,
+                    now: timeGateway.now(),
+                    expOverride:
+                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                    targetRoute: frontRoutes.assessment,
+                    lifetime: "2Days",
+                  }),
+                  singleUse: true,
+                  lastUsedAt: null,
+                },
               }
             : {}),
         }),
@@ -780,28 +820,36 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       const expectedShorlinks = actorsWithShortlinks.reduce(
         (a, actor) => ({
           ...a,
-          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentative.id,
-            role: actor.role,
-            email: actor.email,
-            now: timeGateway.now(),
-            expOverride:
-              timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-            targetRoute: frontRoutes.conventionDocument,
-            lifetime: "long",
-          }),
+          [actor.conventionShortlinkId]: {
+            url: fakeGenerateMagicLinkUrlFn({
+              id: validConventionWithSameTutorAndRepresentative.id,
+              role: actor.role,
+              email: actor.email,
+              now: timeGateway.now(),
+              expOverride:
+                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+              targetRoute: frontRoutes.conventionDocument,
+              lifetime: "short",
+            }),
+            singleUse: false,
+            lastUsedAt: null,
+          },
           ...(actor.assessmentCreationLinkId
             ? {
-                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentative.id,
-                  role: actor.role,
-                  email: actor.email,
-                  now: timeGateway.now(),
-                  expOverride:
-                    timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                  targetRoute: frontRoutes.assessment,
-                  lifetime: "long",
-                }),
+                [actor.assessmentCreationLinkId]: {
+                  url: fakeGenerateMagicLinkUrlFn({
+                    id: validConventionWithSameTutorAndRepresentative.id,
+                    role: actor.role,
+                    email: actor.email,
+                    now: timeGateway.now(),
+                    expOverride:
+                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                    targetRoute: frontRoutes.assessment,
+                    lifetime: "2Days",
+                  }),
+                  singleUse: true,
+                  lastUsedAt: null,
+                },
               }
             : {}),
         }),

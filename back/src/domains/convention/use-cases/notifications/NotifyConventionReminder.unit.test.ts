@@ -376,20 +376,28 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
       //Assert
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.beneficiary.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.beneficiary.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.establishmentRepresentative.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.establishmentRepresentative.email,
-          now: timeGateway.now(),
-        }),
+        [shortLinkIds[0]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
+        [shortLinkIds[1]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
       });
 
       expectSavedNotificationsBatchAndEvent({
@@ -443,27 +451,39 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
       //Assert
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.beneficiary.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.beneficiary.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.establishmentRepresentative.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.establishmentRepresentative.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.establishmentRepresentative.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.establishmentRepresentative.email,
-          now: timeGateway.now(),
-        }),
+        [shortLinkIds[0]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
+        [shortLinkIds[1]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
+        [shortLinkIds[2]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
       });
 
       expectSavedNotificationsBatchAndEvent({
@@ -638,27 +658,39 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
       //Assert
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.beneficiary.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.beneficiary.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.establishmentRepresentative.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.establishmentRepresentative.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.beneficiary.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.beneficiary.email,
-          now: timeGateway.now(),
-        }),
+        [shortLinkIds[0]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
+        [shortLinkIds[1]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
+        [shortLinkIds[2]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+          singleUse: false,
+          lastUsedAt: null,
+        },
       });
 
       expectSavedNotificationsBatchAndEvent({

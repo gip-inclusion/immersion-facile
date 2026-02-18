@@ -316,8 +316,15 @@ export const authEpics = [
 
 const makeExpiredJwtParams = (
   jwtValidator: JwtValidator,
-  { expiredJwt, originalUrl, state }: RenewJwtPayload,
+  { expiredJwt, originalUrl, shortLinkId, state }: RenewJwtPayload,
 ): RenewExpiredJwtRequestDto => {
+  if (shortLinkId)
+    return {
+      kind: "conventionFromShortLink",
+      shortLinkId,
+      expiredJwt: expiredJwt as ConventionJwt,
+    };
+
   const jwtPayload = jwtValidator.decodeJwt(expiredJwt);
   if ("userId" in jwtPayload)
     return {

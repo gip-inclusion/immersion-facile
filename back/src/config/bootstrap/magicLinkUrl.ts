@@ -27,6 +27,8 @@ export type GenerateConventionMagicLinkUrl = ReturnType<
   typeof makeGenerateConventionMagicLinkUrl
 >;
 
+export type ConventionMagicLinkLifetime = "short" | "long" | "2Days";
+
 export const makeGenerateConventionMagicLinkUrl =
   (config: AppConfig, generateConventionJwt: GenerateConventionJwt) =>
   ({
@@ -40,15 +42,18 @@ export const makeGenerateConventionMagicLinkUrl =
   > & {
     extraQueryParams?: Record<string, string>;
     targetRoute: string;
-    lifetime?: "short" | "long";
+    lifetime?: ConventionMagicLinkLifetime;
   }): AbsoluteUrl => {
+    const durationDaysByLifetime = {
+      "2Days": config.conventionJwtTwoDaysDuration,
+      short: config.conventionJwtShortDurationInDays,
+      long: config.conventionJwtLongDurationInDays,
+    };
+
     const jwt = generateConventionJwt(
       createConventionMagicLinkPayload({
         ...jwtPayload,
-        durationDays:
-          lifetime === "short"
-            ? config.conventionJwtShortDurationInDays
-            : config.conventionJwtLongDurationInDays,
+        durationDays: durationDaysByLifetime[lifetime],
       }),
     );
 

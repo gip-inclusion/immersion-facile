@@ -83,26 +83,36 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
       await useCase.execute({ convention });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinks[0]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.beneficiary.role,
-          email: convention.signatories.beneficiary.email,
-          now: timeGateway.now(),
-          targetRoute: frontRoutes.conventionToSign,
-          extraQueryParams: {
-            mtm_source: "email-signature-link-after-modification",
-          },
-        }),
-        [shortLinks[1]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.establishmentRepresentative.role,
-          email: convention.signatories.establishmentRepresentative.email,
-          now: timeGateway.now(),
-          targetRoute: frontRoutes.conventionToSign,
-          extraQueryParams: {
-            mtm_source: "email-signature-link-after-modification",
-          },
-        }),
+        [shortLinks[0]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+            targetRoute: frontRoutes.conventionToSign,
+            lifetime: "2Days",
+            extraQueryParams: {
+              mtm_source: "email-signature-link-after-modification",
+            },
+          }),
+          singleUse: true,
+          lastUsedAt: null,
+        },
+        [shortLinks[1]]: {
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+            targetRoute: frontRoutes.conventionToSign,
+            lifetime: "2Days",
+            extraQueryParams: {
+              mtm_source: "email-signature-link-after-modification",
+            },
+          }),
+          singleUse: true,
+          lastUsedAt: null,
+        },
       });
 
       expectSavedNotificationsAndEvents({

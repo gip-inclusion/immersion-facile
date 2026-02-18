@@ -60,6 +60,7 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareConven
         `${this.#config.immersionFacileBaseUrl}/${params.conventionDraft.internshipKind === "immersion" ? frontRoutes.conventionImmersionRoute : frontRoutes.conventionMiniStageRoute}?conventionDraftId=${params.conventionDraft.id}` as AbsoluteUrl,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       config: this.#config,
+      singleUse: false,
     });
 
     await this.#saveNotificationAndRelatedEvent(uow, {

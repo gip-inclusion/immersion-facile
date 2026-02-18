@@ -7,6 +7,7 @@ import {
   queryParamsAsString,
 } from "shared";
 import type {
+  ConventionMagicLinkLifetime,
   EmailAuthCodeUrlQueryParams,
   GenerateConnectedUserLoginUrl,
   GenerateConventionMagicLinkUrl,
@@ -32,7 +33,7 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
 }: CreateConventionMagicLinkPayloadProperties & {
   extraQueryParams?: Record<string, string>;
   targetRoute: string;
-  lifetime?: "short" | "long";
+  lifetime?: ConventionMagicLinkLifetime;
 }) => {
   const fakeJwt = [id, role, now.toISOString(), email, lifetime]
     .filter(filterNotFalsy)

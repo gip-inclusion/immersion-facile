@@ -163,7 +163,8 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
           }),
         conventionSignShortlink: await makeMagicShortLink({
           targetRoute: frontRoutes.conventionToSign,
-          lifetime: "short",
+          lifetime: "2Days",
+          singleUse: true,
           extraQueryParams: {
             mtm_source: "email-signature-link",
           },
