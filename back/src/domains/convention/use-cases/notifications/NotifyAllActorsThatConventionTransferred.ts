@@ -212,7 +212,7 @@ const sendSignatoriesEmail = (
 
     const shortLink = await makeShortMagicLink({
       targetRoute: frontRoutes.manageConvention,
-      lifetime: "short",
+      lifetime: "1Month",
       singleUse: false,
     });
 

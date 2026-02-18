@@ -55,7 +55,7 @@ export const makeNotifyBeneficiaryThatAssessmentIsCreated = useCaseBuilder(
             role: "beneficiary",
             targetRoute: frontRoutes.assessmentDocument,
             now: today,
-            lifetime: "short",
+            lifetime: "1Month",
           }),
         },
       },

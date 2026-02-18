@@ -108,7 +108,7 @@ describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {
                 role: "beneficiary",
                 targetRoute: frontRoutes.assessmentDocument,
                 now: today,
-                lifetime: "short",
+                lifetime: "1Month",
               }),
             },
             recipients: [convention.signatories.beneficiary.email],

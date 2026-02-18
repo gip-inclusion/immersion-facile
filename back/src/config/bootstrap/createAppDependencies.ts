@@ -64,7 +64,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateConventionJwt: GenerateConventionJwt =
     makeGenerateJwtES256<"convention">(
       config.jwtPrivateKey,
-      config.conventionJwtShortDurationInDays * oneDayInSecond,
+      config.conventionJwt1MonthDurationInDays * oneDayInSecond,
     );
 
   const generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt =

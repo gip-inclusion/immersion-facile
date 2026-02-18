@@ -143,7 +143,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         magicLinkUrl: isSignatoryRole(role)
           ? await makeShortMagicLink({
               targetRoute: frontRoutes.conventionToSign,
-              lifetime: "short",
+              lifetime: "1Month",
               singleUse: false,
             })
           : undefined,
@@ -267,7 +267,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     const shortLink = await makeShortMagicLink({
       targetRoute: frontRoutes.conventionToSign,
-      lifetime: "short",
+      lifetime: "1Month",
       singleUse: false,
     });
 

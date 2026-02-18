@@ -273,12 +273,8 @@ export class AppConfig {
       : `https://${this.immersionFacileDomain}`;
   }
 
-  public get conventionJwtShortDurationInDays(): number {
+  public get conventionJwt1MonthDurationInDays(): number {
     return 31; // 1 month
-  }
-
-  public get conventionJwtLongDurationInDays(): number {
-    return 31 * 6; // 6 months
   }
 
   public get conventionJwtTwoDaysDuration(): number {

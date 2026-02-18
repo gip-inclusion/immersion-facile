@@ -232,7 +232,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       internshipKind: convention.internshipKind,
       magicLink: await makeConventionMagicShortLink({
         targetRoute: this.#findRouteToRenew(originalUrl),
-        lifetime: "short",
+        lifetime: "1Month",
         singleUse: false,
       }),
       conventionId: convention.id,
