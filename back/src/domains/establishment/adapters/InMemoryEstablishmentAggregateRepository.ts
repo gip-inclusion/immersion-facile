@@ -318,7 +318,10 @@ export class InMemoryEstablishmentAggregateRepository
       .slice(0, maxResults);
   }
 
-  public async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
+  public async updateEstablishmentAggregate(
+    aggregate: EstablishmentAggregate,
+    updatedAt: Date,
+  ) {
     const aggregateIndex = this.#establishmentAggregates.findIndex(
       pathEq("establishment.siret", aggregate.establishment.siret),
     );
@@ -329,7 +332,10 @@ export class InMemoryEstablishmentAggregateRepository
     this.#establishmentAggregates = replaceArrayElement(
       this.#establishmentAggregates,
       aggregateIndex,
-      aggregate,
+      {
+        ...aggregate,
+        establishment: { ...aggregate.establishment, updatedAt },
+      },
     );
   }
 

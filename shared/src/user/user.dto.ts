@@ -15,9 +15,11 @@ import type { DateTimeIsoString } from "../utils/date";
 
 export type UserId = Flavor<string, "UserId">;
 
-export type WithOptionalUserId = {
-  userId?: UserId;
+export type WithUserId = {
+  userId: UserId;
 };
+
+export type WithOptionalUserId = Partial<WithUserId>;
 
 export type User = {
   id: UserId;

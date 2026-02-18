@@ -635,6 +635,7 @@ describe("ContactEstablishment", () => {
           [
             new EstablishmentAggregateBuilder(establishmentAggregate)
               .withIsMaxDiscussionsForPeriodReached(true)
+              .withEstablishmentUpdatedAt(timeGateway.now())
               .build(),
           ],
         );
@@ -703,6 +704,7 @@ describe("ContactEstablishment", () => {
           uow.establishmentAggregateRepository.establishmentAggregates,
           [
             new EstablishmentAggregateBuilder(establishmentAggregate)
+              .withEstablishmentUpdatedAt(timeGateway.now())
               .withIsMaxDiscussionsForPeriodReached(true)
               .build(),
           ],
