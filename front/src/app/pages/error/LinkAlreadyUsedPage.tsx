@@ -8,7 +8,7 @@ import { RenewExpiredJwtButton } from "../../components/auth/RenewExpiredJwtButt
 
 const linkAlreadyUsedTitle = "Ce lien a déjà été utilisé";
 const linkAlreadyUsedDescription =
-  "Ce lien de signature ne peut être utilisé qu'une seule fois. Si vous le souhaitez, vous pouvez demander un nouveau lien.";
+  "Ce lien ne peut être utilisé qu'une seule fois. Si vous le souhaitez, vous pouvez demander un nouveau lien.";
 
 export const LinkAlreadyUsedPage = ({
   shortLinkId,
