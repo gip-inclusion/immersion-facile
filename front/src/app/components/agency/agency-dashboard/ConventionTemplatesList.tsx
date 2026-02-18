@@ -4,7 +4,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { HeadingSection, Loader, Task } from "react-design-system";
+import { HeadingSection, InfoSection, Loader, Task } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -170,20 +170,29 @@ export const ConventionTemplatesList = ({
           className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-1w")}
         >
           {conventionTemplates.length === 0 && (
-            <div className={fr.cx("fr-col-12")}>
-              <p>Vous n’avez pas encore de modèle de convention.</p>
-              <p>
-                Les modèles vous permettent de gagner du temps lorsque vous
-                devez préparer plusieurs immersions similaires (job dating avec
-                une même entreprise, plusieurs immersions pour un même candidat,
-                etc.)
-              </p>
-              <p>
-                Créez votre premier modèle pour pré-remplir automatiquement les
-                informations qui reviennent souvent, et partagez-le facilement
-                avec les personnes en immersion ou les entreprises.
-              </p>
-            </div>
+            <InfoSection
+              className={fr.cx("fr-px-2w", "fr-pt-2w", "fr-pb-0")}
+              description={
+                <>
+                  <p>
+                    <strong>
+                      Vous n’avez pas encore de modèle de convention.
+                    </strong>
+                  </p>
+                  <p>
+                    Les modèles vous permettent de gagner du temps lorsque vous
+                    devez préparer plusieurs immersions similaires (job dating,
+                    plusieurs immersions pour un même candidat ou un même
+                    métier, etc.)
+                  </p>
+                  <p>
+                    Créez votre premier modèle pour pré-remplir automatiquement
+                    les informations qui reviennent souvent, et partagez-le
+                    facilement avec les autres parties concernées.
+                  </p>
+                </>
+              }
+            />
           )}
           {conventionTemplates.map((template) => (
             <div
