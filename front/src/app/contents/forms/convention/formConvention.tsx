@@ -37,6 +37,7 @@ const {
 export const formConventionFieldsLabels: (
   internshipKind: InternshipKind,
 ) => FormConventionFieldsLabels = (internshipKind) => ({
+  ...conventionTemplateSection(),
   ...conventionSection(internshipKind),
   ...beneficiarySection(internshipKind),
   ...beneficiaryRepresentativeSection(internshipKind),
@@ -48,6 +49,14 @@ export const formConventionFieldsLabels: (
   // TODO: exclude these fields from typing
   //
   ...fieldsToExclude,
+});
+
+const conventionTemplateSection = () => ({
+  name: {
+    label: "Nom du modèle",
+    id: domElementIds.agencyDashboardConventionTemplate.form.nameInput,
+    required: true,
+  },
 });
 
 const conventionSection = (internshipKind: InternshipKind) => ({
