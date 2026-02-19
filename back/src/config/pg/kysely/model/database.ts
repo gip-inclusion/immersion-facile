@@ -809,6 +809,9 @@ interface ImmersionAssessments {
   contract_start_date: Timestamp | null;
   establishment_advices: string | null;
   establishment_feedback: string;
+  beneficiary_agreement: boolean | null;
+  beneficiary_feedback: string | null;
+  signed_at: Timestamp | null;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
 }
