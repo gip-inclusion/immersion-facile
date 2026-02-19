@@ -93,6 +93,7 @@ import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import {
   conventionPresentationFromConventionDraft,
   getConventionInitialValuesFromUrl,
+  getEmptyConventionInitialValues,
   makeConventionPresentationFromConventionTemplate,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
@@ -145,6 +146,10 @@ export const ConventionForm = ({
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const route = useRoute() as SupportedConventionRoutes;
+  const fromPeConnectedUser =
+    "fromPeConnectedUser" in route.params
+      ? route.params.fromPeConnectedUser
+      : undefined;
 
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
@@ -175,10 +180,9 @@ export const ConventionForm = ({
   );
   const conventionInitialValuesFromUrl = useMemo(
     () =>
-      getConventionInitialValuesFromUrl({
-        route,
-        internshipKind,
-      }),
+      route.name !== "agencyDashboardConventionTemplate"
+        ? getConventionInitialValuesFromUrl({ route, internshipKind })
+        : getEmptyConventionInitialValues(internshipKind),
     [internshipKind, route],
   );
   const acquisitionParams = useGetAcquisitionParams();
@@ -293,11 +297,11 @@ export const ConventionForm = ({
       isCreateConventionPresentationInitialValues(conventionValues)
         ? {
             ...conventionValues,
-            fromPeConnectedUser: route.params.fromPeConnectedUser,
+            fromPeConnectedUser,
           }
         : {
             ...initialValues,
-            fromPeConnectedUser: route.params.fromPeConnectedUser,
+            fromPeConnectedUser,
           },
     ),
   );
@@ -755,7 +759,7 @@ export const ConventionForm = ({
                     internshipKind={conventionValues.internshipKind}
                     emailValidationErrors={emailValidationErrors}
                     setEmailValidationErrors={setEmailValidationErrors}
-                    fromPeConnectedUser={route.params.fromPeConnectedUser}
+                    fromPeConnectedUser={fromPeConnectedUser}
                   />
                 </Accordion>
                 <Accordion

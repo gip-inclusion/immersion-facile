@@ -68,6 +68,19 @@ export const getConventionInitialValuesFromUrl = ({
     : initialFormWithStoredAndUrlParams;
 };
 
+export const getEmptyConventionInitialValues = (
+  internshipKind: InternshipKind,
+): CreateConventionPresentationInitialValues => {
+  const initialForm: CreateConventionPresentationInitialValues = {
+    ...conventionPresentationFromUrlParams({}),
+    status: "READY_TO_SIGN",
+    dateSubmission: toDateUTCString(new Date()),
+    internshipKind,
+  };
+
+  return ENV.prefilledForms ? withDevPrefilledValues(initialForm) : initialForm;
+};
+
 const withDevPrefilledValues = (
   emptyForm: CreateConventionPresentationInitialValues,
 ): CreateConventionPresentationInitialValues => {
