@@ -13,10 +13,14 @@ import { conventionTemplateSelectors } from "src/core-logic/domain/convention-te
 import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
 import type { Route } from "type-route";
 
+export type ConventionTemplatePageRoute = Route<
+  typeof routes.agencyDashboardConventionTemplate
+>;
+
 export const ConventionTemplatePage = ({
   route,
 }: {
-  route: Route<typeof routes.agencyDashboardConventionTemplate>;
+  route: ConventionTemplatePageRoute;
 }) => {
   const { fromRoute, conventionTemplateId } = route.params;
   const dispatch = useDispatch();

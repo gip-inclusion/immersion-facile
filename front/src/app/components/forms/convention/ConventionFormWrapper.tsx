@@ -38,6 +38,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
+import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
@@ -80,7 +81,8 @@ type ConventionFormWrapperProps = {
 export type SupportedConventionRoutes =
   | ConventionImmersionPageRoute
   | ConventionMiniStagePageRoute
-  | ConventionImmersionForExternalsRoute;
+  | ConventionImmersionForExternalsRoute
+  | ConventionTemplatePageRoute;
 
 export const ConventionFormWrapper = ({
   internshipKind,
@@ -88,6 +90,11 @@ export const ConventionFormWrapper = ({
 }: ConventionFormWrapperProps) => {
   const showSummary = useAppSelector(conventionSelectors.showSummary);
   const route = useRoute() as SupportedConventionRoutes;
+  const routeJwt = "jwt" in route.params ? route.params.jwt : undefined;
+  const routeConventionDraftId =
+    "conventionDraftId" in route.params
+      ? route.params.conventionDraftId
+      : undefined;
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const dispatch = useDispatch();
   const conventionFormFeedback = useFeedbackTopic("convention-form");
@@ -134,7 +141,7 @@ export const ConventionFormWrapper = ({
   );
   const conventionDraftId =
     outOfReduxDependencies.localDeviceRepository.get("conventionDraftId") ??
-    route.params.conventionDraftId;
+    routeConventionDraftId;
 
   useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
 
@@ -146,12 +153,10 @@ export const ConventionFormWrapper = ({
           feedbackTopic: "convention-draft",
         }),
       );
-    } else if (mode === "edit-convention" && route.params.jwt) {
-      dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
+    } else if (mode === "edit-convention" && routeJwt) {
+      dispatch(conventionSlice.actions.jwtProvided(routeJwt));
       const { applicationId } =
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-          route.params.jwt,
-        );
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(routeJwt);
 
       const conventionIdInRouteParams =
         "conventionId" in route.params ? route.params.conventionId : undefined;
@@ -160,20 +165,18 @@ export const ConventionFormWrapper = ({
 
       dispatch(
         conventionSlice.actions.fetchConventionRequested({
-          jwt: route.params.jwt,
+          jwt: routeJwt,
           conventionId,
           feedbackTopic: "unused",
         }),
       );
     }
-  }, [dispatch, mode, route.params, conventionDraftId]);
+  }, [dispatch, mode, routeJwt, route.params, conventionDraftId]);
 
   useEffect(() => {
-    if (route.params.jwt) {
+    if (routeJwt) {
       const { role: roleFromJwt } =
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-          route.params.jwt,
-        );
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(routeJwt);
 
       const roles: Role[] = roleFromJwt
         ? [roleFromJwt]
@@ -187,7 +190,7 @@ export const ConventionFormWrapper = ({
         );
       }
     }
-  }, [dispatch, route.params.jwt, userRolesForFetchedConvention]);
+  }, [dispatch, routeJwt, userRolesForFetchedConvention]);
 
   useEffect(() => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
@@ -208,9 +211,9 @@ export const ConventionFormWrapper = ({
     fetchedConvention,
   });
 
-  if (route.params.conventionDraftId && fetchConventionDraftError) {
+  if (routeConventionDraftId && fetchConventionDraftError) {
     throw errors.conventionDraft.notFound({
-      conventionDraftId: route.params.conventionDraftId,
+      conventionDraftId: routeConventionDraftId,
     });
   }
 
@@ -221,15 +224,15 @@ export const ConventionFormWrapper = ({
         showSummary,
         formSuccessfullySubmitted,
         isUpdateMode: mode === "edit-convention",
-        shouldRedirectToError: !!(route.params.jwt && fetchConventionError),
+        shouldRedirectToError: !!(routeJwt && fetchConventionError),
         hasAllowedRoleToEditConvention:
           mode === "edit-convention" &&
-          route.params.jwt &&
+          routeJwt &&
           fetchedConvention &&
           hasAllowedRolesToEditConvention(userRolesOnConvention),
         conventionCantBeEdited:
           mode === "edit-convention" &&
-          route.params.jwt &&
+          routeJwt &&
           fetchedConvention &&
           !conventionStatusesAllowedForModification.includes(
             fetchedConvention?.status,
@@ -238,7 +241,7 @@ export const ConventionFormWrapper = ({
         hasConventionUpdateConflict,
         conventionCantBeEditedAfterAcceptanceByCounsellor:
           mode === "edit-convention" &&
-          route.params.jwt &&
+          routeJwt &&
           fetchedConvention &&
           fetchedConvention?.status === "ACCEPTED_BY_COUNSELLOR" &&
           fetchedConvention?.agencyRefersTo &&
@@ -352,10 +355,10 @@ export const ConventionFormWrapper = ({
         )
         .with({ shouldRedirectToError: true }, () => (
           <>
-            {route.params.jwt && fetchConventionError && (
+            {routeJwt && fetchConventionError && (
               <ShowConventionErrorOrRenewExpiredJwt
                 errorMessage={conventionFormFeedback?.message}
-                jwt={route.params.jwt}
+                jwt={routeJwt}
               />
             )}
           </>
