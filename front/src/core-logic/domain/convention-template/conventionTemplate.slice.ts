@@ -38,11 +38,17 @@ export const conventionTemplateSlice = createSlice({
     },
     createOrUpdateConventionTemplateSucceeded: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{
+      action: PayloadActionWithFeedbackTopic<{
         conventionTemplate: ConventionTemplate;
       }>,
     ) => {
       state.isLoading = false;
+      state.conventionTemplates = [
+        ...state.conventionTemplates.filter(
+          (t) => t.id !== action.payload.conventionTemplate.id,
+        ),
+        action.payload.conventionTemplate,
+      ];
     },
     createOrUpdateConventionTemplateFailed: (
       state,

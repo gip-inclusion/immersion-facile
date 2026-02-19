@@ -21,6 +21,7 @@ import {
   ConventionFormSidebar,
   ErrorNotifications,
   Loader,
+  useScrollToTop,
 } from "react-design-system";
 import {
   FormProvider,
@@ -82,6 +83,7 @@ import {
 } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import {
   displayReadableError,
   getFormContents,
@@ -97,7 +99,7 @@ import {
   makeConventionPresentationFromConventionTemplate,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
-import { useRoute } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
@@ -231,6 +233,8 @@ export const ConventionForm = ({
       ),
     [fetchedConventionTemplate],
   );
+
+  const conventionTemplateFeedback = useFeedbackTopic("convention-template");
 
   const isTemplateForm =
     ["create-convention-template", "edit-convention-template"].includes(mode) &&
@@ -388,6 +392,18 @@ export const ConventionForm = ({
         },
       ),
     );
+
+    if (mode === "create-convention-template") {
+      routes
+        .agencyDashboardConventionTemplate({
+          fromRoute:
+            "fromRoute" in route.params
+              ? route.params.fromRoute
+              : "agencyDashboard",
+          conventionTemplateId: conventionToSave.id,
+        })
+        .replace();
+    }
   };
 
   const onSubmit: SubmitHandler<ConventionFormInitialValues> = (convention) => {
@@ -549,6 +565,8 @@ export const ConventionForm = ({
       status: "READY_TO_SIGN",
     });
   }
+
+  useScrollToTop(!!conventionTemplateFeedback);
 
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { errors } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ErrorPageContent } from "src/app/pages/error/ErrorPageContent";
@@ -70,6 +71,10 @@ export const ConventionTemplatePage = ({
   return (
     <>
       <Button {...backButtonProps} />
+      <Feedback
+        topics={["convention-template"]}
+        className={fr.cx("fr-mb-2w")}
+      />
       <h1>
         {fetchedConventionTemplate?.name
           ? "Modifier un modèle de convention"

@@ -63,7 +63,7 @@ describe("ConventionTemplate slice", () => {
 
     expectToEqual(store.getState().conventionTemplate, {
       isLoading: false,
-      conventionTemplates: [],
+      conventionTemplates: [conventionTemplate],
     });
 
     expectToEqual(
