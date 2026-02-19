@@ -216,7 +216,7 @@ const getPageByRouteName: {
       <AgencyDashboardPage route={route} />
     </DashboardPrivateRoute>
   ),
-  agencyDashboardConventionTemplate: (route) => (
+  conventionTemplate: (route) => (
     <DashboardPrivateRoute route={route}>
       <ConventionTemplatePage route={route} />
     </DashboardPrivateRoute>

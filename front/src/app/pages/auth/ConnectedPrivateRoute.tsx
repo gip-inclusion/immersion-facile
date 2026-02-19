@@ -29,6 +29,7 @@ import {
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
+import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
 import { routes, useRoute } from "src/app/routes/routes";
 import {
   commonIllustrations,
@@ -69,7 +70,6 @@ export const agencyDashboardRoutes = [
   "agencyDashboardOnboarding",
   "agencyDashboardStatsAgencies",
   "agencyDashboardStatsActivitiesByEstablishment",
-  "agencyDashboardConventionTemplate",
 ] satisfies AgencyDashboardRouteName[];
 
 export type EstablishmentDashboardRouteName =
@@ -97,12 +97,12 @@ export type FrontAgencyDashboardRoute =
   | Route<typeof routes.agencyDashboardAgencies>
   | Route<typeof routes.agencyDashboardAgencyDetails>
   | Route<typeof routes.agencyDashboardStatsAgencies>
-  | Route<typeof routes.agencyDashboardStatsActivitiesByEstablishment>
-  | Route<typeof routes.agencyDashboardConventionTemplate>;
+  | Route<typeof routes.agencyDashboardStatsActivitiesByEstablishment>;
 
 export type FrontDashboardRoute =
   | FrontAgencyDashboardRoute
-  | FrontEstablishmentDashboardRoute;
+  | FrontEstablishmentDashboardRoute
+  | ConventionTemplatePageRoute;
 
 type ConnectPrivateRoute =
   | FrontAdminRoute
@@ -398,6 +398,13 @@ const agencyDashboardContent: PageContent = {
   ],
 };
 
+const defaultPageContent: PageContent = {
+  title: "Se connecter avec ProConnect",
+  description:
+    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
+  illustration: loginIllustration,
+};
+
 const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
   {
     establishment: {
@@ -487,14 +494,9 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       description: "Pour la super team IF 😉",
       withEmailLogin: true,
     },
-    agencyDashboardConventionTemplate: agencyDashboardContent,
+    conventionTemplate: defaultPageContent,
 
-    default: {
-      title: "Se connecter avec ProConnect",
-      description:
-        "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-      illustration: loginIllustration,
-    },
+    default: defaultPageContent,
   };
 
 const LoginWithEmail = ({ page }: { page: AllowedLoginSource }) => {

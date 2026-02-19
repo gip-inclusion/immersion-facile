@@ -15,7 +15,7 @@ import { conventionTemplateSlice } from "src/core-logic/domain/convention-templa
 import type { Route } from "type-route";
 
 export type ConventionTemplatePageRoute = Route<
-  typeof routes.agencyDashboardConventionTemplate
+  typeof routes.conventionTemplate
 >;
 
 export const ConventionTemplatePage = ({

@@ -182,7 +182,7 @@ export const ConventionForm = ({
   );
   const conventionInitialValuesFromUrl = useMemo(
     () =>
-      route.name !== "agencyDashboardConventionTemplate"
+      route.name !== "conventionTemplate"
         ? getConventionInitialValuesFromUrl({ route, internshipKind })
         : getEmptyConventionInitialValues(internshipKind),
     [internshipKind, route],
@@ -395,7 +395,7 @@ export const ConventionForm = ({
 
     if (mode === "create-convention-template") {
       routes
-        .agencyDashboardConventionTemplate({
+        .conventionTemplate({
           fromRoute:
             "fromRoute" in route.params
               ? route.params.fromRoute
@@ -703,8 +703,7 @@ export const ConventionForm = ({
                   label="Nom du modèle *"
                   nativeInputProps={{
                     ...register("name"),
-                    id: domElementIds.agencyDashboardConventionTemplate.form
-                      .nameInput,
+                    id: domElementIds.conventionTemplate.form.nameInput,
                   }}
                 />
               )}
@@ -889,8 +888,7 @@ export const ConventionForm = ({
                   type="button"
                   nativeButtonProps={{
                     id: isTemplateForm
-                      ? domElementIds.agencyDashboardConventionTemplate.form
-                          .submitFormButton
+                      ? domElementIds.conventionTemplate.form.submitFormButton
                       : domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
                   onClick={handleSubmit(onSubmit, (errors) => {
@@ -930,7 +928,7 @@ export const ConventionForm = ({
                   type="button"
                   id={
                     isTemplateForm
-                      ? domElementIds.agencyDashboardConventionTemplate.form
+                      ? domElementIds.conventionTemplate.form
                           .submitFormButtonMobile
                       : domElementIds.conventionImmersionRoute
                           .submitFormButtonMobile
