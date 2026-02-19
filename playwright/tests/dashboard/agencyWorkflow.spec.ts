@@ -183,20 +183,18 @@ test.describe("Agency dashboard workflow", () => {
       await goToDashboard(page, "agency");
 
       await page.click(
-        `#${domElementIds.agencyDashboardConventionTemplate.createConventionTemplateButton}`,
+        `#${domElementIds.conventionTemplate.createConventionTemplateButton}`,
       );
-      await page.waitForURL(
-        `${frontRoutes.agencyDashboardConventionTemplate}**`,
-      );
+      await page.waitForURL(`${frontRoutes.conventionTemplate}**`);
 
       await page.fill(
-        `#${domElementIds.agencyDashboardConventionTemplate.form.nameInput}`,
+        `#${domElementIds.conventionTemplate.form.nameInput}`,
         "Mon premier modèle de convention",
       );
       await fillConventionForm(page);
 
       await page.click(
-        `#${domElementIds.agencyDashboardConventionTemplate.form.submitFormButton}`,
+        `#${domElementIds.conventionTemplate.form.submitFormButton}`,
       );
       await expect(page.locator(".fr-alert--success")).toBeVisible();
 
@@ -211,15 +209,15 @@ test.describe("Agency dashboard workflow", () => {
       await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
 
       await page.click(
-        `[id^="${domElementIds.agencyDashboardConventionTemplate.editConventionTemplateButton}-"]`,
+        `[id^="${domElementIds.conventionTemplate.editConventionTemplateButton}-"]`,
       );
       await page.fill(
-        `#${domElementIds.agencyDashboardConventionTemplate.form.nameInput}`,
+        `#${domElementIds.conventionTemplate.form.nameInput}`,
         newConventionTemplateName,
       );
 
       await page.click(
-        `#${domElementIds.agencyDashboardConventionTemplate.form.submitFormButton}`,
+        `#${domElementIds.conventionTemplate.form.submitFormButton}`,
       );
       await expect(page.locator(".fr-alert--success")).toBeVisible();
 
@@ -238,15 +236,15 @@ test.describe("Agency dashboard workflow", () => {
       await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
 
       await page.click(
-        `[id^="${domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft.button}-"]`,
+        `[id^="${domElementIds.conventionTemplate.shareAsConventionDraft.button}-"]`,
       );
 
       await page.fill(
-        `#${domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft.emailInput}`,
+        `#${domElementIds.conventionTemplate.shareAsConventionDraft.emailInput}`,
         faker.internet.email(),
       );
       await page.click(
-        `#${domElementIds.agencyDashboardConventionTemplate.shareAsConventionDraft.submitButton}`,
+        `#${domElementIds.conventionTemplate.shareAsConventionDraft.submitButton}`,
       );
       await expect(page.locator(".fr-alert--success")).toBeVisible();
     });
@@ -257,10 +255,10 @@ test.describe("Agency dashboard workflow", () => {
       await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
 
       await page.click(
-        `[id^="${domElementIds.agencyDashboardConventionTemplate.deleteConventionTemplateButton}-"]`,
+        `[id^="${domElementIds.conventionTemplate.deleteConventionTemplateButton}-"]`,
       );
       await page.click(
-        `#${domElementIds.agencyDashboardConventionTemplate.deleteConventionTemplate.confirmButton}`,
+        `#${domElementIds.conventionTemplate.deleteConventionTemplate.confirmButton}`,
       );
       await expect(page.locator(".fr-alert--success")).toBeVisible();
       await expect(page.locator('[id^="convention-template-"]')).toHaveCount(0);

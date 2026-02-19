@@ -18,9 +18,9 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   establishmentDashboardDiscussions:
     "tableau-de-bord-etablissement/discussions",
   agencyDashboard: "tableau-de-bord-agence",
-  agencyDashboardConventionTemplate: "tableau-de-bord-agence/modele-convention",
   addAgency: "ajouter-prescripteur",
   manageConventionUserConnected: "pilotage-convention-inclusion-connect",
+  conventionTemplate: "modele-convention",
 };
 
 export const frontRoutes = {

@@ -54,7 +54,7 @@ export const formConventionFieldsLabels: (
 const conventionTemplateSection = () => ({
   name: {
     label: "Nom du modèle",
-    id: domElementIds.agencyDashboardConventionTemplate.form.nameInput,
+    id: domElementIds.conventionTemplate.form.nameInput,
     required: true,
   },
 });

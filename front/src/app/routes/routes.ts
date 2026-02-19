@@ -184,13 +184,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   agencyDashboardStatsActivitiesByEstablishment: agencyDashboard.extend(
     "/stats-activites-par-entreprise",
   ),
-  agencyDashboardConventionTemplate: agencyDashboard.extend(
-    {
-      fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer),
-      conventionTemplateId: param.query.optional.string,
-    },
-    () => "/modele-convention",
-  ),
   myProfile,
   myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
   agencyDashboardAgencies: agencyDashboardAgencies,
@@ -252,6 +245,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   conventionStatusDashboard: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.conventionStatusDashboard}`,
+  ),
+  conventionTemplate: defineRoute(
+    {
+      ...connectedUserParams,
+      fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer),
+      conventionTemplateId: param.query.optional.string,
+    },
+    () => "/modele-convention",
   ),
   conventionToSign: defineRoute(
     { jwt: param.query.string },
