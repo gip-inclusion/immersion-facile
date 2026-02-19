@@ -24,6 +24,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
 import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 import { v4 as uuid } from "uuid";
 
@@ -73,6 +74,7 @@ export const ConventionTemplatesList = ({
   const confirmDeleteConventionTemplate = () => {
     if (!conventionTemplateIdToDelete) return;
     if (!connectedUserJwt) throw errors.user.unauthorized();
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     dispatch(
       conventionTemplateSlice.actions.deleteConventionTemplateRequested({
         conventionTemplateId: conventionTemplateIdToDelete,
@@ -116,6 +118,7 @@ export const ConventionTemplatesList = ({
   const onShareFormSubmit = (
     values: ShareConventionDraftByEmailFromConventionTemplateDto,
   ) => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     dispatch(
       conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
         ...values,
@@ -136,6 +139,12 @@ export const ConventionTemplatesList = ({
       );
     }
   }, [connectedUserJwt, dispatch]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    };
+  }, [dispatch]);
 
   return (
     <>
