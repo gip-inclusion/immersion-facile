@@ -4,8 +4,6 @@ import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { errors } from "shared";
-import { Feedback } from "src/app/components/feedback/Feedback";
-import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ErrorPageContent } from "src/app/pages/error/ErrorPageContent";
@@ -35,7 +33,7 @@ export const ConventionTemplatePage = ({
     iconId: "fr-icon-arrow-left-line",
     linkProps: routes[fromRoute]().link,
     className: fr.cx("fr-mb-4w"),
-    children: "Retour",
+    children: "Annuler et revenir en arrière",
   };
 
   useEffect(() => {
@@ -67,33 +65,26 @@ export const ConventionTemplatePage = ({
 
   return (
     <>
+      <Button {...backButtonProps} />
       <h1>
         {fetchedConventionTemplate?.name
           ? "Modifier un modèle de convention"
           : "Créer un modèle de convention"}
       </h1>
-      <Button {...backButtonProps} />
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-        <WithFeedbackReplacer
-          topic="convention-template"
-          renderFeedback={() => {
-            return <Feedback topics={["convention-template"]} />;
-          }}
-        >
-          {isConventionTemplateLoading ? (
-            <Loader />
-          ) : (
-            <ConventionForm
-              internshipKind="immersion"
-              mode={
-                conventionTemplateId
-                  ? "edit-convention-template"
-                  : "create-convention-template"
-              }
-              fromConventionTemplateId={conventionTemplateId}
-            />
-          )}
-        </WithFeedbackReplacer>
+        {isConventionTemplateLoading ? (
+          <Loader />
+        ) : (
+          <ConventionForm
+            internshipKind="immersion"
+            mode={
+              conventionTemplateId
+                ? "edit-convention-template"
+                : "create-convention-template"
+            }
+            fromConventionTemplateId={conventionTemplateId}
+          />
+        )}
       </div>
     </>
   );
