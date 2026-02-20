@@ -64,6 +64,9 @@ describe("CreateAssessment", () => {
     endedWithAJob: false,
     establishmentFeedback: "Ca c'est bien passé",
     establishmentAdvices: "mon conseil",
+    beneficiaryAgreement: null,
+    beneficiaryFeedback: null,
+    signedAt: null,
   };
 
   const tutorPayload: ConventionDomainJwtPayload = {
@@ -171,6 +174,9 @@ describe("CreateAssessment", () => {
         endedWithAJob: false,
         establishmentFeedback: "Ca c'est bien passé",
         establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
       };
       await expectPromiseToFailWithError(
         createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
@@ -190,6 +196,9 @@ describe("CreateAssessment", () => {
         endedWithAJob: false,
         establishmentFeedback: "Ca c'est bien passé",
         establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
       };
       await expectPromiseToFailWithError(
         createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
@@ -351,6 +360,9 @@ describe("CreateAssessment", () => {
         endedWithAJob: false,
         establishmentFeedback: "Ca c'est bien passé",
         establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
       };
 
       uow.conventionRepository.setConventions([convention]);

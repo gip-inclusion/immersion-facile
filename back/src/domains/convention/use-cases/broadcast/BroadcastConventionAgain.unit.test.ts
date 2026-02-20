@@ -208,6 +208,9 @@ describe("BroadcastConventionAgain", () => {
           endedWithAJob: false,
           establishmentFeedback: "commentaire",
           establishmentAdvices: "commentaire",
+          beneficiaryAgreement: null,
+          beneficiaryFeedback: null,
+          signedAt: null,
         };
         await uow.assessmentRepository.save({
           _entityName: "Assessment",

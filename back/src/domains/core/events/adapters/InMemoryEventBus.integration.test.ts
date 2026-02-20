@@ -35,6 +35,9 @@ const domainEvt: DomainEvent = {
       endedWithAJob: false,
       establishmentFeedback: "osef",
       establishmentAdvices: "osef",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
     },
     triggeredBy: {
       kind: "connected-user",

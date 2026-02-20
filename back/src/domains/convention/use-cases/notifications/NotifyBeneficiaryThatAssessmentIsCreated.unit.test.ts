@@ -41,6 +41,9 @@ const assessment: Extract<
   numberOfMissedHours: 4,
   establishmentFeedback: "osef",
   establishmentAdvices: "osef",
+  beneficiaryAgreement: true,
+  beneficiaryFeedback: "my super feedback",
+  signedAt: new Date("2025-01-01").toISOString(),
 };
 
 describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {

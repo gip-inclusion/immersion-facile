@@ -83,6 +83,9 @@ export const AssessmentForm = ({
     establishmentAdvices: "",
     endedWithAJob: null,
     status: null,
+    beneficiaryAgreement: null,
+    beneficiaryFeedback: null,
+    signedAt: null,
   };
   const methods = useForm<FormAssessmentDto>({
     resolver: zodResolver(assessmentDtoSchema),
@@ -570,6 +573,9 @@ export const formAssessmentDtoToAssessmentDto = (
     conventionId: formAssessmentDto.conventionId,
     establishmentFeedback: formAssessmentDto.establishmentFeedback,
     establishmentAdvices: formAssessmentDto.establishmentAdvices,
+    beneficiaryAgreement: formAssessmentDto.beneficiaryAgreement,
+    beneficiaryFeedback: formAssessmentDto.beneficiaryFeedback,
+    signedAt: formAssessmentDto.signedAt,
   };
 
   let assessmentDto: AssessmentDto = {

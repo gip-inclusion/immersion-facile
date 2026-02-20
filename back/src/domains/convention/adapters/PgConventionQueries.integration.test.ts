@@ -169,6 +169,9 @@ describe("Pg implementation of ConventionQueries", () => {
           establishmentFeedback: "Great experience",
           establishmentAdvices: "Keep up the good work",
           numberOfHoursActuallyMade: 100,
+          beneficiaryAgreement: null,
+          beneficiaryFeedback: null,
+          signedAt: null,
         },
       });
 
