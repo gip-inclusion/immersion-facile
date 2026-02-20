@@ -2,10 +2,10 @@ import { z } from "zod";
 import { agencyKindSchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
 import { getNestedValue, isObject } from "../utils";
+import { zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   immersionConventionSchema,
@@ -106,6 +106,9 @@ const validateImmersionBeneficiary = (input: unknown): void => {
   }
 };
 
+// DepartmentCode Schema ?
+const agencyDepartmentSchema = z.string();
+
 const baseConventionDraftSchema = makeConventionDeepPartialSchema(
   immersionConventionSchema,
 )
@@ -114,7 +117,7 @@ const baseConventionDraftSchema = makeConventionDeepPartialSchema(
     z.object({
       id: conventionDraftIdSchema,
       agencyKind: agencyKindSchema.optional(),
-      agencyDepartment: z.string().optional(),
+      agencyDepartment: agencyDepartmentSchema.optional(),
     }),
   );
 
