@@ -5,6 +5,7 @@ import {
   map,
   mergeMap,
 } from "rxjs";
+import type { LookupAddress } from "shared";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -89,7 +90,8 @@ const geocodingFromSiretInfoEpic: AppEpic<GeocodingAction> = (action$) =>
     map((action) => {
       return geocodingSlice.actions.fetchSuggestionsRequested({
         locator: action.payload.addressAutocompleteLocator,
-        lookup: action.payload.siretEstablishment.businessAddress,
+        lookup: action.payload.siretEstablishment
+          .businessAddress as LookupAddress,
         selectFirstSuggestion: true,
         countryCode: action.payload.countryCode,
       });
