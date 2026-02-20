@@ -53,6 +53,7 @@ export const nafSectorLabels: Record<NafSectorCode, NafSectionLabel> = {
 };
 
 export type NafCode = Flavor<string, "NafCode">;
+export type NafSousClasseLabel = Flavor<string, "NafSousClasseLabel">;
 export type NafNomenclature = Flavor<string, "NafNomenclature">;
 export type NafSectionLabel = Flavor<string, "NafSectionLabel">;
 

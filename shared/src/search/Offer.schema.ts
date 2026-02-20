@@ -1,11 +1,20 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { businessNameSchema, customizedNameSchema } from "../business/business";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
+import { nafCodeSchema, nafSousClasseLabelSchema } from "../naf/naf.schema";
 import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { romeCodeSchema } from "../rome";
-import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { siretSchema } from "../siret/siret.schema";
+import {
+  appellationCodeSchema,
+  appellationLabelSchema,
+  romeLabelSchema,
+} from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import {
+  numberOfEmployeesRangeSchema,
+  siretSchema,
+} from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
@@ -30,13 +39,13 @@ const urlOfPartnerSchema: ZodSchemaWithInputMatchingOutput<UrlOfParner> =
 
 const commonOfferSchema = z.object({
   rome: romeCodeSchema,
-  romeLabel: z.string(),
-  naf: z.string(),
-  nafLabel: z.string(),
+  romeLabel: romeLabelSchema,
+  naf: nafCodeSchema,
+  nafLabel: nafSousClasseLabelSchema,
   siret: siretSchema,
   establishmentScore: z.number(),
-  name: z.string(),
-  customizedName: z.string().optional(),
+  name: businessNameSchema,
+  customizedName: customizedNameSchema.optional(),
   voluntaryToImmersion: z.boolean(),
   position: geoPositionSchema,
   address: z.object({
@@ -51,14 +60,14 @@ const commonOfferSchema = z.object({
     })
     .optional(),
   distance_m: z.number().optional(),
-  numberOfEmployeeRange: z.string().optional(),
+  numberOfEmployeeRange: numberOfEmployeesRangeSchema,
   website: absoluteUrlSchema.or(z.literal("")).optional(),
   additionalInformation: zStringCanBeEmpty.optional(),
   fitForDisabledWorkers: fitForDisabledWorkersSchema.nullable(),
   urlOfPartner: urlOfPartnerSchema.optional(),
   appellations: z.array(
     z.object({
-      appellationLabel: z.string(),
+      appellationLabel: appellationLabelSchema,
       appellationCode: appellationCodeSchema,
     }),
   ),

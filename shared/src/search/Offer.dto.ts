@@ -1,16 +1,23 @@
 import type { AddressDto, LocationId } from "../address/address.dto";
 import type {
+  BusinessName,
+  BusinessNameCustomized,
+} from "../business/business";
+import type {
   ContactMode,
+  EstablishmentAdditionnalInformation,
+  EstablishmentWebSite,
   FitForDisableWorkerOption,
   RemoteWorkMode,
 } from "../formEstablishment/FormEstablishment.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
+import type { NafCode, NafSousClasseLabel } from "../naf/naf.dto";
 import type {
   AppellationDto,
   RomeCode,
   RomeLabel,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import type { SiretDto } from "../siret/siret";
+import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import type { DateTimeIsoString } from "../utils/date";
 
@@ -21,11 +28,11 @@ type CommonOfferDto = {
   romeLabel: RomeLabel;
   appellations: AppellationDto[];
   establishmentScore: number;
-  naf: string;
-  nafLabel: string;
+  naf: NafCode;
+  nafLabel: NafSousClasseLabel;
   siret: SiretDto;
-  name: string;
-  customizedName?: string;
+  name: BusinessName;
+  customizedName?: BusinessNameCustomized;
   voluntaryToImmersion: boolean;
   fitForDisabledWorkers: FitForDisableWorkerOption | null;
   locationId: LocationId | null;
@@ -33,9 +40,9 @@ type CommonOfferDto = {
   address: AddressDto;
   contactMode?: ContactMode;
   distance_m?: number;
-  numberOfEmployeeRange?: string;
-  website?: string;
-  additionalInformation?: string;
+  numberOfEmployeeRange?: NumberEmployeesRange;
+  website?: EstablishmentWebSite;
+  additionalInformation?: EstablishmentAdditionnalInformation;
   urlOfPartner?: UrlOfParner;
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;

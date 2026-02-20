@@ -175,7 +175,7 @@ describe("GET /v3/offers", () => {
             isAvailable: true,
             locationId: "11111111-1111-4444-1111-111111111111",
             naf: "7820Z",
-            nafLabel: "NAFRev2",
+            nafLabel: "FAKE",
             name: "Company inside repository",
             numberOfEmployeeRange: "10-19",
             position: {

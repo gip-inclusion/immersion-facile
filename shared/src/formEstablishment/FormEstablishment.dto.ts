@@ -130,8 +130,15 @@ export const fitForDisabledWorkersOptions = [
   "no",
 ] as const;
 
+export type EstablishmentWebSite = AbsoluteUrl | "";
+
+export type EstablishmentAdditionnalInformation = Flavor<
+  string,
+  "EstablishmentAdditionnalInformation"
+>;
+
 export type CommonFormEstablishmentDto = {
-  additionalInformation?: string;
+  additionalInformation?: EstablishmentAdditionnalInformation;
   offers: EstablishmentFormOffer[];
   businessAddresses: FormEstablishmentAddress[];
   userRights: FormEstablishmentUserRight[];
@@ -140,11 +147,11 @@ export type CommonFormEstablishmentDto = {
   fitForDisabledWorkers: FitForDisableWorkerOption;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
-  naf?: NafDto; // { code: string, nomenclature: string }
+  naf?: NafDto;
   nextAvailabilityDate?: DateTimeIsoString;
-  siret: SiretDto; // 14 characters string
+  siret: SiretDto;
   source: FormEstablishmentSource;
-  website?: AbsoluteUrl | "";
+  website?: EstablishmentWebSite;
   searchableBy: EstablishmentSearchableBy;
 };
 

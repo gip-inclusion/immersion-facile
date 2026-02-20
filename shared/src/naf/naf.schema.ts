@@ -1,7 +1,11 @@
 import { keys } from "ramda";
 import { z } from "zod";
 import { searchTextAlphaSchema } from "../search/searchText.schema";
-import { zStringMinLength1 } from "../utils/string.schema";
+import {
+  makeHardenedStringSchema,
+  stringWithMaxLength255,
+  zStringMinLength1,
+} from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -9,9 +13,12 @@ import {
 import {
   type NafCode,
   type NafDto,
+  type NafNomenclature,
+  type NafSectionLabel,
   type NafSectionSuggestion,
   type NafSectionSuggestionsParams,
   type NafSectorCode,
+  type NafSousClasseLabel,
   nafSectorCodes,
   nafSectorLabels,
   type WithNafCodes,
@@ -20,14 +27,23 @@ import {
 export const validNafSectorCodes = keys(nafSectorLabels).filter(
   (val) => val !== "0",
 );
+
 export const nafSectorCodeSchema: ZodSchemaWithInputMatchingOutput<NafSectorCode> =
   z.enum(nafSectorCodes, {
     error: localization.invalidEnum,
   });
 
-export const nafCodeSchema: ZodSchemaWithInputMatchingOutput<NafCode> = z
-  .string()
-  .length(5);
+export const nafSectionLabelSchema: ZodSchemaWithInputMatchingOutput<NafSectionLabel> =
+  stringWithMaxLength255;
+
+export const nafSousClasseLabelSchema: ZodSchemaWithInputMatchingOutput<NafSousClasseLabel> =
+  stringWithMaxLength255;
+
+export const nafCodeSchema: ZodSchemaWithInputMatchingOutput<NafCode> =
+  makeHardenedStringSchema({
+    max: 5,
+    isEmptyAllowed: true, // ISO legacy mais ça pose la question
+  });
 
 export const nafCodesSchema: ZodSchemaWithInputMatchingOutput<NafCode[]> = z
   .array(nafCodeSchema)
@@ -38,9 +54,16 @@ export const withNafCodesSchema: ZodSchemaWithInputMatchingOutput<WithNafCodes> 
     nafCodes: nafCodesSchema.optional(),
   });
 
+//Correspond aux données du type 'NAFRev2' : remplacer par template litterals?
+const nafNomenclatureSchema: ZodSchemaWithInputMatchingOutput<NafNomenclature> =
+  makeHardenedStringSchema({
+    max: 50,
+    isEmptyAllowed: true, // ISO legacy mais ça pose la question
+  });
+
 export const nafSchema: ZodSchemaWithInputMatchingOutput<NafDto> = z.object({
   code: nafCodeSchema,
-  nomenclature: z.string(),
+  nomenclature: nafNomenclatureSchema,
 });
 
 const nafDivisionRegex = /\d{2}/;

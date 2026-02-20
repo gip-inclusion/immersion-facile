@@ -153,7 +153,7 @@ describe("Route to get ImmersionSearchResultDto by siret, appellation code and l
           appellationCode: styliste.appellationCode,
         },
       ],
-      nafLabel: "NAFRev2",
+      nafLabel: "FAKE",
       additionalInformation: "",
       website: "",
       position: {
