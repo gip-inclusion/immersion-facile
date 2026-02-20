@@ -4,6 +4,7 @@ import type {
   ConventionId,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
+  SignAssessmentRequestDto,
   WithConventionId,
 } from "shared";
 import type {
@@ -16,6 +17,15 @@ export const failedIdError = new Error("Failed Id");
 
 export class SimulatedAssessmentGateway implements AssessmentGateway {
   constructor(private latency = 0) {}
+
+  public signAssessment$(
+    params: SignAssessmentRequestDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return params.conventionId === failedId
+      ? throwError(failedIdError)
+      : of(undefined).pipe(delay(this.latency));
+  }
 
   public createAssessment$({ assessment }: AssessmentAndJwt): Observable<void> {
     return assessment.conventionId === failedId
@@ -44,6 +54,9 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
       endedWithAJob: false,
       establishmentAdvices: "my advices",
       establishmentFeedback: "my feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
     });
   }
 
