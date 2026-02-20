@@ -19,7 +19,6 @@ export * from "./footer";
 export * from "./form-overlay";
 export * from "./heading-section";
 export * from "./hero-header";
-export * from "./info-section";
 export * from "./inputs";
 export * from "./label";
 export * from "./link";
