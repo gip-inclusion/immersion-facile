@@ -10,6 +10,7 @@ import {
 import type {
   AppellationAndRomeDto,
   AppellationCode,
+  AppellationLabel,
   AppellationMatchDto,
   AppellationSearchInputParams,
   AppellationSearchResponse,
@@ -42,13 +43,16 @@ export const appellationCodesSchema: ZodSchemaWithInputMatchingOutput<
   AppellationCode[]
 > = z.array(appellationCodeSchema);
 
+export const appellationLabelSchema: ZodSchemaWithInputMatchingOutput<AppellationLabel> =
+  zStringMinLength1;
+
 export const appellationAndRomeDtoSchema: ZodSchemaWithInputMatchingOutput<AppellationAndRomeDto> =
   z.object(
     {
       romeCode: codeRomeSchema,
       romeLabel: romeLabelSchema,
       appellationCode: appellationCodeSchema,
-      appellationLabel: zStringMinLength1,
+      appellationLabel: appellationLabelSchema,
     },
     { error: "Ce champ est obligatoire. Veuillez choisir un métier." },
   );
