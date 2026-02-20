@@ -3,6 +3,7 @@ import type {
   PaginationQueryParams,
   WithRequiredPagination,
 } from "../pagination/pagination.dto";
+import type { SearchTextAlphaNumeric } from "../search/searchText.schema";
 import type { ConventionId, ConventionStatus } from "./convention.dto";
 import type { WithFirstnameAndLastname } from "./convention.schema";
 
@@ -42,7 +43,7 @@ export type BroadcastErrorKind = "functional" | "technical";
 export type ConventionsWithErroredBroadcastFeedbackFilters = {
   broadcastErrorKind?: BroadcastErrorKind;
   conventionStatus?: ConventionStatus[];
-  search?: string;
+  search?: SearchTextAlphaNumeric;
 };
 
 export type FlatGetConventionsWithErroredBroadcastFeedbackParams =

@@ -14,6 +14,7 @@ import type {
   AppellationAndRomeDto,
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { SearchTextAlphaNumeric } from "../search/searchText.schema";
 import type { SiretDto } from "../siret/siret";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
@@ -340,5 +341,5 @@ export type FlatGetPaginatedDiscussionsParams = {
 
   // filters
   statuses?: DiscussionStatus | DiscussionStatus[];
-  search?: string;
+  search?: SearchTextAlphaNumeric;
 };

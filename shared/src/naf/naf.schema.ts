@@ -1,10 +1,10 @@
 import { keys } from "ramda";
 import { z } from "zod";
-import { searchTextSchema } from "../search/searchText.schema";
+import { searchTextAlphaSchema } from "../search/searchText.schema";
+import { zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type NafCode,
@@ -25,7 +25,7 @@ export const nafSectorCodeSchema: ZodSchemaWithInputMatchingOutput<NafSectorCode
     error: localization.invalidEnum,
   });
 
-const nafCodeSchema: ZodSchemaWithInputMatchingOutput<NafCode> = z
+export const nafCodeSchema: ZodSchemaWithInputMatchingOutput<NafCode> = z
   .string()
   .length(5);
 
@@ -58,8 +58,8 @@ export const nafSectionSuggestionsSchema: ZodSchemaWithInputMatchingOutput<
 > = z.array(nafSectionSuggestionSchema);
 export const nafSectionSuggestionsParamsSchema: ZodSchemaWithInputMatchingOutput<NafSectionSuggestionsParams> =
   z.object({
-    searchText: searchTextSchema,
+    searchText: searchTextAlphaSchema,
   });
 z.object({
-  searchText: searchTextSchema,
+  searchText: searchTextAlphaSchema,
 });

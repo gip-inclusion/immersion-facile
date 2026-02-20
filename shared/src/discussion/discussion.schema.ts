@@ -16,6 +16,7 @@ import {
   appellationCodeSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import { searchTextAlphaNumericSchema } from "../search/searchText.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
   makeHardenedStringSchema,
@@ -303,7 +304,7 @@ export const flatGetPaginatedDiscussionsParamsSchema: ZodSchemaWithInputMatching
       .optional()
       .or(z.array(discussionStatusSchema).optional())
       .optional(),
-    search: z.string().optional(),
+    search: searchTextAlphaNumericSchema.optional(),
   });
 
 export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<DiscussionInList> =
