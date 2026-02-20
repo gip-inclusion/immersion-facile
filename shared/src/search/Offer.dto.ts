@@ -8,13 +8,17 @@ import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type {
   AppellationDto,
   RomeCode,
+  RomeLabel,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
+import type { Flavor } from "../typeFlavors";
 import type { DateTimeIsoString } from "../utils/date";
+
+export type UrlOfParner = Flavor<string, "UrlOfParner">;
 
 type CommonOfferDto = {
   rome: RomeCode;
-  romeLabel: string;
+  romeLabel: RomeLabel;
   appellations: AppellationDto[];
   establishmentScore: number;
   naf: string;
@@ -32,7 +36,7 @@ type CommonOfferDto = {
   numberOfEmployeeRange?: string;
   website?: string;
   additionalInformation?: string;
-  urlOfPartner?: string;
+  urlOfPartner?: UrlOfParner;
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
 };

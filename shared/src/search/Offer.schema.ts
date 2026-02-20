@@ -7,20 +7,26 @@ import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zBoolean,
-  zStringCanBeEmpty,
-  zStringMinLength1,
-  zUuidLike,
 } from "../zodUtils";
-import type { ExternalOfferDto, InternalOfferDto } from "./Offer.dto";
+import type {
+  ExternalOfferDto,
+  InternalOfferDto,
+  UrlOfParner,
+} from "./Offer.dto";
 import { remoteWorkModeSchema } from "./SearchQueryParams.schema";
 
 const withRemoteWorkModeSchema = z.object({
   remoteWorkMode: remoteWorkModeSchema,
 });
+
+const urlOfPartnerSchema: ZodSchemaWithInputMatchingOutput<UrlOfParner> =
+  zStringCanBeEmpty;
 
 const commonOfferSchema = z.object({
   rome: romeCodeSchema,
@@ -49,7 +55,7 @@ const commonOfferSchema = z.object({
   website: absoluteUrlSchema.or(z.literal("")).optional(),
   additionalInformation: zStringCanBeEmpty.optional(),
   fitForDisabledWorkers: fitForDisabledWorkersSchema.nullable(),
-  urlOfPartner: z.string().optional(),
+  urlOfPartner: urlOfPartnerSchema.optional(),
   appellations: z.array(
     z.object({
       appellationLabel: z.string(),
