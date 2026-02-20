@@ -160,5 +160,6 @@ export * from "./utils/postalCode";
 export * from "./utils/queryParams";
 export * from "./utils/searchResult";
 export * from "./utils/string";
+export * from "./utils/string.schema";
 export * from "./utils/toDotNotation";
 export * from "./zodUtils";

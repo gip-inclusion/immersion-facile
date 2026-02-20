@@ -1,4 +1,7 @@
+import type z from "zod";
+import { ZodError } from "zod";
 import { emailExchangeSplitters } from "../discussion/discussion.helpers";
+import { localization } from "../zodUtils";
 import {
   cleanSpecialChars,
   cleanStringToHTMLAttribute,
@@ -10,6 +13,13 @@ import {
   splitTextOnFirstSeparator,
   toLowerCaseWithoutDiacritics,
 } from "./string";
+import {
+  makeHardenedStringSchema,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+  zStringPossiblyEmptyWithMax,
+  zTrimmedStringWithMax,
+} from "./string.schema";
 
 describe("string utils", () => {
   describe("cleanStringToHTMLAttribute", () => {
@@ -237,5 +247,557 @@ describe("splitTextOnFirstSeparator", () => {
     const separators = testCase.separators;
     const expected = testCase.expected;
     expect(splitTextOnFirstSeparator(input, separators)[0]).toBe(expected[0]);
+  });
+});
+
+describe("string schemas", () => {
+  describe("zStringMinLength1 schema validation", () => {
+    it.each([
+      "//",
+      "Fourni par l'employeur",
+      " Non ",
+      "texte\navec retour à la ligne\n",
+    ])(`accepts valid "%s"`, (text) => {
+      expect(() => zStringMinLength1.parse(text)).not.toThrow();
+    });
+
+    it.each([
+      {
+        input: "",
+        expectedError: new ZodError([
+          {
+            origin: "string",
+            code: "too_small",
+            input: undefined,
+            minimum: 1,
+            inclusive: true,
+            path: [],
+            message: "Ce champ est obligatoire",
+          },
+        ]),
+      },
+      {
+        input: "\n",
+        expectedError: new ZodError([
+          {
+            origin: "string",
+            code: "too_small",
+            minimum: 1,
+            inclusive: true,
+            path: [],
+            input: undefined,
+            message: "Ce champ est obligatoire",
+          },
+        ]),
+      },
+      {
+        input: " ",
+        expectedError: new ZodError([
+          {
+            origin: "string",
+            code: "too_small",
+            minimum: 1,
+            inclusive: true,
+            input: undefined,
+            path: [],
+            message: "Ce champ est obligatoire",
+          },
+        ]),
+      },
+      {
+        input: "   ",
+        expected: new ZodError([
+          {
+            origin: "string",
+            code: "too_small",
+            minimum: 1,
+            message: "Ce champ est obligatoire",
+            path: [],
+            input: "   ",
+          },
+          {
+            code: "custom",
+            message: "Ce champ est obligatoire",
+            path: [],
+            input: "   ",
+          },
+        ]),
+      },
+    ])(`fails to validate "%s"`, ({ input, expectedError }) => {
+      expect(() => zStringMinLength1.parse(input)).toThrow(expectedError);
+    });
+  });
+
+  describe("zStringCanBeEmpty schema validation", () => {
+    it.each([
+      {
+        input: "",
+        output: "",
+      },
+      {
+        input: " ",
+        output: "",
+      },
+      {
+        input: "//",
+        output: "//",
+      },
+      {
+        input: "Fourni par l'employeur",
+        output: "Fourni par l'employeur",
+      },
+      {
+        input: " Non ",
+        output: "Non",
+      },
+      {
+        input: "\n",
+        output: "",
+      },
+    ])(`accepts valid "%s"`, ({ input, output }) => {
+      expect(zStringCanBeEmpty.parse(input)).toEqual(output);
+    });
+  });
+
+  describe("zStringPossiblyEmptyWithMax schema validation", () => {
+    it.each(["", " ", "//", " Non ", "\n"])(`accepts valid "%s"`, (text) => {
+      expect(() => zStringPossiblyEmptyWithMax(3).parse(text)).not.toThrow();
+    });
+
+    it("fails to validate schema", () => {
+      const expectedError: ZodError = new ZodError([
+        {
+          origin: "string",
+          code: "too_big",
+          maximum: 3,
+          inclusive: true,
+          path: [],
+          input: undefined,
+          message: "Le maximum est de 3 caractères",
+        },
+      ]);
+
+      expect(() =>
+        zStringPossiblyEmptyWithMax(3).parse("Fourni par l'employeur"),
+      ).toThrow(expectedError);
+    });
+  });
+
+  describe("zTrimmedStringWithMax schema validation", () => {
+    it.each(["//", " Non ", "oui"])(`accepts valid "%s"`, (text) => {
+      expect(() => zTrimmedStringWithMax(3).parse(text)).not.toThrow();
+    });
+
+    it.each([
+      {
+        input: "",
+        expectedError: new ZodError([
+          {
+            origin: "string",
+            input: undefined,
+            code: "too_small",
+            minimum: 1,
+            inclusive: true,
+            path: [],
+            message: "Ce champ est obligatoire",
+          },
+        ]),
+      },
+      {
+        input: "\n",
+        expectedError: new ZodError([
+          {
+            origin: "string",
+            code: "too_small",
+            input: undefined,
+            minimum: 1,
+            inclusive: true,
+            path: [],
+            message: "Ce champ est obligatoire",
+          },
+        ]),
+      },
+      {
+        input: " ",
+        expectedError: new ZodError([
+          {
+            origin: "string",
+            code: "too_small",
+            input: undefined,
+            minimum: 1,
+            inclusive: true,
+            path: [],
+            message: "Ce champ est obligatoire",
+          },
+        ]),
+      },
+      {
+        input: "texte trop long",
+        expectedError: new ZodError([
+          {
+            origin: "string",
+            code: "too_big",
+            maximum: 3,
+            inclusive: true,
+            path: [],
+            input: undefined,
+            message: "Le maximum est de 3 caractères",
+          },
+        ]),
+      },
+    ])(`fails to validate "%s"`, ({ input, expectedError }) => {
+      expect(() => zTrimmedStringWithMax(3).parse(input)).toThrow(
+        expectedError,
+      );
+    });
+  });
+
+  describe("makeHardenedStringSchema basic validation", () => {
+    describe("min,max sizes / trim / custom messages", () => {
+      type ExpectedResult = {
+        title: string;
+        text: string;
+        schema: z.ZodString;
+      } & (
+        | {
+            expectedResult: string;
+          }
+        | {
+            expectedError: ZodError;
+          }
+      );
+
+      it.each([
+        {
+          title: "accept trimmed text at max length",
+          text: "toto  ",
+          schema: makeHardenedStringSchema({ max: 4 }),
+          expectedResult: "toto",
+        },
+        {
+          title:
+            "without maxMessage - reject trimmed text over max lenght with default max error message",
+          text: "totogro   ",
+          schema: makeHardenedStringSchema({ max: 4 }),
+          expectedError: new ZodError([
+            {
+              origin: "string",
+              code: "too_big",
+              input: undefined,
+              maximum: 4,
+              inclusive: true,
+              path: [],
+              message: localization.maxCharacters(4),
+            },
+          ]),
+        },
+        {
+          title:
+            "with maxMessage - reject trimmed text over max length with custom max error message",
+          text: "totogro   ",
+          schema: makeHardenedStringSchema({ max: 4, maxMessage: "MAXXXX" }),
+          expectedError: new ZodError([
+            {
+              origin: "string",
+              code: "too_big",
+              input: undefined,
+              maximum: 4,
+              inclusive: true,
+              path: [],
+              message: "MAXXXX",
+            },
+          ]),
+        },
+        {
+          title:
+            "without isEmptyAllowed - reject empty text with spaces trimmed",
+          text: "        ",
+          schema: makeHardenedStringSchema({ max: 4 }),
+          expectedError: new ZodError([
+            {
+              origin: "string",
+              code: "too_small",
+              minimum: 1,
+              inclusive: true,
+              path: [],
+              message: localization.required,
+            },
+          ]),
+        },
+        {
+          title:
+            "without isEmptyAllowed - reject empty text with spaces trimmed with custom min message",
+          text: "        ",
+          schema: makeHardenedStringSchema({
+            max: 4,
+            minMessage: "t'es tout p'tit!",
+          }),
+          expectedError: new ZodError([
+            {
+              origin: "string",
+              code: "too_small",
+              minimum: 1,
+              inclusive: true,
+              path: [],
+              message: "t'es tout p'tit!",
+            },
+          ]),
+        },
+        {
+          title: "with isEmptyAllowed - accept empty text with spaces trimmed",
+          text: "        ",
+          schema: makeHardenedStringSchema({ max: 4, isEmptyAllowed: true }),
+          expectedResult: "",
+        },
+        {
+          title:
+            "with isEmptyAllowed - accept empty text with line breaks trimmed",
+          text: "\n",
+          schema: makeHardenedStringSchema({ max: 4, isEmptyAllowed: true }),
+          expectedResult: "",
+        },
+      ] satisfies ExpectedResult[])("$title - tested input '$text'", (testCase) => {
+        testCase.expectedResult !== undefined
+          ? expect(testCase.schema.parse(testCase.text)).toBe(
+              testCase.expectedResult,
+            )
+          : expect(() => testCase.schema.parse(testCase.text)).toThrow(
+              testCase.expectedError,
+            );
+      });
+    });
+
+    describe("isHtml & XSS ", () => {
+      const invalidHtmlZodError = new ZodError([
+        {
+          code: "custom",
+          path: [],
+          message: localization.invalidTextWithHtml,
+        },
+      ]);
+
+      it("without isHtml - reject text with html by default - tested input '      <br>  '", () => {
+        expect(() =>
+          makeHardenedStringSchema({
+            max: 4,
+          }).parse("      <br>  "),
+        ).toThrow(invalidHtmlZodError);
+      });
+
+      it("with isHtml - accept text with html without xss - tested input '      <br>  '", () => {
+        expect(
+          makeHardenedStringSchema({
+            max: 4,
+            isHtml: true,
+          }).parse("      <br>  "),
+        ).toBe("<br>");
+      });
+
+      describe("with isHtml - XSS cases", () => {
+        type ExpectedResult = {
+          title: string;
+          text: string;
+        };
+
+        it.each([
+          {
+            title: "reject script tag injection",
+            text: `<script>alert("XSS")</script>`,
+          },
+          {
+            title: "reject HTML with inline javascript event",
+            text: `<img src="x" onerror="alert('XSS')" />`,
+          },
+          {
+            title: "reject javascript protocol injection",
+            text: `   <a href="javascript:alert(1)">click</a>      `,
+          },
+          {
+            title: "reject obfuscated script tag",
+            text: "    <scr<script>ipt>alert(1)</scr</script>ipt>      ",
+          },
+          {
+            title: "reject encoded html entities",
+            text: "&lt;script&gt;alert(1)&lt;/script&gt;",
+          },
+          {
+            title: "reject unicode disguised html",
+            text: "       <scr\u0069pt>alert(1)</scr\u0069pt>       ",
+          },
+          {
+            title: "reject other event handlers",
+            text: "       <div onclick='alert(1)'>click</div>       ",
+          },
+          {
+            title: "reject CSS injection",
+            text: '   <div style="background-image:url(javascript:alert(1))">x</div>    ',
+          },
+          {
+            title: "reject Meta refresh / base / iframe",
+            text: '   <iframe src="javascript:alert(1)"></iframe>    ',
+          },
+          {
+            title: "reject Data URIs",
+            text: '   <img src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">    ',
+          },
+          {
+            title: "reject Comment injection / CDATA",
+            text: "   <!-- <script>alert(1)</script> -->    ",
+          },
+          {
+            title: "reject Double-encoding ou homoglyphs",
+            text: "   <scr&#x69;pt>alert(1)</scr&#x69;pt>    ",
+          },
+          {
+            title: "reject SVG",
+            text: "   <svg><script>alert(1)</script></svg>    ",
+          },
+          {
+            title: "reject MathML",
+            text: "   <math><script>alert(1)</script></math>    ",
+          },
+          {
+            title: "reject Form",
+            text: '   <form action="javascript:alert(1)">    ',
+          },
+          {
+            title: "reject Button",
+            text: '   <button formaction="javascript:alert(1)">    ',
+          },
+          {
+            title: "reject Style",
+            text: "   <style>@import 'javascript:alert(1)';</style>    ",
+          },
+          {
+            title: "reject Link",
+            text: '   <link rel="stylesheet" href="javascript:alert(1)">    ',
+          },
+          {
+            title: "reject Complex nested obfuscations",
+            text: "   <scr<!-- -->ipt>alert(1)</scr<!-- -->ipt>    ",
+          },
+          {
+            title: "reject Template / backticks / expression injection",
+            // biome-ignore lint/suspicious/noTemplateCurlyInString: Explicit string injection
+            text: '   <img src="${userInput}">    ',
+          },
+          {
+            title: "reject combined Unicode + homoglyph with entities",
+            text: "   <scr&#x69;\u0070t>alert(1)</scr&#x69;\u0070t    ",
+          },
+          {
+            title: "reject when HTML with long inner HTML attribute",
+            text: `     <brx data-x="${"a".repeat(999)}" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;opacity:0" onmouseover="if(!window.__p){window.__p=1;this.remove();alert('XSS-'+document.domain)}">    `,
+          },
+          {
+            title: "reject mutation XSS via SVG parsing",
+            text: "    <svg><g/onload=alert(1)//</svg>   ",
+          },
+          {
+            title: "reject mutation XSS via malformed HTML reparsing",
+            text: "   <svg><p><style><img src=x onerror=alert(1)>   ",
+          },
+          {
+            title: "reject SVG animate event XSS",
+            text: "<svg><animate onbegin=alert(1) attributeName=x dur=1s>",
+          },
+          {
+            title: "reject SVG set attribute mutation XSS",
+            text: "<svg><set attributeName=onload to=alert(1)>",
+          },
+          {
+            title: "reject zero-width unicode obfuscation",
+            text: "    <scr\u200Bipt>alert(1)</scr\u200Bipt>   ",
+          },
+          {
+            title: "reject null-byte obfuscation",
+            text: "    <scr\u0000ipt>alert(1)</scr\u0000ipt>   ",
+          },
+          {
+            title: "reject newline protocol splitting",
+            text: '    <a href="java\nscript:alert(1)">x</a>   ',
+          },
+          {
+            title: "reject iframe srcdoc injection",
+            text: `<iframe srcdoc="<script>alert(1)</script>"></iframe>`,
+          },
+          {
+            title: "reject svg namespace script",
+            text: `<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>`,
+          },
+          {
+            title: "reject Template engines SSR injection",
+            text: ` {{constructor.constructor('alert(1)')() ${"a".repeat(999)}}}   `,
+          },
+          {
+            title: "reject spaced template delimiters",
+            text: `{ { constructor.constructor('alert(1)')() ${"a".repeat(999)} } }`,
+          },
+          {
+            title: "reject attribute breaking injection",
+            text: `<img src="x" title="test" onerror=alert(1)//">`,
+          },
+          {
+            title: "reject unquoted attribute javascript",
+            text: "<img src=x onerror=alert(1)>",
+          },
+          {
+            title: "reject tab protocol splitting",
+            text: `<a href="java\tscript:alert(1)">x</a>`,
+          },
+          {
+            title: "reject formfeed protocol splitting",
+            text: `<a href="java\fscript:alert(1)">x</a>`,
+          },
+          {
+            title: "reject auto-closing parser mutation",
+            text: "<svg><script>alert(1)",
+          },
+          {
+            title: "reject foreignObject XSS",
+            text: "<svg><foreignObject><script>alert(1)</script></foreignObject></svg>",
+          },
+          {
+            title: "reject encoded javascript protocol",
+            text: `<a href="javas&#99;ript:alert(1)">x</a>`,
+          },
+          {
+            title: "reject xlink href javascript",
+            text: `<svg><a xlink:href="javascript:alert(1)">x</a></svg>`,
+          },
+          {
+            title: "reject css expression",
+            text: `<div style="width: expression(alert(1))">`,
+          },
+          {
+            title: "reject DOM clobbering id",
+            text: `<form id="constructor"></form>`,
+          },
+          {
+            title: "reject DOM clobbering via name attribute",
+            text: `<img name="constructor">`,
+          },
+          {
+            title: "reject unicode bidi override",
+            text: "<scr\u202Eipt>alert(1)</script>",
+          },
+          {
+            title: "reject namespace mutation XSS (parser reparenting)",
+            text: "<math><mtext></math><img src=x onerror=alert(1)>",
+          },
+          {
+            title: "reject deep mutation XSS",
+            text: "<svg><desc></svg><img src=x onerror=alert(1)>",
+          },
+        ] satisfies ExpectedResult[])("$title - tested input '$text'", (testCase) => {
+          expect(() =>
+            makeHardenedStringSchema({
+              max: 3000,
+              isHtml: true,
+            }).parse(testCase.text),
+          ).toThrow(invalidHtmlZodError);
+        });
+      });
+    });
   });
 });

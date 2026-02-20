@@ -6,10 +6,8 @@ import {
 import { emailSchema } from "../email/email.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { replaceEmptyValuesByUndefinedFromObject } from "../utils";
-import {
-  type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
-} from "../zodUtils";
+import { zStringMinLength1 } from "../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import { conventionIdSchema, conventionSchema } from "./convention.schema";
 import type {
   ConventionFormInitialValues,

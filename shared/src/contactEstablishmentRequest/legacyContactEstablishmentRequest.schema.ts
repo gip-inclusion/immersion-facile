@@ -8,13 +8,12 @@ import { emailSchema } from "../email/email.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
-  zStringCanBeEmpty,
-  zStringMinLength1,
-  zUuidLike,
 } from "../zodUtils";
 import type {
   LegacyContactEstablishmentByMailDto,

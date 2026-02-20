@@ -7,10 +7,12 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { ApiConsumerJwt } from "../tokens/jwt.dto";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
-  localization,
   stringWithMaxLength255,
-  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
+} from "../utils/string.schema";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
 import {
   type ApiConsumer,
