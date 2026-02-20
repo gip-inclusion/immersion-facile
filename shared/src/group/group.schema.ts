@@ -1,10 +1,8 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { internalOfferSchema } from "../search/Offer.schema";
-import {
-  type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
-} from "../zodUtils";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type {
   Group,
   GroupOptions,
@@ -21,15 +19,18 @@ export const withGroupSlugSchema: ZodSchemaWithInputMatchingOutput<WithGroupSlug
     groupSlug: groupSlugSchema,
   });
 
+const colorSchema = zStringCanBeEmpty; // 1024 max - voir si on peut faire plus petit
+const backgroundColorSchema = zStringCanBeEmpty; // 1024 max - voir si on peut faire plus petit
+
 const groupOptionsSchema: ZodSchemaWithInputMatchingOutput<GroupOptions> =
   z.object({
     heroHeader: z.object({
       title: zStringMinLength1,
       description: zStringMinLength1,
       logoUrl: absoluteUrlSchema.optional(),
-      backgroundColor: z.string().optional(),
+      backgroundColor: backgroundColorSchema.optional(),
     }),
-    tintColor: z.string().optional(),
+    tintColor: colorSchema.optional(),
   });
 
 export const groupSchema: ZodSchemaWithInputMatchingOutput<Group> = z.object({
