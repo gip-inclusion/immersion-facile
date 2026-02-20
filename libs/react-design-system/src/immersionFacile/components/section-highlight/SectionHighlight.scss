@@ -1,3 +1,8 @@
 .im-section-highlight {
-  background-color: var(--background-alt-blue-france);
+  &--info {
+    background-color: var(--background-alt-blue-france);
+  }
+  &--discrete {
+    background-color: var(--background-alt-grey);
+  }
 }
