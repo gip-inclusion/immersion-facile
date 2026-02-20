@@ -66,7 +66,7 @@ const searchImmersionResult: SearchImmersionResultPublicV3 = {
   },
   siret: "11110000222200",
   voluntaryToImmersion: true,
-  website: "www.masuperboite.com",
+  website: "http://www.masuperboite.com",
   locationId: "123",
   fitForDisabledWorkers: "no",
   remoteWorkMode: "ON_SITE",

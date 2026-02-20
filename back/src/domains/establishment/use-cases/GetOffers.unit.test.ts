@@ -348,7 +348,7 @@ describe("GetOffers", () => {
         remoteWorkMode: "FULL_REMOTE",
         establishmentScore: establishment4.establishment.score,
         naf: establishment4.establishment.nafDto.code,
-        nafLabel: establishment4.establishment.nafDto.nomenclature,
+        nafLabel: "FAKE",
         name: establishment4.establishment.name,
         customizedName: establishment4.establishment.customizedName,
         numberOfEmployeeRange:
@@ -420,7 +420,7 @@ describe("GetOffers", () => {
         remoteWorkMode: "FULL_REMOTE",
         establishmentScore: establishment4.establishment.score,
         naf: establishment4.establishment.nafDto.code,
-        nafLabel: establishment4.establishment.nafDto.nomenclature,
+        nafLabel: "FAKE",
         name: establishment4.establishment.name,
         customizedName: establishment4.establishment.customizedName,
         numberOfEmployeeRange:
@@ -451,7 +451,7 @@ describe("GetOffers", () => {
         remoteWorkMode: "HYBRID",
         establishmentScore: establishment4.establishment.score,
         naf: establishment4.establishment.nafDto.code,
-        nafLabel: establishment4.establishment.nafDto.nomenclature,
+        nafLabel: "FAKE",
         name: establishment4.establishment.name,
         customizedName: establishment4.establishment.customizedName,
         numberOfEmployeeRange:

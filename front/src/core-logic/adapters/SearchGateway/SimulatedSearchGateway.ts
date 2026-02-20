@@ -56,7 +56,7 @@ export class SimulatedSearchGateway implements SearchGateway {
     },
     contactMode: "EMAIL",
     distance_m: 1000,
-    numberOfEmployeeRange: "1-5",
+    numberOfEmployeeRange: "1-2",
     website: "https://www.earl-de-la-ferme.fr",
     additionalInformation: "Ferme bio",
     urlOfPartner: "https://www.emploi-store.fr/portail/accueil",

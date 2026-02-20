@@ -395,7 +395,7 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
   return {
     address: location.address,
     naf: establishmentAgg.establishment.nafDto.code,
-    nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+    nafLabel: "FAKE", // en PG on s'appuie sur la base NAF, l'inMemory n'est pas équipé de ce mapping
     name: establishmentAgg.establishment.name,
     customizedName: establishmentAgg.establishment.customizedName,
     rome: romeCode,
@@ -447,7 +447,7 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = ({
   rome: romeCode,
   establishmentScore: customScore ?? establishmentAggregate.establishment.score,
   naf: establishmentAggregate.establishment.nafDto.code,
-  nafLabel: establishmentAggregate.establishment.nafDto.nomenclature,
+  nafLabel: "FAKE", // en PG on s'appuie sur la base NAF, l'inMemory n'est pas équipé de ce mapping
   siret: establishmentAggregate.establishment.siret,
   name: establishmentAggregate.establishment.name,
   customizedName: establishmentAggregate.establishment.customizedName,

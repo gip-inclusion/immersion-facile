@@ -150,7 +150,7 @@ describe("search route", () => {
           {
             address: avenueChampsElyseesDto,
             naf: defaultNafCode,
-            nafLabel: "NAFRev2",
+            nafLabel: "FAKE",
             name: "Company inside repository",
             website: "https://www.jobs.fr",
             additionalInformation: "",
@@ -270,7 +270,7 @@ describe("search route", () => {
           sirets.map((siret) => ({
             address: avenueChampsElyseesDto,
             naf: defaultNafCode,
-            nafLabel: "NAFRev2",
+            nafLabel: "FAKE",
             name: "Company inside repository",
             website: "https://www.jobs.fr",
             additionalInformation: "",
