@@ -2,9 +2,10 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { internalOfferSchema } from "../search/Offer.schema";
 import {
-  type ZodSchemaWithInputMatchingOutput,
+  makeHardenedStringSchema,
   zStringMinLength1,
-} from "../zodUtils";
+} from "../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type {
   Group,
   GroupOptions,
@@ -21,15 +22,22 @@ export const withGroupSlugSchema: ZodSchemaWithInputMatchingOutput<WithGroupSlug
     groupSlug: groupSlugSchema,
   });
 
+//TODO Review:  Pas sûr du max et isEmptyAllowed comme legacy mais voir si on peut le retirer
+const colorSchema = makeHardenedStringSchema({ max: 50, isEmptyAllowed: true });
+const backgroundColorSchema = makeHardenedStringSchema({
+  max: 50,
+  isEmptyAllowed: true,
+});
+
 const groupOptionsSchema: ZodSchemaWithInputMatchingOutput<GroupOptions> =
   z.object({
     heroHeader: z.object({
       title: zStringMinLength1,
       description: zStringMinLength1,
       logoUrl: absoluteUrlSchema.optional(),
-      backgroundColor: z.string().optional(),
+      backgroundColor: backgroundColorSchema.optional(),
     }),
-    tintColor: z.string().optional(),
+    tintColor: colorSchema.optional(),
   });
 
 export const groupSchema: ZodSchemaWithInputMatchingOutput<Group> = z.object({
