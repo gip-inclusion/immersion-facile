@@ -90,6 +90,7 @@ const topics = [
   "search-result",
   "send-signature-link",
   "send-assessment-link",
+  "sign-assessment",
   "siret-input",
   "close-agency-and-transfer-conventions",
   "transfer-convention-to-agency",
@@ -527,6 +528,19 @@ export const feedbacks: Record<
       action: assessmentSlice.actions.getAssessmentFailed,
       title: "Problème lors de la récupération du bilan",
       message: "Un problème est survenu lors de la récupération du bilan",
+    },
+  },
+  "sign-assessment": {
+    "create.success": {
+      action: assessmentSlice.actions.signAssessmentSucceeded,
+      title: "Votre bilan d'immersion a bien été signé",
+      message:
+        "Merci pour votre retour. Votre signature a bien été prise en compte.",
+    },
+    "create.error": {
+      action: assessmentSlice.actions.signAssessmentFailed,
+      title: "Problème lors de la signature du bilan",
+      message: "Une erreur est survenue lors de la signature du bilan",
     },
   },
   "delete-assessment": {

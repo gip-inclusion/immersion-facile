@@ -36,6 +36,9 @@ describe("Immersion Assessment slice", () => {
               endedWithAJob: false,
               establishmentFeedback: "my feedback",
               establishmentAdvices: "my advices",
+              beneficiaryAgreement: null,
+              beneficiaryFeedback: null,
+              signedAt: null,
             },
             jwt: "",
           },
@@ -67,6 +70,9 @@ describe("Immersion Assessment slice", () => {
               endedWithAJob: false,
               establishmentFeedback: "my feedback",
               establishmentAdvices: "my advices",
+              beneficiaryAgreement: null,
+              beneficiaryFeedback: null,
+              signedAt: null,
             },
             jwt: "",
           },
@@ -95,6 +101,9 @@ describe("Immersion Assessment slice", () => {
       endedWithAJob: false,
       establishmentAdvices: "my advices",
       establishmentFeedback: "my feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
     };
     const feedGatewayWithGetError = (error: Error) => {
       dependencies.assessmentGateway.getResponse$.error(error);
@@ -155,6 +164,70 @@ describe("Immersion Assessment slice", () => {
           level: "error",
           on: "fetch",
           message: "Assessement not found",
+        },
+      });
+    });
+  });
+
+  describe("immersion assessment sign requested", () => {
+    const feedGatewayWithSignError = (error: Error) => {
+      dependencies.assessmentGateway.signAssessmentResponse$.error(error);
+    };
+
+    const feedGatewayWithSignSuccess = () => {
+      dependencies.assessmentGateway.signAssessmentResponse$.next(undefined);
+    };
+
+    it("success", () => {
+      expectStateToMatchInitialState(store);
+      store.dispatch(
+        assessmentSlice.actions.signAssessmentRequested({
+          params: {
+            conventionId: "23465",
+            beneficiaryAgreement: true,
+            beneficiaryFeedback: "Mon commentaire",
+          },
+          jwt: "my-jwt",
+          feedbackTopic: "sign-assessment",
+        }),
+      );
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithSignSuccess();
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "sign-assessment": {
+          title: "Votre bilan d'immersion a bien été signé",
+          level: "success",
+          on: "create",
+          message:
+            "Merci pour votre retour. Votre signature a bien été prise en compte.",
+        },
+      });
+    });
+
+    it("error on backend", () => {
+      const backendError: Error = new Error("Backend Error");
+      expectStateToMatchInitialState(store);
+      store.dispatch(
+        assessmentSlice.actions.signAssessmentRequested({
+          params: {
+            conventionId: "23465",
+            beneficiaryAgreement: true,
+            beneficiaryFeedback: "Mon commentaire",
+          },
+          jwt: "my-jwt",
+          feedbackTopic: "sign-assessment",
+        }),
+      );
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithSignError(backendError);
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "sign-assessment": {
+          title: "Problème lors de la signature du bilan",
+          level: "error",
+          on: "create",
+          message: "Backend Error",
         },
       });
     });
@@ -230,6 +303,9 @@ describe("Immersion Assessment slice", () => {
         endedWithAJob: false,
         establishmentAdvices: "my advices",
         establishmentFeedback: "my feedback",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
       };
       ({ store } = createTestStore({
         assessment: {
