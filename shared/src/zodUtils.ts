@@ -49,6 +49,10 @@ export const zToBoolean = z
     ["true", "1"].includes((v ?? "false").toString().toLowerCase()),
   );
 
+export const trueSchema = zToBoolean.refine(
+  (value) => value === true,
+) as ZodSchemaWithInputMatchingOutput<true>;
+
 export const zToNumber: ZodSchemaWithInputMatchingOutput<number> =
   z.coerce.number();
 
