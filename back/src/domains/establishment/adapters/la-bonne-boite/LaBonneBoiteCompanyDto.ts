@@ -1,6 +1,7 @@
 import type {
   ExternalOfferDto,
   GeoPositionDto,
+  NumberEmployeesRange,
   RomeDto,
   SiretDto,
 } from "shared";
@@ -98,7 +99,8 @@ export class LaBonneBoiteCompanyDto {
       naf: this.props.naf,
       nafLabel: this.props.naf_label,
       name: this.props.company_name,
-      numberOfEmployeeRange: `${this.props.headcount_min}-${this.props.headcount_max}`,
+      numberOfEmployeeRange:
+        `${this.props.headcount_min}-${this.props.headcount_max}` as NumberEmployeesRange,
       position: { lat: this.props.location.lat, lon: this.props.location.lon },
       rome: romeDto.romeCode,
       romeLabel: romeDto.romeLabel,
