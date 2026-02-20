@@ -35,6 +35,9 @@ export type WithEstablishmentComments = {
 
 type CommonAssessmentFields = {
   conventionId: ConventionId;
+  beneficiaryAgreement: boolean | null;
+  beneficiaryFeedback: string | null;
+  signedAt: DateString | null;
 } & WithEndedWithAJob &
   WithEstablishmentComments;
 
@@ -66,6 +69,12 @@ export type DeleteAssessmentRequestDto = {
   deleteAssessmentJustification: string;
 };
 
+export type SignAssessmentRequestDto = {
+  conventionId: ConventionId;
+  beneficiaryAgreement: boolean;
+  beneficiaryFeedback: string;
+};
+
 export type AssessmentMode = "CreateAssessment" | "GetAssessment";
 
 export type LegacyAssessmentDto = {
@@ -77,7 +86,12 @@ export type LegacyAssessmentDto = {
 export type CreateFormAssessmentInitialValues = {
   conventionId: ConventionId;
 } & (WithEndedWithAJob | { endedWithAJob: null }) &
-  WithEstablishmentComments & { status: null };
+  WithEstablishmentComments & {
+    status: null;
+    beneficiaryAgreement: null;
+    beneficiaryFeedback: null;
+    signedAt: null;
+  };
 
 export type FormAssessmentDto =
   | AssessmentDto

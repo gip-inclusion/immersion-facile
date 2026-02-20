@@ -46,6 +46,9 @@ describe("Assessment schema", () => {
       conventionId: "my-convention-id",
       establishmentAdvices: "establishment advice",
       establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -62,6 +65,9 @@ describe("Assessment schema", () => {
       numberOfMissedHours: 10,
       establishmentAdvices: "establishment advices",
       establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -74,6 +80,39 @@ describe("Assessment schema", () => {
       endedWithAJob: false,
       establishmentAdvices: "establishment advices",
       establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
+    };
+    const parsedAssessment = assessmentDtoSchema.parse(assessment);
+    expectToEqual(assessment, parsedAssessment);
+  });
+
+  it("accepts an assessment with beneficiary signature", () => {
+    const assessment: AssessmentDto = {
+      status: "COMPLETED",
+      conventionId: "my-convention-id",
+      endedWithAJob: false,
+      establishmentAdvices: "establishment advices",
+      establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: true,
+      beneficiaryFeedback: "my beneficiary feedback",
+      signedAt: "2024-01-01",
+    };
+    const parsedAssessment = assessmentDtoSchema.parse(assessment);
+    expectToEqual(assessment, parsedAssessment);
+  });
+
+  it("accepts an assessment with beneficiary signature and no feedback", () => {
+    const assessment: AssessmentDto = {
+      status: "COMPLETED",
+      conventionId: "my-convention-id",
+      endedWithAJob: false,
+      establishmentAdvices: "establishment advices",
+      establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: true,
+      beneficiaryFeedback: null,
+      signedAt: "2024-01-01",
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
