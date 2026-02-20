@@ -26,7 +26,6 @@ describe("AppellationSearch", () => {
     expectToEqual(
       await appellationSearch.execute({
         searchText: "lapins",
-        fetchAppellationsFromNaturalLanguage: false,
       }),
       [
         {
@@ -46,7 +45,6 @@ describe("AppellationSearch", () => {
     expectToEqual(
       await appellationSearch.execute({
         searchText: "lap",
-        fetchAppellationsFromNaturalLanguage: false,
       }),
       [
         {
@@ -66,7 +64,6 @@ describe("AppellationSearch", () => {
     expectToEqual(
       await appellationSearch.execute({
         searchText: "l",
-        fetchAppellationsFromNaturalLanguage: false,
       }),
       [],
     );
@@ -76,7 +73,6 @@ describe("AppellationSearch", () => {
     expectToEqual(
       await appellationSearch.execute({
         searchText: "unknown_search_term",
-        fetchAppellationsFromNaturalLanguage: false,
       }),
       [],
     );

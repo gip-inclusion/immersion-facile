@@ -1,22 +1,30 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
+import { searchTextAlphaSchema } from "../search/searchText.schema";
+import { zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
+  trueSchema,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
 } from "../zodUtils";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
   AppellationMatchDto,
+  AppellationSearchInputParams,
+  AppellationSearchResponse,
   MatchRangeDto,
   RomeCode,
+  RomeLabel,
 } from "./romeAndAppellation.dto";
 
 const codeRomeRegex = /^[A-N]\d{4}$/;
 export const codeRomeSchema: ZodSchemaWithInputMatchingOutput<RomeCode> = z
   .string()
   .regex(codeRomeRegex, "Code ROME incorrect");
+
+export const romeLabelSchema: ZodSchemaWithInputMatchingOutput<RomeLabel> =
+  zStringMinLength1;
 
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
 export const appellationCodeSchema: ZodSchemaWithInputMatchingOutput<AppellationCode> =
@@ -38,7 +46,7 @@ export const appellationAndRomeDtoSchema: ZodSchemaWithInputMatchingOutput<Appel
   z.object(
     {
       romeCode: codeRomeSchema,
-      romeLabel: zStringMinLength1,
+      romeLabel: romeLabelSchema,
       appellationCode: appellationCodeSchema,
       appellationLabel: zStringMinLength1,
     },
@@ -70,8 +78,13 @@ export const appellationMatchSchema: ZodSchemaWithInputMatchingOutput<Appellatio
     { error: "Veuillez saisir un métier" },
   );
 
-export const appellationSearchResponseSchema: ZodSchemaWithInputMatchingOutput<
-  AppellationMatchDto[]
-> = z.array(appellationMatchSchema, {
-  error: "Veuillez saisir un métier",
-});
+export const appellationSearchResponseSchema: ZodSchemaWithInputMatchingOutput<AppellationSearchResponse> =
+  z.array(appellationMatchSchema, {
+    error: "Veuillez saisir un métier",
+  });
+
+export const appellationSearchInputParamsSchema: ZodSchemaWithInputMatchingOutput<AppellationSearchInputParams> =
+  z.object({
+    searchText: searchTextAlphaSchema,
+    fetchAppellationsFromNaturalLanguage: trueSchema.optional(),
+  });

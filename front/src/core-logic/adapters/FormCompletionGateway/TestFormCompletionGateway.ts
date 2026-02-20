@@ -1,5 +1,10 @@
 import { BehaviorSubject, delay, type Observable, of, Subject } from "rxjs";
-import type { AppellationMatchDto, GetSiretInfo, RomeDto } from "shared";
+import type {
+  AppellationMatchDto,
+  AppellationSearchInputParams,
+  GetSiretInfo,
+  RomeDto,
+} from "shared";
 import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 
 export class TestFormCompletionGateway implements FormCompletionGateway {
@@ -25,7 +30,7 @@ export class TestFormCompletionGateway implements FormCompletionGateway {
   }
 
   public getAppellationDtoMatching$(
-    _searchText: string,
+    _params: AppellationSearchInputParams,
   ): Observable<AppellationMatchDto[]> {
     return this.appellationDtoMatching$;
   }
