@@ -5,6 +5,7 @@ import type {
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
+  SignAssessmentRequestDto,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -84,6 +85,27 @@ export const assessmentSlice = createSlice({
       state.isLoading = false;
     },
     getAssessmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    signAssessmentRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        params: SignAssessmentRequestDto;
+        jwt: ConventionSupportedJwt;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    signAssessmentSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isLoading = false;
+    },
+    signAssessmentFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
