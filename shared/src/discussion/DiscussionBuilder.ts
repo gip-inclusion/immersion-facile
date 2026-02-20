@@ -3,13 +3,13 @@ import { match, P } from "ts-pattern";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
 import type { Builder } from "../Builder";
-import type { BusinessName } from "../business/business";
 import {
   type ConventionId,
   discoverObjective,
   type ImmersionObjective,
 } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
+import type { BusinessName } from "../establishment/establishment";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type {
   AppellationAndRomeDto,

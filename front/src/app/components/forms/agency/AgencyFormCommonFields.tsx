@@ -12,6 +12,7 @@ import {
   defaultCountryCode,
   domElementIds,
   emailSchema,
+  type LookupAddress,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
@@ -99,7 +100,7 @@ export const AgencyFormCommonFields = ({
       dispatch(
         geocodingSlice.actions.fetchSuggestionsRequested({
           locator: "agency-address",
-          lookup: establishmentInfos.businessAddress,
+          lookup: establishmentInfos.businessAddress as LookupAddress,
           countryCode: defaultCountryCode,
           selectFirstSuggestion: true,
         }),

@@ -1,5 +1,9 @@
 import type { AddressDto, LocationId } from "../address/address.dto";
 import type {
+  BusinessName,
+  BusinessNameCustomized,
+} from "../establishment/establishment";
+import type {
   ContactMode,
   FitForDisableWorkerOption,
   RemoteWorkMode,
