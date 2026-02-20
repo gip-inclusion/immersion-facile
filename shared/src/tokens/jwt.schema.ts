@@ -1,5 +1,7 @@
 import z from "zod";
 import type { RenewExpiredJwtResponse } from "../convention/convention.dto";
+import { makeHardenedStringSchema } from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import {
   expiredJwtErrorMessage,
@@ -7,21 +9,23 @@ import {
   unsupportedMagicLinkErrorMessage,
 } from "./jwt.dto";
 
+const jwtTextKindSchema = makeHardenedStringSchema({ max: 1000 });
+
 export const renewExpiredJwtRequestSchema: ZodSchemaWithInputMatchingOutput<RenewExpiredJwtRequestDto> =
   z.discriminatedUnion("kind", [
     z.object({
       kind: z.literal("convention"),
-      originalUrl: z.string(),
-      expiredJwt: z.string(),
+      originalUrl: makeHardenedStringSchema({ max: 2000 }),
+      expiredJwt: jwtTextKindSchema,
     }),
     z.object({
       kind: z.literal("connectedUser"),
-      expiredJwt: z.string(),
+      expiredJwt: jwtTextKindSchema,
     }),
     z.object({
       kind: z.literal("emailAuthCode"),
-      expiredJwt: z.string(),
-      state: z.string(),
+      expiredJwt: jwtTextKindSchema,
+      state: zUuidLike,
     }),
   ]);
 

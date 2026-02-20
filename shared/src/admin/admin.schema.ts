@@ -4,10 +4,10 @@ import { conventionIdSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { userIdSchema } from "../user/user.schema";
+import { zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
 } from "../zodUtils";
 import type {
   GetUsersFilters,

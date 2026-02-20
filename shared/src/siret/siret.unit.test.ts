@@ -1,4 +1,4 @@
-import { zStringMinLength1 } from "../zodUtils";
+import { zStringMinLength1 } from "../utils/string.schema";
 import { siretSchema } from "./siret.schema";
 
 describe("siretSchema", () => {

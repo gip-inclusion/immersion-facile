@@ -29,7 +29,8 @@ const establishmentToSearchResultPreview = ({
   })),
   nafLabel: "",
   naf: naf?.code || "",
-  name: businessNameCustomized || businessName || "Mon entreprise",
+  name: businessName,
+  customizedName: businessNameCustomized,
   // Fake data
   voluntaryToImmersion: true,
   position: {

@@ -8,6 +8,7 @@ import {
 } from "rxjs";
 import {
   type AppellationMatchDto,
+  type AppellationSearchInputParams,
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
   conflictErrorSiret,
@@ -41,17 +42,17 @@ export class SimulatedFormCompletionGateway implements FormCompletionGateway {
   }
 
   public getAppellationDtoMatching$(
-    searchText: string,
+    params: AppellationSearchInputParams,
   ): Observable<AppellationMatchDto[]> {
-    return from(this.getAppellationDtoMatching(searchText));
+    return from(this.#getAppellationDtoMatching(params));
   }
 
-  public async getAppellationDtoMatching(
-    searchText: string,
+  async #getAppellationDtoMatching(
+    params: AppellationSearchInputParams,
   ): Promise<AppellationMatchDto[]> {
     await sleep(700);
-    if (searchText === "givemeanemptylistplease") return [];
-    if (searchText === "givemeanerrorplease")
+    if (params.searchText === "givemeanemptylistplease") return [];
+    if (params.searchText === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
     return [
       {

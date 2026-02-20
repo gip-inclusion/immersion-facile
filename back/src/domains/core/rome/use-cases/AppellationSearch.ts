@@ -1,10 +1,10 @@
 import {
   type AppellationAndRomeDto,
   type AppellationMatchDto,
+  type AppellationSearchInputParams,
+  appellationSearchInputParamsSchema,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
-  zStringMinLength1,
 } from "shared";
-import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
 import { findMatchRanges } from "../../../../utils/textSearch";
 import { TransactionalUseCase } from "../../UseCase";
@@ -13,16 +13,6 @@ import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPer
 import type { AppellationsGateway } from "../ports/AppellationsGateway";
 
 const logger = createLogger(__filename);
-
-type AppellationSearchInputParams = {
-  searchText: string;
-  fetchAppellationsFromNaturalLanguage: boolean;
-};
-
-const appellationSearchInputParamsSchema = z.object({
-  searchText: zStringMinLength1,
-  fetchAppellationsFromNaturalLanguage: z.boolean(),
-});
 
 export class AppellationSearch extends TransactionalUseCase<
   AppellationSearchInputParams,

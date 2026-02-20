@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { keys } from "ramda";
 import {
   type AddressWithCountryCodeAndPosition,
+  type BusinessAddress,
   defaultCountryCode,
   type LookupAddress,
   type SupportedCountryCode,
@@ -148,7 +149,7 @@ export const geocodingSlice = createSlice({
       action: PayloadActionWithLocator<
         AddressAutocompleteLocator,
         {
-          lookup: LookupAddress;
+          lookup: LookupAddress | BusinessAddress;
           countryCode: SupportedCountryCode;
           selectFirstSuggestion: boolean;
         }

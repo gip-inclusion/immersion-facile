@@ -1,11 +1,14 @@
 import { z } from "zod";
-import { businessNameSchema } from "../business/business";
+import {
+  businessAddressSchema,
+  businessNameSchema,
+} from "../business/business";
 import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";
+import { zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type GetSiretInfo,
@@ -40,7 +43,7 @@ const getSiretResponseSchema: ZodSchemaWithInputMatchingOutput<SiretEstablishmen
   z.object({
     siret: siretSchema,
     businessName: businessNameSchema,
-    businessAddress: z.string(),
+    businessAddress: businessAddressSchema,
     isOpen: z.boolean(), // true if the office is currently open for business.
     nafDto: nafSchema.optional(),
     numberEmployeesRange: z.enum(numberEmployeesRanges, {

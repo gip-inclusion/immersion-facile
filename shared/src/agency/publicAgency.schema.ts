@@ -3,10 +3,8 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
-import {
-  stringWithMaxLength255,
-  type ZodSchemaWithInputMatchingOutput,
-} from "../zodUtils";
+import { stringWithMaxLength255 } from "../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import { agencyIdSchema, agencyKindSchema } from "./agency.schema";
 import type {
   AgencyPublicDisplayDto,

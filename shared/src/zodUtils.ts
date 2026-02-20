@@ -19,6 +19,8 @@ export const localization = {
   invalidImmersionObjective: "Vous devez choisir un objectif d'immersion",
   invalidPhone: "Numéro de téléphone incorrect",
   invalidPostalCode: "Veuillez spécifier un code postal dans l'adresse.",
+  invalidTextWithHtml:
+    "Un text comprennant des éléments HTML n'est pas autorisé.",
   invalidTimeFormat: "Le format de l'heure est invalide",
   invalidUuid: "Le format de l'identifiant est invalide",
   invalidValidationFormatDate:
@@ -37,38 +39,6 @@ export const localization = {
   invalidSiret: "SIRET doit être composé de 14 chiffres",
 };
 
-export const zStringMinLength1 = z
-  .string({
-    error: localization.required,
-  })
-  .trim()
-  .min(1, localization.required);
-
-export const zStringCanBeEmpty = z.string().trim();
-
-export const zStringPossiblyEmptyWithMax = (
-  max: number,
-): ZodSchemaWithInputMatchingOutput<string> =>
-  zStringCanBeEmpty.max(max, localization.maxCharacters(max));
-
-export const zTrimmedStringWithMax = (max: number) =>
-  zStringMinLength1.max(max, localization.maxCharacters(max));
-
-export const stringWithMaxLength255 = zTrimmedStringWithMax(255);
-
-const timeHHmmRegExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-
-export const zTimeString = z
-  .string({
-    error: localization.required,
-  })
-  .regex(timeHHmmRegExp, localization.invalidTimeFormat);
-
-export const makezTrimmedString = (message: string) =>
-  zStringMinLength1
-    .transform((s) => s.trim())
-    .refine((s) => s.length > 0, message);
-
 export const zBoolean = z.boolean({
   error: localization.required,
 });
@@ -82,24 +52,9 @@ export const zToBoolean = z
 export const zToNumber: ZodSchemaWithInputMatchingOutput<number> =
   z.coerce.number();
 
-export const zUuidLike = z.string().length(36);
-
 export const emptyObjectSchema: ZodSchemaWithInputMatchingOutput<
   Record<string, never>
 > = z.object({}).strict();
-
-export const makePersonNameSchema = (fieldName: "firstname" | "lastname") => {
-  const label = fieldName === "firstname" ? "prénom" : "nom";
-  return z
-    .string()
-    .trim()
-    .regex(
-      /^[A-Za-zÀ-ÿ\s'-]*$/,
-      `Le ${label} ne peut contenir que des lettres, espaces, tirets et apostrophes`,
-    )
-    .max(50, `Le ${label} ne doit pas dépasser 50 caractères`)
-    .transform((val) => val.replace(/\s+/g, " "));
-};
 
 export const expressEmptyResponseBody = z.void().or(z.literal(""));
 

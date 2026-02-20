@@ -8,6 +8,7 @@ import {
   type LegacySearchQueryParamsDto,
   type LegacySearchQueryParamsWithGeoParams,
   type NafCode,
+  type NumberEmployeesRange,
   type RomeDto,
 } from "shared";
 import {
@@ -1487,7 +1488,8 @@ const lbbToSearchResult = (
   naf: lbb.props.naf,
   nafLabel: lbb.props.naf_label,
   name: lbb.props.company_name,
-  numberOfEmployeeRange: `${lbb.props.headcount_min}-${lbb.props.headcount_max}`,
+  numberOfEmployeeRange:
+    `${lbb.props.headcount_min}-${lbb.props.headcount_max}` as NumberEmployeesRange,
   position: lbb.props.location,
   rome: romeDto.romeCode,
   romeLabel: romeDto.romeLabel,

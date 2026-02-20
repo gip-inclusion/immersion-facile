@@ -23,6 +23,7 @@ import {
   type SiretDto,
   type UserWithAdminRights,
 } from "shared";
+import type { SearchTextAlphaNumeric } from "shared/src/search/searchText.schema";
 import { v4 as uuid } from "uuid";
 import {
   type KyselyDb,
@@ -2457,7 +2458,9 @@ describe("Pg implementation of ConventionQueries", () => {
             {
               userAgencyIds: [agencyIdA],
               pagination: { page: 1, perPage: 10 },
-              filters: { search: conventionWithManagedError.id },
+              filters: {
+                search: conventionWithManagedError.id as SearchTextAlphaNumeric,
+              },
             },
           );
 
@@ -2521,7 +2524,7 @@ describe("Pg implementation of ConventionQueries", () => {
               userAgencyIds: [agencyIdA],
               pagination: { page: 1, perPage: 10 },
               filters: {
-                search: conventionWithManagedError.id,
+                search: conventionWithManagedError.id as SearchTextAlphaNumeric,
                 broadcastErrorKind: "functional",
                 conventionStatus: ["READY_TO_SIGN"],
               },

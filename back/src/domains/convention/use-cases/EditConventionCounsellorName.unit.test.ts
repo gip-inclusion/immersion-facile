@@ -446,8 +446,8 @@ describe("EditCounsellorName", () => {
         await usecase.execute(
           {
             conventionId,
-            firstname: "",
-            lastname: "",
+            firstname: "Billy",
+            lastname: "Idol",
           },
           {
             userId: connectedUser.id,
@@ -458,17 +458,8 @@ describe("EditCounsellorName", () => {
           {
             ...convention,
             agencyReferent: {
-              firstname: "",
-              lastname: "",
-            },
-          },
-        ]);
-        expectToEqual(uow.conventionRepository.conventions, [
-          {
-            ...convention,
-            agencyReferent: {
-              firstname: "",
-              lastname: "",
+              firstname: "Billy",
+              lastname: "Idol",
             },
           },
         ]);

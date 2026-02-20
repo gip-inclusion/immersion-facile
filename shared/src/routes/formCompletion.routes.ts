@@ -1,8 +1,9 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
-import { appellationSearchResponseSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { searchTextSchema } from "../search/searchText.schema";
+import {
+  appellationSearchInputParamsSchema,
+  appellationSearchResponseSchema,
+} from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import {
   getSiretInfoSchema,
   isSiretExistResponseSchema,
@@ -42,10 +43,7 @@ export const formCompletionRoutes = defineRoutes({
   appellation: defineRoute({
     method: "get",
     url: "/appellation",
-    queryParamsSchema: z.object({
-      searchText: searchTextSchema,
-      naturalLanguage: z.literal("true").optional(),
-    }),
+    queryParamsSchema: appellationSearchInputParamsSchema,
     responses: {
       200: appellationSearchResponseSchema,
     },

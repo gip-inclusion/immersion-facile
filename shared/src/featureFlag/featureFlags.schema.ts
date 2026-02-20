@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringCanBeEmpty,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type FeatureFlag,

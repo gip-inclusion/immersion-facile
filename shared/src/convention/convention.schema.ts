@@ -44,16 +44,20 @@ import type { OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
-  localization,
   makePersonNameSchema,
-  type ZodSchemaWithInputMatchingOutput,
-  zBoolean,
-  zEnumValidation,
+  optionnalEmptyStringMax1024,
+  stringWithMaxLength255,
   zStringCanBeEmpty,
   zStringMinLength1,
   zStringPossiblyEmptyWithMax,
-  zToNumber,
   zTrimmedStringWithMax,
+} from "../utils/string.schema";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+  zBoolean,
+  zEnumValidation,
+  zToNumber,
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
@@ -122,8 +126,6 @@ import {
   validateBeneficiaryAddressAndParse,
 } from "./conventionRefinements";
 
-const zTrimmedStringMax255 = zTrimmedStringWithMax(255);
-
 export const conventionIdSchema: ZodSchemaWithInputMatchingOutput<ConventionId> =
   z.uuid(localization.invalidUuid);
 
@@ -135,8 +137,8 @@ const actorSchema = z.object({
   role: roleSchema,
   email: emailSchema,
   phone: phoneNumberSchema,
-  firstName: zTrimmedStringMax255,
-  lastName: zTrimmedStringMax255,
+  firstName: stringWithMaxLength255,
+  lastName: stringWithMaxLength255,
 });
 
 const signatorySchema = actorSchema.merge(
@@ -150,11 +152,11 @@ const beneficiarySchema: ZodSchemaWithInputMatchingOutput<
 > = signatorySchema.merge(
   z.object({
     role: z.literal("beneficiary"),
-    emergencyContact: zStringCanBeEmpty.optional(),
+    emergencyContact: optionnalEmptyStringMax1024,
     emergencyContactPhone: phoneNumberSchema.optional().or(z.literal("")),
     emergencyContactEmail: emailPossiblyEmptySchema,
     federatedIdentity: peConnectIdentitySchema.optional(),
-    financiaryHelp: zStringCanBeEmpty.optional(),
+    financiaryHelp: optionnalEmptyStringMax1024,
     birthdate: makeDateStringSchema(),
     isRqth: zBoolean.optional(),
   }),
@@ -167,14 +169,14 @@ const studentBeneficiarySchema: ZodSchemaWithInputMatchingOutput<
       levelsOfEducation,
       "Votre niveau d'étude est obligatoire.",
     ),
-    schoolName: zStringMinLength1,
-    schoolPostcode: zStringMinLength1,
+    schoolName: stringWithMaxLength255,
+    schoolPostcode: stringWithMaxLength255,
     address: z
       .object({
-        streetNumberAndAddress: zStringCanBeEmpty,
-        postcode: zStringMinLength1,
-        departmentCode: zStringMinLength1,
-        city: zStringMinLength1,
+        streetNumberAndAddress: stringWithMaxLength255,
+        postcode: stringWithMaxLength255,
+        departmentCode: stringWithMaxLength255,
+        city: stringWithMaxLength255,
       })
       .optional(),
   }),
@@ -183,7 +185,7 @@ const studentBeneficiarySchema: ZodSchemaWithInputMatchingOutput<
 export const establishmentTutorSchema: ZodSchemaWithInputMatchingOutput<EstablishmentTutor> =
   actorSchema.extend({
     role: z.literal("establishment-tutor"),
-    job: zTrimmedStringMax255,
+    job: stringWithMaxLength255,
   });
 
 const establishmentRepresentativeSchema: ZodSchemaWithInputMatchingOutput<EstablishmentRepresentative> =
@@ -202,8 +204,8 @@ const beneficiaryCurrentEmployerSchema: ZodSchemaWithInputMatchingOutput<Benefic
       role: z.literal("beneficiary-current-employer"),
       job: zStringCanBeEmpty,
       businessSiret: siretSchema,
-      businessName: zTrimmedStringMax255,
-      businessAddress: zStringMinLength1,
+      businessName: stringWithMaxLength255,
+      businessAddress: stringWithMaxLength255,
     }),
   );
 

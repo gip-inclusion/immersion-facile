@@ -1,28 +1,37 @@
 import type {
   AddressDto,
   AppellationDto,
+  BusinessName,
+  BusinessNameCustomized,
   ContactMode,
   DateTimeIsoString,
+  EstablishmentAdditionnalInformation,
+  EstablishmentWebSite,
   FitForDisableWorkerOption,
   GeoPositionDto,
   InternalOfferDto,
   LocationId,
+  NafCode,
+  NafSousClasseLabel,
+  NumberEmployeesRange,
   RemoteWorkMode,
   RomeCode,
+  RomeLabel,
   SiretDto,
+  UrlOfParner,
   WithIsAvailable,
 } from "shared";
 
 export type SearchImmersionResultPublicV3 = {
   rome: RomeCode;
-  romeLabel: string;
+  romeLabel: RomeLabel;
   appellations: AppellationDto[];
   establishmentScore: number;
-  naf: string;
-  nafLabel: string;
+  naf: NafCode;
+  nafLabel: NafSousClasseLabel;
   siret: SiretDto;
-  name: string;
-  customizedName?: string;
+  name: BusinessName;
+  customizedName?: BusinessNameCustomized;
   voluntaryToImmersion: boolean;
   fitForDisabledWorkers: FitForDisableWorkerOption | null;
   locationId: LocationId | null;
@@ -30,10 +39,10 @@ export type SearchImmersionResultPublicV3 = {
   address: AddressDto;
   contactMode?: ContactMode;
   distance_m?: number;
-  numberOfEmployeeRange?: string;
-  website?: string;
-  additionalInformation?: string;
-  urlOfPartner?: string;
+  numberOfEmployeeRange?: NumberEmployeesRange;
+  website?: EstablishmentWebSite;
+  additionalInformation?: EstablishmentAdditionnalInformation;
+  urlOfPartner?: UrlOfParner;
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
   remoteWorkMode: RemoteWorkMode;

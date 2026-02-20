@@ -16,14 +16,18 @@ import {
   appellationCodeSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import { searchTextAlphaNumericSchema } from "../search/searchText.schema";
 import { siretSchema } from "../siret/siret.schema";
+import {
+  makeHardenedStringSchema,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+} from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringCanBeEmpty,
-  zStringMinLength1,
   zToNumber,
-  zUuidLike,
 } from "../zodUtils";
 import {
   type Attachment,
@@ -46,6 +50,7 @@ import {
   type ExchangeRead,
   type ExchangeRole,
   type FlatGetPaginatedDiscussionsParams,
+  type Message,
   type PotentialBeneficiaryCommonProps,
   type WithDiscussionId,
   type WithDiscussionRejection,
@@ -191,10 +196,14 @@ export const discussionRejectedSchema: ZodSchemaWithInputMatchingOutput<WithDisc
     })
     .and(discussionRejectionSchema);
 
+//TODO : max message en DB 653522
+export const messageSchema: ZodSchemaWithInputMatchingOutput<Message> =
+  makeHardenedStringSchema({ max: 5000, isHtml: true });
+
 export const withExchangeMessageSchema: ZodSchemaWithInputMatchingOutput<
   Pick<ExchangeFromDashboard, "message">
 > = z.object({
-  message: zStringMinLength1,
+  message: messageSchema,
 });
 
 export const exchangeMessageFromDashboardSchema: ZodSchemaWithInputMatchingOutput<ExchangeFromDashboard> =
@@ -295,7 +304,7 @@ export const flatGetPaginatedDiscussionsParamsSchema: ZodSchemaWithInputMatching
       .optional()
       .or(z.array(discussionStatusSchema).optional())
       .optional(),
-    search: z.string().optional(),
+    search: searchTextAlphaNumericSchema.optional(),
   });
 
 export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<DiscussionInList> =

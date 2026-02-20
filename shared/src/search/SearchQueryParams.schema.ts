@@ -11,18 +11,22 @@ import {
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
+import { zStringCanBeEmpty } from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zToBoolean,
   zToNumber,
-  zUuidLike,
 } from "../zodUtils";
 import type {
   GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   LegacySearchQueryParamsDto,
+  Place,
 } from "./SearchQueryParams.dto";
+
+const placeSchema: ZodSchemaWithInputMatchingOutput<Place> = zStringCanBeEmpty;
 
 export const distanceKmSchema = z.coerce
   .number()
@@ -52,7 +56,7 @@ export const legacySearchParamsSchema: ZodSchemaWithInputMatchingOutput<LegacySe
       appellationCodes: z.array(appellationCodeSchema).optional(),
       siret: siretSchema.optional(),
       voluntaryToImmersion: z.undefined().or(zToBoolean.optional()),
-      place: z.string().optional(),
+      place: placeSchema.optional(),
       establishmentSearchableBy: z
         .enum(["students", "jobSeekers"], {
           error: localization.invalidEnum,
@@ -118,7 +122,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
         error: localization.invalidEnum,
       })
       .optional(),
-    place: z.string().optional(),
+    place: placeSchema.optional(),
     showOnlyAvailableOffers: zToBoolean.optional(),
   })
   .and(paginationQueryParamsSchema)
