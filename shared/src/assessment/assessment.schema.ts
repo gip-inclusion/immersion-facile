@@ -97,6 +97,9 @@ export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyA
     }),
     conventionId: z.string(),
     establishmentFeedback: zStringMinLength1,
+    beneficiaryAgreement: z.boolean().nullable(),
+    beneficiaryFeedback: z.string().nullable(),
+    signedAt: makeDateStringSchema().nullable(),
   });
 
 export const deleteAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<DeleteAssessmentRequestDto> =
