@@ -7,6 +7,7 @@ import {
   type DeleteAssessmentRequestDto,
   errors,
   type LegacyAssessmentDto,
+  type SignAssessmentRequestDto,
   type WithConventionId,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -26,6 +27,30 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   constructor(
     private readonly httpClient: HttpClient<ConventionMagicLinkRoutes>,
   ) {}
+
+  public signAssessment$(
+    params: SignAssessmentRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .signAssessment({
+          headers: { authorization: jwt },
+          body: {
+            conventionId: params.conventionId,
+            beneficiaryAgreement: params.beneficiaryAgreement,
+            beneficiaryFeedback: params.beneficiaryFeedback,
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404, 409) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
 
   public createAssessment$({
     jwt,

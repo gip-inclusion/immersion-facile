@@ -5,6 +5,7 @@ import {
   assessmentDtoSchema,
   deleteAssessmentRequestDtoSchema,
   legacyAssessmentDtoSchema,
+  signAssessmentRequestDtoSchema,
 } from "../assessment/assessment.schema";
 import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
@@ -82,6 +83,21 @@ export const conventionMagicLinkRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+    },
+  }),
+
+  signAssessment: defineRoute({
+    url: "/auth/sign-assessment",
+    method: "post",
+    ...withAuthorizationHeaders,
+    requestBodySchema: signAssessmentRequestDtoSchema,
+    responses: {
+      200: withConventionIdLegacySchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+      409: httpErrorSchema,
     },
   }),
 

@@ -5,6 +5,7 @@ import type {
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
+  SignAssessmentRequestDto,
   WithConventionId,
 } from "shared";
 
@@ -15,6 +16,10 @@ export type AssessmentAndJwt = {
 
 export interface AssessmentGateway {
   createAssessment$(params: AssessmentAndJwt): Observable<void>;
+  signAssessment$(
+    params: SignAssessmentRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void>;
   deleteAssessment$(
     params: DeleteAssessmentRequestDto,
     jwt: ConventionSupportedJwt,
