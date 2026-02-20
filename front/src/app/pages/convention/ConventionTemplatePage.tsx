@@ -12,6 +12,7 @@ import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
 import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 
 export type ConventionTemplatePageRoute = Route<
@@ -53,6 +54,12 @@ export const ConventionTemplatePage = ({
       }),
     );
   }, [dispatch, connectedUserJwt]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    };
+  }, [dispatch]);
 
   if (
     !isConventionTemplateLoading &&
