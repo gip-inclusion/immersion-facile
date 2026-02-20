@@ -26,6 +26,9 @@ const createAssessmentQueryBuilder = (transaction: KyselyDb) => {
       lastDayOfPresence: sql<DateString>`date_to_iso(last_day_of_presence)`,
       numberOfMissedHours: eb.ref("number_of_missed_hours"),
       numberOfHoursActuallyMade: eb.ref("number_of_hours_actually_made"),
+      beneficiaryAgreement: eb.ref("beneficiary_agreement"),
+      beneficiaryFeedback: eb.ref("beneficiary_feedback"),
+      signedAt: sql<DateString>`date_to_iso(signed_at)`,
     }).as("assessment"),
   ]);
 };
@@ -39,6 +42,9 @@ const parseAssessmentEntitySchema = (assessment: any) =>
     establishmentAdvices: assessment.establishmentAdvices,
     endedWithAJob: assessment.endedWithAJob,
     numberOfHoursActuallyMade: assessment.numberOfHoursActuallyMade,
+    beneficiaryAgreement: assessment.beneficiaryAgreement,
+    beneficiaryFeedback: assessment.beneficiaryFeedback,
+    signedAt: assessment.signedAt,
     ...(assessment.contractStartDate
       ? { contractStartDate: assessment.contractStartDate }
       : {}),
@@ -90,39 +96,26 @@ export class PgAssessmentRepository implements AssessmentRepository {
     );
   }
 
+  public async update(
+    conventionId: ConventionId,
+    updatedAssessment: AssessmentEntity,
+  ): Promise<void> {
+    const result = await this.transaction
+      .updateTable("immersion_assessments")
+      .set(assessmentEntityToDbRow(updatedAssessment))
+      .where("convention_id", "=", conventionId)
+      .executeTakeFirst();
+
+    if (Number(result.numUpdatedRows) === 0)
+      throw errors.assessment.notFound(conventionId);
+  }
+
   public async save(assessmentEntity: AssessmentEntity): Promise<void> {
-    const getNonLegacyFields = (assessmentEntity: AssessmentEntity) => {
-      if (!("establishmentAdvices" in assessmentEntity)) return {};
-
-      return {
-        ended_with_a_job: assessmentEntity.endedWithAJob,
-        type_of_contract: assessmentEntity.endedWithAJob
-          ? assessmentEntity.typeOfContract
-          : null,
-        contract_start_date: assessmentEntity.endedWithAJob
-          ? assessmentEntity.contractStartDate
-          : null,
-        establishment_advices: assessmentEntity.establishmentAdvices,
-        last_day_of_presence:
-          assessmentEntity.status === "PARTIALLY_COMPLETED"
-            ? assessmentEntity.lastDayOfPresence
-            : null,
-        number_of_missed_hours:
-          assessmentEntity.status === "PARTIALLY_COMPLETED"
-            ? assessmentEntity.numberOfMissedHours
-            : null,
-      };
-    };
-
     await this.transaction
       .insertInto("immersion_assessments")
       .values({
         convention_id: assessmentEntity.conventionId,
-        status: assessmentEntity.status,
-        establishment_feedback: assessmentEntity.establishmentFeedback,
-        ...getNonLegacyFields(assessmentEntity),
-        number_of_hours_actually_made:
-          assessmentEntity.numberOfHoursActuallyMade,
+        ...assessmentEntityToDbRow(assessmentEntity),
       })
       .execute()
       .catch((error) => {
@@ -144,3 +137,35 @@ const noConventionMatchingErrorMessage =
 
 const assessmentAlreadyExistsErrorMessage =
   '"immersion_assessments" violates unique constraint "immersion_assessments_pkey"';
+const getNonLegacyFields = (assessmentEntity: AssessmentEntity) => {
+  if (!("establishmentAdvices" in assessmentEntity)) return {};
+
+  return {
+    ended_with_a_job: assessmentEntity.endedWithAJob,
+    type_of_contract: assessmentEntity.endedWithAJob
+      ? assessmentEntity.typeOfContract
+      : null,
+    contract_start_date: assessmentEntity.endedWithAJob
+      ? assessmentEntity.contractStartDate
+      : null,
+    establishment_advices: assessmentEntity.establishmentAdvices,
+    last_day_of_presence:
+      assessmentEntity.status === "PARTIALLY_COMPLETED"
+        ? assessmentEntity.lastDayOfPresence
+        : null,
+    number_of_missed_hours:
+      assessmentEntity.status === "PARTIALLY_COMPLETED"
+        ? assessmentEntity.numberOfMissedHours
+        : null,
+  };
+};
+
+const assessmentEntityToDbRow = (assessmentEntity: AssessmentEntity) => ({
+  status: assessmentEntity.status,
+  establishment_feedback: assessmentEntity.establishmentFeedback,
+  ...getNonLegacyFields(assessmentEntity),
+  number_of_hours_actually_made: assessmentEntity.numberOfHoursActuallyMade,
+  beneficiary_agreement: assessmentEntity.beneficiaryAgreement,
+  beneficiary_feedback: assessmentEntity.beneficiaryFeedback,
+  signed_at: assessmentEntity.signedAt,
+});
