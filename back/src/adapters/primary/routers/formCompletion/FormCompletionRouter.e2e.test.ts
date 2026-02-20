@@ -50,6 +50,34 @@ describe("formCompletion Routes", () => {
         status: 200,
       });
     });
+
+    it("200 - forwards valid requests with true as string", async () => {
+      const response = await httpClient.appellation({
+        queryParams: {
+          searchText: "trail",
+          fetchAppellationsFromNaturalLanguage: "true" as unknown as true,
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        body: [
+          {
+            appellation: {
+              appellationCode: "20714",
+              appellationLabel: "Vitrailliste",
+              romeCode: "B1602",
+              romeLabel: "Vitraillerie",
+            },
+            matchRanges: [
+              {
+                startIndexInclusive: 2,
+                endIndexExclusive: 7,
+              },
+            ],
+          },
+        ],
+        status: 200,
+      });
+    });
   });
 
   describe(`${displayRouteName(formCompletionRoutes.getSiretInfo)}`, () => {

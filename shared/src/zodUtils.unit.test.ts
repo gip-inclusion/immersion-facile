@@ -1,4 +1,5 @@
-import { zToBoolean, zToNumber } from "./zodUtils";
+import { ZodError } from "zod";
+import { trueSchema, zToBoolean, zToNumber } from "./zodUtils";
 
 describe("zodUtils", () => {
   describe("zToBoolean schema validation", () => {
@@ -35,6 +36,38 @@ describe("zodUtils", () => {
       "not a number",
     ])("boolean '%s' to be invalid", (boolean) => {
       expect(() => zToNumber.parse(boolean)).toThrow();
+    });
+  });
+
+  describe("trueSchema", () => {
+    const invalidInputZodError = new ZodError([
+      {
+        code: "custom",
+        path: [],
+        message: "Invalid input",
+      },
+    ]);
+    it.each([
+      { input: true, result: true },
+      { input: "true", result: true },
+      { input: "1", result: true },
+      {
+        input: false,
+        result: invalidInputZodError,
+      },
+      { input: "false", result: invalidInputZodError },
+      { input: "0", result: invalidInputZodError },
+      {
+        input: "not a boolean string",
+        result: invalidInputZodError,
+      },
+    ] satisfies {
+      input: string | boolean;
+      result: ZodError | true;
+    }[])("boolean : $input", ({ input, result }) => {
+      if (result instanceof ZodError)
+        expect(() => trueSchema.parse(input)).toThrow(result);
+      else expect(trueSchema.parse(input)).toBe(result);
     });
   });
 });

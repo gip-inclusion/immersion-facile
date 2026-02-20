@@ -51,7 +51,10 @@ const appellationRequestEpic: AppEpic<AppellationAction> = (
     filter(appellationSlice.actions.fetchSuggestionsRequested.match),
     mergeMap((action) => {
       return formCompletionGateway
-        .getAppellationDtoMatching$(action.payload.lookup, true)
+        .getAppellationDtoMatching$({
+          searchText: action.payload.lookup,
+          fetchAppellationsFromNaturalLanguage: true,
+        })
         .pipe(
           map((suggestions) => ({
             suggestions,
