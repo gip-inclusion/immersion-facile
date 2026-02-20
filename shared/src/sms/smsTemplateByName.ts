@@ -36,6 +36,7 @@ const createSmsTemplates = (
 ) => templatesByName;
 
 export type SmsTemplateByName = typeof smsTemplatesByName;
+export type SmsTemplateKind = keyof SmsParamsBySmsType;
 export const smsTemplatesByName = createSmsTemplates({
   ReminderForSignatories: {
     createContent: ({ shortLink }) =>
