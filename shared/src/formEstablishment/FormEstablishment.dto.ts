@@ -2,7 +2,10 @@ import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition, LocationId } from "../address/address.dto";
 import type { ApiConsumerName } from "../apiConsumer/ApiConsumer";
-import type { BusinessName } from "../business/business";
+import type {
+  BusinessName,
+  BusinessNameCustomized,
+} from "../business/business";
 import type { Email } from "../email/email.dto";
 import type { GroupName } from "../group/group.dto";
 import type { NafDto } from "../naf/naf.dto";
@@ -133,7 +136,7 @@ export type CommonFormEstablishmentDto = {
   businessAddresses: FormEstablishmentAddress[];
   userRights: FormEstablishmentUserRight[];
   businessName: BusinessName;
-  businessNameCustomized?: string;
+  businessNameCustomized?: BusinessNameCustomized;
   fitForDisabledWorkers: FitForDisableWorkerOption;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
