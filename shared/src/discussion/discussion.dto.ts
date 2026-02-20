@@ -250,9 +250,12 @@ export type Attachment = {
   link: string;
 };
 
+export type Message = Flavor<string, "Message">;
+export type Subject = Flavor<string, "Subject">;
+
 type CommonExchange = {
-  subject: string;
-  message: string;
+  subject: Subject;
+  message: Message;
   sentAt: DateString;
   attachments: Attachment[];
 };

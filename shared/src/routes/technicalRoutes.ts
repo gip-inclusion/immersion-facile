@@ -1,31 +1,16 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import type { ConventionId } from "../convention/convention.dto";
 import {
   validateEmailInputSchema,
   validateEmailResponseSchema,
 } from "../email/validateEmail.schema";
 import { featureFlagsSchema } from "../featureFlag/featureFlags.schema";
+import { htmlToPdfRequestSchema } from "../file/htmlToPdf";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
-import {
-  emptyObjectSchema,
-  expressEmptyResponseBody,
-  type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
-} from "../zodUtils";
-
-export type HtmlToPdfRequest = {
-  htmlContent: string;
-  conventionId: ConventionId;
-};
-
-export const htmlToPdfRequestSchema: ZodSchemaWithInputMatchingOutput<HtmlToPdfRequest> =
-  z.object({
-    htmlContent: zStringMinLength1,
-    conventionId: z.string(),
-  });
+import { zStringMinLength1 } from "../utils/string.schema";
+import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
 export type AvailableApiVersion = (typeof availableApiVersions)[number];
 const availableApiVersions = ["v2", "v3"] as const;
