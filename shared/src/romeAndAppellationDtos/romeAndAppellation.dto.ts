@@ -1,3 +1,4 @@
+import type { SearchTextAlpha } from "../search/searchText.schema";
 import type { Flavor } from "../typeFlavors";
 
 export type RomeCode = Flavor<string, "CodeRome">;
@@ -31,4 +32,10 @@ export type MatchRangeDto = {
 export type AppellationMatchDto = {
   appellation: AppellationAndRomeDto;
   matchRanges: MatchRangeDto[];
+};
+
+export type AppelationSearchResponse = AppellationMatchDto[];
+export type AppellationSearchInputParams = {
+  searchText: SearchTextAlpha;
+  fetchAppellationsFromNaturalLanguage?: true;
 };
