@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import {
+  businessNameSchema,
+  customizedNameSchema,
+} from "../establishment/establishment";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { createPaginatedSchema } from "../pagination/pagination.schema";

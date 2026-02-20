@@ -6,11 +6,11 @@ import {
   agencyRoleSchema,
 } from "../agency/agency.schema";
 import { proConnectInfoSchema } from "../auth/proConnect/proConnect.schema";
-import { businessNameSchema } from "../business/business";
 import { emailSchema } from "../email/email.schema";
-import type {
-  EstablishmentData,
-  WithEstablishmentDashboards,
+import {
+  businessNameSchema,
+  type EstablishmentData,
+  type WithEstablishmentDashboards,
 } from "../establishment/establishment";
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";

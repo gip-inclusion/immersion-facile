@@ -1,6 +1,5 @@
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, LocationId } from "../address/address.dto";
-import type { BusinessName } from "../business/business";
 import type {
   ConventionId,
   discoverObjective,
@@ -8,6 +7,7 @@ import type {
   LevelOfEducation,
 } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
+import type { BusinessName } from "../establishment/establishment";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
 import type {
