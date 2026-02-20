@@ -285,6 +285,9 @@ export const setupInitialState = ({
         establishmentFeedback: "osef",
         numberOfHoursActuallyMade: 35,
         establishmentAdvices: "pas de conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
         _entityName: "Assessment",
       },
     ];

@@ -39,6 +39,9 @@ describe("Convention routes", () => {
     endedWithAJob: false,
     establishmentFeedback: "Ca c'est bien passé",
     establishmentAdvices: "mon conseil",
+    beneficiaryAgreement: true,
+    beneficiaryFeedback: "Mon commentaire",
+    signedAt: new Date("2025-01-01").toISOString(),
   };
 
   const conventionReadConsumerWithNoScope = new ApiConsumerBuilder()

@@ -306,6 +306,9 @@ describe("authenticatedConventionRoutes", () => {
           establishmentFeedback: "Ca c'est bien passé",
           establishmentAdvices: "mon conseil",
           numberOfHoursActuallyMade: 35,
+          beneficiaryAgreement: true,
+          beneficiaryFeedback: "Mon commentaire",
+          signedAt: new Date("2025-01-01").toISOString(),
           _entityName: "Assessment",
         },
       ];

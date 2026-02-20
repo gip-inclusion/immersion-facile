@@ -538,6 +538,9 @@ export const defaultEmailValueByEmailKind: {
     immersionAppellationLabel: "APPELLATION_LABEL",
     assessment: {
       conventionId: "conv-id",
+      beneficiaryAgreement: true,
+      beneficiaryFeedback: "my super feedback",
+      signedAt: new Date("2025-01-01").toISOString(),
       status: "PARTIALLY_COMPLETED",
       lastDayOfPresence: new Date("2025-01-11").toISOString(),
       numberOfMissedHours: 12,

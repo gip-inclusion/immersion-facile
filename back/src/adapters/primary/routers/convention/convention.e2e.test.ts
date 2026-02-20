@@ -361,6 +361,9 @@ describe("convention e2e", () => {
           establishmentFeedback: "Ca c'est bien passé",
           establishmentAdvices: "mon conseil",
           numberOfHoursActuallyMade: 35,
+          beneficiaryAgreement: null,
+          beneficiaryFeedback: null,
+          signedAt: null,
           _entityName: "Assessment",
         },
       ];

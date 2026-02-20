@@ -12,6 +12,7 @@ import {
   type DeleteAssessmentRequestDto,
   type FormAssessmentDto,
   type LegacyAssessmentDto,
+  type SignAssessmentRequestDto,
   typeOfContracts,
   type WithAssessmentDto,
   type WithEndedWithAJob,
@@ -73,7 +74,14 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
     })
     .and(withAssessmentStatusSchema)
     .and(withEstablishmentCommentsSchema)
-    .and(withEndedWithAJobSchema);
+    .and(withEndedWithAJobSchema)
+    .and(
+      z.object({
+        beneficiaryAgreement: z.boolean().nullable(),
+        beneficiaryFeedback: z.string().nullable(),
+        signedAt: makeDateStringSchema().nullable(),
+      }),
+    );
 
 export const withAssessmentSchema: z.ZodType<
   WithAssessmentDto,
@@ -95,4 +103,11 @@ export const deleteAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<
   z.object({
     conventionId: conventionIdSchema,
     deleteAssessmentJustification: zStringMinLength1,
+  });
+
+export const signAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<SignAssessmentRequestDto> =
+  z.object({
+    conventionId: conventionIdSchema,
+    beneficiaryAgreement: z.boolean(),
+    beneficiaryFeedback: z.string().max(255),
   });

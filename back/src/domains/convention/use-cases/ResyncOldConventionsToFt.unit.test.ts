@@ -677,6 +677,9 @@ describe("ResyncOldConventionsToFt use case", () => {
           endedWithAJob: false,
           establishmentFeedback: "commentaire",
           establishmentAdvices: "commentaire",
+          beneficiaryAgreement: true,
+          beneficiaryFeedback: "my super feedback",
+          signedAt: new Date("2025-01-01").toISOString(),
         };
         uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
         uow.conventionRepository.setConventions([conventionToSync1]);

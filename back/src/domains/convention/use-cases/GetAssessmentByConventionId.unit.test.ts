@@ -59,6 +59,9 @@ describe("GetAssessmentByConventionId", () => {
     endedWithAJob: false,
     establishmentAdvices: "my advices",
     establishmentFeedback: "my feedback",
+    beneficiaryAgreement: true,
+    beneficiaryFeedback: "my super feedback",
+    signedAt: new Date("2025-01-01").toISOString(),
   };
   const [passingRoles, failingRoles] = splitCasesBetweenPassingAndFailing(
     allRoles,
