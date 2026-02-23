@@ -54,13 +54,17 @@ git ls-remote --heads origin <nom-branche-courante>
 - **Si la branche n'a PAS été pushée** : proposer de la renommer en `<numéro-issue>-<slug-du-titre>` (slug : titre en minuscules, espaces remplacés par des tirets, sans caractères spéciaux, sans accents). Si l'utilisateur accepte, exécuter `git branch -m <nouveau-nom>`.
 - **Si la branche a déjà été pushée** : ne pas proposer de renommer, passer directement à la suite.
 
-### Créer un commit de référence
+### Référencer l'issue dans le dernier commit
 
-Créer un commit vide qui référence l'issue, pour que le lien soit établi même avant la PR :
+Amender le dernier commit pour ajouter la référence à l'issue dans son message :
 
 ```
-git commit --allow-empty -m "Refs #<numéro-issue>"
+git commit --amend -m "<message-du-dernier-commit>
+
+Refs #<numéro-issue>"
 ```
+
+Ne PAS créer de commit vide. Récupérer le message du dernier commit avec `git log -1 --format=%B` et y ajouter `Refs #<numéro-issue>` à la fin.
 
 ## Créer la PR en draft
 
@@ -68,7 +72,7 @@ Pusher la branche et créer une PR en draft liée à l'issue :
 
 ```
 git push -u origin <nom-branche>
-gh pr create --draft --title "#<numéro-issue> - <titre-issue>" --body "Fixes #<numéro-issue>"
+gh pr create --draft --fill-first --title "#<numéro-issue> - <titre-issue>" --body "Fixes #<numéro-issue>"
 ```
 
 Le titre de la PR suit le format du projet : `#<numéro-issue> - <description courte>`.
