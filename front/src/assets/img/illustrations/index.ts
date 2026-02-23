@@ -3,6 +3,7 @@ import contact from "./contact.webp";
 import documentsAdministratifs from "./documents-administratifs.webp";
 import error from "./error-illustration.webp";
 import errorMissing from "./error-missing-illustration.webp";
+import fillForm from "./fill-form.webp";
 import infosImportantes from "./infos-importantes.webp";
 import inscription from "./inscription.webp";
 import job from "./job-illustration.webp";
@@ -29,6 +30,7 @@ export const commonIllustrations = {
   documentsAdministratifs,
   contact,
   errorMissing,
+  fillForm,
 };
 export const searchIllustrations = [search1, search2, search3, search4];
 export const loginIllustration = login;
@@ -37,3 +39,4 @@ export const nextStepIllustrations = [
   documentsAdministratifs,
   commonIllustrations.warning,
 ];
+export const formIllustration = fillForm;
