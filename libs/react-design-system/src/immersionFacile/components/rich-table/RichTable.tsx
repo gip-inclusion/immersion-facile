@@ -9,7 +9,7 @@ import { Table, type TableProps } from "@codegouvfr/react-dsfr/Table";
 import { useBreakpointsValuesPx } from "@codegouvfr/react-dsfr/useBreakpointsValuesPx";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
-import { useDebounce, useScrollToTop } from "../../hooks";
+import { useDebounce, useScrollTo } from "../../hooks";
 import { Loader } from "../loader";
 import { RichDropdown, type RichDropdownProps } from "../rich-dropdown";
 import Styles from "./RichTable.styles";
@@ -53,7 +53,7 @@ export const RichTable = ({
   const searchBarRefOnSubmitRef = useRef(searchBar.onSubmit).current;
   const tableRef = useRef<HTMLTableElement>(null);
 
-  useScrollToTop(pagination.defaultPage ?? 1);
+  useScrollTo(pagination.defaultPage ?? 1);
 
   useLayoutEffect(() => {
     const mediaQuery = window.matchMedia(`(min-width: ${lgBreakpoint}px)`);

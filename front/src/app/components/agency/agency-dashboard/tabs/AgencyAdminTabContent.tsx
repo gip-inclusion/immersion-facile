@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { HeadingSection, useScrollToTop } from "react-design-system";
+import { HeadingSection, useScrollTo } from "react-design-system";
 import { useDispatch } from "react-redux";
 import type { UserParamsForAgency } from "shared";
 import { type AgencyRight, type ConnectedUser, domElementIds } from "shared";
@@ -27,7 +27,7 @@ export const AgencyAdminTabContent = ({
     (agencyRight) => !agencyRight.roles.includes("agency-admin"),
   );
 
-  useScrollToTop(useFeedbackTopics(["agency-user-for-dashboard"]).length > 0);
+  useScrollTo(useFeedbackTopics(["agency-user-for-dashboard"]).length > 0);
 
   const onUserUpdateRequested =
     (feedbackTopic: FeedbackTopic) =>

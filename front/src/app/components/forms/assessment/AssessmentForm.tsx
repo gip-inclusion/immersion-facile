@@ -11,7 +11,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
-  useScrollToTop,
+  useScrollTo,
 } from "react-design-system";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -120,7 +120,7 @@ export const AssessmentForm = ({
       setCurrentStep(step);
     }
   };
-  useScrollToTop(currentStep);
+  useScrollTo(currentStep);
 
   return (
     <>

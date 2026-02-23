@@ -19,7 +19,7 @@ import {
   SectionAccordion,
   SectionHighlight,
   SectionTextEmbed,
-  useScrollToTop,
+  useScrollTo,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -228,7 +228,7 @@ export const SearchPage = ({
     [setTempValuesAsFormValues, triggerSearch, filterFormValues, isExternal],
   );
 
-  useScrollToTop(pagination?.currentPage ?? 1);
+  useScrollTo(pagination?.currentPage ?? 1);
 
   useEffect(() => {
     if (

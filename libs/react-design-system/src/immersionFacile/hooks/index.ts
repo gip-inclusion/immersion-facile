@@ -1,2 +1,2 @@
 export * from "./useDebounce";
-export * from "./useScrollToTop";
+export * from "./useScrollTo";

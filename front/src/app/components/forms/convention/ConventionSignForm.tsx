@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
   ConventionSummary,
-  useScrollToTop,
+  useScrollTo,
 } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -150,7 +150,7 @@ export const ConventionSignForm = ({
     );
   };
 
-  useScrollToTop(feedbacks.length > 0);
+  useScrollTo(feedbacks.length > 0);
 
   useEffect(() => {
     if (!isSendSignatureLinkModalOpen) setSignatoryToSendSignatureLink(null);
