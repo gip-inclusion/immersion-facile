@@ -1,25 +1,47 @@
 import { useCallback, useState } from "react";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
-const replaceContentsUrlWithAbsoluteUrl = (htmlContent: string): string =>
-  htmlContent
-    .replaceAll(
-      /(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])\/([^'"]*["'][^>]*>)/gm,
-      `<link rel="stylesheet" href="${window.location.origin}/$2`,
-    )
-    .replaceAll(/<img src="\//gm, `<img src="${window.location.origin}/`);
+const isInternalHref = (href: string): boolean =>
+  href.startsWith("/") || href.startsWith(window.location.origin);
 
-const prepareContentForPdfGenerator = (content: string) => {
-  const contentWithoutScripts = content.replace(
-    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi,
-    "",
-  );
-  return replaceContentsUrlWithAbsoluteUrl(contentWithoutScripts);
+const prepareContentForPdfGenerator = (rawHtml: string): string => {
+  const doc = new DOMParser().parseFromString(rawHtml, "text/html");
+
+  doc.querySelectorAll("script").forEach((el) => el.remove());
+
+  doc.querySelectorAll("link[href]").forEach((el) => {
+    const href = el.getAttribute("href") ?? "";
+    if (!isInternalHref(href)) el.remove();
+  });
+
+  doc
+    .querySelectorAll("chrome_annotation")
+    .forEach((el) => el.replaceWith(el.textContent ?? ""));
+
+  doc
+    .querySelectorAll<HTMLLinkElement>("link[rel='stylesheet'][href^='/']")
+    .forEach((el) => {
+      if (el.href.startsWith(window.location.origin)) return;
+      el.setAttribute(
+        "href",
+        `${window.location.origin}${el.getAttribute("href")}`,
+      );
+    });
+
+  doc.querySelectorAll<HTMLImageElement>("img[src^='/']").forEach((el) => {
+    if (el.src.startsWith(window.location.origin)) return;
+    el.setAttribute(
+      "src",
+      `${window.location.origin}${el.getAttribute("src")}`,
+    );
+  });
+
+  return doc.documentElement.outerHTML;
 };
 
 export const usePdfGenerator = () => {
   const [isPdfLoading, setIsPdfLoading] = useState(false);
-  const { technicalGateway } = outOfReduxDependencies; // Récupération directe des dépendances externes
+  const { technicalGateway } = outOfReduxDependencies;
 
   const generateAndDownloadPdf = useCallback(
     async ({
