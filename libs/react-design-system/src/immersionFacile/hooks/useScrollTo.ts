@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const useScrollToTop = (
+export const useScrollTo = (
   valueToWatch: boolean | number | null,
   elementId?: string,
 ) => {

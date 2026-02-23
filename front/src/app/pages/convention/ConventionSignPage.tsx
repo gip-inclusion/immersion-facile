@@ -6,7 +6,7 @@ import {
   Loader,
   MainWrapper,
   PageHeader,
-  useScrollToTop,
+  useScrollTo,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -95,7 +95,7 @@ const ConventionSignPageContent = ({
     convention ? convention.internshipKind : "immersion",
   );
 
-  useScrollToTop(true);
+  useScrollTo(true);
 
   return (
     <>

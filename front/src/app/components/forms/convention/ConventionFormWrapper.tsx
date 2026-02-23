@@ -7,7 +7,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
-import { ConventionSummary, Loader, useScrollToTop } from "react-design-system";
+import { ConventionSummary, Loader, useScrollTo } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -143,7 +143,7 @@ export const ConventionFormWrapper = ({
     outOfReduxDependencies.localDeviceRepository.get("conventionDraftId") ??
     routeConventionDraftId;
 
-  useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
+  useScrollTo(formSuccessfullySubmitted || hasConventionUpdateConflict);
 
   useEffect(() => {
     if (conventionDraftId) {

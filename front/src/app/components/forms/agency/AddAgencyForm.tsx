@@ -8,11 +8,7 @@ import RadioButtons, {
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  ErrorNotifications,
-  LinkHome,
-  useScrollToTop,
-} from "react-design-system";
+import { ErrorNotifications, LinkHome, useScrollTo } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -71,8 +67,8 @@ export const AddAgencyForm = () => {
     dispatch(agenciesSlice.actions.addAgencyClearRequested());
   }, [dispatch]);
 
-  useScrollToTop(feedback.kind === "agencyAdded");
-  useScrollToTop(feedback.kind === "agencyOfTypeOtherAdded");
+  useScrollTo(feedback.kind === "agencyAdded");
+  useScrollTo(feedback.kind === "agencyOfTypeOtherAdded");
 
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");

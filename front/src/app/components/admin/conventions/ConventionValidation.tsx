@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
   ConventionSummary,
-  useScrollToTop,
+  useScrollTo,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -78,7 +78,7 @@ export const ConventionValidation = ({
   const [isAssessmentLinkSent, setIsAssessmentLinkSent] =
     useState<boolean>(false);
 
-  useScrollToTop(
+  useScrollTo(
     useFeedbackTopics([
       "send-signature-link",
       "send-assessment-link",

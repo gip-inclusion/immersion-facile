@@ -4,7 +4,7 @@ import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader, useScrollToTop } from "react-design-system";
+import { Loader, useScrollTo } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -175,7 +175,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     addressAutocompleteLocator: "multiple-address-0",
     shouldFetch: mode === "create",
   });
-  useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
+  useScrollTo(establishmentFeedback?.level === "success" || currentStep);
 
   useEffect(() => {
     match({
