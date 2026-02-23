@@ -1,10 +1,10 @@
 import { AppConfig } from "../../config/bootstrap/appConfig";
+import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { makeGetOldConventionDraftsAndEmitDeleteEvent } from "../../domains/convention/use-cases/GetOldConventionDraftsAndEmitDeleteEvent";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
-import { createInMemoryUow } from "../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryUowPerformer } from "../../domains/core/unit-of-work/adapters/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
+import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
 import { handleCRONScript } from "../handleCRONScript";
 import { monitoredAsUseCase } from "../utils";
@@ -15,9 +15,12 @@ const config = AppConfig.createFromEnv();
 const deleteOldConventionDrafts = async (): Promise<{
   numberOfConventionDraftsDeleted: number;
 }> => {
-  const uow = createInMemoryUow();
-  const timeGateway = new CustomTimeGateway();
-  const uuidGenerator = new TestUuidGenerator();
+  const { uowPerformer } = createDbRelatedSystems(
+    config,
+    createMakeProductionPgPool(config),
+  );
+  const timeGateway = new RealTimeGateway();
+  const uuidGenerator = new UuidV4Generator();
   const createNewEvent = makeCreateNewEvent({
     timeGateway,
     uuidGenerator,
@@ -25,7 +28,7 @@ const deleteOldConventionDrafts = async (): Promise<{
 
   const getOldConventionDraftsAndEmitDeleteEvent =
     makeGetOldConventionDraftsAndEmitDeleteEvent({
-      uowPerformer: new InMemoryUowPerformer(uow),
+      uowPerformer,
       deps: {
         timeGateway,
         createNewEvent,
