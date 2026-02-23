@@ -4,6 +4,7 @@ import {
   type ConventionStatus,
   calculateTotalImmersionHoursBetweenDateComplex,
   errors,
+  isAssessmentDto,
   type LegacyAssessmentDto,
 } from "shared";
 import type { EntityFromDto } from "../../../utils/EntityFromDto";
@@ -65,10 +66,3 @@ export const getOnlyAssessmentDto = (
 
   return isAssessmentDto(assessment) ? assessment : undefined;
 };
-
-const isAssessmentDto = (
-  assessment: AssessmentDto | LegacyAssessmentDto,
-): assessment is AssessmentDto =>
-  assessment &&
-  assessment.status !== "FINISHED" &&
-  assessment.status !== "ABANDONED";

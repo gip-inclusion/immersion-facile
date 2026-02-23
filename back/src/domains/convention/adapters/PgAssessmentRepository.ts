@@ -4,6 +4,7 @@ import {
   type ConventionId,
   type DateString,
   errors,
+  isAssessmentDto,
 } from "shared";
 import {
   jsonBuildObject,
@@ -165,7 +166,11 @@ const assessmentEntityToDbRow = (assessmentEntity: AssessmentEntity) => ({
   establishment_feedback: assessmentEntity.establishmentFeedback,
   ...getNonLegacyFields(assessmentEntity),
   number_of_hours_actually_made: assessmentEntity.numberOfHoursActuallyMade,
-  beneficiary_agreement: assessmentEntity.beneficiaryAgreement,
-  beneficiary_feedback: assessmentEntity.beneficiaryFeedback,
-  signed_at: assessmentEntity.signedAt,
+  ...(!isAssessmentDto(assessmentEntity)
+    ? {}
+    : {
+        beneficiary_agreement: assessmentEntity.beneficiaryAgreement,
+        beneficiary_feedback: assessmentEntity.beneficiaryFeedback,
+        signed_at: assessmentEntity.signedAt,
+      }),
 });
