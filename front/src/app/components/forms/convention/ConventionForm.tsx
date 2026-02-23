@@ -716,6 +716,7 @@ export const ConventionForm = ({
                       step={1}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
+                      showStepStatus={!isTemplateForm}
                     />
                   }
                   {...makeAccordionProps(1)}
@@ -768,6 +769,7 @@ export const ConventionForm = ({
                       step={2}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
+                      showStepStatus={!isTemplateForm}
                     />
                   }
                   {...makeAccordionProps(2)}
@@ -787,6 +789,7 @@ export const ConventionForm = ({
                       step={3}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
+                      showStepStatus={!isTemplateForm}
                     />
                   }
                   {...makeAccordionProps(3)}
@@ -804,6 +807,7 @@ export const ConventionForm = ({
                       step={4}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
+                      showStepStatus={!isTemplateForm}
                     />
                   }
                   {...makeAccordionProps(4)}
@@ -842,6 +846,7 @@ export const ConventionForm = ({
                       step={5}
                       currentStep={currentStep}
                       stepsStatus={stepsStatus}
+                      showStepStatus={!isTemplateForm}
                     />
                   }
                   {...makeAccordionProps(5)}
@@ -1008,11 +1013,13 @@ const SectionTitle = ({
   step,
   stepsStatus,
   currentStep,
+  showStepStatus,
 }: {
   title: string;
   step: number;
   stepsStatus: Record<number, StepSeverity> | null;
   currentStep: NumberOfSteps;
+  showStepStatus: boolean;
 }) => {
   const badgeData: Record<
     StepSeverity,
@@ -1031,9 +1038,11 @@ const SectionTitle = ({
   return (
     <>
       {currentStep === step ? <strong>{title}</strong> : title}
-      <Badge severity={severity} className={fr.cx("fr-ml-2w")}>
-        {label}
-      </Badge>
+      {showStepStatus && (
+        <Badge severity={severity} className={fr.cx("fr-ml-2w")}>
+          {label}
+        </Badge>
+      )}
     </>
   );
 };
