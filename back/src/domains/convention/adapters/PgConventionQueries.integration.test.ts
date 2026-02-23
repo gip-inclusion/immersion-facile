@@ -20,6 +20,7 @@ import {
   type Email,
   expectToEqual,
   reasonableSchedule,
+  type SearchTextAlphaNumeric,
   type SiretDto,
   type UserWithAdminRights,
 } from "shared";
@@ -2457,7 +2458,9 @@ describe("Pg implementation of ConventionQueries", () => {
             {
               userAgencyIds: [agencyIdA],
               pagination: { page: 1, perPage: 10 },
-              filters: { search: conventionWithManagedError.id },
+              filters: {
+                search: conventionWithManagedError.id as SearchTextAlphaNumeric,
+              },
             },
           );
 
@@ -2521,7 +2524,7 @@ describe("Pg implementation of ConventionQueries", () => {
               userAgencyIds: [agencyIdA],
               pagination: { page: 1, perPage: 10 },
               filters: {
-                search: conventionWithManagedError.id,
+                search: conventionWithManagedError.id as SearchTextAlphaNumeric,
                 broadcastErrorKind: "functional",
                 conventionStatus: ["READY_TO_SIGN"],
               },

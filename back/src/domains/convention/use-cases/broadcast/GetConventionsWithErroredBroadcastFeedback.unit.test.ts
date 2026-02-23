@@ -4,6 +4,7 @@ import {
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   expectToEqual,
+  type SearchTextAlphaNumeric,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -290,7 +291,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
     const result = await useCase.execute(
       {
         pagination: { page: 1, perPage: 10 },
-        filters: { search: convention1.id },
+        filters: { search: convention1.id as SearchTextAlphaNumeric },
       },
       user1,
     );
@@ -321,7 +322,7 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       {
         pagination: { page: 1, perPage: 10 },
         filters: {
-          search: convention1.id,
+          search: convention1.id as SearchTextAlphaNumeric,
           broadcastErrorKind: "functional",
         },
       },
