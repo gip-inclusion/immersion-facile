@@ -21,7 +21,7 @@ import {
   ConventionFormSidebar,
   ErrorNotifications,
   Loader,
-  useScrollToTop,
+  useScrollTo,
 } from "react-design-system";
 import {
   FormProvider,
@@ -572,7 +572,7 @@ export const ConventionForm = ({
     });
   }
 
-  useScrollToTop(!!conventionTemplateFeedback);
+  useScrollTo(!!conventionTemplateFeedback);
 
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(
