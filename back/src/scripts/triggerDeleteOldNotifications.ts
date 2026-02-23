@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { makeDeleteNotifications } from "../domains/core/notifications/useCases/DeleteNotifications";

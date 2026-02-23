@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { createLogger } from "../utils/logger";
 import { triggerUpdateEstablishmentsFromSireneApiScript } from "./scheduledScripts/updateEstablishmentsFromSireneApiScript";
 

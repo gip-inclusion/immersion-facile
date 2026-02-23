@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { sql } from "kysely";
 import { map, splitEvery } from "ramda";
 import { type AppellationCode, pipeWithValue, type RomeCode } from "shared";

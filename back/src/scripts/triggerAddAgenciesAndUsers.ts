@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { readFile } from "node:fs/promises";
 import Papa from "papaparse";
 import { keys } from "ramda";

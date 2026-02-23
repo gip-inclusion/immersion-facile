@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import type { UserId } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";

@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { sql } from "kysely";
 import { Pool } from "pg";
 import { map, splitEvery } from "ramda";

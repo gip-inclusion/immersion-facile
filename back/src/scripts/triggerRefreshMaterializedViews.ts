@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createMakeScriptPgPool } from "../config/pg/pgPool";
 import { createLogger } from "../utils/logger";

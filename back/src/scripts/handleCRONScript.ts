@@ -1,9 +1,8 @@
-import type { captureCheckIn } from "@sentry/node";
+import * as sentry from "@sentry/node";
 import { calculateDurationInSecondsFrom, pipeWithValue, slugify } from "shared";
 import type { AppConfig } from "../config/bootstrap/appConfig";
 import { createLogger, type OpacifiedLogger } from "../utils/logger";
 import { getSlackChannelName, notifyTeam } from "../utils/notifyTeam";
-import { configureSentry } from "./configureSentry";
 
 const camelToKebab = (str: string) =>
   str
@@ -11,7 +10,7 @@ const camelToKebab = (str: string) =>
     .replace(/([A-Z])([A-Z])(?=[a-z])/g, "$1-$2")
     .toLowerCase();
 
-type MonitorConfig = NonNullable<Parameters<typeof captureCheckIn>[1]>;
+type MonitorConfig = NonNullable<Parameters<typeof sentry.captureCheckIn>[1]>;
 const defaultMonitorConfig: MonitorConfig = {
   schedule: { type: "interval", unit: "day", value: 1 },
   timezone: "Europe/Paris",
@@ -39,11 +38,11 @@ export const handleCRONScript = async <
   exitOnFinish?: boolean;
 }) => {
   const sanitizedName = pipeWithValue(name, camelToKebab, slugify);
-  const sentry = configureSentry(config.envType);
+  const isSentryInitialized = !!sentry.getClient();
 
   try {
     const startTime = Date.now();
-    const checkInId = sentry
+    const checkInId = isSentryInitialized
       ? sentry.captureCheckIn(
           {
             monitorSlug: sanitizedName,
@@ -63,7 +62,7 @@ export const handleCRONScript = async <
 
     try {
       const results = await script();
-      if (sentry) {
+      if (isSentryInitialized) {
         sentry.captureCheckIn({
           checkInId,
           monitorSlug: sanitizedName,
@@ -73,7 +72,7 @@ export const handleCRONScript = async <
       }
       await onScriptSuccess<T>({ ...contextParams, handleResults })(results);
     } catch (error) {
-      if (sentry) {
+      if (isSentryInitialized) {
         sentry.captureCheckIn({
           checkInId,
           monitorSlug: sanitizedName,

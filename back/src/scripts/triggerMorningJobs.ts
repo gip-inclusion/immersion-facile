@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { createLogger } from "../utils/logger";
 import { triggerAssessmentReminder } from "./scheduledScripts/assessmentReminder";
 import { triggerContactRequestReminder3Days } from "./scheduledScripts/contactRequestReminder3Days";
