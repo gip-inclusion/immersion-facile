@@ -55,7 +55,10 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   const { errors, submitCount } = formState;
 
   const { getFormErrors } = getFormContents(
-    formConventionFieldsLabels(conventionFormData.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: conventionFormData.internshipKind,
+      isConventionTemplate: false,
+    }),
   );
 
   useEffect(() => {

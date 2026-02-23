@@ -62,7 +62,10 @@ export const RenewConventionModalContent = ({
   const getFieldError = makeFieldError(methods.formState);
 
   const { getFormErrors } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: convention.internshipKind,
+      isConventionTemplate: false,
+    }),
   );
 
   return (
@@ -79,7 +82,10 @@ export const RenewConventionModalContent = ({
             defaultValue: defaultValues.id,
           }}
         />
-        <ScheduleSection internshipKind={convention.internshipKind} />
+        <ScheduleSection
+          internshipKind={convention.internshipKind}
+          isConventionTemplate={false}
+        />
         <Input
           label="Motif de renouvellement *"
           textArea

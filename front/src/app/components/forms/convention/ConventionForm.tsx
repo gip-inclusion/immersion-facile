@@ -78,7 +78,7 @@ import { ScheduleSection } from "src/app/components/forms/convention/sections/sc
 import { useUpdateConventionValuesInUrl } from "src/app/components/forms/convention/useUpdateConventionValuesInUrl";
 import {
   formConventionFieldsLabels,
-  formUiSections,
+  makeFormUiSections,
   sidebarStepContent,
 } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -311,7 +311,10 @@ export const ConventionForm = ({
   );
 
   const { getFormFields, getFormErrors } = getFormContents(
-    formConventionFieldsLabels(conventionValues.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: conventionValues.internshipKind,
+      isConventionTemplate: isTemplateForm,
+    }),
   );
   const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();
@@ -472,6 +475,9 @@ export const ConventionForm = ({
   });
 
   const conventionIsLoading = isLoading || !reduxFormUiReady;
+  const formUiSections = makeFormUiSections({
+    isConventionTemplate: isTemplateForm,
+  });
 
   const validateSteps = async (type: "clearAllErrors" | "doNotClear") => {
     const stepsDataValue = await Promise.all(
@@ -700,7 +706,7 @@ export const ConventionForm = ({
               />
               {isTemplateForm && (
                 <Input
-                  label="Nom du modèle *"
+                  label={formContents.name.label}
                   nativeInputProps={{
                     ...register("name"),
                     id: domElementIds.conventionTemplate.form.nameInput,
@@ -779,6 +785,7 @@ export const ConventionForm = ({
                     emailValidationErrors={emailValidationErrors}
                     setEmailValidationErrors={setEmailValidationErrors}
                     fromPeConnectedUser={fromPeConnectedUser}
+                    isConventionTemplate={isTemplateForm}
                   />
                 </Accordion>
                 <Accordion
@@ -797,6 +804,7 @@ export const ConventionForm = ({
                   <EstablishmentFormSection
                     emailValidationErrors={emailValidationErrors}
                     setEmailValidationErrors={setEmailValidationErrors}
+                    isConventionTemplate={isTemplateForm}
                   />
                 </Accordion>
                 <Accordion
@@ -836,6 +844,7 @@ export const ConventionForm = ({
                   />
                   <ScheduleSection
                     internshipKind={conventionValues.internshipKind}
+                    isConventionTemplate={isTemplateForm}
                   />
                 </Accordion>
                 <Accordion
@@ -851,7 +860,9 @@ export const ConventionForm = ({
                   }
                   {...makeAccordionProps(5)}
                 >
-                  <ImmersionDetailsSection />
+                  <ImmersionDetailsSection
+                    isConventionTemplate={isTemplateForm}
+                  />
                 </Accordion>
               </div>
 

@@ -25,15 +25,20 @@ import { PhoneInput } from "../../../commons/PhoneInput";
 export const EstablishmentRepresentativeFields = ({
   setEmailValidationErrors,
   emailValidationErrors,
+  isConventionTemplate,
 }: {
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
+  isConventionTemplate: boolean;
 }): JSX.Element => {
   const { getValues, register, formState, setValue } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: values.internshipKind,
+      isConventionTemplate,
+    }),
   );
   const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();

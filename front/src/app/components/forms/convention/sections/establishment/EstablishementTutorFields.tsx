@@ -25,17 +25,22 @@ export const EstablishementTutorFields = ({
   setEmailValidationErrors,
   emailValidationErrors,
   isTutorEstablishmentRepresentative,
+  isConventionTemplate,
 }: {
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
   isTutorEstablishmentRepresentative: boolean;
+  isConventionTemplate: boolean;
 }): JSX.Element => {
   const { register, getValues, formState, setValue } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const getFieldError = makeFieldError(formState);
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: values.internshipKind,
+      isConventionTemplate,
+    }),
   );
   const formContents = getFormFields();
   const isFetchingSiret = useSelector(siretSelectors.isFetching);

@@ -49,9 +49,11 @@ export const tutorSelectOptions = (
 export const EstablishmentFormSection = ({
   setEmailValidationErrors,
   emailValidationErrors,
+  isConventionTemplate,
 }: {
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
+  isConventionTemplate: boolean;
 }): JSX.Element => {
   useTutorIsEstablishmentRepresentative();
 
@@ -63,7 +65,10 @@ export const EstablishmentFormSection = ({
   const t = useConventionTexts(getValues().internshipKind);
 
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(getValues("internshipKind")),
+    formConventionFieldsLabels({
+      internshipKind: getValues("internshipKind"),
+      isConventionTemplate,
+    }),
   );
   const formContents = getFormFields();
 
@@ -96,10 +101,13 @@ export const EstablishmentFormSection = ({
         description={t.establishmentSection.subtitle}
       />
 
-      <EstablishmentBusinessFields />
+      <EstablishmentBusinessFields
+        isConventionTemplate={isConventionTemplate}
+      />
       <EstablishmentRepresentativeFields
         emailValidationErrors={emailValidationErrors}
         setEmailValidationErrors={setEmailValidationErrors}
+        isConventionTemplate={isConventionTemplate}
       />
       <RadioButtons
         legend={
@@ -131,6 +139,7 @@ export const EstablishmentFormSection = ({
         emailValidationErrors={emailValidationErrors}
         setEmailValidationErrors={setEmailValidationErrors}
         isTutorEstablishmentRepresentative={isTutorEstablishmentRepresentative}
+        isConventionTemplate={isConventionTemplate}
       />
     </>
   );

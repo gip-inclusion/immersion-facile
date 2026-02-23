@@ -23,19 +23,24 @@ type BeneficiaryRepresentativeFieldsProps = {
   disabled?: boolean;
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
+  isConventionTemplate: boolean;
 };
 
 export const BeneficiaryRepresentativeFields = ({
   disabled,
   setEmailValidationErrors,
   emailValidationErrors,
+  isConventionTemplate,
 }: BeneficiaryRepresentativeFieldsProps) => {
   const { register, getValues, setValue, watch, formState } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const currentValues = watch();
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: values.internshipKind,
+      isConventionTemplate,
+    }),
   );
   const beneficiaryRepresentativeFirstName =
     currentValues.signatories.beneficiaryRepresentative?.firstName;
