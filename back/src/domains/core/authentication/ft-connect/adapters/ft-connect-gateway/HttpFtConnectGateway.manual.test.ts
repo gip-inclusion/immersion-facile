@@ -5,6 +5,7 @@ import {
   expectPromiseToFailWithError,
   FTConnectError,
   ManagedFTConnectError,
+  TooManyRequestApiError,
   testManagedFTConnectError,
   testRawFTConnectError,
 } from "shared";
@@ -861,5 +862,51 @@ describe("HttpFtConnectGateway", () => {
         });
       });
     });
+  });
+
+  describe("limiter backpressure", () => {
+    it("throws TooManyRequestApiError when queue overflows", async () => {
+      const highWater = 1;
+      const expectedResponse: ExternalAccessToken = {
+        access_token: "some-token",
+        expires_in: 50,
+        id_token: "some-id-token",
+      };
+      mock
+        .onPost(routes.exchangeCodeForAccessToken.url)
+        .reply(200, expectedResponse);
+
+      const ftConnectGateway = new HttpFtConnectGateway(
+        createAxiosSharedClient(routes, axiosWithoutValidateStatus, {
+          skipResponseValidation: true,
+        }),
+        {
+          immersionFacileBaseUrl: "https://fake-immersion.fr",
+          franceTravailClientId: "pe-client-id",
+          franceTravailClientSecret: "pe-client-secret",
+          ftAuthCandidatUrl: "https://fake-ft-candidat.fr",
+        },
+        1,
+        highWater,
+      );
+
+      const totalCalls = highWater + 5;
+      const results = await Promise.allSettled(
+        Array.from({ length: totalCalls }, () =>
+          ftConnectGateway.getAccessToken("some-code"),
+        ),
+      );
+
+      const fulfilled = results.filter((r) => r.status === "fulfilled");
+      const rejected = results.filter((r) => r.status === "rejected");
+
+      expect(fulfilled.length).toBeGreaterThan(0);
+      expect(rejected.length).toBeGreaterThan(0);
+
+      for (const result of rejected) {
+        if (result.status !== "rejected") continue;
+        expect(result.reason).toBeInstanceOf(TooManyRequestApiError);
+      }
+    }, 15_000);
   });
 });

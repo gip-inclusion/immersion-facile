@@ -5,6 +5,7 @@ import {
   errors,
   HTTP_STATUS,
   queryParamsAsString,
+  TooManyRequestApiError,
   type WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -18,6 +19,7 @@ import {
   type OpacifiedLogger,
 } from "../../../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../../../utils/notifyTeam";
+import { scheduleWithBackpressure } from "../../../../../../utils/scheduleWithBackpressure";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
 import { ftconnectBeneficiaryBirthdateToIfBeneficiaryBirthdate } from "../../dto/FtConnect.dto";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
@@ -102,23 +104,28 @@ const exchangeCodeForAccessTokenLogger = makeFtConnectLogger(
 );
 
 const rate_ms = 1250;
+export const ftConnectHighWater = 12;
 
 // TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS FT
 export class HttpFtConnectGateway implements FtConnectGateway {
-  // FT Connect limit rate at 1 call per 1.2s
-  #limiter = new Bottleneck({
-    reservoir: this.ftConnectMaxRequestsPerInterval,
-    reservoirRefreshInterval: rate_ms, // number of ms
-    reservoirRefreshAmount: this.ftConnectMaxRequestsPerInterval,
-    maxConcurrent: 1,
-    minTime: Math.ceil(rate_ms / this.ftConnectMaxRequestsPerInterval),
-  });
+  #limiter: Bottleneck;
 
   constructor(
     private httpClient: HttpClient<FtConnectExternalRoutes>,
     private configs: FtConnectOauthConfig,
     private ftConnectMaxRequestsPerInterval: number,
-  ) {}
+    highWater = ftConnectHighWater,
+  ) {
+    this.#limiter = new Bottleneck({
+      reservoir: ftConnectMaxRequestsPerInterval,
+      reservoirRefreshInterval: rate_ms,
+      reservoirRefreshAmount: ftConnectMaxRequestsPerInterval,
+      maxConcurrent: 1,
+      minTime: Math.ceil(rate_ms / ftConnectMaxRequestsPerInterval),
+      highWater,
+      strategy: Bottleneck.strategy.OVERFLOW,
+    });
+  }
 
   public async getAccessToken(
     authorizationCode: string,
@@ -126,19 +133,22 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     const log = exchangeCodeForAccessTokenLogger;
     try {
       log.total({});
-      const response = await this.#limiter.schedule(() =>
-        this.httpClient.exchangeCodeForAccessToken({
-          body: queryParamsAsString({
-            client_id: this.configs.franceTravailClientId,
-            client_secret: this.configs.franceTravailClientSecret,
-            code: authorizationCode,
-            grant_type: "authorization_code",
-            redirect_uri: `${this.configs.immersionFacileBaseUrl}/api/pe-connect`,
+      const response = await scheduleWithBackpressure(
+        this.#limiter,
+        "France Travail Connect",
+        () =>
+          this.httpClient.exchangeCodeForAccessToken({
+            body: queryParamsAsString({
+              client_id: this.configs.franceTravailClientId,
+              client_secret: this.configs.franceTravailClientSecret,
+              code: authorizationCode,
+              grant_type: "authorization_code",
+              redirect_uri: `${this.configs.immersionFacileBaseUrl}/api/pe-connect`,
+            }),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
           }),
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }),
       );
       if (response.status !== 200) {
         log.error({
@@ -223,10 +233,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     const log = getUserStatutInfoLogger;
     try {
       log.total({ ftConnect: { peExternalId } });
-      const response = await this.#limiter.schedule(() =>
-        this.httpClient.getUserStatutInfo({
-          headers,
-        }),
+      const response = await scheduleWithBackpressure(
+        this.#limiter,
+        "France Travail Connect",
+        () =>
+          this.httpClient.getUserStatutInfo({
+            headers,
+          }),
       );
       if (response.status !== 200) {
         log.error({
@@ -269,10 +282,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     const log = getUserInfoLogger;
     try {
       log.total({});
-      const response = await this.#limiter.schedule(() =>
-        this.httpClient.getUserInfo({
-          headers,
-        }),
+      const response = await scheduleWithBackpressure(
+        this.#limiter,
+        "France Travail Connect",
+        () =>
+          this.httpClient.getUserInfo({
+            headers,
+          }),
       );
       if (response.status !== 200) {
         log.error({
@@ -310,10 +326,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     const log = getUserBirthDateLogger;
     try {
       log.total({});
-      const response = await this.#limiter.schedule(() =>
-        this.httpClient.getUserBirthDate({
-          headers,
-        }),
+      const response = await scheduleWithBackpressure(
+        this.#limiter,
+        "France Travail Connect",
+        () =>
+          this.httpClient.getUserBirthDate({
+            headers,
+          }),
       );
       if (response.status !== 200) {
         log.error({
@@ -354,10 +373,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     const log = getUserContactDetailsLogger;
     try {
       log.total({});
-      const response = await this.#limiter.schedule(() =>
-        this.httpClient.getUserContactDetails({
-          headers,
-        }),
+      const response = await scheduleWithBackpressure(
+        this.#limiter,
+        "France Travail Connect",
+        () =>
+          this.httpClient.getUserContactDetails({
+            headers,
+          }),
       );
       if (response.status !== 200) {
         log.error({
@@ -399,10 +421,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     const log = getAdvisorsInfoLogger;
     try {
       log.total({});
-      const response = await this.#limiter.schedule(() =>
-        this.httpClient.getAdvisorsInfo({
-          headers,
-        }),
+      const response = await scheduleWithBackpressure(
+        this.#limiter,
+        "France Travail Connect",
+        () =>
+          this.httpClient.getAdvisorsInfo({
+            headers,
+          }),
       );
       if (response.status !== 200) {
         log.error({
@@ -447,6 +472,7 @@ const manageFtConnectError = (
   routeName: keyof FtConnectExternalRoutes,
   context: Record<string, string>,
 ): never => {
+  if (error instanceof TooManyRequestApiError) throw error;
   if (!(error instanceof Error))
     throw new UnhandledError(
       `Is not an error: ${JSON.stringify(error)}`,
