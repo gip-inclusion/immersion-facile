@@ -1,6 +1,6 @@
 import { keys } from "ramda";
 import { z } from "zod";
-import { searchTextSchema } from "../search/searchText.schema";
+import { searchTextAlphaSchema } from "../search/searchText.schema";
 import {
   makeHardenedStringSchema,
   stringWithMaxLength255,
@@ -82,5 +82,5 @@ export const nafSectionSuggestionsSchema: ZodSchemaWithInputMatchingOutput<
 
 export const nafSectionSuggestionsParamsSchema: ZodSchemaWithInputMatchingOutput<NafSectionSuggestionsParams> =
   z.object({
-    searchText: searchTextSchema,
+    searchText: searchTextAlphaSchema,
   });

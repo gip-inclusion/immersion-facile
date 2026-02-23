@@ -127,6 +127,7 @@ export * from "./search/SearchQueryParams.dto";
 export * from "./search/SearchQueryParams.schema";
 export * from "./search/search.routes";
 export * from "./search/search.utils";
+export * from "./search/searchText.schema";
 export * from "./shortLink/shortLink.dto";
 export * from "./siret/siret";
 export * from "./siret/siret.schema";
