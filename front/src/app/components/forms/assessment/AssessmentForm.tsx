@@ -37,7 +37,9 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { ImmersionDescription } from "src/app/components/forms/assessment/ImmersionDescription";
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { match } from "ts-pattern";
 
@@ -503,6 +505,7 @@ const AssessmentCommentsSection = ({
   jobTitle: string;
   objective: string;
 }) => {
+  const isLoading = useAppSelector(assessmentSelectors.isLoading);
   const { register, formState } = useFormContext<AssessmentDto>();
   const getFieldError = makeFieldError(formState);
   return (
@@ -551,6 +554,7 @@ const AssessmentCommentsSection = ({
               type: "submit",
               priority: "primary",
               id: domElementIds.assessment.formSubmitButton,
+              disabled: isLoading,
             },
           ]}
         />
