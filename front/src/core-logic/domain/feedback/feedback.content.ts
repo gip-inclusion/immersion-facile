@@ -738,7 +738,8 @@ export const feedbacks: Record<
         conventionTemplateSlice.actions
           .createOrUpdateConventionTemplateSucceeded,
       title: "Le modèle de convention a bien été enregistré",
-      message: "Le modèle de convention a bien été enregistré.",
+      message:
+        "Le modèle de convention a bien été enregistré. Vous pouvez continuer à le modifier ou revenir à votre espace.",
     },
     "create.error": {
       action:

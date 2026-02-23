@@ -70,7 +70,8 @@ describe("ConventionTemplate slice", () => {
       feedbacksSelectors.feedbacks(store.getState())["convention-template"],
       {
         level: "success",
-        message: "Le modèle de convention a bien été enregistré.",
+        message:
+          "Le modèle de convention a bien été enregistré. Vous pouvez continuer à le modifier ou revenir à votre espace.",
         on: "create",
         title: "Le modèle de convention a bien été enregistré",
       },
