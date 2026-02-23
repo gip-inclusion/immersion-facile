@@ -9,7 +9,7 @@ Tu dois générer une documentation en **français** pour une issue GitHub, dest
 ## Récupérer le contexte
 
 1. Récupérer le contenu de l'issue : `gh issue view <N>`
-2. Récupérer le diff avec main : `git diff main...HEAD`
+2. Récupérer le diff avec origin/main : `git diff origin/main...HEAD`
 
 ## Rédiger la documentation
 

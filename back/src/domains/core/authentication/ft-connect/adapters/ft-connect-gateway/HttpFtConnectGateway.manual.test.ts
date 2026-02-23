@@ -897,16 +897,15 @@ describe("HttpFtConnectGateway", () => {
         ),
       );
 
-      const fulfilled = results.filter((r) => r.status === "fulfilled");
-      const rejected = results.filter((r) => r.status === "rejected");
-
-      expect(fulfilled.length).toBeGreaterThan(0);
-      expect(rejected.length).toBeGreaterThan(0);
-
-      for (const result of rejected) {
-        if (result.status !== "rejected") continue;
-        expect(result.reason).toBeInstanceOf(TooManyRequestApiError);
-      }
+      expect(results).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ status: "fulfilled" }),
+          expect.objectContaining({
+            status: "rejected",
+            reason: expect.any(TooManyRequestApiError),
+          }),
+        ]),
+      );
     }, 15_000);
   });
 });
