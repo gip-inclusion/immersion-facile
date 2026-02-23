@@ -22,7 +22,7 @@ export class PgBroadcastFeedbacksRepository
       .with("latest_feedback", (qb) =>
         qb
           .selectFrom("broadcast_feedbacks as bf")
-          .where(sql`bf.request_params ->> 'conventionId'`, "=", id)
+          .where(sql`(bf.request_params ->> 'conventionId')::uuid`, "=", id)
           .select([
             "bf.consumer_id as consumerId",
             "bf.consumer_name as consumerName",
@@ -69,7 +69,7 @@ export class PgBroadcastFeedbacksRepository
     const result = await this.transaction
       .updateTable("broadcast_feedbacks")
       .set({ handled_by_agency: true })
-      .where(sql`(request_params ->> 'conventionId')`, "=", conventionId)
+      .where(sql`(request_params ->> 'conventionId')::uuid`, "=", conventionId)
       .where("handled_by_agency", "=", false)
       .executeTakeFirst();
 
