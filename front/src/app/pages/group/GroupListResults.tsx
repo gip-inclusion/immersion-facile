@@ -5,7 +5,7 @@ import { useState } from "react";
 import {
   Tag as ImTag,
   SearchResultIllustration,
-  useScrollToTop,
+  useScrollTo,
 } from "react-design-system";
 import { domElementIds, type InternalOfferDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
@@ -25,7 +25,7 @@ export const GroupListResults = ({
   type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
 
   const defaultResultsPerPage: ResultsPerPageOptions = "12";
-  const initialPage = 0;
+  const initialPage = 1;
   const isResultPerPageOption = (
     value: string,
   ): value is ResultsPerPageOptions =>
@@ -37,12 +37,12 @@ export const GroupListResults = ({
   const resultsPerPageValue = Number.parseInt(resultsPerPage);
   const totalPages = Math.ceil(results.length / resultsPerPageValue);
   const getSearchResultsForPage = (currentPage: number): InternalOfferDto[] => {
-    const start = currentPage * resultsPerPageValue;
+    const start = (currentPage - 1) * resultsPerPageValue;
     const end = start + resultsPerPageValue;
     return results.slice(start, end);
   };
 
-  useScrollToTop(currentPage + 1, parentContainerIdToScrollToTop);
+  useScrollTo(currentPage, parentContainerIdToScrollToTop);
 
   return (
     <>
@@ -98,15 +98,15 @@ export const GroupListResults = ({
             <Pagination
               showFirstLast
               count={totalPages}
-              defaultPage={currentPage + 1}
+              defaultPage={currentPage}
               getPageLinkProps={(pageNumber) => ({
                 title: `Résultats de recherche, page : ${pageNumber}`,
                 onClick: (event) => {
                   event.preventDefault();
-                  setCurrentPage(pageNumber - 1);
+                  setCurrentPage(pageNumber);
                 },
                 href: "#",
-                key: `pagination-link-${pageNumber}`,
+                key: `pagination-link-${pageNumber + 1}`,
               })}
               className={fr.cx("fr-mt-1w")}
             />
