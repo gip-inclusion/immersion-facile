@@ -78,6 +78,7 @@ import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-case
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { makeShareConventionDraftByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
+import { makeSignAssessment } from "../../domains/convention/use-cases/SignAssessment";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
@@ -925,6 +926,13 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         createNewEvent,
+      },
+    }),
+    signAssessment: makeSignAssessment({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        timeGateway: gateways.timeGateway,
       },
     }),
     getAssessmentByConventionId: makeGetAssessmentByConventionId({
