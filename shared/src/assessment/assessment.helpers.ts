@@ -2,7 +2,11 @@ import { match } from "ts-pattern";
 import type { ConventionDto } from "../convention/convention.dto";
 import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
 import { type DateString, hoursValueToHoursDisplayed } from "../utils/date";
-import type { AssessmentStatus } from "./assessment.dto";
+import type {
+  AssessmentDto,
+  AssessmentStatus,
+  LegacyAssessmentDto,
+} from "./assessment.dto";
 
 export const computeTotalHours = ({
   convention,
@@ -37,3 +41,10 @@ export const computeTotalHours = ({
     .with("DID_NOT_SHOW", () => hoursValueToHoursDisplayed({ hoursValue: 0 }))
     .with(null, () => hoursValueToHoursDisplayed({ hoursValue: 0 }))
     .exhaustive();
+
+export const isAssessmentDto = (
+  assessment: AssessmentDto | LegacyAssessmentDto,
+): assessment is AssessmentDto =>
+  assessment &&
+  assessment.status !== "FINISHED" &&
+  assessment.status !== "ABANDONED";

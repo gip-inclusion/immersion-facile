@@ -744,9 +744,6 @@ describe("ResyncOldConventionsToFt use case", () => {
             conventionId: conventionToSync1.id,
             establishmentFeedback: "commentaire",
             numberOfHoursActuallyMade: null,
-            beneficiaryAgreement: null,
-            beneficiaryFeedback: null,
-            signedAt: null,
           },
         ];
         uow.conventionsToSyncRepository.setForTesting([

@@ -263,9 +263,6 @@ describe("Assessment routes", () => {
         conventionId: convention.id,
         status: "FINISHED",
         establishmentFeedback: "The guy left after one day",
-        beneficiaryAgreement: null,
-        beneficiaryFeedback: null,
-        signedAt: null,
       };
 
       await inMemoryUow.conventionRepository.setConventions([convention]);
@@ -494,6 +491,51 @@ describe("Assessment routes", () => {
         body: {
           status: 403,
           message: errors.assessment.signForbidden().message,
+        },
+      });
+    });
+
+    it("403 - cannot sign legacy assessment", async () => {
+      const legacyAssessment = {
+        _entityName: "Assessment" as const,
+        conventionId: testConvention.id,
+        status: "FINISHED" as const,
+        establishmentFeedback: "Legacy feedback",
+        numberOfHoursActuallyMade: null as number | null,
+      };
+
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
+      ];
+      inMemoryUow.conventionRepository.setConventions([testConvention]);
+      inMemoryUow.assessmentRepository.assessments = [
+        legacyAssessment as AssessmentEntity,
+      ];
+
+      const beneficiaryJwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: testConvention.id,
+          role: "beneficiary",
+          email: testConvention.signatories.beneficiary.email,
+          now: new Date(),
+        }),
+      );
+
+      const response = await httpClient.signAssessment({
+        body: {
+          conventionId: testConvention.id,
+          beneficiaryAgreement: true,
+          beneficiaryFeedback: "",
+        },
+        headers: { authorization: beneficiaryJwt },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message:
+            errors.assessment.signNotAvailableForLegacyAssessment().message,
         },
       });
     });
