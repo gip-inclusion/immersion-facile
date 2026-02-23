@@ -2,40 +2,63 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useEffect } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
+import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  type AssessmentDto,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   escapeHtml,
   getFormattedFirstnameAndLastname,
+  isAssessmentDto,
   isStringDate,
-  type LegacyAssessmentDto,
   makeSiretDescriptionLink,
   toDisplayedDate,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
+import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
+import { AssessmentSignModalContent } from "src/app/components/forms/assessment/SignAssessmentModalContent";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
-import type { routes } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { createFormModal } from "src/app/utils/createFormModal";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import type { Route } from "type-route";
 import logoIf from "/assets/img/logo-if.svg";
 import logoRf from "/assets/img/logo-rf.svg";
 
-type AssessmentDocumentPageProps = {
-  route: Route<typeof routes.assessmentDocument>;
+const createAssessmentSignModalParams = {
+  isOpenedByDefault: false,
+  id: domElementIds.assessmentDocument.signAssessmentModal,
+  formId: domElementIds.assessmentDocument.signAssessmentForm,
+  doSubmitClosesModal: false,
+  concealingBackdrop: true,
+  submitButton: {
+    id: domElementIds.assessmentDocument.signAssessmentButton,
+    children: "Signer le bilan",
+    iconId: "fr-icon-pencil-line",
+    iconPosition: "left",
+  },
+  cancelButton: {
+    id: domElementIds.assessmentDocument.cancelSignAssessmentButton,
+    children: "Annuler",
+  },
 };
 
-const isLegacyAssessment = (
-  assessment: AssessmentDto | LegacyAssessmentDto,
-): assessment is LegacyAssessmentDto => {
-  return assessment.status === "FINISHED" || assessment.status === "ABANDONED";
+const {
+  Component: AssessmentSignModal,
+  open: openAssessmentSignModal,
+  close: closeAssessmentSignModal,
+} = createFormModal(createAssessmentSignModalParams);
+
+type AssessmentDocumentPageProps = {
+  route: Route<typeof routes.assessmentDocument>;
 };
 
 export const AssessmentDocumentPage = ({
@@ -53,9 +76,15 @@ export const AssessmentDocumentPage = ({
     conventionId,
   });
   const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const signAssessmentFeedback = useFeedbackTopic("sign-assessment");
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
+  const isBeneficiary = jwtPayload?.role === "beneficiary";
+
+  const isSignAssessmentSuccess =
+    signAssessmentFeedback?.level === "success" &&
+    signAssessmentFeedback?.on === "create";
   const { isPdfLoading, generateAndDownloadPdf } = usePdfGenerator();
 
   const logos = [
@@ -87,12 +116,77 @@ export const AssessmentDocumentPage = ({
     );
 
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
-  if (!assessment) return <p>Pas de bilan correspondant trouvé</p>;
+  if (!assessment)
+    return (
+      <FullPageFeedback
+        title="Ce bilan n’est plus disponible"
+        illustration={commonIllustrations.success}
+        content={
+          <>
+            <p>
+              Ce bilan d’immersion a été supprimé suite à une demande et ne peut
+              plus être consulté ni signé.
+            </p>
+            <p>
+              Un nouveau bilan est en cours de préparation. Dès qu’il sera prêt,
+              vous recevrez un nouvel email vous permettant d’y accéder et de le
+              signer.
+            </p>
+            <p>
+              Vous avez besoin d’aide ?{" "}
+              <a
+                href="https://aide.immersion-facile.beta.gouv.fr/fr/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Contacter le support
+              </a>
+              .
+            </p>
+          </>
+        }
+        buttonProps={{
+          children: "Retourner sur la page d’accueil",
+          onClick: () => routes.home().push(),
+        }}
+      />
+    );
+  if (isSignAssessmentSuccess)
+    return (
+      <FullPageFeedback
+        title="Votre bilan d'immersion a bien été signé"
+        illustration={commonIllustrations.success}
+        content={
+          <>
+            <p>
+              Merci pour votre retour, votre signature a bien été prise en
+              compte.
+            </p>
+            <p>
+              Le bilan d’immersion au format PDF vous sera envoyé par email dans
+              les prochaines minutes, ainsi qu’à votre tuteur et votre
+              accompagnateur.
+            </p>
+            <p>
+              Ce document pourra vous servir de support pour vos démarches et
+              vos échanges futurs.
+            </p>
+          </>
+        }
+        buttonProps={{
+          children: "Découvrir d'autres immersions",
+          onClick: () => routes.search().push(),
+        }}
+      />
+    );
 
-  const isAssessmentLegacy = isLegacyAssessment(assessment);
+  const isAssessmentLegacy = !isAssessmentDto(assessment);
+  const isSignedByBeneficiary = !isAssessmentLegacy && !!assessment.signedAt;
+  const showPdfAndPrint = isSignedByBeneficiary || isAssessmentLegacy;
 
   return (
     <MainWrapper layout="default" vSpacing={8}>
+      <Feedback topics={["sign-assessment"]} />
       <Document
         logos={logos}
         printButtonLabel={"Imprimer le bilan"}
@@ -107,23 +201,28 @@ export const AssessmentDocumentPage = ({
         })}
         businessName={convention.businessName}
         internshipKind={convention.internshipKind}
-        customActions={[
-          <Button
-            key={"htmlToPdfButton"}
-            priority="secondary"
-            onClick={() =>
-              generateAndDownloadPdf({
-                conventionId,
-                prefix: "bilan",
-                jwt,
-              })
-            }
-            className={fr.cx("fr-mr-1w")}
-            id={domElementIds.assessmentDocument.downloadPdfButton}
-          >
-            Télécharger en PDF
-          </Button>,
-        ]}
+        showPrintButton={showPdfAndPrint}
+        customActions={
+          showPdfAndPrint
+            ? [
+                <Button
+                  key={"htmlToPdfButton"}
+                  priority="secondary"
+                  onClick={() =>
+                    generateAndDownloadPdf({
+                      conventionId,
+                      prefix: "bilan",
+                      jwt,
+                    })
+                  }
+                  className={fr.cx("fr-mr-1w")}
+                  id={domElementIds.assessmentDocument.downloadPdfButton}
+                >
+                  Télécharger en PDF
+                </Button>,
+              ]
+            : []
+        }
       >
         <h2 className={fr.cx("fr-h4")}>
           Identifiant de la convention: {convention.id}
@@ -273,7 +372,7 @@ export const AssessmentDocumentPage = ({
             </>
           )}
         </ul>
-        <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Appréciation générale :</h2>
+        <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Appréciation générale</h2>
         <p
           dangerouslySetInnerHTML={{
             __html: escapeHtml(assessment.establishmentFeedback).replace(
@@ -285,7 +384,7 @@ export const AssessmentDocumentPage = ({
         {!isAssessmentLegacy && (
           <>
             <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
-              Conseils pour la suite :
+              Conseils pour la suite
             </h2>
             <p
               dangerouslySetInnerHTML={{
@@ -295,6 +394,54 @@ export const AssessmentDocumentPage = ({
                 ),
               }}
             />
+            {!isAssessmentLegacy && (
+              <>
+                <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
+                  Signature de la personne en immersion
+                </h2>
+                {isSignedByBeneficiary ? (
+                  <>
+                    <p>
+                      Personne en immersion :{" "}
+                      {getFormattedFirstnameAndLastname({
+                        firstname: convention.signatories.beneficiary.firstName,
+                        lastname: convention.signatories.beneficiary.lastName,
+                      })}
+                    </p>
+                    <ul>
+                      <li>
+                        <strong>Choix exprimés :</strong>{" "}
+                        {assessment.beneficiaryAgreement
+                          ? "J'ai bien lu, je suis d'accord"
+                          : "J'ai bien lu, je ne suis pas d'accord"}
+                      </li>
+                      {assessment.signedAt && (
+                        <li>
+                          <strong>Date de signature :</strong>{" "}
+                          {toDisplayedDate({
+                            date: new Date(assessment.signedAt),
+                            withHours: false,
+                          })}
+                        </li>
+                      )}
+                    </ul>
+
+                    {assessment.beneficiaryFeedback && (
+                      <>
+                        <strong>Commentaire :</strong>
+                        <p>{assessment.beneficiaryFeedback}</p>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <p>
+                    La personne en immersion n'a pas encore signé ce bilan. Ce
+                    document est une version provisoire et ne constitue pas un
+                    bilan finalisé.
+                  </p>
+                )}
+              </>
+            )}
           </>
         )}
         <hr className={fr.cx("fr-hr", "fr-mb-6w", "fr-mt-10w")} />
@@ -320,6 +467,48 @@ export const AssessmentDocumentPage = ({
           </p>
         </footer>
       </Document>
+      {isBeneficiary && !isSignedByBeneficiary && !isAssessmentLegacy && (
+        <>
+          <div
+            style={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: "var(--background-raised-grey)",
+              padding: ".3rem",
+              zIndex: 10,
+              borderTop: "1px solid var(--border-default-grey)",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Button
+              priority="primary"
+              type="button"
+              iconId="fr-icon-pencil-line"
+              iconPosition="left"
+              id={
+                domElementIds.assessmentDocument.openSignAssessmentModalButton
+              }
+              className={fr.cx("fr-mr-3w")}
+              onClick={() => openAssessmentSignModal()}
+            >
+              Signer le bilan
+            </Button>
+          </div>
+          {createPortal(
+            <AssessmentSignModal title="Signature du bilan">
+              <AssessmentSignModalContent
+                conventionId={conventionId}
+                jwt={jwt}
+                onCloseModal={closeAssessmentSignModal}
+              />
+            </AssessmentSignModal>,
+            document.body,
+          )}
+        </>
+      )}
     </MainWrapper>
   );
 };

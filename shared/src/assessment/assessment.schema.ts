@@ -106,8 +106,19 @@ export const deleteAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<
   });
 
 export const signAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<SignAssessmentRequestDto> =
-  z.object({
-    conventionId: conventionIdSchema,
-    beneficiaryAgreement: z.boolean(),
-    beneficiaryFeedback: z.string().max(255),
-  });
+  z
+    .object({
+      conventionId: conventionIdSchema,
+    })
+    .and(
+      z.discriminatedUnion("beneficiaryAgreement", [
+        z.object({
+          beneficiaryAgreement: z.literal(true),
+          beneficiaryFeedback: zStringMinLength1.nullable(),
+        }),
+        z.object({
+          beneficiaryAgreement: z.literal(false),
+          beneficiaryFeedback: zStringMinLength1,
+        }),
+      ]),
+    );

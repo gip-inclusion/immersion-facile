@@ -36,11 +36,7 @@ export class HttpAssessmentGateway implements AssessmentGateway {
       this.httpClient
         .signAssessment({
           headers: { authorization: jwt },
-          body: {
-            conventionId: params.conventionId,
-            beneficiaryAgreement: params.beneficiaryAgreement,
-            beneficiaryFeedback: params.beneficiaryFeedback,
-          },
+          body: params,
         })
         .then((response) =>
           match(response)
