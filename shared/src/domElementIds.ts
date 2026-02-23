@@ -961,6 +961,10 @@ export const domElementIds = {
         "im-agency-dashboard__initiate-convention-button",
       selectAgencyToInitiateConventionModal:
         "im-agency-dashboard__select-agency-to-initiate-convention-modal",
+      initiateConventionSourceRadioButtons:
+        "im-agency-dashboard__initiate-convention-source-radio-buttons",
+      initiateConventionTemplateRadioButtons:
+        "im-agency-dashboard__initiate-convention-template-radio-buttons",
       goToConventionButton: "im-agency-dashboard__go-to-convention-button",
     },
     agencyTab: {

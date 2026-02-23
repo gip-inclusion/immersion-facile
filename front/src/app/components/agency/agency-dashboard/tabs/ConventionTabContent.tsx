@@ -1,22 +1,78 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import RadioButtons, {
+  type RadioButtonsProps,
+} from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { type ReactNode, useState } from "react";
-import { HeadingSection } from "react-design-system";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { type ReactNode, useMemo, useState } from "react";
+import {
+  ErrorNotifications,
+  HeadingSection,
+  SectionHighlight,
+} from "react-design-system";
 import { createPortal } from "react-dom";
+import { FormProvider, useForm } from "react-hook-form";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   type AgencyId,
+  type ConventionTemplateId,
   domElementIds,
   miniStageAgencyKinds,
+  toDisplayedDate,
 } from "shared";
 import { AgencyTasks } from "src/app/components/agency/agency-dashboard/AgencyTasks";
 import { ConventionList } from "src/app/components/agency/agency-dashboard/ConventionList";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
+import {
+  displayReadableError,
+  toErrorsWithLabels,
+} from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
+import { match, P } from "ts-pattern";
+import { z } from "zod";
+
+type InitiateConventionFormValues =
+  | {
+      initiateConventionSource: "structure";
+      selectedAgencyId: AgencyId;
+    }
+  | {
+      initiateConventionSource: "template";
+      selectedConventionTemplateId: ConventionTemplateId;
+    };
+
+const defaultFormValues: InitiateConventionFormValues = {
+  initiateConventionSource: "structure",
+  selectedAgencyId: "",
+};
+
+const initiateConventionFormErrorLabels: Record<string, string> = {
+  selectedAgencyId: "Aucun organisme sélectionné",
+  selectedConventionTemplateId: "Aucun modèle sélectionné",
+};
+
+const structureFormSchema = z.object({
+  initiateConventionSource: z.literal("structure"),
+  selectedAgencyId: z.string(),
+});
+
+const templateFormSchema = z.object({
+  initiateConventionSource: z.literal("template"),
+  selectedConventionTemplateId: z
+    .string()
+    .min(1, "Veuillez sélectionner un modèle"),
+});
+
+const initiateConventionFormSchema = z.discriminatedUnion(
+  "initiateConventionSource",
+  [structureFormSchema, templateFormSchema],
+);
 
 const selectAgencyToInitiateConventionModal = createModal({
   isOpenedByDefault: false,
@@ -29,9 +85,68 @@ export const ConventionTabContent = ({
   activeAgencies: AgencyDtoForAgencyUsersAndAdmins[];
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-  const [selectedAgency, setSelectedAgency] = useState<AgencyId | null>(null);
+  const conventionTemplates = useAppSelector(
+    conventionTemplateSelectors.conventionTemplates,
+  );
   const [agencyTaskListElement, setAgencyTaskListElement] =
     useState<ReactNode | null>(null);
+
+  const initiateConventionMethods = useForm<InitiateConventionFormValues>({
+    defaultValues: defaultFormValues,
+    resolver: zodResolver(initiateConventionFormSchema),
+    mode: "onTouched",
+  });
+
+  const { watch, setValue, handleSubmit, formState, reset } =
+    initiateConventionMethods;
+  const { errors: formErrors, submitCount } = formState;
+  const initiateConventionSource = watch("initiateConventionSource");
+  const selectedAgencyId = watch("selectedAgencyId");
+  const selectedConventionTemplateId = watch("selectedConventionTemplateId");
+
+  const initiateConventionSourceOptions: RadioButtonsProps["options"] = useMemo(
+    () => [
+      {
+        label: "À partir d'un modèle",
+        nativeInputProps: {
+          name: "initiateConventionSource",
+          value: "template",
+          checked: initiateConventionSource === "template",
+          onChange: () => setValue("initiateConventionSource", "template"),
+        },
+      },
+      {
+        label: "À partir de vos informations",
+        nativeInputProps: {
+          name: "initiateConventionSource",
+          value: "structure",
+          checked: initiateConventionSource === "structure",
+          onChange: () => {
+            setValue("initiateConventionSource", "structure");
+            if (activeAgencies.length === 1) {
+              setValue("selectedAgencyId", activeAgencies[0].id);
+            }
+          },
+        },
+      },
+    ],
+    [initiateConventionSource, setValue],
+  );
+
+  const conventionTemplateOptions: RadioButtonsProps["options"] = useMemo(
+    () =>
+      conventionTemplates.map((template) => ({
+        label: template.name,
+        hintText: `Mise à jour le ${template.updatedAt ? toDisplayedDate({ date: new Date(template.updatedAt), withHours: true }) : ""}`,
+        nativeInputProps: {
+          name: "initiateConventionTemplate",
+          value: template.id,
+          checked: selectedConventionTemplateId === template.id,
+          onChange: () => setValue("selectedConventionTemplateId", template.id),
+        },
+      })),
+    [conventionTemplates, selectedConventionTemplateId, setValue],
+  );
 
   const redirectToConventionPage = (
     agency: AgencyDtoForAgencyUsersAndAdmins,
@@ -62,11 +177,8 @@ export const ConventionTabContent = ({
   };
 
   const onInitiateConventionButtonClick = () => {
-    if (activeAgencies.length === 1) {
-      redirectToConventionPage(activeAgencies[0]);
-    } else {
-      selectAgencyToInitiateConventionModal.open();
-    }
+    reset(defaultFormValues);
+    selectAgencyToInitiateConventionModal.open();
   };
 
   if (agencyTaskListElement) {
@@ -114,55 +226,136 @@ export const ConventionTabContent = ({
       <ConventionTemplatesList fromRoute={routes.agencyDashboard()} />
 
       {createPortal(
-        <selectAgencyToInitiateConventionModal.Component
-          title="Initier une convention"
-          buttons={[
-            {
-              doClosesModal: true,
-              children: "Fermer",
-            },
-            {
-              id: domElementIds.agencyDashboard.dashboard
-                .initiateConventionModalButton,
-              doClosesModal: false,
-              children: "Initier la convention",
-              disabled: !selectedAgency,
-              onClick: () => {
-                if (selectedAgency) {
-                  const foundAgency = activeAgencies.find(
-                    (agency) => agency.id === selectedAgency,
-                  );
-
-                  if (foundAgency) {
-                    redirectToConventionPage(foundAgency);
+        <FormProvider {...initiateConventionMethods}>
+          <selectAgencyToInitiateConventionModal.Component
+            title="Initier une convention"
+            buttons={[
+              {
+                doClosesModal: true,
+                children: "Fermer",
+              },
+              {
+                id: domElementIds.agencyDashboard.dashboard
+                  .initiateConventionModalButton,
+                doClosesModal: false,
+                children: "Initier la convention",
+                onClick: handleSubmit(() => {
+                  const agencyToRedirect =
+                    activeAgencies.length === 1
+                      ? activeAgencies[0]
+                      : selectedAgencyId
+                        ? activeAgencies.find(
+                            (agency) => agency.id === selectedAgencyId,
+                          )
+                        : undefined;
+                  if (agencyToRedirect) {
+                    selectAgencyToInitiateConventionModal.close();
+                    redirectToConventionPage(agencyToRedirect);
                   }
-                }
+                }),
               },
-            },
-          ]}
-        >
-          Créer une convention depuis votre espace vous permet de la pré-remplir
-          avec vos informations. Sélectionnez l’organisme pour lequel vous
-          souhaitez initier la convention.
-          <Select
-            label={"Organisme"}
-            className={fr.cx("fr-mt-2w")}
-            options={[
-              ...activeAgencies.map((agency) => ({
-                value: agency.id,
-                label: `${agency.name}`,
-              })),
             ]}
-            placeholder="Mes organismes"
-            nativeSelectProps={{
-              defaultValue: "",
-              value: selectedAgency ?? undefined,
-              onChange: (event) => {
-                setSelectedAgency(event.currentTarget.value);
-              },
-            }}
-          />
-        </selectAgencyToInitiateConventionModal.Component>,
+          >
+            <RadioButtons
+              id={
+                domElementIds.agencyDashboard.dashboard
+                  .initiateConventionSourceRadioButtons
+              }
+              name="initiateConventionSource"
+              legend="Comment souhaitez-vous initier la convention ?"
+              options={initiateConventionSourceOptions}
+              className={fr.cx("fr-mb-3w")}
+            />
+            <ErrorNotifications
+              errorsWithLabels={toErrorsWithLabels({
+                labels: initiateConventionFormErrorLabels,
+                errors: displayReadableError(formErrors),
+              })}
+              visible={submitCount !== 0 && Object.keys(formErrors).length > 0}
+            />
+            <SectionHighlight>
+              {match({ initiateConventionSource, activeAgencies })
+                .with(
+                  {
+                    initiateConventionSource: "structure",
+                    activeAgencies: P.when((arr) => arr.length < 1),
+                  },
+                  () => null,
+                )
+                .with(
+                  {
+                    initiateConventionSource: "structure",
+                    activeAgencies: P.when((arr) => arr.length === 1),
+                  },
+                  () => (
+                    <div className={fr.cx("fr-grid-row")}>
+                      <div
+                        className={fr.cx(
+                          "fr-hidden",
+                          "fr-unhidden-md",
+                          "fr-col-12",
+                          "fr-col-md-3",
+                          "fr-pr-2w",
+                        )}
+                      >
+                        <img src={commonIllustrations.fillForm} alt="" />
+                      </div>
+                      <div className={fr.cx("fr-col-12", "fr-col-md-9")}>
+                        Les informations de la convention seront pré-remplies
+                        avec les informations de l'organisme sélectionné.
+                      </div>
+                    </div>
+                  ),
+                )
+                .with(
+                  {
+                    initiateConventionSource: "structure",
+                    activeAgencies: P.when((arr) => arr.length > 1),
+                  },
+                  () => (
+                    <>
+                      Choisissez l'organisme dont les informations seront
+                      automatiquement pré-remplies.
+                      <Select
+                        label={"Organisme"}
+                        className={fr.cx("fr-mt-2w")}
+                        options={[
+                          ...activeAgencies.map((agency) => ({
+                            value: agency.id,
+                            label: `${agency.name}`,
+                          })),
+                        ]}
+                        placeholder="Mes organismes"
+                        nativeSelectProps={{
+                          defaultValue: "",
+                          value: selectedAgencyId,
+                          onChange: (event) => {
+                            setValue(
+                              "selectedAgencyId",
+                              event.currentTarget.value,
+                            );
+                          },
+                        }}
+                      />
+                    </>
+                  ),
+                )
+                .with({ initiateConventionSource: "template" }, () => (
+                  <RadioButtons
+                    id={
+                      domElementIds.agencyDashboard.dashboard
+                        .initiateConventionTemplateRadioButtons
+                    }
+                    name="initiateConventionTemplate"
+                    legend="Quel modèle souhaitez-vous utiliser ?"
+                    options={conventionTemplateOptions}
+                    className={fr.cx("fr-mb-3w")}
+                  />
+                ))
+                .otherwise(() => null)}
+            </SectionHighlight>
+          </selectAgencyToInitiateConventionModal.Component>
+        </FormProvider>,
         document.body,
       )}
     </HeadingSection>
