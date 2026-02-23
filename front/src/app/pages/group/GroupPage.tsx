@@ -82,7 +82,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
       background: group.options.heroHeader.backgroundColor,
     },
   }))();
-  const parentContainerIdToScrollToTop = "group-result-parent-container";
+  const elementIdToScrollTo = `group-${group.slug}-container`;
 
   const [displayedResults, setDisplayedResults] =
     useState<InternalOfferDto[]>(results);
@@ -156,7 +156,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
         </div>
       </section>
       <section
-        id={parentContainerIdToScrollToTop}
+        id={elementIdToScrollTo}
         ref={searchBarRef}
         className={cx(fr.cx("fr-py-6w"), classes.searchBar)}
       >
@@ -189,7 +189,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
       <div className={fr.cx("fr-mt-6w")}>
         <GroupListResults
           results={displayedResults}
-          parentContainerIdToScrollToTop={parentContainerIdToScrollToTop}
+          parentContainerIdToScrollToTop={elementIdToScrollTo}
         />
         <SectionAccordion />
         <SectionTextEmbed
