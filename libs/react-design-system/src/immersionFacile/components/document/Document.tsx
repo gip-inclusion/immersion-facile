@@ -15,6 +15,7 @@ export type ConventionDocumentProperties = {
   logos: ReactNode[];
   title: string;
   customActions?: ReactNode[];
+  showPrintButton?: boolean;
   beneficiaryName: string;
   businessName: string;
   internshipKind: "immersion" | "mini-stage-cci";
@@ -26,6 +27,7 @@ export const Document = ({
   logos,
   title,
   customActions,
+  showPrintButton = true,
   beneficiaryName,
   businessName,
   internshipKind,
@@ -45,13 +47,15 @@ export const Document = ({
     <section className={cx(componentName)}>
       <div className={cx(`${componentName}__tools`)}>
         {customActions}
-        <Button
-          onClick={window.print}
-          type="button"
-          id={"im-convention-document__print-button"}
-        >
-          {printButtonLabel}
-        </Button>
+        {showPrintButton && (
+          <Button
+            onClick={window.print}
+            type="button"
+            id={"im-convention-document__print-button"}
+          >
+            {printButtonLabel}
+          </Button>
+        )}
       </div>
       <article className={cx(`${componentName}__content`)}>
         <header>
