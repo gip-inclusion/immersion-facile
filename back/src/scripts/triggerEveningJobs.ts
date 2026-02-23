@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { createLogger } from "../utils/logger";
 import { triggerDeactivateUnresponsiveEstablishments } from "./scheduledScripts/deactivateUnresponsiveEstablishments";
 import { triggerDeleteEmailAttachements } from "./scheduledScripts/deleteEmailAttachements";

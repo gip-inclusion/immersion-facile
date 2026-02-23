@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { subYears } from "date-fns";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";

@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { createMakeScriptPgPool } from "../config/pg/pgPool";

@@ -7,11 +7,9 @@ import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTi
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
-import { configureSentry } from "../configureSentry";
 import { handleCRONScript } from "../handleCRONScript";
 
 const config = AppConfig.createFromEnv();
-configureSentry(config.envType, { traceRate: 1 }); // it is a CRON, we want to trace all the time for debug.
 
 const logger = createLogger(__filename);
 

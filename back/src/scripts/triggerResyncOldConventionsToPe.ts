@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeConnectedRedisClient } from "../config/bootstrap/cache";

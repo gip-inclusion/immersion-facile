@@ -1,3 +1,4 @@
+import "./instrumentSentryCron";
 import { subDays } from "date-fns";
 import { keys } from "ramda";
 import type { SiretDto } from "shared";
