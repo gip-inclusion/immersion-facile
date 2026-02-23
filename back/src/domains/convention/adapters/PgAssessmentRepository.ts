@@ -131,6 +131,9 @@ export class PgAssessmentRepository implements AssessmentRepository {
             conventionId: assessmentEntity.conventionId,
           });
 
+        if (error?.message.includes(assessmentAlreadyExistsErrorMessage))
+          throw errors.assessment.alreadyExist(assessmentEntity.conventionId);
+
         throw error;
       });
   }
@@ -138,3 +141,6 @@ export class PgAssessmentRepository implements AssessmentRepository {
 
 const noConventionMatchingErrorMessage =
   '"immersion_assessments" violates foreign key constraint "immersion_assessments_convention_id_fkey"';
+
+const assessmentAlreadyExistsErrorMessage =
+  '"immersion_assessments" violates unique constraint "immersion_assessments_pkey"';
