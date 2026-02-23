@@ -81,9 +81,6 @@ export type LegacyAssessmentDto = {
   status: LegacyAssessmentStatus;
   conventionId: ConventionId;
   establishmentFeedback: string;
-  beneficiaryAgreement: boolean | null;
-  beneficiaryFeedback: string | null;
-  signedAt: DateString | null;
 };
 
 export type CreateFormAssessmentInitialValues = {

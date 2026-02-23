@@ -275,9 +275,6 @@ describe("GetAssessmentByConventionId", () => {
         status: "FINISHED",
         conventionId: convention.id,
         establishmentFeedback: "this is my feedback",
-        beneficiaryAgreement: null,
-        beneficiaryFeedback: null,
-        signedAt: null,
       };
       const assessmentEntity: AssessmentEntity = {
         _entityName: "Assessment",
