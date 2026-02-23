@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { errors } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ErrorPageContent } from "src/app/pages/error/ErrorPageContent";
 import { routes } from "src/app/routes/routes";
@@ -33,13 +34,16 @@ export const ConventionTemplatePage = ({
   const isConventionTemplateLoading = useAppSelector(
     conventionTemplateSelectors.isLoading,
   );
+  const conventionTemplateFeedback = useFeedbackTopic("convention-template");
 
   const backButtonProps: ButtonProps = {
     priority: "tertiary",
     iconId: "fr-icon-arrow-left-line",
     linkProps: routes[fromRoute]().link,
     className: fr.cx("fr-mb-4w"),
-    children: "Annuler et revenir en arrière",
+    children: conventionTemplateFeedback
+      ? "Aller à mon espace"
+      : "Annuler et revenir en arrière",
   };
 
   useEffect(() => {
@@ -81,6 +85,7 @@ export const ConventionTemplatePage = ({
       <Feedback
         topics={["convention-template"]}
         className={fr.cx("fr-mb-2w")}
+        closable
       />
       <h1>
         {fetchedConventionTemplate?.name
