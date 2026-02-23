@@ -106,6 +106,10 @@ export const errors = {
       serviceName: string;
       message: string;
     }) => new Error(`[${serviceName}] : ${message}`),
+    tooManyRequests: ({ serviceName }: { serviceName: string }) =>
+      new TooManyRequestApiError(
+        `Le service ${serviceName} a subit trop de sollicitation. Réessayez dans quelques minutes.`,
+      ),
   },
   event: {
     deleteWithBadOccuredAtRange: ({ from, to }: DateRange) =>
