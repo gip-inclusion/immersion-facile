@@ -241,6 +241,7 @@ const getUseCasesByTopics = (
     ),
   ],
   AssessmentDeleted: [useCases.notifyActorsThatAssessmentDeleted],
+  AssessmentSignedByBeneficiary: [],
   ConventionTemplateDeleted: [],
   ConventionTemplateCreatedOrUpdated: [],
   EmailWithLinkToCreateAssessmentSent: [],

@@ -248,6 +248,16 @@ export const errors = {
       new ForbiddenError(
         "Seul les signataires ainsi que les conseillers et les validateurs de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
       ),
+    alreadySigned: (conventionId: ConventionId) =>
+      new ConflictError(
+        `Le bilan pour la convention '${conventionId}' a déjà été signé par le bénéficiaire.`,
+      ),
+    signForbidden: () =>
+      new ForbiddenError("Seul le bénéficiaire peut signer le bilan."),
+    signNotAvailableForLegacyAssessment: () =>
+      new ForbiddenError(
+        "La signature n'est pas disponible pour les anciens bilans.",
+      ),
     sendAssessmentLinkNotAllowedForStatus: ({
       status,
     }: {
