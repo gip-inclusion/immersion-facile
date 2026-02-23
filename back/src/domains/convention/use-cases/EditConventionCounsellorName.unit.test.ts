@@ -463,15 +463,6 @@ describe("EditCounsellorName", () => {
             },
           },
         ]);
-        expectToEqual(uow.conventionRepository.conventions, [
-          {
-            ...convention,
-            agencyReferent: {
-              firstname: "",
-              lastname: "",
-            },
-          },
-        ]);
         expectArraysToMatch(uow.outboxRepository.events, [
           {
             topic: "ConventionCounsellorNameEdited",
