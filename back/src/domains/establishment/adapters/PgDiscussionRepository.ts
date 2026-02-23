@@ -2,6 +2,7 @@ import type { InsertObject } from "kysely";
 import { sql } from "kysely";
 import { keys } from "ramda";
 import {
+  type Attachment,
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
   type ContactMode,
@@ -313,7 +314,19 @@ export class PgDiscussionRepository implements DiscussionRepository {
         message: "Supprimé car trop ancien",
         attachments: sql`CAST(${JSON.stringify([])} AS JSONB)`,
       })
-      .where("sent_at", "<=", endedSince)
+      .where((eb) =>
+        eb.and([
+          eb("sent_at", "<=", endedSince),
+          eb.or([
+            eb("message", "!=", "Supprimé car trop ancien"),
+            eb(
+              "attachments",
+              "!=",
+              sql<Attachment[]>`CAST(${JSON.stringify([])} AS JSONB)`,
+            ),
+          ]),
+        ]),
+      )
       .executeTakeFirst();
 
     return Number(result.numUpdatedRows);
