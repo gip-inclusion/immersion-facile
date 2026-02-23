@@ -13,7 +13,11 @@ import {
 } from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
-export const EstablishmentBusinessFields = (): JSX.Element => {
+export const EstablishmentBusinessFields = ({
+  isConventionTemplate,
+}: {
+  isConventionTemplate: boolean;
+}): JSX.Element => {
   const { getValues, register, control, setValue } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
@@ -45,7 +49,10 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
   const siretValueOnForm = useWatch({ control, name: "siret" });
 
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: values.internshipKind,
+      isConventionTemplate,
+    }),
   );
   const formContents = getFormFields();
 

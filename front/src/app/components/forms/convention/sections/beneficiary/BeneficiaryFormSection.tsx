@@ -47,6 +47,7 @@ type beneficiaryFormSectionProperties = {
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
   fromPeConnectedUser?: boolean;
+  isConventionTemplate: boolean;
 };
 
 export const BeneficiaryFormSection = ({
@@ -54,6 +55,7 @@ export const BeneficiaryFormSection = ({
   setEmailValidationErrors,
   emailValidationErrors,
   fromPeConnectedUser,
+  isConventionTemplate,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const [isMinorAccordingToAge, setIsMinorAccordingToAge] = useState(false);
   const isMinorOrProtected = useAppSelector(conventionSelectors.isMinor);
@@ -69,7 +71,10 @@ export const BeneficiaryFormSection = ({
   const dispatch = useDispatch();
   const getFieldError = makeFieldError(formState);
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: values.internshipKind,
+      isConventionTemplate,
+    }),
   );
   const formContents = getFormFields();
 
@@ -377,6 +382,7 @@ export const BeneficiaryFormSection = ({
         <BeneficiaryRepresentativeFields
           setEmailValidationErrors={setEmailValidationErrors}
           emailValidationErrors={emailValidationErrors}
+          isConventionTemplate={isConventionTemplate}
         />
       )}
 
@@ -401,7 +407,11 @@ export const BeneficiaryFormSection = ({
         }))}
       />
 
-      {!isMinorOrProtected && <BeneficiaryEmergencyContactFields />}
+      {!isMinorOrProtected && (
+        <BeneficiaryEmergencyContactFields
+          isConventionTemplate={isConventionTemplate}
+        />
+      )}
 
       {internshipKind !== "mini-stage-cci" && (
         <>
@@ -443,6 +453,7 @@ export const BeneficiaryFormSection = ({
 
           {hasCurrentEmployer && (
             <BeneficiaryCurrentEmployerFields
+              isConventionTemplate={isConventionTemplate}
               emailValidationErrors={emailValidationErrors}
               setEmailValidationErrors={setEmailValidationErrors}
             />

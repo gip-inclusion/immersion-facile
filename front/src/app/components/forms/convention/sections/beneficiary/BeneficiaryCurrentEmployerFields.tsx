@@ -24,15 +24,20 @@ import { PhoneInput } from "../../../commons/PhoneInput";
 export const BeneficiaryCurrentEmployerFields = ({
   setEmailValidationErrors,
   emailValidationErrors,
+  isConventionTemplate,
 }: {
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
+  isConventionTemplate: boolean;
 }): JSX.Element => {
   const { setValue, getValues, register, formState } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: values.internshipKind,
+      isConventionTemplate,
+    }),
   );
   const formFields = getFormFields();
   const getFieldError = makeFieldError(formState);

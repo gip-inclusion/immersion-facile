@@ -8,11 +8,18 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 
-export const BeneficiaryEmergencyContactFields = (): JSX.Element => {
+export const BeneficiaryEmergencyContactFields = ({
+  isConventionTemplate,
+}: {
+  isConventionTemplate: boolean;
+}): JSX.Element => {
   const { watch, register, formState } = useFormContext<ConventionReadDto>();
 
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(watch().internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: watch().internshipKind,
+      isConventionTemplate,
+    }),
   );
   const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();

@@ -26,8 +26,10 @@ import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
 
 export const ScheduleSection = ({
   internshipKind,
+  isConventionTemplate,
 }: {
   internshipKind: InternshipKind;
+  isConventionTemplate: boolean;
 }) => {
   const { setValue, watch, register, formState, reset } =
     useFormContext<
@@ -36,7 +38,7 @@ export const ScheduleSection = ({
   const values = watch();
 
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(internshipKind),
+    formConventionFieldsLabels({ internshipKind, isConventionTemplate }),
   );
 
   const formContents = getFormFields();

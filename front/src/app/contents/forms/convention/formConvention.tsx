@@ -19,7 +19,8 @@ export type FormFieldKeys =
   | "isCurrentEmployer"
   | "isEstablishmentTutorIsEstablishmentRepresentative"
   | "isMinor"
-  | "agencyKind";
+  | "agencyKind"
+  | "name";
 
 export type FormConventionFieldsLabels = FormFieldsObjectForContent<
   Record<FormFieldKeys, FormFieldAttributesForContent>
@@ -34,16 +35,20 @@ const {
   establishmentRepresentativeSection: establishmentRepresentativeSectionIds,
 } = domElementIds.conventionImmersionRoute;
 
-export const formConventionFieldsLabels: (
-  internshipKind: InternshipKind,
-) => FormConventionFieldsLabels = (internshipKind) => ({
-  ...conventionTemplateSection(),
-  ...conventionSection(internshipKind),
-  ...beneficiarySection(internshipKind),
-  ...beneficiaryRepresentativeSection(internshipKind),
-  ...beneficiaryCurrentEmployerSection,
-  ...establishmentTutorSection(internshipKind),
-  ...establishmentRepresentativeSection(),
+export const formConventionFieldsLabels: (params: {
+  internshipKind: InternshipKind;
+  isConventionTemplate: boolean;
+}) => FormConventionFieldsLabels = ({
+  internshipKind,
+  isConventionTemplate,
+}) => ({
+  ...conventionTemplateSection({ isConventionTemplate }),
+  ...conventionSection({ internshipKind, isConventionTemplate }),
+  ...beneficiarySection({ internshipKind, isConventionTemplate }),
+  ...beneficiaryRepresentativeSection({ internshipKind, isConventionTemplate }),
+  ...beneficiaryCurrentEmployerSection({ isConventionTemplate }),
+  ...establishmentTutorSection({ internshipKind, isConventionTemplate }),
+  ...establishmentRepresentativeSection({ isConventionTemplate }),
 
   //
   // TODO: exclude these fields from typing
@@ -51,22 +56,32 @@ export const formConventionFieldsLabels: (
   ...fieldsToExclude,
 });
 
-const conventionTemplateSection = () => ({
+const conventionTemplateSection = ({
+  isConventionTemplate,
+}: {
+  isConventionTemplate: boolean;
+}) => ({
   name: {
     label: "Nom du modèle",
     id: domElementIds.conventionTemplate.form.nameInput,
-    required: true,
+    required: isConventionTemplate,
   },
 });
 
-const conventionSection = (internshipKind: InternshipKind) => ({
+const conventionSection = ({
+  internshipKind,
+  isConventionTemplate,
+}: {
+  internshipKind: InternshipKind;
+  isConventionTemplate: boolean;
+}) => ({
   agencyDepartment: {
     label:
       internshipKind === "immersion"
         ? "Votre département"
         : "Saisissez le département de votre entreprise d’accueil",
     id: conventionSectionIds.agencyDepartment,
-    required: true,
+    required: !isConventionTemplate,
     placeholder: "Veuillez sélectionner un département",
   },
   agencyKind: {
@@ -80,7 +95,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Votre structure d'accompagnement"
         : "Choisissez la Chambre consulaire correspondant à l'entreprise où se déroulera votre stage",
     id: conventionSectionIds.agencyId,
-    required: true,
+    required: !isConventionTemplate,
     hintText:
       internshipKind === "mini-stage-cci"
         ? "Choisissez votre organisme : Chambre d'agriculture (secteur agricole), CMA (alimentation, bâtiment, fabrication, services) ou CCI (commerce, services, industrie)."
@@ -110,7 +125,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Date de début de l'immersion"
         : "Date de début du stage",
     id: conventionSectionIds.dateStart,
-    required: true,
+    required: !isConventionTemplate,
   },
   dateEnd: {
     label:
@@ -118,7 +133,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Date de fin de l'immersion"
         : "Date de fin du stage",
     id: conventionSectionIds.dateEnd,
-    required: true,
+    required: !isConventionTemplate,
   },
   siret: {
     label:
@@ -130,7 +145,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "La structure d'accueil, c'est l'entreprise, le commerce, l'association... où le candidat va faire son immersion. Format attendu : 362 521 879 00034"
         : "La structure d'accueil, où le candidat va faire son stage. Format attendu : 362 521 879 00034",
     id: conventionSectionIds.siret,
-    required: true,
+    required: !isConventionTemplate,
   },
   businessName: {
     label:
@@ -138,7 +153,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Nom (raison sociale) de l'établissement d'accueil"
         : "Nom (raison sociale) de votre entreprise",
     id: conventionSectionIds.businessName,
-    required: true,
+    required: !isConventionTemplate,
   },
   workConditions: {
     label:
@@ -155,7 +170,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Un équipement de protection individuelle est-il fourni pour l’immersion ?"
         : "Un équipement de protection individuelle est-il fourni pour le stage",
     id: conventionSectionIds.individualProtection,
-    required: true,
+    required: !isConventionTemplate,
   },
   individualProtectionDescription: {
     label: "Précisez le ou les équipement(s) :",
@@ -169,7 +184,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ?"
         : "Des mesures de prévention sanitaire sont-elles prévues pour le stage ?",
     id: conventionSectionIds.sanitaryPrevention,
-    required: true,
+    required: !isConventionTemplate,
   },
   sanitaryPreventionDescription: {
     label: "Précisez les mesures de prévention sanitaire",
@@ -183,12 +198,12 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         : "Adresse du lieu où se fera le stage",
     id: conventionSectionIds.immersionAddress,
     hintText: "Ex : 35, Rue Édouard Danaux, 91220 Brétigny-sur-Orge",
-    required: true,
+    required: !isConventionTemplate,
   },
   immersionObjective: {
     label: "Objet de la période de mise en situation en milieu professionnel",
     id: conventionSectionIds.immersionObjective,
-    required: true,
+    required: !isConventionTemplate,
   },
   immersionAppellation: {
     label:
@@ -197,7 +212,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         : "Intitulé du métier observé pendant le stage",
     hintText: "Ex : employé libre service, web développeur, boulanger …",
     id: conventionSectionIds.immersionAppellation,
-    required: true,
+    required: !isConventionTemplate,
   },
   immersionActivities: {
     label:
@@ -207,7 +222,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     hintText:
       "Précisez les éléments-clés de la période, son contexte, les tâches confiées, les objectifs assignés au candidat.",
     id: conventionSectionIds.immersionActivities,
-    required: true,
+    required: !isConventionTemplate,
   },
   immersionSkills: {
     label:
@@ -222,7 +237,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     label:
       "Si le bénéficiaire est actuellement salarié d'une entreprise, l'immersion va-t-elle se dérouler pendant le temps de travail habituel ?",
     id: conventionSectionIds.isCurrentEmployer,
-    required: true,
+    required: !isConventionTemplate,
     hintText: (
       <>
         <a
@@ -241,7 +256,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion" ? "immersion" : "stage"
     } ?`,
     id: conventionSectionIds.isEstablishmentTutorIsEstablishmentRepresentative,
-    required: true,
+    required: !isConventionTemplate,
   },
   businessAdvantages: {
     label: "Avantages proposés par l'entreprise",
@@ -252,7 +267,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   isMinor: {
     label: "Le candidat est-il majeur protégé ?",
     id: conventionSectionIds.isMinor,
-    required: true,
+    required: !isConventionTemplate,
     hintText:
       "Les majeurs protégés sont les personnes qui sont dans l'impossibilité de pourvoir seules à leurs intérêts en raison de l'altération de leurs facultés mentales ou corporelles de nature à empêcher l'expression de leur volonté.",
   },
@@ -264,28 +279,34 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   },
 });
 
-const beneficiarySection = (internshipKind: InternshipKind) => ({
+const beneficiarySection = ({
+  internshipKind,
+  isConventionTemplate,
+}: {
+  internshipKind: InternshipKind;
+  isConventionTemplate: boolean;
+}) => ({
   "signatories.beneficiary.firstName": {
     label: "Prénom du candidat",
     id: beneficiarySectionIds.firstName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiary.lastName": {
     label: "Nom de famille du candidat",
     id: beneficiarySectionIds.lastName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiary.birthdate": {
     label: "Date de naissance du candidat",
     hintText:
       "Merci d’indiquer la vraie date de naissance. Cette information est indispensable pour identifier la personne en immersion et traiter la convention. Une erreur ou une date volontairement différente peut empêcher la validation de la convention.",
     id: beneficiarySectionIds.birthdate,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiary.email": {
     label: "E-mail du candidat",
     id: beneficiarySectionIds.email,
-    required: true,
+    required: !isConventionTemplate,
     hintText:
       "Cette adresse email sera utilisée dans le cadre de la signature de la convention d'immersion. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
   },
@@ -296,12 +317,12 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
         ? "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55"
         : "Renseignez de préférence un téléphone portable pour pouvoir signer la convention de stage par SMS. Format attendu :  (+33) 6 22 33 44 55",
     id: beneficiarySectionIds.phone,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiary.levelOfEducation": {
     label: "Classe actuelle fréquentée par le candidat",
     id: beneficiarySectionIds.levelOfEducation,
-    required: true,
+    required: !isConventionTemplate,
     hintText: "Précisez votre statut",
   },
   "signatories.beneficiary.financiaryHelp": {
@@ -333,17 +354,17 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.address": {
     label: "Adresse du candidat",
     id: beneficiarySectionIds.address,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiary.schoolName": {
     label: "Nom de l'établissement scolaire du candidat",
     id: beneficiarySectionIds.schoolName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiary.schoolPostcode": {
     label: "Code postal de l'établissement scolaire du candidat",
     id: beneficiarySectionIds.schoolPostcode,
-    required: true,
+    required: !isConventionTemplate,
     hintText: "Ex : 06530",
   },
   "signatories.beneficiary.isRqth": {
@@ -359,25 +380,31 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   },
 });
 
-const establishmentTutorSection = (internshipKind: InternshipKind) => ({
+const establishmentTutorSection = ({
+  internshipKind,
+  isConventionTemplate,
+}: {
+  internshipKind: InternshipKind;
+  isConventionTemplate: boolean;
+}) => ({
   "establishmentTutor.firstName": {
     label: "Prénom du tuteur",
     hintText: "Ex : Alain",
     id: establishmentTutorSectionIds.firstName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "establishmentTutor.lastName": {
     label: "Nom du tuteur",
     hintText: "Ex : Prost",
     id: establishmentTutorSectionIds.lastName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "establishmentTutor.email": {
     label: "Email du tuteur",
     hintText:
       "Le tuteur recevra une copie de la convention à cette adresse email. Pensez à bien vérifier son exactitude. Ex: nom@domain.com",
     id: establishmentTutorSectionIds.email,
-    required: true,
+    required: !isConventionTemplate,
   },
   "establishmentTutor.phone": {
     label:
@@ -387,33 +414,39 @@ const establishmentTutorSection = (internshipKind: InternshipKind) => ({
     hintText:
       "Renseignez de préférence un téléphone portable afin de recevoir les rappels liés au bilan par SMS. Format attendu : 0605040302",
     id: establishmentTutorSectionIds.phone,
-    required: true,
+    required: !isConventionTemplate,
   },
   "establishmentTutor.job": {
     label: "Fonction du tuteur",
     hintText: "Ex : Pilote automobile",
     id: establishmentTutorSectionIds.job,
-    required: true,
+    required: !isConventionTemplate,
   },
 });
 
-const beneficiaryRepresentativeSection = (internshipKind: InternshipKind) => ({
+const beneficiaryRepresentativeSection = ({
+  internshipKind,
+  isConventionTemplate,
+}: {
+  internshipKind: InternshipKind;
+  isConventionTemplate: boolean;
+}) => ({
   "signatories.beneficiaryRepresentative.firstName": {
     label: "Prénom du représentant légal",
     id: beneficiaryRepresentativeSectionIds.firstName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiaryRepresentative.lastName": {
     label: "Nom de famille du représentant légal",
     id: beneficiaryRepresentativeSectionIds.lastName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiaryRepresentative.email": {
     label: "Adresse email du représentant légal",
     id: beneficiaryRepresentativeSectionIds.email,
     hintText:
       "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiaryRepresentative.phone": {
     label: "Téléphone du représentant légal",
@@ -422,15 +455,19 @@ const beneficiaryRepresentativeSection = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55"
         : "Renseignez de préférence un téléphone portable pour pouvoir signer la convention de stage par SMS. Format attendu :  (+33) 6 22 33 44 55",
-    required: true,
+    required: !isConventionTemplate,
   },
 });
 
-const beneficiaryCurrentEmployerSection = {
+const beneficiaryCurrentEmployerSection = ({
+  isConventionTemplate,
+}: {
+  isConventionTemplate: boolean;
+}) => ({
   "signatories.beneficiaryCurrentEmployer.businessName": {
     label: "Raison sociale de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.businessName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.job": {
     label: "Fonction du signataire dans l'entreprise actuelle du candidat",
@@ -439,66 +476,70 @@ const beneficiaryCurrentEmployerSection = {
   "signatories.beneficiaryCurrentEmployer.email": {
     label: "E-mail du signataire dans l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.email,
-    required: true,
+    required: !isConventionTemplate,
     hintText:
       "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
   },
   "signatories.beneficiaryCurrentEmployer.phone": {
     label: "Téléphone de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.phone,
-    required: true,
+    required: !isConventionTemplate,
     hintText:
       "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55",
   },
   "signatories.beneficiaryCurrentEmployer.firstName": {
     label: "Prénom du signataire dans l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.firstName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.lastName": {
     label:
       "Nom de famille du signataire dans l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.lastName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.businessSiret": {
     label: "Siret de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.businessSiret,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.businessAddress": {
     label: "Adresse de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.businessAddress,
-    required: true,
+    required: !isConventionTemplate,
   },
-};
+});
 
-const establishmentRepresentativeSection = () => ({
+const establishmentRepresentativeSection = ({
+  isConventionTemplate,
+}: {
+  isConventionTemplate: boolean;
+}) => ({
   "signatories.establishmentRepresentative.firstName": {
     label: "Indiquez le prénom du représentant de l'entreprise",
     hintText: "Ex : Alain",
     id: establishmentRepresentativeSectionIds.firstName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.establishmentRepresentative.lastName": {
     label: "Indiquez le nom du représentant de l'entreprise",
     hintText: "Ex : Prost",
     id: establishmentRepresentativeSectionIds.lastName,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.establishmentRepresentative.email": {
     label: "Indiquez l'e-mail du représentant de l'entreprise",
     hintText:
       "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Ex: nom@domain.com",
     id: establishmentRepresentativeSectionIds.email,
-    required: true,
+    required: !isConventionTemplate,
   },
   "signatories.establishmentRepresentative.phone": {
     label: "Indiquez le numéro de téléphone du représentant de l'entreprise",
     hintText:
       "Renseignez de préférence un téléphone portable pour signer la convention par SMS. Ex: 0605040302",
     id: establishmentRepresentativeSectionIds.phone,
-    required: true,
+    required: !isConventionTemplate,
   },
 });
 
@@ -888,14 +929,26 @@ export const sidebarStepContent = (
   return contents[internshipKind];
 };
 
-export const formUiSections: Partial<FormFieldKeys>[][] = [
+export const makeFormUiSections = ({
+  isConventionTemplate,
+}: {
+  isConventionTemplate: boolean;
+}): Partial<FormFieldKeys>[][] => [
   ["agencyId"],
-  keys(beneficiarySection("immersion")),
+  keys(
+    beneficiarySection({
+      internshipKind: "immersion",
+      isConventionTemplate,
+    }),
+  ),
   [
     ...keys(
       mergeRight(
-        establishmentRepresentativeSection(),
-        establishmentTutorSection("immersion"),
+        establishmentRepresentativeSection({ isConventionTemplate }),
+        establishmentTutorSection({
+          internshipKind: "immersion",
+          isConventionTemplate,
+        }),
       ),
     ),
     "siret",

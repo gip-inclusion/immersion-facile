@@ -10,7 +10,11 @@ import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 
-export const ImmersionDetailsSection = () => {
+export const ImmersionDetailsSection = ({
+  isConventionTemplate,
+}: {
+  isConventionTemplate: boolean;
+}): JSX.Element => {
   const { setValue, getValues, register, watch } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
@@ -19,7 +23,10 @@ export const ImmersionDetailsSection = () => {
   const hasSanitaryPrevention = watch("sanitaryPrevention");
 
   const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels({
+      internshipKind: values.internshipKind,
+      isConventionTemplate,
+    }),
   );
   const formContents = getFormFields();
 
