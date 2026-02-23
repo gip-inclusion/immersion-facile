@@ -80,6 +80,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
     // REVIEW I had to add this not to have an error
     // TODO Remove when https://git.beta.pole-emploi.fr/jburkard/immersion-facile/-/merge_requests/967 is merged ?
     await db.deleteFrom("immersion_assessments").execute();
+    await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("convention_templates").execute();
