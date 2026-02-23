@@ -71,9 +71,16 @@ export type DeleteAssessmentRequestDto = {
 
 export type SignAssessmentRequestDto = {
   conventionId: ConventionId;
-  beneficiaryAgreement: boolean;
-  beneficiaryFeedback: string;
-};
+} & (
+  | {
+      beneficiaryAgreement: true;
+      beneficiaryFeedback: string | null;
+    }
+  | {
+      beneficiaryAgreement: false;
+      beneficiaryFeedback: string;
+    }
+);
 
 export type AssessmentMode = "CreateAssessment" | "GetAssessment";
 
