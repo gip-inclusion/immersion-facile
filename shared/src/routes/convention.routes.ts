@@ -92,7 +92,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: signAssessmentRequestDtoSchema,
     responses: {
-      200: withConventionIdLegacySchema,
+      200: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
