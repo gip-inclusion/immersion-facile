@@ -17,7 +17,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   type AgencyId,
+  agencyIdSchema,
   type ConventionTemplateId,
+  conventionTemplateIdSchema,
   domElementIds,
   miniStageAgencyKinds,
   toDisplayedDate,
@@ -59,14 +61,12 @@ const initiateConventionFormErrorLabels: Record<string, string> = {
 
 const structureFormSchema = z.object({
   initiateConventionSource: z.literal("structure"),
-  selectedAgencyId: z.string(),
+  selectedAgencyId: agencyIdSchema,
 });
 
 const templateFormSchema = z.object({
   initiateConventionSource: z.literal("template"),
-  selectedConventionTemplateId: z
-    .string()
-    .min(1, "Veuillez sélectionner un modèle"),
+  selectedConventionTemplateId: conventionTemplateIdSchema,
 });
 
 const initiateConventionFormSchema = z.discriminatedUnion(
@@ -107,15 +107,6 @@ export const ConventionTabContent = ({
   const initiateConventionSourceOptions: RadioButtonsProps["options"] = useMemo(
     () => [
       {
-        label: "À partir d'un modèle",
-        nativeInputProps: {
-          name: "initiateConventionSource",
-          value: "template",
-          checked: initiateConventionSource === "template",
-          onChange: () => setValue("initiateConventionSource", "template"),
-        },
-      },
-      {
         label: "À partir de vos informations",
         nativeInputProps: {
           name: "initiateConventionSource",
@@ -129,8 +120,17 @@ export const ConventionTabContent = ({
           },
         },
       },
+      {
+        label: "À partir d'un modèle",
+        nativeInputProps: {
+          name: "initiateConventionSource",
+          value: "template",
+          checked: initiateConventionSource === "template",
+          onChange: () => setValue("initiateConventionSource", "template"),
+        },
+      },
     ],
-    [initiateConventionSource, setValue],
+    [initiateConventionSource, activeAgencies, setValue],
   );
 
   const conventionTemplateOptions: RadioButtonsProps["options"] = useMemo(
@@ -179,6 +179,33 @@ export const ConventionTabContent = ({
   const onInitiateConventionButtonClick = () => {
     reset(defaultFormValues);
     selectAgencyToInitiateConventionModal.open();
+  };
+
+  const onInitiateConventionFormSubmit = () => {
+    if (initiateConventionSource === "structure") {
+      const agencyToRedirect =
+        activeAgencies.length === 1
+          ? activeAgencies[0]
+          : selectedAgencyId
+            ? activeAgencies.find((agency) => agency.id === selectedAgencyId)
+            : undefined;
+      if (agencyToRedirect) {
+        selectAgencyToInitiateConventionModal.close();
+        redirectToConventionPage(agencyToRedirect);
+      }
+    }
+    const selectedConventionTemplate = conventionTemplates.find(
+      (template) => template.id === selectedConventionTemplateId,
+    );
+    if (selectedConventionTemplate) {
+      selectAgencyToInitiateConventionModal.close();
+      routes
+        .conventionImmersion({
+          conventionTemplateId: selectedConventionTemplate.id,
+          skipIntro: true,
+        })
+        .push();
+    }
   };
 
   if (agencyTaskListElement) {
@@ -237,25 +264,19 @@ export const ConventionTabContent = ({
               {
                 id: domElementIds.agencyDashboard.dashboard
                   .initiateConventionModalButton,
-                doClosesModal: false,
                 children: "Initier la convention",
-                onClick: handleSubmit(() => {
-                  const agencyToRedirect =
-                    activeAgencies.length === 1
-                      ? activeAgencies[0]
-                      : selectedAgencyId
-                        ? activeAgencies.find(
-                            (agency) => agency.id === selectedAgencyId,
-                          )
-                        : undefined;
-                  if (agencyToRedirect) {
-                    selectAgencyToInitiateConventionModal.close();
-                    redirectToConventionPage(agencyToRedirect);
-                  }
-                }),
+                doClosesModal: false,
+                onClick: handleSubmit(onInitiateConventionFormSubmit),
               },
             ]}
           >
+            <ErrorNotifications
+              errorsWithLabels={toErrorsWithLabels({
+                labels: initiateConventionFormErrorLabels,
+                errors: displayReadableError(formErrors),
+              })}
+              visible={submitCount !== 0 && Object.keys(formErrors).length > 0}
+            />
             <RadioButtons
               id={
                 domElementIds.agencyDashboard.dashboard
@@ -265,13 +286,6 @@ export const ConventionTabContent = ({
               legend="Comment souhaitez-vous initier la convention ?"
               options={initiateConventionSourceOptions}
               className={fr.cx("fr-mb-3w")}
-            />
-            <ErrorNotifications
-              errorsWithLabels={toErrorsWithLabels({
-                labels: initiateConventionFormErrorLabels,
-                errors: displayReadableError(formErrors),
-              })}
-              visible={submitCount !== 0 && Object.keys(formErrors).length > 0}
             />
             <SectionHighlight>
               {match({ initiateConventionSource, activeAgencies })
