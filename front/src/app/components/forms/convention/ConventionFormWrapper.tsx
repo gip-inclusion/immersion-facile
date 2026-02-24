@@ -328,7 +328,15 @@ export const ConventionFormWrapper = ({
                 conventionId={fetchedConvention.id}
               />
             ) : (
-              <ConventionForm internshipKind={internshipKind} mode={mode} />
+              <ConventionForm
+                internshipKind={internshipKind}
+                mode={mode}
+                fromConventionTemplateId={
+                  "conventionTemplateId" in route.params
+                    ? route.params.conventionTemplateId
+                    : undefined
+                }
+              />
             ),
         )
         .with(
