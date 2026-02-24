@@ -158,6 +158,7 @@ export * from "./utils/json";
 export * from "./utils/mergeObjectsExpectFalsyValues";
 export * from "./utils/postalCode";
 export * from "./utils/queryParams";
+export * from "./utils/sanitizeHtmlForPdf";
 export * from "./utils/searchResult";
 export * from "./utils/string";
 export * from "./utils/toDotNotation";

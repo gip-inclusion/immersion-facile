@@ -1,42 +1,19 @@
 import { useCallback, useState } from "react";
+import { sanitizeHtmlForPdf } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
-const isInternalHref = (href: string): boolean =>
-  href.startsWith("/") || href.startsWith(window.location.origin);
+const relativeLinkHrefRegex = /(<link\b[^>]*\bhref=["'])\/(?!\/)/gi;
+const relativeImgSrcRegex = /(<img\b[^>]*\bsrc=["'])\/(?!\/)/gi;
+
+const absolutizeRelativeUrls = (html: string, origin: string): string =>
+  html
+    .replace(relativeLinkHrefRegex, `$1${origin}/`)
+    .replace(relativeImgSrcRegex, `$1${origin}/`);
 
 const prepareContentForPdfGenerator = (rawHtml: string): string => {
-  const doc = new DOMParser().parseFromString(rawHtml, "text/html");
-
-  doc.querySelectorAll("script").forEach((el) => el.remove());
-
-  doc.querySelectorAll("link[href]").forEach((el) => {
-    const href = el.getAttribute("href") ?? "";
-    if (!isInternalHref(href)) el.remove();
-  });
-
-  doc
-    .querySelectorAll("chrome_annotation")
-    .forEach((el) => el.replaceWith(el.textContent ?? ""));
-
-  doc
-    .querySelectorAll<HTMLLinkElement>("link[rel='stylesheet'][href^='/']")
-    .forEach((el) => {
-      if (el.href.startsWith(window.location.origin)) return;
-      el.setAttribute(
-        "href",
-        `${window.location.origin}${el.getAttribute("href")}`,
-      );
-    });
-
-  doc.querySelectorAll<HTMLImageElement>("img[src^='/']").forEach((el) => {
-    if (el.src.startsWith(window.location.origin)) return;
-    el.setAttribute(
-      "src",
-      `${window.location.origin}${el.getAttribute("src")}`,
-    );
-  });
-
-  return doc.documentElement.outerHTML;
+  const origin = window.location.origin;
+  const withAbsoluteUrls = absolutizeRelativeUrls(rawHtml, origin);
+  return sanitizeHtmlForPdf(withAbsoluteUrls, origin);
 };
 
 export const usePdfGenerator = () => {
