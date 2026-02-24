@@ -6,7 +6,9 @@ import type {
   DiscussionId,
   DiscussionInList,
   SiretDto,
+  UserId,
 } from "shared";
+import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
 import type {
   DiscussionRepository,
   GetDiscussionIdsParams,
@@ -17,10 +19,40 @@ import type {
 type DiscussionsById = Record<DiscussionId, DiscussionDto>;
 
 export class InMemoryDiscussionRepository implements DiscussionRepository {
-  constructor(private _discussions: DiscussionsById = {}) {}
+  constructor(
+    private _discussions: DiscussionsById = {},
+    private userRepository?: InMemoryUserRepository,
+  ) {}
 
   public discussionCallsCount = 0;
   public archivedDiscussionIds: DiscussionId[] = [];
+
+  public async getUserIdsWithNoRecentExchange({
+    userIds,
+    since,
+  }: {
+    userIds: UserId[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (userIds.length === 0 || !this.userRepository) return [];
+
+    const users = this.userRepository.users.filter((u) =>
+      userIds.includes(u.id),
+    );
+
+    return users
+      .filter(
+        (user) =>
+          !this.discussions.some(
+            (discussion) =>
+              discussion.potentialBeneficiary.email === user.email &&
+              discussion.exchanges.some(
+                (exchange) => new Date(exchange.sentAt) >= since,
+              ),
+          ),
+      )
+      .map((u) => u.id);
+  }
 
   public async getPaginatedDiscussionsForUser(): Promise<
     DataWithPagination<DiscussionInList>

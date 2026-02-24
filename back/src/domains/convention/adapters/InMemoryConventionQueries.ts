@@ -48,6 +48,37 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly broadcastFeedbacksRepository: InMemoryBroadcastFeedbacksRepository,
   ) {}
 
+  public async getUserIdsWithNoActiveConvention({
+    userIds,
+    since,
+  }: {
+    userIds: UserId[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (userIds.length === 0) return [];
+
+    const users = this.userRepository.users.filter((u) =>
+      userIds.includes(u.id),
+    );
+
+    return users
+      .filter(
+        (user) =>
+          !this.conventionRepository.conventions.some((convention) => {
+            if (new Date(convention.dateEnd) < since) return false;
+            const conventionEmails = [
+              convention.signatories.beneficiary.email,
+              convention.establishmentTutor.email,
+              convention.signatories.establishmentRepresentative.email,
+              convention.signatories.beneficiaryRepresentative?.email,
+              convention.signatories.beneficiaryCurrentEmployer?.email,
+            ].filter(Boolean);
+            return conventionEmails.includes(user.email);
+          }),
+      )
+      .map((u) => u.id);
+  }
+
   public async getConventionIdsByFilters(
     params: GetConventionIdsParams,
   ): Promise<ConventionId[]> {

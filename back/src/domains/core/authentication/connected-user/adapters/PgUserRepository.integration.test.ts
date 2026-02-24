@@ -1,11 +1,14 @@
+import { subDays, subYears } from "date-fns";
 import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   errors,
+  expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
   type User,
   type UserId,
+  type UserWithAdminRights,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -14,6 +17,7 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
@@ -360,6 +364,221 @@ describe("PgAuthenticatedUserRepository", () => {
         expect(response).toBeUndefined();
       });
     });
+  });
+});
+
+describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
+  const now = new Date("2026-01-15T10:00:00.000Z");
+  const twoYearsAgo = subYears(now, 2);
+  const oneYearAgo = subYears(now, 1);
+  const threeYearsAgoIso = subYears(now, 3).toISOString();
+
+  let pool: Pool;
+  let db: KyselyDb;
+  let userRepository: PgUserRepository;
+  let agencyId: string;
+
+  const makeUserWithOldLogin = (
+    overrides: Partial<UserWithAdminRights> & { id: string; email: string },
+  ): UserWithAdminRights => ({
+    id: overrides.id,
+    email: overrides.email,
+    firstName: overrides.firstName ?? "Jean",
+    lastName: overrides.lastName ?? "Dupont",
+    createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
+    proConnect: null,
+    lastLoginAt: overrides.lastLoginAt ?? threeYearsAgoIso,
+  });
+
+  beforeAll(async () => {
+    pool = makeTestPgPool();
+    db = makeKyselyDb(pool);
+  });
+
+  beforeEach(async () => {
+    await db.deleteFrom("notifications_email_recipients").execute();
+    await db.deleteFrom("notifications_email_attachments").execute();
+    await db.deleteFrom("notifications_email").execute();
+    await db.deleteFrom("exchanges").execute();
+    await db.deleteFrom("discussions").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("actors").execute();
+    await db.deleteFrom("convention_external_ids").execute();
+    await db.deleteFrom("users__agencies").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users_admins").execute();
+    await db.deleteFrom("users").execute();
+
+    userRepository = new PgUserRepository(db);
+
+    const validatorId = uuid();
+    const validator = makeUniqueUserForTest(validatorId);
+    await userRepository.save(validator);
+
+    agencyId = uuid();
+    const agency = new AgencyDtoBuilder().withId(agencyId).build();
+    await new PgAgencyRepository(db).insert(
+      toAgencyWithRights(agency, {
+        [validatorId]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
+  });
+
+  afterAll(async () => {
+    await pool.end();
+  });
+
+  it("returns users with old login and never-logged-in users", async () => {
+    const inactiveUser = makeUserWithOldLogin({
+      id: uuid(),
+      email: "inactive@test.fr",
+    });
+    const recentlyActiveUser = makeUserWithOldLogin({
+      id: uuid(),
+      email: "recently-active@test.fr",
+      lastLoginAt: oneYearAgo.toISOString(),
+    });
+    const neverLoggedIn = makeUserWithOldLogin({
+      id: uuid(),
+      email: "never-logged@test.fr",
+      lastLoginAt: undefined,
+    });
+
+    await userRepository.save(inactiveUser);
+    await userRepository.save(recentlyActiveUser);
+    await userRepository.save(neverLoggedIn);
+
+    const result = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+    });
+
+    expectArraysToEqualIgnoringOrder(result, [
+      inactiveUser.id,
+      neverLoggedIn.id,
+    ]);
+  });
+
+  it("excludes users warned within excludeWarnedSince window", async () => {
+    const excludeWarnedSince = subDays(now, 9);
+
+    const recentlyWarned = makeUserWithOldLogin({
+      id: uuid(),
+      email: "recently-warned@test.fr",
+    });
+    const warnedLongAgo = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-long-ago@test.fr",
+    });
+    const notWarned = makeUserWithOldLogin({
+      id: uuid(),
+      email: "not-warned@test.fr",
+    });
+
+    await userRepository.save(recentlyWarned);
+    await userRepository.save(warnedLongAgo);
+    await userRepository.save(notWarned);
+
+    await db
+      .insertInto("notifications_email")
+      .values([
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 8).toISOString(),
+          user_id: recentlyWarned.id,
+        },
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 10).toISOString(),
+          user_id: warnedLongAgo.id,
+        },
+      ])
+      .execute();
+
+    const resultWithExclude = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+      excludeWarnedSince,
+    });
+
+    expectArraysToEqualIgnoringOrder(resultWithExclude, [
+      warnedLongAgo.id,
+      notWarned.id,
+    ]);
+
+    const resultWithoutExclude = await userRepository.getUserIdsLoggedInLongAgo(
+      {
+        since: twoYearsAgo,
+      },
+    );
+
+    expectArraysToEqualIgnoringOrder(resultWithoutExclude, [
+      recentlyWarned.id,
+      warnedLongAgo.id,
+      notWarned.id,
+    ]);
+  });
+
+  it("returns only users warned between onlyWarnedBetween dates", async () => {
+    const onlyWarnedBetween = {
+      from: subDays(now, 10),
+      to: subDays(now, 7),
+    };
+
+    const warnedInsideWindow = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-8-days@test.fr",
+    });
+    const warnedTooRecently = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-6-days@test.fr",
+    });
+    const warnedTooLongAgo = makeUserWithOldLogin({
+      id: uuid(),
+      email: "warned-11-days@test.fr",
+    });
+    const notWarnedAtAll = makeUserWithOldLogin({
+      id: uuid(),
+      email: "not-warned@test.fr",
+    });
+
+    await userRepository.save(warnedInsideWindow);
+    await userRepository.save(warnedTooRecently);
+    await userRepository.save(warnedTooLongAgo);
+    await userRepository.save(notWarnedAtAll);
+
+    await db
+      .insertInto("notifications_email")
+      .values([
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 8).toISOString(),
+          user_id: warnedInsideWindow.id,
+        },
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 6).toISOString(),
+          user_id: warnedTooRecently.id,
+        },
+        {
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          created_at: subDays(now, 11).toISOString(),
+          user_id: warnedTooLongAgo.id,
+        },
+      ])
+      .execute();
+
+    const result = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+      onlyWarnedBetween,
+    });
+
+    expectArraysToEqualIgnoringOrder(result, [warnedInsideWindow.id]);
   });
 });
 
