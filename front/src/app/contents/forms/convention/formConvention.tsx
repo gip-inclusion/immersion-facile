@@ -136,22 +136,16 @@ const conventionSection = ({
     required: !isConventionTemplate,
   },
   siret: {
-    label:
-      internshipKind === "immersion"
-        ? "SIRET de la structure d'accueil "
-        : "SIRET de l’entreprise",
+    label: "SIRET",
     hintText:
       internshipKind === "immersion"
-        ? "La structure d'accueil, c'est l'entreprise, le commerce, l'association... où le candidat va faire son immersion. Format attendu : 362 521 879 00034"
+        ? "L'entreprise, le commerce ou encore l'association où l'immersion aura lieu. Format attendu : 362 521 879 00034"
         : "La structure d'accueil, où le candidat va faire son stage. Format attendu : 362 521 879 00034",
     id: conventionSectionIds.siret,
     required: !isConventionTemplate,
   },
   businessName: {
-    label:
-      internshipKind === "immersion"
-        ? "Nom (raison sociale) de l'établissement d'accueil"
-        : "Nom (raison sociale) de votre entreprise",
+    label: "Nom (raison sociale)",
     id: conventionSectionIds.businessName,
     required: !isConventionTemplate,
   },
@@ -235,7 +229,7 @@ const conventionSection = ({
   },
   isCurrentEmployer: {
     label:
-      "Si le bénéficiaire est actuellement salarié d'une entreprise, l'immersion va-t-elle se dérouler pendant le temps de travail habituel ?",
+      "Si la personne en immersion est actuellement salariée d'une entreprise, l'immersion va-t-elle se dérouler pendant le temps de travail habituel ?",
     id: conventionSectionIds.isCurrentEmployer,
     required: !isConventionTemplate,
     hintText: (
@@ -252,8 +246,8 @@ const conventionSection = ({
     ),
   },
   isEstablishmentTutorIsEstablishmentRepresentative: {
-    label: `Qui sera le tuteur du candidat durant son ${
-      internshipKind === "immersion" ? "immersion" : "stage"
+    label: `Qui sera le tuteur ${
+      internshipKind === "immersion" ? "de l'immersion" : "du stage"
     } ?`,
     id: conventionSectionIds.isEstablishmentTutorIsEstablishmentRepresentative,
     required: !isConventionTemplate,
@@ -265,7 +259,7 @@ const conventionSection = ({
       "Ex : navettes jusqu’au lieu de travail, paniers repas, hébergement...",
   },
   isMinor: {
-    label: "Le candidat est-il majeur protégé ?",
+    label: "La personne en immersion est-elle majeure protégée ?",
     id: conventionSectionIds.isMinor,
     required: !isConventionTemplate,
     hintText:
@@ -287,31 +281,31 @@ const beneficiarySection = ({
   isConventionTemplate: boolean;
 }) => ({
   "signatories.beneficiary.firstName": {
-    label: "Prénom du candidat",
+    label: "Prénom",
     id: beneficiarySectionIds.firstName,
     required: !isConventionTemplate,
   },
   "signatories.beneficiary.lastName": {
-    label: "Nom de famille du candidat",
+    label: "Nom de famille",
     id: beneficiarySectionIds.lastName,
     required: !isConventionTemplate,
   },
   "signatories.beneficiary.birthdate": {
-    label: "Date de naissance du candidat",
+    label: "Date de naissance",
     hintText:
       "Merci d’indiquer la vraie date de naissance. Cette information est indispensable pour identifier la personne en immersion et traiter la convention. Une erreur ou une date volontairement différente peut empêcher la validation de la convention.",
     id: beneficiarySectionIds.birthdate,
     required: !isConventionTemplate,
   },
   "signatories.beneficiary.email": {
-    label: "E-mail du candidat",
+    label: "E-mail",
     id: beneficiarySectionIds.email,
     required: !isConventionTemplate,
     hintText:
-      "Cette adresse email sera utilisée dans le cadre de la signature de la convention d'immersion. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention d'immersion. Pensez à bien vérifier son exactitude. Format attendu\u00A0: nom@exemple.com",
   },
   "signatories.beneficiary.phone": {
-    label: "Téléphone du candidat",
+    label: "Téléphone",
     hintText:
       internshipKind === "immersion"
         ? "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55"
@@ -349,7 +343,7 @@ const beneficiarySection = ({
   "signatories.beneficiary.emergencyContactEmail": {
     label: "E-mail de la personne à prévenir en cas d'urgence",
     id: beneficiarySectionIds.emergencyContactEmail,
-    hintText: "Format attendu : nom@exemple.com",
+    hintText: "Format attendu\u00A0: nom@exemple.com",
   },
   "signatories.beneficiary.address": {
     label: "Adresse du candidat",
@@ -369,12 +363,12 @@ const beneficiarySection = ({
   },
   "signatories.beneficiary.isRqth": {
     label:
-      "Le candidat a une reconnaissance travailleur handicapé (RQTH) ou équivalent ",
+      "La personne en immersion a-t-elle une reconnaissance travailleur handicapé (RQTH) ou équivalent\u00A0?",
     id: beneficiarySectionIds.isRqth,
     hintText: (
       <>
-        Il n'est pas obligatoire de le préciser, mais cela peut être utile au
-        candidat et à l'entreprise.
+        Il n'est pas obligatoire de le préciser, mais cela peut être utile à la
+        personne en immersion et à l'entreprise.
       </>
     ),
   },
@@ -407,10 +401,7 @@ const establishmentTutorSection = ({
     required: !isConventionTemplate,
   },
   "establishmentTutor.phone": {
-    label:
-      internshipKind === "immersion"
-        ? "Numéro de téléphone du tuteur ou de la structure d'accueil"
-        : "Numéro de téléphone du tuteur ou de l’entreprise",
+    label: "Numéro de téléphone du tuteur ou de l'entreprise",
     hintText:
       "Renseignez de préférence un téléphone portable afin de recevoir les rappels liés au bilan par SMS. Format attendu : 0605040302",
     id: establishmentTutorSectionIds.phone,
@@ -445,7 +436,7 @@ const beneficiaryRepresentativeSection = ({
     label: "Adresse email du représentant légal",
     id: beneficiaryRepresentativeSectionIds.email,
     hintText:
-      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu\u00A0: nom@exemple.com",
     required: !isConventionTemplate,
   },
   "signatories.beneficiaryRepresentative.phone": {
@@ -465,46 +456,45 @@ const beneficiaryCurrentEmployerSection = ({
   isConventionTemplate: boolean;
 }) => ({
   "signatories.beneficiaryCurrentEmployer.businessName": {
-    label: "Raison sociale de l'entreprise actuelle du candidat",
+    label: "Raison sociale de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.businessName,
     required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.job": {
-    label: "Fonction du signataire dans l'entreprise actuelle du candidat",
+    label: "Fonction du signataire de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.job,
   },
   "signatories.beneficiaryCurrentEmployer.email": {
-    label: "E-mail du signataire dans l'entreprise actuelle du candidat",
+    label: "E-mail du signataire de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.email,
     required: !isConventionTemplate,
     hintText:
-      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu\u00A0: nom@exemple.com",
   },
   "signatories.beneficiaryCurrentEmployer.phone": {
-    label: "Téléphone de l'entreprise actuelle du candidat",
+    label: "Téléphone de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.phone,
     required: !isConventionTemplate,
     hintText:
       "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55",
   },
   "signatories.beneficiaryCurrentEmployer.firstName": {
-    label: "Prénom du signataire dans l'entreprise actuelle du candidat",
+    label: "Prénom du signataire de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.firstName,
     required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.lastName": {
-    label:
-      "Nom de famille du signataire dans l'entreprise actuelle du candidat",
+    label: "Nom de famille du signataire de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.lastName,
     required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.businessSiret": {
-    label: "Siret de l'entreprise actuelle du candidat",
+    label: "SIRET de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.businessSiret,
     required: !isConventionTemplate,
   },
   "signatories.beneficiaryCurrentEmployer.businessAddress": {
-    label: "Adresse de l'entreprise actuelle du candidat",
+    label: "Adresse de l'employeur actuel",
     id: beneficiaryCurrentEmployerSectionIds.businessAddress,
     required: !isConventionTemplate,
   },
@@ -761,15 +751,12 @@ export const sidebarStepContent = (
         description: (
           <>
             <p>
-              Cette étape vise à identifier la structure qui accompagne le
-              candidat dans son parcours d’immersion. Cela permet de garantir un
-              suivi et que le candidat soit assuré pendant toute la durée de
+              Cette étape vise à identifier la structure qui accompagne la
+              personne en immersion dans son parcours. Cela permet de garantir
+              un suivi et que celle-ci soit assurée pendant toute la durée de
               l’immersion.
             </p>
-            <p>
-              Pour toute question, n’hésitez pas à contacter le conseiller du
-              candidat.
-            </p>
+            <p>Pour toute question, n’hésitez pas à contacter le conseiller.</p>
           </>
         ),
       },
@@ -778,15 +765,15 @@ export const sidebarStepContent = (
         description: (
           <>
             <p>
-              Cette étape recueille les informations personnelles du candidat
-              pour assurer le bon déroulement de l’immersion. Ces informations
-              seront utilisées uniquement pour le suivi et la validation de la
-              convention.
+              Cette étape recueille les informations personnelles de la personne
+              en immersion pour assurer le bon déroulement de l’immersion. Ces
+              informations seront utilisées uniquement pour le suivi et la
+              validation de la convention.
             </p>
             <p>
               Assurez-vous que les informations saisies sont exactes, car elles
               seront utilisées pour les communications concernant la convention
-              et pour la validation auprès de la structure d’accueil.
+              et pour la validation auprès de l'entreprise.
             </p>
           </>
         ),
@@ -797,10 +784,9 @@ export const sidebarStepContent = (
           <>
             <p>
               L’objectif de cette étape est de fournir les informations
-              nécessaires sur la structure d’accueil (entreprise, collectivité,
-              association, etc.) qui recevra le candidat en immersion. Ces
-              informations permettent de faciliter la signature de la convention
-              par la structure d’accueil.
+              nécessaires sur l'entreprise (ou collectivité, association, etc.)
+              qui recevra la personne en immersion. Ces informations permettent
+              de faciliter la signature de la convention par l'entreprise.
             </p>
             <p>
               Vérifiez les informations sur le tuteur, car il sera le point de
@@ -816,10 +802,11 @@ export const sidebarStepContent = (
           <>
             <p>
               Définir précisément le lieu et les horaires de l’immersion permet
-              de garantir la couverture du candidat pendant cette période.
+              de garantir la couverture de la personne en immersion pendant
+              cette période.
             </p>
 
-            <p>Pour toute question, contactez la structure d’accueil.</p>
+            <p>Pour toute question, contactez l'entreprise.</p>
           </>
         ),
       },
@@ -829,8 +816,8 @@ export const sidebarStepContent = (
           <>
             <p>
               Cette étape vise à préciser les tâches et activités prévues lors
-              de l’immersion, afin de s’assurer que le candidat tirera le
-              meilleur parti de cette expérience.
+              de l’immersion, afin de s’assurer que la personne en immersion
+              tirera le meilleur parti de cette expérience.
             </p>
             <p>
               <strong>
