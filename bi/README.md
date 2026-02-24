@@ -108,6 +108,46 @@ The project currently includes:
 3. Run `./run_dbt.sh run` to build the models
 4. Run `./run_dbt.sh test` to test the models
 
+## Build & Deploy to Scalingo from LOCAL (not recommended, should be done by CI)
+
+### Build
+
+From the repo root:
+
+```bash
+cd bi && rm -rf dbt-build && rm -f dbt-build.tar.gz && ./build.sh
+```
+
+This creates `dbt-build.tar.gz` containing the dbt project ready for Scalingo (uses `git archive`, strips `.env` files).
+
+### Deploy
+
+From the repo root:
+
+```bash
+scalingo --region=osc-secnum-fr1 --app=if-prod-nightly-db deploy bi/dbt-build.tar.gz
+```
+
+### Build + Deploy (one-liner)
+
+```bash
+cd bi && rm -rf dbt-build && rm -f dbt-build.tar.gz && ./build.sh && cd .. && scalingo --region=osc-secnum-fr1 --app=if-prod-nightly-db deploy bi/dbt-build.tar.gz
+```
+
+### Run dbt on Scalingo
+
+After deploying, trigger a dbt run on the remote database:
+
+```bash
+scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
+  echo \"> \$(date) - Starting DBT run\" &&
+    ./run_dbt.sh run &&
+  echo \"> \$(date) - DBT run completed successfully\" &&
+    exit 0"
+```
+
+This starts a one-off XL container on Scalingo that runs all dbt models against the production database.
+
 ## Documentation
 
 For more information about dbt, visit [dbt documentation](https://docs.getdbt.com/).
