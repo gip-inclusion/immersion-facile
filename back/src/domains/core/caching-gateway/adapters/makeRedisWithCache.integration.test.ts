@@ -65,4 +65,67 @@ describe("createRedisWithCache implementation", () => {
     );
     expect(calls).toEqual([query, query]);
   });
+
+  describe("fallback to api call if redis client is not available", () => {
+    const fakeThrowingRedisClient = {
+      isOpen: true,
+      get: async () => {
+        throw new Error("Redis connection lost");
+      },
+      setEx: async () => {
+        throw new Error("Redis connection lost");
+      },
+    } as unknown as RedisClientType<any, any, any>;
+
+    it("bypasses cache and calls partner when redis is disconnected", async () => {
+      const query = "query when disconnected";
+      const expectedResult = { value: `value is : ${query}` };
+
+      await redisClient.disconnect();
+
+      const result = await cachedCallToPartner(query);
+      expect(calls).toEqual([query]);
+      expectToEqual(result, expectedResult);
+
+      await redisClient.connect();
+    });
+
+    it("bypasses cache and calls partner when redis get throws", async () => {
+      const query = "query when get throws";
+      const expectedResult = { value: `value is : ${query}` };
+
+      const withCache = makeRedisWithCache({
+        defaultCacheDurationInHours: 1,
+        redisClient: fakeThrowingRedisClient,
+      });
+
+      const cachedCall = withCache({
+        cb: someCallToAPartner,
+        getCacheKey: (q) => q,
+      });
+
+      const result = await cachedCall(query);
+      expect(calls).toEqual([query]);
+      expectToEqual(result, expectedResult);
+    });
+
+    it("returns result even when redis setEx throws after a cache miss", async () => {
+      const query = "query when setEx throws";
+      const expectedResult = { value: `value is : ${query}` };
+
+      const withCache = makeRedisWithCache({
+        defaultCacheDurationInHours: 1,
+        redisClient: fakeThrowingRedisClient,
+      });
+
+      const cachedCall = withCache({
+        cb: someCallToAPartner,
+        getCacheKey: (q) => q,
+      });
+
+      const result = await cachedCall(query);
+      expect(calls).toEqual([query]);
+      expectToEqual(result, expectedResult);
+    });
+  });
 });

@@ -19,7 +19,16 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
       if (!redisClient.isOpen) return cb(param);
       const cacheKey = getCacheKey(param);
 
-      const cachedValue = await redisClient.get(cacheKey);
+      const cachedValue = await redisClient
+        .get(cacheKey)
+        .catch((error: any) => {
+          logger.error({
+            message: `Error reading cache: ${error?.message}`,
+            error,
+          });
+          return null;
+        });
+
       if (cachedValue) {
         try {
           const response = JSON.parse(cachedValue);
@@ -43,7 +52,6 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
             message: `Error parsing cached value: ${error?.message}`,
             error,
           });
-          // If parsing fails, continue to fetch fresh data
         }
       }
 
