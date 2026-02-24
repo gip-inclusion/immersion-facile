@@ -23,7 +23,7 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
         .get(cacheKey)
         .catch((error: any) => {
           logger.error({
-            message: `Error reading cache: ${error?.message}`,
+            message: `Error reading cache for key "${cacheKey}": ${error?.message}`,
             error,
           });
           return null;
@@ -49,7 +49,7 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
           return response;
         } catch (error: any) {
           logger.error({
-            message: `Error parsing cached value: ${error?.message}`,
+            message: `Error parsing cached value for key "${cacheKey}": ${error?.message}`,
             error,
           });
         }
@@ -68,7 +68,7 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
         );
       } catch (error: any) {
         logger.error({
-          message: `Error setting cache : ${error?.message}`,
+          message: `Error setting cache for key "${cacheKey}": ${error?.message}`,
           error,
         });
         // Continue even if caching fails
