@@ -27,18 +27,18 @@ export const tutorSelectOptions = (
   internshipKind: InternshipKind,
 ): RadioButtonsProps["options"] => [
   {
-    label: "Le représentant de la structure d'accueil sera également le tuteur",
-    hintText: `La même personne signera la convention, accompagnera le candidat en ${
-      internshipKind === "immersion" ? "immersion" : "stage"
-    } au sein de la structure d'accueil et remplira le bilan avec lui.`,
+    label: "Le représentant de l'entreprise sera également le tuteur",
+    hintText: `La même personne signera la convention, accompagnera ${
+      internshipKind === "immersion" ? "l'immersion" : "le stage"
+    } au sein de l'entreprise et remplira le bilan avec lui.`,
     nativeInputProps: {
       value: 1,
     },
   },
   {
-    label: "Le tuteur est différent du représentant de la structure d'accueil",
-    hintText: `Le tuteur accompagnera le candidat en ${
-      internshipKind === "immersion" ? "immersion" : "stage"
+    label: "Le tuteur est différent du représentant de l'entreprise",
+    hintText: `Le tuteur accompagnera ${
+      internshipKind === "immersion" ? "l'immersion" : "le stage"
     } dans l'entreprise et remplira le bilan avec lui. Il ne signera pas la convention, mais la recevra tout de même par email.`,
     nativeInputProps: {
       value: 0,

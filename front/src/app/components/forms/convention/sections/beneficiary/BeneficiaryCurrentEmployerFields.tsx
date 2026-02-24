@@ -57,9 +57,9 @@ export const BeneficiaryCurrentEmployerFields = ({
               </strong>
             </p>
             <p>
-              Le bénéficiaire peut effectuer son immersion sur son temps de
-              travail. Dans ce cas, l’accord de son employeur actuel est
-              nécessaire. Le contrat de travail n’est pas suspendu et
+              La personne en immersion peut effectuer son immersion sur son
+              temps de travail. Dans ce cas, l’accord de son employeur actuel
+              est nécessaire. Le contrat de travail n’est pas suspendu et
               l’employeur actuel couvre le risque accident du travail pendant la
               durée de l’immersion.
             </p>
