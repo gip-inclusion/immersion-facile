@@ -240,9 +240,8 @@ const regulatoryConditionContent = (
         <h3 className={fr.cx("fr-h6")}>Article 2 – Modalités particulières</h3>
         <p>
           Les objectifs et les modalités de la période d'observation sont
-          consignés dans l'annexe pédagogique. Les modalités de prise en charge
-          des frais afférents à cette période ainsi que les modalités
-          d'assurances sont définies dans l'annexe financière.
+          consignés dans les dispositions relatives aux conditions de
+          réalisation du mini-stage.
         </p>
       </div>
 
