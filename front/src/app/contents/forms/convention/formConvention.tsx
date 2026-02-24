@@ -322,7 +322,7 @@ const beneficiarySection = ({
     label: "Aide matérielle",
     id: beneficiarySectionIds.financiaryHelp,
     hintText:
-      "Le candidat a-t-il besoin d'une aide matérielle pour réaliser l'immersion ? Par exemple : aide à la mobilité. Les aides sont soumises à des conditions de ressources. Renseignez-vous auprès de votre conseiller.",
+      "Le candidat a-t-il besoin d'une aide matérielle pour réaliser l'immersion ?",
   },
   "signatories.beneficiary.federatedIdentity": {
     // hidden field
