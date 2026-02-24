@@ -15,6 +15,8 @@
       "CREATE INDEX IF NOT EXISTS idx_conv_count_immersion_objective ON {{ this }} (immersion_objective)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_rome_label ON {{ this }} (rome_label)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_appellation_label ON {{ this }} (appellation_label)",
+      "CREATE INDEX IF NOT EXISTS idx_conv_count_immersion_postal_code ON {{ this }} (immersion_postal_code)",
+      "CREATE INDEX IF NOT EXISTS idx_conv_count_establishment_postcode ON {{ this }} (establishment_postcode)",
     ]
   )
 }}
@@ -49,7 +51,12 @@ select
         else false
     end as is_referenced_establishment,
     b.email as beneficiary_email,
-    conventions.schedule_total_hours as schedule_total_hours
+    conventions.schedule_total_hours as schedule_total_hours,
+    conventions.immersion_postal_code,
+    conventions.establishment_postcode,
+    conventions.beneficiary_birthdate,
+    conventions.beneficiary_level_of_education,
+    conventions.beneficiary_school_name
 from {{ ref('conventions') }}
 inner join {{ source('immersion', 'actors') }} as b
     on conventions.beneficiary_id = b.id

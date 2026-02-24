@@ -331,3 +331,13 @@ models:
         description: Beneficiary's email
       - name: schedule_total_hours
         description: Total hours extracted from schedule JSON
+      - name: immersion_postal_code
+        description: 5-digit postal code extracted from immersion address via regex
+      - name: establishment_postcode
+        description: Postal code of the referenced establishment
+      - name: beneficiary_birthdate
+        description: Beneficiary's date of birth extracted from extra_fields JSON
+      - name: beneficiary_level_of_education
+        description: Beneficiary's education level from extra_fields JSON
+      - name: beneficiary_school_name
+        description: Beneficiary's school name from extra_fields JSON
