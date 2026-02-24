@@ -16,11 +16,10 @@ export const searchEstablishmentAndExpectResultToHaveLength =
       "Poitiers",
     );
     await page
-      .getByRole("option", {
-        name: "Poitiers, Nouvelle-Aquitaine, France",
-      })
+      .getByRole("option", { name: /Poitiers/i })
       .first()
       .click();
+
     await page.getByRole("button", { name: "Rechercher" }).click();
     const resultsSelector = `#${domElementIds.search.searchResultButton}-${updatedEstablishment.siret}`;
     await expect(await page.locator(resultsSelector)).toHaveCount(
