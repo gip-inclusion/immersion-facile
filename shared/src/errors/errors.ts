@@ -108,7 +108,7 @@ export const errors = {
     }) => new Error(`[${serviceName}] : ${message}`),
     tooManyRequests: ({ serviceName }: { serviceName: string }) =>
       new TooManyRequestApiError(
-        `Le service ${serviceName} a subit trop de sollicitation. Réessayez dans quelques minutes.`,
+        `Le service ${serviceName} a subit trop de sollicitations. Réessayez dans quelques minutes.`,
       ),
   },
   event: {
