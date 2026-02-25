@@ -265,6 +265,11 @@ const conventionSection = ({
     hintText:
       "Les majeurs protégés sont les personnes qui sont dans l'impossibilité de pourvoir seules à leurs intérêts en raison de l'altération de leurs facultés mentales ou corporelles de nature à empêcher l'expression de leur volonté.",
   },
+  "schedule.totalHours": {
+    label: `Dates et horaires ${
+      internshipKind === "immersion" ? "de l'immersion" : "du stage"
+    }`,
+  },
   schedule: {
     label: `Dates et horaires ${
       internshipKind === "immersion" ? "de l'immersion" : "du stage"
