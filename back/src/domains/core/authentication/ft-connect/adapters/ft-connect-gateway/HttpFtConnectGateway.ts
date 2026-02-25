@@ -235,7 +235,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       log.total({ ftConnect: { peExternalId } });
       const response = await scheduleWithBackpressure(
         this.#limiter,
-        "France Travail Connect",
+        "France Travail Connect: getUserStatutInfo",
         () =>
           this.httpClient.getUserStatutInfo({
             headers,
