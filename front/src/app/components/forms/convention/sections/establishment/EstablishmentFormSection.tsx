@@ -30,7 +30,7 @@ export const tutorSelectOptions = (
     label: "Le représentant de l'entreprise sera également le tuteur",
     hintText: `La même personne signera la convention, accompagnera ${
       internshipKind === "immersion" ? "l'immersion" : "le stage"
-    } au sein de l'entreprise et remplira le bilan avec lui.`,
+    } au sein de l'entreprise et remplira le bilan.`,
     nativeInputProps: {
       value: 1,
     },
@@ -39,7 +39,7 @@ export const tutorSelectOptions = (
     label: "Le tuteur est différent du représentant de l'entreprise",
     hintText: `Le tuteur accompagnera ${
       internshipKind === "immersion" ? "l'immersion" : "le stage"
-    } dans l'entreprise et remplira le bilan avec lui. Il ne signera pas la convention, mais la recevra tout de même par email.`,
+    } dans l'entreprise et remplira le bilan. Il ne signera pas la convention, mais la recevra tout de même par email.`,
     nativeInputProps: {
       value: 0,
     },
