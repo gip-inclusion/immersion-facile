@@ -109,7 +109,7 @@ describe("SignAssessment", () => {
       {
         conventionId: convention.id,
         beneficiaryAgreement: true,
-        beneficiaryFeedback: "",
+        beneficiaryFeedback: null,
       },
       beneficiaryJwtPayload,
     );
@@ -120,7 +120,7 @@ describe("SignAssessment", () => {
     expectToEqual(signedAssessmentEntity, {
       ...assessmentEntity,
       beneficiaryAgreement: true,
-      beneficiaryFeedback: "",
+      beneficiaryFeedback: null,
       signedAt: expectedSignedAt.toISOString(),
     });
     expectObjectInArrayToMatch(uow.outboxRepository.events, [
@@ -131,7 +131,7 @@ describe("SignAssessment", () => {
           assessment: expect.objectContaining({
             conventionId: convention.id,
             beneficiaryAgreement: true,
-            beneficiaryFeedback: "",
+            beneficiaryFeedback: null,
             signedAt: expectedSignedAt.toISOString(),
           }),
           triggeredBy: { kind: "convention-magic-link", role: "beneficiary" },
@@ -184,7 +184,7 @@ describe("SignAssessment", () => {
         {
           conventionId: convention.id,
           beneficiaryAgreement: true,
-          beneficiaryFeedback: "",
+          beneficiaryFeedback: null,
         },
         {
           ...beneficiaryJwtPayload,
@@ -220,7 +220,7 @@ describe("SignAssessment", () => {
         {
           conventionId: unknownConventionId,
           beneficiaryAgreement: true,
-          beneficiaryFeedback: "",
+          beneficiaryFeedback: null,
         },
         jwtPayload,
       ),
@@ -239,7 +239,7 @@ describe("SignAssessment", () => {
         {
           conventionId: convention.id,
           beneficiaryAgreement: true,
-          beneficiaryFeedback: "",
+          beneficiaryFeedback: null,
         },
         beneficiaryJwtPayload,
       ),
@@ -263,7 +263,7 @@ describe("SignAssessment", () => {
         {
           conventionId: convention.id,
           beneficiaryAgreement: true,
-          beneficiaryFeedback: "",
+          beneficiaryFeedback: null,
         },
         beneficiaryJwtPayload,
       ),
@@ -292,7 +292,7 @@ describe("SignAssessment", () => {
         {
           conventionId: convention.id,
           beneficiaryAgreement: true,
-          beneficiaryFeedback: "",
+          beneficiaryFeedback: null,
         },
         beneficiaryJwtPayload,
       ),
