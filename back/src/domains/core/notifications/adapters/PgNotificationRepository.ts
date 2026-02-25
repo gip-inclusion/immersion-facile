@@ -32,6 +32,16 @@ const getDefaultNotificationState = (): NotificationState => ({
   occurredAt: new Date().toISOString(),
 });
 
+const stripNullsFromNotification = <T>(value: T): T => {
+  if (value === null || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map(stripNullsFromNotification) as T;
+  return Object.fromEntries(
+    Object.entries(value as object)
+      .filter(([, v]) => v !== null)
+      .map(([k, v]) => [k, stripNullsFromNotification(v)]),
+  ) as T;
+};
+
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private transaction: KyselyDb,
@@ -42,7 +52,7 @@ export class PgNotificationRepository implements NotificationRepository {
     return [
       ...(await getSmsNotificationBuilder(this.transaction).execute()),
       ...(await getEmailsNotificationBuilder(this.transaction).execute()),
-    ].map(({ notif }) => notif);
+    ].map(({ notif }) => stripNullsFromNotification(notif));
   }
 
   public async deleteOldestNotifications({
@@ -125,7 +135,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .orderBy("created_at", "desc")
       .executeTakeFirst();
 
-    return result?.notif;
+    return result ? stripNullsFromNotification(result.notif) : undefined;
   }
 
   public async deleteAllEmailAttachements(): Promise<number> {
@@ -162,7 +172,7 @@ export class PgNotificationRepository implements NotificationRepository {
     return getSmsNotificationBuilder(this.transaction)
       .where("id", "in", ids)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   async getEmailsByIds(ids: NotificationId[]): Promise<EmailNotification[]> {
@@ -170,7 +180,7 @@ export class PgNotificationRepository implements NotificationRepository {
     return getEmailsNotificationBuilder(this.transaction)
       .where("e.id", "in", ids)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   public async getEmailsByFilters(
@@ -211,7 +221,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .limit(filters.limit ?? this.maxRetrievedNotifications)
       .offset(filters.offset ?? 0)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   public async getLastNotifications(): Promise<NotificationsByKind> {
@@ -221,7 +231,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .execute()
       .then(async (rows) => ({
         emails: await this.#getLastEmails(),
-        sms: rows.map((row) => row.notif),
+        sms: rows.map((row) => stripNullsFromNotification(row.notif)),
       }));
   }
 
@@ -231,7 +241,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .orderBy("e.created_at", "desc")
       .limit(this.maxRetrievedNotifications)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   public async save(notification: Notification): Promise<void> {
