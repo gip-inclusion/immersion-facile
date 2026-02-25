@@ -1,6 +1,7 @@
 import { filter } from "ramda";
 import {
   type ApiConsumer,
+  type ApiConsumerName,
   type AppellationAndRomeDto,
   type ConventionReadDto,
   errors,
@@ -41,7 +42,7 @@ const getImmersionAppellation = async ({
   uow: UnitOfWork;
   conventionRead: ConventionReadDto;
   apiConsumer: ApiConsumer;
-  consumerNamesUsingRomeV3: string[];
+  consumerNamesUsingRomeV3: ApiConsumerName[];
 }): Promise<AppellationAndRomeDto> => {
   if (consumerNamesUsingRomeV3.includes(apiConsumer.name)) {
     const appellationAndRome =
@@ -65,7 +66,7 @@ const notifySubscriber = ({
   deps: {
     subscribersGateway: SubscribersGateway;
     timeGateway: TimeGateway;
-    consumerNamesUsingRomeV3: string[];
+    consumerNamesUsingRomeV3: ApiConsumerName[];
   };
 }) => {
   return async (apiConsumer: ApiConsumer) => {
@@ -165,7 +166,7 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
   .withDeps<{
     subscribersGateway: SubscribersGateway;
     timeGateway: TimeGateway;
-    consumerNamesUsingRomeV3: string[];
+    consumerNamesUsingRomeV3: ApiConsumerName[];
   }>()
   .build(async ({ inputParams, uow, deps }) => {
     const { conventionId } = inputParams;
