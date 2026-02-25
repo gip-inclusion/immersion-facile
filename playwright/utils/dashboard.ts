@@ -80,3 +80,101 @@ export const deleteConventionTemplate = async (
   await expect(page.locator(".fr-alert--success")).toBeVisible();
   await expect(page.locator('[id^="convention-template-"]')).toHaveCount(0);
 };
+
+export const initiateConvention = async ({
+  page,
+  dashboardKind,
+  fromConventionTemplate,
+}: {
+  page: Page;
+  dashboardKind: "agency" | "establishment";
+  fromConventionTemplate: boolean;
+}): Promise<string | undefined> => {
+  await page.goto("/");
+  await goToDashboard(page, dashboardKind);
+  await page.click(
+    `#${domElementIds.establishmentDashboard.initiateConvention.button}`,
+  );
+  await expect(
+    page.locator(
+      `#${domElementIds.establishmentDashboard.initiateConvention.modal}`,
+    ),
+  ).toBeVisible();
+
+  if (fromConventionTemplate) {
+    await initiateConventionFromConventionTemplate({ page, dashboardKind });
+    return;
+  }
+
+  const appellationSelectLocator = page.locator(
+    `#${domElementIds.establishmentDashboard.initiateConvention.appellationSelect}`,
+  );
+  await appellationSelectLocator.selectOption({ index: 1 });
+  const selectedAppellation =
+    (
+      await appellationSelectLocator.locator("option:checked").textContent()
+    )?.trim() ?? "";
+
+  const addressSelectLocator = page.locator(
+    `#${domElementIds.establishmentDashboard.initiateConvention.addressSelect}`,
+  );
+  await addressSelectLocator.selectOption({ index: 1 });
+  const selectedAddress = await addressSelectLocator.inputValue();
+
+  await page.click(
+    `#${domElementIds.establishmentDashboard.initiateConvention.modalButton}`,
+  );
+
+  expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
+    ),
+  ).toHaveValue(selectedAddress);
+  expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}-wrapper .im-select__single-value`,
+    ),
+  ).toHaveText(selectedAppellation);
+};
+
+const initiateConventionFromConventionTemplate = async ({
+  page,
+  dashboardKind,
+}: {
+  page: Page;
+  dashboardKind: "agency" | "establishment";
+}) => {
+  await page.goto("/");
+  await goToDashboard(page, dashboardKind);
+  await page.click(
+    `#${domElementIds.establishmentDashboard.initiateConvention.button}`,
+  );
+  await expect(
+    page.locator(
+      `#${domElementIds.establishmentDashboard.initiateConvention.modal}`,
+    ),
+  ).toBeVisible();
+
+  const templateRadioButtonLocator = page.locator(
+    `[for='${domElementIds.establishmentDashboard.initiateConvention.sourceRadioButtons}-1']`,
+  );
+
+  await templateRadioButtonLocator.click();
+
+  const firstConventionTemplateLocator = page.locator(
+    `[for='${domElementIds.establishmentDashboard.initiateConvention.templateRadioButtons}-0']`,
+  );
+
+  await firstConventionTemplateLocator.click();
+
+  await page.click(
+    `#${domElementIds.establishmentDashboard.initiateConvention.modalButton}`,
+  );
+  await expect(
+    page.locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`),
+  ).toBeVisible();
+  await page
+    .locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
+    .click();
+  await page.locator(".im-convention-summary__section").first().isVisible();
+};

@@ -1032,14 +1032,19 @@ export const domElementIds = {
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
     tabContainer: "im-establishment-dashboard__tab-container",
-    initiateConventionModal:
-      "im-manage-establishment__initiate-convention-modal",
-    initiateConventionModalButton:
-      "im-manage-establishment__initiate-convention-modal-button",
-    initiateConventionSourceRadioButtons:
-      "im-manage-establishment__initiate-convention-source-radio-buttons",
-    initiateConventionTemplateRadioButtons:
-      "im-manage-establishment__initiate-convention-template-radio-buttons",
+    initiateConvention: {
+      button: "im-establishment-dashboard__initiate-convention-button",
+      modal: "im-manage-establishment__initiate-convention-modal",
+      modalButton: "im-manage-establishment__initiate-convention-modal-button",
+      appellationSelect:
+        "im-manage-establishment__initiate-convention-appellation-select",
+      addressSelect:
+        "im-manage-establishment__initiate-convention-address-select",
+      sourceRadioButtons:
+        "im-manage-establishment__initiate-convention-source-radio-buttons",
+      templateRadioButtons:
+        "im-manage-establishment__initiate-convention-template-radio-buttons",
+    },
     login: {
       proConnectButton:
         "im-login-form__inclusion-connect-button--establishment-dashboard",
