@@ -44,7 +44,7 @@ const {
   close: closeInitiateConventionModal,
 } = createModal({
   isOpenedByDefault: false,
-  id: domElementIds.establishmentDashboard.initiateConventionModal,
+  id: domElementIds.establishmentDashboard.initiateConvention.modal,
 });
 
 type InitiateConventionFormValues =
@@ -255,7 +255,12 @@ export const InitiateConventionButton = () => {
 
   return (
     <>
-      <Button onClick={onOpenModal}>Initier une convention</Button>
+      <Button
+        onClick={onOpenModal}
+        id={domElementIds.establishmentDashboard.initiateConvention.button}
+      >
+        Initier une convention
+      </Button>
       {createPortal(
         <FormProvider {...initiateConventionMethods}>
           <InitiateConventionModal
@@ -266,8 +271,8 @@ export const InitiateConventionButton = () => {
                 children: "Fermer",
               },
               {
-                id: domElementIds.establishmentDashboard
-                  .initiateConventionModalButton,
+                id: domElementIds.establishmentDashboard.initiateConvention
+                  .modalButton,
                 doClosesModal: false,
                 children: "Initier la convention",
                 onClick: handleSubmit(onInitiateConventionFormSubmit),
@@ -287,8 +292,8 @@ export const InitiateConventionButton = () => {
             </p>
             <RadioButtons
               id={
-                domElementIds.establishmentDashboard
-                  .initiateConventionSourceRadioButtons
+                domElementIds.establishmentDashboard.initiateConvention
+                  .sourceRadioButtons
               }
               name="initiateConventionSource"
               legend="Comment souhaitez-vous initier la convention ?"
@@ -299,8 +304,8 @@ export const InitiateConventionButton = () => {
               {initiateConventionSource === "template" ? (
                 <RadioButtons
                   id={
-                    domElementIds.establishmentDashboard
-                      .initiateConventionTemplateRadioButtons
+                    domElementIds.establishmentDashboard.initiateConvention
+                      .templateRadioButtons
                   }
                   name="initiateConventionTemplate"
                   legend="Quel modèle souhaitez-vous utiliser ?"
@@ -359,6 +364,8 @@ export const InitiateConventionButton = () => {
                         : []
                     }
                     nativeSelectProps={{
+                      id: domElementIds.establishmentDashboard
+                        .initiateConvention.appellationSelect,
                       value: establishmentValues?.appellation ?? "",
                       onChange: (event) =>
                         setValue("appellation", event.currentTarget.value, {
@@ -391,6 +398,8 @@ export const InitiateConventionButton = () => {
                       })) ?? []
                     }
                     nativeSelectProps={{
+                      id: domElementIds.establishmentDashboard
+                        .initiateConvention.addressSelect,
                       value: establishmentValues?.location ?? "",
                       onChange: (event) =>
                         setValue("location", event.currentTarget.value, {
