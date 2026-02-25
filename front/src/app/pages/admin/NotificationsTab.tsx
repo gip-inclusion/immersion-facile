@@ -167,7 +167,6 @@ const Email = ({ email }: { email: EmailNotification }) => (
               "agencyLogoUrl",
               "conventionFormUrl",
               "conventionStatusLink",
-              "editFrontUrl",
               "assessmentCreationLink",
               "magicLink",
               "assessmentMagicLink",

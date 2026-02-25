@@ -1,8 +1,5 @@
-import { identity } from "ramda";
 import {
   type AbsoluteUrl,
-  type EstablishmentDashboardTab,
-  frontRoutes,
   immersionFacileNoReplyEmailSender,
   UserBuilder,
 } from "shared";
@@ -128,10 +125,6 @@ describe("SuggestEditEstablishment", () => {
           recipients: [admin1.email],
           sender: immersionFacileNoReplyEmailSender,
           params: {
-            editFrontUrl: `${fakeBaseUrl}/${
-              frontRoutes.establishmentDashboard
-            }/${identity<EstablishmentDashboardTab>("fiche-entreprise")}?siret=${siret}`,
-            businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },
@@ -140,10 +133,6 @@ describe("SuggestEditEstablishment", () => {
           recipients: [admin2.email],
           sender: immersionFacileNoReplyEmailSender,
           params: {
-            editFrontUrl: `${fakeBaseUrl}/${
-              frontRoutes.establishmentDashboard
-            }/${identity<EstablishmentDashboardTab>("fiche-entreprise")}?siret=${siret}`,
-            businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },

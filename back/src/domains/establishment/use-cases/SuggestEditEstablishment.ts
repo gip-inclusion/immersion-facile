@@ -1,10 +1,6 @@
-import { identity } from "ramda";
 import {
   type AbsoluteUrl,
-  addressDtoToString,
-  type EstablishmentDashboardTab,
   errors,
-  frontRoutes,
   immersionFacileNoReplyEmailSender,
   type SiretDto,
   siretSchema,
@@ -58,14 +54,7 @@ export class SuggestEditEstablishment extends TransactionalUseCase<
             sender: immersionFacileNoReplyEmailSender,
             recipients: [user.email],
             params: {
-              editFrontUrl: `${this.#immersionFacileBaseUrl}/${
-                frontRoutes.establishmentDashboard
-              }/${identity<EstablishmentDashboardTab>("fiche-entreprise")}?siret=${siret}`,
               businessName: establishment.customizedName ?? establishment.name,
-              businessAddresses: establishment.locations.map(
-                (addressAndPosition) =>
-                  addressDtoToString(addressAndPosition.address),
-              ),
             },
           },
           followedIds: {
