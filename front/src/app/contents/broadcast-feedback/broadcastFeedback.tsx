@@ -11,28 +11,30 @@ export const broadcastFeedbackErrorMessageMap: Record<
   BroadcastFeedbackError
 > = {
   "Aucun dossier trouvé pour les critères d'identité transmis": {
-    description: "Le bénéficiaire n'est pas inscrit dans votre structure.",
-    solution: (isConventionValidated) => (
+    description: "Aucun dossier trouvé pour les critères d'identité transmis",
+    solution: () => (
       <>
         <p>
-          {"->"} Si le jeune peut être inscrit dans votre structure,
-          inscrivez-le, puis rediffusez la convention via Immersion Facilitée.
+          Cette erreur survient généralement lorsqu'il existe une discordance
+          sur la date de naissance du bénéficiaire. Vérification préalable :
+          Assurez-vous que le jeune est correctement inscrit au sein de votre
+          Mission Locale.
         </p>
-
         <p>
-          {"->"} Si le bénéficiaire ne doit pas être inscrit chez vous
-          {!isConventionValidated
-            ? ", vous pouvez modifier le prescripteur pour adresser la demande de convention à une autre structure. Si vous ne savez pas à qui vous adresser, voyez avec l'agence France Travail de votre bassin. Dorénavant, avec la loi du plein emploi, toute personne peut être inscrite chez France Travail"
-            : " :"}
+          {"->"} Si le bilan a déjà été saisi, la convention est ancienne et/ou
+          vous n'êtes plus en contact avec l'entreprise accueillante : <br />
+          Contactez le support Immersion Facilitée en précisant l'ID de la
+          convention et la date de naissance. Nos équipes corrigeront la donnée
+          et diffuseront la convention dans vos applicatifs."
         </p>
-        {!!isConventionValidated && (
-          <ol>
-            <li>Dupliquez la convention.</li>
-            <li>Modifiez le prescripteur</li>
-            <li>Renvoyez la nouvelle convention en signature.</li>
-            <li>Annulez l'ancienne convention.</li>
-          </ol>
-        )}
+        {"->"} L'immersion n'a pas encore eu lieu, vous êtes en contact avec
+        l'entreprise et le bilan n'a pas encore été saisi :
+        <ol>
+          <li>Dupliquez la convention.</li>
+          <li>Modifiez le prescripteur</li>
+          <li>Renvoyez la nouvelle convention en signature.</li>
+          <li>Annulez l'ancienne convention.</li>
+        </ol>
       </>
     ),
   },
