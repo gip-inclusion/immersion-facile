@@ -1,11 +1,14 @@
 import { faker } from "@faker-js/faker";
 import test, { expect } from "@playwright/test";
-import { type AgencyId, domElementIds, frontRoutes } from "shared";
+import { type AgencyId, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAndSubmitBasicAgencyForm } from "../../utils/agency";
-import { fillConventionForm } from "../../utils/convention";
-import { goToDashboard } from "../../utils/dashboard";
+import {
+  createConventionTemplate,
+  deleteConventionTemplate,
+  goToDashboard,
+} from "../../utils/dashboard";
 
 test.describe.configure({ mode: "serial" });
 
@@ -179,27 +182,7 @@ test.describe("Agency dashboard workflow", () => {
     test.use({ storageState: testConfig.agencyAuthFile });
 
     test("IC user can create a new convention template", async ({ page }) => {
-      await page.goto("/");
-      await goToDashboard(page, "agency");
-
-      await page.click(
-        `#${domElementIds.conventionTemplate.createConventionTemplateButton}`,
-      );
-      await page.waitForURL(`${frontRoutes.conventionTemplate}**`);
-
-      await page.fill(
-        `#${domElementIds.conventionTemplate.form.nameInput}`,
-        "Mon premier modèle de convention",
-      );
-      await fillConventionForm(page);
-
-      await page.click(
-        `#${domElementIds.conventionTemplate.form.submitFormButton}`,
-      );
-      await expect(page.locator(".fr-alert--success")).toBeVisible();
-
-      await goToDashboard(page, "agency");
-      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+      await createConventionTemplate(page, "agency");
     });
 
     test("IC user can update a convention template", async ({ page }) => {
@@ -250,18 +233,7 @@ test.describe("Agency dashboard workflow", () => {
     });
 
     test("IC user can delete a convention template", async ({ page }) => {
-      await page.goto("/");
-      await goToDashboard(page, "agency");
-      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
-
-      await page.click(
-        `[id^="${domElementIds.conventionTemplate.deleteConventionTemplateButton}-"]`,
-      );
-      await page.click(
-        `#${domElementIds.conventionTemplate.deleteConventionTemplate.confirmButton}`,
-      );
-      await expect(page.locator(".fr-alert--success")).toBeVisible();
-      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(0);
+      await deleteConventionTemplate(page, "agency");
     });
   });
 });

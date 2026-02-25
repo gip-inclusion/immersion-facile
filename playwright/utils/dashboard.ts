@@ -1,10 +1,13 @@
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import {
   domElementIds,
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
+  frontRoutes,
 } from "shared";
 import { getTabIndexByTabName } from "./admin";
+import { fillConventionForm } from "./convention";
 
 export const goToEstablishmentDashboardTab = async (
   page: Page,
@@ -30,4 +33,50 @@ export const goToDashboard = async (
   await page.click(selector);
   const submenuItemSelector = `#${domElementIds.header.navLinks[userKind].dashboard}`;
   await page.click(submenuItemSelector);
+};
+
+export const createConventionTemplate = async (
+  page: Page,
+  dashboardKind: "agency" | "establishment",
+) => {
+  await page.goto("/");
+  await goToDashboard(page, dashboardKind);
+
+  await page.click(
+    `#${domElementIds.conventionTemplate.createConventionTemplateButton}`,
+  );
+  await page.waitForURL(`${frontRoutes.conventionTemplate}**`);
+
+  await page.fill(
+    `#${domElementIds.conventionTemplate.form.nameInput}`,
+    "Mon premier modèle de convention",
+  );
+  await fillConventionForm(page);
+
+  await page.click(
+    `#${domElementIds.conventionTemplate.form.submitFormButton}`,
+  );
+  await expect(page.locator(".fr-alert--success")).toBeVisible();
+
+  await goToDashboard(page, dashboardKind);
+  await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+};
+
+export const deleteConventionTemplate = async (
+  page: Page,
+  dashboardKind: "agency" | "establishment",
+) => {
+  await page.goto("/");
+  await goToDashboard(page, dashboardKind);
+
+  await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+
+  await page.click(
+    `[id^="${domElementIds.conventionTemplate.deleteConventionTemplateButton}-"]`,
+  );
+  await page.click(
+    `#${domElementIds.conventionTemplate.deleteConventionTemplate.confirmButton}`,
+  );
+  await expect(page.locator(".fr-alert--success")).toBeVisible();
+  await expect(page.locator('[id^="convention-template-"]')).toHaveCount(0);
 };
