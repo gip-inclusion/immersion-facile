@@ -2087,37 +2087,42 @@ Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moi
     SUGGEST_EDIT_FORM_ESTABLISHMENT: {
       niceName: "Établissement - Suggestion de mise à jour",
       tags: ["mise à jour fiche entreprise"],
-      createEmailVariables: ({
-        editFrontUrl,
-        businessName,
-        businessAddresses,
-      }) => ({
+      createEmailVariables: ({ businessName }) => ({
         subject:
-          "Mettez à jour votre fiche entreprise sur le site Immersion Facilitée",
+          "Devenez une Super Entreprise et gagnez en visibilité sur Immersion Facilitée !",
         greetings: "Bonjour,",
-        content: `Votre entreprise: ${businessName} (${businessAddresses[0]}) est inscrite dans l'annuaire des entreprises accueillantes d'Immersion Facilitée depuis au moins 6 mois. Merci !
+        content: `Votre entreprise <strong>${businessName}</strong> fait déjà partie des entreprises accueillantes sur Immersion Facilitée, merci pour votre engagement !
+        
+        🌟 <strong>Devenez une Super Entreprise</strong>
+        Les entreprises les plus actives peuvent désormais obtenir le <strong>label “Super Entreprise”</strong>. Ce label :
+        • valorise votre engagement RSE,
+        • vous fait remonter en tête des résultats de recherche,
+        • et renforce votre attractivité auprès des candidats
+        Une belle reconnaissance pour votre implication dans la découverte des métiers et de l’inclusion !
 
-      Vous pouvez mettre à jour, si vous le souhaitez, les informations saisies au moment du référencement.
-      
-      Vous pouvez :
-      • ajouter ou supprimer des métiers
-      • modifier l'enseigne ou l'adresse
-      • modifier les coordonnées du référent "Immersion"
-      • modifier le mode de contact souhaité
-      • ajouter un lien vers le site ou des informations complémentaires sur l'activité de l'entreprise
-      • en suspendre la visibilité
+        🎥 <strong>Webinaire : “Comment devenir une Super Entreprise ?”</strong>
+        Tous les jeudis, de 11h à 12h.
+        Découvrez comment :
+        • obtenir le label “Super Entreprise” engagée
+        • booster la visibilité de vos offres d’immersion
+        • utiliser tout le potentiel de votre espace entreprise
+
       `,
-        subContent: `Nous vous invitons à cliquer sur le bouton ci-dessus pour mettre à jour vos informations.
-      
-      Si vous n'avez pas besoin de faire de modifications, vous n'avez rien à faire, les informations concernant votre entreprise seront affichées à l'identique.
-      
+        subContent: `💡 <strong>Au quotidien, votre espace Immersion Facilitée vous permet de :</strong>
+      • gérer vos candidatures reçues chaque mois
+      • traiter efficacement les demandes d’immersion
+      • gérer les utilisateurs reliés à votre espace entreprise
+      • paramétrer vos offres pour attirer des talents
+      Ces outils vous simplifient la gestion et renforcent votre visibilité.
+
+      Votre engagement compte, et ensemble, nous facilitons la découverte des métiers partout en France.      
       ${defaultSignature("immersion")}`,
         legals:
           "* Pour les entreprises de 20 salariés et plus, les personnes en situation de handicap accueillies en immersion sont comptabilisées au titre de l'obligation d'emploi.",
         buttons: [
           {
-            label: "Mettre à jour ma fiche établissement",
-            url: `${editFrontUrl}&shouldUpdateAvailability=true&mtm_campaign=transactionnel-etablissement-suggestion-mise-a-jour`,
+            label: "Je m'inscris au webinaire",
+            url: "https://app.livestorm.co/immersion-facilitee/session-express-boost",
           },
         ],
       }),

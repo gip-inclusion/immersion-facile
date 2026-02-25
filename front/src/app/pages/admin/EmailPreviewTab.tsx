@@ -693,8 +693,6 @@ export const defaultEmailValueByEmailKind: {
     agencyName: "AGENCY_NAME",
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
-    editFrontUrl: "https://EDIT_FRONT_URL",
-    businessAddresses: ["BUSINESS_ADDRESS_1"],
     businessName: "BUSINESS_NAME",
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {

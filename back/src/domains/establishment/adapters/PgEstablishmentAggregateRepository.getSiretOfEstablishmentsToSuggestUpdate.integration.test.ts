@@ -88,8 +88,6 @@ describe("PgScriptsQueries", () => {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
           recipients: ["joe@mail.com"],
           params: {
-            editFrontUrl: "http://edit-front.com",
-            businessAddresses: ["24 rue des boucher 67000 strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },
@@ -115,8 +113,6 @@ describe("PgScriptsQueries", () => {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
           recipients: ["jack@mail.com"],
           params: {
-            editFrontUrl: "http://edit-jack-front.com",
-            businessAddresses: ["24 rue des boucher 67000 strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },
