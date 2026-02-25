@@ -1,23 +1,35 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import RadioButtons, {
+  type RadioButtonsProps,
+} from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { equals } from "ramda";
-import { useEffect, useRef } from "react";
+import { useMemo } from "react";
+import { ErrorNotifications, SectionHighlight } from "react-design-system";
 import { createPortal } from "react-dom";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   appellationCodeSchema,
+  conventionTemplateIdSchema,
   domElementIds,
+  type SiretDto,
   siretSchema,
+  toDisplayedDate,
   zStringMinLength1,
 } from "shared";
+import {
+  displayReadableError,
+  toErrorsWithLabels,
+} from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import {
   defaultFormEstablishmentValue,
@@ -28,18 +40,54 @@ import { z } from "zod";
 const {
   Component: InitiateConventionModal,
   open: openInitiateConventionModal,
+  close: closeInitiateConventionModal,
 } = createModal({
   isOpenedByDefault: false,
   id: domElementIds.establishmentDashboard.initiateConventionModal,
 });
 
-type InitiateConventionFormData = z.infer<typeof initiateConventionFormSchema>;
+type InitiateConventionFormValues =
+  | {
+      initiateConventionSource: "template";
+      conventionTemplateId: string;
+    }
+  | {
+      initiateConventionSource: "establishment";
+      siret: string;
+      appellation: string;
+      location: string;
+    };
 
-const initiateConventionFormSchema = z.object({
+const defaultFormValues: InitiateConventionFormValues = {
+  initiateConventionSource: "establishment",
+  siret: "",
+  appellation: "",
+  location: "",
+};
+
+const initiateConventionFormErrorLabels: Record<string, string> = {
+  siret: "Veuillez sélectionner un établissement",
+  appellation: "Veuillez sélectionner un métier",
+  location: "Veuillez sélectionner un lieu d'immersion",
+  conventionTemplateId: "Aucun modèle sélectionné",
+};
+
+const establishmentFormSchema = z.object({
+  initiateConventionSource: z.literal("establishment"),
   siret: siretSchema,
   appellation: appellationCodeSchema,
   location: zStringMinLength1,
 });
+
+const templateFormSchema = z.object({
+  initiateConventionSource: z.literal("template"),
+  conventionTemplateId: conventionTemplateIdSchema,
+});
+
+const initiateConventionFormSchema = z.discriminatedUnion(
+  "initiateConventionSource",
+  [establishmentFormSchema, templateFormSchema],
+);
 
 export const InitiateConventionButton = () => {
   const dispatch = useDispatch();
@@ -48,194 +96,322 @@ export const InitiateConventionButton = () => {
   const establishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
+  const conventionTemplates = useAppSelector(
+    conventionTemplateSelectors.conventionTemplates,
+  );
   const isEstablishmentDefault = equals(
     establishment,
     defaultFormEstablishmentValue(),
   );
-  const formRef = useRef<HTMLFormElement>(null);
   const currentUserEstablishments = currentUser?.establishments;
-  const defaultValues =
-    currentUserEstablishments && currentUserEstablishments.length === 1
-      ? {
-          siret: currentUserEstablishments[0].siret,
-          appellation: "",
-          location: "",
-        }
-      : undefined;
+
+  const initiateConventionMethods = useForm<InitiateConventionFormValues>({
+    defaultValues: defaultFormValues,
+    resolver: zodResolver(initiateConventionFormSchema),
+    mode: "onTouched",
+  });
+
   const {
-    register,
     handleSubmit,
     setValue,
-    formState: { errors },
     watch,
-  } = useForm<InitiateConventionFormData>({
-    resolver: zodResolver(initiateConventionFormSchema),
-    defaultValues,
-  });
-  const values = watch();
+    reset,
+    formState: { errors: formErrors, submitCount },
+  } = initiateConventionMethods;
 
-  const onSubmit = (data: InitiateConventionFormData) => {
-    const appellation = establishment?.offers.find(
-      (offer) => offer.appellationCode === data.appellation,
+  const initiateConventionSource = watch("initiateConventionSource");
+  const values = watch();
+  const selectedConventionTemplateId = watch("conventionTemplateId");
+
+  const establishmentValues =
+    initiateConventionSource === "establishment"
+      ? (values as Extract<
+          InitiateConventionFormValues,
+          { initiateConventionSource: "establishment" }
+        >)
+      : null;
+
+  const onInitiateConventionFormSubmit = () => {
+    if (initiateConventionSource === "establishment" && establishmentValues) {
+      const appellation = establishment?.offers.find(
+        (offer) => offer.appellationCode === establishmentValues.appellation,
+      );
+      closeInitiateConventionModal();
+      routes
+        .conventionImmersion({
+          siret: establishmentValues.siret,
+          immersionAppellation: appellation,
+          immersionAddress: establishmentValues.location,
+          skipIntro: true,
+        })
+        .push();
+    }
+    const selectedConventionTemplate = conventionTemplates.find(
+      (template) => template.id === selectedConventionTemplateId,
     );
-    routes
-      .conventionImmersion({
-        siret: data.siret,
-        immersionAppellation: appellation,
-        immersionAddress: data.location,
-        skipIntro: true,
-      })
-      .push();
+    if (selectedConventionTemplate) {
+      closeInitiateConventionModal();
+      routes
+        .conventionImmersion({
+          conventionTemplateId: selectedConventionTemplate.id,
+          skipIntro: true,
+        })
+        .push();
+    }
   };
 
-  useEffect(() => {
-    if (
-      !isEstablishmentDefault &&
-      establishment.offers.length === 1 &&
-      values.appellation === ""
-    ) {
-      setValue("appellation", establishment.offers[0].appellationCode, {
-        shouldValidate: true,
-      });
-    }
-  }, [isEstablishmentDefault, establishment.offers, values, setValue]);
+  const initiateConventionSourceOptions: RadioButtonsProps["options"] = useMemo(
+    () => [
+      {
+        label: "À partir de vos informations",
+        nativeInputProps: {
+          name: "initiateConventionSource",
+          value: "establishment",
+          checked: initiateConventionSource === "establishment",
+          onChange: () => {
+            setValue("initiateConventionSource", "establishment");
+            if (currentUserEstablishments?.length === 1) {
+              setValue("siret", currentUserEstablishments[0].siret);
+            }
+          },
+        },
+      },
+      {
+        label: "À partir d'un modèle",
+        nativeInputProps: {
+          name: "initiateConventionSource",
+          value: "template",
+          checked: initiateConventionSource === "template",
+          onChange: () => setValue("initiateConventionSource", "template"),
+        },
+      },
+    ],
+    [initiateConventionSource, currentUserEstablishments, setValue],
+  );
 
-  useEffect(() => {
+  const conventionTemplateOptions: RadioButtonsProps["options"] = useMemo(
+    () =>
+      conventionTemplates.map((template) => ({
+        label: template.name,
+        hintText: `Mise à jour le ${template.updatedAt ? toDisplayedDate({ date: new Date(template.updatedAt), withHours: true }) : ""}`,
+        nativeInputProps: {
+          name: "initiateConventionTemplate",
+          value: template.id,
+          checked: selectedConventionTemplateId === template.id,
+          onChange: () => setValue("conventionTemplateId", template.id),
+        },
+      })),
+    [conventionTemplates, selectedConventionTemplateId, setValue],
+  );
+
+  const makeResetFormValues = (siret: SiretDto) => {
+    reset(defaultFormValues);
+    setValue("siret", siret);
+  };
+
+  const onOpenModal = () => {
     if (
-      !isEstablishmentDefault &&
-      establishment.businessAddresses.length === 1 &&
-      values.location === ""
+      connectedUserJwt &&
+      isEstablishmentDefault &&
+      currentUserEstablishments &&
+      currentUserEstablishments.length === 1
     ) {
-      setValue("location", establishment.businessAddresses[0].rawAddress, {
-        shouldValidate: true,
-      });
+      dispatch(
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: {
+            siret: currentUserEstablishments[0].siret,
+            jwt: connectedUserJwt,
+          },
+          feedbackTopic: "unused",
+        }),
+      );
     }
-  }, [
-    isEstablishmentDefault,
-    establishment.businessAddresses,
-    values,
-    setValue,
-  ]);
+    makeResetFormValues(currentUserEstablishments?.[0]?.siret ?? "");
+    openInitiateConventionModal();
+  };
+
+  if (
+    initiateConventionSource === "establishment" &&
+    !isEstablishmentDefault &&
+    establishment.offers.length === 1 &&
+    establishmentValues?.appellation === ""
+  )
+    setValue("appellation", establishment.offers[0].appellationCode, {
+      shouldValidate: true,
+    });
+
+  if (
+    initiateConventionSource === "establishment" &&
+    !isEstablishmentDefault &&
+    establishment.businessAddresses.length === 1 &&
+    establishmentValues?.location === ""
+  )
+    setValue("location", establishment.businessAddresses[0].rawAddress, {
+      shouldValidate: true,
+    });
+
   if (!currentUser || !connectedUserJwt) return null;
 
   return (
     <>
-      <Button
-        onClick={() => {
-          if (
-            isEstablishmentDefault &&
-            currentUserEstablishments &&
-            currentUserEstablishments.length === 1
-          ) {
-            dispatch(
-              establishmentSlice.actions.fetchEstablishmentRequested({
-                establishmentRequested: {
-                  siret: currentUserEstablishments[0].siret,
-                  jwt: connectedUserJwt,
-                },
-                feedbackTopic: "unused",
-              }),
-            );
-          }
-          openInitiateConventionModal();
-        }}
-      >
-        Initier une convention
-      </Button>
+      <Button onClick={onOpenModal}>Initier une convention</Button>
       {createPortal(
-        <InitiateConventionModal
-          title="Initier une convention"
-          buttons={[
-            {
-              doClosesModal: true,
-              children: "Fermer",
-            },
-            {
-              id: domElementIds.establishmentDashboard
-                .initiateConventionModalButton,
-              doClosesModal: false,
-              children: "Initier la convention",
-              onClick: handleSubmit(onSubmit),
-            },
-          ]}
-        >
-          Créer une convention depuis votre espace vous permet de la pré-remplir
-          avec vos informations. Sélectionnez l'organisme pour lequel vous
-          souhaitez initier la convention.
-          <form onSubmit={handleSubmit(onSubmit)} ref={formRef}>
-            <Select
-              label={"Établissement *"}
-              className={fr.cx("fr-mt-2w")}
-              placeholder="Sélectionnez un établissement"
-              disabled={
-                currentUser.establishments &&
-                currentUser.establishments.length === 1
+        <FormProvider {...initiateConventionMethods}>
+          <InitiateConventionModal
+            title="Initier une convention"
+            buttons={[
+              {
+                doClosesModal: true,
+                children: "Fermer",
+              },
+              {
+                id: domElementIds.establishmentDashboard
+                  .initiateConventionModalButton,
+                doClosesModal: false,
+                children: "Initier la convention",
+                onClick: handleSubmit(onInitiateConventionFormSubmit),
+              },
+            ]}
+          >
+            <ErrorNotifications
+              errorsWithLabels={toErrorsWithLabels({
+                labels: initiateConventionFormErrorLabels,
+                errors: displayReadableError(formErrors),
+              })}
+              visible={submitCount !== 0 && Object.keys(formErrors).length > 0}
+            />
+            <p>
+              Créer une convention depuis votre espace vous permet de la
+              pré-remplir avec vos informations ou à partir d'un modèle.
+            </p>
+            <RadioButtons
+              id={
+                domElementIds.establishmentDashboard
+                  .initiateConventionSourceRadioButtons
               }
-              options={
-                currentUser?.establishments?.map((establishment) => ({
-                  value: establishment.siret,
-                  label: establishment.businessName,
-                })) ?? []
-              }
-              nativeSelectProps={{
-                ...register("siret"),
-                onChange: (event) => {
-                  dispatch(
-                    establishmentSlice.actions.fetchEstablishmentRequested({
-                      establishmentRequested: {
-                        siret: event.currentTarget.value,
-                        jwt: connectedUserJwt,
+              name="initiateConventionSource"
+              legend="Comment souhaitez-vous initier la convention ?"
+              options={initiateConventionSourceOptions}
+              className={fr.cx("fr-mb-3w")}
+            />
+            <SectionHighlight>
+              {initiateConventionSource === "template" ? (
+                <RadioButtons
+                  id={
+                    domElementIds.establishmentDashboard
+                      .initiateConventionTemplateRadioButtons
+                  }
+                  name="initiateConventionTemplate"
+                  legend="Quel modèle souhaitez-vous utiliser ?"
+                  options={conventionTemplateOptions}
+                  className={fr.cx("fr-mb-3w")}
+                />
+              ) : (
+                <>
+                  Sélectionnez l'organisme pour lequel vous souhaitez initier la
+                  convention.
+                  <Select
+                    label={"Établissement *"}
+                    className={fr.cx("fr-mt-2w")}
+                    placeholder="Sélectionnez un établissement"
+                    disabled={
+                      currentUser.establishments &&
+                      currentUser.establishments.length === 1
+                    }
+                    options={
+                      currentUser?.establishments?.map((est) => ({
+                        value: est.siret,
+                        label: est.businessName,
+                      })) ?? []
+                    }
+                    nativeSelectProps={{
+                      value: establishmentValues?.siret ?? "",
+                      onChange: (event) => {
+                        const siret = event.currentTarget.value;
+                        setValue("siret", siret, { shouldValidate: true });
                       },
-                      feedbackTopic: "unused",
-                    }),
-                  );
-                  setValue("siret", event.currentTarget.value, {
-                    shouldValidate: true,
-                  });
-                },
-              }}
-              state={errors.siret ? "error" : "default"}
-              stateRelatedMessage={errors.siret?.message}
-            />
-            <Select
-              label={"Métier *"}
-              placeholder="Sélectionnez un métier"
-              className={fr.cx("fr-mt-2w")}
-              disabled={
-                isEstablishmentDefault || establishment.offers.length === 1
-              }
-              options={
-                !isEstablishmentDefault
-                  ? establishment?.offers.map((offer) => ({
-                      value: offer.appellationCode,
-                      label: offer.appellationLabel,
-                    }))
-                  : []
-              }
-              nativeSelectProps={register("appellation")}
-              state={errors.appellation ? "error" : "default"}
-              stateRelatedMessage={errors.appellation?.message}
-            />
-            <Select
-              label={"Lieu d'immersion *"}
-              placeholder="Sélectionnez un lieu d'immersion"
-              className={fr.cx("fr-mt-2w")}
-              disabled={
-                isEstablishmentDefault ||
-                establishment.businessAddresses.length === 1
-              }
-              options={
-                establishment?.businessAddresses.map((location) => ({
-                  value: location.rawAddress,
-                  label: location.rawAddress,
-                })) ?? []
-              }
-              nativeSelectProps={register("location")}
-              state={errors.location ? "error" : "default"}
-              stateRelatedMessage={errors.location?.message}
-            />
-          </form>
-        </InitiateConventionModal>,
+                    }}
+                    state={
+                      (formErrors as Record<string, { message?: string }>).siret
+                        ? "error"
+                        : "default"
+                    }
+                    stateRelatedMessage={
+                      (formErrors as Record<string, { message?: string }>).siret
+                        ?.message
+                    }
+                  />
+                  <Select
+                    label={"Métier *"}
+                    placeholder="Sélectionnez un métier"
+                    className={fr.cx("fr-mt-2w")}
+                    disabled={
+                      isEstablishmentDefault ||
+                      establishment.offers.length === 1
+                    }
+                    options={
+                      !isEstablishmentDefault
+                        ? (establishment?.offers.map((offer) => ({
+                            value: offer.appellationCode,
+                            label: offer.appellationLabel,
+                          })) ?? [])
+                        : []
+                    }
+                    nativeSelectProps={{
+                      value: establishmentValues?.appellation ?? "",
+                      onChange: (event) =>
+                        setValue("appellation", event.currentTarget.value, {
+                          shouldValidate: true,
+                        }),
+                    }}
+                    state={
+                      (formErrors as Record<string, { message?: string }>)
+                        .appellation
+                        ? "error"
+                        : "default"
+                    }
+                    stateRelatedMessage={
+                      (formErrors as Record<string, { message?: string }>)
+                        .appellation?.message
+                    }
+                  />
+                  <Select
+                    label={"Lieu d'immersion *"}
+                    placeholder="Sélectionnez un lieu d'immersion"
+                    className={fr.cx("fr-mt-2w")}
+                    disabled={
+                      isEstablishmentDefault ||
+                      establishment.businessAddresses.length === 1
+                    }
+                    options={
+                      establishment?.businessAddresses.map((location) => ({
+                        value: location.rawAddress,
+                        label: location.rawAddress,
+                      })) ?? []
+                    }
+                    nativeSelectProps={{
+                      value: establishmentValues?.location ?? "",
+                      onChange: (event) =>
+                        setValue("location", event.currentTarget.value, {
+                          shouldValidate: true,
+                        }),
+                    }}
+                    state={
+                      (formErrors as Record<string, { message?: string }>)
+                        .location
+                        ? "error"
+                        : "default"
+                    }
+                    stateRelatedMessage={
+                      (formErrors as Record<string, { message?: string }>)
+                        .location?.message
+                    }
+                  />
+                </>
+              )}
+            </SectionHighlight>
+          </InitiateConventionModal>
+        </FormProvider>,
         document.body,
       )}
     </>

@@ -1032,6 +1032,10 @@ export const domElementIds = {
       "im-manage-establishment__initiate-convention-modal",
     initiateConventionModalButton:
       "im-manage-establishment__initiate-convention-modal-button",
+    initiateConventionSourceRadioButtons:
+      "im-manage-establishment__initiate-convention-source-radio-buttons",
+    initiateConventionTemplateRadioButtons:
+      "im-manage-establishment__initiate-convention-template-radio-buttons",
     login: {
       proConnectButton:
         "im-login-form__inclusion-connect-button--establishment-dashboard",
