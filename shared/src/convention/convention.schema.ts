@@ -32,6 +32,7 @@ import {
   scheduleSchema,
 } from "../schedule/Schedule.schema";
 import {
+  calculateDailyHoursFromSchedule,
   calculateWeeklyHoursFromSchedule,
   isSundayInSchedule,
   validateSchedule,
@@ -62,6 +63,7 @@ import {
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  CCI_DAILY_MAX_PERMITTED_HOURS,
   CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   CCI_WEEKLY_MAX_PERMITTED_HOURS,
@@ -786,6 +788,11 @@ const addIssueIfLimitedScheduleHoursExceeded = (
     start: new Date(convention.dateStart),
     end: new Date(convention.dateEnd),
   });
+  const dailyHours = calculateDailyHoursFromSchedule(convention.schedule, {
+    start: new Date(convention.dateStart),
+    end: new Date(convention.dateEnd),
+  });
+
   if (
     beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
     weeklyHours.some(
@@ -808,6 +815,15 @@ const addIssueIfLimitedScheduleHoursExceeded = (
   ) {
     addIssue(
       `La durée maximale hebdomadaire pour un mini-stage est de ${CCI_WEEKLY_MAX_PERMITTED_HOURS}h`,
+      getConventionFieldName("schedule.totalHours"),
+    );
+  }
+
+  if (
+    dailyHours.some((dailyHour) => dailyHour > CCI_DAILY_MAX_PERMITTED_HOURS)
+  ) {
+    addIssue(
+      `La durée maximale journalière pour un mini-stage est de ${CCI_DAILY_MAX_PERMITTED_HOURS}h`,
       getConventionFieldName("schedule.totalHours"),
     );
   }

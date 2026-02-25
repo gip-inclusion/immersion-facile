@@ -10,6 +10,7 @@ import {
   MAX_PRESENCE_DAYS_RELEASE_DATE,
   maxPresenceDaysByInternshipKind,
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
+  type TimePeriodsDto,
   toDateUTCString,
   type Weekday,
   type ZodSchemaWithInputMatchingOutput,
@@ -28,6 +29,7 @@ import {
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  CCI_DAILY_MAX_PERMITTED_HOURS,
   type ConventionInternshipKindSpecific,
   type ConventionReadDto,
   conventionStatuses,
@@ -754,7 +756,7 @@ describe("conventionDtoSchema", () => {
       });
     });
 
-    describe("CCI specific, minor under 15yo", () => {
+    describe("CCI specific, minor under 16yo", () => {
       it("max week hours depends on beneficiary age", () => {
         const dateStart = new Date("2024-10-07").toISOString();
         const dateEnd = addDays(new Date(dateStart), 5).toISOString();
@@ -785,7 +787,7 @@ describe("conventionDtoSchema", () => {
           .build();
         expectDtoInvalidWithIssueMessages(conventionSchema, convention, {
           "schedule.totalHours":
-            "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 15 ans est de 30h",
+            "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 16 ans est de 30h",
         });
       });
 
@@ -838,6 +840,56 @@ describe("conventionDtoSchema", () => {
                 "La durée maximale hebdomadaire pour un mini-stage est de 35h",
             },
           );
+        });
+      });
+
+      describe("Add issue when daily hours is greater than cci max daily hours", () => {
+        const dateStart = new Date("2024-10-07").toISOString();
+        const dateEnd = addDays(new Date(dateStart), 4).toISOString();
+
+        const createConventionWithTimePeriods = (
+          timePeriods: TimePeriodsDto,
+        ) => {
+          const dailyComplexSchedule = [
+            { date: "2024-10-07T00:00:00.000Z", timePeriods },
+            {
+              date: "2024-10-08T00:00:00.000Z",
+              timePeriods: [{ start: "09:00", end: "15:00" }],
+            },
+          ];
+
+          return new ConventionDtoBuilder()
+            .withInternshipKind("mini-stage-cci")
+            .withDateStart(dateStart)
+            .withDateEnd(dateEnd)
+            .withSchedule(
+              (_interval: DateIntervalDto, _excludedDays?: Weekday[]) => ({
+                totalHours:
+                  calculateTotalImmersionHoursFromComplexSchedule(
+                    dailyComplexSchedule,
+                  ),
+                isSimple: false,
+                complexSchedule: dailyComplexSchedule,
+                workedDays: calculateNumberOfWorkedDays(dailyComplexSchedule),
+              }),
+            )
+            .build();
+        };
+
+        it("adds issue when a day exceeds CCI_DAILY_MAX_PERMITTED_HOURS", () => {
+          const convention = createConventionWithTimePeriods([
+            { start: "07:00", end: "15:00" },
+          ]);
+          expectDtoInvalidWithIssueMessages(conventionSchema, convention, {
+            "schedule.totalHours": `La durée maximale journalière pour un mini-stage est de ${CCI_DAILY_MAX_PERMITTED_HOURS}h`,
+          });
+        });
+
+        it("does not add issue when all days are within CCI_DAILY_MAX_PERMITTED_HOURS", () => {
+          const convention = createConventionWithTimePeriods([
+            { start: "09:00", end: "14:00" },
+          ]);
+          expectDtoToBeValid(conventionSchema, convention);
         });
       });
     });
