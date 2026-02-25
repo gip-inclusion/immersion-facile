@@ -572,6 +572,13 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     magicLink: "http://MAGIC_LINK",
   },
+  ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    internshipKind: "immersion",
+    assessmentSignatureLink: "http://SIGNATURE_LINK",
+  },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     internshipKind: "immersion",
     agencyReferentName: "AGENCY_REFERENT_NAME",
