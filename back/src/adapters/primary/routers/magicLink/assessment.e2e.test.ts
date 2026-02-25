@@ -99,6 +99,7 @@ describe("Assessment routes", () => {
     conventionMagicLinkRoutes.createAssessment,
   )} to add assessment`, () => {
     it("returns 201 if the jwt is valid", async () => {
+      gateways.shortLinkGenerator.addMoreShortLinkIds(["shortLinkAssessment"]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const assessment: AssessmentDto = {
@@ -126,18 +127,8 @@ describe("Assessment routes", () => {
 
       expectArraysToMatch(gateways.notification.getSentEmails(), [
         {
-          kind: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
-          recipients: [
-            convention.signatories.establishmentRepresentative.email,
-          ],
-        },
-        {
-          kind: "ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION",
+          kind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
           recipients: [convention.signatories.beneficiary.email],
-        },
-        {
-          kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
-          recipients: [validator.email],
         },
       ]);
     });
@@ -496,21 +487,19 @@ describe("Assessment routes", () => {
     });
 
     it("403 - cannot sign legacy assessment", async () => {
-      const legacyAssessment = {
-        _entityName: "Assessment" as const,
+      const legacyAssessment: AssessmentEntity = {
+        _entityName: "Assessment",
         conventionId: testConvention.id,
-        status: "FINISHED" as const,
+        status: "FINISHED",
         establishmentFeedback: "Legacy feedback",
-        numberOfHoursActuallyMade: null as number | null,
+        numberOfHoursActuallyMade: null,
       };
 
       inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
       ];
       inMemoryUow.conventionRepository.setConventions([testConvention]);
-      inMemoryUow.assessmentRepository.assessments = [
-        legacyAssessment as AssessmentEntity,
-      ];
+      inMemoryUow.assessmentRepository.assessments = [legacyAssessment];
 
       const beneficiaryJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
@@ -525,7 +514,7 @@ describe("Assessment routes", () => {
         body: {
           conventionId: testConvention.id,
           beneficiaryAgreement: true,
-          beneficiaryFeedback: "",
+          beneficiaryFeedback: null,
         },
         headers: { authorization: beneficiaryJwt },
       });
@@ -576,6 +565,7 @@ describe("Assessment routes", () => {
         toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
       ];
       inMemoryUow.conventionRepository.setConventions([testConvention]);
+      inMemoryUow.assessmentRepository.assessments = [];
 
       const beneficiaryJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
