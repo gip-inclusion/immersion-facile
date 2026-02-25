@@ -15,15 +15,15 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  type GetOldConventionDraftsAndEmitDeleteEvent,
-  makeGetOldConventionDraftsAndEmitDeleteEvent,
-} from "./GetOldConventionDraftsAndEmitDeleteEvent";
+  makeRequestOldConventionDraftsDeletion,
+  type RequestOldConventionDraftsDeletion,
+} from "./RequestOldConventionDraftsDeletion";
 
-describe("GetOldConventionDraftsAndEmitDeleteEvent", () => {
+describe("RequestOldConventionDraftsDeletion", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
   let uuidGenerator: TestUuidGenerator;
-  let getOldConventionDraftsAndEmitDeleteEvent: GetOldConventionDraftsAndEmitDeleteEvent;
+  let RequestOldConventionDraftsDeletion: RequestOldConventionDraftsDeletion;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -34,14 +34,15 @@ describe("GetOldConventionDraftsAndEmitDeleteEvent", () => {
       uuidGenerator,
     });
 
-    getOldConventionDraftsAndEmitDeleteEvent =
-      makeGetOldConventionDraftsAndEmitDeleteEvent({
+    RequestOldConventionDraftsDeletion = makeRequestOldConventionDraftsDeletion(
+      {
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
           timeGateway,
           createNewEvent,
         },
-      });
+      },
+    );
 
     uow.conventionDraftRepository.conventionDrafts = [];
     uow.outboxRepository.events = [];
@@ -65,7 +66,7 @@ describe("GetOldConventionDraftsAndEmitDeleteEvent", () => {
     );
 
     const { numberOfOldConventionDraftIds } =
-      await getOldConventionDraftsAndEmitDeleteEvent.execute();
+      await RequestOldConventionDraftsDeletion.execute();
 
     expectToEqual(numberOfOldConventionDraftIds, 1);
     expectToEqual(uow.outboxRepository.events, [
@@ -99,7 +100,7 @@ describe("GetOldConventionDraftsAndEmitDeleteEvent", () => {
     );
 
     const { numberOfOldConventionDraftIds } =
-      await getOldConventionDraftsAndEmitDeleteEvent.execute();
+      await RequestOldConventionDraftsDeletion.execute();
 
     expectToEqual(numberOfOldConventionDraftIds, 0);
     expectToEqual(uow.outboxRepository.events, []);
@@ -141,7 +142,7 @@ describe("GetOldConventionDraftsAndEmitDeleteEvent", () => {
     );
 
     const { numberOfOldConventionDraftIds } =
-      await getOldConventionDraftsAndEmitDeleteEvent.execute();
+      await RequestOldConventionDraftsDeletion.execute();
 
     expectToEqual(
       numberOfOldConventionDraftIds,

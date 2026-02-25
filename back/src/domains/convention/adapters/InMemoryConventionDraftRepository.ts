@@ -53,11 +53,10 @@ const makeApplyFiltersToConventionDrafts =
     (
       [
         ({ id }) => (!ids || ids.length === 0 ? true : ids.includes(id)),
-        ({ updatedAt }) =>
-          !lastUpdatedAt
-            ? true
-            : updatedAt
-              ? new Date(updatedAt) <= lastUpdatedAt
-              : false,
+        ({ updatedAt }) => {
+          if (!lastUpdatedAt) return true;
+          if (!updatedAt) return false;
+          return new Date(updatedAt) <= lastUpdatedAt;
+        },
       ] satisfies Array<(draft: ConventionDraftDto) => boolean>
     ).every((filter) => filter(draft));
