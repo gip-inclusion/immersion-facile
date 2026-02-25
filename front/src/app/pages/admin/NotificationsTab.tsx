@@ -171,6 +171,7 @@ const Email = ({ email }: { email: EmailNotification }) => (
               "magicLink",
               "assessmentMagicLink",
               "conventionSignShortlink",
+              "assessmentSignatureLink",
               "unsubscribeToEmailShortLink",
               "registerEstablishmentShortLink",
               "loginLink",

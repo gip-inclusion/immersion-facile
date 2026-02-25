@@ -422,6 +422,53 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         subContent: defaultSignature(internshipKind),
       }),
     },
+    ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION: {
+      niceName: "Bilan - Candidat - Signature du bilan",
+      tags: ["bilan_candidat_signatureBilan"],
+      createEmailVariables: ({
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        internshipKind,
+        assessmentSignatureLink,
+      }) => ({
+        subject: `Votre bilan d'immersion est prêt à être signé`,
+        greetings: `Bonjour${beneficiaryFirstName} ${beneficiaryLastName},`,
+
+        content: `
+        <strong>Nous espérons que votre ${
+          internshipKind === "immersion"
+            ? "immersion professionnelle"
+            : "mini-stage"
+        } au sein de ${businessName} s’est bien déroulée et que cette expérience vous a été bénéfique.</strong>
+       
+        Votre tuteur a rempli le bilan de votre ${
+          internshipKind === "immersion"
+            ? "immersion professionnelle"
+            : "mini-stage"
+        }. Vous pouvez dès maintenant le consulter et le signer en ligne.
+        `,
+        buttons: [
+          {
+            label: "Consulter et signer le bilan",
+            url: assessmentSignatureLink,
+          },
+        ],
+        subContent: `Lors de la signature, vous aurez trois possibilités :
+
+        <ul>
+          <li>J’ai bien lu, je suis d’accord, rien à ajouter</li>
+          <li>J’ai bien lu, je suis d’accord, je veux commenter</li>
+          <li>J’ai bien lu, je ne suis pas d’accord, je veux commenter</li>
+        </ul>
+
+        Si vous décidez d’ajouter un commentaire, il sera intégré directement dans le bilan final.
+
+        Une fois signé, le bilan sera automatiquement envoyé à vous, à l’entreprise et à votre accompagnateur au format PDF.
+        ${defaultSignature(internshipKind)}
+        `,
+      }),
+    },
     ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION: {
       niceName: "Bilan - Bénéficiaire - Bilan complété",
       tags: ["bilan_créé_bénéficiaire"],
