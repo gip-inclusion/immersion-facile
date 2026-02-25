@@ -442,6 +442,19 @@ export const calculateWeeklyHours = (
       .toFixed(2),
   );
 
+export const calculateDailyHours = (day: DailyImmersionTimetableDto): number =>
+  Number.parseFloat(
+    (day.timePeriods ? minutesInDay(day.timePeriods) / 60 : 0).toFixed(2),
+  );
+
+export const calculateDailyHoursFromSchedule = (
+  schedule: ScheduleDto,
+  interval: DateIntervalDto,
+): number[] =>
+  makeImmersionTimetable(schedule.complexSchedule, interval)
+    .flat()
+    .map(calculateDailyHours);
+
 export const defaultTimePeriods: TimePeriodsDto = [
   {
     start: "09:00",
