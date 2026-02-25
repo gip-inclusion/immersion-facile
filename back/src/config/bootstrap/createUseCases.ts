@@ -51,7 +51,6 @@ import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-ca
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
-import { makeGetOldConventionDraftsAndEmitDeleteEvent } from "../../domains/convention/use-cases/GetOldConventionDraftsAndEmitDeleteEvent";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
@@ -72,6 +71,7 @@ import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases
 import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
+import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
@@ -1118,8 +1118,8 @@ export const createUseCases = ({
       }),
     getConventionDraftById: makeGetConventionDraftById({ uowPerformer }),
     deleteConventionDraft: makeDeleteConventionDraft({ uowPerformer }),
-    getOldConventionDraftsAndEmitDeleteEvent:
-      makeGetOldConventionDraftsAndEmitDeleteEvent({
+    makeRequestOldConventionDraftsDeletion:
+      makeRequestOldConventionDraftsDeletion({
         uowPerformer,
         deps: { createNewEvent, timeGateway: gateways.timeGateway },
       }),

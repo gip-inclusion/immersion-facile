@@ -1,6 +1,6 @@
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
-import { makeGetOldConventionDraftsAndEmitDeleteEvent } from "../../domains/convention/use-cases/GetOldConventionDraftsAndEmitDeleteEvent";
+import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
@@ -26,8 +26,8 @@ const deleteOldConventionDrafts = async (): Promise<{
     uuidGenerator,
   });
 
-  const getOldConventionDraftsAndEmitDeleteEvent =
-    makeGetOldConventionDraftsAndEmitDeleteEvent({
+  const requestOldConventionDraftsDeletion =
+    makeRequestOldConventionDraftsDeletion({
       uowPerformer,
       deps: {
         timeGateway,
@@ -36,7 +36,7 @@ const deleteOldConventionDrafts = async (): Promise<{
     });
 
   const { numberOfOldConventionDraftIds } =
-    await getOldConventionDraftsAndEmitDeleteEvent.execute();
+    await requestOldConventionDraftsDeletion.execute();
 
   return {
     numberOfConventionDraftsDeleted: numberOfOldConventionDraftIds,

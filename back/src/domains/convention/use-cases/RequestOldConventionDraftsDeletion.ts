@@ -3,11 +3,11 @@ import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export type GetOldConventionDraftsAndEmitDeleteEvent = ReturnType<
-  typeof makeGetOldConventionDraftsAndEmitDeleteEvent
+export type RequestOldConventionDraftsDeletion = ReturnType<
+  typeof makeRequestOldConventionDraftsDeletion
 >;
-export const makeGetOldConventionDraftsAndEmitDeleteEvent = useCaseBuilder(
-  "GetOldConventionDraftsAndEmitDeleteEvent",
+export const makeRequestOldConventionDraftsDeletion = useCaseBuilder(
+  "RequestOldConventionDraftsDeletion",
 )
   .withOutput<{ numberOfOldConventionDraftIds: number }>()
   .withDeps<{ timeGateway: TimeGateway; createNewEvent: CreateNewEvent }>()
