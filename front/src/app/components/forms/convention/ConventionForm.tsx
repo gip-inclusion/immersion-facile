@@ -23,12 +23,7 @@ import {
   Loader,
   useScrollTo,
 } from "react-design-system";
-import {
-  FormProvider,
-  get,
-  type SubmitHandler,
-  useForm,
-} from "react-hook-form";
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   type AgencyOption,
@@ -119,6 +114,7 @@ import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice"
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { useStyles } from "tss-react/dsfr";
+import { z } from "zod";
 import { ShareConventionDraft } from "./ShareConventionDraft";
 
 type StepSeverity = "error" | "success" | "info";
@@ -283,7 +279,6 @@ export const ConventionForm = ({
   const {
     handleSubmit,
     setValue,
-    trigger,
     clearErrors,
     getValues,
     getFieldState,
@@ -423,11 +418,6 @@ export const ConventionForm = ({
 
   const accordionsRef = useRef<Array<ElementRef<"div">>>([]);
 
-  const [stepsStatus, setStepsStatus] = useState<Record<
-    number,
-    StepSeverity
-  > | null>(null);
-
   const [emailValidationErrors, setEmailValidationErrors] =
     useState<EmailValidationErrorsState>({});
 
@@ -479,47 +469,39 @@ export const ConventionForm = ({
     isConventionTemplate: isTemplateForm,
   });
 
-  const validateSteps = async (type: "clearAllErrors" | "doNotClear") => {
-    const stepsDataValue = await Promise.all(
-      formUiSections.map((_, step) => getStepData(step + 1)),
+  const stepsStatus = useMemo(() => {
+    const parseResult = presentationSchema.safeParse(conventionValues);
+    const fieldErrors: Record<string, string[]> = parseResult.success
+      ? {}
+      : z.flattenError(parseResult.error).fieldErrors;
+
+    const fieldHasError = (stepField: string) =>
+      Object.keys(fieldErrors).some(
+        (errKey) =>
+          (fieldErrors[errKey]?.length ?? 0) > 0 &&
+          (stepField === errKey || stepField.startsWith(`${errKey}.`)),
+      );
+
+    return formUiSections.reduce<Record<number, StepSeverity>>(
+      (status, stepFields, index) => {
+        const step = index + 1;
+        const hasErrors = stepFields.some((f) => fieldHasError(f as string));
+        const isTouched = stepFields.some(
+          (f) => getFieldState(f as keyof ConventionPresentation).isTouched,
+        );
+        status[step] = hasErrors ? (isTouched ? "error" : "info") : "success";
+        return status;
+      },
+      {},
     );
-    setStepsStatus(stepsDataValue.reduce((acc, curr) => ({ ...acc, ...curr })));
+  }, [conventionValues, presentationSchema, formUiSections, getFieldState]);
+
+  const validateSteps = async (type: "clearAllErrors" | "doNotClear") => {
     if (type === "clearAllErrors") {
       // biome-ignore lint/suspicious/noConsole: debug purpose
       console.info("CLEAR ALL ERRORS");
       clearErrors();
     }
-  };
-
-  const getStepData = async (
-    step: number,
-  ): Promise<Record<number, StepSeverity>> => {
-    const stepFields = formUiSections[step - 1];
-    const validatedFields = stepFields.map(async (field) => ({
-      [field]: await trigger(field as keyof ConventionPresentation),
-    }));
-    const validatedFieldsValue = await Promise.all(validatedFields);
-    const getStepStatus = () => {
-      const stepHasErrors = stepFields.filter(
-        (stepField) =>
-          keys(errors).filter((errorKey) => stepField.includes(errorKey))
-            .length && get(errors, stepField),
-      ).length;
-      const stepIsTouched = stepFields.filter(
-        (stepField) =>
-          getFieldState(stepField as keyof ConventionPresentation).isTouched,
-      ).length;
-      if (validatedFieldsValue.every((field) => Object.values(field)[0])) {
-        return "success";
-      }
-      if (stepHasErrors && stepIsTouched) {
-        return "error";
-      }
-      return "info";
-    };
-    return {
-      [step]: getStepStatus(),
-    };
   };
 
   const prevFetchedConventionIdRef = useRef<ConventionId | undefined>(
@@ -1028,7 +1010,7 @@ const SectionTitle = ({
 }: {
   title: string;
   step: number;
-  stepsStatus: Record<number, StepSeverity> | null;
+  stepsStatus: Record<number, StepSeverity>;
   currentStep: NumberOfSteps;
   showStepStatus: boolean;
 }) => {
@@ -1044,7 +1026,7 @@ const SectionTitle = ({
     info: { severity: "info", label: "À compléter" },
   };
 
-  const { label, severity } = badgeData[stepsStatus?.[step] ?? "info"];
+  const { label, severity } = badgeData[stepsStatus[step] ?? "info"];
 
   return (
     <>
