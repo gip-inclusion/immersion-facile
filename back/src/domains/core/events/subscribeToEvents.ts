@@ -233,6 +233,7 @@ const getUseCasesByTopics = (
 
   // Assessment related:
   AssessmentCreated: [
+    useCases.notifyAgencyThatAssessmentIsCreated,
     useCases.notifyBeneficiaryThatAssessmentNeedsSignature,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnAssessmentCreated,

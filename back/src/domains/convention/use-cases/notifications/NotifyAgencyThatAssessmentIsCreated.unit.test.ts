@@ -108,7 +108,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     });
   });
 
-  it("Send an email to validators when beneficiary did the immersion", async () => {
+  it("Send an email to validators when beneficiary did the immersion and sign the assessment", async () => {
     const validator2 = new ConnectedUserBuilder()
       .withEmail("validator2@email.com")
       .withId("validator2")
@@ -249,6 +249,25 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
           recipients: [validator.email, validator2.email],
         },
       ],
+    });
+  });
+
+  it("Do not send an email when assessment is not signed and status is different than DID_NOT_SHOW", async () => {
+    uow.userRepository.users = [validator];
+    await uow.conventionRepository.save(convention);
+    await uow.agencyRepository.insert(
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
+    const assessmentNotSigned: AssessmentDto = {
+      ...assessment,
+      signedAt: null,
+      beneficiaryAgreement: null,
+    };
+    await usecase.execute({ assessment: assessmentNotSigned });
+    expectSavedNotificationsAndEvents({
+      emails: [],
     });
   });
 
