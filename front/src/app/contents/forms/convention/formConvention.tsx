@@ -301,8 +301,7 @@ const beneficiarySection = ({
     label: "E-mail",
     id: beneficiarySectionIds.email,
     required: !isConventionTemplate,
-    hintText:
-      "Cette adresse email sera utilisée dans le cadre de la signature de la convention d'immersion. Pensez à bien vérifier son exactitude. Format attendu\u00A0: nom@exemple.com",
+    hintText: `Cette adresse email sera utilisée dans le cadre de la signature de la convention ${internshipKind === "immersion" ? "d'immersion" : "de stage"}. Pensez à bien vérifier son exactitude. Format attendu\u00A0: nom@exemple.com`,
   },
   "signatories.beneficiary.phone": {
     label: "Téléphone",
@@ -365,17 +364,12 @@ const beneficiarySection = ({
     label:
       "La personne en immersion a-t-elle une reconnaissance travailleur handicapé (RQTH) ou équivalent\u00A0?",
     id: beneficiarySectionIds.isRqth,
-    hintText: (
-      <>
-        Il n'est pas obligatoire de le préciser, mais cela peut être utile à la
-        personne en immersion et à l'entreprise.
-      </>
-    ),
+    hintText: `Il n'est pas obligatoire de le préciser, mais cela peut être utile à la
+        personne en ${internshipKind === "immersion" ? "immersion" : "stage"} et à l'entreprise.`,
   },
 });
 
 const establishmentTutorSection = ({
-  internshipKind,
   isConventionTemplate,
 }: {
   internshipKind: InternshipKind;
