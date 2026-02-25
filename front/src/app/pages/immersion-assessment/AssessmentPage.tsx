@@ -17,10 +17,12 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import type { Route } from "type-route";
 
 type AssessmentRoute = Route<typeof routes.assessment>;
@@ -33,6 +35,9 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   const conventionFormFeedback = useFeedbackTopic("convention-form");
   const userRolesForFetchedConvention = useAppSelector(
     connectedUserSelectors.userRolesForFetchedConvention,
+  );
+  const isEstablishmentRegistered = useAppSelector(
+    siretSelectors.isSiretAlreadySaved,
   );
 
   const fetchConventionError =
@@ -55,6 +60,16 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
     jwt: route.params.jwt,
     conventionId,
   });
+
+  const { isFetchingSiret, updateSiret, currentSiret } = useSiretFetcher({
+    shouldFetchEvenIfAlreadySaved: false,
+    addressAutocompleteLocator: null,
+  });
+
+  if (convention && convention?.siret !== currentSiret) {
+    updateSiret(convention.siret);
+  }
+
   const assessmentFormFeedback = useFeedbackTopic("assessment");
 
   const isLoading = isConventionLoading;
@@ -75,7 +90,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
       </MainWrapper>
     );
 
-  if (isAssessmentSuccessfullySubmitted)
+  if (isAssessmentSuccessfullySubmitted && !isFetchingSiret)
     return (
       <FullPageFeedback
         title="Merci d'avoir rempli le bilan !"
@@ -89,12 +104,28 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
               Votre implication contribue à améliorer notre site et à enrichir
               le dossier du candidat.
             </p>
+            <p>
+              {convention?.signatories.beneficiary.firstName}{" "}
+              {convention?.signatories.beneficiary.lastName} recevra un mail
+              pour consulter le bilan, le signer et, s’il le souhaite, ajouter
+              un commentaire. Une fois signé, la version finale au format PDF
+              sera automatiquement envoyée à toutes les parties
+            </p>
             {roles.includes("establishment-tutor") ? (
               <Highlight>
-                <p>
-                  <strong>Que faire ensuite ?</strong> Maintenez à jour votre
-                  fiche entreprise afin de continuer à recevoir des immersions.
-                </p>
+                {isEstablishmentRegistered ? (
+                  <p>
+                    <strong>Que faire ensuite ?</strong> Maintenez à jour votre
+                    fiche entreprise afin de continuer à recevoir des
+                    immersions.
+                  </p>
+                ) : (
+                  <p>
+                    <strong>Que faire ensuite ?</strong> Créer votre compte
+                    Immersion Facilitée afin de référencer votre entreprise pour
+                    accueillir d'autres immersions.
+                  </p>
+                )}
               </Highlight>
             ) : null}
           </>
@@ -102,9 +133,13 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
         buttonProps={{
           ...(roles.includes("establishment-tutor")
             ? {
-                children: "Accéder à ma fiche entreprise",
+                children: isEstablishmentRegistered
+                  ? "Accéder à ma fiche entreprise"
+                  : "Créer mon espace",
                 onClick: () => {
-                  routes.establishmentDashboard().push();
+                  isEstablishmentRegistered
+                    ? routes.establishmentDashboard().push()
+                    : routes.formEstablishment().push();
                 },
               }
             : {
