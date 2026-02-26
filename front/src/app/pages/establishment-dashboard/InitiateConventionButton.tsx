@@ -209,24 +209,24 @@ export const InitiateConventionButton = () => {
     setValue("siret", siret);
   };
 
+  const fetchEstablishment = (siret: SiretDto) => {
+    if (!connectedUserJwt) return;
+    dispatch(
+      establishmentSlice.actions.fetchEstablishmentRequested({
+        establishmentRequested: {
+          siret,
+          jwt: connectedUserJwt,
+        },
+        feedbackTopic: "unused",
+      }),
+    );
+  };
+
   const onOpenModal = () => {
-    if (
-      connectedUserJwt &&
-      isEstablishmentDefault &&
-      currentUserEstablishments &&
-      currentUserEstablishments.length === 1
-    ) {
-      dispatch(
-        establishmentSlice.actions.fetchEstablishmentRequested({
-          establishmentRequested: {
-            siret: currentUserEstablishments[0].siret,
-            jwt: connectedUserJwt,
-          },
-          feedbackTopic: "unused",
-        }),
-      );
-    }
-    makeResetFormValues(currentUserEstablishments?.[0]?.siret ?? "");
+    const siret = currentUserEstablishments?.[0]?.siret ?? "";
+    if (currentUserEstablishments?.length === 1 && siret)
+      fetchEstablishment(siret);
+    makeResetFormValues(siret);
     openInitiateConventionModal();
   };
 
@@ -236,9 +236,7 @@ export const InitiateConventionButton = () => {
     establishment.offers.length === 1 &&
     establishmentValues?.appellation === ""
   )
-    setValue("appellation", establishment.offers[0].appellationCode, {
-      shouldValidate: true,
-    });
+    setValue("appellation", establishment.offers[0].appellationCode);
 
   if (
     initiateConventionSource === "establishment" &&
@@ -246,9 +244,7 @@ export const InitiateConventionButton = () => {
     establishment.businessAddresses.length === 1 &&
     establishmentValues?.location === ""
   )
-    setValue("location", establishment.businessAddresses[0].rawAddress, {
-      shouldValidate: true,
-    });
+    setValue("location", establishment.businessAddresses[0].rawAddress);
 
   if (!currentUser || !connectedUserJwt) return null;
 
@@ -335,17 +331,15 @@ export const InitiateConventionButton = () => {
                       value: establishmentValues?.siret ?? "",
                       onChange: (event) => {
                         const siret = event.currentTarget.value;
-                        setValue("siret", siret, { shouldValidate: true });
+                        setValue("siret", siret);
+                        setValue("appellation", "");
+                        setValue("location", "");
+                        fetchEstablishment(siret);
                       },
                     }}
-                    state={
-                      (formErrors as Record<string, { message?: string }>).siret
-                        ? "error"
-                        : "default"
-                    }
+                    state={"siret" in formErrors ? "error" : "default"}
                     stateRelatedMessage={
-                      (formErrors as Record<string, { message?: string }>).siret
-                        ?.message
+                      "siret" in formErrors && formErrors.siret?.message
                     }
                   />
                   <Select
@@ -373,15 +367,10 @@ export const InitiateConventionButton = () => {
                           shouldValidate: true,
                         }),
                     }}
-                    state={
-                      (formErrors as Record<string, { message?: string }>)
-                        .appellation
-                        ? "error"
-                        : "default"
-                    }
+                    state={"appellation" in formErrors ? "error" : "default"}
                     stateRelatedMessage={
-                      (formErrors as Record<string, { message?: string }>)
-                        .appellation?.message
+                      "appellation" in formErrors &&
+                      formErrors.appellation?.message
                     }
                   />
                   <Select
@@ -403,19 +392,11 @@ export const InitiateConventionButton = () => {
                         .initiateConvention.addressSelect,
                       value: establishmentValues?.location ?? "",
                       onChange: (event) =>
-                        setValue("location", event.currentTarget.value, {
-                          shouldValidate: true,
-                        }),
+                        setValue("location", event.currentTarget.value),
                     }}
-                    state={
-                      (formErrors as Record<string, { message?: string }>)
-                        .location
-                        ? "error"
-                        : "default"
-                    }
+                    state={"location" in formErrors ? "error" : "default"}
                     stateRelatedMessage={
-                      (formErrors as Record<string, { message?: string }>)
-                        .location?.message
+                      "location" in formErrors && formErrors.location?.message
                     }
                   />
                 </>
