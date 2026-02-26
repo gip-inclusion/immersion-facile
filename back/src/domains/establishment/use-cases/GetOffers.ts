@@ -76,7 +76,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
     const searchMade: SearchMade = {
       appellationCodes,
       nafCodes,
-      establishmentSearchableBy: searchableBy,
+      searchableBy: searchableBy,
       sortedBy: inputParams.sortBy,
       place,
       ...(validatedGeoParams.geoParams ?? {}),

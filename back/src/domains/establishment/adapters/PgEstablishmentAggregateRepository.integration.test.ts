@@ -2295,7 +2295,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 {
                   searchMade: {
                     ...cartographeSearchMade,
-                    establishmentSearchableBy: "students",
+                    searchableBy: "students",
                   },
                 },
               );
@@ -2328,7 +2328,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 {
                   searchMade: {
                     ...cartographeSearchMade,
-                    establishmentSearchableBy: "jobSeekers",
+                    searchableBy: "jobSeekers",
                   },
                 },
               );
@@ -2937,7 +2937,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 place: undefined,
                 appellationCodes: undefined,
                 romeCode: undefined,
-                establishmentSearchableBy: "jobSeekers",
+                searchableBy: "jobSeekers",
                 acquisitionCampaign: undefined,
                 acquisitionKeyword: undefined,
               },

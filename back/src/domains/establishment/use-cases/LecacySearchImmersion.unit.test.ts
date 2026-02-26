@@ -758,7 +758,7 @@ describe("LegacySearchImmersionUseCase", () => {
           needsToBeSearched: true,
           sortedBy: "distance",
           numberOfResults: 4,
-          establishmentSearchableBy: "students",
+          searchableBy: "students",
         },
       ]);
     });
@@ -814,7 +814,7 @@ describe("LegacySearchImmersionUseCase", () => {
           needsToBeSearched: true,
           sortedBy: "distance",
           numberOfResults: 4,
-          establishmentSearchableBy: "jobSeekers",
+          searchableBy: "jobSeekers",
         },
       ]);
     });

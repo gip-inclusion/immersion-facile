@@ -59,7 +59,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
                   sorted_by: searchMade.sortedBy,
                   address: searchMade.place,
                   number_of_results: searchMade.numberOfResults,
-                  searchable_by: searchMade.establishmentSearchableBy,
+                  searchable_by: searchMade.searchableBy,
                   acquisition_keyword: searchMade.acquisitionKeyword,
                   acquisition_campaign: searchMade.acquisitionCampaign,
                   ...(hasSearchMadeGeoParams(searchMade)
