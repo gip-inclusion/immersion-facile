@@ -165,6 +165,7 @@ export const ContactUsButton = ({
   currentUrl,
   currentDate,
   error,
+  priority = "secondary",
 }: ContactErrorInformation) => {
   const emailBody = `%0D%0A________________________%0D%0A
   %0D%0A
@@ -177,7 +178,7 @@ export const ContactUsButton = ({
   `;
   return (
     <Button
-      priority="secondary"
+      priority={priority}
       linkProps={{
         href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
         target: "_blank",

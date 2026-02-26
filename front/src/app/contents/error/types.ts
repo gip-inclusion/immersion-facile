@@ -1,3 +1,4 @@
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import type { ReactElement, ReactNode } from "react";
 
 export type FrontErrorProps = {
@@ -15,4 +16,5 @@ export type ContactErrorInformation = {
   currentUrl: string;
   currentDate: string;
   error: ReactNode;
+  priority?: ButtonProps["priority"];
 };
