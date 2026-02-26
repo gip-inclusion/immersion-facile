@@ -22,6 +22,8 @@ import {
   toDisplayedDate,
   zStringMinLength1,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import {
   displayReadableError,
   toErrorsWithLabels,
@@ -105,6 +107,7 @@ export const InitiateConventionButton = () => {
     defaultFormEstablishmentValue(),
   );
   const currentUserEstablishments = currentUser?.establishments;
+  const establishmentFeedback = useFeedbackTopic("form-establishment");
 
   const initiateConventionMethods = useForm<InitiateConventionFormValues>({
     defaultValues: defaultFormValues,
@@ -218,7 +221,7 @@ export const InitiateConventionButton = () => {
           siret,
           jwt: connectedUserJwt,
         },
-        feedbackTopic: "unused",
+        feedbackTopic: "form-establishment",
       }),
     );
   };
@@ -275,6 +278,9 @@ export const InitiateConventionButton = () => {
               },
             ]}
           >
+            {establishmentFeedback?.level === "error" && (
+              <Feedback topics={["form-establishment"]} closable />
+            )}
             <ErrorNotifications
               errorsWithLabels={toErrorsWithLabels({
                 labels: initiateConventionFormErrorLabels,
