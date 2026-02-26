@@ -8,6 +8,7 @@ import {
   createConventionTemplate,
   deleteConventionTemplate,
   goToDashboard,
+  initiateConvention,
 } from "../../utils/dashboard";
 
 test.describe.configure({ mode: "serial" });
@@ -234,6 +235,28 @@ test.describe("Agency dashboard workflow", () => {
 
     test("IC user can delete a convention template", async ({ page }) => {
       await deleteConventionTemplate(page, "agency");
+    });
+  });
+
+  test.describe("Initiate convention", () => {
+    test.use({ storageState: testConfig.agencyAuthFile });
+
+    test("should initiate from a convention template", async ({ page }) => {
+      await createConventionTemplate(page, "agency");
+      await initiateConvention({
+        page,
+        dashboardKind: "agency",
+        fromConventionTemplate: true,
+      });
+      await deleteConventionTemplate(page, "establishment");
+    });
+
+    test("should initiate from agency informations", async ({ page }) => {
+      await initiateConvention({
+        page,
+        dashboardKind: "agency",
+        fromConventionTemplate: false,
+      });
     });
   });
 });

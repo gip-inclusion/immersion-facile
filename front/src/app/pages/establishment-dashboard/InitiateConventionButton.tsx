@@ -331,6 +331,8 @@ export const InitiateConventionButton = () => {
                       })) ?? []
                     }
                     nativeSelectProps={{
+                      id: domElementIds.establishmentDashboard
+                        .initiateConvention.establishmentSelect,
                       value: establishmentValues?.siret ?? "",
                       onChange: (event) => {
                         const siret = event.currentTarget.value;

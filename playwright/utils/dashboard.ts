@@ -90,20 +90,82 @@ export const initiateConvention = async ({
   dashboardKind: "agency" | "establishment";
   fromConventionTemplate: boolean;
 }): Promise<string | undefined> => {
+  const domIds =
+    dashboardKind === "agency"
+      ? domElementIds.agencyDashboard
+      : domElementIds.establishmentDashboard;
   await page.goto("/");
   await goToDashboard(page, dashboardKind);
-  await page.click(
-    `#${domElementIds.establishmentDashboard.initiateConvention.button}`,
-  );
+  await page.click(`#${domIds.initiateConvention.button}`);
   await expect(
-    page.locator(
-      `#${domElementIds.establishmentDashboard.initiateConvention.modal}`,
-    ),
+    page.locator(`#${domIds.initiateConvention.modal}`),
   ).toBeVisible();
 
   if (fromConventionTemplate) {
     await initiateConventionFromConventionTemplate({ page, dashboardKind });
     return;
+  }
+
+  if (dashboardKind === "establishment") {
+    await initiateConventionFromEstablishmentInformations({ page });
+    return;
+  }
+
+  await initiateConventionFromAgencyInformations({ page });
+};
+
+const initiateConventionFromConventionTemplate = async ({
+  page,
+  dashboardKind,
+}: {
+  page: Page;
+  dashboardKind: "agency" | "establishment";
+}) => {
+  const domIds =
+    dashboardKind === "agency"
+      ? domElementIds.agencyDashboard
+      : domElementIds.establishmentDashboard;
+  await page.goto("/");
+  await goToDashboard(page, dashboardKind);
+  await page.click(`#${domIds.initiateConvention.button}`);
+  await expect(
+    page.locator(`#${domIds.initiateConvention.modal}`),
+  ).toBeVisible();
+
+  const templateRadioButtonLocator = page.locator(
+    `[for='${domIds.initiateConvention.sourceRadioButtons}-1']`,
+  );
+
+  await templateRadioButtonLocator.click();
+
+  const firstConventionTemplateLocator = page.locator(
+    `[for='${domIds.initiateConvention.templateRadioButtons}-0']`,
+  );
+
+  await firstConventionTemplateLocator.click();
+
+  await page.click(`#${domIds.initiateConvention.modalButton}`);
+  await expect(
+    page.locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`),
+  ).toBeVisible();
+  await page
+    .locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
+    .click();
+  await page.locator(".im-convention-summary__section").first().isVisible();
+};
+
+const initiateConventionFromEstablishmentInformations = async ({
+  page,
+}: {
+  page: Page;
+}) => {
+  const establishmentSelectLocator = page.locator(
+    `#${domElementIds.establishmentDashboard.initiateConvention.establishmentSelect}`,
+  );
+  if (!(await establishmentSelectLocator.isDisabled())) {
+    await establishmentSelectLocator.selectOption({
+      label: "France Merguez Distribution",
+    });
   }
 
   const appellationSelectLocator = page.locator(
@@ -137,44 +199,26 @@ export const initiateConvention = async ({
   ).toHaveText(selectedAppellation);
 };
 
-const initiateConventionFromConventionTemplate = async ({
+const initiateConventionFromAgencyInformations = async ({
   page,
-  dashboardKind,
 }: {
   page: Page;
-  dashboardKind: "agency" | "establishment";
 }) => {
-  await page.goto("/");
-  await goToDashboard(page, dashboardKind);
   await page.click(
-    `#${domElementIds.establishmentDashboard.initiateConvention.button}`,
-  );
-  await expect(
-    page.locator(
-      `#${domElementIds.establishmentDashboard.initiateConvention.modal}`,
-    ),
-  ).toBeVisible();
-
-  const templateRadioButtonLocator = page.locator(
-    `[for='${domElementIds.establishmentDashboard.initiateConvention.sourceRadioButtons}-1']`,
+    `#${domElementIds.agencyDashboard.initiateConvention.modalButton}`,
   );
 
-  await templateRadioButtonLocator.click();
-
-  const firstConventionTemplateLocator = page.locator(
-    `[for='${domElementIds.establishmentDashboard.initiateConvention.templateRadioButtons}-0']`,
-  );
-
-  await firstConventionTemplateLocator.click();
-
-  await page.click(
-    `#${domElementIds.establishmentDashboard.initiateConvention.modalButton}`,
-  );
   await expect(
     page.locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`),
   ).toBeVisible();
-  await page
-    .locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
-    .click();
-  await page.locator(".im-convention-summary__section").first().isVisible();
+  await expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.agencyReferentFirstName}`,
+    ),
+  ).toHaveValue("Jean");
+  await expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.agencyReferentLastName}`,
+    ),
+  ).toHaveValue("Immersion");
 };
