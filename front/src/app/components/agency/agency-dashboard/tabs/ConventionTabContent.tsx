@@ -76,8 +76,7 @@ const initiateConventionFormSchema = z.discriminatedUnion(
 
 const selectAgencyToInitiateConventionModal = createModal({
   isOpenedByDefault: false,
-  id: domElementIds.agencyDashboard.dashboard
-    .selectAgencyToInitiateConventionModal,
+  id: domElementIds.agencyDashboard.initiateConvention.modal,
 });
 export const ConventionTabContent = ({
   activeAgencies,
@@ -233,7 +232,7 @@ export const ConventionTabContent = ({
       className={fr.cx("fr-mt-0")}
       titleAction={
         <Button
-          id={domElementIds.agencyDashboard.dashboard.initiateConventionButton}
+          id={domElementIds.agencyDashboard.initiateConvention.button}
           priority="primary"
           iconId="fr-icon-add-line"
           onClick={onInitiateConventionButtonClick}
@@ -262,8 +261,8 @@ export const ConventionTabContent = ({
                 children: "Fermer",
               },
               {
-                id: domElementIds.agencyDashboard.dashboard
-                  .initiateConventionModalButton,
+                id: domElementIds.agencyDashboard.initiateConvention
+                  .modalButton,
                 children: "Initier la convention",
                 doClosesModal: false,
                 onClick: handleSubmit(onInitiateConventionFormSubmit),
@@ -279,8 +278,8 @@ export const ConventionTabContent = ({
             />
             <RadioButtons
               id={
-                domElementIds.agencyDashboard.dashboard
-                  .initiateConventionSourceRadioButtons
+                domElementIds.agencyDashboard.initiateConvention
+                  .sourceRadioButtons
               }
               name="initiateConventionSource"
               legend="Comment souhaitez-vous initier la convention ?"
@@ -357,8 +356,8 @@ export const ConventionTabContent = ({
                 .with({ initiateConventionSource: "template" }, () => (
                   <RadioButtons
                     id={
-                      domElementIds.agencyDashboard.dashboard
-                        .initiateConventionTemplateRadioButtons
+                      domElementIds.agencyDashboard.initiateConvention
+                        .templateRadioButtons
                     }
                     name="initiateConventionTemplate"
                     legend="Quel modèle souhaitez-vous utiliser ?"

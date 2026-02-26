@@ -951,17 +951,16 @@ export const domElementIds = {
     },
     dashboard: {
       tabContainer: "im-agency-dashboard__tab-container",
-      initiateConventionModalButton:
-        "im-agency-dashboard__initiate-convention-modal-button",
-      initiateConventionButton:
-        "im-agency-dashboard__initiate-convention-button",
-      selectAgencyToInitiateConventionModal:
-        "im-agency-dashboard__select-agency-to-initiate-convention-modal",
-      initiateConventionSourceRadioButtons:
-        "im-agency-dashboard__initiate-convention-source-radio-buttons",
-      initiateConventionTemplateRadioButtons:
-        "im-agency-dashboard__initiate-convention-template-radio-buttons",
       goToConventionButton: "im-agency-dashboard__go-to-convention-button",
+    },
+    initiateConvention: {
+      button: "im-agency-dashboard__initiate-convention-button",
+      modalButton: "im-agency-dashboard__initiate-convention-modal-button",
+      modal: "im-agency-dashboard__select-agency-to-initiate-convention-modal",
+      sourceRadioButtons:
+        "im-agency-dashboard__initiate-convention-source-radio-buttons",
+      templateRadioButtons:
+        "im-agency-dashboard__initiate-convention-template-radio-buttons",
     },
     agencyTab: {
       adminRightsModal: "im-agency-dashboard__agency-tab-admin-rights-modal",
