@@ -265,10 +265,8 @@ export class InMemoryEstablishmentAggregateRepository
     return this.#establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
       .filter((aggregate) =>
-        searchMade.establishmentSearchableBy
-          ? aggregate.establishment.searchableBy[
-              searchMade.establishmentSearchableBy
-            ]
+        searchMade.searchableBy
+          ? aggregate.establishment.searchableBy[searchMade.searchableBy]
           : true,
       )
       .filter((agg) => {

@@ -216,7 +216,7 @@ const getSearchMadeById = async (
       numberOfResults: optional(searchMadeResult.number_of_results) ?? 0,
       acquisitionCampaign: optional(searchMadeResult.acquisition_campaign),
       acquisitionKeyword: optional(searchMadeResult.acquisition_keyword),
-      establishmentSearchableBy: optional(searchMadeResult.searchable_by),
+      searchableBy: optional(searchMadeResult.searchable_by),
       nafCodes,
     }
   );

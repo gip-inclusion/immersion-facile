@@ -62,7 +62,7 @@ export class LegacySearchImmersion extends TransactionalUseCase<
       place,
       appellationCodes,
       romeCode: rome,
-      establishmentSearchableBy,
+      searchableBy: establishmentSearchableBy,
       acquisitionCampaign,
       acquisitionKeyword,
       nafCodes,

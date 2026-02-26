@@ -384,7 +384,7 @@ export class PgEstablishmentAggregateRepository
           "lat" in searchMade
             ? pick(["lat", "lon", "distanceKm"], searchMade)
             : undefined,
-        searchableBy: searchMade.establishmentSearchableBy,
+        searchableBy: searchMade.searchableBy,
         fitForDisabledWorkers: getFitForDisabledWorkers(),
         nafCodes: searchMade.nafCodes,
         romeCodes: searchMade.romeCode
