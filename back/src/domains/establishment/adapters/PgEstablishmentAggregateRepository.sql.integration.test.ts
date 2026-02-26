@@ -48,6 +48,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
   beforeEach(async () => {
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("discussions").execute();
+    await db.deleteFrom("convention_drafts").execute();
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();

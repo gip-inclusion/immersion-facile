@@ -1,7 +1,7 @@
 import { subDays } from "date-fns";
 import { type QueryCreator, sql } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
-import { equals, pick } from "ramda";
+import { equals, pick, values } from "ramda";
 import {
   type AppellationAndRomeDto,
   type AppellationCode,
@@ -896,6 +896,22 @@ type SearchImmersionResultsParams = {
   shouldCountAll: boolean;
 } & WithSort<SearchSortedBy>;
 
+const checkHasNoJoinFilters = (filters: SearchImmersionFilters): boolean => {
+  const isEmptyByKey: Record<keyof SearchImmersionFilters, boolean> = {
+    geoParams: !hasSearchGeoParams(filters.geoParams ?? {}),
+    romeCodes: !filters.romeCodes,
+    appellationCodes: !filters.appellationCodes?.length,
+    sirets: !filters.sirets?.length,
+    nafCodes: !filters.nafCodes?.length,
+    remoteWorkModes: !filters.remoteWorkModes?.length,
+    locationIds: !filters.locationIds?.length,
+    fitForDisabledWorkers: true,
+    searchableBy: true,
+    showOnlyAvailableOffers: true,
+  };
+  return values(isEmptyByKey).every(Boolean);
+};
+
 const makeGetFilteredResultsSubQueryBuilder = ({
   filters,
   sort,
@@ -972,14 +988,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
               return qb;
             },
             (qb) => {
-              const hasNoJoinFilters =
-                !hasSearchGeoParams(filters?.geoParams ?? {}) &&
-                !romeCodes &&
-                !appellationCodes?.length &&
-                !sirets?.length &&
-                !nafCodes?.length &&
-                !remoteWorkModes?.length &&
-                !locationIds?.length;
+              const hasNoJoinFilters = checkHasNoJoinFilters(filters);
 
               if (
                 hasNoJoinFilters &&

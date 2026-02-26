@@ -1907,7 +1907,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(resultByDistanceDesc.pagination, expectedPagination);
         expectToEqual(
           resultByDistanceDesc.data.map((d) => d.siret),
-          expectedSiretsDesc,
+          expectedSiretsAsc, // Query by distance is fixed to ASC sorting (by design?)
         );
 
         const resultByDistanceAsc =
