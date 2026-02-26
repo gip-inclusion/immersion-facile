@@ -126,10 +126,16 @@ export const ConventionTabContent = ({
           value: "template",
           checked: initiateConventionSource === "template",
           onChange: () => setValue("initiateConventionSource", "template"),
+          disabled: conventionTemplates.length === 0,
         },
       },
     ],
-    [initiateConventionSource, activeAgencies, setValue],
+    [
+      initiateConventionSource,
+      activeAgencies,
+      setValue,
+      conventionTemplates.length,
+    ],
   );
 
   const conventionTemplateOptions: RadioButtonsProps["options"] = useMemo(
