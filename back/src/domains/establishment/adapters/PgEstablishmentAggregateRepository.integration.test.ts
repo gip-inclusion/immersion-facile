@@ -33,6 +33,7 @@ import { phoneNumbersExist } from "../../core/phone-number/adapters/pgPhoneHelpe
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { GeoParams } from "../entities/SearchMadeEntity";
 import {
+  defaultNafCode,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -1726,6 +1727,201 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
         });
       });
+
+      it("whatever sort param, filtering by appellationCodes returns same results in different order", async () => {
+        const fillerCount = 5001;
+        const targetAppellationCode = offer_A1101_11987.appellationCode;
+
+        const targetEstablishments: EstablishmentAggregate[] = [
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("99000000000001")
+            .withEstablishmentUpdatedAt(new Date("2025-06-01"))
+            .withScore(1)
+            .withLocations([
+              new LocationBuilder(locationOfSearchPosition)
+                .withId(uuid())
+                .build(),
+            ])
+            .withOffers([offer_A1101_11987])
+            .withUserRights([osefUserRight])
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("99000000000002")
+            .withEstablishmentUpdatedAt(new Date("2025-06-02"))
+            .withScore(2)
+            .withLocations([
+              new LocationBuilder(locationOfCloseSearchPosition)
+                .withId(uuid())
+                .build(),
+            ])
+            .withOffers([offer_A1101_11987])
+            .withUserRights([osefUserRight])
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("99000000000003")
+            .withEstablishmentUpdatedAt(new Date("2025-06-03"))
+            .withScore(3)
+            .withLocations([
+              new LocationBuilder(locationOutOfAnySearchedPosition)
+                .withId(uuid())
+                .build(),
+            ])
+            .withOffers([offer_A1101_11987])
+            .withUserRights([osefUserRight])
+            .build(),
+        ];
+
+        await Promise.all(
+          targetEstablishments.map((target) =>
+            pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+              target,
+            ),
+          ),
+        );
+
+        const batchSize = 1000;
+        const fillerSirets = arrayFromNumber(fillerCount).map(
+          (i) => `F${(i + 1).toString().padStart(13, "0")}`,
+        );
+
+        await Promise.all(
+          arrayFromNumber(Math.ceil(fillerSirets.length / batchSize)).map((i) =>
+            kyselyDb
+              .insertInto("establishments")
+              .values(
+                fillerSirets
+                  .slice(i * batchSize, (i + 1) * batchSize)
+                  .map((siret) => ({
+                    siret,
+                    name: "Filler",
+                    source_provider: "immersion-facile",
+                    naf_code: defaultNafCode,
+                    naf_nomenclature: "NAFRev2",
+                    number_employees: "10-19",
+                    update_date: new Date("2010-01-01"),
+                    created_at: new Date("2010-01-01"),
+                    is_open: true,
+                    contact_mode: "EMAIL" as const,
+                    max_contacts_per_month: 10,
+                    searchable_by_job_seekers: true,
+                    searchable_by_students: true,
+                    fit_for_disabled_workers: "no",
+                    score: 50,
+                    customized_name: null,
+                    is_commited: null,
+                    last_insee_check_date: null,
+                    next_availability_date: null,
+                    welcome_address_street_number_and_address: null,
+                    welcome_address_postcode: null,
+                    welcome_address_city: null,
+                    welcome_address_department_code: null,
+                    welcome_address_lat: null,
+                    welcome_address_lon: null,
+                  })),
+              )
+              .execute(),
+          ),
+        );
+
+        const filters: GetOffersParams["filters"] = {
+          appellationCodes: [targetAppellationCode],
+          showOnlyAvailableOffers: false,
+        };
+
+        const expectedSiretsAsc = [
+          "99000000000001",
+          "99000000000002",
+          "99000000000003",
+        ];
+        const expectedSiretsDesc = [...expectedSiretsAsc].reverse();
+        const expectedPagination = {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 20,
+          totalRecords: targetEstablishments.length,
+        };
+
+        const resultByDateDesc =
+          await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: { by: "date", direction: "desc" },
+            filters,
+          });
+        expectToEqual(resultByDateDesc.pagination, expectedPagination);
+        expectToEqual(
+          resultByDateDesc.data.map((d) => d.siret),
+          expectedSiretsDesc,
+        );
+
+        const resultByDateAsc =
+          await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: { by: "date", direction: "asc" },
+            filters,
+          });
+        expectToEqual(resultByDateAsc.pagination, expectedPagination);
+        expectToEqual(
+          resultByDateAsc.data.map((d) => d.siret),
+          expectedSiretsAsc,
+        );
+
+        const resultByScoreDesc =
+          await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: { by: "score", direction: "desc" },
+            filters,
+          });
+        expectToEqual(resultByScoreDesc.pagination, expectedPagination);
+        expectToEqual(
+          resultByScoreDesc.data.map((d) => d.siret),
+          expectedSiretsDesc,
+        );
+
+        const resultByScoreAsc =
+          await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: { by: "score", direction: "asc" },
+            filters,
+          });
+        expectToEqual(resultByScoreAsc.pagination, expectedPagination);
+        expectToEqual(
+          resultByScoreAsc.data.map((d) => d.siret),
+          expectedSiretsAsc,
+        );
+
+        const geoFilters: GetOffersParams["filters"] = {
+          ...filters,
+          geoParams: {
+            lat: locationOfSearchPosition.position.lat,
+            lon: locationOfSearchPosition.position.lon,
+            distanceKm: 10_000,
+          },
+        };
+
+        const resultByDistanceDesc =
+          await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: { by: "distance", direction: "desc" },
+            filters: geoFilters,
+          });
+        expectToEqual(resultByDistanceDesc.pagination, expectedPagination);
+        expectToEqual(
+          resultByDistanceDesc.data.map((d) => d.siret),
+          expectedSiretsDesc,
+        );
+
+        const resultByDistanceAsc =
+          await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: { by: "distance", direction: "asc" },
+            filters: geoFilters,
+          });
+        expectToEqual(resultByDistanceAsc.pagination, expectedPagination);
+        expectToEqual(
+          resultByDistanceAsc.data.map((d) => d.siret),
+          expectedSiretsAsc,
+        );
+      }, 30_000);
 
       describe("tricky tests", () => {
         beforeEach(async () => {

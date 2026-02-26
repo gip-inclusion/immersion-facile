@@ -972,13 +972,19 @@ const makeGetFilteredResultsSubQueryBuilder = ({
               return qb;
             },
             (qb) => {
-              if (
+              const hasNoJoinFilters =
                 !hasSearchGeoParams(filters?.geoParams ?? {}) &&
                 !romeCodes &&
+                !appellationCodes?.length &&
+                !sirets?.length &&
+                !nafCodes?.length &&
+                !remoteWorkModes?.length &&
+                !locationIds?.length;
+
+              if (
+                hasNoJoinFilters &&
                 (sort.by === "date" || sort.by === "score")
               ) {
-                // this is in the case when NO filters are provided, to avoid doing the joins on the whole table when we will only keep 100 results in the end
-                // still doing a limit of 5000 because they will be aggregated by ROME and siret
                 return qb
                   .orderBy(
                     sort.by === "date" ? "update_date" : "score",
