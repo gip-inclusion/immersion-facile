@@ -1031,6 +1031,8 @@ export const domElementIds = {
       button: "im-establishment-dashboard__initiate-convention-button",
       modal: "im-manage-establishment__initiate-convention-modal",
       modalButton: "im-manage-establishment__initiate-convention-modal-button",
+      establishmentSelect:
+        "im-manage-establishment__initiate-convention-establishment-select",
       appellationSelect:
         "im-manage-establishment__initiate-convention-appellation-select",
       addressSelect:

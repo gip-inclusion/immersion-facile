@@ -178,6 +178,9 @@ export const ConventionTabContent = ({
   const onInitiateConventionButtonClick = () => {
     reset(defaultFormValues);
     selectAgencyToInitiateConventionModal.open();
+    if (activeAgencies.length === 1) {
+      setValue("selectedAgencyId", activeAgencies[0].id);
+    }
   };
 
   const onInitiateConventionFormSubmit = () => {
