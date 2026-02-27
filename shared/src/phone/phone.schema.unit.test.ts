@@ -73,8 +73,8 @@ describe("phonesShema", () => {
   it.each<string>([
     "+41000123456", // CH
     "+390012345678", // IT
-    "+3221234567", // BE not valid, but libphonenumber-js/min sees it as valid
-    "+34598765432", // ES not valid, but libphonenumber-js/min sees it as valid
+    "+3221234567", // BE
+    "+34598765432", // ES
   ])("invalid phone number (due to local number assignation) should not be considered as a valid phone number %s", async (phone) => {
     expect(() => phoneNumberSchema.parse(phone)).toThrow();
   });
@@ -92,7 +92,7 @@ describe("toInternationalPhoneNumber", () => {
     ["0441234567", "CH", "+41441234567"], // CH
     ["0612345678", "IT", "+390612345678"], // IT
     ["0986185807", "FR", "+33986185807"], // FR
-    ["0699160058", "FR", "+33699160058"], // FR actuellement converti en +596699160058 alors que ce n'est pas un numéro martiniquais
+    ["0699160058", "FR", "+33699160058"], // FR
   ])("should assign the right prefix to the phone number %s", async (phone, countryCode, expected) => {
     const result = toInternationalPhoneNumber(phone, countryCode);
     expect(result).toBe(expected);
