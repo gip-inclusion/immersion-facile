@@ -11,7 +11,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class SuggestEditEstablishment extends TransactionalUseCase<
+export class SuggestEstablishmentReengagement extends TransactionalUseCase<
   SiretDto,
   void
 > {
@@ -50,7 +50,7 @@ export class SuggestEditEstablishment extends TransactionalUseCase<
         this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
-            kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+            kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
             sender: immersionFacileNoReplyEmailSender,
             recipients: [user.email],
             params: {

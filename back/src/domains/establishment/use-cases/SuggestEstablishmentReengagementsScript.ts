@@ -4,7 +4,7 @@ import { createLogger } from "../../../utils/logger";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
-import type { SuggestEditEstablishment } from "./SuggestEditEstablishment";
+import type { SuggestEstablishmentReengagement } from "./SuggestEstablishmentReengagement";
 
 const logger = createLogger(__filename);
 
@@ -15,24 +15,24 @@ type Report = {
   errors?: Record<SiretDto, Error>;
 };
 
-export type SuggestEditEstablishmentsScript = ReturnType<
-  typeof makeSuggestEditEstablishmentsScript
+export type SuggestEstablishmentReengagementsScript = ReturnType<
+  typeof makeSuggestEstablishmentReengagementsScript
 >;
 
-export const makeSuggestEditEstablishmentsScript = useCaseBuilder(
-  "SuggestEditEstablishmentsScript",
+export const makeSuggestEstablishmentReengagementsScript = useCaseBuilder(
+  "SuggestEstablishmentReengagementsScript",
 )
   .notTransactional()
   .withOutput<Report>()
   .withDeps<{
-    suggestEditEstablishment: SuggestEditEstablishment;
+    suggestEstablishmentReengagement: SuggestEstablishmentReengagement;
     timeGateway: TimeGateway;
     uowPerformer: UnitOfWorkPerformer;
   }>()
   .build(async ({ deps }) => {
     logger.info({
       message:
-        "[triggerSuggestEditFormEstablishmentEvery6Months] Script started.",
+        "[triggerSuggestEstablishmentReengagementEvery6Months] Script started.",
     });
     const since = subMonths(deps.timeGateway.now(), NB_MONTHS_BEFORE_SUGGEST);
 
@@ -46,7 +46,7 @@ export const makeSuggestEditEstablishmentsScript = useCaseBuilder(
       return { numberOfEstablishmentsToContact: 0 };
 
     logger.info({
-      message: `[triggerSuggestEditFormEstablishmentEvery6Months] Found ${
+      message: `[triggerSuggestEstablishmentReengagementEvery6Months] Found ${
         siretsToContact.length
       } establishments not updated since ${since} to contact, with siret : ${siretsToContact.join(
         ", ",
@@ -57,9 +57,11 @@ export const makeSuggestEditEstablishmentsScript = useCaseBuilder(
 
     await Promise.all(
       siretsToContact.map(async (siret) => {
-        await deps.suggestEditEstablishment.execute(siret).catch((error) => {
-          errors[siret] = castError(error);
-        });
+        await deps.suggestEstablishmentReengagement
+          .execute(siret)
+          .catch((error) => {
+            errors[siret] = castError(error);
+          });
       }),
     );
 

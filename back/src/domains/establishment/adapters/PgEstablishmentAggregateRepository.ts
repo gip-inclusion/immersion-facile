@@ -201,7 +201,11 @@ export class PgEstablishmentAggregateRepository
           exists(
             selectFrom("notifications_email as n")
               .select(sql`1`.as("__"))
-              .where("n.email_kind", "=", "SUGGEST_EDIT_FORM_ESTABLISHMENT")
+              .where(
+                "n.email_kind",
+                "=",
+                "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
+              )
               .whereRef("n.establishment_siret", "=", "establishments.siret")
               .where("n.created_at", ">", before)
               .limit(1),
