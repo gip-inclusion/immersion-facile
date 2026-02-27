@@ -1,11 +1,5 @@
 import type { Pool } from "pg";
-import {
-  type AbsoluteUrl,
-  errors,
-  expectPromiseToFailWithError,
-  expectToEqual,
-  type ShortLinkId,
-} from "shared";
+import { type AbsoluteUrl, expectToEqual, type ShortLinkId } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -42,21 +36,21 @@ describe("PgShortLinkQuery", () => {
 
   describe("getById", () => {
     it("success", async () => {
-      await insertShortLinkQuery(db, testShortLinkId, originalUrl, false);
+      await insertShortLinkQuery(db, {
+        id: testShortLinkId,
+        url: originalUrl,
+        lastUsedAt: null,
+      });
 
       expectToEqual(await pgShortLinkQuery.getById(testShortLinkId), {
+        id: testShortLinkId,
         url: originalUrl,
-        singleUse: false,
         lastUsedAt: null,
       });
     });
 
-    it("error: not found", async () => {
-      const shortLinkId: ShortLinkId = "notFoundId";
-      await expectPromiseToFailWithError(
-        pgShortLinkQuery.getById(shortLinkId),
-        errors.shortLink.notFound({ shortLinkId }),
-      );
+    it("undefined on missing", async () => {
+      expectToEqual(await pgShortLinkQuery.getById("notFoundId"), undefined);
     });
   });
 });

@@ -811,7 +811,6 @@ interface ShortLinks {
   url: string;
   created_at: Generated<Timestamp>;
   last_used_at: Timestamp | null;
-  single_use: boolean;
 }
 
 interface MarketingEstablishmentContacts {

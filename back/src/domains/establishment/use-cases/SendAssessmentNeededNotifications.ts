@@ -226,7 +226,6 @@ const sendAssessmentNotifications = async (
               })({
                 targetRoute: frontRoutes.assessment,
                 lifetime: "2Days",
-                singleUse: true,
               }),
             ),
           ]

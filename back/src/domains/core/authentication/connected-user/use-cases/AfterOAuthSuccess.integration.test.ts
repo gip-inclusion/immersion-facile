@@ -123,6 +123,7 @@ describe("AfterOAuthSuccess use case", () => {
     beforeEach(async () => {
       await db.deleteFrom("feature_flags").execute();
       await db.deleteFrom("users_ongoing_oauths").execute();
+      await db.deleteFrom("convention_templates").execute();
       await db.deleteFrom("users").execute();
     });
 

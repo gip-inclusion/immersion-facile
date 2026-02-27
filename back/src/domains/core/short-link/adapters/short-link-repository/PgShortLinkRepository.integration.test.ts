@@ -11,6 +11,7 @@ import {
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../../config/pg/pgPool";
+import type { ShortLink } from "../../ports/ShortLinkQuery";
 import { deleteShortLinkById, getAllShortLinks } from "../PgShortLinkHelpers";
 import { PgShortLinkRepository } from "./PgShortLinkRepository";
 
@@ -22,6 +23,12 @@ describe("PgShortLinkRepository", () => {
   const testShortLinkId: ShortLinkId = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
   const originalUrl: AbsoluteUrl =
     "https://dev.immersion-facile.beta.gouv.fr/verylonglink?queryParams=dfmklghdrfsmgldkrfjhfgdfmkljfghjdfsmfghedrlmkfghdsrflkfghdflkjghdflkjghdfglskjghdlskfghdfgovilèdfsèuyvhberfgvlqermçiufgyeriftuyhrelifgrhdfklwjghdfkljgbndflkjghrdfkljghdfliughdqsfilugheqrtrhrjfkhnskljxbchQSDGFROZERUIGTHERTGHBFS5H455GH23SDF4GD4GDF5G4DF54G2D4GDF4HFYHJ544NX4CFFGDFTG4SETU4YFTGGB54DGWF54TSERD5YH74DFYHGHN4QSD54T7RDFG";
+
+  const unusedShortLink: ShortLink = {
+    id: testShortLinkId,
+    url: originalUrl,
+    lastUsedAt: null,
+  };
 
   beforeAll(async () => {
     pool = makeTestPgPool();
@@ -39,85 +46,48 @@ describe("PgShortLinkRepository", () => {
   });
 
   it("save", async () => {
-    await pgShortLinkRepository.save(testShortLinkId, originalUrl, false);
+    await pgShortLinkRepository.save(unusedShortLink);
 
-    expectArraysToMatch(await getAllShortLinks(db), [
-      {
-        short_link_id: testShortLinkId,
-        url: originalUrl,
-        single_use: false,
-      },
-    ]);
+    expectArraysToMatch(await getAllShortLinks(db), [unusedShortLink]);
   });
 
-  it("save with singleUse true", async () => {
-    await pgShortLinkRepository.save(testShortLinkId, originalUrl, true);
+  it("save : update last used at", async () => {
+    await pgShortLinkRepository.save(unusedShortLink);
 
-    expectArraysToMatch(await getAllShortLinks(db), [
-      {
-        short_link_id: testShortLinkId,
-        url: originalUrl,
-        single_use: true,
-      },
-    ]);
+    expectArraysToMatch(await getAllShortLinks(db), [unusedShortLink]);
+
+    const updatedShortLink: ShortLink = {
+      ...unusedShortLink,
+      lastUsedAt: new Date(),
+    };
+    await pgShortLinkRepository.save(updatedShortLink);
+
+    expectArraysToMatch(await getAllShortLinks(db), [updatedShortLink]);
   });
 
-  it("can't save: duplicate shortLinkId", async () => {
-    await pgShortLinkRepository.save(testShortLinkId, originalUrl, false);
-    expectArraysToMatch(await getAllShortLinks(db), [
-      {
-        short_link_id: testShortLinkId,
-        url: originalUrl,
-        single_use: false,
-      },
-    ]);
+  it("can't save: url can't be changed", async () => {
+    await pgShortLinkRepository.save(unusedShortLink);
+
+    expectArraysToMatch(await getAllShortLinks(db), [unusedShortLink]);
+
     await expectPromiseToFailWithError(
-      pgShortLinkRepository.save(testShortLinkId, originalUrl, false),
-      new Error(
-        'duplicate key value violates unique constraint "short_link_repository_pkey"',
-      ),
+      pgShortLinkRepository.save({
+        ...unusedShortLink,
+        url: "http://newURL",
+      }),
+      errors.shortLink.forbiddenLinkUpdate(),
     );
   });
 
   it("can't save: too long shortLinkId", async () => {
     const tooLongId = `${testShortLinkId}0`;
     await expectPromiseToFailWithError(
-      pgShortLinkRepository.save(tooLongId, originalUrl, false),
+      pgShortLinkRepository.save({
+        id: tooLongId,
+        url: originalUrl,
+        lastUsedAt: null,
+      }),
       new Error("value too long for type character varying(36)"),
     );
-  });
-  describe("markAsUsed", () => {
-    it("markAsUsed existing shortLink", async () => {
-      await pgShortLinkRepository.save(testShortLinkId, originalUrl, true);
-
-      expectArraysToMatch(await getAllShortLinks(db), [
-        {
-          short_link_id: testShortLinkId,
-          url: originalUrl,
-          single_use: true,
-          last_used_at: null,
-        },
-      ]);
-
-      const lastUsedAt = new Date();
-      await pgShortLinkRepository.markAsUsed(testShortLinkId, lastUsedAt);
-
-      expectArraysToMatch(await getAllShortLinks(db), [
-        {
-          short_link_id: testShortLinkId,
-          url: originalUrl,
-          single_use: true,
-          last_used_at: lastUsedAt,
-        },
-      ]);
-    });
-
-    it("throws error if shortLink does not exist", async () => {
-      const nonExistentId = "non-existent-id";
-      await expectPromiseToFailWithError(
-        pgShortLinkRepository.markAsUsed(nonExistentId, new Date()),
-        errors.shortLink.notFound({ shortLinkId: nonExistentId }),
-      );
-    });
   });
 });

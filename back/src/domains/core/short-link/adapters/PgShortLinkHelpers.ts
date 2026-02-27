@@ -5,6 +5,7 @@ import type {
 } from "shared";
 import { z } from "zod";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { ShortLink } from "../ports/ShortLinkQuery";
 
 type PgShortLinkRepositoryDto = {
   short_link_id: string;
@@ -21,22 +22,33 @@ export const pgShortLinkRepositorySchema: ZodSchemaWithInputMatchingOutput<PgSho
 
 export const insertShortLinkQuery = async (
   db: KyselyDb,
-  shortLinkId: ShortLinkId,
-  url: AbsoluteUrl,
-  singleUse: boolean,
+  shortLink: ShortLink,
 ): Promise<void> => {
   await db
     .insertInto("short_links")
     .values({
-      short_link_id: shortLinkId,
-      url,
-      single_use: singleUse,
+      short_link_id: shortLink.id,
+      url: shortLink.url,
+      last_used_at: shortLink.lastUsedAt,
     })
     .execute();
 };
 
-export const getAllShortLinks = async (db: KyselyDb) =>
-  db.selectFrom("short_links").selectAll().execute();
+export const getAllShortLinks = async (db: KyselyDb): Promise<ShortLink[]> =>
+  db
+    .selectFrom("short_links")
+    .selectAll()
+    .execute()
+    .then((results) =>
+      results.map(
+        (result) =>
+          ({
+            id: result.short_link_id,
+            lastUsedAt: result.last_used_at,
+            url: result.url as AbsoluteUrl,
+          }) satisfies ShortLink,
+      ),
+    );
 
 export const deleteShortLinkById = async (
   transaction: KyselyDb,

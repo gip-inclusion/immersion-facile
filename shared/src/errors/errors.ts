@@ -1147,6 +1147,10 @@ export const errors = {
       new NotFoundError(`Le lien court '${shortLinkId}' n'existe pas.`),
     invalidUrl: ({ shortLinkId }: { shortLinkId: ShortLinkId }) =>
       new BadRequestError(`Le lien court '${shortLinkId}' n'est pas valide.`),
+    forbiddenLinkUpdate: () =>
+      new ForbiddenError(
+        "Il est interdit de modifier le lien long d'un lien court. Veuillez créer un nouveau lien court.",
+      ),
   },
   notification: {
     notFound: ({ id, kind }: { id: NotificationId; kind: NotificationKind }) =>

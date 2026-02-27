@@ -206,6 +206,7 @@ export class PgEstablishmentAggregateRepository
           ),
         ),
       )
+
       .execute();
 
     return result.map(({ siret }) => siret);

@@ -122,6 +122,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     expiredJwt: string,
   ): Promise<void> {
     const shortLink = await uow.shortLinkQuery.getById(shortLinkId);
+    if (!shortLink) throw errors.shortLink.notFound({ shortLinkId });
     const appSupportedJwtPayload = extractJwtPayloadFromExpiredJwt(
       this.#config,
       expiredJwt,
@@ -233,7 +234,6 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       magicLink: await makeConventionMagicShortLink({
         targetRoute: this.#findRouteToRenew(originalUrl),
         lifetime: "1Month",
-        singleUse: false,
       }),
       conventionId: convention.id,
     });

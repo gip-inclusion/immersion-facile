@@ -80,6 +80,7 @@ describe("PgDiscussionRepository", () => {
     await db.deleteFrom("discussions").execute();
     await db.deleteFrom("discussions_archives").execute();
     await db.deleteFrom("exchanges").execute();
+    await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("users").execute();
 
     pgDiscussionRepository = new PgDiscussionRepository(db);

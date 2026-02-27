@@ -492,8 +492,9 @@ describe("Send signature link", () => {
         connectedUserPayload,
       );
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkId]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinkId,
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
@@ -503,10 +504,9 @@ describe("Send signature link", () => {
             lifetime: "2Days",
             extraQueryParams: { mtm_source: "sms-signature-link" },
           }),
-          singleUse: true,
           lastUsedAt: null,
         },
-      });
+      ]);
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         { topic: "NotificationAdded" },

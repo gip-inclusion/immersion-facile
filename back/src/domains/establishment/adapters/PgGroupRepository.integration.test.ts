@@ -91,6 +91,7 @@ describe("PgEstablishmentGroupRepository", () => {
     await db.deleteFrom("establishments_location_positions").execute();
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("discussions").execute();
+    await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("users").execute();
 
     await new PgUserRepository(db).save(user);

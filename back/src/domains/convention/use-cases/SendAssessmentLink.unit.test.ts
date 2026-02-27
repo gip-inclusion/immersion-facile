@@ -472,8 +472,9 @@ describe("SendAssessmentLink", () => {
         { userId: connectedUser.id },
       );
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkId]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinkId,
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.establishmentTutor.role,
@@ -483,10 +484,9 @@ describe("SendAssessmentLink", () => {
             lifetime: "2Days",
             extraQueryParams: { mtm_source: "sms-assessment-link" },
           }),
-          singleUse: true,
           lastUsedAt: null,
         },
-      });
+      ]);
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         { topic: "NotificationAdded" },

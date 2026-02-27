@@ -668,7 +668,6 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         timeGateway: gateways.timeGateway,
-        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
       },
     }),
 
