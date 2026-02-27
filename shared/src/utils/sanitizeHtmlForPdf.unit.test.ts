@@ -59,6 +59,7 @@ describe("sanitizeHtmlForPdf", () => {
         `<link rel="stylesheet" href="${allowedOrigin}/assets/dsfr.css">`,
         '<link rel="stylesheet" href="https://gc.kis.v2.scr.kaspersky-labs.com/main.css">',
         '<link rel="dns-prefetch" href="https://client.crisp.chat">',
+        '<link rel="dns-prefetch" href="/local-assets/test.css">',
         "</head><body>",
         "<p>Hello <chrome_annotation>world</chrome_annotation></p>",
         '<script>console.log("injected")</script>',
