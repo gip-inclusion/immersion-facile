@@ -1,4 +1,4 @@
-import { subDays } from "date-fns";
+import { subDays, subMilliseconds } from "date-fns";
 import type { Pool } from "pg";
 import { type ConventionDraftDto, expectToEqual } from "shared";
 import { v4 as uuid } from "uuid";
@@ -258,8 +258,19 @@ describe("PgConventionDraftRepository", () => {
   });
 
   describe("getConventionDraftIdsByFilters", () => {
-    const thirtyDaysAgo = subDays(new Date(now), 30).toISOString();
-    const fourtyDaysAgo = subDays(new Date(now), 40).toISOString();
+    const thirtyDaysAgo = subDays(new Date(now), 30);
+    const thirtyDaysAgoMinus1ms = subMilliseconds(thirtyDaysAgo, -1);
+
+    const recentConventionDraft: ConventionDraftDto = {
+      ...conventionDraft,
+      id: uuid(),
+      updatedAt: thirtyDaysAgoMinus1ms.toISOString(),
+    };
+    const oldConventionDraft: ConventionDraftDto = {
+      ...conventionDraft,
+      id: uuid(),
+      updatedAt: thirtyDaysAgo.toISOString(),
+    };
 
     it("should return all ids when no filters are provided", async () => {
       const conventionDraft2: ConventionDraftDto = {
@@ -294,48 +305,42 @@ describe("PgConventionDraftRepository", () => {
     });
 
     it("should return only ids not updated after the provided lastUpdatedAt date", async () => {
-      const recentConventionDraft: ConventionDraftDto = {
-        ...conventionDraft,
-        updatedAt: now,
-      };
-      const oldConventionDraft: ConventionDraftDto = {
-        ...conventionDraft,
-        id: uuid(),
-        updatedAt: now,
-      };
-
-      await pgConventionDraftRepository.save(recentConventionDraft, now);
-      await pgConventionDraftRepository.save(oldConventionDraft, thirtyDaysAgo);
+      await pgConventionDraftRepository.save(
+        recentConventionDraft,
+        thirtyDaysAgoMinus1ms.toISOString(),
+      );
+      await pgConventionDraftRepository.save(
+        oldConventionDraft,
+        thirtyDaysAgo.toISOString(),
+      );
 
       const result =
         await pgConventionDraftRepository.getConventionDraftIdsByFilters({
-          lastUpdatedAt: new Date(thirtyDaysAgo),
+          lastUpdatedAt: thirtyDaysAgo,
         });
 
       expectToEqual(result, [oldConventionDraft.id]);
     });
 
     it("should return ids matching both ids and lastUpdatedAt filters", async () => {
-      const recentConventionDraft: ConventionDraftDto = {
-        ...conventionDraft,
-        updatedAt: now,
-      };
-      const oldConventionDraft: ConventionDraftDto = {
+      const sixtyDaysAgo = subDays(thirtyDaysAgo, 30);
+      const veryOldConventionDraft: ConventionDraftDto = {
         ...conventionDraft,
         id: uuid(),
-        updatedAt: thirtyDaysAgo,
-      };
-      const oldConventionDraft2: ConventionDraftDto = {
-        ...conventionDraft,
-        id: uuid(),
-        updatedAt: fourtyDaysAgo,
+        updatedAt: sixtyDaysAgo.toISOString(),
       };
 
-      await pgConventionDraftRepository.save(recentConventionDraft, now);
-      await pgConventionDraftRepository.save(oldConventionDraft, thirtyDaysAgo);
       await pgConventionDraftRepository.save(
-        oldConventionDraft2,
-        fourtyDaysAgo,
+        recentConventionDraft,
+        thirtyDaysAgoMinus1ms.toISOString(),
+      );
+      await pgConventionDraftRepository.save(
+        oldConventionDraft,
+        thirtyDaysAgo.toISOString(),
+      );
+      await pgConventionDraftRepository.save(
+        veryOldConventionDraft,
+        sixtyDaysAgo.toISOString(),
       );
 
       const result =
@@ -360,7 +365,7 @@ describe("PgConventionDraftRepository", () => {
     });
 
     it("should return an empty array when no drafts match lastUpdatedAt filter", async () => {
-      await pgConventionDraftRepository.save(conventionDraft, now);
+      await pgConventionDraftRepository.save(recentConventionDraft, now);
 
       const result =
         await pgConventionDraftRepository.getConventionDraftIdsByFilters({
