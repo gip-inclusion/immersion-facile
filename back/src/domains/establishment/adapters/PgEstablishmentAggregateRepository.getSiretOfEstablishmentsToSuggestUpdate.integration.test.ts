@@ -85,7 +85,7 @@ describe("PgScriptsQueries", () => {
         },
         kind: "email",
         templatedContent: {
-          kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+          kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
           recipients: ["joe@mail.com"],
           params: {
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
@@ -110,7 +110,7 @@ describe("PgScriptsQueries", () => {
         },
         kind: "email",
         templatedContent: {
-          kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+          kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
           recipients: ["jack@mail.com"],
           params: {
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",

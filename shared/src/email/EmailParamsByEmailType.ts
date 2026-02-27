@@ -496,7 +496,7 @@ export type EmailParamsByEmailType = {
     signedAt: string;
     agencyName: string;
   };
-  SUGGEST_EDIT_FORM_ESTABLISHMENT: {
+  ESTABLISHMENT_REENGAGEMENT_SUGGESTION: {
     businessName: string;
   };
   TEST_EMAIL: {

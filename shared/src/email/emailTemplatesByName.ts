@@ -2141,7 +2141,7 @@ Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moi
       }),
       tags: ["confirmation de signature de convention"],
     },
-    SUGGEST_EDIT_FORM_ESTABLISHMENT: {
+    ESTABLISHMENT_REENGAGEMENT_SUGGESTION: {
       niceName: "Établissement - Suggestion de mise à jour",
       tags: ["mise à jour fiche entreprise"],
       createEmailVariables: ({ businessName }) => ({
