@@ -1,4 +1,7 @@
 version: "3"
+
+name: immersion-facile_infra
+
 services:
   postgres:
     image: postgis/postgis:13-master

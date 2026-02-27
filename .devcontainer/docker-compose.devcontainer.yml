@@ -1,0 +1,22 @@
+version: "3.9"
+
+name: immersion-facile_devcontainer
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+
+    volumes:
+      - ..:/immersion-facile
+      - /var/run/docker.sock:/var/run/docker.sock
+    tty: true
+    stdin_open: true
+
+    deploy:
+      resources:
+        limits:
+          memory: ${DEVCONTAINER_MEMORY:-1024g}
+
+    mem_limit: ${DEVCONTAINER_MEMORY:-1024g}
+    network_mode: "host"
