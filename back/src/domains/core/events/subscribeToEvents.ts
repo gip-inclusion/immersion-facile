@@ -308,8 +308,8 @@ const extractWithConventionDraftIdFromAddConventionInput = <
   useCase: UC,
 ): InstantiatedUseCase<Partial<WithConventionDraftId>, void, any> => ({
   useCaseName: useCase.useCaseName,
-  execute: (params) =>
+  execute: ({ conventionDraftId }) =>
     useCase.execute({
-      conventionDraftId: params.conventionDraftId,
+      conventionDraftId: conventionDraftId,
     }),
 });
