@@ -16,6 +16,7 @@ logs2
 immersion-facile.code-workspace
 dev-dist
 coverage
+.devcontainer/.env
 
 .cursor/rules
 bi/.venv/

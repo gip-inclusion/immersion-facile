@@ -9,7 +9,7 @@ Il y a pour cela plusieurs axes de travail :
 
 ### Prérequis
 
-Pour démarrer le projet il vous faut `git`, `docker` et `node` (version 18 ) installée sur la machine.
+Pour démarrer le projet il vous faut `git`, `docker` et `node` (version 22.14.0 > voir package.json "engines" ) installée sur la machine.
 Nous utilisons `pnpm` comme gestionnaire de paquets (pour l'installer : `npm install -g pnpm`).
 
 ### Démarrer le projet

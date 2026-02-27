@@ -1,0 +1,52 @@
+{
+  "name": "DevContainer - Développeur Immersion Facilitée",
+  "dockerComposeFile": "docker-compose.devcontainer.yml",
+  "service": "dev",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "containerEnv": {
+    "DOCKER_HOST": "unix:///var/run/docker.sock"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2.5.6": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "installOhMyZshConfig": true,
+      "upgradePackages": true,
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/node:1.7.1": {
+      "version": "22.14.0"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "biomejs.biome",
+        "ms-azuretools.vscode-containers",
+        "ms-azuretools.vscode-docker",
+        "docker.docker",
+        "mhutchie.git-graph",
+        "github.vscode-github-actions",
+        "github.vscode-pull-request-github",
+        "eamodio.gitlens",
+        "chamboug.js-auto-backticks",
+        "firsttris.vscode-jest-runner",
+        "meezilla.json",
+        "ms-vsliveshare.vsliveshare",
+        "yzhang.markdown-all-in-one",
+        "bierner.markdown-emoji",
+        "christian-kohler.npm-intellisense",
+        "ms-playwright.playwright",
+        "gruntfuggly.todo-tree",
+        "clemenspeters.format-json"
+      ]
+    }
+  },
+  "mounts": [
+    "type=bind,source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,readonly"
+  ],
+  "workspaceFolder": "/immersion-facile",
+  "onCreateCommand": "zsh .devcontainer/post-create.sh"
+}
