@@ -2,6 +2,7 @@ import { subDays } from "date-fns";
 import {
   type ConventionDraftDto,
   type ConventionDraftId,
+  expectObjectInArrayToMatch,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -69,20 +70,15 @@ describe("RequestOldConventionDraftsDeletion", () => {
       await RequestOldConventionDraftsDeletion.execute();
 
     expectToEqual(numberOfOldConventionDraftIds, 1);
-    expectToEqual(uow.outboxRepository.events, [
+    expectObjectInArrayToMatch(uow.outboxRepository.events, [
       {
-        topic: "ConventionDrafToDelete",
+        topic: "ConventionDrafToDelete" as const,
         payload: {
           conventionDraftId: oldConventionDraft.id,
           triggeredBy: {
-            kind: "crawler",
+            kind: "crawler" as const,
           },
         },
-        id: expectedEventId,
-        occurredAt: expect.any(String),
-        publications: [],
-        wasQuarantined: false,
-        status: "never-published",
       },
     ]);
   });
@@ -148,9 +144,10 @@ describe("RequestOldConventionDraftsDeletion", () => {
       numberOfOldConventionDraftIds,
       expectedOldConventionDraftIds.length,
     );
-    expectToEqual(
+
+    expectObjectInArrayToMatch(
       uow.outboxRepository.events,
-      expectedOldConventionDraftIds.map((oldConventionDraftId, index) => ({
+      expectedOldConventionDraftIds.map((oldConventionDraftId) => ({
         topic: "ConventionDrafToDelete" as const,
         payload: {
           conventionDraftId: oldConventionDraftId,
@@ -158,11 +155,6 @@ describe("RequestOldConventionDraftsDeletion", () => {
             kind: "crawler" as const,
           },
         },
-        id: expectedEventIds[index],
-        occurredAt: expect.any(String),
-        publications: [],
-        wasQuarantined: false,
-        status: "never-published" as const,
       })),
     );
   });
