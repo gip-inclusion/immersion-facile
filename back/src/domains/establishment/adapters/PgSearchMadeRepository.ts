@@ -36,13 +36,19 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         "api_consumer_name",
         "department_code",
         "distance",
+        "fit_for_disabled_workers",
         "gps",
         "id",
         "lat",
+        "location_ids",
         "lon",
         "needstobesearched",
         "number_of_results",
+        "remote_work_modes",
+        "rome_codes",
         "searchable_by",
+        "show_only_available_offers",
+        "sirets",
         "sorted_by",
         "voluntary_to_immersion",
       ])
@@ -62,6 +68,15 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
                   searchable_by: searchMade.searchableBy,
                   acquisition_keyword: searchMade.acquisitionKeyword,
                   acquisition_campaign: searchMade.acquisitionCampaign,
+                  rome_codes: optionalJsonb(searchMade.romeCodes),
+                  fit_for_disabled_workers: optionalJsonb(
+                    searchMade.fitForDisabledWorkers,
+                  ),
+                  location_ids: optionalJsonb(searchMade.locationIds),
+                  remote_work_modes: optionalJsonb(searchMade.remoteWorkModes),
+                  show_only_available_offers:
+                    searchMade.showOnlyAvailableOffers ?? null,
+                  sirets: optionalJsonb(searchMade.sirets),
                   ...(hasSearchMadeGeoParams(searchMade)
                     ? {
                         lat: searchMade.lat,
@@ -105,6 +120,12 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
               )
               .as("distance"),
             eb.fn
+              .coalesce(
+                sql`${eb.ref("values.fit_for_disabled_workers")}::jsonb`,
+                sql`NULL`,
+              )
+              .as("fit_for_disabled_workers"),
+            eb.fn
               .coalesce(sql`${eb.ref("values.gps")}::geography`, sql`NULL`)
               .as("gps"),
             sql`${eb.ref("values.id")}::uuid`.as("id"),
@@ -114,6 +135,9 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
                 sql`NULL`,
               )
               .as("lat"),
+            eb.fn
+              .coalesce(sql`${eb.ref("values.location_ids")}::jsonb`, sql`NULL`)
+              .as("location_ids"),
             eb.fn
               .coalesce(
                 sql`${eb.ref("values.lon")}::double precision`,
@@ -134,10 +158,28 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
               .as("number_of_results"),
             eb.fn
               .coalesce(
+                sql`${eb.ref("values.remote_work_modes")}::jsonb`,
+                sql`NULL`,
+              )
+              .as("remote_work_modes"),
+            eb.fn
+              .coalesce(sql`${eb.ref("values.rome_codes")}::jsonb`, sql`NULL`)
+              .as("rome_codes"),
+            eb.fn
+              .coalesce(
                 sql`${eb.ref("values.searchable_by")}::searchable_by`,
                 sql`NULL`,
               )
               .as("searchable_by"),
+            eb.fn
+              .coalesce(
+                sql`${eb.ref("values.show_only_available_offers")}::boolean`,
+                sql`NULL`,
+              )
+              .as("show_only_available_offers"),
+            eb.fn
+              .coalesce(sql`${eb.ref("values.sirets")}::jsonb`, sql`NULL`)
+              .as("sirets"),
             eb.fn
               .coalesce(
                 sql`${eb.ref("values.sorted_by")}::sorted_by`,
@@ -189,3 +231,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
       .execute();
   }
 }
+
+const optionalJsonb = (value: unknown[] | undefined): string | null =>
+  value ? JSON.stringify(value) : null;

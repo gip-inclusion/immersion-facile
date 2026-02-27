@@ -1,9 +1,15 @@
 import type { Pool } from "pg";
 import {
   type AppellationCode,
+  type EstablishmentSearchableByValue,
   expectToEqual,
+  type FitForDisableWorkerOption,
+  type LocationId,
   type NafCode,
   optional,
+  type RemoteWorkMode,
+  type RomeCode,
+  type SiretDto,
 } from "shared";
 import {
   type KyselyDb,
@@ -164,6 +170,114 @@ describe("PgSearchesMadeRepository", () => {
       appellationCodes: [appellationCode],
     });
   });
+
+  it("with searchableBy", async () => {
+    const searchableBy: EstablishmentSearchableByValue = "students";
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      searchableBy,
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
+
+  it("with romeCodes", async () => {
+    const romeCodes: RomeCode[] = ["D1102", "A1205"];
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      romeCodes,
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
+
+  it("with fitForDisabledWorkers", async () => {
+    const fitForDisabledWorkers: FitForDisableWorkerOption[] = [
+      "yes-ft-certified",
+      "yes-declared-only",
+    ];
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      fitForDisabledWorkers,
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
+
+  it("with locationIds", async () => {
+    const locationIds: LocationId[] = [
+      "11111111-1111-4111-b111-111111111111" as LocationId,
+      "22222222-2222-4222-b222-222222222222" as LocationId,
+    ];
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      locationIds,
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
+
+  it("with remoteWorkModes", async () => {
+    const remoteWorkModes: RemoteWorkMode[] = ["FULL_REMOTE", "HYBRID"];
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      remoteWorkModes,
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
+
+  it("with showOnlyAvailableOffers", async () => {
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      showOnlyAvailableOffers: true,
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
+
+  it("with sirets", async () => {
+    const sirets: SiretDto[] = ["12345678901234", "56789012345678"];
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      sirets,
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
+
+  it("with all SearchMadeFilters", async () => {
+    const searchMade: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      appellationCodes: ["19365"],
+      romeCodes: ["D1102"],
+      searchableBy: "jobSeekers",
+      fitForDisabledWorkers: ["yes-ft-certified", "no"],
+      locationIds: ["11111111-1111-4111-b111-111111111111"],
+      nafCodes: ["7211Z", "7219Z"],
+      remoteWorkModes: ["FULL_REMOTE", "ON_SITE"],
+      showOnlyAvailableOffers: true,
+      sirets: ["12345678901234"],
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+
+    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
+  });
 });
 
 const getSearchMadeById = async (
@@ -217,6 +331,22 @@ const getSearchMadeById = async (
       acquisitionCampaign: optional(searchMadeResult.acquisition_campaign),
       acquisitionKeyword: optional(searchMadeResult.acquisition_keyword),
       searchableBy: optional(searchMadeResult.searchable_by),
+      romeCodes: optional(searchMadeResult.rome_codes) as
+        | RomeCode[]
+        | undefined,
+      fitForDisabledWorkers: optional(
+        searchMadeResult.fit_for_disabled_workers,
+      ) as FitForDisableWorkerOption[] | undefined,
+      locationIds: optional(searchMadeResult.location_ids) as
+        | LocationId[]
+        | undefined,
+      remoteWorkModes: optional(searchMadeResult.remote_work_modes) as
+        | RemoteWorkMode[]
+        | undefined,
+      showOnlyAvailableOffers: optional(
+        searchMadeResult.show_only_available_offers,
+      ),
+      sirets: optional(searchMadeResult.sirets) as SiretDto[] | undefined,
       nafCodes,
     }
   );
