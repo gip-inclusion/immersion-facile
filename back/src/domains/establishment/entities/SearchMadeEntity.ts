@@ -1,22 +1,46 @@
 import type {
   ApiConsumerName,
   EstablishmentSearchableByValue,
+  ExpectTrue,
+  ExtractAddedOrMissingSearchFiltersKeys,
+  FitForDisableWorkerOption,
   Flavor,
+  LocationId,
+  NafCode,
+  RemoteWorkMode,
+  RomeCode,
   SearchSortedBy,
+  SiretDto,
   WithAcquisition,
   WithNafCodes,
 } from "shared";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
-type SearchMadeWithoutGeoParams = {
+type SearchMadeFilters = {
   appellationCodes?: string[];
-  romeCode?: string;
-  sortedBy?: SearchSortedBy;
-  voluntaryToImmersion?: boolean;
+  romeCodes?: RomeCode[];
+  searchableBy?: EstablishmentSearchableByValue;
+  fitForDisabledWorkers?: FitForDisableWorkerOption[];
+  locationIds?: LocationId[];
+  nafCodes?: NafCode[];
+  remoteWorkModes?: RemoteWorkMode[];
+  showOnlyAvailableOffers?: boolean;
+  sirets?: SiretDto[];
+};
+
+type _CheckExaustiveSearchFilters = ExpectTrue<
+  ExtractAddedOrMissingSearchFiltersKeys<SearchMadeFilters, "geoParams">
+>;
+
+export type SearchMadeCommon = SearchMadeFilters & {
   place?: string;
-  establishmentSearchableBy?: EstablishmentSearchableByValue;
-} & WithAcquisition &
+  voluntaryToImmersion?: boolean;
+  sortedBy?: SearchSortedBy;
+};
+
+type SearchMadeWithoutGeoParams = SearchMadeCommon &
+  WithAcquisition &
   WithNafCodes;
 
 type SearchMadeWithGeoParams = GeoParams & SearchMadeWithoutGeoParams;
