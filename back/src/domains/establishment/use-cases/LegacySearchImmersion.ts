@@ -53,21 +53,19 @@ export class LegacySearchImmersion extends TransactionalUseCase<
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<OfferDto[]> {
+    const geoParams = { lat, lon, distanceKm };
     const searchMade: SearchMade = {
-      lat,
-      lon,
-      distanceKm,
+      ...(hasSearchGeoParams(geoParams) ? geoParams : {}),
       sortedBy,
       voluntaryToImmersion,
       place,
       appellationCodes,
-      romeCode: rome,
+      romeCodes: rome ? [rome] : undefined,
       searchableBy: establishmentSearchableBy,
       acquisitionCampaign,
       acquisitionKeyword,
       nafCodes,
     };
-    const geoParams = { lat, lon, distanceKm };
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
       uow.establishmentAggregateRepository.legacySearchImmersionResults({
         searchMade,

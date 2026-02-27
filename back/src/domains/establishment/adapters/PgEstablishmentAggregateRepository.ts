@@ -12,6 +12,8 @@ import {
   type DataWithPagination,
   type DateTimeIsoString,
   type EstablishmentSearchableByValue,
+  type ExpectTrue,
+  type ExtractAddedOrMissingSearchFiltersKeys,
   errors,
   type FitForDisableWorkerOption,
   type LocationId,
@@ -387,11 +389,11 @@ export class PgEstablishmentAggregateRepository
         searchableBy: searchMade.searchableBy,
         fitForDisabledWorkers: getFitForDisabledWorkers(),
         nafCodes: searchMade.nafCodes,
-        romeCodes: searchMade.romeCode
-          ? [searchMade.romeCode]
-          : await this.#getRomeCodeFromAppellationCodes(
-              searchMade.appellationCodes,
-            ),
+        romeCodes:
+          searchMade.romeCodes ??
+          (await this.#getRomeCodeFromAppellationCodes(
+            searchMade.appellationCodes,
+          )),
         showOnlyAvailableOffers: true,
       },
       sort: searchMade.sortedBy
@@ -877,18 +879,22 @@ const makeEstablishmentAggregateFromDb = (
   };
 };
 
-type SearchImmersionFilters = {
+export type SearchImmersionFilters = {
+  appellationCodes?: AppellationCode[];
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
-  searchableBy?: EstablishmentSearchableByValue;
-  romeCodes?: RomeCode[];
   geoParams?: GeoParams;
+  locationIds?: LocationId[];
   nafCodes?: NafCode[];
   remoteWorkModes?: RemoteWorkMode[];
+  romeCodes?: RomeCode[];
   sirets?: SiretDto[];
-  appellationCodes?: AppellationCode[];
-  locationIds?: LocationId[];
+  searchableBy?: EstablishmentSearchableByValue;
   showOnlyAvailableOffers: boolean;
 };
+
+type _CheckExaustiveSearchFilters = ExpectTrue<
+  ExtractAddedOrMissingSearchFiltersKeys<SearchImmersionFilters>
+>;
 
 type SearchImmersionResultsParams = {
   filters: SearchImmersionFilters;

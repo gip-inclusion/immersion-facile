@@ -2557,7 +2557,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             const results =
               await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
                 {
-                  searchMade: {},
+                  searchMade: { sortedBy: "date" },
                 },
               );
 
@@ -2612,7 +2612,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             const results =
               await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
                 {
-                  searchMade: { nafCodes: [] },
+                  searchMade: { sortedBy: "date", nafCodes: [] },
                 },
               );
 
@@ -2668,6 +2668,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
                 {
                   searchMade: {
+                    sortedBy: "date",
                     nafCodes: [establishment0145Z_A.establishment.nafDto.code],
                   },
                 },
@@ -2700,6 +2701,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
                 {
                   searchMade: {
+                    sortedBy: "date",
                     nafCodes: [
                       establishment0145Z_A.establishment.nafDto.code,
                       establishment4741Z.establishment.nafDto.code,
@@ -2764,7 +2766,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           const results =
             await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
               {
-                searchMade: {},
+                searchMade: { sortedBy: "date" },
               },
             );
           expectToEqual(results, [
@@ -2824,6 +2826,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
               {
                 searchMade: {
+                  sortedBy: "distance",
                   distanceKm: 10,
                   lat: fitForDisabledWorkers.establishment.locations[0].position
                     .lat,
@@ -2859,6 +2862,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
               {
                 searchMade: {
+                  sortedBy: "distance",
                   distanceKm: 10,
                   lat: fitForDisabledWorkers.establishment.locations[0].position
                     .lat,
@@ -2886,6 +2890,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
               {
                 searchMade: {
+                  sortedBy: "distance",
                   distanceKm: 10,
                   lat: fitForDisabledWorkers.establishment.locations[0].position
                     .lat,
@@ -2929,14 +2934,11 @@ describe("PgEstablishmentAggregateRepository", () => {
           await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
             {
               searchMade: {
-                lat: undefined,
-                lon: undefined,
-                distanceKm: undefined,
                 sortedBy: "date",
                 voluntaryToImmersion: true,
                 place: undefined,
                 appellationCodes: undefined,
-                romeCode: undefined,
+                romeCodes: undefined,
                 searchableBy: "jobSeekers",
                 acquisitionCampaign: undefined,
                 acquisitionKeyword: undefined,
@@ -3056,7 +3058,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           await pgEstablishmentAggregateRepository.legacySearchImmersionResults(
             {
-              searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
+              searchMade: { ...cartographeSearchMade, romeCodes: ["A1010"] },
             },
           ),
           [],
@@ -3082,7 +3084,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   sortedBy: "date",
                   distanceKm: 50,
                   ...centerOfSaintesGeoPosition,
-                  romeCode: cuvisteOffer.romeCode,
+                  romeCodes: [cuvisteOffer.romeCode],
                 },
               },
             ),
@@ -3117,7 +3119,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   sortedBy: "date",
                   distanceKm: 100,
                   ...centerOfSaintesGeoPosition,
-                  romeCode: groomChevauxOffer.romeCode,
+                  romeCodes: [groomChevauxOffer.romeCode],
                 },
               },
             ),

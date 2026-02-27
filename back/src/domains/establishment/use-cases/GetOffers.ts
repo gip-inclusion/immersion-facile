@@ -16,6 +16,7 @@ import {
   type GeoParams,
   hasSearchGeoParams,
   type SearchMade,
+  type SearchMadeCommon,
 } from "../entities/SearchMadeEntity";
 
 const defaultPerPage: GetOffersPerPageOption = 12;
@@ -43,7 +44,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       ...sortAndPositionParams
     } = inputParams;
 
-    const validatedGeoParams = getValidatedGeoParams({
+    const geoParams = getValidatedGeoParams({
       lat: sortAndPositionParams.latitude,
       lon: sortAndPositionParams.longitude,
       distanceKm: sortAndPositionParams.distanceKm,
@@ -68,19 +69,27 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
         searchableBy,
         sirets,
         showOnlyAvailableOffers: showOnlyAvailableOffers ?? true,
-        ...validatedGeoParams,
+        geoParams,
       },
       sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },
     });
 
-    const searchMade: SearchMade = {
+    const searchMadeCommon: SearchMadeCommon = {
       appellationCodes,
+      fitForDisabledWorkers,
+      locationIds,
       nafCodes,
-      searchableBy: searchableBy,
+      remoteWorkModes,
+      searchableBy,
+      showOnlyAvailableOffers: showOnlyAvailableOffers ?? true,
+      sirets: sirets ?? [],
       sortedBy: inputParams.sortBy,
       place,
-      ...(validatedGeoParams.geoParams ?? {}),
     };
+
+    const searchMade: SearchMade = geoParams
+      ? { ...searchMadeCommon, ...geoParams }
+      : searchMadeCommon;
 
     await uow.searchMadeRepository.insertSearchMade({
       ...searchMade,
@@ -93,11 +102,13 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
     return result;
   });
 
-const getValidatedGeoParams = (geoParams: Partial<GeoParams>) => {
+const getValidatedGeoParams = (
+  geoParams: Partial<GeoParams>,
+): GeoParams | undefined => {
   const hasNoGeoParams = pipeWithValue(geoParams, values, all(isNil));
 
-  if (hasNoGeoParams) return {};
-  if (hasSearchGeoParams(geoParams)) return { geoParams };
+  if (hasNoGeoParams) return undefined;
+  if (hasSearchGeoParams(geoParams)) return geoParams;
 
   throw errors.search.invalidGeoParams();
 };
