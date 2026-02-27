@@ -5,8 +5,8 @@ import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifica
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SuggestEditEstablishment } from "../../domains/establishment/use-cases/SuggestEditEstablishment";
-import { makeSuggestEditEstablishmentsScript } from "../../domains/establishment/use-cases/SuggestEditEstablishmentsScript";
+import { SuggestEstablishmentReengagement } from "../../domains/establishment/use-cases/SuggestEstablishmentReengagement";
+import { makeSuggestEstablishmentReengagementsScript } from "../../domains/establishment/use-cases/SuggestEstablishmentReengagementsScript";
 import { handleCRONScript } from "../handleCRONScript";
 
 const config = AppConfig.createFromEnv();
@@ -24,9 +24,9 @@ const startScript = async (): Promise<Report> => {
     createMakeProductionPgPool(config),
   );
 
-  return makeSuggestEditEstablishmentsScript({
+  return makeSuggestEstablishmentReengagementsScript({
     deps: {
-      suggestEditEstablishment: new SuggestEditEstablishment(
+      suggestEstablishmentReengagement: new SuggestEstablishmentReengagement(
         uowPerformer,
         makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
         config.immersionFacileBaseUrl,
@@ -37,13 +37,13 @@ const startScript = async (): Promise<Report> => {
   }).execute();
 };
 
-export const triggerSuggestEditFormEstablishmentEvery6Months = ({
+export const triggerSuggestEstablishmentReengagementEvery6Months = ({
   exitOnFinish,
 }: {
   exitOnFinish: boolean;
 }) =>
   handleCRONScript({
-    name: "triggerSuggestEditFormEstablishmentEvery6Months",
+    name: "triggerSuggestEstablishmentReengagementEvery6Months",
     config,
     script: startScript,
     handleResults: ({ numberOfEstablishmentsToContact, errors = {} }) => {

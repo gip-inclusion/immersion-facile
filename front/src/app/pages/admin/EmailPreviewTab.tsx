@@ -692,7 +692,7 @@ export const defaultEmailValueByEmailKind: {
     signedAt: new Date().toISOString(),
     agencyName: "AGENCY_NAME",
   },
-  SUGGEST_EDIT_FORM_ESTABLISHMENT: {
+  ESTABLISHMENT_REENGAGEMENT_SUGGESTION: {
     businessName: "BUSINESS_NAME",
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {

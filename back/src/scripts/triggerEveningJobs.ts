@@ -7,7 +7,7 @@ import { triggerDeleteOldDiscussionMessages } from "./scheduledScripts/deleteOld
 import { triggerMarkEstablishmentsAsSearchableWhenMaxContactsAllows } from "./scheduledScripts/markEstablishmentsAsSearchableWhenMaxContactsAllows";
 import { triggerMarkObsoleteDiscussionsAsDeprecated } from "./scheduledScripts/markObsoleteDiscussionsAsDeprecated";
 import { triggerMarkOldConventionAsDeprecated } from "./scheduledScripts/markOldConventionAsDeprecated";
-import { triggerSuggestEditFormEstablishmentEvery6Months } from "./scheduledScripts/suggestEditFormEstablishmentEvery6Months";
+import { triggerSuggestEstablishmentReengagementEvery6Months } from "./scheduledScripts/triggerSuggestEstablishmentReengagementEvery6Months";
 import { triggerUpdateAllEstablishmentsScores } from "./scheduledScripts/updateAllEstablishmentsScores";
 
 const logger = createLogger(__filename);
@@ -22,7 +22,7 @@ const main = async () => {
     exitOnFinish: false,
   });
   await triggerMarkObsoleteDiscussionsAsDeprecated({ exitOnFinish: false });
-  await triggerSuggestEditFormEstablishmentEvery6Months({
+  await triggerSuggestEstablishmentReengagementEvery6Months({
     exitOnFinish: false,
   });
   await triggerDeleteOldConventionDrafts({ exitOnFinish: false });
