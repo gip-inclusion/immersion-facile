@@ -22,6 +22,7 @@ describe("updateStatsMostFrequentSearchesSql", () => {
   beforeEach(async () => {
     await db.deleteFrom("stats__most_frequent_searches").execute();
     await db.deleteFrom("searches_made__appellation_code").execute();
+    await db.deleteFrom("searches_made__naf_code").execute();
     await db.deleteFrom("searches_made").execute();
   });
 

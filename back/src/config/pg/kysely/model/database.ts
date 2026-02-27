@@ -629,16 +629,23 @@ interface SearchesMade extends WithAcquisition {
   api_consumer_name: string | null;
   department_code: string | null;
   distance: number | null;
+  fit_for_disabled_workers: JSONColumnType<string[]> | null;
   gps: string | null;
   id: string;
   lat: number | null;
+  location_ids: JSONColumnType<string[]> | null;
   lon: number | null;
   needstobesearched: boolean | null;
   number_of_results: number | null;
+  remote_work_modes: JSONColumnType<string[]> | null;
+  rome_codes: JSONColumnType<string[]> | null;
   searchable_by: SearchableBy | null;
+  show_only_available_offers: boolean | null;
+  sirets: JSONColumnType<string[]> | null;
   sorted_by: Generated<SortedBy | null>;
   update_date: Generated<Timestamp | null>;
   voluntary_to_immersion: boolean | null;
+  appellation_cdes: JSONColumnType<string[]> | null;
 }
 
 interface StatsMostFrequentSearches {
