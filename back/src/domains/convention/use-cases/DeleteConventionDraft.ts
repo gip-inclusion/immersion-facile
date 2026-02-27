@@ -1,8 +1,16 @@
 import {
-  partialWithConventionDraftIdSchema,
+  conventionDraftIdSchema,
   type WithConventionDraftId,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
+import z from "zod";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+
+const partialWithConventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<
+  Partial<WithConventionDraftId>
+> = z.object({
+  conventionDraftId: conventionDraftIdSchema.optional(),
+});
 
 export type DeleteConventionDraft = ReturnType<
   typeof makeDeleteConventionDraft

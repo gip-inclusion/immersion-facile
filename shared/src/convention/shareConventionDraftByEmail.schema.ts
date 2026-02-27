@@ -16,7 +16,6 @@ import type {
   ConventionDraftId,
   ShareConventionDraftByEmailFromConventionDto,
   ShareConventionDraftByEmailFromConventionTemplateDto,
-  WithConventionDraftId,
 } from "./shareConventionDraftByEmail.dto";
 
 export const makeConventionDeepPartialSchema = (
@@ -79,15 +78,6 @@ export const makeConventionDeepPartialSchema = (
 
 export const conventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<ConventionDraftId> =
   z.uuid(localization.invalidUuid);
-
-export const withConventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<WithConventionDraftId> =
-  z.object({ conventionDraftId: conventionDraftIdSchema });
-
-export const partialWithConventionDraftIdSchema: ZodSchemaWithInputMatchingOutput<
-  Partial<WithConventionDraftId>
-> = z.object({
-  conventionDraftId: conventionDraftIdSchema.optional(),
-});
 
 const miniStageBeneficiaryFields = [
   "levelOfEducation",
