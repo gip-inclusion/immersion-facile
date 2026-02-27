@@ -86,8 +86,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
 
     await useCase.execute({ convention: validConvention });
 
-    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-      [deterministicShortLinks[0]]: {
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+      {
+        id: deterministicShortLinks[0],
         url: fakeGenerateMagicLinkUrlFn({
           id: validConvention.id,
           role: validConvention.signatories.beneficiary.role,
@@ -97,10 +98,10 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
           lifetime: "2Days",
           extraQueryParams: { mtm_source: "email-signature-link" },
         }),
-        singleUse: true,
         lastUsedAt: null,
       },
-      [deterministicShortLinks[1]]: {
+      {
+        id: deterministicShortLinks[1],
         url: fakeGenerateMagicLinkUrlFn({
           id: validConvention.id,
           // biome-ignore lint/style/noNonNullAssertion: testing purpose
@@ -112,10 +113,10 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
           lifetime: "2Days",
           extraQueryParams: { mtm_source: "email-signature-link" },
         }),
-        singleUse: true,
         lastUsedAt: null,
       },
-      [deterministicShortLinks[2]]: {
+      {
+        id: deterministicShortLinks[2],
         url: fakeGenerateMagicLinkUrlFn({
           id: validConvention.id,
           // biome-ignore lint/style/noNonNullAssertion: testing purpose
@@ -127,10 +128,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
           lifetime: "2Days",
           extraQueryParams: { mtm_source: "email-signature-link" },
         }),
-        singleUse: true,
         lastUsedAt: null,
       },
-    });
+    ]);
 
     const emailNotifications = uow.notificationRepository.notifications.filter(
       (notification): notification is EmailNotification =>

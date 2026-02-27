@@ -119,6 +119,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
     convention: ConventionDto,
   ) {
     const now = this.#timeGateway.now();
+
     const registerEstablishmentShortLink = await makeShortLink({
       uow,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
@@ -128,23 +129,19 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
         convention,
         acquisitionCampaign: "transactionnel-etablissement-rappel-inscription",
       }),
-      singleUse: false,
-    });
-
-    const unsubscribeToEmailLink = this.#generateConventionMagicLinkUrl({
-      id: convention.id,
-      email: convention.signatories.establishmentRepresentative.email,
-      role: "establishment-representative",
-      targetRoute: frontRoutes.unsubscribeEstablishmentLead,
-      now,
     });
 
     const unsubscribeToEmailShortLink = await makeShortLink({
       uow,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       config: this.#config,
-      longLink: unsubscribeToEmailLink,
-      singleUse: false,
+      longLink: this.#generateConventionMagicLinkUrl({
+        id: convention.id,
+        email: convention.signatories.establishmentRepresentative.email,
+        role: "establishment-representative",
+        targetRoute: frontRoutes.unsubscribeEstablishmentLead,
+        now,
+      }),
     });
 
     const notification = await this.#saveNotificationAndRelatedEvent(uow, {

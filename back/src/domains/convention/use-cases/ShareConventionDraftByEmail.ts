@@ -66,7 +66,6 @@ export const makeShareConventionDraftByEmail = useCaseBuilder(
         `${deps.config.immersionFacileBaseUrl}/${inputParams.conventionDraft.internshipKind === "immersion" ? frontRoutes.conventionImmersionRoute : frontRoutes.conventionMiniStageRoute}?conventionDraftId=${inputParams.conventionDraft.id}` as AbsoluteUrl,
       shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
       config: deps.config,
-      singleUse: false,
     });
 
     if ("senderEmail" in inputParams && inputParams.senderEmail) {

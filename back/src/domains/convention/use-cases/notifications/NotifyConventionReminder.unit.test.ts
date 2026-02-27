@@ -375,8 +375,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       });
 
       //Assert
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinkIds[0],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
@@ -384,10 +385,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
           lastUsedAt: null,
         },
-        [shortLinkIds[1]]: {
+        {
+          id: shortLinkIds[1],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
@@ -395,10 +396,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
           lastUsedAt: null,
         },
-      });
+      ]);
 
       expectSavedNotificationsBatchAndEvent({
         emails: [
@@ -450,8 +450,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       });
 
       //Assert
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinkIds[0],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
@@ -459,10 +460,11 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
+
           lastUsedAt: null,
         },
-        [shortLinkIds[1]]: {
+        {
+          id: shortLinkIds[1],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
@@ -470,10 +472,11 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
+
           lastUsedAt: null,
         },
-        [shortLinkIds[2]]: {
+        {
+          id: shortLinkIds[2],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
@@ -481,10 +484,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
+
           lastUsedAt: null,
         },
-      });
+      ]);
 
       expectSavedNotificationsBatchAndEvent({
         emails: [
@@ -657,8 +660,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       });
 
       //Assert
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinkIds[0]]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinkIds[0],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
@@ -666,10 +670,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
           lastUsedAt: null,
         },
-        [shortLinkIds[1]]: {
+        {
+          id: shortLinkIds[1],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
@@ -677,10 +681,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
           lastUsedAt: null,
         },
-        [shortLinkIds[2]]: {
+        {
+          id: shortLinkIds[2],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
@@ -688,10 +692,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
-          singleUse: false,
+
           lastUsedAt: null,
         },
-      });
+      ]);
 
       expectSavedNotificationsBatchAndEvent({
         emails: [

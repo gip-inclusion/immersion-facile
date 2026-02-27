@@ -12,6 +12,7 @@ import {
   expectToEqual,
   frontRoutes,
   type RenewExpiredJwtRequestDto,
+  type ShortLinkId,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
@@ -179,8 +180,9 @@ describe("RenewExpiredJwt use case", () => {
           ],
         });
 
-        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-          [shortLinks[0]]: {
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+          {
+            id: shortLinks[0],
             url: fakeGenerateMagicLinkUrlFn({
               id: validConvention.id,
               role: expectedRole,
@@ -188,10 +190,9 @@ describe("RenewExpiredJwt use case", () => {
               now: timeGateway.now(),
               targetRoute: frontRoutes.conventionToSign,
             }),
-            singleUse: false,
             lastUsedAt: null,
           },
-        });
+        ]);
       });
 
       it("Also work when using encoded Url", async () => {
@@ -314,6 +315,26 @@ describe("RenewExpiredJwt use case", () => {
           }),
         );
       });
+
+      it("on missing short link", async () => {
+        const expiredPayload = createConventionMagicLinkPayload({
+          id: validConvention.id,
+          role: "beneficiary",
+          email: validConvention.signatories.beneficiary.email,
+          now: timeGateway.now(),
+        });
+
+        const shortLinkId: ShortLinkId = "missing";
+
+        expectPromiseToFailWithError(
+          useCase.execute({
+            kind: "conventionFromShortLink",
+            shortLinkId,
+            expiredJwt: generateConventionJwt(expiredPayload),
+          }),
+          errors.shortLink.notFound({ shortLinkId }),
+        );
+      });
     });
   });
 
@@ -327,13 +348,13 @@ describe("RenewExpiredJwt use case", () => {
     const originalUrl = "http://immersionfacile.fr/verifier-et-signer";
 
     beforeEach(() => {
-      uow.shortLinkQuery.setShortLinks({
-        [existingShortLinkId]: {
+      uow.shortLinkQuery.setShortLinks([
+        {
+          id: existingShortLinkId,
           url: originalUrl,
-          singleUse: true,
           lastUsedAt: new Date("2026-02-11"),
         },
-      });
+      ]);
     });
 
     describe("Right paths", () => {
@@ -387,13 +408,14 @@ describe("RenewExpiredJwt use case", () => {
           ],
         });
 
-        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-          [existingShortLinkId]: {
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+          {
+            id: existingShortLinkId,
             url: originalUrl,
-            singleUse: true,
             lastUsedAt: new Date("2026-02-11"),
           },
-          [shortLinks[0]]: {
+          {
+            id: shortLinks[0],
             url: fakeGenerateMagicLinkUrlFn({
               id: validConvention.id,
               role: expectedRole,
@@ -401,10 +423,9 @@ describe("RenewExpiredJwt use case", () => {
               now: timeGateway.now(),
               targetRoute: frontRoutes.conventionToSign,
             }),
-            singleUse: false,
             lastUsedAt: null,
           },
-        });
+        ]);
       });
     });
 
@@ -569,18 +590,18 @@ describe("RenewExpiredJwt use case", () => {
         ],
       });
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinks[0]]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinks[0],
           url: fakeGenerateConnectedUserUrlFn({
             accessToken: undefined,
             user,
             ongoingOAuth: emailUsedOnGoingOAuth,
             now: timeGateway.now(),
           }),
-          singleUse: false,
           lastUsedAt: null,
         },
-      });
+      ]);
     });
 
     describe("Wrong paths", () => {
@@ -699,18 +720,18 @@ describe("RenewExpiredJwt use case", () => {
         ],
       });
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinks[0]]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinks[0],
           url: fakeGenerateEmailAuthCodeUrlFn({
             email: user.email,
             state: emailUnusedOnGoingOAuth.state,
             uri: frontRoutes.magicLinkInterstitial,
             now: timeGateway.now(),
           }),
-          singleUse: false,
           lastUsedAt: null,
         },
-      });
+      ]);
     });
 
     describe("Wrong paths", () => {

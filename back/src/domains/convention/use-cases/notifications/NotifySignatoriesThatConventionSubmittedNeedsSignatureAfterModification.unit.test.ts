@@ -82,8 +82,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await useCase.execute({ convention });
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-        [shortLinks[0]]: {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinks[0],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
@@ -95,10 +96,10 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               mtm_source: "email-signature-link-after-modification",
             },
           }),
-          singleUse: true,
           lastUsedAt: null,
         },
-        [shortLinks[1]]: {
+        {
+          id: shortLinks[1],
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
@@ -110,10 +111,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               mtm_source: "email-signature-link-after-modification",
             },
           }),
-          singleUse: true,
           lastUsedAt: null,
         },
-      });
+      ]);
 
       expectSavedNotificationsAndEvents({
         emails: [

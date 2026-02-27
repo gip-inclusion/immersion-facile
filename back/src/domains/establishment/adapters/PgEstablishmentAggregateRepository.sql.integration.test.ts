@@ -51,6 +51,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
     await db.deleteFrom("convention_drafts").execute();
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("users").execute();
 

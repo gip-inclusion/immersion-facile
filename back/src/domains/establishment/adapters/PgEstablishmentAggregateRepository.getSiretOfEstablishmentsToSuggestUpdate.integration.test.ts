@@ -49,6 +49,7 @@ describe("PgScriptsQueries", () => {
     await db.deleteFrom("outbox").execute();
     await db.deleteFrom("notifications_email_recipients").execute();
     await db.deleteFrom("notifications_email").execute();
+    await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("users").execute();
 
     await new PgUserRepository(db).save(user);

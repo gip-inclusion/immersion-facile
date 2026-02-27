@@ -1,11 +1,11 @@
 import type { AbsoluteUrl, ShortLinkId } from "shared";
 
 export type ShortLink = {
+  id: ShortLinkId;
   url: AbsoluteUrl;
-  singleUse: boolean;
   lastUsedAt: Date | null;
 };
 
 export interface ShortLinkQuery {
-  getById(id: ShortLinkId): Promise<ShortLink>;
+  getById(id: ShortLinkId): Promise<ShortLink | undefined>;
 }

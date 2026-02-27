@@ -30,7 +30,6 @@ type ProvidesShortLinkProperties = {
   shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   config: AppConfig;
   longLink: AbsoluteUrl;
-  singleUse: boolean;
 };
 
 export const prepareConventionMagicShortLinkMaker =
@@ -45,12 +44,10 @@ export const prepareConventionMagicShortLinkMaker =
     targetRoute,
     lifetime,
     extraQueryParams,
-    singleUse,
   }: {
     extraQueryParams?: Record<string, string>;
     targetRoute: string;
     lifetime: ConventionMagicLinkLifetime;
-    singleUse: boolean;
   }): Promise<AbsoluteUrl> =>
     makeShortLink({
       uow,
@@ -62,7 +59,6 @@ export const prepareConventionMagicShortLinkMaker =
         lifetime,
         extraQueryParams,
       }),
-      singleUse,
     });
 
 export const prepareConnectedUserMagicShortLinkMaker =
@@ -83,7 +79,6 @@ export const prepareConnectedUserMagicShortLinkMaker =
       config,
       shortLinkIdGeneratorGateway,
       longLink: generateConnectedUserLoginUrl(params),
-      singleUse: false,
     });
 
 export const prepareEmailAuthCodeShortLinkMaker =
@@ -104,7 +99,6 @@ export const prepareEmailAuthCodeShortLinkMaker =
       config,
       shortLinkIdGeneratorGateway,
       longLink: generateEmailAuthCodeLoginUrl(params),
-      singleUse: false,
     });
 
 export const makeShortLink = async ({
@@ -112,11 +106,14 @@ export const makeShortLink = async ({
   shortLinkIdGeneratorGateway,
   config,
   longLink,
-  singleUse,
 }: ProvidesShortLinkProperties): Promise<AbsoluteUrl> => {
   const shortlinkId: ShortLinkId = shortLinkIdGeneratorGateway.generate();
 
-  await uow.shortLinkRepository.save(shortlinkId, longLink, singleUse);
+  await uow.shortLinkRepository.save({
+    id: shortlinkId,
+    url: longLink,
+    lastUsedAt: null,
+  });
 
   return makeShortLinkUrl(config, shortlinkId);
 };

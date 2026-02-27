@@ -119,7 +119,6 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
         })({
           targetRoute: frontRoutes.conventionToSign,
           lifetime: "2Days",
-          singleUse: true,
           extraQueryParams: {
             mtm_source: "email-signature-link-after-modification",
           },

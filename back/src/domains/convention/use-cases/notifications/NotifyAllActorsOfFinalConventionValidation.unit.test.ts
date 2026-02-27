@@ -3,6 +3,7 @@ import {
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   ConnectedUserBuilder,
+  type ConventionDto,
   ConventionDtoBuilder,
   type ConventionRole,
   type EmailNotification,
@@ -23,6 +24,7 @@ import {
   type WithNotificationIdAndKind,
 } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import type { ShortLink } from "../../../core/short-link/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -184,46 +186,14 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: validConventionWithSameTutorAndRepresentative,
       });
 
-      const expectedShorlinks = actorsWithShortlinks.reduce(
-        (acc, actor) => ({
-          ...acc,
-          [actor.conventionShortlinkId]: {
-            url: fakeGenerateMagicLinkUrlFn({
-              id: validConventionWithSameTutorAndRepresentative.id,
-              role: actor.role,
-              email: actor.email,
-              now: timeGateway.now(),
-              expOverride:
-                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-              targetRoute: frontRoutes.conventionDocument,
-              lifetime: "1Month",
-            }),
-            singleUse: false,
-            lastUsedAt: null,
-          },
-          ...(actor.assessmentCreationLinkId
-            ? {
-                [actor.assessmentCreationLinkId]: {
-                  url: fakeGenerateMagicLinkUrlFn({
-                    id: validConventionWithSameTutorAndRepresentative.id,
-                    role: actor.role,
-                    email: actor.email,
-                    now: timeGateway.now(),
-                    expOverride:
-                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                    targetRoute: frontRoutes.assessment,
-                    lifetime: "2Days",
-                  }),
-                  singleUse: true,
-                  lastUsedAt: null,
-                },
-              }
-            : {}),
-        }),
-        {},
+      expectToEqual(
+        uow.shortLinkQuery.getShortLinks(),
+        makeExpectedShortLinks(
+          actorsWithShortlinks,
+          validConventionWithSameTutorAndRepresentative,
+          timeGateway,
+        ),
       );
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -309,46 +279,14 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: conventionWithBeneficiaryCurrentEmployer,
       });
 
-      const expectedShorlinks = actorsWithShortlinks.reduce(
-        (a, actor) => ({
-          ...a,
-          [actor.conventionShortlinkId]: {
-            url: fakeGenerateMagicLinkUrlFn({
-              id: validConventionWithSameTutorAndRepresentative.id,
-              role: actor.role,
-              email: actor.email,
-              now: timeGateway.now(),
-              expOverride:
-                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-              targetRoute: frontRoutes.conventionDocument,
-              lifetime: "1Month",
-            }),
-            singleUse: false,
-            lastUsedAt: null,
-          },
-          ...(actor.assessmentCreationLinkId
-            ? {
-                [actor.assessmentCreationLinkId]: {
-                  url: fakeGenerateMagicLinkUrlFn({
-                    id: validConventionWithSameTutorAndRepresentative.id,
-                    role: actor.role,
-                    email: actor.email,
-                    now: timeGateway.now(),
-                    expOverride:
-                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                    targetRoute: frontRoutes.assessment,
-                    lifetime: "2Days",
-                  }),
-                  singleUse: true,
-                  lastUsedAt: null,
-                },
-              }
-            : {}),
-        }),
-        {},
+      expectToEqual(
+        uow.shortLinkQuery.getShortLinks(),
+        makeExpectedShortLinks(
+          actorsWithShortlinks,
+          validConventionWithSameTutorAndRepresentative,
+          timeGateway,
+        ),
       );
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -434,46 +372,14 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: conventionWithBeneficiaryCurrentEmployer,
       });
 
-      const expectedShorlinks = actorsWithShortlinks.reduce(
-        (a, actor) => ({
-          ...a,
-          [actor.conventionShortlinkId]: {
-            url: fakeGenerateMagicLinkUrlFn({
-              id: validConventionWithSameTutorAndRepresentative.id,
-              role: actor.role,
-              email: actor.email,
-              now: timeGateway.now(),
-              expOverride:
-                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-              targetRoute: frontRoutes.conventionDocument,
-              lifetime: "1Month",
-            }),
-            singleUse: false,
-            lastUsedAt: null,
-          },
-          ...(actor.assessmentCreationLinkId
-            ? {
-                [actor.assessmentCreationLinkId]: {
-                  url: fakeGenerateMagicLinkUrlFn({
-                    id: validConventionWithSameTutorAndRepresentative.id,
-                    role: actor.role,
-                    email: actor.email,
-                    now: timeGateway.now(),
-                    expOverride:
-                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                    targetRoute: frontRoutes.assessment,
-                    lifetime: "2Days",
-                  }),
-                  singleUse: true,
-                  lastUsedAt: null,
-                },
-              }
-            : {}),
-        }),
-        {},
+      expectToEqual(
+        uow.shortLinkQuery.getShortLinks(),
+        makeExpectedShortLinks(
+          actorsWithShortlinks,
+          validConventionWithSameTutorAndRepresentative,
+          timeGateway,
+        ),
       );
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -559,46 +465,14 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
           conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative,
       });
 
-      const expectedShorlinks = actorsWithShortlinks.reduce(
-        (a, actor) => ({
-          ...a,
-          [actor.conventionShortlinkId]: {
-            url: fakeGenerateMagicLinkUrlFn({
-              id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
-              role: actor.role,
-              email: actor.email,
-              now: timeGateway.now(),
-              expOverride:
-                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-              targetRoute: frontRoutes.conventionDocument,
-              lifetime: "1Month",
-            }),
-            singleUse: false,
-            lastUsedAt: null,
-          },
-          ...(actor.assessmentCreationLinkId
-            ? {
-                [actor.assessmentCreationLinkId]: {
-                  url: fakeGenerateMagicLinkUrlFn({
-                    id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
-                    role: actor.role,
-                    email: actor.email,
-                    now: timeGateway.now(),
-                    expOverride:
-                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                    targetRoute: frontRoutes.assessment,
-                    lifetime: "2Days",
-                  }),
-                  singleUse: true,
-                  lastUsedAt: null,
-                },
-              }
-            : {}),
-        }),
-        {},
+      expectToEqual(
+        uow.shortLinkQuery.getShortLinks(),
+        makeExpectedShortLinks(
+          actorsWithShortlinks,
+          conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative,
+          timeGateway,
+        ),
       );
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -694,45 +568,14 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: validConventionWithSameTutorAndRepresentative,
       });
 
-      const expectedShorlinks = actorsWithShortlinks.reduce(
-        (a, actor) => ({
-          ...a,
-          [actor.conventionShortlinkId]: {
-            url: fakeGenerateMagicLinkUrlFn({
-              id: validConventionWithSameTutorAndRepresentative.id,
-              role: actor.role,
-              email: actor.email,
-              now: timeGateway.now(),
-              expOverride:
-                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-              targetRoute: frontRoutes.conventionDocument,
-              lifetime: "1Month",
-            }),
-            singleUse: false,
-            lastUsedAt: null,
-          },
-          ...(actor.assessmentCreationLinkId
-            ? {
-                [actor.assessmentCreationLinkId]: {
-                  url: fakeGenerateMagicLinkUrlFn({
-                    id: validConventionWithSameTutorAndRepresentative.id,
-                    role: actor.role,
-                    email: actor.email,
-                    now: timeGateway.now(),
-                    expOverride:
-                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                    targetRoute: frontRoutes.assessment,
-                    lifetime: "2Days",
-                  }),
-                  singleUse: true,
-                  lastUsedAt: null,
-                },
-              }
-            : {}),
-        }),
-        {},
+      expectToEqual(
+        uow.shortLinkQuery.getShortLinks(),
+        makeExpectedShortLinks(
+          actorsWithShortlinks,
+          validConventionWithSameTutorAndRepresentative,
+          timeGateway,
+        ),
       );
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -817,45 +660,14 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         convention: validConventionWithSameTutorAndRepresentative,
       });
 
-      const expectedShorlinks = actorsWithShortlinks.reduce(
-        (a, actor) => ({
-          ...a,
-          [actor.conventionShortlinkId]: {
-            url: fakeGenerateMagicLinkUrlFn({
-              id: validConventionWithSameTutorAndRepresentative.id,
-              role: actor.role,
-              email: actor.email,
-              now: timeGateway.now(),
-              expOverride:
-                timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-              targetRoute: frontRoutes.conventionDocument,
-              lifetime: "1Month",
-            }),
-            singleUse: false,
-            lastUsedAt: null,
-          },
-          ...(actor.assessmentCreationLinkId
-            ? {
-                [actor.assessmentCreationLinkId]: {
-                  url: fakeGenerateMagicLinkUrlFn({
-                    id: validConventionWithSameTutorAndRepresentative.id,
-                    role: actor.role,
-                    email: actor.email,
-                    now: timeGateway.now(),
-                    expOverride:
-                      timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                    targetRoute: frontRoutes.assessment,
-                    lifetime: "2Days",
-                  }),
-                  singleUse: true,
-                  lastUsedAt: null,
-                },
-              }
-            : {}),
-        }),
-        {},
+      expectToEqual(
+        uow.shortLinkQuery.getShortLinks(),
+        makeExpectedShortLinks(
+          actorsWithShortlinks,
+          validConventionWithSameTutorAndRepresentative,
+          timeGateway,
+        ),
       );
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -885,3 +697,51 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
     });
   });
 });
+
+const makeExpectedShortLinks = (
+  actorsWithShortlinks: {
+    role: ConventionRole;
+    email: string;
+    conventionShortlinkId: ShortLinkId;
+    assessmentCreationLinkId: ShortLinkId | undefined;
+  }[],
+  convention: ConventionDto,
+  timeGateway: CustomTimeGateway,
+): ShortLink[] =>
+  actorsWithShortlinks.reduce<ShortLink[]>(
+    (shortLinks, actor) => [
+      ...shortLinks,
+      {
+        id: actor.conventionShortlinkId,
+        url: fakeGenerateMagicLinkUrlFn({
+          id: convention.id,
+          role: actor.role,
+          email: actor.email,
+          now: timeGateway.now(),
+          expOverride: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+          targetRoute: frontRoutes.conventionDocument,
+          lifetime: "1Month",
+        }),
+        lastUsedAt: null,
+      },
+      ...(actor.assessmentCreationLinkId
+        ? [
+            {
+              id: actor.assessmentCreationLinkId,
+              url: fakeGenerateMagicLinkUrlFn({
+                id: convention.id,
+                role: actor.role,
+                email: actor.email,
+                now: timeGateway.now(),
+                expOverride:
+                  timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                targetRoute: frontRoutes.assessment,
+                lifetime: "2Days",
+              }),
+              lastUsedAt: null,
+            },
+          ]
+        : []),
+    ],
+    [],
+  );

@@ -9,8 +9,6 @@ import {
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
-  frontRoutes,
-  makeUrlWithQueryParams,
   type ShortLinkId,
   type TechnicalRoutes,
   technicalRoutes,
@@ -268,13 +266,13 @@ describe("technical router", () => {
       technicalRoutes.shortLink,
     )} 302 - Redirect on existing short link`, async () => {
       const expectedLongLink: AbsoluteUrl = "http://longLink";
-      inMemoryUow.shortLinkQuery.setShortLinks({
-        [expectedShortLinkId]: {
+      inMemoryUow.shortLinkQuery.setShortLinks([
+        {
+          id: expectedShortLinkId,
           url: expectedLongLink,
-          singleUse: false,
           lastUsedAt: null,
         },
-      });
+      ]);
 
       const response = await httpClient.shortLink({
         urlParams: { shortLinkId: expectedShortLinkId },
@@ -303,56 +301,35 @@ describe("technical router", () => {
 
     it(`${displayRouteName(
       technicalRoutes.shortLink,
-    )} 302 - Redirect to long URL and mark as used when single-use link first use`, async () => {
+    )} 302 - Redirect to long URL and short link last used updated`, async () => {
       const expectedLongLink: AbsoluteUrl = "https://example.com/sign?jwt=abc";
-      inMemoryUow.shortLinkQuery.setShortLinks({
-        [expectedShortLinkId]: {
+
+      inMemoryUow.shortLinkQuery.setShortLinks([
+        {
+          id: expectedShortLinkId,
           url: expectedLongLink,
-          singleUse: true,
           lastUsedAt: null,
         },
-      });
+      ]);
 
-      const response = await httpClient.shortLink({
-        urlParams: { shortLinkId: expectedShortLinkId },
-      });
-      expectHttpResponseToEqual(response, {
-        body: {},
-        status: 302,
-        headers: { location: expectedLongLink },
-      });
-
-      const shortLink =
-        await inMemoryUow.shortLinkQuery.getById(expectedShortLinkId);
-      expect(shortLink.lastUsedAt).not.toBeNull();
-    });
-
-    it(`${displayRouteName(
-      technicalRoutes.shortLink,
-    )} 302 - Redirect to link already used page with jwt when single-use link already used`, async () => {
-      const expiredJwt = "eyJhbGciOiJIUzI1NiJ9";
-      const expectedLongLink: AbsoluteUrl = `https://example.com/test?jwt=${expiredJwt}`;
-      inMemoryUow.shortLinkQuery.setShortLinks({
-        [expectedShortLinkId]: {
-          url: expectedLongLink,
-          singleUse: true,
-          lastUsedAt: new Date("2026-02-11"),
+      expectHttpResponseToEqual(
+        await httpClient.shortLink({
+          urlParams: { shortLinkId: expectedShortLinkId },
+        }),
+        {
+          body: {},
+          status: 302,
+          headers: { location: expectedLongLink },
         },
-      });
+      );
 
-      const response = await httpClient.shortLink({
-        urlParams: { shortLinkId: expectedShortLinkId },
-      });
-
-      const expectedRedirectUrl = `${appConfig.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-        `/${frontRoutes.linkAlreadyUsed}`,
-        { shortLinkId: expectedShortLinkId, jwt: expiredJwt },
-      )}`;
-      expectHttpResponseToEqual(response, {
-        body: {},
-        status: 302,
-        headers: { location: expectedRedirectUrl },
-      });
+      expectToEqual(inMemoryUow.shortLinkQuery.getShortLinks(), [
+        {
+          id: expectedShortLinkId,
+          url: expectedLongLink,
+          lastUsedAt: gateways.timeGateway.now(),
+        },
+      ]);
     });
   });
 

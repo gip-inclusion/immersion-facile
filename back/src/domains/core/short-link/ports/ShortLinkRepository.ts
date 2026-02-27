@@ -1,10 +1,5 @@
-import type { AbsoluteUrl, ShortLinkId } from "shared";
+import type { ShortLink } from "./ShortLinkQuery";
 
 export interface ShortLinkRepository {
-  save(
-    shortLinkId: ShortLinkId,
-    url: AbsoluteUrl,
-    singleUse: boolean,
-  ): Promise<void>;
-  markAsUsed(shortLinkId: ShortLinkId, lastUsedAt: Date): Promise<void>;
+  save(shortLink: ShortLink): Promise<void>;
 }

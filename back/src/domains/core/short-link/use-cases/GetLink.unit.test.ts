@@ -1,84 +1,56 @@
 import {
   type AbsoluteUrl,
+  errors,
+  expectPromiseToFailWithError,
   expectToEqual,
-  frontRoutes,
-  makeUrlWithQueryParams,
 } from "shared";
-import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  createInMemoryUow,
+  type InMemoryUnitOfWork,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { makeGetLink } from "./GetLink";
+import type { ShortLink } from "../ports/ShortLinkQuery";
+import { type GetLink, makeGetLink } from "./GetLink";
 
 describe("GetLink", () => {
+  let getLink: GetLink;
+  let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
+
   const shortLinkId = "shortLinkId";
-  const timeGateway = new CustomTimeGateway();
-  const uow = createInMemoryUow();
-  const config = new AppConfigBuilder().build();
-  const immersionFacileBaseUrl = config.immersionFacileBaseUrl;
-  const uowPerformer = new InMemoryUowPerformer(uow);
-  const getLink = makeGetLink({
-    uowPerformer,
-    deps: {
-      timeGateway,
-      immersionFacileBaseUrl,
-    },
-  });
+  const longUrl: AbsoluteUrl = "https://example.com/sign?jwt=abc";
+  const initialShortLink: ShortLink = {
+    id: shortLinkId,
+    url: longUrl,
+    lastUsedAt: null,
+  };
 
-  it("redirects to long URL for multiple-use link", async () => {
-    const longUrl: AbsoluteUrl = "https://example.com/sign?jwt=abc";
-    uow.shortLinkQuery.setShortLinks({
-      [shortLinkId]: { url: longUrl, singleUse: false, lastUsedAt: null },
-    });
-
-    const result = await getLink.execute(shortLinkId);
-
-    expectToEqual(result, longUrl);
-  });
-
-  it("redirects to long URL and marks as used for single-use link first use", async () => {
-    const longUrl: AbsoluteUrl = "https://example.com/sign?jwt=abc";
-    uow.shortLinkQuery.setShortLinks({
-      [shortLinkId]: {
-        url: longUrl,
-        singleUse: true,
-        lastUsedAt: null,
+  beforeEach(() => {
+    timeGateway = new CustomTimeGateway();
+    uow = createInMemoryUow();
+    getLink = makeGetLink({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
       },
     });
+    uow.shortLinkQuery.setShortLinks([initialShortLink]);
+  });
 
-    const usedAtDate = new Date("2026-02-12");
-
-    timeGateway.setNextDate(usedAtDate);
-
-    const result = await getLink.execute(shortLinkId);
-
-    expectToEqual(result, longUrl);
-
-    const shortLink = await uow.shortLinkQuery.getById(shortLinkId);
-    expectToEqual(shortLink, {
-      url: longUrl,
-      singleUse: true,
-      lastUsedAt: usedAtDate,
+  it("redirects to long URL and update lastused link date", async () => {
+    expectToEqual(await getLink.execute(shortLinkId), longUrl);
+    expectToEqual(await uow.shortLinkQuery.getById(shortLinkId), {
+      ...initialShortLink,
+      lastUsedAt: timeGateway.now(),
     });
   });
 
-  it("redirects to link already used page with shortLinkId and jwt when single-use link already used", async () => {
-    const longUrl: AbsoluteUrl =
-      "https://example.com/test?jwt=eyJhbGciOiJIUzI1NiJ9";
-    uow.shortLinkQuery.setShortLinks({
-      [shortLinkId]: {
-        url: longUrl,
-        singleUse: true,
-        lastUsedAt: new Date("2026-02-11"),
-      },
-    });
-
-    const result = await getLink.execute(shortLinkId);
-
-    const expectedUrl = `${immersionFacileBaseUrl}${makeUrlWithQueryParams(
-      `/${frontRoutes.linkAlreadyUsed}`,
-      { shortLinkId, jwt: "eyJhbGciOiJIUzI1NiJ9" },
-    )}`;
-    expectToEqual(result, expectedUrl);
+  it("throw not found on missing short link", async () => {
+    const shortLinkId = "missing";
+    expectPromiseToFailWithError(
+      getLink.execute(shortLinkId),
+      errors.shortLink.notFound({ shortLinkId }),
+    );
   });
 });
