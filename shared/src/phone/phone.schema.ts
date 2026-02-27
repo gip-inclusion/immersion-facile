@@ -1,7 +1,7 @@
 import parsePhoneNumberFromString, {
   type CountryCode,
   isValidPhoneNumber,
-} from "libphonenumber-js";
+} from "libphonenumber-js/max";
 import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { keys } from "ramda";
 import { z } from "zod";
