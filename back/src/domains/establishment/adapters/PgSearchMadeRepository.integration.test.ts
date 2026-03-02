@@ -8,7 +8,6 @@ import {
   type NafCode,
   optional,
   type RemoteWorkMode,
-  type RomeCode,
   type SiretDto,
 } from "shared";
 import {
@@ -183,18 +182,6 @@ describe("PgSearchesMadeRepository", () => {
     expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
   });
 
-  it("with romeCodes", async () => {
-    const romeCodes: RomeCode[] = ["D1102", "A1205"];
-    const searchMade: SearchMadeEntity = {
-      ...searchMadeWithoutLocation,
-      romeCodes,
-    };
-
-    await pgSearchesMadeRepository.insertSearchMade(searchMade);
-
-    expectToEqual(await getSearchMadeById(db, searchMade.id), searchMade);
-  });
-
   it("with fitForDisabledWorkers", async () => {
     const fitForDisabledWorkers: FitForDisableWorkerOption[] = [
       "yes-ft-certified",
@@ -261,7 +248,7 @@ describe("PgSearchesMadeRepository", () => {
   });
 
   it("with all SearchMadeFilters", async () => {
-    const searchMade: SearchMadeEntity = {
+    const { romeCodes: _, ...searchMade }: SearchMadeEntity = {
       ...searchMadeWithoutLocation,
       appellationCodes: ["19365"],
       romeCodes: ["D1102"],
@@ -331,9 +318,6 @@ const getSearchMadeById = async (
       acquisitionCampaign: optional(searchMadeResult.acquisition_campaign),
       acquisitionKeyword: optional(searchMadeResult.acquisition_keyword),
       searchableBy: optional(searchMadeResult.searchable_by),
-      romeCodes: optional(searchMadeResult.rome_codes) as
-        | RomeCode[]
-        | undefined,
       fitForDisabledWorkers: optional(
         searchMadeResult.fit_for_disabled_workers,
       ) as FitForDisableWorkerOption[] | undefined,

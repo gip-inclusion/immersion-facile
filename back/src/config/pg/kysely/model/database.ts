@@ -645,7 +645,6 @@ interface SearchesMade extends WithAcquisition {
   sorted_by: Generated<SortedBy | null>;
   update_date: Generated<Timestamp | null>;
   voluntary_to_immersion: boolean | null;
-  appellation_cdes: JSONColumnType<string[]> | null;
 }
 
 interface StatsMostFrequentSearches {
