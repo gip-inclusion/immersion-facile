@@ -25,12 +25,16 @@ export const stripUnsafeHtmlForPdf = (htmlContent: string): string =>
     "$1",
   );
 
+const crossoriginRegex = /\s+crossorigin(?:=["'][^"']*["'])?/gi;
+
 export const sanitizeHtmlForPdf = (
   htmlContent: string,
   allowedDomain: string,
 ): string =>
-  stripUnsafeHtmlForPdf(htmlContent).replace(linkTagRegex, (fullMatch) => {
-    const hrefMatch = hrefRegex.exec(fullMatch);
-    if (!hrefMatch) return fullMatch;
-    return isAllowedLinkHref(hrefMatch[1], allowedDomain) ? fullMatch : "";
-  });
+  stripUnsafeHtmlForPdf(htmlContent)
+    .replace(linkTagRegex, (fullMatch) => {
+      const hrefMatch = hrefRegex.exec(fullMatch);
+      if (!hrefMatch) return fullMatch;
+      return isAllowedLinkHref(hrefMatch[1], allowedDomain) ? fullMatch : "";
+    })
+    .replace(crossoriginRegex, "");

@@ -66,6 +66,16 @@ describe("sanitizeHtmlForPdf", () => {
       expected: "<p>Hello world</p>",
     },
     {
+      case: "strips crossorigin attribute from tags",
+      input: `<link rel="stylesheet" crossorigin href="https://${allowedDomain}/assets/dsfr.css">`,
+      expected: `<link rel="stylesheet" href="https://${allowedDomain}/assets/dsfr.css">`,
+    },
+    {
+      case: "strips crossorigin='anonymous' attribute",
+      input: `<link rel="stylesheet" crossorigin="anonymous" href="https://${allowedDomain}/assets/dsfr.css">`,
+      expected: `<link rel="stylesheet" href="https://${allowedDomain}/assets/dsfr.css">`,
+    },
+    {
       case: "removes relative-path links (not absolutized)",
       input: '<link rel="stylesheet" href="/assets/app.css">',
       expected: "",
