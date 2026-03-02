@@ -15,11 +15,10 @@ import type {
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringCanBeEmpty,
-  zStringMinLength1,
 } from "../zodUtils";
 import type {
   ConnectedUser,

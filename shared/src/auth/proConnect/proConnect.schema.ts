@@ -1,9 +1,7 @@
 import z from "zod";
 import { siretSchema } from "../../siret/siret.schema";
-import {
-  type ZodSchemaWithInputMatchingOutput,
-  zStringCanBeEmpty,
-} from "../../zodUtils";
+import { zStringCanBeEmpty } from "../../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../../zodUtils";
 import type { ProConnectInfos } from "./proConnect.dto";
 
 export const proConnectInfoSchema: ZodSchemaWithInputMatchingOutput<ProConnectInfos> =

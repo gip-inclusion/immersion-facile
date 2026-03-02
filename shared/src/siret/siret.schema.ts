@@ -3,9 +3,12 @@ import { businessNameSchema } from "../business/business";
 import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";
 import {
+  MAX_1024_TEXT_INPUT,
+  makeHardenedStringSchema,
+} from "../utils/string.schema";
+import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type GetSiretInfo,
@@ -25,11 +28,10 @@ export const numberOfEmployeesRangeSchema: ZodSchemaWithInputMatchingOutput<Numb
   });
 
 export const siretSchema: ZodSchemaWithInputMatchingOutput<SiretDto> =
-  zStringMinLength1
-    .regex(siretRegex, {
-      error: localization.invalidSiret,
-    })
-    .transform(removeSpaces);
+  makeHardenedStringSchema({
+    max: MAX_1024_TEXT_INPUT, // 14 ?
+    withRegExp: { regex: siretRegex, message: localization.invalidSiret },
+  }).transform(removeSpaces);
 
 export const withSiretSchema: ZodSchemaWithInputMatchingOutput<WithSiretDto> =
   z.object({

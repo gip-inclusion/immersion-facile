@@ -4,11 +4,10 @@ import {
   dateRegExp,
   dateTimeIsoStringSchema,
 } from "../utils/date";
+import { zStringMinLength1, zTimeString } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
-  zTimeString,
 } from "../zodUtils";
 import type {
   DailyScheduleDto,

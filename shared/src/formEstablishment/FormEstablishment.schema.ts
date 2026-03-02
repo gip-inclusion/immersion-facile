@@ -14,14 +14,13 @@ import type { NotEmptyArray } from "../utils";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import { frenchEstablishmentKinds } from "../utils/establishment";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zBoolean,
   zEnumValidation,
-  zStringCanBeEmpty,
-  zStringMinLength1,
-  zUuidLike,
 } from "../zodUtils";
 import type {
   ContactMode,
