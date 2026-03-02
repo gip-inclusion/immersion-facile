@@ -45,7 +45,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         "needstobesearched",
         "number_of_results",
         "remote_work_modes",
-        "rome_codes",
         "searchable_by",
         "show_only_available_offers",
         "sirets",
@@ -68,7 +67,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
                   searchable_by: searchMade.searchableBy,
                   acquisition_keyword: searchMade.acquisitionKeyword,
                   acquisition_campaign: searchMade.acquisitionCampaign,
-                  rome_codes: optionalJsonb(searchMade.romeCodes),
                   fit_for_disabled_workers: optionalJsonb(
                     searchMade.fitForDisabledWorkers,
                   ),
@@ -162,9 +160,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
                 sql`NULL`,
               )
               .as("remote_work_modes"),
-            eb.fn
-              .coalesce(sql`${eb.ref("values.rome_codes")}::jsonb`, sql`NULL`)
-              .as("rome_codes"),
             eb.fn
               .coalesce(
                 sql`${eb.ref("values.searchable_by")}::searchable_by`,
