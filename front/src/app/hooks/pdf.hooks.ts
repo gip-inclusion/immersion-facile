@@ -13,7 +13,7 @@ const absolutizeRelativeUrls = (html: string, origin: string): string =>
 const prepareContentForPdfGenerator = (rawHtml: string): string => {
   const origin = window.location.origin;
   const withAbsoluteUrls = absolutizeRelativeUrls(rawHtml, origin);
-  return sanitizeHtmlForPdf(withAbsoluteUrls, origin);
+  return sanitizeHtmlForPdf(withAbsoluteUrls, window.location.hostname);
 };
 
 export const usePdfGenerator = () => {

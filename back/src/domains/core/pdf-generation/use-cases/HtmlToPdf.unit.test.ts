@@ -15,6 +15,7 @@ const jwtPayload: ConventionJwtPayload = {
 };
 
 const htmlContent = "<h1>Hello world</h1><p>test</p>";
+const immersionFacileDomain = "immersion-facile.beta.gouv.fr";
 
 describe("HtmlToPdf", () => {
   const conventionId = "convention-id";
@@ -23,6 +24,7 @@ describe("HtmlToPdf", () => {
     htmlToPdf = makeHtmlToPdf({
       deps: {
         pdfGeneratorGateway: new InMemoryPdfGeneratorGateway(),
+        immersionFacileDomain,
       },
     });
   });
@@ -38,16 +40,19 @@ describe("HtmlToPdf", () => {
     );
   });
 
-  it("preserves link tags in html content", async () => {
-    const htmlWithLinks =
-      '<html><head><link rel="stylesheet" href="https://some-origin.com/assets/dsfr.css"></head><body><p>Hello</p></body></html>';
+  it("keeps app-domain link tags and strips external ones", async () => {
+    const appLink = `<link rel="stylesheet" href="https://${immersionFacileDomain}/assets/dsfr.css">`;
+    const externalLink =
+      '<link rel="stylesheet" href="https://evil.com/inject.css">';
+    const htmlWithLinks = `<html><head>${appLink}${externalLink}</head><body><p>Hello</p></body></html>`;
+    const expectedHtml = `<html><head>${appLink}</head><body><p>Hello</p></body></html>`;
     const base64Pdf = await htmlToPdf.execute(
       { htmlContent: htmlWithLinks, conventionId },
       jwtPayload,
     );
     expectToEqual(
       base64Pdf,
-      `PDF_OF convention convention-id >> "${htmlWithLinks}"`,
+      `PDF_OF convention convention-id >> "${expectedHtml}"`,
     );
   });
 
