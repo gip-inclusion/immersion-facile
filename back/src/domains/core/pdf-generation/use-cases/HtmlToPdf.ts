@@ -1,11 +1,10 @@
 import {
-  type AbsoluteUrl,
   type ConnectedUserDomainJwtPayload,
   type ConventionJwtPayload,
   errors,
   type HtmlToPdfRequest,
   htmlToPdfRequestSchema,
-  sanitizeHtmlForPdf,
+  stripUnsafeHtmlForPdf,
 } from "shared";
 import { useCaseBuilder } from "../../useCaseBuilder";
 import type { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
@@ -19,14 +18,10 @@ export const makeHtmlToPdf = useCaseBuilder("HtmlToPdf")
   .withCurrentUser<ConventionJwtPayload | ConnectedUserDomainJwtPayload>()
   .withDeps<{
     pdfGeneratorGateway: PdfGeneratorGateway;
-    immersionFacileBaseUrl: AbsoluteUrl;
   }>()
   .build(async ({ inputParams, deps, currentUser }) => {
     if (!currentUser) throw errors.user.unauthorized();
-    const sanitizedHtmlContent = sanitizeHtmlForPdf(
-      inputParams.htmlContent,
-      deps.immersionFacileBaseUrl,
-    );
+    const sanitizedHtmlContent = stripUnsafeHtmlForPdf(inputParams.htmlContent);
     return deps.pdfGeneratorGateway.make({
       ...inputParams,
       htmlContent: sanitizedHtmlContent,

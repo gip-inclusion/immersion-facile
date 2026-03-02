@@ -1,4 +1,7 @@
-import { sanitizeHtmlForPdf } from "./sanitizeHtmlForPdf";
+import {
+  sanitizeHtmlForPdf,
+  stripUnsafeHtmlForPdf,
+} from "./sanitizeHtmlForPdf";
 
 const allowedOrigin = "https://immersion-facile.beta.gouv.fr";
 
@@ -75,5 +78,29 @@ describe("sanitizeHtmlForPdf", () => {
     },
   ])("$case", ({ input, expected }) => {
     expect(sanitizeHtmlForPdf(input, allowedOrigin)).toBe(expected);
+  });
+});
+
+describe("stripUnsafeHtmlForPdf", () => {
+  it.each([
+    {
+      case: "strips inline script",
+      input: '<p>ok</p><script>console.log("x")</script><p>end</p>',
+      expected: "<p>ok</p><p>end</p>",
+    },
+    {
+      case: "strips chrome_annotation keeping content",
+      input: "<p>Hello <chrome_annotation>world</chrome_annotation></p>",
+      expected: "<p>Hello world</p>",
+    },
+    {
+      case: "keeps all link tags regardless of origin",
+      input:
+        '<link rel="stylesheet" href="https://immersion-facile.beta.gouv.fr/assets/dsfr.css"><link rel="stylesheet" href="https://external.com/inject.css">',
+      expected:
+        '<link rel="stylesheet" href="https://immersion-facile.beta.gouv.fr/assets/dsfr.css"><link rel="stylesheet" href="https://external.com/inject.css">',
+    },
+  ])("$case", ({ input, expected }) => {
+    expect(stripUnsafeHtmlForPdf(input)).toBe(expected);
   });
 });

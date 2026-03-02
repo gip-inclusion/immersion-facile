@@ -13,14 +13,18 @@ const replaceUntilStable = (input: string, regex: RegExp): string => {
   return next === input ? next : replaceUntilStable(next, regex);
 };
 
+export const stripUnsafeHtmlForPdf = (htmlContent: string): string =>
+  replaceUntilStable(htmlContent, scriptTagRegex).replace(
+    chromeAnnotationRegex,
+    "$1",
+  );
+
 export const sanitizeHtmlForPdf = (
   htmlContent: string,
   allowedOrigin: string,
 ): string =>
-  replaceUntilStable(htmlContent, scriptTagRegex)
-    .replace(linkTagRegex, (fullMatch) => {
-      const hrefMatch = hrefRegex.exec(fullMatch);
-      if (!hrefMatch) return fullMatch;
-      return isAllowedLinkHref(hrefMatch[1], allowedOrigin) ? fullMatch : "";
-    })
-    .replace(chromeAnnotationRegex, "$1");
+  stripUnsafeHtmlForPdf(htmlContent).replace(linkTagRegex, (fullMatch) => {
+    const hrefMatch = hrefRegex.exec(fullMatch);
+    if (!hrefMatch) return fullMatch;
+    return isAllowedLinkHref(hrefMatch[1], allowedOrigin) ? fullMatch : "";
+  });

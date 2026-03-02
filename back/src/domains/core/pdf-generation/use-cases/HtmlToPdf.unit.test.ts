@@ -1,5 +1,4 @@
 import {
-  type AbsoluteUrl,
   type ConventionJwtPayload,
   errors,
   expectPromiseToFailWithError,
@@ -15,8 +14,6 @@ const jwtPayload: ConventionJwtPayload = {
   version: 1,
 };
 
-const immersionFacileBaseUrl: AbsoluteUrl =
-  "https://immersion-facile.beta.gouv.fr";
 const htmlContent = "<h1>Hello world</h1><p>test</p>";
 
 describe("HtmlToPdf", () => {
@@ -26,7 +23,6 @@ describe("HtmlToPdf", () => {
     htmlToPdf = makeHtmlToPdf({
       deps: {
         pdfGeneratorGateway: new InMemoryPdfGeneratorGateway(),
-        immersionFacileBaseUrl,
       },
     });
   });
@@ -39,6 +35,19 @@ describe("HtmlToPdf", () => {
     expectToEqual(
       base64Pdf,
       `PDF_OF convention convention-id >> "${htmlContent}"`,
+    );
+  });
+
+  it("preserves link tags in html content", async () => {
+    const htmlWithLinks =
+      '<html><head><link rel="stylesheet" href="https://some-origin.com/assets/dsfr.css"></head><body><p>Hello</p></body></html>';
+    const base64Pdf = await htmlToPdf.execute(
+      { htmlContent: htmlWithLinks, conventionId },
+      jwtPayload,
+    );
+    expectToEqual(
+      base64Pdf,
+      `PDF_OF convention convention-id >> "${htmlWithLinks}"`,
     );
   });
 
