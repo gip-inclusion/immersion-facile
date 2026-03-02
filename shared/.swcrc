@@ -2,9 +2,7 @@
   "jsc": {
     "target": "es2022",
     "parser": {
-      "syntax": "typescript",
-      "tsx": false,
-      "decorators": true
+      "syntax": "typescript"
     }
   },
   "module": {
