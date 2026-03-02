@@ -1,3 +1,4 @@
+import { Parser } from "htmlparser2";
 import { values } from "ramda";
 import { errors } from "../errors/errors";
 
@@ -49,10 +50,25 @@ export const removeSpaces = (str: string) => str.replace(/\s/g, "");
 export const isStringEmpty = (str: string) =>
   str !== "" && str.trim().length === 0;
 
-export const doesStringContainsHTML = (possiblyHtmlString: string): boolean => {
-  const htmlRegex =
-    /(?:<[!]?(?:(?:[a-z][a-z0-9-]{0,1000})|(?:!--[\s\S]{0,1000}?--))(?:\s{0,1000}[^>]{0,1000})?>\s{0,1000})|(?:<!--)/i;
-  return htmlRegex.test(possiblyHtmlString);
+export const doesStringContainsHTML = (possiblyHtmlString: string) => {
+  let hasOpenTag = false;
+  let hasComment = false;
+
+  const parser = new Parser(
+    {
+      onopentag: () => {
+        hasOpenTag = true;
+      },
+      oncomment: () => {
+        hasComment = true;
+      },
+    },
+    { decodeEntities: true },
+  );
+  parser.write(possiblyHtmlString);
+  parser.end();
+
+  return hasOpenTag || hasComment;
 };
 
 export const doesObjectContainsHTML = (obj: object): boolean => {

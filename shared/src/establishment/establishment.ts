@@ -5,10 +5,8 @@ import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
-import {
-  type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
-} from "../zodUtils";
+import { zStringMinLength1 } from "../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 
 export type EstablishmentNameAndAdmins = {
   name: string;
