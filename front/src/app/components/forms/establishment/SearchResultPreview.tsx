@@ -45,6 +45,7 @@ const establishmentToSearchResultPreview = ({
   updatedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
   remoteWorkMode: offers.length > 0 ? offers[0].remoteWorkMode : "HYBRID",
+  isAvailable: true,
 });
 
 type SearchResultPreviewProps = {
