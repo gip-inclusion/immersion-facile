@@ -7,10 +7,13 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { ApiConsumerJwt } from "../tokens/jwt.dto";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
-  localization,
   stringWithMaxLength255,
-  type ZodSchemaWithInputMatchingOutput,
   zStringMinLength1,
+  zStringMinLength1Max255,
+} from "../utils/string.schema";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
 import {
   type ApiConsumer,
@@ -162,4 +165,4 @@ export const apiConsumerSubscriptionIdSchema: ZodSchemaWithInputMatchingOutput<A
 
 export const apiConsumerReadSchema: ZodSchemaWithInputMatchingOutput<
   ApiConsumerName[]
-> = z.array(zStringMinLength1.max(255));
+> = z.array(zStringMinLength1Max255);

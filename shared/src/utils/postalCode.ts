@@ -1,5 +1,6 @@
 import { getCountryCodeFromAddress } from "../address/address.dto";
-import { localization, stringWithMaxLength255 } from "../zodUtils";
+import { localization } from "../zodUtils";
+import { stringWithMaxLength255 } from "./string.schema";
 
 // Matches strings that contain at least one 5-digit number.
 const postalCodeRegex = /(^|\s|,)\d{5}(\s|$|,)/;
