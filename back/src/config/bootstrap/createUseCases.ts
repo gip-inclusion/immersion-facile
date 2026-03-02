@@ -585,6 +585,7 @@ export const createUseCases = ({
     htmlToPdf: makeHtmlToPdf({
       deps: {
         pdfGeneratorGateway: gateways.pdfGeneratorGateway,
+        immersionFacileDomain: config.immersionFacileDomain,
       },
     }),
 

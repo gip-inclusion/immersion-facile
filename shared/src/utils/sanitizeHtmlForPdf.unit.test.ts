@@ -3,7 +3,7 @@ import {
   stripUnsafeHtmlForPdf,
 } from "./sanitizeHtmlForPdf";
 
-const allowedOrigin = "https://immersion-facile.beta.gouv.fr";
+const allowedDomain = "immersion-facile.beta.gouv.fr";
 
 describe("sanitizeHtmlForPdf", () => {
   it.each([
@@ -30,9 +30,24 @@ describe("sanitizeHtmlForPdf", () => {
       expected: "<p>ok</p><p>end</p>",
     },
     {
-      case: "keeps allowed-origin link, removes external link",
-      input: `<link rel="stylesheet" href="${allowedOrigin}/assets/dsfr.css"><link rel="stylesheet" href="https://external.com/inject.css">`,
-      expected: `<link rel="stylesheet" href="${allowedOrigin}/assets/dsfr.css">`,
+      case: "keeps allowed-domain link, removes external link",
+      input: `<link rel="stylesheet" href="https://${allowedDomain}/assets/dsfr.css"><link rel="stylesheet" href="https://external.com/inject.css">`,
+      expected: `<link rel="stylesheet" href="https://${allowedDomain}/assets/dsfr.css">`,
+    },
+    {
+      case: "keeps subdomain link",
+      input: `<link rel="stylesheet" href="https://api.${allowedDomain}/assets/style.css">`,
+      expected: `<link rel="stylesheet" href="https://api.${allowedDomain}/assets/style.css">`,
+    },
+    {
+      case: "strips prefix-attack link",
+      input: `<link rel="stylesheet" href="https://${allowedDomain}.evil.com/x.css">`,
+      expected: "",
+    },
+    {
+      case: "strips link with domain in path",
+      input: `<link rel="stylesheet" href="https://www.evil.com/${allowedDomain}/x.css">`,
+      expected: "",
     },
     {
       case: "removes dns-prefetch and preconnect external links",
@@ -59,7 +74,7 @@ describe("sanitizeHtmlForPdf", () => {
       case: "full document with all injection types",
       input: [
         "<html><head>",
-        `<link rel="stylesheet" href="${allowedOrigin}/assets/dsfr.css">`,
+        `<link rel="stylesheet" href="https://${allowedDomain}/assets/dsfr.css">`,
         '<link rel="stylesheet" href="https://gc.kis.v2.scr.kaspersky-labs.com/main.css">',
         '<link rel="dns-prefetch" href="https://client.crisp.chat">',
         '<link rel="dns-prefetch" href="/local-assets/test.css">',
@@ -70,14 +85,14 @@ describe("sanitizeHtmlForPdf", () => {
       ].join(""),
       expected: [
         "<html><head>",
-        `<link rel="stylesheet" href="${allowedOrigin}/assets/dsfr.css">`,
+        `<link rel="stylesheet" href="https://${allowedDomain}/assets/dsfr.css">`,
         "</head><body>",
         "<p>Hello world</p>",
         "</body></html>",
       ].join(""),
     },
   ])("$case", ({ input, expected }) => {
-    expect(sanitizeHtmlForPdf(input, allowedOrigin)).toBe(expected);
+    expect(sanitizeHtmlForPdf(input, allowedDomain)).toBe(expected);
   });
 });
 
