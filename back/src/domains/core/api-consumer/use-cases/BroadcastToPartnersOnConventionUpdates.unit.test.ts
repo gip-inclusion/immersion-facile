@@ -192,7 +192,6 @@ describe("Broadcast to partners on updated convention", () => {
   it("throws when convention is not found", async () => {
     const unknownConventionId = "00000000-0000-0000-0000-000000000000";
     uow.conventionRepository.setConventions([]);
-    uow.apiConsumerRepository.consumers = [apiConsumer1];
 
     await expectPromiseToFailWithError(
       broadcastUpdatedConvention.execute({ conventionId: unknownConventionId }),

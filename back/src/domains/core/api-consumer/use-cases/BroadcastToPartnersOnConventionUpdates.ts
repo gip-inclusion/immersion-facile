@@ -22,6 +22,98 @@ import type { SubscribersGateway } from "../ports/SubscribersGateway";
 
 const logger = createLogger(__filename);
 
+export type BroadcastToPartnersOnConventionUpdates = ReturnType<
+  typeof makeBroadcastToPartnersOnConventionUpdates
+>;
+
+export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
+  "BroadcastToPartnersOnConventionUpdates",
+)
+  .withInput<WithConventionId>(withConventionIdSchema)
+  .withDeps<{
+    subscribersGateway: SubscribersGateway;
+    timeGateway: TimeGateway;
+    consumerNamesUsingRomeV3: ApiConsumerName[];
+  }>()
+  .build(async ({ inputParams, uow, deps }) => {
+    const { conventionId } = inputParams;
+    const convention = await uow.conventionRepository.getById(conventionId);
+    if (!convention) throw errors.convention.notFound({ conventionId });
+
+    const agencyWithRights = await uow.agencyRepository.getById(
+      convention.agencyId,
+    );
+    if (!agencyWithRights)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+    const {
+      acquisitionCampaign: _,
+      acquisitionKeyword: __,
+      ...conventionWithoutAcquisitionParams
+    } = convention;
+
+    const assessment = await uow.assessmentRepository.getByConventionId(
+      convention.id,
+    );
+
+    const assessmentFields =
+      assesmentEntityToConventionAssessmentFields(assessment);
+
+    const conventionRead: ConventionReadDto = {
+      ...conventionWithoutAcquisitionParams,
+      agencyName: agencyWithRights.name,
+      agencyContactEmail: agencyWithRights.contactEmail,
+      agencyDepartment: agencyWithRights.address.departmentCode,
+      agencyKind: agencyWithRights.kind,
+      agencySiret: agencyWithRights.agencySiret,
+      agencyRefersTo: agencyWithRights.refersToAgencyId
+        ? await getReferedAgency(uow, agencyWithRights.refersToAgencyId)
+        : undefined,
+      agencyCounsellorEmails: agency.counsellorEmails,
+      agencyValidatorEmails: agency.validatorEmails,
+      ...assessmentFields,
+    };
+
+    const apiConsumers = pipeWithValue(
+      await uow.apiConsumerRepository.getByFilters({
+        agencyIds: [
+          conventionRead.agencyId,
+          ...(conventionRead.agencyRefersTo
+            ? [conventionRead.agencyRefersTo.id]
+            : []),
+        ],
+        agencyKinds: [
+          conventionRead.agencyKind,
+          ...(conventionRead.agencyRefersTo
+            ? [conventionRead.agencyRefersTo.kind]
+            : []),
+        ],
+      }),
+      filter<ApiConsumer>(
+        (apiConsumer) =>
+          isApiConsumerAllowed({
+            apiConsumer,
+            rightName: "convention",
+            consumerKind: "SUBSCRIPTION",
+          }) && isConsumerSubscribedToConventionUpdated(apiConsumer),
+      ),
+    );
+
+    if (agencyWithRights.kind === "mission-locale") {
+      logger.warn({
+        message: debugDoubleBroadcastMessage(
+          `apiConsumers.length: ${apiConsumers.length}. ${apiConsumers.length > 1 ? JSON.stringify(apiConsumers) : ""}`,
+        ),
+        conventionId: convention.id,
+      });
+    }
+
+    await Promise.all(
+      apiConsumers.map(notifySubscriber({ uow, conventionRead, deps })),
+    );
+  });
+
 const debugDoubleBroadcastMessage = (message: string) =>
   `Debug Mission Local, message en double. ${message}`;
 
@@ -154,95 +246,3 @@ const notifySubscriber = ({
     logger.info({ subscriberResponse: response });
   };
 };
-
-export type BroadcastToPartnersOnConventionUpdates = ReturnType<
-  typeof makeBroadcastToPartnersOnConventionUpdates
->;
-
-export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
-  "BroadcastToPartnersOnConventionUpdates",
-)
-  .withInput<WithConventionId>(withConventionIdSchema)
-  .withDeps<{
-    subscribersGateway: SubscribersGateway;
-    timeGateway: TimeGateway;
-    consumerNamesUsingRomeV3: ApiConsumerName[];
-  }>()
-  .build(async ({ inputParams, uow, deps }) => {
-    const { conventionId } = inputParams;
-    const convention = await uow.conventionRepository.getById(conventionId);
-    if (!convention) throw errors.convention.notFound({ conventionId });
-
-    const agencyWithRights = await uow.agencyRepository.getById(
-      convention.agencyId,
-    );
-    if (!agencyWithRights)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-    const {
-      acquisitionCampaign: _,
-      acquisitionKeyword: __,
-      ...conventionWithoutAcquisitionParams
-    } = convention;
-
-    const assessment = await uow.assessmentRepository.getByConventionId(
-      convention.id,
-    );
-
-    const assessmentFields =
-      assesmentEntityToConventionAssessmentFields(assessment);
-
-    const conventionRead: ConventionReadDto = {
-      ...conventionWithoutAcquisitionParams,
-      agencyName: agencyWithRights.name,
-      agencyContactEmail: agencyWithRights.contactEmail,
-      agencyDepartment: agencyWithRights.address.departmentCode,
-      agencyKind: agencyWithRights.kind,
-      agencySiret: agencyWithRights.agencySiret,
-      agencyRefersTo: agencyWithRights.refersToAgencyId
-        ? await getReferedAgency(uow, agencyWithRights.refersToAgencyId)
-        : undefined,
-      agencyCounsellorEmails: agency.counsellorEmails,
-      agencyValidatorEmails: agency.validatorEmails,
-      ...assessmentFields,
-    };
-
-    const apiConsumers = pipeWithValue(
-      await uow.apiConsumerRepository.getByFilters({
-        agencyIds: [
-          conventionRead.agencyId,
-          ...(conventionRead.agencyRefersTo
-            ? [conventionRead.agencyRefersTo.id]
-            : []),
-        ],
-        agencyKinds: [
-          conventionRead.agencyKind,
-          ...(conventionRead.agencyRefersTo
-            ? [conventionRead.agencyRefersTo.kind]
-            : []),
-        ],
-      }),
-      filter<ApiConsumer>(
-        (apiConsumer) =>
-          isApiConsumerAllowed({
-            apiConsumer,
-            rightName: "convention",
-            consumerKind: "SUBSCRIPTION",
-          }) && isConsumerSubscribedToConventionUpdated(apiConsumer),
-      ),
-    );
-
-    if (agencyWithRights.kind === "mission-locale") {
-      logger.warn({
-        message: debugDoubleBroadcastMessage(
-          `apiConsumers.length: ${apiConsumers.length}. ${apiConsumers.length > 1 ? JSON.stringify(apiConsumers) : ""}`,
-        ),
-        conventionId: convention.id,
-      });
-    }
-
-    await Promise.all(
-      apiConsumers.map(notifySubscriber({ uow, conventionRead, deps })),
-    );
-  });
