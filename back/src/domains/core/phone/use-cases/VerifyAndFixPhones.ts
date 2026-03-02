@@ -11,10 +11,10 @@ export type PhoneInDB = {
 type FixPhonesReport = {
   correctPhonesInDB: PhoneInDB[];
   fixedPhonesInDB: PhoneInDB[];
-  unfixablePhonesInDB: PhoneInDB[];
+  conflictingPhonesInDB: PhoneInDB[];
 };
 
-export const defaultPhoneNumber = "+33600000000";
+export const defaultPhoneNumber: PhoneNumber = "+33600000000";
 
 export type VerifyAndFixPhones = ReturnType<typeof makeVerifyAndFixPhone>;
 
@@ -26,87 +26,40 @@ export const makeVerifyAndFixPhone = useCaseBuilder("VerifyAndFixPhones")
     const report: FixPhonesReport = {
       correctPhonesInDB: [],
       fixedPhonesInDB: [],
-      unfixablePhonesInDB: [],
+      conflictingPhonesInDB: [],
     };
 
     const phoneNumbersToVerify = await getPhoneNumbers(deps.kyselyDb);
-    phoneNumbersToVerify.forEach((phoneNumberToVerify) => {
-      if (isValidPhoneNumber(phoneNumberToVerify.phoneNumber)) {
-        report.correctPhonesInDB.push(phoneNumberToVerify);
+    const existingPhoneNumbers = new Set(
+      phoneNumbersToVerify.map((p) => p.phoneNumber),
+    );
+
+    phoneNumbersToVerify.forEach((pn) => {
+      if (isValidPhoneNumber(pn.phoneNumber)) {
+        report.correctPhonesInDB.push(pn);
         return;
       }
 
-      const fixedPhoneNumber = fixPhoneNumberCountryCode(
-        phoneNumberToVerify.phoneNumber,
-      );
+      const resolvedPhoneNumber: PhoneNumber =
+        fixPhoneNumberCountryCode(pn.phoneNumber) ?? defaultPhoneNumber;
 
-      if (fixedPhoneNumber) {
-        report.fixedPhonesInDB.push({
-          ...phoneNumberToVerify,
-          phoneNumber: fixedPhoneNumber,
-        });
+      const resolvedPhone: PhoneInDB = {
+        ...pn,
+        phoneNumber: resolvedPhoneNumber,
+      };
+
+      if (existingPhoneNumbers.has(resolvedPhoneNumber)) {
+        report.conflictingPhonesInDB.push(resolvedPhone);
         return;
       }
 
-      report.unfixablePhonesInDB.push({
-        ...phoneNumberToVerify,
-        phoneNumber: defaultPhoneNumber,
-      });
+      existingPhoneNumbers.add(resolvedPhoneNumber);
+      report.fixedPhonesInDB.push(resolvedPhone);
     });
 
     await fixPhones(deps.kyselyDb, report.fixedPhonesInDB);
-    await fixPhones(deps.kyselyDb, report.unfixablePhonesInDB);
 
     return report;
-
-    // for (const table of sourceTables) {
-    //   let phonesBatch: PhoneInDB[] = [];
-    //   let page = 1;
-    //   const perPage = 5;
-
-    //   do {
-    //     const batchReport: FixPhonesReport = {
-    //       correctPhonesInDB: [],
-    //       fixedPhonesInDB: [],
-    //       unfixablePhonesInDB: [],
-    //     };
-
-    //     phonesBatch = await deps.getPhonesToVerify(table, page, perPage);
-
-    //     phonesBatch.forEach((phone) => {
-    //       if (isValidPhoneNumber(phone.phoneNumber)) {
-    //         batchReport.correctPhonesInDB.push(phone);
-    //       }
-
-    //       const fixedPhoneNumber = fixPhoneNumberCountryCode(phone.phoneNumber);
-
-    //       if (!isValidPhoneNumber(phone.phoneNumber) && fixedPhoneNumber) {
-    //         batchReport.fixedPhonesInDB.push({
-    //           ...phone,
-    //           phoneNumber: fixedPhoneNumber,
-    //         });
-    //       }
-
-    //       if (!isValidPhoneNumber(phone.phoneNumber) && !fixedPhoneNumber) {
-    //         batchReport.unfixablePhonesInDB.push({
-    //           ...phone,
-    //           phoneNumber: defaultPhoneNumber,
-    //         });
-    //       }
-    //     });
-
-    //     await deps.updatePhones(batchReport.fixedPhonesInDB, table);
-    //     await deps.updatePhones(batchReport.unfixablePhonesInDB, table);
-
-    //     report.correctPhonesInDB.push(...batchReport.correctPhonesInDB);
-    //     report.fixedPhonesInDB.push(...batchReport.fixedPhonesInDB);
-    //     report.unfixablePhonesInDB.push(...batchReport.unfixablePhonesInDB);
-
-    //     page++;
-    //   } while (phonesBatch.length > 0);
-    // }
-
-    // return report;
   });
 
 const fixPhoneNumberCountryCode = (phoneNumber: string): string | undefined => {
@@ -134,7 +87,9 @@ const fixPhoneNumberCountryCode = (phoneNumber: string): string | undefined => {
   return fixedPhoneNumber;
 };
 
-const getPhoneNumbers = async (kyselyDb: KyselyDb): Promise<PhoneInDB[]> => {
+export const getPhoneNumbers = async (
+  kyselyDb: KyselyDb,
+): Promise<PhoneInDB[]> => {
   return await kyselyDb
     .selectFrom("phone_numbers")
     .select(["id", "phone_number as phoneNumber"])
@@ -144,8 +99,10 @@ const getPhoneNumbers = async (kyselyDb: KyselyDb): Promise<PhoneInDB[]> => {
 const fixPhones = async (
   kyselyDb: KyselyDb,
   phonesToFix: PhoneInDB[],
-): Promise<void> => {
-  await kyselyDb
+): Promise<{ fixedPhoneIds: number[] }> => {
+  if (phonesToFix.length === 0) return { fixedPhoneIds: [] };
+
+  const results = await kyselyDb
     .insertInto("phone_numbers")
     .values(
       phonesToFix.map((pn) => ({ id: pn.id, phone_number: pn.phoneNumber })),
@@ -155,5 +112,10 @@ const fixPhones = async (
         phone_number: eb.ref("excluded.phone_number"),
       })),
     )
+    .returning("id")
     .execute();
+
+  return {
+    fixedPhoneIds: results.map((res) => res.id),
+  };
 };
