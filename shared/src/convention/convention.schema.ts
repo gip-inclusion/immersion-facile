@@ -63,11 +63,13 @@ import {
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  CCI_15YO_REQUIREMENT_RELEASE_DATE,
+  CCI_16YO_REQUIREMENT_RELEASE_DATE,
   CCI_DAILY_MAX_PERMITTED_HOURS,
   CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
+  CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD,
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   CCI_WEEKLY_MAX_PERMITTED_HOURS,
-  CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
   type ConventionCommon,
   type ConventionDto,
   type ConventionId,
@@ -794,33 +796,52 @@ const addIssueIfLimitedScheduleHoursExceeded = (
   });
 
   if (
-    beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
     weeklyHours.some(
       (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
     )
   ) {
-    addIssue(
-      `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
-      getConventionFieldName("schedule.totalHours"),
-    );
+    if (beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD) {
+      addIssue(
+        `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
+        getConventionFieldName("schedule.totalHours"),
+      );
+    }
+    if (
+      beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
+      new Date(convention.dateSubmission).getTime() >=
+        CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime()
+    ) {
+      addIssue(
+        `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
+        getConventionFieldName("schedule.totalHours"),
+      );
+    }
   }
 
   if (
-    beneficiaryAgeAtConventionStart >= CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
     weeklyHours.some(
       (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_MAX_PERMITTED_HOURS,
-    ) &&
-    new Date(convention.dateSubmission).getTime() >=
-      CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE.getTime()
+    )
   ) {
-    addIssue(
-      `La durée maximale hebdomadaire pour un mini-stage est de ${CCI_WEEKLY_MAX_PERMITTED_HOURS}h`,
-      getConventionFieldName("schedule.totalHours"),
-    );
+    if (
+      (beneficiaryAgeAtConventionStart >= CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD &&
+        new Date(convention.dateSubmission).getTime() >=
+          CCI_15YO_REQUIREMENT_RELEASE_DATE.getTime()) ||
+      (beneficiaryAgeAtConventionStart >= CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
+        new Date(convention.dateSubmission).getTime() >=
+          CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime())
+    ) {
+      addIssue(
+        `La durée maximale hebdomadaire pour un mini-stage est de ${CCI_WEEKLY_MAX_PERMITTED_HOURS}h`,
+        getConventionFieldName("schedule.totalHours"),
+      );
+    }
   }
 
   if (
-    dailyHours.some((dailyHour) => dailyHour > CCI_DAILY_MAX_PERMITTED_HOURS)
+    dailyHours.some((dailyHour) => dailyHour > CCI_DAILY_MAX_PERMITTED_HOURS) &&
+    new Date(convention.dateSubmission).getTime() >=
+      CCI_15YO_REQUIREMENT_RELEASE_DATE.getTime()
   ) {
     addIssue(
       `La durée maximale journalière pour un mini-stage est de ${CCI_DAILY_MAX_PERMITTED_HOURS}h`,
