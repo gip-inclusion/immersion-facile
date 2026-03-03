@@ -14,6 +14,7 @@ import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWo
 import {
   domainTopicByTargetStatusMap,
   signConvention,
+  throwErrorOnConventionIdMismatch,
 } from "../entities/Convention";
 
 export class SignConvention extends TransactionalUseCase<
@@ -42,6 +43,10 @@ export class SignConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
+    throwErrorOnConventionIdMismatch({
+      requestedConventionId: conventionId,
+      jwtPayload,
+    });
     const convention =
       await uow.conventionQueries.getConventionById(conventionId);
     if (!convention) throw errors.convention.notFound({ conventionId });

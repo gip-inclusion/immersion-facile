@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   ConnectedUserBuilder,
+  type ConventionDomainJwtPayload,
   ConventionDtoBuilder,
   type ConventionId,
   errors,
@@ -482,6 +483,38 @@ describe("UpdateConventionStatus", () => {
       }),
       errors.convention.notFound({
         conventionId: missingConventionId,
+      }),
+    );
+  });
+  it("should throw if convention id in payload and in jwt mismatch", async () => {
+    const fakeConventionId: ConventionId =
+      "add5c20e-6dd2-45af-affe-000000000000";
+    const jwtPayload: ConventionDomainJwtPayload = {
+      role: "establishment-representative",
+      applicationId: "not-matching-convention-id",
+      emailHash: "bad-hash",
+    };
+    const { updateConventionStatusUseCase, conventionRepository } =
+      await setupInitialState({
+        initialStatus: "IN_REVIEW",
+        conventionId: fakeConventionId,
+      });
+    await expectPromiseToFailWithError(
+      executeUpdateConventionStatusUseCase({
+        jwtPayload,
+        updateStatusParams: {
+          status: "ACCEPTED_BY_VALIDATOR",
+          conventionId: fakeConventionId,
+          firstname: "Validator Firstname",
+          lastname: "Validator Lastname",
+        },
+        updateConventionStatusUseCase,
+        conventionRepository,
+      }),
+      errors.convention.forbiddenConventionIdMismatch({
+        jwtConventionId: jwtPayload.applicationId,
+        jwtRole: jwtPayload.role,
+        requestedConventionId: fakeConventionId,
       }),
     );
   });
