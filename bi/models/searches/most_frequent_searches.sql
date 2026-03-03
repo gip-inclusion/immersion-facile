@@ -15,4 +15,4 @@ select
     appellations.libelle_appellation_long as appellation_label
 from {{ source('immersion', 'stats__most_frequent_searches') }} as mfs
 left join {{ source('immersion', 'public_appellations_data') }} as appellations
-    on mfs.appellation_code = appellations.ogr_appellation
+    on mfs.appellation_code = appellations.ogr_appellation::varchar

@@ -268,6 +268,10 @@ type StatsRow = {
 const toStatsWithDateString = (stats: StatsRow) => ({
   ...stats,
   day: toDateString(stats.day),
+  avg_number_of_results:
+    stats.avg_number_of_results !== null
+      ? Number(stats.avg_number_of_results)
+      : null,
 });
 
 type SearchMadeParams = {

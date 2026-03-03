@@ -36,10 +36,9 @@ export const updateStatsMostFrequentSearchesSql = async (
           "ap.appellation_code",
           "searches_made.address",
           "searches_made.department_code",
-          ({ fn }) =>
-            fn
-              .avg("searches_made.number_of_results")
-              .as("avg_number_of_results"),
+          sql<number>`round(avg(searches_made.number_of_results))::integer`.as(
+            "avg_number_of_results",
+          ),
           ({ fn }) => fn.count("searches_made.id").as("count"),
         ])
         .where(
