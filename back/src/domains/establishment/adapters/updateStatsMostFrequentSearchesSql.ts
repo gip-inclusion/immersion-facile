@@ -36,6 +36,10 @@ export const updateStatsMostFrequentSearchesSql = async (
           "ap.appellation_code",
           "searches_made.address",
           "searches_made.department_code",
+          ({ fn }) =>
+            fn
+              .avg("searches_made.number_of_results")
+              .as("avg_number_of_results"),
           ({ fn }) => fn.count("searches_made.id").as("count"),
         ])
         .where(
@@ -59,13 +63,21 @@ export const updateStatsMostFrequentSearchesSql = async (
           "address",
           "department_code",
           "count",
+          "avg_number_of_results",
           sql<number>`ROW_NUMBER() OVER (PARTITION BY day ORDER BY count DESC)`.as(
             "rn",
           ),
         ]),
     )
     .insertInto("stats__most_frequent_searches")
-    .columns(["day", "appellation_code", "address", "department_code", "count"])
+    .columns([
+      "day",
+      "appellation_code",
+      "address",
+      "department_code",
+      "count",
+      "avg_number_of_results",
+    ])
     .expression((eb) =>
       eb
         .selectFrom("ranked")
@@ -75,6 +87,7 @@ export const updateStatsMostFrequentSearchesSql = async (
           "address",
           "department_code",
           "count",
+          "avg_number_of_results",
         ])
         .where("rn", "<=", 1000),
     )

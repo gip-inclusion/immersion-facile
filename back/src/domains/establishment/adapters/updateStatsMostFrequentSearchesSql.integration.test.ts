@@ -60,6 +60,7 @@ describe("updateStatsMostFrequentSearchesSql", () => {
         address: "Paris",
         department_code: "75",
         count: 1,
+        avg_number_of_results: null,
       },
     ]);
   });
@@ -75,6 +76,7 @@ describe("updateStatsMostFrequentSearchesSql", () => {
         address: "Paris",
         departmentCode: "75",
         voluntaryToImmersion: true,
+        numberOfResults: 10,
       },
       {
         id: searchId2,
@@ -82,6 +84,7 @@ describe("updateStatsMostFrequentSearchesSql", () => {
         address: "Paris",
         departmentCode: "75",
         voluntaryToImmersion: true,
+        numberOfResults: 30,
       },
     ]);
     await insertSearchesMadeAppellationCodes(db, [
@@ -103,6 +106,7 @@ describe("updateStatsMostFrequentSearchesSql", () => {
         address: "Paris",
         department_code: "75",
         count: 2,
+        avg_number_of_results: 20,
       },
     ]);
   });
@@ -209,6 +213,7 @@ describe("updateStatsMostFrequentSearchesSql", () => {
         address: "Lyon",
         department_code: "69",
         count: 1,
+        avg_number_of_results: null,
       },
       {
         day: toDateString(today),
@@ -216,6 +221,7 @@ describe("updateStatsMostFrequentSearchesSql", () => {
         address: "Paris",
         department_code: "75",
         count: 1,
+        avg_number_of_results: null,
       },
     ]);
   });
@@ -256,6 +262,7 @@ type StatsRow = {
   address: string | null;
   department_code: string | null;
   count: number;
+  avg_number_of_results: number | null;
 };
 
 const toStatsWithDateString = (stats: StatsRow) => ({
@@ -269,6 +276,7 @@ type SearchMadeParams = {
   address: string;
   departmentCode: string;
   voluntaryToImmersion: boolean;
+  numberOfResults?: number;
 };
 
 const insertSearchesMade = async (db: KyselyDb, searches: SearchMadeParams[]) =>
@@ -281,6 +289,9 @@ const insertSearchesMade = async (db: KyselyDb, searches: SearchMadeParams[]) =>
         address: s.address,
         department_code: s.departmentCode,
         voluntary_to_immersion: s.voluntaryToImmersion,
+        ...(s.numberOfResults !== undefined && {
+          number_of_results: s.numberOfResults,
+        }),
       })),
     )
     .execute();
