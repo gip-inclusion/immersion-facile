@@ -18,3 +18,7 @@ models:
         description: "Number of searches for this combination"
         tests:
           - not_null
+      - name: avg_number_of_results
+        description: "Average number of results returned for this search combination"
+      - name: appellation_label
+        description: "Full appellation label from public_appellations_data"

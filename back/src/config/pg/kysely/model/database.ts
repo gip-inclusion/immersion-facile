@@ -653,6 +653,7 @@ interface StatsMostFrequentSearches {
   address: string | null;
   department_code: string | null;
   count: number;
+  avg_number_of_results: number | null;
 }
 
 interface UsersAgencies {
