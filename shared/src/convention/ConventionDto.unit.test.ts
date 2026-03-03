@@ -2,7 +2,7 @@ import { addDays, format, subDays, subYears } from "date-fns";
 import { keys } from "ramda";
 import { ZodError } from "zod";
 import {
-  CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
+  CCI_15YO_REQUIREMENT_RELEASE_DATE,
   DATE_CONSIDERED_OLD,
   type DailyScheduleDto,
   type DateIntervalDto,
@@ -29,7 +29,10 @@ import {
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  CCI_16YO_REQUIREMENT_RELEASE_DATE,
   CCI_DAILY_MAX_PERMITTED_HOURS,
+  CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
+  CCI_WEEKLY_MAX_PERMITTED_HOURS,
   type ConventionInternshipKindSpecific,
   type ConventionReadDto,
   conventionStatuses,
@@ -756,104 +759,258 @@ describe("conventionDtoSchema", () => {
       });
     });
 
-    describe("CCI specific, minor under 16yo", () => {
-      it("max week hours depends on beneficiary age", () => {
-        const dateStart = new Date("2024-10-07").toISOString();
-        const dateEnd = addDays(new Date(dateStart), 5).toISOString();
-        const convention = new ConventionDtoBuilder()
-          .withInternshipKind("mini-stage-cci")
-          .withDateStart(dateStart)
-          .withDateEnd(dateEnd)
-          .withSchedule(reasonableSchedule)
-          .withBeneficiary({
-            birthdate: new Date("2010-05-26").toISOString(),
-            firstName: "Jean",
-            lastName: "Bono",
-            role: "beneficiary",
-            email: "jean@bono.com",
-            levelOfEducation: "4ème",
-            schoolName: "lycée Jean Moulin",
-            schoolPostcode: "06500",
-            phone: "0836656565",
-            address: {
-              city: "Paris",
-              postcode: "75001",
-              streetNumberAndAddress: "1 rue de Rivoli",
-              departmentCode: "75",
-            },
-            isRqth: false,
-          })
-          .withBeneficiaryRepresentative(beneficiaryRepresentative)
-          .build();
-        expectDtoInvalidWithIssueMessages(conventionSchema, convention, {
-          "schedule.totalHours":
-            "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 16 ans est de 30h",
-        });
-      });
-
+    describe("CCI specific age constraints", () => {
       describe("Add issue when week hours is greater than cci max hours", () => {
-        const convention42h = new ConventionDtoBuilder()
-          .withInternshipKind("mini-stage-cci")
-          .withDateStart(new Date("2023-12-25").toISOString())
-          .withDateEnd(new Date("2023-12-30").toISOString())
-          .withSchedule(reasonableSchedule)
-          .withBeneficiary({
-            birthdate: subYears(
-              CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
-              18,
-            ).toISOString(),
-            firstName: "Jean",
-            lastName: "Bono",
-            role: "beneficiary",
-            email: "jean@bono.com",
-            levelOfEducation: "4ème",
-            schoolName: "lycée Jean Moulin",
-            schoolPostcode: "06500",
-            phone: "0836656565",
-            isRqth: false,
-          })
-          .build();
+        const conventionStartDate = new Date("2025-11-03");
+        const makeConventionDto = ({
+          conventionStartDate,
+          submissionDate,
+          workedDaysCount,
+          beneficiaryBirthdate,
+        }: {
+          conventionStartDate: Date;
+          submissionDate: DateString;
+          workedDaysCount: number;
+          beneficiaryBirthdate: DateString;
+        }) => {
+          return new ConventionDtoBuilder()
+            .withInternshipKind("mini-stage-cci")
+            .withDateStart(conventionStartDate.toISOString())
+            .withDateEnd(
+              addDays(conventionStartDate, workedDaysCount - 1).toISOString(),
+            )
+            .withDateSubmission(submissionDate)
+            .withBeneficiaryBirthdate(beneficiaryBirthdate)
+            .withBeneficiaryRepresentative(beneficiaryRepresentative)
+            .withSchedule(reasonableSchedule)
+            .build();
+        };
 
-        it("valid when convention created before release date", () => {
-          expectDtoToBeValid(
-            conventionSchema,
-            new ConventionDtoBuilder(convention42h)
-              .withDateSubmission(
-                toDateUTCString(
-                  subDays(CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE, 1),
-                ),
-              )
-              .build(),
+        describe("when beneficiary is under 15yo", () => {
+          const beneficiaryBirthdayDate = subYears(
+            new Date(conventionStartDate),
+            14,
           );
+
+          it.each([
+            {
+              title: `before ${CCI_15YO_REQUIREMENT_RELEASE_DATE}`,
+              submissionDate: subDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+            },
+            {
+              title: `after ${CCI_15YO_REQUIREMENT_RELEASE_DATE}`,
+              submissionDate: addDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+            },
+            {
+              title: `after ${CCI_16YO_REQUIREMENT_RELEASE_DATE}`,
+              submissionDate: addDays(
+                CCI_16YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+            },
+          ])("when $title, can create convention with weekly hours < 30h", ({
+            submissionDate,
+          }) => {
+            const conventionWithLightSchedule = makeConventionDto({
+              conventionStartDate,
+              submissionDate,
+              workedDaysCount: 4,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoToBeValid(conventionSchema, conventionWithLightSchedule);
+          });
+
+          it.each([
+            {
+              title: `before ${CCI_15YO_REQUIREMENT_RELEASE_DATE}`,
+              submissionDate: subDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              beneficiaryAgeLimit: 15,
+            },
+            {
+              title: `after ${CCI_15YO_REQUIREMENT_RELEASE_DATE}`,
+              submissionDate: addDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              beneficiaryAgeLimit: 15,
+            },
+            {
+              title: `after ${CCI_16YO_REQUIREMENT_RELEASE_DATE}`,
+              submissionDate: addDays(
+                CCI_16YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              beneficiaryAgeLimit: 16,
+            },
+          ])("when $title, fails when weekly hours > 30h", ({
+            submissionDate,
+            beneficiaryAgeLimit,
+          }) => {
+            const conventionWithLightSchedule = makeConventionDto({
+              conventionStartDate,
+              submissionDate,
+              workedDaysCount: 5,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoInvalidWithIssueMessages(
+              conventionSchema,
+              conventionWithLightSchedule,
+              {
+                "schedule.totalHours": `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${beneficiaryAgeLimit} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
+              },
+            );
+          });
         });
 
-        it("issue after release date", () => {
-          expectDtoInvalidWithIssueMessages(
-            conventionSchema,
-            new ConventionDtoBuilder(convention42h)
-              .withDateSubmission(
-                toDateUTCString(CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE),
-              )
-              .build(),
-            {
+        describe("when beneficiary is between 15yo and 16yo", () => {
+          const beneficiaryBirthdayDate = subYears(conventionStartDate, 15);
+
+          it(`before ${CCI_15YO_REQUIREMENT_RELEASE_DATE}, convention can have > ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS} hours`, () => {
+            const convention42h = makeConventionDto({
+              conventionStartDate,
+              submissionDate: subDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 6,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoToBeValid(conventionSchema, convention42h);
+          });
+
+          it(`after ${CCI_15YO_REQUIREMENT_RELEASE_DATE}, weekly hours can be > ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS} hours but <= ${CCI_WEEKLY_MAX_PERMITTED_HOURS} hours`, () => {
+            const convention35h = makeConventionDto({
+              conventionStartDate,
+              submissionDate: addDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 5,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoToBeValid(conventionSchema, convention35h);
+          });
+
+          it(`after ${CCI_15YO_REQUIREMENT_RELEASE_DATE} and before ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, fails when weekly hours > ${CCI_WEEKLY_MAX_PERMITTED_HOURS} hours`, () => {
+            const convention42h = makeConventionDto({
+              conventionStartDate,
+              submissionDate: addDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 6,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoInvalidWithIssueMessages(conventionSchema, convention42h, {
               "schedule.totalHours":
                 "La durée maximale hebdomadaire pour un mini-stage est de 35h",
+            });
+          });
+
+          it(`after ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, fails when weekly hours > ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS} hours`, () => {
+            const convention35h = makeConventionDto({
+              conventionStartDate,
+              submissionDate: addDays(
+                CCI_16YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 5,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoInvalidWithIssueMessages(conventionSchema, convention35h, {
+              "schedule.totalHours":
+                "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 16 ans est de 30h",
+            });
+          });
+        });
+
+        describe("when beneficiary is > 16yo", () => {
+          const beneficiaryBirthdayDate = subYears(conventionStartDate, 18);
+
+          it.each([
+            {
+              title: `before ${CCI_15YO_REQUIREMENT_RELEASE_DATE}, can create convention > ${CCI_WEEKLY_MAX_PERMITTED_HOURS} hours`,
+              submissionDate: subDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 6,
+              weeklyHours: 42,
             },
-          );
+            {
+              title: `after ${CCI_15YO_REQUIREMENT_RELEASE_DATE}, can create convention <= ${CCI_WEEKLY_MAX_PERMITTED_HOURS} hours`,
+              submissionDate: addDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 5,
+              weeklyHours: 35,
+            },
+            {
+              title: `after ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, can create convention <= ${CCI_WEEKLY_MAX_PERMITTED_HOURS} hours`,
+              submissionDate: addDays(
+                CCI_16YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 5,
+              weeklyHours: 35,
+            },
+          ])("$title", ({ submissionDate, workedDaysCount }) => {
+            const convention42h = makeConventionDto({
+              conventionStartDate,
+              submissionDate: submissionDate,
+              workedDaysCount: workedDaysCount,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoToBeValid(conventionSchema, convention42h);
+          });
+
+          it(`after ${CCI_15YO_REQUIREMENT_RELEASE_DATE}, cannot create convention > ${CCI_WEEKLY_MAX_PERMITTED_HOURS} hours`, () => {
+            const convention42h = makeConventionDto({
+              conventionStartDate,
+              submissionDate: addDays(
+                CCI_15YO_REQUIREMENT_RELEASE_DATE,
+                1,
+              ).toISOString(),
+              workedDaysCount: 6,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoInvalidWithIssueMessages(conventionSchema, convention42h, {
+              "schedule.totalHours":
+                "La durée maximale hebdomadaire pour un mini-stage est de 35h",
+            });
+          });
         });
       });
 
       describe("Add issue when daily hours is greater than cci max daily hours", () => {
-        const dateStart = new Date("2024-10-07").toISOString();
+        const dateStart = new Date("2022-10-10").toISOString();
         const dateEnd = addDays(new Date(dateStart), 4).toISOString();
 
-        const createConventionWithTimePeriods = (
+        const createOldConventionWithTimePeriods = (
           timePeriods: TimePeriodsDto,
         ) => {
           const dailyComplexSchedule = [
-            { date: "2024-10-07T00:00:00.000Z", timePeriods },
+            { date: "2022-10-10T00:00:00.000Z", timePeriods },
             {
-              date: "2024-10-08T00:00:00.000Z",
+              date: "2022-10-11T00:00:00.000Z",
               timePeriods: [{ start: "09:00", end: "15:00" }],
             },
           ];
@@ -876,20 +1033,39 @@ describe("conventionDtoSchema", () => {
             .build();
         };
 
-        it("adds issue when a day exceeds CCI_DAILY_MAX_PERMITTED_HOURS", () => {
-          const convention = createConventionWithTimePeriods([
-            { start: "07:00", end: "15:00" },
-          ]);
-          expectDtoInvalidWithIssueMessages(conventionSchema, convention, {
-            "schedule.totalHours": `La durée maximale journalière pour un mini-stage est de ${CCI_DAILY_MAX_PERMITTED_HOURS}h`,
-          });
+        it(`valid when submitted before ${CCI_15YO_REQUIREMENT_RELEASE_DATE} and exceed daily limit of ${CCI_DAILY_MAX_PERMITTED_HOURS}h`, () => {
+          const oldConvention = new ConventionDtoBuilder(
+            createOldConventionWithTimePeriods([
+              { start: "07:00", end: "15:00" },
+            ]),
+          )
+            .withDateSubmission(
+              subDays(CCI_15YO_REQUIREMENT_RELEASE_DATE, 1).toISOString(),
+            )
+            .build();
+
+          expectDtoToBeValid(conventionSchema, oldConvention);
         });
 
-        it("does not add issue when all days are within CCI_DAILY_MAX_PERMITTED_HOURS", () => {
-          const convention = createConventionWithTimePeriods([
-            { start: "09:00", end: "14:00" },
-          ]);
-          expectDtoToBeValid(conventionSchema, convention);
+        it(`throw when submitted after ${CCI_15YO_REQUIREMENT_RELEASE_DATE} and exceed daily limit of ${CCI_DAILY_MAX_PERMITTED_HOURS}h`, () => {
+          const recentConvention = new ConventionDtoBuilder(
+            createOldConventionWithTimePeriods([
+              { start: "07:00", end: "15:00" },
+            ]),
+          )
+            .withDateSubmission(
+              toDateUTCString(addDays(CCI_15YO_REQUIREMENT_RELEASE_DATE, 1)),
+            )
+            .build();
+
+          expectDtoInvalidWithIssueMessages(
+            conventionSchema,
+            recentConvention,
+            {
+              "schedule.totalHours":
+                "La durée maximale journalière pour un mini-stage est de 7h",
+            },
+          );
         });
       });
     });
