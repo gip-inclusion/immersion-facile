@@ -4,8 +4,8 @@ Le public cible de l'issue est constitué de **PO, UX designers, PM** qui connai
 
 ## Récupérer le contexte
 
-1. Récupérer les commits de la branche : `git log main..HEAD --oneline`
-2. Récupérer le diff avec main : `git diff main...HEAD`
+1. Récupérer les commits de la branche : `git log origin/main..HEAD --oneline`
+2. Récupérer le diff avec main : `git diff origin/main...HEAD`
 3. Récupérer le nom de la branche courante : `git branch --show-current`
 
 ## Rédiger l'issue
@@ -68,16 +68,20 @@ Ne PAS créer de commit vide. Récupérer le message du dernier commit avec `git
 
 ## Créer la PR en draft
 
-Pusher la branche et créer une PR en draft liée à l'issue :
+Pusher la branche et créer une PR en draft liée à l'issue.
+
+1. Lire le template de PR : `.github/PULL_REQUEST_TEMPLATE.md`
+2. Construire le body en injectant `Fixes #<numéro-issue>` au début, suivi du contenu du template (conserver les checkboxes et sections telles quelles)
+3. Pusher et créer la PR :
 
 ```
 git push -u origin <nom-branche>
-gh pr create --draft --fill-first --title "#<numéro-issue> - <titre-issue>" --body "Fixes #<numéro-issue>"
+gh pr create --draft --title "#<numéro-issue> - <titre-issue>" --body "<body-construit>" --assignee @me
 ```
 
 Le titre de la PR suit le format du projet : `#<numéro-issue> - <description courte>`.
 Exemple : `#4096 - Durée de vie du lien de connexion passée à 15 min`
 
-`Fixes #<numéro-issue>` dans le corps permet à GitHub de fermer automatiquement l'issue au merge.
+`Fixes #<numéro-issue>` dans le body permet à GitHub de fermer automatiquement l'issue au merge.
 
 Afficher l'URL de la PR créée à l'utilisateur.
