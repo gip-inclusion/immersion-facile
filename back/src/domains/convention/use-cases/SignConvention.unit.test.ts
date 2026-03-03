@@ -4,6 +4,7 @@ import {
   allSignatoryRoles,
   type BeneficiaryRepresentative,
   ConnectedUserBuilder,
+  type ConventionDomainJwtPayload,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -79,6 +80,22 @@ describe("Sign convention", () => {
     ]);
 
   describe("wrong paths", () => {
+    it("should throw if convention id in payload and in jwt mismatch", async () => {
+      const jwtPayload: ConventionDomainJwtPayload = {
+        role: "establishment-representative",
+        applicationId: "not-matching-convention-id",
+        emailHash: "bad-hash",
+      };
+      await expectPromiseToFailWithError(
+        signConvention.execute({ conventionId: conventionId }, jwtPayload),
+        errors.convention.forbiddenConventionIdMismatch({
+          jwtConventionId: jwtPayload.applicationId,
+          jwtRole: jwtPayload.role,
+          requestedConventionId: conventionId,
+        }),
+      );
+    });
+
     it("Convention cannot be signed if it is not found in DB", async () => {
       await expectPromiseToFailWithError(
         signConvention.execute(

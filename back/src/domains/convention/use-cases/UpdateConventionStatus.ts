@@ -1,6 +1,5 @@
 import {
   type AgencyId,
-  backOfficeEmail,
   type ConventionDto,
   type ConventionId,
   type ConventionRelatedJwtPayload,
@@ -17,7 +16,6 @@ import {
   validatedConventionStatuses,
   type WithConventionIdLegacy,
 } from "shared";
-import { getAgencyEmailFromEmailHash } from "../../../utils/emailHash";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -25,7 +23,10 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfTransitionNotAllowed } from "../entities/Convention";
+import {
+  throwErrorOnConventionIdMismatch,
+  throwIfTransitionNotAllowed,
+} from "../entities/Convention";
 
 const domainTopicByTargetStatusMap: Record<
   ConventionStatus,
@@ -63,6 +64,10 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     payload: UpdateConventionStatusSupportedJwtPayload,
   ): Promise<WithConventionIdLegacy> {
+    throwErrorOnConventionIdMismatch({
+      requestedConventionId: params.conventionId,
+      jwtPayload: payload,
+    });
     const conventionRead = await uow.conventionQueries.getConventionById(
       params.conventionId,
     );
@@ -274,27 +279,4 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       },
     });
   }
-
-  #getAgencyActorEmail = async (
-    uow: UnitOfWork,
-    payload: UpdateConventionStatusSupportedJwtPayload,
-    originalConvention: ConventionDto,
-  ): Promise<string> => {
-    if (!("role" in payload)) {
-      const agencyIcUserEmail = await this.#agencyEmailFromUserIdAndAgencyId(
-        uow,
-        payload.userId,
-        originalConvention.agencyId,
-      );
-      return agencyIcUserEmail;
-    }
-
-    return "emailHash" in payload
-      ? getAgencyEmailFromEmailHash(
-          uow,
-          originalConvention.agencyId,
-          payload.emailHash,
-        )
-      : backOfficeEmail;
-  };
 }
