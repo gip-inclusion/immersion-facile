@@ -2101,7 +2101,6 @@ Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moi
         Une belle reconnaissance pour votre implication dans la découverte des métiers et de l’inclusion !
 
         🎥 <strong>Webinaire : “Comment devenir une Super Entreprise ?”</strong>
-        Tous les jeudis, de 11h à 12h.
         Découvrez comment :
         • obtenir le label “Super Entreprise” engagée
         • booster la visibilité de vos offres d’immersion
