@@ -21,11 +21,17 @@ export type WithUserId = {
 
 export type WithOptionalUserId = Partial<WithUserId>;
 
+export type LastnameMandatory = Flavor<string, "LastnameMandatory">;
+export type Lastname = Flavor<string, "Lastname"> | LastnameMandatory;
+
+export type FirstnameMandatory = Flavor<string, "FirstnameMandatory">;
+export type Firstname = Flavor<string, "Firstname"> | FirstnameMandatory;
+
 export type User = {
   id: UserId;
   email: Email;
-  firstName: string;
-  lastName: string;
+  firstName: Firstname;
+  lastName: Lastname;
   createdAt: DateTimeIsoString;
   lastLoginAt?: DateTimeIsoString;
   proConnect: ProConnectInfos | null;
