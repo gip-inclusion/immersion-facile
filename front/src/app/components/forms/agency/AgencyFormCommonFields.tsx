@@ -7,6 +7,7 @@ import {
   type AddressAndPosition,
   type AddressDto,
   type AddressWithCountryCodeAndPosition,
+  type AgencyName,
   addressDtoToString,
   type CreateAgencyDto,
   defaultCountryCode,
@@ -96,7 +97,7 @@ export const AgencyFormCommonFields = ({
 
   useEffect(() => {
     if (!isFetchingSiret && establishmentInfos && mode === "create") {
-      setValue("name", establishmentInfos.businessName);
+      setValue("name", establishmentInfos.businessName as AgencyName);
       dispatch(
         geocodingSlice.actions.fetchSuggestionsRequested({
           locator: "agency-address",
