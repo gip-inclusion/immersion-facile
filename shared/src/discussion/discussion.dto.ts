@@ -18,6 +18,12 @@ import type { SearchTextAlphaNumeric } from "../search/searchText.schema";
 import type { SiretDto } from "../siret/siret";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
+import type {
+  Firstname,
+  FirstnameMandatory,
+  Lastname,
+  LastnameMandatory,
+} from "../user/user.dto";
 import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import type {
@@ -42,7 +48,11 @@ export type DiscussionExchangeForbiddenReason =
 export type DiscussionExchangeForbiddenParams = {
   sender: ExchangeRole;
   reason: DiscussionExchangeForbiddenReason;
-  admins: { firstName: string; lastName: string; email: Email }[];
+  admins: {
+    firstName: Firstname;
+    lastName: Lastname;
+    email: Email;
+  }[];
 };
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
@@ -52,18 +62,8 @@ export type WithDiscussionId = {
 
 export type DiscussionKind = "IF" | "1_ELEVE_1_STAGE";
 
-export type LegacyDiscussionEmailParams = {
-  discussionId: DiscussionId;
-  rawRecipientKind: string;
-};
-
-export type DiscussionEmailParams = LegacyDiscussionEmailParams & {
-  firstname: string;
-  lastname: string;
-};
-
 export type WithDiscussionMessage = {
-  message: string;
+  message: Message;
 };
 
 export type SendMessageToDiscussionFromDashboardRequestPayload = {
@@ -89,9 +89,9 @@ export const labelsForContactLevelOfEducation: Record<
 type ContactInformations<D extends DiscussionKind> = {
   appellationCode: AppellationCode;
   siret: SiretDto;
-  potentialBeneficiaryFirstName: string;
-  potentialBeneficiaryLastName: string;
-  potentialBeneficiaryEmail: string;
+  potentialBeneficiaryFirstName: FirstnameMandatory;
+  potentialBeneficiaryLastName: LastnameMandatory;
+  potentialBeneficiaryEmail: Email;
   contactMode: ContactMode;
   kind: D;
   locationId: LocationId;
@@ -141,9 +141,9 @@ type WithDiscussionKindProps<D extends DiscussionKind> = D extends "IF"
     };
 
 export type PotentialBeneficiaryCommonProps = {
-  email: string;
-  firstName: string;
-  lastName: string;
+  email: Email;
+  firstName: FirstnameMandatory;
+  lastName: LastnameMandatory;
   datePreferences: string;
   phone: PhoneNumber;
 };
@@ -251,9 +251,12 @@ export type Attachment = {
   link: string;
 };
 
+export type Message = Flavor<string, "Message">;
+export type Subject = Flavor<string, "Subject">;
+
 type CommonExchange = {
-  subject: string;
-  message: string;
+  subject: Subject;
+  message: Message;
   sentAt: DateString;
   attachments: Attachment[];
 };
@@ -262,8 +265,8 @@ export type SpecificExchangeSender<S extends ExchangeRole> =
   S extends "establishment"
     ? {
         sender: S;
-        firstname: string;
-        lastname: string;
+        firstname: Firstname;
+        lastname: Lastname;
         email: Email;
       }
     : {
@@ -312,8 +315,8 @@ export type DiscussionInList = Pick<
   | "status"
 > & {
   potentialBeneficiary: {
-    firstName: string;
-    lastName: string;
+    firstName: FirstnameMandatory;
+    lastName: LastnameMandatory;
     phone: string | null;
   };
   immersionObjective: ImmersionObjective | null;
