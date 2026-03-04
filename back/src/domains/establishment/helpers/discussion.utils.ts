@@ -1,28 +1,20 @@
 import { renderContent } from "html-templates/src/components/email";
 import {
   type BrevoEmailItem,
-  type DiscussionEmailParams,
+  type DiscussionId,
   type Email,
   type ExchangeRole,
   errors,
   immersionFacileContactEmail,
   makeExchangeEmailSchema,
-  type OmitFromExistingKeys,
 } from "shared";
 
 const defaultSubject = "Sans objet";
 
-type DiscussionEmailParamsWithRecipientKind = OmitFromExistingKeys<
-  DiscussionEmailParams,
-  "rawRecipientKind" | "firstname" | "lastname"
-> & {
-  recipientRole: ExchangeRole;
-};
-
 export const getDiscussionParamsFromEmail = (
   email: Email,
   replyDomain: string,
-): DiscussionEmailParamsWithRecipientKind => {
+): { discussionId: DiscussionId; recipientRole: ExchangeRole } => {
   const validatedEmail = makeExchangeEmailSchema(replyDomain).safeParse(email);
   if (!validatedEmail.success)
     throw errors.discussion.badEmailFormat({

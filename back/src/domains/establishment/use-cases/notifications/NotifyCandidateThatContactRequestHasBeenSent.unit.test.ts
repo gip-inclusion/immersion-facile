@@ -47,7 +47,7 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
   });
 
   it("throws when discussion is not found", async () => {
-    const notFoundDiscussionId = "404";
+    const notFoundDiscussionId = new UuidV4Generator().new();
     await expectPromiseToFailWithError(
       notifyCandidateThatContactRequestHasBeenSent.execute({
         siret: "11112222333344",
