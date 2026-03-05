@@ -51,6 +51,7 @@ export const initialState: SearchState = {
     fitForDisabledWorkers: undefined,
     sortBy: "score",
     sortOrder: "desc",
+    showOnlyAvailableOffers: true,
     page: 1,
     perPage: 12,
   },
