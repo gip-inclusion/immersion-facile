@@ -1,0 +1,21 @@
+{
+  "name": "load-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bundle": "tsc",
+    "typecheck": "tsc --noEmit",
+    "k6-example": "pnpm bundle && k6 run dist/k6-example.js",
+    "gatling-example": "gatling run --simulation gatling-example",
+    "k6-cloud": "k6 cloud src/k6-example.ts"
+  },
+  "dependencies": {
+    "@gatling.io/core": "3.15.1",
+    "@gatling.io/http": "3.15.1"
+  },
+  "devDependencies": {
+    "@gatling.io/cli": "3.15.1",
+    "@types/k6": "^1.6.0",
+    "typescript": "^5.8.3"
+  }
+}
