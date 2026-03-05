@@ -52,7 +52,10 @@ import {
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
-import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
+import {
+  createConnectedUserJwtPayload,
+  createConventionMagicLinkPayload,
+} from "../../../../utils/jwt";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("auth router", () => {
@@ -772,6 +775,35 @@ describe("auth router", () => {
                 role: unsupportedRole,
               }).message,
               status: 400,
+            },
+          });
+        });
+
+        it("403 - renew forbidden case on missing OAuth", async () => {
+          const user = new UserBuilder().build();
+
+          gateways.timeGateway.setNextDate(new Date());
+
+          inMemoryUow.userRepository.users = [user];
+
+          const response = await authRoutesClient.renewExpiredJwt({
+            queryParams: {
+              kind: "connectedUser",
+              expiredJwt: generateConnectedUserJwt(
+                createConnectedUserJwtPayload({
+                  userId: user.id,
+                  now: gateways.timeGateway.now(),
+                  durationHours: 1,
+                }),
+              ),
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
+            status: 403,
+            body: {
+              message: errors.auth.missingOAuth({}).message,
+              status: 403,
             },
           });
         });

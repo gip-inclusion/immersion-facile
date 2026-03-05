@@ -128,6 +128,7 @@ export class HttpAuthGateway implements AuthGateway {
           match(response)
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 403 }, logBodyAndThrow)
             .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),

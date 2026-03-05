@@ -89,6 +89,7 @@ export const authRoutes = defineRoutes({
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
+      403: httpErrorSchema,
       404: httpErrorSchema,
     },
   }),
