@@ -4,3 +4,4 @@ packages:
   - "shared"
   - "libs/*"
   - "playwright"
+  - "load-tests"
