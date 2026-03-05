@@ -4,6 +4,7 @@ packages:
   - "shared"
   - "libs/*"
   - "playwright-e2e"
+  - "load-tests"
 allowBuilds:
   '@parcel/watcher': false
   '@scarf/scarf': false
