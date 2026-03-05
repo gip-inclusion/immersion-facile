@@ -124,7 +124,6 @@ export * from "./schedule/ScheduleDtoBuilder";
 export * from "./schedule/ScheduleUtils";
 export * from "./search/Offer.dto";
 export * from "./search/Offer.schema";
-export * from "./search/SearchFilterKey";
 export * from "./search/SearchQueryParams.dto";
 export * from "./search/SearchQueryParams.schema";
 export * from "./search/search.routes";

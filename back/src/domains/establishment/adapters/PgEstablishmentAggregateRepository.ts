@@ -13,7 +13,6 @@ import {
   type DateTimeIsoString,
   type EstablishmentSearchableByValue,
   type ExpectTrue,
-  type ExtractAddedOrMissingSearchFiltersKeys,
   errors,
   type FitForDisableWorkerOption,
   type LocationId,
@@ -50,6 +49,7 @@ import type {
   RepositorySearchResultDto,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
+import type { ExtractAddedOrMissingSearchFiltersKeys } from "../ports/SearchMadeRepository";
 
 const logger = createLogger(__filename);
 const MAX_RESULTS_HARD_LIMIT = 100;

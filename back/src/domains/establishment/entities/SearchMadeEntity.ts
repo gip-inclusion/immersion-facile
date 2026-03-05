@@ -2,7 +2,6 @@ import type {
   ApiConsumerName,
   EstablishmentSearchableByValue,
   ExpectTrue,
-  ExtractAddedOrMissingSearchFiltersKeys,
   FitForDisableWorkerOption,
   Flavor,
   LocationId,
@@ -14,12 +13,13 @@ import type {
   WithAcquisition,
   WithNafCodes,
 } from "shared";
+import type { ExtractAddedOrMissingSearchFiltersKeys } from "../ports/SearchMadeRepository";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
 type SearchMadeFilters = {
   appellationCodes?: string[];
-  romeCodes?: RomeCode[];
+  romeCodes?: RomeCode[]; // TODO: remove when legacy search is off
   searchableBy?: EstablishmentSearchableByValue;
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
   locationIds?: LocationId[];
