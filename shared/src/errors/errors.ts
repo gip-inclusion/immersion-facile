@@ -274,7 +274,7 @@ export const errors = {
       ),
     missingOAuth: ({ state }: { state?: OAuthState }) =>
       new ForbiddenError(
-        `Il n'y a pas d'OAuth en cours ${state ? `avec l'état '${state}'` : ""}.`,
+        `Il n'y a pas d'authentification en cours ${state ? `avec l'état '${state}'` : ""}.`,
       ),
     unusedOAuth: () =>
       new ForbiddenError(
