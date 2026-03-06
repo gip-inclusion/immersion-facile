@@ -43,7 +43,7 @@ const convention = new ConventionDtoBuilder()
   .withStatus("ACCEPTED_BY_VALIDATOR")
   .build();
 
-const assessment: Extract<
+const signedAssessment: Extract<
   AssessmentDto,
   {
     status: ExtractFromExisting<AssessmentStatus, "PARTIALLY_COMPLETED">;
@@ -86,8 +86,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
   it("Throw when no convention were found", async () => {
     await expectPromiseToFailWithError(
-      usecase.execute({ assessment }),
-      errors.convention.notFound({ conventionId: assessment.conventionId }),
+      usecase.execute({ assessment: signedAssessment }),
+      errors.convention.notFound({
+        conventionId: signedAssessment.conventionId,
+      }),
     );
 
     expectSavedNotificationsAndEvents({
@@ -99,7 +101,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     await uow.conventionRepository.save(convention);
 
     await expectPromiseToFailWithError(
-      usecase.execute({ assessment }),
+      usecase.execute({ assessment: signedAssessment }),
       errors.agency.notFound({ agencyId: convention.agencyId }),
     );
 
@@ -108,7 +110,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     });
   });
 
-  it("Send an email to validators when beneficiary did the immersion and sign the assessment", async () => {
+  it("Send an email to validators when beneficiary did the immersion and signed the assessment", async () => {
     const validator2 = new ConnectedUserBuilder()
       .withEmail("validator2@email.com")
       .withId("validator2")
@@ -125,10 +127,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     );
     await uow.conventionRepository.save(convention);
     await uow.assessmentRepository.save(
-      createAssessmentEntity(assessment, convention),
+      createAssessmentEntity(signedAssessment, convention),
     );
 
-    await usecase.execute({ assessment });
+    await usecase.execute({ assessment: signedAssessment });
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -151,7 +153,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             conventionDateEnd: convention.dateEnd,
             immersionAppellationLabel:
               convention.immersionAppellation.appellationLabel,
-            assessment,
+            assessment: signedAssessment,
             numberOfHoursMade: "45h",
             manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
@@ -179,7 +181,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             conventionDateEnd: convention.dateEnd,
             immersionAppellationLabel:
               convention.immersionAppellation.appellationLabel,
-            assessment,
+            assessment: signedAssessment,
             numberOfHoursMade: "45h",
             manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
@@ -261,7 +263,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       }),
     );
     const assessmentNotSigned: AssessmentDto = {
-      ...assessment,
+      ...signedAssessment,
       signedAt: null,
       beneficiaryAgreement: null,
     };
@@ -301,10 +303,10 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       );
       await uow.conventionRepository.save(convention);
       await uow.assessmentRepository.save(
-        createAssessmentEntity(assessment, convention),
+        createAssessmentEntity(signedAssessment, convention),
       );
 
-      await usecase.execute({ assessment });
+      await usecase.execute({ assessment: signedAssessment });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -327,7 +329,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               conventionDateEnd: convention.dateEnd,
               immersionAppellationLabel:
                 convention.immersionAppellation.appellationLabel,
-              assessment,
+              assessment: signedAssessment,
               numberOfHoursMade: "45h",
               manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,

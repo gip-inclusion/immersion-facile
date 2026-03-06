@@ -52,7 +52,7 @@ export class PgNotificationRepository implements NotificationRepository {
     return [
       ...(await getSmsNotificationBuilder(this.transaction).execute()),
       ...(await getEmailsNotificationBuilder(this.transaction).execute()),
-    ].map(({ notif }) => stripNullsFromNotification(notif));
+    ].map(({ notif }) => notif);
   }
 
   public async deleteOldestNotifications({

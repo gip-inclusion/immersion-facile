@@ -221,10 +221,7 @@ describe("PgAssessmentRepository", () => {
         signedAt: signedAt,
       };
 
-      await assessmentRepository.update(
-        minimalAssessment.conventionId,
-        updatedAssessment,
-      );
+      await assessmentRepository.update(updatedAssessment);
 
       const updatedAssessmentStored =
         await assessmentRepository.getByConventionId(
@@ -237,7 +234,7 @@ describe("PgAssessmentRepository", () => {
       const nonExistentConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
 
       await expectPromiseToFailWithError(
-        assessmentRepository.update(nonExistentConventionId, {
+        assessmentRepository.update({
           _entityName: "Assessment",
           endedWithAJob: false,
           establishmentFeedback: "super feedback",

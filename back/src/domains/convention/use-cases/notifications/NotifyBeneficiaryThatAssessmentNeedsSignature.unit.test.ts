@@ -82,7 +82,7 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
       errors.convention.notFound({ conventionId: convention.id }),
     );
     expectSavedNotificationsAndEvents({ emails: [] });
-    expectToEqual(uow.shortLinkQuery.getShortLinks(), {});
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
   });
 
   it("throws when assessment not found", async () => {
@@ -94,7 +94,7 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
       errors.assessment.notFound(convention.id),
     );
     expectSavedNotificationsAndEvents({ emails: [] });
-    expectToEqual(uow.shortLinkQuery.getShortLinks(), {});
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
   });
 
   it("does not send notification when assessment status is DID_NOT_SHOW", async () => {
@@ -114,7 +114,7 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
     await usecase.execute({ convention, assessment: assessmentDidNotShow });
 
     expectSavedNotificationsAndEvents({ emails: [] });
-    expectToEqual(uow.shortLinkQuery.getShortLinks(), {});
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
   });
 
   it("notify beneficiary that assessment needs signature with single-use and 2-day lifetime signature short link", async () => {
@@ -141,13 +141,13 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
       lifetime: "2Days",
     });
 
-    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-      [shortLinkId]: {
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+      {
+        id: shortLinkId,
         url: expectedLongLink,
-        singleUse: true,
         lastUsedAt: null,
       },
-    });
+    ]);
 
     expectSavedNotificationsAndEvents({
       emails: [

@@ -74,7 +74,6 @@ export const makeNotifyBeneficiaryThatAssessmentNeedsSignature = useCaseBuilder(
     const assessmentSignatureLink = await makeMagicShortLink({
       targetRoute: frontRoutes.assessmentDocument,
       lifetime: "2Days",
-      singleUse: true,
     });
 
     await deps.saveNotificationAndRelatedEvent(uow, {

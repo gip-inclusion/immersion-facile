@@ -34,15 +34,12 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
     this.#assessments.push(assessment);
   }
 
-  public async update(
-    conventionId: ConventionId,
-    updatedAssessment: AssessmentEntity,
-  ): Promise<void> {
+  public async update(updatedAssessment: AssessmentEntity): Promise<void> {
     const assessmentToUpdate = this.#assessments.find(
-      (a) => a.conventionId === conventionId,
+      (a) => a.conventionId === updatedAssessment.conventionId,
     );
     if (!assessmentToUpdate) {
-      throw errors.assessment.notFound(conventionId);
+      throw errors.assessment.notFound(updatedAssessment.conventionId);
     }
     const index = this.#assessments.indexOf(assessmentToUpdate);
 

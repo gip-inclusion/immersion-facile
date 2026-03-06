@@ -398,42 +398,35 @@ describe("Assessment routes", () => {
   describe(`${displayRouteName(
     conventionMagicLinkRoutes.signAssessment,
   )} to sign assessment`, () => {
-    const conventionId = "a99eaca1-ee70-4c90-b3f4-668d492f7392";
-    const testAgency = AgencyDtoBuilder.create().build();
-    const testConvention = new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withAgencyId(testAgency.id)
-      .build();
-    const testAssessment = new AssessmentDtoBuilder()
-      .withConventionId(testConvention.id)
+    const assessment = new AssessmentDtoBuilder()
+      .withConventionId(convention.id)
       .build();
 
     it("200 - beneficiary with valid JWT can sign assessment", async () => {
       inMemoryUow.agencyRepository.agencies = [
-        toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
+        toAgencyWithRights(AgencyDtoBuilder.create(agency.id).build()),
       ];
-      inMemoryUow.conventionRepository.setConventions([testConvention]);
+      inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.assessmentRepository.assessments = [
         {
           _entityName: "Assessment",
-          ...testAssessment,
+          ...assessment,
           numberOfHoursActuallyMade: 40,
         },
       ];
 
       const beneficiaryJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
-          id: testConvention.id,
+          id: convention.id,
           role: "beneficiary",
-          email: testConvention.signatories.beneficiary.email,
+          email: convention.signatories.beneficiary.email,
           now: new Date(),
         }),
       );
 
       const response = await httpClient.signAssessment({
         body: {
-          conventionId: testConvention.id,
+          conventionId: convention.id,
           beneficiaryAgreement: true,
           beneficiaryFeedback: "my feedback",
         },
@@ -448,29 +441,29 @@ describe("Assessment routes", () => {
 
     it("403 - establishment-tutor cannot sign", async () => {
       inMemoryUow.agencyRepository.agencies = [
-        toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
+        toAgencyWithRights(AgencyDtoBuilder.create(agency.id).build()),
       ];
-      inMemoryUow.conventionRepository.setConventions([testConvention]);
+      inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.assessmentRepository.assessments = [
         {
           _entityName: "Assessment",
-          ...testAssessment,
+          ...assessment,
           numberOfHoursActuallyMade: 40,
         },
       ];
 
       const establishmentTutorJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
-          id: testConvention.id,
+          id: convention.id,
           role: "establishment-tutor",
-          email: testConvention.establishmentTutor.email,
+          email: convention.establishmentTutor.email,
           now: new Date(),
         }),
       );
 
       const response = await httpClient.signAssessment({
         body: {
-          conventionId: testConvention.id,
+          conventionId: convention.id,
           beneficiaryAgreement: true,
           beneficiaryFeedback: "my feedback",
         },
@@ -489,30 +482,30 @@ describe("Assessment routes", () => {
     it("403 - cannot sign legacy assessment", async () => {
       const legacyAssessment: AssessmentEntity = {
         _entityName: "Assessment",
-        conventionId: testConvention.id,
+        conventionId: convention.id,
         status: "FINISHED",
         establishmentFeedback: "Legacy feedback",
         numberOfHoursActuallyMade: null,
       };
 
       inMemoryUow.agencyRepository.agencies = [
-        toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
+        toAgencyWithRights(AgencyDtoBuilder.create(agency.id).build()),
       ];
-      inMemoryUow.conventionRepository.setConventions([testConvention]);
+      inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.assessmentRepository.assessments = [legacyAssessment];
 
       const beneficiaryJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
-          id: testConvention.id,
+          id: convention.id,
           role: "beneficiary",
-          email: testConvention.signatories.beneficiary.email,
+          email: convention.signatories.beneficiary.email,
           now: new Date(),
         }),
       );
 
       const response = await httpClient.signAssessment({
         body: {
-          conventionId: testConvention.id,
+          conventionId: convention.id,
           beneficiaryAgreement: true,
           beneficiaryFeedback: null,
         },
@@ -535,7 +528,7 @@ describe("Assessment routes", () => {
         createConventionMagicLinkPayload({
           id: nonExistentConventionId,
           role: "beneficiary",
-          email: testConvention.signatories.beneficiary.email,
+          email: convention.signatories.beneficiary.email,
           now: new Date(),
         }),
       );
@@ -562,23 +555,23 @@ describe("Assessment routes", () => {
 
     it("404 - assessment not found", async () => {
       inMemoryUow.agencyRepository.agencies = [
-        toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
+        toAgencyWithRights(AgencyDtoBuilder.create(agency.id).build()),
       ];
-      inMemoryUow.conventionRepository.setConventions([testConvention]);
+      inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.assessmentRepository.assessments = [];
 
       const beneficiaryJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
-          id: testConvention.id,
+          id: convention.id,
           role: "beneficiary",
-          email: testConvention.signatories.beneficiary.email,
+          email: convention.signatories.beneficiary.email,
           now: new Date(),
         }),
       );
 
       const response = await httpClient.signAssessment({
         body: {
-          conventionId: testConvention.id,
+          conventionId: convention.id,
           beneficiaryAgreement: true,
           beneficiaryFeedback: "my feedback",
         },
@@ -589,14 +582,14 @@ describe("Assessment routes", () => {
         status: 404,
         body: {
           status: 404,
-          message: errors.assessment.notFound(testConvention.id).message,
+          message: errors.assessment.notFound(convention.id).message,
         },
       });
     });
 
     it("409 - assessment already signed", async () => {
       const signedAssessment = new AssessmentDtoBuilder()
-        .withConventionId(testConvention.id)
+        .withConventionId(convention.id)
         .withBeneficiarySignature({
           beneficiaryAgreement: true,
           beneficiaryFeedback: "my feedback",
@@ -605,9 +598,9 @@ describe("Assessment routes", () => {
         .build();
 
       inMemoryUow.agencyRepository.agencies = [
-        toAgencyWithRights(AgencyDtoBuilder.create(testAgency.id).build()),
+        toAgencyWithRights(AgencyDtoBuilder.create(agency.id).build()),
       ];
-      inMemoryUow.conventionRepository.setConventions([testConvention]);
+      inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.assessmentRepository.assessments = [
         {
           _entityName: "Assessment",
@@ -618,16 +611,16 @@ describe("Assessment routes", () => {
 
       const beneficiaryJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
-          id: testConvention.id,
+          id: convention.id,
           role: "beneficiary",
-          email: testConvention.signatories.beneficiary.email,
+          email: convention.signatories.beneficiary.email,
           now: new Date(),
         }),
       );
 
       const response = await httpClient.signAssessment({
         body: {
-          conventionId: testConvention.id,
+          conventionId: convention.id,
           beneficiaryAgreement: true,
           beneficiaryFeedback: "my feedback",
         },
@@ -638,7 +631,7 @@ describe("Assessment routes", () => {
         status: 409,
         body: {
           status: 409,
-          message: errors.assessment.alreadySigned(testConvention.id).message,
+          message: errors.assessment.alreadySigned(convention.id).message,
         },
       });
     });

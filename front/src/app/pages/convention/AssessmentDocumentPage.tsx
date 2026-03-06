@@ -163,9 +163,9 @@ export const AssessmentDocumentPage = ({
               compte.
             </p>
             <p>
-              Le bilan d’immersion au format PDF vous sera envoyé par email dans
-              les prochaines minutes, ainsi qu’à votre tuteur et votre
-              accompagnateur.
+              Un lien vous permettant de télécharger le bilan d’immersion au
+              format PDF vous sera envoyé par email dans les prochaines minutes,
+              ainsi qu’à votre tuteur et votre accompagnateur.
             </p>
             <p>
               Ce document pourra vous servir de support pour vos démarches et
@@ -182,7 +182,10 @@ export const AssessmentDocumentPage = ({
 
   const isAssessmentLegacy = !isAssessmentDto(assessment);
   const isSignedByBeneficiary = !isAssessmentLegacy && !!assessment.signedAt;
-  const showPdfAndPrint = isSignedByBeneficiary || isAssessmentLegacy;
+  const showPdfAndPrint =
+    isSignedByBeneficiary ||
+    isAssessmentLegacy ||
+    assessment.status === "DID_NOT_SHOW";
 
   return (
     <MainWrapper layout="default" vSpacing={8}>

@@ -6,6 +6,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
   zStringMinLength1,
+  zTrimmedStringWithMax,
 } from "../zodUtils";
 import {
   type AssessmentDto,
@@ -78,7 +79,7 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
     .and(
       z.object({
         beneficiaryAgreement: z.boolean().nullable(),
-        beneficiaryFeedback: z.string().nullable(),
+        beneficiaryFeedback: zTrimmedStringWithMax(1000).nullable(),
         signedAt: makeDateStringSchema().nullable(),
       }),
     );
