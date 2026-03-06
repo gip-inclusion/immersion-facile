@@ -7,6 +7,7 @@ import { createAdminRouter } from "../../adapters/primary/routers/admin/createAd
 import { createAgenciesRouter } from "../../adapters/primary/routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouterV2 } from "../../adapters/primary/routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
 import { createApiKeyAuthRouterV3 } from "../../adapters/primary/routers/apiKeyAuthRouter/createApiKeyAuthRouter.v3";
+import { createAssessmentRouter } from "../../adapters/primary/routers/assessment/createAssessmentRouter";
 import { createAuthRouter } from "../../adapters/primary/routers/auth/createAuthRouter";
 import { createConventionRouter } from "../../adapters/primary/routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "../../adapters/primary/routers/establishment/createEstablishmentRouter";
@@ -92,6 +93,7 @@ export const createApp = async (
   app.use(createTechnicalRouter(deps, config.inboundEmailAllowedIps));
   app.use(createAddressRouter(deps));
   app.use(createConventionRouter(deps));
+  app.use(createAssessmentRouter(deps));
   app.use(createAgenciesRouter(deps));
   app.use(createFtConnectRouter(deps));
   app.use(createAuthRouter(deps));

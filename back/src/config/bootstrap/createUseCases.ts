@@ -44,6 +44,7 @@ import { makeEditConventionCounsellorName } from "../../domains/convention/use-c
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
+import { makeGetAssessmentsForAgencyUser } from "../../domains/convention/use-cases/GetAssessmentsForAgencyUser";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
@@ -924,6 +925,9 @@ export const createUseCases = ({
       },
     }),
     getAssessmentByConventionId: makeGetAssessmentByConventionId({
+      uowPerformer,
+    }),
+    getAssessmentsForAgencyUser: makeGetAssessmentsForAgencyUser({
       uowPerformer,
     }),
     notifyBeneficiaryThatAssessmentIsCreated:

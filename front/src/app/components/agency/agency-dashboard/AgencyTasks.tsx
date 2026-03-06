@@ -123,6 +123,27 @@ export const AgencyTasks = ({
               />
             </div>
           )}
+        {!isLoadingConventionsToManage &&
+          conventionsToManagePagination?.totalRecords !== undefined &&
+          conventionsToManagePagination.totalRecords > 0 && (
+            <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+              <TaskSummary
+                count={conventionsToManagePagination.totalRecords}
+                countLabel="Relances bilans"
+                icon="fr-icon-document-text-line"
+                buttonProps={{
+                  children: "Traiter cette liste",
+                  onClick: () =>
+                    onSeeAllConventionsClick(
+                      <ConventionsToManageList
+                        title="Relances bilans"
+                        dateRange={dateStartFrom1MonthAgoToIn5Days}
+                      />,
+                    ),
+                }}
+              />
+            </div>
+          )}
         {!isLoadingConventionsWithBroadcastError &&
           currentUser &&
           hasUserRightsOnAgencyBroadcast(currentUser) &&

@@ -112,6 +112,7 @@ export * from "./romeAndAppellationDtos/romeAndAppellation.dto";
 export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/address.routes";
 export * from "./routes/agency.routes";
+export * from "./routes/assessment.routes";
 export * from "./routes/convention.routes";
 export * from "./routes/establishement.routes";
 export * from "./routes/establishmentLeadRoutes";
