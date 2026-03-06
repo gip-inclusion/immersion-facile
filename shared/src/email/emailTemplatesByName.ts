@@ -422,6 +422,50 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         subContent: defaultSignature(internshipKind),
       }),
     },
+    ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION: {
+      niceName: "Bilan - Candidat - Signature du bilan",
+      tags: ["bilan_candidat_signatureBilan"],
+      createEmailVariables: ({
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        internshipKind,
+        assessmentSignatureLink,
+      }) => ({
+        subject: `Votre bilan d'immersion est prêt à être signé`,
+        greetings: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},`,
+
+        content: `
+        <strong>Nous espérons que votre ${
+          internshipKind === "immersion"
+            ? "immersion professionnelle"
+            : "mini-stage"
+        } au sein de ${businessName} s’est bien déroulée et que cette expérience vous a été bénéfique.</strong>
+       
+        Votre tuteur a rempli le bilan de votre ${
+          internshipKind === "immersion"
+            ? "immersion professionnelle"
+            : "mini-stage"
+        }. Vous pouvez dès maintenant le consulter et le signer en ligne.
+        `,
+        buttons: [
+          {
+            label: "Consulter et signer le bilan",
+            url: assessmentSignatureLink,
+          },
+        ],
+        subContent: `<strong>Lors de la signature, vous aurez trois possibilités :</strong>
+          • J’ai bien lu, je suis d’accord, rien à ajouter
+          • J’ai bien lu, je suis d’accord, je veux commenter
+          • J’ai bien lu, je ne suis pas d’accord, je veux commenter
+
+        Si vous décidez d’ajouter un commentaire, il sera intégré directement dans le bilan final.
+
+        Une fois signé, un lien vous permettant de télécharger le bilan vous sera automatiquement envoyé, ainsi qu'à l’entreprise et à votre accompagnateur au format PDF.
+        ${defaultSignature(internshipKind)}
+        `,
+      }),
+    },
     ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION: {
       niceName: "Bilan - Bénéficiaire - Bilan complété",
       tags: ["bilan_créé_bénéficiaire"],
@@ -441,11 +485,14 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             `${beneficiaryFirstName} ${beneficiaryLastName}`,
           ),
           content: `
-          <strong>Votre entreprise d'accueil a rédigé un avis concernant votre période ${
+          Vous avez signé le bilan de votre période ${
             internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
-          }.</strong> Ce retour peut être un atout pour vos futures candidatures en mettant en valeur vos expériences et compétences acquises.
+          }.
+          La version finale, comprenant votre signature ainsi que les éventuels commentaires que vous avez ajoutés, est désormais disponible au format PDF.
+
+          Ce retour peut être un atout pour vos futures candidatures en mettant en valeur vos expériences et compétences acquises.
           
-          Pour consulter cet avis et le conserver dans votre dossier de candidature, vous pouvez le télécharger au format PDF en cliquant sur le bouton ci-dessous. Ce lien a une validité de 6 mois.
+          Nous vous invitons à télécharger dès maintenant en cliquant sur le bouton ci-dessous. Ce lien a une validité de 1 mois.
           `,
           buttons: [{ label: "Consulter mon bilan", url: magicLink }],
           subContent: `
@@ -474,9 +521,11 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         greetings: `Bonjour ${recipientFullName},`,
         content: `Le bilan ${
           internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
-        } de ${beneficiaryFullName} au sein de votre entreprise ${businessName} est désormais finalisé.
+        } de ${beneficiaryFullName} au sein de votre entreprise ${businessName} est désormais finalisé et signé par le candidat.
         
-        Consultez-le dès maintenant :
+        Vous pouvez télécharger la version finale en PDF, incluant toutes les informations et éventuels commentaires du candidat, en cliquant sur le bouton ci-dessous.
+
+        Ce lien a une validité de 1 mois. Vous pouvez également le télécharger en PDF en cliquant sur le bouton ci-dessous.
         `,
         buttons: [
           {
@@ -485,13 +534,10 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             target: "_blank",
           },
         ],
-        subContent: `Ce document récapitule les éléments clés ${
-          internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
-        }.
-        
+        subContent: `
         Merci pour votre engagement dans l'accueil des candidats en ${
           internshipKind === "immersion" ? "immersion" : "stage"
-        } !
+        }. Votre contribution est précieuse pour la réussite de leur parcours.
         ${defaultSignature(internshipKind)}`,
       }),
     },
@@ -522,46 +568,57 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
           } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
           greetings: greetingsWithConventionId(conventionId),
-          content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${
-            internshipKind === "immersion" ? "immersion" : "mini-stage"
-          } au sein de l'entreprise ${businessName}.
-  
-          <strong>Métier observé : ${immersionAppellationLabel}</strong>
-          <strong>Objectif ${
+          content: `Le bilan ${
             internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
-          } : ${immersionObjective}
-          </strong>
-          Voici les informations saisies concernant cette immersion :<!--   
-       --><ul><!--   
-         --><li>L'immersion a-t-elle bien eu lieu ? Oui</li><!--   
-         --><li>Nombre d'heures totales de l'immersion : ${numberOfHoursMade}</li><!--   
-         --><li>Date réelle de fin de l'immersion : ${
-           isStringDate(lastDayOfPresence)
-             ? toDisplayedDate({
-                 date: new Date(lastDayOfPresence),
-                 withHours: false,
-               })
-             : "DATE INVALIDE"
-         }
+          } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l'entreprise ${businessName} est désormais finalisé et signé par le candidat.
+  
+          <strong>📄 Informations principales</strong>
+          <ul>
+            <li>Métier observé : ${immersionAppellationLabel}</li>
+            <li>Objectif ${
+              internshipKind === "immersion"
+                ? "de l'immersion"
+                : "du mini-stage"
+            } : ${immersionObjective}</li>
+            <li>Immersion réalisée : Oui</li>
+            <li>Nombre d'heures totales de l'immersion : ${numberOfHoursMade}</li>
+            <li>Date réelle de fin de l'immersion : ${toDisplayedDate({
+              date: new Date(lastDayOfPresence),
+              withHours: false,
+            })}</li>
           </ul>
-          <strong>Résultats de l'immersion :</strong><!--   
-       --><ul><!--   
-           --><li>Embauche : ${assessment.endedWithAJob ? "Oui" : "Non"}</li><!--          
-           -->${
+
+          <strong>📊 Résultats de l'immersion :</strong>
+          <ul>   
+           <li>Embauche : ${assessment.endedWithAJob ? "Oui" : "Non"}</li>        
+           ${
              assessment.endedWithAJob
-               ? `<!--          
-             --><li>Date d'embauche : ${toDisplayedDate({
+               ? `          
+             <li>Date d'embauche : ${toDisplayedDate({
                date: new Date(assessment.contractStartDate),
-             })}</li><!--   
-             --><li>Type de contrat : ${assessment.typeOfContract}</li>`
+             })}</li>   
+             <li>Type de contrat : ${assessment.typeOfContract}</li>`
                : ""
            }
           </ul>
-          <strong>Appréciation générale : </strong>
-          ${assessment.establishmentFeedback}
-          
-          <strong>Conseils pour la suite : </strong>
-          ${assessment.establishmentAdvices}
+
+          <strong>⭐ Evaluation de l'entreprise</strong>
+          <ul>
+            <li>Appréciation générale : ${assessment.establishmentFeedback}</li>
+            <li>Conseils pour la suite : ${assessment.establishmentAdvices}</li>
+          </ul>
+
+          <strong>✍️ Validation du candidat</strong>
+          <ul>
+            <li>Choix exprimés : ${assessment.beneficiaryAgreement ? "J'ai bien lu, je suis d'accord" : "J'ai bien lu, je ne suis pas d'accord"}</li>
+            ${
+              assessment.beneficiaryFeedback
+                ? `
+            <li>Commentaire : ${assessment.beneficiaryFeedback}</li>
+            `
+                : ""
+            }
+          </ul>
           
           `,
           buttons: [
@@ -571,7 +628,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             },
           ],
           subContent: `
-          La fiche bilan a également été communiquée au candidat.
+          Ce document a également été communiqué à l’entreprise et au candidat.
           ${
             agencyReferentName &&
             `

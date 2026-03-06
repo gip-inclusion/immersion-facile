@@ -6,12 +6,14 @@ import {
   type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
   zStringMinLength1,
+  zTrimmedStringWithMax,
 } from "../zodUtils";
 import {
   type AssessmentDto,
   type DeleteAssessmentRequestDto,
   type FormAssessmentDto,
   type LegacyAssessmentDto,
+  type SignAssessmentRequestDto,
   typeOfContracts,
   type WithAssessmentDto,
   type WithEndedWithAJob,
@@ -73,7 +75,14 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
     })
     .and(withAssessmentStatusSchema)
     .and(withEstablishmentCommentsSchema)
-    .and(withEndedWithAJobSchema);
+    .and(withEndedWithAJobSchema)
+    .and(
+      z.object({
+        beneficiaryAgreement: z.boolean().nullable(),
+        beneficiaryFeedback: zTrimmedStringWithMax(1000).nullable(),
+        signedAt: makeDateStringSchema().nullable(),
+      }),
+    );
 
 export const withAssessmentSchema: z.ZodType<
   WithAssessmentDto,
@@ -96,3 +105,21 @@ export const deleteAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<
     conventionId: conventionIdSchema,
     deleteAssessmentJustification: zStringMinLength1,
   });
+
+export const signAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<SignAssessmentRequestDto> =
+  z
+    .object({
+      conventionId: conventionIdSchema,
+    })
+    .and(
+      z.discriminatedUnion("beneficiaryAgreement", [
+        z.object({
+          beneficiaryAgreement: z.literal(true),
+          beneficiaryFeedback: zStringMinLength1.nullable(),
+        }),
+        z.object({
+          beneficiaryAgreement: z.literal(false),
+          beneficiaryFeedback: zStringMinLength1,
+        }),
+      ]),
+    );

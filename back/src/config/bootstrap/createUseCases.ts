@@ -60,6 +60,7 @@ import { NotifyAllActorsThatConventionIsDeprecated } from "../../domains/convent
 import { NotifyAllActorsThatConventionIsRejected } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsRejected";
 import { makeNotifyAllActorsThatConventionTransferred } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionTransferred";
 import { makeNotifyBeneficiaryThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentIsCreated";
+import { makeNotifyBeneficiaryThatAssessmentNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentNeedsSignature";
 import { NotifyConventionReminder } from "../../domains/convention/use-cases/notifications/NotifyConventionReminder";
 import { makeNotifyEstablishmentThatAssessmentWasCreated } from "../../domains/convention/use-cases/notifications/NotifyEstablishmentThatAssessmentWasCreated";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/convention/use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
@@ -78,6 +79,7 @@ import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-case
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { makeShareConventionDraftByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
+import { makeSignAssessment } from "../../domains/convention/use-cases/SignAssessment";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
@@ -927,6 +929,13 @@ export const createUseCases = ({
         createNewEvent,
       },
     }),
+    signAssessment: makeSignAssessment({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
     getAssessmentByConventionId: makeGetAssessmentByConventionId({
       uowPerformer,
     }),
@@ -937,6 +946,17 @@ export const createUseCases = ({
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           timeGateway: gateways.timeGateway,
+        },
+      }),
+    notifyBeneficiaryThatAssessmentNeedsSignature:
+      makeNotifyBeneficiaryThatAssessmentNeedsSignature({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          generateConventionMagicLinkUrl,
+          timeGateway: gateways.timeGateway,
+          shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+          config,
         },
       }),
     notifyActorsThatAssessmentDeleted: makeNotifyActorsThatAssessmentDeleted({

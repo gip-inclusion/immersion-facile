@@ -8,6 +8,9 @@ const minimalAssessment: AssessmentDto = {
   endedWithAJob: false,
   establishmentFeedback: "Ca s'est bien passé",
   establishmentAdvices: "mon conseil",
+  beneficiaryAgreement: null,
+  beneficiaryFeedback: null,
+  signedAt: null,
 };
 
 const fullAssessment: AssessmentDto = {
@@ -20,6 +23,9 @@ const fullAssessment: AssessmentDto = {
   contractStartDate: new Date("2024-01-10").toISOString(),
   establishmentFeedback: "Ca s'est bien passé",
   establishmentAdvices: "mon conseil",
+  beneficiaryAgreement: null,
+  beneficiaryFeedback: null,
+  signedAt: null,
 };
 
 export class AssessmentDtoBuilder implements Builder<AssessmentDto> {
@@ -37,6 +43,17 @@ export class AssessmentDtoBuilder implements Builder<AssessmentDto> {
   }
   public withConventionId(conventionId: ConventionId) {
     this.dto.conventionId = conventionId;
+    return this;
+  }
+
+  public withBeneficiarySignature(params: {
+    beneficiaryAgreement: boolean;
+    beneficiaryFeedback: string | null;
+    signedAt: string;
+  }) {
+    this.dto.beneficiaryAgreement = params.beneficiaryAgreement;
+    this.dto.beneficiaryFeedback = params.beneficiaryFeedback;
+    this.dto.signedAt = params.signedAt;
     return this;
   }
 }

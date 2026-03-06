@@ -149,6 +149,7 @@ export type DomainEvent =
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", WithConventionDto & WithAssessmentDto & WithTriggeredBy>
+  | GenericEvent<"AssessmentSignedByBeneficiary", WithConventionId & WithAssessmentDto & WithTriggeredBy>
   | GenericEvent<"AssessmentDeleted", DeleteAssessmentRequestDto & WithTriggeredBy>
   | GenericEvent<
       "ConventionTemplateDeleted",

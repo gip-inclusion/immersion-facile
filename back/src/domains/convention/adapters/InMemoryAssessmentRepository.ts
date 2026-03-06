@@ -1,4 +1,4 @@
-import type { ConventionId } from "shared";
+import { type ConventionId, errors } from "shared";
 import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import type { AssessmentRepository } from "../ports/AssessmentRepository";
 
@@ -32,6 +32,18 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
 
   public async save(assessment: AssessmentEntity): Promise<void> {
     this.#assessments.push(assessment);
+  }
+
+  public async update(updatedAssessment: AssessmentEntity): Promise<void> {
+    const assessmentToUpdate = this.#assessments.find(
+      (a) => a.conventionId === updatedAssessment.conventionId,
+    );
+    if (!assessmentToUpdate) {
+      throw errors.assessment.notFound(updatedAssessment.conventionId);
+    }
+    const index = this.#assessments.indexOf(assessmentToUpdate);
+
+    this.#assessments[index] = updatedAssessment;
   }
 
   public async delete(conventionId: ConventionId): Promise<void> {

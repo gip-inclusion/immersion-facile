@@ -121,6 +121,9 @@ describe("AssessmentReminder", () => {
         establishmentFeedback: "Ca s'est bien passé",
         establishmentAdvices: "mon conseil",
         numberOfHoursActuallyMade: 404,
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
         _entityName: "Assessment",
       };
       await uow.assessmentRepository.save(assessment);

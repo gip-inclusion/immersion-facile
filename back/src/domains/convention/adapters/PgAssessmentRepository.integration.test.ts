@@ -29,12 +29,18 @@ const minimalAssessment: AssessmentEntity = {
   ...new AssessmentDtoBuilder().withMinimalInformations().build(),
   _entityName: "Assessment",
   numberOfHoursActuallyMade: convention.schedule.totalHours,
+  beneficiaryAgreement: null,
+  beneficiaryFeedback: null,
+  signedAt: null,
 };
 
 const fullAssessment: AssessmentEntity = {
   ...new AssessmentDtoBuilder().withFullInformations().build(),
   _entityName: "Assessment",
   numberOfHoursActuallyMade: convention.schedule.totalHours,
+  beneficiaryAgreement: null,
+  beneficiaryFeedback: null,
+  signedAt: null,
 };
 
 describe("PgAssessmentRepository", () => {
@@ -158,6 +164,9 @@ describe("PgAssessmentRepository", () => {
         establishmentAdvices: "mon conseil",
         numberOfHoursActuallyMade: 404,
         _entityName: "Assessment",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
       };
 
       await assessmentRepository.save(assessment);
@@ -189,6 +198,55 @@ describe("PgAssessmentRepository", () => {
           minimalAssessment.conventionId,
         ]),
         [minimalAssessment],
+      );
+    });
+  });
+
+  describe("update", () => {
+    it("updates assessment", async () => {
+      const signedAt = new Date("2024-06-15").toISOString();
+      await assessmentRepository.save(minimalAssessment);
+
+      const updatedAssessment: AssessmentEntity = {
+        ...minimalAssessment,
+        status: "PARTIALLY_COMPLETED",
+        numberOfMissedHours: 7,
+        lastDayOfPresence: new Date("2024-10-17").toISOString(),
+        endedWithAJob: false,
+        establishmentFeedback: "updated feedback",
+        establishmentAdvices: "updated advices",
+        numberOfHoursActuallyMade: 35,
+        beneficiaryAgreement: true,
+        beneficiaryFeedback: "Mon commentaire",
+        signedAt: signedAt,
+      };
+
+      await assessmentRepository.update(updatedAssessment);
+
+      const updatedAssessmentStored =
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        );
+      expectToEqual(updatedAssessmentStored, updatedAssessment);
+    });
+
+    it("throws when assessment does not exist", async () => {
+      const nonExistentConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
+
+      await expectPromiseToFailWithError(
+        assessmentRepository.update({
+          _entityName: "Assessment",
+          endedWithAJob: false,
+          establishmentFeedback: "super feedback",
+          establishmentAdvices: "devam et",
+          numberOfHoursActuallyMade: 43,
+          status: "COMPLETED",
+          conventionId: nonExistentConventionId,
+          beneficiaryAgreement: true,
+          beneficiaryFeedback: "",
+          signedAt: new Date().toISOString(),
+        }),
+        errors.assessment.notFound(nonExistentConventionId),
       );
     });
   });

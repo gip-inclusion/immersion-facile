@@ -32,6 +32,16 @@ const getDefaultNotificationState = (): NotificationState => ({
   occurredAt: new Date().toISOString(),
 });
 
+const stripNullsFromNotification = <T>(value: T): T => {
+  if (value === null || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map(stripNullsFromNotification) as T;
+  return Object.fromEntries(
+    Object.entries(value as object)
+      .filter(([, v]) => v !== null)
+      .map(([k, v]) => [k, stripNullsFromNotification(v)]),
+  ) as T;
+};
+
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private transaction: KyselyDb,
@@ -125,7 +135,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .orderBy("created_at", "desc")
       .executeTakeFirst();
 
-    return result?.notif;
+    return result ? stripNullsFromNotification(result.notif) : undefined;
   }
 
   public async deleteAllEmailAttachements(): Promise<number> {
@@ -162,7 +172,7 @@ export class PgNotificationRepository implements NotificationRepository {
     return getSmsNotificationBuilder(this.transaction)
       .where("id", "in", ids)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   async getEmailsByIds(ids: NotificationId[]): Promise<EmailNotification[]> {
@@ -170,7 +180,7 @@ export class PgNotificationRepository implements NotificationRepository {
     return getEmailsNotificationBuilder(this.transaction)
       .where("e.id", "in", ids)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   public async getEmailsByFilters(
@@ -211,7 +221,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .limit(filters.limit ?? this.maxRetrievedNotifications)
       .offset(filters.offset ?? 0)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   public async getLastNotifications(): Promise<NotificationsByKind> {
@@ -221,7 +231,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .execute()
       .then(async (rows) => ({
         emails: await this.#getLastEmails(),
-        sms: rows.map((row) => row.notif),
+        sms: rows.map((row) => stripNullsFromNotification(row.notif)),
       }));
   }
 
@@ -231,7 +241,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .orderBy("e.created_at", "desc")
       .limit(this.maxRetrievedNotifications)
       .execute()
-      .then(map((row) => row.notif));
+      .then(map((row) => stripNullsFromNotification(row.notif)));
   }
 
   public async save(notification: Notification): Promise<void> {
@@ -456,29 +466,25 @@ export class PgNotificationRepository implements NotificationRepository {
 
 const getSmsNotificationBuilder = (transaction: KyselyDb) =>
   transaction.selectFrom("notifications_sms").select((eb) =>
-    jsonStripNulls(
-      jsonBuildObject({
-        id: eb.ref("id"),
-        kind: sql<"sms">`'sms'`,
-        createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
-        followedIds: jsonBuildObject({
+    sql<SmsNotification>`(${jsonBuildObject({
+      id: eb.ref("id"),
+      kind: sql<"sms">`'sms'`,
+      createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+      followedIds: jsonStripNulls(
+        jsonBuildObject({
           conventionId: eb.ref("convention_id"),
           establishmentId: eb.ref("establishment_siret"),
           agencyId: eb.ref("agency_id"),
         }),
-        state: eb
-          .case()
-          .when("state", "is not", null)
-          .then(eb.ref("state"))
-          .else(null)
-          .end(),
-        templatedContent: jsonBuildObject({
-          kind: eb.ref("sms_kind"),
-          recipientPhone: eb.ref("recipient_phone"),
-          params: eb.ref("params"),
-        }).$castTo<TemplatedSms>(),
-      }),
-    ).as("notif"),
+      ),
+      templatedContent: jsonBuildObject({
+        kind: eb.ref("sms_kind"),
+        recipientPhone: eb.ref("recipient_phone"),
+        params: eb.ref("params"),
+      }).$castTo<TemplatedSms>(),
+    })}::jsonb || COALESCE(${jsonStripNulls(jsonBuildObject({ state: eb.ref("state") }))}::jsonb, '{}'::jsonb))`.as(
+      "notif",
+    ),
   );
 
 const getEmailsNotificationBuilder = (transaction: KyselyDb) =>
@@ -496,55 +502,51 @@ const getEmailsNotificationBuilder = (transaction: KyselyDb) =>
     )
     .groupBy("e.id")
     .select(({ ref, eb }) =>
-      jsonStripNulls(
-        jsonBuildObject({
-          id: ref("e.id"),
-          kind: sql<"email">`'email'`,
-          createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
-          followedIds: jsonBuildObject({
+      sql<EmailNotification>`(${jsonBuildObject({
+        id: ref("e.id"),
+        kind: sql<"email">`'email'`,
+        createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+        followedIds: jsonStripNulls(
+          jsonBuildObject({
             conventionId: ref("convention_id"),
             establishmentId: ref("establishment_siret"),
             agencyId: ref("agency_id"),
           }),
-          state: eb
+        ),
+        templatedContent: jsonBuildObject({
+          kind: ref("email_kind"),
+          replyTo: eb
             .case()
-            .when("state", "is not", null)
-            .then(eb.ref("state"))
-            .else(null)
+            .when(ref("reply_to_email"), "is", null)
+            .then(null)
+            .else(
+              jsonBuildObject({
+                name: ref("reply_to_name"),
+                email: ref("reply_to_email"),
+              }),
+            )
             .end(),
-          templatedContent: jsonBuildObject({
-            kind: ref("email_kind"),
-            replyTo: eb
-              .case()
-              .when(ref("reply_to_email"), "is", null)
-              .then(null)
-              .else(
-                jsonBuildObject({
-                  name: ref("reply_to_name"),
-                  email: ref("reply_to_email"),
-                }),
-              )
-              .end(),
-            recipients: sql`ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'to' THEN r.email ELSE NULL END), NULL)`,
-            cc: sql`ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'cc' THEN r.email ELSE NULL END), NULL)`,
-            params: ref("params").$castTo<any>(),
-            sender: eb
-              .case()
-              .when(ref("sender_email"), "is", null)
-              .then(null)
-              .else(
-                jsonBuildObject({
-                  name: ref("sender_name"),
-                  email: ref("sender_email"),
-                }),
-              )
-              .end(),
-            attachments: sql`CASE
-                  WHEN ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL) = ARRAY[]::jsonb[]
-                    THEN NULL
-                  ELSE ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL)
-                END`,
-          }).$castTo<TemplatedEmail>(),
-        }),
-      ).as("notif"),
+          recipients: sql`ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'to' THEN r.email ELSE NULL END), NULL)`,
+          cc: sql`ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'cc' THEN r.email ELSE NULL END), NULL)`,
+          params: ref("params").$castTo<any>(),
+          sender: eb
+            .case()
+            .when(ref("sender_email"), "is", null)
+            .then(null)
+            .else(
+              jsonBuildObject({
+                name: ref("sender_name"),
+                email: ref("sender_email"),
+              }),
+            )
+            .end(),
+          attachments: sql`CASE
+                WHEN ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL) = ARRAY[]::jsonb[]
+                  THEN NULL
+                ELSE ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL)
+              END`,
+        }).$castTo<TemplatedEmail>(),
+      })}::jsonb || COALESCE(${jsonStripNulls(jsonBuildObject({ state: ref("e.state") }))}::jsonb, '{}'::jsonb))`.as(
+        "notif",
+      ),
     );

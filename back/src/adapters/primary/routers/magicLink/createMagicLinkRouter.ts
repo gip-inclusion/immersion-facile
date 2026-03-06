@@ -94,6 +94,17 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
+  sharedRouter.signAssessment(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.signAssessment.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.convention),
+        ),
+      ),
+  );
+
   sharedRouter.getConventionStatusDashboard(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>

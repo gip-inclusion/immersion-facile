@@ -59,6 +59,31 @@ const getAssessmentEpic: AppEpic<AssessmentAction> = (
     ),
   );
 
+const signAssessmentEpic: AppEpic<AssessmentAction> = (
+  action$,
+  _,
+  { assessmentGateway },
+) =>
+  action$.pipe(
+    filter(assessmentSlice.actions.signAssessmentRequested.match),
+    switchMap((action) => {
+      const { feedbackTopic, params, jwt } = action.payload;
+      return assessmentGateway.signAssessment$(params, jwt).pipe(
+        map(() =>
+          assessmentSlice.actions.signAssessmentSucceeded({
+            feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          assessmentSlice.actions.signAssessmentFailed({
+            errorMessage: error.message,
+            feedbackTopic,
+          }),
+        ),
+      );
+    }),
+  );
+
 const deleteAssessmentEpic: AppEpic<AssessmentAction> = (
   action$,
   _,
@@ -90,5 +115,6 @@ const deleteAssessmentEpic: AppEpic<AssessmentAction> = (
 export const assessmentEpics = [
   createAssessmentEpic,
   getAssessmentEpic,
+  signAssessmentEpic,
   deleteAssessmentEpic,
 ];

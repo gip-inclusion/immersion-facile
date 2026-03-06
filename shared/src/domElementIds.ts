@@ -129,10 +129,6 @@ export const domElementIds = {
   },
 
   homeEstablishments: {
-    siretModal: {
-      siretFetcherInput: "siret-fetcher-input",
-      editEstablishmentButton: "edit-establishment-button",
-    },
     heroHeader: {
       addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
       formConvention: buildHeroHeaderId("establishment-form-convention"),
@@ -919,6 +915,13 @@ export const domElementIds = {
   },
   assessmentDocument: {
     downloadPdfButton: "im-assessment-document__download-pdf-button",
+    cancelSignAssessmentButton:
+      "im-assessment-document__cancel-sign-assessment-button",
+    openSignAssessmentModalButton:
+      "im-assessment-document__open-sign-assessment-modal-button",
+    signAssessmentButton: "im-assessment-document__sign-assessment-button",
+    signAssessmentModal: "im-assessment-document__sign-assessment-modal",
+    signAssessmentForm: "im-assessment-document__sign-assessment-form",
   },
   landingEstablishment: {},
   conventionToSign: {

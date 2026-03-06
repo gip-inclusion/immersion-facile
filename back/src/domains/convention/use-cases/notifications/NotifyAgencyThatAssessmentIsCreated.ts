@@ -85,6 +85,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         },
       });
     } else {
+      if (!assessment.signedAt) return;
       const numberOfHoursMade = computeTotalHours({
         convention,
         lastDayOfPresence:

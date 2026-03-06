@@ -263,6 +263,9 @@ describe("SendAssessmentLink", () => {
         establishmentFeedback: "establishmentFeedback",
         establishmentAdvices: "establishmentAdvices",
         numberOfHoursActuallyMade: 10,
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
         _entityName: "Assessment",
       });
 

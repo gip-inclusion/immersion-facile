@@ -538,6 +538,9 @@ export const defaultEmailValueByEmailKind: {
     immersionAppellationLabel: "APPELLATION_LABEL",
     assessment: {
       conventionId: "conv-id",
+      beneficiaryAgreement: true,
+      beneficiaryFeedback: "my super feedback",
+      signedAt: new Date("2025-01-01").toISOString(),
       status: "PARTIALLY_COMPLETED",
       lastDayOfPresence: new Date("2025-01-11").toISOString(),
       numberOfMissedHours: 12,
@@ -568,6 +571,13 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     magicLink: "http://MAGIC_LINK",
+  },
+  ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    internshipKind: "immersion",
+    assessmentSignatureLink: "http://SIGNATURE_LINK",
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     internshipKind: "immersion",

@@ -234,13 +234,17 @@ const getUseCasesByTopics = (
   // Assessment related:
   AssessmentCreated: [
     useCases.notifyAgencyThatAssessmentIsCreated,
-    useCases.notifyEstablishmentThatAssessmentWasCreated,
-    useCases.notifyBeneficiaryThatAssessmentIsCreated,
+    useCases.notifyBeneficiaryThatAssessmentNeedsSignature,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnAssessmentCreated,
     ),
   ],
   AssessmentDeleted: [useCases.notifyActorsThatAssessmentDeleted],
+  AssessmentSignedByBeneficiary: [
+    useCases.notifyAgencyThatAssessmentIsCreated,
+    useCases.notifyEstablishmentThatAssessmentWasCreated,
+    useCases.notifyBeneficiaryThatAssessmentIsCreated,
+  ],
   ConventionTemplateDeleted: [],
   ConventionTemplateCreatedOrUpdated: [],
   EmailWithLinkToCreateAssessmentSent: [],
