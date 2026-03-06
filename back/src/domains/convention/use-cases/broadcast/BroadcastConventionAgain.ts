@@ -56,8 +56,9 @@ export const makeBroadcastConventionAgain = useCaseBuilder(
       now: deps.timeGateway.now(),
     });
 
-    const assessmentEntity =
-      await uow.assessmentRepository.getByConventionId(conventionId);
+    const assessmentEntity = (
+      await uow.assessmentRepository.getByConventionIds([conventionId])
+    ).at(0);
 
     const assessment = assessmentEntity
       ? getOnlyAssessmentDto(assessmentEntity)

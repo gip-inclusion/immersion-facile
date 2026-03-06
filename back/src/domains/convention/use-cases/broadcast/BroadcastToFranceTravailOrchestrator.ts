@@ -65,9 +65,12 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
             };
           });
 
-        const assessment = await uowPerformer.perform(async (uow) =>
-          uow.assessmentRepository.getByConventionId(convention.id),
-        );
+        const assessment = await uowPerformer.perform(async (uow) => {
+          const assessments = await uow.assessmentRepository.getByConventionIds(
+            [convention.id],
+          );
+          return assessments.at(0);
+        });
 
         const assessmentFields =
           assesmentEntityToConventionAssessmentFields(assessment);

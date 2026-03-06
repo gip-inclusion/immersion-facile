@@ -156,8 +156,9 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
         conventionId: conventionToSyncId,
       });
 
-    const assessmentEntity =
-      await uow.assessmentRepository.getByConventionId(conventionToSyncId);
+    const assessmentEntity = (
+      await uow.assessmentRepository.getByConventionIds([conventionToSyncId])
+    ).at(0);
 
     const assessment = assessmentEntity
       ? getOnlyAssessmentDto(assessmentEntity)

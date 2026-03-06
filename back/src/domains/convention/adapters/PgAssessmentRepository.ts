@@ -63,19 +63,6 @@ export class PgAssessmentRepository implements AssessmentRepository {
       .execute();
   }
 
-  public async getByConventionId(
-    conventionId: ConventionId,
-  ): Promise<AssessmentEntity | undefined> {
-    const result = await createAssessmentQueryBuilder(this.transaction)
-      .where("convention_id", "=", conventionId)
-      .executeTakeFirst();
-
-    const assessment = result?.assessment;
-    if (!assessment) return;
-
-    return parseAssessmentEntitySchema(assessment);
-  }
-
   public async getByConventionIds(
     conventionIds: ConventionId[],
   ): Promise<AssessmentEntity[]> {

@@ -14,14 +14,6 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
     this.#assessments = assessments;
   }
 
-  public async getByConventionId(
-    conventionId: ConventionId,
-  ): Promise<AssessmentEntity | undefined> {
-    return this.#assessments.find(
-      (assessment) => assessment.conventionId === conventionId,
-    );
-  }
-
   public async getByConventionIds(
     conventionIds: ConventionId[],
   ): Promise<AssessmentEntity[]> {
