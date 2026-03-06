@@ -84,6 +84,7 @@ export const searchParams = {
   nafCodes: param.query.optional.ofType(nafCodeSerializer),
   nafLabel: param.query.optional.string,
   remoteWorkModes: param.query.optional.ofType(remoteWorkModeSerializer),
+  showOnlyAvailableOffers: param.query.optional.boolean,
   ...acquisitionParams,
 };
 

@@ -148,18 +148,22 @@ export const SearchPage = ({
         )
       : undefined,
     remoteWorkModes: undefined,
+    showOnlyAvailableOffers: true,
     ...acquisitionParams,
   };
 
   const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
   const filterFormValues = useCallback((values: SearchPageParams) => {
-    return keys(values).reduce(
-      (acc, key) => ({
+    return keys(values).reduce((acc, key) => {
+      const shouldKeepValue =
+        key in values &&
+        typeof values[key] !== "undefined" &&
+        values[key] !== "";
+      return {
         ...acc,
-        ...(values[key] ? { [key]: values[key] } : {}),
-      }),
-      {} as SearchPageParams,
-    );
+        ...(shouldKeepValue ? { [key]: values[key] } : {}),
+      };
+    }, {} as SearchPageParams);
   }, []);
   const routeParams = route.params as Partial<SearchPageParams>;
   const methods = useForm<SearchPageParams>({
@@ -374,6 +378,7 @@ export const SearchPage = ({
                       onChange: (event) => {
                         const value = Number.parseInt(
                           event.currentTarget.value,
+                          10,
                         );
                         setValue("distanceKm", value);
                         if (!value) {
@@ -657,6 +662,7 @@ export const SearchPage = ({
                           onChange: (event) => {
                             const value = Number.parseInt(
                               event.currentTarget.value,
+                              10,
                             );
                             setTempValue({
                               ...tempValue,
@@ -717,11 +723,11 @@ export const SearchPage = ({
                       title: "Plus de critères",
                       content: (
                         <>
-                          <p className={fr.cx("fr-mb-1w")}>
+                          <p className={fr.cx("fr-mb-2w")}>
                             Afficher uniquement les entreprises&nbsp;:
                           </p>
                           <Checkbox
-                            className={fr.cx("fr-mb-1w")}
+                            className={fr.cx("fr-mb-2w")}
                             options={[
                               {
                                 label: rqthLabel,
@@ -744,6 +750,24 @@ export const SearchPage = ({
                                             "yes-ft-certified",
                                           ]
                                         : ["no"],
+                                    });
+                                  },
+                                },
+                              },
+                            ]}
+                          />
+                          <Checkbox
+                            className={fr.cx("fr-mb-2w")}
+                            options={[
+                              {
+                                label: "Mises en relation disponibles",
+                                nativeInputProps: {
+                                  checked: tempValue.showOnlyAvailableOffers,
+                                  onChange: (event) => {
+                                    setTempValue({
+                                      ...tempValue,
+                                      showOnlyAvailableOffers:
+                                        event.currentTarget.checked,
                                     });
                                   },
                                 },
