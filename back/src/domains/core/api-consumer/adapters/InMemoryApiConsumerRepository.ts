@@ -2,6 +2,7 @@ import { addYears, subYears } from "date-fns";
 import { intersection, values } from "ramda";
 import type {
   ApiConsumer,
+  ApiConsumerContact,
   ApiConsumerId,
   ApiConsumerRights,
   Builder,
@@ -304,5 +305,9 @@ export class ApiConsumerBuilder implements Builder<ApiConsumer> {
       ...this.#dto,
       expirationDate,
     });
+  }
+
+  public withContact(contact: ApiConsumerContact): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({ ...this.#dto, contact });
   }
 }

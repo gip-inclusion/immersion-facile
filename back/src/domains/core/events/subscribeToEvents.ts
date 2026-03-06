@@ -245,6 +245,9 @@ const getUseCasesByTopics = (
     ),
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
+
+  // Phone related
+  InvalidPhoneUpdateRequested: [useCases.updateInvalidPhone],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {
