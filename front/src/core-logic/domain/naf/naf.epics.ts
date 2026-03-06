@@ -40,7 +40,7 @@ const searchSectionsEpic: AppEpic<NafAction> = (
     filter(nafSlice.actions.searchSectionsRequested.match),
     switchMap((action) => nafGateway.getNafSuggestions$(action.payload)),
     map((suggestions) => nafSlice.actions.searchSectionsSucceeded(suggestions)),
-    catchEpicError(nafSlice.actions.searchSectionsFailed),
+    catchEpicError((_error) => nafSlice.actions.searchSectionsFailed(null)),
   );
 
 export const nafEpics = [queryHasChangedEpic, searchSectionsEpic];

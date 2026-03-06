@@ -18,7 +18,7 @@
     "@axe-core/playwright": "^4.10.0",
     "@faker-js/faker": "^8.3.1",
     "@playwright/test": "^1.57.0",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.19.8",
     "dotenv": "^16.0.0",
     "shared": "workspace:*"
