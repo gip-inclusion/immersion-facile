@@ -9,9 +9,6 @@ export interface AssessmentRepository {
   getByConventionIds(
     conventionIds: ConventionId[],
   ): Promise<AssessmentEntity[]>;
-  update: (
-    conventionId: ConventionId,
-    updatedAssessment: AssessmentEntity,
-  ) => Promise<void>;
+  update: (updatedAssessment: AssessmentEntity) => Promise<void>;
   delete: (conventionId: ConventionId) => Promise<void>;
 }

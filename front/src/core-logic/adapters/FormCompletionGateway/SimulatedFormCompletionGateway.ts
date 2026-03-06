@@ -20,8 +20,8 @@ import {
   siretApiUnexpectedErrorErrorMessage,
   siretSchema,
   sleep,
-  tooManiSirenRequestsSiretErrorMessage,
   tooManySirenRequestsSiret,
+  tooManySirenRequestsSiretErrorMessage,
 } from "shared";
 import type { FormCompletionGateway } from "../../ports/FormCompletionGateway";
 
@@ -148,7 +148,7 @@ export class SimulatedFormCompletionGateway implements FormCompletionGateway {
     const siret = siretSchema.parse(rawSiret);
 
     if (siret === tooManySirenRequestsSiret)
-      return tooManiSirenRequestsSiretErrorMessage;
+      return tooManySirenRequestsSiretErrorMessage;
     if (siret === apiSirenNotAvailableSiret)
       return siretApiUnavailableSiretErrorMessage;
     if (siret === conflictErrorSiret)

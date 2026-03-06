@@ -7,7 +7,7 @@ import {
   type SiretDto,
   siretApiMissingEstablishmentMessage,
   siretApiUnavailableSiretErrorMessage,
-  tooManiSirenRequestsSiretErrorMessage,
+  tooManySirenRequestsSiretErrorMessage,
 } from "shared";
 import type {
   HttpClient,
@@ -102,7 +102,7 @@ const getBodyIfStatus200ElseThrow = <R extends HttpResponse<number, unknown>>(
 };
 
 const errorMessageByCode = {
-  429: tooManiSirenRequestsSiretErrorMessage,
+  429: tooManySirenRequestsSiretErrorMessage,
   503: siretApiUnavailableSiretErrorMessage,
   404: siretApiMissingEstablishmentMessage,
   400: "Erreur sur le siret fourni",

@@ -2,7 +2,7 @@ import {
   type GetSiretInfo,
   type SiretEstablishmentDto,
   type SupportedCountryCode,
-  tooManiSirenRequestsSiretErrorMessage,
+  tooManySirenRequestsSiretErrorMessage,
 } from "shared";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
@@ -134,7 +134,7 @@ describe("Siret validation and fetching", () => {
 
     it("fetches correctly and keeps the returned error", () => {
       dispatchSiretModified("11110000111100");
-      feedSirenGatewayThroughBackWith(tooManiSirenRequestsSiretErrorMessage);
+      feedSirenGatewayThroughBackWith(tooManySirenRequestsSiretErrorMessage);
       expectSiretErrorToBe(
         "Le service de vérification du SIRET a reçu trop d'appels.",
       );
