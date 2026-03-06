@@ -9,7 +9,7 @@ describe("sms phone number schema", () => {
   });
 
   it("wrong path", () => {
-    const mobilePhoneNumber = "+596697000001"; // Martinique, not a mobile phone number
+    const mobilePhoneNumber = "+596596644873"; // Martinique, not a mobile phone number
     expect(() => smsRecipientPhoneSchema.parse(mobilePhoneNumber)).toThrow();
   });
 });
