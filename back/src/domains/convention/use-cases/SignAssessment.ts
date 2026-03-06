@@ -58,15 +58,10 @@ export const makeSignAssessment = useCaseBuilder("SignAssessment")
       signedAt: deps.timeGateway.now().toISOString(),
     };
 
-    const signedAssessmentEntity = {
+    await uow.assessmentRepository.update({
       ...assessmentEntity,
       ...signedAssessmentDto,
-    };
-
-    await uow.assessmentRepository.update(
-      inputParams.conventionId,
-      signedAssessmentEntity,
-    );
+    });
 
     await uow.outboxRepository.save(
       deps.createNewEvent({

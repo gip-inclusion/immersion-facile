@@ -433,7 +433,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         assessmentSignatureLink,
       }) => ({
         subject: `Votre bilan d'immersion est prêt à être signé`,
-        greetings: `Bonjour${beneficiaryFirstName} ${beneficiaryLastName},`,
+        greetings: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},`,
 
         content: `
         <strong>Nous espérons que votre ${
@@ -461,7 +461,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
 
         Si vous décidez d’ajouter un commentaire, il sera intégré directement dans le bilan final.
 
-        Une fois signé, le bilan sera automatiquement envoyé à vous, à l’entreprise et à votre accompagnateur au format PDF.
+        Une fois signé, un lien vous permettant de télécharger le bilan vous sera automatiquement envoyé, ainsi qu'à l’entreprise et à votre accompagnateur au format PDF.
         ${defaultSignature(internshipKind)}
         `,
       }),

@@ -97,18 +97,15 @@ export class PgAssessmentRepository implements AssessmentRepository {
     );
   }
 
-  public async update(
-    conventionId: ConventionId,
-    updatedAssessment: AssessmentEntity,
-  ): Promise<void> {
+  public async update(updatedAssessment: AssessmentEntity): Promise<void> {
     const result = await this.transaction
       .updateTable("immersion_assessments")
       .set(assessmentEntityToDbRow(updatedAssessment))
-      .where("convention_id", "=", conventionId)
+      .where("convention_id", "=", updatedAssessment.conventionId)
       .executeTakeFirst();
 
     if (Number(result.numUpdatedRows) === 0)
-      throw errors.assessment.notFound(conventionId);
+      throw errors.assessment.notFound(updatedAssessment.conventionId);
   }
 
   public async save(assessmentEntity: AssessmentEntity): Promise<void> {
@@ -138,6 +135,7 @@ const noConventionMatchingErrorMessage =
 
 const assessmentAlreadyExistsErrorMessage =
   '"immersion_assessments" violates unique constraint "immersion_assessments_pkey"';
+
 const getNonLegacyFields = (assessmentEntity: AssessmentEntity) => {
   if (!("establishmentAdvices" in assessmentEntity)) return {};
 
@@ -166,11 +164,15 @@ const assessmentEntityToDbRow = (assessmentEntity: AssessmentEntity) => ({
   establishment_feedback: assessmentEntity.establishmentFeedback,
   ...getNonLegacyFields(assessmentEntity),
   number_of_hours_actually_made: assessmentEntity.numberOfHoursActuallyMade,
-  ...(!isAssessmentDto(assessmentEntity)
-    ? {}
-    : {
+  ...(isAssessmentDto(assessmentEntity)
+    ? {
         beneficiary_agreement: assessmentEntity.beneficiaryAgreement,
         beneficiary_feedback: assessmentEntity.beneficiaryFeedback,
         signed_at: assessmentEntity.signedAt,
+      }
+    : {
+        beneficiary_agreement: null,
+        beneficiary_feedback: null,
+        signed_at: null,
       }),
 });
