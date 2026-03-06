@@ -35,9 +35,11 @@ export const makeGetAssessmentByConventionId = useCaseBuilder(
       jwtPayload: currentUser,
       uow,
     });
-    const assessment = await uow.assessmentRepository.getByConventionId(
-      inputParams.conventionId,
-    );
+    const assessment = (
+      await uow.assessmentRepository.getByConventionIds([
+        inputParams.conventionId,
+      ])
+    ).at(0);
     if (!assessment) {
       throw errors.assessment.notFound(inputParams.conventionId);
     }

@@ -73,7 +73,9 @@ describe("DeleteAssessment", () => {
     );
 
     expectToEqual(
-      await uow.assessmentRepository.getByConventionId(convention.id),
+      (await uow.assessmentRepository.getByConventionIds([convention.id])).at(
+        0,
+      ),
       undefined,
     );
 

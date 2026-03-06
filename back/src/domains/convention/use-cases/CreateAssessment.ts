@@ -96,8 +96,9 @@ const createAssessmentEntityIfNotExist = async (
   convention: ConventionDto,
   assessment: AssessmentDto,
 ): Promise<AssessmentEntity> => {
-  const existingAssessmentEntity =
-    await uow.assessmentRepository.getByConventionId(convention.id);
+  const existingAssessmentEntity = (
+    await uow.assessmentRepository.getByConventionIds([convention.id])
+  ).at(0);
 
   if (existingAssessmentEntity)
     throw errors.assessment.alreadyExist(convention.id);
