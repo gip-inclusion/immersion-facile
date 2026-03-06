@@ -1,6 +1,7 @@
 import { from, type Observable } from "rxjs";
 import {
   type AppellationMatchDto,
+  type AppellationSearchInputParams,
   type FormCompletionRoutes,
   type GetSiretInfo,
   type GetSiretInfoError,
@@ -22,28 +23,19 @@ export class HttpFormCompletionGateway implements FormCompletionGateway {
   constructor(private readonly httpClient: HttpClient<FormCompletionRoutes>) {}
 
   public getAppellationDtoMatching$(
-    searchText: string,
-    useNaturalLanguage: boolean,
+    params: AppellationSearchInputParams,
   ): Observable<AppellationMatchDto[]> {
-    return from(this.getAppellationDtoMatching(searchText, useNaturalLanguage));
-  }
-
-  public getAppellationDtoMatching(
-    searchText: string,
-    useNaturalLanguage: boolean,
-  ): Promise<AppellationMatchDto[]> {
-    return this.httpClient
-      .appellation({
-        queryParams: {
-          searchText,
-          naturalLanguage: useNaturalLanguage ? "true" : undefined,
-        },
-      })
-      .then((response) =>
-        match(response)
-          .with({ status: 200 }, ({ body }) => body)
-          .otherwise(otherwiseThrow),
-      );
+    return from(
+      this.httpClient
+        .appellation({
+          queryParams: params,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
   }
 
   public getSiretInfo$(siret: SiretDto): Observable<GetSiretInfo> {
@@ -102,9 +94,9 @@ const getBodyIfStatus200ElseThrow = <R extends HttpResponse<number, unknown>>(
 };
 
 const errorMessageByCode = {
-  [429]: tooManiSirenRequestsSiretErrorMessage,
-  [503]: siretApiUnavailableSiretErrorMessage,
-  [404]: siretApiMissingEstablishmentMessage,
-  [400]: "Erreur sur le siret fourni",
-  [409]: "Establishment with this siret is already in our DB",
+  429: tooManiSirenRequestsSiretErrorMessage,
+  503: siretApiUnavailableSiretErrorMessage,
+  404: siretApiMissingEstablishmentMessage,
+  400: "Erreur sur le siret fourni",
+  409: "Establishment with this siret is already in our DB",
 } satisfies Record<number, GetSiretInfoError>;

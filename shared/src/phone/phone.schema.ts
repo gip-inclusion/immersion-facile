@@ -13,10 +13,8 @@ import {
   type SupportedCountryCode,
   territoriesByCountryCode,
 } from "../address/address.dto";
-import {
-  type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
-} from "../zodUtils";
+import { zStringMinLength1 } from "../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type { PhoneNumber } from "./phone.dto";
 
 export const phoneNumberSchema: ZodSchemaWithInputMatchingOutput<PhoneNumber> =

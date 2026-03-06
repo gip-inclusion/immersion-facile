@@ -18,8 +18,8 @@ import {
   errors,
   exchangeRoleSchema,
   localization,
+  messageSchema,
   type UserId,
-  zStringMinLength1,
 } from "shared";
 import { z } from "zod";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
@@ -64,7 +64,7 @@ type AddExchangeToDiscussionInput =
 type MessageInput = AddExchangeToDiscussionInput["messageInputs"][number];
 
 const messageInputCommonFieldsSchema = z.object({
-  message: zStringMinLength1,
+  message: messageSchema,
   discussionId: discussionIdSchema,
 });
 

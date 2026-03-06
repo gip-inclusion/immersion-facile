@@ -2,8 +2,11 @@ import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition, LocationId } from "../address/address.dto";
 import type { ApiConsumerName } from "../apiConsumer/ApiConsumer";
-import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
+import type {
+  BusinessName,
+  BusinessNameCustomized,
+} from "../establishment/establishment";
 import type { GroupName } from "../group/group.dto";
 import type { NafDto } from "../naf/naf.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
@@ -127,21 +130,28 @@ export const fitForDisabledWorkersOptions = [
   "no",
 ] as const;
 
+export type EstablishmentWebSite = AbsoluteUrl | "";
+
+export type EstablishmentAdditionnalInformation = Flavor<
+  string,
+  "EstablishmentAdditionnalInformation"
+>;
+
 export type CommonFormEstablishmentDto = {
-  additionalInformation?: string;
+  additionalInformation?: EstablishmentAdditionnalInformation;
   offers: EstablishmentFormOffer[];
   businessAddresses: FormEstablishmentAddress[];
   userRights: FormEstablishmentUserRight[];
   businessName: BusinessName;
-  businessNameCustomized?: string;
+  businessNameCustomized?: BusinessNameCustomized;
   fitForDisabledWorkers: FitForDisableWorkerOption;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
-  naf?: NafDto; // { code: string, nomenclature: string }
+  naf?: NafDto;
   nextAvailabilityDate?: DateTimeIsoString;
-  siret: SiretDto; // 14 characters string
+  siret: SiretDto;
   source: FormEstablishmentSource;
-  website?: AbsoluteUrl | "";
+  website?: EstablishmentWebSite;
   searchableBy: EstablishmentSearchableBy;
 };
 

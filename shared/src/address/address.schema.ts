@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringCanBeEmpty,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type AddressAndPosition,
@@ -18,15 +17,19 @@ import {
   type WithLookupLocationInputQueryParams,
 } from "./address.dto";
 
+//TODO : pourquoi il est différent du schema de departmentCode qu'on a dans addressSchema ?
 export const departmentCodeSchema: ZodSchemaWithInputMatchingOutput<DepartmentCode> =
   z.string();
+
+export const addressDepartmentCodeSchema: ZodSchemaWithInputMatchingOutput<DepartmentCode> =
+  zStringMinLength1;
 
 export const addressSchema: ZodSchemaWithInputMatchingOutput<AddressDto> =
   z.object(
     {
       streetNumberAndAddress: zStringCanBeEmpty,
       postcode: zStringMinLength1,
-      departmentCode: zStringMinLength1,
+      departmentCode: addressDepartmentCodeSchema,
       city: zStringMinLength1,
     },
     {

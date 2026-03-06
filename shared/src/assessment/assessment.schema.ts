@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import { zStringMinLength1 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type AssessmentDto,

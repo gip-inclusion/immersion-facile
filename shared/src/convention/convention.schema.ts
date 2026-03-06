@@ -1,17 +1,22 @@
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
 import { withAcquisitionShape } from "../acquisition.dto";
+import { addressDepartmentCodeSchema } from "../address/address.schema";
 import {
   agencyIdSchema,
   agencyKindSchema,
+  agencyNameSchema,
   refersToAgencyIdSchema,
 } from "../agency/agency.schema";
 import {
   assessmentStatuses,
   legacyAssessmentStatuses,
 } from "../assessment/assessment.dto";
-import { businessNameSchema } from "../business/business";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
+import {
+  businessAddressSchema,
+  businessNameSchema,
+} from "../establishment/establishment";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { dateFilterSchema } from "../filters";
 import {
@@ -41,20 +46,30 @@ import {
   numberOfEmployeesRangeSchema,
   siretSchema,
 } from "../siret/siret.schema";
+import {
+  firstnameMandatorySchema,
+  firstnameSchema,
+  lastnameMandatorySchema,
+  lastnameSchema,
+} from "../user/user.schema";
 import type { OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
-  localization,
-  makePersonNameSchema,
-  type ZodSchemaWithInputMatchingOutput,
-  zBoolean,
-  zEnumValidation,
+  legacyTextWithUnknownAndUnlimitedSizeInDBSchema,
+  optionalEmptyStringMax1024,
+  stringWithMaxLength255,
   zStringCanBeEmpty,
   zStringMinLength1,
   zStringPossiblyEmptyWithMax,
-  zToNumber,
   zTrimmedStringWithMax,
+} from "../utils/string.schema";
+import {
+  localization,
+  type ZodSchemaWithInputMatchingOutput,
+  zBoolean,
+  zEnumValidation,
+  zToNumber,
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
@@ -126,8 +141,6 @@ import {
   validateBeneficiaryAddressAndParse,
 } from "./conventionRefinements";
 
-const zTrimmedStringMax255 = zTrimmedStringWithMax(255);
-
 export const conventionIdSchema: ZodSchemaWithInputMatchingOutput<ConventionId> =
   z.uuid(localization.invalidUuid);
 
@@ -139,8 +152,8 @@ const actorSchema = z.object({
   role: roleSchema,
   email: emailSchema,
   phone: phoneNumberSchema,
-  firstName: zTrimmedStringMax255,
-  lastName: zTrimmedStringMax255,
+  firstName: firstnameMandatorySchema,
+  lastName: lastnameMandatorySchema,
 });
 
 const signatorySchema = actorSchema.merge(
@@ -154,11 +167,11 @@ const beneficiarySchema: ZodSchemaWithInputMatchingOutput<
 > = signatorySchema.merge(
   z.object({
     role: z.literal("beneficiary"),
-    emergencyContact: zStringCanBeEmpty.optional(),
+    emergencyContact: optionalEmptyStringMax1024,
     emergencyContactPhone: phoneNumberSchema.optional().or(z.literal("")),
     emergencyContactEmail: emailPossiblyEmptySchema,
     federatedIdentity: peConnectIdentitySchema.optional(),
-    financiaryHelp: zStringCanBeEmpty.optional(),
+    financiaryHelp: optionalEmptyStringMax1024,
     birthdate: makeDateStringSchema(),
     isRqth: zBoolean.optional(),
   }),
@@ -171,14 +184,14 @@ const studentBeneficiarySchema: ZodSchemaWithInputMatchingOutput<
       levelsOfEducation,
       "Votre niveau d'étude est obligatoire.",
     ),
-    schoolName: zStringMinLength1,
-    schoolPostcode: zStringMinLength1,
+    schoolName: stringWithMaxLength255,
+    schoolPostcode: stringWithMaxLength255,
     address: z
       .object({
         streetNumberAndAddress: zStringCanBeEmpty,
-        postcode: zStringMinLength1,
-        departmentCode: zStringMinLength1,
-        city: zStringMinLength1,
+        postcode: stringWithMaxLength255,
+        departmentCode: stringWithMaxLength255,
+        city: stringWithMaxLength255,
       })
       .optional(),
   }),
@@ -187,7 +200,7 @@ const studentBeneficiarySchema: ZodSchemaWithInputMatchingOutput<
 export const establishmentTutorSchema: ZodSchemaWithInputMatchingOutput<EstablishmentTutor> =
   actorSchema.extend({
     role: z.literal("establishment-tutor"),
-    job: zTrimmedStringMax255,
+    job: stringWithMaxLength255,
   });
 
 const establishmentRepresentativeSchema: ZodSchemaWithInputMatchingOutput<EstablishmentRepresentative> =
@@ -206,8 +219,8 @@ const beneficiaryCurrentEmployerSchema: ZodSchemaWithInputMatchingOutput<Benefic
       role: z.literal("beneficiary-current-employer"),
       job: zStringCanBeEmpty,
       businessSiret: siretSchema,
-      businessName: zTrimmedStringMax255,
-      businessAddress: zStringMinLength1,
+      businessName: businessNameSchema,
+      businessAddress: businessAddressSchema,
     }),
   );
 
@@ -219,8 +232,8 @@ export const immersionObjectiveSchema: ZodSchemaWithInputMatchingOutput<Immersio
 
 export const withOptionalFirstnameAndLastnameSchema: ZodSchemaWithInputMatchingOutput<WithOptionalFirstnameAndLastname> =
   z.object({
-    firstname: makePersonNameSchema("firstname").optional(),
-    lastname: makePersonNameSchema("lastname").optional(),
+    firstname: firstnameSchema.optional(),
+    lastname: lastnameSchema.optional(),
   });
 
 //todo: to remove that when data in db is cleaned up and put a more strict schema (personNameSchema)
@@ -290,7 +303,8 @@ export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<Convention
       status: z.enum(conventionStatuses, {
         error: localization.invalidEnum,
       }),
-      statusJustification: z.string().optional(),
+      statusJustification:
+        legacyTextWithUnknownAndUnlimitedSizeInDBSchema.optional(),
       agencyId: agencyIdSchema,
       updatedAt: makeDateStringSchema().optional(),
       dateSubmission: makeDateStringSchema(),
@@ -305,8 +319,10 @@ export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<Convention
       siret: siretSchema,
       businessName: businessNameSchema,
       schedule: scheduleSchema,
-      workConditions: z.string().optional(),
-      businessAdvantages: z.string().optional(),
+      workConditions:
+        legacyTextWithUnknownAndUnlimitedSizeInDBSchema.optional(),
+      businessAdvantages:
+        legacyTextWithUnknownAndUnlimitedSizeInDBSchema.optional(),
       individualProtection: zBoolean,
       individualProtectionDescription: zStringPossiblyEmptyWithMax(255),
       sanitaryPrevention: zBoolean,
@@ -562,8 +578,8 @@ export const conventionAssessmentFieldsSchema = z
 export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionReadDto> =
   conventionSchema.and(
     z.object({
-      agencyName: z.string(),
-      agencyDepartment: z.string(),
+      agencyName: agencyNameSchema,
+      agencyDepartment: addressDepartmentCodeSchema,
       agencyKind: agencyKindSchema,
       agencyContactEmail: emailSchema,
       agencySiret: siretSchema,
@@ -628,8 +644,8 @@ export type WithFirstnameAndLastname = OmitFromExistingKeys<
 
 export const withFirstnameAndLastnameSchema: ZodSchemaWithInputMatchingOutput<WithFirstnameAndLastname> =
   z.object({
-    firstname: makePersonNameSchema("firstname"),
-    lastname: makePersonNameSchema("lastname"),
+    firstname: firstnameSchema,
+    lastname: lastnameSchema,
   });
 
 const updateConventionStatusWithValidatorSchema: ZodSchemaWithInputMatchingOutput<UpdateConventionStatusWithValidator> =

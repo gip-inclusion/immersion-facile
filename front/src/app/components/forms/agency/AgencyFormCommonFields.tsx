@@ -7,11 +7,13 @@ import {
   type AddressAndPosition,
   type AddressDto,
   type AddressWithCountryCodeAndPosition,
+  type AgencyName,
   addressDtoToString,
   type CreateAgencyDto,
   defaultCountryCode,
   domElementIds,
   emailSchema,
+  type LookupAddress,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
@@ -95,11 +97,11 @@ export const AgencyFormCommonFields = ({
 
   useEffect(() => {
     if (!isFetchingSiret && establishmentInfos && mode === "create") {
-      setValue("name", establishmentInfos.businessName);
+      setValue("name", establishmentInfos.businessName as AgencyName);
       dispatch(
         geocodingSlice.actions.fetchSuggestionsRequested({
           locator: "agency-address",
-          lookup: establishmentInfos.businessAddress,
+          lookup: establishmentInfos.businessAddress as LookupAddress,
           countryCode: defaultCountryCode,
           selectFirstSuggestion: true,
         }),

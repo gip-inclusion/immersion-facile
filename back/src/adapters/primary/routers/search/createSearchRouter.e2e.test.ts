@@ -50,7 +50,7 @@ const toSearchImmersionResults = (
 ): InternalOfferDto[] =>
   params.map(({ siret, offer, establishment }) => ({
     naf: defaultNafCode,
-    nafLabel: "NAFRev2",
+    nafLabel: "FAKE",
     name: "Company inside repository",
     website: "https://www.jobs.fr",
     additionalInformation: "",
@@ -1020,7 +1020,7 @@ describe("/offers route", () => {
           ],
           contactMode: "EMAIL",
           naf: "7820Z",
-          nafLabel: "NAFRev2",
+          nafLabel: "FAKE",
           name: "Company inside repository",
           numberOfEmployeeRange: "10-19",
           position: {

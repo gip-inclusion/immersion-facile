@@ -1,13 +1,5 @@
 import { ZodError } from "zod";
-import {
-  makePersonNameSchema,
-  zStringCanBeEmpty,
-  zStringMinLength1,
-  zStringPossiblyEmptyWithMax,
-  zToBoolean,
-  zToNumber,
-  zTrimmedStringWithMax,
-} from "./zodUtils";
+import { trueSchema, zToBoolean, zToNumber } from "./zodUtils";
 
 describe("zodUtils", () => {
   describe("zToBoolean schema validation", () => {
@@ -47,233 +39,35 @@ describe("zodUtils", () => {
     });
   });
 
-  describe("zStringMinLength1 schema validation", () => {
+  describe("trueSchema", () => {
+    const invalidInputZodError = new ZodError([
+      {
+        code: "custom",
+        path: [],
+        message: "Invalid input",
+      },
+    ]);
     it.each([
-      "//",
-      "Fourni par l'employeur",
-      " Non ",
-      "texte\navec retour à la ligne\n",
-    ])(`accepts valid "%s"`, (text) => {
-      expect(() => zStringMinLength1.parse(text)).not.toThrow();
-    });
-
-    it.each([
+      { input: true, result: true },
+      { input: "true", result: true },
+      { input: "1", result: true },
       {
-        input: "",
-        expectedError: new ZodError([
-          {
-            origin: "string",
-            code: "too_small",
-            input: undefined,
-            minimum: 1,
-            inclusive: true,
-            path: [],
-            message: "Ce champ est obligatoire",
-          },
-        ]),
+        input: false,
+        result: invalidInputZodError,
       },
+      { input: "false", result: invalidInputZodError },
+      { input: "0", result: invalidInputZodError },
       {
-        input: "\n",
-        expectedError: new ZodError([
-          {
-            origin: "string",
-            code: "too_small",
-            minimum: 1,
-            inclusive: true,
-            path: [],
-            input: undefined,
-            message: "Ce champ est obligatoire",
-          },
-        ]),
+        input: "not a boolean string",
+        result: invalidInputZodError,
       },
-      {
-        input: " ",
-        expectedError: new ZodError([
-          {
-            origin: "string",
-            code: "too_small",
-            minimum: 1,
-            inclusive: true,
-            input: undefined,
-            path: [],
-            message: "Ce champ est obligatoire",
-          },
-        ]),
-      },
-      {
-        input: "   ",
-        expected: new ZodError([
-          {
-            origin: "string",
-            code: "too_small",
-            minimum: 1,
-            message: "Ce champ est obligatoire",
-            path: [],
-            input: "   ",
-          },
-          {
-            code: "custom",
-            message: "Ce champ est obligatoire",
-            path: [],
-            input: "   ",
-          },
-        ]),
-      },
-    ])(`fails to validate "%s"`, ({ input, expectedError }) => {
-      expect(() => zStringMinLength1.parse(input)).toThrow(expectedError);
-    });
-  });
-
-  describe("zStringCanBeEmpty schema validation", () => {
-    it.each([
-      {
-        input: "",
-        output: "",
-      },
-      {
-        input: " ",
-        output: "",
-      },
-      {
-        input: "//",
-        output: "//",
-      },
-      {
-        input: "Fourni par l'employeur",
-        output: "Fourni par l'employeur",
-      },
-      {
-        input: " Non ",
-        output: "Non",
-      },
-      {
-        input: "\n",
-        output: "",
-      },
-    ])(`accepts valid "%s"`, ({ input, output }) => {
-      expect(zStringCanBeEmpty.parse(input)).toEqual(output);
-    });
-  });
-
-  describe("zStringPossiblyEmptyWithMax schema validation", () => {
-    it.each(["", " ", "//", " Non ", "\n"])(`accepts valid "%s"`, (text) => {
-      expect(() => zStringPossiblyEmptyWithMax(3).parse(text)).not.toThrow();
-    });
-
-    it("fails to validate schema", () => {
-      const expectedError: ZodError = new ZodError([
-        {
-          origin: "string",
-          code: "too_big",
-          maximum: 3,
-          inclusive: true,
-          path: [],
-          input: undefined,
-          message: "Le maximum est de 3 caractères",
-        },
-      ]);
-
-      expect(() =>
-        zStringPossiblyEmptyWithMax(3).parse("Fourni par l'employeur"),
-      ).toThrow(expectedError);
-    });
-  });
-
-  describe("zTrimmedStringWithMax schema validation", () => {
-    it.each(["//", " Non ", "oui"])(`accepts valid "%s"`, (text) => {
-      expect(() => zTrimmedStringWithMax(3).parse(text)).not.toThrow();
-    });
-
-    it.each([
-      {
-        input: "",
-        expectedError: new ZodError([
-          {
-            origin: "string",
-            input: undefined,
-            code: "too_small",
-            minimum: 1,
-            inclusive: true,
-            path: [],
-            message: "Ce champ est obligatoire",
-          },
-        ]),
-      },
-      {
-        input: "\n",
-        expectedError: new ZodError([
-          {
-            origin: "string",
-            code: "too_small",
-            input: undefined,
-            minimum: 1,
-            inclusive: true,
-            path: [],
-            message: "Ce champ est obligatoire",
-          },
-        ]),
-      },
-      {
-        input: " ",
-        expectedError: new ZodError([
-          {
-            origin: "string",
-            code: "too_small",
-            input: undefined,
-            minimum: 1,
-            inclusive: true,
-            path: [],
-            message: "Ce champ est obligatoire",
-          },
-        ]),
-      },
-      {
-        input: "texte trop long",
-        expectedError: new ZodError([
-          {
-            origin: "string",
-            code: "too_big",
-            maximum: 3,
-            inclusive: true,
-            path: [],
-            input: undefined,
-            message: "Le maximum est de 3 caractères",
-          },
-        ]),
-      },
-    ])(`fails to validate "%s"`, ({ input, expectedError }) => {
-      expect(() => zTrimmedStringWithMax(3).parse(input)).toThrow(
-        expectedError,
-      );
-    });
-  });
-
-  describe("makePersonNameSchema basic validation", () => {
-    it.each([
-      { name: "julien", expectedName: "julien" },
-      { name: "Julien", expectedName: "Julien" },
-      { name: "jean-paul", expectedName: "jean-paul" },
-      { name: "jean  paul", expectedName: "jean paul" },
-      { name: "O'Brien", expectedName: "O'Brien" },
-      { name: "Marie-Claire", expectedName: "Marie-Claire" },
-      { name: "  trimmed  ", expectedName: "trimmed" },
-      { name: "multiple   spaces", expectedName: "multiple spaces" },
-      { name: "Éléonore", expectedName: "Éléonore" },
-    ])("accepts valid name '%s' and transforms to '%s'", ({
-      name,
-      expectedName,
-    }) => {
-      expect(makePersonNameSchema("lastname").parse(name)).toBe(expectedName);
-    });
-
-    it.each([
-      "123",
-      "John@Doe",
-      "John.Doe",
-    ])("rejects invalid name '%s'", (name) => {
-      expect(() => makePersonNameSchema("lastname").parse(name)).toThrow(
-        "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
-      );
+    ] satisfies {
+      input: string | boolean;
+      result: ZodError | true;
+    }[])("boolean : $input", ({ input, result }) => {
+      if (result instanceof ZodError)
+        expect(() => trueSchema.parse(input)).toThrow(result);
+      else expect(trueSchema.parse(input)).toBe(result);
     });
   });
 });

@@ -1,3 +1,4 @@
+import type { SearchTextAlpha } from "../search/searchText.schema";
 import type { Flavor } from "../typeFlavors";
 
 export const nafSectorCodes = [
@@ -52,6 +53,7 @@ export const nafSectorLabels: Record<NafSectorCode, NafSectionLabel> = {
 };
 
 export type NafCode = Flavor<string, "NafCode">;
+export type NafSousClasseLabel = Flavor<string, "NafSousClasseLabel">;
 export type NafNomenclature = Flavor<string, "NafNomenclature">;
 export type NafSectionLabel = Flavor<string, "NafSectionLabel">;
 
@@ -77,5 +79,5 @@ export type NafSectionSuggestion = {
 };
 
 export type NafSectionSuggestionsParams = {
-  searchText: string;
+  searchText: SearchTextAlpha;
 };

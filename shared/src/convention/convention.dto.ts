@@ -1,20 +1,25 @@
 import { differenceInYears, startOfDay } from "date-fns";
 import { keys } from "ramda";
 import type { WithAcquisition } from "../acquisition.dto";
-import type { AddressDto, Postcode } from "../address/address.dto";
-import type { AgencyId, AgencyKind } from "../agency/agency.dto";
+import type {
+  AddressDto,
+  DepartmentCode,
+  Postcode,
+} from "../address/address.dto";
+import type { AgencyId, AgencyKind, AgencyName } from "../agency/agency.dto";
 import type {
   AssessmentStatus,
   LegacyAssessmentDto,
 } from "../assessment/assessment.dto";
-import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
+import type { BusinessName } from "../establishment/establishment";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { DateFilter } from "../filters";
 import type {
   PaginationQueryParams,
   WithOptionalSort,
 } from "../pagination/pagination.dto";
+import type { PhoneNumber } from "../phone/phone.dto";
 import {
   type AgencyRole,
   allSignatoryRoles,
@@ -34,6 +39,10 @@ import type {
 } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 import type {
+  Firstname,
+  FirstnameMandatory,
+  Lastname,
+  LastnameMandatory,
   UserWithAdminRights,
   UserWithAgencyRights,
 } from "../user/user.dto";
@@ -213,8 +222,8 @@ export type ConventionValidatorInputNames = {
 };
 
 export type WithOptionalFirstnameAndLastname = {
-  firstname?: string;
-  lastname?: string;
+  firstname?: Firstname;
+  lastname?: Lastname;
 };
 
 export type ConventionInternshipKindSpecific<T extends InternshipKind> = {
@@ -242,10 +251,10 @@ export type Signatory = GenericSignatory<SignatoryRole>;
 
 export type GenericActor<R extends ConventionActorRole> = {
   role: R;
-  email: string;
-  phone: string;
-  firstName: string;
-  lastName: string;
+  email: Email;
+  phone: PhoneNumber;
+  firstName: FirstnameMandatory;
+  lastName: LastnameMandatory;
 };
 
 export type GenericSignatory<R extends ConventionActorRole> =
@@ -317,8 +326,8 @@ export type AgencyRefersToInConvention = {
 };
 
 export type ConventionAgencyFields = {
-  agencyName: string;
-  agencyDepartment: string;
+  agencyName: AgencyName;
+  agencyDepartment: DepartmentCode;
   agencyContactEmail: Email;
   agencyKind: AgencyKind;
   agencySiret: SiretDto;
@@ -374,8 +383,8 @@ export type UpdateConventionRequestDto = {
 export type UpdateConventionStatusWithValidator = {
   status: ConventionStatusWithValidator;
   conventionId: ConventionId;
-  lastname: string;
-  firstname: string;
+  lastname: Lastname;
+  firstname: Firstname;
 };
 
 export type UpdateConventionStatusWithoutJustification = {

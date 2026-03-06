@@ -297,7 +297,7 @@ describe("HttpLaBonneBoiteGateway", () => {
           naf: "1071C",
           nafLabel: "Boulangerie et boulangerie-pâtisserie",
           name: "AUX DELICES DE LEA",
-          numberOfEmployeeRange: "0-0",
+          numberOfEmployeeRange: "0",
           position: {
             lat: 48.8635,
             lon: 2.35824,

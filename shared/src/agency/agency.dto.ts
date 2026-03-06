@@ -8,6 +8,7 @@ import type { FederatedIdentity } from "../federatedIdentities/federatedIdentity
 import { isFtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type { AgencyRole } from "../role/role.dto";
+import type { SearchTextAlphaNumeric } from "../search/searchText.schema";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import type { UserId } from "../user/user.dto";
@@ -29,10 +30,12 @@ export const closedOrRejectedAgencyStatuses: AgencyStatus[] = [
   "rejected",
 ];
 
+export type AgencyName = Flavor<string, "AgencyName">;
+
 export type CreateAgencyDto = {
   id: AgencyId;
   kind: AgencyKind;
-  name: string;
+  name: AgencyName;
   createdAt: DateString;
   coveredDepartments: DepartmentCode[];
   address: AddressDto;
@@ -203,7 +206,7 @@ export type AgencyPositionFilter = {
 };
 
 export type GetAgenciesFilter = {
-  nameIncludes?: string;
+  nameIncludes?: SearchTextAlphaNumeric;
   position?: AgencyPositionFilter;
   departmentCode?: DepartmentCode;
   filterKind?: AgencyKindFilter;

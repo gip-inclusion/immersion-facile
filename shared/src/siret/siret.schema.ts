@@ -1,11 +1,17 @@
 import { z } from "zod";
-import { businessNameSchema } from "../business/business";
+import {
+  businessAddressSchema,
+  businessNameSchema,
+} from "../establishment/establishment";
 import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";
 import {
+  MAX_1024_TEXT_INPUT,
+  makeHardenedStringSchema,
+} from "../utils/string.schema";
+import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type GetSiretInfo,
@@ -25,11 +31,10 @@ export const numberOfEmployeesRangeSchema: ZodSchemaWithInputMatchingOutput<Numb
   });
 
 export const siretSchema: ZodSchemaWithInputMatchingOutput<SiretDto> =
-  zStringMinLength1
-    .regex(siretRegex, {
-      error: localization.invalidSiret,
-    })
-    .transform(removeSpaces);
+  makeHardenedStringSchema({
+    max: MAX_1024_TEXT_INPUT, // 14 ?
+    withRegExp: { regex: siretRegex, message: localization.invalidSiret },
+  }).transform(removeSpaces);
 
 export const withSiretSchema: ZodSchemaWithInputMatchingOutput<WithSiretDto> =
   z.object({
@@ -40,7 +45,7 @@ const getSiretResponseSchema: ZodSchemaWithInputMatchingOutput<SiretEstablishmen
   z.object({
     siret: siretSchema,
     businessName: businessNameSchema,
-    businessAddress: z.string(),
+    businessAddress: businessAddressSchema,
     isOpen: z.boolean(), // true if the office is currently open for business.
     nafDto: nafSchema.optional(),
     numberEmployeesRange: z.enum(numberEmployeesRanges, {

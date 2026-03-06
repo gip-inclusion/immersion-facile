@@ -397,15 +397,15 @@ describe("NotifyContactRequest", () => {
 
   describe("wrong paths", () => {
     it("Missing discussion", async () => {
-      const discussionId = "missing";
+      const missingDiscussionId = new UuidV4Generator().new();
 
       await expectPromiseToFailWithError(
         notifyContactRequest.execute({
-          discussionId,
+          discussionId: missingDiscussionId,
           siret: "12345678901234",
         }),
         errors.discussion.notFound({
-          discussionId,
+          discussionId: missingDiscussionId,
         }),
       );
     });

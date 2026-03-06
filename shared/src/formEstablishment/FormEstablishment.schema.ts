@@ -3,8 +3,8 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressAndPositionSchema } from "../address/address.schema";
-import { businessNameSchema } from "../business/business";
 import { emailSchema } from "../email/email.schema";
+import { businessNameSchema } from "../establishment/establishment";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { establishmentRoleSchema } from "../role/role.schema";
@@ -14,14 +14,13 @@ import type { NotEmptyArray } from "../utils";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import { frenchEstablishmentKinds } from "../utils/establishment";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zBoolean,
   zEnumValidation,
-  zStringCanBeEmpty,
-  zStringMinLength1,
-  zUuidLike,
 } from "../zodUtils";
 import type {
   ContactMode,

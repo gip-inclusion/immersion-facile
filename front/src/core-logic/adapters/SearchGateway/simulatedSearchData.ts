@@ -382,7 +382,7 @@ export const seedInternalResults: InternalOfferDto[] = [
       },
     ],
     nafLabel: "Métallurgie",
-    website: "www.corp.com/job",
+    website: "http://www.corp.com/job",
     additionalInformation:
       "Afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza, afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza",
     distance_m: 7984654,
@@ -411,8 +411,8 @@ export const seedInternalResults: InternalOfferDto[] = [
       },
     ],
     nafLabel: "Accueil et Restauration",
-    numberOfEmployeeRange: "11-49",
-    website: "www.mega-corp.com/job",
+    numberOfEmployeeRange: "20-49",
+    website: "https://www.mega-corp.com/job",
     additionalInformation:
       "Un texte super long qui donne des tonnes d'informations complémentaires sur l'immersion, les métiers proposés, tout ça... ",
     distance_m: 7000,
@@ -442,8 +442,8 @@ export const seedInternalResults: InternalOfferDto[] = [
       },
     ],
     nafLabel: "Accueil et Restauration",
-    numberOfEmployeeRange: "200-1000",
-    website: "www.coolitude-inc.com/job",
+    numberOfEmployeeRange: "200-249",
+    website: "http://www.coolitude-inc.com/job",
     additionalInformation: `Un texte
      sur plusieurs lignes:
      - tiret 1

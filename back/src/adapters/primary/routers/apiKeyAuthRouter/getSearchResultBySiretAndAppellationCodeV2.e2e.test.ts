@@ -138,7 +138,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
           appellationCode: styliste.appellationCode,
         },
       ],
-      nafLabel: "NAFRev2",
+      nafLabel: "FAKE",
       additionalInformation: "",
       website: "",
       position: {

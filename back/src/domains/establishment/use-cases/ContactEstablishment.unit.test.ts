@@ -103,8 +103,8 @@ describe("ContactEstablishment", () => {
     potentialBeneficiaryPhone: "+33654783402",
     immersionObjective: "Confirmer un projet professionnel",
     kind: "IF",
-    potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
-    potentialBeneficiaryLastName: "potential_beneficiary_last_name",
+    potentialBeneficiaryFirstName: "billy",
+    potentialBeneficiaryLastName: "idol",
     potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
     locationId: location.id,
     experienceAdditionalInformation: "other stuff",
@@ -309,7 +309,7 @@ describe("ContactEstablishment", () => {
               },
               exchanges: [
                 {
-                  subject: `Potential_beneficiary_first_name POTENTIAL_BENEFICIARY_LAST_NAME vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
+                  subject: `Billy IDOL vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
                   sentAt: timeGateway.now().toISOString(),
                   message: `<p>Bonjour,</p>
               
@@ -450,7 +450,7 @@ describe("ContactEstablishment", () => {
               },
               exchanges: [
                 {
-                  subject: `Potential_beneficiary_first_name POTENTIAL_BENEFICIARY_LAST_NAME vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
+                  subject: `Billy IDOL vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
                   sentAt: timeGateway.now().toISOString(),
                   message: `<p>Bonjour,</p>
               

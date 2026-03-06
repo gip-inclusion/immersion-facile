@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
-import { addressSchema } from "../address/address.schema";
+import { addressSchema, departmentCodeSchema } from "../address/address.schema";
 import type {
   UpdateAgencyStatusParams,
   UpdateAgencyStatusParamsWithoutId,
@@ -12,13 +12,16 @@ import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { allAgencyRoles } from "../role/role.dto";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import { searchTextAlphaNumericSchema } from "../search/searchText.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
-  localization,
   stringWithMaxLength255,
+  zStringMinLength1,
+} from "../utils/string.schema";
+import {
+  localization,
   type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
-  zStringMinLength1,
 } from "../zodUtils";
 import {
   type AgencyDto,
@@ -26,6 +29,7 @@ import {
   type AgencyId,
   type AgencyIdResponse,
   type AgencyKind,
+  type AgencyName,
   type AgencyOption,
   activeAgencyStatuses,
   agencyKindFilters,
@@ -96,14 +100,14 @@ export const agencyOptionsSchema: ZodSchemaWithInputMatchingOutput<
 
 export const listAgencyOptionsRequestSchema: ZodSchemaWithInputMatchingOutput<ListAgencyOptionsRequestDto> =
   z.object({
-    departmentCode: z.string().optional(),
-    nameIncludes: z.string().optional(),
+    departmentCode: departmentCodeSchema.optional(),
+    nameIncludes: searchTextAlphaNumericSchema.optional(),
     filterKind: z
       .enum(agencyKindFilters, {
         error: localization.invalidEnum,
       })
       .optional(),
-    siret: z.string().optional(),
+    siret: siretSchema.optional(),
     status: z.array(agencyStatusSchema).optional(),
   });
 
@@ -126,10 +130,13 @@ const withEmails = {
   }),
 };
 
+export const agencyNameSchema: ZodSchemaWithInputMatchingOutput<AgencyName> =
+  stringWithMaxLength255;
+
 const commonAgencyShape = {
   id: agencyIdSchema,
   createdAt: makeDateStringSchema(),
-  name: stringWithMaxLength255,
+  name: agencyNameSchema,
   kind: agencyKindSchema,
   contactEmail: emailSchema,
   coveredDepartments: z.array(zStringMinLength1).min(1),

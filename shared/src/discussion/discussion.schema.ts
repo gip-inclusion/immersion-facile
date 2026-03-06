@@ -16,14 +16,24 @@ import {
   appellationCodeSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import { searchTextAlphaNumericSchema } from "../search/searchText.schema";
 import { siretSchema } from "../siret/siret.schema";
+import {
+  firstnameMandatorySchema,
+  firstnameSchema,
+  lastnameMandatorySchema,
+  lastnameSchema,
+} from "../user/user.schema";
+import {
+  MAX_HTML_SIZE,
+  makeHardenedStringSchema,
+  zStringMinLength1,
+} from "../utils/string.schema";
+import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
-  zStringCanBeEmpty,
-  zStringMinLength1,
   zToNumber,
-  zUuidLike,
 } from "../zodUtils";
 import {
   type Attachment,
@@ -46,6 +56,7 @@ import {
   type ExchangeRead,
   type ExchangeRole,
   type FlatGetPaginatedDiscussionsParams,
+  type Message,
   type PotentialBeneficiaryCommonProps,
   type WithDiscussionId,
   type WithDiscussionRejection,
@@ -118,15 +129,20 @@ export const discussionExchangeForbidenReasonSchema: ZodSchemaWithInputMatchingO
 
 export const attachmentSchema: ZodSchemaWithInputMatchingOutput<Attachment> =
   z.object({
-    name: z.string(),
-    link: z.string(),
+    name: zStringMinLength1,
+    link: zStringMinLength1,
   });
+
+export const messageSchema: ZodSchemaWithInputMatchingOutput<Message> =
+  // Legacy max message en DB 653522 > reprise des historiques de réponses dans les client mail
+  // TODO : faire évoluer la gestion de réponse inbound parsing pour retirer l'historique en cas de réponse
+  makeHardenedStringSchema({ max: MAX_HTML_SIZE, canContainHtml: true });
 
 export const exchangeReadSchema: ZodSchemaWithInputMatchingOutput<ExchangeRead> =
   z
     .object({
       subject: zStringMinLength1,
-      message: zStringMinLength1,
+      message: messageSchema,
       sentAt: makeDateStringSchema(),
       attachments: z.array(attachmentSchema),
     })
@@ -134,8 +150,8 @@ export const exchangeReadSchema: ZodSchemaWithInputMatchingOutput<ExchangeRead> 
       z.discriminatedUnion("sender", [
         z.object({
           sender: z.literal("establishment"),
-          firstname: z.string(),
-          lastname: z.string(),
+          firstname: firstnameSchema,
+          lastname: lastnameSchema,
         }),
         z.object({
           sender: z.literal("potentialBeneficiary"),
@@ -194,7 +210,7 @@ export const discussionRejectedSchema: ZodSchemaWithInputMatchingOutput<WithDisc
 export const withExchangeMessageSchema: ZodSchemaWithInputMatchingOutput<
   Pick<ExchangeFromDashboard, "message">
 > = z.object({
-  message: zStringMinLength1,
+  message: messageSchema,
 });
 
 export const exchangeMessageFromDashboardSchema: ZodSchemaWithInputMatchingOutput<ExchangeFromDashboard> =
@@ -213,9 +229,9 @@ export const withDiscussionStatusSchema: ZodSchemaWithInputMatchingOutput<WithDi
   ]);
 
 const potentialBeneficiaryCommonSchema = z.object({
-  firstName: zStringMinLength1,
-  lastName: zStringMinLength1,
-  email: zStringCanBeEmpty,
+  firstName: firstnameMandatorySchema,
+  lastName: lastnameMandatorySchema,
+  email: emailSchema,
   phone: phoneNumberSchema,
   datePreferences: zStringMinLength1,
 }) satisfies ZodSchemaWithInputMatchingOutput<PotentialBeneficiaryCommonProps>;
@@ -295,7 +311,7 @@ export const flatGetPaginatedDiscussionsParamsSchema: ZodSchemaWithInputMatching
       .optional()
       .or(z.array(discussionStatusSchema).optional())
       .optional(),
-    search: z.string().optional(),
+    search: searchTextAlphaNumericSchema.optional(),
   });
 
 export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<DiscussionInList> =
@@ -310,8 +326,8 @@ export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<Discussion
     exchanges: z.array(exchangeReadSchema),
     city: zStringMinLength1,
     potentialBeneficiary: z.object({
-      firstName: zStringMinLength1,
-      lastName: zStringMinLength1,
+      firstName: firstnameMandatorySchema,
+      lastName: lastnameMandatorySchema,
       phone: phoneNumberSchema.nullable(),
     }),
     immersionObjective: immersionObjectiveSchema.nullable(),
@@ -326,8 +342,8 @@ export const discussionExchangeForbiddenParamsSchema: ZodSchemaWithInputMatching
     reason: discussionExchangeForbidenReasonSchema,
     admins: z.array(
       z.object({
-        firstName: zStringCanBeEmpty,
-        lastName: zStringCanBeEmpty,
+        firstName: firstnameSchema,
+        lastName: lastnameSchema,
         email: emailSchema,
       }),
     ),
@@ -336,8 +352,8 @@ export const discussionExchangeForbiddenParamsSchema: ZodSchemaWithInputMatching
 const contactInformationsCommonSchema = z.object({
   appellationCode: appellationCodeSchema,
   siret: siretSchema,
-  potentialBeneficiaryFirstName: zStringMinLength1,
-  potentialBeneficiaryLastName: zStringMinLength1,
+  potentialBeneficiaryFirstName: firstnameMandatorySchema,
+  potentialBeneficiaryLastName: lastnameMandatorySchema,
   potentialBeneficiaryEmail: emailSchema,
   locationId: zUuidLike,
 });
@@ -380,4 +396,4 @@ export const createDiscussionSchema: ZodSchemaWithInputMatchingOutput<CreateDisc
     .and(withAcquisitionSchema);
 
 export const contactEstablishmentEventPayloadSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentEventPayload> =
-  z.object({ discussionId: z.string(), siret: siretSchema });
+  z.object({ discussionId: discussionIdSchema, siret: siretSchema });
