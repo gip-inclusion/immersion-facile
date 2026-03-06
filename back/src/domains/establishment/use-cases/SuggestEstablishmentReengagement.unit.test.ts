@@ -20,10 +20,10 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { SuggestEditEstablishment } from "./SuggestEditEstablishment";
+import { SuggestEstablishmentReengagement } from "./SuggestEstablishmentReengagement";
 
 describe("SuggestEditEstablishment", () => {
-  let suggestEditEstablishment: SuggestEditEstablishment;
+  let suggestEstablishmentReengagement: SuggestEstablishmentReengagement;
   let uow: InMemoryUnitOfWork;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
@@ -39,7 +39,7 @@ describe("SuggestEditEstablishment", () => {
       uow.outboxRepository,
     );
 
-    suggestEditEstablishment = new SuggestEditEstablishment(
+    suggestEstablishmentReengagement = new SuggestEstablishmentReengagement(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       fakeBaseUrl,
@@ -114,14 +114,14 @@ describe("SuggestEditEstablishment", () => {
     ];
     uow.userRepository.users = [admin1, admin2, contact];
 
-    await suggestEditEstablishment.execute(
+    await suggestEstablishmentReengagement.execute(
       establishmentAggregate.establishment.siret,
     );
 
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+          kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
           recipients: [admin1.email],
           sender: immersionFacileNoReplyEmailSender,
           params: {
@@ -129,7 +129,7 @@ describe("SuggestEditEstablishment", () => {
           },
         },
         {
-          kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+          kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
           recipients: [admin2.email],
           sender: immersionFacileNoReplyEmailSender,
           params: {
