@@ -36,7 +36,7 @@ export const nafSlice = createSlice({
       state.currentNafSections = action.payload;
       state.isLoading = false;
     },
-    searchSectionsFailed: (state, _action) => {
+    searchSectionsFailed: (state, _action: PayloadAction<null>) => {
       state.isLoading = false;
       state.currentNafSections = [];
     },

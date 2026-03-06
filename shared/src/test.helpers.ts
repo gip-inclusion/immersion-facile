@@ -12,7 +12,7 @@ export const expectPromiseToFailWithError = async <T extends Error>(
   promise: Promise<unknown>,
   expectedError: T,
 ) => {
-  await expect(promise).rejects.toThrowError(expectedError);
+  await expect(promise).rejects.toThrow(expectedError);
   await expect(promise).rejects.toBeInstanceOf(expectedError.constructor);
   if (expectedError instanceof BadRequestError) {
     await expectPromiseToFailWithBadRequestError(promise, expectedError);
