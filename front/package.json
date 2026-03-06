@@ -67,7 +67,7 @@
     "redux": "^4.2.0",
     "redux-observable": "^2.0.0",
     "rxjs": "^7.5.5",
-    "sass": "^1.55.0",
+    "sass": "^1.97.3",
     "scss-mapper": "workspace:*",
     "shared": "workspace:*",
     "shared-routes": "^0.10.9",
