@@ -19,7 +19,7 @@
     "commander": "^10.0.0",
     "fs": "0.0.1-security",
     "path": "^0.12.7",
-    "sass": "^1.55.0",
+    "sass": "^1.97.3",
     "string-extract-class-names": "6.1.0"
   },
   "devDependencies": {
