@@ -91,7 +91,7 @@ describe("Assessment schema", () => {
       establishmentAdvices: "my minimum establishment advices",
       establishmentFeedback: "my minimum establishment feedback",
     };
-    expect(() => assessmentDtoSchema.parse(assessment)).toThrowError();
+    expect(() => assessmentDtoSchema.parse(assessment)).toThrow();
   });
 });
 const expectDateRangeToFailWithError = (
