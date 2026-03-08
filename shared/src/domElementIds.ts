@@ -951,13 +951,16 @@ export const domElementIds = {
     },
     dashboard: {
       tabContainer: "im-agency-dashboard__tab-container",
-      initiateConventionModalButton:
-        "im-agency-dashboard__initiate-convention-modal-button",
-      initiateConventionButton:
-        "im-agency-dashboard__initiate-convention-button",
-      selectAgencyToInitiateConventionModal:
-        "im-agency-dashboard__select-agency-to-initiate-convention-modal",
       goToConventionButton: "im-agency-dashboard__go-to-convention-button",
+    },
+    initiateConvention: {
+      button: "im-agency-dashboard__initiate-convention-button",
+      modalButton: "im-agency-dashboard__initiate-convention-modal-button",
+      modal: "im-agency-dashboard__select-agency-to-initiate-convention-modal",
+      sourceRadioButtons:
+        "im-agency-dashboard__initiate-convention-source-radio-buttons",
+      templateRadioButtons:
+        "im-agency-dashboard__initiate-convention-template-radio-buttons",
     },
     agencyTab: {
       adminRightsModal: "im-agency-dashboard__agency-tab-admin-rights-modal",
@@ -1024,10 +1027,21 @@ export const domElementIds = {
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
     tabContainer: "im-establishment-dashboard__tab-container",
-    initiateConventionModal:
-      "im-manage-establishment__initiate-convention-modal",
-    initiateConventionModalButton:
-      "im-manage-establishment__initiate-convention-modal-button",
+    initiateConvention: {
+      button: "im-establishment-dashboard__initiate-convention-button",
+      modal: "im-manage-establishment__initiate-convention-modal",
+      modalButton: "im-manage-establishment__initiate-convention-modal-button",
+      establishmentSelect:
+        "im-manage-establishment__initiate-convention-establishment-select",
+      appellationSelect:
+        "im-manage-establishment__initiate-convention-appellation-select",
+      addressSelect:
+        "im-manage-establishment__initiate-convention-address-select",
+      sourceRadioButtons:
+        "im-manage-establishment__initiate-convention-source-radio-buttons",
+      templateRadioButtons:
+        "im-manage-establishment__initiate-convention-template-radio-buttons",
+    },
     login: {
       proConnectButton:
         "im-login-form__inclusion-connect-button--establishment-dashboard",
