@@ -112,17 +112,26 @@ export const ConventionList = () => {
     },
   });
 
-  const assessmentOptions: RadioButtonsProps["options"] = useMemo(
+  const assessmentOptions: CheckboxProps["options"] = useMemo(
     () => [
       {
         label: "Bilans à compléter par le tuteur",
         nativeInputProps: {
           value: "to-be-completed",
-          checked: tempFilters.assessmentCompletionStatus === "to-be-completed",
+          checked:
+            tempFilters.assessmentCompletionStatus?.includes("to-be-completed"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus: "to-be-completed",
+              assessmentCompletionStatus:
+                prev.assessmentCompletionStatus?.includes("to-be-completed")
+                  ? prev.assessmentCompletionStatus.filter(
+                      (s) => s !== "to-be-completed",
+                    )
+                  : [
+                      ...(prev.assessmentCompletionStatus ?? []),
+                      "to-be-completed",
+                    ],
             }));
           },
         },
@@ -131,11 +140,16 @@ export const ConventionList = () => {
         label: "Bilans à signer par la personne en immersion",
         nativeInputProps: {
           value: "to-sign",
-          checked: tempFilters.assessmentCompletionStatus === "to-sign",
+          checked: tempFilters.assessmentCompletionStatus?.includes("to-sign"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus: "to-sign",
+              assessmentCompletionStatus:
+                prev.assessmentCompletionStatus?.includes("to-sign")
+                  ? prev.assessmentCompletionStatus.filter(
+                      (s) => s !== "to-sign",
+                    )
+                  : [...(prev.assessmentCompletionStatus ?? []), "to-sign"],
             }));
           },
         },
@@ -144,11 +158,16 @@ export const ConventionList = () => {
         label: "Bilans complété et signé",
         nativeInputProps: {
           value: "signed",
-          checked: tempFilters.assessmentCompletionStatus === "signed",
+          checked: tempFilters.assessmentCompletionStatus?.includes("signed"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus: "to-sign",
+              assessmentCompletionStatus:
+                prev.assessmentCompletionStatus?.includes("signed")
+                  ? prev.assessmentCompletionStatus.filter(
+                      (s) => s !== "signed",
+                    )
+                  : [...(prev.assessmentCompletionStatus ?? []), "signed"],
             }));
           },
         },
@@ -439,7 +458,7 @@ export const ConventionList = () => {
                       title: "Filtrer par statut",
                       content: (
                         <>
-                          <Checkbox options={statusOptions} />
+                          <RadioButtons options={statusOptions} />
                         </>
                       ),
                     },
@@ -459,18 +478,23 @@ export const ConventionList = () => {
                     values: [
                       (() => {
                         if (
-                          tempFilters.assessmentCompletionStatus === "signed"
+                          tempFilters.assessmentCompletionStatus?.includes(
+                            "signed",
+                          )
                         ) {
                           return "Bilan : Bilans complété et signer";
                         }
                         if (
-                          tempFilters.assessmentCompletionStatus === "to-sign"
+                          tempFilters.assessmentCompletionStatus?.includes(
+                            "to-sign",
+                          )
                         ) {
                           return "Bilan : Bilans à signer";
                         }
                         if (
-                          tempFilters.assessmentCompletionStatus ===
-                          "to-be-completed"
+                          tempFilters.assessmentCompletionStatus?.includes(
+                            "to-be-completed",
+                          )
                         ) {
                           return "Bilan : Bilans non complétés";
                         }
@@ -481,7 +505,7 @@ export const ConventionList = () => {
                       title: "Filtrer par statut du bilan",
                       content: (
                         <>
-                          <RadioButtons options={assessmentOptions} />
+                          <Checkbox options={assessmentOptions} />
                         </>
                       ),
                     },
