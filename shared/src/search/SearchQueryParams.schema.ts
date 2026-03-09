@@ -23,10 +23,9 @@ import type {
   GetExternalOffersFlatQueryParams,
   GetOffersFlatQueryParams,
   LegacySearchQueryParamsDto,
-  Place,
 } from "./SearchQueryParams.dto";
 
-const placeSchema: ZodSchemaWithInputMatchingOutput<Place> = zStringCanBeEmpty;
+const placeSchema: ZodSchemaWithInputMatchingOutput<string> = zStringCanBeEmpty;
 
 export const distanceKmSchema = z.coerce
   .number()

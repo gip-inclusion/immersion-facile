@@ -26,18 +26,14 @@ import {
   type ZodSchemaWithInputMatchingOutput,
   zBoolean,
 } from "../zodUtils";
-import type {
-  ExternalOfferDto,
-  InternalOfferDto,
-  UrlOfPartner,
-} from "./Offer.dto";
+import type { ExternalOfferDto, InternalOfferDto } from "./Offer.dto";
 import { remoteWorkModeSchema } from "./SearchQueryParams.schema";
 
 const withRemoteWorkModeSchema = z.object({
   remoteWorkMode: remoteWorkModeSchema,
 });
 
-const urlOfPartnerSchema: ZodSchemaWithInputMatchingOutput<UrlOfPartner> =
+const urlOfPartnerSchema: ZodSchemaWithInputMatchingOutput<string> =
   zStringCanBeEmpty;
 
 const commonOfferSchema = z.object({

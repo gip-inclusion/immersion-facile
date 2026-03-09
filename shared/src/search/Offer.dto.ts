@@ -5,7 +5,6 @@ import type {
 } from "../establishment/establishment";
 import type {
   ContactMode,
-  EstablishmentAdditionnalInformation,
   EstablishmentWebSite,
   FitForDisableWorkerOption,
   RemoteWorkMode,
@@ -18,10 +17,7 @@ import type {
   RomeLabel,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
-import type { Flavor } from "../typeFlavors";
 import type { DateTimeIsoString } from "../utils/date";
-
-export type UrlOfPartner = Flavor<string, "UrlOfParner">;
 
 type CommonOfferDto = {
   rome: RomeCode;
@@ -42,8 +38,8 @@ type CommonOfferDto = {
   distance_m?: number;
   numberOfEmployeeRange?: NumberEmployeesRange;
   website?: EstablishmentWebSite;
-  additionalInformation?: EstablishmentAdditionnalInformation;
-  urlOfPartner?: UrlOfPartner;
+  additionalInformation?: string;
+  urlOfPartner?: string;
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
 };

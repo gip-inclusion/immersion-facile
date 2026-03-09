@@ -30,12 +30,10 @@ export const closedOrRejectedAgencyStatuses: AgencyStatus[] = [
   "rejected",
 ];
 
-export type AgencyName = Flavor<string, "AgencyName">;
-
 export type CreateAgencyDto = {
   id: AgencyId;
   kind: AgencyKind;
-  name: AgencyName;
+  name: string;
   createdAt: DateString;
   coveredDepartments: DepartmentCode[];
   address: AddressDto;

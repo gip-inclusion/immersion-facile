@@ -5,7 +5,6 @@ import type {
   BusinessNameCustomized,
   ContactMode,
   DateTimeIsoString,
-  EstablishmentAdditionnalInformation,
   EstablishmentWebSite,
   FitForDisableWorkerOption,
   GeoPositionDto,
@@ -18,7 +17,6 @@ import type {
   RomeCode,
   RomeLabel,
   SiretDto,
-  UrlOfPartner,
   WithIsAvailable,
 } from "shared";
 
@@ -41,8 +39,8 @@ export type SearchImmersionResultPublicV3 = {
   distance_m?: number;
   numberOfEmployeeRange?: NumberEmployeesRange;
   website?: EstablishmentWebSite;
-  additionalInformation?: EstablishmentAdditionnalInformation;
-  urlOfPartner?: UrlOfPartner;
+  additionalInformation?: string;
+  urlOfPartner?: string;
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
   remoteWorkMode: RemoteWorkMode;

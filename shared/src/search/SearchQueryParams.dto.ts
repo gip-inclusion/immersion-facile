@@ -15,7 +15,6 @@ import type {
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
-import type { Flavor } from "../typeFlavors";
 
 export const searchSortedByOptions = ["distance", "date", "score"] as const;
 export type SearchSortedBy = (typeof searchSortedByOptions)[number];
@@ -65,10 +64,8 @@ type LegacySearchQueryParamsAppellationsAndRome = {
   rome?: RomeCode;
 };
 
-export type Place = Flavor<string, "Place">;
-
 type LegacySearchCommonParamsDto = {
-  place?: Place;
+  place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
   fitForDisabledWorkers?: boolean | undefined;
 };
@@ -84,7 +81,7 @@ type WithRemoteWorkModes = {
 };
 
 type GetOffersFlatParamsCommon = WithAcquisition & {
-  place?: Place; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
+  place?: string; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
   locationIds?: LocationId[];
   nafCodes?: NafCode[];

@@ -21,11 +21,8 @@ export type WithUserId = {
 
 export type WithOptionalUserId = Partial<WithUserId>;
 
-export type LastnameMandatory = Flavor<string, "LastnameMandatory">;
-export type Lastname = Flavor<string, "Lastname"> | LastnameMandatory;
-
-export type FirstnameMandatory = Flavor<string, "FirstnameMandatory">;
-export type Firstname = Flavor<string, "Firstname"> | FirstnameMandatory;
+export type Lastname = Flavor<string, "Lastname">;
+export type Firstname = Flavor<string, "Firstname">;
 
 export type User = {
   id: UserId;

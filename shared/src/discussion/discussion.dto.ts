@@ -18,12 +18,7 @@ import type { SearchTextAlphaNumeric } from "../search/searchText.schema";
 import type { SiretDto } from "../siret/siret";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
-import type {
-  Firstname,
-  FirstnameMandatory,
-  Lastname,
-  LastnameMandatory,
-} from "../user/user.dto";
+import type { Firstname, Lastname } from "../user/user.dto";
 import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import type {
@@ -89,8 +84,8 @@ export const labelsForContactLevelOfEducation: Record<
 type ContactInformations<D extends DiscussionKind> = {
   appellationCode: AppellationCode;
   siret: SiretDto;
-  potentialBeneficiaryFirstName: FirstnameMandatory;
-  potentialBeneficiaryLastName: LastnameMandatory;
+  potentialBeneficiaryFirstName: Firstname;
+  potentialBeneficiaryLastName: Lastname;
   potentialBeneficiaryEmail: Email;
   contactMode: ContactMode;
   kind: D;
@@ -142,8 +137,8 @@ type WithDiscussionKindProps<D extends DiscussionKind> = D extends "IF"
 
 export type PotentialBeneficiaryCommonProps = {
   email: Email;
-  firstName: FirstnameMandatory;
-  lastName: LastnameMandatory;
+  firstName: Firstname;
+  lastName: Lastname;
   datePreferences: string;
   phone: PhoneNumber;
 };
@@ -315,8 +310,8 @@ export type DiscussionInList = Pick<
   | "status"
 > & {
   potentialBeneficiary: {
-    firstName: FirstnameMandatory;
-    lastName: LastnameMandatory;
+    firstName: Firstname;
+    lastName: Lastname;
     phone: string | null;
   };
   immersionObjective: ImmersionObjective | null;

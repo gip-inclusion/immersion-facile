@@ -6,7 +6,7 @@ import type {
   DepartmentCode,
   Postcode,
 } from "../address/address.dto";
-import type { AgencyId, AgencyKind, AgencyName } from "../agency/agency.dto";
+import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type {
   AssessmentStatus,
   LegacyAssessmentDto,
@@ -40,9 +40,7 @@ import type {
 import type { Flavor } from "../typeFlavors";
 import type {
   Firstname,
-  FirstnameMandatory,
   Lastname,
-  LastnameMandatory,
   UserWithAdminRights,
   UserWithAgencyRights,
 } from "../user/user.dto";
@@ -253,8 +251,8 @@ export type GenericActor<R extends ConventionActorRole> = {
   role: R;
   email: Email;
   phone: PhoneNumber;
-  firstName: FirstnameMandatory;
-  lastName: LastnameMandatory;
+  firstName: Firstname;
+  lastName: Lastname;
 };
 
 export type GenericSignatory<R extends ConventionActorRole> =
@@ -326,7 +324,7 @@ export type AgencyRefersToInConvention = {
 };
 
 export type ConventionAgencyFields = {
-  agencyName: AgencyName;
+  agencyName: string;
   agencyDepartment: DepartmentCode;
   agencyContactEmail: Email;
   agencyKind: AgencyKind;
