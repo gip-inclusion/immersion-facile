@@ -516,63 +516,57 @@ const filterByAgencyDepartmentCodes =
   };
 
 const filterAssessmentCompletionStatus =
-  (assessmentCompletionStatus: AssessmentCompletionStatusFilter | undefined) =>
+  (
+    assessmentCompletionStatus: AssessmentCompletionStatusFilter[] | undefined,
+  ) =>
   (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
-    if (!assessmentCompletionStatus) {
+    if (!assessmentCompletionStatus || assessmentCompletionStatus.length === 0)
       return builder;
-    }
 
-    if (assessmentCompletionStatus === "signed") {
-      return builder
-        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
-        .where((eb) =>
-          eb.exists(
-            eb
-              .selectFrom("immersion_assessments")
-              .select("convention_id")
-              .where("convention_id", "=", eb.ref("conventions.id"))
-              .where((qb) =>
-                qb.or([
-                  qb("status", "=", "DID_NOT_SHOW"),
-                  qb("signed_at", "is not", null),
+    const hasSigned = assessmentCompletionStatus.includes("signed");
+    const hasToSign = assessmentCompletionStatus.includes("to-sign");
+    const hasToBeCompleted =
+      assessmentCompletionStatus.includes("to-be-completed");
+
+    if (hasSigned && hasToSign && hasToBeCompleted) return builder;
+
+    return builder
+      .leftJoin(
+        "immersion_assessments as ia",
+        "ia.convention_id",
+        "conventions.id",
+      )
+      .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+      .where((eb) => {
+        const conditions: ReturnType<typeof eb>[] = [];
+
+        if (hasSigned && hasToSign)
+          conditions.push(eb("ia.convention_id", "is not", null));
+        else {
+          if (hasSigned)
+            conditions.push(
+              eb.and([
+                eb("ia.convention_id", "is not", null),
+                eb.or([
+                  eb("ia.status", "=", "DID_NOT_SHOW"),
+                  eb("ia.signed_at", "is not", null),
                 ]),
-              ),
-          ),
-        );
-    }
+              ]),
+            );
+          if (hasToSign)
+            conditions.push(
+              eb.and([
+                eb("ia.convention_id", "is not", null),
+                eb("ia.signed_at", "is", null),
+                eb("ia.status", "!=", "DID_NOT_SHOW"),
+              ]),
+            );
+        }
+        if (hasToBeCompleted)
+          conditions.push(eb("ia.convention_id", "is", null));
 
-    if (assessmentCompletionStatus === "to-sign") {
-      return builder
-        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
-        .where((eb) =>
-          eb.exists(
-            eb
-              .selectFrom("immersion_assessments")
-              .select("convention_id")
-              .where("convention_id", "=", eb.ref("conventions.id"))
-              .where("signed_at", "is", null)
-              .where("status", "!=", "DID_NOT_SHOW"),
-          ),
-        );
-    }
-
-    if (assessmentCompletionStatus === "to-be-completed") {
-      return builder
-        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
-        .where((eb) =>
-          eb.not(
-            eb.exists(
-              eb
-                .selectFrom("immersion_assessments")
-                .select("convention_id")
-                .where("convention_id", "=", eb.ref("conventions.id")),
-            ),
-          ),
-        );
-    }
-    assessmentCompletionStatus satisfies never;
-
-    return builder;
+        return conditions.length === 1 ? conditions[0] : eb.or(conditions);
+      });
   };
 
 const filterDate =
