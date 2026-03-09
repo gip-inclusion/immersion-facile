@@ -477,36 +477,34 @@ const makeApplyFiltersToConventions =
 const makeApplyAssessmentCompletionStatusFilterConventionsRead =
   ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
   (convention: ConventionReadDto) => {
-    if (!assessmentCompletionStatus) return true;
-    if (convention.status !== "ACCEPTED_BY_VALIDATOR" || !convention.assessment)
-      return false;
+    if (!assessmentCompletionStatus || assessmentCompletionStatus.length === 0)
+      return true;
+    if (convention.status !== "ACCEPTED_BY_VALIDATOR") return false;
 
-    const isLegacyAssessment =
-      convention.assessment.status === "FINISHED" ||
-      convention.assessment.status === "ABANDONED";
-    if (!convention.assessment || isLegacyAssessment) return false;
+    const hasSigned = assessmentCompletionStatus.includes("signed");
+    const hasToSign = assessmentCompletionStatus.includes("to-sign");
+    const hasToBeCompleted =
+      assessmentCompletionStatus.includes("to-be-completed");
 
-    if (
-      assessmentCompletionStatus === "signed" &&
-      "signedAt" in convention.assessment
-    ) {
-      return (
-        convention.assessment !== null &&
-        convention.assessment.signedAt !== null
-      );
-    }
-    if (
-      assessmentCompletionStatus === "to-sign" &&
-      "signedAt" in convention.assessment
-    ) {
-      return (
-        convention.assessment === null ||
-        convention.assessment.signedAt === null
-      );
-    }
-    if (assessmentCompletionStatus === "to-be-completed") {
-      return convention.assessment === null;
-    }
+    const assessment = convention.assessment;
+    const hasAssessment =
+      assessment !== null &&
+      assessment.status !== "FINISHED" &&
+      assessment.status !== "ABANDONED";
 
-    return false;
+    let matchesSigned = false;
+    let matchesToSign = false;
+    if (hasAssessment && assessment && "signedAt" in assessment) {
+      matchesSigned =
+        assessment.status === "DID_NOT_SHOW" || assessment.signedAt !== null;
+      matchesToSign =
+        assessment.signedAt === null && assessment.status !== "DID_NOT_SHOW";
+    }
+    const matchesToBeCompleted = assessment === null;
+
+    return (
+      (hasSigned && matchesSigned) ||
+      (hasToSign && matchesToSign) ||
+      (hasToBeCompleted && matchesToBeCompleted)
+    );
   };

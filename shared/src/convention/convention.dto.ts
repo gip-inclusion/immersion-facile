@@ -502,7 +502,7 @@ export type GetPaginatedConventionsFilters = {
   dateStart?: DateFilter;
   dateEnd?: DateFilter;
   dateSubmission?: DateFilter;
-  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter[];
 };
 
 export type GetPaginatedConventionsSortBy = keyof Pick<
@@ -542,5 +542,5 @@ export type FlatGetConventionsForAgencyUserParams = {
   dateSubmissionTo?: DateString;
 
   // assessment filter
-  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter[];
 };

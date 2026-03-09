@@ -932,6 +932,13 @@ export const statusSchema = z.enum(conventionStatuses, {
   error: localization.invalidEnum,
 });
 
+const assessmentCompletionStatusFilterSchema = z.enum(
+  assessmentCompletionStatusFilters,
+  {
+    error: localization.invalidEnum,
+  },
+);
+
 export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatchingOutput<FlatGetConventionsForAgencyUserParams> =
   z.object({
     // pagination
@@ -966,7 +973,10 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
 
     // assessment filter
     assessmentCompletionStatus: z
-      .enum(assessmentCompletionStatusFilters)
+      .tuple(
+        [assessmentCompletionStatusFilterSchema],
+        assessmentCompletionStatusFilterSchema,
+      )
       .optional(),
   });
 
@@ -992,7 +1002,10 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
           dateEnd: dateFilterSchema.optional(),
           dateSubmission: dateFilterSchema.optional(),
           assessmentCompletionStatus: z
-            .enum(assessmentCompletionStatusFilters)
+            .tuple(
+              [assessmentCompletionStatusFilterSchema],
+              assessmentCompletionStatusFilterSchema,
+            )
             .optional(),
         })
         .optional(),
