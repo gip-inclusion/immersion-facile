@@ -415,13 +415,16 @@ export const wrapInMaterializedCteWithEnrichment = ({
 const createBroadcastFeedbackBaseBuilder = ({
   transaction,
   userAgencyIds,
+  conventionSubmittedAfter,
 }: {
   transaction: KyselyDb;
   userAgencyIds: AgencyId[];
-}) =>
-  transaction
-    .with("conventions_with_latest_feedback", (qb) =>
-      qb
+  conventionSubmittedAfter?: Date;
+}) => {
+  const cteBuilder = transaction.with(
+    "conventions_with_latest_feedback",
+    (qb) => {
+      let query = qb
         .selectFrom("conventions as c")
         .innerJoin(
           "actors as beneficiary",
@@ -453,36 +456,55 @@ const createBroadcastFeedbackBaseBuilder = ({
           eb.ref("c.date_submission").as("dateSubmission"),
         ])
         .where("c.agency_id", "in", userAgencyIds)
+        .where("bf.subscriber_error_feedback", "is not", null)
+        .where("bf.handled_by_agency", "=", false)
         .distinctOn("c.id")
         .orderBy("c.id")
-        .orderBy("bf.occurred_at", "desc"),
-    )
-    .selectFrom("conventions_with_latest_feedback as cf")
-    .where("cf.subscriberErrorFeedback", "is not", null)
-    .where("cf.handledByAgency", "=", false);
+        .orderBy("bf.occurred_at", "desc");
+
+      if (conventionSubmittedAfter)
+        query = query.where(
+          "c.date_submission",
+          ">=",
+          conventionSubmittedAfter,
+        );
+
+      return query;
+    },
+  );
+
+  return cteBuilder.selectFrom("conventions_with_latest_feedback as cf");
+};
 
 export const createConventionsWithErroredBroadcastFeedbackBuilder = ({
   transaction,
   userAgencyIds,
+  conventionSubmittedAfter,
 }: {
   transaction: KyselyDb;
   userAgencyIds: AgencyId[];
+  conventionSubmittedAfter?: Date;
 }) =>
   createBroadcastFeedbackBaseBuilder({
     transaction,
     userAgencyIds,
+    conventionSubmittedAfter,
   }).selectAll();
 
 export const createBroadcastFeedbackCountBuilder = ({
   transaction,
   userAgencyIds,
+  conventionSubmittedAfter,
 }: {
   transaction: KyselyDb;
   userAgencyIds: AgencyId[];
+  conventionSubmittedAfter?: Date;
 }) =>
-  createBroadcastFeedbackBaseBuilder({ transaction, userAgencyIds }).select(
-    (eb) => sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
-  );
+  createBroadcastFeedbackBaseBuilder({
+    transaction,
+    userAgencyIds,
+    conventionSubmittedAfter,
+  }).select((eb) => sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"));
 
 export const getConventionAgencyFieldsForAgencies = async (
   transaction: KyselyDb,
