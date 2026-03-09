@@ -348,6 +348,7 @@ describe("Get Convention", () => {
             assessment: {
               status: assessment.status,
               endedWithAJob: assessment.endedWithAJob,
+              signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
           },
@@ -375,6 +376,7 @@ describe("Get Convention", () => {
               assessment: {
                 status: assessment.status,
                 endedWithAJob: assessment.endedWithAJob,
+                signedAt: assessment.signedAt,
                 createdAt: assessment.createdAt,
               },
             },
@@ -444,6 +446,7 @@ describe("Get Convention", () => {
               assessment: {
                 status: assessment.status,
                 endedWithAJob: assessment.endedWithAJob,
+                signedAt: assessment.signedAt,
                 createdAt: assessment.createdAt,
               },
             },
@@ -471,6 +474,7 @@ describe("Get Convention", () => {
             assessment: {
               status: assessment.status,
               endedWithAJob: assessment.endedWithAJob,
+              signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
           },
@@ -534,6 +538,7 @@ describe("Get Convention", () => {
             assessment: {
               status: assessment.status,
               endedWithAJob: assessment.endedWithAJob,
+              signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
           },
@@ -594,6 +599,7 @@ describe("Get Convention", () => {
             assessment: {
               status: assessment.status,
               endedWithAJob: assessment.endedWithAJob,
+              signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
           },

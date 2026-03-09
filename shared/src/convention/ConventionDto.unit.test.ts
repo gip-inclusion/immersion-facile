@@ -221,6 +221,7 @@ describe("conventionDtoSchema", () => {
         assessment: {
           status: "COMPLETED",
           endedWithAJob: false,
+          signedAt: null,
           createdAt: new Date().toISOString(),
         },
       };
@@ -243,6 +244,7 @@ describe("conventionDtoSchema", () => {
         assessment: {
           status: "COMPLETED",
           endedWithAJob: false,
+          signedAt: null,
           createdAt: new Date().toISOString(),
         },
       };

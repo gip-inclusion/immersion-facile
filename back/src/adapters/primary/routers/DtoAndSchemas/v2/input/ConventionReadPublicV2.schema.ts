@@ -34,6 +34,7 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
           z.object({
             status: z.enum(assessmentStatuses),
             endedWithAJob: z.boolean(),
+            signedAt: makeDateStringSchema().nullable(),
             createdAt: dateTimeIsoStringSchema,
           }),
           z.object({
