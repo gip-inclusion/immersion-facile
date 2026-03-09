@@ -132,13 +132,8 @@ export const fitForDisabledWorkersOptions = [
 
 export type EstablishmentWebSite = AbsoluteUrl | "";
 
-export type EstablishmentAdditionnalInformation = Flavor<
-  string,
-  "EstablishmentAdditionnalInformation"
->;
-
 export type CommonFormEstablishmentDto = {
-  additionalInformation?: EstablishmentAdditionnalInformation;
+  additionalInformation?: string;
   offers: EstablishmentFormOffer[];
   businessAddresses: FormEstablishmentAddress[];
   userRights: FormEstablishmentUserRight[];

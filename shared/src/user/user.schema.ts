@@ -27,9 +27,7 @@ import {
 import type {
   ConnectedUser,
   Firstname,
-  FirstnameMandatory,
   Lastname,
-  LastnameMandatory,
   User,
   UserId,
   UserWithNumberOfAgenciesAndEstablishments,
@@ -85,12 +83,12 @@ const makePersonNameSchema = (
 
 export const firstnameSchema: ZodSchemaWithInputMatchingOutput<Firstname> =
   makePersonNameSchema("firstname", false);
-export const firstnameMandatorySchema: ZodSchemaWithInputMatchingOutput<FirstnameMandatory> =
+export const firstnameMandatorySchema: ZodSchemaWithInputMatchingOutput<Firstname> =
   makePersonNameSchema("firstname", true);
 
 export const lastnameSchema: ZodSchemaWithInputMatchingOutput<Lastname> =
   makePersonNameSchema("lastname", false);
-export const lastnameMandatorySchema: ZodSchemaWithInputMatchingOutput<LastnameMandatory> =
+export const lastnameMandatorySchema: ZodSchemaWithInputMatchingOutput<Lastname> =
   makePersonNameSchema("lastname", true);
 
 const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =

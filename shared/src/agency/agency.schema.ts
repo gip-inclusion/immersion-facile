@@ -29,7 +29,6 @@ import {
   type AgencyId,
   type AgencyIdResponse,
   type AgencyKind,
-  type AgencyName,
   type AgencyOption,
   activeAgencyStatuses,
   agencyKindFilters,
@@ -130,7 +129,7 @@ const withEmails = {
   }),
 };
 
-export const agencyNameSchema: ZodSchemaWithInputMatchingOutput<AgencyName> =
+export const agencyNameSchema: ZodSchemaWithInputMatchingOutput<string> =
   stringWithMaxLength255;
 
 const commonAgencyShape = {
