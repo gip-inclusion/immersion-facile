@@ -802,7 +802,7 @@ const addIssueIfLimitedScheduleHoursExceeded = (
   ) {
     if (
       beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD &&
-      new Date(convention.dateSubmission).getTime() <
+      new Date(convention.dateSubmission).getTime() <=
         CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime()
     ) {
       addIssue(
@@ -812,7 +812,7 @@ const addIssueIfLimitedScheduleHoursExceeded = (
     }
     if (
       beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
-      new Date(convention.dateSubmission).getTime() >=
+      new Date(convention.dateSubmission).getTime() >
         CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime()
     ) {
       addIssue(
@@ -832,7 +832,7 @@ const addIssueIfLimitedScheduleHoursExceeded = (
         new Date(convention.dateSubmission).getTime() >=
           CCI_15YO_REQUIREMENT_RELEASE_DATE.getTime()) ||
       (beneficiaryAgeAtConventionStart >= CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
-        new Date(convention.dateSubmission).getTime() >=
+        new Date(convention.dateSubmission).getTime() >
           CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime())
     ) {
       addIssue(
@@ -844,7 +844,7 @@ const addIssueIfLimitedScheduleHoursExceeded = (
 
   if (
     dailyHours.some((dailyHour) => dailyHour > CCI_DAILY_MAX_PERMITTED_HOURS) &&
-    new Date(convention.dateSubmission).getTime() >=
+    new Date(convention.dateSubmission).getTime() >
       CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime()
   ) {
     addIssue(

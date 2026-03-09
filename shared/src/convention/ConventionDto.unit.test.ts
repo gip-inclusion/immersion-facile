@@ -902,6 +902,19 @@ describe("conventionDtoSchema", () => {
             ]);
           });
 
+          it(`on ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, weekly hours can be > ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS} hours but <= ${CCI_WEEKLY_MAX_PERMITTED_HOURS} hours`, () => {
+            const convention35h = makeConventionDto({
+              conventionStartDate,
+              submissionDate: toDateUTCString(
+                CCI_16YO_REQUIREMENT_RELEASE_DATE,
+              ),
+              workedDaysCount: 5,
+              beneficiaryBirthdate: beneficiaryBirthdayDate.toISOString(),
+            });
+
+            expectDtoToBeValid(conventionSchema, convention35h);
+          });
+
           it(`after ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, fails when weekly hours > ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS} hours`, () => {
             const convention35h = makeConventionDto({
               conventionStartDate,
@@ -1024,6 +1037,18 @@ describe("conventionDtoSchema", () => {
             .build();
 
           expectDtoToBeValid(conventionSchema, oldConvention);
+        });
+
+        it(`valid when submitted on ${CCI_16YO_REQUIREMENT_RELEASE_DATE} and exceed daily limit of ${CCI_DAILY_MAX_PERMITTED_HOURS}h`, () => {
+          const conventionOnDate = new ConventionDtoBuilder(
+            createOldConventionWithTimePeriods([
+              { start: "07:00", end: "15:00" },
+            ]),
+          )
+            .withDateSubmission(CCI_16YO_REQUIREMENT_RELEASE_DATE.toISOString())
+            .build();
+
+          expectDtoToBeValid(conventionSchema, conventionOnDate);
         });
 
         it(`throw when submitted after ${CCI_16YO_REQUIREMENT_RELEASE_DATE} and exceed daily limit of ${CCI_DAILY_MAX_PERMITTED_HOURS}h`, () => {
