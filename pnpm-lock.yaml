@@ -661,6 +661,9 @@ importers:
       testcontainers:
         specifier: ^11.11.0
         version: 11.14.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
 
   shared:
     dependencies:
@@ -15303,7 +15306,6 @@ snapshots:
       '@esbuild/win32-arm64': 0.27.7
       '@esbuild/win32-ia32': 0.27.7
       '@esbuild/win32-x64': 0.27.7
-    optional: true
 
   escalade@3.2.0: {}
 
@@ -15714,7 +15716,6 @@ snapshots:
   get-tsconfig@4.14.0:
     dependencies:
       resolve-pkg-maps: 1.0.0
-    optional: true
 
   giget@1.2.5:
     dependencies:
@@ -18333,8 +18334,7 @@ snapshots:
 
   resolve-from@5.0.0: {}
 
-  resolve-pkg-maps@1.0.0:
-    optional: true
+  resolve-pkg-maps@1.0.0: {}
 
   resolve@1.22.11:
     dependencies:
@@ -19255,7 +19255,6 @@ snapshots:
       get-tsconfig: 4.14.0
     optionalDependencies:
       fsevents: 2.3.3
-    optional: true
 
   turbo@2.9.16:
     optionalDependencies:

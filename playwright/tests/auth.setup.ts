@@ -6,23 +6,28 @@ import { acceptCookiesIfBannerVisible } from "../utils/utils";
 const { adminAuthFile, establishmentAuthFile, agencyAuthFile } = testConfig;
 
 setup("authenticate as admin", async ({ page }) => {
+  console.time("auth-admin");
   await page.goto("/");
   await acceptCookiesIfBannerVisible(page);
   const adminButton = await page.locator("#fr-header-main-navigation-button-4");
   await loginWithIdentityProvider(page, "admin", "ProConnect");
   await expect(adminButton).toBeVisible();
   await page.context().storageState({ path: adminAuthFile });
+  console.timeEnd("auth-admin");
 });
 
 setup("authenticate as IC user establishment", async ({ page }) => {
+  console.time("auth-establishment");
   await page.goto("/");
   await acceptCookiesIfBannerVisible(page);
   await loginWithIdentityProvider(page, "establishmentDashboard", "ProConnect");
   await expect(page.locator(".fr-tabs__list")).toBeVisible();
   await page.context().storageState({ path: establishmentAuthFile });
+  console.timeEnd("auth-establishment");
 });
 
 setup("authenticate as IC user agency", async ({ page }) => {
+  console.time("auth-agency");
   await page.goto("/");
   await acceptCookiesIfBannerVisible(page);
 
@@ -32,6 +37,7 @@ setup("authenticate as IC user agency", async ({ page }) => {
   ).toBeVisible();
 
   await page.context().storageState({ path: agencyAuthFile });
+  console.timeEnd("auth-agency");
 });
 
 type ProviderMode = "ProConnect";
