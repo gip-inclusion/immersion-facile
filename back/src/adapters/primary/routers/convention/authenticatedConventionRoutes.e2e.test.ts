@@ -366,6 +366,7 @@ describe("authenticatedConventionRoutes", () => {
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
+          signedAt: new Date("2025-01-01").toISOString(),
           createdAt: new Date("2025-01-01").toISOString(),
         },
       };
@@ -408,7 +409,7 @@ describe("authenticatedConventionRoutes", () => {
       ]);
     });
 
-    it("200 - Successfully gets conventions with assessment completion status filter - completed", async () => {
+    it("200 - Successfully gets conventions with assessment completion status filter - signed", async () => {
       gateways.timeGateway.setNextDate(new Date());
       const jwt = generateConnectedUserJwt({
         userId: validator.id,
@@ -419,7 +420,7 @@ describe("authenticatedConventionRoutes", () => {
       const response = await httpClient.getConventionsForAgencyUser({
         headers: { authorization: jwt },
         queryParams: {
-          assessmentCompletionStatus: "completed",
+          assessmentCompletionStatus: "signed",
           sortBy: "dateStart",
           page: 1,
           perPage: 10,
@@ -443,6 +444,7 @@ describe("authenticatedConventionRoutes", () => {
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
+          signedAt: new Date("2025-01-01").toISOString(),
           createdAt: new Date("2025-01-01").toISOString(),
         },
       };
@@ -464,7 +466,7 @@ describe("authenticatedConventionRoutes", () => {
         {
           agencyUserId: validator.id,
           filters: {
-            assessmentCompletionStatus: "completed",
+            assessmentCompletionStatus: "signed",
           },
           pagination: {
             page: 1,
@@ -562,6 +564,7 @@ describe("authenticatedConventionRoutes", () => {
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
+          signedAt: new Date("2025-01-01").toISOString(),
           createdAt: new Date("2025-01-01").toISOString(),
         },
       };

@@ -523,7 +523,7 @@ const filterAssessmentCompletionStatus =
       return builder;
     }
 
-    if (assessmentCompletionStatus === "completed") {
+    if (assessmentCompletionStatus === "signed") {
       return builder
         .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
         .where((eb) =>
@@ -531,7 +531,28 @@ const filterAssessmentCompletionStatus =
             eb
               .selectFrom("immersion_assessments")
               .select("convention_id")
-              .where("convention_id", "=", eb.ref("conventions.id")),
+              .where("convention_id", "=", eb.ref("conventions.id"))
+              .where((qb) =>
+                qb.or([
+                  qb("status", "=", "DID_NOT_SHOW"),
+                  qb("signed_at", "is not", null),
+                ]),
+              ),
+          ),
+        );
+    }
+
+    if (assessmentCompletionStatus === "to-sign") {
+      return builder
+        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+        .where((eb) =>
+          eb.exists(
+            eb
+              .selectFrom("immersion_assessments")
+              .select("convention_id")
+              .where("convention_id", "=", eb.ref("conventions.id"))
+              .where("signed_at", "is", null)
+              .where("status", "!=", "DID_NOT_SHOW"),
           ),
         );
     }

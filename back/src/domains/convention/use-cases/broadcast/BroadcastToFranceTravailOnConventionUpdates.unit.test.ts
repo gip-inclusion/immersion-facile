@@ -59,6 +59,7 @@ const conventionReadDtoFrom = ({
     ? {
         status: assessment.status,
         endedWithAJob: assessment.endedWithAJob,
+        signedAt: assessment.signedAt,
         createdAt: assessment.createdAt,
       }
     : null,
