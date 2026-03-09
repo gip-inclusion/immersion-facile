@@ -413,6 +413,7 @@ export class PgConventionQueries implements ConventionQueries {
     const broadcastFeedbackBuilderParams = {
       transaction: this.transaction,
       userAgencyIds,
+      conventionSubmittedAfter: new Date("2025-01-01"),
     };
 
     const applyBroadcastFilters = (qb: BroadcastFeedbackBaseQueryBuilder) =>
@@ -421,9 +422,6 @@ export class PgConventionQueries implements ConventionQueries {
         filterBroadcastErrorKind(broadcastErrorKind),
         filterConventionStatus(conventionStatus),
         filterSearchForBroadcastFeedback(search),
-        filterBroadcastFeedbackWithConventionCreatedAfter(
-          new Date("2025-01-01"),
-        ),
       );
 
     const [result, countResult] = await Promise.all([
@@ -634,13 +632,6 @@ const filterSearchForBroadcastFeedback =
       ]),
     );
   };
-
-const filterBroadcastFeedbackWithConventionCreatedAfter =
-  (date: Date) =>
-  (
-    builder: BroadcastFeedbackBaseQueryBuilder,
-  ): BroadcastFeedbackBaseQueryBuilder =>
-    builder.where("cf.dateSubmission", ">=", date);
 
 const sortConventionsWithBroadcastFeedback =
   () =>
