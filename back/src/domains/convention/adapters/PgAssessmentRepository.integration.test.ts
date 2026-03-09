@@ -225,10 +225,11 @@ describe("PgAssessmentRepository", () => {
 
       await assessmentRepository.update(updatedAssessment);
 
-      const updatedAssessmentStored =
-        await assessmentRepository.getByConventionId(
+      const updatedAssessmentStored = (
+        await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
-        );
+        ])
+      ).at(0);
       expectToEqual(updatedAssessmentStored, updatedAssessment);
     });
 

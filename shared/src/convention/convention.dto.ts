@@ -339,6 +339,7 @@ export type ConventionAssessmentFields = {
     | {
         status: AssessmentStatus;
         endedWithAJob: boolean;
+        signedAt: DateString | null;
         createdAt: DateTimeIsoString;
       }
     | { status: LegacyAssessmentDto["status"] }
@@ -485,7 +486,8 @@ export const getExactAge = ({
 };
 
 export const assessmentCompletionStatusFilters = [
-  "completed",
+  "signed",
+  "to-sign",
   "to-be-completed",
 ] as const;
 

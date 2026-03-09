@@ -76,8 +76,9 @@ describe("SignAssessment", () => {
       beneficiaryJwtPayload,
     );
 
-    const signedAssessmentEntity =
-      await uow.assessmentRepository.getByConventionId(convention.id);
+    const signedAssessmentEntity = (
+      await uow.assessmentRepository.getByConventionIds([convention.id])
+    ).at(0);
 
     expectToEqual(signedAssessmentEntity, {
       ...assessmentEntity,
@@ -114,8 +115,9 @@ describe("SignAssessment", () => {
       beneficiaryJwtPayload,
     );
 
-    const signedAssessmentEntity =
-      await uow.assessmentRepository.getByConventionId(convention.id);
+    const signedAssessmentEntity = (
+      await uow.assessmentRepository.getByConventionIds([convention.id])
+    ).at(0);
 
     expectToEqual(signedAssessmentEntity, {
       ...assessmentEntity,
@@ -152,8 +154,9 @@ describe("SignAssessment", () => {
       beneficiaryJwtPayload,
     );
 
-    const signedAssessmentEntity =
-      await uow.assessmentRepository.getByConventionId(convention.id);
+    const signedAssessmentEntity = (
+      await uow.assessmentRepository.getByConventionIds([convention.id])
+    ).at(0);
 
     expectToEqual(signedAssessmentEntity, {
       ...assessmentEntity,

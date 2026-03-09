@@ -413,6 +413,7 @@ describe("convention e2e", () => {
           assessment: {
             status: "COMPLETED",
             endedWithAJob: false,
+            signedAt: null,
             createdAt: new Date("2025-01-01").toISOString(),
           },
         },

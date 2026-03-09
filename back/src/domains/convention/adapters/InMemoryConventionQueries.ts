@@ -478,11 +478,35 @@ const makeApplyAssessmentCompletionStatusFilterConventionsRead =
   ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
   (convention: ConventionReadDto) => {
     if (!assessmentCompletionStatus) return true;
+    if (convention.status !== "ACCEPTED_BY_VALIDATOR" || !convention.assessment)
+      return false;
 
-    return (
-      convention.status === "ACCEPTED_BY_VALIDATOR" &&
-      (assessmentCompletionStatus === "completed"
-        ? convention.assessment !== null
-        : convention.assessment === null)
-    );
+    const isLegacyAssessment =
+      convention.assessment.status === "FINISHED" ||
+      convention.assessment.status === "ABANDONED";
+    if (!convention.assessment || isLegacyAssessment) return false;
+
+    if (
+      assessmentCompletionStatus === "signed" &&
+      "signedAt" in convention.assessment
+    ) {
+      return (
+        convention.assessment !== null &&
+        convention.assessment.signedAt !== null
+      );
+    }
+    if (
+      assessmentCompletionStatus === "to-sign" &&
+      "signedAt" in convention.assessment
+    ) {
+      return (
+        convention.assessment === null ||
+        convention.assessment.signedAt === null
+      );
+    }
+    if (assessmentCompletionStatus === "to-be-completed") {
+      return convention.assessment === null;
+    }
+
+    return false;
   };
