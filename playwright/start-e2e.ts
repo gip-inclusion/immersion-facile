@@ -163,6 +163,18 @@ const main = async () => {
           console.log(
             `Reusing existing container ${existingState.containerId}`,
           );
+          console.log("Re-seeding database...");
+          console.time("seed");
+          execSync("pnpm db:seed:bun", {
+            cwd: ROOT_DIR,
+            env: {
+              ...process.env,
+              ...e2eBackendEnv,
+              DATABASE_URL: existingState.connectionUri,
+            },
+            stdio: "inherit",
+          });
+          console.timeEnd("seed");
           return existingState.connectionUri;
         })()
       : await (async () => {
