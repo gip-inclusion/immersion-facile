@@ -64,6 +64,11 @@ export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
     );
     rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, inputParams.roles);
     rejectEmailModificationIfProConnectedUser(userToUpdate, inputParams.email);
+    rejectEmailModificationIfNotAdminNorOwnEmail(
+      currentUser.id,
+      userToUpdate.id,
+      isBackOfficeOrAgencyAdmin,
+    );
     await rejectIfEmailModificationToAnotherEmailAlreadyLinkedToAgency(
       agency,
       inputParams,
@@ -106,6 +111,16 @@ export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
       ),
     ]);
   });
+
+const rejectEmailModificationIfNotAdminNorOwnEmail = (
+  currentUserId: string,
+  userToUpdateId: string,
+  isBackOfficeOrAgencyAdmin: boolean,
+): void => {
+  if (isBackOfficeOrAgencyAdmin) return;
+  if (currentUserId === userToUpdateId) return;
+  throw errors.user.forbiddenEmailUpdate();
+};
 
 const rejectEmailModificationIfProConnectedUser = (
   user: User,

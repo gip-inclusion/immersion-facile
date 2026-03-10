@@ -365,6 +365,126 @@ describe("Agency routes", () => {
     });
   });
 
+  describe(`${displayRouteName(
+    agencyRoutes.updateUserRoleForAgency,
+  )} update user role for agency`, () => {
+    it("401 - rejects request with invalid token", async () => {
+      const response = await httpClient.updateUserRoleForAgency({
+        urlParams: { agencyId: "any-agency" },
+        headers: { authorization: "invalid-token" },
+        body: {
+          agencyId: "any-agency",
+          userId: "any-user",
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+          email: "any@email.fr",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: { status: 401, message: invalidTokenMessage },
+      });
+    });
+
+    it("403 - non-admin user with agency-viewer role cannot update another user's email", async () => {
+      const agency = new AgencyDtoBuilder().build();
+
+      const victim: User = {
+        id: "victim-id",
+        email: "victim@mail.com",
+        firstName: "Victim",
+        lastName: "User",
+        proConnect: null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const attacker: User = {
+        id: "attacker-id",
+        email: "attacker@mail.com",
+        firstName: "Attacker",
+        lastName: "User",
+        proConnect: null,
+        createdAt: new Date().toISOString(),
+      };
+
+      inMemoryUow.userRepository.users = [victim, attacker];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [victim.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [attacker.id]: { roles: ["agency-viewer"], isNotifiedByEmail: false },
+        }),
+      ];
+
+      const attackerToken = generateConnectedUserJwt({
+        userId: attacker.id,
+        version: currentJwtVersions.connectedUser,
+        iat: Date.now(),
+        exp: addDays(new Date(), 5).getTime(),
+      });
+
+      const response = await httpClient.updateUserRoleForAgency({
+        urlParams: { agencyId: agency.id },
+        headers: { authorization: attackerToken },
+        body: {
+          agencyId: agency.id,
+          userId: victim.id,
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+          email: "attacker-controlled@email.com",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: errors.user.forbiddenEmailUpdate().message,
+        },
+      });
+    });
+
+    it("201 - backoffice admin can update user role for agency", async () => {
+      const agency = new AgencyDtoBuilder().build();
+
+      const userToUpdate: User = {
+        id: "user-to-update-id",
+        email: "user-to-update@mail.com",
+        firstName: "User",
+        lastName: "ToUpdate",
+        proConnect: null,
+        createdAt: new Date().toISOString(),
+      };
+
+      inMemoryUow.userRepository.users = [backofficeAdminUser, userToUpdate];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [userToUpdate.id]: {
+            roles: ["to-review"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+
+      const response = await httpClient.updateUserRoleForAgency({
+        urlParams: { agencyId: agency.id },
+        headers: { authorization: backofficeAdminToken },
+        body: {
+          agencyId: agency.id,
+          userId: userToUpdate.id,
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+          email: userToUpdate.email,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 201,
+        body: "",
+      });
+    });
+  });
+
   describe("Private routes (for backoffice admin)", () => {
     describe(`${displayRouteName(
       agencyRoutes.updateAgencyStatus,
