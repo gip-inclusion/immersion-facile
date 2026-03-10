@@ -25,7 +25,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { AddConvention } from "./AddConvention";
+import { makeAddConvention } from "./AddConvention";
 import { RenewConvention } from "./RenewConvention";
 
 describe("RenewConvention", () => {
@@ -81,14 +81,16 @@ describe("RenewConvention", () => {
     uuidGenerator = new TestUuidGenerator();
     renewConvention = new RenewConvention(
       uowPerformer,
-      new AddConvention(
+      makeAddConvention({
         uowPerformer,
-        makeCreateNewEvent({
-          timeGateway: new CustomTimeGateway(),
-          uuidGenerator,
-        }),
-        new InMemorySiretGateway(),
-      ),
+        deps: {
+          createNewEvent: makeCreateNewEvent({
+            timeGateway: new CustomTimeGateway(),
+            uuidGenerator,
+          }),
+          siretGateway: new InMemorySiretGateway(),
+        },
+      }),
     );
     uow.conventionRepository.setConventions([existingValidatedConvention]);
     uow.userRepository.users = [backofficeAdmin, validator, agencyAdmin];
