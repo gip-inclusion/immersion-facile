@@ -1,4 +1,5 @@
-@import "../../../config/responsive";
+@use "sass:map";
+@use "../../../config/responsive" as *;
 $white: var(--grey-1000-100);
 $patternSizes: 80px, 160px, 130px;
 $typesTints: (
@@ -79,9 +80,9 @@ $typesTints: (
     }
   }
   @each $type, $colors in $typesTints {
-    $primary: map-get($colors, "primary");
-    $light: map-get($colors, "light");
-    $heroBackground: map-get($colors, "heroBackground");
+    $primary: map.get($colors, "primary");
+    $light: map.get($colors, "light");
+    $heroBackground: map.get($colors, "heroBackground");
     &--#{$type} {
       color: $primary;
       .im-nav-card__title {

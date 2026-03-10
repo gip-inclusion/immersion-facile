@@ -1,4 +1,4 @@
-@import "react-design-system/src/config/responsive";
+@use "react-design-system/src/config/responsive" as *;
 
 .im-search-page {
   &__form {

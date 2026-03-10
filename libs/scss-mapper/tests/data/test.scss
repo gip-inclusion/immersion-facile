@@ -1,4 +1,4 @@
-@import "./responsive";
+@use "./responsive" as *;
 
 .im-section-convention-next-steps {
   $section: &;
