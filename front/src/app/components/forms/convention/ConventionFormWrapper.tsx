@@ -40,6 +40,7 @@ import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/Conv
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
+import { frontErrors } from "src/app/pages/error/front-errors";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -212,9 +213,7 @@ export const ConventionFormWrapper = ({
   });
 
   if (routeConventionDraftId && fetchConventionDraftError) {
-    throw errors.conventionDraft.notFound({
-      conventionDraftId: routeConventionDraftId,
-    });
+    throw frontErrors.convention.conventionDraftIdNotFound();
   }
 
   return (

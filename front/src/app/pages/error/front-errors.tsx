@@ -116,6 +116,40 @@ export const frontErrors = {
         ),
         buttons: [HomeButton, ContactUsButton],
       }),
+    conventionDraftIdNotFound: () =>
+      new FrontSpecificError({
+        title: "Ce brouillon de convention n'existe plus",
+        description: (
+          <>
+            <p>Ce brouillon n'est plus accessible, soit car :</p>
+            <ul>
+              <li>
+                <strong>Le brouillon a expiré :</strong> Les brouillons sont
+                supprimés automatiquement après 30 jours sans modification.
+              </li>
+              <li>
+                <strong>Une convention a déjà été créée</strong> à partir de ce
+                brouillon.
+              </li>
+            </ul>
+            <p>
+              Si besoin, vous pouvez créer une nouvelle demande de convention.
+            </p>
+          </>
+        ),
+        buttons: [
+          <Button
+            key="InitiateConventionButton"
+            priority="primary"
+            linkProps={{
+              ...routes.initiateConvention().link,
+              id: domElementIds.error.initiateConventionButton,
+            }}
+          >
+            Créer une demande de convention
+          </Button>,
+        ],
+      }),
   },
   establishment: {
     notFound: ({ siret }: { siret?: SiretDto }) => {
