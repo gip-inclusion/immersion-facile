@@ -251,6 +251,7 @@ const getUseCasesByTopics = (
   BeneficiaryAssessmentEmailSent: [],
   AssessmentReminderManuallySent: [],
 
+  UserAuthenticationByEmailRequested: [useCases.initiateLoginByEmail],
   UserAuthenticatedSuccessfully: [
     useCases.linkFranceTravailUsersToTheirAgencies,
   ],

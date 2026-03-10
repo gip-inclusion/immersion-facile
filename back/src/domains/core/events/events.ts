@@ -6,6 +6,7 @@ import {
   type DateString,
   type DeleteAssessmentRequestDto,
   type Flavor,
+  type InitiateLoginByEmailParams,
   type RejectConnectedUserRoleForAgencyParams,
   type Role,
   roleSchema,
@@ -164,6 +165,7 @@ export type DomainEvent =
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto & WithTriggeredBy>
   // USER CONNECTED related.
   // We don't put full OAuth in payload to avoid private data in logs etc...
+  | GenericEvent<"UserAuthenticationByEmailRequested", InitiateLoginByEmailParams >
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
   // INACTIVE USER ACCOUNT DELETION
   | GenericEvent<"InactiveUserAccountDeletionTriggered", WithUserId& WithTriggeredBy>
