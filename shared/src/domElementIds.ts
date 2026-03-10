@@ -935,6 +935,7 @@ export const domElementIds = {
       "im-error-page__establishment-dashboard-button",
     homeButton: "im-error-page__home-button",
     contactUsButton: "im-error-contact-us-button",
+    initiateConventionButton: "im-error-initiate-convention-button",
   },
   conventionMiniStageRoute: {},
 
