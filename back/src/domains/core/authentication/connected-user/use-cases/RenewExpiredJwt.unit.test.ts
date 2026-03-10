@@ -8,6 +8,7 @@ import {
   type ConventionRole,
   type Email,
   errors,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -32,6 +33,10 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import {
+  type CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../../events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../../../jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -90,6 +95,7 @@ describe("RenewExpiredJwt use case", () => {
   let useCase: RenewExpiredJwt;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let createNewEvent: CreateNewEvent;
 
   beforeEach(() => {
     const uuidGenerator = new TestUuidGenerator();
@@ -98,12 +104,13 @@ describe("RenewExpiredJwt use case", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
+    createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     useCase = new RenewExpiredJwt({
       uowPerformer: new InMemoryUowPerformer(uow),
-      makeGenerateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
-      makeGenerateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
-      makeGenerateEmailAuthCodeUrl: fakeGenerateEmailAuthCodeUrlFn,
+      generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+      generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+      generateEmailAuthCodeUrl: fakeGenerateEmailAuthCodeUrlFn,
       config,
       timeGateway,
       shortLinkIdGeneratorGateway,
@@ -111,6 +118,7 @@ describe("RenewExpiredJwt use case", () => {
         uuidGenerator,
         timeGateway,
       ),
+      createNewEvent,
     });
 
     uow.agencyRepository.agencies = [
@@ -698,7 +706,7 @@ describe("RenewExpiredJwt use case", () => {
       uow.ongoingOAuthRepository.ongoingOAuths = [emailUnusedOnGoingOAuth];
     });
 
-    it("Sends a magiclink renewal email including a shortlink mapped to ConnectedUserUrl with renewed JWT", async () => {
+    it("on unused oAuth, sends a magiclink renewal email including a shortlink mapped to ConnectedUserUrl with renewed JWT", async () => {
       const shortLinks = ["shortLink1"];
       shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
 
@@ -734,25 +742,38 @@ describe("RenewExpiredJwt use case", () => {
       ]);
     });
 
-    describe("Wrong paths", () => {
-      it("unused oauth", () => {
-        uow.ongoingOAuthRepository.ongoingOAuths = [
-          {
-            ...emailUnusedOnGoingOAuth,
-            usedAt: new Date(),
-          },
-        ];
+    it("on already used oauth, sends a 'UserAuthenticationByEmailRequested' event", async () => {
+      uow.ongoingOAuthRepository.ongoingOAuths = [
+        {
+          ...emailUnusedOnGoingOAuth,
+          usedAt: new Date(),
+        },
+      ];
 
-        expectPromiseToFailWithError(
-          useCase.execute({
-            kind: "emailAuthCode",
-            state: emailUnusedOnGoingOAuth.state,
-            expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
-          }),
-          errors.auth.alreadyUsedAuthentication(),
-        );
+      await useCase.execute({
+        kind: "emailAuthCode",
+        state: emailUnusedOnGoingOAuth.state,
+        expiredJwt: generateEmailAuthCodeJwt(expiredPayload),
       });
 
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "UserAuthenticationByEmailRequested",
+          payload: {
+            email: emailUnusedOnGoingOAuth.email,
+            redirectUri: emailUnusedOnGoingOAuth.fromUri,
+          },
+        },
+      ]);
+    });
+
+    describe("Wrong paths", () => {
       it("unsupported oauth provider", () => {
         uow.ongoingOAuthRepository.ongoingOAuths = [
           {

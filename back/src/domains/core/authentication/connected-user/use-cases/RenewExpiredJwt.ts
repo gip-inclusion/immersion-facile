@@ -25,6 +25,7 @@ import {
   conventionEmailsByRole,
 } from "../../../../../utils/convention";
 import { makeEmailHash } from "../../../../../utils/jwt";
+import type { CreateNewEvent } from "../../../events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../../short-link/ports/ShortLinkIdGeneratorGateway";
 import {
@@ -43,9 +44,9 @@ export class RenewExpiredJwt extends TransactionalUseCase<
 > {
   protected inputSchema = renewExpiredJwtRequestSchema;
 
-  readonly #makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-  readonly #makeGenerateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
-  readonly #makeGenerateEmailAuthCodeUrl: GenerateEmailAuthCodeUrl;
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+  readonly #generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
+  readonly #generateEmailAuthCodeUrl: GenerateEmailAuthCodeUrl;
 
   readonly #config: AppConfig;
 
@@ -54,35 +55,38 @@ export class RenewExpiredJwt extends TransactionalUseCase<
   readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  readonly #createNewEvent: CreateNewEvent;
 
   constructor({
     uowPerformer,
-    makeGenerateConventionMagicLinkUrl,
-    makeGenerateConnectedUserLoginUrl,
-    makeGenerateEmailAuthCodeUrl,
+    generateConventionMagicLinkUrl,
+    generateConnectedUserLoginUrl,
+    generateEmailAuthCodeUrl,
     config,
     timeGateway,
     shortLinkIdGeneratorGateway,
     saveNotificationAndRelatedEvent,
+    createNewEvent,
   }: {
     uowPerformer: UnitOfWorkPerformer;
-    makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-    makeGenerateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
-    makeGenerateEmailAuthCodeUrl: GenerateEmailAuthCodeUrl;
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+    generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
+    generateEmailAuthCodeUrl: GenerateEmailAuthCodeUrl;
     config: AppConfig;
     timeGateway: TimeGateway;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    createNewEvent: CreateNewEvent;
   }) {
     super(uowPerformer);
     this.#config = config;
-    this.#makeGenerateConventionMagicLinkUrl =
-      makeGenerateConventionMagicLinkUrl;
-    this.#makeGenerateConnectedUserLoginUrl = makeGenerateConnectedUserLoginUrl;
-    this.#makeGenerateEmailAuthCodeUrl = makeGenerateEmailAuthCodeUrl;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#generateConnectedUserLoginUrl = generateConnectedUserLoginUrl;
+    this.#generateEmailAuthCodeUrl = generateEmailAuthCodeUrl;
     this.#timeGateway = timeGateway;
     this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(input: RenewExpiredJwtRequestDto, uow: UnitOfWork) {
@@ -143,23 +147,32 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     const ongoingOAuth = await uow.ongoingOAuthRepository.findByState(state);
 
     if (!ongoingOAuth) throw errors.auth.missingOAuth({ state });
-    if (ongoingOAuth.usedAt) throw errors.auth.alreadyUsedAuthentication();
     if (ongoingOAuth.provider !== "email")
       throw errors.auth.otherRenewalNotSupported(ongoingOAuth.provider);
 
-    return this.#sendTokenRenewal(uow, ongoingOAuth.email, {
-      magicLink: await prepareEmailAuthCodeShortLinkMaker({
-        uow,
-        config: this.#config,
-        generateEmailAuthCodeLoginUrl: this.#makeGenerateEmailAuthCodeUrl,
-        shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      })({
-        email: ongoingOAuth.email,
-        now: this.#timeGateway.now(),
-        state: ongoingOAuth.state,
-        uri: frontRoutes.magicLinkInterstitial,
-      }),
-    });
+    return ongoingOAuth.usedAt
+      ? uow.outboxRepository.save(
+          this.#createNewEvent({
+            topic: "UserAuthenticationByEmailRequested",
+            payload: {
+              email: ongoingOAuth.email,
+              redirectUri: ongoingOAuth.fromUri,
+            },
+          }),
+        )
+      : this.#sendTokenRenewal(uow, ongoingOAuth.email, {
+          magicLink: await prepareEmailAuthCodeShortLinkMaker({
+            uow,
+            config: this.#config,
+            generateEmailAuthCodeLoginUrl: this.#generateEmailAuthCodeUrl,
+            shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
+          })({
+            email: ongoingOAuth.email,
+            now: this.#timeGateway.now(),
+            state: ongoingOAuth.state,
+            uri: frontRoutes.magicLinkInterstitial,
+          }),
+        });
   }
 
   async #onConnectedUserDomainJwtPayload(
@@ -182,7 +195,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
         uow,
         config: this.#config,
         shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-        generateConnectedUserLoginUrl: this.#makeGenerateConnectedUserLoginUrl,
+        generateConnectedUserLoginUrl: this.#generateConnectedUserLoginUrl,
       })({
         user,
         accessToken: undefined,
@@ -219,7 +232,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     const makeConventionMagicShortLink = prepareConventionMagicShortLinkMaker({
       uow,
       config: this.#config,
-      generateConventionMagicLinkUrl: this.#makeGenerateConventionMagicLinkUrl,
+      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       conventionMagicLinkPayload: {
         id: convention.id,
