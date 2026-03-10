@@ -53,6 +53,8 @@ import {
 } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 
 describe("Update Establishment aggregate from form data", () => {
+  //TODO : test suite à refacto car constantes pas claires et tests possiblement redondant
+
   let siretGateway: InMemorySiretGateway;
   let addressGateway: InMemoryAddressGateway;
   let uuidGenerator: TestUuidGenerator;
@@ -87,25 +89,115 @@ describe("Update Establishment aggregate from form data", () => {
       });
   });
 
-  it("Fails if establishment does not exists amongst aggregates", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [];
-    const user = new ConnectedUserBuilder().buildUser();
-    uow.userRepository.users = [user];
+  describe("wrong paths", () => {
+    const contactUser = new UserBuilder().withId("contact").build();
 
-    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
-    await expectPromiseToFailWithError(
-      updateEstablishmentAggregateFromFormUseCase.execute(
+    const establishment = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withMaxContactsPerMonth(6)
+          .withScore(25)
+          .withCreatedAt(creationDate)
+          .build(),
+      )
+      .withOffers([
+        new OfferEntityBuilder().build(),
+        new OfferEntityBuilder().build(),
+      ])
+      .withSearchableBy({
+        jobSeekers: false,
+        students: true,
+      })
+      .withUserRights([
         {
-          formEstablishment,
+          userId: "admin",
+          role: "establishment-admin",
+          job: "job",
+          phone: "+336558464365",
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
         {
-          userId: user.id,
+          userId: contactUser.id,
+          role: "establishment-contact",
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
         },
-      ),
-      errors.establishment.notFound({
-        siret: formEstablishment.siret,
-      }),
-    );
+      ])
+      .build();
+
+    it("Fails if establishment does not exists amongst aggregates", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [];
+      const user = new ConnectedUserBuilder().buildUser();
+      uow.userRepository.users = [user];
+
+      const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+      await expectPromiseToFailWithError(
+        updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment,
+          },
+          {
+            userId: user.id,
+          },
+        ),
+        errors.establishment.notFound({
+          siret: formEstablishment.siret,
+        }),
+      );
+    });
+
+    it("Forbidden if user has no rights on establishment aggregate", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [];
+      const user = new ConnectedUserBuilder().buildUser();
+      uow.userRepository.users = [user];
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment,
+      ];
+
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withSiret(establishment.establishment.siret)
+        .build();
+
+      await expectPromiseToFailWithError(
+        updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment,
+          },
+          {
+            userId: user.id,
+          },
+        ),
+        errors.user.forbidden({ userId: user.id }),
+      );
+    });
+
+    it("Forbidden if user has establishment-contact on establishment aggregate", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [];
+      const user = new ConnectedUserBuilder().buildUser();
+      uow.userRepository.users = [user, contactUser];
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment,
+      ];
+
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withSiret(establishment.establishment.siret)
+        .build();
+
+      await expectPromiseToFailWithError(
+        updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment,
+          },
+          {
+            userId: contactUser.id,
+          },
+        ),
+        errors.user.forbidden({ userId: contactUser.id }),
+      );
+    });
   });
 
   describe("Replaces establishment and offers with same siret, and apply users rights", () => {
@@ -895,7 +987,7 @@ describe("Update Establishment aggregate from form data", () => {
         await updateEstablishmentAggregateFromFormUseCase.execute(
           { formEstablishment: updatedFormEstablishmentWithUserRights },
           {
-            userId: establishmentContactUser.id,
+            userId: user.id,
           },
         );
 
