@@ -27,7 +27,7 @@ import { makeLinkFranceTravailUsersToTheirAgencies } from "../../domains/connect
 import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
 import { makeRemoveUserFromAgency } from "../../domains/connected-users/use-cases/RemoveUserFromAgency";
 import { makeUpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
-import { AddConvention } from "../../domains/convention/use-cases/AddConvention";
+import { makeAddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
@@ -246,11 +246,10 @@ export const createUseCases = ({
     generateEmailAuthCodeJwt,
   );
 
-  const addConvention = new AddConvention(
+  const addConvention = makeAddConvention({
+    deps: { createNewEvent, siretGateway: gateways.siret },
     uowPerformer,
-    createNewEvent,
-    gateways.siret,
-  );
+  });
 
   const broadcastToFranceTravailOnConventionUpdates =
     makeBroadcastToFranceTravailOnConventionUpdates({
@@ -315,7 +314,6 @@ export const createUseCases = ({
       addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
 
       // Conventions
-      addConvention,
       getConvention: new GetConvention(uowPerformer),
       getConventionForApiConsumer: new GetConventionForApiConsumer(
         uowPerformer,
@@ -543,6 +541,9 @@ export const createUseCases = ({
         gateways.timeGateway,
       ),
     }),
+
+    //Convention
+    addConvention,
 
     shareConventionByEmail: makeShareConventionDraftByEmail({
       uowPerformer,
