@@ -337,6 +337,56 @@ describe("UpdateUserForAgency", () => {
       expectToEqual(updatedUser?.email, "new-email@email.com");
     });
 
+    it("throws forbidden if non-admin user with agency-viewer role tries to update another user's email", async () => {
+      const victim: User = {
+        ...notAdminUser,
+        email: "victim@mail.com",
+        id: "victim-id",
+        proConnect: null,
+      };
+
+      const attackerBuilder = new ConnectedUserBuilder()
+        .withId("attacker-id")
+        .withEmail("attacker@mail.com")
+        .withIsAdmin(false);
+
+      const attackerUser = attackerBuilder.buildUser();
+
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [victim.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [attackerUser.id]: {
+            roles: ["agency-viewer"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+      uow.userRepository.users = [victim, attackerUser];
+
+      await expectPromiseToFailWithError(
+        updateUserForAgency.execute(
+          {
+            roles: ["validator"],
+            agencyId: agency.id,
+            userId: victim.id,
+            isNotifiedByEmail: true,
+            email: "attacker-controlled@email.com",
+          },
+          {
+            ...attackerBuilder.build(),
+            agencyRights: [
+              {
+                agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
+                roles: ["agency-viewer"],
+                isNotifiedByEmail: false,
+              },
+            ],
+          },
+        ),
+        errors.user.forbiddenEmailUpdate(),
+      );
+    });
+
     it("agency-admin can update the user email for a non ic user", async () => {
       const nonIcUser: User = {
         ...notAdminUser,

@@ -966,6 +966,10 @@ export const errors = {
       new ForbiddenError(
         "Vous n'avez pas les droits nécessaires pour modifier ces rôles.",
       ),
+    forbiddenEmailUpdate: () =>
+      new ForbiddenError(
+        "Vous n'avez pas les droits nécessaires pour modifier l'email d'un autre utilisateur.",
+      ),
     missingPreviousJwtPublicKey: () =>
       new Error("No deprecated JWT private key provided"),
     notEnoughRightOnAgency: ({
