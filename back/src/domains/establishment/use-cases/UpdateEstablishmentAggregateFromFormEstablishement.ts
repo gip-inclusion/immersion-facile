@@ -7,11 +7,9 @@ import {
   withFormEstablishmentSchema,
 } from "shared";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
-import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type {
@@ -50,18 +48,24 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
         siret: inputParams.formEstablishment.siret,
       });
 
-    const triggeredBy = await getTriggeredBy(
-      uow,
-      currentUser,
-      initialEstablishmentAggregate,
+    const triggeredByUser = await uow.userRepository.getById(
+      currentUser.userId,
     );
 
-    if (triggeredBy.kind !== "connected-user") throw errors.user.unauthorized();
-    const triggeredByUser = await uow.userRepository.getById(
-      triggeredBy.userId,
-    );
     if (!triggeredByUser)
-      throw errors.user.notFound({ userId: triggeredBy.userId });
+      throw errors.user.notFound({ userId: currentUser.userId });
+
+    const hasPermission =
+      triggeredByUser.isBackofficeAdmin ||
+      initialEstablishmentAggregate.userRights.some(
+        ({ userId, role }) =>
+          userId === triggeredByUser.id && role === "establishment-admin",
+      );
+
+    if (!hasPermission)
+      throw errors.user.forbidden({
+        userId: triggeredByUser.id,
+      });
 
     const establishmentAggregate = await makeEstablishmentAggregate({
       uow,
@@ -158,7 +162,10 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
         topic: "UpdatedEstablishmentAggregateInsertedFromForm",
         payload: {
           siret: establishmentAggregate.establishment.siret,
-          triggeredBy,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: triggeredByUser.id,
+          },
         },
       }),
     );
@@ -187,28 +194,4 @@ const getUserRightsUpdated = (
         !equals(existingUserRight, userRight),
     ),
   );
-};
-
-const getTriggeredBy = async (
-  uow: UnitOfWork,
-  jwtPayload: ConnectedUserDomainJwtPayload,
-  establishmentAggregate: EstablishmentAggregate,
-): Promise<TriggeredBy> => {
-  const user = await uow.userRepository.getById(jwtPayload.userId);
-  if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
-
-  if (
-    establishmentAggregate.userRights.some(
-      ({ userId }) => userId === user.id,
-    ) ||
-    user.isBackofficeAdmin
-  )
-    return {
-      kind: "connected-user",
-      userId: user.id,
-    };
-
-  throw errors.user.forbidden({
-    userId: user.id,
-  });
 };
