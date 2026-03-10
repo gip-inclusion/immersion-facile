@@ -1,4 +1,6 @@
-@import "../../../config/responsive";
+@use "sass:map";
+@use "sass:list";
+@use "../../../config/responsive" as *;
 
 $white: var(--grey-1000-100);
 $patternSizes: 80px, 160px, 130px;
@@ -31,7 +33,7 @@ $typesTints: (
   position: relative;
   background: var(--blue-france-sun-113-625);
   @each $type, $colors in $typesTints {
-    $heroBackground: map-get($colors, "heroBackground");
+    $heroBackground: map.get($colors, "heroBackground");
     &--#{$type} {
       background: $heroBackground;
     }
@@ -104,10 +106,10 @@ $typesTints: (
     opacity: 0.2;
     filter: blur(20px);
     position: absolute;
-    @for $i from 0 to length($patternSizes) {
+    @for $i from 0 to list.length($patternSizes) {
       &--#{$i} {
-        width: #{nth($patternSizes, $i + 1)};
-        height: #{nth($patternSizes, $i + 1)};
+        width: #{list.nth($patternSizes, $i + 1)};
+        height: #{list.nth($patternSizes, $i + 1)};
       }
     }
     &--0 {
@@ -137,7 +139,7 @@ $typesTints: (
     align-items: stretch;
   }
   @each $type, $colors in $typesTints {
-    $heroBackground: map-get($colors, "heroBackground");
+    $heroBackground: map.get($colors, "heroBackground");
     &--#{$type} {
       &:after {
         background: $heroBackground;

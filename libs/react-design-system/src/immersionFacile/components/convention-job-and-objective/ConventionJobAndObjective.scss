@@ -1,4 +1,4 @@
-@import "../../../config/responsive";
+@use "../../../config/responsive" as *;
 
 .im-convention-job-and-objective {
   background-color: var(--background-alt-blue-france);

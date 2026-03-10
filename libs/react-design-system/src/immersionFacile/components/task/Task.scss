@@ -1,4 +1,4 @@
-@import "../../../config/responsive";
+@use "../../../config/responsive" as *;
 
 .im-task {
   &__buttons {
