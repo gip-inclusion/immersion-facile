@@ -44,7 +44,7 @@ import { makeEditConventionCounsellorName } from "../../domains/convention/use-c
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
-import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
+import { makeGetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
@@ -314,7 +314,6 @@ export const createUseCases = ({
       addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
 
       // Conventions
-      getConvention: new GetConvention(uowPerformer),
       getConventionForApiConsumer: new GetConventionForApiConsumer(
         uowPerformer,
       ),
@@ -545,6 +544,7 @@ export const createUseCases = ({
 
     //Convention
     addConvention,
+    getConvention: makeGetConvention({ uowPerformer }),
 
     shareConventionByEmail: makeShareConventionDraftByEmail({
       uowPerformer,
