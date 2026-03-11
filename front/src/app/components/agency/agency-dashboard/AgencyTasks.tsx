@@ -88,8 +88,8 @@ export const AgencyTasks = ({
         connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
           {
             params: {
-              sortBy: "dateStart",
-              sortDirection: "desc",
+              sortBy: "dateEnd",
+              sortDirection: "asc",
               assessmentCompletionStatus: ["to-be-completed", "to-sign"],
               dateEndTo: threeDaysAgo,
               page: 1,

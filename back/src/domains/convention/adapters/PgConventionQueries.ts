@@ -500,9 +500,13 @@ const sortConventions =
     };
 
     if (!sort || !sort.by)
-      return builder.orderBy(sortByKey.dateStart, "desc") as T;
+      return builder
+        .orderBy(sortByKey.dateStart, "desc")
+        .orderBy("conventions.id", "asc") as T;
 
-    return builder.orderBy(sortByKey[sort.by], sort.direction ?? "desc") as T;
+    return builder
+      .orderBy(sortByKey[sort.by], sort.direction ?? "desc")
+      .orderBy("conventions.id", "asc") as T;
   };
 
 const filterByAgencyDepartmentCodes =
