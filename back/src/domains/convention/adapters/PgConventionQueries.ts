@@ -1,7 +1,9 @@
+import { addDays } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
   type AgencyId,
+  ASSESSMENT_SIGNATURE_RELEASE_DATE,
   type AssessmentCompletionStatusFilter,
   type BroadcastErrorKind,
   type ConventionAssessmentFields,
@@ -539,6 +541,9 @@ const filterAssessmentCompletionStatus =
         "immersion_assessments as ia",
         "ia.convention_id",
         "conventions.id",
+      )
+      .where(
+        sql<boolean>`ia.created_at > ${addDays(ASSESSMENT_SIGNATURE_RELEASE_DATE, 1).toISOString()}::timestamptz`,
       )
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .where((eb) => {
