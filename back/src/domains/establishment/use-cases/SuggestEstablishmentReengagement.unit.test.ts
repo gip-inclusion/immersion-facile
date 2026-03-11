@@ -1,8 +1,4 @@
-import {
-  type AbsoluteUrl,
-  immersionFacileNoReplyEmailSender,
-  UserBuilder,
-} from "shared";
+import { immersionFacileNoReplyEmailSender, UserBuilder } from "shared";
 import { v4 as uuid } from "uuid";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -28,8 +24,6 @@ describe("SuggestEditEstablishment", () => {
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
 
-  const fakeBaseUrl: AbsoluteUrl = "https://if-base-url";
-
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
@@ -42,7 +36,6 @@ describe("SuggestEditEstablishment", () => {
     suggestEstablishmentReengagement = new SuggestEstablishmentReengagement(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      fakeBaseUrl,
     );
   });
 
