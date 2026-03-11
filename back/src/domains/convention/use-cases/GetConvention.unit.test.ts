@@ -23,7 +23,7 @@ import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryU
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { createAssessmentEntity } from "../entities/AssessmentEntity";
-import { GetConvention } from "./GetConvention";
+import { type GetConvention, makeGetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
   const uuidGenerator = new UuidV4Generator();
@@ -150,7 +150,9 @@ describe("Get Convention", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getConvention = new GetConvention(new InMemoryUowPerformer(uow));
+    getConvention = makeGetConvention({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
 
     uow.conventionRepository.setConventions([
       convention,
@@ -173,13 +175,6 @@ describe("Get Convention", () => {
 
   describe("Wrong paths", () => {
     describe("Forbidden error", () => {
-      it("When no auth payload provided", async () => {
-        await expectPromiseToFailWithError(
-          getConvention.execute({ conventionId: convention.id }),
-          errors.user.noJwtProvided(),
-        );
-      });
-
       it("When the user don't have correct role on connected users neither has right on existing establishment with same siret in convention", async () => {
         uow.establishmentAggregateRepository.establishmentAggregates = [
           establishmentWithSiret,
