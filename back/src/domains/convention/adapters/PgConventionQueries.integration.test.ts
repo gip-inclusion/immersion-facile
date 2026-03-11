@@ -7,6 +7,8 @@ import {
   type AgencyId,
   type AgencyKind,
   type AppellationCode,
+  ASSESSMENT_SIGNATURE_RELEASE_DATE,
+  type AssessmentDto,
   AssessmentDtoBuilder,
   type BroadcastFeedback,
   ConnectedUserBuilder,
@@ -1191,7 +1193,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
       ]);
@@ -1437,14 +1439,29 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
         { ...conventionB, ...agencyFields, assessment: null },
       ]);
     });
 
-    it("should filter conventions by assessment completion status - completed", async () => {
+    it(`should filter conventions by assessment completion status - completed and after ${ASSESSMENT_SIGNATURE_RELEASE_DATE}`, async () => {
+      const conventionWithOldAssessment: ConventionDto = {
+        ...conventionB,
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+        status: "ACCEPTED_BY_VALIDATOR",
+      };
+      const oldAssessment: AssessmentDto = {
+        ...completedAssessment,
+        conventionId: conventionWithOldAssessment.id,
+        createdAt: ASSESSMENT_SIGNATURE_RELEASE_DATE.toISOString(),
+      };
+      await conventionRepository.save(conventionWithOldAssessment);
+      await assessmentRepo.save(
+        createAssessmentEntity(oldAssessment, conventionWithOldAssessment),
+      );
+
       const result =
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
@@ -1464,7 +1481,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
       ]);
@@ -1513,6 +1530,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
+            createdAt: completedAssessment.createdAt,
           },
         },
         {
@@ -1522,6 +1540,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt,
+            createdAt: signedAssessment.createdAt,
           },
         },
       ]);
@@ -1559,7 +1578,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
         { ...conventionD, ...differentAgencyFields, assessment: null },
@@ -1587,7 +1606,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
       ]);
@@ -1637,7 +1656,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
         { ...conventionB, ...agencyFields, assessment: null },
@@ -1715,7 +1734,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
         { ...conventionB, ...agencyFields, assessment: null },
@@ -1751,7 +1770,7 @@ describe("Pg implementation of ConventionQueries", () => {
             status: "COMPLETED",
             endedWithAJob: false,
             signedAt: null,
-            createdAt: assessment.createdAt,
+            createdAt: completedAssessment.createdAt,
           },
         },
         { ...conventionB, ...agencyFields, assessment: null },

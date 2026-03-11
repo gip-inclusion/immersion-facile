@@ -11,7 +11,7 @@ const minimalAssessment: AssessmentDto = {
   beneficiaryAgreement: null,
   beneficiaryFeedback: null,
   signedAt: null,
-  createdAt: new Date("2024-01-02").toISOString(),
+  createdAt: new Date("2026-03-11").toISOString(),
 };
 
 const fullAssessment: AssessmentDto = {
@@ -27,7 +27,7 @@ const fullAssessment: AssessmentDto = {
   beneficiaryAgreement: null,
   beneficiaryFeedback: null,
   signedAt: null,
-  createdAt: new Date("2024-01-02").toISOString(),
+  createdAt: new Date("2026-03-11").toISOString(),
 };
 
 export class AssessmentDtoBuilder implements Builder<AssessmentDto> {
