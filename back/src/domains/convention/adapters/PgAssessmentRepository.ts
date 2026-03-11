@@ -1,11 +1,11 @@
 import { sql } from "kysely";
-import {
-  type AssessmentStatus,
-  type ConventionId,
-  type DateString,
-  errors,
-  isAssessmentDto,
+import type {
+  AssessmentStatus,
+  ConventionId,
+  DateString,
+  DateTimeIsoString,
 } from "shared";
+import { errors, isAssessmentDto } from "shared";
 import {
   jsonBuildObject,
   type KyselyDb,
@@ -30,7 +30,7 @@ const createAssessmentQueryBuilder = (transaction: KyselyDb) => {
       beneficiaryAgreement: eb.ref("beneficiary_agreement"),
       beneficiaryFeedback: eb.ref("beneficiary_feedback"),
       signedAt: sql<DateString>`date_to_iso(signed_at)`,
-      createdAt: sql<DateString>`date_to_iso(created_at)`,
+      createdAt: sql<DateTimeIsoString>`date_to_iso(created_at)`,
     }).as("assessment"),
   ]);
 };
@@ -116,9 +116,7 @@ export class PgAssessmentRepository implements AssessmentRepository {
       .values({
         convention_id: assessmentEntity.conventionId,
         ...assessmentEntityToDbRow(assessmentEntity),
-        ...("createdAt" in assessmentEntity
-          ? { created_at: sql`${assessmentEntity.createdAt}::timestamptz` }
-          : {}),
+        created_at: new Date(assessmentEntity.createdAt),
       })
       .execute()
       .catch((error) => {

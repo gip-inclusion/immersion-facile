@@ -45,7 +45,7 @@ import type {
   UserWithAgencyRights,
 } from "../user/user.dto";
 import type { NotEmptyArray } from "../utils";
-import type { DateString } from "../utils/date";
+import type { DateString, DateTimeIsoString } from "../utils/date";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
 
@@ -339,7 +339,7 @@ export type ConventionAssessmentFields = {
     | {
         status: AssessmentStatus;
         endedWithAJob: boolean;
-        createdAt: DateString | null;
+        createdAt: DateTimeIsoString;
       }
     | { status: LegacyAssessmentDto["status"] }
     | null;

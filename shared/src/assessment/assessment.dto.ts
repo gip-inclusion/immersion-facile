@@ -1,5 +1,5 @@
 import type { ConventionId } from "../convention/convention.dto";
-import type { DateString } from "../utils/date";
+import type { DateString, DateTimeIsoString } from "../utils/date";
 
 export type AssessmentStatus = AssessmentDto["status"];
 export const assessmentStatuses: AssessmentStatus[] = [
@@ -60,7 +60,7 @@ export type AssessmentDto = (
   | AssessmentDtoDidNotShow
   | AssessmentDtoPartiallyCompleted
 ) & {
-  createdAt: DateString;
+  createdAt: DateTimeIsoString;
 };
 
 export type WithAssessmentDto = {
@@ -91,6 +91,7 @@ export type LegacyAssessmentDto = {
   status: LegacyAssessmentStatus;
   conventionId: ConventionId;
   establishmentFeedback: string;
+  createdAt: DateTimeIsoString;
 };
 
 export type CreateFormAssessmentInitialValues = {
@@ -101,7 +102,7 @@ export type CreateFormAssessmentInitialValues = {
     beneficiaryAgreement: null;
     beneficiaryFeedback: null;
     signedAt: null;
-    createdAt: DateString;
+    createdAt: DateTimeIsoString;
   };
 
 export type FormAssessmentDto =

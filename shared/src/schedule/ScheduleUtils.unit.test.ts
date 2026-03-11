@@ -694,7 +694,7 @@ jeudi : 09:00-12:45, 13:15-17:00`,
     });
   });
 
-  describe("dateIsoStringSchema schema", () => {
+  describe("dateTimeIsoStringSchema schema", () => {
     it.each([
       "2022-07-05",
       "Not a date",

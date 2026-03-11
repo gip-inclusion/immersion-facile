@@ -259,6 +259,7 @@ describe("Assessment routes", () => {
         conventionId: convention.id,
         status: "FINISHED",
         establishmentFeedback: "The guy left after one day",
+        createdAt: new Date("2023-03-11").toISOString(),
       };
 
       await inMemoryUow.conventionRepository.setConventions([convention]);
@@ -492,6 +493,7 @@ describe("Assessment routes", () => {
         status: "FINISHED",
         establishmentFeedback: "Legacy feedback",
         numberOfHoursActuallyMade: null,
+        createdAt: new Date("2023-03-11").toISOString(),
       };
 
       inMemoryUow.agencyRepository.agencies = [

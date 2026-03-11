@@ -746,6 +746,7 @@ describe("ResyncOldConventionsToFt use case", () => {
             conventionId: conventionToSync1.id,
             establishmentFeedback: "commentaire",
             numberOfHoursActuallyMade: null,
+            createdAt: new Date("2023-03-11").toISOString(),
           },
         ];
         uow.conventionsToSyncRepository.setForTesting([
