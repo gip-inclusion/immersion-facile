@@ -39,6 +39,7 @@ describe("Immersion Assessment slice", () => {
               beneficiaryAgreement: null,
               beneficiaryFeedback: null,
               signedAt: null,
+              createdAt: new Date().toISOString(),
             },
             jwt: "",
           },
@@ -73,6 +74,7 @@ describe("Immersion Assessment slice", () => {
               beneficiaryAgreement: null,
               beneficiaryFeedback: null,
               signedAt: null,
+              createdAt: new Date().toISOString(),
             },
             jwt: "",
           },
@@ -104,6 +106,7 @@ describe("Immersion Assessment slice", () => {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
+      createdAt: new Date().toISOString(),
     };
     const feedGatewayWithGetError = (error: Error) => {
       dependencies.assessmentGateway.getResponse$.error(error);
@@ -306,6 +309,7 @@ describe("Immersion Assessment slice", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date().toISOString(),
       };
       ({ store } = createTestStore({
         assessment: {

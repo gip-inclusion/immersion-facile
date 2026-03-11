@@ -167,6 +167,7 @@ describe("PgAssessmentRepository", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date().toISOString(),
       };
 
       await assessmentRepository.save(assessment);
@@ -245,6 +246,7 @@ describe("PgAssessmentRepository", () => {
           beneficiaryAgreement: true,
           beneficiaryFeedback: "",
           signedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
         }),
         errors.assessment.notFound(nonExistentConventionId),
       );

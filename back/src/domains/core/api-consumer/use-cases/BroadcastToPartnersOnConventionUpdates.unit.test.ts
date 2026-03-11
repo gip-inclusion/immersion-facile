@@ -307,6 +307,7 @@ describe("Broadcast to partners on updated convention", () => {
               assessment: {
                 status: assessment.status,
                 endedWithAJob: assessment.endedWithAJob,
+                createdAt: assessment.createdAt,
               },
             },
           },
@@ -487,6 +488,7 @@ describe("Broadcast to partners on updated convention", () => {
               assessment: {
                 status: assessment.status,
                 endedWithAJob: assessment.endedWithAJob,
+                createdAt: assessment.createdAt,
               },
             },
           },
@@ -516,6 +518,7 @@ describe("Broadcast to partners on updated convention", () => {
               assessment: {
                 status: assessment.status,
                 endedWithAJob: assessment.endedWithAJob,
+                createdAt: assessment.createdAt,
               },
             },
           },

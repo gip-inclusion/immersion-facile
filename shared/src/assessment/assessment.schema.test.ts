@@ -49,6 +49,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
+      createdAt: "2024-01-01",
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -68,6 +69,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
+      createdAt: "2024-01-01",
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -83,6 +85,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
+      createdAt: "2024-01-01",
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -98,6 +101,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: true,
       beneficiaryFeedback: "my beneficiary feedback",
       signedAt: "2024-01-01",
+      createdAt: "2024-01-01",
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -113,6 +117,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: true,
       beneficiaryFeedback: null,
       signedAt: "2024-01-01",
+      createdAt: "2024-01-01",
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);

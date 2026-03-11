@@ -266,6 +266,7 @@ describe("SendAssessmentLink", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date().toISOString(),
         _entityName: "Assessment",
       });
 

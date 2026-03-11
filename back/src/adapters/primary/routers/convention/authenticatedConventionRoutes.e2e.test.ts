@@ -309,6 +309,7 @@ describe("authenticatedConventionRoutes", () => {
           beneficiaryAgreement: true,
           beneficiaryFeedback: "Mon commentaire",
           signedAt: new Date("2025-01-01").toISOString(),
+          createdAt: new Date("2025-01-01").toISOString(),
           _entityName: "Assessment",
         },
       ];
@@ -365,6 +366,7 @@ describe("authenticatedConventionRoutes", () => {
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
+          createdAt: new Date("2025-01-01").toISOString(),
         },
       };
 
@@ -441,6 +443,7 @@ describe("authenticatedConventionRoutes", () => {
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
+          createdAt: new Date("2025-01-01").toISOString(),
         },
       };
 
@@ -559,6 +562,7 @@ describe("authenticatedConventionRoutes", () => {
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
+          createdAt: new Date("2025-01-01").toISOString(),
         },
       };
 

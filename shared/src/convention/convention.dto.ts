@@ -336,7 +336,11 @@ export type ConventionAgencyFields = {
 
 export type ConventionAssessmentFields = {
   assessment:
-    | { status: AssessmentStatus; endedWithAJob: boolean }
+    | {
+        status: AssessmentStatus;
+        endedWithAJob: boolean;
+        createdAt: DateString | null;
+      }
     | { status: LegacyAssessmentDto["status"] }
     | null;
 };

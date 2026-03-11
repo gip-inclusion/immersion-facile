@@ -211,6 +211,7 @@ describe("BroadcastConventionAgain", () => {
           beneficiaryAgreement: null,
           beneficiaryFeedback: null,
           signedAt: null,
+          createdAt: new Date("2025-01-01").toISOString(),
         };
         await uow.assessmentRepository.save({
           _entityName: "Assessment",

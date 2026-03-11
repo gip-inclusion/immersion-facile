@@ -86,6 +86,7 @@ export const AssessmentForm = ({
     beneficiaryAgreement: null,
     beneficiaryFeedback: null,
     signedAt: null,
+    createdAt: new Date().toISOString(),
   };
   const methods = useForm<FormAssessmentDto>({
     resolver: zodResolver(assessmentDtoSchema),
@@ -582,6 +583,7 @@ export const formAssessmentDtoToAssessmentDto = (
     ...commonFields,
     status: "COMPLETED",
     endedWithAJob: false,
+    createdAt: new Date().toISOString(),
   };
 
   if (formAssessmentDto.status === "DID_NOT_SHOW") {

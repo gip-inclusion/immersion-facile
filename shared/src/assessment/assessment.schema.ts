@@ -83,6 +83,7 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
         beneficiaryAgreement: z.boolean().nullable(),
         beneficiaryFeedback: zTrimmedStringWithMax(1000).nullable(),
         signedAt: makeDateStringSchema().nullable(),
+        createdAt: makeDateStringSchema(),
       }),
     );
 

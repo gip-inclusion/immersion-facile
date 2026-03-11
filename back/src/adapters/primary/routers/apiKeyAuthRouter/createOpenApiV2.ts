@@ -178,7 +178,11 @@ const conventionExample: ConventionReadDto = {
   agencyCounsellorEmails: [],
   agencyValidatorEmails: ["validator@mail.com"],
   agencyRefersTo: undefined,
-  assessment: { status: "COMPLETED", endedWithAJob: false },
+  assessment: {
+    status: "COMPLETED",
+    endedWithAJob: false,
+    createdAt: new Date("2025-01-01").toISOString(),
+  },
 };
 
 const callbackBodySchema: ZodSchemaWithInputMatchingOutput<ConventionUpdatedSubscriptionCallbackBody> =

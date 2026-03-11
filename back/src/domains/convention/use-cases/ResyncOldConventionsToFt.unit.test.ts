@@ -680,6 +680,7 @@ describe("ResyncOldConventionsToFt use case", () => {
           beneficiaryAgreement: true,
           beneficiaryFeedback: "my super feedback",
           signedAt: new Date("2025-01-01").toISOString(),
+          createdAt: new Date("2025-01-01").toISOString(),
         };
         uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
         uow.conventionRepository.setConventions([conventionToSync1]);
@@ -723,6 +724,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               assessment: {
                 status: assessment.status,
                 endedWithAJob: assessment.endedWithAJob,
+                createdAt: assessment.createdAt,
               },
             },
           },

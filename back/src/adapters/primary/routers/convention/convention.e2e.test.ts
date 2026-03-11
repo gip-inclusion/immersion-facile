@@ -364,6 +364,7 @@ describe("convention e2e", () => {
           beneficiaryAgreement: null,
           beneficiaryFeedback: null,
           signedAt: null,
+          createdAt: new Date("2025-01-01").toISOString(),
           _entityName: "Assessment",
         },
       ];
@@ -412,6 +413,7 @@ describe("convention e2e", () => {
           assessment: {
             status: "COMPLETED",
             endedWithAJob: false,
+            createdAt: new Date("2025-01-01").toISOString(),
           },
         },
       });

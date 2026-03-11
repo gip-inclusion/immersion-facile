@@ -59,6 +59,7 @@ const signedAssessment: Extract<
   beneficiaryAgreement: true,
   beneficiaryFeedback: "my super feedback",
   signedAt: new Date("2025-01-01").toISOString(),
+  createdAt: new Date("2025-01-01").toISOString(),
 };
 
 describe("NotifyAgencyThatAssessmentIsCreated", () => {
@@ -204,6 +205,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       beneficiaryAgreement: true,
       beneficiaryFeedback: "my super feedback",
       signedAt: new Date("2025-01-01").toISOString(),
+      createdAt: new Date("2025-01-01").toISOString(),
     };
 
     const validator2 = new ConnectedUserBuilder()
@@ -359,6 +361,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
         beneficiaryAgreement: true,
         beneficiaryFeedback: "my super feedback",
         signedAt: new Date("2025-01-01").toISOString(),
+        createdAt: new Date("2025-01-01").toISOString(),
       };
       await uow.assessmentRepository.save(
         createAssessmentEntity(assessmentDidNotShow, convention),
