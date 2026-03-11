@@ -78,11 +78,10 @@ export const isApiConsumerAllowed = ({
   rightName,
   consumerKind,
 }: {
-  apiConsumer: ApiConsumer | undefined;
+  apiConsumer: ApiConsumer;
   rightName: ApiConsumerRightName;
   consumerKind: ApiConsumerKind;
-}): boolean =>
-  !!apiConsumer && apiConsumer.rights[rightName].kinds.includes(consumerKind);
+}): boolean => apiConsumer.rights[rightName].kinds.includes(consumerKind);
 
 export const authorizedCallbackHeaderKeys = [
   "authorization",
