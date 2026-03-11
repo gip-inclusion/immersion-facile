@@ -44,6 +44,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     job: "Marketing Contact",
     phone: "",
     role: "establishment-admin",
+    status: "ACCEPTED",
     shouldReceiveDiscussionNotifications: true,
     isMainContactByPhone: false,
   };
@@ -397,6 +398,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
         .withUserRights([
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: userMarketingContact.id,
             shouldReceiveDiscussionNotifications: true,
           },

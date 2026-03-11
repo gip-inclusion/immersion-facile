@@ -56,6 +56,7 @@ describe("SendExchangeToRecipient", () => {
   const notifiedEstablishmentRights: EstablishmentUserRight[] = [
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       userId: admin.id,
       job: "",
       phone: "",
@@ -64,6 +65,7 @@ describe("SendExchangeToRecipient", () => {
     },
     {
       role: "establishment-contact",
+      status: "ACCEPTED",
       userId: contact.id,
       shouldReceiveDiscussionNotifications: true,
     },
@@ -208,6 +210,7 @@ describe("SendExchangeToRecipient", () => {
               ...notifiedEstablishmentRights,
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "otherUser1",
                 shouldReceiveDiscussionNotifications: false,
                 job: "",
@@ -216,6 +219,7 @@ describe("SendExchangeToRecipient", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "otherUser2",
                 shouldReceiveDiscussionNotifications: false,
               },

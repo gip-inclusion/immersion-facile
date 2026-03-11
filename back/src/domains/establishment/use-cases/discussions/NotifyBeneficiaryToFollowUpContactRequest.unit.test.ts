@@ -65,6 +65,7 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
         .withUserRights([
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: contactUser.id,
             job: "Manager",
             phone: "+33123456789",
@@ -128,6 +129,7 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
           .withUserRights([
             {
               role: "establishment-contact",
+              status: "ACCEPTED",
               userId: contactUser.id,
               job: "Manager",
               phone: "+33123456789",
@@ -166,6 +168,7 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
           .withUserRights([
             {
               role: "establishment-contact",
+              status: "ACCEPTED",
               userId: contactUser.id,
               phone: undefined,
               isMainContactByPhone: true,

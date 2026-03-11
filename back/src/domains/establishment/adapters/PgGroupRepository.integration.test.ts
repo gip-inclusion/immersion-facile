@@ -62,6 +62,7 @@ describe("PgEstablishmentGroupRepository", () => {
   const user = new UserBuilder().withId(uuid()).build();
   const userRight: EstablishmentUserRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     userId: user.id,
     job: "",
     phone: "+33600000000",

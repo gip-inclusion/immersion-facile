@@ -74,6 +74,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           userId: testUser.id,
           job: "",
           phone: "+33600000000",

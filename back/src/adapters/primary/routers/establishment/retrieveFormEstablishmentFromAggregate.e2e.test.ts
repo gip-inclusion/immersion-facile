@@ -53,6 +53,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     .build();
   const establishmentAdminRight: EstablishmentAdminRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     userId: establishmentAdmin.id,
     job: "job",
     phone: "+3366887744",
@@ -83,6 +84,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       establishmentAdminRight,
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: establishmentContact.id,
         shouldReceiveDiscussionNotifications: true,
       },
@@ -160,6 +162,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         userRights: [
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             email: establishmentAdmin.email,
             job: establishmentAdminRight.job,
             phone: establishmentAdminRight.phone,
@@ -168,6 +171,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             email: establishmentContact.email,
             shouldReceiveDiscussionNotifications: true,
           },
@@ -230,6 +234,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         userRights: [
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             email: establishmentAdmin.email,
             job: establishmentAdminRight.job,
             phone: establishmentAdminRight.phone,
@@ -238,6 +243,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             email: establishmentContact.email,
             shouldReceiveDiscussionNotifications: true,
           },

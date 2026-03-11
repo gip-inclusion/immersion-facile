@@ -50,6 +50,7 @@ describe("ContactRequestReminder", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         userId: establishmentAdmin.id,
         job: "boss",
         phone: "0677889944",
@@ -58,11 +59,13 @@ describe("ContactRequestReminder", () => {
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: establishmentContact.id,
         shouldReceiveDiscussionNotifications: true,
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: "not-notified-user-id",
         shouldReceiveDiscussionNotifications: false,
       },

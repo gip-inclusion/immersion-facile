@@ -67,6 +67,7 @@ describe("ContactEstablishment", () => {
 
   const establishmentAdminRight: EstablishmentAdminRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     userId: adminUser.id,
     job: "",
     phone: "",
@@ -78,6 +79,7 @@ describe("ContactEstablishment", () => {
     establishmentAdminRight,
     {
       role: "establishment-contact",
+      status: "ACCEPTED",
       userId: contactUser.id,
       shouldReceiveDiscussionNotifications: true,
     },
@@ -732,6 +734,7 @@ describe("ContactEstablishment", () => {
           .withUserRights([
             {
               role: "establishment-admin",
+              status: "ACCEPTED",
               userId: adminUser.id,
               shouldReceiveDiscussionNotifications: true,
               isMainContactByPhone: false,
@@ -740,6 +743,7 @@ describe("ContactEstablishment", () => {
             },
             {
               role: "establishment-contact",
+              status: "ACCEPTED",
               userId: contactUser.id,
               shouldReceiveDiscussionNotifications: true,
               isMainContactByPhone: false,

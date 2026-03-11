@@ -44,6 +44,7 @@ describe("UpdateDiscussionStatus", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "osef",
           phone: "osef",
           shouldReceiveDiscussionNotifications: false,
@@ -105,6 +106,7 @@ describe("UpdateDiscussionStatus", () => {
           .withUserRights([
             {
               role: "establishment-admin",
+              status: "ACCEPTED",
               userId: "other-user",
               job: "",
               phone: "",
@@ -404,6 +406,7 @@ describe("UpdateDiscussionStatus", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "other-user-id",
                 job: "osef",
                 phone: "osef",
@@ -412,6 +415,7 @@ describe("UpdateDiscussionStatus", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: authorizedUser.id,
                 shouldReceiveDiscussionNotifications: false,
               },

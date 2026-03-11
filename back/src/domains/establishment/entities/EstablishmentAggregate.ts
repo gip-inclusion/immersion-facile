@@ -1,5 +1,6 @@
 import type {
   EstablishmentRole,
+  EstablishmentUserRightStatus,
   UserId,
   WithIsMainContactInPerson,
   WithJobAndPhone,
@@ -20,6 +21,7 @@ export type WithEstablishmentAggregate = {
 type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
   userId: UserId;
   role: Role;
+  status: EstablishmentUserRightStatus;
   shouldReceiveDiscussionNotifications: boolean;
 };
 

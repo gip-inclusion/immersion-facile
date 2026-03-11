@@ -72,6 +72,7 @@ describe("LegacyContactEstablishment", () => {
 
   const establishmentAdminRight: EstablishmentAdminRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     job: "Boss",
     phone: "+33877995544",
     userId: establishmentAdmin.id,
@@ -82,6 +83,7 @@ describe("LegacyContactEstablishment", () => {
     establishmentAdminRight,
     {
       role: "establishment-contact",
+      status: "ACCEPTED",
       userId: establishmentContact.id,
       shouldReceiveDiscussionNotifications: true,
     },

@@ -57,6 +57,7 @@ describe("Delete Establishment", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "boss",
         phone: "+33655447788",
         userId: establishmentAdmin.id,
@@ -65,11 +66,13 @@ describe("Delete Establishment", () => {
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: establishmentContact1.id,
         shouldReceiveDiscussionNotifications: true,
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: establishmentContact2.id,
         shouldReceiveDiscussionNotifications: true,
       },

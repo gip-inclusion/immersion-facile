@@ -227,6 +227,7 @@ describe("Update Establishment aggregate from form data", () => {
         {
           userId: previousEstablishmentAdmin.id,
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "job",
           phone: "+336558464365",
           shouldReceiveDiscussionNotifications: true,
@@ -283,6 +284,7 @@ describe("Update Establishment aggregate from form data", () => {
     const nextAvailabilityDate = new Date();
     const updatedFormAdmin: AdminFormEstablishmentUserRight = {
       role: "establishment-admin",
+      status: "ACCEPTED",
       email: newEstablishmentAdmin.email,
       job: "new job",
       phone: "+33677445511",
@@ -291,6 +293,7 @@ describe("Update Establishment aggregate from form data", () => {
     };
     const updatedFormContact: ContactFormEstablishmentUserRight = {
       role: "establishment-contact",
+      status: "ACCEPTED",
       email: newEstablishmentContact.email,
       shouldReceiveDiscussionNotifications: true,
     };
@@ -378,6 +381,7 @@ describe("Update Establishment aggregate from form data", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: newEstablishmentAdmin.id,
                 job: updatedFormAdmin.job,
                 phone: updatedFormAdmin.phone,
@@ -386,6 +390,7 @@ describe("Update Establishment aggregate from form data", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: newEstablishmentContact.id,
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -481,6 +486,7 @@ describe("Update Establishment aggregate from form data", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: newEstablishmentAdmin.id,
                 job: updatedFormAdmin.job,
                 phone: updatedFormAdmin.phone,
@@ -489,6 +495,7 @@ describe("Update Establishment aggregate from form data", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: newEstablishmentContact.id,
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -616,6 +623,7 @@ describe("Update Establishment aggregate from form data", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "",
           phone: "",
           userId: user.id,
@@ -627,6 +635,7 @@ describe("Update Establishment aggregate from form data", () => {
 
     const newAdminRight: EstablishmentAdminRight = {
       role: "establishment-admin",
+      status: "ACCEPTED",
       job: "new job",
       phone: "+33612345679",
       userId: "nextuser1",
@@ -635,6 +644,7 @@ describe("Update Establishment aggregate from form data", () => {
     };
     const newContactRight: EstablishmentContactRight = {
       role: "establishment-contact",
+      status: "ACCEPTED",
       userId: "nextuser2",
       shouldReceiveDiscussionNotifications: false,
     };
@@ -839,6 +849,7 @@ describe("Update Establishment aggregate from form data", () => {
         const newAdminEmail = "new.admin@gmail.com";
         const newAdminRight: EstablishmentAdminRight = {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "new job",
           phone: "+33612345679",
           userId: "next-user-1",
@@ -850,11 +861,13 @@ describe("Update Establishment aggregate from form data", () => {
           userRights: [
             {
               role: "establishment-contact",
+              status: "ACCEPTED",
               email: user.email,
               shouldReceiveDiscussionNotifications: true,
             },
             {
               role: newAdminRight.role,
+              status: "ACCEPTED",
               email: newAdminEmail,
               job: newAdminRight.job,
               phone: newAdminRight.phone,
@@ -879,6 +892,7 @@ describe("Update Establishment aggregate from form data", () => {
                 {
                   userId: user.id,
                   role: "establishment-contact",
+                  status: "ACCEPTED",
                   shouldReceiveDiscussionNotifications: true,
                 },
                 newAdminRight,
@@ -946,6 +960,7 @@ describe("Update Establishment aggregate from form data", () => {
         const existingEstablishmentAdminRight: EstablishmentAdminRight = {
           userId: user.id,
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "new job",
           phone: "+33612345679",
           shouldReceiveDiscussionNotifications: true,
@@ -955,6 +970,7 @@ describe("Update Establishment aggregate from form data", () => {
         const existingEstablishmentContactRight: EstablishmentContactRight = {
           userId: establishmentContactUser.id,
           role: "establishment-contact",
+          status: "ACCEPTED",
           shouldReceiveDiscussionNotifications: true,
         };
 
@@ -978,6 +994,7 @@ describe("Update Establishment aggregate from form data", () => {
             {
               email: establishmentContactUser.email,
               role: existingEstablishmentContactRight.role,
+              status: existingEstablishmentContactRight.status,
               shouldReceiveDiscussionNotifications:
                 existingEstablishmentContactRight.shouldReceiveDiscussionNotifications,
             },
