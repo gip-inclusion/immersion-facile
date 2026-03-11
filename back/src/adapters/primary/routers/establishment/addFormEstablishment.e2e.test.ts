@@ -90,6 +90,7 @@ describe("Add form establishment", () => {
     )} 200 Check if email notification has been sent and published after FormEstablishment added`, async () => {
       const adminFormRight: AdminFormEstablishmentUserRight = {
         role: "establishment-admin",
+        status: "ACCEPTED",
         email: "mail@mail.com",
         job: "osef",
         phone: "+33600000000",

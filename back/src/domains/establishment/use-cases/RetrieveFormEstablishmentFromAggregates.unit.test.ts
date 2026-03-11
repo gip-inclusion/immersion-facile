@@ -66,6 +66,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       {
         userId: establishmentAdmin.id,
         role: "establishment-admin",
+        status: "ACCEPTED",
         job,
         phone,
         shouldReceiveDiscussionNotifications: true,
@@ -74,6 +75,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       {
         userId: establishmentContact.id,
         role: "establishment-contact",
+        status: "ACCEPTED",
         shouldReceiveDiscussionNotifications: true,
       },
     ])
@@ -133,6 +135,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           .withUserRights([
             {
               role: "establishment-admin",
+              status: "ACCEPTED",
               userId: adminWithoutFirstNameAndLastName.id,
               job,
               phone,
@@ -142,6 +145,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
             {
               userId: establishmentContact.id,
               role: "establishment-contact",
+              status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: true,
             },
           ])
@@ -203,6 +207,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           .withUserRights([
             {
               role: "establishment-admin",
+              status: "ACCEPTED",
               userId: adminUser.id,
               job,
               phone,
@@ -247,6 +252,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           .buildUser();
       const adminUserRight: EstablishmentUserRight = {
         role: "establishment-admin",
+        status: "ACCEPTED",
         userId: adminUser.id,
         job,
         phone,
@@ -255,6 +261,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       };
       const establishmentContactWithPhoneRight: EstablishmentUserRight = {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: establishmentContactWithPhoneButMainContactBuPhoneUndefined.id,
         shouldReceiveDiscussionNotifications: true,
         phone: "+33611111111",
@@ -294,6 +301,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         userRights: [
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             email: "admin@mail.com",
             job: adminUserRight.job,
             phone: adminUserRight.phone,
@@ -305,6 +313,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
             email: "contact@email.com",
             job: establishmentContactWithPhoneRight.job,
             role: "establishment-contact",
+            status: "ACCEPTED",
             phone: establishmentContactWithPhoneRight.phone,
             shouldReceiveDiscussionNotifications:
               establishmentContactWithPhoneRight.shouldReceiveDiscussionNotifications,
@@ -386,6 +395,7 @@ const makeExpectedFormEstablishment = ({
   userRights: [
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       email: establishmentAdmin.email,
       job,
       phone,
@@ -394,6 +404,7 @@ const makeExpectedFormEstablishment = ({
     },
     {
       role: "establishment-contact",
+      status: "ACCEPTED",
       email: establishmentContact.email,
       shouldReceiveDiscussionNotifications: true,
     },

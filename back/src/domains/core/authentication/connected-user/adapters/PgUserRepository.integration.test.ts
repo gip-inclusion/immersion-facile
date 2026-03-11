@@ -331,6 +331,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
                 role: "establishment-admin",
                 job: "Chef",
                 userId: user1.id,
+                status: "ACCEPTED",
                 shouldReceiveDiscussionNotifications: true,
                 phone: "+33611223344",
                 isMainContactByPhone: false,

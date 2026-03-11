@@ -62,6 +62,7 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
     {
       userId: seedUsers.franceMerguezUser.id,
       role: "establishment-admin",
+      status: "ACCEPTED",
       phone: "+33600110011",
       job: "Le Boss des merguez",
       shouldReceiveDiscussionNotifications: true,
@@ -70,6 +71,7 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
     {
       userId: seedUsers.adminUser.id,
       role: "establishment-contact",
+      status: "ACCEPTED",
       job: "la compta",
       phone: "+33672787844",
       shouldReceiveDiscussionNotifications: true,
@@ -77,6 +79,7 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
     {
       userId: seedUsers.icUser.id,
       role: "establishment-contact",
+      status: "ACCEPTED",
       job: "Contact RH",
       phone: "+33672787846",
       shouldReceiveDiscussionNotifications: true,
@@ -110,6 +113,7 @@ const decathlon = new EstablishmentAggregateBuilder()
     {
       userId: seedUsers.decathlonUser.id,
       role: "establishment-admin",
+      status: "ACCEPTED",
       phone: "+33600110011",
       job: "The Big Boss @Decathlon",
       shouldReceiveDiscussionNotifications: true,

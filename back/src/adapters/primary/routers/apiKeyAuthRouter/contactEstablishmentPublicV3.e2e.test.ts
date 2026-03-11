@@ -159,6 +159,7 @@ describe("POST /v3/apply-to-offers public V3 route", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           userId: user.id,
           job: "",
           phone: "",
@@ -211,6 +212,7 @@ describe("POST /v3/apply-to-offers public V3 route", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: user.id,
             job: "",
             phone: "",
@@ -258,6 +260,7 @@ describe("POST /v3/apply-to-offers public V3 route", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: user.id,
             job: "",
             phone: "",
@@ -309,6 +312,7 @@ describe("POST /v3/apply-to-offers public V3 route", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: user.id,
             job: "",
             phone: "",

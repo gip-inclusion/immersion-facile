@@ -42,6 +42,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "",
             phone: "",
             userId: establishmentAdmin.id,
@@ -50,6 +51,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: establishmentContact.id,
             shouldReceiveDiscussionNotifications: false,
           },

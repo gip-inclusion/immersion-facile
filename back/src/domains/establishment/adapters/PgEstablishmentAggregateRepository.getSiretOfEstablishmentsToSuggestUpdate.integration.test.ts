@@ -18,6 +18,7 @@ describe("PgScriptsQueries", () => {
   const user = new UserBuilder().withId(new UuidV4Generator().new()).build();
   const userRight: EstablishmentUserRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     job: "osef",
     phone: "+33600000000",
     userId: user.id,

@@ -40,6 +40,7 @@ describe("Delete establishment", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "fsd",
         phone: "+66",
         userId: user.id,

@@ -218,6 +218,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "a job",
                 phone: "+33612345678",
                 userId: "1",
@@ -226,11 +227,13 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "2",
                 shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "3",
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -276,6 +279,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "",
             phone: "",
             userId: "",
@@ -371,6 +375,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "a job",
                 phone: "+33612345678",
                 userId: "1",
@@ -379,11 +384,13 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "2",
                 shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "3",
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -462,6 +469,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "a job",
                 phone: "+33612345678",
                 userId: "1",
@@ -470,11 +478,13 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "2",
                 shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "3",
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -552,6 +562,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "",
             phone: "",
             userId: "",

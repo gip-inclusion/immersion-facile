@@ -42,6 +42,7 @@ import type {
 } from "./FormEstablishment.dto";
 import {
   fitForDisabledWorkersOptions,
+  formEstablishmentUserRightStatus,
   remoteWorkModes,
 } from "./FormEstablishment.dto";
 
@@ -66,8 +67,14 @@ export const contactModeSchema = zEnumValidation(
   "Choisissez parmi les options proposées",
 );
 
+const formEstablishmentUserRightStatusSchema = zEnumValidation(
+  formEstablishmentUserRightStatus,
+  "Le statut est inconnu",
+);
+
 const establishmentContactBaseSchema = z.object({
   role: z.literal("establishment-contact"),
+  status: formEstablishmentUserRightStatusSchema,
   email: emailSchema,
   shouldReceiveDiscussionNotifications: zBoolean,
   job: zStringMinLength1Max255.optional(),
@@ -85,6 +92,7 @@ const establishmentContactSchema = establishmentContactBaseSchema.and(
 
 const establishmentAdminSchema = z.object({
   role: z.literal("establishment-admin"),
+  status: formEstablishmentUserRightStatusSchema,
   email: emailSchema,
   phone: phoneNumberSchema,
   isMainContactByPhone: zBoolean,
