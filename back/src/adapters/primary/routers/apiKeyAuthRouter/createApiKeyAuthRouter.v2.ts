@@ -62,6 +62,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (
+          !req.apiConsumer ||
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
             rightName: "searchEstablishment",
@@ -87,6 +88,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         if (
+          !req.apiConsumer ||
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
             rightName: "searchEstablishment",
@@ -115,6 +117,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res.status(201), () => {
         if (
+          !req.apiConsumer ||
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
             rightName: "searchEstablishment",
@@ -144,6 +147,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   conventionV2Router.getConventionById(deps.apiConsumerMiddleware, (req, res) =>
     sendHttpResponse(req, res, () => {
       if (
+        !req.apiConsumer ||
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
           rightName: "convention",
@@ -161,6 +165,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   conventionV2Router.getConventions(deps.apiConsumerMiddleware, (req, res) =>
     sendHttpResponse(req, res, () => {
       if (
+        !req.apiConsumer ||
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
           rightName: "convention",
@@ -209,6 +214,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     sendHttpResponse(req, res.status(201), () => {
       const rightNeeded = eventToRightName(req.body.subscribedEvent);
       if (
+        !req.apiConsumer ||
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
           rightName: rightNeeded,

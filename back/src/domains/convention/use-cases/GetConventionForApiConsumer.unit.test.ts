@@ -4,10 +4,10 @@ import {
   type ApiConsumer,
   type ApiConsumerRights,
   ConventionDtoBuilder,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   ForbiddenError,
-  NotFoundError,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
@@ -15,7 +15,10 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { GetConventionForApiConsumer } from "./GetConventionForApiConsumer";
+import {
+  type GetConventionForApiConsumer,
+  makeGetConventionForApiConsumer,
+} from "./GetConventionForApiConsumer";
 
 describe("Get Convention for ApiConsumer", () => {
   const agencyIdInScope = "agency-id-in-scope";
@@ -57,22 +60,15 @@ describe("Get Convention for ApiConsumer", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getConventionForApiConsumer = new GetConventionForApiConsumer(
-      new InMemoryUowPerformer(uow),
-    );
+    getConventionForApiConsumer = makeGetConventionForApiConsumer({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
     uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
     uow.conventionRepository.setConventions([convention]);
   });
 
   describe("Wrong paths", () => {
     describe("Forbidden error", () => {
-      it("When no api consumer is provided", async () => {
-        await expectPromiseToFailWithError(
-          getConventionForApiConsumer.execute({ conventionId: convention.id }),
-          new ForbiddenError("No api consumer provided"),
-        );
-      });
-
       describe("When convention is not in the scope of the api consumer", () => {
         it("convention is linked to an agency with an Id which is not", async () => {
           const apiConsumer = createApiConsumer({
@@ -122,7 +118,7 @@ describe("Get Convention for ApiConsumer", () => {
               subscriptions: [],
             }),
           ),
-          new NotFoundError(`No convention found with id ${notFoundId}`),
+          errors.convention.notFound({ conventionId: notFoundId }),
         );
       });
     });
