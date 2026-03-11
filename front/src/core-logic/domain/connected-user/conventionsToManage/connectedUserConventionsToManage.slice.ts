@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type {
-  ConventionDto,
+  ConventionReadDto,
   DataWithPagination,
   FlatGetConventionsForAgencyUserParams,
   Pagination,
@@ -11,9 +11,12 @@ import type {
 } from "src/core-logic/domain/feedback/feedback.slice";
 
 type ConnectedUserConventionsToManageState = {
-  conventions: ConventionDto[];
+  conventions: ConventionReadDto[];
   isLoading: boolean;
   pagination: Pagination | undefined;
+  conventionsWithAssessmentIssue: ConventionReadDto[];
+  conventionsWithAssessmentIssuePagination: Pagination | undefined;
+  isLoadingConventionsWithAssessmentIssue: boolean;
 };
 
 export const connectedUserConventionsToManageInitialState: ConnectedUserConventionsToManageState =
@@ -21,6 +24,9 @@ export const connectedUserConventionsToManageInitialState: ConnectedUserConventi
     conventions: [],
     isLoading: false,
     pagination: undefined,
+    conventionsWithAssessmentIssue: [],
+    conventionsWithAssessmentIssuePagination: undefined,
+    isLoadingConventionsWithAssessmentIssue: false,
   };
 
 export const connectedUserConventionsToManageSlice = createSlice({
@@ -38,7 +44,9 @@ export const connectedUserConventionsToManageSlice = createSlice({
     },
     getConventionsForConnectedUserSucceeded: (
       state,
-      action: PayloadActionWithFeedbackTopic<DataWithPagination<ConventionDto>>,
+      action: PayloadActionWithFeedbackTopic<
+        DataWithPagination<ConventionReadDto>
+      >,
     ) => {
       state.isLoading = false;
       state.conventions = action.payload.data;
@@ -49,6 +57,32 @@ export const connectedUserConventionsToManageSlice = createSlice({
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
+    },
+    getConventionsWithAssessmentIssueRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        params: FlatGetConventionsForAgencyUserParams;
+        jwt: string;
+      }>,
+    ) => {
+      state.isLoadingConventionsWithAssessmentIssue = true;
+    },
+    getConventionsWithAssessmentIssueSucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<
+        DataWithPagination<ConventionReadDto>
+      >,
+    ) => {
+      state.isLoadingConventionsWithAssessmentIssue = false;
+      state.conventionsWithAssessmentIssue = action.payload.data;
+      state.conventionsWithAssessmentIssuePagination =
+        action.payload.pagination;
+    },
+    getConventionsWithAssessmentIssueFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoadingConventionsWithAssessmentIssue = false;
     },
   },
 });
