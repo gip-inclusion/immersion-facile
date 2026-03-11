@@ -90,6 +90,7 @@ describe("Route to get ImmersionSearchResultDto by siret, appellation code and l
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: "osef",
             job: "",
             phone: "",

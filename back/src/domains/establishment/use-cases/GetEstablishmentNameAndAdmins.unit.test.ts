@@ -30,6 +30,7 @@ describe("GetEstablishmentNameAndAdmins", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         userId: establishmentAdminUser.id,
         job: "osef",
         phone: "osef",
@@ -38,6 +39,7 @@ describe("GetEstablishmentNameAndAdmins", () => {
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: establishmentContactUser.id,
         job: "osef",
         phone: "osef",

@@ -62,6 +62,7 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "Boss",
             phone: "+3366887744",
             userId: establishmentAdmin.id,
@@ -70,11 +71,13 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: establishmentContact1.id,
             shouldReceiveDiscussionNotifications: true,
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: establishmentContact2.id,
             shouldReceiveDiscussionNotifications: true,
           },

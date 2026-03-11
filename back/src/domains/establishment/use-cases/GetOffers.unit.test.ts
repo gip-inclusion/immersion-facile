@@ -29,6 +29,7 @@ describe("GetOffers", () => {
     {
       userId: "test-user-id",
       role: "establishment-admin",
+      status: "ACCEPTED",
       job: "Chef",
       phone: "+33600000000",
       shouldReceiveDiscussionNotifications: true,

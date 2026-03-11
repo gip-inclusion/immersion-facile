@@ -35,6 +35,7 @@ describe("DeleteUser", () => {
     .build();
   const admin1Right: EstablishmentAdminRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     userId: admin1.id,
     isMainContactByPhone: true,
     job: "",
@@ -43,6 +44,7 @@ describe("DeleteUser", () => {
   };
   const admin2Right: EstablishmentAdminRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     userId: admin2.id,
     isMainContactByPhone: true,
     job: "",
@@ -52,11 +54,13 @@ describe("DeleteUser", () => {
   const contactMostActiveRight: EstablishmentContactRight = {
     userId: contactMostActive.id,
     role: "establishment-contact",
+    status: "ACCEPTED",
     shouldReceiveDiscussionNotifications: true,
   };
   const contactLessActiveRight: EstablishmentContactRight = {
     userId: contactLessActive.id,
     role: "establishment-contact",
+    status: "ACCEPTED",
     shouldReceiveDiscussionNotifications: true,
   };
 
@@ -169,6 +173,7 @@ describe("DeleteUser", () => {
                 {
                   userId: contactMostActive.id,
                   role: "establishment-admin",
+                  status: "ACCEPTED",
                   shouldReceiveDiscussionNotifications: true,
                   isMainContactByPhone: null,
                   job: "non-communiqué", // comment on défini le job si on ne le connait pas ?

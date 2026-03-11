@@ -61,6 +61,7 @@ describe("AddExchangeToDiscussion", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "boss",
         phone: "+33655885588",
         userId: adminUserEstablishment1.id,
@@ -69,6 +70,7 @@ describe("AddExchangeToDiscussion", () => {
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: contactUserEstablishment1.id,
         shouldReceiveDiscussionNotifications: true,
       },
@@ -80,6 +82,7 @@ describe("AddExchangeToDiscussion", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "boss",
         phone: "+33655885588",
         userId: adminUserEstablishment2.id,
@@ -88,6 +91,7 @@ describe("AddExchangeToDiscussion", () => {
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: contactUserEstablishment2.id,
         shouldReceiveDiscussionNotifications: true,
       },
@@ -1115,6 +1119,7 @@ describe("AddExchangeToDiscussion", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "",
             phone: "",
             shouldReceiveDiscussionNotifications: true,

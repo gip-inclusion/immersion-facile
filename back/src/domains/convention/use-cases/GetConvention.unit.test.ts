@@ -115,6 +115,7 @@ describe("Get Convention", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "",
         phone: "",
         userId: tutor.id,
@@ -416,6 +417,7 @@ describe("Get Convention", () => {
               {
                 userId: johnDoe.id,
                 role,
+                status: "ACCEPTED",
                 job: "",
                 phone: "",
                 shouldReceiveDiscussionNotifications: true,

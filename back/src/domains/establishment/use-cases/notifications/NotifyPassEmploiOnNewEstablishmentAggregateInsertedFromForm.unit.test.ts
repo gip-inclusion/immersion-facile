@@ -59,6 +59,7 @@ describe("Notify pass-emploi", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "",
           phone: "",
           userId: "osef",

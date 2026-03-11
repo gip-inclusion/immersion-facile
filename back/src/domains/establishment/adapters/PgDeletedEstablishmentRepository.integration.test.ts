@@ -33,6 +33,7 @@ describe("PgDeletedEstablishmentRepository", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "osef",
           phone: "0600000000",
           userId: "osef",

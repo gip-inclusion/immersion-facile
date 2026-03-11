@@ -78,6 +78,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: "osef",
             job: "",
             phone: "",

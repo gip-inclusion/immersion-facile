@@ -457,6 +457,7 @@ describe("GetConnectedUser", () => {
             [
               {
                 job: "Chef",
+                status: "ACCEPTED",
                 role: "establishment-admin",
                 userId: notAdminUser.id,
                 phone: "+33600000000",
@@ -465,6 +466,7 @@ describe("GetConnectedUser", () => {
               },
               {
                 job: "Dev",
+                status: "ACCEPTED",
                 role: "establishment-admin",
                 userId: anotherUser.id,
                 phone: "+33600000001",
@@ -477,6 +479,7 @@ describe("GetConnectedUser", () => {
             [
               {
                 job: "Chef",
+                status: "ACCEPTED",
                 role: "establishment-contact",
                 userId: notAdminUser.id,
                 phone: "+33600000000",

@@ -53,6 +53,7 @@ export const makeEstablishmentAggregate = async ({
       ({
         email,
         role,
+        status,
         job,
         phone,
         shouldReceiveDiscussionNotifications,
@@ -65,6 +66,7 @@ export const makeEstablishmentAggregate = async ({
         return role === "establishment-admin"
           ? {
               role,
+              status,
               userId: user.id,
               job,
               phone,
@@ -77,6 +79,7 @@ export const makeEstablishmentAggregate = async ({
             }
           : {
               role,
+              status,
               userId: user.id,
               shouldReceiveDiscussionNotifications,
               ...populatePropIfDefined(

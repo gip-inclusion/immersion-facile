@@ -135,6 +135,7 @@ describe("search route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "",
                 phone: "",
                 userId: user.id,
@@ -334,6 +335,7 @@ describe("search route", () => {
                 .withUserRights([
                   {
                     role: "establishment-admin",
+                    status: "ACCEPTED",
                     job: "",
                     phone: "",
                     userId: user.id,
@@ -366,6 +368,7 @@ describe("search route", () => {
                 .withUserRights([
                   {
                     role: "establishment-admin",
+                    status: "ACCEPTED",
                     job: "",
                     phone: "",
                     userId: user.id,
@@ -398,6 +401,7 @@ describe("search route", () => {
                 .withUserRights([
                   {
                     role: "establishment-admin",
+                    status: "ACCEPTED",
                     job: "",
                     phone: "",
                     userId: user.id,

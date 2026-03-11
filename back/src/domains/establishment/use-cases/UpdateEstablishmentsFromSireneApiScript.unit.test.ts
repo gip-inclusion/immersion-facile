@@ -148,6 +148,7 @@ describe("Update establishments from Sirene API", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "",
                 phone: "",
                 userId: "osef",
@@ -218,6 +219,7 @@ describe("Update establishments from Sirene API", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "",
                 phone: "",
                 userId: "osef",
@@ -245,6 +247,7 @@ describe("Update establishments from Sirene API", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "",
                 phone: "",
                 userId: "osef",
@@ -272,6 +275,7 @@ describe("Update establishments from Sirene API", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "",
                 phone: "",
                 userId: "osef",
@@ -363,6 +367,7 @@ const makeEstablishmentWithLastInseeCheck = (
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "",
         phone: "",
         userId: "osef",

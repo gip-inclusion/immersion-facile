@@ -52,6 +52,7 @@ describe("discussion e2e", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "Boss",
         phone: "+33688774455",
         userId: establishmentAdminUser.id,
@@ -202,6 +203,7 @@ describe("discussion e2e", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "other",
                 job: "",
                 phone: "",
@@ -340,6 +342,7 @@ describe("discussion e2e", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "osef",
           phone: "osef",
           userId: user.id,

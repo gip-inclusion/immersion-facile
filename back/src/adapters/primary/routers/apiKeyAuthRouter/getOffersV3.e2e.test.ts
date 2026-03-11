@@ -74,6 +74,7 @@ describe("GET /v3/offers", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: "osef",
             job: "",
             phone: "",

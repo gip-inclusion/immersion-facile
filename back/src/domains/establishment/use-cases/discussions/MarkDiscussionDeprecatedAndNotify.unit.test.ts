@@ -63,6 +63,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: admin.id,
             shouldReceiveDiscussionNotifications: true,
             job: "osef",
@@ -71,11 +72,13 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: contact.id,
             shouldReceiveDiscussionNotifications: true,
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: "not-notified-user",
             shouldReceiveDiscussionNotifications: false,
           },

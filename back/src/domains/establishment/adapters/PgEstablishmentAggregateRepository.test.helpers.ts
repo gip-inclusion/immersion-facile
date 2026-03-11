@@ -159,6 +159,7 @@ export const offer_A1101_20404 = new OfferEntityBuilder(offer_A1101)
 export const osefUser = new UserBuilder().withId(uuid()).build();
 export const osefUserRight: EstablishmentUserRight = {
   role: "establishment-admin",
+  status: "ACCEPTED",
   job: "osef",
   phone: "+33600000000",
   userId: osefUser.id,

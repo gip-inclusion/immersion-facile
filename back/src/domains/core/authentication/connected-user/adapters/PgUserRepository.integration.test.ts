@@ -310,6 +310,7 @@ describe("PgAuthenticatedUserRepository", () => {
           .withUserRights([
             {
               role: "establishment-admin",
+              status: "ACCEPTED",
               job: "Chef",
               userId: user1.id,
               shouldReceiveDiscussionNotifications: true,
