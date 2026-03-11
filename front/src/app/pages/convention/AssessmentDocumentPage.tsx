@@ -1,10 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { addDays, isBefore } from "date-fns";
 import { useEffect } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
+  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
@@ -182,10 +184,18 @@ export const AssessmentDocumentPage = ({
 
   const isAssessmentLegacy = !isAssessmentDto(assessment);
   const isSignedByBeneficiary = !isAssessmentLegacy && !!assessment.signedAt;
-  const showPdfAndPrint =
+  const isBeforeSignatureReleaseDate =
+    !isAssessmentLegacy &&
+    isBefore(
+      new Date(assessment.createdAt),
+      addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
+    );
+  const isSignatureRequired = !(
     isSignedByBeneficiary ||
-    isAssessmentLegacy ||
-    assessment.status === "DID_NOT_SHOW";
+    isBeforeSignatureReleaseDate ||
+    assessment.status === "DID_NOT_SHOW" ||
+    isBeforeSignatureReleaseDate
+  );
 
   return (
     <MainWrapper layout="default" vSpacing={8}>
@@ -204,9 +214,9 @@ export const AssessmentDocumentPage = ({
         })}
         businessName={convention.businessName}
         internshipKind={convention.internshipKind}
-        showPrintButton={showPdfAndPrint}
+        showPrintButton={!isSignatureRequired}
         customActions={
-          showPdfAndPrint
+          !isSignatureRequired
             ? [
                 <Button
                   key={"htmlToPdfButton"}
@@ -397,7 +407,7 @@ export const AssessmentDocumentPage = ({
                 ),
               }}
             />
-            {!isAssessmentLegacy && (
+            {!isAssessmentLegacy && !isBeforeSignatureReleaseDate && (
               <>
                 <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
                   Signature de la personne en immersion
@@ -470,7 +480,7 @@ export const AssessmentDocumentPage = ({
           </p>
         </footer>
       </Document>
-      {isBeneficiary && !isSignedByBeneficiary && !isAssessmentLegacy && (
+      {isBeneficiary && isSignatureRequired && (
         <>
           <div
             style={{

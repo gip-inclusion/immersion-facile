@@ -8,6 +8,8 @@ import type {
   LegacyAssessmentDto,
 } from "./assessment.dto";
 
+export const ASSESSEMENT_SIGNATURE_RELEASE_DATE = new Date("2026-03-10");
+
 export const computeTotalHours = ({
   convention,
   status,
