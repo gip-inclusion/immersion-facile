@@ -29,7 +29,6 @@ const startScript = async (): Promise<Report> => {
       suggestEstablishmentReengagement: new SuggestEstablishmentReengagement(
         uowPerformer,
         makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-        config.immersionFacileBaseUrl,
       ),
       timeGateway,
       uowPerformer,

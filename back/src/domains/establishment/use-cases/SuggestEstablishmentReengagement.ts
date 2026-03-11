@@ -1,5 +1,4 @@
 import {
-  type AbsoluteUrl,
   errors,
   immersionFacileNoReplyEmailSender,
   type SiretDto,
@@ -19,16 +18,12 @@ export class SuggestEstablishmentReengagement extends TransactionalUseCase<
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
-  readonly #immersionFacileBaseUrl: AbsoluteUrl;
-
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    immersionFacileBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
