@@ -42,6 +42,7 @@ const assessment: AssessmentDto = {
   beneficiaryAgreement: true,
   beneficiaryFeedback: null,
   signedAt: null,
+  createdAt: new Date().toISOString(),
 };
 
 describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {

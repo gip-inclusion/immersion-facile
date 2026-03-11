@@ -38,6 +38,7 @@ const domainEvt: DomainEvent = {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
+      createdAt: new Date().toISOString(),
     },
     triggeredBy: {
       kind: "connected-user",

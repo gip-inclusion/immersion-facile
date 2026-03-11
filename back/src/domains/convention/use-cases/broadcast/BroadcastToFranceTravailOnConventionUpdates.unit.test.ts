@@ -56,7 +56,11 @@ const conventionReadDtoFrom = ({
   agencyCounsellorEmails: agency.counsellorEmails,
   agencyValidatorEmails: agency.validatorEmails,
   assessment: assessment
-    ? { status: assessment.status, endedWithAJob: assessment.endedWithAJob }
+    ? {
+        status: assessment.status,
+        endedWithAJob: assessment.endedWithAJob,
+        createdAt: assessment.createdAt,
+      }
     : null,
 });
 

@@ -57,6 +57,7 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
+      createdAt: new Date().toISOString(),
     });
   }
 

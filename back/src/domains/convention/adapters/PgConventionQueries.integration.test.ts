@@ -173,6 +173,7 @@ describe("Pg implementation of ConventionQueries", () => {
           beneficiaryAgreement: null,
           beneficiaryFeedback: null,
           signedAt: null,
+          createdAt: new Date("2025-01-01").toISOString(),
         },
       });
 
@@ -1186,7 +1187,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
       ]);
 
@@ -1427,7 +1432,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
         { ...conventionB, ...agencyFields, assessment: null },
       ]);
@@ -1449,7 +1458,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
       ]);
     });
@@ -1472,7 +1485,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
         { ...conventionD, ...differentAgencyFields, assessment: null },
       ]);
@@ -1495,7 +1512,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
       ]);
     });
@@ -1540,7 +1561,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
         { ...conventionB, ...agencyFields, assessment: null },
         { ...conventionA, ...agencyFields, assessment: null },
@@ -1613,7 +1638,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
         { ...conventionB, ...agencyFields, assessment: null },
         { ...conventionA, ...agencyFields, assessment: null },
@@ -1644,7 +1673,11 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
-          assessment: { status: "COMPLETED", endedWithAJob: false },
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            createdAt: assessment.createdAt,
+          },
         },
         { ...conventionB, ...agencyFields, assessment: null },
         { ...conventionA, ...agencyFields, assessment: null },

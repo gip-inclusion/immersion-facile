@@ -568,6 +568,7 @@ export const conventionAssessmentFieldsSchema = z
     z.object({
       status: z.enum(assessmentStatuses),
       endedWithAJob: z.boolean(),
+      createdAt: makeDateStringSchema(),
     }),
     z.object({
       status: z.enum(legacyAssessmentStatuses),

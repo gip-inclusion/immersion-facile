@@ -111,6 +111,7 @@ describe("Assessment routes", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
       };
 
       const response = await httpClient.createAssessment({
@@ -143,6 +144,7 @@ describe("Assessment routes", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
       };
 
       const response = await httpClient.createAssessment({
@@ -166,6 +168,7 @@ describe("Assessment routes", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
       };
 
       const response = await httpClient.createAssessment({
@@ -201,6 +204,7 @@ describe("Assessment routes", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
       };
 
       const response = await httpClient.createAssessment({
@@ -231,6 +235,7 @@ describe("Assessment routes", () => {
         beneficiaryAgreement: true,
         beneficiaryFeedback: "Mon commentaire",
         signedAt: new Date("2025-01-01").toISOString(),
+        createdAt: new Date("2025-01-01").toISOString(),
       };
 
       await httpClient.createAssessment({
@@ -290,6 +295,7 @@ describe("Assessment routes", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date().toISOString(),
       };
       await httpClient.createAssessment({
         body: assessment,

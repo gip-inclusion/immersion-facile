@@ -67,6 +67,7 @@ describe("CreateAssessment", () => {
     beneficiaryAgreement: null,
     beneficiaryFeedback: null,
     signedAt: null,
+    createdAt: new Date("2025-01-01").toISOString(),
   };
 
   const tutorPayload: ConventionDomainJwtPayload = {
@@ -177,6 +178,7 @@ describe("CreateAssessment", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
       };
       await expectPromiseToFailWithError(
         createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
@@ -199,6 +201,7 @@ describe("CreateAssessment", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
       };
       await expectPromiseToFailWithError(
         createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
@@ -363,6 +366,7 @@ describe("CreateAssessment", () => {
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
       };
 
       uow.conventionRepository.setConventions([convention]);

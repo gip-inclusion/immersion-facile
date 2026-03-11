@@ -42,6 +42,7 @@ describe("Convention routes", () => {
     beneficiaryAgreement: true,
     beneficiaryFeedback: "Mon commentaire",
     signedAt: new Date("2025-01-01").toISOString(),
+    createdAt: new Date("2025-01-01").toISOString(),
   };
 
   const conventionReadConsumerWithNoScope = new ApiConsumerBuilder()
@@ -177,6 +178,7 @@ describe("Convention routes", () => {
           assessment: {
             status: assessment.status,
             endedWithAJob: assessment.endedWithAJob,
+            createdAt: assessment.createdAt,
           },
         },
         status: 200,
@@ -272,6 +274,7 @@ describe("Convention routes", () => {
             assessment: {
               status: assessment.status,
               endedWithAJob: assessment.endedWithAJob,
+              createdAt: assessment.createdAt,
             },
           },
         ],

@@ -78,6 +78,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     assessment: {
       status: assessment.status,
       endedWithAJob: assessment.endedWithAJob,
+      createdAt: assessment.createdAt,
     },
   };
 

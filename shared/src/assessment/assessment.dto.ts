@@ -55,10 +55,13 @@ export type AssessmentDtoPartiallyCompleted = CommonAssessmentFields & {
   numberOfMissedHours: number;
 };
 
-export type AssessmentDto =
+export type AssessmentDto = (
   | AssessmentDtoCompleted
   | AssessmentDtoDidNotShow
-  | AssessmentDtoPartiallyCompleted;
+  | AssessmentDtoPartiallyCompleted
+) & {
+  createdAt: DateString;
+};
 
 export type WithAssessmentDto = {
   assessment: AssessmentDto;
@@ -98,6 +101,7 @@ export type CreateFormAssessmentInitialValues = {
     beneficiaryAgreement: null;
     beneficiaryFeedback: null;
     signedAt: null;
+    createdAt: DateString;
   };
 
 export type FormAssessmentDto =

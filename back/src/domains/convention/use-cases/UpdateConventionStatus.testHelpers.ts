@@ -288,6 +288,7 @@ export const setupInitialState = ({
         beneficiaryAgreement: null,
         beneficiaryFeedback: null,
         signedAt: null,
+        createdAt: new Date().toISOString(),
         _entityName: "Assessment",
       },
     ];
