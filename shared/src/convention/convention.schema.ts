@@ -939,6 +939,13 @@ const assessmentCompletionStatusFilterSchema = z.enum(
   },
 );
 
+const conventionAvailableSort = [
+  "dateValidation",
+  "dateStart",
+  "dateSubmission",
+  "dateEnd",
+] as const;
+
 export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatchingOutput<FlatGetConventionsForAgencyUserParams> =
   z.object({
     // pagination
@@ -947,7 +954,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
 
     // sort
     sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission", "dateEnd"], {
+      .enum(conventionAvailableSort, {
         error: localization.invalidEnum,
       })
       .optional(),
@@ -981,7 +988,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
   });
 
 const withSortedConventionsSchema = withOptionalSortSchema(
-  z.enum(["dateValidation", "dateStart", "dateSubmission"], {
+  z.enum(conventionAvailableSort, {
     error: localization.invalidEnum,
   }),
 );

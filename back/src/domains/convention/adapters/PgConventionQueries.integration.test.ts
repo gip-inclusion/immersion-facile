@@ -1527,7 +1527,16 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
 
-    it("should sort conventions by dateStart", async () => {
+    it("should sort conventions by dateStart, then conventionId", async () => {
+      const sameDateStartConvention = {
+        ...conventionA,
+        id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      };
+      await conventionRepository.save(
+        sameDateStartConvention,
+        anyConventionUpdatedAt,
+      );
+
       const result =
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
@@ -1538,9 +1547,10 @@ describe("Pg implementation of ConventionQueries", () => {
           },
         });
 
-      expect(result.data.length).toBe(4);
+      expect(result.data.length).toBe(5);
       expectToEqual(result.data, [
         { ...conventionA, ...agencyFields, assessment: null },
+        { ...sameDateStartConvention, ...agencyFields, assessment: null },
         { ...conventionB, ...agencyFields, assessment: null },
         {
           ...conventionC,

@@ -10,6 +10,7 @@ import {
   assessmentTextsByStatus,
   type ConventionReadDto,
   domElementIds,
+  type FlatGetConventionsForAgencyUserParams,
   getAssessmentCompletionStatusFilter,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
   toDisplayedDate,
@@ -20,9 +21,9 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 
-const filters = {
-  sortBy: "dateStart" as const,
-  sortDirection: "desc" as const,
+const filters: FlatGetConventionsForAgencyUserParams = {
+  sortBy: "dateEnd",
+  sortDirection: "asc",
   assessmentCompletionStatus: ["to-be-completed", "to-sign"] as [
     "to-be-completed",
     "to-sign",
