@@ -10,6 +10,10 @@ import {
 import { useDispatch } from "react-redux";
 import { NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE } from "shared";
 import { ConventionsToManageList } from "src/app/components/agency/agency-dashboard/ConventionsToManageList";
+import {
+  ConventionsWithAssessmentToCompleteList,
+  threeDaysAgo,
+} from "src/app/components/agency/agency-dashboard/ConventionsWithAssessmentToCompleteList";
 import { ConventionsWithBroadcastErrorList } from "src/app/components/agency/agency-dashboard/ConventionsWithBroadcastErrorList";
 import { hasUserRightsOnAgencyBroadcast } from "src/app/components/forms/convention/manage-actions/getButtonConfigBySubStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -34,11 +38,17 @@ export const AgencyTasks = ({
   const isLoadingConventionsToManage = useAppSelector(
     connectedUserConventionsToManageSelectors.isLoading,
   );
+  const isLoadingConventionsWithAssessmentIssue = useAppSelector(
+    connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue,
+  );
   const isLoadingConventionsWithBroadcastError = useAppSelector(
     conventionsWithBroadcastFeedbackSelectors.isLoading,
   );
   const conventionsToManagePagination = useAppSelector(
     connectedUserConventionsToManageSelectors.pagination,
+  );
+  const conventionsWithAssessmentIssuePagination = useAppSelector(
+    connectedUserConventionsToManageSelectors.conventionsWithAssessmentIssuePagination,
   );
   const conventionsWithErroredBroadcastFeedbackPagination = useAppSelector(
     conventionsWithBroadcastFeedbackSelectors.erroredBroadcastConventionsWithPagination,
@@ -75,6 +85,22 @@ export const AgencyTasks = ({
         ),
       );
       dispatch(
+        connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
+          {
+            params: {
+              sortBy: "dateStart",
+              sortDirection: "desc",
+              assessmentCompletionStatus: ["to-be-completed", "to-sign"],
+              dateEndTo: threeDaysAgo,
+              page: 1,
+              perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
+            },
+            jwt: connectedUserJwt,
+            feedbackTopic: "conventions-with-assessment-issue",
+          },
+        ),
+      );
+      dispatch(
         conventionsWithBroadcastFeedbackSlice.actions.getConventionsWithErroredBroadcastFeedbackRequested(
           {
             filters: {
@@ -97,8 +123,10 @@ export const AgencyTasks = ({
       className={fr.cx("fr-mt-2w", "fr-mb-4w")}
     >
       {(isLoadingConventionsToManage ||
+        isLoadingConventionsWithAssessmentIssue ||
         isLoadingConventionsWithBroadcastError) && <Loader />}
       {conventionsToManagePagination?.totalRecords === 0 &&
+        conventionsWithAssessmentIssuePagination?.totalRecords === 0 &&
         conventionsWithErroredBroadcastFeedbackPagination.pagination
           .totalRecords === 0 && <p>Aucune tâche à traiter.</p>}
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -118,6 +146,25 @@ export const AgencyTasks = ({
                         title="Actions urgentes"
                         dateRange={dateStartFrom1MonthAgoToIn5Days}
                       />,
+                    ),
+                }}
+              />
+            </div>
+          )}
+        {!isLoadingConventionsWithAssessmentIssue &&
+          conventionsWithAssessmentIssuePagination?.totalRecords !==
+            undefined &&
+          conventionsWithAssessmentIssuePagination.totalRecords > 0 && (
+            <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+              <TaskSummary
+                count={conventionsWithAssessmentIssuePagination.totalRecords}
+                countLabel="Bilans à compléter"
+                icon="fr-icon-file-text-line"
+                buttonProps={{
+                  children: "Traiter cette liste",
+                  onClick: () =>
+                    onSeeAllConventionsClick(
+                      <ConventionsWithAssessmentToCompleteList title="Relances bilans" />,
                     ),
                 }}
               />
