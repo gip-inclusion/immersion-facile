@@ -192,7 +192,6 @@ export const AssessmentDocumentPage = ({
     );
   const isSignatureRequired = !(
     isSignedByBeneficiary ||
-    isBeforeSignatureReleaseDate ||
     assessment.status === "DID_NOT_SHOW" ||
     isBeforeSignatureReleaseDate
   );

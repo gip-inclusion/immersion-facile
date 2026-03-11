@@ -255,6 +255,7 @@ describe("SignAssessment", () => {
       status: "FINISHED",
       establishmentFeedback: "Legacy feedback",
       numberOfHoursActuallyMade: null,
+      createdAt: new Date("2023-03-11").toISOString(),
     };
     uow.assessmentRepository.assessments = [legacyAssessment];
 

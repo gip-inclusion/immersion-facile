@@ -276,6 +276,7 @@ describe("GetAssessmentByConventionId", () => {
         status: "FINISHED",
         conventionId: convention.id,
         establishmentFeedback: "this is my feedback",
+        createdAt: new Date("2023-03-11").toISOString(),
       };
       const assessmentEntity: AssessmentEntity = {
         _entityName: "Assessment",

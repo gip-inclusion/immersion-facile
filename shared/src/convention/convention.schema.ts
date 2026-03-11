@@ -53,7 +53,7 @@ import {
   lastnameSchema,
 } from "../user/user.schema";
 import type { OmitFromExistingKeys } from "../utils";
-import type { DateString } from "../utils/date";
+import { type DateString, dateTimeIsoStringSchema } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   legacyTextWithUnknownAndUnlimitedSizeInDBSchema,
@@ -568,7 +568,7 @@ export const conventionAssessmentFieldsSchema = z
     z.object({
       status: z.enum(assessmentStatuses),
       endedWithAJob: z.boolean(),
-      createdAt: makeDateStringSchema(),
+      createdAt: dateTimeIsoStringSchema,
     }),
     z.object({
       status: z.enum(legacyAssessmentStatuses),

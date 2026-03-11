@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   zStringMinLength1,
   zTrimmedStringWithMax,
@@ -83,7 +84,7 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
         beneficiaryAgreement: z.boolean().nullable(),
         beneficiaryFeedback: zTrimmedStringWithMax(1000).nullable(),
         signedAt: makeDateStringSchema().nullable(),
-        createdAt: makeDateStringSchema(),
+        createdAt: dateTimeIsoStringSchema,
       }),
     );
 
@@ -101,6 +102,7 @@ export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyA
     }),
     conventionId: z.string(),
     establishmentFeedback: zStringMinLength1,
+    createdAt: dateTimeIsoStringSchema,
   });
 
 export const deleteAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<DeleteAssessmentRequestDto> =

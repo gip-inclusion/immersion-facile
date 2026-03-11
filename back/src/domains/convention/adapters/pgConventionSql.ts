@@ -702,7 +702,7 @@ export const getAssessmentFieldsByConventionId = async (
       jsonBuildObject({
         status: eb.ref("status").$castTo<AssessmentStatus>(),
         endedWithAJob: eb.ref("ended_with_a_job"),
-        createdAt: sql<DateString>`date_to_iso(created_at)`,
+        createdAt: sql<DateTimeIsoString>`date_to_iso(created_at)`,
       }).as("assessment"),
     ])
     .where("convention_id", "=", conventionId)
@@ -718,7 +718,7 @@ export const getAssessmentFieldsByConventionId = async (
         ? {
             status: result.assessment.status,
             endedWithAJob: result.assessment.endedWithAJob ?? false,
-            createdAt: result.assessment.createdAt ?? null,
+            createdAt: result.assessment.createdAt,
           }
         : {
             status: result.assessment.status,

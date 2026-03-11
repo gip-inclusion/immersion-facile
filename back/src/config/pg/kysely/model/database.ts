@@ -812,7 +812,7 @@ interface ImmersionAssessments {
   beneficiary_agreement: boolean | null;
   beneficiary_feedback: string | null;
   signed_at: Timestamp | null;
-  created_at: Generated<Timestamp | null>;
+  created_at: Timestamp;
   updated_at: Generated<Timestamp | null>;
 }
 
