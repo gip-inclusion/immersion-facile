@@ -44,6 +44,39 @@ const getConventionsForConnectedUserEpic: ConnectedUserConventionsToManageEpic =
       ),
     );
 
+const getConventionsWithAssessmentIssueEpic: ConnectedUserConventionsToManageEpic =
+  (actions$, _, { conventionGateway }) =>
+    actions$.pipe(
+      filter(
+        connectedUserConventionsToManageSlice.actions
+          .getConventionsWithAssessmentIssueRequested.match,
+      ),
+      switchMap((action) =>
+        conventionGateway
+          .getConventionsForUser$(action.payload.params, action.payload.jwt)
+          .pipe(
+            map((response) =>
+              connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueSucceeded(
+                {
+                  feedbackTopic: action.payload.feedbackTopic,
+                  data: response.data,
+                  pagination: response.pagination,
+                },
+              ),
+            ),
+            catchEpicError((error) =>
+              connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueFailed(
+                {
+                  feedbackTopic: action.payload.feedbackTopic,
+                  errorMessage: error.message,
+                },
+              ),
+            ),
+          ),
+      ),
+    );
+
 export const connectedUserConventionsEpics = [
   getConventionsForConnectedUserEpic,
+  getConventionsWithAssessmentIssueEpic,
 ];

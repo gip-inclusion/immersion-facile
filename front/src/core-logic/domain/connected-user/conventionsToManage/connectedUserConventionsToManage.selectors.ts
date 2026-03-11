@@ -20,8 +20,26 @@ const isLoading = createSelector(
   (state) => state.isLoading,
 );
 
+const conventionsWithAssessmentIssue = createSelector(
+  connectedUserConventionsToManageState,
+  (state) => state.conventionsWithAssessmentIssue,
+);
+
+const conventionsWithAssessmentIssuePagination = createSelector(
+  connectedUserConventionsToManageState,
+  (state) => state.conventionsWithAssessmentIssuePagination,
+);
+
+const isLoadingConventionsWithAssessmentIssue = createSelector(
+  connectedUserConventionsToManageState,
+  (state) => state.isLoadingConventionsWithAssessmentIssue,
+);
+
 export const connectedUserConventionsToManageSelectors = {
   conventions,
   isLoading,
   pagination,
+  conventionsWithAssessmentIssue,
+  conventionsWithAssessmentIssuePagination,
+  isLoadingConventionsWithAssessmentIssue,
 };

@@ -12,6 +12,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { HeadingSection, RichTable } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  assessmentTextsByStatus,
   type ConventionStatus,
   conventionStatuses,
   defaultPerPageInWebPagination,
@@ -115,7 +116,7 @@ export const ConventionList = () => {
   const assessmentOptions: CheckboxProps["options"] = useMemo(
     () => [
       {
-        label: "Bilans à compléter par le tuteur",
+        label: `Bilans ${assessmentTextsByStatus["to-be-completed"].longLabel}`,
         nativeInputProps: {
           value: "to-be-completed",
           checked:
@@ -137,7 +138,7 @@ export const ConventionList = () => {
         },
       },
       {
-        label: "Bilans à signer par la personne en immersion",
+        label: `Bilans ${assessmentTextsByStatus["to-sign"].longLabel}`,
         nativeInputProps: {
           value: "to-sign",
           checked: tempFilters.assessmentCompletionStatus?.includes("to-sign"),
@@ -155,7 +156,8 @@ export const ConventionList = () => {
         },
       },
       {
-        label: "Bilans complété et signé",
+        label: `Bilans ${assessmentTextsByStatus.signed.longLabel}`,
+        hintText: assessmentTextsByStatus.signed.description,
         nativeInputProps: {
           value: "signed",
           checked: tempFilters.assessmentCompletionStatus?.includes("signed"),
@@ -482,21 +484,21 @@ export const ConventionList = () => {
                             "signed",
                           )
                         ) {
-                          return "Bilan : Bilans complété et signer";
+                          return `Bilan : Bilans ${assessmentTextsByStatus.signed.longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
                             "to-sign",
                           )
                         ) {
-                          return "Bilan : Bilans à signer";
+                          return `Bilan : Bilans ${assessmentTextsByStatus["to-sign"].longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
                             "to-be-completed",
                           )
                         ) {
-                          return "Bilan : Bilans non complétés";
+                          return `Bilan : Bilans ${assessmentTextsByStatus["to-be-completed"].longLabel}`;
                         }
                         return "Tous les bilans";
                       })(),
@@ -505,7 +507,7 @@ export const ConventionList = () => {
                       title: "Filtrer par statut du bilan",
                       content: (
                         <>
-                          <Checkbox options={assessmentOptions} />
+                          <RadioButtons options={assessmentOptions} />
                         </>
                       ),
                     },
