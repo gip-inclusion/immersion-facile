@@ -84,6 +84,7 @@ describe("Contact establishment public v2 e2e", () => {
           .withUserRights([
             {
               role: "establishment-admin",
+              status: "ACCEPTED",
               userId: user.id,
               job: "",
               phone: "",

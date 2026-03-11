@@ -52,6 +52,7 @@ describe("NotifyContactRequest", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "osef",
         phone: adminPhone,
         shouldReceiveDiscussionNotifications: true,
@@ -60,11 +61,13 @@ describe("NotifyContactRequest", () => {
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: establishmentContact.id,
         shouldReceiveDiscussionNotifications: true,
       },
       {
         role: "establishment-contact",
+        status: "ACCEPTED",
         userId: "not-notified-user",
         shouldReceiveDiscussionNotifications: false,
       },
@@ -78,6 +81,7 @@ describe("NotifyContactRequest", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "osef",
           phone: adminPhone,
           shouldReceiveDiscussionNotifications: true,
@@ -86,6 +90,7 @@ describe("NotifyContactRequest", () => {
         },
         {
           role: "establishment-contact",
+          status: "ACCEPTED",
           userId: establishmentContact.id,
           shouldReceiveDiscussionNotifications: true,
         },
@@ -99,6 +104,7 @@ describe("NotifyContactRequest", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "osef",
           phone: "0600000000",
           shouldReceiveDiscussionNotifications: true,
@@ -107,6 +113,7 @@ describe("NotifyContactRequest", () => {
         },
         {
           role: "establishment-contact",
+          status: "ACCEPTED",
           userId: establishmentContact.id,
           shouldReceiveDiscussionNotifications: true,
         },
@@ -120,6 +127,7 @@ describe("NotifyContactRequest", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "osef",
           phone: adminPhone,
           shouldReceiveDiscussionNotifications: true,
@@ -128,6 +136,7 @@ describe("NotifyContactRequest", () => {
         },
         {
           role: "establishment-contact",
+          status: "ACCEPTED",
           userId: establishmentContact.id,
           shouldReceiveDiscussionNotifications: true,
           isMainContactInPerson: true,
@@ -142,6 +151,7 @@ describe("NotifyContactRequest", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "osef",
           phone: adminPhone,
           shouldReceiveDiscussionNotifications: true,

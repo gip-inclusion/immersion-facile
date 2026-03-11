@@ -81,6 +81,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
   const formAdminRight: AdminFormEstablishmentUserRight = {
     role: "establishment-admin",
+    status: "ACCEPTED",
     email: establishmentAdmin.email,
     job: "osef",
     phone: "+33655445544",
@@ -90,6 +91,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
   const formContactRight: ContactFormEstablishmentUserRight = {
     role: "establishment-contact",
+    status: "ACCEPTED",
     email: establishmentContact.email,
     shouldReceiveDiscussionNotifications: true,
   };
@@ -221,6 +223,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: formAdminRight.job,
                 phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
@@ -229,6 +232,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: establishmentContact.id,
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -329,6 +333,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: formAdminRight.job,
                 phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
@@ -337,6 +342,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: establishmentContact.id,
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -426,12 +432,14 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 job: formAdminRight.job,
                 phone: formAdminRight.phone,
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 shouldReceiveDiscussionNotifications:
                   formAdminRight.shouldReceiveDiscussionNotifications,
                 userId: establishmentAdmin.id,
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 shouldReceiveDiscussionNotifications:
                   formContactRight.shouldReceiveDiscussionNotifications,
                 userId: establishmentContact.id,
@@ -448,6 +456,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           formAdminRight,
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             email: formAdminRight.email,
             shouldReceiveDiscussionNotifications: true,
           },
@@ -561,6 +570,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "",
           phone: "",
           userId: establishmentAdmin.id,
@@ -569,6 +579,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         },
         {
           role: "establishment-contact",
+          status: "ACCEPTED",
           userId: establishmentContact.id,
           shouldReceiveDiscussionNotifications: true,
         },
@@ -696,6 +707,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "a job",
           phone: "+33612345678",
           userId: "estab.admin",
@@ -704,11 +716,13 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         },
         {
           role: "establishment-contact",
+          status: "ACCEPTED",
           userId: "estab.contact",
           shouldReceiveDiscussionNotifications: false,
         },
         {
           role: "establishment-contact",
+          status: "ACCEPTED",
           userId: "no-uuid-provided",
           shouldReceiveDiscussionNotifications: true,
         },
@@ -800,6 +814,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "a job",
             phone: "+33612345678",
             userId: "estab.admin",
@@ -808,11 +823,13 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: "estab.contact",
             shouldReceiveDiscussionNotifications: false,
           },
           {
             role: "establishment-contact",
+            status: "ACCEPTED",
             userId: "no-uuid-provided",
             shouldReceiveDiscussionNotifications: true,
           },
@@ -930,6 +947,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "a job",
                 phone: "+33612345678",
                 userId: "estab.admin",
@@ -938,11 +956,13 @@ describe("InsertEstablishmentAggregateFromForm", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "estab.contact",
                 shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 userId: "no-uuid-provided",
                 shouldReceiveDiscussionNotifications: true,
               },
@@ -960,6 +980,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "",
             phone: "",
             userId: "",

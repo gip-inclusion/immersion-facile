@@ -88,6 +88,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   userRights: [
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       email: "amil@mail.com",
       job: "a job",
       phone: "+33612345678",
@@ -96,11 +97,13 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
     },
     {
       role: "establishment-contact",
+      status: "ACCEPTED",
       email: "copy1@mail.com",
       shouldReceiveDiscussionNotifications: false,
     },
     {
       role: "establishment-contact",
+      status: "ACCEPTED",
       email: "copy2@mail.com",
       shouldReceiveDiscussionNotifications: true,
     },
@@ -152,6 +155,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
   userRights: [
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       email: "my-updated-email@test.com",
       job: "new job",
       phone: "+33612345679",
@@ -160,6 +164,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
     },
     {
       role: "establishment-contact",
+      status: "ACCEPTED",
       email: "updated-copy-email@test.com",
       shouldReceiveDiscussionNotifications: false,
     },

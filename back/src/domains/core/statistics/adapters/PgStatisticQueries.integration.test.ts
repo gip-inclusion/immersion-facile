@@ -87,6 +87,7 @@ describe("PgStatisticQueries", () => {
         .build();
       const userRight: EstablishmentUserRight = {
         role: "establishment-admin",
+        status: "ACCEPTED",
         userId: user.id,
         job: "",
         phone: "+33600000000",

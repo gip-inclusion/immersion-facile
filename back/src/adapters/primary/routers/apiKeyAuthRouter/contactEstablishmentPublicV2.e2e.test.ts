@@ -154,6 +154,7 @@ describe("POST contact-establishment public V2 route", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           userId: user.id,
           job: "",
           phone: "",
@@ -206,6 +207,7 @@ describe("POST contact-establishment public V2 route", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: user.id,
             job: "",
             phone: "",
@@ -253,6 +255,7 @@ describe("POST contact-establishment public V2 route", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: user.id,
             job: "",
             phone: "",
@@ -304,6 +307,7 @@ describe("POST contact-establishment public V2 route", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: user.id,
             job: "",
             phone: "",

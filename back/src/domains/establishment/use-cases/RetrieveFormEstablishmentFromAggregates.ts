@@ -107,6 +107,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     return userRights.map(
       ({
         role,
+        status,
         userId,
         job,
         phone,
@@ -120,6 +121,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         if (role === "establishment-admin") {
           return {
             role,
+            status,
             email: user.email,
             job,
             phone,
@@ -131,6 +133,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 
         const baseContact = {
           role,
+          status,
           email: user.email,
           job,
           phone,

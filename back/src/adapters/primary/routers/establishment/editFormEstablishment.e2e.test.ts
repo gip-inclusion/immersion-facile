@@ -60,6 +60,7 @@ describe("Edit form establishments", () => {
     .withUserRights([
       {
         role: "establishment-admin",
+        status: "ACCEPTED",
         job: "Boss",
         phone: "+33688774455",
         userId: establishmentAdminUser.id,

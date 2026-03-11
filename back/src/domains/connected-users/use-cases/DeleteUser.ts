@@ -133,6 +133,7 @@ const updateEstablishment =
               ? ({
                   userId: right.userId,
                   role: "establishment-admin",
+                  status: "ACCEPTED",
                   shouldReceiveDiscussionNotifications:
                     right.shouldReceiveDiscussionNotifications,
                   isMainContactInPerson: right.isMainContactInPerson,

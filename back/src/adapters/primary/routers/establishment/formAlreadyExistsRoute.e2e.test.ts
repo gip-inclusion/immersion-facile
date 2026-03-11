@@ -43,6 +43,7 @@ describe("route to check if a form's siret already exists", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "",
             phone: "",
             userId: "osef",

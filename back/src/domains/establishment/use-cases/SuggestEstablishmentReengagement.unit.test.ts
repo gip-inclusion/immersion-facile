@@ -88,6 +88,7 @@ describe("SuggestEditEstablishment", () => {
         {
           userId: admin1.id,
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "Boss1",
           phone: "+33688779955",
           shouldReceiveDiscussionNotifications: true,
@@ -96,6 +97,7 @@ describe("SuggestEditEstablishment", () => {
         {
           userId: admin2.id,
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "Boss2",
           phone: "+33688779666",
           shouldReceiveDiscussionNotifications: true,
@@ -103,6 +105,7 @@ describe("SuggestEditEstablishment", () => {
         },
         {
           userId: contact.id,
+          status: "ACCEPTED",
           role: "establishment-contact",
           shouldReceiveDiscussionNotifications: true,
         },

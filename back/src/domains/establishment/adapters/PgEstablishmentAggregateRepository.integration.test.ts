@@ -3950,6 +3950,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
@@ -3958,6 +3959,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user2.id,
@@ -3972,6 +3974,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
@@ -3980,6 +3983,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 job: "bbbbbbbbbb",
                 phone: "+33600000099",
                 userId: user2.id,
@@ -4001,6 +4005,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
@@ -4009,6 +4014,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               },
               {
                 role: "establishment-contact",
+                status: "ACCEPTED",
                 job: "bbbbbbbbbbbbb",
                 phone: "+33600000099",
                 userId: user2.id,
@@ -4023,6 +4029,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 job: "sdlm!fjsdlfkjsdmlfj",
                 phone: "+33666887744",
                 userId: user.id,
@@ -4380,6 +4387,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "doing stuff",
           phone: "+336887875544",
           userId: user1.id,
@@ -4395,6 +4403,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "doing other stuff",
           phone: "+33688445577",
           userId: user2.id,
@@ -4410,6 +4419,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "doing other stuffffffffffffff",
           phone: "+33688445566",
           userId: user2.id,

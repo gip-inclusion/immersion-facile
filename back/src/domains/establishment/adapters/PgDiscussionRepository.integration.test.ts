@@ -396,6 +396,7 @@ describe("PgDiscussionRepository", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: user.id,
                 job: "",
                 phone: "+33600000000",
@@ -2438,6 +2439,7 @@ describe("PgDiscussionRepository", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: user.id,
                 job: "",
                 phone: "+33600000000",
@@ -2456,6 +2458,7 @@ describe("PgDiscussionRepository", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: user.id,
                 job: "",
                 phone: "+33600000000",
@@ -2892,6 +2895,7 @@ describe("PgDiscussionRepository", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             userId: user.id,
             job: "",
             phone: "+33600000000",

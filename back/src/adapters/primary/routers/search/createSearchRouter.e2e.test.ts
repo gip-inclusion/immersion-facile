@@ -116,6 +116,7 @@ const establishmentAggregate1 = new EstablishmentAggregateBuilder()
   .withUserRights([
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       userId: "osef",
       job: "",
       phone: "",
@@ -152,6 +153,7 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
   .withUserRights([
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       userId: "osef",
       job: "",
       phone: "",
@@ -173,6 +175,7 @@ const unavailableEstablishmentAggregate = new EstablishmentAggregateBuilder()
   .withUserRights([
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       userId: "osef",
       job: "",
       phone: "",
@@ -351,6 +354,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",
@@ -373,6 +377,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",
@@ -395,6 +400,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",
@@ -528,6 +534,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",
@@ -549,6 +556,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",
@@ -765,6 +773,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",
@@ -787,6 +796,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",
@@ -809,6 +819,7 @@ describe("/offers route", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
+                status: "ACCEPTED",
                 userId: "osef",
                 job: "",
                 phone: "",

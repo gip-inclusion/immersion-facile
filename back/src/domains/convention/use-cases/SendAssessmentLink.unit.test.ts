@@ -331,6 +331,7 @@ describe("SendAssessmentLink", () => {
               {
                 userId: connectedUser.id,
                 role,
+                status: "ACCEPTED",
                 job: "job",
                 phone: "phone",
                 shouldReceiveDiscussionNotifications: true,

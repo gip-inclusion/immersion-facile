@@ -137,6 +137,7 @@ describe("formCompletion Routes", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             job: "",
             phone: "",
             userId: "osef",
