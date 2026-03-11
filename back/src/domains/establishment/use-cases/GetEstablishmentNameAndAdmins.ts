@@ -14,7 +14,7 @@ export type GetEstablishmentNameAndAdmins = ReturnType<
 >;
 
 export const makeGetEstablishmentNameAndAdmins = useCaseBuilder(
-  "UpdateMarketingEstablishmentContactList",
+  "GetEstablishmentNameAndAdmins",
 )
   .withInput<WithSiretDto>(withSiretSchema)
   .withOutput<EstablishmentNameAndAdmins>()
