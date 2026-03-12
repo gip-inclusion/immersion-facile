@@ -55,6 +55,8 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
           "KyselyDb is null. In memory is not available for this use case",
         );
 
+      const triggeredUseCaseDate = timeGateway.now();
+
       const phonesToMarkAsVerified: PhoneInDB[] = [];
       const report: VerifyAndRequestInvalidPhonesUpdateReport = {
         nbOfCorrectPhones: 0,
@@ -84,6 +86,7 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
                 topic: "InvalidPhoneUpdateRequested",
                 payload: {
                   phoneToUpdate,
+                  verificationDateISOString: triggeredUseCaseDate.toISOString(),
                   triggeredBy: { kind: "crawler" },
                 },
               }),
@@ -96,7 +99,11 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
         }),
       );
 
-      await markAsVerified(kyselyDb, timeGateway, phonesToMarkAsVerified);
+      await markAsVerified(
+        kyselyDb,
+        triggeredUseCaseDate,
+        phonesToMarkAsVerified,
+      );
 
       return report;
     },
@@ -129,7 +136,7 @@ const fixPhoneNumberCountryCode = (phoneNumber: string): string | undefined => {
 
 const markAsVerified = async (
   kyselyDb: KyselyDb,
-  timeGateway: TimeGateway,
+  verifiedDate: Date,
   phonesToMarkAsVerified: PhoneInDB[],
 ) => {
   if (phonesToMarkAsVerified.length === 0) return;
@@ -138,7 +145,7 @@ const markAsVerified = async (
 
   await kyselyDb
     .updateTable("phone_numbers")
-    .set({ verified_at: timeGateway.now() })
+    .set({ verified_at: verifiedDate })
     .where("id", "in", phoneIds)
     .execute();
 };

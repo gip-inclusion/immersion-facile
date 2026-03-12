@@ -1,8 +1,12 @@
 import { sql } from "kysely";
-import { type PhoneNumber, phoneNumberSchema } from "shared";
+import {
+  type DateTimeIsoString,
+  dateTimeIsoStringSchema,
+  type PhoneNumber,
+  phoneNumberSchema,
+} from "shared";
 import z from "zod";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../useCaseBuilder";
 import {
   type PhoneInDB,
@@ -22,14 +26,20 @@ const phoneToUpdateSchema = z.object({
 export type UpdateInvalidPhone = ReturnType<typeof makeUpdateInvalidPhone>;
 
 export const makeUpdateInvalidPhone = useCaseBuilder("UpdateInvalidPhone")
-  .withInput<{ phoneToUpdate: PhoneToUpdate }>(
-    z.object({ phoneToUpdate: phoneToUpdateSchema }),
+  .withInput<{
+    phoneToUpdate: PhoneToUpdate;
+    verificationDateISOString: DateTimeIsoString;
+  }>(
+    z.object({
+      phoneToUpdate: phoneToUpdateSchema,
+      verificationDateISOString: dateTimeIsoStringSchema,
+    }),
   )
-  .withDeps<{ timeGateway: TimeGateway; kyselyDb: KyselyDb | null }>()
+  .withDeps<{ kyselyDb: KyselyDb | null }>()
   .build(
     async ({
-      inputParams: { phoneToUpdate },
-      deps: { timeGateway, kyselyDb },
+      inputParams: { phoneToUpdate, verificationDateISOString },
+      deps: { kyselyDb },
     }) => {
       if (!kyselyDb)
         throw new Error(
@@ -52,7 +62,11 @@ export const makeUpdateInvalidPhone = useCaseBuilder("UpdateInvalidPhone")
             phoneToUpdate,
             conflictingPhoneNumberId,
           )
-        : await fixNotConflictingPhone(kyselyDb, timeGateway, phoneToUpdate);
+        : await fixNotConflictingPhone(
+            kyselyDb,
+            phoneToUpdate,
+            new Date(verificationDateISOString),
+          );
     },
   );
 
@@ -71,14 +85,14 @@ const getConflictingPhoneNumberId = async (
 
 const fixNotConflictingPhone = async (
   kyselyDb: KyselyDb,
-  timeGateway: TimeGateway,
   phoneToUpdate: PhoneToUpdate,
+  verificationDate: Date,
 ): Promise<{ fixedPhoneId: number } | null> => {
   const result = await kyselyDb
     .updateTable("phone_numbers")
     .set({
       phone_number: phoneToUpdate.newPhoneNumber,
-      verified_at: timeGateway.now(),
+      verified_at: verificationDate,
     })
     .where("id", "=", phoneToUpdate.currentPhone.id)
     .returning("id")
