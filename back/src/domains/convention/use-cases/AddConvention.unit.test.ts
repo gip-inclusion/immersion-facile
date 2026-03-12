@@ -21,7 +21,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { AddConvention } from "./AddConvention";
+import { type AddConvention, makeAddConvention } from "./AddConvention";
 
 const validConvention = new ConventionDtoBuilder().build();
 
@@ -43,11 +43,13 @@ describe("Add Convention", () => {
     });
     siretGateway = new InMemorySiretGateway();
     const uowPerformer = new InMemoryUowPerformer(uow);
-    addConvention = new AddConvention(
+    addConvention = makeAddConvention({
       uowPerformer,
-      createNewEvent,
-      siretGateway,
-    );
+      deps: {
+        createNewEvent,
+        siretGateway,
+      },
+    });
   });
 
   it("saves valid conventions in the repository", async () => {

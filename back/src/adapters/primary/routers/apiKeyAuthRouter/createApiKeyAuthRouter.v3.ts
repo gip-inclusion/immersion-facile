@@ -31,6 +31,7 @@ export const createApiKeyAuthRouterV3 = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res.status(201), () => {
         if (
+          !req.apiConsumer ||
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
             rightName: "searchEstablishment",
@@ -57,6 +58,7 @@ export const createApiKeyAuthRouterV3 = (deps: AppDependencies) => {
   searchEstablishmentV3Router.getOffer(deps.apiConsumerMiddleware, (req, res) =>
     sendHttpResponse(req, res, () => {
       if (
+        !req.apiConsumer ||
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
           rightName: "searchEstablishment",
@@ -76,6 +78,7 @@ export const createApiKeyAuthRouterV3 = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (
+          !req.apiConsumer ||
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
             rightName: "searchEstablishment",

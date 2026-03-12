@@ -27,7 +27,7 @@ import { makeLinkFranceTravailUsersToTheirAgencies } from "../../domains/connect
 import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
 import { makeRemoveUserFromAgency } from "../../domains/connected-users/use-cases/RemoveUserFromAgency";
 import { makeUpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
-import { AddConvention } from "../../domains/convention/use-cases/AddConvention";
+import { makeAddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
@@ -44,9 +44,9 @@ import { makeEditConventionCounsellorName } from "../../domains/convention/use-c
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
-import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
+import { makeGetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
-import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
+import { makeGetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
@@ -246,11 +246,10 @@ export const createUseCases = ({
     generateEmailAuthCodeJwt,
   );
 
-  const addConvention = new AddConvention(
+  const addConvention = makeAddConvention({
+    deps: { createNewEvent, siretGateway: gateways.siret },
     uowPerformer,
-    createNewEvent,
-    gateways.siret,
-  );
+  });
 
   const broadcastToFranceTravailOnConventionUpdates =
     makeBroadcastToFranceTravailOnConventionUpdates({
@@ -315,11 +314,6 @@ export const createUseCases = ({
       addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
 
       // Conventions
-      addConvention,
-      getConvention: new GetConvention(uowPerformer),
-      getConventionForApiConsumer: new GetConventionForApiConsumer(
-        uowPerformer,
-      ),
       getConventionsForApiConsumer: new GetConventionsForApiConsumer(
         uowPerformer,
       ),
@@ -542,6 +536,13 @@ export const createUseCases = ({
         generateApiConsumerJwt,
         gateways.timeGateway,
       ),
+    }),
+
+    //Convention
+    addConvention,
+    getConvention: makeGetConvention({ uowPerformer }),
+    getConventionForApiConsumer: makeGetConventionForApiConsumer({
+      uowPerformer,
     }),
 
     shareConventionByEmail: makeShareConventionDraftByEmail({

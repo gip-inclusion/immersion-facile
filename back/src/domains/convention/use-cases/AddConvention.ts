@@ -1,66 +1,49 @@
 import {
-  type AddConventionInput,
   addConventionInputSchema,
   type ConventionStatus,
   errors,
-  type WithConventionIdLegacy,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class AddConvention extends TransactionalUseCase<
-  AddConventionInput,
-  WithConventionIdLegacy
-> {
-  protected inputSchema = addConventionInputSchema;
+export type AddConvention = ReturnType<typeof makeAddConvention>;
 
-  readonly #createNewEvent: CreateNewEvent;
+export const makeAddConvention = useCaseBuilder("AddConvention")
+  .withInput(addConventionInputSchema)
+  .withDeps<{ siretGateway: SiretGateway; createNewEvent: CreateNewEvent }>()
+  .build(
+    async ({
+      inputParams: { convention, discussionId, fromConventionDraftId },
+      deps,
+      uow,
+    }) => {
+      const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
-  readonly #siretGateway: SiretGateway;
+      if (convention.status !== minimalValidStatus) {
+        throw errors.convention.forbiddenStatus({
+          status: convention.status,
+        });
+      }
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-    siretGateway: SiretGateway,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-    this.#siretGateway = siretGateway;
-  }
+      await rejectsSiretIfNotAnOpenCompany(deps.siretGateway, convention.siret);
 
-  protected async _execute(
-    { convention, discussionId, fromConventionDraftId }: AddConventionInput,
-    uow: UnitOfWork,
-  ): Promise<WithConventionIdLegacy> {
-    const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
+      await uow.conventionRepository.save(convention);
+      await uow.conventionExternalIdRepository.save(convention.id);
 
-    if (convention.status !== minimalValidStatus) {
-      throw errors.convention.forbiddenStatus({
-        status: convention.status,
+      const event = deps.createNewEvent({
+        topic: "ConventionSubmittedByBeneficiary",
+        payload: {
+          convention,
+          triggeredBy: null,
+          ...(fromConventionDraftId ? { fromConventionDraftId } : {}),
+          ...(discussionId ? { discussionId } : {}),
+        },
       });
-    }
 
-    await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, convention.siret);
+      await uow.outboxRepository.save(event);
 
-    await uow.conventionRepository.save(convention);
-    await uow.conventionExternalIdRepository.save(convention.id);
-
-    const event = this.#createNewEvent({
-      topic: "ConventionSubmittedByBeneficiary",
-      payload: {
-        convention,
-        triggeredBy: null,
-        ...(fromConventionDraftId ? { fromConventionDraftId } : {}),
-        ...(discussionId ? { discussionId } : {}),
-      },
-    });
-
-    await uow.outboxRepository.save(event);
-
-    return { id: convention.id };
-  }
-}
+      return { id: convention.id };
+    },
+  );

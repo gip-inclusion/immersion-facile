@@ -1,39 +1,33 @@
 import {
   type ApiConsumer,
   type ConventionReadDto,
+  errors,
   ForbiddenError,
-  NotFoundError,
-  type WithConventionId,
   withConventionIdSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { isConventionInScope } from "../entities/Convention";
 
-export class GetConventionForApiConsumer extends TransactionalUseCase<
-  WithConventionId,
-  ConventionReadDto,
-  ApiConsumer
-> {
-  protected inputSchema = withConventionIdSchema;
+export type GetConventionForApiConsumer = ReturnType<
+  typeof makeGetConventionForApiConsumer
+>;
 
-  protected async _execute(
-    { conventionId }: WithConventionId,
-    uow: UnitOfWork,
-    apiConsumer?: ApiConsumer,
-  ): Promise<ConventionReadDto> {
-    if (!apiConsumer) throw new ForbiddenError("No api consumer provided");
+// TODO: Question de fond - GetConventionForApiConsumer c'est une query sans ajout de data? Besoin d'un transactional usecase ?
+// TODO: GetConventionForApiConsumer & GetConvention > on ne peut pas mutualiser ?
 
+export const makeGetConventionForApiConsumer = useCaseBuilder(
+  "GetConventionForApiConsumer",
+)
+  .withInput(withConventionIdSchema)
+  .withOutput<ConventionReadDto>()
+  .withCurrentUser<ApiConsumer>()
+  .build(async ({ inputParams: { conventionId }, uow, currentUser }) => {
     const conventionRead =
       await uow.conventionQueries.getConventionById(conventionId);
 
-    if (!conventionRead) throw noConventionFound(conventionId);
-    if (isConventionInScope(conventionRead, apiConsumer)) return conventionRead;
+    if (!conventionRead) throw errors.convention.notFound({ conventionId });
+    if (isConventionInScope(conventionRead, currentUser)) return conventionRead;
     throw new ForbiddenError(
       `You are not allowed to access convention : ${conventionRead.id}`,
     );
-  }
-}
-
-const noConventionFound = (conventionId: string) =>
-  new NotFoundError(`No convention found with id ${conventionId}`);
+  });
