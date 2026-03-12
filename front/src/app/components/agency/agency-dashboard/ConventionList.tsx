@@ -156,20 +156,27 @@ export const ConventionList = () => {
         },
       },
       {
-        label: `Bilans ${assessmentTextsByStatus.signed.longLabel}`,
-        hintText: assessmentTextsByStatus.signed.description,
+        label: `Bilans ${assessmentTextsByStatus["completed-maybe-signed"].longLabel}`,
+        hintText: assessmentTextsByStatus["completed-maybe-signed"].description,
         nativeInputProps: {
-          value: "signed",
-          checked: tempFilters.assessmentCompletionStatus?.includes("signed"),
+          value: "completed-maybe-signed",
+          checked: tempFilters.assessmentCompletionStatus?.includes(
+            "completed-maybe-signed",
+          ),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
               assessmentCompletionStatus:
-                prev.assessmentCompletionStatus?.includes("signed")
+                prev.assessmentCompletionStatus?.includes(
+                  "completed-maybe-signed",
+                )
                   ? prev.assessmentCompletionStatus.filter(
-                      (s) => s !== "signed",
+                      (s) => s !== "completed-maybe-signed",
                     )
-                  : [...(prev.assessmentCompletionStatus ?? []), "signed"],
+                  : [
+                      ...(prev.assessmentCompletionStatus ?? []),
+                      "completed-maybe-signed",
+                    ],
             }));
           },
         },
@@ -481,10 +488,10 @@ export const ConventionList = () => {
                       (() => {
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
-                            "signed",
+                            "completed-maybe-signed",
                           )
                         ) {
-                          return `Bilan : Bilans ${assessmentTextsByStatus.signed.longLabel}`;
+                          return `Bilan : Bilans ${assessmentTextsByStatus["completed-maybe-signed"].longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(

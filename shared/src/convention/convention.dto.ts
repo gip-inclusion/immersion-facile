@@ -488,7 +488,7 @@ export const getExactAge = ({
 };
 
 export const assessmentCompletionStatusFilters = [
-  "signed",
+  "completed-maybe-signed",
   "to-sign",
   "to-be-completed",
 ] as const;

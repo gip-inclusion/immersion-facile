@@ -5,6 +5,7 @@ import {
   dateTimeIsoStringSchema,
   emailSchema,
   legacyAssessmentStatuses,
+  makeDateStringSchema,
   siretSchema,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
