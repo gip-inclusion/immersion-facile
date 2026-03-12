@@ -76,6 +76,10 @@ export const zStringCanBeEmpty = makeHardenedStringSchema({
   isEmptyAllowed: true,
   max: MAX_1024_TEXT_INPUT,
 });
+export const zStringCanBeEmptyMax255 = makeHardenedStringSchema({
+  isEmptyAllowed: true,
+  max: MAX_255_TEXT_INPUT,
+});
 export const zStringCanBeEmptyMax3000 = makeHardenedStringSchema({
   isEmptyAllowed: true,
   max: MAX_3000_TEXT_INPUT,
