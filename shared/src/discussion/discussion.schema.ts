@@ -28,6 +28,8 @@ import {
   MAX_HTML_SIZE,
   makeHardenedStringSchema,
   zStringMinLength1Max1024,
+  zStringMinLength1Max6000,
+  zStringMinLength1Max11000,
 } from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
 import {
@@ -233,7 +235,7 @@ const potentialBeneficiaryCommonSchema = z.object({
   lastName: lastnameMandatorySchema,
   email: emailSchema,
   phone: phoneNumberSchema,
-  datePreferences: zStringMinLength1Max1024,
+  datePreferences: zStringMinLength1Max6000,
 }) satisfies ZodSchemaWithInputMatchingOutput<PotentialBeneficiaryCommonProps>;
 
 const commonDiscussionSchema: ZodSchemaWithInputMatchingOutput<CommonDiscussionDto> =
@@ -275,7 +277,7 @@ export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionRe
             immersionObjective: immersionObjectiveSchema.or(z.null()),
             resumeLink: resumeLinkSchema,
             experienceAdditionalInformation:
-              zStringMinLength1Max1024.optional(),
+              zStringMinLength1Max11000.optional(),
           }),
         }),
         z.object({
@@ -362,7 +364,7 @@ const contactInformationsCommonSchema = z.object({
 const createDiscussionCommonSchema = contactInformationsCommonSchema.and(
   z.object({
     potentialBeneficiaryPhone: phoneNumberSchema,
-    datePreferences: zStringMinLength1Max1024,
+    datePreferences: zStringMinLength1Max6000,
     contactMode: contactModeSchema,
   }),
 );
