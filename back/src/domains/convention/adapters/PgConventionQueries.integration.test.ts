@@ -1487,6 +1487,39 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
 
+    it("should filter conventions by assessment completion statuses to-be-completed", async () => {
+      const validatedConventionWithoutAssessment: ConventionDto = {
+        ...conventionB,
+        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+        status: "ACCEPTED_BY_VALIDATOR",
+      };
+      await conventionRepository.save(
+        validatedConventionWithoutAssessment,
+        anyConventionUpdatedAt,
+      );
+
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: {
+            assessmentCompletionStatus: ["to-be-completed"],
+          },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expectToEqual(result.data, [
+        {
+          ...validatedConventionWithoutAssessment,
+          ...agencyFields,
+          assessment: null,
+        },
+      ]);
+    });
+
     it("should filter conventions by multiple assessment completion statuses signed + to-sign", async () => {
       const anotherValidatedConvention: ConventionDto = {
         ...conventionB,
