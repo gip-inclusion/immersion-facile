@@ -1,12 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 import Card from "@codegouvfr/react-dsfr/Card";
-import { formatDistance } from "date-fns";
-import { fr as frLocale } from "date-fns/locale";
 import { equals } from "ramda";
-
 import { memo, type ReactNode } from "react";
 import {
-  type DateTimeIsoString,
   domElementIds,
   frenchEstablishmentKinds,
   isInternalOfferDto,
@@ -14,10 +11,9 @@ import {
   type OfferDto,
   remoteWorkModeLabels,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
 import type { Link } from "type-route";
 import "./SearchResult.scss";
-import Badge from "@codegouvfr/react-dsfr/Badge";
-import { useStyles } from "tss-react/dsfr";
 
 export type EnterpriseSearchResultProps = {
   searchResult: OfferDto;
@@ -26,18 +22,6 @@ export type EnterpriseSearchResultProps = {
   disableButton?: boolean;
   preview?: boolean;
   showDistance?: boolean;
-};
-
-const getLastDate = (
-  createdAt?: DateTimeIsoString,
-  updatedAt?: DateTimeIsoString,
-): DateTimeIsoString | undefined => {
-  if (createdAt)
-    return formatDistance(new Date(updatedAt ?? createdAt), new Date(), {
-      addSuffix: true,
-      locale: frLocale,
-    });
-  return;
 };
 
 const componentRootClassName = "im-search-result";
@@ -56,8 +40,6 @@ const SearchResultComponent = ({
     romeLabel,
     appellations,
     voluntaryToImmersion,
-    createdAt,
-    updatedAt,
   } = searchResult;
   const isCustomizedNameValidToDisplay =
     customizedName &&
@@ -81,8 +63,6 @@ const SearchResultComponent = ({
     establismentNameFirstLetter.toLocaleUpperCase(),
     establismentNameOtherLetters.join("").toLocaleLowerCase(),
   ].join("");
-
-  const dateJobCreatedAt = getLastDate(createdAt, updatedAt);
 
   const displayedLocation =
     isInternalOfferDto(searchResult) &&
@@ -122,7 +102,6 @@ const SearchResultComponent = ({
       enlargeLink
       titleAs="h2"
       imageComponent={illustration}
-      endDetail={dateJobCreatedAt}
       detail={
         isNotAvailableOffer ? (
           <span
