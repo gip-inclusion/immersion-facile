@@ -1,5 +1,6 @@
 import type { Flavor, PhoneNumber } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { PhoneInDB } from "../use-cases/VerifyAndRequestInvalidPhonesUpdate";
 
 export type PhoneId = Flavor<number, "PhoneId">;
 
@@ -62,4 +63,13 @@ export const phoneNumbersExist = async (
     .execute();
 
   return results.length === uniquePhoneNumbers.length;
+};
+
+export const getPhoneNumbers = async (
+  kyselyDb: KyselyDb,
+): Promise<PhoneInDB[]> => {
+  return await kyselyDb
+    .selectFrom("phone_numbers")
+    .select(["id", "phone_number as phoneNumber", "verified_at as verifiedAt"])
+    .execute();
 };
