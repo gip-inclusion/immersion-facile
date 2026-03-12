@@ -116,7 +116,9 @@ export const frontErrors = {
         ),
         buttons: [HomeButton, ContactUsButton],
       }),
-    conventionDraftIdNotFound: () =>
+  },
+  conventionDraft: {
+    notFound: () =>
       new FrontSpecificError({
         title: "Ce brouillon de convention n'existe plus",
         description: (

@@ -213,7 +213,7 @@ export const ConventionFormWrapper = ({
   });
 
   if (routeConventionDraftId && fetchConventionDraftError) {
-    throw frontErrors.convention.conventionDraftIdNotFound();
+    throw frontErrors.conventionDraft.notFound();
   }
 
   return (
