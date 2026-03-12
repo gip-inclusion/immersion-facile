@@ -4,6 +4,7 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   zStringMinLength1,
+  zStringMinLength1Max9200,
   zTrimmedStringWithMax,
 } from "../utils/string.schema";
 import {
@@ -51,7 +52,7 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
 
 const withEstablishmentCommentsSchema: ZodSchemaWithInputMatchingOutput<WithEstablishmentComments> =
   z.object({
-    establishmentFeedback: zStringMinLength1,
+    establishmentFeedback: zStringMinLength1Max9200,
     establishmentAdvices: zStringMinLength1,
   });
 
@@ -101,7 +102,7 @@ export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyA
       error: localization.invalidEnum,
     }),
     conventionId: z.string(),
-    establishmentFeedback: zStringMinLength1,
+    establishmentFeedback: zStringMinLength1Max9200,
     createdAt: dateTimeIsoStringSchema,
   });
 

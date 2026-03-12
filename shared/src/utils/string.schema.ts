@@ -64,6 +64,10 @@ export const zStringMinLength1Max255 = makeHardenedStringSchema({
 export const zStringMinLength1Max3000 = makeHardenedStringSchema({
   max: MAX_3000_TEXT_INPUT,
 });
+export const zStringMinLength1Max9200 = makeHardenedStringSchema({
+  max: MAX_9200_TEXT_INPUT,
+});
+
 export const zStringCanBeEmpty = makeHardenedStringSchema({
   isEmptyAllowed: true,
   max: MAX_1024_TEXT_INPUT,
