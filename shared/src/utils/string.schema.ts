@@ -47,6 +47,7 @@ export const makeHardenedStringSchema = ({
 const MAX_255_TEXT_INPUT = 255;
 export const MAX_1024_TEXT_INPUT = 1024;
 const MAX_3000_TEXT_INPUT = 3000;
+const MAX_5000_TEXT_INPUT = 5000;
 const MAX_9200_TEXT_INPUT = 9200;
 export const MAX_HTML_SIZE = 700_000;
 
@@ -63,6 +64,9 @@ export const zStringMinLength1Max255 = makeHardenedStringSchema({
 });
 export const zStringMinLength1Max3000 = makeHardenedStringSchema({
   max: MAX_3000_TEXT_INPUT,
+});
+export const zStringMinLength1Max5000 = makeHardenedStringSchema({
+  max: MAX_5000_TEXT_INPUT,
 });
 export const zStringMinLength1Max9200 = makeHardenedStringSchema({
   max: MAX_9200_TEXT_INPUT,
