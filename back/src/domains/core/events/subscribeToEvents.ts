@@ -279,6 +279,9 @@ const getUseCasesByTopics = (
     useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
+
+  // Phone related
+  InvalidPhoneUpdateRequested: [useCases.updateInvalidPhone],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {
