@@ -23,9 +23,9 @@ import {
   type InternshipKind,
   isSignatory,
   type Role,
-  statusJustificationSchema,
   toDisplayedDate,
   type WithStatusJustification,
+  withStatusJustificationSchema,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
@@ -417,7 +417,7 @@ const ConventionSummarySection = ({
     useForm<WithStatusJustification>({
       mode: "onTouched",
       defaultValues: { statusJustification: "" },
-      resolver: zodResolver(statusJustificationSchema),
+      resolver: zodResolver(withStatusJustificationSchema),
     });
   const getFieldError = makeFieldError(formState);
 

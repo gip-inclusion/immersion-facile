@@ -6,7 +6,10 @@ import {
 import { emailSchema } from "../email/email.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { replaceEmptyValuesByUndefinedFromObject } from "../utils";
-import { zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringMinLength1,
+  zStringMinLength1Max6000,
+} from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import { conventionIdSchema, conventionSchema } from "./convention.schema";
 import type {
@@ -70,7 +73,7 @@ export const makeConventionPresentationSchemaWithNormalizedInput = ({
     makeConventionPresentationSchema(isTemplateForm),
   );
 
-export const statusJustificationSchema: ZodSchemaWithInputMatchingOutput<WithStatusJustification> =
+export const withStatusJustificationSchema: ZodSchemaWithInputMatchingOutput<WithStatusJustification> =
   z.object({
-    statusJustification: zStringMinLength1,
+    statusJustification: zStringMinLength1Max6000,
   });

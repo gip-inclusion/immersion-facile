@@ -4,7 +4,7 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   zStringMinLength1,
-  zStringMinLength1Max5000,
+  zStringMinLength1Max6000,
   zStringMinLength1Max9200,
   zTrimmedStringWithMax,
 } from "../utils/string.schema";
@@ -54,7 +54,7 @@ const withAssessmentStatusSchema = z.discriminatedUnion(
 const withEstablishmentCommentsSchema: ZodSchemaWithInputMatchingOutput<WithEstablishmentComments> =
   z.object({
     establishmentFeedback: zStringMinLength1Max9200,
-    establishmentAdvices: zStringMinLength1Max5000,
+    establishmentAdvices: zStringMinLength1Max6000,
   });
 
 const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJob> =
