@@ -56,11 +56,14 @@ import type { OmitFromExistingKeys } from "../utils";
 import { type DateString, dateTimeIsoStringSchema } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
-  legacyTextWithUnknownAndUnlimitedSizeInDBSchema,
   optionalEmptyStringMax1024,
   stringWithMaxLength255,
   zStringCanBeEmpty,
+  zStringCanBeEmptyMax3000,
+  zStringCanBeEmptyMax6000,
   zStringMinLength1,
+  zStringMinLength1Max3000,
+  zStringMinLength1Max6000,
   zStringPossiblyEmptyWithMax,
   zTrimmedStringWithMax,
 } from "../utils/string.schema";
@@ -293,7 +296,7 @@ export const editBeneficiaryBirthdateRequestSchema: ZodSchemaWithInputMatchingOu
 
 export const renewedSchema = z.object({
   from: conventionIdSchema,
-  justification: zStringMinLength1,
+  justification: zStringMinLength1Max3000,
 });
 
 export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<ConventionCommon> =
@@ -303,8 +306,7 @@ export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<Convention
       status: z.enum(conventionStatuses, {
         error: localization.invalidEnum,
       }),
-      statusJustification:
-        legacyTextWithUnknownAndUnlimitedSizeInDBSchema.optional(),
+      statusJustification: zStringCanBeEmptyMax6000.optional(),
       agencyId: agencyIdSchema,
       updatedAt: makeDateStringSchema().optional(),
       dateSubmission: makeDateStringSchema(),
@@ -319,10 +321,8 @@ export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<Convention
       siret: siretSchema,
       businessName: businessNameSchema,
       schedule: scheduleSchema,
-      workConditions:
-        legacyTextWithUnknownAndUnlimitedSizeInDBSchema.optional(),
-      businessAdvantages:
-        legacyTextWithUnknownAndUnlimitedSizeInDBSchema.optional(),
+      workConditions: zStringCanBeEmptyMax6000.optional(),
+      businessAdvantages: zStringCanBeEmptyMax3000.optional(),
       individualProtection: zBoolean,
       individualProtectionDescription: zStringPossiblyEmptyWithMax(255),
       sanitaryPrevention: zBoolean,
@@ -619,8 +619,6 @@ export const updateConventionRequestSchema: ZodSchemaWithInputMatchingOutput<Upd
     convention: conventionSchema,
   });
 
-const justificationSchema = zStringMinLength1;
-
 export const updateConventionStatusWithoutJustificationSchema: ZodSchemaWithInputMatchingOutput<UpdateConventionStatusWithoutJustification> =
   z.object({
     status: z.enum(conventionStatusesWithoutJustificationNorValidator, {
@@ -634,7 +632,7 @@ export const updateConventionStatusWithJustificationSchema: ZodSchemaWithInputMa
     status: z.enum(conventionStatusesWithJustification, {
       error: localization.invalidEnum,
     }),
-    statusJustification: justificationSchema,
+    statusJustification: zStringMinLength1Max6000,
     conventionId: conventionIdSchema,
   });
 
