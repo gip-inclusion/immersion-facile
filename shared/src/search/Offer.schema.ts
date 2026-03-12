@@ -19,7 +19,11 @@ import {
   siretSchema,
 } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringCanBeEmptyMax9200,
+  zStringMinLength1,
+} from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
 import {
   localization,
@@ -61,7 +65,7 @@ const commonOfferSchema = z.object({
   distance_m: z.number().optional(),
   numberOfEmployeeRange: numberOfEmployeesRangeSchema,
   website: absoluteUrlSchema.or(z.literal("")).optional(),
-  additionalInformation: zStringCanBeEmpty.optional(),
+  additionalInformation: zStringCanBeEmptyMax9200.optional(),
   fitForDisabledWorkers: fitForDisabledWorkersSchema.nullable(),
   urlOfPartner: urlOfPartnerSchema.optional(),
   appellations: z.array(

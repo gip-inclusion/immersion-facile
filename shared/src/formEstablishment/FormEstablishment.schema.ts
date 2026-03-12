@@ -14,7 +14,11 @@ import type { NotEmptyArray } from "../utils";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import { frenchEstablishmentKinds } from "../utils/establishment";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringCanBeEmptyMax9200,
+  zStringMinLength1,
+} from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
 import {
   localization,
@@ -147,7 +151,7 @@ const formEstablishmentCommonShape = {
     )
     .optional(),
   website: absoluteUrlSchema.or(z.literal("")).optional(),
-  additionalInformation: zStringCanBeEmpty.optional(),
+  additionalInformation: zStringCanBeEmptyMax9200.optional(),
   businessAddresses: z
     .array(
       z.object({
@@ -270,7 +274,7 @@ export const establishmentCSVRowSchema: ZodSchemaWithInputMatchingOutput<Establi
     contactMode: contactModeSchema,
     isSearchable: csvBooleanSchema,
     website: zStringCanBeEmpty,
-    additionalInformation: zStringCanBeEmpty,
+    additionalInformation: zStringCanBeEmptyMax9200,
     fitForDisabledWorkers: csvBooleanSchema,
     searchableByJobSeekers: csvBooleanSchema,
     searchableByStudents: csvBooleanSchema,
