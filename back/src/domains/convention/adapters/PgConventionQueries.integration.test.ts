@@ -1515,7 +1515,9 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
-          filters: { assessmentCompletionStatus: ["signed", "to-sign"] },
+          filters: {
+            assessmentCompletionStatus: ["completed-maybe-signed", "to-sign"],
+          },
           sort: {
             by: "dateSubmission",
             direction: "desc",

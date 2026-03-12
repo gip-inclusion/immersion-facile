@@ -61,16 +61,16 @@ export const getAssessmentCompletionStatusFilter = (
   if (!assessment) return "to-be-completed";
   if ("signedAt" in assessment)
     return assessment.signedAt !== null || assessment.status === "DID_NOT_SHOW"
-      ? "signed"
+      ? "completed-maybe-signed"
       : "to-sign";
-  return "signed";
+  return "completed-maybe-signed";
 };
 
 export const assessmentTextsByStatus: Record<
   AssessmentCompletionStatusFilter,
   { shortLabel: string; longLabel: string; description?: string }
 > = {
-  signed: {
+  "completed-maybe-signed": {
     shortLabel: "signé",
     longLabel: "complété et signé",
     description:
