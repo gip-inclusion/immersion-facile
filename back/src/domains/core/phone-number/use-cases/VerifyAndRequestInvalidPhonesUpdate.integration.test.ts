@@ -76,6 +76,7 @@ describe("VerifyAndFixPhones", () => {
     await kyselyDb.deleteFrom("convention_drafts").execute();
     await kyselyDb.deleteFrom("convention_templates").execute();
     await kyselyDb.deleteFrom("conventions").execute();
+    await kyselyDb.deleteFrom("agency_groups__agencies").execute();
     await kyselyDb.deleteFrom("agencies").execute();
     await kyselyDb.deleteFrom("actors").execute();
     await kyselyDb.deleteFrom("api_consumers").execute();
@@ -170,6 +171,7 @@ describe("VerifyAndFixPhones", () => {
             topic: "InvalidPhoneUpdateRequested",
             payload: {
               phoneToUpdate: fixablePhoneToUpdate,
+              verificationDateISOString: now.toISOString(),
               triggeredBy: { kind: "crawler" },
             },
           },
@@ -207,6 +209,7 @@ describe("VerifyAndFixPhones", () => {
             topic: "InvalidPhoneUpdateRequested",
             payload: {
               phoneToUpdate: unfixablePhoneToUpdate,
+              verificationDateISOString: now.toISOString(),
               triggeredBy: { kind: "crawler" },
             },
           },
@@ -268,6 +271,7 @@ describe("VerifyAndFixPhones", () => {
             topic: "InvalidPhoneUpdateRequested",
             payload: {
               phoneToUpdate: fixablePhoneToUpdate,
+              verificationDateISOString: now.toISOString(),
               triggeredBy: { kind: "crawler" },
             },
           },
@@ -275,6 +279,7 @@ describe("VerifyAndFixPhones", () => {
             topic: "InvalidPhoneUpdateRequested",
             payload: {
               phoneToUpdate: unfixablePhoneToUpdate,
+              verificationDateISOString: now.toISOString(),
               triggeredBy: { kind: "crawler" },
             },
           },

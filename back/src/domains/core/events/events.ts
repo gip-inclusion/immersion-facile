@@ -4,6 +4,7 @@ import {
   type ConventionId,
   type ConventionTemplateId,
   type DateString,
+  type DateTimeIsoString,
   type DeleteAssessmentRequestDto,
   type Flavor,
   type InitiateLoginByEmailParams,
@@ -187,6 +188,6 @@ export type DomainEvent =
   | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId } & WithTriggeredBy>
 
   // PHONE RELATED
-  | GenericEvent<"InvalidPhoneUpdateRequested", { phoneToUpdate: PhoneToUpdate } &  WithTriggeredBy>;
+  | GenericEvent<"InvalidPhoneUpdateRequested", { phoneToUpdate: PhoneToUpdate, verificationDateISOString: DateTimeIsoString } &  WithTriggeredBy>;
 
 export type DomainTopic = DomainEvent["topic"];
