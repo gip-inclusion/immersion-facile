@@ -420,7 +420,7 @@ describe("authenticatedConventionRoutes", () => {
       const response = await httpClient.getConventionsForAgencyUser({
         headers: { authorization: jwt },
         queryParams: {
-          assessmentCompletionStatus: ["signed"],
+          assessmentCompletionStatus: ["completed-maybe-signed"],
           sortBy: "dateStart",
           page: 1,
           perPage: 10,
@@ -466,7 +466,7 @@ describe("authenticatedConventionRoutes", () => {
         {
           agencyUserId: validator.id,
           filters: {
-            assessmentCompletionStatus: ["signed"],
+            assessmentCompletionStatus: ["completed-maybe-signed"],
           },
           pagination: {
             page: 1,
