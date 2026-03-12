@@ -303,7 +303,7 @@ export class PgConventionQueries implements ConventionQueries {
       filterInList("status", statuses),
       filterInList("agency_id", agencyIds),
       filterByAgencyDepartmentCodes(agencyDepartmentCodes),
-      filterAssessmentCompletionStatus(assessmentCompletionStatus),
+      filterByAssessmentCompletionStatus(assessmentCompletionStatus),
     );
 
     const countQuery = filteredBuilder.select((eb) =>
@@ -522,7 +522,7 @@ const filterByAgencyDepartmentCodes =
     );
   };
 
-const filterAssessmentCompletionStatus =
+const filterByAssessmentCompletionStatus =
   (
     assessmentCompletionStatus: AssessmentCompletionStatusFilter[] | undefined,
   ) =>
@@ -540,13 +540,12 @@ const filterAssessmentCompletionStatus =
     if (hasSigned && hasToSign && hasToBeCompleted) return builder;
 
     return builder
-      .leftJoin(
-        "immersion_assessments as ia",
-        "ia.convention_id",
-        "conventions.id",
-      )
-      .where(
-        sql<boolean>`ia.created_at > ${addDays(ASSESSMENT_SIGNATURE_RELEASE_DATE, 1).toISOString()}::timestamptz`,
+      .leftJoin("immersion_assessments as ia", (join) =>
+        join
+          .onRef("ia.convention_id", "=", "conventions.id")
+          .on(
+            sql<boolean>`ia.created_at > ${addDays(ASSESSMENT_SIGNATURE_RELEASE_DATE, 1).toISOString()}::timestamptz`,
+          ),
       )
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .where((eb) => {
