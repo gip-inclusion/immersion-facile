@@ -1,6 +1,6 @@
 import z from "zod";
 import { userIdSchema } from "../user/user.schema";
-import { zStringMinLength1 } from "../utils/string.schema";
+import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -18,7 +18,7 @@ export const conventionTemplateSchema: ZodSchemaWithInputMatchingOutput<Conventi
   conventionDraftSchema.and(
     z.object({
       id: conventionTemplateIdSchema,
-      name: zStringMinLength1,
+      name: zStringMinLength1Max1024,
       userId: userIdSchema,
     }),
   );

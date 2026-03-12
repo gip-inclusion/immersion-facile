@@ -12,7 +12,7 @@ import {
   appellationCodeSchema,
   domElementIds,
   siretSchema,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -38,7 +38,7 @@ type InitiateConventionFormData = z.infer<typeof initiateConventionFormSchema>;
 const initiateConventionFormSchema = z.object({
   siret: siretSchema,
   appellation: appellationCodeSchema,
-  location: zStringMinLength1,
+  location: zStringMinLength1Max1024,
 });
 
 export const InitiateConventionButton = () => {

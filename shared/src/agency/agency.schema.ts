@@ -16,7 +16,7 @@ import { searchTextAlphaNumericSchema } from "../search/searchText.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
   stringWithMaxLength255,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import {
   localization,
@@ -47,7 +47,7 @@ import {
 } from "./agency.dto";
 
 export const agencyIdSchema: ZodSchemaWithInputMatchingOutput<AgencyId> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 export const refersToAgencyIdSchema: ZodSchemaWithInputMatchingOutput<AgencyId> =
   z.string();
 export const agencyIdsSchema: ZodSchemaWithInputMatchingOutput<AgencyId[]> = z
@@ -90,7 +90,7 @@ export const agencyOptionSchema: ZodSchemaWithInputMatchingOutput<AgencyOption> 
     kind: agencyKindSchema,
     status: agencyStatusSchema,
     address: addressSchema,
-    refersToAgencyName: zStringMinLength1.or(z.null()),
+    refersToAgencyName: zStringMinLength1Max1024.or(z.null()),
   });
 
 export const agencyOptionsSchema: ZodSchemaWithInputMatchingOutput<
@@ -138,7 +138,7 @@ const commonAgencyShape = {
   name: agencyNameSchema,
   kind: agencyKindSchema,
   contactEmail: emailSchema,
-  coveredDepartments: z.array(zStringMinLength1).min(1),
+  coveredDepartments: z.array(zStringMinLength1Max1024).min(1),
   address: addressSchema,
   position: geoPositionSchema,
   signature: stringWithMaxLength255,
@@ -155,7 +155,7 @@ export const createAgencySchema: z.ZodType<
   .and(
     z.object({
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
-      refersToAgencyName: zStringMinLength1.or(z.null()),
+      refersToAgencyName: zStringMinLength1Max1024.or(z.null()),
       refersToAgencyContactEmail: emailSchema.or(z.null()),
       delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
     }),
@@ -200,11 +200,11 @@ export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
   .and(
     z.object({
       status: agencyStatusSchema,
-      codeSafir: zStringMinLength1.or(z.null()),
+      codeSafir: zStringMinLength1Max1024.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
-      refersToAgencyName: zStringMinLength1.or(z.null()),
+      refersToAgencyName: zStringMinLength1Max1024.or(z.null()),
       refersToAgencyContactEmail: emailSchema.or(z.null()),
-      statusJustification: zStringMinLength1.or(z.null()),
+      statusJustification: zStringMinLength1Max1024.or(z.null()),
       delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
     }),
   )
@@ -227,9 +227,9 @@ export const agencyDtoForAgencyUsersAndAdminsSchema: ZodSchemaWithInputMatchingO
       z.object({
         agencySiret: siretSchema,
         status: agencyStatusSchema,
-        codeSafir: zStringMinLength1.or(z.null()),
+        codeSafir: zStringMinLength1Max1024.or(z.null()),
         refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
-        refersToAgencyName: zStringMinLength1.or(z.null()),
+        refersToAgencyName: zStringMinLength1Max1024.or(z.null()),
         refersToAgencyContactEmail: emailSchema.or(z.null()),
         statusJustification: z.string().or(z.null()),
         delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
@@ -244,11 +244,11 @@ export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
     z.object({
       agencySiret: siretSchema,
       status: agencyStatusSchema,
-      codeSafir: zStringMinLength1.or(z.null()),
+      codeSafir: zStringMinLength1Max1024.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
-      refersToAgencyName: zStringMinLength1.or(z.null()),
+      refersToAgencyName: zStringMinLength1Max1024.or(z.null()),
       refersToAgencyContactEmail: emailSchema.or(z.null()),
-      statusJustification: zStringMinLength1.or(z.null()),
+      statusJustification: zStringMinLength1Max1024.or(z.null()),
       delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
     }),
   )
@@ -271,7 +271,7 @@ export const updateAgencyStatusParamsWithoutIdSchema: ZodSchemaWithInputMatching
     .or(
       z.object({
         status: z.literal("rejected"),
-        statusJustification: zStringMinLength1,
+        statusJustification: zStringMinLength1Max1024,
       }),
     );
 

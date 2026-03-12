@@ -4,7 +4,7 @@ import {
   reminderKinds,
   withConventionSchema,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "shared";
 import { z } from "zod";
 import type {
@@ -23,7 +23,7 @@ export const conventionReminderPayloadSchema: ZodSchemaWithInputMatchingOutput<C
 export const transferConventionToAgencyPayloadSchema: ZodSchemaWithInputMatchingOutput<TransferConventionToAgencyPayload> =
   withConventionSchema.and(
     z.object({
-      justification: zStringMinLength1,
+      justification: zStringMinLength1Max1024,
       agencyId: agencyIdSchema,
       previousAgencyId: agencyIdSchema,
       shouldNotifyActors: z.boolean(),

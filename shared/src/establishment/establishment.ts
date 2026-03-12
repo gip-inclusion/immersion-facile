@@ -5,7 +5,10 @@ import { emailSchema } from "../email/email.schema";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringMinLength1Max1024,
+} from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 
 export type EstablishmentNameAndAdmins = {
@@ -15,7 +18,7 @@ export type EstablishmentNameAndAdmins = {
 
 export const establishmentNameAndAdminsSchema: ZodSchemaWithInputMatchingOutput<EstablishmentNameAndAdmins> =
   z.object({
-    name: zStringMinLength1,
+    name: zStringMinLength1Max1024,
     adminEmails: z.array(emailSchema),
   });
 
@@ -47,7 +50,7 @@ export type WithEstablishmentDashboards = {
 
 export type BusinessName = Flavor<string, "BusinessName">;
 export const businessNameSchema: ZodSchemaWithInputMatchingOutput<BusinessName> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 
 export type BusinessNameCustomized = Flavor<string, "BusinessNameCustomized">;
 export const customizedNameSchema: ZodSchemaWithInputMatchingOutput<BusinessNameCustomized> =

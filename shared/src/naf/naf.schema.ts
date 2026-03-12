@@ -4,7 +4,7 @@ import { searchTextAlphaSchema } from "../search/searchText.schema";
 import {
   makeHardenedStringSchema,
   stringWithMaxLength255,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import {
   localization,
@@ -73,7 +73,7 @@ export const nafDivisionSchema = z
 
 export const nafSectionSuggestionSchema: ZodSchemaWithInputMatchingOutput<NafSectionSuggestion> =
   z.object({
-    label: zStringMinLength1,
+    label: zStringMinLength1Max1024,
     nafCodes: nafCodesSchema,
   });
 export const nafSectionSuggestionsSchema: ZodSchemaWithInputMatchingOutput<

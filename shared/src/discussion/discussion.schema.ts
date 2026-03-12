@@ -27,7 +27,7 @@ import {
 import {
   MAX_HTML_SIZE,
   makeHardenedStringSchema,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
 import {
@@ -129,8 +129,8 @@ export const discussionExchangeForbidenReasonSchema: ZodSchemaWithInputMatchingO
 
 export const attachmentSchema: ZodSchemaWithInputMatchingOutput<Attachment> =
   z.object({
-    name: zStringMinLength1,
-    link: zStringMinLength1,
+    name: zStringMinLength1Max1024,
+    link: zStringMinLength1Max1024,
   });
 
 export const messageSchema: ZodSchemaWithInputMatchingOutput<Message> =
@@ -141,7 +141,7 @@ export const messageSchema: ZodSchemaWithInputMatchingOutput<Message> =
 export const exchangeReadSchema: ZodSchemaWithInputMatchingOutput<ExchangeRead> =
   z
     .object({
-      subject: zStringMinLength1,
+      subject: zStringMinLength1Max1024,
       message: messageSchema,
       sentAt: makeDateStringSchema(),
       attachments: z.array(attachmentSchema),
@@ -167,7 +167,7 @@ export const discussionRejectionSchema: ZodSchemaWithInputMatchingOutput<WithDis
   z.union([
     z.object({
       rejectionKind: z.literal("OTHER"),
-      rejectionReason: zStringMinLength1,
+      rejectionReason: zStringMinLength1Max1024,
     }),
     z.object({
       rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"], {
@@ -233,7 +233,7 @@ const potentialBeneficiaryCommonSchema = z.object({
   lastName: lastnameMandatorySchema,
   email: emailSchema,
   phone: phoneNumberSchema,
-  datePreferences: zStringMinLength1,
+  datePreferences: zStringMinLength1Max1024,
 }) satisfies ZodSchemaWithInputMatchingOutput<PotentialBeneficiaryCommonProps>;
 
 const commonDiscussionSchema: ZodSchemaWithInputMatchingOutput<CommonDiscussionDto> =
@@ -243,7 +243,7 @@ const commonDiscussionSchema: ZodSchemaWithInputMatchingOutput<CommonDiscussionD
       createdAt: makeDateStringSchema(),
       updatedAt: makeDateStringSchema(),
       siret: siretSchema,
-      businessName: zStringMinLength1,
+      businessName: zStringMinLength1Max1024,
       address: addressSchema,
       conventionId: conventionIdSchema.optional(),
     })
@@ -274,7 +274,8 @@ export const discussionReadSchema: ZodSchemaWithInputMatchingOutput<DiscussionRe
           potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
             immersionObjective: immersionObjectiveSchema.or(z.null()),
             resumeLink: resumeLinkSchema,
-            experienceAdditionalInformation: zStringMinLength1.optional(),
+            experienceAdditionalInformation:
+              zStringMinLength1Max1024.optional(),
           }),
         }),
         z.object({
@@ -320,11 +321,11 @@ export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<Discussion
     siret: siretSchema,
     status: discussionStatusSchema,
     appellation: appellationAndRomeDtoSchema,
-    businessName: zStringMinLength1,
+    businessName: zStringMinLength1Max1024,
     createdAt: makeDateStringSchema(),
     kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
     exchanges: z.array(exchangeReadSchema),
-    city: zStringMinLength1,
+    city: zStringMinLength1Max1024,
     potentialBeneficiary: z.object({
       firstName: firstnameMandatorySchema,
       lastName: lastnameMandatorySchema,
@@ -361,7 +362,7 @@ const contactInformationsCommonSchema = z.object({
 const createDiscussionCommonSchema = contactInformationsCommonSchema.and(
   z.object({
     potentialBeneficiaryPhone: phoneNumberSchema,
-    datePreferences: zStringMinLength1,
+    datePreferences: zStringMinLength1Max1024,
     contactMode: contactModeSchema,
   }),
 );
@@ -371,7 +372,7 @@ const createDiscussionIFSchema: ZodSchemaWithInputMatchingOutput<CreateDiscussio
     z.object({
       kind: z.literal("IF"),
       immersionObjective: immersionObjectiveSchema,
-      experienceAdditionalInformation: zStringMinLength1.optional(),
+      experienceAdditionalInformation: zStringMinLength1Max1024.optional(),
       potentialBeneficiaryResumeLink: resumeLinkSchema,
     }),
   );

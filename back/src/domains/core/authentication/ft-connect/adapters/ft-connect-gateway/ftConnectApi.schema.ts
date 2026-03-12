@@ -3,7 +3,7 @@ import {
   localization,
   makeDateStringSchema,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "shared";
 import { z } from "zod";
 import type { BearerToken } from "../../dto/BearerToken";
@@ -23,13 +23,13 @@ import type {
 export const externalFtConnectUserSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectUser> =
   z.object({
     email: emailSchema.optional(),
-    family_name: zStringMinLength1,
+    family_name: zStringMinLength1Max1024,
     gender: z.enum(["male", "female"], {
       error: localization.invalidEnum,
     }),
-    given_name: zStringMinLength1,
-    idIdentiteExterne: zStringMinLength1,
-    sub: zStringMinLength1,
+    given_name: zStringMinLength1Max1024,
+    idIdentiteExterne: zStringMinLength1Max1024,
+    sub: zStringMinLength1Max1024,
   });
 
 export const externalFtConnectUserStatutSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectStatut> =
@@ -52,8 +52,8 @@ const ftAdvisorKindSchema: ZodSchemaWithInputMatchingOutput<FtConnectAdvisorsKin
 
 const externalftConnectAdvisorSchema: ZodSchemaWithInputMatchingOutput<ExternalFtConnectAdvisor> =
   z.object({
-    nom: zStringMinLength1,
-    prenom: zStringMinLength1,
+    nom: zStringMinLength1Max1024,
+    prenom: zStringMinLength1Max1024,
     civilite: z.enum(["1", "2"], {
       error: localization.invalidEnum,
     }),
@@ -81,12 +81,12 @@ export const externalFtConnectContactDetailsSchema: ZodSchemaWithInputMatchingOu
     libelleCommune: z.string().optional(),
     codePays: z.string().optional(),
     libellePays: z.string().optional(),
-    nom: zStringMinLength1,
-    prenom: zStringMinLength1,
+    nom: zStringMinLength1Max1024,
+    prenom: zStringMinLength1Max1024,
     email: emailSchema,
     telephone1: z.string().optional(),
     telephone2: z.string().optional(),
-    statutValidationEmail: zStringMinLength1,
+    statutValidationEmail: zStringMinLength1Max1024,
   });
 
 const bearerSchema = z

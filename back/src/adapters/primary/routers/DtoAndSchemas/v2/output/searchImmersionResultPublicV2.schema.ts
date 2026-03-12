@@ -8,7 +8,7 @@ import {
   siretSchema,
   type ZodSchemaWithInputMatchingOutput,
   zStringCanBeEmpty,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
   zUuidLike,
 } from "shared";
 import { z } from "zod";
@@ -29,8 +29,8 @@ export const searchResultPublicV2Schema: ZodSchemaWithInputMatchingOutput<Search
     address: z.object({
       streetNumberAndAddress: zStringCanBeEmpty,
       postcode: zStringCanBeEmpty,
-      departmentCode: zStringMinLength1,
-      city: zStringMinLength1,
+      departmentCode: zStringMinLength1Max1024,
+      city: zStringMinLength1Max1024,
     }),
     contactMode: z
       .enum(["EMAIL", "PHONE", "IN_PERSON"], {

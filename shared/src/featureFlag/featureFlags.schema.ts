@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringMinLength1Max1024,
+} from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -38,7 +41,7 @@ const withFeatureFlagMessageSchema: ZodSchemaWithInputMatchingOutput<WithFeature
 const withFeatureFlagButtonSchema: ZodSchemaWithInputMatchingOutput<WithFeatureFlagButtonValue> =
   z.object({
     href: absoluteUrlSchema,
-    label: zStringMinLength1,
+    label: zStringMinLength1Max1024,
   });
 
 export const featureFlagHighlightValueSchema: ZodSchemaWithInputMatchingOutput<

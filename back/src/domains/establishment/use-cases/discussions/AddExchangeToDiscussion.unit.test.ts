@@ -230,7 +230,7 @@ describe("AddExchangeToDiscussion", () => {
               exchanges: [
                 ...pendingDiscussion1.exchanges,
                 {
-                  message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
+                  message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1Max1024 is performing a trim!
                   sender: "establishment",
                   email: contactUserEstablishment1.email,
                   firstname: contactUserEstablishment1.firstName,
@@ -251,7 +251,7 @@ describe("AddExchangeToDiscussion", () => {
               exchanges: [
                 ...pendingDiscussion2.exchanges,
                 {
-                  message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
+                  message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1Max1024 is performing a trim!
                   sender: "potentialBeneficiary",
                   sentAt: "2023-06-28T08:06:52.000Z",
                   subject: secondInboundParsingItem.Subject,

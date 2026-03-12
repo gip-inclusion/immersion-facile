@@ -3,7 +3,7 @@ import { conventionIdSchema } from "../convention/convention.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
-  zStringMinLength1,
+  zStringMinLength1Max1024,
   zStringMinLength1Max6000,
   zStringMinLength1Max9200,
   zTrimmedStringWithMax,
@@ -110,7 +110,7 @@ export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyA
 export const deleteAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<DeleteAssessmentRequestDto> =
   z.object({
     conventionId: conventionIdSchema,
-    deleteAssessmentJustification: zStringMinLength1,
+    deleteAssessmentJustification: zStringMinLength1Max1024,
   });
 
 export const signAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<SignAssessmentRequestDto> =
@@ -122,11 +122,11 @@ export const signAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<Si
       z.discriminatedUnion("beneficiaryAgreement", [
         z.object({
           beneficiaryAgreement: z.literal(true),
-          beneficiaryFeedback: zStringMinLength1.nullable(),
+          beneficiaryFeedback: zStringMinLength1Max1024.nullable(),
         }),
         z.object({
           beneficiaryAgreement: z.literal(false),
-          beneficiaryFeedback: zStringMinLength1,
+          beneficiaryFeedback: zStringMinLength1Max1024,
         }),
       ]),
     );

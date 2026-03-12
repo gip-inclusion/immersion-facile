@@ -61,7 +61,7 @@ import {
   zStringCanBeEmpty,
   zStringCanBeEmptyMax3000,
   zStringCanBeEmptyMax6000,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
   zStringMinLength1Max3000,
   zStringMinLength1Max6000,
   zStringPossiblyEmptyWithMax,
@@ -589,7 +589,7 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
       agencyRefersTo: z
         .object({
           id: refersToAgencyIdSchema,
-          name: zStringMinLength1,
+          name: zStringMinLength1Max1024,
           contactEmail: emailSchema,
           kind: agencyKindSchema,
           siret: siretSchema,
@@ -707,7 +707,7 @@ export const transferConventionToAgencyRequestSchema: ZodSchemaWithInputMatching
   z.object({
     conventionId: conventionIdSchema,
     agencyId: agencyIdSchema,
-    justification: zStringMinLength1,
+    justification: zStringMinLength1Max1024,
   });
 
 export const markPartnersErroredConventionAsHandledRequestSchema: ZodSchemaWithInputMatchingOutput<MarkPartnersErroredConventionAsHandledRequest> =
@@ -919,7 +919,7 @@ export const findSimilarConventionsParamsSchema: ZodSchemaWithInputMatchingOutpu
     codeAppellation: appellationCodeSchema,
     dateStart: makeDateStringSchema(),
     beneficiaryBirthdate: makeDateStringSchema(),
-    beneficiaryLastName: zStringMinLength1,
+    beneficiaryLastName: zStringMinLength1Max1024,
   });
 
 export const findSimilarConventionsResponseSchema: ZodSchemaWithInputMatchingOutput<FindSimilarConventionsResponseDto> =

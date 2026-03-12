@@ -22,7 +22,7 @@ import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   zStringCanBeEmpty,
   zStringCanBeEmptyMax9200,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
 import {
@@ -54,8 +54,8 @@ const commonOfferSchema = z.object({
   address: z.object({
     streetNumberAndAddress: zStringCanBeEmpty,
     postcode: zStringCanBeEmpty,
-    departmentCode: zStringMinLength1,
-    city: zStringMinLength1,
+    departmentCode: zStringMinLength1Max1024,
+    city: zStringMinLength1Max1024,
   }),
   contactMode: z
     .enum(["EMAIL", "PHONE", "IN_PERSON"], {

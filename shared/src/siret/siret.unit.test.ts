@@ -1,4 +1,4 @@
-import { zStringMinLength1 } from "../utils/string.schema";
+import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import { siretSchema } from "./siret.schema";
 
 describe("siretSchema", () => {
@@ -38,6 +38,6 @@ describe("siretSchema", () => {
   });
 
   it("trims the given input", () => {
-    expect(zStringMinLength1.parse("yolo ")).toBe("yolo");
+    expect(zStringMinLength1Max1024.parse("yolo ")).toBe("yolo");
   });
 });

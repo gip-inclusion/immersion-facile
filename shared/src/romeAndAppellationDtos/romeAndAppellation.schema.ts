@@ -1,7 +1,7 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
 import { searchTextAlphaSchema } from "../search/searchText.schema";
-import { zStringMinLength1 } from "../utils/string.schema";
+import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import {
   localization,
   trueSchema,
@@ -25,7 +25,7 @@ export const codeRomeSchema: ZodSchemaWithInputMatchingOutput<RomeCode> = z
   .regex(codeRomeRegex, "Code ROME incorrect");
 
 export const romeLabelSchema: ZodSchemaWithInputMatchingOutput<RomeLabel> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
 export const appellationCodeSchema: ZodSchemaWithInputMatchingOutput<AppellationCode> =
@@ -44,7 +44,7 @@ export const appellationCodesSchema: ZodSchemaWithInputMatchingOutput<
 > = z.array(appellationCodeSchema);
 
 export const appellationLabelSchema: ZodSchemaWithInputMatchingOutput<AppellationLabel> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 
 export const appellationAndRomeDtoSchema: ZodSchemaWithInputMatchingOutput<AppellationAndRomeDto> =
   z.object(

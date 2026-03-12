@@ -2,7 +2,7 @@ import {
   localization,
   validateEmailReasonSchema,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "shared";
 import { z } from "zod";
 import type {
@@ -12,11 +12,11 @@ import type {
 } from "./EmailableEmailValidationGateway.dto";
 
 const emailableApiKeySchema: ZodSchemaWithInputMatchingOutput<EmailableApiKey> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 
 export const emailableValidationTargetsQueryParamsSchema: ZodSchemaWithInputMatchingOutput<EmailableEmailValidationParams> =
   z.object({
-    email: zStringMinLength1,
+    email: zStringMinLength1Max1024,
     api_key: emailableApiKeySchema,
   });
 
