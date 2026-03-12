@@ -2,8 +2,11 @@ import test, { expect, type Page } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
+  createConventionTemplate,
+  deleteConventionTemplate,
   goToDashboard,
   goToEstablishmentDashboardTab,
+  initiateConvention,
 } from "../../utils/dashboard";
 import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
 
@@ -56,6 +59,28 @@ test.describe("Establishment dashboard workflow", () => {
       await expect(
         await page.locator(".im-exchange-message").all(),
       ).toHaveLength(3);
+    });
+  });
+
+  test.describe("Initiate convention", () => {
+    test("should initiate from a convention template", async ({ page }) => {
+      await createConventionTemplate(page, "establishment");
+      await initiateConvention({
+        page,
+        dashboardKind: "establishment",
+        fromConventionTemplate: true,
+      });
+      await deleteConventionTemplate(page, "establishment");
+    });
+
+    test("should initiate from establishment informations", async ({
+      page,
+    }) => {
+      await initiateConvention({
+        page,
+        dashboardKind: "establishment",
+        fromConventionTemplate: false,
+      });
     });
   });
 });

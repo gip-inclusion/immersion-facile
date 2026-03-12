@@ -59,9 +59,7 @@ export const AgencyAdminTabContent = ({
         titleAs="h2"
         titleAction={
           <Button
-            id={
-              domElementIds.agencyDashboard.dashboard.initiateConventionButton
-            }
+            id={domElementIds.agencyDashboard.initiateConvention.button}
             linkProps={
               routes.addAgency({
                 siret: hasAgencyRoleOnProConnectSiret
