@@ -1,13 +1,13 @@
 import {
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
   type RomeDto,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "shared";
 import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
-  protected inputSchema = zStringMinLength1;
+  protected inputSchema = zStringMinLength1Max1024;
 
   public async _execute(
     searchText: string,

@@ -1,5 +1,8 @@
 import type { Flavor } from "../typeFlavors";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringMinLength1Max1024,
+} from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 
 export type SearchTextAlpha = Flavor<string, "SearchTextAlpha">;
@@ -7,7 +10,7 @@ export type SearchTextAlpha = Flavor<string, "SearchTextAlpha">;
 const sanitizeAlpha = (text: string) =>
   text.replace(/[^a-zA-ZÀ-ÿ-]/g, " ").trim();
 export const searchTextAlphaSchema: ZodSchemaWithInputMatchingOutput<SearchTextAlpha> =
-  zStringMinLength1.transform(sanitizeAlpha);
+  zStringMinLength1Max1024.transform(sanitizeAlpha);
 
 export type SearchTextAlphaNumeric = Flavor<string, "SearchTextAlphaNumeric">;
 

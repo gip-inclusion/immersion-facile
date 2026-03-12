@@ -8,7 +8,11 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import type { AgencyId, UpdateAgencyStatusParams, WithAgencyId } from "shared";
-import { domElementIds, withAgencyIdSchema, zStringMinLength1 } from "shared";
+import {
+  domElementIds,
+  withAgencyIdSchema,
+  zStringMinLength1Max1024,
+} from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { createFormModal } from "src/app/utils/createFormModal";
 import "src/assets/admin.css";
@@ -177,7 +181,9 @@ const RejectAgencyModalContent = ({
     defaultValues: {
       statusJustification: undefined,
     },
-    resolver: zodResolver(z.object({ statusJustification: zStringMinLength1 })),
+    resolver: zodResolver(
+      z.object({ statusJustification: zStringMinLength1Max1024 }),
+    ),
   });
   const { register, handleSubmit } = methods;
 

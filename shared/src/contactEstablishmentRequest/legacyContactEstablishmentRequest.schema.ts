@@ -8,7 +8,10 @@ import { emailSchema } from "../email/email.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringMinLength1Max1024,
+} from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
 import {
   localization,
@@ -25,8 +28,8 @@ import type {
 const commonFields = {
   appellationCode: appellationCodeSchema,
   siret: siretSchema,
-  potentialBeneficiaryFirstName: zStringMinLength1,
-  potentialBeneficiaryLastName: zStringMinLength1,
+  potentialBeneficiaryFirstName: zStringMinLength1Max1024,
+  potentialBeneficiaryLastName: zStringMinLength1Max1024,
   potentialBeneficiaryEmail: emailSchema,
   locationId: zUuidLike,
 };
@@ -40,7 +43,7 @@ export const legacyContactEstablishmentByMailSchema: ZodSchemaWithInputMatchingO
   z.object({
     ...commonFields,
     contactMode: z.literal("EMAIL"),
-    message: zStringMinLength1,
+    message: zStringMinLength1Max1024,
     potentialBeneficiaryPhone: phoneNumberSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),

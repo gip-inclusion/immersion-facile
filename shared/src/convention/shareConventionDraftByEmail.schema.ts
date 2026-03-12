@@ -2,7 +2,7 @@ import { z } from "zod";
 import { agencyKindSchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
 import { getNestedValue, isObject } from "../utils";
-import { zStringMinLength1 } from "../utils/string.schema";
+import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -131,14 +131,14 @@ export const shareConventionDraftByEmailFromConventionSchema: ZodSchemaWithInput
   z.object({
     senderEmail: emailSchema,
     recipientEmail: emailSchema.optional(),
-    details: zStringMinLength1.optional(),
+    details: zStringMinLength1Max1024.optional(),
     conventionDraft: conventionDraftSchema,
   });
 
 export const shareConventionDraftByEmailFromConventionTemplateSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailFromConventionTemplateDto> =
   z.object({
     recipientEmail: emailSchema,
-    details: zStringMinLength1.optional(),
+    details: zStringMinLength1Max1024.optional(),
     conventionDraft: conventionDraftSchema,
   });
 

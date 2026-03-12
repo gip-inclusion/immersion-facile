@@ -4,7 +4,7 @@ import { conventionIdSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { userIdSchema } from "../user/user.schema";
-import { zStringMinLength1 } from "../utils/string.schema";
+import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -40,7 +40,7 @@ export const rejectIcUserRoleForAgencyParamsSchema: ZodSchemaWithInputMatchingOu
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,
-    justification: zStringMinLength1,
+    justification: zStringMinLength1Max1024,
   });
 
 export const withUserFiltersSchema: ZodSchemaWithInputMatchingOutput<WithUserFilters> =

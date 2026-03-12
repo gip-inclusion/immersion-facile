@@ -7,7 +7,7 @@ import { emailSchema } from "../email/email.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { replaceEmptyValuesByUndefinedFromObject } from "../utils";
 import {
-  zStringMinLength1,
+  zStringMinLength1Max1024,
   zStringMinLength1Max6000,
 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
@@ -32,7 +32,7 @@ const makeConventionPresentationSchema = (
       agencyRefersTo: z
         .object({
           id: refersToAgencyIdSchema,
-          name: zStringMinLength1,
+          name: zStringMinLength1Max1024,
           contactEmail: emailSchema,
           kind: agencyKindSchema,
           siret: siretSchema,
@@ -44,13 +44,13 @@ const makeConventionPresentationSchema = (
     return conventionDraftSchema.and(
       z.object({
         id: conventionIdSchema,
-        name: zStringMinLength1,
+        name: zStringMinLength1Max1024,
         fromConventionTemplateId: conventionTemplateIdSchema.optional(),
         agencyDepartment: z.string().optional(),
         agencyRefersTo: z
           .object({
             id: refersToAgencyIdSchema,
-            name: zStringMinLength1,
+            name: zStringMinLength1Max1024,
             contactEmail: emailSchema,
             kind: agencyKindSchema,
             siret: siretSchema,

@@ -56,7 +56,7 @@ export const optionalEmptyStringMax1024 = makeHardenedStringSchema({
   max: MAX_1024_TEXT_INPUT,
 }).optional();
 
-export const zStringMinLength1 = makeHardenedStringSchema({
+export const zStringMinLength1Max1024 = makeHardenedStringSchema({
   max: MAX_1024_TEXT_INPUT,
 });
 export const zStringMinLength1Max255 = makeHardenedStringSchema({

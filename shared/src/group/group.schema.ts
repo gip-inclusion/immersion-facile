@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { internalOfferSchema } from "../search/Offer.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringMinLength1Max1024,
+} from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type {
   Group,
@@ -12,7 +15,7 @@ import type {
 } from "./group.dto";
 
 const groupSlugSchema: ZodSchemaWithInputMatchingOutput<GroupSlug> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 
 export const withGroupSlugSchema: ZodSchemaWithInputMatchingOutput<WithGroupSlug> =
   z.object({
@@ -25,8 +28,8 @@ const backgroundColorSchema = zStringCanBeEmpty; // 1024 max - voir si on peut f
 const groupOptionsSchema: ZodSchemaWithInputMatchingOutput<GroupOptions> =
   z.object({
     heroHeader: z.object({
-      title: zStringMinLength1,
-      description: zStringMinLength1,
+      title: zStringMinLength1Max1024,
+      description: zStringMinLength1Max1024,
       logoUrl: absoluteUrlSchema.optional(),
       backgroundColor: backgroundColorSchema.optional(),
     }),
@@ -35,7 +38,7 @@ const groupOptionsSchema: ZodSchemaWithInputMatchingOutput<GroupOptions> =
 
 export const groupSchema: ZodSchemaWithInputMatchingOutput<Group> = z.object({
   slug: groupSlugSchema,
-  name: zStringMinLength1,
+  name: zStringMinLength1Max1024,
   options: groupOptionsSchema,
 });
 

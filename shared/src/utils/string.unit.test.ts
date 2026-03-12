@@ -18,7 +18,7 @@ import {
   type HardenedStringSchema,
   makeHardenedStringSchema,
   zStringCanBeEmpty,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
   zStringPossiblyEmptyWithMax,
   zTrimmedStringWithMax,
 } from "./string.schema";
@@ -253,14 +253,14 @@ describe("splitTextOnFirstSeparator", () => {
 });
 
 describe("string schemas", () => {
-  describe("zStringMinLength1 schema validation", () => {
+  describe("zStringMinLength1Max1024 schema validation", () => {
     it.each([
       "//",
       "Fourni par l'employeur",
       " Non ",
       "texte\navec retour à la ligne\n",
     ])(`accepts valid "%s"`, (text) => {
-      expect(() => zStringMinLength1.parse(text)).not.toThrow();
+      expect(() => zStringMinLength1Max1024.parse(text)).not.toThrow();
     });
 
     it.each([
@@ -326,7 +326,9 @@ describe("string schemas", () => {
         ]),
       },
     ])(`fails to validate "%s"`, ({ input, expectedError }) => {
-      expect(() => zStringMinLength1.parse(input)).toThrow(expectedError);
+      expect(() => zStringMinLength1Max1024.parse(input)).toThrow(
+        expectedError,
+      );
     });
   });
 

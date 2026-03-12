@@ -8,8 +8,8 @@ import type { ApiConsumerJwt } from "../tokens/jwt.dto";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   stringWithMaxLength255,
-  zStringMinLength1,
   zStringMinLength1Max255,
+  zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import {
   localization,
@@ -31,9 +31,9 @@ import {
 
 const apiConsumerContactSchema: ZodSchemaWithInputMatchingOutput<ApiConsumerContact> =
   z.object({
-    lastName: zStringMinLength1,
-    firstName: zStringMinLength1,
-    job: zStringMinLength1,
+    lastName: zStringMinLength1Max1024,
+    firstName: zStringMinLength1Max1024,
+    job: zStringMinLength1Max1024,
     phone: phoneNumberSchema,
     emails: z.array(emailSchema),
   });
@@ -46,7 +46,7 @@ const callbackHeadersSchema: ZodSchemaWithInputMatchingOutput<CallbackHeaders> =
     z.enum(authorizedCallbackHeaderKeys, {
       error: localization.invalidEnum,
     }),
-    zStringMinLength1,
+    zStringMinLength1Max1024,
   );
 
 export const createWebhookSubscriptionSchema: ZodSchemaWithInputMatchingOutput<CreateWebhookSubscription> =

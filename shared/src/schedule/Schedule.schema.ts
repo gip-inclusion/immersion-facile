@@ -4,7 +4,7 @@ import {
   dateRegExp,
   dateTimeIsoStringSchema,
 } from "../utils/date";
-import { zStringMinLength1, zTimeString } from "../utils/string.schema";
+import { zStringMinLength1Max1024, zTimeString } from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -32,7 +32,7 @@ export const timePeriodsSchema: ZodSchemaWithInputMatchingOutput<TimePeriodsDto>
 export const makeDateStringSchema: (
   errorMessage?: string,
 ) => ZodSchemaWithInputMatchingOutput<DateString> = (errorMessage) =>
-  zStringMinLength1.refine(
+  zStringMinLength1Max1024.refine(
     (dateString) => dateString.match(dateRegExp),
     errorMessage ?? localization.invalidDate,
   );

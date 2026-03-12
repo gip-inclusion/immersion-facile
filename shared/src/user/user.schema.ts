@@ -18,7 +18,8 @@ import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   zStringCanBeEmpty,
   zStringCanBeEmptyMax255,
-  zStringMinLength1,
+  zStringMinLength1Max255,
+  zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import {
   localization,
@@ -36,7 +37,7 @@ import type {
 } from "./user.dto";
 
 export const userIdSchema: ZodSchemaWithInputMatchingOutput<UserId> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 
 export const withUserIdSchema: ZodSchemaWithInputMatchingOutput<WithUserId> =
   z.object({
@@ -67,7 +68,7 @@ export const userInListSchema: ZodSchemaWithInputMatchingOutput<UserWithNumberOf
 
 const makePersonNameSchema = ({ mandatory }: { mandatory: boolean }) => {
   if (mandatory) {
-    return zStringMinLength1;
+    return zStringMinLength1Max255;
   }
   return zStringCanBeEmptyMax255;
 };

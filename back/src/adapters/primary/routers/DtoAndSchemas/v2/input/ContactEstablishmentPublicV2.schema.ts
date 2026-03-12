@@ -9,7 +9,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
   zStringCanBeEmpty,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
   zUuidLike,
 } from "shared";
 import { z } from "zod";
@@ -21,8 +21,8 @@ import type {
 const commonFields = {
   appellationCode: appellationCodeSchema,
   siret: siretSchema,
-  potentialBeneficiaryFirstName: zStringMinLength1,
-  potentialBeneficiaryLastName: zStringMinLength1,
+  potentialBeneficiaryFirstName: zStringMinLength1Max1024,
+  potentialBeneficiaryLastName: zStringMinLength1Max1024,
   potentialBeneficiaryEmail: emailSchema,
   locationId: zUuidLike.optional(),
 };
@@ -40,7 +40,7 @@ const contactEstablishmentByMailSchema: ZodSchemaWithInputMatchingOutput<Contact
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
-    message: zStringMinLength1,
+    message: zStringMinLength1Max1024,
     potentialBeneficiaryPhone: phoneNumberSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),

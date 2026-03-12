@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../utils/string.schema";
+import {
+  zStringCanBeEmpty,
+  zStringMinLength1Max1024,
+} from "../utils/string.schema";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
@@ -22,15 +25,15 @@ export const departmentCodeSchema: ZodSchemaWithInputMatchingOutput<DepartmentCo
   z.string();
 
 export const addressDepartmentCodeSchema: ZodSchemaWithInputMatchingOutput<DepartmentCode> =
-  zStringMinLength1;
+  zStringMinLength1Max1024;
 
 export const addressSchema: ZodSchemaWithInputMatchingOutput<AddressDto> =
   z.object(
     {
       streetNumberAndAddress: zStringCanBeEmpty,
-      postcode: zStringMinLength1,
+      postcode: zStringMinLength1Max1024,
       departmentCode: addressDepartmentCodeSchema,
-      city: zStringMinLength1,
+      city: zStringMinLength1Max1024,
     },
     {
       message: localization.invalidAddress,

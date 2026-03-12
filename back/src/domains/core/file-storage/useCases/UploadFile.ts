@@ -4,7 +4,7 @@ import {
   errors,
   validateFile,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "shared";
 import { z } from "zod";
 
@@ -23,11 +23,11 @@ type UploadFileInput = {
 const uploadFileInput: ZodSchemaWithInputMatchingOutput<UploadFileInput> =
   z.object({
     file: z.object({
-      name: zStringMinLength1,
-      encoding: zStringMinLength1,
+      name: zStringMinLength1Max1024,
+      encoding: zStringMinLength1Max1024,
       size: z.number(),
       buffer: z.instanceof(Buffer), // class not supported by NarrowEvent<Topic>["payload"]
-      mimetype: zStringMinLength1,
+      mimetype: zStringMinLength1Max1024,
     }),
   });
 

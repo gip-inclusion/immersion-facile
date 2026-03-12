@@ -2,7 +2,7 @@ import z from "zod";
 import type { RenewExpiredJwtResponse } from "../convention/convention.dto";
 import {
   makeHardenedStringSchema,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
@@ -20,7 +20,7 @@ export const renewExpiredJwtRequestSchema: ZodSchemaWithInputMatchingOutput<Rene
       kind: z.literal("convention"),
       // respect legacy + limite max à 1024
       // TODO : utiliser absoluteUrlSchema << ne supporte pas encodeURIComponent
-      originalUrl: zStringMinLength1,
+      originalUrl: zStringMinLength1Max1024,
       expiredJwt: expiredJwtSchema,
     }),
     z.object({
