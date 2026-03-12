@@ -46,7 +46,8 @@ export const makeHardenedStringSchema = ({
 
 const MAX_255_TEXT_INPUT = 255;
 export const MAX_1024_TEXT_INPUT = 1024;
-export const MAX_3000_TEXT_INPUT = 3000;
+const MAX_3000_TEXT_INPUT = 3000;
+const MAX_9200_TEXT_INPUT = 9200;
 export const MAX_HTML_SIZE = 700_000;
 
 export const optionalEmptyStringMax1024 = makeHardenedStringSchema({
@@ -66,6 +67,10 @@ export const zStringMinLength1Max3000 = makeHardenedStringSchema({
 export const zStringCanBeEmpty = makeHardenedStringSchema({
   isEmptyAllowed: true,
   max: MAX_1024_TEXT_INPUT,
+});
+export const zStringCanBeEmptyMax9200 = makeHardenedStringSchema({
+  isEmptyAllowed: true,
+  max: MAX_9200_TEXT_INPUT,
 });
 
 export const makezTrimmedString = (minMessage: string) =>
