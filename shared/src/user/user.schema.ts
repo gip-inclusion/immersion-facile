@@ -16,8 +16,8 @@ import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
-  makeHardenedStringSchema,
   zStringCanBeEmpty,
+  zStringCanBeEmptyMax255,
   zStringMinLength1,
 } from "../utils/string.schema";
 import {
@@ -65,31 +65,22 @@ export const userInListSchema: ZodSchemaWithInputMatchingOutput<UserWithNumberOf
     }),
   );
 
-const makePersonNameSchema = (
-  fieldName: "firstname" | "lastname",
-  mandatory: boolean,
-) => {
-  const label = fieldName === "firstname" ? "prénom" : "nom";
-  return makeHardenedStringSchema({
-    max: 50,
-    maxMessage: `Le ${label} ne doit pas dépasser 50 caractères`,
-    isEmptyAllowed: mandatory ? undefined : true,
-    withRegExp: {
-      regex: /^[A-Za-zÀ-ÿ\s'-]*$/,
-      message: `Le ${label} ne peut contenir que des lettres, espaces, tirets et apostrophes`,
-    },
-  }).transform((val) => val.replace(/\s+/g, " "));
+const makePersonNameSchema = ({ mandatory }: { mandatory: boolean }) => {
+  if (mandatory) {
+    return zStringMinLength1;
+  }
+  return zStringCanBeEmptyMax255;
 };
 
 export const firstnameSchema: ZodSchemaWithInputMatchingOutput<Firstname> =
-  makePersonNameSchema("firstname", false);
+  makePersonNameSchema({ mandatory: false });
 export const firstnameMandatorySchema: ZodSchemaWithInputMatchingOutput<Firstname> =
-  makePersonNameSchema("firstname", true);
+  makePersonNameSchema({ mandatory: true });
 
 export const lastnameSchema: ZodSchemaWithInputMatchingOutput<Lastname> =
-  makePersonNameSchema("lastname", false);
+  makePersonNameSchema({ mandatory: false });
 export const lastnameMandatorySchema: ZodSchemaWithInputMatchingOutput<Lastname> =
-  makePersonNameSchema("lastname", true);
+  makePersonNameSchema({ mandatory: true });
 
 const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =
   z.object({
