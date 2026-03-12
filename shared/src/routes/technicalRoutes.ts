@@ -9,7 +9,6 @@ import { htmlToPdfRequestSchema } from "../file/htmlToPdf";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
-import { zStringMinLength1 } from "../utils/string.schema";
 import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
 export type AvailableApiVersion = (typeof availableApiVersions)[number];
@@ -27,7 +26,7 @@ export const technicalRoutes = defineRoutes({
     url: "/auth/html-to-pdf",
     ...withAuthorizationHeaders,
     requestBodySchema: htmlToPdfRequestSchema,
-    responses: { 200: zStringMinLength1 },
+    responses: { 200: z.string() },
   }),
   openApiSpec: defineRoute({
     method: "get",
