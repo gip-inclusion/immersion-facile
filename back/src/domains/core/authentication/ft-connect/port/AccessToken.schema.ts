@@ -1,7 +1,7 @@
 import {
   makezTrimmedString,
   type ZodSchemaWithInputMatchingOutput,
-  zStringMinLength1,
+  zStringMinLength1Max3000,
 } from "shared";
 import { z } from "zod";
 import type { ExternalAccessToken } from "../adapters/ft-connect-gateway/ftConnectApi.dto";
@@ -12,5 +12,5 @@ export const externalAccessTokenSchema: ZodSchemaWithInputMatchingOutput<Externa
       "Le format du token peConnect est invalide",
     ),
     expires_in: z.number().min(1, "Ce token est déja expiré"),
-    id_token: zStringMinLength1,
+    id_token: zStringMinLength1Max3000,
   });
