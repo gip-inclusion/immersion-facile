@@ -65,7 +65,7 @@ describe("UpdateInvalidPhone", () => {
   let kyselyDb: KyselyDb;
   let uowPerformer: PgUowPerformer;
   let timeGateway: TimeGateway;
-  let now: Date;
+  let verificationDateString: Date;
   let uuidGenerator: UuidV4Generator;
 
   let pgUserRepository: PgUserRepository;
@@ -110,10 +110,10 @@ describe("UpdateInvalidPhone", () => {
 
   beforeEach(async () => {
     timeGateway = new CustomTimeGateway();
-    now = timeGateway.now();
+    verificationDateString = timeGateway.now();
     uuidGenerator = new UuidV4Generator();
     updateInvalidPhone = makeUpdateInvalidPhone({
-      deps: { timeGateway, kyselyDb },
+      deps: { kyselyDb },
       uowPerformer,
     });
 
@@ -309,12 +309,13 @@ describe("UpdateInvalidPhone", () => {
             currentPhone: fixablePhone,
             newPhoneNumber: fixedPhoneNumber,
           },
+          verificationDateISOString: verificationDateString.toISOString(),
         });
 
         const fixedPhone: PhoneInDB = {
           id: fixablePhoneId,
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: now,
+          verifiedAt: verificationDateString,
         };
 
         expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
@@ -350,7 +351,7 @@ describe("UpdateInvalidPhone", () => {
       it("updates multiple references on the same table", async () => {
         const fixedPhoneId = await insertPhoneNumber(kyselyDb, {
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: now,
+          verifiedAt: verificationDateString,
         });
         const fixablePhoneId = await insertPhoneNumber(kyselyDb, {
           phoneNumber: fixablePhoneNumber,
@@ -378,7 +379,7 @@ describe("UpdateInvalidPhone", () => {
         const fixedPhone: PhoneInDB = {
           id: fixedPhoneId,
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: now,
+          verifiedAt: verificationDateString,
         };
 
         await updateInvalidPhone.execute({
@@ -386,6 +387,7 @@ describe("UpdateInvalidPhone", () => {
             currentPhone: fixablePhone,
             newPhoneNumber: fixedPhone.phoneNumber,
           },
+          verificationDateISOString: verificationDateString.toISOString(),
         });
 
         expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
@@ -405,7 +407,7 @@ describe("UpdateInvalidPhone", () => {
       it("updates all references on multiple tables", async () => {
         const fixedPhoneId = await insertPhoneNumber(kyselyDb, {
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: now,
+          verifiedAt: verificationDateString,
         });
         const fixablePhoneId = await insertPhoneNumber(kyselyDb, {
           phoneNumber: fixablePhoneNumber,
@@ -421,7 +423,7 @@ describe("UpdateInvalidPhone", () => {
         const fixedPhone: PhoneInDB = {
           id: fixedPhoneId,
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: now,
+          verifiedAt: verificationDateString,
         };
 
         await updateInvalidPhone.execute({
@@ -429,6 +431,7 @@ describe("UpdateInvalidPhone", () => {
             currentPhone: fixablePhone,
             newPhoneNumber: fixedPhone.phoneNumber,
           },
+          verificationDateISOString: verificationDateString.toISOString(),
         });
 
         expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
@@ -463,7 +466,7 @@ describe("UpdateInvalidPhone", () => {
       it("does nothing if a conflicting phone number is not referenced on any tables", async () => {
         const fixedPhoneId = await insertPhoneNumber(kyselyDb, {
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: now,
+          verifiedAt: verificationDateString,
         });
         const fixablePhoneId = await insertPhoneNumber(kyselyDb, {
           phoneNumber: fixablePhoneNumber,
@@ -482,12 +485,13 @@ describe("UpdateInvalidPhone", () => {
             currentPhone: fixablePhone,
             newPhoneNumber: fixedPhoneNumber,
           },
+          verificationDateISOString: verificationDateString.toISOString(),
         });
 
         const fixedPhone: PhoneInDB = {
           id: fixedPhoneId,
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: now,
+          verifiedAt: verificationDateString,
         };
 
         expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
@@ -526,7 +530,7 @@ describe("UpdateInvalidPhone", () => {
     it("throws if kysely not defined", async () => {
       updateInvalidPhone = makeUpdateInvalidPhone({
         uowPerformer,
-        deps: { timeGateway, kyselyDb: null },
+        deps: { kyselyDb: null },
       });
 
       await expect(
@@ -539,6 +543,7 @@ describe("UpdateInvalidPhone", () => {
             },
             newPhoneNumber: defaultPhoneNumber,
           },
+          verificationDateISOString: verificationDateString.toISOString(),
         }),
       ).rejects.toThrow();
     });
@@ -554,6 +559,7 @@ describe("UpdateInvalidPhone", () => {
             },
             newPhoneNumber: "not-a-phone",
           },
+          verificationDateISOString: verificationDateString.toISOString(),
         }),
       ).rejects.toThrow();
     });
@@ -569,6 +575,7 @@ describe("UpdateInvalidPhone", () => {
 
       await updateInvalidPhone.execute({
         phoneToUpdate: { currentPhone, newPhoneNumber: correctPhoneNumber },
+        verificationDateISOString: verificationDateString.toISOString(),
       });
 
       expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), []);
@@ -600,6 +607,7 @@ describe("UpdateInvalidPhone", () => {
           currentPhone: conflictingDefaultPhoneNumberWithNonExistingId,
           newPhoneNumber: correctPhoneNumber,
         },
+        verificationDateISOString: verificationDateString.toISOString(),
       });
 
       expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
@@ -622,6 +630,7 @@ describe("UpdateInvalidPhone", () => {
           currentPhone: currentFixedPhone,
           newPhoneNumber: currentFixedPhone.phoneNumber,
         },
+        verificationDateISOString: verificationDateString.toISOString(),
       });
       expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
         currentFixedPhone,
