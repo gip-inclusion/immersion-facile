@@ -174,6 +174,10 @@ describe("UpdateDiscussionStatus", () => {
         }),
       );
     });
+
+    it("throws when user have pending right on establishment", async () => {
+      expect(true).toBe(false);
+    });
   });
 
   describe("Accept discussion", () => {

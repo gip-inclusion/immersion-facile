@@ -114,6 +114,9 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
         }),
       );
     });
+    it("throws accessForbidden when user have pending right on establishment", async () => {
+      expect(true).toBe(false);
+    });
   });
 
   describe("Right paths", () => {
