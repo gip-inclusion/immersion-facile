@@ -573,6 +573,7 @@ export const conventionAssessmentFieldsSchema = z
     }),
     z.object({
       status: z.enum(legacyAssessmentStatuses),
+      createdAt: dateTimeIsoStringSchema,
     }),
   ])
   .nullable();

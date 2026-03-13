@@ -724,6 +724,7 @@ export const getAssessmentFieldsByConventionId = async (
           }
         : {
             status: result.assessment.status,
+            createdAt: result.assessment.createdAt,
           },
   };
 };

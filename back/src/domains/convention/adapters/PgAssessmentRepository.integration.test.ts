@@ -92,14 +92,11 @@ describe("PgAssessmentRepository", () => {
     });
 
     it("saves a minimal assessment", async () => {
-      expectToEqual(
-        (
-          await assessmentRepository.getByConventionIds([
-            minimalAssessment.conventionId,
-          ])
-        ).at(0),
-        undefined,
-      );
+      expect(
+        await assessmentRepository.getByConventionIds([
+          minimalAssessment.conventionId,
+        ]),
+      ).toHaveLength(0);
 
       await assessmentRepository.save(minimalAssessment);
 
@@ -117,14 +114,11 @@ describe("PgAssessmentRepository", () => {
     });
 
     it("saves a full assessment", async () => {
-      expectToEqual(
-        (
-          await assessmentRepository.getByConventionIds([
-            fullAssessment.conventionId,
-          ])
-        ).at(0),
-        undefined,
-      );
+      expect(
+        await assessmentRepository.getByConventionIds([
+          fullAssessment.conventionId,
+        ]),
+      ).toHaveLength(0);
 
       await assessmentRepository.save(fullAssessment);
 
@@ -142,14 +136,11 @@ describe("PgAssessmentRepository", () => {
 
   describe("getByConventionIds", () => {
     it("returns undefined if no Convention where found", async () => {
-      expectToEqual(
-        (
-          await assessmentRepository.getByConventionIds([
-            "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
-          ])
-        ).at(0),
-        undefined,
-      );
+      expect(
+        await assessmentRepository.getByConventionIds([
+          "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
+        ]),
+      ).toHaveLength(0);
     });
 
     it("returns assessment found", async () => {
@@ -268,14 +259,11 @@ describe("PgAssessmentRepository", () => {
 
       await assessmentRepository.delete(minimalAssessment.conventionId);
 
-      expectToEqual(
-        (
-          await assessmentRepository.getByConventionIds([
-            minimalAssessment.conventionId,
-          ])
-        )[0],
-        undefined,
-      );
+      expect(
+        await assessmentRepository.getByConventionIds([
+          minimalAssessment.conventionId,
+        ]),
+      ).toHaveLength(0);
     });
 
     it("does not throw when assessment already deleted (idempotent)", async () => {
@@ -291,12 +279,11 @@ describe("PgAssessmentRepository", () => {
 
       await assessmentRepository.delete(minimalAssessment.conventionId);
 
-      expectToEqual(
+      expect(
         await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
         ]),
-        [],
-      );
+      ).toHaveLength(0);
     });
   });
 });

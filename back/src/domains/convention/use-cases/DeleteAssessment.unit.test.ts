@@ -5,7 +5,6 @@ import {
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
-  expectToEqual,
 } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -72,12 +71,9 @@ describe("DeleteAssessment", () => {
       adminConnectedUser,
     );
 
-    expectToEqual(
-      (await uow.assessmentRepository.getByConventionIds([convention.id])).at(
-        0,
-      ),
-      undefined,
-    );
+    expect(
+      await uow.assessmentRepository.getByConventionIds([convention.id]),
+    ).toHaveLength(0);
 
     expectArraysToMatch(uow.outboxRepository.events, [
       {

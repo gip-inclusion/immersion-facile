@@ -40,6 +40,7 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
           }),
           z.object({
             status: z.enum(legacyAssessmentStatuses),
+            createdAt: dateTimeIsoStringSchema,
           }),
         ])
         .nullable(),

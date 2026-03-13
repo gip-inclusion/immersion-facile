@@ -148,8 +148,6 @@ export const SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE = new Date(
   "2025-04-30",
 );
 
-export const ASSESSMENT_SIGNATURE_RELEASE_DATE = new Date("2025-03-01");
-
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",
 ];
@@ -344,7 +342,7 @@ export type ConventionAssessmentFields = {
         signedAt: DateString | null;
         createdAt: DateTimeIsoString;
       }
-    | { status: LegacyAssessmentDto["status"] }
+    | { status: LegacyAssessmentDto["status"]; createdAt: DateTimeIsoString }
     | null;
 };
 

@@ -158,7 +158,7 @@ export const AgencyTasks = ({
             <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
               <TaskSummary
                 count={conventionsWithAssessmentIssuePagination.totalRecords}
-                countLabel="Bilans à compléter"
+                countLabel="Relances bilans"
                 icon="fr-icon-file-text-line"
                 buttonProps={{
                   children: "Traiter cette liste",
