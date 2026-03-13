@@ -1,11 +1,28 @@
 import {
+  ConnectedUserBuilder,
+  DiscussionBuilder,
   defaultPerPageInWebPagination,
+  errors,
+  expectArraysToEqual,
+  expectPromiseToFailWithError,
   expectToEqual,
   maxPerPageInWebPagination,
+  type UserId,
 } from "shared";
-import { flatDiscussionQueryParamsToGetPaginatedDiscussionsParams } from "./GetDiscussionsForUser";
+import {
+  createInMemoryUow,
+  type InMemoryUnitOfWork,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
+import {
+  flatDiscussionQueryParamsToGetPaginatedDiscussionsParams,
+  makeGetDiscussionsForUser,
+} from "./GetDiscussionsForUser";
 
 describe("GetDiscussionsForUser", () => {
+  let uow: InMemoryUnitOfWork;
+
   describe("flatDiscussionQueryParamsTogetPaginatedDiscussionsParams", () => {
     it("converts flat filters to correct filters", () => {
       const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
@@ -78,7 +95,50 @@ describe("GetDiscussionsForUser", () => {
     });
   });
 
-  it("throws when user have pending right on establishment", async () => {
+  it("return no discussions if user has no ACCEPTED status on any establishment right", async () => {
+    uow = createInMemoryUow();
+
+    const userId: UserId = "userIaaaaad2c-6f02-11ec-90d6-0242ac120004d";
+    const establishmentAggregate = new EstablishmentAggregateBuilder()
+      .withUserRights([
+        {
+          userId,
+          status: "PENDING",
+          role: "establishment-contact",
+          shouldReceiveDiscussionNotifications: true,
+        },
+      ])
+      .build();
+    const discussionsForEstablishment = [
+      new DiscussionBuilder()
+        .withSiret(establishmentAggregate.establishment.siret)
+        .buildRead(),
+    ];
+
+    const connectedUser = new ConnectedUserBuilder().withId(userId).build();
+
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      establishmentAggregate,
+    );
+    uow.discussionRepository.discussionsForUser = discussionsForEstablishment;
+    await uow.userRepository.save(connectedUser);
+
+    const params = {
+      page: 1,
+      perPage: 150,
+    };
+
+    const getDiscussionsForUser = makeGetDiscussionsForUser({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
+
+    expectArraysToEqual(
+      (await getDiscussionsForUser.execute(params, connectedUser)).data,
+      [],
+    );
+  });
+
+  it("return no discussions if user has no sufficient rights on establishment", async () => {
     expect(true).toBe(false);
   });
 });

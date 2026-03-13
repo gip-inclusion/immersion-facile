@@ -5,6 +5,7 @@ import type {
   DiscussionDto,
   DiscussionId,
   DiscussionInList,
+  DiscussionReadDto,
   SiretDto,
 } from "shared";
 import type {
@@ -21,11 +22,31 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
 
   public discussionCallsCount = 0;
   public archivedDiscussionIds: DiscussionId[] = [];
+  public discussionsForUser: DiscussionReadDto[] = [];
 
   public async getPaginatedDiscussionsForUser(): Promise<
     DataWithPagination<DiscussionInList>
   > {
-    throw new Error("Not implemented");
+    return {
+      data: this.discussionsForUser.map((discussion) => {
+        return {
+          ...discussion,
+          potentialBeneficiary: {
+            firstName: discussion.potentialBeneficiary.firstName,
+            lastName: discussion.potentialBeneficiary.lastName,
+            phone: null,
+          },
+          city: discussion.address.city,
+          immersionObjective: null,
+        };
+      }),
+      pagination: {
+        currentPage: 1,
+        numberPerPage: 10,
+        totalPages: 1,
+        totalRecords: 0,
+      },
+    };
   }
 
   public async archiveDiscussions(

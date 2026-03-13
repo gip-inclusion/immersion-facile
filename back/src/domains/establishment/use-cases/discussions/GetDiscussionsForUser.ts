@@ -17,6 +17,7 @@ export const makeGetDiscussionsForUser = useCaseBuilder("GetDiscussionsForUser")
   .withOutput<DataWithPagination<DiscussionInList>>()
   .withCurrentUser<ConnectedUser>()
   .build(async ({ inputParams, uow, currentUser }) => {
+    const hasUserValidStatusOnAnyEstablishment = currentUser.establishments?.some((establishment) => establishment.)
     const getPaginatedDiscussionsParams =
       flatDiscussionQueryParamsToGetPaginatedDiscussionsParams(inputParams);
 
