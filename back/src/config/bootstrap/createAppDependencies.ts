@@ -40,10 +40,8 @@ export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createMakeProductionPgPool(config);
   const gateways = await createGateways(config, uuidGenerator);
 
-  const { uowPerformer, inMemoryUow, queries } = createDbRelatedSystems(
-    config,
-    getPgPoolFn,
-  );
+  const { uowPerformer, inMemoryUow, queries, kyselyDb } =
+    createDbRelatedSystems(config, getPgPoolFn);
 
   const eventBus = new InMemoryEventBus(
     gateways.timeGateway,
@@ -87,7 +85,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const useCases = createUseCases({
     config,
     gateways,
-    deps: { uowPerformer, uuidGenerator, queries },
+    deps: { uowPerformer, uuidGenerator, queries, kyselyDb },
     jwt: {
       generateConventionJwt,
       generateConnectedUserJwt,

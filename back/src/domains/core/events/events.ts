@@ -4,6 +4,7 @@ import {
   type ConventionId,
   type ConventionTemplateId,
   type DateString,
+  type DateTimeIsoString,
   type DeleteAssessmentRequestDto,
   type Flavor,
   type InitiateLoginByEmailParams,
@@ -32,6 +33,7 @@ import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/L
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
+import type { PhoneToUpdate } from "../phone-number/use-cases/UpdateInvalidPhone";
 import type {
   ConventionReminderPayload,
   TransferConventionToAgencyPayload,
@@ -183,6 +185,9 @@ export type DomainEvent =
   | GenericEvent<"ApiConsumerRevoked", { consumerId: string } & WithTriggeredBy>
   | GenericEvent<"ApiConsumerKeyRenewed", { consumerId: string } & WithTriggeredBy>
   // ERRORED CONVENTION RELATED
-  | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId } & WithTriggeredBy>;
+  | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId } & WithTriggeredBy>
+
+  // PHONE RELATED
+  | GenericEvent<"InvalidPhoneUpdateRequested", { phoneToUpdate: PhoneToUpdate, verificationDateISOString: DateTimeIsoString } &  WithTriggeredBy>;
 
 export type DomainTopic = DomainEvent["topic"];

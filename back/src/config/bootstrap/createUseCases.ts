@@ -122,6 +122,8 @@ import {
 import { SendNotification } from "../../domains/core/notifications/useCases/SendNotification";
 import { SendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
 import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
+import { makeUpdateInvalidPhone } from "../../domains/core/phone-number/use-cases/UpdateInvalidPhone";
+import { makeVerifyAndRequestInvalidPhonesUpdate } from "../../domains/core/phone-number/use-cases/VerifyAndRequestInvalidPhonesUpdate";
 import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
 import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
 import { makeGetLink } from "../../domains/core/short-link/use-cases/GetLink";
@@ -168,6 +170,7 @@ import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from 
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { makeUpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
+import type { KyselyDb } from "../pg/kysely/kyselyUtils";
 import type { AppConfig } from "./appConfig";
 import type { Gateways } from "./createGateways";
 import {
@@ -183,6 +186,7 @@ type CreateUsecasesParams = {
     uowPerformer: UnitOfWorkPerformer;
     uuidGenerator: UuidGenerator;
     queries: OutOfTransactionQueries;
+    kyselyDb: KyselyDb | null;
   };
   jwt: {
     generateConventionJwt: GenerateConventionJwt;
@@ -195,7 +199,7 @@ type CreateUsecasesParams = {
 
 export const createUseCases = ({
   config,
-  deps: { uowPerformer, uuidGenerator, queries },
+  deps: { uowPerformer, uuidGenerator, queries, kyselyDb },
   gateways,
   jwt: {
     generateApiConsumerJwt,
@@ -1148,6 +1152,19 @@ export const createUseCases = ({
         uowPerformer,
         deps: { createNewEvent, timeGateway: gateways.timeGateway },
       }),
+    verifyAndRequestInvalidPhonesUpdate:
+      makeVerifyAndRequestInvalidPhonesUpdate({
+        deps: {
+          timeGateway: gateways.timeGateway,
+          createNewEvent,
+          uowPerformer,
+          kyselyDb: kyselyDb,
+        },
+      }),
+    updateInvalidPhone: makeUpdateInvalidPhone({
+      uowPerformer,
+      deps: { kyselyDb },
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
