@@ -1507,6 +1507,9 @@ describe("AddExchangeToDiscussion", () => {
         );
       });
     });
+    it("throws an error if user right of sender is pending", async () => {
+      expect(true).toBe(false);
+    });
   });
 
   const createInboundParsingResponse = (
