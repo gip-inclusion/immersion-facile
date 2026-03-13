@@ -724,6 +724,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               assessment: {
                 status: assessment.status,
                 endedWithAJob: assessment.endedWithAJob,
+                signedAt: assessment.signedAt,
                 createdAt: assessment.createdAt,
               },
             },
@@ -778,7 +779,10 @@ describe("ResyncOldConventionsToFt use case", () => {
               agencySiret: agencyFT.agencySiret,
               agencyCounsellorEmails: [],
               agencyValidatorEmails: [],
-              assessment: { status: "FINISHED" },
+              assessment: {
+                status: "FINISHED",
+                createdAt: new Date("2023-03-11").toISOString(),
+              },
             },
           },
         ]);

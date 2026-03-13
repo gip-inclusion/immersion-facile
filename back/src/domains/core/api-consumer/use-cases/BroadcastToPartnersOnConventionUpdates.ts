@@ -53,9 +53,9 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
       ...conventionWithoutAcquisitionParams
     } = convention;
 
-    const assessment = await uow.assessmentRepository.getByConventionId(
-      convention.id,
-    );
+    const assessment = (
+      await uow.assessmentRepository.getByConventionIds([convention.id])
+    ).at(0);
 
     const assessmentFields =
       assesmentEntityToConventionAssessmentFields(assessment);

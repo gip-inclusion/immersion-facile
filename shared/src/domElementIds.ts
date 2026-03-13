@@ -1010,6 +1010,8 @@ export const domElementIds = {
       "im-manage-convention-user-connected__pilot-convention-with-broadcast-error-button",
     pilotConventionToManageButton:
       "im-manage-convention-user-connected__pilot-convention-to-manage-button",
+    pilotConventionWithAssessmentIssueButton:
+      "im-manage-convention-user-connected__pilot-convention-with-assessment-issue-button",
   },
   establishmentDashboardDiscussions: {
     login: {

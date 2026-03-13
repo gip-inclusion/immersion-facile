@@ -95,9 +95,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ? [roleOrUser.roleInPayload]
         : await this.#rolesFromUser(roleOrUser.userWithRights, conventionRead);
 
-    const assessment = await uow.assessmentRepository.getByConventionId(
-      conventionRead.id,
-    );
+    const assessment = (
+      await uow.assessmentRepository.getByConventionIds([conventionRead.id])
+    ).at(0);
 
     throwIfTransitionNotAllowed({
       roles,

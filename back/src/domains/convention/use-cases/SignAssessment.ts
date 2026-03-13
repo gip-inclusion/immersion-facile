@@ -38,9 +38,11 @@ export const makeSignAssessment = useCaseBuilder("SignAssessment")
       isValidatorOfAgencyRefersToAllowed: false,
     });
 
-    const assessmentEntity = await uow.assessmentRepository.getByConventionId(
-      inputParams.conventionId,
-    );
+    const assessmentEntity = (
+      await uow.assessmentRepository.getByConventionIds([
+        inputParams.conventionId,
+      ])
+    ).at(0);
     if (!assessmentEntity)
       throw errors.assessment.notFound(inputParams.conventionId);
 

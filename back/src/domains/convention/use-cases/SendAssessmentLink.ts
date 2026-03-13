@@ -155,8 +155,9 @@ const throwErrorIfAssessmentAlreadyFullfilled = async (
   conventionId: ConventionId,
   uow: UnitOfWork,
 ) => {
-  const assessment =
-    await uow.assessmentRepository.getByConventionId(conventionId);
+  const assessment = (
+    await uow.assessmentRepository.getByConventionIds([conventionId])
+  ).at(0);
 
   if (assessment)
     throw errors.assessment.assessmentAlreadyFullfilled(conventionId);

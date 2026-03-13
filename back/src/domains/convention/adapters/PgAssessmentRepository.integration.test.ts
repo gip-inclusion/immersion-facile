@@ -92,12 +92,11 @@ describe("PgAssessmentRepository", () => {
     });
 
     it("saves a minimal assessment", async () => {
-      expectToEqual(
-        await assessmentRepository.getByConventionId(
+      expect(
+        await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
-        ),
-        undefined,
-      );
+        ]),
+      ).toHaveLength(0);
 
       await assessmentRepository.save(minimalAssessment);
 
@@ -105,50 +104,54 @@ describe("PgAssessmentRepository", () => {
         await db.selectFrom("immersion_assessments").selectAll().execute(),
       ).toHaveLength(1);
       expectToEqual(
-        await assessmentRepository.getByConventionId(
-          minimalAssessment.conventionId,
-        ),
+        (
+          await assessmentRepository.getByConventionIds([
+            minimalAssessment.conventionId,
+          ])
+        ).at(0),
         minimalAssessment,
       );
     });
 
     it("saves a full assessment", async () => {
-      expectToEqual(
-        await assessmentRepository.getByConventionId(
+      expect(
+        await assessmentRepository.getByConventionIds([
           fullAssessment.conventionId,
-        ),
-        undefined,
-      );
+        ]),
+      ).toHaveLength(0);
 
       await assessmentRepository.save(fullAssessment);
 
       expect(
         await db.selectFrom("immersion_assessments").selectAll().execute(),
       ).toHaveLength(1);
-      const savedAssessment = await assessmentRepository.getByConventionId(
-        fullAssessment.conventionId,
-      );
+      const savedAssessment = (
+        await assessmentRepository.getByConventionIds([
+          fullAssessment.conventionId,
+        ])
+      ).at(0);
       expectToEqual(savedAssessment, fullAssessment);
     });
   });
 
-  describe("getByConventionId", () => {
+  describe("getByConventionIds", () => {
     it("returns undefined if no Convention where found", async () => {
-      expectToEqual(
-        await assessmentRepository.getByConventionId(
+      expect(
+        await assessmentRepository.getByConventionIds([
           "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
-        ),
-        undefined,
-      );
+        ]),
+      ).toHaveLength(0);
     });
 
     it("returns assessment found", async () => {
       await assessmentRepository.save(minimalAssessment);
 
       expectToEqual(
-        await assessmentRepository.getByConventionId(
-          minimalAssessment.conventionId,
-        ),
+        (
+          await assessmentRepository.getByConventionIds([
+            minimalAssessment.conventionId,
+          ])
+        ).at(0),
         minimalAssessment,
       );
     });
@@ -173,8 +176,10 @@ describe("PgAssessmentRepository", () => {
       await assessmentRepository.save(assessment);
 
       expectToEqual(
-        await assessmentRepository.getByConventionId(assessment.conventionId),
-        assessment,
+        await assessmentRepository.getByConventionIds([
+          assessment.conventionId,
+        ]),
+        [assessment],
       );
     });
 
@@ -182,23 +187,10 @@ describe("PgAssessmentRepository", () => {
       await assessmentRepository.save(fullAssessment);
 
       expectToEqual(
-        await assessmentRepository.getByConventionId(
-          fullAssessment.conventionId,
-        ),
-        fullAssessment,
-      );
-    });
-  });
-
-  describe("getByConventionIds", () => {
-    it("returns assessment found", async () => {
-      await assessmentRepository.save(minimalAssessment);
-
-      expectToEqual(
         await assessmentRepository.getByConventionIds([
-          minimalAssessment.conventionId,
+          fullAssessment.conventionId,
         ]),
-        [minimalAssessment],
+        [fullAssessment],
       );
     });
   });
@@ -224,10 +216,11 @@ describe("PgAssessmentRepository", () => {
 
       await assessmentRepository.update(updatedAssessment);
 
-      const updatedAssessmentStored =
-        await assessmentRepository.getByConventionId(
+      const updatedAssessmentStored = (
+        await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
-        );
+        ])
+      ).at(0);
       expectToEqual(updatedAssessmentStored, updatedAssessment);
     });
 
@@ -258,20 +251,19 @@ describe("PgAssessmentRepository", () => {
       await assessmentRepository.save(minimalAssessment);
 
       expectToEqual(
-        await assessmentRepository.getByConventionId(
+        await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
-        ),
-        minimalAssessment,
+        ]),
+        [minimalAssessment],
       );
 
       await assessmentRepository.delete(minimalAssessment.conventionId);
 
-      expectToEqual(
-        await assessmentRepository.getByConventionId(
+      expect(
+        await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
-        ),
-        undefined,
-      );
+        ]),
+      ).toHaveLength(0);
     });
 
     it("does not throw when assessment already deleted (idempotent)", async () => {
@@ -279,20 +271,19 @@ describe("PgAssessmentRepository", () => {
       await assessmentRepository.delete(minimalAssessment.conventionId);
 
       expectToEqual(
-        await assessmentRepository.getByConventionId(
+        await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
-        ),
-        undefined,
+        ]),
+        [],
       );
 
       await assessmentRepository.delete(minimalAssessment.conventionId);
 
-      expectToEqual(
-        await assessmentRepository.getByConventionId(
+      expect(
+        await assessmentRepository.getByConventionIds([
           minimalAssessment.conventionId,
-        ),
-        undefined,
-      );
+        ]),
+      ).toHaveLength(0);
     });
   });
 });

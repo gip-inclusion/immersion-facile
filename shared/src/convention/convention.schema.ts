@@ -568,10 +568,12 @@ export const conventionAssessmentFieldsSchema = z
     z.object({
       status: z.enum(assessmentStatuses),
       endedWithAJob: z.boolean(),
+      signedAt: makeDateStringSchema().nullable(),
       createdAt: dateTimeIsoStringSchema,
     }),
     z.object({
       status: z.enum(legacyAssessmentStatuses),
+      createdAt: dateTimeIsoStringSchema,
     }),
   ])
   .nullable();
@@ -931,6 +933,20 @@ export const statusSchema = z.enum(conventionStatuses, {
   error: localization.invalidEnum,
 });
 
+const assessmentCompletionStatusFilterSchema = z.enum(
+  assessmentCompletionStatusFilters,
+  {
+    error: localization.invalidEnum,
+  },
+);
+
+const conventionAvailableSort = [
+  "dateValidation",
+  "dateStart",
+  "dateSubmission",
+  "dateEnd",
+] as const;
+
 export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatchingOutput<FlatGetConventionsForAgencyUserParams> =
   z.object({
     // pagination
@@ -939,7 +955,7 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
 
     // sort
     sortBy: z
-      .enum(["dateValidation", "dateStart", "dateSubmission", "dateEnd"], {
+      .enum(conventionAvailableSort, {
         error: localization.invalidEnum,
       })
       .optional(),
@@ -965,12 +981,15 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
 
     // assessment filter
     assessmentCompletionStatus: z
-      .enum(assessmentCompletionStatusFilters)
+      .tuple(
+        [assessmentCompletionStatusFilterSchema],
+        assessmentCompletionStatusFilterSchema,
+      )
       .optional(),
   });
 
 const withSortedConventionsSchema = withOptionalSortSchema(
-  z.enum(["dateValidation", "dateStart", "dateSubmission"], {
+  z.enum(conventionAvailableSort, {
     error: localization.invalidEnum,
   }),
 );
@@ -991,7 +1010,10 @@ export const getConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatching
           dateEnd: dateFilterSchema.optional(),
           dateSubmission: dateFilterSchema.optional(),
           assessmentCompletionStatus: z
-            .enum(assessmentCompletionStatusFilters)
+            .tuple(
+              [assessmentCompletionStatusFilterSchema],
+              assessmentCompletionStatusFilterSchema,
+            )
             .optional(),
         })
         .optional(),

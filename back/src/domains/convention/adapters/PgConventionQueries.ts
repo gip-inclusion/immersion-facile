@@ -1,7 +1,9 @@
+import { addDays } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
   type AgencyId,
+  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type AssessmentCompletionStatusFilter,
   type BroadcastErrorKind,
   type ConventionAssessmentFields,
@@ -301,7 +303,7 @@ export class PgConventionQueries implements ConventionQueries {
       filterInList("status", statuses),
       filterInList("agency_id", agencyIds),
       filterByAgencyDepartmentCodes(agencyDepartmentCodes),
-      filterAssessmentCompletionStatus(assessmentCompletionStatus),
+      filterByAssessmentCompletionStatus(assessmentCompletionStatus),
     );
 
     const countQuery = filteredBuilder.select((eb) =>
@@ -499,9 +501,13 @@ const sortConventions =
     };
 
     if (!sort || !sort.by)
-      return builder.orderBy(sortByKey.dateStart, "desc") as T;
+      return builder
+        .orderBy(sortByKey.dateStart, "desc")
+        .orderBy("conventions.id", "asc") as T;
 
-    return builder.orderBy(sortByKey[sort.by], sort.direction ?? "desc") as T;
+    return builder
+      .orderBy(sortByKey[sort.by], sort.direction ?? "desc")
+      .orderBy("conventions.id", "asc") as T;
   };
 
 const filterByAgencyDepartmentCodes =
@@ -515,43 +521,63 @@ const filterByAgencyDepartmentCodes =
     );
   };
 
-const filterAssessmentCompletionStatus =
-  (assessmentCompletionStatus: AssessmentCompletionStatusFilter | undefined) =>
+const filterByAssessmentCompletionStatus =
+  (
+    assessmentCompletionStatus: AssessmentCompletionStatusFilter[] | undefined,
+  ) =>
   (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
-    if (!assessmentCompletionStatus) {
+    if (!assessmentCompletionStatus || assessmentCompletionStatus.length === 0)
       return builder;
-    }
 
-    if (assessmentCompletionStatus === "completed") {
-      return builder
-        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
-        .where((eb) =>
-          eb.exists(
-            eb
-              .selectFrom("immersion_assessments")
-              .select("convention_id")
-              .where("convention_id", "=", eb.ref("conventions.id")),
+    const hasSignedFilter = assessmentCompletionStatus.includes(
+      "completed-maybe-signed",
+    );
+    const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
+    const hasToBeCompletedFilter =
+      assessmentCompletionStatus.includes("to-be-completed");
+
+    if (hasSignedFilter && hasToSignFilter && hasToBeCompletedFilter)
+      return builder;
+
+    return builder
+      .leftJoin("immersion_assessments as ia", (join) =>
+        join
+          .onRef("ia.convention_id", "=", "conventions.id")
+          .on(
+            sql<boolean>`ia.created_at > ${addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1).toISOString()}::timestamptz`,
           ),
-        );
-    }
+      )
+      .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+      .where((eb) => {
+        const conditions: ReturnType<typeof eb>[] = [];
 
-    if (assessmentCompletionStatus === "to-be-completed") {
-      return builder
-        .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
-        .where((eb) =>
-          eb.not(
-            eb.exists(
-              eb
-                .selectFrom("immersion_assessments")
-                .select("convention_id")
-                .where("convention_id", "=", eb.ref("conventions.id")),
-            ),
-          ),
-        );
-    }
-    assessmentCompletionStatus satisfies never;
+        if (hasSignedFilter && hasToSignFilter)
+          conditions.push(eb("ia.convention_id", "is not", null));
+        else {
+          if (hasSignedFilter)
+            conditions.push(
+              eb.and([
+                eb("ia.convention_id", "is not", null),
+                eb.or([
+                  eb("ia.status", "=", "DID_NOT_SHOW"),
+                  eb("ia.signed_at", "is not", null),
+                ]),
+              ]),
+            );
+          if (hasToSignFilter)
+            conditions.push(
+              eb.and([
+                eb("ia.convention_id", "is not", null),
+                eb("ia.signed_at", "is", null),
+                eb("ia.status", "!=", "DID_NOT_SHOW"),
+              ]),
+            );
+        }
+        if (hasToBeCompletedFilter)
+          conditions.push(eb("ia.convention_id", "is", null));
 
-    return builder;
+        return conditions.length === 1 ? conditions[0] : eb.or(conditions);
+      });
   };
 
 const filterDate =

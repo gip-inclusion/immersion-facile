@@ -60,9 +60,9 @@ export const conventionDtoToConventionReadDto = async (
     ? await uow.agencyRepository.getById(agency.refersToAgencyId)
     : undefined;
 
-  const assessment = await uow.assessmentRepository.getByConventionId(
-    conventionDto.id,
-  );
+  const assessment = (
+    await uow.assessmentRepository.getByConventionIds([conventionDto.id])
+  ).at(0);
 
   return {
     ...conventionDto,
@@ -100,12 +100,14 @@ export const assesmentEntityToConventionAssessmentFields = (
         assessment: {
           status: assessmentEntity.status,
           endedWithAJob: assessmentEntity.endedWithAJob,
+          signedAt: assessmentEntity.signedAt ?? null,
           createdAt: assessmentEntity.createdAt,
         },
       }
     : {
         assessment: {
           status: assessmentEntity.status,
+          createdAt: assessmentEntity.createdAt,
         },
       };
 };

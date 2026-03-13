@@ -19,6 +19,7 @@ import {
   type FlatGetConventionsForAgencyUserParams,
   getFormattedFirstnameAndLastname,
   isNotEmptyArray,
+  makeAssessmentTextsByStatus,
   toDisplayedDate,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -115,27 +116,51 @@ export const ConventionList = () => {
   const assessmentOptions: RadioButtonsProps["options"] = useMemo(
     () => [
       {
-        label: "Bilans complétés",
+        label: makeAssessmentTextsByStatus({ isPlural: true })[
+          "to-be-completed"
+        ].longLabel,
         nativeInputProps: {
-          value: "completed",
-          checked: tempFilters.assessmentCompletionStatus === "completed",
+          value: "to-be-completed",
+          checked:
+            tempFilters.assessmentCompletionStatus?.includes("to-be-completed"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus: "completed",
+              assessmentCompletionStatus: ["to-be-completed"],
             }));
           },
         },
       },
       {
-        label: "Bilans non complétés",
+        label: makeAssessmentTextsByStatus({ isPlural: true })["to-sign"]
+          .longLabel,
         nativeInputProps: {
-          value: "to-be-completed",
-          checked: tempFilters.assessmentCompletionStatus === "to-be-completed",
+          value: "to-sign",
+          checked: tempFilters.assessmentCompletionStatus?.includes("to-sign"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus: "to-be-completed",
+              assessmentCompletionStatus: ["to-sign"],
+            }));
+          },
+        },
+      },
+      {
+        label: makeAssessmentTextsByStatus({ isPlural: true })[
+          "completed-maybe-signed"
+        ].longLabel,
+        hintText: makeAssessmentTextsByStatus({ isPlural: true })[
+          "completed-maybe-signed"
+        ].description,
+        nativeInputProps: {
+          value: "completed-maybe-signed",
+          checked: tempFilters.assessmentCompletionStatus?.includes(
+            "completed-maybe-signed",
+          ),
+          onChange: () => {
+            setTempFilters((prev) => ({
+              ...prev,
+              assessmentCompletionStatus: ["completed-maybe-signed"],
             }));
           },
         },
@@ -426,7 +451,7 @@ export const ConventionList = () => {
                       title: "Filtrer par statut",
                       content: (
                         <>
-                          <Checkbox options={statusOptions} />
+                          <RadioButtons options={statusOptions} />
                         </>
                       ),
                     },
@@ -446,15 +471,25 @@ export const ConventionList = () => {
                     values: [
                       (() => {
                         if (
-                          tempFilters.assessmentCompletionStatus === "completed"
+                          tempFilters.assessmentCompletionStatus?.includes(
+                            "completed-maybe-signed",
+                          )
                         ) {
-                          return "Bilan : Bilans complétés";
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["completed-maybe-signed"].longLabel}`;
                         }
                         if (
-                          tempFilters.assessmentCompletionStatus ===
-                          "to-be-completed"
+                          tempFilters.assessmentCompletionStatus?.includes(
+                            "to-sign",
+                          )
                         ) {
-                          return "Bilan : Bilans non complétés";
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-sign"].longLabel}`;
+                        }
+                        if (
+                          tempFilters.assessmentCompletionStatus?.includes(
+                            "to-be-completed",
+                          )
+                        ) {
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-be-completed"].longLabel}`;
                         }
                         return "Tous les bilans";
                       })(),

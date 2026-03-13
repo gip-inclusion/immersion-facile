@@ -477,12 +477,40 @@ const makeApplyFiltersToConventions =
 const makeApplyAssessmentCompletionStatusFilterConventionsRead =
   ({ assessmentCompletionStatus }: GetPaginatedConventionsFilters) =>
   (convention: ConventionReadDto) => {
-    if (!assessmentCompletionStatus) return true;
+    if (!assessmentCompletionStatus || assessmentCompletionStatus.length === 0)
+      return true;
+    if (convention.status !== "ACCEPTED_BY_VALIDATOR") return false;
+
+    const hasCompletedMaybeSignedFilter = assessmentCompletionStatus.includes(
+      "completed-maybe-signed",
+    );
+    const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
+    const hasToBeCompletedFilter =
+      assessmentCompletionStatus.includes("to-be-completed");
+
+    const hasAssessment =
+      convention.assessment !== null &&
+      convention.assessment.status !== "FINISHED" &&
+      convention.assessment.status !== "ABANDONED";
+
+    const assessment = convention.assessment;
+    const isAssessmentCompletedAndMaybeSigned =
+      hasAssessment &&
+      assessment !== null &&
+      "signedAt" in assessment &&
+      (assessment.status === "DID_NOT_SHOW" || assessment.signedAt !== null);
+
+    const isAssessmentToSign =
+      hasAssessment &&
+      assessment !== null &&
+      "signedAt" in assessment &&
+      assessment.signedAt === null &&
+      assessment.status !== "DID_NOT_SHOW";
+    const isAssessmentToBeCompleted = convention.assessment === null;
 
     return (
-      convention.status === "ACCEPTED_BY_VALIDATOR" &&
-      (assessmentCompletionStatus === "completed"
-        ? convention.assessment !== null
-        : convention.assessment === null)
+      (hasCompletedMaybeSignedFilter && isAssessmentCompletedAndMaybeSigned) ||
+      (hasToSignFilter && isAssessmentToSign) ||
+      (hasToBeCompletedFilter && isAssessmentToBeCompleted)
     );
   };

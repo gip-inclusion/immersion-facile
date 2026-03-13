@@ -5,6 +5,7 @@ import {
   dateTimeIsoStringSchema,
   emailSchema,
   legacyAssessmentStatuses,
+  makeDateStringSchema,
   siretSchema,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
@@ -34,10 +35,12 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
           z.object({
             status: z.enum(assessmentStatuses),
             endedWithAJob: z.boolean(),
+            signedAt: makeDateStringSchema().nullable(),
             createdAt: dateTimeIsoStringSchema,
           }),
           z.object({
             status: z.enum(legacyAssessmentStatuses),
+            createdAt: dateTimeIsoStringSchema,
           }),
         ])
         .nullable(),

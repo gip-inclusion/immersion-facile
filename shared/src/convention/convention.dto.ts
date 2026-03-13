@@ -339,9 +339,10 @@ export type ConventionAssessmentFields = {
     | {
         status: AssessmentStatus;
         endedWithAJob: boolean;
+        signedAt: DateString | null;
         createdAt: DateTimeIsoString;
       }
-    | { status: LegacyAssessmentDto["status"] }
+    | { status: LegacyAssessmentDto["status"]; createdAt: DateTimeIsoString }
     | null;
 };
 
@@ -485,7 +486,8 @@ export const getExactAge = ({
 };
 
 export const assessmentCompletionStatusFilters = [
-  "completed",
+  "completed-maybe-signed",
+  "to-sign",
   "to-be-completed",
 ] as const;
 
@@ -500,7 +502,7 @@ export type GetPaginatedConventionsFilters = {
   dateStart?: DateFilter;
   dateEnd?: DateFilter;
   dateSubmission?: DateFilter;
-  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter[];
 };
 
 export type GetPaginatedConventionsSortBy = keyof Pick<
@@ -540,5 +542,5 @@ export type FlatGetConventionsForAgencyUserParams = {
   dateSubmissionTo?: DateString;
 
   // assessment filter
-  assessmentCompletionStatus?: AssessmentCompletionStatusFilter;
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter[];
 };

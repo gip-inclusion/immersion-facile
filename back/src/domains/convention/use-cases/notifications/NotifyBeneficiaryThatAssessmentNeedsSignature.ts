@@ -45,9 +45,11 @@ export const makeNotifyBeneficiaryThatAssessmentNeedsSignature = useCaseBuilder(
         conventionId: inputParams.convention.id,
       });
 
-    const assessment = await uow.assessmentRepository.getByConventionId(
-      inputParams.convention.id,
-    );
+    const assessment = (
+      await uow.assessmentRepository.getByConventionIds([
+        inputParams.convention.id,
+      ])
+    ).at(0);
 
     if (!assessment)
       throw errors.assessment.notFound(inputParams.convention.id);

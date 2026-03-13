@@ -19,9 +19,11 @@ export const makeDeleteAssessment = useCaseBuilder("DeleteAssessment")
   .build(async ({ uow, deps, inputParams, currentUser }) => {
     throwIfNotAdmin(currentUser);
 
-    const existingAssessment = await uow.assessmentRepository.getByConventionId(
-      inputParams.conventionId,
-    );
+    const existingAssessment = (
+      await uow.assessmentRepository.getByConventionIds([
+        inputParams.conventionId,
+      ])
+    ).at(0);
     if (!existingAssessment)
       throw errors.assessment.notFound(inputParams.conventionId);
 
