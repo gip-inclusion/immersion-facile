@@ -538,5 +538,9 @@ describe("SendExchangeToRecipient", () => {
         );
       });
     });
+
+    it("throws when user have pending right on establishment", async () => {
+      expect(true).toBe(false);
+    });
   });
 });

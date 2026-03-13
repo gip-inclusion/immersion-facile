@@ -119,6 +119,12 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         errors.establishment.notFound({ siret }),
       );
     });
+    it("throws an error if current user right is pending", async () => {
+      expect(true).toBe(false);
+    });
+    it("throws an error if current user right is not establishment admin", async () => {
+      expect(true).toBe(false);
+    });
   });
 
   describe("Right paths", () => {

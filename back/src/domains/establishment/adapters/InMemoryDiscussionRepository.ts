@@ -5,7 +5,7 @@ import type {
   DiscussionDto,
   DiscussionId,
   DiscussionInList,
-  SiretDto,
+  SiretDto
 } from "shared";
 import type {
   DiscussionRepository,
@@ -17,7 +17,7 @@ import type {
 type DiscussionsById = Record<DiscussionId, DiscussionDto>;
 
 export class InMemoryDiscussionRepository implements DiscussionRepository {
-  constructor(private _discussions: DiscussionsById = {}) {}
+  constructor(private _discussions: DiscussionsById = {}) { }
 
   public discussionCallsCount = 0;
   public archivedDiscussionIds: DiscussionId[] = [];
@@ -62,12 +62,12 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
       ({ createdAt }) =>
         filters.createdBetween
           ? new Date(createdAt) >= filters.createdBetween.from &&
-            new Date(createdAt) <= filters.createdBetween.to
+          new Date(createdAt) <= filters.createdBetween.to
           : true,
       ({ exchanges }) =>
         filters.answeredByEstablishment !== undefined
           ? exchanges.filter((e) => e.sender === "establishment").length > 0 ===
-            filters.answeredByEstablishment
+          filters.answeredByEstablishment
           : true,
       ({ contactMode }) =>
         filters.contactMode !== undefined

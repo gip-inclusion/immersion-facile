@@ -483,5 +483,9 @@ describe("NotifyContactRequest", () => {
         }),
       );
     });
+
+    it("does not contact user with pending rights on establishment", async () => {
+      expect(true).toBe(false);
+    });
   });
 });
