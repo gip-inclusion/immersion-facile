@@ -76,7 +76,7 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
 
           const resolvedPhone = fixPhoneNumberCountryCode(pn.phoneNumber);
           const phoneToUpdate: PhoneToUpdate = {
-            currentPhone: pn,
+            currentPhone: { ...pn, verifiedAt: null },
             newPhoneNumber: resolvedPhone ?? defaultPhoneNumber,
           };
 
