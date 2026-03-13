@@ -23,9 +23,9 @@ jobs:
           scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
                 echo \"> \$(date) - Installing tools\" &&
                   install-scalingo-cli &&
-                  dbclient-fetcher pgsql &&
+                  dbclient-fetcher pgsql 16 &&
                 echo \"> \$(date) - Dumping prod DB (excluding large unused tables)\" &&
-                  pg_dump --dbname=\"\$SOURCE_PROD_DATABASE_URL\" \
+                  /app/bin/pg_dump --dbname=\"\$SOURCE_PROD_DATABASE_URL\" \
                     --format=custom \
                     --no-owner \
                     --no-privileges \
@@ -52,7 +52,7 @@ jobs:
                 echo \"> \$(date) - Add Postgis extension if not exists\" &&
                   psql \$SCALINGO_POSTGRESQL_URL -c 'CREATE EXTENSION IF NOT EXISTS postgis;' &&
                 echo \"> \$(date) - Starting restore to nightly\" &&
-                  pg_restore \
+                  /app/bin/pg_restore \
                     --dbname=\$SCALINGO_POSTGRESQL_URL \
                     --jobs=8 \
                     --verbose \
