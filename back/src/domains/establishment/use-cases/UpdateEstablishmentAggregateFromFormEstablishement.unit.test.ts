@@ -779,6 +779,12 @@ describe("Update Establishment aggregate from form data", () => {
           }),
         );
       });
+      it("throws an error if current user right is pending", async () => {
+        expect(true).toBe(false);
+      });
+      it("throws an error if current user right is not admin", async () => {
+        expect(true).toBe(false);
+      });
     });
 
     describe("Right paths", () => {

@@ -8,6 +8,7 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type UserId,
 } from "shared";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -1506,6 +1507,49 @@ describe("AddExchangeToDiscussion", () => {
           errors.user.notFound({ userId: unknownUser.id }),
         );
       });
+    });
+    it("throws an error if user right of sender is pending", async () => {
+      const userId: UserId = "usefIaaaaad2c-6f02-11ec-90d6-0242ac120012";
+      const userWithPendingRight = new ConnectedUserBuilder()
+        .withId(userId)
+        .withProConnectInfos(null)
+        .withEmail("lemorzadec@douarnenez.com")
+        .build();
+      const establishmentAggregateWithPendingUserRight =
+        new EstablishmentAggregateBuilder(establishment1)
+          .withUserRights([
+            {
+              userId: userWithPendingRight.id,
+              status: "PENDING",
+              role: "establishment-contact",
+              shouldReceiveDiscussionNotifications: true,
+            },
+          ])
+          .build();
+
+      await uow.userRepository.save(userWithPendingRight);
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregateWithPendingUserRight,
+      );
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(
+          {
+            source: "dashboard",
+            messageInputs: [
+              {
+                message: "Hello",
+                discussionId: pendingDiscussion1.id,
+                recipientRole: "potentialBeneficiary",
+                attachments: [],
+              },
+            ],
+          },
+          userWithPendingRight,
+        ),
+        errors.user.forbidden({ userId: userWithPendingRight.id }),
+      );
+      expect(true).toBe(false);
     });
   });
 

@@ -118,5 +118,9 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
         ],
       });
     });
+
+    it("Does not cc contact if contact user have pending right on establishment", async () => {
+      expect(true).toBe(false);
+    });
   });
 });

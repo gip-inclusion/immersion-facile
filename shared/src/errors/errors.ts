@@ -1088,6 +1088,12 @@ export const errors = {
         `La candidature '${discussionId}' n'a pas le statut '${expectedStatus}'.`,
       ),
   },
+  discussions: {
+    accessForbidden: ({ siret, userId }: { siret: SiretDto; userId: UserId }) =>
+      new ForbiddenError(
+        `L'utilisateur '${userId}' n'a pas accès aux candidatures de l'entreprise avec le SIRET ${siret}'.`,
+      ),
+  },
   establishmentGroup: {
     missingBySlug: ({ groupSlug }: { groupSlug: GroupSlug }) =>
       new NotFoundError(`Aucun group avec le terme ${groupSlug} trouvé.`),

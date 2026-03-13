@@ -69,6 +69,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
     ];
   });
 
+  it("", () => {
+    // Delete usecase because unused from front to back
+    expect(true).toBe(false);
+  });
   describe("right paths", () => {
     describe("allow get establishment name and admins", () => {
       it.each([
