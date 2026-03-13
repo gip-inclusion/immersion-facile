@@ -3,7 +3,7 @@ import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
   type AgencyId,
-  ASSESSMENT_SIGNATURE_RELEASE_DATE,
+  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type AssessmentCompletionStatusFilter,
   type BroadcastErrorKind,
   type ConventionAssessmentFields,
@@ -530,31 +530,32 @@ const filterByAssessmentCompletionStatus =
     if (!assessmentCompletionStatus || assessmentCompletionStatus.length === 0)
       return builder;
 
-    const hasSigned = assessmentCompletionStatus.includes(
+    const hasSignedFilter = assessmentCompletionStatus.includes(
       "completed-maybe-signed",
     );
-    const hasToSign = assessmentCompletionStatus.includes("to-sign");
-    const hasToBeCompleted =
+    const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
+    const hasToBeCompletedFilter =
       assessmentCompletionStatus.includes("to-be-completed");
 
-    if (hasSigned && hasToSign && hasToBeCompleted) return builder;
+    if (hasSignedFilter && hasToSignFilter && hasToBeCompletedFilter)
+      return builder;
 
     return builder
       .leftJoin("immersion_assessments as ia", (join) =>
         join
           .onRef("ia.convention_id", "=", "conventions.id")
           .on(
-            sql<boolean>`ia.created_at > ${addDays(ASSESSMENT_SIGNATURE_RELEASE_DATE, 1).toISOString()}::timestamptz`,
+            sql<boolean>`ia.created_at > ${addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1).toISOString()}::timestamptz`,
           ),
       )
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .where((eb) => {
         const conditions: ReturnType<typeof eb>[] = [];
 
-        if (hasSigned && hasToSign)
+        if (hasSignedFilter && hasToSignFilter)
           conditions.push(eb("ia.convention_id", "is not", null));
         else {
-          if (hasSigned)
+          if (hasSignedFilter)
             conditions.push(
               eb.and([
                 eb("ia.convention_id", "is not", null),
@@ -564,7 +565,7 @@ const filterByAssessmentCompletionStatus =
                 ]),
               ]),
             );
-          if (hasToSign)
+          if (hasToSignFilter)
             conditions.push(
               eb.and([
                 eb("ia.convention_id", "is not", null),
@@ -573,7 +574,7 @@ const filterByAssessmentCompletionStatus =
               ]),
             );
         }
-        if (hasToBeCompleted)
+        if (hasToBeCompletedFilter)
           conditions.push(eb("ia.convention_id", "is", null));
 
         return conditions.length === 1 ? conditions[0] : eb.or(conditions);

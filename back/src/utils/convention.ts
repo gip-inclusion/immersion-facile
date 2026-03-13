@@ -107,6 +107,7 @@ export const assesmentEntityToConventionAssessmentFields = (
     : {
         assessment: {
           status: assessmentEntity.status,
+          createdAt: assessmentEntity.createdAt,
         },
       };
 };

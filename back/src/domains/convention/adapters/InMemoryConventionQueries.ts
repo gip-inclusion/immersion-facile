@@ -481,32 +481,36 @@ const makeApplyAssessmentCompletionStatusFilterConventionsRead =
       return true;
     if (convention.status !== "ACCEPTED_BY_VALIDATOR") return false;
 
-    const hasSigned = assessmentCompletionStatus.includes(
+    const hasCompletedMaybeSignedFilter = assessmentCompletionStatus.includes(
       "completed-maybe-signed",
     );
-    const hasToSign = assessmentCompletionStatus.includes("to-sign");
-    const hasToBeCompleted =
+    const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
+    const hasToBeCompletedFilter =
       assessmentCompletionStatus.includes("to-be-completed");
 
-    const assessment = convention.assessment;
     const hasAssessment =
-      assessment !== null &&
-      assessment.status !== "FINISHED" &&
-      assessment.status !== "ABANDONED";
+      convention.assessment !== null &&
+      convention.assessment.status !== "FINISHED" &&
+      convention.assessment.status !== "ABANDONED";
 
-    let matchesSigned = false;
-    let matchesToSign = false;
-    if (hasAssessment && assessment && "signedAt" in assessment) {
-      matchesSigned =
-        assessment.status === "DID_NOT_SHOW" || assessment.signedAt !== null;
-      matchesToSign =
-        assessment.signedAt === null && assessment.status !== "DID_NOT_SHOW";
-    }
-    const matchesToBeCompleted = assessment === null;
+    const assessment = convention.assessment;
+    const isAssessmentCompletedAndMaybeSigned =
+      hasAssessment &&
+      assessment !== null &&
+      "signedAt" in assessment &&
+      (assessment.status === "DID_NOT_SHOW" || assessment.signedAt !== null);
+
+    const isAssessmentToSign =
+      hasAssessment &&
+      assessment !== null &&
+      "signedAt" in assessment &&
+      assessment.signedAt === null &&
+      assessment.status !== "DID_NOT_SHOW";
+    const isAssessmentToBeCompleted = convention.assessment === null;
 
     return (
-      (hasSigned && matchesSigned) ||
-      (hasToSign && matchesToSign) ||
-      (hasToBeCompleted && matchesToBeCompleted)
+      (hasCompletedMaybeSignedFilter && isAssessmentCompletedAndMaybeSigned) ||
+      (hasToSignFilter && isAssessmentToSign) ||
+      (hasToBeCompletedFilter && isAssessmentToBeCompleted)
     );
   };

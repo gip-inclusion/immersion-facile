@@ -7,11 +7,11 @@ import { useCallback, useEffect } from "react";
 import { HeadingSection, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  assessmentTextsByStatus,
   type ConventionReadDto,
   domElementIds,
   type FlatGetConventionsForAgencyUserParams,
   getAssessmentCompletionStatusFilter,
+  makeAssessmentTextsByStatus,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
   toDisplayedDate,
 } from "shared";
@@ -24,10 +24,7 @@ import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/con
 const filters: FlatGetConventionsForAgencyUserParams = {
   sortBy: "dateEnd",
   sortDirection: "asc",
-  assessmentCompletionStatus: ["to-be-completed", "to-sign"] as [
-    "to-be-completed",
-    "to-sign",
-  ],
+  assessmentCompletionStatus: ["to-be-completed", "to-sign"],
   page: 1,
   perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
 };
@@ -49,7 +46,7 @@ export const ConventionsWithAssessmentToCompleteList = ({
   );
 
   const fetchConventions = useCallback(
-    (page: number) => {
+    ({ page }: { page: number }) => {
       if (connectedUserJwt) {
         dispatch(
           connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
@@ -70,12 +67,12 @@ export const ConventionsWithAssessmentToCompleteList = ({
   );
 
   useEffect(() => {
-    fetchConventions(1);
+    fetchConventions({ page: 1 });
   }, [fetchConventions]);
 
   const onPaginationClick = useCallback(
     (pageNumber: number) => {
-      fetchConventions(pageNumber);
+      fetchConventions({ page: pageNumber });
     },
     [fetchConventions],
   );
@@ -135,12 +132,16 @@ const AssessmentToCompleteTaskItem = ({
         severity="warning"
         small
       >
-        Bilan {assessmentTextsByStatus[assessmentCompletionStatus].shortLabel}
+        {
+          makeAssessmentTextsByStatus({ isPlural: false })[
+            assessmentCompletionStatus
+          ].shortLabel
+        }
       </Badge>
     </>
   );
   const footer = convention.assessment
-    ? `Date de complétion du bilan : ${toDisplayedDate({ date: new Date(convention.dateEnd) })}`
+    ? `Date de complétion du bilan : ${toDisplayedDate({ date: new Date(convention.assessment.createdAt) })}`
     : `Date de fin d'immersion : ${toDisplayedDate({ date: new Date(convention.dateEnd) })}`;
 
   return (
@@ -148,13 +149,15 @@ const AssessmentToCompleteTaskItem = ({
       title={title}
       titleAs="h3"
       description={
-        assessmentTextsByStatus[assessmentCompletionStatus].description
+        makeAssessmentTextsByStatus({ isPlural: false })[
+          assessmentCompletionStatus
+        ].description
       }
       footer={footer}
       buttonsRows={[
         {
           id: domElementIds.manageConventionUserConnected
-            .pilotConventionToManageButton,
+            .pilotConventionWithAssessmentIssueButton,
           content: (
             <Button
               priority="secondary"
