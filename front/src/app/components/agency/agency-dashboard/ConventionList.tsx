@@ -12,7 +12,6 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { HeadingSection, RichTable } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  assessmentTextsByStatus,
   type ConventionStatus,
   conventionStatuses,
   defaultPerPageInWebPagination,
@@ -20,6 +19,7 @@ import {
   type FlatGetConventionsForAgencyUserParams,
   getFormattedFirstnameAndLastname,
   isNotEmptyArray,
+  makeAssessmentTextsByStatus,
   toDisplayedDate,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -113,10 +113,12 @@ export const ConventionList = () => {
     },
   });
 
-  const assessmentOptions: CheckboxProps["options"] = useMemo(
+  const assessmentOptions: RadioButtonsProps["options"] = useMemo(
     () => [
       {
-        label: `Bilans ${assessmentTextsByStatus["to-be-completed"].longLabel}`,
+        label: makeAssessmentTextsByStatus({ isPlural: true })[
+          "to-be-completed"
+        ].longLabel,
         nativeInputProps: {
           value: "to-be-completed",
           checked:
@@ -124,40 +126,32 @@ export const ConventionList = () => {
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus:
-                prev.assessmentCompletionStatus?.includes("to-be-completed")
-                  ? prev.assessmentCompletionStatus.filter(
-                      (s) => s !== "to-be-completed",
-                    )
-                  : [
-                      ...(prev.assessmentCompletionStatus ?? []),
-                      "to-be-completed",
-                    ],
+              assessmentCompletionStatus: ["to-be-completed"],
             }));
           },
         },
       },
       {
-        label: `Bilans ${assessmentTextsByStatus["to-sign"].longLabel}`,
+        label: makeAssessmentTextsByStatus({ isPlural: true })["to-sign"]
+          .longLabel,
         nativeInputProps: {
           value: "to-sign",
           checked: tempFilters.assessmentCompletionStatus?.includes("to-sign"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus:
-                prev.assessmentCompletionStatus?.includes("to-sign")
-                  ? prev.assessmentCompletionStatus.filter(
-                      (s) => s !== "to-sign",
-                    )
-                  : [...(prev.assessmentCompletionStatus ?? []), "to-sign"],
+              assessmentCompletionStatus: ["to-sign"],
             }));
           },
         },
       },
       {
-        label: `Bilans ${assessmentTextsByStatus["completed-maybe-signed"].longLabel}`,
-        hintText: assessmentTextsByStatus["completed-maybe-signed"].description,
+        label: makeAssessmentTextsByStatus({ isPlural: true })[
+          "completed-maybe-signed"
+        ].longLabel,
+        hintText: makeAssessmentTextsByStatus({ isPlural: true })[
+          "completed-maybe-signed"
+        ].description,
         nativeInputProps: {
           value: "completed-maybe-signed",
           checked: tempFilters.assessmentCompletionStatus?.includes(
@@ -166,17 +160,7 @@ export const ConventionList = () => {
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus:
-                prev.assessmentCompletionStatus?.includes(
-                  "completed-maybe-signed",
-                )
-                  ? prev.assessmentCompletionStatus.filter(
-                      (s) => s !== "completed-maybe-signed",
-                    )
-                  : [
-                      ...(prev.assessmentCompletionStatus ?? []),
-                      "completed-maybe-signed",
-                    ],
+              assessmentCompletionStatus: ["completed-maybe-signed"],
             }));
           },
         },
@@ -491,21 +475,21 @@ export const ConventionList = () => {
                             "completed-maybe-signed",
                           )
                         ) {
-                          return `Bilan : Bilans ${assessmentTextsByStatus["completed-maybe-signed"].longLabel}`;
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["completed-maybe-signed"].longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
                             "to-sign",
                           )
                         ) {
-                          return `Bilan : Bilans ${assessmentTextsByStatus["to-sign"].longLabel}`;
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-sign"].longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
                             "to-be-completed",
                           )
                         ) {
-                          return `Bilan : Bilans ${assessmentTextsByStatus["to-be-completed"].longLabel}`;
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-be-completed"].longLabel}`;
                         }
                         return "Tous les bilans";
                       })(),
