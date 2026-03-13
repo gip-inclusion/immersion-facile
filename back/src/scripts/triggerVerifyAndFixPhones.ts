@@ -42,13 +42,13 @@ const verifyAndFixPhones = async () => {
   return await verifyAndRequestInvalidPhonesUpdate.execute();
 };
 
-export const triggerMarkObsoleteDiscussionsAsDeprecated = ({
+const triggerVerifyAndFixPhones = ({
   exitOnFinish,
 }: {
   exitOnFinish: boolean;
 }) =>
   handleCRONScript({
-    name: "triggerMarkObsoleteDiscussionsAsDeprecated",
+    name: "triggerVerifyAndFixPhones",
     config,
     script: verifyAndFixPhones,
     handleResults: (report) =>
@@ -56,3 +56,5 @@ export const triggerMarkObsoleteDiscussionsAsDeprecated = ({
     logger,
     exitOnFinish,
   });
+
+triggerVerifyAndFixPhones({ exitOnFinish: true });
