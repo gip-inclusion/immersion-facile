@@ -17,6 +17,7 @@ import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   zStringCanBeEmpty,
   zStringCanBeEmptyMax9200,
+  zStringMinLength1Max255,
   zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import { zUuidLike } from "../utils/uuid";
@@ -69,7 +70,7 @@ const establishmentContactBaseSchema = z.object({
   role: z.literal("establishment-contact"),
   email: emailSchema,
   shouldReceiveDiscussionNotifications: zBoolean,
-  job: zStringMinLength1Max1024.optional(),
+  job: zStringMinLength1Max255.optional(),
   isMainContactInPerson: zBoolean.optional(),
 });
 
@@ -89,7 +90,7 @@ const establishmentAdminSchema = z.object({
   isMainContactByPhone: zBoolean,
   isMainContactInPerson: zBoolean.optional(),
   shouldReceiveDiscussionNotifications: zBoolean,
-  job: zStringMinLength1Max1024,
+  job: zStringMinLength1Max255,
 });
 
 export const formEstablishmentUserRightSchema: ZodSchemaWithInputMatchingOutput<FormEstablishmentUserRight> =
@@ -144,7 +145,7 @@ const formEstablishmentCommonShape = {
   source: formEstablishmentSourceSchema,
   siret: siretSchema,
   businessName: businessNameSchema,
-  businessNameCustomized: zStringMinLength1Max1024
+  businessNameCustomized: zStringMinLength1Max255
     .refine(
       (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
       "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
