@@ -95,22 +95,30 @@ export const createTechnicalRouter = (
           .execute(
             {
               source: "inbound-parsing",
-              messageInputs: req.body.items.map((brevoEmailItem) => ({
-                senderEmail: brevoEmailItem.From.Address,
-                message: processInboundParsingEmailMessage(brevoEmailItem),
-                ...getDiscussionParamsFromEmail(
-                  brevoEmailItem.To[0].Address,
-                  `reply.${deps.config.immersionFacileDomain}`,
-                ),
-                sentAt: new Date(brevoEmailItem.SentAtDate).toISOString(),
-                attachments: (brevoEmailItem.Attachments || []).map(
-                  (attachment) => ({
-                    name: attachment.Name,
-                    link: attachment.DownloadToken,
-                  }),
-                ),
-                subject: getSubjectFromEmail(brevoEmailItem),
-              })),
+              messageInputs: req.body.items.map((brevoEmailItem) => {
+                if (!brevoEmailItem.To.length || !brevoEmailItem.To[0]?.Address)
+                  logger.error({
+                    message: `Inbound email with missing To Address - MessageId: ${brevoEmailItem.MessageId} - From: ${JSON.stringify(brevoEmailItem.From)} - To: ${JSON.stringify(brevoEmailItem.To)}`,
+                    request: { path: req.path, method: req.method },
+                  });
+
+                return {
+                  senderEmail: brevoEmailItem.From.Address,
+                  message: processInboundParsingEmailMessage(brevoEmailItem),
+                  ...getDiscussionParamsFromEmail(
+                    brevoEmailItem.To[0].Address,
+                    `reply.${deps.config.immersionFacileDomain}`,
+                  ),
+                  sentAt: new Date(brevoEmailItem.SentAtDate).toISOString(),
+                  attachments: (brevoEmailItem.Attachments || []).map(
+                    (attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    }),
+                  ),
+                  subject: getSubjectFromEmail(brevoEmailItem),
+                };
+              }),
             },
             undefined,
           )
