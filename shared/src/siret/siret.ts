@@ -44,6 +44,7 @@ export type NumberEmployeesRange = (typeof numberEmployeesRanges)[number];
 export const numberEmployeesRanges = [
   "",
   "0",
+  "0-0",
   "1-2",
   "3-5",
   "6-9",
