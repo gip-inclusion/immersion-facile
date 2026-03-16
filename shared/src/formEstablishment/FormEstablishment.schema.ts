@@ -41,8 +41,8 @@ import type {
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
 import {
+  establishmentUserRightStatus,
   fitForDisabledWorkersOptions,
-  formEstablishmentUserRightStatus,
   remoteWorkModes,
 } from "./FormEstablishment.dto";
 
@@ -68,7 +68,7 @@ export const contactModeSchema = zEnumValidation(
 );
 
 const formEstablishmentUserRightStatusSchema = zEnumValidation(
-  formEstablishmentUserRightStatus,
+  establishmentUserRightStatus,
   "Le statut est inconnu",
 );
 
