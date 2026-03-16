@@ -58,7 +58,9 @@ export const RenewExpiredJwtButton = ({
         id: domElementIds.magicLinkRenewal.renewalButton,
       }}
     >
-      Demander un nouveau lien
+      {renewExpiredJwtFeedback?.level === "success"
+        ? "Nouveau lien envoyé"
+        : "Demander un nouveau lien"}
     </Button>
   );
 };
