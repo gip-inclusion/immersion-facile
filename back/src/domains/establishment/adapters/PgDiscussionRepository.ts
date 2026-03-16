@@ -382,7 +382,8 @@ export class PgDiscussionRepository implements DiscussionRepository {
         )
         .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
         .where("eu.user_id", "=", userId)
-        .where("eu.role", "in", authorizedRoles),
+        .where("eu.role", "in", authorizedRoles)
+        .where("eu.status", "=", "ACCEPTED"),
       (b) => {
         if (!filters?.statuses || filters.statuses.length === 0) return b;
         return b.where("discussions.status", "in", filters.statuses);

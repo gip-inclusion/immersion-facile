@@ -67,8 +67,14 @@ describe("PgDiscussionRepository", () => {
   let establishmentAggregateRepo: PgEstablishmentAggregateRepository;
   let db: KyselyDb;
 
-  const user = new UserBuilder().withId(new UuidV4Generator().new()).build();
-  const pendingUser = new UserBuilder().withId(new UuidV4Generator().new()).build();
+  const user = new UserBuilder()
+    .withId(new UuidV4Generator().new())
+    .withEmail("user@test.com")
+    .build();
+  const pendingUser = new UserBuilder()
+    .withId(new UuidV4Generator().new())
+    .withEmail("pending-user@test.com")
+    .build();
 
   beforeAll(async () => {
     pool = makeTestPgPool();
@@ -87,7 +93,9 @@ describe("PgDiscussionRepository", () => {
     pgDiscussionRepository = new PgDiscussionRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
 
-    await new PgUserRepository(db).save(user);
+    const userRepo = new PgUserRepository(db);
+    await userRepo.save(user);
+    await userRepo.save(pendingUser);
   });
 
   afterAll(async () => {
@@ -2220,11 +2228,10 @@ describe("PgDiscussionRepository", () => {
       describe("combo filters", () => {
         it("exclude discussions that does not match filters", async () => {
           const sentByBeneficiary: SpecificExchangeSender<"potentialBeneficiary"> =
-          {
-            sender: "potentialBeneficiary",
-          };
-          const sentByEstablishment: SpecificExchangeSender<"establishment"> =
-          {
+            {
+              sender: "potentialBeneficiary",
+            };
+          const sentByEstablishment: SpecificExchangeSender<"establishment"> = {
             sender: "establishment",
             email: "mail@mail.com",
             firstname: "billy",
@@ -2263,15 +2270,13 @@ describe("PgDiscussionRepository", () => {
           )
             .withId(uuid())
             .withExchanges(
-              [sentByBeneficiary, sentByEstablishment].map(
-                (rest, index) => ({
-                  ...rest,
-                  message: "",
-                  subject: "",
-                  attachments: [],
-                  sentAt: addHours(new Date(date), index).toISOString(),
-                }),
-              ),
+              [sentByBeneficiary, sentByEstablishment].map((rest, index) => ({
+                ...rest,
+                message: "",
+                subject: "",
+                attachments: [],
+                sentAt: addHours(new Date(date), index).toISOString(),
+              })),
             )
             .withCreatedAt(
               addHours(
@@ -2393,6 +2398,21 @@ describe("PgDiscussionRepository", () => {
         .withStatus({ status: "REJECTED", rejectionKind: "UNABLE_TO_HELP" })
         .build();
 
+      const discussion4Objective: ImmersionObjective =
+        "Initier une démarche de recrutement";
+
+      const discussion4 = new DiscussionBuilder()
+        .withId(uuid())
+        .withSiret("00000000000004")
+        .withPotentialBeneficiaryFirstname("John")
+        .withBusinessName("Something else")
+        .withAppellationCode(styliste.appellationCode)
+        .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
+        .withCreatedAt(new Date("2025-05-21"))
+        .withImmersionObjective(discussion4Objective)
+        .withStatus({ status: "PENDING" })
+        .build();
+
       const discussion2InList: DiscussionInList = {
         id: discussion2.id,
         siret: discussion2.siret,
@@ -2429,10 +2449,29 @@ describe("PgDiscussionRepository", () => {
         exchanges: discussion3.exchanges,
       };
 
+      const discussion4InList: DiscussionInList = {
+        id: discussion4.id,
+        siret: discussion4.siret,
+        status: discussion4.status,
+        appellation: styliste,
+        businessName: discussion4.businessName,
+        createdAt: discussion4.createdAt,
+        kind: discussion4.kind,
+        potentialBeneficiary: {
+          firstName: discussion4.potentialBeneficiary.firstName,
+          lastName: discussion4.potentialBeneficiary.lastName,
+          phone: potentialBeneficiaryPhone,
+        },
+        city: discussion4.address.city,
+        immersionObjective: discussion4Objective,
+        exchanges: discussion4.exchanges,
+      };
+
       beforeEach(async () => {
         await pgDiscussionRepository.insert(discussion1);
         await pgDiscussionRepository.insert(discussion2);
         await pgDiscussionRepository.insert(discussion3);
+        await pgDiscussionRepository.insert(discussion4);
 
         await establishmentAggregateRepo.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
@@ -2491,22 +2530,63 @@ describe("PgDiscussionRepository", () => {
       });
 
       it("returns no discussions if user has no ACCEPTED status on any establishment right", async () => {
-        const result = await pgDiscussionRepository.getPaginatedDiscussionsForUser({
-          pagination: {
-            page: 1,
-            perPage: 10,
-          },
-          sort: { by: "createdAt", direction: "desc" },
-          userId: pendingUser.id,
-        });
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            sort: { by: "createdAt", direction: "desc" },
+            userId: pendingUser.id,
+          });
 
         expectToEqual(result, {
           data: [],
           pagination: {
             currentPage: 1,
             numberPerPage: 10,
-            totalPages: 1,
+            totalPages: 0,
             totalRecords: 0,
+          },
+        });
+      });
+
+      it("filters out discussions on establishment user right with status PENDING and keeps discussions on establishment user right with status ACCEPTED", async () => {
+        await establishmentAggregateRepo.insertEstablishmentAggregate(
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(discussion4.siret)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                status: "ACCEPTED",
+                userId: pendingUser.id,
+                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
+                job: "",
+                phone: "+33600000000",
+              },
+            ])
+            .withLocationId(uuid())
+            .withOffers([stylisteOffer])
+            .build(),
+        );
+
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            sort: { by: "createdAt", direction: "desc" },
+            userId: pendingUser.id,
+          });
+        expectToEqual(result, {
+          data: [discussion4InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 1,
           },
         });
       });
