@@ -1,16 +1,13 @@
 import { useDispatch } from "react-redux";
 import {
-  authExpiredMessage,
-  expiredJwtErrorTitle,
   getJwtExpiredSinceInSeconds,
   handleJWTStringPossiblyContainingJsonError,
-  oneMinuteInSeconds,
 } from "shared";
 import { RenewExpiredJwtButton } from "src/app/components/auth/RenewExpiredJwtButton";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
-import { ContactUsButton } from "src/app/pages/error/front-errors";
+import { ContactUsButton, frontErrors } from "src/app/pages/error/front-errors";
 import { type routes, useRoute } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -33,26 +30,7 @@ export const MagicLinkInterstitialPage = () => {
   );
 
   if (expiredSinceSeconds) {
-    const expiredMessage = authExpiredMessage(
-      Math.ceil(expiredSinceSeconds / oneMinuteInSeconds),
-    );
-    return (
-      <ErrorPage
-        title={expiredJwtErrorTitle}
-        buttons={[
-          RenewJwtButton,
-          <ContactUsButton
-            key={"contact-us-button"}
-            errorMessage={expiredMessage}
-          />,
-        ]}
-        error={{
-          message: expiredMessage,
-          name: "Erreur de connexion",
-        }}
-        feedbackTopic={feedbackTopic}
-      />
-    );
+    throw frontErrors.auth.expiredJwt({ RenewJwtButton });
   }
 
   return (

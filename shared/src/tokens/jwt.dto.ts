@@ -25,7 +25,7 @@ export type JwtDto = {
   jwt: AppSupportedJwt;
 };
 
-export const expiredJwtErrorTitle = "Erreur lors du renouvellement de lien";
+export const expiredJwtErrorTitle = "Votre lien de connexion a expiré";
 export const expiredJwtErrorMessage = "Le lien magique est périmé";
 export const unsupportedMagicLinkErrorMessage =
   "Le lien magique est n'est pas valide";

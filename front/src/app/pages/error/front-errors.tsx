@@ -1,8 +1,10 @@
 import Button from "@codegouvfr/react-dsfr/Button";
+import type { ReactElement } from "react";
 import {
   type ConventionId,
   domElementIds,
   type Email,
+  expiredJwtErrorTitle,
   immersionFacileContactEmail,
   type SiretDto,
 } from "shared";
@@ -23,6 +25,31 @@ export class FrontSpecificError extends Error {
 }
 
 export const frontErrors = {
+  auth: {
+    expiredJwt: ({ RenewJwtButton }: { RenewJwtButton: ReactElement }) =>
+      new FrontSpecificError({
+        title: expiredJwtErrorTitle,
+        description: (
+          <>
+            <p>
+              Pour des raisons de sécurité, les liens de connexion sont valables
+              pendant une durée limitée.
+            </p>
+            <p>
+              Vous pouvez demander un nouveau lien ci-dessous. Il vous sera
+              envoyé par email dans les 2 à 3 minutes.
+            </p>
+            <p>
+              Vous n'avez pas reçu le lien ?{" "}
+              <a href={`mailto:${immersionFacileContactEmail}`}>
+                Contactez-nous
+              </a>
+            </p>
+          </>
+        ),
+        buttons: [RenewJwtButton],
+      }),
+  },
   generic: {
     pageNotFound: () =>
       new FrontSpecificError({
