@@ -47,9 +47,10 @@ export const createConventionTemplate = async (
   );
   await page.waitForURL(`${frontRoutes.conventionTemplate}**`);
 
+  const templateName = "Mon premier modèle de convention";
   await page.fill(
     `#${domElementIds.conventionTemplate.form.nameInput}`,
-    "Mon premier modèle de convention",
+    templateName,
   );
   await fillConventionForm(page);
 
@@ -60,6 +61,11 @@ export const createConventionTemplate = async (
 
   await goToDashboard(page, dashboardKind);
   await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+  await expect(
+    page
+      .locator('[id^="convention-template-"]')
+      .getByRole("heading", { name: templateName }),
+  ).toHaveCount(1);
 };
 
 export const deleteConventionTemplate = async (
@@ -97,21 +103,15 @@ export const initiateConvention = async ({
   await page.goto("/");
   await goToDashboard(page, dashboardKind);
   await page.click(`#${domIds.initiateConvention.button}`);
-  await expect(
-    page.locator(`#${domIds.initiateConvention.modal}`),
-  ).toBeVisible();
 
   if (fromConventionTemplate) {
     await initiateConventionFromConventionTemplate({ page, dashboardKind });
     return;
   }
 
-  if (dashboardKind === "establishment") {
-    await initiateConventionFromEstablishmentInformations({ page });
-    return;
-  }
-
-  await initiateConventionFromAgencyInformations({ page });
+  dashboardKind === "establishment"
+    ? await initiateConventionFromEstablishmentInformations({ page })
+    : await initiateConventionFromAgencyInformations({ page });
 };
 
 const initiateConventionFromConventionTemplate = async ({
@@ -159,6 +159,12 @@ const initiateConventionFromEstablishmentInformations = async ({
 }: {
   page: Page;
 }) => {
+  await page.goto("/");
+  await goToDashboard(page, "establishment");
+  await page.click(
+    `#${domElementIds.establishmentDashboard.initiateConvention.button}`,
+  );
+
   const establishmentSelectLocator = page.locator(
     `#${domElementIds.establishmentDashboard.initiateConvention.establishmentSelect}`,
   );
@@ -204,9 +210,20 @@ const initiateConventionFromAgencyInformations = async ({
 }: {
   page: Page;
 }) => {
+  await page.goto("/");
+  await goToDashboard(page, "agency");
   await page.click(
-    `#${domElementIds.agencyDashboard.initiateConvention.modalButton}`,
+    `#${domElementIds.agencyDashboard.initiateConvention.button}`,
   );
+
+  const hasConventionTemplates =
+    (await page.locator('[id^="convention-template-"]').count()) > 0;
+
+  if (hasConventionTemplates) {
+    await page.click(
+      `#${domElementIds.agencyDashboard.initiateConvention.modalButton}`,
+    );
+  }
 
   await expect(
     page.locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`),

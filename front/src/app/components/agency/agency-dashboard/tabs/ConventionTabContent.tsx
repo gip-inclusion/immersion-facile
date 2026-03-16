@@ -186,6 +186,9 @@ export const ConventionTabContent = ({
     selectAgencyToInitiateConventionModal.open();
     if (activeAgencies.length === 1) {
       setValue("selectedAgencyId", activeAgencies[0].id);
+      if (conventionTemplates.length === 0) {
+        onInitiateConventionFormSubmit();
+      }
     }
   };
 
@@ -285,16 +288,18 @@ export const ConventionTabContent = ({
               })}
               visible={submitCount !== 0 && Object.keys(formErrors).length > 0}
             />
-            <RadioButtons
-              id={
-                domElementIds.agencyDashboard.initiateConvention
-                  .sourceRadioButtons
-              }
-              name="initiateConventionSource"
-              legend="Comment souhaitez-vous initier la convention ?"
-              options={initiateConventionSourceOptions}
-              className={fr.cx("fr-mb-3w")}
-            />
+            {conventionTemplates.length > 0 && (
+              <RadioButtons
+                id={
+                  domElementIds.agencyDashboard.initiateConvention
+                    .sourceRadioButtons
+                }
+                name="initiateConventionSource"
+                legend="Comment souhaitez-vous initier la convention ?"
+                options={initiateConventionSourceOptions}
+                className={fr.cx("fr-mb-3w")}
+              />
+            )}
             <SectionHighlight>
               {match({ initiateConventionSource, activeAgencies })
                 .with(

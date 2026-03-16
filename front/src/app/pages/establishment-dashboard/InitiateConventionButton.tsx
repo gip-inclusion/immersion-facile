@@ -18,9 +18,8 @@ import {
   domElementIds,
   type SiretDto,
   siretSchema,
-  zStringMinLength1Max1024,
   toDisplayedDate,
-  zStringMinLength1,
+  zStringMinLength1Max1024,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
@@ -298,16 +297,18 @@ export const InitiateConventionButton = () => {
               Créer une convention depuis votre espace vous permet de la
               pré-remplir avec vos informations ou à partir d'un modèle.
             </p>
-            <RadioButtons
-              id={
-                domElementIds.establishmentDashboard.initiateConvention
-                  .sourceRadioButtons
-              }
-              name="initiateConventionSource"
-              legend="Comment souhaitez-vous initier la convention ?"
-              options={initiateConventionSourceOptions}
-              className={fr.cx("fr-mb-3w")}
-            />
+            {conventionTemplates.length > 0 && (
+              <RadioButtons
+                id={
+                  domElementIds.establishmentDashboard.initiateConvention
+                    .sourceRadioButtons
+                }
+                name="initiateConventionSource"
+                legend="Comment souhaitez-vous initier la convention ?"
+                options={initiateConventionSourceOptions}
+                className={fr.cx("fr-mb-3w")}
+              />
+            )}
             <SectionHighlight>
               {initiateConventionSource === "template" ? (
                 <RadioButtons
