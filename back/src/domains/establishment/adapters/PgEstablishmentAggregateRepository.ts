@@ -657,6 +657,7 @@ export class PgEstablishmentAggregateRepository
             userRight.shouldReceiveDiscussionNotifications,
           is_main_contact_by_phone: userRight.isMainContactByPhone,
           is_main_contact_in_person: userRight.isMainContactInPerson,
+          status: userRight.status,
         })),
       )
       .execute()
