@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: groups
+    description: "Groups information - one row per group slug"
+    columns:
+      - name: slug
+        description: "Primary key - URL slug"
+        tests:
+          - unique
+          - not_null
+      - name: created_at
+        description: "Timestamp when created"
+      - name: updated_at
+        description: "Timestamp when updated"
+      - name: name
+        description: "Name of the group"
+      - name: hero_header_title
+        description: "Hero header title"
+      - name: hero_header_description
+        description: "Hero header description"
+      - name: hero_header_logo_url
+        description: "URL of hero header logo"
+      - name: hero_header_background_color
+        description: "Background color of hero header"
+      - name: tint_color
+        description: "Tint color"
+
+  - name: groups_sirets
+    description: "Relationship between groups and SIRETs - one row per (group_slug, siret)"
+    columns:
+      - name: group_slug
+        description: "Foreign key to groups table"
+        tests:
+          - not_null
+      - name: siret
+        description: "SIRET number"
+        tests:
+          - not_null
