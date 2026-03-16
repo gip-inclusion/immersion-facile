@@ -37,6 +37,8 @@ on-run-end:
   - "ANALYZE public_analytics.establishment_users"
   - "ANALYZE public_analytics.agencies"
   - "ANALYZE public_analytics.discussion_with_number_of_exchanges"
+  - "ANALYZE public_analytics.groups"
+  - "ANALYZE public_analytics.groups_sirets"
 
 models:
   immersion_bi:
