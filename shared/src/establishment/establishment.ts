@@ -7,6 +7,7 @@ import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import {
   zStringCanBeEmpty,
+  zStringMinLength1Max255,
   zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
@@ -50,7 +51,7 @@ export type WithEstablishmentDashboards = {
 
 export type BusinessName = Flavor<string, "BusinessName">;
 export const businessNameSchema: ZodSchemaWithInputMatchingOutput<BusinessName> =
-  zStringMinLength1Max1024;
+  zStringMinLength1Max255;
 
 export type BusinessNameCustomized = Flavor<string, "BusinessNameCustomized">;
 export const customizedNameSchema: ZodSchemaWithInputMatchingOutput<BusinessNameCustomized> =

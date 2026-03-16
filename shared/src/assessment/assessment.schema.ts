@@ -4,9 +4,9 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import {
   zStringMinLength1Max1024,
+  zStringMinLength1Max3000,
   zStringMinLength1Max6000,
   zStringMinLength1Max9200,
-  zTrimmedStringWithMax,
 } from "../utils/string.schema";
 import {
   localization,
@@ -84,7 +84,7 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
     .and(
       z.object({
         beneficiaryAgreement: z.boolean().nullable(),
-        beneficiaryFeedback: zTrimmedStringWithMax(1000).nullable(),
+        beneficiaryFeedback: zStringMinLength1Max3000.nullable(),
         signedAt: makeDateStringSchema().nullable(),
         createdAt: dateTimeIsoStringSchema,
       }),
@@ -122,11 +122,11 @@ export const signAssessmentRequestDtoSchema: ZodSchemaWithInputMatchingOutput<Si
       z.discriminatedUnion("beneficiaryAgreement", [
         z.object({
           beneficiaryAgreement: z.literal(true),
-          beneficiaryFeedback: zStringMinLength1Max1024.nullable(),
+          beneficiaryFeedback: zStringMinLength1Max3000.nullable(),
         }),
         z.object({
           beneficiaryAgreement: z.literal(false),
-          beneficiaryFeedback: zStringMinLength1Max1024,
+          beneficiaryFeedback: zStringMinLength1Max3000,
         }),
       ]),
     );
