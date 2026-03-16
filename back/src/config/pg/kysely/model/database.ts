@@ -12,6 +12,7 @@ import type {
   DiscussionKind,
   DiscussionStatus,
   Email,
+  EstablishmentUserRightStatus,
   SiretDto,
   SubscriberErrorFeedback,
 } from "shared";
@@ -558,6 +559,7 @@ interface EstablishmentsUsers {
   should_receive_discussion_notifications: boolean;
   is_main_contact_by_phone: boolean | null;
   is_main_contact_in_person: boolean | null;
+  status: EstablishmentUserRightStatus;
 }
 
 type AgencyGroupKind = "france-travail";
