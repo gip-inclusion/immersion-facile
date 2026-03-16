@@ -64,12 +64,10 @@ const contactModes = ["EMAIL", "PHONE", "IN_PERSON"] as const;
 export type ContactMode = (typeof contactModes)[number];
 export const isContactMode = includesTypeGuard(contactModes);
 
-export const formEstablishmentUserRightStatus = [
-  "ACCEPTED",
-  "PENDING",
-] as const;
+export const establishmentUserRightStatus = ["ACCEPTED", "PENDING"] as const;
+
 export type EstablishmentUserRightStatus =
-  (typeof formEstablishmentUserRightStatus)[number];
+  (typeof establishmentUserRightStatus)[number];
 
 type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
   email: Email;
