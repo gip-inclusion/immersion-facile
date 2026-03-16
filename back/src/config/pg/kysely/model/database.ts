@@ -101,6 +101,7 @@ type InternshipKind = "immersion" | "mini-stage-cci";
 type NumberEmployeesRange =
   | ""
   | "0"
+  | "0-0"
   | "1-2"
   | "3-5"
   | "6-9"

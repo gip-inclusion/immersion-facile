@@ -138,6 +138,7 @@ const maxContactPerWeekByNumberEmployees: Record<NumberEmployeesRange, number> =
   {
     "": defaultMaxContactsPerMonth,
     "0": 2,
+    "0-0": 2,
     "1-2": 2,
     "3-5": 2,
     "6-9": 2,
