@@ -58,6 +58,11 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
         .withEmail("contact2@estab.com")
         .buildUser();
 
+      const pendingUser = new ConnectedUserBuilder()
+        .withId("pending-user")
+        .withEmail("pending-user@estab.com")
+        .buildUser();
+
       const establishmentAggregate = new EstablishmentAggregateBuilder()
         .withUserRights([
           {
@@ -81,6 +86,12 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
             userId: establishmentContact2.id,
             shouldReceiveDiscussionNotifications: true,
           },
+          {
+            role: "establishment-contact",
+            status: "PENDING",
+            userId: pendingUser.id,
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build();
 
@@ -91,6 +102,7 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
         establishmentAdmin,
         establishmentContact1,
         establishmentContact2,
+        pendingUser,
       ];
 
       await notifyConfirmationEstablishmentCreated.execute({
@@ -102,7 +114,7 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
           {
             kind: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
             recipients: [establishmentAdmin.email],
-            cc: [establishmentContact1.email, establishmentContact2.email],
+            cc: [establishmentContact1.email, establishmentContact2.email], // pending user is not cc'ed
             params: {
               businessName: establishmentAggregate.establishment.name,
               businessAddresses:
@@ -117,10 +129,6 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
           },
         ],
       });
-    });
-
-    it("Does not cc contact if contact user have pending right on establishment", async () => {
-      expect(true).toBe(false);
     });
   });
 });

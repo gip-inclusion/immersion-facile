@@ -117,7 +117,7 @@ export const formEstablishmentUserRightsSchema: ZodSchemaWithInputMatchingOutput
   .array(formEstablishmentUserRightSchema)
   .refine(
     (userRights) =>
-      userRights.filter((right) => right.role === "establishment-admin")
+      userRights.filter((right) => right.role === "establishment-admin" && right.status === "ACCEPTED")
         .length > 0,
     "La structure accueillante nécessite au moins un administrateur pour être valide.",
   )
@@ -128,7 +128,7 @@ export const formEstablishmentUserRightsSchema: ZodSchemaWithInputMatchingOutput
   )
   .refine(
     (userRights) =>
-      userRights.some((right) => right.shouldReceiveDiscussionNotifications),
+      userRights.some((right) => right.shouldReceiveDiscussionNotifications && right.status === "ACCEPTED"),
     "La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
   );
 
@@ -214,9 +214,9 @@ export const formEstablishmentSchema: ZodSchemaWithInputMatchingOutput<FormEstab
       (formEstablishment) =>
         formEstablishment.contactMode === "PHONE"
           ? formEstablishment.userRights
-              .map((right) => right.isMainContactByPhone)
-              .filter((isMainContactByPhone) => isMainContactByPhone === true)
-              .length === 1
+            .map((right) => right.isMainContactByPhone)
+            .filter((isMainContactByPhone) => isMainContactByPhone === true)
+            .length === 1
           : true,
       {
         message:
@@ -228,9 +228,9 @@ export const formEstablishmentSchema: ZodSchemaWithInputMatchingOutput<FormEstab
       (formEstablishment) =>
         formEstablishment.contactMode === "IN_PERSON"
           ? formEstablishment.userRights
-              .map((right) => right.isMainContactInPerson)
-              .filter((isMainContactInPerson) => isMainContactInPerson === true)
-              .length === 1
+            .map((right) => right.isMainContactInPerson)
+            .filter((isMainContactInPerson) => isMainContactInPerson === true)
+            .length === 1
           : true,
       {
         message:

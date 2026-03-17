@@ -41,7 +41,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 
     if (
       establishmentAggregate.userRights.some(
-        (right) => right.userId === currentUser.id,
+        (right) => right.userId === currentUser.id && right.status === "ACCEPTED" && right.role === "establishment-admin",
       ) ||
       currentUser.isBackofficeAdmin
     )
@@ -88,10 +88,10 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       searchableBy: establishmentAggregate.establishment.searchableBy,
       ...(establishmentAggregate.establishment.contactMode === "IN_PERSON"
         ? {
-            potentialBeneficiaryWelcomeAddress:
-              establishmentAggregate.establishment
-                .potentialBeneficiaryWelcomeAddress,
-          }
+          potentialBeneficiaryWelcomeAddress:
+            establishmentAggregate.establishment
+              .potentialBeneficiaryWelcomeAddress,
+        }
         : {}),
     };
   }
@@ -143,10 +143,10 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 
         return phone && isMainContactByPhone !== undefined
           ? {
-              ...baseContact,
-              isMainContactByPhone,
-              isMainContactInPerson,
-            }
+            ...baseContact,
+            isMainContactByPhone,
+            isMainContactInPerson,
+          }
           : baseContact;
       },
     );

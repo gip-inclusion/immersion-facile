@@ -112,6 +112,7 @@ describe("Update Establishment aggregate from form data", () => {
         {
           userId: "admin",
           role: "establishment-admin",
+          status: "ACCEPTED",
           job: "job",
           phone: "+336558464365",
           shouldReceiveDiscussionNotifications: true,
@@ -120,6 +121,7 @@ describe("Update Establishment aggregate from form data", () => {
         {
           userId: contactUser.id,
           role: "establishment-contact",
+          status: "ACCEPTED",
           shouldReceiveDiscussionNotifications: true,
           isMainContactByPhone: false,
         },
@@ -603,7 +605,7 @@ describe("Update Establishment aggregate from form data", () => {
           })
           .withNextAvailabilityDate(
             existingFormEstablishment.nextAvailabilityDate &&
-              new Date(existingFormEstablishment.nextAvailabilityDate),
+            new Date(existingFormEstablishment.nextAvailabilityDate),
           )
           .withCreatedAt(creationDate)
           .withUpdatedAt(creationDate)
@@ -673,7 +675,7 @@ describe("Update Establishment aggregate from form data", () => {
           })
           .withNextAvailabilityDate(
             updatedFormEstablishment.nextAvailabilityDate &&
-              new Date(updatedFormEstablishment.nextAvailabilityDate),
+            new Date(updatedFormEstablishment.nextAvailabilityDate),
           )
           .withCreatedAt(creationDate)
           .withUpdatedAt(now)
@@ -780,10 +782,75 @@ describe("Update Establishment aggregate from form data", () => {
         );
       });
       it("throws an error if current user right is pending", async () => {
-        expect(true).toBe(false);
+        const pendingUser = new ConnectedUserBuilder()
+          .withId("pendingUser")
+          .withFirstName("Pending")
+          .withLastName("User")
+          .withEmail("pending.user@establishment.com")
+          .build();
+        uow.userRepository.users = [pendingUser];
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          {
+            ...existingEstablishmentAggregate,
+            userRights: [
+              {
+                role: "establishment-admin",
+                status: "PENDING",
+                userId: pendingUser.id,
+                shouldReceiveDiscussionNotifications: true,
+                job: "osef",
+                phone: "osef",
+                isMainContactByPhone: false,
+              },
+            ],
+          },
+        ];
+        await expectPromiseToFailWithError(
+          updateEstablishmentAggregateFromFormUseCase.execute(
+            { formEstablishment: updatedFormEstablishment },
+            {
+              userId: pendingUser.id,
+            },
+          ),
+          errors.establishment.notAdmin({
+            siret: updatedFormEstablishment.siret,
+            userId: pendingUser.id,
+          }),
+        );
       });
       it("throws an error if current user right is not admin", async () => {
-        expect(true).toBe(false);
+        const contactUser = new ConnectedUserBuilder()
+          .withId("contactUser")
+          .withFirstName("Contact")
+          .withLastName("User")
+          .withEmail("contact.user@establishment.com")
+          .build();
+        uow.userRepository.users = [contactUser];
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          {
+            ...existingEstablishmentAggregate,
+            userRights: [
+              {
+                role: "establishment-contact",
+                status: "ACCEPTED",
+                userId: contactUser.id,
+                shouldReceiveDiscussionNotifications: true,
+              },
+            ],
+          },
+        ];
+        await expectPromiseToFailWithError(
+          updateEstablishmentAggregateFromFormUseCase.execute(
+            { formEstablishment: updatedFormEstablishment },
+            {
+              userId: contactUser.id,
+            },
+          ),
+          errors.establishment.notAdmin({
+            siret: updatedFormEstablishment.siret,
+            userId: contactUser.id,
+          }),
+        );
       });
     });
 
@@ -1010,7 +1077,7 @@ describe("Update Establishment aggregate from form data", () => {
         await updateEstablishmentAggregateFromFormUseCase.execute(
           { formEstablishment: updatedFormEstablishmentWithUserRights },
           {
-            userId: user.id,
+            userId: existingEstablishmentAdminRight.userId,
           },
         );
 
@@ -1040,10 +1107,10 @@ describe("Update Establishment aggregate from form data", () => {
           remoteWorkMode: "FULL_REMOTE",
         };
         const updatedFormEstablishmentWithOfferRemoteWorkMode: FormEstablishmentDto =
-          {
-            ...updatedFormEstablishment,
-            offers: [updatedOffer],
-          };
+        {
+          ...updatedFormEstablishment,
+          offers: [updatedOffer],
+        };
         const expectedEstablishmentAggregate = {
           ...updatedEstablishmentAggregate,
           offers: [

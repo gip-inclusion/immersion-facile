@@ -39,6 +39,13 @@ describe("UpdateDiscussionStatus", () => {
     .withEmail("unauthorized@domain.com")
     .build();
 
+  const pendingUser = new ConnectedUserBuilder()
+    .withId("pendingUser")
+    .withFirstName("Pending")
+    .withLastName("User")
+    .withEmail("pending.user@establishment.com")
+    .build();
+
   const establishmentWithAuthorizedUserRight =
     new EstablishmentAggregateBuilder()
       .withUserRights([
@@ -49,6 +56,24 @@ describe("UpdateDiscussionStatus", () => {
           phone: "osef",
           shouldReceiveDiscussionNotifications: false,
           userId: authorizedUser.id,
+          isMainContactByPhone: false,
+        },
+        {
+          role: "establishment-contact",
+          status: "PENDING",
+          userId: authorizedUser.id,
+          shouldReceiveDiscussionNotifications: false,
+          job: "osef",
+          phone: "osef",
+          isMainContactByPhone: false,
+        },
+        {
+          role: "establishment-contact",
+          status: "PENDING",
+          userId: pendingUser.id,
+          shouldReceiveDiscussionNotifications: false,
+          job: "osef",
+          phone: "osef",
           isMainContactByPhone: false,
         },
       ])
@@ -176,7 +201,21 @@ describe("UpdateDiscussionStatus", () => {
     });
 
     it("throws when user have pending right on establishment", async () => {
-      expect(true).toBe(false);
+
+      await expectPromiseToFailWithError(
+        updateDiscussionStatus.execute(
+          {
+            discussionId: discussion.id,
+            status: "REJECTED",
+            rejectionKind: "UNABLE_TO_HELP",
+          },
+          pendingUser,
+        ),
+        errors.discussion.rejectForbidden({
+          discussionId: discussion.id,
+          userId: pendingUser.id,
+        }),
+      );
     });
   });
 

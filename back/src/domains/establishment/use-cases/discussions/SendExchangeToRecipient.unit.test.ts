@@ -53,6 +53,13 @@ describe("SendExchangeToRecipient", () => {
     .withEmail("billy.idol@establishment.com")
     .buildUser();
 
+  const pendingUser = new ConnectedUserBuilder()
+    .withId(uuid())
+    .withFirstName("Pending")
+    .withLastName("User")
+    .withEmail("pending.user@establishment.com")
+    .buildUser();
+
   const notifiedEstablishmentRights: EstablishmentUserRight[] = [
     {
       role: "establishment-admin",
@@ -71,12 +78,26 @@ describe("SendExchangeToRecipient", () => {
     },
   ];
 
-  const establishment = new EstablishmentAggregateBuilder()
+  const establishmentAggregate = new EstablishmentAggregateBuilder()
     .withUserRights(notifiedEstablishmentRights)
     .build();
 
+  const establishmentAggregateWithOnlyPendingUser = new EstablishmentAggregateBuilder()
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        status: "PENDING",
+        userId: pendingUser.id,
+        shouldReceiveDiscussionNotifications: true,
+        job: "",
+        phone: "",
+        isMainContactByPhone: false,
+      },
+    ])
+    .build();
+
   const discussionWithSiretAndAppellation = new DiscussionBuilder()
-    .withSiret(establishment.establishment.siret)
+    .withSiret(establishmentAggregate.establishment.siret)
     .withAppellationCode("20567")
     .withExchanges([])
     .build();
@@ -142,9 +163,9 @@ describe("SendExchangeToRecipient", () => {
       [notABlobLink]: "not-a-blob",
     };
     uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment,
+      establishmentAggregate,
     ];
-    uow.userRepository.users = [admin, contact];
+    uow.userRepository.users = [admin, contact, pendingUser];
   });
 
   describe("right paths", () => {
@@ -205,7 +226,7 @@ describe("SendExchangeToRecipient", () => {
 
       it("when last exchange is from potential beneficiary, the exchange is sent to establishment users that have enabled notifications", async () => {
         uow.establishmentAggregateRepository.establishmentAggregates = [
-          new EstablishmentAggregateBuilder(establishment)
+          new EstablishmentAggregateBuilder(establishmentAggregate)
             .withUserRights([
               ...notifiedEstablishmentRights,
               {
@@ -540,7 +561,29 @@ describe("SendExchangeToRecipient", () => {
     });
 
     it("throws when user have pending right on establishment", async () => {
-      expect(true).toBe(false);
+      // should never happen, establishment are supposed to have at least one admin with ACCEPTED right (changes made in the form establishment schema)
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregateWithOnlyPendingUser,
+      ];
+
+      const discussion = new DiscussionBuilder(
+        discussionWithSiretAndAppellation,
+      )
+        .withSiret(establishmentAggregateWithOnlyPendingUser.establishment.siret)
+        .withExchanges([firstBeneficiaryExchange, lastBeneficiaryExchange])
+        .build();
+      uow.discussionRepository.discussions = [discussion];
+
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          discussionId: discussion.id,
+        }),
+        errors.establishment.notAdminOrContactRight({
+          siret: discussion.siret,
+          userId: pendingUser.id,
+        }),
+      );
     });
   });
 });
