@@ -77,9 +77,7 @@ export const zAnyObj = z.object({}).loose();
 
 export const timestampSchema = z
   .number()
-  .int()
-  .positive()
-  .refine((val) => !Number.isNaN(new Date(val).getTime()), {
+  .refine((value) => !Number.isNaN(new Date(value).getTime()), {
     message: "Le format du timestamp est invalide",
   });
 

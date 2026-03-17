@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import {
@@ -47,7 +48,17 @@ export const technicalRoutes = defineRoutes({
   featureFlags: defineRoute({
     method: "get",
     url: "/feature-flags",
-    queryParamsSchema: z.record(timestampSchema, z.never()).or(z.null()),
+    queryParamsSchema: z
+      .record(z.string().max(13).min(7), z.string().max(0).min(0))
+      .refine((record) => {
+        const [key, second] = keys(record);
+        if (!key) return true;
+        if (second) return false;
+        const keyAsNumber = Number.parseInt(key, 10);
+        if (Number.isNaN(keyAsNumber)) return false;
+        return timestampSchema.safeParse(keyAsNumber).success;
+      }, "Le format des paramètres est invalide")
+      .or(z.null()),
     responses: { 200: featureFlagsSchema },
   }),
   inboundEmailParsing: defineRoute({
