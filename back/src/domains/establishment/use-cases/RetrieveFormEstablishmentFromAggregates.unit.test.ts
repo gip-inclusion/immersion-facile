@@ -120,10 +120,64 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       );
     });
     it("throws an error if current user right is pending", async () => {
-      expect(true).toBe(false);
+      const pendingUser = new ConnectedUserBuilder()
+        .withId("pendingUser")
+        .withEmail("pending@mail.com")
+        .buildUser();
+
+      uow.userRepository.users = [pendingUser];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        {
+          ...establishmentAggregate,
+          userRights: [
+            {
+              ...establishmentAggregate.userRights[0],
+              userId: pendingUser.id,
+              role: "establishment-admin",
+              job,
+              phone,
+              shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
+              status: "PENDING",
+            },
+          ],
+        },
+      ];
+
+      await expectPromiseToFailWithError(
+        useCase.execute(siret, {
+          userId: pendingUser.id,
+        }),
+        errors.user.unauthorized(),
+      );
     });
     it("throws an error if current user right is not establishment admin", async () => {
-      expect(true).toBe(false);
+      const contactUser = new ConnectedUserBuilder()
+        .withId("contactUser")
+        .withEmail("contact@mail.com")
+        .buildUser();
+
+      uow.userRepository.users = [contactUser];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        {
+          ...establishmentAggregate,
+          userRights: [
+            {
+              ...establishmentAggregate.userRights[1],
+              userId: contactUser.id,
+              role: "establishment-contact",
+              status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: true,
+            },
+          ],
+        },
+      ];
+      await expectPromiseToFailWithError(
+        useCase.execute(siret, {
+          userId: contactUser.id,
+        }),
+        errors.user.unauthorized(),
+      );
     });
   });
 
@@ -349,7 +403,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
     it("returns a reconstructed form if establishment with siret exists & IC jwt payload with user that have same email on establishment contacts", async () => {
       const establishmentForm = await useCase.execute(siret, {
-        userId: establishmentContact.id,
+        userId: establishmentAdmin.id,
       });
 
       expectToEqual(

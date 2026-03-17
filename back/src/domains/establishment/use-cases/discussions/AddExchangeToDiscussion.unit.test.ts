@@ -1508,12 +1508,100 @@ describe("AddExchangeToDiscussion", () => {
         );
       });
     });
-    it("throws an error if user right of sender is pending", async () => {
+
+    it("through inbound parsing, throws an error if user right of sender is pending", async () => {
       const userId: UserId = "usefIaaaaad2c-6f02-11ec-90d6-0242ac120012";
       const userWithPendingRight = new ConnectedUserBuilder()
         .withId(userId)
         .withProConnectInfos(null)
-        .withEmail("lemorzadec@douarnenez.com")
+        .withEmail("pending-user@test.com")
+        .build();
+      const establishmentAggregateWithPendingUserRight =
+        new EstablishmentAggregateBuilder(establishment1)
+          .withUserRights([
+            {
+              userId: userWithPendingRight.id,
+              status: "PENDING",
+              role: "establishment-contact",
+              shouldReceiveDiscussionNotifications: true,
+            },
+          ])
+          .build();
+
+      await uow.userRepository.save(userWithPendingRight);
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregateWithPendingUserRight,
+      );
+
+      expectToEqual(
+        await addExchangeToDiscussion.execute(
+          {
+            source: "inbound-parsing",
+            messageInputs: [
+              {
+                senderEmail: userWithPendingRight.email,
+                message: "Hello",
+                discussionId: pendingDiscussion1.id,
+                recipientRole: "potentialBeneficiary",
+                attachments: [],
+                sentAt: new Date().toISOString(),
+                subject: "fake subject",
+              },
+            ],
+          },
+          userWithPendingRight,
+        ),
+        {
+          reason: "user_unknown_or_missing_rights_on_establishment",
+          sender: "establishment",
+          admins: [
+            {
+              firstName: adminUserEstablishment1.firstName,
+              lastName: adminUserEstablishment1.lastName,
+              email: adminUserEstablishment1.email,
+            },
+          ],
+        },
+      );
+
+      expectToEqual(uow.discussionRepository.discussions, [
+        pendingDiscussion1,
+        pendingDiscussion2,
+      ]);
+
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "NotificationAdded",
+        },
+      ]);
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+            params: {
+              reason: "user_unknown_or_missing_rights_on_establishment",
+              sender: "establishment",
+              admins: [
+                {
+                  firstName: adminUserEstablishment1.firstName,
+                  lastName: adminUserEstablishment1.lastName,
+                  email: adminUserEstablishment1.email,
+                },
+              ],
+            },
+            recipients: [userWithPendingRight.email],
+          },
+        ],
+        sms: [],
+      });
+    });
+    it("through dashboard,throws an error if user right of sender is pending", async () => {
+      const userId: UserId = "usefIaaaaad2c-6f02-11ec-90d6-0242ac120012";
+      const userWithPendingRight = new ConnectedUserBuilder()
+        .withId(userId)
+        .withProConnectInfos(null)
+        .withEmail("pending-user@test.com")
         .build();
       const establishmentAggregateWithPendingUserRight =
         new EstablishmentAggregateBuilder(establishment1)
@@ -1547,9 +1635,11 @@ describe("AddExchangeToDiscussion", () => {
           },
           userWithPendingRight,
         ),
-        errors.user.forbidden({ userId: userWithPendingRight.id }),
+        errors.establishment.notAdminOrContactRight({
+          userId: userWithPendingRight.id,
+          siret: establishment1.establishment.siret,
+        }),
       );
-      expect(true).toBe(false);
     });
   });
 
