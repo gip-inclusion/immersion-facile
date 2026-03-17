@@ -41,6 +41,7 @@ describe("formEstablishmentSchema", () => {
           {
             email: "test@test.com",
             role: "establishment-admin",
+            status: "ACCEPTED",
             shouldReceiveDiscussionNotifications: true,
             job: "test",
             phone: "0145784644",
@@ -71,6 +72,7 @@ describe("formEstablishmentSchema", () => {
             phone: "+33612345678",
             isMainContactByPhone: false,
             role: "establishment-admin",
+            status: "ACCEPTED",
             shouldReceiveDiscussionNotifications: true,
             job: "test",
           },
@@ -85,6 +87,42 @@ describe("formEstablishmentSchema", () => {
             path: ["userRights"],
             message:
               "En cas de mode de contact par téléphone, vous devez renseigner un contact principal par téléphone.",
+          },
+        ]),
+      );
+    });
+
+    it("invalid establishment : only 1 establishment admin but not with status ACCEPTED", () => {
+      const invalidFormEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withContactMode("EMAIL")
+        .withUserRights([
+          {
+            email: "test@test.com",
+            phone: "+33612345678",
+            isMainContactByPhone: true,
+            role: "establishment-admin",
+            status: "PENDING",
+            shouldReceiveDiscussionNotifications: true,
+            job: "test",
+          },
+        ])
+        .build();
+
+      expect(() =>
+        formEstablishmentSchema.parse(invalidFormEstablishment),
+      ).toThrow(
+        new ZodError([
+          {
+            code: "custom",
+            path: ["userRights"],
+            message:
+              "La structure accueillante nécessite au moins un administrateur pour être valide.",
+          },
+          {
+            code: "custom",
+            path: ["userRights"],
+            message:
+              "La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
           },
         ]),
       );
@@ -110,6 +148,7 @@ describe("formEstablishmentSchema", () => {
             isMainContactByPhone: false,
             isMainContactInPerson: true,
             role: "establishment-admin",
+            status: "ACCEPTED",
             shouldReceiveDiscussionNotifications: true,
             job: "test",
           },
@@ -143,6 +182,7 @@ describe("formEstablishmentSchema", () => {
             phone: "+33612345678",
             isMainContactByPhone: true,
             role: "establishment-admin",
+            status: "ACCEPTED",
             shouldReceiveDiscussionNotifications: true,
             job: "test",
           },
@@ -174,6 +214,7 @@ describe("formEstablishmentSchema", () => {
             email: "test@test.com",
             phone: "+33612345678",
             role: "establishment-admin",
+            status: "ACCEPTED",
             shouldReceiveDiscussionNotifications: true,
             job: "test",
             isMainContactByPhone: false,
