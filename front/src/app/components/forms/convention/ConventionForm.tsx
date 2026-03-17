@@ -29,9 +29,7 @@ import {
   type AgencyOption,
   addressDtoToString,
   type Beneficiary,
-  type ConventionDraftId,
   type ConventionFormInitialValues,
-  type ConventionId,
   type ConventionPresentation,
   type ConventionReadDto,
   type ConventionTemplate,
@@ -141,13 +139,7 @@ export const ConventionForm = ({
   mode: ConventionFormMode;
   fromConventionTemplateId?: ConventionTemplateId;
 }) => {
-  const { cx } = useStyles();
-  const dispatch = useDispatch();
   const route = useRoute() as SupportedConventionRoutes;
-  const fromPeConnectedUser =
-    "fromPeConnectedUser" in route.params
-      ? route.params.fromPeConnectedUser
-      : undefined;
 
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
@@ -160,22 +152,7 @@ export const ConventionForm = ({
   );
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-
-  const currentStep = useAppSelector(conventionSelectors.currentStep);
-  const isLoading = useAppSelector(conventionSelectors.isLoading);
-
-  const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
-  const establishmentNumberEmployeesRange = useAppSelector(
-    siretSelectors.establishmentInfos,
-  )?.numberEmployeesRange;
-
-  const agencyOptions = useSelector(agenciesSelectors.options);
-  const agenciesFeedback = useSelector(agenciesSelectors.feedback);
-  const isAgenciesLoading = useSelector(agenciesSelectors.isLoading);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const establishmentAddressCountryCode = useAppSelector(
-    siretSelectors.countryCode,
-  );
   const conventionInitialValuesFromUrl = useMemo(
     () =>
       route.name !== "conventionTemplate"
@@ -209,11 +186,6 @@ export const ConventionForm = ({
     addressAutocompleteLocator: "convention-immersion-address",
   });
 
-  const reduxFormUiReady = useWaitForReduxFormUiReadyBeforeInitialisation(
-    initialValues,
-    mode,
-  );
-
   const conventionPresentationFromDraft = useMemo(
     () =>
       fetchedConventionDraft &&
@@ -230,14 +202,10 @@ export const ConventionForm = ({
     [fetchedConventionTemplate],
   );
 
-  const conventionTemplateFeedback = useFeedbackTopic("convention-template");
-
   const isTemplateForm =
     ["create-convention-template", "edit-convention-template"].includes(mode) &&
     !!connectedUserJwt &&
     !!currentUser;
-  const shouldShowShareConventionDraftButton =
-    mode !== "edit-convention" && !isTemplateForm;
 
   const makeDefaultValues = ({ mode }: { mode: ConventionFormMode }) => {
     const isCreationMode = creationFormModes.includes(
@@ -258,9 +226,69 @@ export const ConventionForm = ({
       initialValues
     );
   };
-  const defaultValues: ConventionFormInitialValues = makeDefaultValues({
-    mode,
-  });
+  const defaultValues: ConventionFormInitialValues = {
+    ...makeDefaultValues({
+      mode,
+    }),
+    status: "READY_TO_SIGN",
+  };
+
+  return (
+    <ConventionFormContent
+      key={defaultValues.id}
+      defaultValues={defaultValues}
+      initialValues={initialValues}
+      mode={mode}
+      internshipKind={internshipKind}
+      fromConventionTemplateId={fromConventionTemplateId}
+    />
+  );
+};
+
+const ConventionFormContent = ({
+  defaultValues,
+  initialValues,
+  mode,
+  internshipKind,
+  fromConventionTemplateId,
+}: {
+  defaultValues: ConventionFormInitialValues;
+  initialValues: CreateConventionPresentationInitialValues;
+  mode: ConventionFormMode;
+  internshipKind: InternshipKind;
+  fromConventionTemplateId?: ConventionTemplateId;
+}) => {
+  const { cx } = useStyles();
+  const dispatch = useDispatch();
+  const route = useRoute() as SupportedConventionRoutes;
+  const fromPeConnectedUser =
+    "fromPeConnectedUser" in route.params
+      ? route.params.fromPeConnectedUser
+      : undefined;
+
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const currentStep = useAppSelector(conventionSelectors.currentStep);
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
+  const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
+  const establishmentNumberEmployeesRange = useAppSelector(
+    siretSelectors.establishmentInfos,
+  )?.numberEmployeesRange;
+  const agencyOptions = useSelector(agenciesSelectors.options);
+  const agenciesFeedback = useSelector(agenciesSelectors.feedback);
+  const areAgenciesLoading = useSelector(agenciesSelectors.isLoading);
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const establishmentAddressCountryCode = useAppSelector(
+    siretSelectors.countryCode,
+  );
+
+  const conventionTemplateFeedback = useFeedbackTopic("convention-template");
+  const isTemplateForm =
+    ["create-convention-template", "edit-convention-template"].includes(mode) &&
+    !!connectedUserJwt &&
+    !!currentUser;
+  const shouldShowShareConventionDraftButton =
+    mode !== "edit-convention" && !isTemplateForm;
 
   const presentationSchema = useMemo(
     () =>
@@ -268,9 +296,13 @@ export const ConventionForm = ({
     [isTemplateForm],
   );
 
+  const reduxFormUiReady = useWaitForReduxFormUiReadyBeforeInitialisation(
+    defaultValues,
+    mode,
+  );
+
   const methods = useForm<ConventionFormInitialValues>({
     defaultValues,
-    values: defaultValues,
     resolver: zodResolver(presentationSchema),
     mode: "onTouched",
   });
@@ -283,7 +315,6 @@ export const ConventionForm = ({
     getFieldState,
     formState,
     register,
-    reset,
   } = methods;
 
   const { errors, submitCount } = formState;
@@ -503,16 +534,6 @@ export const ConventionForm = ({
     }
   };
 
-  const prevFetchedConventionIdRef = useRef<ConventionId | undefined>(
-    undefined,
-  );
-  const prevConventionDraftIdRef = useRef<ConventionDraftId | undefined>(
-    undefined,
-  );
-  const prevConventionTemplateIdRef = useRef<ConventionTemplateId | undefined>(
-    undefined,
-  );
-
   const submitButtonLabel = useMemo(() => {
     if (isTemplateForm) {
       return mode === "create-convention-template"
@@ -521,37 +542,6 @@ export const ConventionForm = ({
     }
     return "Vérifier la demande";
   }, [isTemplateForm, mode]);
-
-  if (
-    fetchedConvention &&
-    fetchedConvention.id !== prevFetchedConventionIdRef.current
-  ) {
-    prevFetchedConventionIdRef.current = fetchedConvention.id;
-    reset({ ...fetchedConvention, status: "READY_TO_SIGN" });
-  }
-
-  if (
-    conventionPresentationFromDraft &&
-    conventionPresentationFromDraft.fromConventionDraftId !==
-      prevConventionDraftIdRef.current
-  ) {
-    prevConventionDraftIdRef.current =
-      conventionPresentationFromDraft.fromConventionDraftId;
-    reset({ ...conventionPresentationFromDraft, status: "READY_TO_SIGN" });
-  }
-
-  if (
-    conventionPresentationFromConventionTemplate &&
-    conventionPresentationFromConventionTemplate.id !==
-      prevConventionTemplateIdRef.current
-  ) {
-    prevConventionTemplateIdRef.current =
-      conventionPresentationFromConventionTemplate.id;
-    reset({
-      ...conventionPresentationFromConventionTemplate,
-      status: "READY_TO_SIGN",
-    });
-  }
 
   useScrollTo(!!conventionTemplateFeedback);
 
@@ -723,7 +713,7 @@ export const ConventionForm = ({
                       onDepartmentCodeChangedMemoized
                     }
                     agencyOptions={agencyOptions}
-                    isLoading={isAgenciesLoading}
+                    isLoading={areAgenciesLoading}
                     isFetchAgencyOptionsError={
                       agenciesFeedback.kind === "errored"
                     }
@@ -965,23 +955,26 @@ const makeInitialBenefiaryForm = (
 };
 
 const useWaitForReduxFormUiReadyBeforeInitialisation = (
-  initialValues: CreateConventionPresentationInitialValues,
+  initialValues: ConventionFormInitialValues,
   mode: ConventionFormMode,
 ) => {
   const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(
-      conventionSlice.actions.isMinorChanged(
-        isBeneficiaryMinor({
-          beneficiaryRepresentative:
-            initialValues.signatories.beneficiaryRepresentative,
-          beneficiaryBirthdate: initialValues.signatories.beneficiary.birthdate,
-          conventionDateStart: initialValues.dateStart,
-        }),
-      ),
-    );
+    if (initialValues.signatories?.beneficiary?.birthdate) {
+      dispatch(
+        conventionSlice.actions.isMinorChanged(
+          isBeneficiaryMinor({
+            hasBeneficiaryRepresentative:
+              !!initialValues.signatories.beneficiaryRepresentative,
+            beneficiaryBirthdate:
+              initialValues.signatories.beneficiary.birthdate,
+            conventionDateStart: initialValues.dateStart,
+          }),
+        ),
+      );
+    }
     dispatch(
       conventionSlice.actions.isCurrentEmployerChanged(
         !!initialValues.signatories?.beneficiaryCurrentEmployer,
