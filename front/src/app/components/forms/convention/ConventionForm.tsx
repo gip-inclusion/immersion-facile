@@ -250,7 +250,6 @@ export const ConventionForm = ({
       if (isTemplateForm) {
         return replaceEmptyValuesByUndefinedFromObject(initialValues);
       }
-      return initialValues;
     }
     return (
       fetchedConvention ||
