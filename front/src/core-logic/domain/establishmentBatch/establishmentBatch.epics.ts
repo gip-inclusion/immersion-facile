@@ -175,6 +175,7 @@ const makeUserRightsFromCSV = (
             {
               role,
               job,
+              status: "ACCEPTED",
               phone,
               email,
               shouldReceiveDiscussionNotifications: true,
@@ -187,6 +188,7 @@ const makeUserRightsFromCSV = (
   return [
     {
       role: "establishment-admin",
+      status: "ACCEPTED",
       email: csvRow.right1_email,
       job: csvRow.right1_job,
       phone: csvRow.right1_phone,
