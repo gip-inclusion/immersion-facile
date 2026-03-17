@@ -22,7 +22,12 @@ import { match } from "ts-pattern";
 export class HttpTechnicalGateway implements TechnicalGateway {
   public getAllFeatureFlags$ = (): Observable<FeatureFlags> =>
     from(this.httpClient.featureFlags({ queryParams: null })).pipe(
-      map((response) => response.body),
+      map((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+          .otherwise(otherwiseThrow),
+      ),
     );
 
   constructor(

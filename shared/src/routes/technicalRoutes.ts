@@ -10,7 +10,11 @@ import { htmlToPdfRequestSchema } from "../file/htmlToPdf";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
-import { emptyObjectSchema, expressEmptyResponseBody, timestampSchema } from "../zodUtils";
+import {
+  emptyObjectSchema,
+  expressEmptyResponseBody,
+  timestampSchema,
+} from "../zodUtils";
 
 export type AvailableApiVersion = (typeof availableApiVersions)[number];
 const availableApiVersions = ["v2", "v3"] as const;
@@ -59,7 +63,7 @@ export const technicalRoutes = defineRoutes({
         return timestampSchema.safeParse(keyAsNumber).success;
       }, "Le format des paramètres est invalide")
       .or(z.null()),
-    responses: { 200: featureFlagsSchema },
+    responses: { 200: featureFlagsSchema, 400: httpErrorSchema },
   }),
   inboundEmailParsing: defineRoute({
     method: "post",

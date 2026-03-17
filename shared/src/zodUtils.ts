@@ -78,7 +78,7 @@ export const zAnyObj = z.object({}).loose();
 export const timestampSchema = z
   .number()
   .refine((value) => !Number.isNaN(new Date(value).getTime()), {
-    message: "Le format du timestamp est invalide",
+    message: localization.invalidDate,
   });
 
 export type ZodSchemaWithInputMatchingOutput<T> = z.ZodType<

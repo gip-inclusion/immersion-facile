@@ -9,6 +9,11 @@ import {
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
+  type FeatureFlags,
+  makeBooleanFeatureFlag,
+  makeHighlightFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
   type ShortLinkId,
   type TechnicalRoutes,
   technicalRoutes,
@@ -371,6 +376,82 @@ describe("technical router", () => {
           ],
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /validate-email",
+          status: 400,
+        },
+        status: 400,
+      });
+    });
+  });
+
+  describe("/feature-flags", () => {
+    const defaultFeatureFlags: FeatureFlags = {
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+        imageAlt: "altImage",
+        imageUrl: "https://imageUrl",
+        message: "message",
+        redirectUrl: "https://redirect-url",
+        overtitle: "overtitle",
+        title: "title",
+      }),
+      enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
+        message: "Maintenance message",
+        severity: "warning",
+      }),
+      enableSearchByScore: makeBooleanFeatureFlag(false),
+      enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+      enableStandardFormatBroadcastToFranceTravail:
+        makeBooleanFeatureFlag(false),
+      enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight pour l'entreprise",
+        message: "Mon message de highlight pour l'entreprise",
+        href: "https://www.example.com",
+        label: "Mon label de highlight pour l'entreprise",
+      }),
+      enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight pour l'agence",
+        message: "Mon message de highlight pour l'agence",
+        href: "https://www.example.com",
+        label: "Mon label de highlight pour l'agence",
+      }),
+    };
+    it(`${displayRouteName(
+      technicalRoutes.featureFlags,
+    )} 200 when all goes well without query params`, async () => {
+      const response = await httpClient.featureFlags({
+        queryParams: null,
+      });
+      expectHttpResponseToEqual(response, {
+        body: defaultFeatureFlags,
+        status: 200,
+      });
+    });
+    it(`${displayRouteName(
+      technicalRoutes.featureFlags,
+    )} 200 when all goes well with query params`, async () => {
+      const response = await httpClient.featureFlags({
+        queryParams: { [Date.now().toString()]: "" },
+      });
+      expectHttpResponseToEqual(response, {
+        body: defaultFeatureFlags,
+        status: 200,
+      });
+    });
+    it(`${displayRouteName(
+      technicalRoutes.featureFlags,
+    )} 400 when query params are invalid`, async () => {
+      const response = await httpClient.featureFlags({
+        queryParams: { "invalid-timestamp": "" },
+      });
+      expectHttpResponseToEqual(response, {
+        body: {
+          issues: [
+            "invalid-timestamp : Invalid key in record",
+            " : Invalid input: expected null, received object",
+          ],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /feature-flags",
           status: 400,
         },
         status: 400,
