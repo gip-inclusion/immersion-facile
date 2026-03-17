@@ -75,6 +75,14 @@ export const zEnumValidation = <T extends string>(
 
 export const zAnyObj = z.object({}).loose();
 
+export const timestampSchema = z
+  .number()
+  .int()
+  .positive()
+  .refine((val) => !Number.isNaN(new Date(val).getTime()), {
+    message: "Le format du timestamp est invalide",
+  });
+
 export type ZodSchemaWithInputMatchingOutput<T> = z.ZodType<
   T,
   T,
