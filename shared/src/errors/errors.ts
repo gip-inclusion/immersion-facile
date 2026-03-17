@@ -161,6 +161,7 @@ export const errors = {
   generic: {
     badDateRange: ({ from, to }: OptionalDateRange) =>
       new Error(`L'intervale de temps n'est pas supporté. De: ${from} À:${to}`),
+    invalidTimestamp: () => new Error("Invalid timestamp"),
     notAnError: () => new Error("Not an error class"),
     testError: (message: string) => new Error(message),
     fakeError: (message: string, httpStatus?: number) => {

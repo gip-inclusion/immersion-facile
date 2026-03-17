@@ -21,7 +21,9 @@ import { match } from "ts-pattern";
 
 export class HttpTechnicalGateway implements TechnicalGateway {
   public getAllFeatureFlags$ = (): Observable<FeatureFlags> =>
-    from(this.httpClient.featureFlags()).pipe(map((response) => response.body));
+    from(this.httpClient.featureFlags({ queryParams: null })).pipe(
+      map((response) => response.body),
+    );
 
   constructor(
     private readonly httpClient: HttpClient<TechnicalRoutes>,
