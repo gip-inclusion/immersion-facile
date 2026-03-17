@@ -17,7 +17,6 @@ import type {
 } from "../utils";
 import type { DateString } from "../utils/date";
 import type {
-  BeneficiaryRepresentative,
   ConventionDto,
   ConventionRenewed,
   ConventionStatus,
@@ -146,15 +145,15 @@ export const isBeneficiaryMinorAccordingToAge = (
 };
 
 export const isBeneficiaryMinor = ({
-  beneficiaryRepresentative,
+  hasBeneficiaryRepresentative,
   beneficiaryBirthdate,
   conventionDateStart,
 }: {
   beneficiaryBirthdate: string;
-  beneficiaryRepresentative?: BeneficiaryRepresentative;
+  hasBeneficiaryRepresentative: boolean;
   conventionDateStart?: DateString;
 }): boolean =>
-  !!beneficiaryRepresentative ||
+  hasBeneficiaryRepresentative ||
   (!!conventionDateStart &&
     isBeneficiaryMinorAccordingToAge(
       conventionDateStart,
