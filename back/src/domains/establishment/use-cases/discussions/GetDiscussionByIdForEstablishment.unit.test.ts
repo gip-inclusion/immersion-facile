@@ -24,6 +24,9 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
   const establishmentContact = new ConnectedUserBuilder()
     .withId(uuid())
     .buildUser();
+  const pendingUser = new ConnectedUserBuilder()
+    .withId(uuid())
+    .buildUser();
   const discussion = new DiscussionBuilder().withId(uuid()).build();
 
   let getDiscussionByIdForEstablishment: GetDiscussionByIdForEstablishment;
@@ -34,7 +37,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
     getDiscussionByIdForEstablishment = makeGetDiscussionByIdForEstablishment({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
-    uow.userRepository.users = [establishmentAdmin, establishmentContact];
+    uow.userRepository.users = [establishmentAdmin, establishmentContact, pendingUser];
     uow.discussionRepository.discussions = [discussion];
     uow.establishmentAggregateRepository.establishmentAggregates = [
       new EstablishmentAggregateBuilder()
@@ -53,6 +56,12 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
             role: "establishment-contact",
             status: "ACCEPTED",
             userId: establishmentContact.id,
+            shouldReceiveDiscussionNotifications: false,
+          },
+          {
+            role: "establishment-contact",
+            status: "PENDING",
+            userId: pendingUser.id,
             shouldReceiveDiscussionNotifications: false,
           },
         ])
@@ -114,8 +123,18 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
         }),
       );
     });
-    it("throws accessForbidden when user have pending right on establishment", async () => {
-      expect(true).toBe(false);
+    it("throws accessForbidden when user have no ACCEPTED right on establishment", async () => {
+      uow.userRepository.users = [pendingUser];
+
+      await expectPromiseToFailWithError(
+        getDiscussionByIdForEstablishment.execute(discussion.id, {
+          userId: pendingUser.id,
+        }),
+        errors.discussion.accessForbidden({
+          discussionId: discussion.id,
+          userId: pendingUser.id,
+        }),
+      );
     });
   });
 

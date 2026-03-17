@@ -192,8 +192,7 @@ export const errors = {
       serviceName: string;
     }) =>
       new Error(
-        `Unsupported response status form ${serviceName} : ${
-          status
+        `Unsupported response status form ${serviceName} : ${status
         } with body '${JSON.stringify(body, null, 2)}'`,
       ),
   },
@@ -228,8 +227,7 @@ export const errors = {
       ),
     forbidden: (mode: AssessmentMode) =>
       new ForbiddenError(
-        `Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs de l'agence prescriptrice peuvent ${
-          mode === "GetAssessment" ? "récupérer" : "créer"
+        `Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs de l'agence prescriptrice peuvent ${mode === "GetAssessment" ? "récupérer" : "créer"
         } le bilan.`,
       ),
     conventionEndingInMoreThanOneDay: () =>
@@ -640,6 +638,10 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur '${userId}' n'a pas les droits administrateur ou contact sur l'entreprise '${siret}'.`,
       ),
+    notAdmin: ({ siret, userId }: { siret: SiretDto; userId: UserId }) =>
+      new ForbiddenError(
+        `L'utilisateur '${userId}' n'a pas les droits administrateur actifs sur l'entreprise '${siret}'.`,
+      ),
     missingOrClosed: ({ siret }: { siret: SiretDto }) =>
       new BadRequestError(
         `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
@@ -700,11 +702,11 @@ export const errors = {
     }) =>
       mode === "bad request"
         ? new BadRequestError(
-            `L'entreprise '${siret}' n'a pas d'offre d'immersion avec le code appellation '${appellationCode}'.`,
-          )
+          `L'entreprise '${siret}' n'a pas d'offre d'immersion avec le code appellation '${appellationCode}'.`,
+        )
         : new NotFoundError(
-            `L'entreprise '${siret}' n'a pas d'offre d'immersion avec le code appellation '${appellationCode}'.`,
-          ),
+          `L'entreprise '${siret}' n'a pas d'offre d'immersion avec le code appellation '${appellationCode}'.`,
+        ),
     missingLocation: ({
       siret,
       locationId,
@@ -980,8 +982,7 @@ export const errors = {
       userId?: UserId;
     }) =>
       new ForbiddenError(
-        `L'utilisateur ${
-          userId ? `qui a l'identifiant '${userId}' ` : ""
+        `L'utilisateur ${userId ? `qui a l'identifiant '${userId}' ` : ""
         }n'a pas les droits suffisant sur l'agence qui a l'identifiant '${agencyId}'.`,
       ),
     noContactPhone: ({ userId }: { userId: UserId }) =>
@@ -1179,10 +1180,9 @@ export const errors = {
       ),
     missingRecipient: (params: { notificationId?: NotificationId }) =>
       new BadRequestError(
-        `Il n'y a pas de destinataire fourni pour l'email. ${
-          params?.notificationId
-            ? `Identifiant de la notification : ${params.notificationId}`
-            : ""
+        `Il n'y a pas de destinataire fourni pour l'email. ${params?.notificationId
+          ? `Identifiant de la notification : ${params.notificationId}`
+          : ""
         }`,
       ),
     smsNotSupported: () =>

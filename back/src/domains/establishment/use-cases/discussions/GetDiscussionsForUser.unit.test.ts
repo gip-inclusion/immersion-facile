@@ -6,7 +6,6 @@ import {
 import { flatDiscussionQueryParamsToGetPaginatedDiscussionsParams } from "./GetDiscussionsForUser";
 
 describe("GetDiscussionsForUser", () => {
-
   describe("flatDiscussionQueryParamsTogetPaginatedDiscussionsParams", () => {
     it("converts flat filters to correct filters", () => {
       const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
@@ -79,6 +78,8 @@ describe("GetDiscussionsForUser", () => {
     });
   });
 
+  // Following tests logic is done in repo
+
   // it("return no discussions if user has no ACCEPTED status on any establishment right", async () => {
   //   uow = createInMemoryUow();
 
@@ -122,7 +123,7 @@ describe("GetDiscussionsForUser", () => {
   //   );
   // });
 
-  it("return no discussions if user has no sufficient rights on establishment", async () => {
-    expect(true).toBe(false);
-  });
+  // it("return no discussions if user has no sufficient rights on establishment", async () => {
+  //   expect(true).toBe(false);
+  // });
 });

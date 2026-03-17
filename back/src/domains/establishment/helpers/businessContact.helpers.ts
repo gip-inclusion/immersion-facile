@@ -9,8 +9,8 @@ export const getNotifiedUsersFromEstablishmentUserRights = async (
   uow.userRepository.getByIds(
     userRights
       .filter(
-        ({ shouldReceiveDiscussionNotifications }) =>
-          shouldReceiveDiscussionNotifications,
+        ({ shouldReceiveDiscussionNotifications, status }) =>
+          shouldReceiveDiscussionNotifications && status === "ACCEPTED",
       )
       .map(({ userId }) => userId),
   );
