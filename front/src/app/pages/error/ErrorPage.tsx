@@ -6,8 +6,9 @@ import type {
   FrontErrorProps,
 } from "src/app/contents/error/types";
 import {
-  defaultFrontErrorButtons,
+  ContactUsButton,
   FrontSpecificError,
+  HomeButton,
 } from "src/app/pages/error/front-errors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { ErrorPageContent } from "./ErrorPageContent";
@@ -30,7 +31,13 @@ const getPageContentProps = (
   return {
     title: title ?? "Erreur inattendue",
     description: error.message,
-    buttons: buttons ?? defaultFrontErrorButtons,
+    buttons: buttons ?? [
+      HomeButton,
+      <ContactUsButton
+        errorMessage={error.message}
+        key={ContactUsButton.name}
+      />,
+    ],
   };
 };
 

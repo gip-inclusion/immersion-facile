@@ -45,14 +45,19 @@ export const frontErrors = {
             </p>
           </>
         ),
-        buttons: defaultFrontErrorButtons,
+        buttons: [
+          HomeButton,
+          ContactUsButton({ errorMessage: "Page introuvable." }),
+        ],
       }),
-    unauthorized: () =>
-      new FrontSpecificError({
+    unauthorized: () => {
+      const description = "Vous n'êtes pas autorisé à accéder à cette page.";
+      return new FrontSpecificError({
         title: "Non-autorisé",
-        description: "Vous n'êtes pas autorisé à accéder à cette page.",
-        buttons: defaultFrontErrorButtons,
-      }),
+        description,
+        buttons: [HomeButton, ContactUsButton({ errorMessage: description })],
+      });
+    },
   },
   convention: {
     cancelled: ({
@@ -84,12 +89,14 @@ export const frontErrors = {
           </Button>,
         ],
       }),
-    externalConsumerNotFound: ({ consumerName }: { consumerName: string }) =>
-      new FrontSpecificError({
+    externalConsumerNotFound: ({ consumerName }: { consumerName: string }) => {
+      const description = `Nous n'avons aucun partenaire avec le nom : ${consumerName}. Veuillez vérifier l'orthographe.`;
+      return new FrontSpecificError({
         title: "Partenaire inconnu",
-        description: `Nous n'avons aucun partenaire avec le nom : ${consumerName}. Veuillez vérifier l'orthographe.`,
-        buttons: [HomeButton, ContactUsButton],
-      }),
+        description,
+        buttons: [HomeButton, ContactUsButton({ errorMessage: description })],
+      });
+    },
     noRightsOnConvention: ({
       userEmail,
       conventionId,
@@ -114,7 +121,13 @@ export const frontErrors = {
             </p>
           </>
         ),
-        buttons: [HomeButton, ContactUsButton],
+        buttons: [
+          HomeButton,
+          ContactUsButton({
+            errorMessage: `L’accès à la convention '${conventionId}' n’est pas possible avec le compte
+              actuel (${userEmail}). Ce compte n’a aucun droit sur la convention.`,
+          }),
+        ],
       }),
   },
   conventionDraft: {
@@ -155,12 +168,11 @@ export const frontErrors = {
   },
   establishment: {
     notFound: ({ siret }: { siret?: SiretDto }) => {
+      const description = `Nous n'avons trouvé aucun établissement ${siret ? `avec le siret ${siret}` : ""}.`;
       return new FrontSpecificError({
         title: "Établissment non trouvé",
-        description: `Nous n'avons trouvé aucun établissement ${
-          siret ? `avec le siret ${siret}` : ""
-        }.`,
-        buttons: [HomeButton, ContactUsButton],
+        description,
+        buttons: [HomeButton, ContactUsButton({ errorMessage: description })],
       });
     },
     expiredLink: () => {
@@ -198,19 +210,17 @@ export const HomeButton: ErrorButton = (
 );
 
 export const ContactUsButton = ({
-  currentUrl,
-  currentDate,
-  error,
+  errorMessage,
   priority = "secondary",
 }: ContactErrorInformation) => {
   const emailBody = `%0D%0A________________________%0D%0A
   %0D%0A
   Veuillez répondre au dessus de cette ligne.%0D%0A%0D%0A
   Les infos suivantes peuvent être utiles pour résoudre votre problème :%0D%0A%0D%0A
-  - URL de la page concernée : ${currentUrl}%0D%0A%0D%0A
-  - Date et heure de l'erreur : ${currentDate}%0D%0A%0D%0A
+  - URL de la page concernée : ${window.location.href}%0D%0A%0D%0A
+  - Date et heure de l'erreur : ${new Date().toISOString()}%0D%0A%0D%0A
   - Résumé de l'erreur :%0D%0A%0D%0A
-  ${error}
+  ${errorMessage}
   `;
   return (
     <Button
@@ -225,5 +235,3 @@ export const ContactUsButton = ({
     </Button>
   );
 };
-
-export const defaultFrontErrorButtons = [HomeButton, ContactUsButton];
