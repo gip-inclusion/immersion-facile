@@ -8,13 +8,9 @@ export type FrontErrorProps = {
   description: ReactNode;
 };
 
-export type ErrorButton =
-  | ReactElement
-  | ((params: ContactErrorInformation) => ReactElement);
+export type ErrorButton = ReactElement;
 
 export type ContactErrorInformation = {
-  currentUrl: string;
-  currentDate: string;
-  error: ReactNode;
+  errorMessage: string;
   priority?: ButtonProps["priority"];
 };

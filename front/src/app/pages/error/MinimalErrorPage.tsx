@@ -48,25 +48,25 @@ export const MinimalErrorPage = ({ error }: { error: Error }) => {
         <ErrorPageContent
           buttons={[
             <ContactUsButton
-              currentDate={new Date().toISOString()}
-              currentUrl={window.location.href}
-              error={error.message}
+              errorMessage={error.message}
               priority="primary"
               key={ContactUsButton.name}
             />,
           ]}
           title="Erreur inattendue"
-          description=<>
-            <p>
-              Notre site rencontre actuellement un problème technique empêchant
-              son utilisation. Notre équipe fait tout son possible pour rétablir
-              la situation.
-            </p>
-            <p>
-              Nous vous remercions pour votre patience et nous excusons pour la
-              gêne occasionnée.
-            </p>
-          </>
+          description={
+            <>
+              <p>
+                Notre site rencontre actuellement un problème technique
+                empêchant son utilisation. Notre équipe fait tout son possible
+                pour rétablir la situation.
+              </p>
+              <p>
+                Nous vous remercions pour votre patience et nous excusons pour
+                la gêne occasionnée.
+              </p>
+            </>
+          }
         />
       </MainWrapper>
       <LayoutFooter />

@@ -28,17 +28,7 @@ export const ErrorPageContent = ({
       <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>{description}</p>
       <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
         {buttons.length
-          ? buttons.map((button) => {
-              const buttonJsx =
-                typeof button === "function"
-                  ? button({
-                      currentUrl: window.location.href,
-                      currentDate: new Date().toISOString(),
-                      error: description,
-                    })
-                  : button;
-              return <li key={buttonJsx.key}>{buttonJsx}</li>;
-            })
+          ? buttons.map((button) => <li key={button.key}>{button}</li>)
           : null}
       </ul>
       {feedbackTopic && <Feedback topics={[feedbackTopic]} />}

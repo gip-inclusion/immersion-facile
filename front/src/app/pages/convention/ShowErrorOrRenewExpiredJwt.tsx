@@ -23,17 +23,18 @@ export const ShowConventionErrorOrRenewExpiredJwt = ({
     );
 
   const feedbackTopic: FeedbackTopic = "renew-expired-jwt-convention";
+  const description = authExpiredMessage();
   return (
     <ErrorPageContent
       title={expiredJwtErrorTitle}
-      description={authExpiredMessage()}
+      description={description}
       buttons={[
         RenewExpiredJwtButton({
           feedbackTopic: feedbackTopic,
           expiredJwt: jwt,
           originalUrl: window.location.href,
         }),
-        ContactUsButton,
+        ContactUsButton({ errorMessage: description }),
       ]}
       feedbackTopic={feedbackTopic}
     />

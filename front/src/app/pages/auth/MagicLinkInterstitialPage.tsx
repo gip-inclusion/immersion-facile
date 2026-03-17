@@ -25,6 +25,7 @@ export const MagicLinkInterstitialPage = () => {
   const feedbackTopic: FeedbackTopic = "renew-expired-jwt-email-auth-code";
   const RenewJwtButton = (
     <RenewExpiredJwtButton
+      key={RenewExpiredJwtButton.name}
       expiredJwt={code}
       feedbackTopic={feedbackTopic}
       state={state}
@@ -32,14 +33,21 @@ export const MagicLinkInterstitialPage = () => {
   );
 
   if (expiredSinceSeconds) {
+    const expiredMessage = authExpiredMessage(
+      Math.ceil(expiredSinceSeconds / oneMinuteInSeconds),
+    );
     return (
       <ErrorPage
         title={expiredJwtErrorTitle}
-        buttons={[RenewJwtButton, ContactUsButton]}
+        buttons={[
+          RenewJwtButton,
+          <ContactUsButton
+            key={"contact-us-button"}
+            errorMessage={expiredMessage}
+          />,
+        ]}
         error={{
-          message: authExpiredMessage(
-            Math.ceil(expiredSinceSeconds / oneMinuteInSeconds),
-          ),
+          message: expiredMessage,
           name: "Erreur de connexion",
         }}
         feedbackTopic={feedbackTopic}
@@ -55,7 +63,10 @@ export const MagicLinkInterstitialPage = () => {
         return (
           <ErrorPage
             title={title ?? "Erreur de connexion"}
-            buttons={[RenewJwtButton, ContactUsButton]}
+            buttons={[
+              RenewJwtButton,
+              ContactUsButton({ errorMessage: messageText }),
+            ]}
             error={{
               message: messageText,
               name: title ?? "Erreur de connexion",
