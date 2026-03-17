@@ -14,10 +14,13 @@ type DurationFormat = ExtractFromExisting<
   "minutes" | "hours" | "days"
 >;
 
-export const displayDuration = (
-  durationInSeconds: number,
-  format: DurationFormat,
-) =>
+export const displayDuration = ({
+  durationInSeconds,
+  format,
+}: {
+  durationInSeconds: number;
+  format: DurationFormat;
+}): string =>
   formatDuration(
     intervalToDuration({ start: 0, end: durationInSeconds * 1000 }),
     {

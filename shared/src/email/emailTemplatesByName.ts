@@ -11,7 +11,7 @@ import type {
 import type { AgencyRole } from "../role/role.dto";
 import { frontRoutes } from "../routes/route.utils";
 import { isStringDate, toDisplayedDate } from "../utils/date";
-import { displayDuration } from "../utils/durations";
+import { displayDuration, oneMinuteInSeconds } from "../utils/durations";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
@@ -1569,7 +1569,7 @@ Tél : ${beneficiaryPhone}`,
           },
         ],
         subContent: `
-          Ce lien est valable pendant ${displayDuration(validMinutes, "minutes")} et ne peut être utilisé qu’une seule fois.
+          Ce lien est valable pendant ${displayDuration({ durationInSeconds: validMinutes * oneMinuteInSeconds, format: "minutes" })} et ne peut être utilisé qu’une seule fois.
           
           Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
           
