@@ -592,6 +592,7 @@ describe("InclusionConnected", () => {
             {
               email: currentUserAdminData.email,
               role: "establishment-admin",
+              status: "ACCEPTED",
               job: "fake job",
               phone: "+33600000000",
               shouldReceiveDiscussionNotifications: true,
@@ -600,6 +601,7 @@ describe("InclusionConnected", () => {
             {
               email: otherUserAdminData.email,
               role: "establishment-admin",
+              status: "ACCEPTED",
               job: "fake job",
               phone: "+33600000000",
               shouldReceiveDiscussionNotifications: true,
@@ -640,6 +642,7 @@ describe("InclusionConnected", () => {
         const otherEstablishmentToKeepUserRight: FormEstablishmentUserRight = {
           email: otherUserAdminData.email,
           role: "establishment-contact",
+          status: "ACCEPTED",
           job: "fake job",
           phone: "+33600000000",
           shouldReceiveDiscussionNotifications: true,
@@ -729,6 +732,7 @@ describe("InclusionConnected", () => {
         const otherEstablishmentUserRight: FormEstablishmentUserRight = {
           email: otherUserAdminData.email,
           role: "establishment-contact",
+          status: "ACCEPTED",
           job: "fake job",
           phone: "+33600000000",
           shouldReceiveDiscussionNotifications: true,
@@ -768,6 +772,7 @@ describe("InclusionConnected", () => {
         const updatedEstablishmentUserRight: FormEstablishmentUserRight = {
           email: currentUserAdminData.email,
           role: "establishment-contact",
+          status: "ACCEPTED",
           job: "fake job",
           phone: "+33600000000",
           shouldReceiveDiscussionNotifications: true,

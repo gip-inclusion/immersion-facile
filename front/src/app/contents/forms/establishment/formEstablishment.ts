@@ -99,6 +99,10 @@ export const formEstablishmentFieldsLabels = (
     label: "",
     id: "",
   },
+  "userRights.0.status": {
+    label: "",
+    id: "",
+  },
   "userRights.0.isMainContactByPhone": {
     label: "Numéro de téléphone principal",
     id: domElementIds.establishment[mode].businessContact.isMainContactByPhone,

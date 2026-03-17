@@ -114,6 +114,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             {
               email: federatedIdentity?.email ?? "",
               job: "",
+              status: "ACCEPTED",
               phone: "",
               isMainContactByPhone: true,
               role: "establishment-admin",
