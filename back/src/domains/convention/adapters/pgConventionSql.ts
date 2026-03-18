@@ -456,8 +456,6 @@ const createBroadcastFeedbackBaseBuilder = ({
           eb.ref("c.date_submission").as("dateSubmission"),
         ])
         .where("c.agency_id", "in", userAgencyIds)
-        .where("bf.subscriber_error_feedback", "is not", null)
-        .where("bf.handled_by_agency", "=", false)
         .distinctOn("c.id")
         .orderBy("c.id")
         .orderBy("bf.occurred_at", "desc");

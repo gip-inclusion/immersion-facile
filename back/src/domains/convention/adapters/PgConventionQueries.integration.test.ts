@@ -1729,7 +1729,7 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
-    describe("when there are conventions with multiple errored broadcast feedbacks for the agency user", () => {
+    describe("when conventions have multiple errored broadcast feedbacks for the agency user", () => {
       it("should return conventions with the last errored broadcast feedback for the agency user with pagination", async () => {
         const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
         const convention = new ConventionDtoBuilder()
@@ -1819,6 +1819,76 @@ describe("Pg implementation of ConventionQueries", () => {
             totalPages: 1,
             numberPerPage: 10,
             totalRecords: 1,
+          },
+        });
+      });
+
+      it("when convention broadcast finally succeeded, it should not be returned", async () => {
+        const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
+        const convention = new ConventionDtoBuilder()
+          .withId(conventionIdA)
+          .withAgencyId(agencyIdA)
+          .withDateSubmission("2025-01-02T00:00:00.000Z")
+          .build();
+        const firstBroadcast: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-01T00:00:00.000Z",
+          handledByAgency: false,
+          requestParams: {
+            conventionId: conventionIdA,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          subscriberErrorFeedback: {
+            message: "any-error-message-1",
+            error: { code: "ANY_ERROR_CODE_1" },
+          },
+          response: {
+            httpStatus: 500,
+            body: { error: "ANY_ERROR_CODE_1" },
+          },
+        };
+        const lastBroadcast: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-30T00:00:00.000Z",
+          handledByAgency: false,
+          requestParams: {
+            conventionId: convention.id,
+            conventionStatus: "READY_TO_SIGN",
+          },
+          response: {
+            httpStatus: 200,
+          },
+        };
+        await agencyRepo.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
+        await conventionRepository.save(convention);
+        await broadcastFeedbacksRepository.save(firstBroadcast);
+        await broadcastFeedbacksRepository.save(lastBroadcast);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 0,
           },
         });
       });
