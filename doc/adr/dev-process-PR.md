@@ -1,7 +1,5 @@
 # Comment s'organise-t-on pour gérer le cycle de vie d'une feature ?
 
-## 2026/01/06 - Process de dev
-
 1. Dans "Prêt à développer", on est censé avoir les story qui sont prêtes à être développées (description claire, intervenants et partenaires identifiés sur le ticket)
 2. Les story à "faire dans l'itération" sont les prochaines à être développées
 3. Les dev se mettent d'accord entre eux sur qui prend quoi
@@ -19,5 +17,58 @@
 10. Quand les devs veulent faire une release, on prévient @if-produit et @if-devs qu'une recette est faisable sur la staging en créant un thread sur Slack (dans #if-staging-déploiement, en partant du message de déploiement de la pré-release)
     - Pendant la recette, on bloque le merge de PR
     - Pour du détail sur la recette voir [la documentation du processus de recette](https://github.com/gip-inclusion/immersion-facile/blob/main/doc/adr/review-and-deployment-process.md).
-11. Quand le métier a validé la recette, on lance le déploiement en prod.
+11. Quand le métier a validé la recette, on lance le déploiement en prod
 
+
+# Précision concernant le contenu des PR et les actions de refactoring
+
+```
+Statut : Accepté
+Date : 17 mars 2026
+Décideurs : Équipe Technique hors Clément (congés)
+```
+
+## 1. Contexte
+La fluidité des revues de code (PR) est essentielle pour maintenir une vélocité constante. Jusqu'à présent, certaines PR mélangeaient nouvelles fonctionnalités et refactorisations lourdes, rendant la lecture difficile et les retours subjectifs (performances, style, sécurité) sans base de référence commune.
+
+## 2. Décision
+### Périmètre d'une Pull Request lié à une Issue Métier (PR)
+- Focus : Une PR doit répondre exclusivement à l'objectif de l'Issue associée avec le minimum de code nécessaire (make it work).
+
+- Objectivité : Les critères de performance, sécurité ou "code propre" ne sont opposables en revue que s'ils s'appuient sur un ADR existant. Le reste est jugé trop subjectif pour bloquer une PR.
+
+- Tolérance : Les changements mineurs hors sujet sont acceptés s'ils sont liés au code modifié et ne nuisent pas à la lisibilité.
+
+- Rejet : Toute PR jugée trop volumineuse car incluant du refactorisation non prévue sera scindée. Le code de l'issue d'un côté, le code de refactorisation de l'autre. Le code de refactorisation devra suivre le processus de refactorisation.
+
+### Processus de Refactorisation
+Tout besoin de refactorisation doit suivre un parcours formel pour être planifié et visible :
+
+- Création d'une Issue : Type Task, Label TECH, avec une description claire du changement envisagé. La tâche est placée dans la colonne "Prêt à Dev".
+
+- Communication : Proposition lors du point tech du mardi, du point matin (si urgent) ou en asynchrone dans l'issue (voir point suivant). Dans tout les cas, une formalisation dans l'issue est obligatoire pour le suivi général.
+
+- Validation : Vote par l'ensemble des devs qui ne sont pas en congés via réactions (👍, 👎 ou abstention). Les commentaires servent à argumenter. Une tâche validée est placée dans "A faire dans l'itération".
+> L'équipe technique est garant du temps disponible pour traiter ses sujets dans les itérations. Il est convenu que les tâches validées soient visible idéalement dans l'itération avant qu'elle démarre. Les tâches ne sont pas des choses à faire "en plus" en surchargeant les itérations. Le ratio tâches techs / métier est discutable en début d'itération.
+
+- Issue non acceptée : Clôturée comme "Non planifiée". Elle peut être reproposée ultérieurement.
+
+### Évolutions d'Architecture
+Si le changement impacte l'architecture globale et/ou un changement de solution technique :
+
+> Un ADR doit être rédigé et validé en amont.
+
+Exemple: remplacer l'usage des classes de UseCase par le useCaseBuilder
+
+Les tâches techniques découlant de cet ADR sont découpées en petits lots et ne nécessitent pas de nouveau vote d'approbation individuel.
+
+## 3. Conséquences
+### Positives ✅
+- Revues accélérées : Moins de lignes à relire et des objectifs clairs.
+- Transparence : La dette technique et les refactorisations deviennent visibles et priorisables par l'équipe.
+- Moins de conflits : Réduction des débats subjectifs en PR grâce à l'appui sur les ADRs.
+- Moins de réalisations subjectifs individuels et plus de réalisations souhaitée par la majorité de l'équipe technique
+
+### Négatives ⚠️
+- Lenteur administrative : Nécessite de créer des issues pour des changements qu'on aurait pu faire "au passage".
+- Rigueur accrue : Demande une discipline constante pour ne pas laisser traîner les tâches TECH validées.
