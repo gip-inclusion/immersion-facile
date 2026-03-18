@@ -419,6 +419,7 @@ export class PgConventionQueries implements ConventionQueries {
     const applyBroadcastFilters = (qb: BroadcastFeedbackBaseQueryBuilder) =>
       pipeWithValue(
         qb,
+        filterHasErroredFeedback(),
         filterBroadcastErrorKind(broadcastErrorKind),
         filterConventionStatus(conventionStatus),
         filterSearchForBroadcastFeedback(search),
@@ -616,6 +617,16 @@ const filterConventionStatus =
   ): BroadcastFeedbackBaseQueryBuilder => {
     if (!conventionStatus || conventionStatus.length === 0) return builder;
     return builder.where("cf.status", "in", conventionStatus);
+  };
+
+const filterHasErroredFeedback =
+  () =>
+  (
+    builder: BroadcastFeedbackBaseQueryBuilder,
+  ): BroadcastFeedbackBaseQueryBuilder => {
+    return builder
+      .where("cf.subscriberErrorFeedback", "is not", null)
+      .where("cf.handledByAgency", "=", false);
   };
 
 const filterSearchForBroadcastFeedback =
