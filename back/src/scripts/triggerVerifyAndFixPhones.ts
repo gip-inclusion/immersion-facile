@@ -1,9 +1,6 @@
+import { subDays } from "date-fns";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
-import {
-  createMakeProductionPgPool,
-  createMakeScriptPgPool,
-} from "../config/pg/pgPool";
+import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeVerifyAndRequestInvalidPhonesUpdate } from "../domains/core/phone-number/use-cases/VerifyAndRequestInvalidPhonesUpdate";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -16,8 +13,6 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const verifyAndFixPhones = async () => {
-  const pool = createMakeScriptPgPool(config)();
-  const kyselyDb = makeKyselyDb(pool);
   const { uowPerformer } = createDbRelatedSystems(
     config,
     createMakeProductionPgPool(config),
@@ -31,15 +26,14 @@ const verifyAndFixPhones = async () => {
 
   const verifyAndRequestInvalidPhonesUpdate =
     makeVerifyAndRequestInvalidPhonesUpdate({
-      deps: {
-        kyselyDb,
-        timeGateway,
-        createNewEvent,
-        uowPerformer,
-      },
+      deps: { createNewEvent, timeGateway },
+      uowPerformer,
     });
 
-  return await verifyAndRequestInvalidPhonesUpdate.execute();
+  const oneDayAgo = subDays(timeGateway.now(), 1);
+  return await verifyAndRequestInvalidPhonesUpdate.execute({
+    dateToVerifyBefore: oneDayAgo,
+  });
 };
 
 const triggerVerifyAndFixPhones = ({
