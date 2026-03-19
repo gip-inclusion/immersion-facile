@@ -1739,7 +1739,7 @@ Tél : ${beneficiaryPhone}`,
         subContent: `La décision de votre ${
           internshipKind === "immersion"
             ? "conseiller"
-            : "conseiller de la de la Chambre consulaire ayant émis la convention"
+            : "conseiller de la Chambre consulaire ayant émis la convention"
         } vous sera transmise par mail.
   
           ${defaultSignature(internshipKind)}
