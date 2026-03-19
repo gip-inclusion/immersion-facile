@@ -1,22 +1,18 @@
+import { subSeconds } from "date-fns";
 import type { Pool } from "pg";
 import {
   type AgencyDto,
   AgencyDtoBuilder,
-  type AgencyId,
   type AgencyWithUsersRights,
   type ApiConsumer,
-  type ApiConsumerId,
   ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
-  type ConventionId,
   DiscussionBuilder,
   type DiscussionDto,
-  type DiscussionId,
   defaultPhoneNumber,
-  type ExtractFromExisting,
   expectArraysToEqualIgnoringOrder,
-  expectToEqual,
+  type Phone,
   type PhoneNumber,
 } from "shared";
 import {
@@ -26,82 +22,67 @@ import {
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
-import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
-import { PgDiscussionRepository } from "../../../establishment/adapters/PgDiscussionRepository";
-import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import type {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { ApiConsumerBuilder } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
-import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
-import { PgUserRepository } from "../../authentication/connected-user/adapters/PgUserRepository";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { createPgUow } from "../../unit-of-work/adapters/createPgUow";
 import { PgUowPerformer } from "../../unit-of-work/adapters/PgUowPerformer";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { getPhoneNumbers } from "../adapters/pgPhoneHelper";
-import { insertPhoneNumber } from "../adapters/pgPhoneTestFileHelper";
+import {
+  type TablesWithPhoneReference,
+  tablesWithPhoneReference,
+} from "../ports/PhoneRepository";
 import {
   makeUpdateInvalidPhone,
   type UpdateInvalidPhone,
+  type UpdatePhonePayload,
 } from "./UpdateInvalidPhone";
-import type { PhoneInDB } from "./VerifyAndRequestInvalidPhonesUpdate";
 
-type RepoTablesWithPhoneReference = ExtractFromExisting<
-  keyof Database,
-  | "discussions"
-  | "agencies"
-  | "api_consumers"
-  | "establishments__users"
-  | "conventions"
->;
+type PhoneReference = {
+  tableName: TablesWithPhoneReference;
+  objectIdWithPhoneReference: string;
+};
 
 describe("UpdateInvalidPhone", () => {
   let pool: Pool;
   let kyselyDb: KyselyDb;
+  let uow: UnitOfWork;
   let uowPerformer: PgUowPerformer;
   let timeGateway: TimeGateway;
-  let verificationDateString: Date;
   let uuidGenerator: UuidV4Generator;
+  let now: Date;
 
-  let pgUserRepository: PgUserRepository;
+  let updateInvalidPhone: UpdateInvalidPhone;
 
-  let pgConventionRepository: PgConventionRepository;
-  let pgApiConsumerRepository: PgApiConsumerRepository;
-  let pgAgencyRepository: PgAgencyRepository;
-  let pgDiscussionRepository: PgDiscussionRepository;
-  let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
-
-  const correctPhoneNumber: PhoneNumber = "+33555689727";
   const fixablePhoneNumber: PhoneNumber = "+32784423078";
   const fixedPhoneNumber: PhoneNumber = "+33784423078";
 
-  const agencyId: AgencyId = "550e8400-e29b-41d4-a716-446655440001";
-  const conventionId: ConventionId = "550e8400-e29b-41d4-a716-446655440002";
-  const apiConsumerId: ApiConsumerId = "550e8400-e29b-41d4-a716-446655440003";
-  const discussionId: DiscussionId = "550e8400-e29b-41d4-a716-446655440004";
-  const establishmentUserId = "550e8400-e29b-41d4-a716-446655440005";
+  const insertPhoneNumber = async (phoneToInsert: Phone): Promise<void> => {
+    await kyselyDb
+      .insertInto("phone_numbers")
+      .values({
+        id: phoneToInsert.id,
+        phone_number: phoneToInsert.phoneNumber,
+        verified_at: phoneToInsert.verifiedAt,
+        verification_status: phoneToInsert.verificationStatus,
+      })
+      .execute();
+  };
 
-  let updateInvalidPhone: UpdateInvalidPhone;
+  const generateRandomSiret = () => {
+    return (Math.floor(Math.random() * 9e13) + 1e13).toString();
+  };
 
   beforeAll(async () => {
     pool = makeTestPgPool();
     kyselyDb = makeKyselyDb(pool);
-    uowPerformer = new PgUowPerformer(kyselyDb, createPgUow);
-
-    pgUserRepository = new PgUserRepository(kyselyDb);
-
-    pgConventionRepository = new PgConventionRepository(kyselyDb);
-    pgApiConsumerRepository = new PgApiConsumerRepository(kyselyDb);
-    pgAgencyRepository = new PgAgencyRepository(kyselyDb);
-    pgDiscussionRepository = new PgDiscussionRepository(kyselyDb);
-    pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      kyselyDb,
-    );
+    uow = createPgUow(kyselyDb);
   });
 
   afterAll(async () => {
@@ -110,10 +91,11 @@ describe("UpdateInvalidPhone", () => {
 
   beforeEach(async () => {
     timeGateway = new CustomTimeGateway();
-    verificationDateString = timeGateway.now();
+    now = timeGateway.now();
     uuidGenerator = new UuidV4Generator();
+
+    uowPerformer = new PgUowPerformer(kyselyDb, createPgUow);
     updateInvalidPhone = makeUpdateInvalidPhone({
-      deps: { kyselyDb },
       uowPerformer,
     });
 
@@ -143,26 +125,27 @@ describe("UpdateInvalidPhone", () => {
 
   const createPhoneReferencesOnAllTables = async (
     phoneNumber: PhoneNumber,
-  ): Promise<void> => {
+  ): Promise<PhoneReference[]> => {
     const validator = new ConnectedUserBuilder()
       .withId(uuidGenerator.new())
-      .withEmail("validator1@agency1.fr")
+      .withEmail(`${uuidGenerator.new()}@agency1.fr`)
+      .withProConnectInfos(null)
       .buildUser();
     const agency: AgencyDto = new AgencyDtoBuilder()
-      .withId(agencyId)
-      .withAgencySiret("11110000111100")
+      .withId(uuidGenerator.new())
+      .withAgencySiret(generateRandomSiret())
       .withPhoneNumber(phoneNumber)
       .build();
 
     const conventionWithPhoneNumber: ConventionDto = new ConventionDtoBuilder()
-      .withId(conventionId)
+      .withId(uuidGenerator.new())
       .withAgencyId(agency.id)
       .withBeneficiary({
         birthdate: new Date("2000-05-26").toISOString(),
         firstName: "Nolwenn",
         lastName: "Le Bihan",
         role: "beneficiary",
-        email: "lebihan@breizh.com",
+        email: `${uuidGenerator.new()}@breizh.com`,
         phone: phoneNumber,
       })
       .withEstablishmentTutorPhone(phoneNumber)
@@ -170,9 +153,9 @@ describe("UpdateInvalidPhone", () => {
       .build();
 
     const apiConsumerWithPhoneNumber: ApiConsumer = new ApiConsumerBuilder()
-      .withId(apiConsumerId)
+      .withId(uuidGenerator.new())
       .withContact({
-        emails: ["abc@abc.com"],
+        emails: [`${uuidGenerator.new()}@abc.com`],
         firstName: "Erwan",
         lastName: "Leguidec",
         phone: phoneNumber,
@@ -181,13 +164,14 @@ describe("UpdateInvalidPhone", () => {
       .build();
 
     const discussionWithPhoneNumber: DiscussionDto = new DiscussionBuilder()
-      .withId(discussionId)
+      .withId(uuidGenerator.new())
       .withPotentialBeneficiaryPhone(phoneNumber)
       .build();
 
     const establishmentUser = new ConnectedUserBuilder()
-      .withId(establishmentUserId)
-      .withEmail("bob@lebricoleur.com")
+      .withId(uuidGenerator.new())
+      .withEmail(`${uuidGenerator.new()}@lebricoleur.com`)
+      .withProConnectInfos(null)
       .buildUser();
     const establishmentUserRight: EstablishmentUserRight = {
       role: "establishment-contact",
@@ -197,10 +181,12 @@ describe("UpdateInvalidPhone", () => {
     };
     const establishmentAggregate: EstablishmentAggregate =
       new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(generateRandomSiret())
+        .withLocationId(uuidGenerator.new().toString())
         .withUserRights([establishmentUserRight])
         .build();
 
-    await pgUserRepository.save(validator);
+    await uow.userRepository.save(validator);
     const agencyWithPhoneNumber: AgencyWithUsersRights = toAgencyWithRights(
       agency,
       {
@@ -210,431 +196,251 @@ describe("UpdateInvalidPhone", () => {
         },
       },
     );
-    await pgAgencyRepository.insert(agencyWithPhoneNumber);
 
-    await pgConventionRepository.save(conventionWithPhoneNumber);
-
-    await pgApiConsumerRepository.save(apiConsumerWithPhoneNumber);
-
-    await pgDiscussionRepository.insert(discussionWithPhoneNumber);
-
-    await pgUserRepository.save(establishmentUser);
-    await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+    await uow.agencyRepository.insert(agencyWithPhoneNumber);
+    await uow.conventionRepository.save(conventionWithPhoneNumber);
+    await uow.apiConsumerRepository.save(apiConsumerWithPhoneNumber);
+    await uow.discussionRepository.insert(discussionWithPhoneNumber);
+    await uow.userRepository.save(establishmentUser);
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate,
+    );
+
+    const referenceByTable: Record<TablesWithPhoneReference, PhoneReference> = {
+      agencies: {
+        tableName: "agencies",
+        objectIdWithPhoneReference: agency.id,
+      },
+      actors: {
+        tableName: "actors",
+        objectIdWithPhoneReference: conventionWithPhoneNumber.id,
+      },
+      api_consumers: {
+        tableName: "api_consumers",
+        objectIdWithPhoneReference: apiConsumerWithPhoneNumber.id,
+      },
+      discussions: {
+        tableName: "discussions",
+        objectIdWithPhoneReference: discussionWithPhoneNumber.id,
+      },
+      establishments__users: {
+        tableName: "establishments__users",
+        objectIdWithPhoneReference: establishmentUserRight.userId,
+      },
+    };
+
+    return Object.values(referenceByTable);
+  };
+
+  const expectPhoneReferencesToMatchPhoneNumber = async (
+    phoneReferences: PhoneReference[],
+    phoneNumber: PhoneNumber,
+  ) => {
+    const expectByTable: Record<
+      TablesWithPhoneReference,
+      (id: string) => Promise<void>
+    > = {
+      agencies: async (id) => {
+        const agency = await uow.agencyRepository.getById(id);
+        expect(agency?.phoneNumber).toBe(phoneNumber);
+      },
+
+      actors: async (id) => {
+        const convention = await uow.conventionRepository.getById(id);
+        expect(convention?.signatories.beneficiary.phone).toBe(phoneNumber);
+        expect(convention?.establishmentTutor.phone).toBe(phoneNumber);
+        expect(convention?.signatories.establishmentRepresentative.phone).toBe(
+          phoneNumber,
+        );
+      },
+
+      api_consumers: async (id) => {
+        const apiConsumer = await uow.apiConsumerRepository.getById(id);
+        expect(apiConsumer?.contact.phone).toBe(phoneNumber);
+      },
+
+      discussions: async (id) => {
+        const discussion = await uow.discussionRepository.getById(id);
+        expect(discussion?.potentialBeneficiary.phone).toBe(phoneNumber);
+      },
+
+      establishments__users: async (id) => {
+        const establishmentAggregateWithUser =
+          await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
+            { userId: id },
+          );
+        const userRight = establishmentAggregateWithUser?.[0].userRights.find(
+          (userRight) => userRight.userId === id,
+        );
+        expect(userRight?.phone).toBe(phoneNumber);
+      },
+    };
+
+    await Promise.all(
+      phoneReferences.map(({ tableName, objectIdWithPhoneReference }) =>
+        expectByTable[tableName](objectIdWithPhoneReference),
+      ),
     );
   };
 
-  const expectPhoneReferenceInObjectToMatch = async (
-    {
-      repoTableName,
-      objectId,
-    }: {
-      repoTableName: RepoTablesWithPhoneReference;
-      objectId: string;
-    },
-    newReferencedPhoneNumber: string,
-  ) => {
-    if (repoTableName === "agencies") {
-      expectToEqual(
-        (await pgAgencyRepository.getById(objectId))?.phoneNumber,
-        newReferencedPhoneNumber,
-      );
-    }
+  it("updates a non conflicting phone number", async () => {
+    const nonConflictingPhone: Phone = {
+      id: 1,
+      phoneNumber: fixablePhoneNumber,
+      verifiedAt: null,
+      verificationStatus: "PENDING_VERIFICATION",
+    };
 
-    if (repoTableName === "api_consumers") {
-      expectToEqual(
-        (await pgApiConsumerRepository.getById(objectId))?.contact.phone,
-        newReferencedPhoneNumber,
-      );
-    }
+    await insertPhoneNumber(nonConflictingPhone);
 
-    if (repoTableName === "conventions") {
-      const convention = await pgConventionRepository.getById(objectId);
-      expectToEqual(
-        convention?.signatories.beneficiary.phone,
-        newReferencedPhoneNumber,
-      );
-      expectToEqual(
-        convention?.signatories.establishmentRepresentative?.phone,
-        newReferencedPhoneNumber,
-      );
-      expectToEqual(
-        convention?.establishmentTutor.phone,
-        newReferencedPhoneNumber,
-      );
-    }
+    const updateNonConflictingPhonePayload: UpdatePhonePayload = {
+      currentPhone: nonConflictingPhone,
+      newPhoneNumber: fixedPhoneNumber,
+      newVerificationDate: subSeconds(now, 10).toISOString(),
+      triggeredBy: { kind: "crawler" },
+    };
 
-    if (repoTableName === "discussions") {
-      expectToEqual(
-        (await pgDiscussionRepository.getById(objectId))?.potentialBeneficiary
-          .phone,
-        newReferencedPhoneNumber,
-      );
-    }
+    await updateInvalidPhone.execute(updateNonConflictingPhonePayload);
 
-    if (repoTableName === "establishments__users") {
-      const establishmentAggregatesWithUser: EstablishmentAggregate[] =
-        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
-          { userId: establishmentUserId },
-        );
-
-      const userRightsPhones = establishmentAggregatesWithUser
-        .flatMap((aggregate) => aggregate.userRights)
-        .filter((userRight) => userRight.userId === establishmentUserId)
-        .map((userRight) => userRight.phone);
-
-      userRightsPhones.map((phone) =>
-        expectToEqual(phone, newReferencedPhoneNumber),
-      );
-    }
-  };
-
-  describe("Right path", () => {
-    describe("Non conflicting phone number", () => {
-      it("updates a non conflicting phone number", async () => {
-        const fixablePhoneId = await insertPhoneNumber(kyselyDb, {
-          phoneNumber: fixablePhoneNumber,
-        });
-
-        await createPhoneReferencesOnAllTables(fixablePhoneNumber);
-
-        const fixablePhone: PhoneInDB = {
-          id: fixablePhoneId,
-          phoneNumber: fixablePhoneNumber,
-          verifiedAt: null,
-        };
-
-        await updateInvalidPhone.execute({
-          phoneToUpdate: {
-            currentPhone: fixablePhone,
-            newPhoneNumber: fixedPhoneNumber,
-          },
-          verificationDateISOString: verificationDateString.toISOString(),
-        });
-
-        const fixedPhone: PhoneInDB = {
-          id: fixablePhoneId,
+    expectArraysToEqualIgnoringOrder(
+      await uow.phoneRepository.getPhoneNumbers({ limit: 100 }),
+      [
+        {
+          ...nonConflictingPhone,
           phoneNumber: fixedPhoneNumber,
-          verifiedAt: verificationDateString,
-        };
-
-        expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
-          fixedPhone,
-        ]);
-
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: agencyId, repoTableName: "agencies" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: apiConsumerId, repoTableName: "api_consumers" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: conventionId, repoTableName: "conventions" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: discussionId, repoTableName: "discussions" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          {
-            objectId: establishmentUserId,
-            repoTableName: "establishments__users",
-          },
-          fixedPhone.phoneNumber,
-        );
-      });
-    });
-    describe("Conflicting phone number", () => {
-      it("updates multiple references on the same table", async () => {
-        const fixedPhoneId = await insertPhoneNumber(kyselyDb, {
-          phoneNumber: fixedPhoneNumber,
-          verifiedAt: verificationDateString,
-        });
-        const fixablePhoneId = await insertPhoneNumber(kyselyDb, {
-          phoneNumber: fixablePhoneNumber,
-        });
-
-        const discussionWithPhoneNumber: DiscussionDto = new DiscussionBuilder()
-          .withId(discussionId)
-          .withPotentialBeneficiaryPhone(fixablePhoneNumber)
-          .build();
-        const discussionId2 = uuidGenerator.new();
-        const discussion2WithPhoneNumber: DiscussionDto =
-          new DiscussionBuilder()
-            .withId(discussionId2)
-            .withPotentialBeneficiaryPhone(fixablePhoneNumber)
-            .build();
-
-        await pgDiscussionRepository.insert(discussionWithPhoneNumber);
-        await pgDiscussionRepository.insert(discussion2WithPhoneNumber);
-
-        const fixablePhone: PhoneInDB = {
-          id: fixablePhoneId,
-          phoneNumber: fixablePhoneNumber,
-          verifiedAt: null,
-        };
-        const fixedPhone: PhoneInDB = {
-          id: fixedPhoneId,
-          phoneNumber: fixedPhoneNumber,
-          verifiedAt: verificationDateString,
-        };
-
-        await updateInvalidPhone.execute({
-          phoneToUpdate: {
-            currentPhone: fixablePhone,
-            newPhoneNumber: fixedPhone.phoneNumber,
-          },
-          verificationDateISOString: verificationDateString.toISOString(),
-        });
-
-        expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
-          fixedPhone,
-          fixablePhone,
-        ]);
-
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: discussionId, repoTableName: "discussions" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: discussionId2, repoTableName: "discussions" },
-          fixedPhone.phoneNumber,
-        );
-      });
-      it("updates all references on multiple tables", async () => {
-        const fixedPhoneId = await insertPhoneNumber(kyselyDb, {
-          phoneNumber: fixedPhoneNumber,
-          verifiedAt: verificationDateString,
-        });
-        const fixablePhoneId = await insertPhoneNumber(kyselyDb, {
-          phoneNumber: fixablePhoneNumber,
-        });
-
-        await createPhoneReferencesOnAllTables(fixablePhoneNumber);
-
-        const fixablePhone: PhoneInDB = {
-          id: fixablePhoneId,
-          phoneNumber: fixablePhoneNumber,
-          verifiedAt: null,
-        };
-        const fixedPhone: PhoneInDB = {
-          id: fixedPhoneId,
-          phoneNumber: fixedPhoneNumber,
-          verifiedAt: verificationDateString,
-        };
-
-        await updateInvalidPhone.execute({
-          phoneToUpdate: {
-            currentPhone: fixablePhone,
-            newPhoneNumber: fixedPhone.phoneNumber,
-          },
-          verificationDateISOString: verificationDateString.toISOString(),
-        });
-
-        expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
-          fixedPhone,
-          fixablePhone,
-        ]);
-
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: agencyId, repoTableName: "agencies" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: apiConsumerId, repoTableName: "api_consumers" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: conventionId, repoTableName: "conventions" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: discussionId, repoTableName: "discussions" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          {
-            objectId: establishmentUserId,
-            repoTableName: "establishments__users",
-          },
-          fixedPhone.phoneNumber,
-        );
-      });
-      it("does nothing if a conflicting phone number is not referenced on any tables", async () => {
-        const fixedPhoneId = await insertPhoneNumber(kyselyDb, {
-          phoneNumber: fixedPhoneNumber,
-          verifiedAt: verificationDateString,
-        });
-        const fixablePhoneId = await insertPhoneNumber(kyselyDb, {
-          phoneNumber: fixablePhoneNumber,
-        });
-
-        await createPhoneReferencesOnAllTables(fixedPhoneNumber);
-
-        const fixablePhone: PhoneInDB = {
-          id: fixablePhoneId,
-          phoneNumber: fixablePhoneNumber,
-          verifiedAt: null,
-        };
-
-        await updateInvalidPhone.execute({
-          phoneToUpdate: {
-            currentPhone: fixablePhone,
-            newPhoneNumber: fixedPhoneNumber,
-          },
-          verificationDateISOString: verificationDateString.toISOString(),
-        });
-
-        const fixedPhone: PhoneInDB = {
-          id: fixedPhoneId,
-          phoneNumber: fixedPhoneNumber,
-          verifiedAt: verificationDateString,
-        };
-
-        expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
-          fixedPhone,
-          fixablePhone,
-        ]);
-
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: agencyId, repoTableName: "agencies" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: apiConsumerId, repoTableName: "api_consumers" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: conventionId, repoTableName: "conventions" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          { objectId: discussionId, repoTableName: "discussions" },
-          fixedPhone.phoneNumber,
-        );
-        await expectPhoneReferenceInObjectToMatch(
-          {
-            objectId: establishmentUserId,
-            repoTableName: "establishments__users",
-          },
-          fixedPhone.phoneNumber,
-        );
-      });
-    });
+          verifiedAt: new Date(
+            updateNonConflictingPhonePayload.newVerificationDate,
+          ),
+          verificationStatus: "VERIFICATION_COMPLETED",
+        },
+      ],
+    );
   });
 
-  describe("Wrong path", () => {
-    it("throws if kysely not defined", async () => {
-      updateInvalidPhone = makeUpdateInvalidPhone({
-        uowPerformer,
-        deps: { kyselyDb: null },
-      });
+  it("updates a conflicting phone referenced on multiple tables and delete old and unused phone reference", async () => {
+    const conflictingFixablePhone: Phone = {
+      id: 1,
+      phoneNumber: fixablePhoneNumber,
+      verifiedAt: null,
+      verificationStatus: "NOT_VERIFIED",
+    };
 
-      await expect(
-        updateInvalidPhone.execute({
-          phoneToUpdate: {
-            currentPhone: {
-              id: 1,
-              phoneNumber: defaultPhoneNumber,
-              verifiedAt: null,
-            },
-            newPhoneNumber: defaultPhoneNumber,
-          },
-          verificationDateISOString: verificationDateString.toISOString(),
-        }),
-      ).rejects.toThrow();
-    });
+    const fixedPhone: Phone = {
+      id: 2,
+      phoneNumber: fixedPhoneNumber,
+      verifiedAt: null,
+      verificationStatus: "NOT_VERIFIED",
+    };
 
-    it("throws if newPhoneNumber has invalid format", async () => {
-      await expect(
-        updateInvalidPhone.execute({
-          phoneToUpdate: {
-            currentPhone: {
-              id: 1,
-              phoneNumber: defaultPhoneNumber,
-              verifiedAt: null,
-            },
-            newPhoneNumber: "not-a-phone",
-          },
-          verificationDateISOString: verificationDateString.toISOString(),
-        }),
-      ).rejects.toThrow();
-    });
+    await insertPhoneNumber(fixedPhone);
+    await insertPhoneNumber(conflictingFixablePhone);
 
-    it("does nothing if currentPhone.id does not exist in DB and newPhoneNumber is not conflicting", async () => {
-      const notExistingId = 9999;
+    await createPhoneReferencesOnAllTables(fixedPhoneNumber);
+    const objectsWithFixablePhoneReferences =
+      await createPhoneReferencesOnAllTables(fixablePhoneNumber);
 
-      const currentPhone: PhoneInDB = {
-        id: notExistingId,
-        phoneNumber: defaultPhoneNumber,
-        verifiedAt: null,
-      };
+    const updateConflictingPhonePayload: UpdatePhonePayload = {
+      currentPhone: conflictingFixablePhone,
+      newPhoneNumber: fixedPhoneNumber,
+      newVerificationDate: subSeconds(now, 10).toISOString(),
+      triggeredBy: { kind: "crawler" },
+    };
 
-      await updateInvalidPhone.execute({
-        phoneToUpdate: { currentPhone, newPhoneNumber: correctPhoneNumber },
-        verificationDateISOString: verificationDateString.toISOString(),
-      });
+    await updateInvalidPhone.execute(updateConflictingPhonePayload);
 
-      expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), []);
-    });
+    expectArraysToEqualIgnoringOrder(
+      await uow.phoneRepository.getPhoneNumbers({ limit: 100 }),
+      [fixedPhone],
+    );
+    await expectPhoneReferencesToMatchPhoneNumber(
+      objectsWithFixablePhoneReferences,
+      fixedPhoneNumber,
+    );
+  });
 
-    it("does nothing if currentPhone.id does not exist in DB and currentPhone.phoneNumber is conflicting", async () => {
-      const defaultPhoneId: number = await insertPhoneNumber(kyselyDb, {
-        phoneNumber: defaultPhoneNumber,
-      });
-      const defaultPhone: PhoneInDB = {
-        id: defaultPhoneId,
-        phoneNumber: defaultPhoneNumber,
-        verifiedAt: null,
-      };
-
-      expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
-        defaultPhone,
-      ]);
-
-      const notExistingId = 9999;
-      const conflictingDefaultPhoneNumberWithNonExistingId: PhoneInDB = {
-        id: notExistingId,
-        phoneNumber: defaultPhone.phoneNumber,
-        verifiedAt: null,
-      };
-
-      await updateInvalidPhone.execute({
-        phoneToUpdate: {
-          currentPhone: conflictingDefaultPhoneNumberWithNonExistingId,
-          newPhoneNumber: correctPhoneNumber,
+  it("throws if newPhoneNumber has invalid format", async () => {
+    await expect(
+      updateInvalidPhone.execute({
+        currentPhone: {
+          id: 1,
+          phoneNumber: defaultPhoneNumber,
+          verifiedAt: null,
+          verificationStatus: "PENDING_VERIFICATION",
         },
-        verificationDateISOString: verificationDateString.toISOString(),
-      });
+        newPhoneNumber: "not-a-phone",
+        newVerificationDate: now.toISOString(),
+        triggeredBy: { kind: "crawler" },
+      }),
+    ).rejects.toThrow();
+  });
 
-      expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
-        defaultPhone,
-      ]);
+  it("does nothing if newPhoneNumber is identical to currentPhone", async () => {
+    const defaultPhone: Phone = {
+      id: 1,
+      phoneNumber: defaultPhoneNumber,
+      verifiedAt: null,
+      verificationStatus: "PENDING_VERIFICATION",
+    };
+
+    await insertPhoneNumber(defaultPhone);
+
+    const objectsWithDefaultPhoneReferences =
+      await createPhoneReferencesOnAllTables(defaultPhoneNumber);
+
+    await updateInvalidPhone.execute({
+      currentPhone: defaultPhone,
+      newPhoneNumber: defaultPhoneNumber,
+      newVerificationDate: now.toISOString(),
+      triggeredBy: { kind: "crawler" },
     });
 
-    it("does nothing if newPhoneNumber is identical to currentPhone", async () => {
-      const fixedPhoneId: number = await insertPhoneNumber(kyselyDb, {
-        phoneNumber: fixedPhoneNumber,
-      });
-      const currentFixedPhone: PhoneInDB = {
-        id: fixedPhoneId,
-        phoneNumber: fixedPhoneNumber,
-        verifiedAt: null,
-      };
+    expectArraysToEqualIgnoringOrder(
+      await uow.phoneRepository.getPhoneNumbers({ limit: 100 }),
+      [defaultPhone],
+    );
+    await expectPhoneReferencesToMatchPhoneNumber(
+      objectsWithDefaultPhoneReferences,
+      defaultPhoneNumber,
+    );
+  });
 
-      await updateInvalidPhone.execute({
-        phoneToUpdate: {
-          currentPhone: currentFixedPhone,
-          newPhoneNumber: currentFixedPhone.phoneNumber,
-        },
-        verificationDateISOString: verificationDateString.toISOString(),
-      });
-      expectArraysToEqualIgnoringOrder(await getPhoneNumbers(kyselyDb), [
-        currentFixedPhone,
-      ]);
+  it("does nothing if currentPhone.id does not exist in DB", async () => {
+    const nonExistingId = 999;
+    const phone: Phone = {
+      id: nonExistingId,
+      phoneNumber: fixablePhoneNumber,
+      verifiedAt: null,
+      verificationStatus: "PENDING_VERIFICATION",
+    };
+
+    await updateInvalidPhone.execute({
+      currentPhone: phone,
+      newPhoneNumber: fixedPhoneNumber,
+      newVerificationDate: now.toISOString(),
+      triggeredBy: { kind: "crawler" },
     });
+
+    expectArraysToEqualIgnoringOrder(
+      await uow.phoneRepository.getPhoneNumbers({ limit: 100 }),
+      [],
+    );
+  });
+
+  it("throws if TablesWithPhoneReference does not contain all tables with phone reference", async () => {
+    const isReportedTableWithPhoneReference = (
+      table: keyof Database,
+    ): table is TablesWithPhoneReference =>
+      (tablesWithPhoneReference as readonly (keyof Database)[]).includes(table);
+
+    const tablesWithPhoneReferenceInDB =
+      await uow.phoneRepository.getTableNamesReferencingPhoneNumbers();
+    const unsupportedTables = tablesWithPhoneReferenceInDB.filter(
+      (table) => !isReportedTableWithPhoneReference(table),
+    );
+    if (unsupportedTables.length > 0) {
+      throw new Error(
+        `Phone reference in tables [${unsupportedTables.join(", ")}] is not updated`,
+      );
+    }
   });
 });
