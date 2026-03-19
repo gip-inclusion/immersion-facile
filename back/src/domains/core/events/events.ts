@@ -4,7 +4,6 @@ import {
   type ConventionId,
   type ConventionTemplateId,
   type DateString,
-  type DateTimeIsoString,
   type DeleteAssessmentRequestDto,
   type Flavor,
   type InitiateLoginByEmailParams,
@@ -37,7 +36,7 @@ import type {
 } from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
-import type { PhoneToUpdate } from "../phone-number/use-cases/UpdateInvalidPhone";
+import type { UpdatePhonePayload } from "../phone-number/use-cases/UpdateInvalidPhone";
 import type {
   ConventionReminderPayload,
   TransferConventionToAgencyPayload,
@@ -194,6 +193,6 @@ export type DomainEvent =
   | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId } & WithTriggeredBy>
 
   // PHONE RELATED
-  | GenericEvent<"InvalidPhoneUpdateRequested", { phoneToUpdate: PhoneToUpdate, verificationDateISOString: DateTimeIsoString } &  WithTriggeredBy>;
+  | GenericEvent<"InvalidPhoneUpdateRequested", UpdatePhonePayload>;
 
 export type DomainTopic = DomainEvent["topic"];
