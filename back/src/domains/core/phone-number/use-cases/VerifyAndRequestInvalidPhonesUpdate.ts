@@ -1,28 +1,22 @@
 import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js/max";
+import { partition } from "ramda";
 import {
   defaultPhoneNumber,
   getSupportedCountryCodesForCountry,
-  type PhoneNumber,
+  phoneVerificationStatus,
 } from "shared";
 import z from "zod";
-import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { TriggeredBy } from "../../events/events";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { useCaseBuilder } from "../../useCaseBuilder";
-import { getPhoneNumbers } from "../adapters/pgPhoneHelper";
-import type { PhoneToUpdate } from "./UpdateInvalidPhone";
-
-export type PhoneInDB = {
-  id: number;
-  phoneNumber: PhoneNumber;
-  verifiedAt: Date | null;
-};
+import type { UpdatePhonePayload } from "./UpdateInvalidPhone";
 
 export const phoneInDBSchema = z.object({
   id: z.number(),
   phoneNumber: z.string(),
   verifiedAt: z.date().nullable(),
+  verificationStatus: z.enum(phoneVerificationStatus),
 });
 
 export type VerifyAndRequestInvalidPhonesUpdateReport = {
@@ -40,72 +34,108 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
 )
   .withDeps<{
     timeGateway: TimeGateway;
-    kyselyDb: KyselyDb | null;
-    uowPerformer: UnitOfWorkPerformer;
     createNewEvent: CreateNewEvent;
   }>()
+  .withInput(z.object({ dateToVerifyBefore: z.date() }))
   .withOutput<VerifyAndRequestInvalidPhonesUpdateReport>()
-  .notTransactional()
   .build(
-    async ({
-      deps: { kyselyDb, timeGateway, uowPerformer, createNewEvent },
-    }) => {
-      if (!kyselyDb)
-        throw new Error(
-          "KyselyDb is null. In memory is not available for this use case",
-        );
-
+    async ({ deps: { timeGateway, createNewEvent }, uow, inputParams }) => {
       const triggeredUseCaseDate = timeGateway.now();
 
-      const phonesToMarkAsVerified: PhoneInDB[] = [];
-      const report: VerifyAndRequestInvalidPhonesUpdateReport = {
-        nbOfCorrectPhones: 0,
-        nbOfFixedPhones: 0,
-        nbOfPhonesSetToDefault: 0,
-      };
+      const phoneNumbersToVerify = await uow.phoneRepository.getPhoneNumbers({
+        limit: 10_000,
+        verifiedBefore: inputParams.dateToVerifyBefore,
+      });
 
-      const phoneNumbersToVerify = await getPhoneNumbers(kyselyDb);
+      const verifiedPhoneNumbers: {
+        updatePhonePayload: UpdatePhonePayload;
+        isValid: boolean;
+      }[] = phoneNumbersToVerify.map((pn) => {
+        const verifiedAt = triggeredUseCaseDate.toISOString();
+        const triggeredBy = { kind: "crawler" } satisfies TriggeredBy;
 
-      await Promise.all(
-        phoneNumbersToVerify.map(async (pn) => {
-          if (isValidPhoneNumber(pn.phoneNumber)) {
-            phonesToMarkAsVerified.push(pn);
-            report.nbOfCorrectPhones++;
-            return;
-          }
+        const isValid = isValidPhoneNumber(pn.phoneNumber);
 
-          const resolvedPhone = fixPhoneNumberCountryCode(pn.phoneNumber);
-          const phoneToUpdate: PhoneToUpdate = {
-            currentPhone: { ...pn, verifiedAt: null },
-            newPhoneNumber: resolvedPhone ?? defaultPhoneNumber,
+        if (isValid) {
+          return {
+            updatePhonePayload: {
+              currentPhone: {
+                id: pn.id,
+                phoneNumber: pn.phoneNumber,
+                verifiedAt: pn.verifiedAt,
+                verificationStatus: "VERIFICATION_COMPLETED",
+              },
+              newPhoneNumber: pn.phoneNumber,
+              newVerificationDate: verifiedAt,
+              triggeredBy,
+            },
+            isValid,
+          } satisfies {
+            updatePhonePayload: UpdatePhonePayload;
+            isValid: boolean;
           };
+        }
 
-          await uowPerformer.perform((uow) =>
-            uow.outboxRepository.save(
-              createNewEvent({
-                topic: "InvalidPhoneUpdateRequested",
-                payload: {
-                  phoneToUpdate,
-                  verificationDateISOString: triggeredUseCaseDate.toISOString(),
-                  triggeredBy: { kind: "crawler" },
-                },
-              }),
-            ),
-          );
+        const resolvedPhone = fixPhoneNumberCountryCode(pn.phoneNumber);
+        const updatePhonePayload: UpdatePhonePayload = {
+          currentPhone: {
+            id: pn.id,
+            phoneNumber: pn.phoneNumber,
+            verifiedAt: pn.verifiedAt,
+            verificationStatus: "PENDING_VERIFICATION",
+          },
+          newPhoneNumber: resolvedPhone ?? defaultPhoneNumber,
+          newVerificationDate: verifiedAt,
+          triggeredBy,
+        };
+        return {
+          updatePhonePayload,
+          isValid,
+        };
+      });
 
-          phoneToUpdate.newPhoneNumber === defaultPhoneNumber
-            ? report.nbOfPhonesSetToDefault++
-            : report.nbOfFixedPhones++;
-        }),
+      const [validPhoneList, invalidPhoneList] = partition(
+        ({ isValid }) => isValid,
+        verifiedPhoneNumbers,
       );
 
-      await markAsVerified(
-        kyselyDb,
-        triggeredUseCaseDate,
-        phonesToMarkAsVerified,
+      const invalidPhonesToUpdateEvents = invalidPhoneList.map(
+        ({ updatePhonePayload }) => {
+          return createNewEvent({
+            topic: "InvalidPhoneUpdateRequested",
+            payload: updatePhonePayload,
+          });
+        },
+      );
+      await uow.outboxRepository.saveNewEventsBatch(
+        invalidPhonesToUpdateEvents,
       );
 
-      return report;
+      await uow.phoneRepository.markAsVerified({
+        phoneIds: validPhoneList.map(
+          ({ updatePhonePayload }) => updatePhonePayload.currentPhone.id,
+        ),
+        verifiedDate: triggeredUseCaseDate,
+      });
+
+      await uow.phoneRepository.updateVerificationStatus({
+        phoneIds: invalidPhoneList.map(
+          ({ updatePhonePayload }) => updatePhonePayload.currentPhone.id,
+        ),
+        verificationStatus: "PENDING_VERIFICATION",
+      });
+
+      const [defaultedPhoneList, fixedPhoneList] = partition(
+        ({ updatePhonePayload: { newPhoneNumber } }) =>
+          newPhoneNumber === defaultPhoneNumber,
+        invalidPhoneList,
+      );
+
+      return {
+        nbOfCorrectPhones: validPhoneList.length,
+        nbOfFixedPhones: fixedPhoneList.length,
+        nbOfPhonesSetToDefault: defaultedPhoneList.length,
+      };
     },
   );
 
@@ -132,20 +162,4 @@ const fixPhoneNumberCountryCode = (phoneNumber: string): string | undefined => {
   }
 
   return fixedPhoneNumber;
-};
-
-const markAsVerified = async (
-  kyselyDb: KyselyDb,
-  verifiedDate: Date,
-  phonesToMarkAsVerified: PhoneInDB[],
-) => {
-  if (phonesToMarkAsVerified.length === 0) return;
-
-  const phoneIds = phonesToMarkAsVerified.map((phone) => phone.id);
-
-  await kyselyDb
-    .updateTable("phone_numbers")
-    .set({ verified_at: verifiedDate })
-    .where("id", "in", phoneIds)
-    .execute();
 };
