@@ -13,6 +13,7 @@ import type {
   DiscussionStatus,
   Email,
   EstablishmentUserRightStatus,
+  PhoneVerificationStatus,
   SiretDto,
   SubscriberErrorFeedback,
 } from "shared";
@@ -843,5 +844,6 @@ interface PhoneNumbers {
   id: Generated<number>;
   phone_number: string;
   verified_at: Timestamp | null;
+  verification_status: PhoneVerificationStatus;
   created_at: Generated<Timestamp>;
 }
