@@ -855,17 +855,13 @@ export const SearchPage = ({
                             routeParams.appellations.length > 0 && (
                               <span className={cx(fr.cx("fr-text--xs"))}>
                                 pour la recherche{" "}
-                                <strong className={fr.cx("fr-text--bold")}>
-                                  {routeParams.appellations[0].appellationLabel}
-                                </strong>
-                                , étendue au secteur{" "}
                                 <a
                                   href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
                                   target="_blank"
                                   className={fr.cx("fr-text--bold")}
                                   rel="noreferrer"
                                 >
-                                  {routeParams.appellations[0].romeLabel}
+                                  {routeParams.appellations[0].appellationLabel}
                                 </a>
                               </span>
                             )}
