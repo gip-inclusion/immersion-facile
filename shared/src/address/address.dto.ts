@@ -175,6 +175,7 @@ export const frenchDepartmentCodeFromDepartmentNameOrCity: Record<
   "Île-de-France": "75",
   "Métropole de Lyon": "69",
   "Auvergne-Rhône-Alpes": "69",
+  "Territoire de Belfort": "90",
 };
 
 export const getDepartmentCodeFromDepartmentName = (
