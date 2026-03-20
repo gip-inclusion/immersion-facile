@@ -3,20 +3,21 @@ import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import { subDays } from "date-fns";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { HeadingSection, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  type AssessmentCompletionStatusFilter,
+  type ConventionAssessmentFields,
   type ConventionReadDto,
   domElementIds,
   type FlatGetConventionsForAgencyUserParams,
-  getAssessmentCompletionStatusFilter,
-  makeAssessmentTextsByStatus,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
   toDisplayedDate,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { makeAssessmentTextsByStatus } from "src/app/utils/assessment.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
@@ -31,11 +32,7 @@ const filters: FlatGetConventionsForAgencyUserParams = {
 
 export const threeDaysAgo = subDays(new Date(), 3).toISOString();
 
-export const ConventionsWithAssessmentToCompleteList = ({
-  title,
-}: {
-  title: string;
-}) => {
+export const ConventionsWithAssessmentToCompleteList = () => {
   const dispatch = useDispatch();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const conventions = useAppSelector(
@@ -66,10 +63,6 @@ export const ConventionsWithAssessmentToCompleteList = ({
     [connectedUserJwt, dispatch],
   );
 
-  useEffect(() => {
-    fetchConventions({ page: 1 });
-  }, [fetchConventions]);
-
   const onPaginationClick = useCallback(
     (pageNumber: number) => {
       fetchConventions({ page: pageNumber });
@@ -79,7 +72,7 @@ export const ConventionsWithAssessmentToCompleteList = ({
 
   return (
     <HeadingSection
-      title={title}
+      title="Relances bilans"
       titleAs="h2"
       className={fr.cx("fr-mt-2w", "fr-mb-4w")}
     >
@@ -177,4 +170,15 @@ const AssessmentToCompleteTaskItem = ({
       ]}
     />
   );
+};
+
+const getAssessmentCompletionStatusFilter = (
+  assessment: ConventionAssessmentFields["assessment"],
+): AssessmentCompletionStatusFilter => {
+  if (!assessment) return "to-be-completed";
+  if ("signedAt" in assessment)
+    return assessment.signedAt !== null || assessment.status === "DID_NOT_SHOW"
+      ? "completed-maybe-signed"
+      : "to-sign";
+  return "completed-maybe-signed";
 };

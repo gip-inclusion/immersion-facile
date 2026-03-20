@@ -577,7 +577,7 @@ const filterByAssessmentCompletionStatus =
         if (hasToBeCompletedFilter)
           conditions.push(eb("ia.convention_id", "is", null));
 
-        return conditions.length === 1 ? conditions[0] : eb.or(conditions);
+        return eb.or(conditions);
       });
   };
 

@@ -76,9 +76,8 @@ describe("SignAssessment", () => {
       beneficiaryJwtPayload,
     );
 
-    const signedAssessmentEntity = (
-      await uow.assessmentRepository.getByConventionIds([convention.id])
-    ).at(0);
+    const signedAssessmentEntity =
+      await uow.assessmentRepository.getByConventionId(convention.id);
 
     expectToEqual(signedAssessmentEntity, {
       ...assessmentEntity,

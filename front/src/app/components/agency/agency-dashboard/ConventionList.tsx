@@ -19,7 +19,6 @@ import {
   type FlatGetConventionsForAgencyUserParams,
   getFormattedFirstnameAndLastname,
   isNotEmptyArray,
-  makeAssessmentTextsByStatus,
   toDisplayedDate,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -27,6 +26,7 @@ import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenB
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { makeAssessmentTextsByStatus } from "src/app/utils/assessment.utils";
 import logoFtSvg from "src/assets/img/logo-ft.svg";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
