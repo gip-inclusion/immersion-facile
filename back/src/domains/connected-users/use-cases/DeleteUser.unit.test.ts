@@ -35,6 +35,18 @@ describe("DeleteUser", () => {
     .withEmail("contactLessActive")
     .withLastLoginAt(new Date("2024-01-01"))
     .build();
+  const readOnlyAndCounsellor = new UserBuilder()
+    .withId("readOnlyAndCounsellor")
+    .withEmail("readOnlyAndCounsellor")
+    .build();
+  const validator1 = new UserBuilder()
+    .withId("validator1")
+    .withEmail("validator1")
+    .build();
+  const validator2 = new UserBuilder()
+    .withId("validator2")
+    .withEmail("validator2")
+    .build();
   const admin1Right: EstablishmentAdminRight = {
     role: "establishment-admin",
     userId: admin1.id,
@@ -95,6 +107,9 @@ describe("DeleteUser", () => {
       admin2,
       contactMostActive,
       contactLessActive,
+      readOnlyAndCounsellor,
+      validator1,
+      validator2,
     ];
   });
 
@@ -116,6 +131,9 @@ describe("DeleteUser", () => {
           admin1,
           admin2,
           contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
         ]);
         expectToEqual(
           uow.establishmentAggregateRepository.establishmentAggregates,
@@ -161,6 +179,9 @@ describe("DeleteUser", () => {
           admin2,
           contactMostActive,
           contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
         ]);
         expectToEqual(
           uow.establishmentAggregateRepository.establishmentAggregates,
@@ -196,6 +217,9 @@ describe("DeleteUser", () => {
           admin2,
           contactMostActive,
           contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
         ]);
         expectToEqual(
           uow.establishmentAggregateRepository.establishmentAggregates,
@@ -234,6 +258,9 @@ describe("DeleteUser", () => {
           admin2,
           contactMostActive,
           contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
         ]);
         expectToEqual(
           uow.establishmentAggregateRepository.establishmentAggregates,
@@ -263,21 +290,490 @@ describe("DeleteUser", () => {
     });
 
     describe("User with agency rights", () => {
-      beforeEach(() => {
+      it("case P1 - with read-only/counsellor -> remove agency right + event UserDeleted + user deleted", async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+            [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+            [readOnlyAndCounsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["agency-viewer", "counsellor"],
+            },
           }),
         ];
+
+        await deleteUser.execute({
+          userId: readOnlyAndCounsellor.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          validator1,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+            [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: readOnlyAndCounsellor.id,
+            },
+          },
+        ]);
       });
 
-      it("TEMPORARY behavior - throws forbidden when user to delete have agency rights", () => {
+      it("case P2 - with validator and another user with validator right not notified -> remove agency right + event UserDeleted + user deleted + set last validator notified", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+            [validator2.id]: {
+              isNotifiedByEmail: false,
+              roles: ["validator"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: validator1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+            [validator2.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: validator1.id,
+            },
+          },
+        ]);
+      });
+
+      it("case P2- BIS - with validator and another user with validator right notified -> remove agency right + event UserDeleted + user deleted", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+            [validator2.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: validator1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+            [validator2.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: validator1.id,
+            },
+          },
+        ]);
+      });
+
+      it("case P3 - with last validator and admins -> remove agency right + event UserDeleted + user deleted + set most active admin validator & notified", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: validator1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin", "validator"],
+            },
+          }),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: validator1.id,
+            },
+          },
+        ]);
+      });
+
+      it("case P3 BIS - with last validator and no admins - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenPutOnHold", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+            [readOnlyAndCounsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: validator1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(
+            new AgencyDtoBuilder(agency).withStatus("needsReview").build(),
+            {
+              [readOnlyAndCounsellor.id]: {
+                isNotifiedByEmail: false,
+                roles: ["counsellor"],
+              },
+            },
+          ),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: validator1.id,
+            },
+          },
+          {
+            topic: "AgencyHasBeenPutOnHold",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              agencyId: agency.id,
+            },
+          },
+        ]);
+      });
+
+      it("case P4 - with admin and other admins - remove agency right  + user deleted + event UserDeleted", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin"],
+            },
+            [admin2.id]: {
+              isNotifiedByEmail: false,
+              roles: ["agency-admin"],
+            },
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: admin1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [admin2.id]: {
+              isNotifiedByEmail: false,
+              roles: ["agency-admin"],
+            },
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: admin1.id,
+            },
+          },
+        ]);
+      });
+
+      it("case P4 BIS - with admin and other validators - remove agency right  + user deleted + event UserDeleted + set most active validator admin", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin"],
+            },
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: admin1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator", "agency-admin"],
+            },
+          }),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: admin1.id,
+            },
+          },
+        ]);
+      });
+      it("case P5 ALT - with last admin + validator and another user with counsellor/readonly - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenPutOnHold ", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin", "validator"],
+            },
+            [readOnlyAndCounsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor", "agency-viewer"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: admin1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(
+            new AgencyDtoBuilder(agency).withStatus("needsReview").build(),
+            {
+              [readOnlyAndCounsellor.id]: {
+                isNotifiedByEmail: false,
+                roles: ["counsellor", "agency-viewer"],
+              },
+            },
+          ),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: admin1.id,
+            },
+          },
+          {
+            topic: "AgencyHasBeenPutOnHold",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              agencyId: agency.id,
+            },
+          },
+        ]);
+      });
+
+      it("case P6 - with last admin + validator and no more users - remove agency right  + user deleted + agency closed + event UserDeleted", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin", "validator"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: admin1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(
+            new AgencyDtoBuilder(agency).withStatus("closed").build(),
+            {},
+          ),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: admin1.id,
+            },
+          },
+        ]);
+      });
+    });
+
+    describe("Hybrid case - Throw HYBRYD BEHAVIOR NOT IMPLEMENTED by security - waiting for todo", () => {
+      it("case H1  - not active user on agency only ", async () => {
+        expectPromiseToFailWithError(
+          deleteUser.execute({
+            userId: admin1.id,
+            triggeredBy: { kind: "crawler" },
+            partialDelete: "agency-only",
+          }),
+          new Error("HYBRYD BEHAVIOR NOT IMPLEMENTED"),
+        );
+      });
+
+      it("case H1 bis - not active user on establishment only", async () => {
+        expectPromiseToFailWithError(
+          deleteUser.execute({
+            userId: admin1.id,
+            triggeredBy: { kind: "crawler" },
+            partialDelete: "establishement-only",
+          }),
+          new Error("HYBRYD BEHAVIOR NOT IMPLEMENTED"),
+        );
+      });
+
+      it("case H2 bis - not active user without rights on establishment & agency - Throw NOT IMPLEMENTED by security", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [];
+        uow.agencyRepository.agencies = [];
+
         expectPromiseToFailWithError(
           deleteUser.execute({
             userId: admin1.id,
             triggeredBy: { kind: "crawler" },
           }),
-          errors.user.deleteForbiddenAgencyRights(admin1.id),
+          new Error("HYBRYD BEHAVIOR NOT IMPLEMENTED"),
         );
       });
     });

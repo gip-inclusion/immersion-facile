@@ -30,3 +30,6 @@ export const callbackUrlSchema: ZodSchemaWithInputMatchingOutput<AbsoluteUrl> =
 
 export const toAbsoluteUrl = (url: string): AbsoluteUrl =>
   !/^https?:\/\//i.test(url) ? `https://${url}` : (url as AbsoluteUrl);
+
+export const immersionFacileHelpdeskRootUrl: AbsoluteUrl =
+  "https://aide.immersion-facile.beta.gouv.fr/fr";

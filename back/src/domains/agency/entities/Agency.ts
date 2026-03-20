@@ -1,4 +1,11 @@
-import { type AgencyWithUsersRights, ConflictError } from "shared";
+import { toPairs } from "ramda";
+import {
+  type AgencyRole,
+  type AgencyUsersRights,
+  type AgencyWithUsersRights,
+  ConflictError,
+  type UserId,
+} from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwConflictErrorOnSimilarAgencyFound = async ({
@@ -20,3 +27,18 @@ export const throwConflictErrorOnSimilarAgencyFound = async ({
       "Une autre agence du même type existe avec la même adresse",
     );
 };
+
+export const getUserIdsWithoutRoleFromAgencyRights = ({
+  rights,
+  excludedRole,
+}: {
+  rights: AgencyUsersRights;
+  excludedRole: AgencyRole;
+}): UserId[] =>
+  toPairs(rights).reduce<UserId[]>(
+    (acc, [userId, right]) => [
+      ...acc,
+      ...(right?.roles.includes(excludedRole) ? [] : [userId]),
+    ],
+    [],
+  );

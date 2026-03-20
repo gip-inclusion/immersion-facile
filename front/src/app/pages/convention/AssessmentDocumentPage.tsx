@@ -13,6 +13,7 @@ import {
   domElementIds,
   escapeHtml,
   getFormattedFirstnameAndLastname,
+  immersionFacileHelpdeskRootUrl,
   isAssessmentDto,
   isStringDate,
   makeSiretDescriptionLink,
@@ -136,7 +137,7 @@ export const AssessmentDocumentPage = ({
             <p>
               Vous avez besoin d’aide ?{" "}
               <a
-                href="https://aide.immersion-facile.beta.gouv.fr/fr/"
+                href={immersionFacileHelpdeskRootUrl}
                 target="_blank"
                 rel="noreferrer"
               >

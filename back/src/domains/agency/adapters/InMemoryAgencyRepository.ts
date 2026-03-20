@@ -138,6 +138,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
               filters?.doesNotReferToOtherAgency,
             ),
             agencyCreatedAtBefore(agency, filters?.createdAtBefore),
+            agencyHasUserIds(agency, filters?.userIds),
           ].includes(false),
       )
       .slice(0, limit);
@@ -292,6 +293,16 @@ const agencyHasName = (
 ): boolean => {
   if (!name) return true;
   return agency.name.toLowerCase().includes(name.toLowerCase());
+};
+
+const agencyHasUserIds = (
+  agency: AgencyWithUsersRights,
+  userIds?: UserId[],
+) => {
+  if (userIds?.length === 0) return false;
+  return userIds
+    ? keys(agency.usersRights).some((userId) => userIds.includes(userId))
+    : true;
 };
 
 const agencyHasSirets = (

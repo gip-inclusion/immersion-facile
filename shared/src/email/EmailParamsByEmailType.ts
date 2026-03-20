@@ -64,6 +64,7 @@ export type EmailParamsByEmailType = {
     dateStart: string;
     dateEnd: string;
   };
+  AGENCY_HAS_BEEN_PUT_ON_HOLD: { agencyName: string };
   AGENCY_LAST_REMINDER: {
     manageConventionLink: string;
     agencyReferentName: string | undefined;

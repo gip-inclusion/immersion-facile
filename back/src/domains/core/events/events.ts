@@ -28,6 +28,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
+import type { DeleteUserInputSchema } from "../../connected-users/use-cases/DeleteUser";
 import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
@@ -147,6 +148,7 @@ export type DomainEvent =
   | GenericEvent<"AgencyActivated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyUpdated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyRejected", WithAgencyId & WithTriggeredBy>
+  | GenericEvent<"AgencyHasBeenPutOnHold", WithAgencyId & WithTriggeredBy>
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", WithConventionDto & WithAssessmentDto & WithTriggeredBy>
@@ -168,7 +170,7 @@ export type DomainEvent =
   | GenericEvent<"UserAuthenticationByEmailRequested", InitiateLoginByEmailParams >
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
   // INACTIVE USER ACCOUNT DELETION
-  | GenericEvent<"InactiveUserAccountDeletionTriggered", WithUserId& WithTriggeredBy>
+  | GenericEvent<"InactiveUserAccountDeletionTriggered", DeleteUserInputSchema>
   | GenericEvent<"UserDeleted", WithUserId& WithTriggeredBy>
 
 

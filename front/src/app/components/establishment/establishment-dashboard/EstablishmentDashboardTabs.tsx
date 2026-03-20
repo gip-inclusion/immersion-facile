@@ -10,6 +10,7 @@ import {
   domElementIds,
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
+  immersionFacileHelpdeskRootUrl,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
 import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
@@ -266,7 +267,7 @@ const OnboardingTabContent = () => (
       <Highlight className={fr.cx("fr-ml-0")}>
         <strong>Besoin d’aide ?</strong> N’hésitez pas à{" "}
         <a
-          href="https://aide.immersion-facile.beta.gouv.fr/fr/"
+          href={immersionFacileHelpdeskRootUrl}
           target="_blank"
           rel="noreferrer"
         >
@@ -274,7 +275,7 @@ const OnboardingTabContent = () => (
         </a>
         ou lire notre article d’aide sur{" "}
         <a
-          href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-referencer-mon-entreprise-en-tant-quentreprise-accueillante-zr6rxv/"
+          href={`${immersionFacileHelpdeskRootUrl}/article/comment-referencer-mon-entreprise-en-tant-quentreprise-accueillante-zr6rxv/`}
           target="_blank"
           rel="noreferrer"
         >

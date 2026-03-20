@@ -21,6 +21,7 @@ import {
   domElementIds,
   type Email,
   emailSchema,
+  immersionFacileHelpdeskRootUrl,
   immersionFacileNoReplyEmail,
   isFederatedIdentityProvider,
   makeUrlWithQueryParams,
@@ -454,7 +455,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
           Immersion Facilitée. Elle est accessible aux{" "}
           <a
             className={fr.cx("fr-link", "fr-text--lead")}
-            href="https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-prescrire-une-immersion-6frnyn/"
+            href={`${immersionFacileHelpdeskRootUrl}/article/qui-peut-prescrire-une-immersion-6frnyn/`}
             target="_blank"
             rel="noreferrer"
           >
