@@ -473,6 +473,48 @@ describe("string schemas", () => {
 
       it.each([
         {
+          title: "accept text at min length",
+          text: "toto",
+          schema: makeHardenedStringSchema({ min: 0, max: 4 }),
+          expectedResult: "toto",
+        },
+        {
+          title: "accept text at min length",
+          text: "toto",
+          schema: makeHardenedStringSchema({ min: 4, max: 4 }),
+          expectedResult: "toto",
+        },
+        {
+          title: "reject text below min length",
+          text: "tot",
+          schema: makeHardenedStringSchema({ min: 4, max: 4 }),
+          expectedError: new ZodError([
+            {
+              origin: "string",
+              code: "too_small",
+              minimum: 4,
+              inclusive: true,
+              path: [],
+              message: localization.required,
+            },
+          ]),
+        },
+        {
+          title: "reject text below min length once trimmed",
+          text: "  tot   ",
+          schema: makeHardenedStringSchema({ min: 4, max: 4 }),
+          expectedError: new ZodError([
+            {
+              origin: "string",
+              code: "too_small",
+              minimum: 4,
+              inclusive: true,
+              path: [],
+              message: localization.required,
+            },
+          ]),
+        },
+        {
           title: "accept trimmed text at max length",
           text: "toto  ",
           schema: makeHardenedStringSchema({ max: 4 }),

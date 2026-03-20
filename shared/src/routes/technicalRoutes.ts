@@ -10,6 +10,7 @@ import { htmlToPdfRequestSchema } from "../file/htmlToPdf";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
+import { makeHardenedStringSchema } from "../utils/string.schema";
 import {
   emptyObjectSchema,
   expressEmptyResponseBody,
@@ -53,7 +54,10 @@ export const technicalRoutes = defineRoutes({
     method: "get",
     url: "/feature-flags",
     queryParamsSchema: z
-      .record(z.string().max(13).min(7), z.string().max(0).min(0))
+      .record(
+        makeHardenedStringSchema({ max: 13, min: 7 }),
+        makeHardenedStringSchema({ max: 0, min: 0 }),
+      )
       .refine((record) => {
         const [key, second] = keys(record);
         if (!key) return true;
