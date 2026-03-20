@@ -7,6 +7,7 @@ import { useSetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFetchFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
 import { useRoute } from "src/app/routes/routes";
+import { TagContainer } from "src/app/TagContainer";
 import { ENV } from "src/config/environmentVariables";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { Router } from "./routes/Router";
@@ -39,6 +40,13 @@ export const App = () => {
         <CrispChat
           crispWebsiteId={ENV.crispWebSiteId}
           userConsent={!!consent?.finalityConsent?.support}
+        />
+      )}
+      {ENV.envType === "staging" && (
+        <TagContainer
+          containerUrl={
+            "https://cdn.tagcommander.com/7774/uat/tc_ImmersionFacile_31.js"
+          }
         />
       )}
     </ErrorBoundary>
