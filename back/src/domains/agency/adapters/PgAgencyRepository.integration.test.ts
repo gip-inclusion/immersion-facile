@@ -1283,6 +1283,101 @@ describe("PgAgencyRepository", () => {
         expectToEqual(agencies, [agencyCreatedBefore, agencyCreatedOnDate]);
       });
     });
+
+    describe("filter userIds", () => {
+      const agencyWithUsers_1_2 = toAgencyWithRights(
+        agency1builder
+          .withId("00000000-0000-0000-0000-000000000010")
+          .withAgencySiret("00000000000010")
+          .build(),
+        {
+          [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        },
+      );
+
+      const agencyWithUsers_1_3 = toAgencyWithRights(
+        agency1builder
+          .withId("00000000-0000-0000-0000-000000000011")
+          .withAgencySiret("00000000000011")
+          .build(),
+        {
+          [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      const agencyWithUsers_3 = toAgencyWithRights(
+        agency1builder
+          .withId("00000000-0000-0000-0000-000000000012")
+          .withAgencySiret("00000000000012")
+          .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      const agencyWithUsers_1_2_3 = toAgencyWithRights(
+        agency1builder
+          .withId("00000000-0000-0000-0000-000000000013")
+          .withAgencySiret("00000000000013")
+          .build(),
+        {
+          [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
+      beforeEach(async () => {
+        await Promise.all([
+          agencyRepository.insert(agencyWithUsers_1_3),
+          agencyRepository.insert(agencyWithUsers_1_2),
+          agencyRepository.insert(agencyWithUsers_3),
+          agencyRepository.insert(agencyWithUsers_1_2_3),
+        ]);
+      });
+
+      it("returns only agencies with rights made to specified userIds only - single user", async () => {
+        const agencies = await agencyRepository.getAgencies({
+          filters: { userIds: [validator1.id] },
+        });
+
+        expectToEqual(agencies, [
+          agencyWithUsers_1_3,
+          agencyWithUsers_3,
+          agencyWithUsers_1_2_3,
+        ]);
+      });
+
+      it("returns only agencies with rights made to specified userIds only - multiple users", async () => {
+        const agencies = await agencyRepository.getAgencies({
+          filters: { userIds: [counsellor1.id, counsellor2.id] },
+        });
+
+        expectToEqual(agencies, [
+          agencyWithUsers_1_2,
+          agencyWithUsers_1_3,
+          agencyWithUsers_1_2_3,
+        ]);
+      });
+
+      it("returns nothing when user has no rights on agencies", async () => {
+        const agencies = await agencyRepository.getAgencies({
+          filters: { userIds: [validator2.id] },
+        });
+
+        expect(agencies).toEqual([]);
+      });
+
+      it("returns nothing if empty userIds specified", async () => {
+        const agencies = await agencyRepository.getAgencies({
+          filters: { userIds: [] },
+        });
+
+        expectToEqual(agencies, []);
+      });
+    });
   });
 
   describe("getAgenciesRelatedToAgency()", () => {

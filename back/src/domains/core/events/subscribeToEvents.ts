@@ -230,6 +230,7 @@ const getUseCasesByTopics = (
   AgencyUpdated: [useCases.updateAgencyReferringToUpdatedAgency],
   AgencyRejected: [useCases.sendEmailWhenAgencyIsRejected],
   AgencyRegisteredToConnectedUser: [],
+  AgencyHasBeenPutOnHold: [useCases.notifyAgencyHasBeenPutOnHold],
 
   // Assessment related:
   AssessmentCreated: [

@@ -13,6 +13,7 @@ import { makeAddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeCloseAgencyAndTransferConventions } from "../../domains/agency/use-cases/CloseAgencyAndTransferConventions";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { makeListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
+import { makeNotifyAgencyHasBeenPutOnHold } from "../../domains/agency/use-cases/NotifyAgencyHasBeenPutOnHold";
 import { makeRegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/RegisterAgencyToConnectedUser";
 import { makeUpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
@@ -660,6 +661,11 @@ export const createUseCases = ({
         saveNotificationAndRelatedEvent,
       },
       uowPerformer,
+    }),
+
+    notifyAgencyHasBeenPutOnHold: makeNotifyAgencyHasBeenPutOnHold({
+      uowPerformer,
+      deps: { saveNotificationAndRelatedEvent },
     }),
 
     getFeatureFlags: useCaseBuilder("GetFeatureFlags")

@@ -1,4 +1,5 @@
 import { createTemplatesByName } from "html-templates";
+import { immersionFacileHelpdeskRootUrl } from "../AbsoluteUrl";
 import {
   type ConventionId,
   type InternshipKind,
@@ -69,8 +70,7 @@ export const emailTemplatesByName =
           },
         ],
         highlight: {
-          content:
-            "Voici un article d’aide pour vous guider dans la gestion de ces demandes : <a href='https://aide.immersion-facile.beta.gouv.fr/fr/article/administrateur-comment-gerer-les-acces-a-lespace-prescripteur-de-vos-collaborateurs-1cdg4de/' target='_blank'>Administrateur - Comment gérer les accès à l'espace prescripteur de vos collaborateurs</a>",
+          content: `Voici un article d’aide pour vous guider dans la gestion de ces demandes : <a href='${immersionFacileHelpdeskRootUrl}/article/administrateur-comment-gerer-les-acces-a-lespace-prescripteur-de-vos-collaborateurs-1cdg4de/' target='_blank'>Administrateur - Comment gérer les accès à l'espace prescripteur de vos collaborateurs</a>`,
         },
         subContent: `Vous recevrez un rappel d’ici une semaine si des demandes restent en attente.
         ${defaultSignature("immersion")}
@@ -148,6 +148,45 @@ export const emailTemplatesByName =
         ],
         subContent: `Bonne journée,
       L'équipe Immersion Facilitée`,
+      }),
+    },
+    AGENCY_HAS_BEEN_PUT_ON_HOLD: {
+      niceName:
+        "Suppression compte - Prescripteur - Absence d’admin ou de validateur",
+      tags: [
+        "suppressionCompte",
+        "prescripteur",
+        "absenceAdminOuValidateur",
+        "rôle(s)",
+      ],
+      createEmailVariables: ({ agencyName }) => ({
+        subject: "",
+        greetings: "Bonjour,",
+        content: `Suite à une vérification automatique, ${agencyName} a été mise en attente sur Immersion Facilitée.
+        
+        <strong>Pourquoi ?</strong>
+        Le compte administrateur de l’agence n’était plus actif depuis longtemps et aucun utilisateur avec le rôle de validateur n’est actuellement actif dans l’agence. Dans cette situation, l’agence ne peut plus gérer correctement ses conventions.
+
+        <strong>Quelle est la conséquence ?</strong>
+        Certaines actions sont temporairement bloquées (ex. validation de conventions).
+
+        <strong>Que faire maintenant ?</strong>
+        Pour réactiver votre structure, il est nécessaire qu’un utilisateur actif dispose du rôle de validateur ou administrateur.
+        Contactez notre support en désignant le nom, prénom, fonction et numéro de téléphone de la personne qui prendra ce rôle.
+        `,
+        buttons: [
+          {
+            label: "Contacter le support Immersion Facilitée",
+            url: immersionFacileHelpdeskRootUrl,
+            target: "_blank",
+          },
+        ],
+        subContent: `
+      Nous restons disponibles pour vous accompagner.
+
+      Bien cordialement,
+      L’équipe Immersion Facilitée
+      `,
       }),
     },
     AGENCY_LAST_REMINDER: {
@@ -304,7 +343,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
 
         Cette fermeture n’a pas d’impact sur les conventions qui auraient déjà été signées et archivées.
         
-        Si cette fermeture ne correspond pas à votre situation, ou si l’organisme doit être rouvert, vous pouvez <a href="https://aide.immersion-facile.beta.gouv.fr/fr/" target="_blank">contacter le support</a>.
+        Si cette fermeture ne correspond pas à votre situation, ou si l’organisme doit être rouvert, vous pouvez <a href=${immersionFacileHelpdeskRootUrl} target="_blank">contacter le support</a>.
         `,
         subContent: defaultSignature("immersion"),
       }),

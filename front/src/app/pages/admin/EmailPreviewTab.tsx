@@ -235,6 +235,9 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     conventionId: "CONVENTION_ID",
   },
+  AGENCY_HAS_BEEN_PUT_ON_HOLD: {
+    agencyName: "AGENCY_NAME",
+  },
   AGENCY_WAS_ACTIVATED: {
     agencyName: "AGENCY_NAME",
     agencyLogoUrl: defaultEmailPreviewUrl,

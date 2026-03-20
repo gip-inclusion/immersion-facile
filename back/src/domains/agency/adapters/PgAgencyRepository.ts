@@ -251,9 +251,15 @@ export class PgAgencyRepository implements AgencyRepository {
       sirets,
       status,
       createdAtBefore,
+      userIds,
+      ...rest
     } = filters;
 
-    const results = await pipeWithValue(
+    rest satisfies Record<string, never>;
+
+    if (userIds?.length === 0) return [];
+
+    const builder = pipeWithValue(
       this.#getAgencyWithJsonBuiltQueryBuilder(),
       (b) =>
         departmentCode
@@ -296,16 +302,29 @@ export class PgAgencyRepository implements AgencyRepository {
             )
           : b,
       (b) =>
+        userIds
+          ? b.where((eb) =>
+              eb.exists(
+                eb
+                  .selectFrom("users__agencies as sub")
+                  .whereRef("sub.agency_id", "=", "agencies.id")
+                  .where("sub.user_id", "in", userIds),
+              ),
+            )
+          : b,
+      (b) =>
         b.limit(
           Math.min(limit ?? MAX_AGENCIES_RETURNED, MAX_AGENCIES_RETURNED),
         ),
-    )
-      .orderBy("agencies.id asc")
-      .execute();
+    ).orderBy("agencies.id asc");
 
-    return results
-      .map(({ agency }) => this.#pgAgencyToAgencyWithRights(agency))
-      .filter(isTruthy);
+    return builder
+      .execute()
+      .then((results) =>
+        results
+          .map(({ agency }) => this.#pgAgencyToAgencyWithRights(agency))
+          .filter(isTruthy),
+      );
   }
 
   public async getAgenciesRelatedToAgency(
