@@ -10,6 +10,7 @@ import { doesStringContainsHTML } from "./string";
 export type HardenedStringSchema = ReturnType<typeof makeHardenedStringSchema>;
 
 export const makeHardenedStringSchema = ({
+  min,
   minMessage = localization.required,
   max,
   maxMessage = localization.maxCharacters(max),
@@ -17,6 +18,7 @@ export const makeHardenedStringSchema = ({
   canContainHtml,
   withRegExp,
 }: {
+  min?: number;
   max: number;
   minMessage?: string;
   maxMessage?: string;
@@ -31,7 +33,7 @@ export const makeHardenedStringSchema = ({
     (schema) =>
       schema
         .max(max, maxMessage)
-        .min(isEmptyAllowed ? 0 : 1, minMessage)
+        .min(min ?? (isEmptyAllowed ? 0 : 1), minMessage)
         .transform((value) =>
           canContainHtml ? sanitize(normalizer(value)) : value,
         )
