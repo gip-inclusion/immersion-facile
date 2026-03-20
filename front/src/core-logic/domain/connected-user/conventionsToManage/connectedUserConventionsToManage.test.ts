@@ -112,119 +112,121 @@ describe("ConnectedUserConventionsToManage", () => {
     });
   });
 
-  it("get the conventions with assessment issue", () => {
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
-        store.getState(),
-      ),
-      false,
-    );
+  describe("getConventionsWithAssessmentIssueRequested", () => {
+    it("get the conventions with assessment issue", () => {
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
+          store.getState(),
+        ),
+        false,
+      );
 
-    store.dispatch(
-      connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
-        {
-          params: {
-            assessmentCompletionStatus: ["to-be-completed", "to-sign"],
+      store.dispatch(
+        connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
+          {
+            params: {
+              assessmentCompletionStatus: ["to-be-completed", "to-sign"],
+            },
+            jwt: "my-jwt",
+            feedbackTopic: "conventions-with-assessment-issue",
           },
-          jwt: "my-jwt",
-          feedbackTopic: "conventions-with-assessment-issue",
+        ),
+      );
+
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
+          store.getState(),
+        ),
+        true,
+      );
+
+      const agencyFields = {
+        agencyContactEmail: "contact@mail.com",
+        agencyName: "Agency Name",
+        agencyDepartment: "75",
+        agencyKind: "pole-emploi" as const,
+        agencySiret: "11112222000033",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: [],
+      };
+
+      const convention: ConventionReadDto = {
+        ...new ConventionDtoBuilder().build(),
+        assessment: null,
+        ...agencyFields,
+      };
+
+      const result: DataWithPagination<ConventionReadDto> = {
+        data: [convention],
+        pagination: {
+          totalRecords: 5,
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
         },
-      ),
-    );
+      };
+      dependencies.conventionGateway.getConventionsForUserResult$.next(result);
 
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
-        store.getState(),
-      ),
-      true,
-    );
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.conventionsWithAssessmentIssue(
+          store.getState(),
+        ),
+        result.data,
+      );
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.conventionsWithAssessmentIssuePagination(
+          store.getState(),
+        ),
+        result.pagination,
+      );
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
+          store.getState(),
+        ),
+        false,
+      );
+    });
 
-    const agencyFields = {
-      agencyContactEmail: "contact@mail.com",
-      agencyName: "Agency Name",
-      agencyDepartment: "75",
-      agencyKind: "pole-emploi" as const,
-      agencySiret: "11112222000033",
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [],
-    };
-
-    const convention: ConventionReadDto = {
-      ...new ConventionDtoBuilder().build(),
-      assessment: null,
-      ...agencyFields,
-    };
-
-    const result: DataWithPagination<ConventionReadDto> = {
-      data: [convention],
-      pagination: {
-        totalRecords: 5,
-        currentPage: 1,
-        totalPages: 1,
-        numberPerPage: 10,
-      },
-    };
-    dependencies.conventionGateway.getConventionsForUserResult$.next(result);
-
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.conventionsWithAssessmentIssue(
-        store.getState(),
-      ),
-      result.data,
-    );
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.conventionsWithAssessmentIssuePagination(
-        store.getState(),
-      ),
-      result.pagination,
-    );
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
-        store.getState(),
-      ),
-      false,
-    );
-  });
-
-  it("failed to get the conventions with assessment issue", () => {
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
-        store.getState(),
-      ),
-      false,
-    );
-    store.dispatch(
-      connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
-        {
-          params: {},
-          jwt: "my-jwt",
-          feedbackTopic: "conventions-with-assessment-issue",
+    it("failed to get the conventions with assessment issue", () => {
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
+          store.getState(),
+        ),
+        false,
+      );
+      store.dispatch(
+        connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
+          {
+            params: {},
+            jwt: "my-jwt",
+            feedbackTopic: "conventions-with-assessment-issue",
+          },
+        ),
+      );
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
+          store.getState(),
+        ),
+        true,
+      );
+      dependencies.conventionGateway.getConventionsForUserResult$.error(
+        new Error("assessment-issue-error"),
+      );
+      expectToEqual(
+        connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
+          store.getState(),
+        ),
+        false,
+      );
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "conventions-with-assessment-issue": {
+          on: "fetch",
+          level: "error",
+          title:
+            "Problème lors de la récupération des bilans à compléter ou à signer",
+          message: "assessment-issue-error",
         },
-      ),
-    );
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
-        store.getState(),
-      ),
-      true,
-    );
-    dependencies.conventionGateway.getConventionsForUserResult$.error(
-      new Error("assessment-issue-error"),
-    );
-    expectToEqual(
-      connectedUserConventionsToManageSelectors.isLoadingConventionsWithAssessmentIssue(
-        store.getState(),
-      ),
-      false,
-    );
-    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-      "conventions-with-assessment-issue": {
-        on: "fetch",
-        level: "error",
-        title:
-          "Problème lors de la récupération des bilans à compléter ou à signer",
-        message: "assessment-issue-error",
-      },
+      });
     });
   });
 });

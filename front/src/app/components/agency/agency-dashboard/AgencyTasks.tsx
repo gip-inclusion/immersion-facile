@@ -130,8 +130,7 @@ export const AgencyTasks = ({
         conventionsWithErroredBroadcastFeedbackPagination.pagination
           .totalRecords === 0 && <p>Aucune tâche à traiter.</p>}
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-        {!isLoadingConventionsToManage &&
-          conventionsToManagePagination?.totalRecords !== undefined &&
+        {conventionsToManagePagination?.totalRecords !== undefined &&
           conventionsToManagePagination.totalRecords > 0 && (
             <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
               <TaskSummary
@@ -151,9 +150,7 @@ export const AgencyTasks = ({
               />
             </div>
           )}
-        {!isLoadingConventionsWithAssessmentIssue &&
-          conventionsWithAssessmentIssuePagination?.totalRecords !==
-            undefined &&
+        {conventionsWithAssessmentIssuePagination?.totalRecords !== undefined &&
           conventionsWithAssessmentIssuePagination.totalRecords > 0 && (
             <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
               <TaskSummary
@@ -164,14 +161,13 @@ export const AgencyTasks = ({
                   children: "Traiter cette liste",
                   onClick: () =>
                     onSeeAllConventionsClick(
-                      <ConventionsWithAssessmentToCompleteList title="Relances bilans" />,
+                      <ConventionsWithAssessmentToCompleteList />,
                     ),
                 }}
               />
             </div>
           )}
-        {!isLoadingConventionsWithBroadcastError &&
-          currentUser &&
+        {currentUser &&
           hasUserRightsOnAgencyBroadcast(currentUser) &&
           conventionsWithErroredBroadcastFeedbackPagination?.pagination
             ?.totalRecords !== undefined &&
