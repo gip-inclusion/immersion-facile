@@ -235,7 +235,7 @@ export default {
   Les « Services » sont les fonctionnalités offertes par la plateforme pour répondre à ses finalités.
 
 
-  <strong>Article 4 - Fonctionnalités </strong>
+  <strong>Article 4 - Fonctionnalités du service</strong>
 
   <strong>4.1 Création de compte</strong> 
 
