@@ -16,9 +16,19 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       notNull: true,
     },
   });
+
+  pgm.alterColumn("phone_numbers", "verified_at", {
+    type: "TIMESTAMPTZ",
+    using: "verified_at AT TIME ZONE 'UTC'",
+  });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.alterColumn("phone_numbers", "verified_at", {
+    type: "TIMESTAMP WITHOUT TIME ZONE",
+    using: "verified_at AT TIME ZONE 'UTC'",
+  });
+
   pgm.dropColumns("phone_numbers", ["verification_status"]);
   pgm.dropType(PHONE_VERIFICATION_STATUS_NAME);
 }
