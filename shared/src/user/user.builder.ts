@@ -68,6 +68,13 @@ export class UserBuilder implements Builder<User> {
     return new UserBuilder({ ...this.#dto, createdAt: date.toISOString() });
   }
 
+  withLastLoginAt(date: Date | undefined) {
+    return new UserBuilder({
+      ...this.#dto,
+      lastLoginAt: date ? date.toISOString() : undefined,
+    });
+  }
+
   build() {
     return this.#dto;
   }

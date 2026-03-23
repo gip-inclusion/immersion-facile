@@ -30,11 +30,11 @@ import { NotifyNewConventionNeedsReview } from "./NotifyNewConventionNeedsReview
 describe("NotifyConventionNeedsReview", () => {
   const validator1 = new ConnectedUserBuilder()
     .withId(uuid())
-    .withEmail("aValidator@unmail.com")
+    .withEmail("validator1@unmail.com")
     .buildUser();
   const validator2 = new ConnectedUserBuilder()
     .withId(uuid())
-    .withEmail("anotherValidator@unmail.com")
+    .withEmail("validator2@unmail.com")
     .buildUser();
   const councellor1 = new ConnectedUserBuilder()
     .withId(uuid())

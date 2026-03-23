@@ -6,6 +6,7 @@ import {
   expectToEqual,
   type User,
   type UserId,
+  type UserWithAdminRights,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -17,10 +18,13 @@ import { toAgencyWithRights } from "../../../../../utils/agency";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
+import { InMemoryUserRepository } from "./InMemoryUserRepository";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 import { PgUserRepository } from "./PgUserRepository";
 
-describe("PgAuthenticatedUserRepository", () => {
+const adapters: ("InMemory" | "Pg")[] = ["Pg", "InMemory"];
+
+describe.each(adapters)("%s UserRepository", (adapter) => {
   const userExternalId = "my-external-id";
   const createdAt = new Date().toISOString();
   const user: User = {
@@ -61,7 +65,7 @@ describe("PgAuthenticatedUserRepository", () => {
 
   let pool: Pool;
   let db: KyselyDb;
-  let userRepository: PgUserRepository;
+  let userRepository: PgUserRepository | InMemoryUserRepository;
 
   beforeAll(() => {
     pool = makeTestPgPool();
@@ -69,11 +73,18 @@ describe("PgAuthenticatedUserRepository", () => {
   });
 
   beforeEach(async () => {
-    userRepository = new PgUserRepository(db);
-    await db.deleteFrom("users_ongoing_oauths").execute();
-    await db.deleteFrom("convention_templates").execute();
-    await db.deleteFrom("users").execute();
-    await db.deleteFrom("users_admins").execute();
+    userRepository =
+      adapter === "Pg"
+        ? new PgUserRepository(db)
+        : new InMemoryUserRepository();
+
+    if (adapter === "Pg") {
+      await db.deleteFrom("users_ongoing_oauths").execute();
+      await db.deleteFrom("convention_drafts").execute();
+      await db.deleteFrom("convention_templates").execute();
+      await db.deleteFrom("users").execute();
+      await db.deleteFrom("users_admins").execute();
+    }
   });
 
   afterAll(async () => {
@@ -150,7 +161,7 @@ describe("PgAuthenticatedUserRepository", () => {
 
     describe("updateEmail()", () => {
       it("updates users email in users table", async () => {
-        await insertUser(db, user1, true);
+        await insertUser(userRepository, user1, true);
         const updatedEmail = "new-email@email.fr";
 
         await userRepository.updateEmail(user1.id, updatedEmail);
@@ -164,7 +175,7 @@ describe("PgAuthenticatedUserRepository", () => {
 
     describe("delete()", () => {
       it("deletes an existing user", async () => {
-        await insertUser(db, user1, true);
+        await insertUser(userRepository, user1, true);
         await userRepository.delete(user1.id);
         const response = await userRepository.getById(user1.id);
         expectToEqual(response, undefined);
@@ -188,19 +199,27 @@ describe("PgAuthenticatedUserRepository", () => {
 
     describe("getById()", () => {
       it("gets the connected user from its Id", async () => {
-        await insertUser(db, user1, true);
+        await insertUser(userRepository, user1, true);
 
         expectToEqual(await userRepository.getById(user1.id), user1);
       });
 
       it("gets the connected user with admin right for admins", async () => {
-        await insertUser(db, user1, true);
-        await db
-          .insertInto("users_admins")
-          .values({ user_id: user1.id })
-          .execute();
-        const adminUser = await userRepository.getById(user1.id);
-        expectToEqual(adminUser, {
+        const adminUser: UserWithAdminRights = {
+          ...user1,
+          isBackofficeAdmin: true,
+        };
+
+        await insertUser(userRepository, adminUser, true);
+
+        if (adapter === "Pg") {
+          await db
+            .insertInto("users_admins")
+            .values({ user_id: adminUser.id })
+            .execute();
+        }
+
+        expectToEqual(await userRepository.getById(user1.id), {
           ...user1,
           isBackofficeAdmin: true,
         });
@@ -213,15 +232,15 @@ describe("PgAuthenticatedUserRepository", () => {
       });
 
       it("success one user", async () => {
-        await insertUser(db, user1, true);
+        await insertUser(userRepository, user1, true);
 
         expectToEqual(await userRepository.getByIds([user1.id]), [user1]);
       });
 
       it("success multiple users", async () => {
-        await insertUser(db, user1, true);
-        await insertUser(db, user2, true);
-        await insertUser(db, user, true);
+        await insertUser(userRepository, user1, true);
+        await insertUser(userRepository, user2, true);
+        await insertUser(userRepository, user, true);
 
         expectToEqual(
           await userRepository.getByIds([user1.id, user2.id, user.id]),
@@ -230,7 +249,7 @@ describe("PgAuthenticatedUserRepository", () => {
       });
 
       it("error if at least one missing user", async () => {
-        await insertUser(db, user1, true);
+        await insertUser(userRepository, user1, true);
 
         const missingUserId: UserId = uuid();
 
@@ -267,13 +286,13 @@ describe("PgAuthenticatedUserRepository", () => {
           proConnect: null,
         };
 
-        await insertUser(db, user1, true);
-        await insertUser(db, user2, false);
-        await insertUser(db, userNotIcConnected, false);
+        await insertUser(userRepository, user1, true);
+        await insertUser(userRepository, user2, false);
+        await insertUser(userRepository, userNotIcConnected, false);
 
         const withNoAgenciesOrEstablishements = {
-          numberOfAgencies: 0,
-          numberOfEstablishments: 0,
+          numberOfAgencies: adapter === "Pg" ? 0 : 404,
+          numberOfEstablishments: adapter === "Pg" ? 0 : 404,
         };
 
         expectToEqual(await userRepository.getUsers({ emailContains: "j" }), [
@@ -284,52 +303,53 @@ describe("PgAuthenticatedUserRepository", () => {
       });
 
       it("returns user with 1 agency and 1 establishment", async () => {
-        await insertUser(db, user1, true);
+        await insertUser(userRepository, user1, true);
 
-        await db.deleteFrom("conventions").execute();
-        await db.deleteFrom("agency_groups__agencies").execute();
-        await db.deleteFrom("agencies").execute();
-        await db.deleteFrom("establishments").execute();
+        if (adapter === "Pg") {
+          await db.deleteFrom("conventions").execute();
+          await db.deleteFrom("agency_groups__agencies").execute();
+          await db.deleteFrom("agencies").execute();
+          await db.deleteFrom("establishments").execute();
 
-        const agencyRepository = new PgAgencyRepository(db);
-        const agency = new AgencyDtoBuilder().build();
+          const agencyRepository = new PgAgencyRepository(db);
+          const agency = new AgencyDtoBuilder().build();
 
-        await agencyRepository.insert(
-          toAgencyWithRights(agency, {
-            [user1.id]: {
-              roles: ["validator"],
-              isNotifiedByEmail: true,
-            },
-          }),
-        );
+          await agencyRepository.insert(
+            toAgencyWithRights(agency, {
+              [user1.id]: {
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            }),
+          );
 
-        const establishmentRepository = new PgEstablishmentAggregateRepository(
-          db,
-        );
-        const establishmentAggregate = new EstablishmentAggregateBuilder()
-          .withUserRights([
-            {
-              role: "establishment-admin",
-              job: "Chef",
-              userId: user1.id,
-              shouldReceiveDiscussionNotifications: true,
-              phone: "+33611223344",
-              isMainContactByPhone: false,
-              isMainContactInPerson: false,
-            },
-          ])
-          .build();
-        await establishmentRepository.insertEstablishmentAggregate(
-          establishmentAggregate,
-        );
+          const establishmentRepository =
+            new PgEstablishmentAggregateRepository(db);
+          const establishmentAggregate = new EstablishmentAggregateBuilder()
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "Chef",
+                userId: user1.id,
+                shouldReceiveDiscussionNotifications: true,
+                phone: "+33611223344",
+                isMainContactByPhone: false,
+                isMainContactInPerson: false,
+              },
+            ])
+            .build();
+          await establishmentRepository.insertEstablishmentAggregate(
+            establishmentAggregate,
+          );
+        }
 
         const users = await userRepository.getUsers({ emailContains: "john" });
 
         expectToEqual(users, [
           {
             ...user1,
-            numberOfAgencies: 1,
-            numberOfEstablishments: 1,
+            numberOfAgencies: adapter === "Pg" ? 1 : 404,
+            numberOfEstablishments: adapter === "Pg" ? 1 : 404,
           },
         ]);
       });
@@ -365,24 +385,12 @@ describe("PgAuthenticatedUserRepository", () => {
 });
 
 const insertUser = async (
-  db: KyselyDb,
-  { id, email, firstName, lastName, proConnect, createdAt }: User,
+  userRepository: PgUserRepository | InMemoryUserRepository,
+  user: UserWithAdminRights,
   isProConnected: boolean,
 ) => {
-  await db
-    .insertInto("users")
-    .values({
-      id,
-      email,
-      first_name: firstName,
-      last_name: lastName,
-      created_at: createdAt,
-      ...(isProConnected
-        ? {
-            pro_connect_sub: proConnect?.externalId,
-            pro_connect_siret: proConnect?.siret,
-          }
-        : {}),
-    })
-    .execute();
+  await userRepository.save({
+    ...user,
+    proConnect: isProConnected ? user.proConnect : null,
+  });
 };

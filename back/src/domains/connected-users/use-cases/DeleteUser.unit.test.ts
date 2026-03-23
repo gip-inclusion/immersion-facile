@@ -28,10 +28,12 @@ describe("DeleteUser", () => {
   const contactMostActive = new UserBuilder()
     .withId("contactMostActive")
     .withEmail("contactMostActive")
+    .withLastLoginAt(new Date("2025-01-01"))
     .build();
   const contactLessActive = new UserBuilder()
     .withId("contactLessActive")
     .withEmail("contactLessActive")
+    .withLastLoginAt(new Date("2024-01-01"))
     .build();
   const admin1Right: EstablishmentAdminRight = {
     role: "establishment-admin",
@@ -104,7 +106,7 @@ describe("DeleteUser", () => {
         ];
       });
 
-      it("case E1 - with contact right -> remove establishment right + event UserDeleted + user deleted", async () => {
+      it("case E1 - with contact right - remove establishment right + event UserDeleted + user deleted", async () => {
         await deleteUser.execute({
           userId: contactMostActive.id,
           triggeredBy: { kind: "crawler" },
@@ -139,7 +141,7 @@ describe("DeleteUser", () => {
         ]);
       });
 
-      it("case E2 - with admin right and another user with not admin right -> remove establishment right + event UserDeleted + user deleted + most active remaining user with admin right", async () => {
+      it("case E2 - with admin right and another user with not admin right - remove establishment right + event UserDeleted + user deleted + most active remaining user with admin right", async () => {
         uow.establishmentAggregateRepository.establishmentAggregates = [
           new EstablishmentAggregateBuilder(establishment)
             .withUserRights([
