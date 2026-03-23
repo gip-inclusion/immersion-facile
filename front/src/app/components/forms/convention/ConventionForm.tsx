@@ -112,7 +112,6 @@ import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice"
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { useStyles } from "tss-react/dsfr";
-import { z } from "zod";
 import { ShareConventionDraft } from "./ShareConventionDraft";
 
 type StepSeverity = "error" | "success" | "info";
@@ -503,7 +502,14 @@ const ConventionFormContent = ({
     const parseResult = presentationSchema.safeParse(conventionValues);
     const fieldErrors: Record<string, string[]> = parseResult.success
       ? {}
-      : z.flattenError(parseResult.error).fieldErrors;
+      : parseResult.error.issues.reduce(
+          (acc, issue) => {
+            const path = issue.path.join(".");
+            acc[path] = [issue.message];
+            return acc;
+          },
+          {} as Record<string, string[]>,
+        );
 
     const fieldHasError = (stepField: string) =>
       Object.keys(fieldErrors).some(
