@@ -24,9 +24,7 @@ test.describe("Agency dashboard workflow", () => {
         customizedName: "Handicap emploi !",
         rawAddress: "1 Avenue Jean-Marie Verne 01000 Bourg-en-Bresse",
       });
-      await expect(
-        await page.locator(".fr-alert--success").first(),
-      ).toBeVisible();
+      await expect(page.locator(".fr-alert--success").first()).toBeVisible();
       await expect(agencyId).not.toBeNull();
     });
   });
@@ -48,9 +46,7 @@ test.describe("Agency dashboard workflow", () => {
         )
         .click();
 
-      await expect(
-        await page.locator(".fr-alert--success").first(),
-      ).toBeVisible();
+      await expect(page.locator(".fr-alert--success").first()).toBeVisible();
       await page.waitForTimeout(testConfig.timeForEventCrawler);
     });
   });
@@ -111,9 +107,7 @@ test.describe("Agency dashboard workflow", () => {
         .first()
         .click();
 
-      await expect(
-        await page.locator(".fr-alert--success").first(),
-      ).toBeVisible();
+      await expect(page.locator(".fr-alert--success").first()).toBeVisible();
 
       expect(
         await page
@@ -172,7 +166,7 @@ test.describe("Agency dashboard workflow", () => {
       await page.goto("/");
       await goToDashboard(page, "agency");
       await expect(
-        await page.locator(
+        page.locator(
           `#${domElementIds.agencyDashboard.dashboard.tabContainer}`,
         ),
       ).toBeVisible();
