@@ -1,3 +1,4 @@
+import { setMilliseconds } from "date-fns";
 import {
   type ApiConsumerId,
   type ApiConsumerJwt,
@@ -21,7 +22,7 @@ export type RenewApiConsumerKey = ReturnType<typeof makeRenewApiConsumerKey>;
 export const makeRenewApiConsumerKey = useCaseBuilder("RenewApiConsumerKey")
   .withInput<ApiConsumerId>(apiConsumerIdSchema)
   .withOutput<ApiConsumerJwt>()
-  .withCurrentUser<ConnectedUser | undefined>()
+  .withCurrentUser<ConnectedUser>()
   .withDeps<Deps>()
   .build(async ({ inputParams: consumerId, uow, currentUser, deps }) => {
     throwIfNotAdmin(currentUser);
@@ -32,29 +33,27 @@ export const makeRenewApiConsumerKey = useCaseBuilder("RenewApiConsumerKey")
     if (!existingApiConsumer)
       throw errors.apiConsumer.notFound({ id: consumerId });
 
-    const now = deps.timeGateway.now();
-    const newKeyIssuedAt = now.toISOString();
+    const now = setMilliseconds(deps.timeGateway.now(), 0);
 
-    const updatedApiConsumer = {
-      ...existingApiConsumer,
-      currentKeyIssuedAt: newKeyIssuedAt,
-      revokedAt: null,
-    };
-
-    await uow.apiConsumerRepository.save(updatedApiConsumer);
-
-    await uow.outboxRepository.save(
-      deps.createNewEvent({
-        topic: "ApiConsumerKeyRenewed",
-        payload: {
-          consumerId,
-          triggeredBy: {
-            kind: "connected-user",
-            userId: currentUser!.id,
-          },
-        },
+    await Promise.all([
+      uow.apiConsumerRepository.save({
+        ...existingApiConsumer,
+        currentKeyIssuedAt: now.toISOString(),
+        revokedAt: null,
       }),
-    );
+      uow.outboxRepository.save(
+        deps.createNewEvent({
+          topic: "ApiConsumerKeyRenewed",
+          payload: {
+            consumerId,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: currentUser.id,
+            },
+          },
+        }),
+      ),
+    ]);
 
     return deps.generateApiConsumerJwt({
       id: consumerId,
