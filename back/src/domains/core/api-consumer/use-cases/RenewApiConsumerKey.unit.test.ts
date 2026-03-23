@@ -1,3 +1,4 @@
+import { setMilliseconds } from "date-fns";
 import {
   ConnectedUserBuilder,
   errors,
@@ -114,18 +115,6 @@ describe("RenewApiConsumerKey", () => {
   });
 
   describe("Wrong paths", () => {
-    it("throws UnauthorizedError without JWT payload", async () => {
-      await expectPromiseToFailWithError(
-        renewApiConsumerKey.execute(
-          authorizedUnJeuneUneSolutionApiConsumer.id,
-          undefined,
-        ),
-        errors.user.unauthorized(),
-      );
-
-      expectToEqual(uow.outboxRepository.events, []);
-    });
-
     it("throws ForbiddenError if user is not admin", async () => {
       await expectPromiseToFailWithError(
         renewApiConsumerKey.execute(
@@ -153,7 +142,7 @@ describe("RenewApiConsumerKey", () => {
   describe("Reactivation of revoked consumer", () => {
     it("reactivates a revoked consumer by clearing revokedAt and generating new key", async () => {
       const revokedAt = "2024-01-10T00:00:00.000Z";
-      const now = new Date("2024-01-15T10:00:00.000Z");
+      const now = new Date("2024-01-15T10:00:00.350");
       const eventId = "event-id-3333-3333-3333-333333333333";
       timeGateway.setNextDates([now, now]);
       uuidGenerator.setNextUuids([eventId]);
@@ -174,14 +163,14 @@ describe("RenewApiConsumerKey", () => {
         generateApiConsumerJwtTestFn({
           id: revokedConsumer.id,
           version: 1,
-          iat: now.getTime() / 1000,
+          iat: setMilliseconds(now, 0).getTime() / 1000,
         }),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, [
         {
           ...revokedConsumer,
-          currentKeyIssuedAt: now.toISOString(),
+          currentKeyIssuedAt: setMilliseconds(now, 0).toISOString(),
           revokedAt: null,
         },
       ]);

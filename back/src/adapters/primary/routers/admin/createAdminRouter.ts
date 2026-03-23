@@ -161,7 +161,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, () =>
         deps.useCases.renewApiConsumerKey.execute(
           req.params.consumerId,
-          req.payloads?.currentUser,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
