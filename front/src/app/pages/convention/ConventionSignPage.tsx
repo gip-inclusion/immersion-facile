@@ -106,12 +106,10 @@ const ConventionSignPageContent = ({
       })
         .with({ isLoading: true }, () => <Loader />)
         .with({ fetchConventionError: true }, () => (
-          <MainWrapper layout={"default"}>
-            <ShowConventionErrorOrRenewExpiredJwt
-              errorMessage={conventionFormFeedback?.message ?? ""}
-              jwt={jwt}
-            />
-          </MainWrapper>
+          <ShowConventionErrorOrRenewExpiredJwt
+            errorMessage={conventionFormFeedback?.message ?? ""}
+            jwt={jwt}
+          />
         ))
         .with({ hasConvention: false }, () => (
           <Alert

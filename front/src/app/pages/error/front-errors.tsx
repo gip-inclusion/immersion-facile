@@ -50,6 +50,31 @@ export const frontErrors = {
         buttons: [RenewJwtButton],
       }),
   },
+  jwtLink: {
+    expired: ({ RenewJwtButton }: { RenewJwtButton: ReactElement }) =>
+      new FrontSpecificError({
+        title: "Votre lien magique est périmé",
+        description: (
+          <>
+            <p>
+              Pour des raisons de sécurité, les liens magiques sont valables
+              pendant une durée limitée.
+            </p>
+            <p>
+              Vous pouvez demander un nouveau lien ci-dessous. Il vous sera
+              envoyé par email dans les 2 à 3 minutes.
+            </p>
+            <p>
+              Vous n'avez pas reçu le lien ?{" "}
+              <a href={`mailto:${immersionFacileContactEmail}`}>
+                Contactez-nous
+              </a>
+            </p>
+          </>
+        ),
+        buttons: [RenewJwtButton],
+      }),
+  },
   generic: {
     pageNotFound: () =>
       new FrontSpecificError({
