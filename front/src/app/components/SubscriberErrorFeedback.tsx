@@ -46,15 +46,15 @@ export const SubscriberErrorFeedbackComponent = ({
       {managedError}
       {!managedError && (
         <div>
-          <strong>
-            Une erreur technique s'est produite. Veuillez contacter votre DSI
-            pour la corriger.
-          </strong>
+          <strong>Erreur technique</strong>
           <Accordion
             label="Détail de l'erreur"
             className={fr.cx("fr-mb-4w", "fr-mt-1w")}
           >
-            <p>{message}</p>
+            <p>
+              Nous travaillons actuellement à une proposition de solution avec
+              votre DSI, Elle vous sera proposée prochainement.
+            </p>
           </Accordion>
         </div>
       )}

@@ -184,32 +184,58 @@ export const broadcastFeedbackErrorMessageMap: Record<
         <p>{"-> "}Dans le cas ou il n'est pas inscrit :</p>
         <p>
           {!isConventionValidated ? (
-            "Je procède à son inscription avant validation de la convention"
+            <ul>
+              <li>
+                Je procède à son inscription avant validation de la convention
+              </li>
+              <li>
+                Je peux rediffuser la convention pour qu’elle s’installe dans
+                mes applicatifs
+              </li>
+              <li>Ou dès validation, elle s’installera automatiquement.</li>
+            </ul>
           ) : (
             <ul>
-              <li>Procéder à l'inscription du bénéficiaire</li>
+              <li>Je procède à l'inscription du bénéficiaire</li>
               <li>
-                Rediffuser la convention dans votre SI depuis Immersion
-                facilitée
+                Je rediffuse la convention dans mon SI France travail depuis
+                Immersion facilitée
               </li>
             </ul>
           )}
         </p>
-        <p>{"-> "}Dans le cas où l'adresse mail est différente:</p>
+        <p>
+          {"-> "}Dans le cas où l'adresse mail et / ou le téléphone sont
+          différents:
+        </p>
         <p>
           {!isConventionValidated ? (
-            "Je contacte le bénéficiaire pour l'informer que je modifie l'adresse mail indiquée sur la convention par celle présente dans le dossier France travail avant validation de la convention."
-          ) : (
             <ul>
               <li>
-                Faire modifier l'adresse mail du bénéficiaire avec son accord au
-                sein de France travail
+                Je contacte le bénéficiaire pour l'informer que je modifie
+                l'adresse mail et/ou le téléphone (de préférence un portable)
+                indiqués sur la convention par ceux présents dans le dossier
+                France travail avant validation de la convention.
               </li>
               <li>
-                Rediffuser la convention dans votre SI depuis Immersion
-                facilitée
+                Dès que la convention sera modifiée, elle s’installera dans
+                votre SI et l’erreur disparaîtra de vos «conventions à
+                vérifier».
               </li>
             </ul>
+          ) : (
+            <p>
+              je me rends sur mon assistant Immersion facilitée accessible
+              depuis “Gestion des aides” via PCM pour forcer l’identification du
+              bénéficiaire. Je suis la démarche indiquée dans la version{" "}
+              <a
+                href="https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/_layouts/15/Doc.aspx?sourcedoc=%7B40B26A24-77FD-40B3-A083-F6805C8C0B6E%7D&file=%5B26M03_3.C%5D_CFTPro_CDDE_Identification_Beneficiaires_Immersions.SA.V1.pptx&action=edit&mobileredirect=true"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ici
+              </a>
+            </p>
           )}
         </p>
       </>
@@ -221,46 +247,37 @@ export const broadcastFeedbackErrorMessageMap: Record<
     solution: (isConventionValidated) => (
       <>
         {isConventionValidated ? (
-          <>
-            <p>
-              {"->"} Si la convention a été validée, il n'y a pas longtemps et
-              que le bilan n'a pas été complété :
-            </p>
-            <ul>
-              <li>Dupliquer la convention.</li>
-              <li>Corriger la date de naissance du bénéficiaire.</li>
-              <li>Renvoyer la nouvelle convention en signature.</li>
-              <li>Attendre la validation</li>
-              <li>Vérifier son intégration dans vos applicatifs.</li>
-              <li>Annuler l'ancienne convention.</li>
-            </ul>
-
-            <p>
-              {"->"} Si la convention a été validée, il y a longtemps ou que le
-              bilan a été complété :
-            </p>
-            <ul>
-              <li>
-                Contacter notre centre d'aide pour erreur date de naissance
-              </li>
-              <li>
-                Communiquer la date de naissance à modifier et le numéro de
-                convention.
-              </li>
-              <li>
-                Nous procéderons à la modification et l'installation de la
-                convention dans vos applicatifs.
-              </li>
-            </ul>
-          </>
+          <ul>
+            <li>
+              Je contacte notre centre d'aide{" "}
+              <a
+                href="https://aide.immersion-facile.beta.gouv.fr/fr/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ici
+              </a>{" "}
+              pour erreur date de naissance
+            </li>
+            <li>
+              Je communique la date de naissance à modifier et le numéro de
+              convention.
+            </li>
+            <li>
+              Nous procéderons à la modification et l'installation de la
+              convention dans vos applicatifs.
+            </li>
+          </ul>
         ) : (
           <ul>
             <li>
-              Faire modifier la date de naissance du bénéficiaire avec son
-              accord au sein de France travail
+              Je modifie la date de naissance du bénéficiaire sur la convention
+              en récupérant celle sous MAP
             </li>
             <li>
-              Rediffuser la convention dans votre SI depuis Immersion facilitée
+              Dès que la convention sera modifiée, elle s’installera
+              automatiquement dans votre SI et l’erreur disparaîtra de vos
+              «conventions à vérifier».
             </li>
           </ul>
         )}
