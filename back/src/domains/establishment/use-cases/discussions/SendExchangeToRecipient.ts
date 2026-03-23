@@ -99,24 +99,27 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
                   Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
                   <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
-                  <li>Candidat : ${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName
-            }</li>
+                  <li>Candidat : ${discussion.potentialBeneficiary.firstName} ${
+                    discussion.potentialBeneficiary.lastName
+                  }</li>
                   <li>Métier : ${appellation?.appellationLabel}</li>
-                  <li>Entreprise : ${discussion.businessName} - ${discussion.address.streetNumberAndAddress
-            } ${discussion.address.postcode} ${discussion.address.city}</li>
+                  <li>Entreprise : ${discussion.businessName} - ${
+                    discussion.address.streetNumberAndAddress
+                  } ${discussion.address.postcode} ${discussion.address.city}</li>
                   </ul><br /></div>
-            ${lastExchange.message.length
-              ? lastExchange.message
-              : "--- pas de message ---"
+            ${
+              lastExchange.message.length
+                ? lastExchange.message
+                : "--- pas de message ---"
             }`,
         },
         recipients:
           lastExchange.sender === "establishment"
             ? [discussion.potentialBeneficiary.email]
             : await getEstablishmentNotifiedContactEmails(
-              uow,
-              discussion.siret,
-            ),
+                uow,
+                discussion.siret,
+              ),
         replyTo: {
           email: createOpaqueEmail({
             discussionId: discussion.id,
@@ -167,9 +170,9 @@ const getEstablishmentNotifiedContactEmails = async (
   if (notifiedUsers.length === 0) {
     throw errors.establishment.notAdminOrContactRight({
       siret,
-      userId: establishment.userRights.find(
-        ({ status }) => status === "PENDING",
-      )?.userId ?? "unknown-pending-user",
+      userId:
+        establishment.userRights.find(({ status }) => status === "PENDING")
+          ?.userId ?? "unknown-pending-user",
     });
   }
 

@@ -79,5 +79,7 @@ const hasUserRightToAccessDiscussion = async (
 
   if (!establishment)
     throw errors.establishment.notFound({ siret: discussion.siret });
-  return establishment.userRights.some((right) => right.userId === user.id && right.status === "ACCEPTED");
+  return establishment.userRights.some(
+    (right) => right.userId === user.id && right.status === "ACCEPTED",
+  );
 };

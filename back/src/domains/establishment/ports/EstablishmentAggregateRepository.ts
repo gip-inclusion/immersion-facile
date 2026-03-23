@@ -54,7 +54,11 @@ export type GetOffersParams = WithRequiredPagination &
     filters: GetOffersFilters;
   };
 
-export type EstablishmentAggregateFilters = { userId: UserId };
+export type EstablishmentAggregateFilters = {
+  nameIncludes?: string;
+  sirets?: SiretDto[];
+  userId?: UserId;
+};
 
 export interface EstablishmentAggregateRepository {
   //Establishment aggregate

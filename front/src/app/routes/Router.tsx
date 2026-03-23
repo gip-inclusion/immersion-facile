@@ -40,6 +40,7 @@ import { StatsPage } from "src/app/pages/StatsPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { MyProfile } from "src/app/pages/user/MyProfile";
 import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";
+import { RequestEstablishmentRegistrationPage } from "src/app/pages/user/RequestEstablishmentRegistrationPage";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { store } from "src/config/dependencies";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
@@ -289,6 +290,9 @@ const getPageByRouteName: {
     </ConnectedPrivateRoute>
   ),
   myProfileAgencyRegistration: () => <RequestAgencyRegistrationPage />,
+  myProfileEstablishmentRegistration: () => (
+    <RequestEstablishmentRegistrationPage />
+  ),
   openApiDoc: (route: Route<typeof routes.openApiDoc>) => {
     if (route.params.version === "v3") return <OpenApiDocV3Page />;
     return <OpenApiDocV2Page />;

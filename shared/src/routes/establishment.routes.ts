@@ -8,7 +8,11 @@ import {
   withDiscussionStatusSchema,
   withExchangeMessageSchema,
 } from "../discussion/discussion.schema";
-import { establishmentNameAndAdminsSchema } from "../establishment/establishment";
+import {
+  establishmentNameAndAdminsSchema,
+  establishmentPublicOptionsSchema,
+  getEstablishmentPublicOptionsByFiltersSchema,
+} from "../establishment/establishment";
 import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -71,6 +75,16 @@ export const establishmentRoutes = defineRoutes({
     responses: {
       200: establishmentNameAndAdminsSchema,
       404: httpErrorSchema,
+    },
+  }),
+  getEstablishmentPublicOptionsByFilters: defineRoute({
+    method: "get",
+    url: "/establishments/public-options",
+    ...withAuthorizationHeaders,
+    queryParamsSchema: getEstablishmentPublicOptionsByFiltersSchema,
+    responses: {
+      200: establishmentPublicOptionsSchema,
+      401: httpErrorSchema,
     },
   }),
   getDiscussions: defineRoute({

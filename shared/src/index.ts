@@ -113,7 +113,7 @@ export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/address.routes";
 export * from "./routes/agency.routes";
 export * from "./routes/convention.routes";
-export * from "./routes/establishement.routes";
+export * from "./routes/establishment.routes";
 export * from "./routes/establishmentLeadRoutes";
 export * from "./routes/formCompletion.routes";
 export * from "./routes/route.utils";

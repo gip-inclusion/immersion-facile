@@ -83,6 +83,40 @@ const fetchEstablishmentNameAndAdminEpic: AppEpic<EstablishmentAction> = (
     ),
   );
 
+const fetchEstablishmentPublicOptionsEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(
+      establishmentSlice.actions.fetchEstablishmentPublicOptionsRequested.match,
+    ),
+    switchMap((action) =>
+      establishmentGateway
+        .getEstablishmentPublicOptions$(
+          action.payload.filters,
+          action.payload.jwt,
+        )
+        .pipe(
+          map((establishmentPublicOptions) =>
+            establishmentSlice.actions.fetchEstablishmentPublicOptionsSucceeded(
+              {
+                feedbackTopic: action.payload.feedbackTopic,
+                establishmentPublicOptions,
+              },
+            ),
+          ),
+          catchEpicError((error) =>
+            establishmentSlice.actions.fetchEstablishmentPublicOptionsFailed({
+              feedbackTopic: action.payload.feedbackTopic,
+              errorMessage: error.message,
+            }),
+          ),
+        ),
+    ),
+  );
+
 const createFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
   action$,
   _state$,
@@ -174,6 +208,7 @@ const deleteFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
 export const establishmentEpics = [
   fetchEstablishmentEpic,
   fetchEstablishmentNameAndAdminEpic,
+  fetchEstablishmentPublicOptionsEpic,
   createFormEstablishmentEpic,
   editFormEstablishmentEpic,
   deleteFormEstablishmentEpic,
