@@ -25,7 +25,7 @@ import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/con
 const filters: FlatGetConventionsForAgencyUserParams = {
   sortBy: "dateEnd",
   sortDirection: "asc",
-  assessmentCompletionStatus: ["to-be-completed", "to-sign"],
+  assessmentCompletionStatus: ["to-complete", "to-sign"],
   page: 1,
   perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
 };
@@ -175,10 +175,10 @@ const AssessmentToCompleteTaskItem = ({
 const getAssessmentCompletionStatusFilter = (
   assessment: ConventionAssessmentFields["assessment"],
 ): AssessmentCompletionStatusFilter => {
-  if (!assessment) return "to-be-completed";
+  if (!assessment) return "to-complete";
   if ("signedAt" in assessment)
     return assessment.signedAt !== null || assessment.status === "DID_NOT_SHOW"
-      ? "completed-maybe-signed"
+      ? "finalized"
       : "to-sign";
-  return "completed-maybe-signed";
+  return "finalized";
 };

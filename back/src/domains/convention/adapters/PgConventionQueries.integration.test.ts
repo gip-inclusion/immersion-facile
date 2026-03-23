@@ -1516,7 +1516,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           filters: {
-            assessmentCompletionStatus: ["to-be-completed"],
+            assessmentCompletionStatus: ["to-complete"],
           },
           sort: {
             by: "dateSubmission",
@@ -1543,7 +1543,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           filters: {
-            assessmentCompletionStatus: ["to-be-completed"],
+            assessmentCompletionStatus: ["to-complete"],
           },
           sort: {
             by: "dateSubmission",
@@ -1589,7 +1589,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           filters: {
-            assessmentCompletionStatus: ["completed-maybe-signed", "to-sign"],
+            assessmentCompletionStatus: ["finalized", "to-sign"],
           },
           sort: {
             by: "dateSubmission",
@@ -1619,6 +1619,23 @@ describe("Pg implementation of ConventionQueries", () => {
           },
         },
       ]);
+    });
+
+    it("should not filter conventions by assessment completion statuses if the convention is not accepted by validator", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: {
+            assessmentCompletionStatus: ["to-complete"],
+          },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
+
+      expectToEqual(result.data, []);
     });
 
     it("should sort conventions by dateStart, then conventionId", async () => {

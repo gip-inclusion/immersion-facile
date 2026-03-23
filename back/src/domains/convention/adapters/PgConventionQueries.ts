@@ -530,12 +530,10 @@ const filterByAssessmentCompletionStatus =
     if (!assessmentCompletionStatus || assessmentCompletionStatus.length === 0)
       return builder;
 
-    const hasSignedFilter = assessmentCompletionStatus.includes(
-      "completed-maybe-signed",
-    );
+    const hasSignedFilter = assessmentCompletionStatus.includes("finalized");
     const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
     const hasToBeCompletedFilter =
-      assessmentCompletionStatus.includes("to-be-completed");
+      assessmentCompletionStatus.includes("to-complete");
 
     if (hasSignedFilter && hasToSignFilter && hasToBeCompletedFilter)
       return builder;
