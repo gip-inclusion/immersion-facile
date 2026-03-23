@@ -82,19 +82,20 @@ describe("SendExchangeToRecipient", () => {
     .withUserRights(notifiedEstablishmentRights)
     .build();
 
-  const establishmentAggregateWithOnlyPendingUser = new EstablishmentAggregateBuilder()
-    .withUserRights([
-      {
-        role: "establishment-admin",
-        status: "PENDING",
-        userId: pendingUser.id,
-        shouldReceiveDiscussionNotifications: true,
-        job: "",
-        phone: "",
-        isMainContactByPhone: false,
-      },
-    ])
-    .build();
+  const establishmentAggregateWithOnlyPendingUser =
+    new EstablishmentAggregateBuilder()
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          status: "PENDING",
+          userId: pendingUser.id,
+          shouldReceiveDiscussionNotifications: true,
+          job: "",
+          phone: "",
+          isMainContactByPhone: false,
+        },
+      ])
+      .build();
 
   const discussionWithSiretAndAppellation = new DiscussionBuilder()
     .withSiret(establishmentAggregate.establishment.siret)
@@ -570,7 +571,9 @@ describe("SendExchangeToRecipient", () => {
       const discussion = new DiscussionBuilder(
         discussionWithSiretAndAppellation,
       )
-        .withSiret(establishmentAggregateWithOnlyPendingUser.establishment.siret)
+        .withSiret(
+          establishmentAggregateWithOnlyPendingUser.establishment.siret,
+        )
         .withExchanges([firstBeneficiaryExchange, lastBeneficiaryExchange])
         .build();
       uow.discussionRepository.discussions = [discussion];

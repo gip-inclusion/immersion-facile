@@ -6,8 +6,10 @@ import {
   type DiscussionInList,
   type DiscussionReadDto,
   type EstablishmentNameAndAdmins,
+  type EstablishmentPublicOption,
   type Exchange,
   type FormEstablishmentDto,
+  type GetEstablishmentPublicOptionsByFiltersInput,
   type SiretDto,
   type WithDiscussionStatusRejected,
 } from "shared";
@@ -41,6 +43,20 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
           .map(({ email }) => email),
       }).pipe(delay(this.delay));
     throw new Error(`Establishment with siret ${siret} not found.`);
+  }
+
+  getEstablishmentPublicOptions$(
+    _filters: GetEstablishmentPublicOptionsByFiltersInput,
+    _jwt: ConnectedUserJwt,
+  ): Observable<EstablishmentPublicOption[]> {
+    return of(
+      this.establishments.map((establishment) => ({
+        businessName:
+          establishment.businessNameCustomized || establishment.businessName,
+        siret: establishment.siret,
+        userRightIds: ["1234567890"],
+      })),
+    ).pipe(delay(this.delay));
   }
 
   public addFormEstablishment$(

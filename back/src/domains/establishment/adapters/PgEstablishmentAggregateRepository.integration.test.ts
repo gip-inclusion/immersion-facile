@@ -4397,7 +4397,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       ])
       .build();
 
-    const establishmentWithUserId1 = new EstablishmentAggregateBuilder()
+    const establishmentWithUserId2_1 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret("00000000000002")
       .withLocationId(uuid())
       .withUserRights([
@@ -4413,7 +4413,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       ])
       .build();
 
-    const establishmentWithUserId2 = new EstablishmentAggregateBuilder()
+    const establishmentWithUserId2_2 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret("00000000000003")
       .withLocationId(uuid())
       .withUserRights([
@@ -4429,6 +4429,26 @@ describe("PgEstablishmentAggregateRepository", () => {
       ])
       .build();
 
+    const establishmentFindableByName = new EstablishmentAggregateBuilder()
+      .withEstablishmentName("establishmentFindableByName")
+      .withLocationId(uuid())
+      .withUserRights([osefUserRight])
+      .build();
+
+    const establishmentFindableBySiret = new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("00000000000004")
+      .withLocationId(uuid())
+      .withUserRights([osefUserRight])
+      .build();
+
+    const establishmentFindableByBothSiretAndName =
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("00000000000005")
+        .withEstablishmentName("establishmentFindableBothBySiretAndName")
+        .withLocationId(uuid())
+        .withUserRights([osefUserRight])
+        .build();
+
     beforeEach(async () => {
       await pgUserRepository.save(user1);
       await pgUserRepository.save(user2);
@@ -4436,10 +4456,19 @@ describe("PgEstablishmentAggregateRepository", () => {
         establishmentWithoutEmail,
       );
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-        establishmentWithUserId1,
+        establishmentWithUserId2_1,
       );
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-        establishmentWithUserId2,
+        establishmentWithUserId2_2,
+      );
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentFindableByName,
+      );
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentFindableBySiret,
+      );
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentFindableByBothSiretAndName,
       );
     });
 
@@ -4454,14 +4483,48 @@ describe("PgEstablishmentAggregateRepository", () => {
       );
     });
 
-    it("return an establishmentAggregate if matched email", async () => {
+    it("return an establishmentAggregate if matched userId", async () => {
       expectToEqual(
         await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
           {
             userId: user2.id,
           },
         ),
-        [establishmentWithUserId1, establishmentWithUserId2],
+        [establishmentWithUserId2_1, establishmentWithUserId2_2],
+      );
+    });
+
+    it("return an establishmentAggregate if matched nameIncludes", async () => {
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
+          {
+            nameIncludes: "FindableByName",
+          },
+        ),
+        [establishmentFindableByName],
+      );
+    });
+    it("return an establishmentAggregate if matched sirets", async () => {
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
+          {
+            sirets: [establishmentFindableBySiret.establishment.siret],
+          },
+        ),
+        [establishmentFindableBySiret],
+      );
+    });
+    it("return an establishmentAggregate if matched both nameIncludes and sirets", async () => {
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
+          {
+            nameIncludes: "BothBySiretAndName",
+            sirets: [
+              establishmentFindableByBothSiretAndName.establishment.siret,
+            ],
+          },
+        ),
+        [establishmentFindableByBothSiretAndName],
       );
     });
   });

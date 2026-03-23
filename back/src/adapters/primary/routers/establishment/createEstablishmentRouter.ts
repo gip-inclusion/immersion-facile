@@ -148,5 +148,16 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       ),
   );
 
+  establishmentSharedRouter.getEstablishmentPublicOptionsByFilters(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getEstablishmentPublicOptionsByFilters.execute(
+          req.query,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   return establishmentRouter;
 };

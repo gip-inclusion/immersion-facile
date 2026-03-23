@@ -201,7 +201,6 @@ describe("UpdateDiscussionStatus", () => {
     });
 
     it("throws when user have pending right on establishment", async () => {
-
       await expectPromiseToFailWithError(
         updateDiscussionStatus.execute(
           {

@@ -165,12 +165,12 @@ const updateDiscussion = async ({
         status: "REJECTED",
         ...(params.rejectionKind === "OTHER"
           ? {
-            rejectionKind: params.rejectionKind,
-            rejectionReason: params.rejectionReason,
-          }
+              rejectionKind: params.rejectionKind,
+              rejectionReason: params.rejectionReason,
+            }
           : {
-            rejectionKind: params.rejectionKind,
-          }),
+              rejectionKind: params.rejectionKind,
+            }),
         exchanges: [
           ...discussion.exchanges,
           {

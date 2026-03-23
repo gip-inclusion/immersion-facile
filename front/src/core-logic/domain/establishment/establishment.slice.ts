@@ -3,7 +3,9 @@ import {
   type ConnectedUserJwt,
   defaultMaxContactsPerMonth,
   type EstablishmentNameAndAdmins,
+  type EstablishmentPublicOption,
   type FormEstablishmentDto,
+  type GetEstablishmentPublicOptionsByFiltersInput,
   type SiretDto,
 } from "shared";
 import type {
@@ -23,6 +25,11 @@ export type EstablishmentDeletePayload = {
 
 export type SiretAndJwtPayload = {
   siret: SiretDto;
+  jwt: ConnectedUserJwt;
+};
+
+export type EstablishmentPublicOptionsPayload = {
+  filters: GetEstablishmentPublicOptionsByFiltersInput;
   jwt: ConnectedUserJwt;
 };
 
@@ -58,12 +65,14 @@ export type EstablishmentState = {
     | EstablishmentNameAndAdmins
     | null
     | "establishmentNotFound";
+  establishmentPublicOptions: EstablishmentPublicOption[];
 };
 
 const initialState: EstablishmentState = {
   isLoading: false,
   formEstablishment: defaultFormEstablishmentValue(),
   establishmentNameAndAdmins: null,
+  establishmentPublicOptions: [],
 };
 
 export const establishmentSlice = createSlice({
@@ -185,7 +194,28 @@ export const establishmentSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
-
+    fetchEstablishmentPublicOptionsRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<EstablishmentPublicOptionsPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    fetchEstablishmentPublicOptionsSucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        establishmentPublicOptions: EstablishmentPublicOption[];
+      }>,
+    ) => {
+      state.establishmentPublicOptions =
+        action.payload.establishmentPublicOptions;
+      state.isLoading = false;
+    },
+    fetchEstablishmentPublicOptionsFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
     clearEstablishmentRequested: () => initialState,
   },
 });

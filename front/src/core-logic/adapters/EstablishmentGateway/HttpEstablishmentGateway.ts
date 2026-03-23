@@ -6,10 +6,12 @@ import {
   type DiscussionInList,
   type DiscussionReadDto,
   type EstablishmentNameAndAdmins,
+  type EstablishmentPublicOption,
   type EstablishmentRoutes,
   type ExchangeRead,
   errors,
   type FormEstablishmentDto,
+  type GetEstablishmentPublicOptionsByFiltersInput,
   type SendMessageToDiscussionFromDashboardRequestPayload,
   type SiretDto,
   type UpdateDiscussionStatusParams,
@@ -123,6 +125,25 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             .with({ status: 404 }, () => {
               throw errors.establishment.notFound({ siret });
             })
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getEstablishmentPublicOptions$(
+    filters: GetEstablishmentPublicOptionsByFiltersInput,
+    jwt: ConnectedUserJwt,
+  ): Observable<EstablishmentPublicOption[]> {
+    return from(
+      this.httpClient
+        .getEstablishmentPublicOptionsByFilters({
+          queryParams: filters,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

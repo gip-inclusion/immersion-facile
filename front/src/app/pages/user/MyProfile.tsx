@@ -48,7 +48,6 @@ export const MyProfile = (_: MyProfileProps) => {
   return (
     <UserProfile
       title={userDisplayed}
-      currentUser={currentUser}
       userWithRights={currentUser}
       editInformationsLink={linkToUpdateAccountInfo}
     />

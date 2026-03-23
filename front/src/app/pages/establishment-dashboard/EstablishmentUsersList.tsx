@@ -2,28 +2,17 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import Input from "@codegouvfr/react-dsfr/Input";
-import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { uniqBy } from "ramda";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useState } from "react";
 import { NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
-import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import {
-  domElementIds,
-  establishmentsRoles,
-  type FormEstablishmentUserRight,
-  formEstablishmentUserRightSchema,
-  localization,
-} from "shared";
+import { domElementIds, type FormEstablishmentUserRight } from "shared";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUsersEditForm";
 import { routes } from "src/app/routes/routes";
 import { createFormModal, useFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -128,8 +117,9 @@ export const EstablishmentUsersList = () => {
               : "Ajouter un utilisateur"
           }
         >
-          <EstablishmentUsersEditForm
+          <EstablishmentUserForm
             alreadyExistingUserRight={editingUserRight}
+            establishmentUsersEditModal={establishmentUsersEditModal}
           />
         </establishmentUsersEditModal.Component>,
         document.body,
@@ -213,151 +203,6 @@ const EstablishmentUsersDeleteContent = ({
         </p>
       )}
     </form>
-  );
-};
-
-const EstablishmentUsersEditForm = ({
-  alreadyExistingUserRight,
-}: {
-  alreadyExistingUserRight: FormEstablishmentUserRight | null;
-}) => {
-  const formEstablishment = useAppSelector(
-    establishmentSelectors.formEstablishment,
-  );
-  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const dispatch = useDispatch();
-  const emptyValues = useRef({
-    email: "",
-    phone: "",
-    job: "",
-    role: undefined,
-    shouldReceiveDiscussionNotifications: false,
-    isMainContactByPhone: false,
-  });
-
-  const defaultValues = { ...emptyValues.current, ...alreadyExistingUserRight };
-
-  const methods = useForm<FormEstablishmentUserRight>({
-    resolver: zodResolver(formEstablishmentUserRightSchema),
-    defaultValues,
-  });
-
-  const {
-    register,
-    setValue,
-    watch,
-    reset,
-    formState: { errors },
-    handleSubmit,
-  } = methods;
-
-  const { formId } = useFormModal();
-
-  const mergeUserRights = (
-    userRights: FormEstablishmentUserRight[],
-    userRightToMerge: FormEstablishmentUserRight,
-  ) => {
-    const userRightsWithoutPreviousOne = userRights.filter(
-      (userRight) => userRight.email !== userRightToMerge.email,
-    );
-
-    return uniqBy(
-      (userRight) => userRight.email,
-      [userRightToMerge, ...userRightsWithoutPreviousOne],
-    );
-  };
-
-  const onSubmit = (data: FormEstablishmentUserRight) => {
-    const updatedFormEstablishment = {
-      ...formEstablishment,
-      userRights: mergeUserRights(formEstablishment.userRights, data),
-    };
-    dispatch(
-      establishmentSlice.actions.updateEstablishmentRequested({
-        establishmentUpdate: {
-          formEstablishment: updatedFormEstablishment,
-          jwt: connectedUserJwt ?? "",
-        },
-        feedbackTopic: "establishment-dashboard-users-rights",
-      }),
-    );
-    establishmentUsersEditModal.close();
-  };
-
-  useEffect(() => {
-    reset(defaultValues);
-  }, [alreadyExistingUserRight, reset]);
-
-  const values = watch();
-  return (
-    <>
-      {values.email && (
-        <p>
-          Pour modifier le nom, prénom ou l'email, l'utilisateur doit passer par
-          son compte ProConnect créé avec l'email :{" "}
-          <strong>{values.email}</strong>
-        </p>
-      )}
-      <form
-        id={formId}
-        onSubmit={(event) => {
-          event.stopPropagation();
-          handleSubmit(onSubmit)(event);
-        }}
-      >
-        {!alreadyExistingUserRight?.email && (
-          <Input
-            label="Email"
-            nativeInputProps={{
-              ...register("email"),
-            }}
-          />
-        )}
-        <Input
-          label="Téléphone *"
-          nativeInputProps={{
-            ...register("phone"),
-          }}
-          {...(errors.phone && {
-            state: "error",
-            stateRelatedMessage: localization.required,
-          })}
-        />
-        <Input
-          label="Fonction *"
-          nativeInputProps={{
-            ...register("job"),
-          }}
-          {...(errors.job && {
-            state: "error",
-            stateRelatedMessage: localization.required,
-          })}
-        />
-        <RadioButtons
-          legend="Rôle"
-          options={establishmentsRoles.map((role) => ({
-            label: userRolesToDisplay[role].label,
-            hintText: userRolesToDisplay[role].description,
-            nativeInputProps: {
-              checked: values.role === role,
-              value: role,
-              onChange: () => {
-                setValue("role", role);
-              },
-            },
-          }))}
-        />
-
-        <ToggleSwitch
-          label="Recevoir les notifications pour toutes les candidatures de cet établissement"
-          inputTitle="Recevoir les notifications pour toutes les candidatures de cet établissement"
-          onChange={(checked) => {
-            setValue("shouldReceiveDiscussionNotifications", checked);
-          }}
-          checked={values.shouldReceiveDiscussionNotifications}
-        />
-      </form>
-    </>
   );
 };
 

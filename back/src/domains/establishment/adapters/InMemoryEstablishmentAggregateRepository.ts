@@ -62,12 +62,25 @@ export class InMemoryEstablishmentAggregateRepository
 
   public async getEstablishmentAggregatesByFilters({
     userId,
+    nameIncludes,
+    sirets,
   }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]> {
-    return this.#establishmentAggregates.filter((establishmentAggregate) =>
-      establishmentAggregate.userRights.some(
-        (userRight) => userRight.userId === userId,
-      ),
-    );
+    return this.#establishmentAggregates.filter((establishmentAggregate) => {
+      if (userId)
+        return establishmentAggregate.userRights.some(
+          (userRight) => userRight.userId === userId,
+        );
+
+      const matchesName = nameIncludes
+        ? establishmentAggregate.establishment.name.includes(nameIncludes)
+        : true;
+
+      const matchesSiret = sirets
+        ? sirets.includes(establishmentAggregate.establishment.siret)
+        : true;
+
+      return matchesName && matchesSiret;
+    });
   }
 
   public async getOffersAsAppellationAndRomeDtosBySiret(

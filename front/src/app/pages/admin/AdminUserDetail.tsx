@@ -47,11 +47,5 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
       ? `${user.firstName} ${user.lastName}`
       : user.email;
 
-  return (
-    <UserProfile
-      title={title}
-      currentUser={currentUser}
-      userWithRights={user}
-    />
-  );
+  return <UserProfile title={title} userWithRights={user} />;
 };

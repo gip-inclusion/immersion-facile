@@ -4,7 +4,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Table from "@codegouvfr/react-dsfr/Table";
 import { values } from "ramda";
 import { Fragment, useMemo, useState } from "react";
-import { HeadingSection, NotificationIndicator } from "react-design-system";
+import { NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -27,7 +27,6 @@ import { AgencyLineAdminEmails } from "./agency-line/AgencyLineAdminEmails";
 
 type AgencyRightsTableProps = {
   agencyRights: AgencyRight[];
-  title: string;
   user: User;
   isBackofficeAdmin?: boolean;
   onUserRegistrationCancelledRequested?: (agencyRight: AgencyRight) => void;
@@ -42,7 +41,6 @@ type AgencyRightsTableProps = {
 export const AgencyRightsTable = ({
   agencyRights,
   user,
-  title,
   isBackofficeAdmin,
   modalId,
   onUserUpdateRequested,
@@ -84,7 +82,7 @@ export const AgencyRightsTable = ({
   };
 
   return (
-    <HeadingSection title={title} titleAs="h4">
+    <>
       <Table
         headers={[
           "Organisme",
@@ -146,7 +144,7 @@ export const AgencyRightsTable = ({
           </userModal.Component>,
           document.body,
         )}
-    </HeadingSection>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import {
   type ConnectedUserJwt,
+  type EstablishmentPublicOption,
   errors,
   expectObjectsToMatch,
   expectToEqual,
@@ -94,6 +95,7 @@ describe("Establishment", () => {
         isLoading: true,
         formEstablishment,
         establishmentNameAndAdmins: null,
+        establishmentPublicOptions: [],
       };
       ({ store, dependencies } = createTestStore({
         establishment: initialEstablishmentState,
@@ -443,6 +445,67 @@ describe("Establishment", () => {
       expectEstablishmentStateToMatch({
         isLoading: false,
         establishmentNameAndAdmins: null,
+      });
+    });
+  });
+
+  describe("establishment public options", () => {
+    it("successfully fetched establishment public options from gateway", () => {
+      expectStoreToMatchInitialState();
+
+      store.dispatch(
+        establishmentSlice.actions.fetchEstablishmentPublicOptionsRequested({
+          feedbackTopic: "my-profile-establishment-registration",
+          filters: {},
+          jwt: "any-connected-user-jwt",
+        }),
+      );
+      expect(establishmentSelectors.isLoading(store.getState())).toBe(true);
+      const establishmentPublicOption: EstablishmentPublicOption = {
+        businessName: "L'omelette de la mère Poulard",
+        siret: "10000000000000",
+        userRightIds: [],
+      };
+
+      dependencies.establishmentGateway.establishmentPublicOptions$.next([
+        establishmentPublicOption,
+      ]);
+
+      expectToEqual(
+        establishmentSelectors.establishmentPublicOptions(store.getState()),
+        [establishmentPublicOption],
+      );
+      expect(establishmentSelectors.isLoading(store.getState())).toBe(false);
+    });
+
+    it("failed to fetched establishment public options from gateway", () => {
+      expectStoreToMatchInitialState();
+
+      store.dispatch(
+        establishmentSlice.actions.fetchEstablishmentPublicOptionsRequested({
+          feedbackTopic: "my-profile-establishment-registration",
+          filters: {},
+          jwt: "any-connected-user-jwt",
+        }),
+      );
+      expect(establishmentSelectors.isLoading(store.getState())).toBe(true);
+
+      const expectedError = new Error(
+        "Error fetching establishment public options",
+      );
+      dependencies.establishmentGateway.establishmentPublicOptions$.error(
+        expectedError,
+      );
+
+      expect(establishmentSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "my-profile-establishment-registration": {
+          on: "fetch",
+          level: "error",
+          message: expectedError.message,
+          title: "Problème lors de la récupération des entreprises",
+        },
       });
     });
   });

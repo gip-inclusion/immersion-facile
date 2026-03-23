@@ -7,8 +7,10 @@ import type {
   DiscussionInList,
   DiscussionReadDto,
   EstablishmentNameAndAdmins,
+  EstablishmentPublicOption,
   ExchangeRead,
   FormEstablishmentDto,
+  GetEstablishmentPublicOptionsByFiltersInput,
   SendMessageToDiscussionFromDashboardRequestPayload,
   SiretDto,
   WithDiscussionStatus,
@@ -42,6 +44,10 @@ export interface EstablishmentGateway {
   getDiscussionById$(
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
+  getEstablishmentPublicOptions$(
+    filters: GetEstablishmentPublicOptionsByFiltersInput,
+    jwt: ConnectedUserJwt,
+  ): Observable<EstablishmentPublicOption[]>;
   sendMessage$(
     payload: SendMessageToDiscussionFromDashboardRequestPayload,
   ): Observable<ExchangeRead | DiscussionExchangeForbiddenParams>;
