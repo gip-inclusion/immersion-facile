@@ -56,7 +56,9 @@ select
     conventions.establishment_postcode,
     conventions.beneficiary_birthdate,
     conventions.beneficiary_level_of_education,
-    conventions.beneficiary_school_name
+    conventions.beneficiary_school_name,
+    conventions.beneficiary_is_rqth,
+    estab.fit_for_disabled_workers as establishment_fit_for_disabled_workers
 from {{ ref('conventions') }}
 inner join {{ source('immersion', 'actors') }} as b
     on conventions.beneficiary_id = b.id
