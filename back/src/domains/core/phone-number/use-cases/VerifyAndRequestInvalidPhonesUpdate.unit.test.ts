@@ -190,6 +190,29 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
     });
   });
 
+  it("Does not verify a phone that is in PENDING_VERIFICATION status", async () => {
+    const pendingVerificationPhone: Phone = {
+      id: 1,
+      phoneNumber: fixablePhoneNumber,
+      verifiedAt: subDays(now, 10),
+      verificationStatus: "PENDING_VERIFICATION",
+    };
+
+    uow.phoneRepository.phones = [pendingVerificationPhone];
+
+    const report = await verifyAndRequestInvalidPhonesUpdate.execute({
+      dateToVerifyBefore: now,
+    });
+
+    expectToEqual(uow.phoneRepository.phones, [pendingVerificationPhone]);
+    expectArraysToMatch(uow.outboxRepository.events, []);
+    expectToEqual(report, {
+      nbOfCorrectPhones: 0,
+      nbOfFixedPhones: 0,
+      nbOfPhonesSetToDefault: 0,
+    });
+  });
+
   it("Returns empty report and does not affect data when there are no phone numbers in DB", async () => {
     const report = await verifyAndRequestInvalidPhonesUpdate.execute({
       dateToVerifyBefore: now,
