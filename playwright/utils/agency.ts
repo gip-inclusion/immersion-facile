@@ -26,7 +26,7 @@ export const fillAndSubmitBasicAgencyForm = async (
     .fill(override?.siret ?? "751 984 972 00016");
 
   await expect(
-    await page.locator(
+    page.locator(
       `#${domElementIds.addAgency.addressAutocomplete}-wrapper .im-select__single-value`,
     ),
   ).toContainText(override?.rawAddress ?? "55 Rue Boissonade 75014 Paris");
@@ -47,7 +47,7 @@ export const fillAndSubmitBasicAgencyForm = async (
   });
 
   await expect(
-    await page.locator(`#${domElementIds.addAgency.nameInput}`),
+    page.locator(`#${domElementIds.addAgency.nameInput}`),
   ).toHaveValue(override?.customizedName ?? "Cap emploi de Bayonne");
 
   await page
@@ -89,9 +89,7 @@ export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
     .fill(agencyId);
 
   await expectLocatorToBeVisibleAndEnabled(
-    await page.locator(
-      `#${domElementIds.admin.agencyTab.agencyToReviewButton}`,
-    ),
+    page.locator(`#${domElementIds.admin.agencyTab.agencyToReviewButton}`),
   );
 
   await page
