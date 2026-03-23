@@ -125,7 +125,7 @@ describe("ConnectedUserConventionsToManage", () => {
         connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
           {
             params: {
-              assessmentCompletionStatus: ["to-be-completed", "to-sign"],
+              assessmentCompletionStatus: ["to-complete", "to-sign"],
             },
             jwt: "my-jwt",
             feedbackTopic: "conventions-with-assessment-issue",

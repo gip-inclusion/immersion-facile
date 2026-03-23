@@ -420,7 +420,7 @@ describe("authenticatedConventionRoutes", () => {
       const response = await httpClient.getConventionsForAgencyUser({
         headers: { authorization: jwt },
         queryParams: {
-          assessmentCompletionStatus: ["completed-maybe-signed"],
+          assessmentCompletionStatus: ["finalized"],
           sortBy: "dateStart",
           page: 1,
           perPage: 10,
@@ -466,7 +466,7 @@ describe("authenticatedConventionRoutes", () => {
         {
           agencyUserId: validator.id,
           filters: {
-            assessmentCompletionStatus: ["completed-maybe-signed"],
+            assessmentCompletionStatus: ["finalized"],
           },
           pagination: {
             page: 1,
@@ -491,7 +491,7 @@ describe("authenticatedConventionRoutes", () => {
       const response = await httpClient.getConventionsForAgencyUser({
         headers: { authorization: jwt },
         queryParams: {
-          assessmentCompletionStatus: ["to-be-completed"],
+          assessmentCompletionStatus: ["to-complete"],
           sortBy: "dateStart",
           page: 1,
           perPage: 10,
@@ -515,7 +515,7 @@ describe("authenticatedConventionRoutes", () => {
         {
           agencyUserId: validator.id,
           filters: {
-            assessmentCompletionStatus: ["to-be-completed"],
+            assessmentCompletionStatus: ["to-complete"],
           },
           pagination: {
             page: 1,

@@ -116,17 +116,16 @@ export const ConventionList = () => {
   const assessmentOptions: RadioButtonsProps["options"] = useMemo(
     () => [
       {
-        label: makeAssessmentTextsByStatus({ isPlural: true })[
-          "to-be-completed"
-        ].longLabel,
+        label: makeAssessmentTextsByStatus({ isPlural: true })["to-complete"]
+          .longLabel,
         nativeInputProps: {
-          value: "to-be-completed",
+          value: "to-complete",
           checked:
-            tempFilters.assessmentCompletionStatus?.includes("to-be-completed"),
+            tempFilters.assessmentCompletionStatus?.includes("to-complete"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus: ["to-be-completed"],
+              assessmentCompletionStatus: ["to-complete"],
             }));
           },
         },
@@ -146,21 +145,18 @@ export const ConventionList = () => {
         },
       },
       {
-        label: makeAssessmentTextsByStatus({ isPlural: true })[
-          "completed-maybe-signed"
-        ].longLabel,
-        hintText: makeAssessmentTextsByStatus({ isPlural: true })[
-          "completed-maybe-signed"
-        ].description,
+        label: makeAssessmentTextsByStatus({ isPlural: true }).finalized
+          .longLabel,
+        hintText: makeAssessmentTextsByStatus({ isPlural: true }).finalized
+          .description,
         nativeInputProps: {
-          value: "completed-maybe-signed",
-          checked: tempFilters.assessmentCompletionStatus?.includes(
-            "completed-maybe-signed",
-          ),
+          value: "finalized",
+          checked:
+            tempFilters.assessmentCompletionStatus?.includes("finalized"),
           onChange: () => {
             setTempFilters((prev) => ({
               ...prev,
-              assessmentCompletionStatus: ["completed-maybe-signed"],
+              assessmentCompletionStatus: ["finalized"],
             }));
           },
         },
@@ -472,10 +468,10 @@ export const ConventionList = () => {
                       (() => {
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
-                            "completed-maybe-signed",
+                            "finalized",
                           )
                         ) {
-                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["completed-maybe-signed"].longLabel}`;
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true }).finalized.longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
@@ -486,10 +482,10 @@ export const ConventionList = () => {
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
-                            "to-be-completed",
+                            "to-complete",
                           )
                         ) {
-                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-be-completed"].longLabel}`;
+                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-complete"].longLabel}`;
                         }
                         return "Tous les bilans";
                       })(),

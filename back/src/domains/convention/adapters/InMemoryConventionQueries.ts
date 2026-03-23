@@ -481,12 +481,11 @@ const makeApplyAssessmentCompletionStatusFilterConventionsRead =
       return true;
     if (convention.status !== "ACCEPTED_BY_VALIDATOR") return false;
 
-    const hasCompletedMaybeSignedFilter = assessmentCompletionStatus.includes(
-      "completed-maybe-signed",
-    );
+    const hasCompletedMaybeSignedFilter =
+      assessmentCompletionStatus.includes("finalized");
     const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
     const hasToBeCompletedFilter =
-      assessmentCompletionStatus.includes("to-be-completed");
+      assessmentCompletionStatus.includes("to-complete");
 
     const hasAssessment =
       convention.assessment !== null &&

@@ -8,7 +8,7 @@ export const makeAssessmentTextsByStatus = ({
   AssessmentCompletionStatusFilter,
   { shortLabel: string; longLabel: string; description?: string }
 > => ({
-  "completed-maybe-signed": {
+  finalized: {
     shortLabel: isPlural ? "Bilans signés" : "Bilan signé",
     longLabel: isPlural
       ? "Bilans complétés et signés"
@@ -24,7 +24,7 @@ export const makeAssessmentTextsByStatus = ({
     description:
       "Le bilan n'a pas encore été signé par la personne en immersion.",
   },
-  "to-be-completed": {
+  "to-complete": {
     shortLabel: isPlural ? "Bilans à compléter" : "Bilan à compléter",
     longLabel: isPlural
       ? "Bilans à compléter par le tuteur"

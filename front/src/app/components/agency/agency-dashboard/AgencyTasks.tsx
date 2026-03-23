@@ -90,7 +90,7 @@ export const AgencyTasks = ({
             params: {
               sortBy: "dateEnd",
               sortDirection: "asc",
-              assessmentCompletionStatus: ["to-be-completed", "to-sign"],
+              assessmentCompletionStatus: ["to-complete", "to-sign"],
               dateEndTo: threeDaysAgo,
               page: 1,
               perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
