@@ -341,3 +341,7 @@ models:
         description: Beneficiary's education level from extra_fields JSON
       - name: beneficiary_school_name
         description: Beneficiary's school name from extra_fields JSON
+      - name: beneficiary_is_rqth
+        description: Beneficiary's disability status (RQTH) from extra_fields JSON
+      - name: establishment_fit_for_disabled_workers
+        description: Whether the establishment is accessible for disabled workers
