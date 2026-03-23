@@ -206,10 +206,10 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
             kind: "AGENCY_WAS_REJECTED",
             recipients: [
               user1.email,
+              user10.email,
               user4.email,
               user6.email,
               user8.email,
-              user10.email,
             ],
             params: {
               agencyName: agencyWithRefersTo.name,

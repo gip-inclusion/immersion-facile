@@ -109,8 +109,8 @@ describe("Send email when agency of type other added ", () => {
         {
           kind: "AGENCY_OF_TYPE_OTHER_ADDED",
           recipients: [
-            validator.email,
             counsellorAndValidator.email,
+            validator.email,
             counsellor.email,
           ],
           params: {

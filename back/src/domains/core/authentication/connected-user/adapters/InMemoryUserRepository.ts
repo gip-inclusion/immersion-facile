@@ -36,25 +36,46 @@ export class InMemoryUserRepository implements UserRepository {
     if (missingUserIds.length > 0)
       throw errors.users.notFound({ userIds: missingUserIds });
 
-    return users;
+    return users.sort((a, b) => a.email.localeCompare(b.email));
   }
 
   public async save(user: UserWithAdminRights): Promise<void> {
-    this.#usersById[user.id] = user;
+    const existingUser = this.#usersById[user.id];
+    if (!existingUser) {
+      this.#usersById[user.id] = user;
+      return usersIntegrityCheck(values(this.#usersById), user);
+    }
     if (
-      values(this.#usersById).filter(({ email }) => email === user.email)
-        .length > 1
-    )
-      throw errors.user.conflictByEmail({ userEmail: user.email });
+      existingUser.firstName === user.firstName &&
+      existingUser.lastName === user.lastName &&
+      existingUser.email === user.email &&
+      existingUser.proConnect?.externalId === user.proConnect?.externalId &&
+      existingUser.proConnect?.siret === user.proConnect?.siret
+    ) {
+      if (user.lastLoginAt) {
+        this.#usersById[user.id] = {
+          ...existingUser,
+          lastLoginAt: user.lastLoginAt,
+        };
+      }
+      return usersIntegrityCheck(values(this.#usersById), user);
+    }
 
-    const externalId = user.proConnect?.externalId;
-    if (
-      externalId &&
-      values(this.#usersById).filter(
-        ({ proConnect }) => proConnect?.externalId === externalId,
-      ).length > 1
-    )
-      throw errors.user.conflictByExternalId({ externalId });
+    this.#usersById[user.id] = {
+      ...existingUser,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      proConnect: user.proConnect
+        ? {
+            externalId: user.proConnect?.externalId,
+            siret: user.proConnect?.siret,
+          }
+        : null,
+      lastLoginAt: user.lastLoginAt,
+    };
+
+    return usersIntegrityCheck(values(this.#usersById), user);
   }
 
   public async delete(id: UserId): Promise<void> {
@@ -100,10 +121,31 @@ export class InMemoryUserRepository implements UserRepository {
         ...u,
         numberOfAgencies: 404, // no need to implement this
         numberOfEstablishments: 404, // no need to implement this
-      }));
+      }))
+      .sort((a, b) => a.email.localeCompare(b.email));
   }
 
   public async updateEmail(userId: UserId, email: string): Promise<void> {
     this.#usersById[userId].email = email;
   }
+
+  async getAllUsers(): Promise<UserWithAdminRights[]> {
+    return values(this.#usersById);
+  }
+}
+
+function usersIntegrityCheck(
+  users: UserWithAdminRights[],
+  userInserted: UserWithAdminRights,
+) {
+  if (users.filter(({ email }) => email === userInserted.email).length > 1)
+    throw errors.user.conflictByEmail({ userEmail: userInserted.email });
+
+  const externalId = userInserted.proConnect?.externalId;
+  if (
+    externalId &&
+    users.filter(({ proConnect }) => proConnect?.externalId === externalId)
+      .length > 1
+  )
+    throw errors.user.conflictByExternalId({ externalId });
 }

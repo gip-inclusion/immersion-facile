@@ -49,11 +49,11 @@ describe("SuggestEditEstablishment", () => {
   it("Sends an email to each establishment admin with specific jwt", async () => {
     const admin1 = new UserBuilder()
       .withId(uuid())
-      .withEmail("jerome@gmail.com")
+      .withEmail("a.admin@gmail.com")
       .build();
     const admin2 = new UserBuilder()
       .withId(uuid())
-      .withEmail("billy@gmail.com")
+      .withEmail("b.admin@gmail.com")
       .build();
     const contact = new UserBuilder()
       .withId(uuid())

@@ -71,11 +71,10 @@ export const makeDeleteUser = useCaseBuilder("DeleteUser")
     },
   );
 
-const getMostActiveUserId = async (users: User[]): Promise<UserId> => {
-  return users.sort((a, b) =>
-    Number(a.lastLoginAt) > Number(b.lastLoginAt) ? -1 : 1,
+const getMostActiveUserId = (users: User[]): UserId =>
+  users.sort((a, b) =>
+    Number(a.lastLoginAt) < Number(b.lastLoginAt) ? 1 : -1,
   )[0].id;
-};
 
 const updateEstablishment = async ({
   establishment,
@@ -96,7 +95,7 @@ const updateEstablishment = async ({
 
   const userIdToSetAdmin =
     isNotEmptyArray(remainingRights) && isNoMoreEstablishmentAdmins
-      ? await getMostActiveUserId(
+      ? getMostActiveUserId(
           await uow.userRepository.getByIds(
             remainingRights.map(({ userId }) => userId),
           ),
