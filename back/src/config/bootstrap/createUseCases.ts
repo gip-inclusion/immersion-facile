@@ -152,6 +152,7 @@ import { makeSendExchangeToRecipient } from "../../domains/establishment/use-cas
 import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
 import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import { makeGetEstablishmentNameAndAdmins } from "../../domains/establishment/use-cases/GetEstablishmentNameAndAdmins";
+import { makeGetEstablishmentPublicOptionsByFilters } from "../../domains/establishment/use-cases/GetEstablishmentPublicOptionsByFilters";
 import { makeGetExternalOffers } from "../../domains/establishment/use-cases/GetExternalOffers";
 import { makeGetExternalSearchResult } from "../../domains/establishment/use-cases/GetExternalSearchResult";
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
@@ -623,6 +624,11 @@ export const createUseCases = ({
       },
       uowPerformer,
     }),
+
+    getEstablishmentPublicOptionsByFilters:
+      makeGetEstablishmentPublicOptionsByFilters({
+        uowPerformer,
+      }),
 
     getDiscussionByIdForEstablishment: makeGetDiscussionByIdForEstablishment({
       uowPerformer,

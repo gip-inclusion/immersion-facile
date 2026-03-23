@@ -18,8 +18,14 @@ const establishmentNameAndAdmins = createSelector(
   (establishment) => establishment.establishmentNameAndAdmins,
 );
 
+const establishmentPublicOptions = createSelector(
+  establishmentState,
+  (establishment) => establishment.establishmentPublicOptions,
+);
+
 export const establishmentSelectors = {
   formEstablishment,
   isLoading,
   establishmentNameAndAdmins,
+  establishmentPublicOptions,
 };

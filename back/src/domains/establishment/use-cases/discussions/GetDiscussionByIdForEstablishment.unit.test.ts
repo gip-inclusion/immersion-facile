@@ -24,9 +24,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
   const establishmentContact = new ConnectedUserBuilder()
     .withId(uuid())
     .buildUser();
-  const pendingUser = new ConnectedUserBuilder()
-    .withId(uuid())
-    .buildUser();
+  const pendingUser = new ConnectedUserBuilder().withId(uuid()).buildUser();
   const discussion = new DiscussionBuilder().withId(uuid()).build();
 
   let getDiscussionByIdForEstablishment: GetDiscussionByIdForEstablishment;
@@ -37,7 +35,11 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
     getDiscussionByIdForEstablishment = makeGetDiscussionByIdForEstablishment({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
-    uow.userRepository.users = [establishmentAdmin, establishmentContact, pendingUser];
+    uow.userRepository.users = [
+      establishmentAdmin,
+      establishmentContact,
+      pendingUser,
+    ];
     uow.discussionRepository.discussions = [discussion];
     uow.establishmentAggregateRepository.establishmentAggregates = [
       new EstablishmentAggregateBuilder()

@@ -5,8 +5,10 @@ import type {
   DiscussionInList,
   DiscussionReadDto,
   EstablishmentNameAndAdmins,
+  EstablishmentPublicOption,
   ExchangeRead,
   FormEstablishmentDto,
+  GetEstablishmentPublicOptionsByFiltersInput,
   SiretDto,
   WithDiscussionStatusRejected,
 } from "shared";
@@ -27,6 +29,10 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
   public formEstablishment$ = new Subject<FormEstablishmentDto>();
 
   public establishmentAdmins$ = new Subject<EstablishmentNameAndAdmins>();
+
+  public establishmentPublicOptions$ = new Subject<
+    EstablishmentPublicOption[]
+  >();
 
   public discussions$ = new Subject<DataWithPagination<DiscussionInList>>();
 
@@ -61,6 +67,13 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
     _jwt: ConnectedUserJwt,
   ): Observable<EstablishmentNameAndAdmins> {
     return this.establishmentAdmins$;
+  }
+
+  public getEstablishmentPublicOptions$(
+    _filters: GetEstablishmentPublicOptionsByFiltersInput,
+    _jwt: ConnectedUserJwt,
+  ): Observable<EstablishmentPublicOption[]> {
+    return this.establishmentPublicOptions$;
   }
 
   public updateFormEstablishment$(

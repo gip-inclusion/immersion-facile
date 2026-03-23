@@ -83,7 +83,8 @@ const getEstablishmentContactUsers = async (
   establishment: EstablishmentAggregate,
 ): Promise<UserWithAdminRights[]> => {
   const contactUserRights = establishment.userRights.filter(
-    (user) => user.role === "establishment-contact" && user.status === "ACCEPTED",
+    (user) =>
+      user.role === "establishment-contact" && user.status === "ACCEPTED",
   );
 
   return uow.userRepository.getByIds(

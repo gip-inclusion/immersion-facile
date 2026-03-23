@@ -15,12 +15,6 @@ export const EstablishmentsRightsTable = ({
   isBackofficeAdmin?: boolean;
 }) => (
   <>
-    <h2 className={fr.cx("fr-h4")}>
-      {withEstablishmentData.length === 1
-        ? "Établissement rattaché au profil pour accueillir des candidats (1 établissement)"
-        : `Établissements rattachés au profil pour accueillir des candidats (${withEstablishmentData.length} établissements)`}
-    </h2>
-
     <Table
       fixed={true}
       headers={["Établissement", "Administrateurs", "Rôle"]}

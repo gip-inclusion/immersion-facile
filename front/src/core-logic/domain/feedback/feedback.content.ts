@@ -83,6 +83,7 @@ const topics = [
   "establishments-batch",
   "form-establishment",
   "form-establishment-offer-modal",
+  "my-profile-establishment-registration",
   "login-by-email",
   "magic-link-interstitial",
   "renew-expired-jwt-convention",
@@ -329,6 +330,14 @@ export const feedbacks: Record<
         "Problème lors de l'annulation de la demande d’accès de l'utilisateur à cette agence",
       message:
         "Une erreur est survenue lors de l'annulation de la demande d'accès de l'utilisateur.",
+    },
+  },
+  "my-profile-establishment-registration": {
+    "fetch.error": {
+      action: establishmentSlice.actions.fetchEstablishmentPublicOptionsFailed,
+      title: "Problème lors de la récupération des entreprises",
+      message:
+        "Une erreur est survenue lors de la récupération des entreprises",
     },
   },
   "agency-user-for-dashboard": {
