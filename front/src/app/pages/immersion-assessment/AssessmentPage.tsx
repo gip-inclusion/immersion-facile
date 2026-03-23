@@ -82,12 +82,10 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
 
   if (fetchConventionError)
     return (
-      <MainWrapper layout="default" vSpacing={0}>
-        <ShowConventionErrorOrRenewExpiredJwt
-          errorMessage={conventionFormFeedback?.message}
-          jwt={route.params.jwt}
-        />
-      </MainWrapper>
+      <ShowConventionErrorOrRenewExpiredJwt
+        errorMessage={conventionFormFeedback?.message}
+        jwt={route.params.jwt}
+      />
     );
 
   if (isAssessmentSuccessfullySubmitted && !isFetchingSiret)

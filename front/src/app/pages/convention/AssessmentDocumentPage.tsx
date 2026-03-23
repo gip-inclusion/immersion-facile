@@ -109,12 +109,10 @@ export const AssessmentDocumentPage = ({
 
   if (fetchConventionError)
     return (
-      <MainWrapper layout="default">
-        <ShowConventionErrorOrRenewExpiredJwt
-          errorMessage={conventionFormFeedback.message}
-          jwt={jwt}
-        />
-      </MainWrapper>
+      <ShowConventionErrorOrRenewExpiredJwt
+        errorMessage={conventionFormFeedback.message}
+        jwt={jwt}
+      />
     );
 
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;

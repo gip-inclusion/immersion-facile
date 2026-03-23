@@ -1,11 +1,5 @@
-import {
-  authExpiredMessage,
-  type ConventionSupportedJwt,
-  expiredJwtErrorMessage,
-  expiredJwtErrorTitle,
-} from "shared";
-import { ErrorPageContent } from "src/app/pages/error/ErrorPageContent";
-import { ContactUsButton } from "src/app/pages/error/front-errors";
+import { type ConventionSupportedJwt, expiredJwtErrorMessage } from "shared";
+import { frontErrors } from "src/app/pages/error/front-errors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { RenewExpiredJwtButton } from "../../components/auth/RenewExpiredJwtButton";
 
@@ -23,20 +17,14 @@ export const ShowConventionErrorOrRenewExpiredJwt = ({
     );
 
   const feedbackTopic: FeedbackTopic = "renew-expired-jwt-convention";
-  const description = authExpiredMessage();
-  return (
-    <ErrorPageContent
-      title={expiredJwtErrorTitle}
-      description={description}
-      buttons={[
-        RenewExpiredJwtButton({
-          feedbackTopic: feedbackTopic,
-          expiredJwt: jwt,
-          originalUrl: window.location.href,
-        }),
-        ContactUsButton({ errorMessage: description }),
-      ]}
-      feedbackTopic={feedbackTopic}
-    />
-  );
+
+  throw frontErrors.jwtLink.expired({
+    RenewJwtButton: (
+      <RenewExpiredJwtButton
+        key={RenewExpiredJwtButton.name}
+        expiredJwt={jwt}
+        feedbackTopic={feedbackTopic}
+      />
+    ),
+  });
 };
