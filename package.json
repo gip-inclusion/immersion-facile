@@ -94,10 +94,14 @@
       "webpack@>= 5.49.0 <= 5.104.0": "5.104.1",
       "ws@>= 6.0.0 < 6.2.3": "^6.2.3",
       "ws@>= 8.0.0 < 8.17.1": "^8.17.1"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@sentry-internal/node-cpu-profiler",
+      "esbuild"
+    ]
   },
   "engines": {
-    "node": "^22.14.0"
+    "node": "^24.14.0"
   },
-  "packageManager": "pnpm@10.9.0"
+  "packageManager": "pnpm@10.32.1"
 }
