@@ -28,7 +28,7 @@ import { PgFeatureFlagQueries } from "../../feature-flags/adapters/PgFeatureFlag
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
 import { PgNafRepository } from "../../naf/adapters/PgNafRepository";
 import { PgNotificationRepository } from "../../notifications/adapters/PgNotificationRepository";
-import { PgPhoneRepository } from "../../phone-number/adapters/pgPhoneRepository";
+import { PgPhoneRepository } from "../../phone-number/adapters/PgPhoneRepository";
 import { PgRomeRepository } from "../../rome/adapters/PgRomeRepository";
 import { PgBroadcastFeedbacksRepository } from "../../saved-errors/adapters/PgBroadcastFeedbacksRepository";
 import { PgShortLinkRepository } from "../../short-link/adapters/short-link-repository/PgShortLinkRepository";

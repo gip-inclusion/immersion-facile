@@ -1,6 +1,7 @@
 import { sql } from "kysely";
 import {
   type Phone,
+  type PhoneNumber,
   type PhoneVerificationStatus,
   pipeWithValue,
 } from "shared";
@@ -8,7 +9,6 @@ import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import type {
   PhoneRepository,
-  SafeUpdatePhoneParams,
   TablesWithPhoneReference,
 } from "../ports/PhoneRepository";
 import type { UpdatePhonePayload } from "../use-cases/UpdateInvalidPhone";
@@ -18,13 +18,13 @@ export class PgPhoneRepository implements PhoneRepository {
   constructor(private transaction: KyselyDb) {}
 
   async getConflictingPhoneNumberId(params: {
-    updatePhonePayload: UpdatePhonePayload;
+    phoneNumber: PhoneNumber;
   }): Promise<number | null> {
-    const { updatePhonePayload } = params;
+    const { phoneNumber } = params;
     const existingPhone = await this.transaction
       .selectFrom("phone_numbers")
       .select("id")
-      .where("phone_number", "=", updatePhonePayload.newPhoneNumber)
+      .where("phone_number", "=", phoneNumber)
       .executeTakeFirst();
 
     return existingPhone ? existingPhone.id : null;
@@ -93,30 +93,33 @@ export class PgPhoneRepository implements PhoneRepository {
 
   async fixNotConflictingPhone(params: {
     updatePhonePayload: UpdatePhonePayload;
-    verificationDate: Date;
-  }): Promise<{ fixedPhoneId: number } | null> {
-    const { updatePhonePayload, verificationDate } = params;
-    const result = await this.transaction
+  }): Promise<void> {
+    const { updatePhonePayload } = params;
+    await this.transaction
       .updateTable("phone_numbers")
       .set({
         phone_number: updatePhonePayload.newPhoneNumber,
         verification_status: "VERIFICATION_COMPLETED",
-        verified_at: verificationDate,
+        verified_at: updatePhonePayload.newVerificationDate,
       })
       .where("id", "=", updatePhonePayload.currentPhone.id)
-      .returning("id")
-      .executeTakeFirst();
-
-    return result ? { fixedPhoneId: result.id } : null;
+      .execute();
   }
 
   async getPhoneNumbers(
-    params: { verifiedBefore?: Date; limit?: number } = {
-      limit: 100,
-      verifiedBefore: new Date(Date.now()),
-    },
-  ): Promise<Phone[]> {
-    const { verifiedBefore, limit } = params;
+    params: {
+      verifiedBefore?: Date;
+      limit?: number;
+      verificationStatus?: PhoneVerificationStatus[];
+      fromId?: PhoneId;
+    } = {},
+  ): Promise<{ phones: Phone[]; cursorId: number | null }> {
+    const {
+      verifiedBefore = new Date(),
+      limit = 100,
+      verificationStatus,
+      fromId,
+    } = params;
 
     const rows = await pipeWithValue(
       this.transaction
@@ -131,15 +134,26 @@ export class PgPhoneRepository implements PhoneRepository {
               ]),
             )
           : b,
-      (b) => (limit ? b.limit(limit) : b),
+      (b) => (fromId ? b.where("id", ">", fromId) : b),
+      (b) =>
+        verificationStatus && verificationStatus.length > 0
+          ? b.where("verification_status", "in", verificationStatus)
+          : b,
+      (b) => b.limit(limit + 1),
     ).execute();
 
-    return rows.map((row) => ({
+    const hasMore = rows.length > limit;
+    const phones = rows.slice(0, limit).map((row) => ({
       id: row.id,
       phoneNumber: row.phone_number,
       verificationStatus: row.verification_status,
       verifiedAt: row.verified_at ? new Date(row.verified_at) : null,
     }));
+
+    return {
+      phones,
+      cursorId: hasMore ? phones[phones.length - 1].id : null,
+    };
   }
 
   async markAsVerified(params: {
@@ -169,24 +183,6 @@ export class PgPhoneRepository implements PhoneRepository {
       .updateTable("phone_numbers")
       .set({ verification_status: verificationStatus })
       .where("id", "in", phoneIds)
-      .execute();
-  }
-
-  async safeUpdatePhone(
-    phoneId: number,
-    params: Partial<SafeUpdatePhoneParams>,
-  ): Promise<void> {
-    const { verifiedAt, verificationStatus } = params;
-
-    await this.transaction
-      .updateTable("phone_numbers")
-      .set({
-        ...(verifiedAt !== undefined && { verified_at: verifiedAt }),
-        ...(verificationStatus !== undefined && {
-          verification_status: verificationStatus,
-        }),
-      })
-      .where("id", "=", phoneId)
       .execute();
   }
 

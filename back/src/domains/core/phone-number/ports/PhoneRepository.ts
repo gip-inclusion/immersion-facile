@@ -1,4 +1,4 @@
-import type { Phone, PhoneVerificationStatus } from "shared";
+import type { Phone, PhoneNumber, PhoneVerificationStatus } from "shared";
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import type { PhoneId } from "../adapters/pgPhoneHelper";
 import type { UpdatePhonePayload } from "../use-cases/UpdateInvalidPhone";
@@ -21,7 +21,7 @@ export type TablesWithPhoneReference =
 
 export interface PhoneRepository {
   getConflictingPhoneNumberId(params: {
-    updatePhonePayload: UpdatePhonePayload;
+    phoneNumber: PhoneNumber;
   }): Promise<number | null>;
   fixConflictingPhoneUpdate(params: {
     updatePhonePayload: UpdatePhonePayload;
@@ -29,14 +29,13 @@ export interface PhoneRepository {
   }): Promise<void>;
   fixNotConflictingPhone(params: {
     updatePhonePayload: UpdatePhonePayload;
-    verificationDate: Date;
-  }): Promise<{
-    fixedPhoneId: number;
-  } | null>;
+  }): Promise<void>;
   getPhoneNumbers(params: {
     verifiedBefore?: Date;
     limit?: number;
-  }): Promise<Phone[]>;
+    verificationStatus?: PhoneVerificationStatus[];
+    fromId?: PhoneId;
+  }): Promise<{ phones: Phone[]; cursorId: number | null }>;
   markAsVerified(params: {
     phoneIds: PhoneId[];
     verifiedDate: Date;
@@ -45,9 +44,5 @@ export interface PhoneRepository {
     phoneIds: PhoneId[];
     verificationStatus: PhoneVerificationStatus;
   }): Promise<void>;
-  safeUpdatePhone(
-    phoneId: PhoneId,
-    params: Partial<SafeUpdatePhoneParams>,
-  ): Promise<void>;
   getTableNamesReferencingPhoneNumbers(): Promise<(keyof Database)[]>;
 }

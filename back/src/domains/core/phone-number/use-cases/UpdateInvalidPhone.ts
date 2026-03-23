@@ -37,7 +37,7 @@ export const makeUpdateInvalidPhone = useCaseBuilder("UpdateInvalidPhone")
 
     const conflictingPhoneNumberId =
       await uow.phoneRepository.getConflictingPhoneNumberId({
-        updatePhonePayload,
+        phoneNumber: updatePhonePayload.newPhoneNumber,
       });
 
     conflictingPhoneNumberId
@@ -47,6 +47,5 @@ export const makeUpdateInvalidPhone = useCaseBuilder("UpdateInvalidPhone")
         })
       : await uow.phoneRepository.fixNotConflictingPhone({
           updatePhonePayload,
-          verificationDate: new Date(updatePhonePayload.newVerificationDate),
         });
   });
