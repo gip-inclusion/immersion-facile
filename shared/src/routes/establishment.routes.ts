@@ -13,7 +13,10 @@ import {
   establishmentPublicOptionsSchema,
   getEstablishmentPublicOptionsByFiltersSchema,
 } from "../establishment/establishment";
-import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
+import {
+  formEstablishmentSchema,
+  formEstablishmentUserRightSchema,
+} from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { renewExpiredJwtResponseSchema } from "../tokens/jwt.schema";
@@ -134,6 +137,15 @@ export const establishmentRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,
+    },
+  }),
+  registerUserOnEstablishment: defineRoute({
+    method: "post",
+    url: "/establishments/:siret/register-user",
+    ...withAuthorizationHeaders,
+    requestBodySchema: formEstablishmentUserRightSchema,
+    responses: {
+      200: expressEmptyResponseBody,
     },
   }),
 });

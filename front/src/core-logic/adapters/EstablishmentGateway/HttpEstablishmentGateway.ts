@@ -11,6 +11,7 @@ import {
   type ExchangeRead,
   errors,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   type GetEstablishmentPublicOptionsByFiltersInput,
   type SendMessageToDiscussionFromDashboardRequestPayload,
   type SiretDto,
@@ -168,6 +169,26 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             })
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 403, 404, 409) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public userRegistrationOnEstablishment$(
+    siret: SiretDto,
+    userRight: FormEstablishmentUserRight,
+    jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .registerUserOnEstablishment({
+          headers: { authorization: jwt },
+          urlParams: { siret },
+          body: userRight,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
             .otherwise(otherwiseThrow),
         ),
     );

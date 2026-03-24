@@ -159,5 +159,19 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       ),
   );
 
+  establishmentSharedRouter.registerUserOnEstablishment(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.registerUserOnEstablishment.execute(
+          {
+            siret: req.params.siret,
+            userRight: req.body,
+          },
+          req.payloads?.currentUser,
+        ),
+      ),
+  );
+
   return establishmentRouter;
 };

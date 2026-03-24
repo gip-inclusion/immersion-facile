@@ -725,6 +725,26 @@ export const errors = {
       new ForbiddenError(
         `L'entreprise ${siret} n'est pas disponible pour des immersions.`,
       ),
+    userRightStatusNotPending: ({
+      siret,
+      userId,
+    }: {
+      siret: SiretDto;
+      userId: UserId;
+    }) =>
+      new ForbiddenError(
+        `L'utilisateur '${userId}' n'a pas demandé le statut 'PENDING' sur l'entreprise '${siret}'.`,
+      ),
+    userRightAlreadyExists: ({
+      siret,
+      userId,
+    }: {
+      siret: SiretDto;
+      userId: UserId;
+    }) =>
+      new ForbiddenError(
+        `L'utilisateur '${userId}' a déjà un droit sur l'entreprise '${siret}'.`,
+      ),
   },
   establishmentLead: {
     notFound: ({ siret }: { siret: SiretDto }) =>

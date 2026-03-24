@@ -51,6 +51,7 @@ test.describe("Establishment creation and modification workflow", () => {
         .withUserRights([
           {
             role: "establishment-admin",
+            status: "ACCEPTED",
             email: testConfig.proConnect.username,
             job: faker.person.jobType(),
             phone: faker.helpers.fromRegExp(phoneRegexp),
@@ -81,6 +82,7 @@ test.describe("Establishment creation and modification workflow", () => {
       .withUserRights([
         {
           role: "establishment-admin",
+          status: "ACCEPTED",
           email: testConfig.proConnect.username,
           job: "Successfully updated job",
           phone: "0165754860",
@@ -89,6 +91,7 @@ test.describe("Establishment creation and modification workflow", () => {
         },
         {
           role: "establishment-contact",
+          status: "ACCEPTED",
           email:
             "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
           shouldReceiveDiscussionNotifications: false,

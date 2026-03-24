@@ -5,6 +5,7 @@ import {
   type EstablishmentNameAndAdmins,
   type EstablishmentPublicOption,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   type GetEstablishmentPublicOptionsByFiltersInput,
   type SiretDto,
 } from "shared";
@@ -30,6 +31,12 @@ export type SiretAndJwtPayload = {
 
 export type EstablishmentPublicOptionsPayload = {
   filters: GetEstablishmentPublicOptionsByFiltersInput;
+  jwt: ConnectedUserJwt;
+};
+
+export type UserRegistrationOnEstablishmentPayload = {
+  siret: SiretDto;
+  userRight: FormEstablishmentUserRight;
   jwt: ConnectedUserJwt;
 };
 
@@ -211,6 +218,24 @@ export const establishmentSlice = createSlice({
       state.isLoading = false;
     },
     fetchEstablishmentPublicOptionsFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    userRegistrationOnEstablishmentRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<UserRegistrationOnEstablishmentPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    userRegistrationOnEstablishmentSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isLoading = false;
+    },
+    userRegistrationOnEstablishmentFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
