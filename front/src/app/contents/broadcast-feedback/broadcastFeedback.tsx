@@ -31,7 +31,7 @@ export const broadcastFeedbackErrorMessageMap: Record<
         l'entreprise et le bilan n'a pas encore été saisi :
         <ol>
           <li>Dupliquez la convention.</li>
-          <li>Modifiez le prescripteur</li>
+          <li>Corrigez la date de naissance du bénéficiaire.</li>
           <li>Renvoyez la nouvelle convention en signature.</li>
           <li>Annulez l'ancienne convention.</li>
         </ol>
