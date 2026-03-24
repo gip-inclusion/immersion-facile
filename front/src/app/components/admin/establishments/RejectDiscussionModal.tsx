@@ -7,6 +7,7 @@ import RadioButtons, {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import DOMPurify from "dompurify";
 import { renderContent } from "html-templates/src/components/email";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -161,11 +162,12 @@ export const RejectDiscussionModal = ({
           desc={
             <div
               dangerouslySetInnerHTML={{
-                __html:
+                __html: DOMPurify.sanitize(
                   renderContent(htmlContent, {
                     wrapInTable: false,
                     replaceNewLines: true,
                   }) ?? "",
+                ),
               }}
             />
           }

@@ -85,5 +85,8 @@
   "peerDependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.3"
   }
 }

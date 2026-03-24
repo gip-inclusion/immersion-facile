@@ -26,7 +26,6 @@ import {
 } from "../user/user.schema";
 import {
   MAX_HTML_SIZE,
-  makeHardenedStringSchema,
   zStringMinLength1Max1024,
   zStringMinLength1Max6000,
   zStringMinLength1Max11000,
@@ -135,10 +134,16 @@ export const attachmentSchema: ZodSchemaWithInputMatchingOutput<Attachment> =
     link: zStringMinLength1Max1024,
   });
 
-export const messageSchema: ZodSchemaWithInputMatchingOutput<Message> =
-  // Legacy max message en DB 653522 > reprise des historiques de réponses dans les client mail
-  // TODO : faire évoluer la gestion de réponse inbound parsing pour retirer l'historique en cas de réponse
-  makeHardenedStringSchema({ max: MAX_HTML_SIZE, canContainHtml: true });
+// Legacy max message en DB 653522 > reprise des historiques de réponses dans les client mail
+// TODO : faire évoluer la gestion de réponse inbound parsing pour retirer l'historique en cas de réponse
+// DOMPurify (via isomorphic-dompurify/JSDOM) is extremely slow on large HTML
+// (400-700KB emails → 80-240s CPU freeze, causing 504s in production).
+// Temporarily bypass DOMPurify for messages until a faster server-side
+// sanitization solution is in place. XSS is handled client-side via DOMPurify.
+export const messageSchema: ZodSchemaWithInputMatchingOutput<Message> = z
+  .string()
+  .trim()
+  .max(MAX_HTML_SIZE);
 
 export const exchangeReadSchema: ZodSchemaWithInputMatchingOutput<ExchangeRead> =
   z
