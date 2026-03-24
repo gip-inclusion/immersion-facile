@@ -53,12 +53,12 @@ export const frontErrors = {
   jwtLink: {
     expired: ({ RenewJwtButton }: { RenewJwtButton: ReactElement }) =>
       new FrontSpecificError({
-        title: "Votre lien magique est périmé",
+        title: "Votre lien a expiré",
         description: (
           <>
             <p>
-              Pour des raisons de sécurité, les liens magiques sont valables
-              pendant une durée limitée.
+              Pour des raisons de sécurité, les liens sont valables pendant une
+              durée limitée.
             </p>
             <p>
               Vous pouvez demander un nouveau lien ci-dessous. Il vous sera
