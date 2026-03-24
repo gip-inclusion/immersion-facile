@@ -1,5 +1,7 @@
+import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
+  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type AuthenticatedConventionRoutes,
   authExpiredMessage,
   authenticatedConventionRoutes,
@@ -268,9 +270,13 @@ describe("authenticatedConventionRoutes", () => {
   });
 
   describe("GetConventionsForAgencyUser", () => {
+    const assessmentCreatedAt = addDays(
+      ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+      2,
+    ).toISOString();
     const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
 
-    const convention1 = new ConventionDtoBuilder()
+    const conventionWithAssessment = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withAgencyId(peAgency.id)
       .withDateStart(new Date("2023-03-15").toISOString())
@@ -279,7 +285,7 @@ describe("authenticatedConventionRoutes", () => {
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .build();
 
-    const convention2 = new ConventionDtoBuilder()
+    const conventionWithoutAssessment = new ConventionDtoBuilder()
       .withId("bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb")
       .withAgencyId(peAgency.id)
       .withDateStart(new Date("2023-02-15").toISOString())
@@ -295,12 +301,12 @@ describe("authenticatedConventionRoutes", () => {
         }),
       ];
       inMemoryUow.conventionRepository.setConventions([
-        convention1,
-        convention2,
+        conventionWithAssessment,
+        conventionWithoutAssessment,
       ]);
       inMemoryUow.assessmentRepository.assessments = [
         {
-          conventionId: convention1.id,
+          conventionId: conventionWithAssessment.id,
           status: "COMPLETED",
           endedWithAJob: false,
           establishmentFeedback: "Ca c'est bien passé",
@@ -308,8 +314,8 @@ describe("authenticatedConventionRoutes", () => {
           numberOfHoursActuallyMade: 35,
           beneficiaryAgreement: true,
           beneficiaryFeedback: "Mon commentaire",
-          signedAt: new Date("2025-01-01").toISOString(),
-          createdAt: new Date("2025-01-01").toISOString(),
+          signedAt: assessmentCreatedAt,
+          createdAt: assessmentCreatedAt,
           _entityName: "Assessment",
         },
       ];
@@ -361,18 +367,18 @@ describe("authenticatedConventionRoutes", () => {
       };
 
       const conventionRead1 = {
-        ...convention1,
+        ...conventionWithAssessment,
         ...agencyFields,
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
-          signedAt: new Date("2025-01-01").toISOString(),
-          createdAt: new Date("2025-01-01").toISOString(),
+          signedAt: assessmentCreatedAt,
+          createdAt: assessmentCreatedAt,
         },
       };
 
       const conventionRead2 = {
-        ...convention2,
+        ...conventionWithoutAssessment,
         ...agencyFields,
         assessment: null,
       };
@@ -439,13 +445,13 @@ describe("authenticatedConventionRoutes", () => {
       };
 
       const conventionRead1 = {
-        ...convention1,
+        ...conventionWithAssessment,
         ...agencyFields,
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
-          signedAt: new Date("2025-01-01").toISOString(),
-          createdAt: new Date("2025-01-01").toISOString(),
+          signedAt: assessmentCreatedAt,
+          createdAt: assessmentCreatedAt,
         },
       };
 
@@ -559,18 +565,18 @@ describe("authenticatedConventionRoutes", () => {
       };
 
       const conventionRead1 = {
-        ...convention1,
+        ...conventionWithAssessment,
         ...agencyFields,
         assessment: {
           status: "COMPLETED" as const,
           endedWithAJob: false,
-          signedAt: new Date("2025-01-01").toISOString(),
-          createdAt: new Date("2025-01-01").toISOString(),
+          signedAt: assessmentCreatedAt,
+          createdAt: assessmentCreatedAt,
         },
       };
 
       const conventionRead2 = {
-        ...convention2,
+        ...conventionWithoutAssessment,
         ...agencyFields,
         assessment: null,
       };

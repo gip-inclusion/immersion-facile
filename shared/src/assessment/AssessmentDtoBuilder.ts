@@ -48,6 +48,11 @@ export class AssessmentDtoBuilder implements Builder<AssessmentDto> {
     return this;
   }
 
+  public withCreatedAt(createdAt: string) {
+    this.dto.createdAt = createdAt;
+    return this;
+  }
+
   public withBeneficiarySignature(params: {
     beneficiaryAgreement: boolean;
     beneficiaryFeedback: string | null;

@@ -5,6 +5,7 @@ import {
   type AgencyId,
   ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type AssessmentCompletionStatusFilter,
+  assessmentStatuses,
   type BroadcastErrorKind,
   type ConventionAssessmentFields,
   type ConventionDto,
@@ -530,42 +531,66 @@ const filterByAssessmentCompletionStatus =
     if (!assessmentCompletionStatus || assessmentCompletionStatus.length === 0)
       return builder;
 
-    const hasSignedFilter = assessmentCompletionStatus.includes("finalized");
+    const hasFinalizedFilter = assessmentCompletionStatus.includes("finalized");
     const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
     const hasToBeCompletedFilter =
       assessmentCompletionStatus.includes("to-complete");
 
-    if (hasSignedFilter && hasToSignFilter && hasToBeCompletedFilter)
+    if (hasFinalizedFilter && hasToSignFilter && hasToBeCompletedFilter)
       return builder;
 
     return builder
-      .leftJoin("immersion_assessments as ia", (join) =>
-        join
-          .onRef("ia.convention_id", "=", "conventions.id")
-          .on(
-            sql<boolean>`ia.created_at > ${addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1).toISOString()}::timestamptz`,
-          ),
+      .leftJoin(
+        "immersion_assessments as ia",
+        "ia.convention_id",
+        "conventions.id",
       )
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .where((eb) => {
         const conditions: ReturnType<typeof eb>[] = [];
 
-        if (hasSignedFilter && hasToSignFilter)
-          conditions.push(eb("ia.convention_id", "is not", null));
+        if (hasFinalizedFilter && hasToSignFilter)
+          conditions.push(
+            eb.and([
+              eb("ia.convention_id", "is not", null),
+              eb(
+                "ia.created_at",
+                ">",
+                addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
+              ),
+            ]),
+          );
         else {
-          if (hasSignedFilter)
+          if (hasFinalizedFilter)
             conditions.push(
-              eb.and([
-                eb("ia.convention_id", "is not", null),
-                eb.or([
-                  eb("ia.status", "=", "DID_NOT_SHOW"),
+              eb.or([
+                eb("ia.status", "=", "DID_NOT_SHOW"),
+                eb.and([
+                  eb(
+                    "ia.created_at",
+                    ">",
+                    addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
+                  ),
                   eb("ia.signed_at", "is not", null),
+                ]),
+                eb.and([
+                  eb(
+                    "ia.created_at",
+                    "<=",
+                    addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
+                  ),
+                  eb("ia.status", "in", assessmentStatuses),
                 ]),
               ]),
             );
           if (hasToSignFilter)
             conditions.push(
               eb.and([
+                eb(
+                  "ia.created_at",
+                  ">",
+                  addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
+                ),
                 eb("ia.convention_id", "is not", null),
                 eb("ia.signed_at", "is", null),
                 eb("ia.status", "!=", "DID_NOT_SHOW"),
