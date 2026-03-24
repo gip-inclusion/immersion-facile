@@ -11,7 +11,6 @@ import {
   type ConventionAssessmentFields,
   type ConventionReadDto,
   domElementIds,
-  type FlatGetConventionsForAgencyUserParams,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
   toDisplayedDate,
 } from "shared";
@@ -22,15 +21,8 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 
-const filters: FlatGetConventionsForAgencyUserParams = {
-  sortBy: "dateEnd",
-  sortDirection: "asc",
-  assessmentCompletionStatus: ["to-complete", "to-sign"],
-  page: 1,
-  perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
-};
-
 export const threeDaysAgo = subDays(new Date(), 3).toISOString();
+export const startOf2026 = new Date("2026-01-01").toISOString();
 
 export const ConventionsWithAssessmentToCompleteList = () => {
   const dispatch = useDispatch();
@@ -49,9 +41,13 @@ export const ConventionsWithAssessmentToCompleteList = () => {
           connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
             {
               params: {
-                ...filters,
-                page,
+                sortBy: "dateEnd",
+                sortDirection: "asc",
+                assessmentCompletionStatus: ["to-complete", "to-sign"],
+                dateStartFrom: startOf2026,
                 dateEndTo: threeDaysAgo,
+                page,
+                perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
               },
               jwt: connectedUserJwt,
               feedbackTopic: "conventions-with-assessment-issue",

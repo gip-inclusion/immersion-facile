@@ -1,4 +1,4 @@
-import { addDays, subDays } from "date-fns";
+import { addDays, subDays, subMonths } from "date-fns";
 import { sql } from "kysely";
 import type { Pool } from "pg";
 import {
@@ -1111,6 +1111,9 @@ describe("Pg implementation of ConventionQueries", () => {
 
     const completedAssessment = new AssessmentDtoBuilder()
       .withConventionId(conventionC.id)
+      .withCreatedAt(
+        addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 2).toISOString(),
+      )
       .build();
 
     const agencyFields = {
@@ -1446,196 +1449,382 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
 
-    it(`should filter conventions by assessment completion status - completed and after ${ASSESSEMENT_SIGNATURE_RELEASE_DATE}`, async () => {
-      const conventionWithOldAssessment: ConventionDto = {
-        ...conventionB,
-        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
-        status: "ACCEPTED_BY_VALIDATOR",
-      };
-      const oldAssessment: AssessmentDto = {
-        ...completedAssessment,
-        conventionId: conventionWithOldAssessment.id,
-        createdAt: ASSESSEMENT_SIGNATURE_RELEASE_DATE.toISOString(),
-      };
-      await conventionRepository.save(conventionWithOldAssessment);
-      await assessmentRepo.save(
-        createAssessmentEntity(oldAssessment, conventionWithOldAssessment),
-      );
+    describe("assessment completion status filter", () => {
+      describe("assessment filter is 'finalized'", () => {
+        it(`should return old convention with assessment created before ${ASSESSEMENT_SIGNATURE_RELEASE_DATE.toISOString()}`, async () => {
+          const oldAssessmentCreatedAt = subMonths(
+            ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+            1,
+          ).toISOString();
 
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { assessmentCompletionStatus: ["to-sign"] },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+          const conventionWithOldAssessment: ConventionDto = {
+            ...conventionB,
+            id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+            status: "ACCEPTED_BY_VALIDATOR",
+          };
 
-      expectToEqual(result.data, [
-        {
-          ...conventionC,
-          ...agencyFields,
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
+          const oldAssessmentWithoutSignature: AssessmentDto = {
+            ...completedAssessment,
+            conventionId: conventionWithOldAssessment.id,
+            createdAt: oldAssessmentCreatedAt,
             signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-        },
-      ]);
-    });
+          };
 
-    it("should return empty array when assessment completion status does not match any convention", async () => {
-      const validatedConvention: ConventionDto = {
-        ...conventionB,
-        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
-        status: "ACCEPTED_BY_VALIDATOR",
-      };
-      const signedAt = new Date().toISOString();
-      const signedAssessment = new AssessmentDtoBuilder()
-        .withConventionId(validatedConvention.id)
-        .withBeneficiarySignature({
-          beneficiaryAgreement: true,
-          beneficiaryFeedback: "feedback",
-          signedAt,
-        })
-        .build();
+          await conventionRepository.save(
+            conventionWithOldAssessment,
+            anyConventionUpdatedAt,
+          );
+          await assessmentRepo.save(
+            createAssessmentEntity(
+              oldAssessmentWithoutSignature,
+              conventionWithOldAssessment,
+            ),
+          );
 
-      await conventionRepository.save(
-        validatedConvention,
-        anyConventionUpdatedAt,
-      );
-      await assessmentRepo.save(
-        createAssessmentEntity(signedAssessment, validatedConvention),
-      );
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: { assessmentCompletionStatus: ["finalized"] },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
 
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            assessmentCompletionStatus: ["to-complete"],
-          },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
+          expectToEqual(result.data, [
+            {
+              ...conventionWithOldAssessment,
+              ...agencyFields,
+              assessment: {
+                status: "COMPLETED",
+                endedWithAJob: false,
+                signedAt: null,
+                createdAt: oldAssessmentWithoutSignature.createdAt,
+              },
+            },
+          ]);
         });
 
-      expectToEqual(result.data, []);
-    });
+        it(`should return convention with assessment signed and created after ${ASSESSEMENT_SIGNATURE_RELEASE_DATE.toISOString()}`, async () => {
+          const signedAssessment: AssessmentDto = {
+            ...completedAssessment,
+            conventionId: conventionC.id,
+            createdAt: addDays(
+              ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+              2,
+            ).toISOString(),
+            signedAt: addDays(
+              ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+              2,
+            ).toISOString(),
+          };
 
-    it("should filter conventions by assessment completion statuses to-be-completed", async () => {
-      const validatedConventionWithoutAssessment: ConventionDto = {
-        ...conventionB,
-        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
-        status: "ACCEPTED_BY_VALIDATOR",
-      };
-      await conventionRepository.save(
-        validatedConventionWithoutAssessment,
-        anyConventionUpdatedAt,
-      );
+          await assessmentRepo.update({
+            ...signedAssessment,
+            _entityName: "Assessment",
+            numberOfHoursActuallyMade: null,
+          });
 
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            assessmentCompletionStatus: ["to-complete"],
-          },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: { assessmentCompletionStatus: ["finalized"] },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
+
+          expectToEqual(result.data, [
+            {
+              ...conventionC,
+              ...agencyFields,
+              assessment: {
+                status: "COMPLETED",
+                endedWithAJob: false,
+                signedAt: addDays(
+                  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+                  2,
+                ).toISOString(),
+                createdAt: completedAssessment.createdAt,
+              },
+            },
+          ]);
+        });
+      });
+
+      describe("assessment filter is 'to-sign'", () => {
+        it(`should return convention when assessment is created after ${ASSESSEMENT_SIGNATURE_RELEASE_DATE.toISOString()}`, async () => {
+          const oldAssessmentCreatedAt = subMonths(
+            ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+            1,
+          ).toISOString();
+
+          const conventionWithOldAssessment: ConventionDto = {
+            ...conventionB,
+            id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+            status: "ACCEPTED_BY_VALIDATOR",
+          };
+
+          const oldAssessment: AssessmentDto = {
+            ...completedAssessment,
+            conventionId: conventionWithOldAssessment.id,
+            createdAt: oldAssessmentCreatedAt,
+          };
+
+          await conventionRepository.save(
+            conventionWithOldAssessment,
+            anyConventionUpdatedAt,
+          );
+          await assessmentRepo.save(
+            createAssessmentEntity(oldAssessment, conventionWithOldAssessment),
+          );
+
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: { assessmentCompletionStatus: ["to-sign"] },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
+
+          expectToEqual(result.data, [
+            {
+              ...conventionC,
+              ...agencyFields,
+              assessment: {
+                status: "COMPLETED",
+                endedWithAJob: false,
+                signedAt: null,
+                createdAt: completedAssessment.createdAt,
+              },
+            },
+          ]);
+        });
+      });
+
+      describe("assessment filter is 'to-complete'", () => {
+        it("should return convention when missing assessment", async () => {
+          const oldConventionWithoutAssessment: ConventionDto = {
+            ...conventionB,
+            status: "ACCEPTED_BY_VALIDATOR",
+            updatedAt: anyConventionUpdatedAt,
+          };
+          const recentConventionWithoutAssessment = new ConventionDtoBuilder(
+            conventionA,
+          )
+            .withStatus("ACCEPTED_BY_VALIDATOR")
+            .withDateStart(new Date("2023-03-15").toISOString())
+            .withDateEnd(new Date("2023-03-20").toISOString())
+            .withDateSubmission(new Date("2023-03-10").toISOString())
+            .withSchedule(reasonableSchedule)
+            .withUpdatedAt(anyConventionUpdatedAt)
+            .build();
+          await conventionRepository.update(
+            oldConventionWithoutAssessment,
+            anyConventionUpdatedAt,
+          );
+          await conventionRepository.update(
+            recentConventionWithoutAssessment,
+            anyConventionUpdatedAt,
+          );
+
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: { assessmentCompletionStatus: ["to-complete"] },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
+
+          expectToEqual(result.data, [
+            {
+              ...recentConventionWithoutAssessment,
+              ...agencyFields,
+              assessment: null,
+            },
+            {
+              ...oldConventionWithoutAssessment,
+              ...agencyFields,
+              assessment: null,
+            },
+          ]);
         });
 
-      expectToEqual(result.data, [
-        {
-          ...validatedConventionWithoutAssessment,
-          ...agencyFields,
-          assessment: null,
-        },
-      ]);
-    });
+        it("should return empty array when assessment completion status to-complete does not match any convention", async () => {
+          const validatedConvention: ConventionDto = {
+            ...conventionB,
+            id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+            status: "ACCEPTED_BY_VALIDATOR",
+          };
+          const signedAt = new Date().toISOString();
+          const signedAssessment = new AssessmentDtoBuilder()
+            .withConventionId(validatedConvention.id)
+            .withBeneficiarySignature({
+              beneficiaryAgreement: true,
+              beneficiaryFeedback: "feedback",
+              signedAt,
+            })
+            .build();
 
-    it("should filter conventions by multiple assessment completion statuses signed + to-sign", async () => {
-      const anotherValidatedConvention: ConventionDto = {
-        ...conventionB,
-        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
-        status: "ACCEPTED_BY_VALIDATOR",
-      };
-      const signedAt = new Date().toISOString();
-      const signedAssessment = new AssessmentDtoBuilder()
-        .withConventionId(anotherValidatedConvention.id)
-        .withBeneficiarySignature({
-          beneficiaryAgreement: true,
-          beneficiaryFeedback: "feedback",
-          signedAt,
-        })
-        .build();
+          await conventionRepository.save(
+            validatedConvention,
+            anyConventionUpdatedAt,
+          );
+          await assessmentRepo.save(
+            createAssessmentEntity(signedAssessment, validatedConvention),
+          );
 
-      await conventionRepository.save(
-        anotherValidatedConvention,
-        anyConventionUpdatedAt,
-      );
-      await assessmentRepo.save(
-        createAssessmentEntity(signedAssessment, anotherValidatedConvention),
-      );
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: {
+                assessmentCompletionStatus: ["to-complete"],
+              },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
 
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            assessmentCompletionStatus: ["finalized", "to-sign"],
-          },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
+          expectToEqual(result.data, []);
+        });
+      });
+
+      describe("when multiple filters", () => {
+        it("should filter conventions by assessment completion statuses to-complete + to-sign", async () => {
+          const validatedConventionWithoutAssessment: ConventionDto = {
+            ...conventionB,
+            id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+            status: "ACCEPTED_BY_VALIDATOR",
+          };
+          await conventionRepository.save(
+            validatedConventionWithoutAssessment,
+            anyConventionUpdatedAt,
+          );
+
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: {
+                assessmentCompletionStatus: ["to-complete", "to-sign"],
+              },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
+
+          expectToEqual(result.data, [
+            {
+              ...conventionC,
+              ...agencyFields,
+              assessment: {
+                status: "COMPLETED",
+                endedWithAJob: false,
+                signedAt: null,
+                createdAt: completedAssessment.createdAt,
+              },
+            },
+            {
+              ...validatedConventionWithoutAssessment,
+              ...agencyFields,
+              assessment: null,
+            },
+          ]);
         });
 
-      expectToEqual(result.data, [
-        {
-          ...conventionC,
-          ...agencyFields,
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-        },
-        {
-          ...anotherValidatedConvention,
-          ...agencyFields,
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt,
-            createdAt: signedAssessment.createdAt,
-          },
-        },
-      ]);
-    });
+        it("should filter conventions by multiple assessment completion statuses signed + to-sign", async () => {
+          const anotherValidatedConvention: ConventionDto = {
+            ...conventionB,
+            id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+            status: "ACCEPTED_BY_VALIDATOR",
+          };
+          const signedAt = new Date().toISOString();
+          const signedAssessment = new AssessmentDtoBuilder()
+            .withConventionId(anotherValidatedConvention.id)
+            .withBeneficiarySignature({
+              beneficiaryAgreement: true,
+              beneficiaryFeedback: "feedback",
+              signedAt,
+            })
+            .build();
 
-    it("should not filter conventions by assessment completion statuses if the convention is not accepted by validator", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            assessmentCompletionStatus: ["to-complete"],
-          },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
+          await conventionRepository.save(
+            anotherValidatedConvention,
+            anyConventionUpdatedAt,
+          );
+          await assessmentRepo.save(
+            createAssessmentEntity(
+              signedAssessment,
+              anotherValidatedConvention,
+            ),
+          );
+
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: {
+                assessmentCompletionStatus: ["finalized", "to-sign"],
+              },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
+
+          expectToEqual(result.data, [
+            {
+              ...conventionC,
+              ...agencyFields,
+              assessment: {
+                status: "COMPLETED",
+                endedWithAJob: false,
+                signedAt: null,
+                createdAt: completedAssessment.createdAt,
+              },
+            },
+            {
+              ...anotherValidatedConvention,
+              ...agencyFields,
+              assessment: {
+                status: "COMPLETED",
+                endedWithAJob: false,
+                signedAt,
+                createdAt: signedAssessment.createdAt,
+              },
+            },
+          ]);
         });
+      });
 
-      expectToEqual(result.data, []);
+      it("should not filter conventions by assessment completion statuses if the convention is not accepted by validator", async () => {
+        const result =
+          await conventionQueries.getPaginatedConventionsForAgencyUser({
+            agencyUserId: validator.id,
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              assessmentCompletionStatus: ["to-complete"],
+            },
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+        expectToEqual(result.data, []);
+      });
     });
 
     it("should sort conventions by dateStart, then conventionId", async () => {

@@ -1,7 +1,8 @@
-import { isBefore } from "date-fns";
+import { addDays, isAfter, isBefore } from "date-fns";
 import { propEq, toPairs } from "ramda";
 import {
   type AgencyId,
+  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
@@ -481,34 +482,48 @@ const makeApplyAssessmentCompletionStatusFilterConventionsRead =
       return true;
     if (convention.status !== "ACCEPTED_BY_VALIDATOR") return false;
 
-    const hasCompletedMaybeSignedFilter =
-      assessmentCompletionStatus.includes("finalized");
+    const hasFinalizedFilter = assessmentCompletionStatus.includes("finalized");
     const hasToSignFilter = assessmentCompletionStatus.includes("to-sign");
     const hasToBeCompletedFilter =
       assessmentCompletionStatus.includes("to-complete");
 
-    const hasAssessment =
+    if (hasFinalizedFilter && hasToSignFilter && hasToBeCompletedFilter)
+      return true;
+
+    const isNotLegacyAssessment =
       convention.assessment !== null &&
       convention.assessment.status !== "FINISHED" &&
       convention.assessment.status !== "ABANDONED";
 
     const assessment = convention.assessment;
-    const isAssessmentCompletedAndMaybeSigned =
-      hasAssessment &&
+    const isAssessementAfterSignatureRelease =
+      assessment !== null &&
+      isAfter(
+        new Date(assessment.createdAt),
+        addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
+      );
+    const isAssessmentSigned =
       assessment !== null &&
       "signedAt" in assessment &&
-      (assessment.status === "DID_NOT_SHOW" || assessment.signedAt !== null);
+      assessment.signedAt !== null;
+
+    const isAssessmentFinalized =
+      isNotLegacyAssessment &&
+      assessment !== null &&
+      ((isAssessmentSigned && isAssessementAfterSignatureRelease) ||
+        assessment.status === "DID_NOT_SHOW" ||
+        !isAssessementAfterSignatureRelease);
 
     const isAssessmentToSign =
-      hasAssessment &&
+      isNotLegacyAssessment &&
       assessment !== null &&
-      "signedAt" in assessment &&
-      assessment.signedAt === null &&
+      !isAssessmentSigned &&
+      isAssessementAfterSignatureRelease &&
       assessment.status !== "DID_NOT_SHOW";
     const isAssessmentToBeCompleted = convention.assessment === null;
 
     return (
-      (hasCompletedMaybeSignedFilter && isAssessmentCompletedAndMaybeSigned) ||
+      (hasFinalizedFilter && isAssessmentFinalized) ||
       (hasToSignFilter && isAssessmentToSign) ||
       (hasToBeCompletedFilter && isAssessmentToBeCompleted)
     );
