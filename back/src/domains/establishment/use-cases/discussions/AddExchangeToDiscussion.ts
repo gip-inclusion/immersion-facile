@@ -1,3 +1,4 @@
+import sanitizeHtml from "sanitize-html";
 import {
   type Attachment,
   attachmentSchema,
@@ -18,7 +19,7 @@ import {
   errors,
   exchangeRoleSchema,
   localization,
-  messageSchema,
+  MAX_HTML_SIZE,
   type UserId,
 } from "shared";
 import { z } from "zod";
@@ -28,6 +29,25 @@ import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
+
+// messageSchema from shared uses DOMPurify (via isomorphic-dompurify/JSDOM)
+// which is extremely slow on large HTML (400-700KB emails → 80-240s CPU freeze).
+// Server-side we use sanitize-html (based on htmlparser2) which is much faster.
+const backendSanitizeHtml = (value: string): string =>
+  sanitizeHtml(value, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ["src", "srcset", "alt", "title", "width", "height", "loading"],
+      "*": ["class", "style"],
+    },
+  });
+
+const backendMessageSchema = z
+  .string()
+  .trim()
+  .max(MAX_HTML_SIZE)
+  .transform(backendSanitizeHtml);
 
 const inputSources = ["dashboard", "inbound-parsing"] as const;
 
@@ -64,7 +84,7 @@ type AddExchangeToDiscussionInput =
 type MessageInput = AddExchangeToDiscussionInput["messageInputs"][number];
 
 const messageInputCommonFieldsSchema = z.object({
-  message: messageSchema,
+  message: backendMessageSchema,
   discussionId: discussionIdSchema,
 });
 
