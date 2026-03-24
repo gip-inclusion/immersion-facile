@@ -70,25 +70,25 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
     if (
       initialEstablishmentAggregate.userRights.some(
         ({ userId, status }) =>
-          userId === triggeredBy.userId && status === "PENDING",
+          userId === triggeredByUser.id && status === "PENDING",
       )
     )
       throw errors.establishment.notAdmin({
         siret: initialEstablishmentAggregate.establishment.siret,
-        userId: triggeredBy.userId,
+        userId: triggeredByUser.id,
       });
 
     if (
       initialEstablishmentAggregate.userRights.some(
         ({ userId, status, role }) =>
-          userId === triggeredBy.userId &&
+          userId === triggeredByUser.id &&
           status === "ACCEPTED" &&
           role !== "establishment-admin",
       )
     )
       throw errors.establishment.notAdmin({
         siret: initialEstablishmentAggregate.establishment.siret,
-        userId: triggeredBy.userId,
+        userId: triggeredByUser.id,
       });
 
     const establishmentAggregate = await makeEstablishmentAggregate({

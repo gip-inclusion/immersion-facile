@@ -4,7 +4,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Table from "@codegouvfr/react-dsfr/Table";
 import { values } from "ramda";
 import { Fragment, useMemo, useState } from "react";
-import { NotificationIndicator } from "react-design-system";
+import { HeadingSection, NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -29,6 +29,7 @@ type AgencyRightsTableProps = {
   agencyRights: AgencyRight[];
   user: User;
   isBackofficeAdmin?: boolean;
+  title?: string;
   onUserRegistrationCancelledRequested?: (agencyRight: AgencyRight) => void;
 } & (
   | {
@@ -45,6 +46,7 @@ export const AgencyRightsTable = ({
   modalId,
   onUserUpdateRequested,
   onUserRegistrationCancelledRequested,
+  title,
 }: AgencyRightsTableProps) => {
   const dispatch = useDispatch();
   const [selectedAgencyRight, setSelectedAgencyRight] =
@@ -81,70 +83,74 @@ export const AgencyRightsTable = ({
     userModal.open();
   };
 
-  return (
-    <>
-      <Table
-        headers={[
-          "Organisme",
-          "Type",
-          "Administrateurs",
-          "Mes Rôles & préférences",
-        ]}
-        data={agencyRights
-          .sort((a, b) => {
-            const aIsClosedOrRejected =
-              a.agency.status === "closed" || a.agency.status === "rejected";
-            const bIsClosedOrRejected =
-              b.agency.status === "closed" || b.agency.status === "rejected";
+  const jsxContent = (
+    <Table
+      headers={[
+        "Organisme",
+        "Type",
+        "Administrateurs",
+        "Mes Rôles & préférences",
+      ]}
+      data={agencyRights
+        .sort((a, b) => {
+          const aIsClosedOrRejected =
+            a.agency.status === "closed" || a.agency.status === "rejected";
+          const bIsClosedOrRejected =
+            b.agency.status === "closed" || b.agency.status === "rejected";
 
-            if (aIsClosedOrRejected && !bIsClosedOrRejected) return 1;
-            if (!aIsClosedOrRejected && bIsClosedOrRejected) return -1;
+          if (aIsClosedOrRejected && !bIsClosedOrRejected) return 1;
+          if (!aIsClosedOrRejected && bIsClosedOrRejected) return -1;
 
-            return a.agency.name.localeCompare(b.agency.name);
-          })
-          .map((agencyRight) =>
-            AgencyRightLine(
-              agencyRight,
-              onUserUpdateRequested && onUpdateClicked,
-              onUserRegistrationCancelledRequested,
-              isBackofficeAdmin,
-            ),
-          )}
-      />
-      {onUserUpdateRequested &&
-        userModal &&
-        createPortal(
-          <userModal.Component title={"Modifier le rôle de l'utilisateur"}>
-            {selectedAgencyRight && (
-              <AgencyUserModificationForm
-                modalId={modalId}
-                agencyUser={{
-                  agencyId: selectedAgencyRight.agency.id,
-                  userId: user.id,
-                  roles: selectedAgencyRight.roles,
-                  email: user.email,
-                  isNotifiedByEmail: selectedAgencyRight.isNotifiedByEmail,
-                  isIcUser: !!user.proConnect,
-                }}
-                closeModal={() => userModal.close()}
-                agencyHasRefersTo={
-                  !!selectedAgencyRight.agency.refersToAgencyId
-                }
-                isEmailDisabled={true}
-                areRolesDisabled={
-                  !isBackofficeAdmin &&
-                  !selectedAgencyRight.roles.includes("agency-admin")
-                }
-                onSubmit={onUserUpdateRequested}
-                routeName="myProfile"
-                hasCounsellorRoles={selectedAgencyHasCounsellorRoles}
-                isFTAgency={selectedAgencyRight.agency.kind === "pole-emploi"}
-              />
-            )}
-          </userModal.Component>,
-          document.body,
+          return a.agency.name.localeCompare(b.agency.name);
+        })
+        .map((agencyRight) =>
+          AgencyRightLine(
+            agencyRight,
+            onUserUpdateRequested && onUpdateClicked,
+            onUserRegistrationCancelledRequested,
+            isBackofficeAdmin,
+          ),
         )}
-    </>
+    />
+  );
+  onUserUpdateRequested &&
+    userModal &&
+    createPortal(
+      <userModal.Component title={"Modifier le rôle de l'utilisateur"}>
+        {selectedAgencyRight && (
+          <AgencyUserModificationForm
+            modalId={modalId}
+            agencyUser={{
+              agencyId: selectedAgencyRight.agency.id,
+              userId: user.id,
+              roles: selectedAgencyRight.roles,
+              email: user.email,
+              isNotifiedByEmail: selectedAgencyRight.isNotifiedByEmail,
+              isIcUser: !!user.proConnect,
+            }}
+            closeModal={() => userModal.close()}
+            agencyHasRefersTo={!!selectedAgencyRight.agency.refersToAgencyId}
+            isEmailDisabled={true}
+            areRolesDisabled={
+              !isBackofficeAdmin &&
+              !selectedAgencyRight.roles.includes("agency-admin")
+            }
+            onSubmit={onUserUpdateRequested}
+            routeName="myProfile"
+            hasCounsellorRoles={selectedAgencyHasCounsellorRoles}
+            isFTAgency={selectedAgencyRight.agency.kind === "pole-emploi"}
+          />
+        )}
+      </userModal.Component>,
+      document.body,
+    );
+
+  return title ? (
+    <HeadingSection title={title} titleAs="h4">
+      {jsxContent}
+    </HeadingSection>
+  ) : (
+    jsxContent
   );
 };
 

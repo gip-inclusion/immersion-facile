@@ -339,6 +339,19 @@ export const feedbacks: Record<
       message:
         "Une erreur est survenue lors de la récupération des entreprises",
     },
+    "create.success": {
+      action:
+        establishmentSlice.actions.userRegistrationOnEstablishmentSucceeded,
+      title: "L'utilisateur a bien été enregistré sur l'entreprise",
+      message: "L'utilisateur a bien été enregistré sur l'entreprise",
+    },
+    "create.error": {
+      action: establishmentSlice.actions.userRegistrationOnEstablishmentFailed,
+      title:
+        "Problème lors de l'enregistrement de l'utilisateur sur l'entreprise",
+      message:
+        "Une erreur est survenue lors de l'enregistrement de l'utilisateur sur l'entreprise",
+    },
   },
   "agency-user-for-dashboard": {
     "fetch.error": {

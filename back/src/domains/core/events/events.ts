@@ -30,7 +30,10 @@ import {
 import { z } from "zod";
 import type { DeleteUserInputSchema } from "../../connected-users/use-cases/DeleteUser";
 import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
-import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type {
+  WithEstablishmentAggregate,
+  WithEstablishmentUserRight,
+} from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import type {
@@ -115,7 +118,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
   | GenericEvent<"ConventionWithAssessmentBroadcastRequested", WithConventionId & WithAssessmentDto & WithTriggeredBy>
   | GenericEvent<"ConventionBroadcastRequested", WithConventionId & WithTriggeredBy>
-  | GenericEvent<"ConventionTransferredToAgency",  WithConventionDto & TransferConventionToAgencyPayload & WithTriggeredBy>
+  | GenericEvent<"ConventionTransferredToAgency", WithConventionDto & TransferConventionToAgencyPayload & WithTriggeredBy>
   | GenericEvent<"ConventionCounsellorNameEdited", WithConventionId & WithOptionalFirstnameAndLastname & WithTriggeredBy>
   | GenericEvent<"ConventionBeneficiaryBirthdateEdited", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
@@ -131,6 +134,7 @@ export type DomainEvent =
   | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"AllEstablishmentUsersDeleted", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"EstablishmentDeleted", WithSiretDto & WithTriggeredBy>
+  | GenericEvent<"UserRightRegisteredOnEstablishment", WithSiretDto & WithEstablishmentUserRight & WithTriggeredBy>
 
   // CONTACT REQUEST RELATED
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
@@ -139,7 +143,7 @@ export type DomainEvent =
   | GenericEvent<"DiscussionMarkedAsDeprecated", WithDiscussionId & WithTriggeredBy>
   | GenericEvent<"DiscussionBeneficiaryFollowUpRequested", WithDiscussionId & WithTriggeredBy>
   | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
-  
+
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
 
@@ -155,9 +159,9 @@ export type DomainEvent =
   | GenericEvent<"AssessmentSignedByBeneficiary", WithConventionId & WithAssessmentDto & WithTriggeredBy>
   | GenericEvent<"AssessmentDeleted", DeleteAssessmentRequestDto & WithTriggeredBy>
   | GenericEvent<
-      "ConventionTemplateDeleted",
-      { conventionTemplateId: ConventionTemplateId } & WithTriggeredBy
-    >
+    "ConventionTemplateDeleted",
+    { conventionTemplateId: ConventionTemplateId } & WithTriggeredBy
+  >
   | GenericEvent<"ConventionTemplateCreatedOrUpdated", { conventionTemplateId: ConventionTemplateId } & WithTriggeredBy>
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
@@ -171,7 +175,7 @@ export type DomainEvent =
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
   // INACTIVE USER ACCOUNT DELETION
   | GenericEvent<"InactiveUserAccountDeletionTriggered", DeleteUserInputSchema>
-  | GenericEvent<"UserDeleted", WithUserId& WithTriggeredBy>
+  | GenericEvent<"UserDeleted", WithUserId & WithTriggeredBy>
 
 
   // Est-ce que les deux events au final c'est pas la même chose ???????!!!!!!! De quoi péter un gros boulard!

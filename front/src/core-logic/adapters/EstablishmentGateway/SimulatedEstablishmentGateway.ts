@@ -9,6 +9,7 @@ import {
   type EstablishmentPublicOption,
   type Exchange,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   type GetEstablishmentPublicOptionsByFiltersInput,
   type SiretDto,
   type WithDiscussionStatusRejected,
@@ -51,8 +52,8 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
   ): Observable<EstablishmentPublicOption[]> {
     return of(
       this.establishments.map((establishment) => ({
-        businessName:
-          establishment.businessNameCustomized || establishment.businessName,
+        businessName: establishment.businessName,
+        businessNameCustomized: establishment.businessNameCustomized,
         siret: establishment.siret,
         userRightIds: ["1234567890"],
       })),
@@ -133,5 +134,13 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
     _payload: FetchDiscussionListRequestedPayload,
   ): Observable<DataWithPagination<DiscussionInList>> {
     return of(initialDiscussionsWithPagination).pipe(delay(this.delay));
+  }
+
+  public userRegistrationOnEstablishment$(
+    _siret: SiretDto,
+    _userRight: FormEstablishmentUserRight,
+    _jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return of(undefined).pipe(delay(this.delay));
   }
 }

@@ -510,6 +510,73 @@ describe("Establishment", () => {
     });
   });
 
+  describe("user registration on establishment", () => {
+    it("successfully registered user on establishment", () => {
+      expectStoreToMatchInitialState();
+
+      store.dispatch(
+        establishmentSlice.actions.userRegistrationOnEstablishmentRequested({
+          siret: "12345123451234",
+          userRight: {
+            email: "test@test.com",
+            role: "establishment-contact",
+            status: "ACCEPTED",
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+          jwt: "any-connected-user-jwt",
+          feedbackTopic: "my-profile-establishment-registration",
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.establishmentGateway.userRegistrationOnEstablishmentResult$.next(
+        undefined,
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "my-profile-establishment-registration": {
+          on: "create",
+          level: "success",
+          message: "L'utilisateur a bien été enregistré sur l'entreprise",
+          title: "L'utilisateur a bien été enregistré sur l'entreprise",
+        },
+      });
+    });
+
+    it("failed to register user on establishment on gateway error", () => {
+      expectStoreToMatchInitialState();
+
+      store.dispatch(
+        establishmentSlice.actions.userRegistrationOnEstablishmentRequested({
+          siret: "12345123451234",
+          userRight: {
+            email: "test@test.com",
+            role: "establishment-contact",
+            status: "ACCEPTED",
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+          jwt: "any-connected-user-jwt",
+          feedbackTopic: "my-profile-establishment-registration",
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.establishmentGateway.userRegistrationOnEstablishmentResult$.error(
+        new Error("Failed to register user on establishment"),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "my-profile-establishment-registration": {
+          on: "create",
+          level: "error",
+          message: "Failed to register user on establishment",
+          title:
+            "Problème lors de l'enregistrement de l'utilisateur sur l'entreprise",
+        },
+      });
+    });
+  });
+
   const expectStoreToMatchInitialState = () =>
     expectEstablishmentStateToMatch({
       isLoading: false,

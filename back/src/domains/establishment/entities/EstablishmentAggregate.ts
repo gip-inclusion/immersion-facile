@@ -18,6 +18,10 @@ export type WithEstablishmentAggregate = {
   establishmentAggregate: EstablishmentAggregate;
 };
 
+export type WithEstablishmentUserRight = {
+  userRight: EstablishmentUserRight;
+};
+
 type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
   userId: UserId;
   role: Role;
