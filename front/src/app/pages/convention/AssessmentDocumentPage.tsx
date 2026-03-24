@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { addDays, isBefore } from "date-fns";
+import DOMPurify from "dompurify";
 import { useEffect } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
 import { createPortal } from "react-dom";
@@ -385,9 +386,11 @@ export const AssessmentDocumentPage = ({
         <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Appréciation générale</h2>
         <p
           dangerouslySetInnerHTML={{
-            __html: escapeHtml(assessment.establishmentFeedback).replace(
-              /\n/g,
-              "<br />",
+            __html: DOMPurify.sanitize(
+              escapeHtml(assessment.establishmentFeedback).replace(
+                /\n/g,
+                "<br />",
+              ),
             ),
           }}
         />
@@ -398,9 +401,11 @@ export const AssessmentDocumentPage = ({
             </h2>
             <p
               dangerouslySetInnerHTML={{
-                __html: escapeHtml(assessment.establishmentAdvices).replace(
-                  /\n/g,
-                  "<br />",
+                __html: DOMPurify.sanitize(
+                  escapeHtml(assessment.establishmentAdvices).replace(
+                    /\n/g,
+                    "<br />",
+                  ),
                 ),
               }}
             />
