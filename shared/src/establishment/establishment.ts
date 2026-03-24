@@ -2,7 +2,11 @@ import { z } from "zod";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
-import type { FormEstablishmentDto } from "../formEstablishment/FormEstablishment.dto";
+import type {
+  FormEstablishmentDto,
+  FormEstablishmentUserRight,
+} from "../formEstablishment/FormEstablishment.dto";
+import { formEstablishmentUserRightSchema } from "../formEstablishment/FormEstablishment.schema";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
@@ -61,6 +65,17 @@ export const establishmentPublicOptionSchema: ZodSchemaWithInputMatchingOutput<E
 export const establishmentPublicOptionsSchema: ZodSchemaWithInputMatchingOutput<
   EstablishmentPublicOption[]
 > = z.array(establishmentPublicOptionSchema);
+
+export const registerUserOnEstablishmentPayloadSchema: ZodSchemaWithInputMatchingOutput<RegisterUserOnEstablishmentPayload> =
+  z.object({
+    siret: siretSchema,
+    userRight: formEstablishmentUserRightSchema,
+  });
+
+export type RegisterUserOnEstablishmentPayload = {
+  siret: SiretDto;
+  userRight: FormEstablishmentUserRight;
+};
 
 export type EstablishmentPublicOption = Pick<
   FormEstablishmentDto,

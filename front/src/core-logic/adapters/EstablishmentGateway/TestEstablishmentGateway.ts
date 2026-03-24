@@ -8,6 +8,7 @@ import type {
   EstablishmentPublicOption,
   ExchangeRead,
   FormEstablishmentDto,
+  FormEstablishmentUserRight,
   GetEstablishmentPublicOptionsByFiltersInput,
   SiretDto,
   WithDiscussionStatusRejected,
@@ -33,6 +34,8 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
   public establishmentPublicOptions$ = new Subject<
     EstablishmentPublicOption[]
   >();
+
+  public userRegistrationOnEstablishmentResult$ = new Subject<void>();
 
   public discussions$ = new Subject<DataWithPagination<DiscussionInList>>();
 
@@ -74,6 +77,14 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
     _jwt: ConnectedUserJwt,
   ): Observable<EstablishmentPublicOption[]> {
     return this.establishmentPublicOptions$;
+  }
+
+  public userRegistrationOnEstablishment$(
+    _siret: SiretDto,
+    _userRight: FormEstablishmentUserRight,
+    _jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return this.userRegistrationOnEstablishmentResult$;
   }
 
   public updateFormEstablishment$(

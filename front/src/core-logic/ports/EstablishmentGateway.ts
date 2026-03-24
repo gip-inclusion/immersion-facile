@@ -10,6 +10,7 @@ import type {
   EstablishmentPublicOption,
   ExchangeRead,
   FormEstablishmentDto,
+  FormEstablishmentUserRight,
   GetEstablishmentPublicOptionsByFiltersInput,
   SendMessageToDiscussionFromDashboardRequestPayload,
   SiretDto,
@@ -60,4 +61,10 @@ export interface EstablishmentGateway {
   getDiscussions$(
     payload: FetchDiscussionListRequestedPayload,
   ): Observable<DataWithPagination<DiscussionInList>>;
+
+  userRegistrationOnEstablishment$(
+    siret: SiretDto,
+    userRight: FormEstablishmentUserRight,
+    jwt: ConnectedUserJwt,
+  ): Observable<void>;
 }

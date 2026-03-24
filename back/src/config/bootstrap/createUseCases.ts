@@ -167,6 +167,7 @@ import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/
 import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
+import { makeRegisterUserOnEstablishment } from "../../domains/establishment/use-cases/RegisterUserOnEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { makeUpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
@@ -629,6 +630,13 @@ export const createUseCases = ({
       makeGetEstablishmentPublicOptionsByFilters({
         uowPerformer,
       }),
+
+    registerUserOnEstablishment: makeRegisterUserOnEstablishment({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+      },
+    }),
 
     getDiscussionByIdForEstablishment: makeGetDiscussionByIdForEstablishment({
       uowPerformer,

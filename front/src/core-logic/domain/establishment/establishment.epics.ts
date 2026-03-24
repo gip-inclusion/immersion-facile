@@ -205,6 +205,40 @@ const deleteFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
     ),
   );
 
+const userRegistrationOnEstablishmentEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(
+      establishmentSlice.actions.userRegistrationOnEstablishmentRequested.match,
+    ),
+    switchMap((action) =>
+      establishmentGateway
+        .userRegistrationOnEstablishment$(
+          action.payload.siret,
+          action.payload.userRight,
+          action.payload.jwt,
+        )
+        .pipe(
+          map(() =>
+            establishmentSlice.actions.userRegistrationOnEstablishmentSucceeded(
+              {
+                feedbackTopic: action.payload.feedbackTopic,
+              },
+            ),
+          ),
+          catchEpicError((error) =>
+            establishmentSlice.actions.userRegistrationOnEstablishmentFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const establishmentEpics = [
   fetchEstablishmentEpic,
   fetchEstablishmentNameAndAdminEpic,
@@ -212,6 +246,7 @@ export const establishmentEpics = [
   createFormEstablishmentEpic,
   editFormEstablishmentEpic,
   deleteFormEstablishmentEpic,
+  userRegistrationOnEstablishmentEpic,
 ];
 
 const hasPayloadJwt = (payload: unknown): payload is SiretAndJwtPayload =>
