@@ -273,9 +273,8 @@ export type WithAgencyRights = {
 
 export type AgencyStatsDashboards = {
   // statistics dashboards :
-  statsEstablishmentDetailsUrl?: AbsoluteUrl;
-  statsConventionsByEstablishmentByDepartmentUrl?: AbsoluteUrl;
-  statsAgenciesUrl?: AbsoluteUrl;
+  agencyManagement?: AbsoluteUrl;
+  establishmentManagement?: AbsoluteUrl;
 };
 
 export type AgencyDashboards = AgencyStatsDashboards & {

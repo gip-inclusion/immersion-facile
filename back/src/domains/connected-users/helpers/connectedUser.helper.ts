@@ -156,13 +156,11 @@ async function makeAgencyDashboards({
       })
     ).length > 0;
 
-  const agencyKind = agencyKinds.length === 1 ? agencyKinds[0] : undefined;
-
   return {
     ...(agencyIdsWithEnoughPrivileges.length > 0
       ? dashboardGateway.getAgencyUserUrls(
           user.id,
-          agencyKind,
+          user.agencyRights.map((right) => right.agency.name),
           timeGateway.now(),
         )
       : {}),

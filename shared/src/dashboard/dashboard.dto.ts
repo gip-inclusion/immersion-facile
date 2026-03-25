@@ -21,9 +21,8 @@ export type AgencyDashboardName = (typeof agencyDashboardNames)[number];
 export const agencyDashboardNames = [
   "agencyForUser",
   "erroredConventionsForUser",
-  "statsEstablishmentDetails",
-  "statsConventionsByEstablishmentByDepartment",
-  "statsAgencies",
+  "agencyManagement",
+  "establishmentManagement",
 ] as const;
 
 export const simpleDashboardNames = [

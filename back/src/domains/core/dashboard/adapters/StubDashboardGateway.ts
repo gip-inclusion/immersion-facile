@@ -3,7 +3,6 @@ import type {
   AdminDashboardName,
   AgencyDashboards,
   AgencyId,
-  AgencyKind,
   ConventionId,
   OmitFromExistingKeys,
   UserId,
@@ -13,14 +12,13 @@ import type { DashboardGateway } from "../port/DashboardGateway";
 export class StubDashboardGateway implements DashboardGateway {
   getAgencyUserUrls(
     userId: UserId,
-    agencyKind: AgencyKind | undefined,
+    agencyNames: string[],
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
-      agencyDashboardUrl: `http://stubAgencyUserDashboard/${userId}/${now}`,
-      statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${now}`,
-      statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${now}`,
-      statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${now}${agencyKind ? `/${agencyKind}` : ""}`,
+      agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${userId}/${now}`,
+      agencyManagement: `http://stub-metabasev2/ManageMyAgency/${now}/${agencyNames.join()}`,
+      establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${now}`,
     };
   }
   getAgencyForAdminUrl(
