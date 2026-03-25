@@ -4,6 +4,7 @@ import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type FormEstablishmentUserRight,
   UserBuilder,
 } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -22,17 +23,20 @@ import {
 
 describe("RegisterUserOnEstablishment", () => {
   let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
   let registerUserOnEstablishment: RegisterUserOnEstablishment;
 
   const anyConnectedUser = new ConnectedUserBuilder().build();
 
   beforeEach(() => {
     uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
     registerUserOnEstablishment = makeRegisterUserOnEstablishment({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
+        timeGateway,
         createNewEvent: makeCreateNewEvent({
-          timeGateway: new CustomTimeGateway(),
+          timeGateway,
           uuidGenerator: new TestUuidGenerator(),
         }),
       },
@@ -99,6 +103,8 @@ describe("RegisterUserOnEstablishment", () => {
       );
     });
     it("fails if no establishment with this siret", async () => {
+      uow.userRepository.users = [anyConnectedUser];
+
       await expectPromiseToFailWithError(
         registerUserOnEstablishment.execute(
           {
@@ -106,7 +112,7 @@ describe("RegisterUserOnEstablishment", () => {
             userRight: {
               email: "test@test.com",
               role: "establishment-contact",
-              status: "ACCEPTED",
+              status: "PENDING",
               shouldReceiveDiscussionNotifications: true,
               isMainContactByPhone: false,
             },
@@ -162,7 +168,7 @@ describe("RegisterUserOnEstablishment", () => {
           {
             userId: adminEstablishmentUser.id,
             role: "establishment-admin",
-            status: "PENDING",
+            status: "ACCEPTED",
             shouldReceiveDiscussionNotifications: true,
             isMainContactByPhone: false,
             job: "osef",
@@ -172,24 +178,45 @@ describe("RegisterUserOnEstablishment", () => {
         .build();
 
       it("registers user on establishment", async () => {
+        const userRightWithRequestedRole: FormEstablishmentUserRight = {
+          email: "test@test.com",
+          role: "establishment-contact",
+          status: "PENDING",
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
+        };
+
         uow.userRepository.users = [anyConnectedUser];
         uow.establishmentAggregateRepository.establishmentAggregates = [
           establishmentAggregate,
         ];
+
         const result = await registerUserOnEstablishment.execute(
           {
             siret: establishmentAggregate.establishment.siret,
-            userRight: {
-              email: "test@test.com",
-              role: "establishment-contact",
-              status: "PENDING",
-              shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
-            },
+            userRight: userRightWithRequestedRole,
           },
           anyConnectedUser,
         );
+
         expectToEqual(result, undefined);
+        expectToEqual(
+          await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            establishmentAggregate.establishment.siret,
+          ),
+          {
+            ...establishmentAggregate,
+            userRights: [
+              ...establishmentAggregate.userRights,
+              { ...userRightWithRequestedRole, userId: anyConnectedUser.id },
+            ],
+            establishment: {
+              ...establishmentAggregate.establishment,
+              updatedAt: timeGateway.now(),
+            },
+          },
+        );
+
         expect(uow.outboxRepository.events).toHaveLength(1);
         expectObjectsToMatch(uow.outboxRepository.events[0], {
           topic: "UserRightRegisteredOnEstablishment",
