@@ -4,7 +4,9 @@ import {
   registerUserOnEstablishmentPayloadSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 
 export type RegisterUserOnEstablishment = ReturnType<
   typeof makeRegisterUserOnEstablishment
@@ -15,7 +17,7 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
 )
   .withInput(registerUserOnEstablishmentPayloadSchema)
   .withCurrentUser<ConnectedUser | undefined>()
-  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .withDeps<{ timeGateway: TimeGateway; createNewEvent: CreateNewEvent }>()
   .build(async ({ uow, currentUser, deps, inputParams: payload }) => {
     if (!currentUser) throw errors.user.unauthorized();
     if (payload.userRight.status !== "PENDING")
@@ -40,6 +42,20 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
         siret: payload.siret,
         userId: currentUser.id,
       });
+
+    const establishmentAggregateWithRequestedUserRight: EstablishmentAggregate =
+      {
+        ...establishmentAggregate,
+        userRights: [
+          ...establishmentAggregate.userRights,
+          { ...payload.userRight, userId: user.id },
+        ],
+      };
+
+    await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
+      establishmentAggregateWithRequestedUserRight,
+      deps.timeGateway.now(),
+    );
 
     await uow.outboxRepository.save(
       deps.createNewEvent({
