@@ -3,10 +3,8 @@ import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition, LocationId } from "../address/address.dto";
 import type { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import type { Email } from "../email/email.dto";
-import type {
-  BusinessName,
-  BusinessNameCustomized,
-} from "../establishment/establishment";
+import type { BusinessName } from "../establishment/businessName";
+import type { BusinessNameCustomized } from "../establishment/establishment";
 import type { GroupName } from "../group/group.dto";
 import type { NafDto } from "../naf/naf.dto";
 import type { PhoneNumber } from "../phone/phone.dto";

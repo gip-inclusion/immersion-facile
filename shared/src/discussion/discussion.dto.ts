@@ -7,7 +7,7 @@ import type {
   LevelOfEducation,
 } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
-import type { BusinessName } from "../establishment/establishment";
+import type { BusinessName } from "../establishment/businessName";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
 import type {

@@ -15,26 +15,18 @@ import type { UserId } from "../user/user.dto";
 import { userIdSchema } from "../user/user.schema";
 import {
   zStringCanBeEmpty,
-  zStringMinLength1Max255,
   zStringMinLength1Max1024,
 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
+import { type BusinessName, businessNameSchema } from "./businessName";
 
 export type EstablishmentNameAndAdmins = {
   name: string;
   adminEmails: Email[];
 };
 
-export type BusinessName = Flavor<string, "BusinessName">;
-export const businessNameSchema: ZodSchemaWithInputMatchingOutput<BusinessName> =
-  zStringMinLength1Max255;
-
 export type BusinessNameCustomized = Flavor<string, "BusinessNameCustomized">;
 export const customizedNameSchema: ZodSchemaWithInputMatchingOutput<BusinessNameCustomized> =
-  zStringCanBeEmpty;
-
-export type BusinessAddress = Flavor<string, "BusinessAddress">;
-export const businessAddressSchema: ZodSchemaWithInputMatchingOutput<BusinessAddress> =
   zStringCanBeEmpty;
 
 export const establishmentNameAndAdminsSchema: ZodSchemaWithInputMatchingOutput<EstablishmentNameAndAdmins> =
@@ -109,5 +101,3 @@ export type EstablishmentDashboards = {
 export type WithEstablishmentDashboards = {
   establishments: EstablishmentDashboards;
 };
-
-
