@@ -1,7 +1,5 @@
-import type {
-  BusinessAddress,
-  BusinessName,
-} from "../establishment/establishment";
+import type { BusinessAddress } from "../establishment/businessAddress";
+import type { BusinessName } from "../establishment/businessName";
 import type { NafDto } from "../naf/naf.dto";
 import type { Flavor } from "../typeFlavors";
 

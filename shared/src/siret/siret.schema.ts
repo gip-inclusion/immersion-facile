@@ -1,8 +1,6 @@
 import { z } from "zod";
-import {
-  businessAddressSchema,
-  businessNameSchema,
-} from "../establishment/establishment";
+import { businessAddressSchema } from "../establishment/businessAddress";
+import { businessNameSchema } from "../establishment/businessName";
 import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";
 import {

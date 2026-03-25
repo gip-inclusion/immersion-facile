@@ -13,10 +13,8 @@ import {
   legacyAssessmentStatuses,
 } from "../assessment/assessment.dto";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
-import {
-  businessAddressSchema,
-  businessNameSchema,
-} from "../establishment/establishment";
+import { businessAddressSchema } from "../establishment/businessAddress";
+import { businessNameSchema } from "../establishment/businessName";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { dateFilterSchema } from "../filters";
 import {
