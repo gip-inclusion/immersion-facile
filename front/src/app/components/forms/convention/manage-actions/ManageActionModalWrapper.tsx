@@ -5,17 +5,17 @@ import {
   type ConnectedUser,
   type ConventionDto,
   type ConventionStatus,
-  conventionStatusesWithJustification,
   conventionStatusesWithValidator,
   type DeleteAssessmentRequestDto,
-  doesStatusNeedsJustification,
   doesStatusNeedsValidators,
   type EditConventionCounsellorNameRequestDto,
+  isUnvalidatedConventionStatus,
   type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
   type Role,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
+  unvalidatedConventionStatuses,
   type WithConventionId,
 } from "shared";
 import {
@@ -93,7 +93,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     verificationAction !== "FILL_ASSESSMENT_INFO" &&
     verificationAction !== "DELETE_ASSESSMENT" &&
     verificationAction !== "SIGN" &&
-    doesStatusNeedsJustification(
+    isUnvalidatedConventionStatus(
       newStatusByVerificationAction[verificationAction],
     );
   const showValidatorModal =
@@ -199,7 +199,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             showJustificationModal: true,
             showValidatorModal: false,
             showRenewModal: false,
-            newStatus: P.union(...conventionStatusesWithJustification),
+            newStatus: P.union(...unvalidatedConventionStatuses),
           },
           ({ newStatus }) => (
             <JustificationModalContent

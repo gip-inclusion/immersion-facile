@@ -68,12 +68,10 @@ export const conventionStatusesWithoutJustificationNorValidator = [
   "IN_REVIEW",
 ] as const;
 
-export const doesStatusNeedsJustification = (
+export const isUnvalidatedConventionStatus = (
   status: ConventionStatus | null,
-): status is ConventionStatusWithJustification =>
-  conventionStatusesWithJustification.includes(
-    status as ConventionStatusWithJustification,
-  );
+): status is UnvalidatedConventionStatus =>
+  unvalidatedConventionStatuses.includes(status as UnvalidatedConventionStatus);
 
 export const doesStatusNeedsValidators = (
   initialStatus: ConventionStatus,
@@ -96,9 +94,9 @@ export const conventionStatusesAllowedForModification: ConventionStatus[] = [
   "ACCEPTED_BY_COUNSELLOR",
 ] as const;
 
-export type ConventionStatusWithJustification =
-  (typeof conventionStatusesWithJustification)[number];
-export const conventionStatusesWithJustification = [
+export type UnvalidatedConventionStatus =
+  (typeof unvalidatedConventionStatuses)[number];
+export const unvalidatedConventionStatuses = [
   "REJECTED",
   "CANCELLED",
   "DEPRECATED",
@@ -112,7 +110,7 @@ export const conventionStatusesWithValidator = [
 
 export const conventionStatuses = [
   ...conventionStatusesWithoutJustificationNorValidator,
-  ...conventionStatusesWithJustification,
+  ...unvalidatedConventionStatuses,
   ...conventionStatusesWithValidator,
 ] as const;
 
@@ -396,7 +394,7 @@ export type UpdateConventionStatusWithoutJustification = {
 };
 
 export type UpdateConventionStatusWithJustification = {
-  status: ConventionStatusWithJustification;
+  status: UnvalidatedConventionStatus;
   conventionId: ConventionId;
   statusJustification: string;
 };

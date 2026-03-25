@@ -1,31 +1,25 @@
 import { createModal, type ModalProps } from "@codegouvfr/react-dsfr/Modal";
 import type { ComponentType } from "react";
-import { type ConventionStatusWithJustification, domElementIds } from "shared";
+import { domElementIds, type UnvalidatedConventionStatus } from "shared";
 import type { VerificationActionWithModal } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
 import {
   createFormModal,
   type FormModalProps,
 } from "src/app/utils/createFormModal";
 
-const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
+const confirmByStatus: Record<UnvalidatedConventionStatus, string> = {
   REJECTED: "Confirmer le refus",
   CANCELLED: "Confirmer l'annulation",
   DEPRECATED: "Confirmer que la demande est obsolète",
 };
 
-const submitButtonIdByStatus: Record<
-  ConventionStatusWithJustification,
-  string
-> = {
+const submitButtonIdByStatus: Record<UnvalidatedConventionStatus, string> = {
   REJECTED: domElementIds.manageConvention.rejectedModalSubmitButton,
   CANCELLED: domElementIds.manageConvention.cancelModalSubmitButton,
   DEPRECATED: domElementIds.manageConvention.deprecatedModalSubmitButton,
 };
 
-const cancelButtonIdByStatus: Record<
-  ConventionStatusWithJustification,
-  string
-> = {
+const cancelButtonIdByStatus: Record<UnvalidatedConventionStatus, string> = {
   REJECTED: domElementIds.manageConvention.rejectedModalCancelButton,
   CANCELLED: domElementIds.manageConvention.cancelModalCancelButton,
   DEPRECATED: domElementIds.manageConvention.deprecatedModalCancelButton,
