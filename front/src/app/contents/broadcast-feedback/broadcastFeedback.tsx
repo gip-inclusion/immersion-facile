@@ -178,28 +178,31 @@ export const broadcastFeedbackErrorMessageMap: Record<
   },
   "Identifiant National DE non trouvé": {
     description:
-      "Le bénéficiaire n'est pas inscrit à France travail OU l'adresse mail indiquée sur la convention n'est pas identique à celle du dossier France travail.",
+      "Le bénéficiaire n'est pas inscrit à France Travail OU l'adresse mail indiquée sur la convention n'est pas identique à celle du dossier France travail.",
     solution: (isConventionValidated) => (
       <>
-        <p>{"-> "}Dans le cas ou il n'est pas inscrit :</p>
+        <p>{"-> "}Dans le cas où il n'est pas inscrit :</p>
         <p>
           {!isConventionValidated ? (
             <ul>
               <li>
-                Je procède à son inscription avant validation de la convention
+                Je procède à son inscription avant validation de la convention.
               </li>
               <li>
                 Je peux rediffuser la convention pour qu’elle s’installe dans
-                mes applicatifs
+                mes applicatifs,
               </li>
-              <li>Ou dès validation, elle s’installera automatiquement.</li>
+              <li>
+                Ou dès validation de la convention, elle s’installera
+                automatiquement.
+              </li>
             </ul>
           ) : (
             <ul>
-              <li>Je procède à l'inscription du bénéficiaire</li>
+              <li>Je procède à l'inscription du bénéficiaire.</li>
               <li>
-                Je rediffuse la convention dans mon SI France travail depuis
-                Immersion facilitée
+                Je rediffuse la convention dans mon SI France Travail depuis
+                Immersion Facilitée.
               </li>
             </ul>
           )}
@@ -219,13 +222,13 @@ export const broadcastFeedbackErrorMessageMap: Record<
               </li>
               <li>
                 Dès que la convention sera modifiée, elle s’installera dans
-                votre SI et l’erreur disparaîtra de vos «conventions à
-                vérifier».
+                votre SI et l’erreur disparaîtra de vos « conventions à vérifier
+                ».
               </li>
             </ul>
           ) : (
             <p>
-              je me rends sur mon assistant Immersion facilitée accessible
+              Je me rends sur mon assistant Immersion Facilitée accessible
               depuis “Gestion des aides” via PCM pour forcer l’identification du
               bénéficiaire. Je suis la démarche indiquée dans la version{" "}
               <a
@@ -243,13 +246,13 @@ export const broadcastFeedbackErrorMessageMap: Record<
   },
   "Identifiant National DE trouvé mais écart sur la date de naissance": {
     description:
-      "La date de naissance du bénéficiaire indiquée sur la convention n'est pas identique à celle du dossier France travail.",
+      "La date de naissance du bénéficiaire indiquée sur la convention n'est pas identique à celle du dossier France Travail.",
     solution: (isConventionValidated) => (
       <>
         {isConventionValidated ? (
           <ul>
             <li>
-              Je contacte notre centre d'aide{" "}
+              Je contacte le centre d'aide d'Immersion Facilitée{" "}
               <a
                 href="https://aide.immersion-facile.beta.gouv.fr/fr/"
                 target="_blank"
@@ -264,20 +267,20 @@ export const broadcastFeedbackErrorMessageMap: Record<
               convention.
             </li>
             <li>
-              Nous procéderons à la modification et l'installation de la
-              convention dans vos applicatifs.
+              Immersion Facilitée procèdera à la modification et l'installation
+              de la convention dans vos applicatifs.
             </li>
           </ul>
         ) : (
           <ul>
             <li>
               Je modifie la date de naissance du bénéficiaire sur la convention
-              en récupérant celle sous MAP
+              en récupérant celle sous MAP.
             </li>
             <li>
               Dès que la convention sera modifiée, elle s’installera
-              automatiquement dans votre SI et l’erreur disparaîtra de vos
-              «conventions à vérifier».
+              automatiquement dans votre SI et l’erreur disparaîtra de vos «
+              conventions à vérifier ».
             </li>
           </ul>
         )}

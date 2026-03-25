@@ -52,8 +52,8 @@ export const SubscriberErrorFeedbackComponent = ({
             className={fr.cx("fr-mb-4w", "fr-mt-1w")}
           >
             <p>
-              Nous travaillons actuellement à une proposition de solution avec
-              votre DSI, Elle vous sera proposée prochainement.
+              Immersion facilitée travaille actuellement à une proposition de
+              solution avec votre DSI. Elle vous sera proposée prochainement.
             </p>
           </Accordion>
         </div>
