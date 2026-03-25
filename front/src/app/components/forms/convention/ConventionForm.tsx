@@ -206,31 +206,37 @@ export const ConventionForm = ({
     !!connectedUserJwt &&
     !!currentUser;
 
-  const makeDefaultValues = ({ mode }: { mode: ConventionFormMode }) => {
-    const isCreationMode = creationFormModes.includes(
-      mode as ExcludeFromExisting<
-        ConventionFormMode,
-        "edit-convention" | "edit-convention-template"
-      >,
-    );
-    if (isCreationMode) {
-      if (isTemplateForm) {
-        return replaceEmptyValuesByUndefinedFromObject(initialValues);
+  const defaultValues: ConventionFormInitialValues = useMemo(() => {
+    const makeDefaultValuesForMode = () => {
+      const isCreationMode = creationFormModes.includes(
+        mode as ExcludeFromExisting<
+          ConventionFormMode,
+          "edit-convention" | "edit-convention-template"
+        >,
+      );
+      if (isCreationMode) {
+        if (isTemplateForm)
+          return replaceEmptyValuesByUndefinedFromObject(initialValues);
       }
-    }
-    return (
-      fetchedConvention ||
-      conventionPresentationFromDraft ||
-      conventionPresentationFromConventionTemplate ||
-      initialValues
-    );
-  };
-  const defaultValues: ConventionFormInitialValues = {
-    ...makeDefaultValues({
-      mode,
-    }),
-    status: "READY_TO_SIGN",
-  };
+      return (
+        fetchedConvention ||
+        conventionPresentationFromDraft ||
+        conventionPresentationFromConventionTemplate ||
+        initialValues
+      );
+    };
+    return {
+      ...makeDefaultValuesForMode(),
+      status: "READY_TO_SIGN",
+    };
+  }, [
+    mode,
+    isTemplateForm,
+    initialValues,
+    fetchedConvention,
+    conventionPresentationFromDraft,
+    conventionPresentationFromConventionTemplate,
+  ]);
 
   return (
     <ConventionFormContent
