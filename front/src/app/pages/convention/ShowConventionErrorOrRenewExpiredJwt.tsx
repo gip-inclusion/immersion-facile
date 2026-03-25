@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { type ConventionSupportedJwt, expiredJwtErrorMessage } from "shared";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
@@ -10,6 +11,13 @@ export const ShowConventionErrorOrRenewExpiredJwt = ({
   errorMessage: string;
   jwt: ConventionSupportedJwt;
 }) => {
+  const href = window.location.href;
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (href) setOriginalUrl(href);
+  }, [href]);
+
   // un peu fragile, mais j'attends qu'on remette au carré les erreurs front/back. Ca fait un fix rapide (8/12/2022)
   if (!errorMessage.includes(expiredJwtErrorMessage))
     throw new Error(
@@ -18,14 +26,17 @@ export const ShowConventionErrorOrRenewExpiredJwt = ({
 
   const feedbackTopic: FeedbackTopic = "renew-expired-jwt-convention";
 
-  throw frontErrors.jwtLink.expired({
-    RenewJwtButton: (
-      <RenewExpiredJwtButton
-        key={RenewExpiredJwtButton.name}
-        expiredJwt={jwt}
-        feedbackTopic={feedbackTopic}
-        originalUrl={window.location.href}
-      />
-    ),
-  });
+  if (originalUrl)
+    throw frontErrors.jwtLink.expired({
+      RenewJwtButton: (
+        <RenewExpiredJwtButton
+          key={RenewExpiredJwtButton.name}
+          expiredJwt={jwt}
+          feedbackTopic={feedbackTopic}
+          originalUrl={originalUrl}
+        />
+      ),
+    });
+
+  return undefined;
 };
