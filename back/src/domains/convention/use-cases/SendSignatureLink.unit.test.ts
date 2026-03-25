@@ -6,7 +6,6 @@ import {
   type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
   type ConventionRole,
-  conventionStatusesWithJustification,
   conventionStatusesWithValidator,
   errors,
   expectObjectInArrayToMatch,
@@ -16,6 +15,7 @@ import {
   type Notification,
   type SignatoryRole,
   UserBuilder,
+  unvalidatedConventionStatuses,
 } from "shared";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -171,7 +171,7 @@ describe("Send signature link", () => {
 
     it.each([
       "IN_REVIEW",
-      ...conventionStatusesWithJustification,
+      ...unvalidatedConventionStatuses,
       ...conventionStatusesWithValidator,
     ] as const)("throws bad request if convention status %s does not allow send signature link", async (conventionStatus) => {
       const convention = new ConventionDtoBuilder()

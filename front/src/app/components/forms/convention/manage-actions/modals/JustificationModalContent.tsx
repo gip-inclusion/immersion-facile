@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionDto,
-  type ConventionStatusWithJustification,
-  doesStatusNeedsJustification,
+  isUnvalidatedConventionStatus,
+  type UnvalidatedConventionStatus,
   type UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
 } from "shared";
@@ -22,7 +22,7 @@ export const JustificationModalContent = ({
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
-  newStatus: ConventionStatusWithJustification;
+  newStatus: UnvalidatedConventionStatus;
   convention: ConventionDto;
 }) => {
   const { register, handleSubmit, formState } = useForm({
@@ -64,7 +64,7 @@ export const JustificationModalContent = ({
           description="Vous souhaitez annuler une convention qui a déjà été validée. Veuillez indiquer votre nom et prénom afin de garantir un suivi des annulations de convention."
         />
       )}
-      {doesStatusNeedsJustification(newStatus) && (
+      {isUnvalidatedConventionStatus(newStatus) && (
         <form id={formId} onSubmit={handleSubmit(onFormSubmit)}>
           <Input
             textArea
@@ -80,7 +80,7 @@ export const JustificationModalContent = ({
   );
 };
 
-const inputLabelByStatus: Record<ConventionStatusWithJustification, string> = {
+const inputLabelByStatus: Record<UnvalidatedConventionStatus, string> = {
   REJECTED: "Pourquoi l'immersion est-elle refusée ?",
   CANCELLED: "Pourquoi souhaitez-vous annuler cette convention ?",
   DEPRECATED: "Pourquoi l'immersion est-elle obsolète ?",
