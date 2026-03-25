@@ -29,7 +29,7 @@ import { useConventionTexts } from "../../contents/forms/convention/textSetup";
 import { useConvention } from "../../hooks/convention.hooks";
 import { useExistingSiret } from "../../hooks/siret.hooks";
 import type { routes } from "../../routes/routes";
-import { ShowConventionErrorOrRenewExpiredJwt } from "./ShowErrorOrRenewExpiredJwt";
+import { ShowConventionErrorOrRenewExpiredJwt } from "./ShowConventionErrorOrRenewExpiredJwt";
 
 interface ConventionSignPageProperties {
   route: Route<typeof routes.conventionToSign>;

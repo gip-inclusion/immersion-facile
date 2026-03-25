@@ -21,7 +21,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { match } from "ts-pattern";
-import { ShowConventionErrorOrRenewExpiredJwt } from "../../../pages/convention/ShowErrorOrRenewExpiredJwt";
+import { ShowConventionErrorOrRenewExpiredJwt } from "../../../pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { NpsSection } from "../../nps/NpsSection";
 import {
   ConventionManageActions,
