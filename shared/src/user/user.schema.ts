@@ -7,10 +7,10 @@ import {
 } from "../agency/agency.schema";
 import { proConnectInfoSchema } from "../auth/proConnect/proConnect.schema";
 import { emailSchema } from "../email/email.schema";
-import {
-  businessNameSchema,
-  type EstablishmentData,
-  type WithEstablishmentDashboards,
+import { businessNameSchema } from "../establishment/businessName";
+import type {
+  EstablishmentData,
+  WithEstablishmentDashboards,
 } from "../establishment/establishment";
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";

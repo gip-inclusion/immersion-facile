@@ -4,7 +4,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressAndPositionSchema } from "../address/address.schema";
 import { emailSchema } from "../email/email.schema";
-import { businessNameSchema } from "../establishment/establishment";
+import { businessNameSchema } from "../establishment/businessName";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { establishmentRoleSchema } from "../role/role.schema";
