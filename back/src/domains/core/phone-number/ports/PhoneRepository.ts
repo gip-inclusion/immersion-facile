@@ -1,12 +1,6 @@
-import type { Phone, PhoneNumber, PhoneVerificationStatus } from "shared";
+import type { Phone, PhoneNumber, PhoneStatus } from "shared";
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import type { PhoneId } from "../adapters/pgPhoneHelper";
-import type { UpdatePhonePayload } from "../use-cases/UpdateInvalidPhone";
-
-export type SafeUpdatePhoneParams = Pick<
-  Phone,
-  "verifiedAt" | "verificationStatus"
->;
 
 export const tablesWithPhoneReference = [
   "discussions",
@@ -19,30 +13,36 @@ export const tablesWithPhoneReference = [
 export type TablesWithPhoneReference =
   (typeof tablesWithPhoneReference)[number];
 
+export type FixConflictingPhoneParams = {
+  phoneToUpdate: Phone;
+  newPhoneNumber: PhoneNumber;
+  conflictingPhoneId: PhoneId;
+};
+
+export type FixNotConflictingPhoneParams = {
+  phoneToUpdate: Phone;
+  newPhoneNumber: PhoneNumber;
+};
+
 export interface PhoneRepository {
   getConflictingPhoneNumberId(params: {
     phoneNumber: PhoneNumber;
   }): Promise<number | null>;
-  fixConflictingPhoneUpdate(params: {
-    updatePhonePayload: UpdatePhonePayload;
-    conflictingPhoneNumberId: number;
-  }): Promise<void>;
-  fixNotConflictingPhone(params: {
-    updatePhonePayload: UpdatePhonePayload;
-  }): Promise<void>;
-  getPhoneNumbers(params: {
+  fixConflictingPhone(params: FixConflictingPhoneParams): Promise<void>;
+  fixNotConflictingPhone(params: FixNotConflictingPhoneParams): Promise<void>;
+  getPhones(params: {
     verifiedBefore?: Date;
     limit?: number;
-    verificationStatus?: PhoneVerificationStatus[];
+    verificationStatus?: PhoneStatus[];
     fromId?: PhoneId;
   }): Promise<{ phones: Phone[]; cursorId: number | null }>;
+  getPhoneById(id: PhoneId): Promise<Phone | undefined>;
   markAsVerified(params: {
     phoneIds: PhoneId[];
     verifiedDate: Date;
   }): Promise<void>;
-  updateVerificationStatus(params: {
+  updateStatus(params: {
     phoneIds: PhoneId[];
-    verificationStatus: PhoneVerificationStatus;
+    status: PhoneStatus;
   }): Promise<void>;
-  getTableNamesReferencingPhoneNumbers(): Promise<(keyof Database)[]>;
 }

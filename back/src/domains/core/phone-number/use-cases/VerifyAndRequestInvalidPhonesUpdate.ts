@@ -3,7 +3,8 @@ import { partition } from "ramda";
 import {
   defaultPhoneNumber,
   getSupportedCountryCodesForCountry,
-  phoneVerificationStatus,
+  type Phone,
+  phoneStatus,
 } from "shared";
 import z from "zod";
 import type { TriggeredBy } from "../../events/events";
@@ -12,11 +13,11 @@ import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../useCaseBuilder";
 import type { UpdatePhonePayload } from "./UpdateInvalidPhone";
 
-export const phoneInDBSchema = z.object({
+export const phoneSchema: z.ZodType<Phone> = z.object({
   id: z.number(),
   phoneNumber: z.string(),
   verifiedAt: z.date().nullable(),
-  verificationStatus: z.enum(phoneVerificationStatus),
+  status: z.enum(phoneStatus),
 });
 
 export type VerifyAndRequestInvalidPhonesUpdateReport = {
@@ -40,29 +41,26 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
   .withOutput<VerifyAndRequestInvalidPhonesUpdateReport>()
   .build(
     async ({ deps: { timeGateway, createNewEvent }, uow, inputParams }) => {
+      const batchSize = 10_000;
       const triggeredUseCaseDate = timeGateway.now();
       const report: VerifyAndRequestInvalidPhonesUpdateReport = {
         nbOfCorrectPhones: 0,
         nbOfFixedPhones: 0,
         nbOfPhonesSetToDefault: 0,
       };
-      let fromId: number | undefined;
       let hasMore = true;
 
       while (hasMore) {
-        const { phones: phoneNumbersToVerify, cursorId } =
-          await uow.phoneRepository.getPhoneNumbers({
+        const { phones: phoneNumbersToVerify } =
+          await uow.phoneRepository.getPhones({
             limit: 10_000,
             verifiedBefore: inputParams.dateToVerifyBefore,
-            verificationStatus: ["NOT_VERIFIED", "VERIFICATION_COMPLETED"],
-            fromId,
           });
 
         const verifiedPhoneNumbers: {
           updatePhonePayload: UpdatePhonePayload;
           isValid: boolean;
         }[] = phoneNumbersToVerify.map((pn) => {
-          const verifiedAt = triggeredUseCaseDate.toISOString();
           const triggeredBy = { kind: "crawler" } satisfies TriggeredBy;
 
           const isValid = isValidPhoneNumber(pn.phoneNumber);
@@ -70,14 +68,8 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
           if (isValid) {
             return {
               updatePhonePayload: {
-                currentPhone: {
-                  id: pn.id,
-                  phoneNumber: pn.phoneNumber,
-                  verifiedAt: pn.verifiedAt,
-                  verificationStatus: "VERIFICATION_COMPLETED",
-                },
+                phoneIdToUpdate: pn.id,
                 newPhoneNumber: pn.phoneNumber,
-                newVerificationDate: verifiedAt,
                 triggeredBy,
               },
               isValid,
@@ -89,14 +81,8 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
 
           const resolvedPhone = fixPhoneNumberCountryCode(pn.phoneNumber);
           const updatePhonePayload: UpdatePhonePayload = {
-            currentPhone: {
-              id: pn.id,
-              phoneNumber: pn.phoneNumber,
-              verifiedAt: pn.verifiedAt,
-              verificationStatus: "PENDING_VERIFICATION",
-            },
+            phoneIdToUpdate: pn.id,
             newPhoneNumber: resolvedPhone ?? defaultPhoneNumber,
-            newVerificationDate: verifiedAt,
             triggeredBy,
           };
           return {
@@ -115,6 +101,7 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
             return createNewEvent({
               topic: "InvalidPhoneUpdateRequested",
               payload: updatePhonePayload,
+              wasQuarantined: true, // we don't know how many events there are to fix phones
             });
           },
         );
@@ -123,17 +110,24 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
         );
 
         await uow.phoneRepository.markAsVerified({
-          phoneIds: validPhoneList.map(
-            ({ updatePhonePayload }) => updatePhonePayload.currentPhone.id,
+          phoneIds: verifiedPhoneNumbers.map(
+            (phone) => phone.updatePhonePayload.phoneIdToUpdate,
           ),
           verifiedDate: triggeredUseCaseDate,
         });
 
-        await uow.phoneRepository.updateVerificationStatus({
-          phoneIds: invalidPhoneList.map(
-            ({ updatePhonePayload }) => updatePhonePayload.currentPhone.id,
+        await uow.phoneRepository.updateStatus({
+          phoneIds: validPhoneList.map(
+            (phone) => phone.updatePhonePayload.phoneIdToUpdate,
           ),
-          verificationStatus: "PENDING_VERIFICATION",
+          status: "VALID",
+        });
+
+        await uow.phoneRepository.updateStatus({
+          phoneIds: invalidPhoneList.map(
+            ({ updatePhonePayload }) => updatePhonePayload.phoneIdToUpdate,
+          ),
+          status: "UPDATE_PENDING",
         });
 
         const [defaultedPhoneList, fixedPhoneList] = partition(
@@ -146,8 +140,9 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
         report.nbOfFixedPhones += fixedPhoneList.length;
         report.nbOfPhonesSetToDefault += defaultedPhoneList.length;
 
-        fromId = cursorId ?? undefined;
-        hasMore = cursorId !== null;
+        if (phoneNumbersToVerify.length < batchSize) {
+          hasMore = false;
+        }
       }
 
       return report;

@@ -1,4 +1,4 @@
-import { subSeconds } from "date-fns";
+import { addDays, subDays, subSeconds } from "date-fns";
 import type { Pool } from "pg";
 import {
   type AgencyDto,
@@ -11,6 +11,7 @@ import {
   DiscussionBuilder,
   type DiscussionDto,
   defaultPhoneNumber,
+  expectArraysToEqual,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   type Phone,
@@ -41,7 +42,6 @@ import {
   type TablesWithPhoneReference,
   tablesWithPhoneReference,
 } from "../ports/PhoneRepository";
-import type { UpdatePhonePayload } from "../use-cases/UpdateInvalidPhone";
 import { PgPhoneRepository } from "./PgPhoneRepository";
 import { getOrCreatePhoneIds } from "./pgPhoneHelper";
 
@@ -70,6 +70,8 @@ describe("PgPhoneRepository", () => {
   const correctPhoneNumber: PhoneNumber = "+33555689727";
   const fixablePhoneNumber: PhoneNumber = "+32784423078";
   const fixedPhoneNumber: PhoneNumber = "+33784423078";
+
+  const fakeVerificationDate = new Date("2026-03-23");
 
   beforeAll(async () => {
     pool = makeTestPgPool();
@@ -131,7 +133,7 @@ describe("PgPhoneRepository", () => {
         id: phoneToInsert.id,
         phone_number: phoneToInsert.phoneNumber,
         verified_at: phoneToInsert.verifiedAt,
-        verification_status: phoneToInsert.verificationStatus,
+        status: phoneToInsert.status,
       })
       .execute();
   };
@@ -329,25 +331,19 @@ describe("PgPhoneRepository", () => {
       const fixablePhone: Phone = {
         id: 1,
         phoneNumber: fixablePhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(fixablePhone);
 
-      const updatePhonePayload: UpdatePhonePayload = {
-        currentPhone: { ...fixablePhone, id: unknownConflictingPhoneId },
+      await pgPhoneRepository.fixConflictingPhone({
+        phoneToUpdate: { ...fixablePhone, id: unknownConflictingPhoneId },
         newPhoneNumber: fixedPhoneNumber,
-        newVerificationDate: tenSecondsAgo.toISOString(),
-        triggeredBy: { kind: "crawler" },
-      };
-
-      await pgPhoneRepository.fixConflictingPhoneUpdate({
-        conflictingPhoneNumberId: unknownConflictingPhoneId,
-        updatePhonePayload,
+        conflictingPhoneId: unknownConflictingPhoneId,
       });
 
-      expectToEqual((await pgPhoneRepository.getPhoneNumbers()).phones, [
+      expectToEqual((await pgPhoneRepository.getPhones()).phones, [
         fixablePhone,
       ]);
     });
@@ -356,15 +352,15 @@ describe("PgPhoneRepository", () => {
       const conflictingFixablePhone: Phone = {
         id: 1,
         phoneNumber: fixablePhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "NOT_VERIFIED",
+        verifiedAt: fakeVerificationDate,
+        status: "NOT_VERIFIED",
       };
 
       const fixedPhone: Phone = {
         id: 2,
         phoneNumber: fixedPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "NOT_VERIFIED",
+        verifiedAt: fakeVerificationDate,
+        status: "NOT_VERIFIED",
       };
 
       await insertPhone(fixedPhone);
@@ -374,20 +370,14 @@ describe("PgPhoneRepository", () => {
       const fixablePhoneReferences =
         await createPhoneReferencesOnAllTables(fixablePhoneNumber);
 
-      const updateConflictingPhonePayload: UpdatePhonePayload = {
-        currentPhone: conflictingFixablePhone,
+      await pgPhoneRepository.fixConflictingPhone({
+        phoneToUpdate: conflictingFixablePhone,
         newPhoneNumber: fixedPhoneNumber,
-        newVerificationDate: subSeconds(now, 10).toISOString(),
-        triggeredBy: { kind: "crawler" },
-      };
-
-      await pgPhoneRepository.fixConflictingPhoneUpdate({
-        conflictingPhoneNumberId: fixedPhone.id,
-        updatePhonePayload: updateConflictingPhonePayload,
+        conflictingPhoneId: fixedPhone.id,
       });
 
       expectArraysToEqualIgnoringOrder(
-        (await pgPhoneRepository.getPhoneNumbers({ limit: 100 })).phones,
+        (await pgPhoneRepository.getPhones({ limit: 100 })).phones,
         [fixedPhone],
       );
       await expectPhoneReferencesToMatchPhoneNumber(
@@ -404,25 +394,22 @@ describe("PgPhoneRepository", () => {
       const nonConflictingPhone: Phone = {
         id: 1,
         phoneNumber: fixablePhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(nonConflictingPhone);
 
-      const updatePhonePayload: UpdatePhonePayload = {
-        currentPhone: { ...nonConflictingPhone, id: unknownConflictingPhoneId },
+      await pgPhoneRepository.fixConflictingPhone({
+        phoneToUpdate: {
+          ...nonConflictingPhone,
+          id: unknownConflictingPhoneId,
+        },
         newPhoneNumber: fixedPhoneNumber,
-        newVerificationDate: tenSecondsAgo.toISOString(),
-        triggeredBy: { kind: "crawler" },
-      };
-
-      await pgPhoneRepository.fixConflictingPhoneUpdate({
-        conflictingPhoneNumberId: unknownConflictingPhoneId,
-        updatePhonePayload,
+        conflictingPhoneId: unknownConflictingPhoneId,
       });
 
-      expectToEqual((await pgPhoneRepository.getPhoneNumbers()).phones, [
+      expectToEqual((await pgPhoneRepository.getPhones()).phones, [
         nonConflictingPhone,
       ]);
     });
@@ -431,33 +418,24 @@ describe("PgPhoneRepository", () => {
       const nonConflictingPhone: Phone = {
         id: 1,
         phoneNumber: fixablePhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(nonConflictingPhone);
 
-      const updateNonConflictingPhonePayload: UpdatePhonePayload = {
-        currentPhone: nonConflictingPhone,
-        newPhoneNumber: fixedPhoneNumber,
-        newVerificationDate: tenSecondsAgo.toISOString(),
-        triggeredBy: { kind: "crawler" },
-      };
-
       await pgPhoneRepository.fixNotConflictingPhone({
-        updatePhonePayload: updateNonConflictingPhonePayload,
+        phoneToUpdate: nonConflictingPhone,
+        newPhoneNumber: fixedPhoneNumber,
       });
 
       expectArraysToEqualIgnoringOrder(
-        (await pgPhoneRepository.getPhoneNumbers({ limit: 100 })).phones,
+        (await pgPhoneRepository.getPhones({ limit: 100 })).phones,
         [
           {
             ...nonConflictingPhone,
             phoneNumber: fixedPhoneNumber,
-            verifiedAt: new Date(
-              updateNonConflictingPhonePayload.newVerificationDate,
-            ),
-            verificationStatus: "VERIFICATION_COMPLETED",
+            status: "VALID",
           },
         ],
       );
@@ -469,22 +447,20 @@ describe("PgPhoneRepository", () => {
       const phone1: Phone = {
         id: 1,
         phoneNumber: correctPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
       const phone2: Phone = {
         id: 2,
         phoneNumber: fixablePhoneNumber,
         verifiedAt: null,
-        verificationStatus: "NOT_VERIFIED",
+        status: "NOT_VERIFIED",
       };
 
       await insertPhone(phone1);
       await insertPhone(phone2);
 
-      const { phones } = await pgPhoneRepository.getPhoneNumbers({
-        limit: 100,
-      });
+      const { phones } = await pgPhoneRepository.getPhones();
 
       expectArraysToEqualIgnoringOrder(phones, [phone1, phone2]);
     });
@@ -493,22 +469,21 @@ describe("PgPhoneRepository", () => {
       const pendingPhone: Phone = {
         id: 1,
         phoneNumber: correctPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
       const notVerifiedPhone: Phone = {
         id: 2,
         phoneNumber: fixablePhoneNumber,
         verifiedAt: null,
-        verificationStatus: "NOT_VERIFIED",
+        status: "NOT_VERIFIED",
       };
 
       await insertPhone(pendingPhone);
       await insertPhone(notVerifiedPhone);
 
-      const { phones } = await pgPhoneRepository.getPhoneNumbers({
-        limit: 100,
-        verificationStatus: ["PENDING_VERIFICATION"],
+      const { phones } = await pgPhoneRepository.getPhones({
+        verificationStatus: ["UPDATE_PENDING"],
       });
 
       expectArraysToEqualIgnoringOrder(phones, [pendingPhone]);
@@ -518,22 +493,21 @@ describe("PgPhoneRepository", () => {
       const oldVerifiedPhone: Phone = {
         id: 1,
         phoneNumber: correctPhoneNumber,
-        verifiedAt: tenSecondsAgo,
-        verificationStatus: "VERIFICATION_COMPLETED",
+        verifiedAt: subDays(fakeVerificationDate, 1),
+        status: "UPDATE_PENDING",
       };
       const recentPhone: Phone = {
         id: 2,
         phoneNumber: fixablePhoneNumber,
-        verifiedAt: now,
-        verificationStatus: "VERIFICATION_COMPLETED",
+        verifiedAt: addDays(fakeVerificationDate, 1),
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(oldVerifiedPhone);
       await insertPhone(recentPhone);
 
-      const { phones } = await pgPhoneRepository.getPhoneNumbers({
-        verifiedBefore: now,
-        limit: 100,
+      const { phones } = await pgPhoneRepository.getPhones({
+        verifiedBefore: fakeVerificationDate,
       });
 
       expectToEqual(phones, [oldVerifiedPhone]);
@@ -543,20 +517,20 @@ describe("PgPhoneRepository", () => {
       const phone1: Phone = {
         id: 1,
         phoneNumber: correctPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
       const phone2: Phone = {
         id: 2,
         phoneNumber: fixablePhoneNumber,
         verifiedAt: null,
-        verificationStatus: "NOT_VERIFIED",
+        status: "NOT_VERIFIED",
       };
 
       await insertPhone(phone1);
       await insertPhone(phone2);
 
-      const { phones, cursorId } = await pgPhoneRepository.getPhoneNumbers({
+      const { phones, cursorId } = await pgPhoneRepository.getPhones({
         limit: 1,
       });
 
@@ -565,7 +539,7 @@ describe("PgPhoneRepository", () => {
     });
 
     it("returns an empty array when no phone numbers match the filters", async () => {
-      const { phones, cursorId } = await pgPhoneRepository.getPhoneNumbers({
+      const { phones, cursorId } = await pgPhoneRepository.getPhones({
         limit: 100,
       });
 
@@ -574,13 +548,33 @@ describe("PgPhoneRepository", () => {
     });
   });
 
-  describe("markAsVerified", () => {
-    it("marks the given phone ids as verified with the provided date", async () => {
+  describe("getPhoneById", () => {
+    it("returns phone when getting by an existing phone by id", async () => {
       const phone: Phone = {
         id: 1,
         phoneNumber: correctPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "VALID",
+      };
+      await insertPhone(phone);
+
+      expectToEqual(await pgPhoneRepository.getPhoneById(phone.id), phone);
+    });
+
+    it("returns undefined when getting an unknown phone id", async () => {
+      const unknownId = 999;
+      expectToEqual(await pgPhoneRepository.getPhoneById(unknownId), undefined);
+    });
+  });
+
+  describe("markAsVerified", () => {
+    it("marks the given phone ids as verified with the provided date", async () => {
+      const oldVerificationDate = subDays(now, 30);
+      const phone: Phone = {
+        id: 1,
+        phoneNumber: correctPhoneNumber,
+        verifiedAt: oldVerificationDate,
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(phone);
@@ -590,7 +584,7 @@ describe("PgPhoneRepository", () => {
         verifiedDate: tenSecondsAgo,
       });
 
-      const { phones } = await pgPhoneRepository.getPhoneNumbers({
+      const { phones } = await pgPhoneRepository.getPhones({
         limit: 100,
       });
 
@@ -602,7 +596,7 @@ describe("PgPhoneRepository", () => {
         id: 1,
         phoneNumber: correctPhoneNumber,
         verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(phone);
@@ -612,7 +606,7 @@ describe("PgPhoneRepository", () => {
         verifiedDate: tenSecondsAgo,
       });
 
-      const { phones } = await pgPhoneRepository.getPhoneNumbers({
+      const { phones } = await pgPhoneRepository.getPhones({
         limit: 100,
       });
 
@@ -627,50 +621,48 @@ describe("PgPhoneRepository", () => {
       const phone: Phone = {
         id: 1,
         phoneNumber: correctPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
       await insertPhone(phone);
 
-      await pgPhoneRepository.updateVerificationStatus({
+      await pgPhoneRepository.updateStatus({
         phoneIds: [unknownPhoneId],
-        verificationStatus: "VERIFICATION_COMPLETED",
+        status: "VALID",
       });
-      expectToEqual((await pgPhoneRepository.getPhoneNumbers()).phones, [
-        phone,
-      ]);
+      expectToEqual((await pgPhoneRepository.getPhones()).phones, [phone]);
     });
 
     it("updates the verification status for the given phone ids", async () => {
       const phone1: Phone = {
         id: 1,
         phoneNumber: correctPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
 
       const phone2: Phone = {
         id: 2,
         phoneNumber: defaultPhoneNumber,
-        verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        verifiedAt: fakeVerificationDate,
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(phone1);
       await insertPhone(phone2);
 
-      await pgPhoneRepository.updateVerificationStatus({
+      await pgPhoneRepository.updateStatus({
         phoneIds: [phone1.id, phone2.id],
-        verificationStatus: "VERIFICATION_COMPLETED",
+        status: "VALID",
       });
 
-      const { phones } = await pgPhoneRepository.getPhoneNumbers({
+      const { phones } = await pgPhoneRepository.getPhones({
         limit: 100,
       });
 
-      expectToEqual(phones, [
-        { ...phone1, verificationStatus: "VERIFICATION_COMPLETED" },
-        { ...phone2, verificationStatus: "VERIFICATION_COMPLETED" },
+      expectArraysToEqual(phones, [
+        { ...phone1, status: "VALID" },
+        { ...phone2, status: "VALID" },
       ]);
     });
 
@@ -679,17 +671,17 @@ describe("PgPhoneRepository", () => {
         id: 1,
         phoneNumber: correctPhoneNumber,
         verifiedAt: null,
-        verificationStatus: "PENDING_VERIFICATION",
+        status: "UPDATE_PENDING",
       };
 
       await insertPhone(phone);
 
-      await pgPhoneRepository.updateVerificationStatus({
+      await pgPhoneRepository.updateStatus({
         phoneIds: [],
-        verificationStatus: "VERIFICATION_COMPLETED",
+        status: "VALID",
       });
 
-      const { phones } = await pgPhoneRepository.getPhoneNumbers({
+      const { phones } = await pgPhoneRepository.getPhones({
         limit: 100,
       });
 

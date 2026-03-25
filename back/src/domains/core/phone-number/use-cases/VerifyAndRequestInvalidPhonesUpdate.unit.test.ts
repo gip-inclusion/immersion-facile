@@ -48,9 +48,6 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: { timeGateway, createNewEvent },
       });
-
-    uow.phoneRepository.phones = [];
-    uow.outboxRepository.events = [];
   });
 
   it("Marks as verified a correct phone, fix a fixable phone number, and update an unfixable phone number with default value and reports correctly", async () => {
@@ -58,19 +55,19 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
       id: 1,
       phoneNumber: correctPhoneNumber,
       verifiedAt: null,
-      verificationStatus: "NOT_VERIFIED",
+      status: "NOT_VERIFIED",
     };
     const fixablePhone: Phone = {
       id: 2,
       phoneNumber: fixablePhoneNumber,
       verifiedAt: null,
-      verificationStatus: "NOT_VERIFIED",
+      status: "NOT_VERIFIED",
     };
     const unfixablePhone: Phone = {
       id: 3,
       phoneNumber: unfixablePhoneNumber,
       verifiedAt: null,
-      verificationStatus: "NOT_VERIFIED",
+      status: "NOT_VERIFIED",
     };
 
     uow.phoneRepository.phones = [correctPhone, fixablePhone, unfixablePhone];
@@ -79,41 +76,37 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
       dateToVerifyBefore: now,
     });
 
-    const verifiedCorrectPhone: Phone = {
-      ...correctPhone,
-      verifiedAt: now,
-      verificationStatus: "VERIFICATION_COMPLETED",
-    };
-    const pendingFixablePhone: Phone = {
-      ...fixablePhone,
-      verificationStatus: "PENDING_VERIFICATION",
-    };
-    const pendingUnfixablePhone: Phone = {
-      ...unfixablePhone,
-      verificationStatus: "PENDING_VERIFICATION",
-    };
-
     expectToEqual(uow.phoneRepository.phones, [
-      verifiedCorrectPhone,
-      pendingFixablePhone,
-      pendingUnfixablePhone,
+      {
+        ...correctPhone,
+        verifiedAt: now,
+        status: "VALID",
+      },
+      {
+        ...fixablePhone,
+        verifiedAt: now,
+        status: "UPDATE_PENDING",
+      },
+      {
+        ...unfixablePhone,
+        verifiedAt: now,
+        status: "UPDATE_PENDING",
+      },
     ]);
     expectArraysToMatch(uow.outboxRepository.events, [
       {
         topic: "InvalidPhoneUpdateRequested",
         payload: {
-          currentPhone: pendingFixablePhone,
+          phoneIdToUpdate: fixablePhone.id,
           newPhoneNumber: fixedPhoneNumber,
-          newVerificationDate: now.toISOString(),
           triggeredBy: { kind: "crawler" },
         },
       },
       {
         topic: "InvalidPhoneUpdateRequested",
         payload: {
-          currentPhone: pendingUnfixablePhone,
+          phoneIdToUpdate: unfixablePhone.id,
           newPhoneNumber: defaultPhoneNumber,
-          newVerificationDate: now.toISOString(),
           triggeredBy: { kind: "crawler" },
         },
       },
@@ -125,27 +118,26 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
     });
   });
 
-  it("Does not update phones that have been verified after the input date", async () => {
+  it("Does not verify phones that have been verified after the input date", async () => {
     const dateToVerifyBefore = subDays(now, 5);
-    const afterToVerifyBeforeDate = addDays(dateToVerifyBefore, 1);
 
     const correctPhone: Phone = {
       id: 1,
       phoneNumber: correctPhoneNumber,
-      verifiedAt: afterToVerifyBeforeDate,
-      verificationStatus: "VERIFICATION_COMPLETED",
+      verifiedAt: subDays(dateToVerifyBefore, 5),
+      status: "VALID",
     };
     const fixablePhone: Phone = {
       id: 2,
       phoneNumber: fixablePhoneNumber,
-      verifiedAt: afterToVerifyBeforeDate,
-      verificationStatus: "VERIFICATION_COMPLETED",
+      verifiedAt: addDays(dateToVerifyBefore, 1),
+      status: "VALID",
     };
     const unfixablePhone: Phone = {
       id: 3,
       phoneNumber: unfixablePhoneNumber,
-      verifiedAt: afterToVerifyBeforeDate,
-      verificationStatus: "VERIFICATION_COMPLETED",
+      verifiedAt: addDays(dateToVerifyBefore, 1),
+      status: "VALID",
     };
 
     uow.phoneRepository.phones = [correctPhone, fixablePhone, unfixablePhone];
@@ -155,13 +147,13 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
     });
 
     expectToEqual(uow.phoneRepository.phones, [
-      correctPhone,
+      { ...correctPhone, verifiedAt: now },
       fixablePhone,
       unfixablePhone,
     ]);
     expectArraysToMatch(uow.outboxRepository.events, []);
     expectToEqual(report, {
-      nbOfCorrectPhones: 0,
+      nbOfCorrectPhones: 1,
       nbOfFixedPhones: 0,
       nbOfPhonesSetToDefault: 0,
     });
@@ -172,7 +164,7 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
       id: 1,
       phoneNumber: correctPhoneNumber,
       verifiedAt: subDays(now, 10),
-      verificationStatus: "VERIFICATION_COMPLETED",
+      status: "VALID",
     };
 
     uow.phoneRepository.phones = [phone];
@@ -185,29 +177,6 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
     expectArraysToMatch(uow.outboxRepository.events, []);
     expectToEqual(report, {
       nbOfCorrectPhones: 1,
-      nbOfFixedPhones: 0,
-      nbOfPhonesSetToDefault: 0,
-    });
-  });
-
-  it("Does not verify a phone that is in PENDING_VERIFICATION status", async () => {
-    const pendingVerificationPhone: Phone = {
-      id: 1,
-      phoneNumber: fixablePhoneNumber,
-      verifiedAt: subDays(now, 10),
-      verificationStatus: "PENDING_VERIFICATION",
-    };
-
-    uow.phoneRepository.phones = [pendingVerificationPhone];
-
-    const report = await verifyAndRequestInvalidPhonesUpdate.execute({
-      dateToVerifyBefore: now,
-    });
-
-    expectToEqual(uow.phoneRepository.phones, [pendingVerificationPhone]);
-    expectArraysToMatch(uow.outboxRepository.events, []);
-    expectToEqual(report, {
-      nbOfCorrectPhones: 0,
       nbOfFixedPhones: 0,
       nbOfPhonesSetToDefault: 0,
     });

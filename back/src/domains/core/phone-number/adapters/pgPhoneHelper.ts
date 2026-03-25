@@ -19,7 +19,7 @@ export const getOrCreatePhoneIds = async (
       uniquePhoneNumbers.map((phone_number) => ({
         phone_number,
         verified_at: null,
-        verification_status: "NOT_VERIFIED",
+        status: "NOT_VERIFIED",
       })),
     )
     .onConflict((oc) =>
