@@ -109,13 +109,6 @@ export const AgencyTasks = ({
               page: 1,
               perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
               broadcastErrorKind: "functional",
-              conventionStatus: [
-                "READY_TO_SIGN",
-                "PARTIALLY_SIGNED",
-                "IN_REVIEW",
-                "ACCEPTED_BY_COUNSELLOR",
-                "ACCEPTED_BY_VALIDATOR",
-              ],
             },
             jwt: connectedUserJwt,
             feedbackTopic: "conventions-with-broadcast-feedback",

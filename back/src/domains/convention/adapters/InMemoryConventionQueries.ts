@@ -14,6 +14,7 @@ import {
   errors,
   type GetPaginatedConventionsFilters,
   isFunctionalBroadcastFeedbackError,
+  isUnvalidatedConventionStatus,
   NotFoundError,
   type PaginationQueryParams,
   type SiretDto,
@@ -332,6 +333,18 @@ export class InMemoryConventionQueries implements ConventionQueries {
           if (filters.broadcastErrorKind === "technical" && isFunctional)
             return false;
         }
+
+        const hasPriorSuccessfulBroadcast =
+          this.broadcastFeedbacksRepository.broadcastFeedbacks.some(
+            (bf) =>
+              bf.requestParams.conventionId === result.id &&
+              !bf.subscriberErrorFeedback,
+          );
+        if (
+          isUnvalidatedConventionStatus(result.status) &&
+          !hasPriorSuccessfulBroadcast
+        )
+          return false;
 
         if (filters.conventionStatus && filters.conventionStatus.length > 0) {
           if (!filters.conventionStatus.includes(result.status)) return false;

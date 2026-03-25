@@ -2269,6 +2269,131 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
+    describe("unvalidated convention status and prior successful broadcast (SQL filter)", () => {
+      const cancelledConventionId: ConventionId =
+        "33333333-3333-4333-8333-333333333333";
+
+      const cancelledConvention: ConventionDto = new ConventionDtoBuilder()
+        .withId(cancelledConventionId)
+        .withAgencyId(agencyIdA)
+        .withStatus("CANCELLED")
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
+        .build();
+
+      const errorBroadcast: BroadcastFeedback = {
+        consumerId: null,
+        consumerName: "any-consumer-name",
+        serviceName:
+          "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+        occurredAt: "2024-07-01T00:00:00.000Z",
+        handledByAgency: false,
+        requestParams: {
+          conventionId: cancelledConventionId,
+          conventionStatus: "CANCELLED",
+        },
+        subscriberErrorFeedback: {
+          message: "Aucun dossier trouvé pour les critères d'identité transmis",
+          error: { code: "ANY_FUNCTIONAL_ERROR" },
+        },
+        response: {
+          httpStatus: 500,
+          body: { error: "ANY_FUNCTIONAL_ERROR" },
+        },
+      };
+
+      const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
+
+      beforeEach(async () => {
+        await agencyRepo.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
+        await conventionRepository.save(cancelledConvention);
+        await broadcastFeedbacksRepository.save(errorBroadcast);
+      });
+
+      it("includes convention in unvalidated status when a prior broadcast succeeded", async () => {
+        const priorSuccessBroadcast: BroadcastFeedback = {
+          consumerId: null,
+          consumerName: "any-consumer-name",
+          serviceName:
+            "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+          occurredAt: "2024-07-01T00:00:00.000Z",
+          handledByAgency: false,
+          requestParams: {
+            conventionId: cancelledConventionId,
+            conventionStatus: "CANCELLED",
+          },
+          response: {
+            httpStatus: 200,
+          },
+        };
+
+        await broadcastFeedbacksRepository.save(priorSuccessBroadcast);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: { broadcastErrorKind: "functional" },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: cancelledConvention.id,
+              status: "CANCELLED",
+              beneficiary: {
+                firstname:
+                  cancelledConvention.signatories.beneficiary.firstName,
+                lastname: cancelledConvention.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...errorBroadcast,
+                subscriberErrorFeedback: {
+                  message:
+                    errorBroadcast.subscriberErrorFeedback?.message ?? "",
+                  error: JSON.stringify(
+                    errorBroadcast.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("excludes convention in unvalidated status when every broadcast errored", async () => {
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              pagination: { page: 1, perPage: 10 },
+              filters: { broadcastErrorKind: "functional" },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 0,
+          },
+        });
+      });
+    });
+
     describe("when there are conventions with handled broadcast errors", () => {
       const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
       const defaultPagination = { page: 1, perPage: 10 };
