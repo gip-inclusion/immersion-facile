@@ -84,6 +84,7 @@ seed()
   .then(() => {
     // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log("Seeding script ended !");
+    process.exit(0);
   })
   .catch((err) => {
     console.error("Something went wrong with seed script : ", err);

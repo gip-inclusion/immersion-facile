@@ -5,9 +5,12 @@
   "main": "index.js",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test:local": "playwright test",
+    "test:e2e": "tsx start-e2e.ts",
+    "test:e2e:dev": "tsx start-e2e.ts --dev",
+    "test:e2e:dev:reset": "tsx start-e2e.ts --dev --reset",
+    "test:e2e:dev:stop": "tsx start-e2e.ts --stop",
     "test:local-on-staging": "BASE_URL=https://staging.immersion-facile.beta.gouv.fr playwright test",
-    "test:ci": "CI=true playwright test",
+    "test:ci": "CI=true tsx start-e2e.ts",
     "show-report": "playwright show-report",
     "install": "playwright install --with-deps chromium"
   },
@@ -18,10 +21,13 @@
     "@axe-core/playwright": "^4.10.0",
     "@faker-js/faker": "^8.3.1",
     "@playwright/test": "^1.57.0",
+    "@testcontainers/postgresql": "^11.10.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.8",
     "dotenv": "^16.0.0",
-    "shared": "workspace:*"
+    "shared": "workspace:*",
+    "testcontainers": "^11.11.0",
+    "tsx": "^4.19.0"
   },
   "dependencies": {
     "date-fns": "2.28.0"
