@@ -40,4 +40,18 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
         siret: payload.siret,
         userId: currentUser.id,
       });
+
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "UserRightRegisteredOnEstablishment",
+        payload: {
+          siret: payload.siret,
+          userRight: {
+            ...payload.userRight,
+            userId: user.id,
+          },
+          triggeredBy: { kind: "connected-user", userId: user.id },
+        },
+      }),
+    );
   });
