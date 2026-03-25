@@ -26,7 +26,7 @@ import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
+import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { routes } from "src/app/routes/routes";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { commonIllustrations } from "src/assets/img/illustrations";

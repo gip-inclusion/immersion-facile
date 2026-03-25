@@ -39,7 +39,7 @@ import type { ConventionImmersionPageRoute } from "src/app/pages/convention/Conv
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
-import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowErrorOrRenewExpiredJwt";
+import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
