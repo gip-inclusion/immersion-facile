@@ -3,6 +3,7 @@ import {
   type BroadcastFeedback,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
+  type ConventionId,
   expectToEqual,
   type SearchTextAlphaNumeric,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -347,6 +348,115 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
         totalPages: 1,
         numberPerPage: 10,
       },
+    });
+  });
+
+  describe("unvalidated convention status and prior successful broadcast (SQL filter)", () => {
+    const cancelledConventionId: ConventionId =
+      "33333333-3333-4333-8333-333333333333";
+
+    const cancelledConvention = new ConventionDtoBuilder()
+      .withId(cancelledConventionId)
+      .withAgencyId(agencyId1)
+      .withStatus("CANCELLED")
+      .withDateSubmission("2025-01-02T00:00:00.000Z")
+      .build();
+
+    const errorBroadcast: BroadcastFeedback = {
+      consumerId: null,
+      consumerName: "any-consumer-name",
+      serviceName:
+        "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+      occurredAt: "2024-07-01T14:00:00.000Z",
+      handledByAgency: false,
+      requestParams: {
+        conventionId: cancelledConventionId,
+        conventionStatus: "CANCELLED",
+      },
+      subscriberErrorFeedback: {
+        message: "Aucun dossier trouvé pour les critères d'identité transmis",
+        error: { code: "ANY_FUNCTIONAL_ERROR" },
+      },
+      response: {
+        httpStatus: 500,
+        body: { error: "ANY_FUNCTIONAL_ERROR" },
+      },
+    };
+
+    const priorSuccessBroadcast: BroadcastFeedback = {
+      consumerId: null,
+      consumerName: "any-consumer-name",
+      serviceName:
+        "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
+      occurredAt: "2024-07-01T08:00:00.000Z",
+      handledByAgency: false,
+      requestParams: {
+        conventionId: cancelledConventionId,
+        conventionStatus: "CANCELLED",
+      },
+      response: {
+        httpStatus: 200,
+      },
+    };
+
+    beforeEach(() => {
+      uow.conventionRepository.setConventions([cancelledConvention]);
+      uow.broadcastFeedbacksRepository.broadcastFeedbacks = [errorBroadcast];
+    });
+
+    it("includes convention in unvalidated status when a prior broadcast succeeded", async () => {
+      uow.broadcastFeedbacksRepository.broadcastFeedbacks = [
+        priorSuccessBroadcast,
+        errorBroadcast,
+      ];
+
+      const result = await useCase.execute(
+        {
+          pagination: { page: 1, perPage: 10 },
+          filters: { broadcastErrorKind: "functional" },
+        },
+        user1,
+      );
+
+      expectToEqual(result, {
+        data: [
+          {
+            id: cancelledConventionId,
+            status: "CANCELLED",
+            beneficiary: {
+              firstname: cancelledConvention.signatories.beneficiary.firstName,
+              lastname: cancelledConvention.signatories.beneficiary.lastName,
+            },
+            lastBroadcastFeedback: errorBroadcast,
+          },
+        ],
+        pagination: {
+          totalRecords: 1,
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+        },
+      });
+    });
+
+    it("excludes convention in unvalidated status when every broadcast errored", async () => {
+      const result = await useCase.execute(
+        {
+          pagination: { page: 1, perPage: 10 },
+          filters: { broadcastErrorKind: "functional" },
+        },
+        user1,
+      );
+
+      expectToEqual(result, {
+        data: [],
+        pagination: {
+          totalRecords: 0,
+          currentPage: 1,
+          totalPages: 0,
+          numberPerPage: 10,
+        },
+      });
     });
   });
 });

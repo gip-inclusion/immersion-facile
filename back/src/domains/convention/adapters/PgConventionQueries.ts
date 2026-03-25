@@ -30,6 +30,7 @@ import {
   pipeWithValue,
   type SiretDto,
   type UserId,
+  unvalidatedConventionStatuses,
   type WithSort,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
@@ -424,6 +425,7 @@ export class PgConventionQueries implements ConventionQueries {
         qb,
         filterHasErroredFeedback(),
         filterBroadcastErrorKind(broadcastErrorKind),
+        filterExcludeUnvalidatedConventionsWithoutPriorSuccessfulBroadcast(),
         filterConventionStatus(conventionStatus),
         filterSearchForBroadcastFeedback(search),
       );
@@ -658,6 +660,28 @@ const filterBroadcastErrorKind =
       ),
     );
   };
+
+const filterExcludeUnvalidatedConventionsWithoutPriorSuccessfulBroadcast =
+  () =>
+  (
+    builder: BroadcastFeedbackBaseQueryBuilder,
+  ): BroadcastFeedbackBaseQueryBuilder =>
+    builder.where((eb) =>
+      eb.or([
+        eb("cf.status", "not in", [...unvalidatedConventionStatuses]),
+        eb.exists(
+          eb
+            .selectFrom("broadcast_feedbacks as bf_ok")
+            .select(sql`1`.as("__"))
+            .where(
+              sql`(bf_ok.request_params->>'conventionId')::uuid`,
+              "=",
+              eb.ref("cf.conventionId"),
+            )
+            .where("bf_ok.subscriber_error_feedback", "is", null),
+        ),
+      ]),
+    );
 
 const filterConventionStatus =
   (conventionStatus?: ConventionStatus[]) =>
