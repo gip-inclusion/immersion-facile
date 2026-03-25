@@ -24,6 +24,7 @@ export const ShowConventionErrorOrRenewExpiredJwt = ({
         key={RenewExpiredJwtButton.name}
         expiredJwt={jwt}
         feedbackTopic={feedbackTopic}
+        originalUrl={window.location.href}
       />
     ),
   });
