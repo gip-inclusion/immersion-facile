@@ -634,6 +634,7 @@ export const createUseCases = ({
     registerUserOnEstablishment: makeRegisterUserOnEstablishment({
       uowPerformer,
       deps: {
+        timeGateway: gateways.timeGateway,
         createNewEvent,
       },
     }),
