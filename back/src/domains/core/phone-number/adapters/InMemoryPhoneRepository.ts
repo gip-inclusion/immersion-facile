@@ -1,42 +1,36 @@
-import type { Phone, PhoneNumber, PhoneVerificationStatus } from "shared";
-import type { Database } from "../../../../config/pg/kysely/model/database";
-import type { PhoneRepository } from "../ports/PhoneRepository";
-import type { UpdatePhonePayload } from "../use-cases/UpdateInvalidPhone";
+import {
+  type Phone,
+  type PhoneNumber,
+  type PhoneStatus,
+  replaceArrayElement,
+} from "shared";
+import type {
+  FixConflictingPhoneParams,
+  FixNotConflictingPhoneParams,
+  PhoneRepository,
+} from "../ports/PhoneRepository";
 import type { PhoneId } from "./pgPhoneHelper";
-
-const tablesWithRepoAndPhoneReference = [
-  "discussions",
-  "agencies",
-  "api_consumers",
-  "establishments__users",
-  "conventions",
-] as const satisfies (keyof Database)[];
-
-export type TablesWithRepoAndPhoneReference =
-  (typeof tablesWithRepoAndPhoneReference)[number];
 
 export class InMemoryPhoneRepository implements PhoneRepository {
   phones: Phone[] = [];
+  fixConflictingPhoneUpdateCalls: FixConflictingPhoneParams[] = [];
+  fixNotConflictingPhoneCalls: FixNotConflictingPhoneParams[] = [];
 
-  async updateVerificationStatus(params: {
+  async updateStatus(params: {
     phoneIds: PhoneId[];
-    verificationStatus: PhoneVerificationStatus;
+    status: PhoneStatus;
   }): Promise<void> {
-    const { phoneIds, verificationStatus } = params;
+    const { phoneIds, status } = params;
 
     this.phones = this.phones.map((phone) =>
-      phoneIds.includes(phone.id) ? { ...phone, verificationStatus } : phone,
+      phoneIds.includes(phone.id) ? { ...phone, status } : phone,
     );
   }
 
-  async getTableNamesReferencingPhoneNumbers(): Promise<(keyof Database)[]> {
-    return [...tablesWithRepoAndPhoneReference];
-  }
-
-  async getPhoneNumbers(params: {
+  async getPhones(params: {
     verifiedBefore?: Date;
     limit?: number;
-    verificationStatus?: PhoneVerificationStatus[];
+    verificationStatus?: PhoneStatus[];
     fromId?: number;
   }): Promise<{ phones: Phone[]; cursorId: number | null }> {
     const {
@@ -49,9 +43,7 @@ export class InMemoryPhoneRepository implements PhoneRepository {
     const filtered = this.phones
       .filter((phone) => !phone.verifiedAt || phone.verifiedAt < verifiedBefore)
       .filter((phone) =>
-        verificationStatus
-          ? verificationStatus.includes(phone.verificationStatus)
-          : true,
+        verificationStatus ? verificationStatus.includes(phone.status) : true,
       )
       .filter((phone) => (fromId ? phone.id > fromId : true));
 
@@ -64,37 +56,56 @@ export class InMemoryPhoneRepository implements PhoneRepository {
     };
   }
 
+  async getPhoneById(id: PhoneId): Promise<Phone | undefined> {
+    return this.phones.find((phone) => phone.id === id);
+  }
+
   async markAsVerified(params: {
     phoneIds: PhoneId[];
     verifiedDate: Date;
   }): Promise<void> {
-    this.phones = this.phones.map((phone) =>
-      params.phoneIds.includes(phone.id)
-        ? {
-            ...phone,
-            verifiedAt: params.verifiedDate,
-            verificationStatus: "VERIFICATION_COMPLETED",
-          }
-        : phone,
-    );
+    const phonesVerified = this.phones.map((phone) => {
+      const updatedPhone: Phone = params.phoneIds.includes(phone.id)
+        ? { ...phone, verifiedAt: params.verifiedDate }
+        : phone;
+      return updatedPhone;
+    });
+    this.phones = phonesVerified;
   }
 
   async getConflictingPhoneNumberId(params: {
     phoneNumber: PhoneNumber;
   }): Promise<number | null> {
-    throw new Error("Method not implemented.");
+    const conflictingPhone = this.phones.find(
+      (phone) => phone.phoneNumber === params.phoneNumber,
+    );
+    return conflictingPhone ? conflictingPhone.id : null;
   }
 
-  async fixConflictingPhoneUpdate(params: {
-    updatePhonePayload: UpdatePhonePayload;
-    conflictingPhoneNumberId: number;
-  }): Promise<void> {
-    throw new Error("Method not implemented.");
+  async fixConflictingPhone(params: FixConflictingPhoneParams): Promise<void> {
+    this.fixConflictingPhoneUpdateCalls.push(params); // Should update all references but not possible in InMemory so we just test that it's correctly invoked
+    this.phones = this.phones.filter(
+      (phone) => phone.id !== params.phoneToUpdate.id,
+    );
   }
 
-  async fixNotConflictingPhone(params: {
-    updatePhonePayload: UpdatePhonePayload;
-  }): Promise<void> {
-    throw new Error("Method not implemented.");
+  async fixNotConflictingPhone(
+    params: FixNotConflictingPhoneParams,
+  ): Promise<void> {
+    this.fixNotConflictingPhoneCalls.push(params);
+
+    const { phoneToUpdate, newPhoneNumber } = params;
+
+    const phoneToUpdateIndex = this.phones.findIndex(
+      (phone) => phone.id === phoneToUpdate.id,
+    );
+
+    if (phoneToUpdateIndex === -1) return;
+
+    this.phones = replaceArrayElement(this.phones, phoneToUpdateIndex, {
+      ...phoneToUpdate,
+      phoneNumber: newPhoneNumber,
+      status: "VALID",
+    });
   }
 }
