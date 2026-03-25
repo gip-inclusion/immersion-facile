@@ -3,7 +3,6 @@ import type {
   AdminDashboardName,
   AgencyDashboards,
   AgencyId,
-  AgencyKind,
   ConventionId,
   OmitFromExistingKeys,
   UserId,
@@ -16,7 +15,7 @@ export interface DashboardGateway {
   ): AbsoluteUrl;
   getAgencyUserUrls(
     userId: UserId,
-    agencyKind: AgencyKind | undefined,
+    agencyNames: string[],
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl">;
   getAgencyForAdminUrl(agencyId: AgencyId, now: Date): AbsoluteUrl;

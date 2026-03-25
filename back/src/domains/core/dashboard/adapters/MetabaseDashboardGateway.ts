@@ -4,7 +4,6 @@ import type {
   AdminDashboardName,
   AgencyDashboards,
   AgencyId,
-  AgencyKind,
   ConventionId,
   DashboardName,
   OmitFromExistingKeys,
@@ -12,33 +11,48 @@ import type {
 } from "shared";
 import type { DashboardGateway } from "../port/DashboardGateway";
 
+type MetabaseEndpoint = "v1" | "v2";
+
+type MetabaseEndpointConfig = {
+  url: AbsoluteUrl;
+  apiKey: string;
+};
+
+export type MetabaseConfig = Record<MetabaseEndpoint, MetabaseEndpointConfig>;
+
 type DashboardKind = "dashboard" | "question";
 
 type MetabaseDashboard = {
+  endpoint: MetabaseEndpoint;
   kind: DashboardKind;
   id: number;
 };
 
 const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
-  adminAgencyDetails: { kind: "dashboard", id: 4 },
-  adminAgencies: { kind: "dashboard", id: 130 },
-  adminConventions: { kind: "dashboard", id: 5 },
-  adminEvents: { kind: "question", id: 330 },
-  adminEstablishments: { kind: "dashboard", id: 115 },
-  agencyForUser: { kind: "dashboard", id: 150 }, // https://metabase.immersion-facile.beta.gouv.fr/dashboard/150
-  erroredConventionsForUser: { kind: "dashboard", id: 151 },
-  conventionStatus: { kind: "dashboard", id: 45 },
+  adminAgencyDetails: { kind: "dashboard", id: 4, endpoint: "v1" },
+  adminAgencies: { kind: "dashboard", id: 130, endpoint: "v1" },
+  adminConventions: { kind: "dashboard", id: 5, endpoint: "v1" },
+  adminEvents: { kind: "question", id: 330, endpoint: "v1" },
+  adminEstablishments: { kind: "dashboard", id: 115, endpoint: "v1" },
+  agencyForUser: { kind: "dashboard", id: 150, endpoint: "v1" }, // https://metabase.immersion-facile.beta.gouv.fr/dashboard/150
+  erroredConventionsForUser: {
+    kind: "dashboard",
+    id: 151,
+    endpoint: "v1",
+  },
+  conventionStatus: { kind: "dashboard", id: 45, endpoint: "v1" },
   establishmentRepresentativeConventions: {
     kind: "dashboard",
     id: 128,
+    endpoint: "v1",
   },
   establishmentRepresentativeDiscussions: {
     kind: "dashboard",
     id: 138,
+    endpoint: "v1",
   },
-  statsAgencies: { kind: "dashboard", id: 237 },
-  statsEstablishmentDetails: { kind: "dashboard", id: 223 },
-  statsConventionsByEstablishmentByDepartment: { kind: "dashboard", id: 224 },
+  agencyManagement: { kind: "dashboard", id: 2, endpoint: "v2" },
+  establishmentManagement: { kind: "dashboard", id: 13, endpoint: "v2" },
 };
 
 type MetabasePayload = {
@@ -48,10 +62,8 @@ type MetabasePayload = {
 };
 
 export class MetabaseDashboardGateway implements DashboardGateway {
-  constructor(
-    private metabaseUrl: AbsoluteUrl,
-    private metabaseApiKey: string,
-  ) {}
+  constructor(private metabaseConfig: MetabaseConfig) {}
+
   public getAgencyForAdminUrl(agencyId: AgencyId, now: Date): AbsoluteUrl {
     const dashboard = dashboardByName.adminAgencyDetails;
     const token = this.#createToken({
@@ -80,7 +92,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
 
   public getAgencyUserUrls(
     userId: UserId,
-    agencyKind: AgencyKind | undefined,
+    agencyNames: string[],
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
@@ -89,19 +101,15 @@ export class MetabaseDashboardGateway implements DashboardGateway {
         now,
         { ic_user_id: userId },
       ),
-      statsEstablishmentDetailsUrl: this.#makeDashboardUrlByDashboardName(
-        "statsEstablishmentDetails",
+      agencyManagement: this.#makeDashboardUrlByDashboardName(
+        "agencyManagement",
         now,
+        { structure: agencyNames },
       ),
-      statsConventionsByEstablishmentByDepartmentUrl:
-        this.#makeDashboardUrlByDashboardName(
-          "statsConventionsByEstablishmentByDepartment",
-          now,
-        ),
-      statsAgenciesUrl: this.#makeDashboardUrlByDashboardName(
-        "statsAgencies",
+      establishmentManagement: this.#makeDashboardUrlByDashboardName(
+        "establishmentManagement",
         now,
-        agencyKind ? { type_de_structure: agencyKind } : undefined,
+        {},
       ),
     };
   }
@@ -152,8 +160,8 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     );
   }
 
-  #makeUrl(token: string, { kind }: MetabaseDashboard): AbsoluteUrl {
-    return `${this.metabaseUrl}/embed/${kind}/${token}#bordered=true&titled=true`;
+  #makeUrl(token: string, { kind, endpoint }: MetabaseDashboard): AbsoluteUrl {
+    return `${this.metabaseConfig[endpoint].url}/embed/${kind}/${token}#bordered=true&titled=true`;
   }
 
   #createToken({
@@ -171,6 +179,6 @@ export class MetabaseDashboardGateway implements DashboardGateway {
       exp: Math.round(now.getTime() / 1000) + 60 * 60 * 8, // 8 hours expiration
     };
 
-    return jwt.sign(payload, this.metabaseApiKey);
+    return jwt.sign(payload, this.metabaseConfig[dashboard.endpoint].apiKey);
   }
 }

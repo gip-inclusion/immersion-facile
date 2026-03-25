@@ -13,6 +13,7 @@ import {
   makeThrowIfNotOpenCageGeosearchKey,
   type ProcessEnv,
 } from "shared";
+import type { MetabaseConfig } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import type { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import type { DomainTopic } from "../../domains/core/events/events";
 import type { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
@@ -367,12 +368,22 @@ export class AppConfig {
     );
   }
 
-  public get metabase() {
+  public get metabase(): MetabaseConfig {
     return {
-      metabaseUrl: this.#throwIfNotDefinedOrDefault(
-        "METABASE_URL",
-      ) as AbsoluteUrl,
-      metabaseApiKey: this.#throwIfNotDefinedOrDefault("METABASE_API_KEY"),
+      v1: {
+        url: this.#throwIfNotDefinedOrDefault("METABASE_URL") as AbsoluteUrl,
+        apiKey: this.#throwIfNotDefinedOrDefault("METABASE_API_KEY"),
+      },
+      v2: {
+        url: this.#throwIfNotDefinedOrDefault(
+          "METABASE_V2_URL",
+          "MISSING_METABASE_V2_URL",
+        ) as AbsoluteUrl,
+        apiKey: this.#throwIfNotDefinedOrDefault(
+          "METABASE_V2_API_KEY",
+          "MISSING_METABASE_V2_API_KEY",
+        ),
+      },
     };
   }
 

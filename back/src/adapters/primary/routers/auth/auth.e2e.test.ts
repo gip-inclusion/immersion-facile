@@ -512,15 +512,14 @@ describe("auth router", () => {
             ...agencyUser,
             dashboards: {
               agencies: {
-                agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+                agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${
                   agencyUser.id
                 }/${gateways.timeGateway.now()}`,
                 erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                   agencyUser.id
                 }/${gateways.timeGateway.now()}`,
-                statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${gateways.timeGateway.now()}/${agency.kind}`,
-                statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${gateways.timeGateway.now()}`,
-                statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${gateways.timeGateway.now()}`,
+                agencyManagement: `http://stub-metabasev2/ManageMyAgency/${gateways.timeGateway.now()}/${agency.name}`,
+                establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${gateways.timeGateway.now()}`,
               },
               establishments: {
                 conventions: `http://stubEstablishmentConventionsDashboardUrl/${

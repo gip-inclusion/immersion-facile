@@ -137,15 +137,14 @@ describe("GetConnectedUser", () => {
             ],
             dashboards: {
               agencies: {
+                agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${
+                  connectedNotAdminUser.id
+                }/${timeGateway.now()}`,
                 erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                   connectedNotAdminUser.id
                 }/${timeGateway.now()}`,
-                agencyDashboardUrl: `http://stubAgencyUserDashboard/${
-                  connectedNotAdminUser.id
-                }/${timeGateway.now()}`,
-                statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/${agency.kind}`,
-                statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
-                statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
+                agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${agency.name}`,
+                establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
               },
               establishments: {},
             },
@@ -210,13 +209,12 @@ describe("GetConnectedUser", () => {
           ],
           dashboards: {
             agencies: {
-              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+              agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
               erroredConventionsDashboardUrl: undefined,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/${agency.kind}`,
-              statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
-              statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
+              agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${agency.name}`,
+              establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
             },
             establishments: {},
           },
@@ -298,15 +296,14 @@ describe("GetConnectedUser", () => {
           ],
           dashboards: {
             agencies: {
-              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+              agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}/pole-emploi`,
-              statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
-              statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
+              agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${[agency1, agency2, agency3, agency4].map((agency) => agency.name).join()}`,
+              establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
             },
             establishments: {},
           },
@@ -370,15 +367,14 @@ describe("GetConnectedUser", () => {
           ],
           dashboards: {
             agencies: {
-              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+              agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
-              statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${timeGateway.now()}`,
-              statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${timeGateway.now()}`,
-              statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${timeGateway.now()}`,
+              agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${[agency1, agency2, agency3].map((agency) => agency.name).join()}`,
+              establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
             },
             establishments: {},
           },

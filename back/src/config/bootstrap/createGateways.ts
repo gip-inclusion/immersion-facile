@@ -455,8 +455,5 @@ const createDocumentGateway = (config: AppConfig): DocumentGateway => {
 
 const createDashboardGateway = (config: AppConfig): DashboardGateway =>
   config.dashboard === "METABASE"
-    ? new MetabaseDashboardGateway(
-        config.metabase.metabaseUrl,
-        config.metabase.metabaseApiKey,
-      )
+    ? new MetabaseDashboardGateway(config.metabase)
     : new StubDashboardGateway();
