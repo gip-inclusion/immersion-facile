@@ -37,7 +37,9 @@ export const makeAddConvention = useCaseBuilder("AddConvention")
         payload: {
           convention,
           triggeredBy: null,
-          ...(fromConventionDraftId ? { fromConventionDraftId } : {}),
+          ...(fromConventionDraftId
+            ? { conventionDraftId: fromConventionDraftId }
+            : {}),
           ...(discussionId ? { discussionId } : {}),
         },
       });
