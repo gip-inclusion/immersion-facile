@@ -82,7 +82,7 @@ export const ConventionsWithBroadcastErrorList = ({
     if (isFunctionalBroadcastFeedbackError(errorMessage)) {
       return broadcastFeedbackErrorMessageMap[errorMessage].description;
     }
-    return "Erreur technique : Nous travaillons actuellement à une proposition de solution avec votre DSI, Elle vous sera proposée prochainement.";
+    return "Erreur technique : Immersion facilitée travaille actuellement à une proposition de solution avec votre DSI. Elle vous sera proposée prochainement.";
   };
 
   const broadcastErrorKindOptions: RadioButtonsProps["options"] = useMemo(
