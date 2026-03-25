@@ -118,6 +118,39 @@ describe("Add Convention", () => {
     ]);
   });
 
+  it("sends conventionDraftId in the event when the convention was created from a draft", async () => {
+    const fromConventionDraftId = "550e8400-e29b-41d4-a716-446655440000";
+    const occurredAt = new Date("2021-10-15T15:00");
+    const id = "eventId";
+    timeGateway.setNextDate(occurredAt);
+    uuidGenerator.setNextUuid(id);
+
+    expect(
+      await addConvention.execute({
+        convention: validConvention,
+        fromConventionDraftId,
+      }),
+    ).toEqual({
+      id: validConvention.id,
+    });
+
+    expectDomainEventsToBeInOutbox([
+      {
+        id,
+        occurredAt: occurredAt.toISOString(),
+        topic: "ConventionSubmittedByBeneficiary",
+        payload: {
+          convention: validConvention,
+          conventionDraftId: fromConventionDraftId,
+          triggeredBy: null,
+        },
+        publications: [],
+        status: "never-published",
+        wasQuarantined: false,
+      },
+    ]);
+  });
+
   it("also sends the discussionId in the event, if initialy provided to the use case", async () => {
     const discussion = new DiscussionBuilder().build();
     const occurredAt = new Date("2021-10-15T15:00");
