@@ -82,26 +82,62 @@ export const emailTemplatesByName =
       tags: [
         "Transmision des informations de contact des DR aux agences sans délégation",
       ],
-      createEmailVariables: ({
-        firstName,
-        lastName,
-        agencyName,
-        agencyProvince,
-        delegationProviderMail,
-      }) => ({
+      createEmailVariables: ({ delegationProviderMail }) => ({
         subject:
           "Envoyez la demande de délégation à votre Direction régionale France Travail !",
-        greetings: `Bonjour ${firstName} ${lastName},`,
+        greetings: "Bonjour,",
         content: `
-        Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée.
-        Afin de référencer votre structure ${agencyName} située dans la région ${agencyProvince}, vous devez demander une convention de délégation par email au prescripteur de droit dont votre structure dépend.
-        Votre structure dépend de la DR ${agencyProvince}, contactez-les par email  : <a href="mailto:${delegationProviderMail}" target="_blank">${delegationProviderMail}</a>
+        Vous souhaitez solliciter France Travail pour bénéficier d’une convention de délégation.
+
+        Avant d’effectuer votre demande, vous devez vous avoir pris connaissance des <a href="https://travail-emploi.gouv.fr/les-periodes-de-mise-en-situation-en-milieu-professionnel-pmsmp#anchor-navigation-768" target="_blank">obligations légales</a>, notamment celles liées :
+
+          • à la cotisation à l’URSSAF pour le risque AT/MP
+          • à l’assurance pour les périodes d’immersion
+
+        <strong>Pour finaliser votre demande, vous devez :</strong>
+
+          1. Copier les éléments ci-dessous
+          2. Les compléter
+          3. Les envoyer à ${delegationProviderMail}
+
+        Si vous n’avez pas de réponse sous trois semaines, merci de nous en informer à l’adresse suivante : <a href="mailto:delegation@immersion-facile.beta.gouv.fr" target="_blank">delegation@immersion-facile.beta.gouv.fr</a>
       `,
-        highlight: {
-          content:
-            "Pour formuler votre demande, nous vous invitons à la motiver en précisant le type de public que vous accompagnez, la raison pour laquelle vous souhaitez mobiliser l'immersion professionnelle et le territoire sur lequel vous agissez (régional, départemental).",
-        },
-        subContent: defaultSignature("immersion"),
+        subContent: `
+        Bonne journée,
+        L'équipe Immersion Facilitée
+  
+        <p style="border-top:1px solid #d9d9d9; border-bottom:1px solid #d9d9d9; font-style:italic; color:#4a4a4a; font-family:Arial, Helvetica, sans-serif; padding:0 0 20px 0;">
+          Éléments à copier ci dessous (mail type à envoyer à la Direction Régionale)
+        </p>
+        Bonjour,
+
+        Ma structure souhaite bénéficier d’une convention de délégation afin de pouvoir prescrire des immersions (PMSMP).
+
+        Vous trouverez ci-dessous les informations nécessaires au traitement de ma demande :
+
+        <strong>Informations légales de ma structure</strong>
+        
+          • SIRET :
+          • Nom de la structure :
+          • Adresse :
+          • Nom et prénom de la personne représentant la structure :
+          • Adresse mail de(s) personne(s) à contacter pour établir la convention de délégation :
+          • Numéro de téléphone à joindre en cas de besoin :
+          • Cette demande est-elle effectuée dans le cadre d’un marché de prestations ? (Oui / Non)
+        
+        <strong>Informations concernant les immersions</strong>
+        
+          • Descriptif du public qui sera concerné par les immersions
+          • Le territoire concerné par la demande (périmètre géographique)
+          • Estimation du nombre d’immersions prévues sur une année
+        
+        <strong>Informations complémentaires</strong>
+        
+          • Je confirme que ma structure va cotiser au risque AT/MP : (Oui / Non)
+          • Je confirme que ma structure est assurée pour couvrir les périodes d’immersion : (Oui / Non)
+
+        Cordialement,
+      `,
       }),
     },
     AGENCY_FIRST_REMINDER: {

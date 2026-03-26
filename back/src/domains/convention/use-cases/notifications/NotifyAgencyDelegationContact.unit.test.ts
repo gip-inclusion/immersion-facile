@@ -1,9 +1,4 @@
-import {
-  errors,
-  expectPromiseToFailWithError,
-  getTallyFormValueOf,
-  type TallyForm,
-} from "shared";
+import { errors, expectPromiseToFailWithError, type TallyForm } from "shared";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -64,14 +59,6 @@ describe("NotifyAgencyDelegationContact", () => {
           kind: "AGENCY_DELEGATION_CONTACT_INFORMATION",
           recipients: [tallyForm.data.fields[2].value],
           params: {
-            firstName: getTallyFormValueOf(tallyForm, "Nom") ?? "",
-            lastName: getTallyFormValueOf(tallyForm, "Prénom") ?? "",
-            agencyName:
-              getTallyFormValueOf(
-                tallyForm,
-                "Nom de la structure qui souhaite une convention de délégation",
-              ) ?? "",
-            agencyProvince: tallyFormProvince,
             delegationProviderMail: delegationContactEmail,
           },
         },

@@ -56,16 +56,6 @@ export class NotifyAgencyDelegationContact extends TransactionalUseCase<TallyFor
       kind: "AGENCY_DELEGATION_CONTACT_INFORMATION",
       recipients: [getTallyFormValueOrThrow(tallyForm, "Email")],
       params: {
-        firstName: getTallyFormValueOrThrow(tallyForm, "Nom"),
-        lastName: getTallyFormValueOrThrow(tallyForm, "Prénom"),
-        agencyName: getTallyFormValueOrThrow(
-          tallyForm,
-          "Nom de la structure qui souhaite une convention de délégation",
-        ),
-        agencyProvince: getTallyFormValueOrThrow(
-          tallyForm,
-          "Région de la structure qui souhaite une convention de délégation",
-        ),
         delegationProviderMail: delegationEmail,
       },
     };
