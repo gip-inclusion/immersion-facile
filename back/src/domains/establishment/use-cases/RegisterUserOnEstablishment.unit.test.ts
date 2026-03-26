@@ -63,6 +63,25 @@ describe("RegisterUserOnEstablishment", () => {
       );
     });
 
+    it("fails if current user email does not match user right email", async () => {
+      await expectPromiseToFailWithError(
+        registerUserOnEstablishment.execute(
+          {
+            siret: "12345678901234",
+            userRight: {
+              email: "test@test.com",
+              role: "establishment-contact",
+              status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
+            },
+          },
+          anyConnectedUser,
+        ),
+        errors.user.forbiddenEmailUpdate(),
+      );
+    });
+
     it("fails if user right status is not pending", async () => {
       await expectPromiseToFailWithError(
         registerUserOnEstablishment.execute(
@@ -84,24 +103,7 @@ describe("RegisterUserOnEstablishment", () => {
         }),
       );
     });
-    it("fails if user doesn't exist", async () => {
-      await expectPromiseToFailWithError(
-        registerUserOnEstablishment.execute(
-          {
-            siret: "12345678901234",
-            userRight: {
-              email: "test@test.com",
-              role: "establishment-contact",
-              status: "PENDING",
-              shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
-            },
-          },
-          anyConnectedUser,
-        ),
-        errors.user.notFound({ userId: anyConnectedUser.id }),
-      );
-    });
+
     it("fails if no establishment with this siret", async () => {
       uow.userRepository.users = [anyConnectedUser];
 
@@ -158,83 +160,83 @@ describe("RegisterUserOnEstablishment", () => {
         }),
       );
     });
+  });
 
-    describe("Right path", () => {
-      const adminEstablishmentUser = new UserBuilder()
-        .withId("adminEstablishmentUser")
-        .build();
-      const establishmentAggregate = new EstablishmentAggregateBuilder()
-        .withUserRights([
-          {
-            userId: adminEstablishmentUser.id,
-            role: "establishment-admin",
-            status: "ACCEPTED",
-            shouldReceiveDiscussionNotifications: true,
-            isMainContactByPhone: false,
-            job: "osef",
-            phone: "osef",
-          },
-        ])
-        .build();
-
-      it("registers user on establishment", async () => {
-        const userRightWithRequestedRole: FormEstablishmentUserRight = {
-          email: "test@test.com",
-          role: "establishment-contact",
-          status: "PENDING",
+  describe("Right path", () => {
+    const adminEstablishmentUser = new UserBuilder()
+      .withId("adminEstablishmentUser")
+      .build();
+    const establishmentAggregate = new EstablishmentAggregateBuilder()
+      .withUserRights([
+        {
+          userId: adminEstablishmentUser.id,
+          role: "establishment-admin",
+          status: "ACCEPTED",
           shouldReceiveDiscussionNotifications: true,
           isMainContactByPhone: false,
-        };
+          job: "osef",
+          phone: "osef",
+        },
+      ])
+      .build();
 
-        uow.userRepository.users = [anyConnectedUser];
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          establishmentAggregate,
-        ];
+    it("registers user on establishment", async () => {
+      const userRightWithRequestedRole: FormEstablishmentUserRight = {
+        email: "test@test.com",
+        role: "establishment-contact",
+        status: "PENDING",
+        shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
+      };
 
-        const result = await registerUserOnEstablishment.execute(
-          {
-            siret: establishmentAggregate.establishment.siret,
-            userRight: userRightWithRequestedRole,
+      uow.userRepository.users = [anyConnectedUser];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+
+      const result = await registerUserOnEstablishment.execute(
+        {
+          siret: establishmentAggregate.establishment.siret,
+          userRight: userRightWithRequestedRole,
+        },
+        anyConnectedUser,
+      );
+
+      expectToEqual(result, undefined);
+      expectToEqual(
+        await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          establishmentAggregate.establishment.siret,
+        ),
+        {
+          ...establishmentAggregate,
+          userRights: [
+            ...establishmentAggregate.userRights,
+            { ...userRightWithRequestedRole, userId: anyConnectedUser.id },
+          ],
+          establishment: {
+            ...establishmentAggregate.establishment,
+            updatedAt: timeGateway.now(),
           },
-          anyConnectedUser,
-        );
+        },
+      );
 
-        expectToEqual(result, undefined);
-        expectToEqual(
-          await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-            establishmentAggregate.establishment.siret,
-          ),
-          {
-            ...establishmentAggregate,
-            userRights: [
-              ...establishmentAggregate.userRights,
-              { ...userRightWithRequestedRole, userId: anyConnectedUser.id },
-            ],
-            establishment: {
-              ...establishmentAggregate.establishment,
-              updatedAt: timeGateway.now(),
-            },
+      expect(uow.outboxRepository.events).toHaveLength(1);
+      expectObjectsToMatch(uow.outboxRepository.events[0], {
+        topic: "PendingUserRightRegisteredOnEstablishment",
+        payload: {
+          siret: establishmentAggregate.establishment.siret,
+          userRight: {
+            userId: anyConnectedUser.id,
+            role: "establishment-contact",
+            status: "PENDING",
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
           },
-        );
-
-        expect(uow.outboxRepository.events).toHaveLength(1);
-        expectObjectsToMatch(uow.outboxRepository.events[0], {
-          topic: "UserRightRegisteredOnEstablishment",
-          payload: {
-            siret: establishmentAggregate.establishment.siret,
-            userRight: {
-              userId: anyConnectedUser.id,
-              role: "establishment-contact",
-              status: "PENDING",
-              shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
-            },
-            triggeredBy: {
-              kind: "connected-user",
-              userId: anyConnectedUser.id,
-            },
+          triggeredBy: {
+            kind: "connected-user",
+            userId: anyConnectedUser.id,
           },
-        });
+        },
       });
     });
   });

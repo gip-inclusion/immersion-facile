@@ -162,7 +162,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   establishmentSharedRouter.registerUserOnEstablishment(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () =>
+      sendHttpResponse(req, res.status(201), () =>
         deps.useCases.registerUserOnEstablishment.execute(
           {
             siret: req.params.siret,
