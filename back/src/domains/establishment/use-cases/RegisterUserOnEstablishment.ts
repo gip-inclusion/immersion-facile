@@ -24,10 +24,13 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
       throw errors.user.forbiddenEmailUpdate();
     }
 
+    const user = await uow.userRepository.getById(currentUser.id);
+    if (!user) throw errors.user.notFound({ userId: currentUser.id });
+
     if (payload.userRight.status !== "PENDING")
       throw errors.establishment.userRightStatusNotPending({
         siret: payload.siret,
-        userId: currentUser.id,
+        userId: user.id,
       });
 
     const establishmentAggregate =
@@ -38,12 +41,12 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
       throw errors.establishment.notFound({ siret: payload.siret });
     if (
       establishmentAggregate.userRights.some(
-        (userRight) => userRight.userId === currentUser.id,
+        (userRight) => userRight.userId === user.id,
       )
     )
       throw errors.establishment.userRightAlreadyExists({
         siret: payload.siret,
-        userId: currentUser.id,
+        userId: user.id,
       });
 
     const establishmentAggregateWithRequestedUserRight: EstablishmentAggregate =
@@ -51,7 +54,7 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
         ...establishmentAggregate,
         userRights: [
           ...establishmentAggregate.userRights,
-          { ...payload.userRight, userId: currentUser.id },
+          { ...payload.userRight, userId: user.id },
         ],
       };
 
@@ -67,9 +70,9 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
           siret: payload.siret,
           userRight: {
             ...payload.userRight,
-            userId: currentUser.id,
+            userId: user.id,
           },
-          triggeredBy: { kind: "connected-user", userId: currentUser.id },
+          triggeredBy: { kind: "connected-user", userId: user.id },
         },
       }),
     );

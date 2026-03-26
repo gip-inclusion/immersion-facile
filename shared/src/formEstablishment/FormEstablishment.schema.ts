@@ -67,7 +67,7 @@ export const contactModeSchema = zEnumValidation(
   "Choisissez parmi les options proposées",
 );
 
-const formEstablishmentUserRightStatusSchema = zEnumValidation(
+export const formEstablishmentUserRightStatusSchema = zEnumValidation(
   establishmentUserRightStatus,
   "Le statut est inconnu",
 );

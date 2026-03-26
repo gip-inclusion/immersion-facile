@@ -3,6 +3,7 @@ import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import type {
+  EstablishmentUserRightStatus,
   FormEstablishmentDto,
   FormEstablishmentUserRight,
 } from "../formEstablishment/FormEstablishment.dto";
@@ -86,6 +87,7 @@ export type EstablishmentData = {
   siret: SiretDto;
   businessName: BusinessName;
   role: EstablishmentRole;
+  status: EstablishmentUserRightStatus;
   admins: EstablishmentAdminPrivateData[];
 };
 

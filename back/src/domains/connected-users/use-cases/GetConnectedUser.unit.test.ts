@@ -515,6 +515,7 @@ describe("GetConnectedUser", () => {
                       establishmentAggregate1.establishment.customizedName ??
                       establishmentAggregate1.establishment.name,
                     role: "establishment-admin",
+                    status: "ACCEPTED",
                     admins: [
                       {
                         email: anotherUser.email,
@@ -534,6 +535,7 @@ describe("GetConnectedUser", () => {
                       establishmentAggregate2.establishment.customizedName ??
                       establishmentAggregate2.establishment.name,
                     role: "establishment-contact",
+                    status: "ACCEPTED",
                     admins: [],
                   },
                 ],

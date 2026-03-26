@@ -3,6 +3,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Table } from "@codegouvfr/react-dsfr/Table";
+import { uniqBy } from "ramda";
 import { Fragment, useState } from "react";
 import { NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
@@ -12,7 +13,7 @@ import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutName
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUsersEditForm";
+import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUserForm";
 import { routes } from "src/app/routes/routes";
 import { createFormModal, useFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -41,10 +42,31 @@ export const EstablishmentUsersList = () => {
   const formEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const dispatch = useDispatch();
   const [editingUserRight, setEditingUserRight] =
     useState<FormEstablishmentUserRight | null>(null);
 
   if (!formEstablishment?.userRights) return null;
+
+  const onValidateUserRight = (userRight: FormEstablishmentUserRight) => {
+    const updatedFormEstablishment = {
+      ...formEstablishment,
+      userRights: mergeUserRights(formEstablishment.userRights, {
+        ...userRight,
+        status: "ACCEPTED",
+      }),
+    };
+    dispatch(
+      establishmentSlice.actions.updateEstablishmentRequested({
+        establishmentUpdate: {
+          formEstablishment: updatedFormEstablishment,
+          jwt: connectedUserJwt ?? "",
+        },
+        feedbackTopic: "establishment-dashboard-users-rights",
+      }),
+    );
+  };
 
   const headers = [
     "Utilisateur",
@@ -70,6 +92,7 @@ export const EstablishmentUsersList = () => {
       isLastAdmin,
       index,
       setEditingUserRight,
+      onValidateUserRight,
     });
   });
 
@@ -211,59 +234,116 @@ const getEstablishmentUserRow = ({
   isLastAdmin,
   index,
   setEditingUserRight,
+  onValidateUserRight,
 }: {
   userRight: FormEstablishmentUserRight;
   isLastAdmin: boolean;
   index: number;
   setEditingUserRight: (userRight: FormEstablishmentUserRight) => void;
+  onValidateUserRight: (userRight: FormEstablishmentUserRight) => void;
 }) => [
   userRight.email,
   <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
     <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
     <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>
   </Fragment>,
-  <Badge
-    key={`${userRight.email}-${userRight.role}`}
-    small
-    className={fr.cx(userRolesToDisplay[userRight.role].className, "fr-mr-1w")}
-  >
-    {userRolesToDisplay[userRight.role].label}
-  </Badge>,
+  <>
+    <Badge
+      key={`${userRight.email}-${userRight.role}`}
+      small
+      className={fr.cx(
+        userRolesToDisplay[userRight.role].className,
+        "fr-mr-1w",
+      )}
+    >
+      {userRolesToDisplay[userRight.role].label}
+    </Badge>
+    {userRight.status === "PENDING" && (
+      <Badge small severity="warning">
+        En attente
+      </Badge>
+    )}
+  </>,
   <NotificationIndicator
     key={`${userRight.email}-${userRight.role}`}
     isNotified={userRight.shouldReceiveDiscussionNotifications}
   />,
-  <ButtonsGroup
-    key={`${userRight.email}-${userRight.role}`}
-    inlineLayoutWhen="always"
-    buttonsSize="small"
-    buttons={[
-      {
-        children: "Modifier",
-        onClick: () => {
-          setEditingUserRight(userRight);
-          establishmentUsersEditModal.open();
+  userRight.status === "PENDING" ? (
+    <ButtonsGroup
+      key={`${userRight.email}`}
+      buttonsSize="small"
+      inlineLayoutWhen="always"
+      buttons={[
+        {
+          children: "Accepter",
+          onClick: () => {
+            onValidateUserRight(userRight);
+          },
+          priority: "primary",
+          className: fr.cx("fr-my-1v"),
+          type: "button",
+          id: `${domElementIds.establishmentDashboard.manageEstablishments.rejectUserRightButton}-${index}`,
         },
-        priority: "secondary",
-        className: fr.cx("fr-my-1v"),
-        type: "button",
-        id: `${domElementIds.establishmentDashboard.manageEstablishments.editUserButton}-${index}`,
-      },
-      {
-        children: "Supprimer",
-        onClick: () => {
-          setEditingUserRight(userRight);
-          establishmentUsersDeleteModal.open();
+        {
+          children: "Refuser",
+          onClick: () => {
+            setEditingUserRight(userRight);
+            establishmentUsersDeleteModal.open();
+          },
+          priority: "secondary",
+          className: fr.cx("fr-my-1v"),
+          type: "button",
+          id: `${domElementIds.establishmentDashboard.manageEstablishments.validateUserRightButton}-${index}`,
         },
-        priority: "secondary",
-        className: fr.cx("fr-my-1v"),
-        type: "button",
-        disabled: isLastAdmin,
-        title: isLastAdmin
-          ? "Vous devez avoir au moins un administrateur pour votre établissement."
-          : undefined,
-        id: `${domElementIds.establishmentDashboard.manageEstablishments.deleteUserButton}-${index}`,
-      },
-    ]}
-  />,
+      ]}
+    />
+  ) : (
+    <ButtonsGroup
+      key={`${userRight.email}-${userRight.role}`}
+      inlineLayoutWhen="always"
+      buttonsSize="small"
+      buttons={[
+        {
+          children: "Modifier",
+          onClick: () => {
+            setEditingUserRight(userRight);
+            establishmentUsersEditModal.open();
+          },
+          priority: "secondary",
+          className: fr.cx("fr-my-1v"),
+          type: "button",
+          id: `${domElementIds.establishmentDashboard.manageEstablishments.editUserButton}-${index}`,
+        },
+        {
+          children: "Supprimer",
+          onClick: () => {
+            setEditingUserRight(userRight);
+            establishmentUsersDeleteModal.open();
+          },
+          priority: "secondary",
+          className: fr.cx("fr-my-1v"),
+          type: "button",
+          disabled: isLastAdmin,
+          title: isLastAdmin
+            ? "Vous devez avoir au moins un administrateur pour votre établissement."
+            : undefined,
+          id: `${domElementIds.establishmentDashboard.manageEstablishments.deleteUserButton}-${index}`,
+        },
+      ]}
+    />
+  ),
 ];
+
+export const mergeUserRights = (
+  userRights: FormEstablishmentUserRight[],
+  userRightToMerge: FormEstablishmentUserRight,
+) => {
+  const userRightsWithoutPreviousOne = userRights.filter(
+    (userRight) => userRight.email !== userRightToMerge.email,
+  );
+
+  return uniqBy(
+    (userRight) => userRight.email,
+    [userRightToMerge, ...userRightsWithoutPreviousOne],
+  );
+};

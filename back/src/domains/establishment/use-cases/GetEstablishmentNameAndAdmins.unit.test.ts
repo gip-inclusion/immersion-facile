@@ -83,6 +83,7 @@ describe("GetEstablishmentNameAndAdmins", () => {
                 role: "establishment-contact",
                 siret: establishment.establishment.siret,
                 businessName: establishment.establishment.name,
+                status: "ACCEPTED",
                 admins: [],
               },
             ],
