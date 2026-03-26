@@ -402,63 +402,108 @@ describe("auth router", () => {
     describe(`${displayRouteName(
       authRoutes.getOAuthLogoutUrl,
     )} returns the logout url`, () => {
-      it("returns 401 if not logged in", async () => {
-        const response = await authRoutesClient.getOAuthLogoutUrl({
-          queryParams: { idToken: "fake-id-token", provider: "proConnect" },
-          headers: { authorization: "" },
+      describe("when provider is 'proConnect'", () => {
+        it("returns 401 if authorization header is missing", async () => {
+          const response = await authRoutesClient.getOAuthLogoutUrl({
+            queryParams: { idToken: "fake-id-token", provider: "proConnect" },
+            headers: { authorization: "" },
+          });
+
+          expectHttpResponseToEqual(response, {
+            status: 401,
+            body: {
+              status: 401,
+              message: "Veuillez vous authentifier",
+            },
+          });
         });
 
-        expectHttpResponseToEqual(response, {
-          status: 401,
-          body: {
+        it("returns 401 when user does not exist", async () => {
+          const token = generateConnectedUserJwt({
+            userId: "missing-user-id",
+            version: currentJwtVersions.connectedUser,
+          });
+
+          const response = await authRoutesClient.getOAuthLogoutUrl({
+            headers: { authorization: token },
+            queryParams: {
+              idToken: "fake-id-token",
+              provider: "proConnect",
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
             status: 401,
-            message: "Veuillez vous authentifier",
-          },
+            body: {
+              status: 401,
+              message: invalidTokenMessage,
+            },
+          });
+        });
+
+        it("returns a correct logout url with status 200", async () => {
+          const user = new UserBuilder()
+            .withProConnectInfos({ externalId: "id", siret: "00000000000000" })
+            .build();
+
+          inMemoryUow.userRepository.users = [user];
+          const state = "fake-state";
+          inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
+            {
+              fromUri: "uri",
+              userId: user.id,
+              accessToken: "yolo",
+              provider: "proConnect",
+              state,
+              nonce: "fake-nonce",
+              externalId: user.proConnect?.externalId,
+              usedAt: null,
+            },
+          ];
+
+          const token = generateConnectedUserJwt({
+            userId: user.id,
+            version: currentJwtVersions.connectedUser,
+          });
+
+          const response = await authRoutesClient.getOAuthLogoutUrl({
+            headers: { authorization: token },
+            queryParams: {
+              idToken: "fake-id-token",
+              provider: "proConnect",
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
+            body: `${
+              appConfig.proConnectConfig.providerBaseUri
+            }${fakeProConnectLogoutUri}?${queryParamsAsString({
+              postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
+              idToken: "fake-id-token",
+              state,
+            })}`,
+            status: 200,
+          });
         });
       });
 
-      it("returns a correct logout url with status 200", async () => {
-        const user = new UserBuilder()
-          .withProConnectInfos({ externalId: "id", siret: "00000000000000" })
-          .build();
+      describe("when provider is 'peConnect'", () => {
+        it("when peConnect, returns a correct logout url with status 200", async () => {
+          const response = await authRoutesClient.getOAuthLogoutUrl({
+            headers: { authorization: "fake-token" },
+            queryParams: {
+              idToken: "fake-id-token",
+              provider: "peConnect",
+            },
+          });
 
-        inMemoryUow.userRepository.users = [user];
-        const state = "fake-state";
-        inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
-          {
-            fromUri: "uri",
-            userId: user.id,
-            accessToken: "yolo",
-            provider: "proConnect",
-            state,
-            nonce: "fake-nonce",
-            externalId: user.proConnect?.externalId,
-            usedAt: null,
-          },
-        ];
-
-        const token = generateConnectedUserJwt({
-          userId: user.id,
-          version: currentJwtVersions.connectedUser,
-        });
-
-        const response = await authRoutesClient.getOAuthLogoutUrl({
-          headers: { authorization: token },
-          queryParams: {
-            idToken: "fake-id-token",
-            provider: "proConnect",
-          },
-        });
-
-        expectHttpResponseToEqual(response, {
-          body: `${
-            appConfig.proConnectConfig.providerBaseUri
-          }${fakeProConnectLogoutUri}?${queryParamsAsString({
-            postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
-            idToken: "fake-id-token",
-            state,
-          })}`,
-          status: 200,
+          expectHttpResponseToEqual(response, {
+            body: `https://fake-ft-connect-logout-url?${queryParamsAsString({
+              id_token_hint: "fake-id-token",
+              redirect_uri: "fake-redirect-uri",
+            })}`,
+            status: 200,
+          });
         });
       });
     });

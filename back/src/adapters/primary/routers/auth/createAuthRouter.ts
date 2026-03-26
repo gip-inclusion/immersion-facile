@@ -1,3 +1,4 @@
+import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
 import { authRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
@@ -35,12 +36,19 @@ export const createAuthRouter = (deps: AppDependencies) => {
   );
 
   authSharedRouter.getOAuthLogoutUrl(
-    deps.connectedUserAuthMiddleware,
+    (req: Request<any, any, any, any>, res: Response, next: NextFunction) => {
+      if (req.query.provider === "peConnect") {
+        return next();
+      }
+      return deps.connectedUserAuthMiddleware(req, res, next);
+    },
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getOAuthLogoutUrl.execute(
           req.query,
-          getGenericAuthOrThrow(req.payloads?.currentUser),
+          req.query.provider === "peConnect"
+            ? undefined
+            : getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
