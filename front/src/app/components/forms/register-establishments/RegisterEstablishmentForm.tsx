@@ -20,7 +20,7 @@ import {
   type SiretDto,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUsersEditForm";
+import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUserForm";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";

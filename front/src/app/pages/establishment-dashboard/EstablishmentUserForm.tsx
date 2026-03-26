@@ -2,7 +2,6 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { uniqBy } from "ramda";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -15,6 +14,7 @@ import {
 } from "shared";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { mergeUserRights } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
 import { type routes, useRoute } from "src/app/routes/routes";
 import {
   type createFormModal,
@@ -78,20 +78,6 @@ export const EstablishmentUserForm = ({
   } = methods;
 
   const { formId } = useFormModal();
-
-  const mergeUserRights = (
-    userRights: FormEstablishmentUserRight[],
-    userRightToMerge: FormEstablishmentUserRight,
-  ) => {
-    const userRightsWithoutPreviousOne = userRights.filter(
-      (userRight) => userRight.email !== userRightToMerge.email,
-    );
-
-    return uniqBy(
-      (userRight) => userRight.email,
-      [userRightToMerge, ...userRightsWithoutPreviousOne],
-    );
-  };
 
   const onSubmit = (data: FormEstablishmentUserRight) => {
     if (isEstablishmentDashboardFormEstablishment) {

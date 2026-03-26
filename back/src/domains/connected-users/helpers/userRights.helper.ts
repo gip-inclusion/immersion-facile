@@ -67,6 +67,7 @@ const makeEstablishmentRights = async (
       ? establishment.customizedName
       : establishment.name,
     role: userRight.role,
+    status: userRight.status,
     admins: adminUsers.map(({ firstName, lastName, email }) => ({
       firstName,
       lastName,

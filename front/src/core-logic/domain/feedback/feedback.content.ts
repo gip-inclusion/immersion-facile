@@ -342,8 +342,9 @@ export const feedbacks: Record<
     "create.success": {
       action:
         establishmentSlice.actions.userRegistrationOnEstablishmentSucceeded,
-      title: "L'utilisateur a bien été enregistré sur l'entreprise",
-      message: "L'utilisateur a bien été enregistré sur l'entreprise",
+      title: "Votre demande d'accès a bien été prise en compte",
+      message:
+        "Elle sera étudiée prochainement par un administrateur de l'entreprise et vous serez informé de sa décision.",
     },
     "create.error": {
       action: establishmentSlice.actions.userRegistrationOnEstablishmentFailed,

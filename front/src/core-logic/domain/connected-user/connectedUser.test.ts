@@ -569,12 +569,14 @@ describe("InclusionConnected", () => {
               businessName: "Ma super entreprise",
               role: "establishment-admin",
               siret: "01234567890123",
+              status: "ACCEPTED",
             },
             {
               admins: [otherUserAdminData],
               businessName: "Ma super entreprise 2",
               role: "establishment-admin",
               siret: "01234567890124",
+              status: "ACCEPTED",
             },
           ])
           .build();
@@ -653,6 +655,7 @@ describe("InclusionConnected", () => {
           businessName: "Ma super entreprise 2",
           role: otherEstablishmentToKeepUserRight.role,
           siret: "01234567890124",
+          status: "ACCEPTED",
         };
         const user = new ConnectedUserBuilder()
           .withEmail(currentUserAdminData.email)
@@ -666,6 +669,7 @@ describe("InclusionConnected", () => {
               businessName: "Ma super entreprise",
               role: "establishment-admin",
               siret: "01234567890123",
+              status: "ACCEPTED",
             },
             otherEstablishmentToKeepData,
           ])
@@ -695,6 +699,7 @@ describe("InclusionConnected", () => {
               businessName: updatedFormEstablishment.businessName,
               siret: updatedFormEstablishment.siret,
               role: "establishment-admin",
+              status: "ACCEPTED",
             },
             otherEstablishmentToKeepData,
           ],
@@ -743,6 +748,7 @@ describe("InclusionConnected", () => {
           businessName: "Ma super entreprise 2",
           role: otherEstablishmentUserRight.role,
           siret: "01234567890124",
+          status: "ACCEPTED",
         };
         const user = new ConnectedUserBuilder()
           .withEmail(currentUserAdminData.email)
@@ -756,6 +762,7 @@ describe("InclusionConnected", () => {
               businessName: "Ma super entreprise",
               role: "establishment-admin",
               siret: "01234567890123",
+              status: "ACCEPTED",
             },
             otherEstablishmentData,
           ])
@@ -805,6 +812,7 @@ describe("InclusionConnected", () => {
               businessName: establishment.businessName,
               siret: establishment.siret,
               role: "establishment-contact",
+              status: "ACCEPTED",
             },
             otherEstablishmentData,
           ],

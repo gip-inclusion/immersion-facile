@@ -16,9 +16,7 @@ export const EstablishmentsTablesSection = ({
       <Button
         id={domElementIds.profile.registerEstablishmentButton}
         priority="primary"
-        linkProps={{
-          href: `${routes.myProfileEstablishmentRegistration().href}`,
-        }}
+        linkProps={routes.myProfileEstablishmentRegistration().link}
         className={fr.cx("fr-ml-auto")}
         iconId="fr-icon-add-line"
       >
