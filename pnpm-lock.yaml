@@ -637,6 +637,9 @@ importers:
       uuid:
         specifier: ^8.3.2
         version: 8.3.2
+      zod:
+        specifier: 4.0.17
+        version: 4.0.17
     devDependencies:
       '@swc/core':
         specifier: ^1.15.11
@@ -698,9 +701,6 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
-      zod:
-        specifier: 4.0.17
-        version: 4.0.17
 
 packages:
 
