@@ -5,7 +5,7 @@ import { emailSchema } from "../email/email.schema";
 import type {
   EstablishmentUserRightStatus,
   FormEstablishmentDto,
-  FormEstablishmentUserRight,
+  FormEstablishmentPendingUserRight,
 } from "../formEstablishment/FormEstablishment.dto";
 import { formEstablishmentUserRightSchema } from "../formEstablishment/FormEstablishment.schema";
 import type { EstablishmentRole } from "../role/role.dto";
@@ -62,12 +62,16 @@ export const establishmentPublicOptionsSchema: ZodSchemaWithInputMatchingOutput<
 export const registerUserOnEstablishmentPayloadSchema: ZodSchemaWithInputMatchingOutput<RegisterUserOnEstablishmentPayload> =
   z.object({
     siret: siretSchema,
-    userRight: formEstablishmentUserRightSchema,
+    userRight: formEstablishmentUserRightSchema.and(
+      z.object({
+        status: z.literal("PENDING"),
+      }),
+    ),
   });
 
 export type RegisterUserOnEstablishmentPayload = {
   siret: SiretDto;
-  userRight: FormEstablishmentUserRight;
+  userRight: FormEstablishmentPendingUserRight;
 };
 
 export type EstablishmentPublicOption = Pick<
