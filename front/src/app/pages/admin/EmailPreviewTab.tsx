@@ -288,11 +288,7 @@ export const defaultEmailValueByEmailKind: {
     numberOfMonthsWithoutConvention: 6,
   },
   AGENCY_DELEGATION_CONTACT_INFORMATION: {
-    agencyName: "AGENCY_NAME",
-    agencyProvince: "AGENCY_PROVINCE",
     delegationProviderMail: "DELEGATION_PROVIDER_EMAIL",
-    firstName: "FIRST_NAME",
-    lastName: "LAST_NAME",
   },
   ASSESSMENT_BENEFICIARY_NOTIFICATION: {
     conventionId: "CONVENTION_ID",
