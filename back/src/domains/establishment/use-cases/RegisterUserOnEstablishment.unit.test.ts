@@ -82,6 +82,26 @@ describe("RegisterUserOnEstablishment", () => {
       );
     });
 
+    it("fails if user doesn't exist anymore", async () => {
+      uow.userRepository.users = [];
+      await expectPromiseToFailWithError(
+        registerUserOnEstablishment.execute(
+          {
+            siret: "12345678901234",
+            userRight: {
+              email: anyConnectedUser.email,
+              role: "establishment-contact",
+              status: "PENDING",
+              shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
+            },
+          },
+          anyConnectedUser,
+        ),
+        errors.user.notFound({ userId: anyConnectedUser.id }),
+      );
+    });
+
     it("fails if user right status is not pending", async () => {
       await expectPromiseToFailWithError(
         registerUserOnEstablishment.execute(

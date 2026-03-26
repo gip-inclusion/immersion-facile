@@ -605,7 +605,7 @@ describe("Update Establishment aggregate from form data", () => {
           })
           .withNextAvailabilityDate(
             existingFormEstablishment.nextAvailabilityDate &&
-            new Date(existingFormEstablishment.nextAvailabilityDate),
+              new Date(existingFormEstablishment.nextAvailabilityDate),
           )
           .withCreatedAt(creationDate)
           .withUpdatedAt(creationDate)
@@ -675,7 +675,7 @@ describe("Update Establishment aggregate from form data", () => {
           })
           .withNextAvailabilityDate(
             updatedFormEstablishment.nextAvailabilityDate &&
-            new Date(updatedFormEstablishment.nextAvailabilityDate),
+              new Date(updatedFormEstablishment.nextAvailabilityDate),
           )
           .withCreatedAt(creationDate)
           .withUpdatedAt(now)
@@ -1107,10 +1107,10 @@ describe("Update Establishment aggregate from form data", () => {
           remoteWorkMode: "FULL_REMOTE",
         };
         const updatedFormEstablishmentWithOfferRemoteWorkMode: FormEstablishmentDto =
-        {
-          ...updatedFormEstablishment,
-          offers: [updatedOffer],
-        };
+          {
+            ...updatedFormEstablishment,
+            offers: [updatedOffer],
+          };
         const expectedEstablishmentAggregate = {
           ...updatedEstablishmentAggregate,
           offers: [

@@ -28,9 +28,7 @@ export const RequestEstablishmentRegistrationPage = () => {
             breadcrumbs={<Breadcrumbs />}
             badge={
               <Button
-                linkProps={{
-                  href: `${routes.myProfile().href}`,
-                }}
+                linkProps={routes.myProfile().link}
                 priority={"secondary"}
                 className={fr.cx("fr-my-6w")}
               >

@@ -130,7 +130,9 @@ const makeEstablishmentDashboardTabs = (
   const userIsOnboarding = establishmentsArray.length === 0;
   const userCanManageEstablishments =
     establishmentsArray.filter(
-      (establishment) => establishment.role === "establishment-admin",
+      (establishment) =>
+        establishment.role === "establishment-admin" &&
+        establishment.status === "ACCEPTED",
     ).length > 0;
 
   return [

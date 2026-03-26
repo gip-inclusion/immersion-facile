@@ -12,6 +12,7 @@ import type {
   EstablishmentData,
   WithEstablishmentDashboards,
 } from "../establishment/establishment";
+import { formEstablishmentUserRightStatusSchema } from "../formEstablishment/FormEstablishment.schema";
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
@@ -97,6 +98,7 @@ const withEstablishmentSiretAndName: ZodSchemaWithInputMatchingOutput<Establishm
     role: z.enum(establishmentsRoles, {
       error: localization.invalidEnum,
     }),
+    status: formEstablishmentUserRightStatusSchema,
     admins: z.array(
       z.object({
         firstName: zStringCanBeEmpty,
