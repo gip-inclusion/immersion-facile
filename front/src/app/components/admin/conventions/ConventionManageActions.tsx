@@ -30,6 +30,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { getConventionSubStatus } from "src/app/utils/conventionSubStatus";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { conventionActionSelectors } from "src/core-logic/domain/convention/convention-action/conventionAction.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import type { Feedback as FeedbackType } from "src/core-logic/domain/feedback/feedback.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
@@ -75,6 +76,9 @@ export const ConventionManageActions = ({
   jwtParams,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
+  const isConventionActionLoading = useAppSelector(
+    conventionActionSelectors.isLoading,
+  );
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const broadcastErrorFeedback = useAppSelector(
     partnersErroredConventionSelectors.lastBroadcastFeedback,
@@ -206,6 +210,8 @@ export const ConventionManageActions = ({
     }
 
     if ("status" in params) {
+      if (isConventionActionLoading) return;
+
       if (params.status === "ACCEPTED_BY_COUNSELLOR") {
         dispatch(
           conventionActionSlice.actions.acceptByCounsellorRequested({
