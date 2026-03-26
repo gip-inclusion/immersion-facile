@@ -13,7 +13,7 @@ Hosté
     - Buildpacks :
       - https://github.com/Scalingo/buildpack-jvm-common
       - https://github.com/metabase/metabase-buildpack
-- Clevercloud (https://www.clever-cloud.com/blog/engineering/2019/02/20/how-to-install-metabase/)
+- Clevercloud (https://www.clever.cloud/blog/engineering/2019/02/20/how-to-install-metabase/)
 
 Managé:
 
@@ -90,8 +90,8 @@ Hosté :
 
 - Clevercloud ( prob < 50€ mensuel démarrage):
 
-  - Nécessite un runtime Java (https://www.clever-cloud.com/pricing/#Java)
-  - avec un addon-postgre (https://www.clever-cloud.com/pricing/#PostgreSQL)
+  - Nécessite un runtime Java (https://www.clever.cloud/pricing/#Java)
+  - avec un addon-postgre (https://www.clever.cloud/pricing/#PostgreSQL)
 
 - Scalingo ( prob < 50€ mensuel démarrage):
   - Estimation basée sur les buildpack

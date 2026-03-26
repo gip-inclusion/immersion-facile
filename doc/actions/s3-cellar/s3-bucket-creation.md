@@ -7,7 +7,7 @@
 Nous avons besoin d'un outil pour manipuler les configurations des buckets.
 
 Pour faciliter un déploiement automatisé et une possibilité d'architecture nous allons utiliser dans ce tutoriel la [cli aws via docker](https://hub.docker.com/r/amazon/aws-cli) pour gérer les buckets eux-mêmes.
-La liste des autres options (s3cmd | AWS Sdk) est disponible ici : [https://www.clever-cloud.com/doc/deploy/addon/cellar/](https://www.clever-cloud.com/doc/deploy/addon/cellar/)  
+La liste des autres options (s3cmd | AWS Sdk) est disponible ici : [https://www.clever.cloud/developers/doc/addons/cellar/](https://www.clever.cloud/developers/doc/addons/cellar/)  
 La configuration des s3 se manipule via la cli aws.
 
 ```
@@ -30,7 +30,7 @@ CELLAR_ADDON_KEY_ID et CELLAR_ADDON_KEY_SECRET correspondent aux identifiants Aw
 
 ## Créer le bucket en pas-à-pas (optionnel)
 
-Documentation clevercloud : [https://www.clever-cloud.com/doc/deploy/addon/cellar/#using-aws-cli](https://www.clever-cloud.com/doc/deploy/addon/cellar/#using-aws-cli)
+Documentation clevercloud : [https://www.clever.cloud/developers/doc/addons/cellar/#with-aws-cli](https://www.clever.cloud/developers/doc/addons/cellar/#with-aws-cli)
 
 ### Recommandé avec Docker (sans installation de la cli aws en local)
 

@@ -236,7 +236,7 @@ Certaines des données sont envoyées à des sous-traitants pour réaliser certa
     <tr>
       <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">CleverCloud</td>
       <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">Stockage des fichiers</td>
-      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;"><a href="https://www.clever.cloud/fr/conditions-generales-dutilisation/accord-de-traitement-des-donnees/" target="_blank">https://www.clever-cloud.com/fr/conditions-generales-dutilisation/accord-de-traitement-des-donnees/</a></td>
+      <td style="border: 1px solid #000; padding: 8px; vertical-align: top;"><a href="https://www.clever.cloud/fr/conditions-generales-dutilisation/accord-de-traitement-des-donnees/" target="_blank">https://www.clever.cloud/fr/conditions-generales-dutilisation/accord-de-traitement-des-donnees/</a></td>
     </tr>
   </tbody>
 </table>
