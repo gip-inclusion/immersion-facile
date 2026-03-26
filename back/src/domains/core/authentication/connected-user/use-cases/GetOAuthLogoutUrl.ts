@@ -14,7 +14,7 @@ export type GetOAuthLogoutUrl = ReturnType<typeof makeGetOAuthLogoutUrl>;
 export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
   .withInput<LogoutQueryParams>(logoutQueryParamsSchema)
   .withOutput<AbsoluteUrl>()
-  .withCurrentUser<ConnectedUser>()
+  .withCurrentUser<ConnectedUser | undefined>()
   .withDeps<{
     oAuthGateway: OAuthGateway;
     ftConnectGateway: FtConnectGateway;
@@ -31,6 +31,8 @@ export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
           idToken: inputParams.idToken,
         });
       }
+
+      if (!currentUser) throw errors.user.unauthorized();
 
       const ongoingOAuth = await uow.ongoingOAuthRepository.findByUserId(
         currentUser.id,
