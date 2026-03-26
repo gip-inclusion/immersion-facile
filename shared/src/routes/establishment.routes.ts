@@ -145,7 +145,11 @@ export const establishmentRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: formEstablishmentUserRightSchema,
     responses: {
-      200: expressEmptyResponseBody,
+      201: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });

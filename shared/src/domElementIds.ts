@@ -15,9 +15,9 @@ type FrontRouteParametrizedValue = (
 
 type FrontRoutePossibleValues =
   | Record<
-      string,
-      string | FrontRouteParametrizedValue | Record<string, string>
-    >
+    string,
+    string | FrontRouteParametrizedValue | Record<string, string>
+  >
   | string
   | FrontRouteParametrizedValue;
 
@@ -1118,6 +1118,8 @@ export const domElementIds = {
         "im-manage-establishment__create-establishment-button",
       editUserButton: "im-manage-establishment__edit-user-button",
       deleteUserButton: "im-manage-establishment__delete-user-button",
+      validateUserRightButton: "im-manage-establishment__validate-user-right-button",
+      rejectUserRightButton: "im-manage-establishment__reject-user-right-button",
     },
   },
   searchDiagoriente: {},

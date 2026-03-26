@@ -134,7 +134,7 @@ export type DomainEvent =
   | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"AllEstablishmentUsersDeleted", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"EstablishmentDeleted", WithSiretDto & WithTriggeredBy>
-  | GenericEvent<"UserRightRegisteredOnEstablishment", WithSiretDto & WithEstablishmentUserRight & WithTriggeredBy>
+  | GenericEvent<"PendingUserRightRegisteredOnEstablishment", WithSiretDto & WithEstablishmentUserRight & WithTriggeredBy>
 
   // CONTACT REQUEST RELATED
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
@@ -171,7 +171,7 @@ export type DomainEvent =
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto & WithTriggeredBy>
   // USER CONNECTED related.
   // We don't put full OAuth in payload to avoid private data in logs etc...
-  | GenericEvent<"UserAuthenticationByEmailRequested", InitiateLoginByEmailParams >
+  | GenericEvent<"UserAuthenticationByEmailRequested", InitiateLoginByEmailParams>
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
   // INACTIVE USER ACCOUNT DELETION
   | GenericEvent<"InactiveUserAccountDeletionTriggered", DeleteUserInputSchema>

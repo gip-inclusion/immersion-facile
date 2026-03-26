@@ -20,13 +20,16 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
   .withDeps<{ timeGateway: TimeGateway; createNewEvent: CreateNewEvent }>()
   .build(async ({ uow, currentUser, deps, inputParams: payload }) => {
     if (!currentUser) throw errors.user.unauthorized();
+    if (currentUser.email !== payload.userRight.email) {
+      throw errors.user.forbiddenEmailUpdate();
+    }
+
     if (payload.userRight.status !== "PENDING")
       throw errors.establishment.userRightStatusNotPending({
         siret: payload.siret,
         userId: currentUser.id,
       });
-    const user = await uow.userRepository.getById(currentUser.id);
-    if (!user) throw errors.user.notFound({ userId: currentUser.id });
+
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         payload.siret,
@@ -48,7 +51,7 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
         ...establishmentAggregate,
         userRights: [
           ...establishmentAggregate.userRights,
-          { ...payload.userRight, userId: user.id },
+          { ...payload.userRight, userId: currentUser.id },
         ],
       };
 
@@ -59,14 +62,14 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
 
     await uow.outboxRepository.save(
       deps.createNewEvent({
-        topic: "UserRightRegisteredOnEstablishment",
+        topic: "PendingUserRightRegisteredOnEstablishment",
         payload: {
           siret: payload.siret,
           userRight: {
             ...payload.userRight,
-            userId: user.id,
+            userId: currentUser.id,
           },
-          triggeredBy: { kind: "connected-user", userId: user.id },
+          triggeredBy: { kind: "connected-user", userId: currentUser.id },
         },
       }),
     );
