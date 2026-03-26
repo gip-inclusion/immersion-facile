@@ -11,6 +11,7 @@ import {
   type FormEstablishmentUserRight,
   formEstablishmentUserRightSchema,
   localization,
+  type SiretDto,
 } from "shared";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -30,11 +31,13 @@ type EstablishmentUserUserFormProps = {
     | Partial<FormEstablishmentUserRight>
     | null;
   establishmentUsersEditModal: ReturnType<typeof createFormModal>;
+  selectedEstablishmentSiret?: SiretDto | undefined;
 };
 
 export const EstablishmentUserForm = ({
   alreadyExistingUserRight,
   establishmentUsersEditModal,
+  selectedEstablishmentSiret,
 }: EstablishmentUserUserFormProps) => {
   const formEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
@@ -106,10 +109,14 @@ export const EstablishmentUserForm = ({
         }),
       );
     }
-    if (isMyProfileEstablishmentRegistration && connectedUserJwt) {
+    if (
+      isMyProfileEstablishmentRegistration &&
+      connectedUserJwt &&
+      selectedEstablishmentSiret
+    ) {
       dispatch(
         establishmentSlice.actions.userRegistrationOnEstablishmentRequested({
-          siret: formEstablishment.siret,
+          siret: selectedEstablishmentSiret,
           userRight: data,
           feedbackTopic: "my-profile-establishment-registration",
           jwt: connectedUserJwt,
@@ -124,6 +131,7 @@ export const EstablishmentUserForm = ({
   }, [alreadyExistingUserRight, reset]);
 
   const values = watch();
+
   return (
     <>
       {values.email && isEstablishmentDashboardFormEstablishment && (

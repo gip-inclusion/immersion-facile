@@ -13,7 +13,12 @@ import {
 import { Loader, useDebounce } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import { type ConnectedUser, domElementIds, looksLikeSiret } from "shared";
+import {
+  type ConnectedUser,
+  domElementIds,
+  looksLikeSiret,
+  type SiretDto,
+} from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUsersEditForm";
 import { createFormModal } from "src/app/utils/createFormModal";
@@ -53,13 +58,15 @@ export const RegisterEstablishmentsForm = ({
     useRef<ElementRef<"input">>(null);
   const debouncedInputValue = useDebounce(inputValue, 500);
 
-  const [_selectedEstablishmentIds, setSelectedEstablishmentIds] = useState([]);
+  const [selectedEstablishmentSiret, setSelectedEstablishmentSiret] = useState<
+    SiretDto | undefined
+  >(undefined);
 
   const onEstablishmentSearchChange = (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
     setInputValue(event.currentTarget.value);
-    setSelectedEstablishmentIds([]);
+    setSelectedEstablishmentSiret(undefined);
   };
 
   if (inputValue === undefined && currentUser.proConnect) {
@@ -135,9 +142,12 @@ export const RegisterEstablishmentsForm = ({
                     desc={establishmentPublicOption.siret}
                     endDetail={
                       <Button
-                        onClick={() =>
-                          establishmentRegisterEstablishmentModal.open()
-                        }
+                        onClick={() => {
+                          setSelectedEstablishmentSiret(
+                            establishmentPublicOption.siret,
+                          );
+                          establishmentRegisterEstablishmentModal.open();
+                        }}
                         size="small"
                       >
                         Demander le rattachement
@@ -157,6 +167,7 @@ export const RegisterEstablishmentsForm = ({
                   email: currentUser.email,
                   status: "PENDING",
                 }}
+                selectedEstablishmentSiret={selectedEstablishmentSiret}
                 establishmentUsersEditModal={
                   establishmentRegisterEstablishmentModal
                 }
