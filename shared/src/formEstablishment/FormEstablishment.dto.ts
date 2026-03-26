@@ -13,6 +13,7 @@ import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndApp
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
+import type { OmitFromExistingKeys } from "../utils";
 import type { DateTimeIsoString } from "../utils/date";
 
 export type ImmersionContactInEstablishmentId = Flavor<
@@ -102,6 +103,24 @@ export type ContactFormEstablishmentUserRight =
 export type FormEstablishmentUserRight =
   | AdminFormEstablishmentUserRight
   | ContactFormEstablishmentUserRight;
+
+type FormEstablishmentPendingUserRightAdmin = OmitFromExistingKeys<
+  AdminFormEstablishmentUserRight,
+  "status"
+> & {
+  status: "PENDING";
+};
+
+type FormEstablishmentPendingUserRightContact = OmitFromExistingKeys<
+  ContactFormEstablishmentUserRight,
+  "status"
+> & {
+  status: "PENDING";
+};
+
+export type FormEstablishmentPendingUserRight =
+  | FormEstablishmentPendingUserRightAdmin
+  | FormEstablishmentPendingUserRightContact;
 
 export type FormEstablishmentSourceInUrl =
   | "immersion-facile"

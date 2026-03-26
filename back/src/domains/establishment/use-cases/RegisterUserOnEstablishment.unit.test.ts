@@ -4,7 +4,7 @@ import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  type FormEstablishmentUserRight,
+  type FormEstablishmentPendingUserRight,
   UserBuilder,
 } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -52,7 +52,7 @@ describe("RegisterUserOnEstablishment", () => {
             userRight: {
               email: "test@test.com",
               role: "establishment-contact",
-              status: "ACCEPTED",
+              status: "PENDING",
               shouldReceiveDiscussionNotifications: true,
               isMainContactByPhone: false,
             },
@@ -71,7 +71,7 @@ describe("RegisterUserOnEstablishment", () => {
             userRight: {
               email: "test@test.com",
               role: "establishment-contact",
-              status: "ACCEPTED",
+              status: "PENDING",
               shouldReceiveDiscussionNotifications: true,
               isMainContactByPhone: false,
             },
@@ -110,16 +110,19 @@ describe("RegisterUserOnEstablishment", () => {
             userRight: {
               email: "test@test.com",
               role: "establishment-contact",
-              status: "ACCEPTED",
+              status: "ACCEPTED" as any,
               shouldReceiveDiscussionNotifications: true,
               isMainContactByPhone: false,
             },
           },
           anyConnectedUser,
         ),
-        errors.establishment.userRightStatusNotPending({
-          siret: "12345678901234",
-          userId: anyConnectedUser.id,
+        errors.inputs.badSchema({
+          useCaseName: "RegisterUserOnEstablishment",
+          id: "12345678901234",
+          flattenErrors: [
+            'userRight.status : Invalid input: expected "PENDING"',
+          ],
         }),
       );
     });
@@ -132,7 +135,7 @@ describe("RegisterUserOnEstablishment", () => {
           {
             siret: "12345678901234",
             userRight: {
-              email: "test@test.com",
+              email: anyConnectedUser.email,
               role: "establishment-contact",
               status: "PENDING",
               shouldReceiveDiscussionNotifications: true,
@@ -165,7 +168,7 @@ describe("RegisterUserOnEstablishment", () => {
           {
             siret: establishmentAggregate.establishment.siret,
             userRight: {
-              email: "test@test.com",
+              email: anyConnectedUser.email,
               role: "establishment-contact",
               status: "PENDING",
               shouldReceiveDiscussionNotifications: true,
@@ -201,8 +204,8 @@ describe("RegisterUserOnEstablishment", () => {
       .build();
 
     it("registers user on establishment", async () => {
-      const userRightWithRequestedRole: FormEstablishmentUserRight = {
-        email: "test@test.com",
+      const userRightWithRequestedRole: FormEstablishmentPendingUserRight = {
+        email: anyConnectedUser.email,
         role: "establishment-contact",
         status: "PENDING",
         shouldReceiveDiscussionNotifications: true,
