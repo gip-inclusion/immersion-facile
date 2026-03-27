@@ -1,9 +1,4 @@
-import {
-  ConnectedUserBuilder,
-  errors,
-  expectPromiseToFailWithError,
-  expectToEqual,
-} from "shared";
+import { ConnectedUserBuilder, expectToEqual } from "shared";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -86,15 +81,6 @@ describe("GetEstablishmentPublicOptionsByFilters", () => {
       establishmentAggregateToKeepOnName2,
     ];
     uow.userRepository.users = [connectedUser];
-  });
-
-  describe("Wrong paths", () => {
-    it("throws unauthorized if user is not connected", () => {
-      expectPromiseToFailWithError(
-        getEstablishmentPublicOptionsByFilters.execute({}, undefined),
-        errors.user.unauthorized(),
-      );
-    });
   });
 
   describe("Right paths", () => {

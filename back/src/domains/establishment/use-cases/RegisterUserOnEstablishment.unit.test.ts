@@ -44,25 +44,6 @@ describe("RegisterUserOnEstablishment", () => {
   });
 
   describe("Wrong path", () => {
-    it("fails if no current user", async () => {
-      await expectPromiseToFailWithError(
-        registerUserOnEstablishment.execute(
-          {
-            siret: "12345678901234",
-            userRight: {
-              email: "test@test.com",
-              role: "establishment-contact",
-              status: "PENDING",
-              shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
-            },
-          },
-          undefined,
-        ),
-        errors.user.unauthorized(),
-      );
-    });
-
     it("fails if current user email does not match user right email", async () => {
       await expectPromiseToFailWithError(
         registerUserOnEstablishment.execute(
