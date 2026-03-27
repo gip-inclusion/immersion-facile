@@ -19,7 +19,7 @@ export const goToEstablishmentDashboardTab = async (
     .locator(".fr-tabs__list li")
     .nth(getTabIndexByTabName(establishmentDashboardTabsList, tab))
     .locator(".fr-tabs__tab");
-  await tabLocator.click({ force: true });
+  await tabLocator.click({ force: true, noWaitAfter: true });
 };
 
 export const goToDashboard = async (
