@@ -1,4 +1,3 @@
-import DomPurify from "isomorphic-dompurify";
 import z from "zod";
 import { pipeWithValue } from "../pipeWithValue";
 import {
@@ -15,7 +14,6 @@ export const makeHardenedStringSchema = ({
   max,
   maxMessage = localization.maxCharacters(max),
   isEmptyAllowed,
-  canContainHtml,
   withRegExp,
 }: {
   min?: number;
@@ -23,7 +21,6 @@ export const makeHardenedStringSchema = ({
   minMessage?: string;
   maxMessage?: string;
   isEmptyAllowed?: true;
-  canContainHtml?: true;
   withRegExp?: { regex: RegExp; message?: string };
 }) =>
   pipeWithValue(
@@ -34,16 +31,9 @@ export const makeHardenedStringSchema = ({
       schema
         .max(max, maxMessage)
         .min(min ?? (isEmptyAllowed ? 0 : 1), minMessage)
-        .transform((value) =>
-          canContainHtml ? sanitize(normalizer(value)) : value,
-        )
-        .refine(
-          (input) =>
-            !canContainHtml ? !doesStringContainsHTML(normalizer(input)) : true,
-          {
-            message: localization.invalidTextContainHtml,
-          },
-        ),
+        .refine((input) => !doesStringContainsHTML(normalizer(input)), {
+          message: localization.invalidTextContainHtml,
+        }),
   );
 
 const MAX_255_TEXT_INPUT = 255;
@@ -155,50 +145,3 @@ const decodeEntities = (input: string): string =>
 
     return HTML_ENTITIES[entity] ?? subString;
   });
-
-const sanitize = (value: string): string => {
-  const sanitizeAttributeHook = "uponSanitizeAttribute";
-
-  DomPurify.addHook(sanitizeAttributeHook, (_, data) => {
-    if (
-      data.attrName === "src" &&
-      data.attrValue.toLowerCase().includes("data:")
-    ) {
-      data.attrValue = "";
-    }
-  });
-
-  const isWholeDocument = /<html|<head|<body/i.test(value);
-
-  const sanitized = pipeWithValue(
-    value.replace(/{.*?{/g, "{{").replace(/}.*?}/g, "}}"),
-    (value) =>
-      DomPurify.sanitize(value, {
-        WHOLE_DOCUMENT: isWholeDocument,
-        ADD_TAGS: isWholeDocument
-          ? ["html", "head", "body", "link", "style"]
-          : [],
-        ADD_ATTR: ["target", "data-smartmail"],
-        FORBID_TAGS: ["script", "iframe"],
-        FORBID_ATTR: ["onerror", "onclick"],
-        KEEP_CONTENT: false,
-        SAFE_FOR_TEMPLATES: true,
-        ALLOW_DATA_ATTR: true,
-        USE_PROFILES: { html: true, svg: true, mathMl: true },
-        ALLOWED_URI_REGEXP:
-          /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
-      }),
-    (value) =>
-      value.includes("style=")
-        ? value.replace(
-            /style="[^"]*(?:expression|javascript|vbscript|-moz-binding)[^"]*"/gi,
-            'style=""',
-          )
-        : value,
-    (value) => value.trim(),
-  );
-
-  DomPurify.removeHook(sanitizeAttributeHook);
-
-  return sanitized;
-};
