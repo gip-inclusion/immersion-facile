@@ -1,7 +1,6 @@
 import {
   type ConnectedUser,
   type EstablishmentPublicOption,
-  errors,
   getEstablishmentPublicOptionsByFiltersSchema,
   removeSpaces,
 } from "shared";
@@ -16,10 +15,8 @@ export const makeGetEstablishmentPublicOptionsByFilters = useCaseBuilder(
 )
   .withInput(getEstablishmentPublicOptionsByFiltersSchema)
   .withOutput<EstablishmentPublicOption[]>()
-  .withCurrentUser<ConnectedUser | undefined>()
-  .build(async ({ uow, inputParams, currentUser }) => {
-    if (!currentUser) throw errors.user.unauthorized();
-
+  .withCurrentUser<ConnectedUser>()
+  .build(async ({ uow, inputParams }) => {
     const { nameIncludes, siret } = inputParams;
 
     const establishments =

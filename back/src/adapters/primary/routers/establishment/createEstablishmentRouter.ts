@@ -168,7 +168,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
             siret: req.params.siret,
             userRight: req.body,
           },
-          req.payloads?.currentUser,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
