@@ -16,10 +16,9 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
   "RegisterUserOnEstablishment",
 )
   .withInput(registerUserOnEstablishmentPayloadSchema)
-  .withCurrentUser<ConnectedUser | undefined>()
+  .withCurrentUser<ConnectedUser>()
   .withDeps<{ timeGateway: TimeGateway; createNewEvent: CreateNewEvent }>()
   .build(async ({ uow, currentUser, deps, inputParams: payload }) => {
-    if (!currentUser) throw errors.user.unauthorized();
     if (currentUser.email !== payload.userRight.email) {
       throw errors.user.forbiddenEmailUpdate();
     }
