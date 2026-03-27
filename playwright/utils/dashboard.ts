@@ -95,19 +95,9 @@ export const initiateConvention = async ({
   page: Page;
   dashboardKind: "agency" | "establishment";
   fromConventionTemplate: boolean;
-}): Promise<string | undefined> => {
-  const domIds =
-    dashboardKind === "agency"
-      ? domElementIds.agencyDashboard
-      : domElementIds.establishmentDashboard;
-  await page.goto("/");
-  await goToDashboard(page, dashboardKind);
-  await page.click(`#${domIds.initiateConvention.button}`);
-
-  if (fromConventionTemplate) {
-    await initiateConventionFromConventionTemplate({ page, dashboardKind });
-    return;
-  }
+}): Promise<void> => {
+  if (fromConventionTemplate)
+    return initiateConventionFromConventionTemplate({ page, dashboardKind });
 
   dashboardKind === "establishment"
     ? await initiateConventionFromEstablishmentInformations({ page })
