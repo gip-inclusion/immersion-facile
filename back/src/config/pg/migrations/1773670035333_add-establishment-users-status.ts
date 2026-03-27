@@ -3,12 +3,13 @@ import type { MigrationBuilder } from "node-pg-migrate";
 
 const tableName = "establishments__users";
 const columnName = "status";
+const ESTABLISHMENT_USER_RIGHT_STATUS_NAME = "establishment_user_right_status";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createType("establishment_user_right_status", ["ACCEPTED", "PENDING"]);
+  pgm.createType(ESTABLISHMENT_USER_RIGHT_STATUS_NAME, ["ACCEPTED", "PENDING"]);
   pgm.addColumn(tableName, {
     [columnName]: {
-      type: "establishment_user_right_status",
+      type: ESTABLISHMENT_USER_RIGHT_STATUS_NAME,
       notNull: true,
       default: "PENDING",
     },
@@ -22,4 +23,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumn(tableName, columnName);
+  pgm.dropType(ESTABLISHMENT_USER_RIGHT_STATUS_NAME);
 }
