@@ -4,7 +4,7 @@ import {
   errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
-  type FormEstablishmentUserRight,
+  type FormEstablishmentPendingUserRight,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -93,7 +93,7 @@ describe("registerUserOnEstablishment", () => {
           body: {
             email: "different-email@example.com",
             role: "establishment-contact",
-            status: "ACCEPTED",
+            status: "PENDING",
             shouldReceiveDiscussionNotifications: true,
             job: "crêpier",
             phone: "+33600000000",
@@ -147,7 +147,7 @@ describe("registerUserOnEstablishment", () => {
 
     describe("Right paths", () => {
       it("201 - returns empty response body", async () => {
-        const formEstablishmentUserRight: FormEstablishmentUserRight = {
+        const formEstablishmentUserRight: FormEstablishmentPendingUserRight = {
           email: connectedUserToRegister.email,
           role: "establishment-contact",
           status: "PENDING",

@@ -9,6 +9,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { EstablishmentUserRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { toEstablishmentPublicOption } from "../../../../domains/establishment/use-cases/GetEstablishmentPublicOptionsByFilters";
 import { buildTestApp } from "../../../../utils/buildTestApp";
@@ -21,52 +22,31 @@ describe("Get establishment public options by filters e2e", () => {
     let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
     const connectedUser = new ConnectedUserBuilder().build();
+    const connectedUserRight: EstablishmentUserRight = {
+      userId: connectedUser.id,
+      role: "establishment-admin",
+      status: "ACCEPTED",
+      shouldReceiveDiscussionNotifications: true,
+      job: "osef",
+      phone: "osef",
+      isMainContactByPhone: false,
+    };
     const establishmentAggregateToKeepOnSiret =
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("10000000000000")
-        .withUserRights([
-          {
-            userId: connectedUser.id,
-            role: "establishment-admin",
-            status: "ACCEPTED",
-            shouldReceiveDiscussionNotifications: true,
-            job: "osef",
-            phone: "osef",
-            isMainContactByPhone: false,
-          },
-        ])
+        .withUserRights([connectedUserRight])
         .build();
     const establishmentAggregateToKeepOnName1 =
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("10000000000001")
         .withEstablishmentName("La kig ha farz de la mère kergadec")
-        .withUserRights([
-          {
-            userId: connectedUser.id,
-            role: "establishment-admin",
-            status: "ACCEPTED",
-            shouldReceiveDiscussionNotifications: true,
-            job: "osef",
-            phone: "osef",
-            isMainContactByPhone: false,
-          },
-        ])
+        .withUserRights([connectedUserRight])
         .build();
     const establishmentAggregateToKeepOnName2 =
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("10000000000002")
         .withEstablishmentName("La kig ha farz de la mère Plougelac'h")
-        .withUserRights([
-          {
-            userId: connectedUser.id,
-            role: "establishment-admin",
-            status: "ACCEPTED",
-            shouldReceiveDiscussionNotifications: true,
-            job: "osef",
-            phone: "osef",
-            isMainContactByPhone: false,
-          },
-        ])
+        .withUserRights([connectedUserRight])
         .build();
 
     beforeEach(async () => {
@@ -84,11 +64,88 @@ describe("Get establishment public options by filters e2e", () => {
       inMemoryUow.userRepository.users = [connectedUser];
     });
 
-    it("200 - returns the establishment public options by filters", async () => {
+    it("200 - returns empty array when filters do not match any results", async () => {
+      const result = await sharedRequest.getEstablishmentPublicOptionsByFilters(
+        {
+          queryParams: {
+            nameIncludes: "not existing name",
+          },
+          headers: {
+            authorization: generateConnectedUserJwt(
+              createConnectedUserJwtPayload({
+                userId: connectedUser.id,
+                durationHours: 1,
+                now: new Date(),
+              }),
+            ),
+          },
+        },
+      );
+
+      expectHttpResponseToEqual(result, {
+        status: 200,
+        body: [],
+      });
+    });
+
+    it("200 - returns the establishment public options with one filter by name", async () => {
       const result = await sharedRequest.getEstablishmentPublicOptionsByFilters(
         {
           queryParams: {
             nameIncludes: "La kig ha farz de la mère kergadec",
+          },
+          headers: {
+            authorization: generateConnectedUserJwt(
+              createConnectedUserJwtPayload({
+                userId: connectedUser.id,
+                durationHours: 1,
+                now: new Date(),
+              }),
+            ),
+          },
+        },
+      );
+
+      expectHttpResponseToEqual(result, {
+        status: 200,
+        body: [
+          toEstablishmentPublicOption(establishmentAggregateToKeepOnName1),
+        ],
+      });
+    });
+
+    it("200 - returns the establishment public options with one filter by siret", async () => {
+      const result = await sharedRequest.getEstablishmentPublicOptionsByFilters(
+        {
+          queryParams: {
+            siret: establishmentAggregateToKeepOnName1.establishment.siret,
+          },
+          headers: {
+            authorization: generateConnectedUserJwt(
+              createConnectedUserJwtPayload({
+                userId: connectedUser.id,
+                durationHours: 1,
+                now: new Date(),
+              }),
+            ),
+          },
+        },
+      );
+
+      expectHttpResponseToEqual(result, {
+        status: 200,
+        body: [
+          toEstablishmentPublicOption(establishmentAggregateToKeepOnName1),
+        ],
+      });
+    });
+
+    it("200 - returns the establishment public options with name includes and siret filters", async () => {
+      const result = await sharedRequest.getEstablishmentPublicOptionsByFilters(
+        {
+          queryParams: {
+            nameIncludes: "La kig ha farz de la mère kergadec",
+            siret: establishmentAggregateToKeepOnName1.establishment.siret,
           },
           headers: {
             authorization: generateConnectedUserJwt(
