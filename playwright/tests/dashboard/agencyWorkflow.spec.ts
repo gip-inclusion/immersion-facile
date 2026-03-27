@@ -242,7 +242,7 @@ test.describe("Agency dashboard workflow", () => {
         dashboardKind: "agency",
         fromConventionTemplate: true,
       });
-      await deleteConventionTemplate(page, "establishment");
+      await deleteConventionTemplate(page, "agency");
     });
 
     test("should initiate from agency informations", async ({ page }) => {
