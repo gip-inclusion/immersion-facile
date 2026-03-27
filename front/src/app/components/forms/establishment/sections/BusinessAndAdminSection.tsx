@@ -126,9 +126,7 @@ export const BusinessAndAdminSection = ({
                     "businessNameCustomized",
                     "website",
                     "additionalInformation",
-                    "userRights.0.job",
-                    "userRights.0.phone",
-                    "userRights.0.email",
+                    "userRights",
                   ]);
                 },
                 type: "button",
