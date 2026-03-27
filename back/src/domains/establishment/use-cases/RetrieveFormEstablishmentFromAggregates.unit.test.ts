@@ -151,34 +151,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         errors.user.unauthorized(),
       );
     });
-    it("throws an error if current user right is not establishment admin", async () => {
-      const contactUser = new ConnectedUserBuilder()
-        .withId("contactUser")
-        .withEmail("contact@mail.com")
-        .buildUser();
-
-      uow.userRepository.users = [contactUser];
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        {
-          ...establishmentAggregate,
-          userRights: [
-            {
-              ...establishmentAggregate.userRights[1],
-              userId: contactUser.id,
-              role: "establishment-contact",
-              status: "ACCEPTED",
-              shouldReceiveDiscussionNotifications: true,
-            },
-          ],
-        },
-      ];
-      await expectPromiseToFailWithError(
-        useCase.execute(siret, {
-          userId: contactUser.id,
-        }),
-        errors.user.unauthorized(),
-      );
-    });
   });
 
   describe("Right paths", () => {

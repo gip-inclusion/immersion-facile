@@ -42,9 +42,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     if (
       establishmentAggregate.userRights.some(
         (right) =>
-          right.userId === currentUser.id &&
-          right.status === "ACCEPTED" &&
-          right.role === "establishment-admin",
+          right.userId === currentUser.id && right.status === "ACCEPTED",
       ) ||
       currentUser.isBackofficeAdmin
     )
