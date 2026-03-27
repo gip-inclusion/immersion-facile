@@ -14,8 +14,8 @@ import {
   getEstablishmentPublicOptionsByFiltersSchema,
 } from "../establishment/establishment";
 import {
+  formEstablishmentPendingUserRightSchema,
   formEstablishmentSchema,
-  formEstablishmentUserRightSchema,
 } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -143,7 +143,7 @@ export const establishmentRoutes = defineRoutes({
     method: "post",
     url: "/establishments/:siret/register-user",
     ...withAuthorizationHeaders,
-    requestBodySchema: formEstablishmentUserRightSchema,
+    requestBodySchema: formEstablishmentPendingUserRightSchema,
     responses: {
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
