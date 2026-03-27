@@ -95,7 +95,7 @@ export const RegisterEstablishmentsForm = ({
           label="Se rattacher à une entreprise"
           hintText="Rechercher par n° SIRET ou nom sous lequel il est enregistré sur Immersion Facilitée"
           nativeInputProps={{
-            id: domElementIds.profile.registerEstablishment.search,
+            id: domElementIds.profile.registerEstablishmentSearch,
             type: "search",
             placeholder: "",
             value: inputValue,

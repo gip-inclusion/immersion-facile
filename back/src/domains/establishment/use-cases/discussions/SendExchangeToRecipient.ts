@@ -168,11 +168,8 @@ const getEstablishmentNotifiedContactEmails = async (
   );
 
   if (notifiedUsers.length === 0) {
-    throw errors.establishment.notAdminOrContactRight({
+    throw errors.establishment.noContactToNotify({
       siret,
-      userId:
-        establishment.userRights.find(({ status }) => status === "PENDING")
-          ?.userId ?? "unknown-pending-user",
     });
   }
 
