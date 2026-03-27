@@ -486,32 +486,42 @@ export const AssessmentDocumentPage = ({
       {isBeneficiary && isSignatureRequired && (
         <>
           <div
+            className={fr.cx("fr-container", "fr-grid-row--center")}
             style={{
               position: "fixed",
               bottom: 0,
-              left: 0,
-              right: 0,
-              background: "var(--background-raised-grey)",
-              padding: ".3rem",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "100%",
+              boxSizing: "border-box",
               zIndex: 10,
-              borderTop: "1px solid var(--border-default-grey)",
-              display: "flex",
-              justifyContent: "flex-end",
             }}
           >
-            <Button
-              priority="primary"
-              type="button"
-              iconId="fr-icon-pencil-line"
-              iconPosition="left"
-              id={
-                domElementIds.assessmentDocument.openSignAssessmentModalButton
-              }
-              className={fr.cx("fr-mr-3w")}
-              onClick={() => openAssessmentSignModal()}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                width: "100%",
+                background: "var(--background-raised-grey)",
+                borderTop: "1px solid var(--border-default-grey)",
+                padding: ".3rem",
+              }}
             >
-              Signer le bilan
-            </Button>
+              <Button
+                priority="primary"
+                type="button"
+                iconId="fr-icon-pencil-line"
+                iconPosition="left"
+                id={
+                  domElementIds.assessmentDocument.openSignAssessmentModalButton
+                }
+                className={fr.cx("fr-mr-2w", "fr-my-1w")}
+                onClick={() => openAssessmentSignModal()}
+              >
+                Signer le bilan
+              </Button>
+            </div>
           </div>
           {createPortal(
             <AssessmentSignModal title="Signature du bilan">
