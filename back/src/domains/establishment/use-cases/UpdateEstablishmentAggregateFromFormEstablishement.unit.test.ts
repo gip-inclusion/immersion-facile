@@ -812,8 +812,7 @@ describe("Update Establishment aggregate from form data", () => {
               userId: pendingUser.id,
             },
           ),
-          errors.establishment.notAdmin({
-            siret: updatedFormEstablishment.siret,
+          errors.user.forbidden({
             userId: pendingUser.id,
           }),
         );
@@ -846,10 +845,7 @@ describe("Update Establishment aggregate from form data", () => {
               userId: contactUser.id,
             },
           ),
-          errors.establishment.notAdmin({
-            siret: updatedFormEstablishment.siret,
-            userId: contactUser.id,
-          }),
+          errors.user.forbidden({ userId: contactUser.id }),
         );
       });
     });

@@ -644,6 +644,8 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur '${userId}' n'a pas les droits administrateur actifs sur l'entreprise '${siret}'.`,
       ),
+    noContactToNotify: ({ siret }: { siret: SiretDto }) =>
+      new BadRequestError(`L'entreprise ${siret} n'a aucun contact a notifier`),
     missingOrClosed: ({ siret }: { siret: SiretDto }) =>
       new BadRequestError(
         `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
@@ -724,16 +726,6 @@ export const errors = {
     forbiddenUnavailable: ({ siret }: { siret: SiretDto }) =>
       new ForbiddenError(
         `L'entreprise ${siret} n'est pas disponible pour des immersions.`,
-      ),
-    userRightStatusNotPending: ({
-      siret,
-      userId,
-    }: {
-      siret: SiretDto;
-      userId: UserId;
-    }) =>
-      new ForbiddenError(
-        `L'utilisateur '${userId}' n'a pas demandé le statut 'PENDING' sur l'entreprise '${siret}'.`,
       ),
     userRightAlreadyExists: ({
       siret,

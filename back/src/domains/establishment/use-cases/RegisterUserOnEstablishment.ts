@@ -26,12 +26,6 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
     const user = await uow.userRepository.getById(currentUser.id);
     if (!user) throw errors.user.notFound({ userId: currentUser.id });
 
-    if (payload.userRight.status !== "PENDING")
-      throw errors.establishment.userRightStatusNotPending({
-        siret: payload.siret,
-        userId: user.id,
-      });
-
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         payload.siret,
