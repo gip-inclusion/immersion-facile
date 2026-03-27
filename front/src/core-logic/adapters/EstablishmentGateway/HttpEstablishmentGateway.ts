@@ -11,7 +11,7 @@ import {
   type ExchangeRead,
   errors,
   type FormEstablishmentDto,
-  type FormEstablishmentUserRight,
+  type FormEstablishmentPendingUserRight,
   type GetEstablishmentPublicOptionsByFiltersInput,
   type SendMessageToDiscussionFromDashboardRequestPayload,
   type SiretDto,
@@ -176,7 +176,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public userRegistrationOnEstablishment$(
     siret: SiretDto,
-    userRight: FormEstablishmentUserRight,
+    userRight: FormEstablishmentPendingUserRight,
     jwt: ConnectedUserJwt,
   ): Observable<void> {
     return from(

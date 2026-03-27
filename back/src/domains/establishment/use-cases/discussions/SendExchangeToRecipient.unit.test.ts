@@ -582,9 +582,8 @@ describe("SendExchangeToRecipient", () => {
         useCase.execute({
           discussionId: discussion.id,
         }),
-        errors.establishment.notAdminOrContactRight({
+        errors.establishment.noContactToNotify({
           siret: discussion.siret,
-          userId: pendingUser.id,
         }),
       );
     });

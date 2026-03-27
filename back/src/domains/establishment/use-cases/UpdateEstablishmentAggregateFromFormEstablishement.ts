@@ -58,36 +58,14 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
     const hasPermission =
       triggeredByUser.isBackofficeAdmin ||
       initialEstablishmentAggregate.userRights.some(
-        ({ userId, role }) =>
-          userId === triggeredByUser.id && role === "establishment-admin",
+        ({ userId, status, role }) =>
+          userId === triggeredByUser.id &&
+          role === "establishment-admin" &&
+          status === "ACCEPTED",
       );
 
     if (!hasPermission)
       throw errors.user.forbidden({
-        userId: triggeredByUser.id,
-      });
-
-    if (
-      initialEstablishmentAggregate.userRights.some(
-        ({ userId, status }) =>
-          userId === triggeredByUser.id && status === "PENDING",
-      )
-    )
-      throw errors.establishment.notAdmin({
-        siret: initialEstablishmentAggregate.establishment.siret,
-        userId: triggeredByUser.id,
-      });
-
-    if (
-      initialEstablishmentAggregate.userRights.some(
-        ({ userId, status, role }) =>
-          userId === triggeredByUser.id &&
-          status === "ACCEPTED" &&
-          role !== "establishment-admin",
-      )
-    )
-      throw errors.establishment.notAdmin({
-        siret: initialEstablishmentAggregate.establishment.siret,
         userId: triggeredByUser.id,
       });
 

@@ -537,8 +537,9 @@ describe("Establishment", () => {
         "my-profile-establishment-registration": {
           on: "create",
           level: "success",
-          message: "L'utilisateur a bien été enregistré sur l'entreprise",
-          title: "L'utilisateur a bien été enregistré sur l'entreprise",
+          message:
+            "Elle sera étudiée prochainement par un administrateur de l'entreprise et vous serez informé de sa décision.",
+          title: "Votre demande d'accès a bien été prise en compte",
         },
       });
     });

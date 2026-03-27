@@ -822,6 +822,7 @@ describe("InclusionConnected", () => {
               businessName: establishment.businessName,
               siret: establishment.siret,
               role: "establishment-contact",
+              status: "ACCEPTED",
             },
             otherEstablishmentData,
           ],
