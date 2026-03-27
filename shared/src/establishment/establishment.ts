@@ -7,7 +7,7 @@ import type {
   FormEstablishmentDto,
   FormEstablishmentPendingUserRight,
 } from "../formEstablishment/FormEstablishment.dto";
-import { formEstablishmentUserRightSchema } from "../formEstablishment/FormEstablishment.schema";
+import { formEstablishmentPendingUserRightSchema } from "../formEstablishment/FormEstablishment.schema";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
@@ -62,11 +62,7 @@ export const establishmentPublicOptionsSchema: ZodSchemaWithInputMatchingOutput<
 export const registerUserOnEstablishmentPayloadSchema: ZodSchemaWithInputMatchingOutput<RegisterUserOnEstablishmentPayload> =
   z.object({
     siret: siretSchema,
-    userRight: formEstablishmentUserRightSchema.and(
-      z.object({
-        status: z.literal("PENDING"),
-      }),
-    ),
+    userRight: formEstablishmentPendingUserRightSchema,
   });
 
 export type RegisterUserOnEstablishmentPayload = {

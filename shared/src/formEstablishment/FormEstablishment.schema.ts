@@ -111,6 +111,13 @@ export const establishmentFormOfferSchema: ZodSchemaWithInputMatchingOutput<Esta
     }),
   );
 
+export const formEstablishmentPendingUserRightSchema =
+  formEstablishmentUserRightSchema.and(
+    z.object({
+      status: z.literal("PENDING"),
+    }),
+  );
+
 export const formEstablishmentUserRightsSchema: ZodSchemaWithInputMatchingOutput<
   FormEstablishmentUserRight[]
 > = z
