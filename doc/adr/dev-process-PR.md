@@ -33,18 +33,22 @@ La fluidité des revues de code (PR) est essentielle pour maintenir une vélocit
 
 ## 2. Décision
 ### Périmètre d'une Pull Request lié à une Issue Métier (PR)
-- Focus : Une PR doit répondre exclusivement à l'objectif de l'Issue associée avec le minimum de code nécessaire (make it work).
 
-- Objectivité : Les critères de performance, sécurité ou "code propre" ne sont opposables en revue que s'ils s'appuient sur un ADR existant. Le reste est jugé trop subjectif pour bloquer une PR.
+- **Focus "Make it work"** : Une PR doit répondre exclusivement à l'objectif de l'Issue associée avec le minimum de code nécessaire.
 
-- Tolérance : Les changements mineurs hors sujet sont acceptés s'ils sont liés au code modifié et ne nuisent pas à la lisibilité.
+- **Critères d'opposabilité en revue** :
+  - **Sécurité : Non négociable**. Tout risque de faille identifié en revue doit être corrigé avant le merge. La sécurité fait partie de la base commune indispensable.
+  - **Performance** : Opposable dès lors que l'inefficacité est démontrable (ex: copies d'objets inutiles en boucle, requêtes SQL sans index prouvées par un EXPLAIN ANALYZE, fuites de mémoire). Les optimisations "préventives" ou basées sur des intuitions sans preuve restent soumises à discussion sans être bloquantes.
+  - **Style et "Code Propre"** : Les choix d'implémentation, d'algorithmie ou de nommage (hors fautes manifestes) ne sont pas opposables s'ils respectent les standards de l'équipe et les ADRs en vigueur. Si un reviewer souhaite une approche différente pour des raisons de maintenabilité, il peut suggérer une tâche TECH ou un nouvel ADR, mais ne bloque pas la PR.
 
-- Rejet : Toute PR jugée trop volumineuse car incluant du refactorisation non prévue sera scindée. Le code de l'issue d'un côté, le code de refactorisation de l'autre. Le code de refactorisation devra suivre le processus de refactorisation.
+- **Tolérance** : Les changements mineurs (typos, renommages locaux) sont acceptés s'ils sont directement liés au code modifié, ou bien n'impose pas de problème de lisibilité.
+
+- **Scission obligatoire** : Toute PR incluant du refactoring lourd non prévu sera rejetée et scindée (une PR de feature, une PR de refacto via le processus TECH).
 
 ### Processus de Refactorisation
 Tout besoin de refactorisation doit suivre un parcours formel pour être planifié et visible :
 
-- Création d'une Issue : Type Task, Label TECH, avec une description claire du changement envisagé. La tâche est placée dans la colonne "Prêt à Dev".
+- Création d'une Issue : Type `Task` avec les labels `TECH` & `suggestion`, avec une description claire du changement envisagé. La tâche est placée dans la colonne "Prêt à Dev".
 
 - Communication : Proposition lors du point tech du mardi, du point matin (si urgent) ou en asynchrone dans l'issue (voir point suivant). Dans tout les cas, une formalisation dans l'issue est obligatoire pour le suivi général.
 
