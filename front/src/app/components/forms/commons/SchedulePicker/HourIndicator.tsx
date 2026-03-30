@@ -1,12 +1,5 @@
 import { addYears } from "date-fns";
-
-import {
-  CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
-  CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
-  CCI_WEEKLY_MAX_PERMITTED_HOURS,
-  IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS,
-  type InternshipKind,
-} from "shared";
+import { AGES, type InternshipKind, WEEKLY_HOURS } from "shared";
 import { formatHoursString } from "./TotalWeeklylHoursIndicator";
 
 type HourIndicatorProperties = {
@@ -36,10 +29,8 @@ const getMaxAllowedHours = (
   internshipKind: InternshipKind,
   birthdate: string,
 ) => {
-  if (internshipKind === "immersion")
-    return IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS;
-  return addYears(new Date(birthdate), CCI_WEEKLY_LIMITED_SCHEDULE_AGE) >
-    new Date()
-    ? CCI_WEEKLY_LIMITED_SCHEDULE_HOURS
-    : CCI_WEEKLY_MAX_PERMITTED_HOURS;
+  if (internshipKind === "immersion") return WEEKLY_HOURS.FORTY_EIGHT;
+  return addYears(new Date(birthdate), AGES.SIXTEEN) > new Date()
+    ? WEEKLY_HOURS.THIRTY
+    : WEEKLY_HOURS.THIRTY_FIVE;
 };

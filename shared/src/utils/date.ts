@@ -16,6 +16,15 @@ export type DateRange = {
   to: Date;
 };
 export type OptionalDateRange = Partial<DateRange>;
+export const isInRange = (
+  { from, to }: Partial<DateRange>,
+  date: Date,
+): boolean => {
+  const fromCondition = from ? date >= from : true;
+  const toCondition = to ? date <= to : true;
+
+  return fromCondition && toCondition;
+};
 
 export const withDateRangeSchema: ZodSchemaWithInputMatchingOutput<DateRange> =
   z
