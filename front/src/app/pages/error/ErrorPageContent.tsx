@@ -3,6 +3,7 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import type { FrontErrorProps } from "src/app/contents/error/types";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
+import { match, Pattern } from "ts-pattern";
 
 type ErrorPageContentProps = FrontErrorProps & {
   feedbackTopic?: FeedbackTopic;
@@ -26,15 +27,16 @@ export const ErrorPageContent = ({
       <h1>{title}</h1>
       <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{subtitle}</p>
       <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>{description}</p>
-      {buttons.length > 1 ? (
-        <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
-          {buttons.map((button) => (
-            <li key={button.key}>{button}</li>
-          ))}
-        </ul>
-      ) : buttons.length === 1 ? (
-        buttons[0]
-      ) : null}
+      {match(buttons.length)
+        .with(1, () => buttons[0])
+        .with(Pattern.number.gt(1), () => (
+          <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
+            {buttons.map((button) => (
+              <li key={button.key}>{button}</li>
+            ))}
+          </ul>
+        ))
+        .otherwise(() => null)}
       {feedbackTopic && <Feedback topics={[feedbackTopic]} />}
     </div>
     <div className={fr.cx("fr-hidden", "fr-unhidden-lg", "fr-col-4")}>
