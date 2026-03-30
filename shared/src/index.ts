@@ -161,7 +161,6 @@ export * from "./utils/date";
 export * from "./utils/durations";
 export * from "./utils/establishment";
 export * from "./utils/json";
-export * from "./utils/mergeObjectsExpectFalsyValues";
 export * from "./utils/postalCode";
 export * from "./utils/queryParams";
 export * from "./utils/sanitizeHtmlForPdf";
