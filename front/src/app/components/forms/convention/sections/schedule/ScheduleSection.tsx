@@ -151,7 +151,7 @@ export const ScheduleSection = ({
             severity="info"
             className={fr.cx("fr-mb-4w")}
             title="Période et durée de stage"
-            description="La présente convention est signée pour la durée de la période d'observation en milieu professionnel, qui ne peut dépasser 5 jours et 7h max/jours sur une période de vacances scolaires fixée annuellement par le Ministère de l'éducation nationale. La durée de la présence hebdomadaire des jeunes en milieu professionnel ne peut excéder 30 heures pour les jeunes de moins de 16 ans et 35 heures pour les jeunes de 16 ans et plus, répartis sur 5 jours maximum. Plusieurs stages sont possibles pour un même jeune pendant l'année, sous réserve d'observer des métiers différents et de ne pas dépasser la moitié de chaque période de vacances scolaires."
+            description="La présente convention est signée pour la durée de la période d'observation en milieu professionnel, qui ne peut dépasser 5 jours et 7h max/jours sur une période de vacances scolaires fixée annuellement par le Ministère de l'éducation nationale. La durée de la présence hebdomadaire des jeunes en milieu professionnel ne peut excéder 30 heures pour les jeunes de moins de 15 ans et 35 heures pour les jeunes de 15 ans et plus, répartis sur 5 jours maximum. Plusieurs stages sont possibles pour un même jeune pendant l'année, sous réserve d'observer des métiers différents et de ne pas dépasser la moitié de chaque période de vacances scolaires."
           />
 
           <Alert
