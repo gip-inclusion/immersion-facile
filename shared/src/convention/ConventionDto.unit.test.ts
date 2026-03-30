@@ -914,8 +914,8 @@ describe("conventionDtoSchema", () => {
             );
           });
 
-          it(`after ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, fails when weekly hours > 30h`, () => {
-            expectDtoInvalidWithIssueMessages(
+          it(`on ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, weekly hours can be > 30h but <= 35h`, () => {
+            expectDtoToBeValid(
               conventionSchema,
               makeConventionDto({
                 conventionStartDate,
@@ -923,8 +923,21 @@ describe("conventionDtoSchema", () => {
                 workedDaysCount: 5,
                 beneficiaryBirthdate: beneficiaryBirthdayDate_15yr,
               }),
+            );
+          });
+
+          it(`after ${CCI_16YO_REQUIREMENT_RELEASE_DATE}, fails when weekly hours > 35h`, () => {
+            expectDtoInvalidWithIssueMessages(
+              conventionSchema,
+              makeConventionDto({
+                conventionStartDate,
+                submissionDate: DATES.CCI_16YO_RELEASE_AFTER,
+                workedDaysCount: 6,
+                beneficiaryBirthdate: beneficiaryBirthdayDate_15yr,
+              }),
               [
-                "schedule.totalHours: La durée maximale hebdomadaire d'un mini-stage pour une personne de 15 ans est de 30h",
+                "dateEnd: Le nombre maximum de jours de présence est 5 jours. Actuellement, il y a 6 jours de présence.",
+                "schedule.totalHours: La durée maximale hebdomadaire d'un mini-stage pour une personne de 15 ans est de 35h",
               ],
             );
           });
@@ -988,11 +1001,22 @@ describe("conventionDtoSchema", () => {
         const dateStart = new Date("2022-10-10").toISOString();
         const dateEnd = addDays(new Date(dateStart), 4).toISOString();
 
-        const createOldConventionWithTimePeriods = () => {
+        type DailyHourOption = 8 | 9;
+
+        const createOldConventionWithTimePeriods = (
+          dailyHours: DailyHourOption,
+        ) => {
+          const endHourSelector: Record<DailyHourOption, DateString> = {
+            "8": "15:00",
+            "9": "16:00",
+          };
+
           const dailyComplexSchedule: DailyScheduleDto[] = [
             {
               date: "2022-10-10T00:00:00.000Z",
-              timePeriods: [{ start: "07:00", end: "15:00" }],
+              timePeriods: [
+                { start: "07:00", end: endHourSelector[dailyHours] },
+              ],
             },
             {
               date: "2022-10-11T00:00:00.000Z",
@@ -1021,7 +1045,7 @@ describe("conventionDtoSchema", () => {
         it(`valid when submitted before ${CCI_16YO_REQUIREMENT_RELEASE_DATE} and exceed daily limit of ${7}h`, () => {
           expectDtoToBeValid(
             conventionSchema,
-            new ConventionDtoBuilder(createOldConventionWithTimePeriods())
+            new ConventionDtoBuilder(createOldConventionWithTimePeriods(8))
               .withDateSubmission(DATES.CCI_16YO_RELEASE_BEFORE)
               .build(),
           );
@@ -1030,7 +1054,16 @@ describe("conventionDtoSchema", () => {
         it(`valid when submitted on ${CCI_16YO_REQUIREMENT_RELEASE_DATE} and exceed daily limit of ${7}h`, () => {
           expectDtoToBeValid(
             conventionSchema,
-            new ConventionDtoBuilder(createOldConventionWithTimePeriods())
+            new ConventionDtoBuilder(createOldConventionWithTimePeriods(8))
+              .withDateSubmission(DATES.CCI_16YO_RELEASE_AT)
+              .build(),
+          );
+        });
+
+        it(`valid when submitted after ${CCI_16YO_REQUIREMENT_RELEASE_DATE} and below daily limit of 8h`, () => {
+          expectDtoToBeValid(
+            conventionSchema,
+            new ConventionDtoBuilder(createOldConventionWithTimePeriods(8))
               .withDateSubmission(DATES.CCI_16YO_RELEASE_AT)
               .build(),
           );
@@ -1038,7 +1071,7 @@ describe("conventionDtoSchema", () => {
 
         it(`throw when submitted after ${CCI_16YO_REQUIREMENT_RELEASE_DATE} and exceed daily limit of ${7}h`, () => {
           const recentConvention = new ConventionDtoBuilder(
-            createOldConventionWithTimePeriods(),
+            createOldConventionWithTimePeriods(9),
           )
             .withDateSubmission(DATES.CCI_16YO_RELEASE_AFTER)
             .build();
@@ -1047,7 +1080,7 @@ describe("conventionDtoSchema", () => {
             conventionSchema,
             recentConvention,
             [
-              "schedule.totalHours: La durée maximale journalière d'un mini-stage pour une personne de 20 ans est de 7h",
+              "schedule.totalHours: La durée maximale journalière d'un mini-stage pour une personne de 20 ans est de 8h",
             ],
           );
         });
