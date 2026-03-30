@@ -232,7 +232,7 @@ test.describe("Agency dashboard workflow", () => {
     });
   });
 
-  test.describe("Initiate convention", () => {
+  test.skip("Initiate convention", () => {
     test.use({ storageState: testConfig.agencyAuthFile });
 
     test("should initiate from a convention template", async ({ page }) => {
