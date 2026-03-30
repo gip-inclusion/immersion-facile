@@ -18,54 +18,18 @@ import {
   isBeneficiaryStudent,
   keys,
   type LevelOfEducation,
-  mergeObjectsExceptFalsyValues,
   reasonableSchedule,
   type ScheduleDto,
   type Signatories,
   toDateUTCString,
 } from "shared";
-import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
-import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
-import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import {
   appellationAndRomeDtoSerializer,
   scheduleSerializer,
 } from "src/app/routes/valueSerializer";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { param, type ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
-
-type ConventionRoutes =
-  | ConventionMiniStagePageRoute
-  | ConventionImmersionPageRoute
-  | ConventionImmersionForExternalsRoute;
-
-export const getConventionInitialValuesFromUrl = ({
-  route,
-  internshipKind,
-}: {
-  route: ConventionRoutes;
-  internshipKind: InternshipKind;
-}): CreateConventionPresentationInitialValues => {
-  const params = mergeObjectsExceptFalsyValues(
-    outOfReduxDependencies.localDeviceRepository.get(
-      "partialConventionInUrl",
-    ) ?? {},
-    route.params satisfies ConventionParamsInUrl,
-  );
-  const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
-    {
-      ...getEmptyConventionInitialValues({ internshipKind }),
-      status: "READY_TO_SIGN",
-      dateSubmission: toDateUTCString(new Date()),
-      internshipKind,
-    };
-
-  return ENV.prefilledForms
-    ? withDevPrefilledValues(initialFormWithStoredAndUrlParams)
-    : initialFormWithStoredAndUrlParams;
-};
 
 export const getEmptyConventionInitialValues = ({
   internshipKind,

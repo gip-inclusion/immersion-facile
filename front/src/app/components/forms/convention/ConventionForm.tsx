@@ -90,7 +90,6 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   conventionPresentationFromConventionDraft,
-  getConventionInitialValuesFromUrl,
   getEmptyConventionInitialValues,
   makeConventionPresentationFromConventionTemplate,
   makeValuesToWatchInUrl,
@@ -141,7 +140,6 @@ export const ConventionForm = ({
   mode: ConventionFormMode;
   fromConventionTemplateId?: ConventionTemplateId;
 }) => {
-  const route = useRoute() as SupportedConventionRoutes;
   const dispatch = useDispatch();
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
@@ -156,11 +154,8 @@ export const ConventionForm = ({
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const conventionInitialValuesFromUrl = useMemo(
-    () =>
-      route.name !== "conventionTemplate"
-        ? getConventionInitialValuesFromUrl({ route, internshipKind })
-        : getEmptyConventionInitialValues({ internshipKind }),
-    [internshipKind, route],
+    () => getEmptyConventionInitialValues({ internshipKind }),
+    [internshipKind],
   );
   const acquisitionParams = useGetAcquisitionParams();
 

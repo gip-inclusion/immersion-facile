@@ -127,7 +127,9 @@ const getActivateDraftConventionButtonProps = ({
   connectedUser,
 }: DiscussionDetailsProps): ButtonProps => {
   const draftConvention = makeConventionFromDiscussion({
-    initialConvention: getEmptyConventionInitialValues({ internshipKind: "immersion" }),
+    initialConvention: getEmptyConventionInitialValues({
+      internshipKind: "immersion",
+    }),
     discussion,
     connectedUser,
   });
