@@ -119,6 +119,8 @@ export const ConventionManageActions = ({
       | WithConventionId
       | MarkPartnersErroredConventionAsHandledRequest,
   ) => {
+    if (isConventionActionLoading) return;
+
     if (verificationAction === "BROADCAST_AGAIN" && "conventionId" in params) {
       dispatch(
         conventionActionSlice.actions.broadcastConventionToPartnerRequested({
@@ -210,8 +212,6 @@ export const ConventionManageActions = ({
     }
 
     if ("status" in params) {
-      if (isConventionActionLoading) return;
-
       if (params.status === "ACCEPTED_BY_COUNSELLOR") {
         dispatch(
           conventionActionSlice.actions.acceptByCounsellorRequested({
