@@ -147,6 +147,7 @@ const WEEKLY_HOURS = {
 
 const DAILY_HOURS = {
   SEVEN: 7,
+  EIGHT: 8,
   FOURTEEN: 14,
 };
 
@@ -240,13 +241,13 @@ export const CCI_RULES: Record<CCI_RULENAME, CCI_RULE> = {
   },
   v2between15and16yo: {
     maxDailyHours: DAILY_HOURS.SEVEN,
-    maxWeeklyHours: WEEKLY_HOURS.THIRTY,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
     ageStart: AGES.FIFTEEN,
     ageLimit: AGES.SIXTEEN,
     conventionSubmitDateRange: FROM_16YO_RELEASE,
   },
   v2from16yo: {
-    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxDailyHours: DAILY_HOURS.EIGHT,
     maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
     ageStart: AGES.SIXTEEN,
     ageLimit: AGES.ONE_HUNDRED_AND_TWENTY,
