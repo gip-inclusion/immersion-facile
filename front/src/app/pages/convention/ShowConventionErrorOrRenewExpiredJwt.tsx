@@ -16,7 +16,7 @@ export const ShowConventionErrorOrRenewExpiredJwt = ({
       `Erreur lors de la récupération de la convention : ${errorMessage}`,
     );
 
-  const feedbackTopic: FeedbackTopic = "renew-expired-jwt-convention";
+  const feedbackTopic: FeedbackTopic = "renew-expired-jwt";
 
   throw frontErrors.jwtLink.expired({
     RenewJwtButton: (

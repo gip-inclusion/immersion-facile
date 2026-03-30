@@ -1,3 +1,5 @@
+import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useDispatch } from "react-redux";
 import {
@@ -13,6 +15,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
+import { Feedback } from "../feedback/Feedback";
 
 export const RenewExpiredJwtButton = ({
   expiredJwt,
@@ -47,20 +50,31 @@ export const RenewExpiredJwtButton = ({
   const renewExpiredJwtFeedback = useFeedbackTopic(feedbackTopic);
 
   return (
-    <Button
-      priority="primary"
-      disabled={
-        isRequestingRenewExpiredJwt ||
-        renewExpiredJwtFeedback?.level === "success"
-      }
-      onClick={onClick}
-      nativeButtonProps={{
-        id: domElementIds.magicLinkRenewal.renewalButton,
-      }}
-    >
-      {renewExpiredJwtFeedback?.level === "success"
-        ? "Nouveau lien envoyé"
-        : "Demander un nouveau lien"}
-    </Button>
+    <>
+      <Button
+        priority="primary"
+        disabled={
+          isRequestingRenewExpiredJwt ||
+          renewExpiredJwtFeedback?.level === "success"
+        }
+        onClick={onClick}
+        nativeButtonProps={{
+          id: domElementIds.magicLinkRenewal.renewalButton,
+        }}
+      >
+        Demander un nouveau lien
+      </Button>
+      <Feedback
+        topics={[feedbackTopic]}
+        render={({ level, message }) => (
+          <Alert
+            small
+            description={message}
+            severity={level}
+            className={fr.cx("fr-mt-2w")}
+          />
+        )}
+      />
+    </>
   );
 };

@@ -1,8 +1,5 @@
 import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import {
-  expiredJwtErrorTitle,
-  loginByEmailLinkDurationInMinutes,
-} from "shared";
+import { loginByEmailLinkDurationInMinutes } from "shared";
 import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
 
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
@@ -86,8 +83,7 @@ const topics = [
   "my-profile-establishment-registration",
   "login-by-email",
   "magic-link-interstitial",
-  "renew-expired-jwt-convention",
-  "renew-expired-jwt-email-auth-code",
+  "renew-expired-jwt",
   "partner-conventions",
   "search-result",
   "send-signature-link",
@@ -933,30 +929,16 @@ export const feedbacks: Record<
         "Une erreur est survenue lors de la connexion via le lien magique",
     },
   },
-  "renew-expired-jwt-convention": {
+  "renew-expired-jwt": {
     "create.success": {
       action: authSlice.actions.renewExpiredJwtSucceded,
-      message:
-        "Votre demande est enregistrée. Vous recevrez un message avec le nouveau lien dans quelques instants.",
+      message: `Le nouveau lien a bien été envoyé par email. Attention, la durée de ce lien, une fois envoyé est de ${loginByEmailLinkDurationInMinutes} minutes.`,
       title: "Renouvellement de lien réussi",
     },
     "create.error": {
       action: authSlice.actions.renewExpiredJwtFailed,
       message: "",
-      title: expiredJwtErrorTitle,
-    },
-  },
-  "renew-expired-jwt-email-auth-code": {
-    "create.success": {
-      action: authSlice.actions.renewExpiredJwtSucceded,
-      message: `Votre demande est enregistrée. Vous recevrez un message avec le nouveau lien dans quelques instants. 
-      Attention, la durée de ce lien, une fois envoyé est de ${loginByEmailLinkDurationInMinutes} minutes.`,
-      title: "Renouvellement de lien réussi",
-    },
-    "create.error": {
-      action: authSlice.actions.renewExpiredJwtFailed,
-      message: "",
-      title: expiredJwtErrorTitle,
+      title: "Une erreur s'est produite",
     },
   },
   unused: {},

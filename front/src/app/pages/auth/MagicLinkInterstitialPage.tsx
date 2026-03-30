@@ -19,7 +19,7 @@ export const MagicLinkInterstitialPage = () => {
   const { code, state, email } = params;
   const dispatch = useDispatch();
   const expiredSinceSeconds = getJwtExpiredSinceInSeconds(code, new Date());
-  const feedbackTopic: FeedbackTopic = "renew-expired-jwt-email-auth-code";
+  const feedbackTopic: FeedbackTopic = "renew-expired-jwt";
   const RenewJwtButton = (
     <RenewExpiredJwtButton
       key={RenewExpiredJwtButton.name}

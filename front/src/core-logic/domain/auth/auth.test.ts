@@ -614,7 +614,7 @@ describe("Auth slice", () => {
   });
 
   describe("renew expired jwt", () => {
-    const feedbackTopic: FeedbackTopic = "renew-expired-jwt-convention";
+    const feedbackTopic: FeedbackTopic = "renew-expired-jwt";
     const payload: RenewJwtPayload & PayloadWithFeedbackTopic = {
       expiredJwt: "jwt",
       feedbackTopic,
