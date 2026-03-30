@@ -26,11 +26,15 @@ export const ErrorPageContent = ({
       <h1>{title}</h1>
       <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{subtitle}</p>
       <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>{description}</p>
-      <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
-        {buttons.length
-          ? buttons.map((button) => <li key={button.key}>{button}</li>)
-          : null}
-      </ul>
+      {buttons.length > 1 ? (
+        <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
+          {buttons.map((button) => (
+            <li key={button.key}>{button}</li>
+          ))}
+        </ul>
+      ) : buttons.length === 1 ? (
+        buttons[0]
+      ) : null}
       {feedbackTopic && <Feedback topics={[feedbackTopic]} />}
     </div>
     <div className={fr.cx("fr-hidden", "fr-unhidden-lg", "fr-col-4")}>
