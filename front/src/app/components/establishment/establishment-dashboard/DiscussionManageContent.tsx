@@ -47,7 +47,7 @@ import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
-  getConventionInitialValuesFromUrl,
+  getEmptyConventionInitialValues,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
@@ -127,10 +127,7 @@ const getActivateDraftConventionButtonProps = ({
   connectedUser,
 }: DiscussionDetailsProps): ButtonProps => {
   const draftConvention = makeConventionFromDiscussion({
-    initialConvention: getConventionInitialValuesFromUrl({
-      route: routes.conventionImmersion(),
-      internshipKind: "immersion",
-    }),
+    initialConvention: getEmptyConventionInitialValues({ internshipKind: "immersion" }),
     discussion,
     connectedUser,
   });
