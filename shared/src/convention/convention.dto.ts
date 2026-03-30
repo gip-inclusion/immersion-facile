@@ -1,5 +1,10 @@
-import { differenceInYears, startOfDay } from "date-fns";
-import { keys } from "ramda";
+import {
+  addMilliseconds,
+  differenceInYears,
+  startOfDay,
+  subMilliseconds,
+} from "date-fns";
+import { keys, values } from "ramda";
 import type { WithAcquisition } from "../acquisition.dto";
 import type {
   AddressDto,
@@ -45,7 +50,12 @@ import type {
   UserWithAgencyRights,
 } from "../user/user.dto";
 import type { NotEmptyArray } from "../utils";
-import type { DateString, DateTimeIsoString } from "../utils/date";
+import {
+  type DateString,
+  type DateTimeIsoString,
+  isInRange,
+  type OptionalDateRange,
+} from "../utils/date";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
 
@@ -129,17 +139,134 @@ export const maximumCalendarDayByInternshipKind: Record<
 
 export const DATE_CONSIDERED_OLD = new Date("2024-08-31");
 
-export const BENEFICIARY_MAXIMUM_AGE_REQUIREMENT = 120;
-export const IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT = 16;
-export const MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT = 10;
-export const IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS = 48;
-export const CCI_WEEKLY_LIMITED_SCHEDULE_HOURS = 30;
-export const CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD = 15;
-export const CCI_WEEKLY_LIMITED_SCHEDULE_AGE = 16;
-export const CCI_WEEKLY_MAX_PERMITTED_HOURS = 35;
-export const CCI_DAILY_MAX_PERMITTED_HOURS = 7;
+const WEEKLY_HOURS = {
+  THIRTY: 30,
+  THIRTY_FIVE: 35,
+  FORTY_EIGHT: 48,
+};
+
+const DAILY_HOURS = {
+  SEVEN: 7,
+  FOURTEEN: 14,
+};
+
+const AGES = {
+  ZERO: 0,
+  TEN: 10,
+  FIFTEEN: 15,
+  SIXTEEN: 16,
+  ONE_HUNDRED_AND_TWENTY: 120,
+};
+
+export const ageRequirementByInternshipKind: Record<InternshipKind, number> = {
+  "mini-stage-cci": AGES.TEN,
+  immersion: AGES.SIXTEEN,
+};
+
+export const IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS = WEEKLY_HOURS.FORTY_EIGHT;
+export const CCI_WEEKLY_LIMITED_SCHEDULE_HOURS = WEEKLY_HOURS.THIRTY;
+export const CCI_WEEKLY_MAX_PERMITTED_HOURS = WEEKLY_HOURS.THIRTY_FIVE;
+export const BENEFICIARY_MAXIMUM_AGE_REQUIREMENT = AGES.ONE_HUNDRED_AND_TWENTY;
+export const CCI_WEEKLY_LIMITED_SCHEDULE_AGE = AGES.SIXTEEN;
+
 export const CCI_15YO_REQUIREMENT_RELEASE_DATE = new Date("2023-12-22");
 export const CCI_16YO_REQUIREMENT_RELEASE_DATE = new Date("2026-03-03");
+
+type CCI_RULE = {
+  maxWeeklyHours: number;
+  maxDailyHours: number;
+  ageStart: number;
+  ageLimit: number;
+  conventionSubmitDateRange: OptionalDateRange;
+};
+type CCI_RULENAME =
+  | "v0forall"
+  | "v1before15yo"
+  | "v1between15and16yo"
+  | "v1from16yo"
+  | "v2before15yo"
+  | "v2between15and16yo"
+  | "v2from16yo";
+
+const BEFORE_15YO_RELEASE: OptionalDateRange = {
+  to: subMilliseconds(CCI_15YO_REQUIREMENT_RELEASE_DATE, 1),
+};
+const BETWEEN_15YO_AND_16YO_RELEASES: OptionalDateRange = {
+  from: CCI_15YO_REQUIREMENT_RELEASE_DATE,
+  to: CCI_16YO_REQUIREMENT_RELEASE_DATE,
+};
+const FROM_15YO_RELEASE: OptionalDateRange = {
+  from: CCI_15YO_REQUIREMENT_RELEASE_DATE,
+};
+const FROM_16YO_RELEASE: OptionalDateRange = {
+  from: addMilliseconds(CCI_16YO_REQUIREMENT_RELEASE_DATE, 1),
+};
+
+export const CCI_RULES: Record<CCI_RULENAME, CCI_RULE> = {
+  v0forall: {
+    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxWeeklyHours: WEEKLY_HOURS.FORTY_EIGHT,
+    ageStart: AGES.FIFTEEN,
+    ageLimit: AGES.ONE_HUNDRED_AND_TWENTY,
+    conventionSubmitDateRange: BEFORE_15YO_RELEASE,
+  },
+  v1before15yo: {
+    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY,
+    ageStart: AGES.ZERO,
+    ageLimit: AGES.FIFTEEN,
+    conventionSubmitDateRange: BEFORE_15YO_RELEASE,
+  },
+  v1between15and16yo: {
+    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
+    ageStart: AGES.FIFTEEN,
+    ageLimit: AGES.SIXTEEN,
+    conventionSubmitDateRange: BETWEEN_15YO_AND_16YO_RELEASES,
+  },
+  v1from16yo: {
+    maxDailyHours: DAILY_HOURS.FOURTEEN,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
+    ageStart: AGES.SIXTEEN,
+    ageLimit: AGES.ONE_HUNDRED_AND_TWENTY,
+    conventionSubmitDateRange: BETWEEN_15YO_AND_16YO_RELEASES,
+  },
+  v2before15yo: {
+    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY,
+    ageStart: AGES.TEN,
+    ageLimit: AGES.FIFTEEN,
+    conventionSubmitDateRange: FROM_15YO_RELEASE,
+  },
+  v2between15and16yo: {
+    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY,
+    ageStart: AGES.FIFTEEN,
+    ageLimit: AGES.SIXTEEN,
+    conventionSubmitDateRange: FROM_16YO_RELEASE,
+  },
+  v2from16yo: {
+    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
+    ageStart: AGES.SIXTEEN,
+    ageLimit: AGES.ONE_HUNDRED_AND_TWENTY,
+    conventionSubmitDateRange: FROM_16YO_RELEASE,
+  },
+};
+
+export const getCCIRule = (
+  beneficiaryAgeAtConventionStart: number,
+  conventionSubmissionDate: DateString,
+): CCI_RULE | undefined =>
+  values(CCI_RULES).find(
+    (rule) =>
+      beneficiaryAgeAtConventionStart >= rule.ageStart &&
+      beneficiaryAgeAtConventionStart < rule.ageLimit &&
+      isInRange(
+        rule.conventionSubmitDateRange,
+        new Date(conventionSubmissionDate),
+      ),
+  );
 
 export const MAX_PRESENCE_DAYS_RELEASE_DATE = new Date("2025-03-27");
 export const SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE = new Date(

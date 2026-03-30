@@ -76,18 +76,12 @@ import {
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
+  ageRequirementByInternshipKind,
   assessmentCompletionStatusFilters,
   BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
-  CCI_15YO_REQUIREMENT_RELEASE_DATE,
-  CCI_16YO_REQUIREMENT_RELEASE_DATE,
-  CCI_DAILY_MAX_PERMITTED_HOURS,
-  CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
-  CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD,
-  CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
-  CCI_WEEKLY_MAX_PERMITTED_HOURS,
   type ConventionCommon,
   type ConventionDto,
   type ConventionId,
@@ -108,14 +102,13 @@ import {
   type FlatGetConventionsForAgencyUserParams,
   type GenerateMagicLinkRequestDto,
   type GetConventionsForAgencyUserParams,
+  getCCIRule,
   getExactAge,
-  IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   type ImmersionObjective,
   type InternshipKind,
   internshipKinds,
   levelsOfEducation,
   type MarkPartnersErroredConventionAsHandledRequest,
-  MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   type RenewConventionParams,
   type SendSignatureLinkRequestDto,
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
@@ -280,18 +273,12 @@ export const editBeneficiaryBirthdateRequestSchema: ZodSchemaWithInputMatchingOu
           message,
           path: ["updatedBeneficiaryBirthDate"],
         });
-      if (data.internshipKind === "mini-stage-cci")
-        addIssueIfAgeLessThanMinimumAge(
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-          MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
-        );
-      if (data.internshipKind === "immersion")
-        addIssueIfAgeLessThanMinimumAge(
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-          IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
-        );
+
+      addIssueIfAgeLessThanMinimumAge(
+        addIssue,
+        beneficiaryAgeAtConventionStart,
+        ageRequirementByInternshipKind[data.internshipKind],
+      );
     });
 
 export const renewedSchema = z.object({
@@ -522,20 +509,13 @@ export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
           convention.schedule.complexSchedule,
           convention.dateEnd,
         );
-        addIssueIfAgeLessThanMinimumAge(
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-          MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
-        );
       }
 
-      if (convention.internshipKind === "immersion") {
-        addIssueIfAgeLessThanMinimumAge(
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-          IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
-        );
-      }
+      addIssueIfAgeLessThanMinimumAge(
+        addIssue,
+        beneficiaryAgeAtConventionStart,
+        ageRequirementByInternshipKind[convention.internshipKind],
+      );
 
       addIssueIfAgeMoreThanMaximumAge(
         addIssue,
@@ -803,6 +783,19 @@ const addIssueIfLimitedScheduleHoursExceeded = (
   addIssue: (message: string, path: string) => void,
   beneficiaryAgeAtConventionStart: number,
 ) => {
+  const beneficiaryPrettyAge = Math.floor(beneficiaryAgeAtConventionStart);
+
+  const cciRule = getCCIRule(
+    beneficiaryAgeAtConventionStart,
+    convention.dateSubmission,
+  );
+  if (!cciRule) {
+    return addIssue(
+      `Il n'y a pas de règle identifiée pour valider les horaires d'un mini stage créé le ${convention.dateSubmission} pour un bénéficiaire âgé de ${beneficiaryPrettyAge} ans.`,
+      "schedule.totalHours",
+    );
+  }
+
   const weeklyHours = calculateWeeklyHoursFromSchedule(convention.schedule, {
     start: new Date(convention.dateStart),
     end: new Date(convention.dateEnd),
@@ -813,59 +806,17 @@ const addIssueIfLimitedScheduleHoursExceeded = (
   });
 
   if (
-    weeklyHours.some(
-      (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
-    )
-  ) {
-    if (
-      beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD &&
-      new Date(convention.dateSubmission).getTime() <=
-        CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime()
-    ) {
-      addIssue(
-        `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
-        getConventionFieldName("schedule.totalHours"),
-      );
-    }
-    if (
-      beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
-      new Date(convention.dateSubmission).getTime() >
-        CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime()
-    ) {
-      addIssue(
-        `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
-        getConventionFieldName("schedule.totalHours"),
-      );
-    }
-  }
-
-  if (
-    weeklyHours.some(
-      (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_MAX_PERMITTED_HOURS,
-    )
-  ) {
-    if (
-      (beneficiaryAgeAtConventionStart >= CCI_WEEKLY_LIMITED_SCHEDULE_AGE_OLD &&
-        new Date(convention.dateSubmission).getTime() >=
-          CCI_15YO_REQUIREMENT_RELEASE_DATE.getTime()) ||
-      (beneficiaryAgeAtConventionStart >= CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
-        new Date(convention.dateSubmission).getTime() >
-          CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime())
-    ) {
-      addIssue(
-        `La durée maximale hebdomadaire pour un mini-stage est de ${CCI_WEEKLY_MAX_PERMITTED_HOURS}h`,
-        getConventionFieldName("schedule.totalHours"),
-      );
-    }
-  }
-
-  if (
-    dailyHours.some((dailyHour) => dailyHour > CCI_DAILY_MAX_PERMITTED_HOURS) &&
-    new Date(convention.dateSubmission).getTime() >
-      CCI_16YO_REQUIREMENT_RELEASE_DATE.getTime()
+    weeklyHours.some((weeklyHourSet) => weeklyHourSet > cciRule.maxWeeklyHours)
   ) {
     addIssue(
-      `La durée maximale journalière pour un mini-stage est de ${CCI_DAILY_MAX_PERMITTED_HOURS}h`,
+      `La durée maximale hebdomadaire d'un mini-stage pour une personne de ${beneficiaryPrettyAge} ans est de ${cciRule.maxWeeklyHours}h`,
+      getConventionFieldName("schedule.totalHours"),
+    );
+  }
+
+  if (dailyHours.some((dailyHour) => dailyHour > cciRule.maxDailyHours)) {
+    addIssue(
+      `La durée maximale journalière d'un mini-stage pour une personne de ${beneficiaryPrettyAge} ans est de ${cciRule.maxDailyHours}h`,
       getConventionFieldName("schedule.totalHours"),
     );
   }
