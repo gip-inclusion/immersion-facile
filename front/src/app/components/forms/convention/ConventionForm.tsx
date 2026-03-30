@@ -159,7 +159,7 @@ export const ConventionForm = ({
     () =>
       route.name !== "conventionTemplate"
         ? getConventionInitialValuesFromUrl({ route, internshipKind })
-        : getEmptyConventionInitialValues(internshipKind),
+        : getEmptyConventionInitialValues({ internshipKind }),
     [internshipKind, route],
   );
   const acquisitionParams = useGetAcquisitionParams();

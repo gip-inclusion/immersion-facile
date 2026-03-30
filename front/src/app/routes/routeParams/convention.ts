@@ -3,7 +3,6 @@ import {
   type AgencyKind,
   type AppellationAndRomeDto,
   addressDtoToString,
-  addressStringToDto,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionDraftDto,
@@ -57,7 +56,7 @@ export const getConventionInitialValuesFromUrl = ({
   );
   const initialFormWithStoredAndUrlParams: CreateConventionPresentationInitialValues =
     {
-      ...conventionPresentationFromUrlParams(params),
+      ...getEmptyConventionInitialValues({ internshipKind }),
       status: "READY_TO_SIGN",
       dateSubmission: toDateUTCString(new Date()),
       internshipKind,
@@ -68,11 +67,63 @@ export const getConventionInitialValuesFromUrl = ({
     : initialFormWithStoredAndUrlParams;
 };
 
-export const getEmptyConventionInitialValues = (
-  internshipKind: InternshipKind,
-): CreateConventionPresentationInitialValues => {
+export const getEmptyConventionInitialValues = ({
+  internshipKind,
+}: {
+  internshipKind: InternshipKind;
+}): CreateConventionPresentationInitialValues => {
   const initialForm: CreateConventionPresentationInitialValues = {
-    ...conventionPresentationFromUrlParams({}),
+    id: uuidV4(),
+
+    establishmentTutor: {
+      role: "establishment-tutor",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      job: "",
+    },
+    signatories: {
+      beneficiary: {
+        role: "beneficiary",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        emergencyContact: "",
+        emergencyContactPhone: "",
+        emergencyContactEmail: "",
+        address: undefined,
+        schoolName: "",
+        schoolPostcode: "",
+        financiaryHelp: "",
+        birthdate: "",
+        isRqth: false,
+      },
+      establishmentRepresentative: {
+        role: "establishment-representative",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+      },
+      beneficiaryRepresentative: beneficiaryRepresentativeFromParams({
+        email: "",
+        phone: "",
+        firstName: "",
+        lastName: "",
+      }),
+      beneficiaryCurrentEmployer: beneficiaryCurrentEmployerFromParams({
+        businessName: "",
+        businessSiret: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        job: "",
+        businessAddress: "",
+      }),
+    },
     status: "READY_TO_SIGN",
     dateSubmission: toDateUTCString(new Date()),
     internshipKind,
@@ -529,105 +580,6 @@ const scheduleFromParams = ({
       ),
   };
 };
-
-const conventionPresentationFromUrlParams = (
-  params: ConventionParamsInUrl,
-): Omit<CreateConventionPresentationInitialValues, "internshipKind"> => ({
-  id: uuidV4(),
-
-  // Agency
-  agencyId: params.agencyId ?? undefined,
-  agencyDepartment: params.agencyDepartment ?? "",
-  agencyKind: params.agencyKind as AgencyKind | undefined,
-  agencyReferent: {
-    firstname: params.agencyReferentFirstName ?? "",
-    lastname: params.agencyReferentLastName ?? "",
-  },
-
-  //Actors
-  establishmentTutor: {
-    role: "establishment-tutor",
-    firstName: params.etFirstName ?? "",
-    lastName: params.etLastName ?? "",
-    email: params.etEmail ?? "",
-    phone: params.etPhone ?? "",
-    job: params.etJob ?? "",
-  },
-  signatories: {
-    beneficiary: {
-      role: "beneficiary",
-      firstName: params.firstName ?? "",
-      lastName: params.lastName ?? "",
-      email: params.email ?? "",
-      phone: params.phone ?? "",
-      emergencyContact: params.emergencyContact ?? "",
-      emergencyContactPhone: params.emergencyContactPhone ?? "",
-      emergencyContactEmail: params.emergencyContactEmail ?? "",
-      address: params.address ? addressStringToDto(params.address) : undefined,
-      levelOfEducation: (params.led as LevelOfEducation) ?? "",
-      schoolName: params.schoolName ?? "",
-      schoolPostcode: params.schoolPostcode ?? "",
-      financiaryHelp: params.financiaryHelp ?? "",
-      birthdate: params.birthdate ?? "",
-      isRqth: params.isRqth ?? false,
-      ...(params.fedId && params.fedIdProvider
-        ? {
-            federatedIdentity: {
-              provider: params.fedIdProvider as FtConnectIdentity["provider"],
-              token: params.fedId,
-            },
-          }
-        : {}),
-    },
-    establishmentRepresentative: {
-      role: "establishment-representative",
-      firstName: params.erFirstName ?? "",
-      lastName: params.erLastName ?? "",
-      email: params.erEmail ?? "",
-      phone: params.erPhone ?? "",
-    },
-    beneficiaryRepresentative: beneficiaryRepresentativeFromParams({
-      email: params.brEmail,
-      phone: params.brPhone,
-      firstName: params.brFirstName,
-      lastName: params.brLastName,
-    }),
-    beneficiaryCurrentEmployer: beneficiaryCurrentEmployerFromParams({
-      businessName: params.bceBusinessName ?? "",
-      businessSiret: params.bceSiret ?? "",
-      firstName: params.bceFirstName ?? "",
-      lastName: params.bceLastName ?? "",
-      email: params.bceEmail ?? "",
-      phone: params.bcePhone ?? "",
-      job: params.bceJob ?? "",
-      businessAddress: params.bceBusinessAddress ?? "",
-    }),
-  },
-
-  // Schedule
-  ...scheduleFromParams(params),
-
-  // Enterprise
-  siret: params.siret ?? "",
-  businessName: params.businessName ?? "",
-  immersionAddress: params.immersionAddress ?? "",
-  workConditions: params.workConditions ?? "",
-  businessAdvantages: params.businessAdvantages ?? "",
-
-  // Covid
-  individualProtection: params.individualProtection ?? undefined,
-  individualProtectionDescription: params.individualProtectionDescription ?? "",
-  sanitaryPrevention: params.sanitaryPrevention ?? undefined,
-  sanitaryPreventionDescription: params.sanitaryPreventionDescription ?? "",
-
-  // Immersion
-  immersionObjective: params.immersionObjective as
-    | ImmersionObjective
-    | undefined,
-  immersionAppellation: params.immersionAppellation,
-  immersionActivities: params.immersionActivities ?? "",
-  immersionSkills: params.immersionSkills ?? "",
-});
 
 export const conventionPresentationFromConventionDraft = (
   conventionDraft: ConventionDraftDto,
