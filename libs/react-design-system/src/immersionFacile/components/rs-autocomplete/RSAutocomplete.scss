@@ -25,6 +25,14 @@
     position: absolute;
     top: .5rem;
     left: 1rem;
+
+    .fr-modal & {
+      position: static;
+
+      &--opened {
+        position: absolute;
+      }
+    }
   }
 
   &__placeholder {
