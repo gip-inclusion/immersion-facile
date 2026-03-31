@@ -741,7 +741,7 @@ describe("DeleteUser", () => {
       });
     });
 
-    describe("Hybrid case - Throw HYBRYD BEHAVIOR NOT IMPLEMENTED by security - waiting for todo", () => {
+    describe("Hybrid cases", () => {
       it("case H1  - not active user on agency only ", async () => {
         expectPromiseToFailWithError(
           deleteUser.execute({
@@ -764,17 +764,106 @@ describe("DeleteUser", () => {
         );
       });
 
-      it("case H2 bis - not active user without rights on establishment & agency - Throw NOT IMPLEMENTED by security", async () => {
+      it("case H2 - user with rights on establishment & agency - apply rules according to establishment & agency rights respectivelly + delete user + event UserDeleted", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishment,
+        ];
+
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin", "validator"],
+            },
+            [contactMostActive.id]: {
+              isNotifiedByEmail: false,
+              roles: ["agency-viewer", "counsellor"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: contactMostActive.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
+        ]);
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            new EstablishmentAggregateBuilder(establishment)
+              .withEstablishmentUpdatedAt(timeGateway.now())
+              .withUserRights([
+                admin1Right,
+                admin2Right,
+                contactLessActiveRight,
+              ])
+              .build(),
+          ],
+        );
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin", "validator"],
+            },
+          }),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: contactMostActive.id,
+            },
+          },
+        ]);
+      });
+
+      it("case H2 - user without rights on establishment & agency - delete user + event UserDeleted", async () => {
         uow.establishmentAggregateRepository.establishmentAggregates = [];
         uow.agencyRepository.agencies = [];
 
-        expectPromiseToFailWithError(
-          deleteUser.execute({
-            userId: admin1.id,
-            triggeredBy: { kind: "crawler" },
-          }),
-          new Error("HYBRYD BEHAVIOR NOT IMPLEMENTED"),
+        await deleteUser.execute({
+          userId: contactMostActive.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: contactMostActive.id,
+            },
+          },
+        ]);
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [],
         );
+
+        expectToEqual(uow.agencyRepository.agencies, []);
       });
     });
   });
