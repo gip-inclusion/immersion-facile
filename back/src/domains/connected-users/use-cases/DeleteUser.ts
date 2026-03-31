@@ -64,10 +64,7 @@ export const makeDeleteUser = useCaseBuilder("DeleteUser")
           { userId: userToDelete.id },
         );
 
-      if (
-        inputParams.partialDelete ||
-        (!agenciesWithUserRight.length && !establishmentsWithUserRight.length)
-      )
+      if (inputParams.partialDelete)
         throw new Error("HYBRYD BEHAVIOR NOT IMPLEMENTED");
 
       const updatedAgencies = await Promise.all(
