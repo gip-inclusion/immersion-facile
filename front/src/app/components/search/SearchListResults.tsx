@@ -7,6 +7,7 @@ import { useState } from "react";
 import {
   Tag as ImTag,
   SearchResultIllustration,
+  SectionHighlight,
   useStyleUtils,
 } from "react-design-system";
 import {
@@ -37,10 +38,14 @@ export const SearchListResults = ({
   showDistance,
   route,
   isExternal,
+  onSearchFormSubmit,
 }: {
   route: SearchRoute;
   showDistance: boolean;
   isExternal: boolean;
+  onSearchFormSubmit: (
+    searchParams: ReturnType<typeof searchSelectors.searchParams>,
+  ) => void;
 }) => {
   const { triggerSearch } = useSearch(route);
   const { data: searchResults, pagination } = useAppSelector(
@@ -65,7 +70,7 @@ export const SearchListResults = ({
   const isFullRemoteSearch =
     searchParams.remoteWorkModes?.length === 1 &&
     !isPhysicalWorkMode(searchParams.remoteWorkModes[0]);
-  const numberOfColumns = isFullRemoteSearch ? 4 : 6;
+  const numberOfColumns = 6;
 
   return (
     <div className={fr.cx("fr-container", isExternal && "fr-mb-8w")}>
@@ -76,12 +81,7 @@ export const SearchListResults = ({
           !hasResults && "fr-grid-row--center",
         )}
       >
-        <div
-          className={fr.cx(
-            "fr-col-12",
-            isFullRemoteSearch ? "fr-col-lg-12" : "fr-col-lg-8",
-          )}
-        >
+        <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
           <div
             className={fr.cx(
               "fr-grid-row",
@@ -114,32 +114,82 @@ export const SearchListResults = ({
             {!hasResults &&
               !isExternal &&
               isSearchWithAppellationAndGeoParams && (
-                <div
-                  className={cx(
-                    fr.cx("fr-col-6", "fr-py-6w"),
-                    classes["text-centered"],
-                  )}
-                >
+                <div className={cx(fr.cx("fr-p-6w"), classes["text-centered"])}>
                   <p className={fr.cx("fr-h6")}>
                     Nous n'avons pas trouvé d'entreprises actuellement
                     disponibles correspondant à votre recherche 🥺
                   </p>
-                  <p>
-                    Découvrez d'autres opportunités d'entreprise à fort
-                    potentiel d'embauche grâce à notre partenaire La Bonne Boîte
-                    !
-                  </p>
-                  <Button
-                    id={domElementIds.search.noResultsLbbButton}
-                    linkProps={
-                      routes.externalSearch(
-                        getFilteredSearchParamsForLBB(searchParams),
-                      ).link
-                    }
-                    priority="primary"
-                  >
-                    Rechercher sur La Bonne Boîte
-                  </Button>
+
+                  {searchParams.showOnlyAvailableOffers ? (
+                    <>
+                      <p>
+                        Certaines entreprises peuvent être temporairement
+                        masquées lorsqu’elles ont déjà reçu le maximum de
+                        candidatures qu’elles peuvent traiter.
+                      </p>
+                      <p>
+                        Vous pouvez afficher toutes les entreprises et revenir
+                        dans quelques semaines, lorsque de nouvelles places
+                        seront disponibles ou découvrir d’autres opportunités à
+                        votre potentiel d’embauche grâce à notre partenaire La
+                        Bonne Boîte.
+                      </p>
+                      <ul
+                        className={fr.cx(
+                          "fr-btns-group",
+                          "fr-btns-group--inline-md",
+                          "fr-btns-group--center",
+                        )}
+                      >
+                        <li>
+                          <Button
+                            id={domElementIds.search.noResultsLbbButton}
+                            priority="secondary"
+                            onClick={() => {
+                              onSearchFormSubmit({
+                                ...searchParams,
+                                showOnlyAvailableOffers: false,
+                              });
+                            }}
+                          >
+                            Afficher toutes les entreprises
+                          </Button>
+                        </li>
+                        <li>
+                          <Button
+                            id={domElementIds.search.noResultsLbbButton}
+                            linkProps={
+                              routes.externalSearch(
+                                getFilteredSearchParamsForLBB(searchParams),
+                              ).link
+                            }
+                            priority="primary"
+                          >
+                            Rechercher sur La Bonne Boîte
+                          </Button>
+                        </li>
+                      </ul>
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        Découvrez d'autres opportunités d'entreprise à fort
+                        potentiel d'embauche grâce à notre partenaire La Bonne
+                        Boîte !
+                      </p>
+                      <Button
+                        id={domElementIds.search.noResultsLbbButton}
+                        linkProps={
+                          routes.externalSearch(
+                            getFilteredSearchParamsForLBB(searchParams),
+                          ).link
+                        }
+                        priority="primary"
+                      >
+                        Rechercher sur La Bonne Boîte
+                      </Button>
+                    </>
+                  )}
                 </div>
               )}
             {hasResults &&
@@ -204,14 +254,33 @@ export const SearchListResults = ({
             )}
           </div>
         </div>
-        {hasResults && !isFullRemoteSearch && (
+        {hasResults && (
           <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
-            <SearchMiniMap
-              kind="list"
-              activeMarkerKey={activeMarkerKey}
-              setActiveMarkerKey={setActiveMarkerKey}
-              isExternal={isExternal}
-            />
+            {!isFullRemoteSearch && (
+              <div className={fr.cx("fr-mb-2w")}>
+                <SearchMiniMap
+                  kind="list"
+                  activeMarkerKey={activeMarkerKey}
+                  setActiveMarkerKey={setActiveMarkerKey}
+                  isExternal={isExternal}
+                />
+              </div>
+            )}
+            <SectionHighlight priority="discrete" className={fr.cx("fr-p-2w")}>
+              <p>
+                <strong>
+                  Certaines entreprises sont temporairement masquées.
+                </strong>
+              </p>
+              <p>
+                Lorsqu’elles ont reçu le nombre maximum de candidatures qu’elles
+                peuvent traiter, les entreprises n’apparaissent plus dans la
+                recherche. Décochez le filtre “Mises en relation disponibles
+                uniquement” dans “Toutes les entreprises” pour les voir. Si
+                l’une d’entre-elles vous intéresse, revenez consulter sa fiche
+                dans les prochaines semaines.
+              </p>
+            </SectionHighlight>
           </div>
         )}
         {!isExternal && (
