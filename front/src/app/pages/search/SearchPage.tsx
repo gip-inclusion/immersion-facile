@@ -873,6 +873,7 @@ export const SearchPage = ({
                     route={route}
                     showDistance={areValidGeoParams(searchMade)}
                     isExternal={route.name === "externalSearch"}
+                    onSearchFormSubmit={onSearchFormSubmit}
                   />
                 </div>
               )}
