@@ -129,6 +129,7 @@ const getActivateDraftConventionButtonProps = ({
   const draftConvention = makeConventionFromDiscussion({
     initialConvention: getEmptyConventionInitialValues({
       internshipKind: "immersion",
+      federatedIdentity: null,
     }),
     discussion,
     connectedUser,

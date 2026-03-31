@@ -29,7 +29,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   type AgencyOption,
   addressDtoToString,
-  type Beneficiary,
   type ConventionFormInitialValues,
   type ConventionPresentation,
   type ConventionReadDto,
@@ -46,7 +45,6 @@ import {
   isBeneficiaryMinor,
   isCreateConventionPresentationInitialValues,
   isEstablishmentTutorIsEstablishmentRepresentative,
-  isFtConnectIdentity,
   isRemotableWorkMode,
   keys,
   makeConventionPresentationSchemaWithNormalizedInput,
@@ -100,7 +98,6 @@ import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selec
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
@@ -153,22 +150,11 @@ export const ConventionForm = ({
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const conventionInitialValuesFromUrl = useMemo(
-    () => getEmptyConventionInitialValues({ internshipKind }),
-    [internshipKind],
-  );
   const acquisitionParams = useGetAcquisitionParams();
 
   const initialValues = useRef<CreateConventionPresentationInitialValues>({
-    ...conventionInitialValuesFromUrl,
+    ...getEmptyConventionInitialValues({ internshipKind, federatedIdentity }),
     ...acquisitionParams,
-    signatories: {
-      ...conventionInitialValuesFromUrl.signatories,
-      beneficiary: makeInitialBenefiaryForm(
-        conventionInitialValuesFromUrl.signatories.beneficiary,
-        federatedIdentity,
-      ),
-    },
     ...(federatedIdentity?.payload?.advisor &&
     mode === "create-convention-from-scratch"
       ? {
@@ -980,23 +966,6 @@ const ConventionFormContent = ({
       />
     </>
   );
-};
-
-const makeInitialBenefiaryForm = (
-  beneficiary: Beneficiary<"immersion" | "mini-stage-cci">,
-  federatedIdentityWithUser: FederatedIdentityWithUser | null,
-): Beneficiary<"immersion" | "mini-stage-cci"> => {
-  const { federatedIdentity, ...beneficiaryOtherProperties } = beneficiary;
-  const peConnectIdentity =
-    federatedIdentityWithUser && isFtConnectIdentity(federatedIdentityWithUser)
-      ? federatedIdentityWithUser
-      : undefined;
-  const federatedIdentityValue = federatedIdentity ?? peConnectIdentity;
-
-  return {
-    ...beneficiaryOtherProperties,
-    federatedIdentity: federatedIdentityValue,
-  };
 };
 
 const useWaitForReduxFormUiReadyBeforeInitialisation = (

@@ -16,6 +16,7 @@ import {
   type ImmersionObjective,
   type InternshipKind,
   isBeneficiaryStudent,
+  isFtConnectIdentity,
   keys,
   type LevelOfEducation,
   reasonableSchedule,
@@ -28,17 +29,28 @@ import {
   scheduleSerializer,
 } from "src/app/routes/valueSerializer";
 import { ENV } from "src/config/environmentVariables";
+import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { param, type ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
 export const getEmptyConventionInitialValues = ({
   internshipKind,
+  federatedIdentity,
 }: {
   internshipKind: InternshipKind;
+  federatedIdentity: FederatedIdentityWithUser | null;
 }): CreateConventionPresentationInitialValues => {
+  const dateStart = new Date();
+  const dateEnd = addDays(dateStart, 1);
   const initialForm: CreateConventionPresentationInitialValues = {
     id: uuidV4(),
 
+    dateStart: dateStart.toISOString(),
+    dateEnd: dateEnd.toISOString(),
+    schedule: reasonableSchedule({
+      start: dateStart,
+      end: dateEnd,
+    }),
     establishmentTutor: {
       role: "establishment-tutor",
       firstName: "",
@@ -63,6 +75,10 @@ export const getEmptyConventionInitialValues = ({
         financiaryHelp: "",
         birthdate: "",
         isRqth: false,
+        federatedIdentity:
+          federatedIdentity && isFtConnectIdentity(federatedIdentity)
+            ? federatedIdentity
+            : undefined,
       },
       establishmentRepresentative: {
         role: "establishment-representative",
