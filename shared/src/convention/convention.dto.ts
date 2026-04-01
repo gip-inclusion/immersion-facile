@@ -173,21 +173,22 @@ export const CCI_WEEKLY_LIMITED_SCHEDULE_AGE = AGES.SIXTEEN;
 export const CCI_15YO_REQUIREMENT_RELEASE_DATE = new Date("2023-12-22");
 export const CCI_16YO_REQUIREMENT_RELEASE_DATE = new Date("2026-03-03");
 
-type CCI_RULE = {
+type MINI_STAGE_RULE = {
   maxWeeklyHours: number;
-  maxDailyHours: number;
+  maxDailyHours: number | null;
   ageStart: number;
   ageLimit: number;
   conventionSubmitDateRange: OptionalDateRange;
 };
-type CCI_RULENAME =
+type MINI_STAGE_RULENAME =
   | "v0forall"
   | "v1before15yo"
   | "v1between15and16yo"
   | "v1from16yo"
   | "v2before15yo"
-  | "v2between15and16yo"
-  | "v2from16yo";
+  | "currentbefore15yo"
+  | "currentbetween15and16yo"
+  | "currentfrom16yo";
 
 const BEFORE_15YO_RELEASE: OptionalDateRange = {
   to: subMilliseconds(CCI_15YO_REQUIREMENT_RELEASE_DATE, 1),
@@ -196,57 +197,61 @@ const BETWEEN_15YO_AND_16YO_RELEASES: OptionalDateRange = {
   from: CCI_15YO_REQUIREMENT_RELEASE_DATE,
   to: CCI_16YO_REQUIREMENT_RELEASE_DATE,
 };
-const FROM_15YO_RELEASE: OptionalDateRange = {
-  from: CCI_15YO_REQUIREMENT_RELEASE_DATE,
-};
 const FROM_16YO_RELEASE: OptionalDateRange = {
   from: addMilliseconds(CCI_16YO_REQUIREMENT_RELEASE_DATE, 1),
 };
 
-export const CCI_RULES: Record<CCI_RULENAME, CCI_RULE> = {
+export const MINI_STAGE_RULES: Record<MINI_STAGE_RULENAME, MINI_STAGE_RULE> = {
   v0forall: {
-    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxDailyHours: null,
     maxWeeklyHours: WEEKLY_HOURS.FORTY_EIGHT,
     ageStart: AGES.FIFTEEN,
     ageLimit: AGES.ONE_HUNDRED_AND_TWENTY,
     conventionSubmitDateRange: BEFORE_15YO_RELEASE,
   },
   v1before15yo: {
-    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxDailyHours: null,
     maxWeeklyHours: WEEKLY_HOURS.THIRTY,
     ageStart: AGES.ZERO,
     ageLimit: AGES.FIFTEEN,
     conventionSubmitDateRange: BEFORE_15YO_RELEASE,
   },
   v1between15and16yo: {
-    maxDailyHours: DAILY_HOURS.SEVEN,
+    maxDailyHours: null,
     maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
     ageStart: AGES.FIFTEEN,
     ageLimit: AGES.SIXTEEN,
     conventionSubmitDateRange: BETWEEN_15YO_AND_16YO_RELEASES,
   },
   v1from16yo: {
-    maxDailyHours: DAILY_HOURS.FOURTEEN,
+    maxDailyHours: null,
     maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
     ageStart: AGES.SIXTEEN,
     ageLimit: AGES.ONE_HUNDRED_AND_TWENTY,
     conventionSubmitDateRange: BETWEEN_15YO_AND_16YO_RELEASES,
   },
   v2before15yo: {
+    maxDailyHours: null,
+    maxWeeklyHours: WEEKLY_HOURS.THIRTY,
+    ageStart: AGES.TEN,
+    ageLimit: AGES.FIFTEEN,
+    conventionSubmitDateRange: BETWEEN_15YO_AND_16YO_RELEASES,
+  },
+  currentbefore15yo: {
     maxDailyHours: DAILY_HOURS.SEVEN,
     maxWeeklyHours: WEEKLY_HOURS.THIRTY,
     ageStart: AGES.TEN,
     ageLimit: AGES.FIFTEEN,
-    conventionSubmitDateRange: FROM_15YO_RELEASE,
+    conventionSubmitDateRange: FROM_16YO_RELEASE,
   },
-  v2between15and16yo: {
+  currentbetween15and16yo: {
     maxDailyHours: DAILY_HOURS.SEVEN,
     maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
     ageStart: AGES.FIFTEEN,
     ageLimit: AGES.SIXTEEN,
     conventionSubmitDateRange: FROM_16YO_RELEASE,
   },
-  v2from16yo: {
+  currentfrom16yo: {
     maxDailyHours: DAILY_HOURS.EIGHT,
     maxWeeklyHours: WEEKLY_HOURS.THIRTY_FIVE,
     ageStart: AGES.SIXTEEN,
@@ -255,11 +260,11 @@ export const CCI_RULES: Record<CCI_RULENAME, CCI_RULE> = {
   },
 };
 
-export const getCCIRule = (
+export const getMiniStageRule = (
   beneficiaryAgeAtConventionStart: number,
   conventionSubmissionDate: DateString,
-): CCI_RULE | undefined =>
-  values(CCI_RULES).find(
+): MINI_STAGE_RULE | undefined =>
+  values(MINI_STAGE_RULES).find(
     (rule) =>
       beneficiaryAgeAtConventionStart >= rule.ageStart &&
       beneficiaryAgeAtConventionStart < rule.ageLimit &&

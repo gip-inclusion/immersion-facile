@@ -102,8 +102,8 @@ import {
   type FlatGetConventionsForAgencyUserParams,
   type GenerateMagicLinkRequestDto,
   type GetConventionsForAgencyUserParams,
-  getCCIRule,
   getExactAge,
+  getMiniStageRule,
   type ImmersionObjective,
   type InternshipKind,
   internshipKinds,
@@ -785,11 +785,11 @@ const addIssueIfLimitedScheduleHoursExceeded = (
 ) => {
   const beneficiaryPrettyAge = Math.floor(beneficiaryAgeAtConventionStart);
 
-  const cciRule = getCCIRule(
+  const miniStageRule = getMiniStageRule(
     beneficiaryAgeAtConventionStart,
     convention.dateSubmission,
   );
-  if (!cciRule) {
+  if (!miniStageRule) {
     return addIssue(
       `Il n'y a pas de règle identifiée pour valider les horaires d'un mini stage créé le ${convention.dateSubmission} pour un bénéficiaire âgé de ${beneficiaryPrettyAge} ans.`,
       "schedule.totalHours",
@@ -806,17 +806,24 @@ const addIssueIfLimitedScheduleHoursExceeded = (
   });
 
   if (
-    weeklyHours.some((weeklyHourSet) => weeklyHourSet > cciRule.maxWeeklyHours)
+    weeklyHours.some(
+      (weeklyHourSet) => weeklyHourSet > miniStageRule.maxWeeklyHours,
+    )
   ) {
     addIssue(
-      `La durée maximale hebdomadaire d'un mini-stage pour une personne de ${beneficiaryPrettyAge} ans est de ${cciRule.maxWeeklyHours}h`,
+      `La durée maximale hebdomadaire d'un mini-stage pour une personne de ${beneficiaryPrettyAge} ans est de ${miniStageRule.maxWeeklyHours}h`,
       getConventionFieldName("schedule.totalHours"),
     );
   }
 
-  if (dailyHours.some((dailyHour) => dailyHour > cciRule.maxDailyHours)) {
+  if (
+    dailyHours.some(
+      (dailyHour) =>
+        miniStageRule.maxDailyHours && dailyHour > miniStageRule.maxDailyHours,
+    )
+  ) {
     addIssue(
-      `La durée maximale journalière d'un mini-stage pour une personne de ${beneficiaryPrettyAge} ans est de ${cciRule.maxDailyHours}h`,
+      `La durée maximale journalière d'un mini-stage pour une personne de ${beneficiaryPrettyAge} ans est de ${miniStageRule.maxDailyHours}h`,
       getConventionFieldName("schedule.totalHours"),
     );
   }
