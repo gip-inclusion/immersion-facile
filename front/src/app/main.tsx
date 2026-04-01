@@ -50,7 +50,7 @@ if (ENV.envType !== "local") {
       "https://staging.immersion-facile.beta.gouv.fr/api",
       "https://immersion-facile.beta.gouv.fr/api",
     ],
-    replaysOnErrorSampleRate: 1,
+    replaysOnErrorSampleRate: 0.05,
     replaysSessionSampleRate: 0,
   });
 }
