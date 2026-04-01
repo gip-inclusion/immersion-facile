@@ -67,6 +67,7 @@ jobs:
                   exit 0"
 
       - name: Run DBT transformations
+        if: always()
         run: >-
           scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL -- bash -c "
                 echo \"> \$(date) - Starting DBT run\" &&
