@@ -70,7 +70,6 @@ import { BeneficiaryFormSection } from "src/app/components/forms/convention/sect
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";
 import { ScheduleSection } from "src/app/components/forms/convention/sections/schedule/ScheduleSection";
-import { useUpdateConventionValuesInUrl } from "src/app/components/forms/convention/useUpdateConventionValuesInUrl";
 import {
   formConventionFieldsLabels,
   makeFormUiSections,
@@ -90,7 +89,6 @@ import {
   conventionPresentationFromConventionDraft,
   getEmptyConventionInitialValues,
   makeConventionPresentationFromConventionTemplate,
-  makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -234,7 +232,6 @@ export const ConventionForm = ({
     <ConventionFormContent
       key={defaultValues.id}
       defaultValues={defaultValues}
-      initialValues={initialValues}
       mode={mode}
       internshipKind={internshipKind}
       fromConventionTemplateId={fromConventionTemplateId}
@@ -244,13 +241,11 @@ export const ConventionForm = ({
 
 const ConventionFormContent = ({
   defaultValues,
-  initialValues,
   mode,
   internshipKind,
   fromConventionTemplateId,
 }: {
   defaultValues: ConventionFormInitialValues;
-  initialValues: CreateConventionPresentationInitialValues;
   mode: ConventionFormMode;
   internshipKind: InternshipKind;
   fromConventionTemplateId?: ConventionTemplateId;
@@ -317,20 +312,6 @@ const ConventionFormContent = ({
   const { errors, submitCount } = formState;
 
   const conventionValues = getValues();
-
-  useUpdateConventionValuesInUrl(
-    makeValuesToWatchInUrl(
-      isCreateConventionPresentationInitialValues(conventionValues)
-        ? {
-            ...conventionValues,
-            fromPeConnectedUser,
-          }
-        : {
-            ...initialValues,
-            fromPeConnectedUser,
-          },
-    ),
-  );
 
   const { getFormFields, getFormErrors } = getFormContents(
     formConventionFieldsLabels({
