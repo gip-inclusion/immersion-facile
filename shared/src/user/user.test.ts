@@ -1,6 +1,11 @@
 import { ZodError } from "zod";
 import type { $ZodIssue } from "zod/v4/core/errors.cjs";
-import { firstnameSchema, lastnameSchema } from "./user.schema";
+import { ConnectedUserBuilder } from "./user.builder";
+import {
+  connectedUserSchema,
+  firstnameSchema,
+  lastnameSchema,
+} from "./user.schema";
 
 describe("lastnameSchema & firstnameSchema", () => {
   describe("basic validation", () => {
@@ -148,5 +153,42 @@ describe("lastnameSchema & firstnameSchema", () => {
     ])("rejects invalid firstname '%s'", ({ input, error }) => {
       expect(() => firstnameSchema.parse(input)).toThrow(error);
     });
+  });
+});
+
+describe("connectedUserSchema", () => {
+  it("accepts a valid connected user", () => {
+    const connectedUser = new ConnectedUserBuilder().build();
+
+    const result = connectedUserSchema.safeParse(connectedUser);
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects unknown keys in dashboards.agencies", () => {
+    const connectedUser = new ConnectedUserBuilder().build();
+    const connectedUserWithUnknownKey = {
+      ...connectedUser,
+      dashboards: {
+        establishments: {},
+        agencies: {
+          agencyManagement: "https://www.agency-management.fr",
+          unknownKey: "unknown key",
+        },
+      },
+    };
+
+    const result = connectedUserSchema.safeParse(connectedUserWithUnknownKey);
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "unrecognized_keys",
+          path: ["dashboards", "agencies"],
+          keys: ["unknownKey"],
+        }),
+      ]),
+    );
   });
 });
