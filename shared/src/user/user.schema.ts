@@ -109,19 +109,21 @@ const withEstablishmentSiretAndName: ZodSchemaWithInputMatchingOutput<Establishm
 const dashboardsSchema: ZodSchemaWithInputMatchingOutput<
   WithAgencyDashboards & WithEstablishmentDashboards
 > = z.object({
-  establishments: z.object({
-    conventions: absoluteUrlSchema.optional(),
-    discussions: absoluteUrlSchema.optional(),
-    editEstablishment: siretSchema.optional(),
-  }),
-  agencies: z.object({
-    agencyDashboardUrl: absoluteUrlSchema.optional(),
-    erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
-    statsEstablishmentDetailsUrl: absoluteUrlSchema.optional(),
-    statsConventionsByEstablishmentByDepartmentUrl:
-      absoluteUrlSchema.optional(),
-    statsAgenciesUrl: absoluteUrlSchema.optional(),
-  }),
+  establishments: z
+    .object({
+      conventions: absoluteUrlSchema.optional(),
+      discussions: absoluteUrlSchema.optional(),
+      editEstablishment: siretSchema.optional(),
+    })
+    .strict(),
+  agencies: z
+    .object({
+      agencyDashboardUrl: absoluteUrlSchema.optional(),
+      erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
+      agencyManagement: absoluteUrlSchema.optional(),
+      establishmentManagement: absoluteUrlSchema.optional(),
+    })
+    .strict(),
 });
 
 export const connectedUserSchema: ZodSchemaWithInputMatchingOutput<ConnectedUser> =
