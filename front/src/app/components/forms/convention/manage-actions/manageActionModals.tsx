@@ -166,6 +166,7 @@ const createRenewConventionModalParams = {
   id: domElementIds.manageConvention.renewModal,
   isOpenedByDefault: false,
   formId: domElementIds.manageConvention.renewModalForm,
+  doSubmitClosesModal: false,
   submitButton: {
     id: domElementIds.manageConvention.submitRenewModalButton,
     children: "Renouveler la convention",
