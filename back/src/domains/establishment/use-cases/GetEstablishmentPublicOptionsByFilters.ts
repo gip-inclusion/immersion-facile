@@ -2,7 +2,6 @@ import {
   type ConnectedUser,
   type EstablishmentPublicOption,
   getEstablishmentPublicOptionsByFiltersSchema,
-  removeSpaces,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
@@ -23,7 +22,7 @@ export const makeGetEstablishmentPublicOptionsByFilters = useCaseBuilder(
       await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
         {
           nameIncludes,
-          sirets: siret ? [removeSpaces(siret)] : undefined,
+          sirets: siret ? [siret] : undefined,
         },
       );
 
@@ -36,5 +35,4 @@ export const toEstablishmentPublicOption = (
   businessName: establishmentAggregate.establishment.name,
   businessNameCustomized: establishmentAggregate.establishment.customizedName,
   siret: establishmentAggregate.establishment.siret,
-  userRightIds: establishmentAggregate.userRights.map(({ userId }) => userId),
 });

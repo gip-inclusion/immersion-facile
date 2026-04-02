@@ -231,7 +231,12 @@ const makeEstablishmentDashboard = async (
       },
     );
 
-  const userHasEstablishmentRights = establishmentAggregates.length > 0;
+  const userHasEstablishmentRights =
+    establishmentAggregates.filter((establishmentAggregate) =>
+      establishmentAggregate.userRights.some(
+        ({ status, userId }) => status === "ACCEPTED" && userId === user.id,
+      ),
+    ).length > 0;
   const [conventions, discussions] = await Promise.all([
     makeConventionEstablishmentDashboard({
       uow: uow,

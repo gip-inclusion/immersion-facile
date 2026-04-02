@@ -1,5 +1,6 @@
 import {
   errors,
+  onlyContactUserRightsWithStatusAccepted,
   type UserWithAdminRights,
   type WithSiretDto,
   withSiretSchema,
@@ -83,8 +84,7 @@ const getEstablishmentContactUsers = async (
   establishment: EstablishmentAggregate,
 ): Promise<UserWithAdminRights[]> => {
   const contactUserRights = establishment.userRights.filter(
-    (user) =>
-      user.role === "establishment-contact" && user.status === "ACCEPTED",
+    onlyContactUserRightsWithStatusAccepted,
   );
 
   return uow.userRepository.getByIds(

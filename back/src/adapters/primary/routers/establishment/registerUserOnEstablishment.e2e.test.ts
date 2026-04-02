@@ -58,28 +58,7 @@ describe("registerUserOnEstablishment", () => {
     });
 
     describe("Wrong paths", () => {
-      it("401 - returns 401 when user is not connected", async () => {
-        expectHttpResponseToEqual(
-          await sharedRequest.registerUserOnEstablishment({
-            headers: {
-              authorization: "Bearer invalid-token",
-            },
-            urlParams: { siret: establishmentAggregate.establishment.siret },
-            body: {
-              email: "ploumanach@breizh.bzh",
-              role: "establishment-contact",
-              status: "PENDING",
-              shouldReceiveDiscussionNotifications: true,
-              job: "crêpier",
-              phone: "+33600000000",
-              isMainContactByPhone: false,
-            },
-          }),
-          { status: 401, body: { status: 401, message: invalidTokenMessage } },
-        );
-      });
-
-      it("403 - returns 403 when user request registration for a different email", async () => {
+      it("400 - returns 400 when user request registration for a different email", async () => {
         const result = await sharedRequest.registerUserOnEstablishment({
           headers: {
             authorization: generateConnectedUserJwt(
@@ -103,13 +82,34 @@ describe("registerUserOnEstablishment", () => {
         });
 
         expectHttpResponseToEqual(result, {
-          status: 403,
+          status: 400,
           body: {
-            status: 403,
-            message: errors.user.forbiddenEmailUpdate().message,
+            status: 400,
+            message: errors.user.emailMismatch().message,
           },
         });
       });
+      it("401 - returns 401 when user is not connected", async () => {
+        expectHttpResponseToEqual(
+          await sharedRequest.registerUserOnEstablishment({
+            headers: {
+              authorization: "Bearer invalid-token",
+            },
+            urlParams: { siret: establishmentAggregate.establishment.siret },
+            body: {
+              email: "ploumanach@breizh.bzh",
+              role: "establishment-contact",
+              status: "PENDING",
+              shouldReceiveDiscussionNotifications: true,
+              job: "crêpier",
+              phone: "+33600000000",
+              isMainContactByPhone: false,
+            },
+          }),
+          { status: 401, body: { status: 401, message: invalidTokenMessage } },
+        );
+      });
+
       it("404 - returns 404 when requested establishment is not found", async () => {
         const nonExistingSiret = "99999999999999";
         const result = await sharedRequest.registerUserOnEstablishment({

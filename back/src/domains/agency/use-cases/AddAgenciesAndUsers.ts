@@ -13,6 +13,7 @@ import {
   NotFoundError,
   type PhoneNumber,
   phoneNumberSchema,
+  removeSpaces,
   type SiretDto,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
@@ -248,7 +249,6 @@ const linkUsersToExistingAgency = async ({
 const formatImportedAgencyAndUserRow = (
   importedAgencyAndUserRow: ImportedAgencyAndUserRow[],
 ): ImportedAgencyAndUserRow[] => {
-  const removeSpaces = (str: string) => str.replace(/\s/g, "");
   const capitalizeFirstLetter = (str: string) =>
     str
       .toLowerCase()

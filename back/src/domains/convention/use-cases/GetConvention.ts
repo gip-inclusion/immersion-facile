@@ -101,7 +101,8 @@ async function onConnectedUserPayload({
     );
 
   const hasSomeEstablishmentRights = establishment?.userRights.some(
-    (userRight) => userRight.userId === user.id,
+    (userRight) =>
+      userRight.userId === user.id && userRight.status === "ACCEPTED",
   );
 
   if (hasSomeEstablishmentRights) return convention;

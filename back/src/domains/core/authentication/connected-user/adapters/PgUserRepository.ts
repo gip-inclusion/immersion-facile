@@ -177,7 +177,7 @@ export class PgUserRepository implements UserRepository {
         sql<number>`COUNT(DISTINCT ${eb.ref("users__agencies.agency_id")})::int`.as(
           "numberOfAgencies",
         ),
-        sql<number>`COUNT(DISTINCT ${eb.ref("establishments__users.siret")})::int`.as(
+        sql<number>`COUNT(DISTINCT CASE WHEN ${eb.ref("establishments__users.status")} = 'ACCEPTED' THEN ${eb.ref("establishments__users.siret")} END)::int`.as(
           "numberOfEstablishments",
         ),
       ])

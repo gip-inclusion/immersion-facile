@@ -4,7 +4,7 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { HeadingSection } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds, type EstablishmentData } from "shared";
+import { domElementIds, type UserEstablishmentRightDetails } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes, useRoute } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
@@ -14,7 +14,7 @@ import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import type { Route } from "type-route";
 
 type ManageEstablishmentTabProps = {
-  establishments: EstablishmentData[];
+  establishments: UserEstablishmentRightDetails[];
 };
 
 export const ManageEstablishmentsTab = ({

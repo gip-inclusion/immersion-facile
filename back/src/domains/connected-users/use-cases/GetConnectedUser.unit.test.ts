@@ -49,6 +49,14 @@ describe("GetConnectedUser", () => {
     .withId("admin-id")
     .withFirstName("Admin")
     .withIsAdmin(true);
+  const pendingUserBuilder = new ConnectedUserBuilder()
+    .withId("pending-id")
+    .withFirstName("Pending")
+    .withIsAdmin(false);
+
+  const connectedPendingUser = pendingUserBuilder.build();
+
+  const pendingUser = pendingUserBuilder.buildUser();
 
   const connectedAdminUser = adminUserBuilder.build();
   const admin = adminUserBuilder.buildUser();
@@ -479,6 +487,15 @@ describe("GetConnectedUser", () => {
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
+              {
+                job: "Dev",
+                status: "PENDING",
+                role: "establishment-contact",
+                userId: pendingUser.id,
+                phone: "+33600000002",
+                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
+              },
             ];
 
           const establishmentUserRightsForSecondEstablishment: EstablishmentUserRight[] =
@@ -510,57 +527,92 @@ describe("GetConnectedUser", () => {
             ];
           });
 
-          it("retrieve establishments rights and discussions / conventions dashboards when user have right on at least one establishment even if there is no conventions/discussion for establishment", async () => {
+          it("retrieve establishments rights and discussions / conventions dashboards when user have right on at least one establishment even if there is no conventions/discussion for establishment for all user right status", async () => {
             uow.conventionRepository.setConventions([]);
             uow.discussionRepository.discussions = [];
+            uow.userRepository.users = [notAdminUser, anotherUser, pendingUser];
 
             expectToEqual(
-              await getConnectedUser.execute({}, connectedNotAdminUser),
-              {
-                ...connectedNotAdminUser,
-                establishments: [
-                  {
-                    siret: establishmentAggregate1.establishment.siret,
-                    businessName:
-                      establishmentAggregate1.establishment.customizedName ??
-                      establishmentAggregate1.establishment.name,
-                    role: "establishment-admin",
-                    status: "ACCEPTED",
-                    admins: [
-                      {
-                        email: anotherUser.email,
-                        firstName: anotherUser.firstName,
-                        lastName: anotherUser.lastName,
-                      },
-                      {
-                        email: notAdminUser.email,
-                        firstName: notAdminUser.firstName,
-                        lastName: notAdminUser.lastName,
-                      },
-                    ],
-                  },
-                  {
-                    siret: establishmentAggregate2.establishment.siret,
-                    businessName:
-                      establishmentAggregate2.establishment.customizedName ??
-                      establishmentAggregate2.establishment.name,
-                    role: "establishment-contact",
-                    status: "ACCEPTED",
-                    admins: [],
-                  },
-                ],
-                dashboards: {
-                  agencies: noAgencyDashboards,
-                  establishments: {
-                    conventions: `http://stubEstablishmentConventionsDashboardUrl/${
-                      notAdminUser.id
-                    }/${timeGateway.now()}`,
-                    discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
-                      notAdminUser.id
-                    }/${timeGateway.now()}`,
+              await Promise.all([
+                getConnectedUser.execute({}, connectedNotAdminUser),
+                getConnectedUser.execute({}, connectedPendingUser),
+              ]),
+              [
+                {
+                  ...connectedNotAdminUser,
+                  establishments: [
+                    {
+                      siret: establishmentAggregate1.establishment.siret,
+                      businessName:
+                        establishmentAggregate1.establishment.customizedName ??
+                        establishmentAggregate1.establishment.name,
+                      role: "establishment-admin",
+                      status: "ACCEPTED",
+                      admins: [
+                        {
+                          email: anotherUser.email,
+                          firstName: anotherUser.firstName,
+                          lastName: anotherUser.lastName,
+                        },
+                        {
+                          email: notAdminUser.email,
+                          firstName: notAdminUser.firstName,
+                          lastName: notAdminUser.lastName,
+                        },
+                      ],
+                    },
+                    {
+                      siret: establishmentAggregate2.establishment.siret,
+                      businessName:
+                        establishmentAggregate2.establishment.customizedName ??
+                        establishmentAggregate2.establishment.name,
+                      role: "establishment-contact",
+                      status: "ACCEPTED",
+                      admins: [],
+                    },
+                  ],
+                  dashboards: {
+                    agencies: noAgencyDashboards,
+                    establishments: {
+                      conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                        notAdminUser.id
+                      }/${timeGateway.now()}`,
+                      discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
+                        notAdminUser.id
+                      }/${timeGateway.now()}`,
+                    },
                   },
                 },
-              },
+                {
+                  ...connectedPendingUser,
+                  establishments: [
+                    {
+                      siret: establishmentAggregate1.establishment.siret,
+                      businessName:
+                        establishmentAggregate1.establishment.customizedName ??
+                        establishmentAggregate1.establishment.name,
+                      role: "establishment-contact",
+                      status: "PENDING",
+                      admins: [
+                        {
+                          email: anotherUser.email,
+                          firstName: anotherUser.firstName,
+                          lastName: anotherUser.lastName,
+                        },
+                        {
+                          email: notAdminUser.email,
+                          firstName: notAdminUser.firstName,
+                          lastName: notAdminUser.lastName,
+                        },
+                      ],
+                    },
+                  ],
+                  dashboards: {
+                    agencies: noAgencyDashboards,
+                    establishments: noEstablishmentDashboard,
+                  },
+                },
+              ],
             );
           });
         });

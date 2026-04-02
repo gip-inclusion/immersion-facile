@@ -1,10 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type { EstablishmentData } from "shared";
+import type { UserEstablishmentRightDetails } from "shared";
 
 export const EstablishmentLineAdminsInfos = ({
   data,
 }: {
-  data: EstablishmentData;
+  data: UserEstablishmentRightDetails;
 }) => (
   <ul className={fr.cx("fr-raw-list")}>
     {data.admins.map((admin) => (

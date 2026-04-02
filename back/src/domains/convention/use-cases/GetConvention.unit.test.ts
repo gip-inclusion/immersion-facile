@@ -43,6 +43,14 @@ describe("Get Convention", () => {
     proConnect: defaultProConnectInfos,
     createdAt: new Date().toISOString(),
   };
+  const pendingUser: User = {
+    id: "pendinguser",
+    email: "pending@mail.com",
+    firstName: "Pending",
+    lastName: "User",
+    proConnect: defaultProConnectInfos,
+    createdAt: new Date().toISOString(),
+  };
   const establishmentRep: User = {
     id: "estabrep",
     email: "estabrep@mail.com",
@@ -122,6 +130,15 @@ describe("Get Convention", () => {
         shouldReceiveDiscussionNotifications: true,
         isMainContactByPhone: false,
       },
+      {
+        role: "establishment-admin",
+        status: "PENDING",
+        job: "",
+        phone: "",
+        userId: pendingUser.id,
+        shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
+      },
     ])
     .build();
 
@@ -197,7 +214,30 @@ describe("Get Convention", () => {
           }),
         );
       });
+      it("When the user don't have correct status on connected users neither has right on existing establishment with same siret in convention", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishmentWithSiret,
+        ];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [pendingUser.id]: {
+              isNotifiedByEmail: false,
+              roles: ["to-review"],
+            },
+          }),
+        ];
 
+        await expectPromiseToFailWithError(
+          getConvention.execute(
+            { conventionId: convention.id },
+            { userId: johnDoe.id },
+          ),
+          errors.convention.forbiddenMissingRightsUserId({
+            conventionId: convention.id,
+            userId: johnDoe.id,
+          }),
+        );
+      });
       describe("with ConventionJwtPayload", () => {
         it("When convention id in jwt token does not match provided one", async () => {
           const jwtPayload: ConventionDomainJwtPayload = {

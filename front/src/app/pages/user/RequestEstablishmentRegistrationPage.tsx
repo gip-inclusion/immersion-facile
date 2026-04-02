@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { RegisterEstablishmentsForm } from "src/app/components/forms/register-establishments/RegisterEstablishmentForm";
+import { RequestRegisterEstablishmentsForUserForm } from "src/app/components/forms/register-establishments/RequestRegisterEstablishmentsForUserForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -48,7 +48,7 @@ export const RequestEstablishmentRegistrationPage = () => {
           closable
           className={fr.cx("fr-mb-2w")}
         />
-        <RegisterEstablishmentsForm currentUser={currentUser} />
+        <RequestRegisterEstablishmentsForUserForm currentUser={currentUser} />
       </MainWrapper>
     </HeaderFooterLayout>
   );

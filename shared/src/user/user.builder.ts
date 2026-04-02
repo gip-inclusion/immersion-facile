@@ -6,7 +6,7 @@ import {
   noEstablishmentDashboard,
 } from "../dashboard/dashboard.dto";
 import type { Email } from "../email/email.dto";
-import type { EstablishmentData } from "../establishment/establishment";
+import type { UserEstablishmentRightDetails } from "../establishment/establishment";
 import type {
   ConnectedUser,
   User,
@@ -146,7 +146,9 @@ export class ConnectedUserBuilder implements Builder<ConnectedUser> {
     return new ConnectedUserBuilder({ ...this.#dto, agencyRights });
   }
 
-  withEstablishments(establishments: EstablishmentData[] | undefined) {
+  withEstablishments(
+    establishments: UserEstablishmentRightDetails[] | undefined,
+  ) {
     return new ConnectedUserBuilder({ ...this.#dto, establishments });
   }
 }

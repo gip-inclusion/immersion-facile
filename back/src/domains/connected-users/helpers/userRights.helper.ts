@@ -1,6 +1,6 @@
 import {
-  type EstablishmentData,
   errors,
+  type UserEstablishmentRightDetails,
   type UserId,
   type UserWithAdminRights,
   type UserWithRights,
@@ -35,7 +35,7 @@ const withEstablishments = async (
         userId: user.id,
       },
     );
-  const establishments: EstablishmentData[] = await Promise.all(
+  const establishments: UserEstablishmentRightDetails[] = await Promise.all(
     establishmentAggregates.map((establishment) =>
       makeEstablishmentRights(uow, establishment, user.id),
     ),

@@ -8,7 +8,6 @@ import {
   ConventionDtoBuilder,
   type ConventionReadDto,
   type EstablishmentAdminPrivateData,
-  type EstablishmentData,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   FormEstablishmentDtoBuilder,
@@ -16,6 +15,7 @@ import {
   noAgencyDashboards,
   noEstablishmentDashboard,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type UserEstablishmentRightDetails,
   type WithAgencyIds,
 } from "shared";
 import { removeUserFromAgencySelectors } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.selectors";
@@ -650,7 +650,7 @@ describe("InclusionConnected", () => {
           shouldReceiveDiscussionNotifications: true,
           isMainContactByPhone: false,
         };
-        const otherEstablishmentToKeepData: EstablishmentData = {
+        const otherEstablishmentToKeepData: UserEstablishmentRightDetails = {
           admins: [otherUserAdminData],
           businessName: "Ma super entreprise 2",
           role: otherEstablishmentToKeepUserRight.role,
@@ -743,7 +743,7 @@ describe("InclusionConnected", () => {
           shouldReceiveDiscussionNotifications: true,
           isMainContactByPhone: false,
         };
-        const otherEstablishmentData: EstablishmentData = {
+        const otherEstablishmentData: UserEstablishmentRightDetails = {
           admins: [otherUserAdminData],
           businessName: "Ma super entreprise 2",
           role: otherEstablishmentUserRight.role,

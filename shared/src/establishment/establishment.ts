@@ -11,24 +11,18 @@ import { formEstablishmentPendingUserRightSchema } from "../formEstablishment/Fo
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
-import type { Flavor } from "../typeFlavors";
-import type { UserId } from "../user/user.dto";
-import { userIdSchema } from "../user/user.schema";
-import {
-  zStringCanBeEmpty,
-  zStringMinLength1Max1024,
-} from "../utils/string.schema";
+import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
-import { type BusinessName, businessNameSchema } from "./businessName";
+import {
+  type BusinessName,
+  businessNameSchema,
+  customizedNameSchema,
+} from "./businessName";
 
 export type EstablishmentNameAndAdmins = {
   name: string;
   adminEmails: Email[];
 };
-
-export type BusinessNameCustomized = Flavor<string, "BusinessNameCustomized">;
-export const customizedNameSchema: ZodSchemaWithInputMatchingOutput<BusinessNameCustomized> =
-  zStringCanBeEmpty;
 
 export const establishmentNameAndAdminsSchema: ZodSchemaWithInputMatchingOutput<EstablishmentNameAndAdmins> =
   z.object({
@@ -52,7 +46,6 @@ export const establishmentPublicOptionSchema: ZodSchemaWithInputMatchingOutput<E
     businessName: businessNameSchema,
     businessNameCustomized: customizedNameSchema.optional(),
     siret: siretSchema,
-    userRightIds: z.array(userIdSchema),
   });
 
 export const establishmentPublicOptionsSchema: ZodSchemaWithInputMatchingOutput<
@@ -73,9 +66,7 @@ export type RegisterUserOnEstablishmentPayload = {
 export type EstablishmentPublicOption = Pick<
   FormEstablishmentDto,
   "businessName" | "businessNameCustomized" | "siret"
-> & {
-  userRightIds: UserId[];
-};
+>;
 
 export type EstablishmentAdminPrivateData = {
   firstName: string;
@@ -83,7 +74,7 @@ export type EstablishmentAdminPrivateData = {
   email: Email;
 };
 
-export type EstablishmentData = {
+export type UserEstablishmentRightDetails = {
   siret: SiretDto;
   businessName: BusinessName;
   role: EstablishmentRole;
@@ -92,7 +83,7 @@ export type EstablishmentData = {
 };
 
 export type WithEstablishmentsData = {
-  establishments?: EstablishmentData[];
+  establishments?: UserEstablishmentRightDetails[];
 };
 
 export type EstablishmentDashboards = {

@@ -44,7 +44,7 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
   });
 
   describe("When establishment is valid", () => {
-    it("Nominal case: Sends notification email to Establisment contact", async () => {
+    it("Nominal case: Sends notification email to Establisment contact (pending user is not cc'ed)", async () => {
       const establishmentAdmin = new ConnectedUserBuilder()
         .withId("admin")
         .withEmail("admin@estab.com")
@@ -114,7 +114,7 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
           {
             kind: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
             recipients: [establishmentAdmin.email],
-            cc: [establishmentContact1.email, establishmentContact2.email], // pending user is not cc'ed
+            cc: [establishmentContact1.email, establishmentContact2.email],
             params: {
               businessName: establishmentAggregate.establishment.name,
               businessAddresses:

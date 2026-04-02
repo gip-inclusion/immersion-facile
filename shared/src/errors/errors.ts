@@ -387,7 +387,7 @@ export const errors = {
       userId: UserId;
     }) =>
       new ForbiddenError(
-        `L'utilisateur ${userId}n'a pas de droit sur la convention '${conventionId}'.`,
+        `L'utilisateur ${userId} n'a pas de droit sur la convention '${conventionId}'.`,
       ),
     forbiddenMissingRightsEmailHash: ({
       conventionId,
@@ -985,6 +985,10 @@ export const errors = {
     forbiddenEmailUpdate: () =>
       new ForbiddenError(
         "Vous n'avez pas les droits nécessaires pour modifier l'email d'un autre utilisateur.",
+      ),
+    emailMismatch: () =>
+      new BadRequestError(
+        "L'email fourni ne correspond pas à l'email de l'utilisateur connecté.",
       ),
     missingPreviousJwtPublicKey: () =>
       new Error("No deprecated JWT private key provided"),

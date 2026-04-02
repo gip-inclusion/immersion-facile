@@ -33,7 +33,7 @@ const establishmentRegisterEstablishmentModal = createFormModal({
   doSubmitClosesModal: false,
 });
 
-export const RegisterEstablishmentsForm = ({
+export const RequestRegisterEstablishmentsForUserForm = ({
   currentUser,
 }: {
   currentUser: ConnectedUser;
@@ -49,9 +49,12 @@ export const RegisterEstablishmentsForm = ({
     () =>
       establishmentPublicOptions.filter(
         (establishmentPublicOption) =>
-          !establishmentPublicOption.userRightIds.includes(currentUser.id),
+          !currentUser.establishments?.some(
+            (establishment) =>
+              establishment.siret === establishmentPublicOption.siret,
+          ),
       ),
-    [establishmentPublicOptions, currentUser.id],
+    [establishmentPublicOptions, currentUser.establishments],
   );
 
   const establishmentSearchBySiretOrNameInput =

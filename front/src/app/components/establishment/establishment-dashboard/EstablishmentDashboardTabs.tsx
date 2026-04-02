@@ -11,6 +11,7 @@ import {
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
   immersionFacileHelpdeskRootUrl,
+  onlyAdminUserRightsWithStatusAccepted,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
 import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
@@ -129,11 +130,8 @@ const makeEstablishmentDashboardTabs = (
   const establishmentsArray = establishments ?? [];
   const userIsOnboarding = establishmentsArray.length === 0;
   const userCanManageEstablishments =
-    establishmentsArray.filter(
-      (establishment) =>
-        establishment.role === "establishment-admin" &&
-        establishment.status === "ACCEPTED",
-    ).length > 0;
+    establishmentsArray.filter(onlyAdminUserRightsWithStatusAccepted).length >
+    0;
 
   return [
     {
