@@ -20,11 +20,8 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
   .withDeps<{ timeGateway: TimeGateway; createNewEvent: CreateNewEvent }>()
   .build(async ({ uow, currentUser, deps, inputParams: payload }) => {
     if (currentUser.email !== payload.userRight.email) {
-      throw errors.user.forbiddenEmailUpdate();
+      throw errors.user.emailMismatch();
     }
-
-    const user = await uow.userRepository.getById(currentUser.id);
-    if (!user) throw errors.user.notFound({ userId: currentUser.id });
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
@@ -34,12 +31,12 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
       throw errors.establishment.notFound({ siret: payload.siret });
     if (
       establishmentAggregate.userRights.some(
-        (userRight) => userRight.userId === user.id,
+        (userRight) => userRight.userId === currentUser.id,
       )
     )
       throw errors.establishment.userRightAlreadyExists({
         siret: payload.siret,
-        userId: user.id,
+        userId: currentUser.id,
       });
 
     const establishmentAggregateWithRequestedUserRight: EstablishmentAggregate =
@@ -47,7 +44,7 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
         ...establishmentAggregate,
         userRights: [
           ...establishmentAggregate.userRights,
-          { ...payload.userRight, userId: user.id },
+          { ...payload.userRight, userId: currentUser.id },
         ],
       };
 
@@ -63,9 +60,9 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
           siret: payload.siret,
           userRight: {
             ...payload.userRight,
-            userId: user.id,
+            userId: currentUser.id,
           },
-          triggeredBy: { kind: "connected-user", userId: user.id },
+          triggeredBy: { kind: "connected-user", userId: currentUser.id },
         },
       }),
     );

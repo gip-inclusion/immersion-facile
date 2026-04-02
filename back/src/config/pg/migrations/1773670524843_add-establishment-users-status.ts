@@ -11,14 +11,13 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     [columnName]: {
       type: ESTABLISHMENT_USER_RIGHT_STATUS_NAME,
       notNull: true,
-      default: "PENDING",
+      default: "ACCEPTED",
     },
   });
 
-  pgm.sql(`
-    UPDATE ${tableName}
-    SET ${columnName} = 'ACCEPTED'
-  `);
+  pgm.alterColumn(tableName, columnName, {
+    default: null,
+  });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {

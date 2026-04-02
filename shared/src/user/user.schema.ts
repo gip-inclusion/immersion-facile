@@ -9,7 +9,7 @@ import { proConnectInfoSchema } from "../auth/proConnect/proConnect.schema";
 import { emailSchema } from "../email/email.schema";
 import { businessNameSchema } from "../establishment/businessName";
 import type {
-  EstablishmentData,
+  UserEstablishmentRightDetails,
   WithEstablishmentDashboards,
 } from "../establishment/establishment";
 import { formEstablishmentUserRightStatusSchema } from "../formEstablishment/FormEstablishment.schema";
@@ -91,7 +91,7 @@ const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =
     isNotifiedByEmail: z.boolean(),
   });
 
-const withEstablishmentSiretAndName: ZodSchemaWithInputMatchingOutput<EstablishmentData> =
+const userEstablishmentRightDetailsSchema: ZodSchemaWithInputMatchingOutput<UserEstablishmentRightDetails> =
   z.object({
     siret: siretSchema,
     businessName: businessNameSchema,
@@ -133,7 +133,7 @@ export const connectedUserSchema: ZodSchemaWithInputMatchingOutput<ConnectedUser
     z.object({
       agencyRights: z.array(agencyRightSchema),
       dashboards: dashboardsSchema,
-      establishments: z.array(withEstablishmentSiretAndName).optional(),
+      establishments: z.array(userEstablishmentRightDetailsSchema).optional(),
       isBackofficeAdmin: z.boolean().optional(),
     }),
   );

@@ -2552,6 +2552,7 @@ describe("PgDiscussionRepository", () => {
       });
 
       it("filters out discussions on establishment user right with status PENDING and keeps discussions on establishment user right with status ACCEPTED", async () => {
+        const userOnlyAcceptedOnDiscussion4 = pendingUser;
         await establishmentAggregateRepo.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(discussion4.siret)
@@ -2559,7 +2560,7 @@ describe("PgDiscussionRepository", () => {
               {
                 role: "establishment-admin",
                 status: "ACCEPTED",
-                userId: pendingUser.id,
+                userId: userOnlyAcceptedOnDiscussion4.id,
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
                 job: "",
@@ -2578,8 +2579,16 @@ describe("PgDiscussionRepository", () => {
               perPage: 10,
             },
             sort: { by: "createdAt", direction: "desc" },
-            userId: pendingUser.id,
+            userId: userOnlyAcceptedOnDiscussion4.id,
           });
+
+        expectToEqual(
+          (
+            await establishmentAggregateRepo.getAllEstablishmentAggregatesForTest()
+          ).length,
+          3,
+        );
+
         expectToEqual(result, {
           data: [discussion4InList],
           pagination: {

@@ -464,7 +464,6 @@ describe("Establishment", () => {
       const establishmentPublicOption: EstablishmentPublicOption = {
         businessName: "L'omelette de la mère Poulard",
         siret: "10000000000000",
-        userRightIds: [],
       };
 
       dependencies.establishmentGateway.establishmentPublicOptions$.next([

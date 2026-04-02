@@ -1,6 +1,7 @@
 import {
   errors,
   immersionFacileNoReplyEmailSender,
+  onlyAdminUserRightsWithStatusAccepted,
   type SiretDto,
   siretSchema,
 } from "shared";
@@ -35,7 +36,7 @@ export class SuggestEstablishmentReengagement extends TransactionalUseCase<
 
     const { userRights, establishment } = establishmentAggregate;
     const adminIds = userRights
-      .filter((userRight) => userRight.role === "establishment-admin")
+      .filter(onlyAdminUserRightsWithStatusAccepted)
       .map((right) => right.userId);
 
     const admins = await uow.userRepository.getByIds(adminIds);

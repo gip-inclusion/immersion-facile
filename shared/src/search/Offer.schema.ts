@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { businessNameSchema } from "../establishment/businessName";
-import { customizedNameSchema } from "../establishment/establishment";
+import {
+  businessNameSchema,
+  customizedNameSchema,
+} from "../establishment/businessName";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { nafCodeSchema, nafSousClasseLabelSchema } from "../naf/naf.schema";

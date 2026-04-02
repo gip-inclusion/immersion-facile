@@ -39,7 +39,7 @@ describe("SuggestEditEstablishment", () => {
     );
   });
 
-  it("Sends an email to each establishment admin with specific jwt", async () => {
+  it("Sends an email to each ACCEPTED establishment admin with specific jwt", async () => {
     const admin1 = new UserBuilder()
       .withId(uuid())
       .withEmail("a.admin@gmail.com")
@@ -47,6 +47,10 @@ describe("SuggestEditEstablishment", () => {
     const admin2 = new UserBuilder()
       .withId(uuid())
       .withEmail("b.admin@gmail.com")
+      .build();
+    const pendingAdmin = new UserBuilder()
+      .withId(uuid())
+      .withEmail("pending.admin@gmail.com")
       .build();
     const contact = new UserBuilder()
       .withId(uuid())
@@ -97,6 +101,15 @@ describe("SuggestEditEstablishment", () => {
           isMainContactByPhone: false,
         },
         {
+          userId: pendingAdmin.id,
+          role: "establishment-admin",
+          status: "PENDING",
+          job: "Boss3",
+          phone: "+33688779777",
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
+        },
+        {
           userId: contact.id,
           status: "ACCEPTED",
           role: "establishment-contact",
@@ -108,7 +121,7 @@ describe("SuggestEditEstablishment", () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishmentAggregate,
     ];
-    uow.userRepository.users = [admin1, admin2, contact];
+    uow.userRepository.users = [admin1, admin2, pendingAdmin, contact];
 
     await suggestEstablishmentReengagement.execute(
       establishmentAggregate.establishment.siret,

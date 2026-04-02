@@ -1,7 +1,7 @@
 import {
   ConnectedUserBuilder,
   errors,
-  expectObjectsToMatch,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   type FormEstablishmentPendingUserRight,
@@ -59,27 +59,7 @@ describe("RegisterUserOnEstablishment", () => {
           },
           anyConnectedUser,
         ),
-        errors.user.forbiddenEmailUpdate(),
-      );
-    });
-
-    it("fails if user doesn't exist anymore", async () => {
-      uow.userRepository.users = [];
-      await expectPromiseToFailWithError(
-        registerUserOnEstablishment.execute(
-          {
-            siret: "12345678901234",
-            userRight: {
-              email: anyConnectedUser.email,
-              role: "establishment-contact",
-              status: "PENDING",
-              shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
-            },
-          },
-          anyConnectedUser,
-        ),
-        errors.user.notFound({ userId: anyConnectedUser.id }),
+        errors.user.emailMismatch(),
       );
     });
 
@@ -198,7 +178,7 @@ describe("RegisterUserOnEstablishment", () => {
         establishmentAggregate,
       ];
 
-      const result = await registerUserOnEstablishment.execute(
+      await registerUserOnEstablishment.execute(
         {
           siret: establishmentAggregate.establishment.siret,
           userRight: userRightWithRequestedRole,
@@ -206,42 +186,42 @@ describe("RegisterUserOnEstablishment", () => {
         anyConnectedUser,
       );
 
-      expectToEqual(result, undefined);
       expectToEqual(
-        await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-          establishmentAggregate.establishment.siret,
-        ),
-        {
-          ...establishmentAggregate,
-          userRights: [
-            ...establishmentAggregate.userRights,
-            { ...userRightWithRequestedRole, userId: anyConnectedUser.id },
-          ],
-          establishment: {
-            ...establishmentAggregate.establishment,
-            updatedAt: timeGateway.now(),
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [
+          {
+            ...establishmentAggregate,
+            userRights: [
+              ...establishmentAggregate.userRights,
+              { ...userRightWithRequestedRole, userId: anyConnectedUser.id },
+            ],
+            establishment: {
+              ...establishmentAggregate.establishment,
+              updatedAt: timeGateway.now(),
+            },
           },
-        },
+        ],
       );
 
-      expect(uow.outboxRepository.events).toHaveLength(1);
-      expectObjectsToMatch(uow.outboxRepository.events[0], {
-        topic: "PendingUserRightRegisteredOnEstablishment",
-        payload: {
-          siret: establishmentAggregate.establishment.siret,
-          userRight: {
-            userId: anyConnectedUser.id,
-            role: "establishment-contact",
-            status: "PENDING",
-            shouldReceiveDiscussionNotifications: true,
-            isMainContactByPhone: false,
-          },
-          triggeredBy: {
-            kind: "connected-user",
-            userId: anyConnectedUser.id,
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "PendingUserRightRegisteredOnEstablishment",
+          payload: {
+            siret: establishmentAggregate.establishment.siret,
+            userRight: {
+              userId: anyConnectedUser.id,
+              role: "establishment-contact",
+              status: "PENDING",
+              shouldReceiveDiscussionNotifications: true,
+              isMainContactByPhone: false,
+            },
+            triggeredBy: {
+              kind: "connected-user",
+              userId: anyConnectedUser.id,
+            },
           },
         },
-      });
+      ]);
     });
   });
 });

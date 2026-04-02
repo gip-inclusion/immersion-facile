@@ -326,6 +326,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
           const establishmentRepository =
             new PgEstablishmentAggregateRepository(db);
           const establishmentAggregate = new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("12345678901234")
             .withUserRights([
               {
                 role: "establishment-admin",
@@ -339,8 +340,27 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
               },
             ])
             .build();
+
+          const establishmentAggregateWithPendingUser =
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret("12345678901235")
+              .withUserRights([
+                {
+                  role: "establishment-contact",
+                  job: "Sous-chef",
+                  userId: user1.id,
+                  status: "PENDING",
+                  shouldReceiveDiscussionNotifications: true,
+                },
+              ])
+              .withLocationId(uuid())
+              .build();
+
           await establishmentRepository.insertEstablishmentAggregate(
             establishmentAggregate,
+          );
+          await establishmentRepository.insertEstablishmentAggregate(
+            establishmentAggregateWithPendingUser,
           );
         }
 

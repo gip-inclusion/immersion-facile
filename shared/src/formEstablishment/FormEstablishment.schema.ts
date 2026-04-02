@@ -7,6 +7,7 @@ import { emailSchema } from "../email/email.schema";
 import { businessNameSchema } from "../establishment/businessName";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
+import type { EstablishmentRole } from "../role/role.dto";
 import { establishmentRoleSchema } from "../role/role.schema";
 import { appellationAndRomeDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -33,6 +34,7 @@ import type {
   EstablishmentBatchReport,
   EstablishmentCSVRow,
   EstablishmentFormOffer,
+  EstablishmentUserRightStatus,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
@@ -41,13 +43,27 @@ import type {
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
 import {
-  establishmentUserRightStatus,
+  establishmentUserRightStatuses,
   fitForDisabledWorkersOptions,
   remoteWorkModes,
 } from "./FormEstablishment.dto";
 
 export const defaultMaxContactsPerMonth = 6;
 export const noContactPerMonth = 0;
+
+const makeOnlyTargetRoleAndAcceptedStatus =
+  (role: EstablishmentRole) =>
+  (statusAndRole: {
+    status: EstablishmentUserRightStatus;
+    role: EstablishmentRole;
+  }): boolean => {
+    return statusAndRole.role === role && statusAndRole.status === "ACCEPTED";
+  };
+
+export const onlyAdminUserRightsWithStatusAccepted =
+  makeOnlyTargetRoleAndAcceptedStatus("establishment-admin");
+export const onlyContactUserRightsWithStatusAccepted =
+  makeOnlyTargetRoleAndAcceptedStatus("establishment-contact");
 
 const contactModesWithoutWelcomeAddress: NotEmptyArray<ContactMode> = [
   "EMAIL",
@@ -68,7 +84,7 @@ export const contactModeSchema = zEnumValidation(
 );
 
 export const formEstablishmentUserRightStatusSchema = zEnumValidation(
-  establishmentUserRightStatus,
+  establishmentUserRightStatuses,
   "Le statut est inconnu",
 );
 
@@ -124,10 +140,7 @@ export const formEstablishmentUserRightsSchema: ZodSchemaWithInputMatchingOutput
   .array(formEstablishmentUserRightSchema)
   .refine(
     (userRights) =>
-      userRights.filter(
-        (right) =>
-          right.role === "establishment-admin" && right.status === "ACCEPTED",
-      ).length > 0,
+      userRights.filter(onlyAdminUserRightsWithStatusAccepted).length > 0,
     "La structure accueillante nécessite au moins un administrateur pour être valide.",
   )
   .refine(

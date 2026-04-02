@@ -7,7 +7,6 @@ import {
   listAgencyOptionsRequestSchema,
   miniStageAgencyKinds,
   orderedAgencyKindList,
-  removeSpaces,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { GetAgenciesFilters } from "../ports/AgencyRepository";
@@ -29,7 +28,7 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
         nameIncludes,
         departmentCode,
         status: status ? status : activeAgencyStatuses,
-        sirets: siret ? [removeSpaces(siret)] : undefined,
+        sirets: siret ? [siret] : undefined,
         ...extraFilters,
       },
     });

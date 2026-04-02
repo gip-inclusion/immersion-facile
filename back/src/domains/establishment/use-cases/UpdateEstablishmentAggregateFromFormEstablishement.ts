@@ -3,6 +3,7 @@ import {
   type AbsoluteUrl,
   type ConnectedUserDomainJwtPayload,
   errors,
+  onlyAdminUserRightsWithStatusAccepted,
   type WithFormEstablishmentDto,
   withFormEstablishmentSchema,
 } from "shared";
@@ -60,8 +61,10 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
       initialEstablishmentAggregate.userRights.some(
         ({ userId, status, role }) =>
           userId === triggeredByUser.id &&
-          role === "establishment-admin" &&
-          status === "ACCEPTED",
+          onlyAdminUserRightsWithStatusAccepted({
+            role,
+            status,
+          }),
       );
 
     if (!hasPermission)

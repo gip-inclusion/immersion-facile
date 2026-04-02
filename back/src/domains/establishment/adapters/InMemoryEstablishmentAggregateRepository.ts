@@ -1,4 +1,4 @@
-import { uniqBy } from "ramda";
+import { isEmpty, uniqBy } from "ramda";
 import {
   type AppellationAndRomeDto,
   type AppellationCode,
@@ -60,16 +60,18 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getEstablishmentAggregatesByFilters({
-    userId,
-    nameIncludes,
-    sirets,
-  }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]> {
+  public async getEstablishmentAggregatesByFilters(
+    filters: EstablishmentAggregateFilters,
+  ): Promise<EstablishmentAggregate[]> {
+    if (isEmpty(filters)) return [];
+    const { userId, nameIncludes, sirets, ...rest } = filters;
+    rest satisfies Record<string, never>;
     return this.#establishmentAggregates.filter((establishmentAggregate) => {
-      if (userId)
-        return establishmentAggregate.userRights.some(
-          (userRight) => userRight.userId === userId,
-        );
+      const matchesUserId = userId
+        ? establishmentAggregate.userRights.some(
+            (userRight) => userRight.userId === userId,
+          )
+        : true;
 
       const matchesName = nameIncludes
         ? establishmentAggregate.establishment.name.includes(nameIncludes)
@@ -79,7 +81,7 @@ export class InMemoryEstablishmentAggregateRepository
         ? sirets.includes(establishmentAggregate.establishment.siret)
         : true;
 
-      return matchesName && matchesSiret;
+      return matchesUserId && matchesName && matchesSiret;
     });
   }
 

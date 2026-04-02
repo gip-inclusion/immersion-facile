@@ -144,5 +144,15 @@ describe("GetEstablishmentPublicOptionsByFilters", () => {
         toEstablishmentPublicOption(establishmentAggregateToKeepOnName1),
       ]);
     });
+    it("gets establishment public options by name includes and sirets", async () => {
+      const notMatchingSiret = "10000000000003";
+      const resultsByNameAndSiret =
+        await getEstablishmentPublicOptionsByFilters.execute(
+          { nameIncludes: "La kig ha farz", siret: notMatchingSiret },
+          connectedUser,
+        );
+
+      expectToEqual(resultsByNameAndSiret, []);
+    });
   });
 });

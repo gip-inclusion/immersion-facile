@@ -1,7 +1,7 @@
 import { subDays } from "date-fns";
 import { type QueryCreator, sql } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
-import { equals, pick, values } from "ramda";
+import { equals, isEmpty, pick, values } from "ramda";
 import {
   type AppellationAndRomeDto,
   type AppellationCode,
@@ -85,11 +85,12 @@ export class PgEstablishmentAggregateRepository
     return aggregate && makeEstablishmentAggregateFromDb(aggregate.aggregate);
   }
 
-  public async getEstablishmentAggregatesByFilters({
-    userId,
-    nameIncludes,
-    sirets,
-  }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]> {
+  public async getEstablishmentAggregatesByFilters(
+    filters: EstablishmentAggregateFilters,
+  ): Promise<EstablishmentAggregate[]> {
+    if (isEmpty(filters)) return [];
+    const { userId, nameIncludes, sirets, ...rest } = filters;
+    rest satisfies Record<string, never>;
     const aggregates = await establishmentByFiltersQueryBuilder(
       this.transaction,
     )

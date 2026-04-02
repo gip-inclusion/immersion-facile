@@ -1,6 +1,8 @@
 import type { AddressDto, LocationId } from "../address/address.dto";
-import type { BusinessName } from "../establishment/businessName";
-import type { BusinessNameCustomized } from "../establishment/establishment";
+import type {
+  BusinessName,
+  BusinessNameCustomized,
+} from "../establishment/businessName";
 import type {
   ContactMode,
   EstablishmentWebSite,
