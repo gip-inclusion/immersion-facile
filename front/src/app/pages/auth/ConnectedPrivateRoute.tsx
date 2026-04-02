@@ -59,6 +59,7 @@ export const agencyDashboardTabsList = [
   "agencyDashboardAgencies",
   "agencyManagement",
   "establishmentManagement",
+  "statsEstablishmentDetails",
 ] satisfies AgencyDashboardRouteName[];
 
 export type AgencyTabRoute = (typeof agencyDashboardTabsList)[number];
