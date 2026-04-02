@@ -1493,6 +1493,11 @@ Tél : ${beneficiaryPhone}`,
             url: registerEstablishmentShortLink,
           },
         ],
+        highlight: {
+          content:
+            "Pour gagner du temps lors de l’inscription, utilisez la même adresse email que celle indiquée dans la convention d’immersion.Certaines informations de votre entreprise pourront ainsi être pré-remplies automatiquement.",
+          kind: "info",
+        },
         subContent: `Bonne journée,
       L'équipe Immersion Facilitée`,
         legals: `<a href=${unsubscribeToEmailShortLink}>Je ne souhaite pas devenir entreprise accueillante</a>`,
