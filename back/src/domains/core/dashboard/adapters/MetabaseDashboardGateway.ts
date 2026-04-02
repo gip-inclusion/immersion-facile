@@ -58,7 +58,7 @@ const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
 
 type MetabasePayload = {
   resource: Partial<Record<DashboardKind, number>>;
-  params?: Record<string, string[] | string>;
+  params: Record<string, string[] | string>;
   exp: number; // number of milliseconds before expiration
 };
 
@@ -182,7 +182,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   }): string {
     const payload: MetabasePayload = {
       resource: { [dashboard.kind]: dashboard.id },
-      params: lockedParams,
+      params: lockedParams ?? {},
       exp: Math.round(now.getTime() / 1000) + 60 * 60 * 8, // 8 hours expiration
     };
 
