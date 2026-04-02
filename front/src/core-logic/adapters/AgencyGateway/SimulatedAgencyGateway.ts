@@ -11,6 +11,8 @@ import {
   type CreateAgencyDto,
   errors,
   type ListAgencyOptionsRequestDto,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   toAgencyPublicDisplayDto,
   type UpdateAgencyStatusParams,
   type UserParamsForAgency,
@@ -112,7 +114,10 @@ export class SimulatedAgencyGateway implements AgencyGateway {
           firstName: "Rémi",
           lastName: "Sanfamille",
           agencyRights: [],
-          dashboards: { agencies: {}, establishments: {} },
+          dashboards: {
+            agencies: noAgencyDashboards,
+            establishments: noEstablishmentDashboard,
+          },
           proConnect: {
             externalId: "fake-user-external-id-2",
             siret: "00000000002222",

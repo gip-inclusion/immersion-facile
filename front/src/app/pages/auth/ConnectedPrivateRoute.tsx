@@ -57,8 +57,8 @@ export const agencyDashboardTabsList = [
   "agencyDashboardMain",
   "agencyDashboardSynchronisedConventions",
   "agencyDashboardAgencies",
-  "agencyDashboardStatsAgencies",
-  "agencyDashboardStatsActivitiesByEstablishment",
+  "agencyManagement",
+  "establishmentManagement",
 ] satisfies AgencyDashboardRouteName[];
 
 export type AgencyTabRoute = (typeof agencyDashboardTabsList)[number];
@@ -69,8 +69,9 @@ export const agencyDashboardRoutes = [
   "agencyDashboardAgencies",
   "agencyDashboardAgencyDetails",
   "agencyDashboardOnboarding",
-  "agencyDashboardStatsAgencies",
-  "agencyDashboardStatsActivitiesByEstablishment",
+  "statsEstablishmentDetails",
+  "agencyManagement",
+  "establishmentManagement",
 ] satisfies AgencyDashboardRouteName[];
 
 export type EstablishmentDashboardRouteName =
@@ -97,8 +98,9 @@ export type FrontAgencyDashboardRoute =
   | Route<typeof routes.agencyDashboardSynchronisedConventions>
   | Route<typeof routes.agencyDashboardAgencies>
   | Route<typeof routes.agencyDashboardAgencyDetails>
-  | Route<typeof routes.agencyDashboardStatsAgencies>
-  | Route<typeof routes.agencyDashboardStatsActivitiesByEstablishment>;
+  | Route<typeof routes.agencyManagement>
+  | Route<typeof routes.establishmentManagement>
+  | Route<typeof routes.statsEstablishmentDetails>;
 
 export type FrontDashboardRoute =
   | FrontAgencyDashboardRoute

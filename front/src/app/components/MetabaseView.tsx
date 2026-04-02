@@ -14,7 +14,7 @@ export const MetabaseView = ({
   url,
   titleAs,
 }: {
-  url?: AbsoluteUrl;
+  url: AbsoluteUrl | null;
   title: string;
   subtitle?: string;
   titleAs?: TitleLevel;

@@ -181,10 +181,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   agencyDashboardSynchronisedConventions: agencyDashboard.extend(
     "/conventions-synchronisees",
   ),
-  agencyDashboardStatsAgencies: agencyDashboard.extend("/stats-agences"),
-  agencyDashboardStatsActivitiesByEstablishment: agencyDashboard.extend(
+  statsEstablishmentDetails: agencyDashboard.extend(
     "/stats-activites-par-entreprise",
   ),
+  agencyManagement: agencyDashboard.extend("/pilotage-structure"),
+  establishmentManagement: agencyDashboard.extend("/pilotage-entreprises"),
+
   myProfile,
   myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
   agencyDashboardAgencies: agencyDashboardAgencies,

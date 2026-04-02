@@ -1,6 +1,10 @@
 import type { AgencyRight } from "../agency/agency.dto";
 import type { ProConnectInfos } from "../auth/proConnect/proConnect.dto";
 import type { Builder } from "../Builder";
+import {
+  noAgencyDashboards,
+  noEstablishmentDashboard,
+} from "../dashboard/dashboard.dto";
 import type { Email } from "../email/email.dto";
 import type { EstablishmentData } from "../establishment/establishment";
 import type {
@@ -32,7 +36,10 @@ const defaultConnectedUser: ConnectedUser = {
   proConnect: defaultProConnectInfos,
   createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
   agencyRights: [],
-  dashboards: { agencies: {}, establishments: {} },
+  dashboards: {
+    agencies: noAgencyDashboards,
+    establishments: noEstablishmentDashboard,
+  },
   establishments: [],
   isBackofficeAdmin: false,
 };

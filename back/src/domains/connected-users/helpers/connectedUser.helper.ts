@@ -83,8 +83,19 @@ export const getConnectedUsersByUserIds = async (
         agenciesRelatedToUsersByAgencyId,
         uow,
       ),
-      dashboards: { agencies: {}, establishments: {} }, /// ?????
-      // establishments: ???????
+      dashboards: {
+        agencies: {
+          agencyDashboardUrl: null,
+          agencyManagement: null,
+          erroredConventionsDashboardUrl: null,
+          establishmentManagement: null,
+          statsEstablishmentDetailsUrl: null,
+        },
+        establishments: {
+          conventions: null,
+          discussions: null,
+        },
+      },
     })),
   );
 };
@@ -163,17 +174,20 @@ async function makeAgencyDashboards({
           user.agencyRights.map((right) => right.agency.name),
           timeGateway.now(),
         )
-      : {}),
-    ...(agencyIdsWithEnoughPrivileges.length > 0
-      ? {
-          erroredConventionsDashboardUrl: isSynchronisationEnableForAgency
-            ? dashboardGateway.getErroredConventionsDashboardUrl(
-                user.id,
-                timeGateway.now(),
-              )
-            : undefined,
-        }
-      : {}),
+      : {
+          agencyDashboardUrl: null,
+          agencyManagement: null,
+          establishmentManagement: null,
+          statsEstablishmentDetailsUrl: null,
+        }),
+    erroredConventionsDashboardUrl:
+      agencyIdsWithEnoughPrivileges.length > 0 &&
+      isSynchronisationEnableForAgency
+        ? dashboardGateway.getErroredConventionsDashboardUrl(
+            user.id,
+            timeGateway.now(),
+          )
+        : null,
   };
 }
 
@@ -235,8 +249,8 @@ const makeEstablishmentDashboard = async (
   ]);
 
   return {
-    ...(conventions ? { conventions } : {}),
-    ...(discussions ? { discussions } : {}),
+    conventions,
+    discussions,
   };
 };
 
@@ -252,7 +266,7 @@ const makeConventionEstablishmentDashboard = async ({
   timeGateway: TimeGateway;
   user: User;
   userHasEstablishmentRights: boolean;
-}): Promise<AbsoluteUrl | undefined> => {
+}): Promise<AbsoluteUrl | null> => {
   const conventionDashboardUrl =
     dashboardGateway.getEstablishmentConventionsDashboardUrl(
       user.id,
@@ -282,9 +296,7 @@ const makeConventionEstablishmentDashboard = async ({
       })
     ).length > 0;
 
-  if (hasConventionForEstablishmentTutor) return conventionDashboardUrl;
-
-  return undefined;
+  return hasConventionForEstablishmentTutor ? conventionDashboardUrl : null;
 };
 
 const makeDiscussionsEstablishmentDashboard = async ({
@@ -297,13 +309,13 @@ const makeDiscussionsEstablishmentDashboard = async ({
   timeGateway: TimeGateway;
   user: User;
   userHasEstablishmentRights: boolean;
-}): Promise<AbsoluteUrl | undefined> =>
+}): Promise<AbsoluteUrl | null> =>
   userHasEstablishmentRights
     ? dashboardGateway.getEstablishmentDiscussionsDashboardUrl(
         user.id,
         timeGateway.now(),
       )
-    : undefined;
+    : null;
 
 export const getUserByEmailAndCreateIfMissing = async ({
   userRepository,

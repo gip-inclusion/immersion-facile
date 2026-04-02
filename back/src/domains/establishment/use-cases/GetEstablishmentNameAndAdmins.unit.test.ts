@@ -3,6 +3,8 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   UserBuilder,
 } from "shared";
 import {
@@ -81,7 +83,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
               },
             ],
             agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
           },
         },
         {
@@ -93,7 +98,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
               siret: establishment.establishment.siret,
             },
             agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
           },
         },
         {
@@ -102,7 +110,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
             ...userWithoutEstablishmentRight,
             isBackofficeAdmin: true,
             agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
           },
         },
       ] satisfies {
@@ -140,7 +151,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
           siret: establishmentWithCustomizedName.establishment.siret,
         },
         agencyRights: [],
-        dashboards: { agencies: {}, establishments: {} },
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
       };
 
       expectToEqual(
@@ -171,7 +185,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
             ...userWithoutEstablishmentRight,
             isBackofficeAdmin: true,
             agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
           },
         ),
         errors.establishment.notFound({
@@ -187,7 +204,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
           {
             ...userWithoutEstablishmentRight,
             agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
           },
         ),
         errors.user.forbidden({
@@ -206,7 +226,10 @@ describe("GetEstablishmentNameAndAdmins", () => {
             ...userWithoutEstablishmentRight,
             isBackofficeAdmin: true,
             agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
           },
         ),
         errors.users.notFound({

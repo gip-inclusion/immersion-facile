@@ -96,6 +96,18 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
     return {
       ...user,
       agencyRights: await getAgencyRightByUserId(uow, user.id),
-      dashboards: { agencies: {}, establishments: {} },
+      dashboards: {
+        agencies: {
+          agencyDashboardUrl: null,
+          agencyManagement: null,
+          erroredConventionsDashboardUrl: null,
+          establishmentManagement: null,
+          statsEstablishmentDetailsUrl: null,
+        },
+        establishments: {
+          conventions: null,
+          discussions: null,
+        },
+      },
     };
   });

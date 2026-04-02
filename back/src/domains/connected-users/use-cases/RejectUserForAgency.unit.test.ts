@@ -5,6 +5,8 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   type ProConnectInfos,
   toAgencyDtoForAgencyUsersAndAdmins,
   type User,
@@ -98,8 +100,8 @@ describe("RejectUserForAgency", () => {
         },
       ],
       dashboards: {
-        agencies: {},
-        establishments: {},
+        agencies: noAgencyDashboards,
+        establishments: noEstablishmentDashboard,
       },
     };
 
@@ -130,8 +132,8 @@ describe("RejectUserForAgency", () => {
         },
       ],
       dashboards: {
-        agencies: {},
-        establishments: {},
+        agencies: noAgencyDashboards,
+        establishments: noEstablishmentDashboard,
       },
     };
 

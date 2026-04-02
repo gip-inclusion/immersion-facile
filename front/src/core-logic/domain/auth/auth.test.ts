@@ -7,6 +7,8 @@ import {
   errors,
   expectToEqual,
   type FederatedIdentity,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
 } from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -351,7 +353,10 @@ describe("Auth slice", () => {
       firstName: connectedUserFederatedIdentity.firstName,
       lastName: connectedUserFederatedIdentity.lastName,
       agencyRights: [],
-      dashboards: { agencies: {}, establishments: {} },
+      dashboards: {
+        agencies: noAgencyDashboards,
+        establishments: noEstablishmentDashboard,
+      },
       proConnect: {
         externalId: "fake-user-external-id",
         siret: "12345678901234",

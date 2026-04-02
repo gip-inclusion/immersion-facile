@@ -17,6 +17,7 @@ export class StubDashboardGateway implements DashboardGateway {
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
       agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${userId}/${now}`,
+      statsEstablishmentDetailsUrl: `http://stub-metabasev1/EstablishmentDashboard/${now}`,
       agencyManagement: `http://stub-metabasev2/ManageMyAgency/${now}/${agencyNames.join()}`,
       establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${now}`,
     };

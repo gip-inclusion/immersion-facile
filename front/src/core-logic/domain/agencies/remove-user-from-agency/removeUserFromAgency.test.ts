@@ -1,4 +1,10 @@
-import { AgencyDtoBuilder, type ConnectedUser, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  type ConnectedUser,
+  expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
+} from "shared";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { removeUserFromAgencySelectors } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.selectors";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
@@ -30,7 +36,10 @@ describe("RemoveUserFromAgency", () => {
     createdAt: new Date().toISOString(),
     proConnect: null,
     agencyRights: [],
-    dashboards: { agencies: {}, establishments: {} },
+    dashboards: {
+      agencies: noAgencyDashboards,
+      establishments: noEstablishmentDashboard,
+    },
   };
 
   it("should remove user successfully", () => {

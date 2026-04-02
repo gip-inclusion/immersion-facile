@@ -12,6 +12,8 @@ import {
   type GetDashboardParams,
   type GetUsersFilters,
   type NotificationsByKind,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   type RejectConnectedUserRoleForAgencyParams,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserId,
@@ -60,7 +62,10 @@ export class SimulatedAdminGateway implements AdminGateway {
           firstName: "Rémi",
           lastName: "Sanfamille",
           agencyRights: [],
-          dashboards: { agencies: {}, establishments: {} },
+          dashboards: {
+            agencies: noAgencyDashboards,
+            establishments: noEstablishmentDashboard,
+          },
           proConnect: {
             externalId: "fake-user-external-id-2",
             siret: "00000000001234",
@@ -155,7 +160,10 @@ export class SimulatedAdminGateway implements AdminGateway {
           isNotifiedByEmail: true,
         },
       ],
-      dashboards: { agencies: {}, establishments: {} },
+      dashboards: {
+        agencies: noAgencyDashboards,
+        establishments: noEstablishmentDashboard,
+      },
     });
   }
 
