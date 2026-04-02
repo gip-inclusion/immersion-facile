@@ -47,11 +47,7 @@ export const MinimalErrorPage = ({ error }: { error: Error }) => {
       <MainWrapper layout="default" vSpacing={8}>
         <ErrorPageContent
           buttons={[
-            <ContactUsButton
-              errorMessage={error.message}
-              priority="primary"
-              key={ContactUsButton.name}
-            />,
+            <ContactUsButton priority="primary" key={ContactUsButton.name} />,
           ]}
           title="Erreur inattendue"
           description={
