@@ -5,9 +5,9 @@ import {
   domElementIds,
   type Email,
   expiredJwtErrorTitle,
-  immersionFacileContactEmail,
   type SiretDto,
 } from "shared";
+import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
 import type {
   ContactErrorInformation,
   ErrorButton,
@@ -41,7 +41,11 @@ export const frontErrors = {
             </p>
             <p>
               Vous n'avez pas reçu le lien ?{" "}
-              <a href={`mailto:${immersionFacileContactEmail}`}>
+              <a
+                href={immersionFacileSupportUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Contactez-nous
               </a>
             </p>
@@ -66,7 +70,11 @@ export const frontErrors = {
             </p>
             <p>
               Vous n'avez pas reçu le lien ?{" "}
-              <a href={`mailto:${immersionFacileContactEmail}`}>
+              <a
+                href={immersionFacileSupportUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Contactez-nous
               </a>
             </p>
@@ -97,17 +105,14 @@ export const frontErrors = {
             </p>
           </>
         ),
-        buttons: [
-          HomeButton,
-          ContactUsButton({ errorMessage: "Page introuvable." }),
-        ],
+        buttons: [HomeButton, ContactUsButton()],
       }),
     unauthorized: () => {
       const description = "Vous n'êtes pas autorisé à accéder à cette page.";
       return new FrontSpecificError({
         title: "Non-autorisé",
         description,
-        buttons: [HomeButton, ContactUsButton({ errorMessage: description })],
+        buttons: [HomeButton, ContactUsButton()],
       });
     },
   },
@@ -146,7 +151,7 @@ export const frontErrors = {
       return new FrontSpecificError({
         title: "Partenaire inconnu",
         description,
-        buttons: [HomeButton, ContactUsButton({ errorMessage: description })],
+        buttons: [HomeButton, ContactUsButton()],
       });
     },
     noRightsOnConvention: ({
@@ -173,13 +178,7 @@ export const frontErrors = {
             </p>
           </>
         ),
-        buttons: [
-          HomeButton,
-          ContactUsButton({
-            errorMessage: `L’accès à la convention '${conventionId}' n’est pas possible avec le compte
-              actuel (${userEmail}). Ce compte n’a aucun droit sur la convention.`,
-          }),
-        ],
+        buttons: [HomeButton, ContactUsButton()],
       }),
   },
   conventionDraft: {
@@ -224,7 +223,7 @@ export const frontErrors = {
       return new FrontSpecificError({
         title: "Établissment non trouvé",
         description,
-        buttons: [HomeButton, ContactUsButton({ errorMessage: description })],
+        buttons: [HomeButton, ContactUsButton()],
       });
     },
     expiredLink: () => {
@@ -262,23 +261,13 @@ export const HomeButton: ErrorButton = (
 );
 
 export const ContactUsButton = ({
-  errorMessage,
   priority = "secondary",
-}: ContactErrorInformation) => {
-  const emailBody = `%0D%0A________________________%0D%0A
-  %0D%0A
-  Veuillez répondre au dessus de cette ligne.%0D%0A%0D%0A
-  Les infos suivantes peuvent être utiles pour résoudre votre problème :%0D%0A%0D%0A
-  - URL de la page concernée : ${window.location.href}%0D%0A%0D%0A
-  - Date et heure de l'erreur : ${new Date().toISOString()}%0D%0A%0D%0A
-  - Résumé de l'erreur :%0D%0A%0D%0A
-  ${errorMessage}
-  `;
+}: ContactErrorInformation = {}) => {
   return (
     <Button
       priority={priority}
       linkProps={{
-        href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
+        href: `${immersionFacileSupportUrl}`,
         target: "_blank",
         id: domElementIds.error.contactUsButton,
       }}

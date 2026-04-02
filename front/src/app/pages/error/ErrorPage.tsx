@@ -33,10 +33,7 @@ const getPageContentProps = (
     description: error.message,
     buttons: buttons ?? [
       HomeButton,
-      <ContactUsButton
-        errorMessage={error.message}
-        key={ContactUsButton.name}
-      />,
+      <ContactUsButton key={ContactUsButton.name} />,
     ],
   };
 };

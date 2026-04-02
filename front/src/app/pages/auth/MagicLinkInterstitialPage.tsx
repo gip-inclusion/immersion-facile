@@ -41,10 +41,7 @@ export const MagicLinkInterstitialPage = () => {
         return (
           <ErrorPage
             title={title ?? "Erreur de connexion"}
-            buttons={[
-              RenewJwtButton,
-              ContactUsButton({ errorMessage: messageText }),
-            ]}
+            buttons={[RenewJwtButton, ContactUsButton()]}
             error={{
               message: messageText,
               name: title ?? "Erreur de connexion",

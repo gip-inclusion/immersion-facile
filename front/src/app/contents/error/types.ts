@@ -11,6 +11,5 @@ export type FrontErrorProps = {
 export type ErrorButton = ReactElement;
 
 export type ContactErrorInformation = {
-  errorMessage: string;
   priority?: ButtonProps["priority"];
 };
