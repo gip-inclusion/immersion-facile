@@ -22,6 +22,8 @@ import {
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   type SetFeatureFlagParam,
   technicalRoutes,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -585,7 +587,10 @@ describe("Admin router", () => {
             isNotifiedByEmail: false,
           },
         ],
-        dashboards: { agencies: {}, establishments: {} },
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
         proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };

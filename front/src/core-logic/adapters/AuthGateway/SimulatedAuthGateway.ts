@@ -6,6 +6,8 @@ import {
   type AgencyRight,
   type ConnectedUser,
   type InitiateLoginByEmailParams,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   type OAuthSuccessLoginParams,
   type RenewExpiredJwtRequestDto,
   sleep,
@@ -33,7 +35,10 @@ export class SimulatedAuthGateway implements AuthGateway {
         firstName: "Jean",
         lastName: "Bon",
         agencyRights: simulatedAgencyRights,
-        dashboards: { agencies: {}, establishments: {} },
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
         proConnect: {
           externalId: "fake-user-external-id-1",
           siret: "00000000002222",
@@ -46,7 +51,10 @@ export class SimulatedAuthGateway implements AuthGateway {
         firstName: "Rémi",
         lastName: "Sanfamille",
         agencyRights: [],
-        dashboards: { agencies: {}, establishments: {} },
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
         proConnect: {
           externalId: "fake-user-external-id-2",
           siret: "00000000001111",
@@ -71,7 +79,10 @@ export class SimulatedAuthGateway implements AuthGateway {
             isNotifiedByEmail: true,
           },
         ],
-        dashboards: { agencies: {}, establishments: {} },
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
         proConnect: {
           externalId: "fake-user-in-error-external-id",
           siret: "00000000003333",
@@ -111,7 +122,10 @@ const simulatedUserConnected: ConnectedUser = {
   lastName: "User",
   id: "fake-user-id",
   agencyRights: [],
-  dashboards: { agencies: {}, establishments: {} },
+  dashboards: {
+    agencies: noAgencyDashboards,
+    establishments: noEstablishmentDashboard,
+  },
   proConnect: {
     externalId: "fake-user-external-id",
     siret: "00000000000000",

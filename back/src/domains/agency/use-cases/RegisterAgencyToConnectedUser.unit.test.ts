@@ -7,6 +7,8 @@ import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -32,8 +34,8 @@ describe("RegisterAgencyToConnectedUser use case", () => {
     createdAt: new Date().toISOString(),
     agencyRights: [],
     dashboards: {
-      agencies: {},
-      establishments: {},
+      agencies: noAgencyDashboards,
+      establishments: noEstablishmentDashboard,
     },
   };
 

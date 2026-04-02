@@ -111,17 +111,17 @@ const dashboardsSchema: ZodSchemaWithInputMatchingOutput<
 > = z.object({
   establishments: z
     .object({
-      conventions: absoluteUrlSchema.optional(),
-      discussions: absoluteUrlSchema.optional(),
-      editEstablishment: siretSchema.optional(),
+      conventions: absoluteUrlSchema.nullable(),
+      discussions: absoluteUrlSchema.nullable(),
     })
     .strict(),
   agencies: z
     .object({
-      agencyDashboardUrl: absoluteUrlSchema.optional(),
-      erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
-      agencyManagement: absoluteUrlSchema.optional(),
-      establishmentManagement: absoluteUrlSchema.optional(),
+      agencyDashboardUrl: absoluteUrlSchema.nullable(),
+      erroredConventionsDashboardUrl: absoluteUrlSchema.nullable(),
+      statsEstablishmentDetailsUrl: absoluteUrlSchema.nullable(),
+      agencyManagement: absoluteUrlSchema.nullable(),
+      establishmentManagement: absoluteUrlSchema.nullable(),
     })
     .strict(),
 });

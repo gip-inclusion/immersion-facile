@@ -8,6 +8,8 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   splitCasesBetweenPassingAndFailing,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
@@ -143,10 +145,11 @@ describe("GetConnectedUser", () => {
                 erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                   connectedNotAdminUser.id
                 }/${timeGateway.now()}`,
+                statsEstablishmentDetailsUrl: `http://stub-metabasev1/EstablishmentDashboard/${timeGateway.now()}`,
                 agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${agency.name}`,
                 establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
               },
-              establishments: {},
+              establishments: noEstablishmentDashboard,
             },
           });
         });
@@ -178,7 +181,10 @@ describe("GetConnectedUser", () => {
                   isNotifiedByEmail: true,
                 },
               ],
-              dashboards: { agencies: {}, establishments: {} },
+              dashboards: {
+                agencies: noAgencyDashboards,
+                establishments: noEstablishmentDashboard,
+              },
             },
           );
         });
@@ -212,11 +218,12 @@ describe("GetConnectedUser", () => {
               agencyDashboardUrl: `http://stub-metabasev1/AgencyUserDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
-              erroredConventionsDashboardUrl: undefined,
+              erroredConventionsDashboardUrl: null,
+              statsEstablishmentDetailsUrl: `http://stub-metabasev1/EstablishmentDashboard/${timeGateway.now()}`,
               agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${agency.name}`,
               establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
             },
-            establishments: {},
+            establishments: noEstablishmentDashboard,
           },
         });
       });
@@ -302,10 +309,11 @@ describe("GetConnectedUser", () => {
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
+              statsEstablishmentDetailsUrl: `http://stub-metabasev1/EstablishmentDashboard/${timeGateway.now()}`,
               agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${[agency1, agency2, agency3, agency4].map((agency) => agency.name).join()}`,
               establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
             },
-            establishments: {},
+            establishments: noEstablishmentDashboard,
           },
         });
       });
@@ -373,10 +381,11 @@ describe("GetConnectedUser", () => {
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                 notAdminUser.id
               }/${timeGateway.now()}`,
+              statsEstablishmentDetailsUrl: `http://stub-metabasev1/EstablishmentDashboard/${timeGateway.now()}`,
               agencyManagement: `http://stub-metabasev2/ManageMyAgency/${timeGateway.now()}/${[agency1, agency2, agency3].map((agency) => agency.name).join()}`,
               establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${timeGateway.now()}`,
             },
-            establishments: {},
+            establishments: noEstablishmentDashboard,
           },
         });
       });
@@ -389,8 +398,8 @@ describe("GetConnectedUser", () => {
               ...notAdminUser,
               agencyRights: [],
               dashboards: {
-                agencies: {},
-                establishments: {},
+                agencies: noAgencyDashboards,
+                establishments: noEstablishmentDashboard,
               },
             },
           );
@@ -402,9 +411,10 @@ describe("GetConnectedUser", () => {
               ...notAdminUser,
               agencyRights: [],
               dashboards: {
-                agencies: {},
+                agencies: noAgencyDashboards,
                 establishments: {
                   conventions: `http://stubEstablishmentConventionsDashboardUrl/${notAdminUser.id}/${now}`,
+                  discussions: null,
                 },
               },
             };
@@ -535,7 +545,7 @@ describe("GetConnectedUser", () => {
                   },
                 ],
                 dashboards: {
-                  agencies: {},
+                  agencies: noAgencyDashboards,
                   establishments: {
                     conventions: `http://stubEstablishmentConventionsDashboardUrl/${
                       notAdminUser.id
@@ -569,8 +579,8 @@ describe("GetConnectedUser", () => {
           ...notAdminUser,
           proConnect: defaultProConnectInfos,
           dashboards: {
-            agencies: {},
-            establishments: {},
+            agencies: noAgencyDashboards,
+            establishments: noEstablishmentDashboard,
           },
           agencyRights: [],
         });

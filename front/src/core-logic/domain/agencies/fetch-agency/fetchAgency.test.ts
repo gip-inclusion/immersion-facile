@@ -5,6 +5,8 @@ import {
   type AgencyRight,
   type ConnectedUser,
   expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import type {
@@ -45,7 +47,10 @@ const user1: ConnectedUserWithNormalizedAgencyRights = {
       roles: ["agency-admin"],
     },
   },
-  dashboards: { agencies: {}, establishments: {} },
+  dashboards: {
+    agencies: noAgencyDashboards,
+    establishments: noEstablishmentDashboard,
+  },
   proConnect: {
     externalId: "fake-user-external-id-1",
     siret: "00000000001111",
@@ -65,7 +70,10 @@ const user2: ConnectedUserWithNormalizedAgencyRights = {
       roles: ["agency-admin"],
     },
   },
-  dashboards: { agencies: {}, establishments: {} },
+  dashboards: {
+    agencies: noAgencyDashboards,
+    establishments: noEstablishmentDashboard,
+  },
   proConnect: {
     externalId: "fake-user-in-error-external-id",
     siret: "00000000000000",
@@ -324,7 +332,10 @@ describe("fetchAgency", () => {
           agencyRights: {
             [agencyDto.id]: agencyRight,
           },
-          dashboards: { agencies: {}, establishments: {} },
+          dashboards: {
+            agencies: noAgencyDashboards,
+            establishments: noEstablishmentDashboard,
+          },
         };
 
         const user: ConnectedUser = {
@@ -388,7 +399,10 @@ describe("fetchAgency", () => {
           agencyRights: {
             [agencyDto.id]: agencyRight,
           },
-          dashboards: { agencies: {}, establishments: {} },
+          dashboards: {
+            agencies: noAgencyDashboards,
+            establishments: noEstablishmentDashboard,
+          },
         };
 
         store.dispatch(

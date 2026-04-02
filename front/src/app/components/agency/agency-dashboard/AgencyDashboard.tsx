@@ -155,11 +155,25 @@ const rawAgencyDashboardTabs = ({
           },
         ]
       : []),
-    ...(dashboards.agencies.agencyManagement
+    ...(dashboards.agencies.statsEstablishmentDetailsUrl
       ? [
           {
             tabId:
-              "agencyDashboardStatsAgencies" satisfies AgencyDashboardRouteName,
+              "statsEstablishmentDetails" satisfies AgencyDashboardRouteName,
+            label: "Activités par entreprise",
+            content: (
+              <MetabaseView
+                title="Détails par entreprise"
+                url={dashboards.agencies.statsEstablishmentDetailsUrl}
+              />
+            ),
+          },
+        ]
+      : []),
+    ...(dashboards.agencies.agencyManagement
+      ? [
+          {
+            tabId: "agencyManagement" satisfies AgencyDashboardRouteName,
             label: "Pilotage de ma structure",
             content: (
               <MetabaseView
@@ -173,8 +187,7 @@ const rawAgencyDashboardTabs = ({
     ...(dashboards.agencies.establishmentManagement
       ? [
           {
-            tabId:
-              "agencyDashboardStatsActivitiesByEstablishment" satisfies AgencyDashboardRouteName,
+            tabId: "establishmentManagement" satisfies AgencyDashboardRouteName,
             label: "Pilotage de mes entreprises",
             content: (
               <MetabaseView

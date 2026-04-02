@@ -51,6 +51,7 @@ const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
     id: 138,
     endpoint: "v1",
   },
+  statsEstablishmentDetails: { kind: "dashboard", id: 223, endpoint: "v1" },
   agencyManagement: { kind: "dashboard", id: 2, endpoint: "v2" },
   establishmentManagement: { kind: "dashboard", id: 13, endpoint: "v2" },
 };
@@ -65,58 +66,49 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   constructor(private metabaseConfig: MetabaseConfig) {}
 
   public getAgencyForAdminUrl(agencyId: AgencyId, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.adminAgencyDetails;
-    const token = this.#createToken({
-      dashboard,
-      params: { filtrer_par_structure: [agencyId] },
+    return this.#makeDashboardUrlByDashboardName({
+      dashboardName: "adminAgencyDetails",
       now,
+      lockedParams: {
+        filtrer_par_structure: [agencyId],
+      },
     });
-    return this.#makeUrl(token, dashboard);
-  }
-
-  #makeDashboardUrlByDashboardName(
-    dashboardName: DashboardName,
-    now: Date,
-    params?: Record<string, string | string[]>,
-  ) {
-    const dashboard = dashboardByName[dashboardName];
-    return this.#makeUrl(
-      this.#createToken({
-        dashboard,
-        params,
-        now,
-      }),
-      dashboard,
-    );
   }
 
   public getAgencyUserUrls(
     userId: UserId,
-    _agencyNames: string[],
+    agencyNames: string[],
     now: Date,
   ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
     return {
-      agencyDashboardUrl: this.#makeDashboardUrlByDashboardName(
-        "agencyForUser",
+      agencyDashboardUrl: this.#makeDashboardUrlByDashboardName({
+        dashboardName: "agencyForUser",
         now,
-        { ic_user_id: userId },
-      ),
-      agencyManagement: this.#makeDashboardUrlByDashboardName(
-        "agencyManagement",
+        lockedParams: { ic_user_id: userId },
+      }),
+      statsEstablishmentDetailsUrl: this.#makeDashboardUrlByDashboardName({
+        dashboardName: "statsEstablishmentDetails",
         now,
-        {},
-      ),
-      establishmentManagement: this.#makeDashboardUrlByDashboardName(
-        "establishmentManagement",
+      }),
+      agencyManagement: this.#makeDashboardUrlByDashboardName({
+        dashboardName: "agencyManagement",
+        editableParams: { structure: agencyNames },
         now,
-        {},
-      ),
+      }),
+      establishmentManagement: this.#makeDashboardUrlByDashboardName({
+        dashboardName: "establishmentManagement",
+        now,
+      }),
     };
   }
 
   public getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl {
-    return this.#makeDashboardUrlByDashboardName("conventionStatus", now, {
-      id: [id],
+    return this.#makeDashboardUrlByDashboardName({
+      dashboardName: "conventionStatus",
+      now,
+      lockedParams: {
+        id: [id],
+      },
     });
   }
 
@@ -124,61 +116,90 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     dashboardName: AdminDashboardName,
     now: Date,
   ): AbsoluteUrl {
-    return this.#makeDashboardUrlByDashboardName(dashboardName, now);
+    return this.#makeDashboardUrlByDashboardName({ dashboardName, now });
   }
 
   public getErroredConventionsDashboardUrl(
     userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    return this.#makeDashboardUrlByDashboardName(
-      "erroredConventionsForUser",
+    return this.#makeDashboardUrlByDashboardName({
+      dashboardName: "erroredConventionsForUser",
       now,
-      { ic_user_id: userId },
-    );
+      lockedParams: { ic_user_id: userId },
+    });
   }
 
   public getEstablishmentConventionsDashboardUrl(
     userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    return this.#makeDashboardUrlByDashboardName(
-      "establishmentRepresentativeConventions",
+    return this.#makeDashboardUrlByDashboardName({
+      dashboardName: "establishmentRepresentativeConventions",
       now,
-      { ic_user_id: userId },
-    );
+      lockedParams: { ic_user_id: userId },
+    });
   }
 
   public getEstablishmentDiscussionsDashboardUrl(
     userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    return this.#makeDashboardUrlByDashboardName(
-      "establishmentRepresentativeDiscussions",
+    return this.#makeDashboardUrlByDashboardName({
+      dashboardName: "establishmentRepresentativeDiscussions",
       now,
-      { ic_user_id: userId },
-    );
+      lockedParams: { ic_user_id: userId },
+    });
   }
 
-  #makeUrl(token: string, { kind, endpoint }: MetabaseDashboard): AbsoluteUrl {
-    return `${this.metabaseConfig[endpoint].url}/embed/${kind}/${token}#bordered=true&titled=true`;
+  #makeDashboardUrlByDashboardName({
+    dashboardName,
+    now,
+    editableParams,
+    lockedParams,
+  }: {
+    dashboardName: DashboardName;
+    now: Date;
+    editableParams?: Record<string, string | string[]>;
+    lockedParams?: Record<string, string | string[]>;
+  }): AbsoluteUrl {
+    const dashboard = dashboardByName[dashboardName];
+    const metabaseEndpointUrl = this.metabaseConfig[dashboard.endpoint].url;
+    const baseUrl: AbsoluteUrl = `${metabaseEndpointUrl}/embed/${dashboard.kind}/${this.#createToken({ dashboard, now, lockedParams })}`;
+    const queryString = makeQueryStringFromParams(editableParams ?? {});
+
+    return `${baseUrl}${queryString ? `?${queryString}` : ""}#bordered=true&titled=true`;
   }
 
   #createToken({
     dashboard,
-    params = {},
+    lockedParams,
     now,
   }: {
     dashboard: MetabaseDashboard;
-    params?: Record<string, string | string[]>;
+    lockedParams?: Record<string, string | string[]>;
     now: Date;
   }): string {
     const payload: MetabasePayload = {
       resource: { [dashboard.kind]: dashboard.id },
-      params,
+      params: lockedParams,
       exp: Math.round(now.getTime() / 1000) + 60 * 60 * 8, // 8 hours expiration
     };
 
     return jwt.sign(payload, this.metabaseConfig[dashboard.endpoint].apiKey);
   }
+}
+
+function makeQueryStringFromParams(params: Record<string, string | string[]>) {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    Array.isArray(value)
+      ? value.forEach((v) => {
+          searchParams.append(key, v);
+        })
+      : searchParams.set(key, value);
+  });
+
+  return searchParams.toString();
 }

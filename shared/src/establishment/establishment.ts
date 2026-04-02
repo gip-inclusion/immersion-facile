@@ -41,8 +41,8 @@ export type WithEstablishmentsData = {
 };
 
 export type EstablishmentDashboards = {
-  conventions?: AbsoluteUrl;
-  discussions?: AbsoluteUrl;
+  conventions: AbsoluteUrl | null;
+  discussions: AbsoluteUrl | null;
 };
 
 export type WithEstablishmentDashboards = {

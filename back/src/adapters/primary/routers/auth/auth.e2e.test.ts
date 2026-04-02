@@ -17,6 +17,8 @@ import {
   expectHttpResponseToEqual,
   expectToEqual,
   frontRoutes,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   queryParamsAsString,
   type Role,
   type TechnicalRoutes,
@@ -563,6 +565,7 @@ describe("auth router", () => {
                 erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
                   agencyUser.id
                 }/${gateways.timeGateway.now()}`,
+                statsEstablishmentDetailsUrl: `http://stub-metabasev1/EstablishmentDashboard/${gateways.timeGateway.now()}`,
                 agencyManagement: `http://stub-metabasev2/ManageMyAgency/${gateways.timeGateway.now()}/${agency.name}`,
                 establishmentManagement: `http://stub-metabasev2/ManageMyEstablishments/${gateways.timeGateway.now()}`,
               },
@@ -570,6 +573,7 @@ describe("auth router", () => {
                 conventions: `http://stubEstablishmentConventionsDashboardUrl/${
                   agencyUser.id
                 }/${gateways.timeGateway.now()}`,
+                discussions: null,
               },
             },
             agencyRights: [
@@ -680,7 +684,10 @@ describe("auth router", () => {
                   isNotifiedByEmail: true,
                 },
               ],
-              dashboards: { agencies: {}, establishments: {} },
+              dashboards: {
+                agencies: noAgencyDashboards,
+                establishments: noEstablishmentDashboard,
+              },
             },
           ],
         });

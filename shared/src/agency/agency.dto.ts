@@ -273,14 +273,15 @@ export type WithAgencyRights = {
 
 export type AgencyStatsDashboards = {
   // statistics dashboards :
-  agencyManagement?: AbsoluteUrl;
-  establishmentManagement?: AbsoluteUrl;
+  statsEstablishmentDetailsUrl: AbsoluteUrl | null;
+  agencyManagement: AbsoluteUrl | null;
+  establishmentManagement: AbsoluteUrl | null;
 };
 
 export type AgencyDashboards = AgencyStatsDashboards & {
-  erroredConventionsDashboardUrl?: AbsoluteUrl;
+  erroredConventionsDashboardUrl: AbsoluteUrl | null;
   // convention dashboard :
-  agencyDashboardUrl?: AbsoluteUrl;
+  agencyDashboardUrl: AbsoluteUrl | null;
 };
 
 export type WithAgencyDashboards = {

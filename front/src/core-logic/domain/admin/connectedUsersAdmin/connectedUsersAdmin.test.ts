@@ -7,6 +7,8 @@ import {
   type ConnectedUser,
   errors,
   expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   type RejectConnectedUserRoleForAgencyParams,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserParamsForAgency,
@@ -74,7 +76,10 @@ const authUser1: ConnectedUserWithNormalizedAgencyRights = {
   lastName: "user-last-name",
   createdAt: new Date().toISOString(),
   agencyRights: user1AgencyRights,
-  dashboards: { agencies: {}, establishments: {} },
+  dashboards: {
+    agencies: noAgencyDashboards,
+    establishments: noEstablishmentDashboard,
+  },
   proConnect: {
     externalId: "fake-user-external-id-1",
     siret: "00000111112222",
@@ -88,7 +93,10 @@ const authUser2: ConnectedUserWithNormalizedAgencyRights = {
   lastName: "user-last-name-2",
   createdAt: new Date().toISOString(),
   agencyRights: user2AgencyRights,
-  dashboards: { agencies: {}, establishments: {} },
+  dashboards: {
+    agencies: noAgencyDashboards,
+    establishments: noEstablishmentDashboard,
+  },
   proConnect: {
     externalId: "fake-user-external-id-2",
     siret: "00000000001234",
@@ -613,7 +621,10 @@ describe("Agency registration for authenticated users", () => {
         createdAt: new Date().toISOString(),
         proConnect: null,
         agencyRights: {},
-        dashboards: { agencies: {}, establishments: {} },
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
       };
 
       store.dispatch(
@@ -683,7 +694,10 @@ describe("Agency registration for authenticated users", () => {
         proConnect: null,
         createdAt: new Date().toISOString(),
         agencyRights: {},
-        dashboards: { agencies: {}, establishments: {} },
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
       };
 
       store.dispatch(

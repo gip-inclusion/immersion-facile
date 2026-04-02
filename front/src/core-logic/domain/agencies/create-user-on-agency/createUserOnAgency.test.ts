@@ -3,6 +3,8 @@ import {
   type ConnectedUser,
   errors,
   expectToEqual,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
@@ -37,7 +39,10 @@ describe("CreateUserOnAgency", () => {
     proConnect: null,
     createdAt: new Date().toISOString(),
     agencyRights: {},
-    dashboards: { agencies: {}, establishments: {} },
+    dashboards: {
+      agencies: noAgencyDashboards,
+      establishments: noEstablishmentDashboard,
+    },
   };
 
   it("should create user successfully", () => {

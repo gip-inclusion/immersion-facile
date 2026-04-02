@@ -13,6 +13,8 @@ import {
   expectToEqual,
   FormEstablishmentDtoBuilder,
   type FormEstablishmentUserRight,
+  noAgencyDashboards,
+  noEstablishmentDashboard,
   toAgencyDtoForAgencyUsersAndAdmins,
   type WithAgencyIds,
 } from "shared";
@@ -48,8 +50,11 @@ describe("InclusionConnected", () => {
     lastName: "User",
     id: "fake-user-id",
     dashboards: {
-      agencies: { agencyDashboardUrl: "https://placeholder.com/" },
-      establishments: {},
+      agencies: {
+        ...noAgencyDashboards,
+        agencyDashboardUrl: "https://placeholder.com/",
+      },
+      establishments: noEstablishmentDashboard,
     },
     agencyRights: [
       {

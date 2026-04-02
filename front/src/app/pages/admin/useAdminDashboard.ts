@@ -18,7 +18,7 @@ export const useAdminDashboard = (params: GetAdminDashboardParams) => {
   }, [initialParams, dispatch]);
 
   return {
-    url: dashboardUrls[params.name] ?? undefined,
+    url: dashboardUrls[params.name] ?? null,
     error: dashboardError,
   };
 };
