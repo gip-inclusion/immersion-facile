@@ -146,3 +146,15 @@ export const parseStringToJsonOrThrow = <T>(
     throw errors.routeParams.malformedJson({ paramName });
   }
 };
+
+export const sliceTextUpToBytesLimit = (
+  text: string,
+  MAX_BYTES: number,
+): string => {
+  const textBytesEncoded = new TextEncoder().encode(text);
+  return textBytesEncoded.length > MAX_BYTES
+    ? new TextDecoder("utf-8")
+        .decode(textBytesEncoded.slice(0, MAX_BYTES))
+        .replace(/\uFFFD/g, "")
+    : text;
+};

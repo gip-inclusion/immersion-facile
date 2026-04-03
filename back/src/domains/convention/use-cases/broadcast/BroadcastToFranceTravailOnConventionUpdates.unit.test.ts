@@ -317,6 +317,57 @@ describe("Broadcasts events to France Travail", () => {
     });
   });
 
+  it("Converts and sends conventions, with limit 255 bytes on sanitaryPreventionDescription, individualProtectionDescription & tutor job", async () => {
+    const convention = new ConventionDtoBuilder()
+      .withAgencyId(peAgencyWithoutCounsellorsAndValidators.id)
+      .withSanitaryPreventionDescription(
+        "•	Lavage régulier des mains 	•	Port d’une tenue propre (blouse, tablier) 	•	Port du filet à cheveux ou charlotte 	•	Nettoyage fréquent du plan de travail et du matériel 	•	Respect des règles d’hygiène liées à la manipulation des produits alimentaires",
+      )
+      .withIndividualProtectionDescription(
+        "Gants à usage unique  Masques (chirurgicaux ou FFP2 selon les situations)  Tenue professionnelle (pantalon, polo ou blouson aux normes)  Chaussures de sécurité ou adaptées au transport sanitaire  Gilet fluorescent pour interventions sur voie publique",
+      )
+      .withEstablishmentTutorJob(
+        "Responsable des affaires juridiques et institutionnelles au sein du Service des Affaires juridiques et institutionnelles ; Délégué à la protection des données personnelles (DPO) ; Responsable de l’accès aux documents administratifs (PRADA)",
+      )
+      .build();
+
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      eventType: "CONVENTION_UPDATED",
+      convention: conventionReadDtoFrom({
+        convention,
+        agency: {
+          ...peAgencyWithoutCounsellorsAndValidators,
+          counsellorEmails: [counsellor.email],
+          validatorEmails: [validator.email],
+        },
+      }),
+    });
+
+    expectToEqual(franceTravailGateway.broadcastParamsCalls, [
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDtoFrom({
+          convention: {
+            ...convention,
+            sanitaryPreventionDescription:
+              "•	Lavage regulier des mains 	•	Port d'une tenue propre (blouse, tablier) 	•	Port du filet a cheveux ou charlotte 	•	Nettoyage frequent du plan de travail et du materiel 	•	Respect des regles d'hygiene liees a la manipulation des produits aliment",
+            individualProtectionDescription:
+              "Gants a usage unique  Masques (chirurgicaux ou FFP2 selon les situations)  Tenue professionnelle (pantalon, polo ou blouson aux normes)  Chaussures de securite ou adaptees au transport sanitaire  Gilet fluorescent pour interventions sur voie publique",
+            establishmentTutor: {
+              ...convention.establishmentTutor,
+              job: "Responsable des affaires juridiques et institutionnelles au sein du Service des Affaires juridiques et institutionnelles ; Délégué à la protection des données personnelles (DPO) ; Responsable de l’accès aux documents administratifs (PRADA)",
+            },
+          },
+          agency: {
+            ...peAgencyWithoutCounsellorsAndValidators,
+            counsellorEmails: [counsellor.email],
+            validatorEmails: [validator.email],
+          },
+        }),
+      },
+    ]);
+  });
+
   it("broadcast to pole-emploi when convention is from an agency RefersTo", async () => {
     // Prepare
     const agencyWithRefersTo = toAgencyWithRights(

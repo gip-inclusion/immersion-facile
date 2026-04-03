@@ -1,6 +1,7 @@
 import { ZodError } from "zod";
 import type { $ZodIssue } from "zod/v4/core/errors.cjs";
 import { emailExchangeSplitters } from "../discussion/discussion.helpers";
+import { expectToEqual } from "../test.helpers";
 import { localization } from "../zodUtils";
 import {
   cleanSpecialChars,
@@ -9,6 +10,7 @@ import {
   getFormattedFirstnameAndLastname,
   looksLikeSiret,
   removeDiacritics,
+  sliceTextUpToBytesLimit,
   slugify,
   splitTextOnFirstSeparator,
   toLowerCaseWithoutDiacritics,
@@ -220,6 +222,41 @@ describe("string utils", () => {
       ["test espace insécable \u00A0", "test espace insecable  "],
     ])("should clean special chars", (input, expected) => {
       expect(cleanSpecialChars(input)).toBe(expected);
+    });
+  });
+
+  describe("sliceTextUpToBytesLimit", () => {
+    type ExpectedResult = {
+      original: string;
+      expectedResult: string;
+    };
+
+    it.each([
+      { original: "a", expectedResult: "a" },
+      { original: "a".repeat(254), expectedResult: "a".repeat(254) },
+      { original: "a".repeat(255), expectedResult: "a".repeat(255) },
+      { original: "a".repeat(256), expectedResult: "a".repeat(255) },
+      {
+        original: `${"a".repeat(254)}é`,
+        expectedResult: `${"a".repeat(254)}`,
+      },
+      {
+        original:
+          "gants de jardinage, bottes ou chaussures de sécurité, chapeau ou casquette, gilet de visibilité si travail près de routes, tablier ou combinaison légère, protections contre le soleil (crème, lunettes), éventuellement genouillères pour le travail à genoux.",
+        expectedResult:
+          "gants de jardinage, bottes ou chaussures de sécurité, chapeau ou casquette, gilet de visibilité si travail près de routes, tablier ou combinaison légère, protections contre le soleil (crème, lunettes), éventuellement genouillères pour le travail ",
+      },
+      {
+        original:
+          "Tenue professionnelle obligatoire, veste ou blouse de pâtissier, un pantalon professionnel, charlotte, et des chaussures de sécurité ou antidérapantes. Gants à usage alimentaire. Tablier de protection, protections contre la chaleur (gants thermiques).",
+        expectedResult:
+          "Tenue professionnelle obligatoire, veste ou blouse de pâtissier, un pantalon professionnel, charlotte, et des chaussures de sécurité ou antidérapantes. Gants à usage alimentaire. Tablier de protection, protections contre la chaleur (gants thermiques)",
+      },
+    ] satisfies ExpectedResult[])("slice '$original' to '$expectedResult'", ({
+      expectedResult,
+      original,
+    }) => {
+      expectToEqual(sliceTextUpToBytesLimit(original, 255), expectedResult);
     });
   });
 });

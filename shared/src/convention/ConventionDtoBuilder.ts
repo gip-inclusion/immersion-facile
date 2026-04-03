@@ -545,6 +545,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return this.withEstablishmentTutor({ ...this.#establishmentTutor, phone });
   }
 
+  public withEstablishmentTutorJob(job: string) {
+    return this.withEstablishmentTutor({ ...this.#establishmentTutor, job });
+  }
+
   public withFederatedIdentity(
     federatedIdentity: FtConnectIdentity | undefined,
   ): ConventionDtoBuilder {
