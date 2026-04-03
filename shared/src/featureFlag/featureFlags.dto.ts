@@ -13,7 +13,6 @@ export const featureFlagNames = [
   "enableBroadcastOfMissionLocaleToFT",
   "enableBroadcastOfConseilDepartementalToFT",
   "enableBroadcastOfCapEmploiToFT",
-  "enableStandardFormatBroadcastToFranceTravail",
   "enableEstablishmentDashboardHighlight",
   "enableAgencyDashboardHighlight",
 ] as const;
@@ -83,7 +82,6 @@ export type FeatureFlags = {
   enableBroadcastOfMissionLocaleToFT: FeatureFlagBoolean;
   enableBroadcastOfConseilDepartementalToFT: FeatureFlagBoolean;
   enableBroadcastOfCapEmploiToFT: FeatureFlagBoolean;
-  enableStandardFormatBroadcastToFranceTravail: FeatureFlagBoolean;
   enableEstablishmentDashboardHighlight: FeatureFlagHighlight;
   enableAgencyDashboardHighlight: FeatureFlagHighlight;
 };

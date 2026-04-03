@@ -56,8 +56,6 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-      enableStandardFormatBroadcastToFranceTravail:
-        makeBooleanFeatureFlag(false),
       enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
         title: "Mon titre de highlight",
         message: "Mon message de highlight",
@@ -91,8 +89,6 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-      enableStandardFormatBroadcastToFranceTravail:
-        makeBooleanFeatureFlag(false),
       enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
         title: "Mon titre de highlight",
         message: "Mon message de highlight",
@@ -126,8 +122,6 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-      enableStandardFormatBroadcastToFranceTravail:
-        makeBooleanFeatureFlag(false),
       enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
         title: "Mon titre de highlight",
         message: "Mon message de highlight",
@@ -190,8 +184,6 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-      enableStandardFormatBroadcastToFranceTravail:
-        makeBooleanFeatureFlag(false),
       enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(true, {
         title: "updatedTitle",
         message: "updatedMessage",

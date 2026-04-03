@@ -25,7 +25,6 @@ const defaultFlags: FeatureFlags = {
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-  enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
   enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
     title: "Mon titre de highlight pour l'entreprise",
     message: "Mon message de highlight pour l'entreprise",
