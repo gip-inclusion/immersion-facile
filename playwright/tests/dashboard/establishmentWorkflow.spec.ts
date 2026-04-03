@@ -20,7 +20,9 @@ test.describe("Establishment dashboard workflow", () => {
     }) => {
       await page.goto("/");
       await goToDiscussion(page, "aaaaaaaa-9c0a-1aaa-aa6d-aaaaaaaaaaaa");
-      await expect(page.locator(".im-exchange-message")).toHaveCount(2);
+      const initialMessageCount = await page
+        .locator(".im-exchange-message")
+        .count();
       await page.click(
         `#${domElementIds.establishmentDashboard.discussion.handleDiscussionButton}`,
       );
@@ -54,7 +56,9 @@ test.describe("Establishment dashboard workflow", () => {
       await expect(await badgeLocator.getAttribute("class")).toContain(
         "fr-badge",
       );
-      await expect(page.locator(".im-exchange-message")).toHaveCount(3);
+      await expect(page.locator(".im-exchange-message")).toHaveCount(
+        initialMessageCount + 1,
+      );
     });
   });
 

@@ -5,7 +5,10 @@ import {
   remoteWorkModeLabels,
   toDisplayedDate,
 } from "shared";
-import type { PlaywrightTestCallback } from "../../utils/utils";
+import {
+  type PlaywrightTestCallback,
+  waitForVisibleLoaderHidden,
+} from "../../utils/utils";
 import {
   checkAvailabilityButtons,
   type MakeFormEstablishmentFromRetryNumber,
@@ -67,8 +70,7 @@ const checkEstablishment = async (
   page: Page,
   updatedEstablishmentInfos: FormEstablishmentDto,
 ): Promise<void> => {
-  await page.waitForTimeout(1000);
-  await expect(await page.locator(".im-loader")).toBeHidden();
+  await waitForVisibleLoaderHidden(page, ".im-loader");
   const adminRight = updatedEstablishmentInfos.userRights.find(
     (right) => right.role === "establishment-admin",
   );

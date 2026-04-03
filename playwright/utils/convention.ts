@@ -85,14 +85,22 @@ export const fillConventionForm = async (page: Page) => {
     beneficiaryBirthdate,
   );
   await openConventionAccordionSection(page, 2); // Open Establishment section
+
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.conventionSection.siret}`,
     getRandomSiret(),
   );
-  await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.firstName}`,
-    faker.person.firstName(),
+  await page.waitForResponse(
+    (response) =>
+      response.url().includes("/siret/") && response.status() === 200,
+    { timeout: 30_000 },
   );
+
+  const establishmentFirstName = page.locator(
+    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.firstName}`,
+  );
+  await expect(establishmentFirstName).toBeEnabled({ timeout: 15_000 });
+  await establishmentFirstName.fill(faker.person.firstName());
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.lastName}`,
     faker.person.lastName(),

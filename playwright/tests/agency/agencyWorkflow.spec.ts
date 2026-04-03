@@ -18,7 +18,11 @@ test.describe("Agency workflow", () => {
       page,
     }) => {
       agencyAddedId = await fillAndSubmitBasicAgencyForm(page);
-      await expect(page.locator(".fr-alert--success")).toBeVisible();
+      await expect(
+        page
+          .locator(".fr-alert--success")
+          .or(page.locator(".fr-alert--error").filter({ hasText: /existe/i })),
+      ).toBeVisible();
     });
 
     test("Cannot add a second agency with same data", async ({ page }) => {

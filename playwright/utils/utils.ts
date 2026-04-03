@@ -40,21 +40,27 @@ export const fillAutocomplete = async ({
   if (await clearButton.isVisible()) {
     await clearButton.click();
   }
+
   await page.locator(locator).pressSequentially(value, {
     delay: 50,
   });
-  if (endpoint) {
-    await page.waitForResponse(`**${endpoint}**`);
-  }
-  const listbox = await page.locator(locator);
+
+  if (endpoint)
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes(endpoint) && response.status() === 200,
+      { timeout: 15_000 },
+    );
+
+  const listbox = page.locator(locator);
   await listbox.waitFor();
   const listboxId = await listbox.getAttribute("aria-controls");
   await expect(listboxId).not.toBeNull();
-  const options = await page.locator(
+  const options = page.locator(
     `#${listboxId} > div:not(.im-select__menu-notice--loading, .im-select__menu-notice--no-options)`,
   );
-  const firstOption = await options.first();
-  await expect(firstOption).toBeVisible();
+  const firstOption = options.first();
+  await expect(firstOption).toBeVisible({ timeout: 10_000 });
   await firstOption.click();
 };
 
@@ -106,4 +112,13 @@ export const expectLocatorToBeReadOnly = async (
 
 export const expectNoErrorVisible = async (page: Page) => {
   await expect(page.locator(".fr-alert--error")).not.toBeVisible();
+};
+
+export const waitForVisibleLoaderHidden = async (
+  page: Page,
+  loaderKind: ".im-loader__overlay" | ".im-loader",
+) => {
+  const loader = page.locator(loaderKind);
+  if (await loader.isVisible())
+    await loader.waitFor({ state: "hidden", timeout: 10_000 });
 };

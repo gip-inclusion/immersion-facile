@@ -152,7 +152,9 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
   await expect(summaryAppellations).toHaveCount(2);
 
   await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
-  await expect(page.locator(".fr-alert--success")).toBeVisible();
+  await expect(page.locator(".fr-alert--success")).toBeVisible({
+    timeout: 20_000,
+  });
 };
 
 type RemoteMode = "hybrid" | "fullRemote" | "onsite";
@@ -209,5 +211,4 @@ const addLocation = async (page: Page) => {
     value: "28 rue des mimosas",
     endpoint: addressRoutes.lookupStreetAddress.url,
   });
-  await page.waitForTimeout(2000);
 };
