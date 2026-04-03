@@ -16,7 +16,7 @@ export const goToAdminTab = async (page: Page, tabName: AdminTabRouteName) => {
   await page
     .locator(`#${domElementIds.header.navLinks.admin.backOffice}`)
     .click();
-  await page.waitForTimeout(500); // wait for the submenu to close (its visibility makes hard to click on tabs)
+  await page.locator(".fr-tabs__tab").first().waitFor();
   const tabLocator = await page
     .locator(".fr-tabs__list li")
     .nth(getTabIndexByTabName(adminTabRouteNames, tabName))

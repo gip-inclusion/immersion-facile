@@ -5,6 +5,7 @@ import {
   type SiretDto,
 } from "shared";
 import { goToAdminTab } from "../../utils/admin";
+import { waitForVisibleLoaderHidden } from "../../utils/utils";
 
 export const goToManageEstablishmentThroughEstablishmentDashboard = async (
   page: Page,
@@ -39,6 +40,8 @@ export const goToManageEtablishmentBySiretInAdmin = async (
   await siretInputLocator.waitFor();
   await siretInputLocator.fill(siret);
   await page.click(`#${domElementIds.admin.manageEstablishment.searchButton}`);
-  await page.waitForTimeout(1000); // waiting for fetch and render
+
+  await waitForVisibleLoaderHidden(page, ".im-loader");
+
   await expect(page.url()).toContain("pilotage-etablissement-admin");
 };

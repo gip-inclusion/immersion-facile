@@ -1,5 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import { domElementIds, type FormEstablishmentDto } from "shared";
+import { waitForVisibleLoaderHidden } from "../../utils/utils";
 
 export type MakeFormEstablishmentFromRetryNumber = (
   retryIndex: number,
@@ -21,6 +22,8 @@ export const goToNextStep = async (
   currentStep: 1 | 2 | 3 | 4,
   mode: "create" | "edit",
 ) => {
+  await waitForVisibleLoaderHidden(page, ".im-loader__overlay");
+
   const nextButton = page.locator(
     `#${domElementIds.establishment[mode].nextButtonFromStepAndMode({
       currentStep,
@@ -28,14 +31,7 @@ export const goToNextStep = async (
     })}`,
   );
   await expect(nextButton).toBeEnabled();
-  await page
-    .locator(
-      `#${domElementIds.establishment[mode].nextButtonFromStepAndMode({
-        currentStep,
-        mode,
-      })}`,
-    )
-    .click();
+  await nextButton.click();
 };
 
 export const closeModal = async (page: Page) => {

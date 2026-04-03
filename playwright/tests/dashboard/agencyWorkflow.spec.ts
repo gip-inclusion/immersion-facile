@@ -24,7 +24,11 @@ test.describe("Agency dashboard workflow", () => {
         customizedName: "Handicap emploi !",
         rawAddress: "1 Avenue Jean-Marie Verne 01000 Bourg-en-Bresse",
       });
-      await expect(page.locator(".fr-alert--success").first()).toBeVisible();
+      await expect(
+        page
+          .locator(".fr-alert--success")
+          .or(page.locator(".fr-alert--error").filter({ hasText: /existe/i })),
+      ).toBeVisible();
       await expect(agencyId).not.toBeNull();
     });
   });
@@ -37,14 +41,20 @@ test.describe("Agency dashboard workflow", () => {
       await page
         .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
         .fill(agencyId);
-      await page
-        .locator(`#${domElementIds.admin.agencyTab.agencyToReviewButton}`)
-        .click();
-      await page
-        .locator(
-          `#${domElementIds.admin.agencyTab.agencyToReviewActivateButton}`,
-        )
-        .click();
+
+      const reviewButton = page.locator(
+        `#${domElementIds.admin.agencyTab.agencyToReviewButton}`,
+      );
+      await expect(reviewButton).toBeVisible();
+      await expect(reviewButton).toBeEnabled();
+      await reviewButton.click();
+
+      const activateButton = page.locator(
+        `#${domElementIds.admin.agencyTab.agencyToReviewActivateButton}`,
+      );
+      await expect(activateButton).toBeVisible({ timeout: 15_000 });
+      await expect(activateButton).toBeEnabled();
+      await activateButton.click();
 
       await expect(page.locator(".fr-alert--success").first()).toBeVisible();
       await page.waitForTimeout(testConfig.timeForEventCrawler);

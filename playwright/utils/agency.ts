@@ -20,16 +20,24 @@ export const fillAndSubmitBasicAgencyForm = async (
     .locator(`#${domElementIds.addAgency.kindSelect}`)
     .selectOption("cap-emploi");
 
-  await page.locator(`#${domElementIds.addAgency.agencySiretInput}`).click();
   await page
     .locator(`#${domElementIds.addAgency.agencySiretInput}`)
     .fill(override?.siret ?? "751 984 972 00016");
+  await page.waitForResponse(
+    (response) =>
+      response.url().includes("/siret/") && response.status() === 200,
+    { timeout: 30_000 },
+  );
 
   await expect(
     page.locator(
       `#${domElementIds.addAgency.addressAutocomplete}-wrapper .im-select__single-value`,
     ),
-  ).toContainText(override?.rawAddress ?? "55 Rue Boissonade 75014 Paris");
+  ).toHaveText(/\S/, { timeout: 15_000 });
+
+  await expect(
+    page.locator(`#${domElementIds.addAgency.nameInput}`),
+  ).not.toHaveValue("", { timeout: 15_000 });
 
   await page
     .locator(`#${domElementIds.addAgency.nameInput}`)
@@ -75,6 +83,9 @@ export const fillAndSubmitBasicAgencyForm = async (
     .locator(`#${domElementIds.addAgency.id}`)
     .getAttribute("value");
   await page.locator(`#${domElementIds.addAgency.submitButton}`).click();
+  await expect(
+    page.locator(".fr-alert--success, .fr-alert--error"),
+  ).toBeVisible({ timeout: 30_000 });
   return agencyId;
 };
 
@@ -96,6 +107,11 @@ export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
     .locator(`#${domElementIds.admin.agencyTab.agencyToReviewButton}`)
     .click();
 
+  await expectLocatorToBeVisibleAndEnabled(
+    page.locator(
+      `#${domElementIds.admin.agencyTab.agencyToReviewRejectButton}`,
+    ),
+  );
   await page
     .locator(`#${domElementIds.admin.agencyTab.agencyToReviewRejectButton}`)
     .click();

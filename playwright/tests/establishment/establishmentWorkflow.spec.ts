@@ -1,8 +1,9 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import { test } from "@playwright/test";
 import { addMonths } from "date-fns";
-import { FormEstablishmentDtoBuilder } from "shared";
+import { domElementIds, FormEstablishmentDtoBuilder } from "shared";
 import { testConfig } from "../../custom.config";
+import { goToAdminTab } from "../../utils/admin";
 import { phoneRegexp } from "../../utils/utils";
 import { createEstablishmentForm } from "./createNewEstablishment";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
@@ -109,6 +110,36 @@ test.describe("Establishment creation and modification workflow", () => {
       .withFitForDisabledWorkers("yes-ft-certified")
       .withIsEngagedEnterprise(true)
       .build();
+
+  test.describe("Cleanup stale establishments from previous runs", () => {
+    test.use({ storageState: testConfig.adminAuthFile });
+    for (const { siret } of testEstablishments) {
+      test(`delete establishment ${siret} if it already exists`, async ({
+        page,
+      }) => {
+        page.on("dialog", (dialog) => dialog.accept());
+        await page.goto("/");
+        await goToAdminTab(page, "adminEstablishments");
+        const siretInput = page.locator(
+          `#${domElementIds.admin.manageEstablishment.siretInput}`,
+        );
+        await siretInput.waitFor();
+        await siretInput.fill(siret);
+        await page.click(
+          `#${domElementIds.admin.manageEstablishment.searchButton}`,
+        );
+        const deleteButton = page.locator(
+          `#${domElementIds.admin.manageEstablishment.submitDeleteButton}`,
+        );
+        try {
+          await deleteButton.waitFor({ timeout: 10_000 });
+          await deleteButton.click();
+        } catch {
+          // Establishment does not exist yet, nothing to clean up
+        }
+      });
+    }
+  });
 
   test.describe("Create & update establishment as establishment admin", () => {
     test.use({ storageState: testConfig.establishmentAuthFile });
