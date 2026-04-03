@@ -1,4 +1,8 @@
-import { type ConventionReadDto, cleanSpecialChars } from "shared";
+import {
+  type ConventionReadDto,
+  cleanSpecialChars,
+  sliceTextUpToBytesLimit,
+} from "shared";
 import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
@@ -28,8 +32,11 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
     options: { resyncMode: boolean };
   }>()
   .build(async ({ inputParams, uow, deps }): Promise<void> => {
-    const { convention } = inputParams;
-    const { agency, refersToAgency } = await getLinkedAgencies(uow, convention);
+    const { agency, refersToAgency } = await getLinkedAgencies(
+      uow,
+      inputParams.convention,
+    );
+
     const featureFlags = await uow.featureFlagQueries.getAll();
 
     if (
@@ -41,31 +48,21 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
     )
       return deps.options.resyncMode
         ? uow.conventionsToSyncRepository.save({
-            id: convention.id,
+            id: inputParams.convention.id,
             status: "SKIP",
             processDate: deps.timeGateway.now(),
             reason: "Agency is not of kind pole-emploi",
           })
         : undefined;
 
-    const cleanedConventionParams: ConventionReadDto = {
-      ...inputParams.convention,
-      sanitaryPreventionDescription: cleanSpecialChars(
-        inputParams.convention.sanitaryPreventionDescription,
-      ),
-      individualProtectionDescription: cleanSpecialChars(
-        inputParams.convention.individualProtectionDescription,
-      ),
-    };
-
     const response = await deps.franceTravailGateway.notifyOnConventionUpdated({
       ...inputParams,
-      convention: cleanedConventionParams,
+      convention: makeFranceTravailSupportedConvention(inputParams.convention),
     });
 
     if (deps.options.resyncMode)
       await uow.conventionsToSyncRepository.save({
-        id: convention.id,
+        id: inputParams.convention.id,
         status: "SUCCESS",
         processDate: deps.timeGateway.now(),
       });
@@ -75,8 +72,8 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
       consumerName: "France Travail",
       serviceName: broadcastToFtServiceName,
       requestParams: {
-        conventionId: convention.id,
-        conventionStatus: convention.status,
+        conventionId: inputParams.convention.id,
+        conventionStatus: inputParams.convention.status,
       },
       response: { httpStatus: response.status, body: response.body },
       occurredAt: deps.timeGateway.now().toISOString(),
@@ -86,3 +83,21 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
         : {}),
     });
   });
+
+const makeFranceTravailSupportedConvention = (
+  convention: ConventionReadDto,
+): ConventionReadDto => ({
+  ...convention,
+  establishmentTutor: {
+    ...convention.establishmentTutor,
+    job: sliceTextUpToBytesLimit(convention.establishmentTutor.job, 255),
+  },
+  sanitaryPreventionDescription: sliceTextUpToBytesLimit(
+    cleanSpecialChars(convention.sanitaryPreventionDescription),
+    255,
+  ),
+  individualProtectionDescription: sliceTextUpToBytesLimit(
+    cleanSpecialChars(convention.individualProtectionDescription),
+    255,
+  ),
+});
