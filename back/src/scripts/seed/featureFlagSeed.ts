@@ -28,7 +28,6 @@ export const featureFlagsSeed = async (uow: UnitOfWork) => {
     enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
     enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
     enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-    enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
     enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
       title: "Mon titre de highlight",
       message: "Mon message de highlight",

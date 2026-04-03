@@ -114,7 +114,6 @@ export const featureFlagsSchema: ZodSchemaWithInputMatchingOutput<FeatureFlags> 
     enableBroadcastOfConseilDepartementalToFT: featureFlagBooleanSchema,
     enableBroadcastOfCapEmploiToFT: featureFlagBooleanSchema,
     enableBroadcastOfMissionLocaleToFT: featureFlagBooleanSchema,
-    enableStandardFormatBroadcastToFranceTravail: featureFlagBooleanSchema,
     enableEstablishmentDashboardHighlight: featureFlagHighlightSchema,
     enableAgencyDashboardHighlight: featureFlagHighlightSchema,
   });

@@ -49,7 +49,6 @@ const defaultFeatureFlags: FeatureFlags = {
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-  enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
   enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(
     false,
     defaultHighlightFeatureFlagValue,
@@ -77,7 +76,6 @@ const flagsFromApi: FeatureFlags = {
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
-  enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
   enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(
     false,
     highlightFeatureFlagFromApi,
