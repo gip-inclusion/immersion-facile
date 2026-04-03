@@ -15,7 +15,7 @@ import {
   type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/events/ports/EventBus";
-import { broadcastToFtLegacyServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -81,7 +81,7 @@ describe("mark partners errored convention as handled", () => {
 
   it("Mark partner errored convention as handled", async () => {
     const savedErrorConvention: BroadcastFeedback = {
-      serviceName: broadcastToFtLegacyServiceName,
+      serviceName: broadcastToFtServiceName,
       consumerName: "Yolo",
       consumerId: "yolo-id",
       requestParams: {
@@ -155,7 +155,7 @@ describe("mark partners errored convention as handled", () => {
     const broadcastFeedbacksRepository = uow.broadcastFeedbacksRepository;
 
     const savedHandledErrorConvention: BroadcastFeedback = {
-      serviceName: broadcastToFtLegacyServiceName,
+      serviceName: broadcastToFtServiceName,
       consumerId: "my-consumer-id",
       consumerName: "My consumer name",
       requestParams: {

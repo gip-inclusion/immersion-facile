@@ -32,7 +32,6 @@ import { makeAddConvention } from "../../domains/convention/use-cases/AddConvent
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
-import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
@@ -256,16 +255,6 @@ export const createUseCases = ({
 
   const broadcastToFranceTravailOnConventionUpdates =
     makeBroadcastToFranceTravailOnConventionUpdates({
-      uowPerformer,
-      deps: {
-        franceTravailGateway: gateways.franceTravailGateway,
-        timeGateway: gateways.timeGateway,
-        options: { resyncMode: false },
-      },
-    });
-
-  const broadcastToFranceTravailOnConventionUpdatesLegacy =
-    makeBroadcastToFranceTravailOnConventionUpdatesLegacy({
       uowPerformer,
       deps: {
         franceTravailGateway: gateways.franceTravailGateway,
@@ -902,7 +891,6 @@ export const createUseCases = ({
       makeBroadcastToFranceTravailOrchestrator({
         uowPerformer,
         broadcastToFranceTravailOnConventionUpdates,
-        broadcastToFranceTravailOnConventionUpdatesLegacy,
         eventType: "CONVENTION_UPDATED",
       }),
 
@@ -910,7 +898,6 @@ export const createUseCases = ({
       makeBroadcastToFranceTravailOrchestrator({
         uowPerformer,
         broadcastToFranceTravailOnConventionUpdates,
-        broadcastToFranceTravailOnConventionUpdatesLegacy,
         eventType: "ASSESSMENT_CREATED",
       }),
 

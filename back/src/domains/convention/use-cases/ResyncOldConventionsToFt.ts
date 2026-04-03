@@ -11,10 +11,6 @@ import {
   type BroadcastToFranceTravailOnConventionUpdates,
   makeBroadcastToFranceTravailOnConventionUpdates,
 } from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
-import {
-  type BroadcastToFranceTravailOnConventionUpdatesLegacy,
-  makeBroadcastToFranceTravailOnConventionUpdatesLegacy,
-} from "./broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
 
 type ResyncOldConventionToFtReport = {
   success: number;
@@ -28,7 +24,6 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
 > {
   protected override inputSchema = z.void();
 
-  readonly #legacyBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdatesLegacy;
   readonly #standardBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
 
   #report: ResyncOldConventionToFtReport = {
@@ -48,15 +43,6 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     limit: number,
   ) {
     super(uowPerform);
-    this.#legacyBroadcastToFTUsecase =
-      makeBroadcastToFranceTravailOnConventionUpdatesLegacy({
-        uowPerformer: uowPerform,
-        deps: {
-          franceTravailGateway,
-          timeGateway,
-          options: { resyncMode: true },
-        },
-      });
     this.#standardBroadcastToFTUsecase =
       makeBroadcastToFranceTravailOnConventionUpdates({
         uowPerformer: uowPerform,
@@ -91,13 +77,7 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     conventionToSyncId: ConventionId,
   ) {
     try {
-      const { enableStandardFormatBroadcastToFranceTravail } =
-        await uow.featureFlagQueries.getAll();
-      await this.#resync({
-        uow: uow,
-        conventionToSyncId: conventionToSyncId,
-        isLegacy: !enableStandardFormatBroadcastToFranceTravail.isActive,
-      });
+      await this.#resync({ uow, conventionToSyncId });
       const updatedConventionToSync =
         await uow.conventionsToSyncRepository.getById(conventionToSyncId);
 
@@ -143,11 +123,9 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
   async #resync({
     uow,
     conventionToSyncId,
-    isLegacy,
   }: {
     uow: UnitOfWork;
     conventionToSyncId: ConventionId;
-    isLegacy: boolean;
   }): Promise<void> {
     const convention =
       await uow.conventionQueries.getConventionById(conventionToSyncId);
@@ -162,12 +140,6 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     const assessment = assessmentEntity
       ? getOnlyAssessmentDto(assessmentEntity)
       : undefined;
-
-    if (isLegacy) {
-      return this.#legacyBroadcastToFTUsecase.execute({
-        convention,
-      });
-    }
 
     return assessment
       ? this.#standardBroadcastToFTUsecase.execute({

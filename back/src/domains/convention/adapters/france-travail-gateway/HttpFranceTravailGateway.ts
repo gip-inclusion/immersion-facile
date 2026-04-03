@@ -19,7 +19,6 @@ import {
 } from "../../../core/retry-strategy/ports/RetryStrategy";
 import type {
   FranceTravailBroadcastResponse,
-  FranceTravailConvention,
   FranceTravailGateway,
 } from "../../ports/FranceTravailGateway";
 import type { BroadcastConventionParams } from "../../use-cases/broadcast/broadcastConventionParams";
@@ -145,36 +144,6 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
     );
   }
 
-  public async notifyOnConventionUpdatedLegacy(
-    ftConvention: FranceTravailConvention,
-  ): Promise<FranceTravailBroadcastResponse> {
-    logger.info({
-      message: "FtBroadcastLegacy",
-      franceTravailGatewayStatus: "total",
-      ftConnect: {
-        ftId: ftConvention.id,
-        originalId: ftConvention.originalId,
-      },
-    });
-
-    if (this.#isDev) {
-      return {
-        status: 200,
-        body: { success: true },
-      };
-    }
-
-    const conventionParams: HandleConventionParams = {
-      conventionId: ftConvention.originalId,
-      ftConventionId: ftConvention.id,
-      isLegacy: true,
-    };
-
-    return this.#postLegacyFranceTravailConvention(ftConvention)
-      .then(handleFtResponse(conventionParams))
-      .catch(handleError(conventionParams));
-  }
-
   public async notifyOnConventionUpdated(
     broadcastConventionParams: BroadcastConventionParams,
   ): Promise<FranceTravailBroadcastResponse> {
@@ -196,29 +165,11 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
 
     const conventionParams: HandleConventionParams = {
       conventionId: convention.id,
-      isLegacy: false,
     };
 
     return this.#postConvention(broadcastConventionParams)
       .then(handleFtResponse(conventionParams))
       .catch(handleError(conventionParams));
-  }
-
-  async #postLegacyFranceTravailConvention(
-    ftConvention: FranceTravailConvention,
-  ) {
-    const accessTokenResponse = await this.getAccessToken(
-      `echangespmsmp api_${this.#ftTestPrefix}immersion-prov2`,
-    );
-
-    return this.#broadcastlimiter.schedule(() =>
-      this.#httpClient.broadcastLegacyConvention({
-        body: ftConvention,
-        headers: {
-          authorization: `Bearer ${accessTokenResponse.access_token}`,
-        },
-      }),
-    );
   }
 
   async #postConvention(params: BroadcastConventionParams) {
@@ -239,26 +190,23 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
 
 type HandleConventionParams = {
   conventionId: ConventionId;
-  ftConventionId?: string;
-  isLegacy: boolean;
 };
 
 type BroadcastConventionHttpResponse = Awaited<
-  ReturnType<HttpClient<FrancetTravailRoutes>["broadcastLegacyConvention"]>
+  ReturnType<HttpClient<FrancetTravailRoutes>["broadcastConvention"]>
 >;
 
 const handleFtResponse =
-  ({ conventionId, ftConventionId, isLegacy }: HandleConventionParams) =>
+  ({ conventionId }: HandleConventionParams) =>
   (
     response: BroadcastConventionHttpResponse,
   ): FranceTravailBroadcastResponse => {
     if (response.status === 400 || response.status === 404) {
       logger.error({
-        message: `FtBroadcast${isLegacy ? "Legacy" : ""} - handled error`,
+        message: "FtBroadcast - handled error",
         franceTravailGatewayStatus: "error",
         error: new Error(JSON.stringify(response.body, null, 2)),
         ftConnect: {
-          ftId: ftConventionId,
           originalId: conventionId,
         },
       });
@@ -271,11 +219,10 @@ const handleFtResponse =
 
     if ([200, 201, 204].includes(response.status)) {
       logger.info({
-        message: `FtBroadcast${isLegacy ? "Legacy" : ""}`,
+        message: "FtBroadcast",
         franceTravailGatewayStatus: "success",
         sharedRouteResponse: response,
         ftConnect: {
-          ftId: ftConventionId,
           originalId: conventionId,
         },
       });
@@ -291,7 +238,6 @@ const handleFtResponse =
       franceTravailGatewayStatus: "error",
       error: new Error(JSON.stringify(response.body, null, 2)),
       ftConnect: {
-        ftId: ftConventionId,
         originalId: conventionId,
       },
     };
@@ -309,14 +255,13 @@ const handleFtResponse =
   };
 
 const handleError =
-  ({ conventionId, ftConventionId }: HandleConventionParams) =>
+  ({ conventionId }: HandleConventionParams) =>
   (error: any): FranceTravailBroadcastResponse => {
     const errorObject: LoggerParamsWithMessage = {
       message: `FtBroadcast - unexpected error - ${error?.message}`,
       franceTravailGatewayStatus: "error",
       error,
       ftConnect: {
-        ftId: ftConventionId,
         originalId: conventionId,
       },
     };

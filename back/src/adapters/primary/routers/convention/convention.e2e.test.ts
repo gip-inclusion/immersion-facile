@@ -635,11 +635,13 @@ describe("convention e2e", () => {
         )
         .exhaustive();
 
+      const statusJustification = "test-justification";
+
       const response = await magicLinkRequest.updateConventionStatus({
         headers: { authorization: jwt },
         body: {
           status: "REJECTED",
-          statusJustification: "test-justification",
+          statusJustification,
           conventionId: convention.id,
         },
       });
@@ -651,55 +653,25 @@ describe("convention e2e", () => {
 
       await eventCrawler.processNewEvents();
 
-      expectToEqual(
-        gateways.franceTravailGateway.legacyBroadcastConventionCalls,
-        [
-          {
-            activitesObservees: convention.immersionActivities,
-            adresseImmersion: convention.immersionAddress,
-            codeAppellation: "017751",
-            codeRome: convention.immersionAppellation.romeCode,
-            competencesObservees:
-              "Utilisation des pneus optimale, gestion de carburant",
-            dateDebut: convention.dateStart,
-            dateDemande: convention.dateSubmission,
-            dateFin: convention.dateEnd,
-            dateNaissance: new Date(
-              convention.signatories.beneficiary.birthdate,
-            ).toISOString(),
-            descriptionPreventionSanitaire: "fourniture de gel",
-            dureeImmersion: 70,
-            email: "beneficiary@email.fr",
-            emailTuteur: "establishment@example.com",
-            id: externalId,
-            nom: "Ocon",
-            nomPrenomFonctionTuteur: "Alain Prost Big Boss",
-            objectifDeImmersion: 2,
-            originalId: "a99eaca1-ee70-4c90-b3f4-668d492f7392",
-            peConnectId: "some-id",
-            prenom: "Esteban",
-            preventionSanitaire: true,
-            protectionIndividuelle: true,
-            raisonSociale: "Beta.gouv.fr",
-            signatureBeneficiaire: true,
-            signatureEntreprise: true,
-            siret: "12345678901234",
-            statut: "REJETÉ",
-            telephone: "+33123456780",
-            telephoneTuteur: "+33601010101",
-            typeAgence: "france-travail",
-            nomAgence: peAgency.name,
-            prenomValidateurRenseigne:
-              convention.validators?.agencyValidator?.firstname,
-            nomValidateurRenseigne:
-              convention.validators?.agencyValidator?.lastname,
-            rqth: "N",
-            prenomTuteur: convention.establishmentTutor.firstName,
-            nomTuteur: convention.establishmentTutor.lastName,
-            fonctionTuteur: convention.establishmentTutor.job,
+      expectToEqual(gateways.franceTravailGateway.broadcastParamsCalls, [
+        {
+          eventType: "CONVENTION_UPDATED",
+          convention: {
+            ...convention,
+            status: "REJECTED",
+            statusJustification,
+            agencyName: peAgency.name,
+            agencyDepartment: peAgency.address.departmentCode,
+            agencyContactEmail: peAgency.contactEmail,
+            agencyKind: peAgency.kind,
+            agencySiret: peAgency.agencySiret,
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: [],
+            agencyRefersTo: undefined,
+            assessment: null,
           },
-        ],
-      );
+        },
+      ]);
     });
 
     it("when a convention is ACCEPTED_BY_VALIDATOR, an Establishment Lead is created", async () => {
