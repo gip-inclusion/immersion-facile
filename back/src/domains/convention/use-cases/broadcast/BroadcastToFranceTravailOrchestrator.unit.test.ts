@@ -7,7 +7,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   UserBuilder,
-  type WithConventionDto,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
@@ -17,7 +16,6 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createAssessmentEntity } from "../../entities/AssessmentEntity";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
-import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import {
   type BroadcastToFranceTravailOrchestrator,
   makeBroadcastToFranceTravailOrchestrator,
@@ -28,8 +26,6 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
   let uow: InMemoryUnitOfWork;
   let standardBroadcastToFT: BroadcastToFranceTravailOnConventionUpdates;
   let standardBroadcastCalls: BroadcastConventionParams[];
-  let legacyBroadcastToFT: BroadcastToFranceTravailOnConventionUpdatesLegacy;
-  let legacyBroadcastCalls: WithConventionDto[];
   let broadcastToFranceTravailOrchestrator: BroadcastToFranceTravailOrchestrator;
 
   const validator = new UserBuilder().withEmail("validator@email.fr").build();
@@ -86,15 +82,12 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
   beforeEach(() => {
     ({ standardBroadcastCalls, standardBroadcastToFT } =
       createFakeStandardBroadcastToFT());
-    ({ legacyBroadcastCalls, legacyBroadcastToFT } =
-      createFakeLegacyBroadcastToFT());
     uow = createInMemoryUow();
     broadcastToFranceTravailOrchestrator =
       makeBroadcastToFranceTravailOrchestrator({
         uowPerformer: new InMemoryUowPerformer(uow),
         eventType: "CONVENTION_UPDATED",
         broadcastToFranceTravailOnConventionUpdates: standardBroadcastToFT,
-        broadcastToFranceTravailOnConventionUpdatesLegacy: legacyBroadcastToFT,
       });
 
     uow.conventionRepository.setConventions([
@@ -116,116 +109,53 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     ];
   });
 
-  describe("When enableStandardFormatBroadcastToFT feature flag is OFF", () => {
+  it("triggers standard broadcast on convention update", async () => {
+    await broadcastToFranceTravailOrchestrator.execute({
+      conventionId: convention.id,
+    });
+    expectStandardBroadcastCallsToEqual([
+      { eventType: "CONVENTION_UPDATED", convention: conventionReadDto },
+    ]);
+  });
+
+  describe("when eventType is 'ASSESSMENT_CREATED'", () => {
+    let broadcastToFranceTravailOrchestratorForAssessmentCreated: BroadcastToFranceTravailOrchestrator;
+
     beforeEach(() => {
-      uow.featureFlagRepository.update({
-        flagName: "enableStandardFormatBroadcastToFranceTravail",
-        featureFlag: { kind: "boolean", isActive: false },
-      });
-    });
-
-    it("triggers legacy broadcast", async () => {
-      await broadcastToFranceTravailOrchestrator.execute({
-        conventionId: convention.id,
-      });
-      expectLegacyBroadcastCallsToEqual([{ convention: convention }]);
-    });
-
-    it("does NOT trigger standard format broadcast", async () => {
-      await broadcastToFranceTravailOrchestrator.execute({
-        conventionId: convention.id,
-      });
-      expectStandardBroadcastCallsToEqual([]);
-    });
-
-    it("does NOTHING when eventType is 'ASSESSMENT_CREATED'", async () => {
-      const broadcastToFranceTravailOrchestratorForAssementCreated =
+      broadcastToFranceTravailOrchestratorForAssessmentCreated =
         makeBroadcastToFranceTravailOrchestrator({
           uowPerformer: new InMemoryUowPerformer(uow),
           eventType: "ASSESSMENT_CREATED",
           broadcastToFranceTravailOnConventionUpdates: standardBroadcastToFT,
-          broadcastToFranceTravailOnConventionUpdatesLegacy:
-            legacyBroadcastToFT,
         });
+    });
 
-      await broadcastToFranceTravailOrchestratorForAssementCreated.execute({
+    it("throws when assessment is missing", async () => {
+      await expectPromiseToFailWithError(
+        broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
+          conventionId: conventionWithoutAssessment.id,
+        }),
+        errors.assessment.missingAssessment({
+          conventionId: conventionWithoutAssessment.id,
+        }),
+      );
+    });
+
+    it("triggers standard broadcast with assessment when all is good", async () => {
+      await broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
         conventionId: convention.id,
       });
 
-      expectLegacyBroadcastCallsToEqual([]);
-      expectStandardBroadcastCallsToEqual([]);
-    });
-  });
-
-  describe("When enableStandardFormatBroadcastToFT feature flag is ON", () => {
-    beforeEach(() => {
-      uow.featureFlagRepository.update({
-        flagName: "enableStandardFormatBroadcastToFranceTravail",
-        featureFlag: { kind: "boolean", isActive: true },
-      });
-    });
-
-    it("triggers standard broadcast", async () => {
-      await broadcastToFranceTravailOrchestrator.execute({
-        conventionId: convention.id,
-      });
       expectStandardBroadcastCallsToEqual([
-        { eventType: "CONVENTION_UPDATED", convention: conventionReadDto },
+        {
+          eventType: "ASSESSMENT_CREATED",
+          convention: conventionReadDto,
+          assessment,
+        },
       ]);
     });
-
-    it("does NOT trigger legacy broadcast", async () => {
-      await broadcastToFranceTravailOrchestrator.execute({
-        conventionId: convention.id,
-      });
-      expectLegacyBroadcastCallsToEqual([]);
-    });
-
-    describe("when eventType is 'ASSESSMENT_CREATED'", () => {
-      let broadcastToFranceTravailOrchestratorForAssessmentCreated: BroadcastToFranceTravailOrchestrator;
-
-      beforeEach(() => {
-        broadcastToFranceTravailOrchestratorForAssessmentCreated =
-          makeBroadcastToFranceTravailOrchestrator({
-            uowPerformer: new InMemoryUowPerformer(uow),
-            eventType: "ASSESSMENT_CREATED",
-            broadcastToFranceTravailOnConventionUpdates: standardBroadcastToFT,
-            broadcastToFranceTravailOnConventionUpdatesLegacy:
-              legacyBroadcastToFT,
-          });
-      });
-
-      it("throws when assessment is missing", async () => {
-        await expectPromiseToFailWithError(
-          broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
-            conventionId: conventionWithoutAssessment.id,
-          }),
-          errors.assessment.missingAssessment({
-            conventionId: conventionWithoutAssessment.id,
-          }),
-        );
-      });
-
-      it("triggers standard broadcast, with assessment when all is good", async () => {
-        await broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
-          conventionId: convention.id,
-        });
-
-        expectLegacyBroadcastCallsToEqual([]);
-        expectStandardBroadcastCallsToEqual([
-          {
-            eventType: "ASSESSMENT_CREATED",
-            convention: conventionReadDto,
-            assessment,
-          },
-        ]);
-      });
-    });
   });
 
-  const expectLegacyBroadcastCallsToEqual = (expected: WithConventionDto[]) => {
-    expectToEqual(legacyBroadcastCalls, expected);
-  };
   const expectStandardBroadcastCallsToEqual = (
     expected: BroadcastConventionParams[],
   ) => {
@@ -244,22 +174,6 @@ const createFakeStandardBroadcastToFT = (): {
       useCaseName: "BroadcastToFranceTravailOnConventionUpdates",
       execute: async (params) => {
         standardBroadcastCalls.push(params);
-      },
-    },
-  };
-};
-
-const createFakeLegacyBroadcastToFT = (): {
-  legacyBroadcastToFT: BroadcastToFranceTravailOnConventionUpdatesLegacy;
-  legacyBroadcastCalls: WithConventionDto[];
-} => {
-  const legacyBroadcastCalls: WithConventionDto[] = [];
-  return {
-    legacyBroadcastCalls,
-    legacyBroadcastToFT: {
-      useCaseName: "BroadcastToFranceTravailOnConventionUpdates",
-      execute: async (params) => {
-        legacyBroadcastCalls.push(params);
       },
     },
   };

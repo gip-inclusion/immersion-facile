@@ -6,7 +6,6 @@ import {
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
-import type { FranceTravailConvention } from "../../ports/FranceTravailGateway";
 import { broadcastConventionParamsSchema } from "../../use-cases/broadcast/broadcastConventionParams";
 
 export const getFtTestPrefix = (ftApiUrl: AbsoluteUrl) =>
@@ -15,9 +14,6 @@ export const getFtTestPrefix = (ftApiUrl: AbsoluteUrl) =>
     : "";
 
 export type FrancetTravailRoutes = ReturnType<typeof createFranceTravailRoutes>;
-
-const franceTravailConventionSchema: ZodSchemaWithInputMatchingOutput<FranceTravailConvention> =
-  z.any();
 
 const ftBusinessError = z.object({
   codeErreur: z.string().optional(),
@@ -60,19 +56,6 @@ export const createFranceTravailRoutes = ({
         400: ftAuthError,
         429: z.any(),
         503: z.any(),
-      },
-    }),
-    broadcastLegacyConvention: defineRoute({
-      method: "post",
-      url: `${ftApiUrl}/partenaire/${ftTestPrefix}immersion-pro/v2/demandes-immersion`,
-      requestBodySchema: franceTravailConventionSchema,
-      ...withAuthorizationHeaders,
-      responses: {
-        200: z.any(),
-        201: z.any(),
-        204: z.any(),
-        400: ftBusinessError,
-        404: ftBusinessError,
       },
     }),
     broadcastConvention: defineRoute({

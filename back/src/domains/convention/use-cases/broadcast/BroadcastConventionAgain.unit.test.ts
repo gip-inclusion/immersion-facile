@@ -12,7 +12,7 @@ import {
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
-import { broadcastToFtLegacyServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import {
@@ -135,7 +135,7 @@ describe("BroadcastConventionAgain", () => {
         userWithAgencyViewerRight,
       ])("trigger ConventionBroadcastAgain event with the whole convention in payload", async (user) => {
         uow.broadcastFeedbacksRepository.save({
-          serviceName: broadcastToFtLegacyServiceName,
+          serviceName: broadcastToFtServiceName,
           consumerId: "my-consumer-id",
           consumerName: "My consumer name",
           requestParams: {
@@ -171,7 +171,7 @@ describe("BroadcastConventionAgain", () => {
         );
 
         uow.broadcastFeedbacksRepository.save({
-          serviceName: broadcastToFtLegacyServiceName,
+          serviceName: broadcastToFtServiceName,
           consumerId: "my-consumer-id",
           consumerName: "My consumer name",
           requestParams: {

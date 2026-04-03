@@ -24,7 +24,7 @@ import type { SuperTest, Test } from "supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
-import { broadcastToFtLegacyServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
@@ -186,7 +186,7 @@ describe("authenticatedConventionRoutes", () => {
       ];
       inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.broadcastFeedbacksRepository.save({
-        serviceName: broadcastToFtLegacyServiceName,
+        serviceName: broadcastToFtServiceName,
         consumerName: "France Travail",
         consumerId: null,
         subscriberErrorFeedback: { message: "Some message" },
@@ -205,7 +205,7 @@ describe("authenticatedConventionRoutes", () => {
         inMemoryUow.broadcastFeedbacksRepository.broadcastFeedbacks,
         [
           {
-            serviceName: broadcastToFtLegacyServiceName,
+            serviceName: broadcastToFtServiceName,
             consumerName: "France Travail",
             consumerId: null,
             subscriberErrorFeedback: {

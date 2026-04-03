@@ -236,11 +236,14 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     expect(inMemoryUow.notificationRepository.notifications).toHaveLength(3);
     const ftNotification =
-      gateways.franceTravailGateway.legacyBroadcastConventionCalls[0];
-    expect(ftNotification.id).toBe(externalId);
-    expectToEqual(ftNotification.statut, "DEMANDE_A_SIGNER");
-    expect(ftNotification.originalId).toBe(convention.id);
-    expect(ftNotification.email).toBe(convention.signatories.beneficiary.email);
+      gateways.franceTravailGateway.broadcastParamsCalls[0];
+    expectToEqual(ftNotification.eventType, "CONVENTION_UPDATED");
+    expectToEqual(ftNotification.convention.id, convention.id);
+    expectToEqual(ftNotification.convention.status, "READY_TO_SIGN");
+    expectToEqual(
+      ftNotification.convention.signatories.beneficiary.email,
+      convention.signatories.beneficiary.email,
+    );
     const sentEmails = gateways.notification.getSentEmails();
     expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
     expectArraysToEqualIgnoringOrder(
