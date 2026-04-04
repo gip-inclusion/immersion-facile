@@ -239,6 +239,27 @@ describe("/offers route", () => {
         });
       });
 
+      it("accepts more than 20 items in query params arrays", async () => {
+        // Act and assert
+        const result = await httpClient.getOffers({
+          queryParams: {
+            appellationCodes: Array(21).fill(immersionOffer.appellationCode),
+            sortBy: "score",
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: {
+            data: [],
+            pagination: {
+              ...getBasicPagination(),
+              totalRecords: 0,
+            },
+          },
+        });
+      });
+
       it("with given appellationCode and position", async () => {
         const immersionOffer = new OfferEntityBuilder()
           .withRomeCode(establishmentAggregate2.offers[0].romeCode)

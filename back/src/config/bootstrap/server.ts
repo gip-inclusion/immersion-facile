@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import express, { type Express } from "express";
 import type { HttpError } from "http-errors";
 import PinoHttp from "pino-http";
+import qs from "qs";
 import { createAddressRouter } from "../../adapters/primary/routers/address/createAddressRouter";
 import { createAdminRouter } from "../../adapters/primary/routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "../../adapters/primary/routers/agencies/createAgenciesRouter";
@@ -50,6 +51,13 @@ export const createApp = async (
   config: AppConfig,
 ): Promise<CreateAppProperties> => {
   const app = express();
+
+  app.set("query parser", (str: string) =>
+    qs.parse(str, {
+      allowPrototypes: true,
+      arrayLimit: 100,
+    }),
+  );
 
   app.use(
     PinoHttp({
