@@ -907,6 +907,8 @@ export const domElementIds = {
     editAgencyUserRoleSubmitButton:
       "im-profile-form-edit-agency__users-submit-button",
     registerAgenciesSearchLink: "im-profile__register-agencies-search-link",
+  },
+  myProfileEstablishmentRegistration: {
     registerEstablishmentButton: "im-profile__register-establishment-button",
     registerEstablishmentSearch: "im-register-establishment__search",
   },

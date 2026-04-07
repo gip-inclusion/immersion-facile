@@ -1,4 +1,5 @@
 import {
+  type AbsoluteUrl,
   type BrevoInboundBody,
   ConnectedUserBuilder,
   DiscussionBuilder,
@@ -155,6 +156,8 @@ describe("AddExchangeToDiscussion", () => {
           timeGateway,
         ),
         timeGateway,
+        immersionFacileBaseUrl:
+          "https://www.fake-immersion-facile-base-url.com",
       },
       uowPerformer: new InMemoryUowPerformer(uow),
     });
@@ -711,13 +714,6 @@ describe("AddExchangeToDiscussion", () => {
             const expectedResult: DiscussionExchangeForbiddenParams = {
               sender: "establishment",
               reason: "discussion_completed",
-              admins: [
-                {
-                  firstName: adminUserEstablishment2.firstName,
-                  lastName: adminUserEstablishment2.lastName,
-                  email: adminUserEstablishment2.email,
-                },
-              ],
             };
             expectToEqual(
               await addExchangeToDiscussion.execute(
@@ -790,13 +786,6 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(result, {
               reason: "discussion_completed",
               sender: "establishment",
-              admins: [
-                {
-                  firstName: adminUserEstablishment2.firstName,
-                  lastName: adminUserEstablishment2.lastName,
-                  email: adminUserEstablishment2.email,
-                },
-              ],
             });
 
             expectToEqual(uow.discussionRepository.discussions, [
@@ -848,13 +837,6 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(result, {
               reason: "discussion_completed",
               sender: "potentialBeneficiary",
-              admins: [
-                {
-                  firstName: adminUserEstablishment2.firstName,
-                  lastName: adminUserEstablishment2.lastName,
-                  email: adminUserEstablishment2.email,
-                },
-              ],
             });
 
             expectToEqual(uow.discussionRepository.discussions, [
@@ -874,13 +856,6 @@ describe("AddExchangeToDiscussion", () => {
                   params: {
                     reason: "discussion_completed",
                     sender: "potentialBeneficiary",
-                    admins: [
-                      {
-                        firstName: adminUserEstablishment2.firstName,
-                        lastName: adminUserEstablishment2.lastName,
-                        email: adminUserEstablishment2.email,
-                      },
-                    ],
                   },
                   recipients: [discussionRejected.potentialBeneficiary.email],
                 },
@@ -894,6 +869,7 @@ describe("AddExchangeToDiscussion", () => {
   });
 
   describe("wrong paths", () => {
+    const requestEstablishmentRegistrationUrl: AbsoluteUrl = `https://www.fake-immersion-facile-base-url.com/mon-profil/rattachement-entreprise?siret=${pendingDiscussion1.siret}`;
     it("throws an error if the discussion does not exist", async () => {
       const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
 
@@ -981,7 +957,6 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "establishment",
-            admins: [],
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -1002,7 +977,6 @@ describe("AddExchangeToDiscussion", () => {
                 params: {
                   reason: "establishment_missing",
                   sender: "establishment",
-                  admins: [],
                 },
                 recipients: [adminUserEstablishment1.email],
               },
@@ -1030,7 +1004,6 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "establishment",
-            admins: [],
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -1081,7 +1054,6 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "potentialBeneficiary",
-            admins: [],
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -1102,7 +1074,6 @@ describe("AddExchangeToDiscussion", () => {
                 params: {
                   reason: "establishment_missing",
                   sender: "potentialBeneficiary",
-                  admins: [],
                 },
                 recipients: [pendingDiscussion1.potentialBeneficiary.email],
               },
@@ -1158,13 +1129,7 @@ describe("AddExchangeToDiscussion", () => {
           {
             reason: "user_unknown_or_missing_rights_on_establishment",
             sender: "establishment",
-            admins: [
-              {
-                firstName: adminUserEstablishment1.firstName,
-                lastName: adminUserEstablishment1.lastName,
-                email: adminUserEstablishment1.email,
-              },
-            ],
+            requestEstablishmentRegistrationUrl,
           },
         );
 
@@ -1186,13 +1151,7 @@ describe("AddExchangeToDiscussion", () => {
               params: {
                 reason: "user_unknown_or_missing_rights_on_establishment",
                 sender: "establishment",
-                admins: [
-                  {
-                    firstName: adminUserEstablishment1.firstName,
-                    lastName: adminUserEstablishment1.lastName,
-                    email: adminUserEstablishment1.email,
-                  },
-                ],
+                requestEstablishmentRegistrationUrl,
               },
               recipients: [contactUserEstablishment2.email],
             },
@@ -1252,13 +1211,7 @@ describe("AddExchangeToDiscussion", () => {
           {
             reason: "user_unknown_or_missing_rights_on_establishment",
             sender: "establishment",
-            admins: [
-              {
-                firstName: adminConnectedUserEstablishment1.firstName,
-                lastName: adminConnectedUserEstablishment1.lastName,
-                email: adminConnectedUserEstablishment1.email,
-              },
-            ],
+            requestEstablishmentRegistrationUrl,
           },
         );
 
@@ -1280,13 +1233,7 @@ describe("AddExchangeToDiscussion", () => {
               params: {
                 reason: "user_unknown_or_missing_rights_on_establishment",
                 sender: "establishment",
-                admins: [
-                  {
-                    firstName: adminConnectedUserEstablishment1.firstName,
-                    lastName: adminConnectedUserEstablishment1.lastName,
-                    email: adminConnectedUserEstablishment1.email,
-                  },
-                ],
+                requestEstablishmentRegistrationUrl,
               },
               recipients: [adminConnectedUserEstablishment2.email],
             },
@@ -1353,13 +1300,7 @@ describe("AddExchangeToDiscussion", () => {
           {
             reason: "user_unknown_or_missing_rights_on_establishment",
             sender: "establishment",
-            admins: [
-              {
-                firstName: adminConnectedUserEstablishment1.firstName,
-                lastName: adminConnectedUserEstablishment1.lastName,
-                email: adminConnectedUserEstablishment1.email,
-              },
-            ],
+            requestEstablishmentRegistrationUrl,
           },
         );
 
@@ -1381,13 +1322,7 @@ describe("AddExchangeToDiscussion", () => {
               params: {
                 reason: "user_unknown_or_missing_rights_on_establishment",
                 sender: "establishment",
-                admins: [
-                  {
-                    firstName: adminConnectedUserEstablishment1.firstName,
-                    lastName: adminConnectedUserEstablishment1.lastName,
-                    email: adminConnectedUserEstablishment1.email,
-                  },
-                ],
+                requestEstablishmentRegistrationUrl,
               },
               recipients: [connectedUserWithNoRightsOnDiscussion.email],
             },
@@ -1445,13 +1380,7 @@ describe("AddExchangeToDiscussion", () => {
           {
             reason: "user_unknown_or_missing_rights_on_establishment",
             sender: "potentialBeneficiary",
-            admins: [
-              {
-                firstName: adminUserEstablishment1.firstName,
-                lastName: adminUserEstablishment1.lastName,
-                email: adminUserEstablishment1.email,
-              },
-            ],
+            requestEstablishmentRegistrationUrl,
           },
         );
 
@@ -1473,13 +1402,7 @@ describe("AddExchangeToDiscussion", () => {
               params: {
                 reason: "user_unknown_or_missing_rights_on_establishment",
                 sender: "potentialBeneficiary",
-                admins: [
-                  {
-                    firstName: adminUserEstablishment1.firstName,
-                    lastName: adminUserEstablishment1.lastName,
-                    email: adminUserEstablishment1.email,
-                  },
-                ],
+                requestEstablishmentRegistrationUrl,
               },
               recipients: [unknownUser.email],
             },
@@ -1554,13 +1477,7 @@ describe("AddExchangeToDiscussion", () => {
         {
           reason: "user_unknown_or_missing_rights_on_establishment",
           sender: "establishment",
-          admins: [
-            {
-              firstName: adminUserEstablishment1.firstName,
-              lastName: adminUserEstablishment1.lastName,
-              email: adminUserEstablishment1.email,
-            },
-          ],
+          requestEstablishmentRegistrationUrl: `https://www.fake-immersion-facile-base-url.com/mon-profil/rattachement-entreprise?siret=${pendingDiscussion1.siret}`,
         },
       );
 
@@ -1582,13 +1499,7 @@ describe("AddExchangeToDiscussion", () => {
             params: {
               reason: "user_unknown_or_missing_rights_on_establishment",
               sender: "establishment",
-              admins: [
-                {
-                  firstName: adminUserEstablishment1.firstName,
-                  lastName: adminUserEstablishment1.lastName,
-                  email: adminUserEstablishment1.email,
-                },
-              ],
+              requestEstablishmentRegistrationUrl: `https://www.fake-immersion-facile-base-url.com/mon-profil/rattachement-entreprise?siret=${pendingDiscussion1.siret}`,
             },
             recipients: [userWithPendingRight.email],
           },

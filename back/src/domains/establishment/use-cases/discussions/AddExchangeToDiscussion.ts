@@ -1,4 +1,5 @@
 import {
+  type AbsoluteUrl,
   type Attachment,
   attachmentSchema,
   type BusinessName,
@@ -17,6 +18,7 @@ import {
   emailSchema,
   errors,
   exchangeRoleSchema,
+  frontRoutes,
   localization,
   messageSchema,
   type UserId,
@@ -105,6 +107,7 @@ type MessageInputFromDashboardWithUserId = MessageInputFromDashboard & {
 };
 
 type Deps = {
+  immersionFacileBaseUrl: AbsoluteUrl;
   createNewEvent: CreateNewEvent;
   saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   timeGateway: TimeGateway;
@@ -169,7 +172,6 @@ const processSendMessage = async ({
         discussion,
         source,
         messageInput,
-        establishment,
         reason: !establishment
           ? "establishment_missing"
           : "discussion_completed",
@@ -252,7 +254,6 @@ const onEstablishmentAndDiscussionNotRejected = async ({
       source,
       messageInput,
       reason: "user_unknown_or_missing_rights_on_establishment",
-      establishment,
       deps,
     });
 
@@ -335,7 +336,6 @@ const notifyForbidden = async ({
   source,
   messageInput,
   reason,
-  establishment,
   deps,
 }: {
   uow: UnitOfWork;
@@ -343,29 +343,25 @@ const notifyForbidden = async ({
   source: InputSource;
   messageInput: MessageInput;
   reason: DiscussionExchangeForbiddenReason;
-  establishment?: EstablishmentAggregate;
   deps: Deps;
 }): Promise<DiscussionExchangeForbiddenParams> => {
-  const adminUsers = establishment
-    ? await uow.userRepository.getByIds(
-        establishment.userRights
-          .filter((right) => right.role === "establishment-admin")
-          .map(({ userId }) => userId),
-      )
-    : [];
-
-  const params: DiscussionExchangeForbiddenParams = {
-    sender:
-      messageInput.recipientRole === "establishment"
-        ? "potentialBeneficiary"
-        : "establishment",
-    reason,
-    admins: adminUsers.map(({ firstName, lastName, email }) => ({
-      firstName,
-      lastName,
-      email,
-    })),
-  };
+  const params: DiscussionExchangeForbiddenParams =
+    reason === "user_unknown_or_missing_rights_on_establishment"
+      ? {
+          sender:
+            messageInput.recipientRole === "establishment"
+              ? "potentialBeneficiary"
+              : "establishment",
+          reason,
+          requestEstablishmentRegistrationUrl: `${deps.immersionFacileBaseUrl}/${frontRoutes.profile}/${frontRoutes.myProfileEstablishmentRegistration}?siret=${discussion.siret}`,
+        }
+      : {
+          sender:
+            messageInput.recipientRole === "establishment"
+              ? "potentialBeneficiary"
+              : "establishment",
+          reason,
+        };
 
   if (source === "inbound-parsing" && isMessageInputFromEmail(messageInput))
     await deps.saveNotificationAndRelatedEvent(uow, {

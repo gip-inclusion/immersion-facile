@@ -47,6 +47,7 @@ export const frontRoutes = {
   magicLinkInterstitial: "connexion-interstitiel",
   manageConvention: "pilotage-convention",
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
+  myProfileEstablishmentRegistration: "rattachement-entreprise",
   profile: "mon-profil",
   search: "recherche",
   externalSearch: "recherche-partenaires",
