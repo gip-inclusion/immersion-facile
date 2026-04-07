@@ -3,7 +3,7 @@ import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
-import { createFranceTravailRoutes } from "../../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+import { createFranceTravailRoutes } from "../../domains/convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "../../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryFranceTravailGateway } from "../../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import { HttpAddressGateway } from "../../domains/core/address/adapters/HttpAddressGateway";

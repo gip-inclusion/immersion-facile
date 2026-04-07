@@ -25,7 +25,7 @@ import type { BroadcastConventionParams } from "../../use-cases/broadcast/broadc
 import {
   type FrancetTravailRoutes,
   getFtTestPrefix,
-} from "./FrancetTravailRoutes";
+} from "./FranceTravailRoutes";
 
 const logger = createLogger(__filename);
 

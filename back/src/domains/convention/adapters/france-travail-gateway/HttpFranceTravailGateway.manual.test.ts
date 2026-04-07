@@ -19,7 +19,7 @@ import type { WithCache } from "../../../core/caching-gateway/port/WithCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { isBroadcastResponseOk } from "../../ports/FranceTravailGateway";
 import type { BroadcastConventionParams } from "../../use-cases/broadcast/broadcastConventionParams";
-import { createFranceTravailRoutes } from "./FrancetTravailRoutes";
+import { createFranceTravailRoutes } from "./FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "./HttpFranceTravailGateway";
 
 const config = AppConfig.createFromEnv();
