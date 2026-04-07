@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, setMilliseconds } from "date-fns";
 import {
   type AdminRoutes,
   AgencyDtoBuilder,
@@ -712,7 +712,7 @@ describe("Admin router", () => {
         {
           ...authorizedUnJeuneUneSolutionApiConsumer,
           createdAt: now.toISOString(),
-          currentKeyIssuedAt: now.toISOString(),
+          currentKeyIssuedAt: setMilliseconds(now, 0).toISOString(),
           revokedAt: null,
         },
       ]);

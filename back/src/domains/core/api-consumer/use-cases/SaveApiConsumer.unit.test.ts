@@ -1,4 +1,4 @@
-import { addMilliseconds, addYears } from "date-fns";
+import { addMilliseconds, addYears, setMilliseconds } from "date-fns";
 import {
   type ApiConsumer,
   ConnectedUserBuilder,
@@ -20,19 +20,19 @@ import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorIm
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../adapters/InMemoryApiConsumerRepository";
 import { SaveApiConsumer } from "./SaveApiConsumer";
 
-const backofficeAdminBuilder = new ConnectedUserBuilder()
-  .withId("backoffice-admin")
-  .withIsAdmin(true);
-const connectedBackofficeAdmin = backofficeAdminBuilder.build();
-const backofficeAdmin = backofficeAdminBuilder.buildUser();
-
-const simpleUserBuilder = new ConnectedUserBuilder()
-  .withId("simple-user")
-  .withIsAdmin(false);
-const connectedSimpleUser = simpleUserBuilder.build();
-const simpleUser = simpleUserBuilder.buildUser();
-
 describe("SaveApiConsumer", () => {
+  const backofficeAdminBuilder = new ConnectedUserBuilder()
+    .withId("backoffice-admin")
+    .withIsAdmin(true);
+  const connectedBackofficeAdmin = backofficeAdminBuilder.build();
+  const backofficeAdmin = backofficeAdminBuilder.buildUser();
+
+  const simpleUserBuilder = new ConnectedUserBuilder()
+    .withId("simple-user")
+    .withIsAdmin(false);
+  const connectedSimpleUser = simpleUserBuilder.build();
+  const simpleUser = simpleUserBuilder.buildUser();
+
   let uow: InMemoryUnitOfWork;
   let saveApiConsumer: SaveApiConsumer;
   let timeGateway: CustomTimeGateway;
@@ -40,7 +40,9 @@ describe("SaveApiConsumer", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    timeGateway = new CustomTimeGateway();
+    timeGateway = new CustomTimeGateway(
+      addMilliseconds(new Date("2024-01-01"), 203),
+    );
     uuidGenerator = new TestUuidGenerator();
     uow.userRepository.users = [backofficeAdmin, simpleUser];
     saveApiConsumer = new SaveApiConsumer(
@@ -56,9 +58,6 @@ describe("SaveApiConsumer", () => {
 
   describe("Right paths", () => {
     it("Adds a new api consumer if not existing", async () => {
-      const today = new Date("2023-09-22");
-      const justAfterToday = addMilliseconds(today, 1);
-      timeGateway.setNextDates([today, justAfterToday]);
       const result = await saveApiConsumer.execute(
         createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
@@ -71,20 +70,24 @@ describe("SaveApiConsumer", () => {
         generateApiConsumerJwtTestFn({
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
           version: 1,
+          iat: setMilliseconds(timeGateway.now(), 0).getTime() / 1000,
         }),
       );
       expectToEqual(uow.apiConsumerRepository.consumers, [
         {
           ...authorizedUnJeuneUneSolutionApiConsumer,
-          createdAt: today.toISOString(),
-          currentKeyIssuedAt: today.toISOString(),
+          createdAt: timeGateway.now().toISOString(),
+          currentKeyIssuedAt: setMilliseconds(
+            timeGateway.now(),
+            0,
+          ).toISOString(),
           revokedAt: null,
         },
       ]);
       expectToEqual(uow.outboxRepository.events, [
         {
           id: uuidGenerator.new(),
-          occurredAt: justAfterToday.toISOString(),
+          occurredAt: timeGateway.now().toISOString(),
           topic: "ApiConsumerSaved",
           payload: {
             consumerId: authorizedUnJeuneUneSolutionApiConsumer.id,
