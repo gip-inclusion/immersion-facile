@@ -1,11 +1,10 @@
+import { setMilliseconds } from "date-fns";
 import { keys } from "ramda";
 import {
   type ApiConsumer,
   type ApiConsumerJwt,
-  type ApiConsumerRight,
   type ApiConsumerRights,
   type ConnectedUser,
-  type CreateWebhookSubscription,
   type WriteApiConsumerParams,
   writeApiConsumerSchema,
 } from "shared";
@@ -54,63 +53,76 @@ export class SaveApiConsumer extends TransactionalUseCase<
     );
     const isNewApiConsumer = !existingApiConsumer;
 
-    const apiConsumer = this.#buildApiConsumerWithoutSubscription(
-      input,
-      existingApiConsumer,
-    );
+    const keyIssuedAt = setMilliseconds(this.#timeGateway.now(), 0);
 
-    await uow.apiConsumerRepository.save(apiConsumer);
-
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "ApiConsumerSaved",
-        payload: {
-          consumerId: input.id,
-          triggeredBy: {
-            kind: "connected-user",
-            userId: currentUser.id,
+    await Promise.all([
+      uow.apiConsumerRepository.save(
+        this.#buildApiConsumerWithoutSubscription({
+          input,
+          existingApiConsumer,
+          keyIssuedAt,
+        }),
+      ),
+      uow.outboxRepository.save(
+        this.#createNewEvent({
+          topic: "ApiConsumerSaved",
+          payload: {
+            consumerId: input.id,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: currentUser.id,
+            },
           },
-        },
-      }),
-    );
+        }),
+      ),
+    ]);
 
-    if (isNewApiConsumer)
-      return this.#generateApiConsumerJwt({
-        id: input.id,
-        version: 1,
-      });
-
-    return;
+    return isNewApiConsumer
+      ? this.#generateApiConsumerJwt({
+          id: input.id,
+          version: 1,
+          iat: keyIssuedAt.getTime() / 1000,
+        })
+      : undefined;
   }
 
-  #buildApiConsumerWithoutSubscription(
-    input: WriteApiConsumerParams,
-    existingApiConsumer: ApiConsumer | undefined,
-  ): ApiConsumer {
-    const rights = keys(input.rights).reduce((acc, rightName) => {
-      const subscriptions = existingApiConsumer
-        ? existingApiConsumer.rights[rightName].subscriptions
-        : [];
-      const newRight = {
-        ...input.rights[rightName],
-        ...acc[rightName],
-        subscriptions,
-      } satisfies ApiConsumerRight<unknown, CreateWebhookSubscription>;
-
-      return {
+  #buildApiConsumerWithoutSubscription({
+    input,
+    existingApiConsumer,
+    keyIssuedAt,
+  }: {
+    input: WriteApiConsumerParams;
+    existingApiConsumer: ApiConsumer | undefined;
+    keyIssuedAt: Date;
+  }): ApiConsumer {
+    const updatedRights = keys(input.rights).reduce(
+      (acc, rightName) => ({
         ...acc,
-        [rightName]: newRight,
-      };
-    }, {} as ApiConsumerRights);
-
-    const now = this.#timeGateway.now().toISOString();
+        [rightName]: {
+          ...input.rights[rightName],
+          ...acc[rightName],
+          subscriptions: existingApiConsumer
+            ? existingApiConsumer.rights[rightName].subscriptions
+            : [],
+        },
+      }),
+      {} as ApiConsumerRights,
+    );
 
     return {
       ...input,
-      createdAt: existingApiConsumer?.createdAt ?? now,
-      rights,
-      revokedAt: existingApiConsumer?.revokedAt ?? null,
-      currentKeyIssuedAt: existingApiConsumer?.currentKeyIssuedAt ?? now,
+      rights: updatedRights,
+      ...(existingApiConsumer
+        ? {
+            currentKeyIssuedAt: existingApiConsumer.currentKeyIssuedAt,
+            createdAt: existingApiConsumer.createdAt,
+            revokedAt: existingApiConsumer.revokedAt,
+          }
+        : {
+            createdAt: this.#timeGateway.now().toISOString(),
+            currentKeyIssuedAt: keyIssuedAt.toISOString(),
+            revokedAt: null,
+          }),
     };
   }
 }
