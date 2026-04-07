@@ -190,6 +190,7 @@ describe("PgPhoneRepository", () => {
       .buildUser();
     const establishmentUserRight: EstablishmentUserRight = {
       role: "establishment-contact",
+      status: "ACCEPTED",
       shouldReceiveDiscussionNotifications: false,
       userId: establishmentUser.id,
       phone: phoneNumber,
