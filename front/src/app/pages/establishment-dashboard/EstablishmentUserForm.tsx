@@ -2,7 +2,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -45,12 +45,14 @@ export const EstablishmentUserForm = ({
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const route = useRoute() as Route<
     | typeof routes.establishmentDashboardFormEstablishment
+    | typeof routes.manageEstablishmentAdmin
     | typeof routes.myProfileEstablishmentRegistration
   >;
   const isEstablishmentDashboardFormEstablishment =
     route.name === "establishmentDashboardFormEstablishment";
   const isMyProfileEstablishmentRegistration =
     route.name === "myProfileEstablishmentRegistration";
+  const isManageEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
   const dispatch = useDispatch();
   const emptyValues = useRef({
     email: "",
@@ -61,7 +63,10 @@ export const EstablishmentUserForm = ({
     isMainContactByPhone: false,
   });
 
-  const defaultValues = { ...emptyValues.current, ...alreadyExistingUserRight };
+  const defaultValues = useMemo(
+    () => ({ ...emptyValues.current, ...alreadyExistingUserRight }),
+    [alreadyExistingUserRight],
+  );
 
   const methods = useForm<FormEstablishmentUserRight>({
     resolver: zodResolver(formEstablishmentUserRightSchema),
@@ -80,7 +85,10 @@ export const EstablishmentUserForm = ({
   const { formId } = useFormModal();
 
   const onSubmit = (data: FormEstablishmentUserRight) => {
-    if (isEstablishmentDashboardFormEstablishment) {
+    if (
+      isEstablishmentDashboardFormEstablishment ||
+      isManageEstablishmentAdmin
+    ) {
       const updatedFormEstablishment = {
         ...formEstablishment,
         userRights: mergeUserRights(formEstablishment.userRights, data),
@@ -114,7 +122,7 @@ export const EstablishmentUserForm = ({
 
   useEffect(() => {
     reset(defaultValues);
-  }, [alreadyExistingUserRight, reset]);
+  }, [defaultValues, reset]);
 
   const values = watch();
 
