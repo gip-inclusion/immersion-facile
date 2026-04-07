@@ -2,7 +2,7 @@ import type { RedisClientType } from "redis";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
 import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
-import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { makeRedisWithCache } from "../../../core/caching-gateway/adapters/makeRedisWithCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";

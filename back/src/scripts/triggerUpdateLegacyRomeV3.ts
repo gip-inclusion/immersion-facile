@@ -14,7 +14,7 @@ import {
   HttpRome3Gateway,
   makeRome3Routes,
 } from "../domains/agency/adapters/ft-agencies-referential/HttpRome3Gateway";
-import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { withNoCache } from "../domains/core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";

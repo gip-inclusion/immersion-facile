@@ -10,6 +10,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`
     INSERT INTO feature_flags(flag_name, is_active, kind)
-    VALUES ('enableStandardFormatBroadcastToFranceTravail', false, 'boolean')
+    VALUES ('enableStandardFormatBroadcastToFranceTravail', true, 'boolean')
   `);
 }

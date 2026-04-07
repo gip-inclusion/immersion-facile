@@ -3,7 +3,7 @@ import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   createFranceTravailRoutes,
   type FrancetTravailRoutes,
-} from "../../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+} from "../../domains/convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { makeAxiosInstances } from "../../utils/axiosUtils";
 import type { AppConfig } from "../bootstrap/appConfig";
 

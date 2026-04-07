@@ -12,7 +12,7 @@ import {
   HttpRome4Gateway,
   makeRome4Routes,
 } from "../domains/agency/adapters/ft-agencies-referential/HttpRome4Gateway";
-import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { makeRedisWithCache } from "../domains/core/caching-gateway/adapters/makeRedisWithCache";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";

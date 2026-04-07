@@ -3,7 +3,7 @@ import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeConnectedRedisClient } from "../config/bootstrap/cache";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";
-import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
 import { makeRedisWithCache } from "../domains/core/caching-gateway/adapters/makeRedisWithCache";

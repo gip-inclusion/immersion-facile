@@ -11,7 +11,7 @@ import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeConnectedRedisClient } from "../../../../config/bootstrap/cache";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
-import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+import { createFranceTravailRoutes } from "../../../convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { makeRedisWithCache } from "../../../core/caching-gateway/adapters/makeRedisWithCache";
 import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
