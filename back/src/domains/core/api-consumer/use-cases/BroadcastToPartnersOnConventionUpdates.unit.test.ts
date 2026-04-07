@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type AgencyKind,
   AssessmentDtoBuilder,
   type BroadcastFeedback,
   ConnectedUserBuilder,
@@ -531,5 +532,102 @@ describe("Broadcast to partners on updated convention", () => {
     ];
 
     expectToEqual(subscribersGateway.calls, expectedCallsAfterFirstExecute);
+  });
+
+  describe("when previousAgencyId is provided (convention transfer)", () => {
+    const previousAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("previous-agency")
+        .withKind("pole-emploi" as AgencyKind)
+        .build(),
+      {
+        [counsellor1.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+        [validator1.id]: { roles: ["validator"], isNotifiedByEmail: true },
+      },
+    );
+
+    const previousAgencySubscriptionParams: SubscriptionParams = {
+      callbackHeaders: { authorization: "prev-agency-auth" },
+      callbackUrl: "https://www.previous-agency-service.com/convention-updated",
+    };
+
+    const apiConsumerForPreviousAgency = new ApiConsumerBuilder()
+      .withId("api-consumer-previous-agency")
+      .withConventionRight({
+        kinds: ["SUBSCRIPTION"],
+        scope: { agencyIds: [previousAgency.id] },
+        subscriptions: [
+          {
+            ...previousAgencySubscriptionParams,
+            subscribedEvent: "convention.updated",
+            createdAt: new Date().toISOString(),
+            id: "prev-subscription-id",
+          },
+        ],
+      })
+      .build();
+
+    it("broadcasts to previous agency's consumers when transferring", async () => {
+      uow.agencyRepository.agencies = [
+        agency1,
+        agency2,
+        agencyWithRefersTo,
+        previousAgency,
+      ];
+      uow.conventionRepository.setConventions([convention1]);
+      uow.apiConsumerRepository.consumers = [
+        apiConsumer1,
+        apiConsumerForPreviousAgency,
+      ];
+
+      await broadcastUpdatedConvention.execute({
+        conventionId: convention1.id,
+        previousAgencyId: previousAgency.id,
+      });
+
+      expectToEqual(subscribersGateway.calls.length, 2);
+    });
+
+    it("does not double-broadcast when previous agency consumer already matches new agency", async () => {
+      uow.agencyRepository.agencies = [
+        agency1,
+        agency2,
+        agencyWithRefersTo,
+        previousAgency,
+      ];
+      uow.conventionRepository.setConventions([convention1]);
+      uow.apiConsumerRepository.consumers = [apiConsumer1];
+
+      await broadcastUpdatedConvention.execute({
+        conventionId: convention1.id,
+        previousAgencyId: previousAgency.id,
+      });
+
+      expectToEqual(subscribersGateway.calls.length, 1);
+    });
+
+    it("works the same as without previousAgencyId when previous agency has no matching consumers", async () => {
+      const agencyWithNoConsumers = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("no-consumers-agency")
+          .withKind("autre" as AgencyKind)
+          .build(),
+      );
+      uow.agencyRepository.agencies = [
+        agency1,
+        agency2,
+        agencyWithRefersTo,
+        agencyWithNoConsumers,
+      ];
+      uow.conventionRepository.setConventions([convention1]);
+      uow.apiConsumerRepository.consumers = [apiConsumer1];
+
+      await broadcastUpdatedConvention.execute({
+        conventionId: convention1.id,
+        previousAgencyId: agencyWithNoConsumers.id,
+      });
+
+      expectToEqual(subscribersGateway.calls.length, 1);
+    });
   });
 });

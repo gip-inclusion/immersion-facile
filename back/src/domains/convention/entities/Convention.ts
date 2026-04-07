@@ -1,6 +1,7 @@
 import { uniq } from "ramda";
 import {
   type AgencyDto,
+  type AgencyId,
   type AgencyKind,
   type AgencyWithUsersRights,
   type ApiConsumer,
@@ -238,15 +239,12 @@ export const throwErrorIfPhoneNumberNotValid = ({
     });
 };
 
-export const getLinkedAgencies = async (
+export const getLinkedAgenciesFromAgencyId = async (
   uow: UnitOfWork,
-  convention: ConventionDto,
+  agencyId: AgencyId,
 ): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> => {
-  const agencyWithRights = await uow.agencyRepository.getById(
-    convention.agencyId,
-  );
-  if (!agencyWithRights)
-    throw errors.agency.notFound({ agencyId: convention.agencyId });
+  const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+  if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
 
   const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
@@ -264,6 +262,12 @@ export const getLinkedAgencies = async (
     refersToAgency: await agencyWithRightToAgencyDto(uow, refersToAgency),
   };
 };
+
+export const getLinkedAgencies = async (
+  uow: UnitOfWork,
+  convention: ConventionDto,
+): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> =>
+  getLinkedAgenciesFromAgencyId(uow, convention.agencyId);
 
 export const shouldBroadcastToFranceTravail = ({
   agency,

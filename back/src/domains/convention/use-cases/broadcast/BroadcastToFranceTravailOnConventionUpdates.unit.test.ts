@@ -640,4 +640,117 @@ describe("Broadcasts events to France Travail", () => {
       });
     });
   });
+
+  describe("when previousAgencyId is provided", () => {
+    const peAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("pe-agency-for-transfer")
+        .withKind("pole-emploi")
+        .build(),
+    );
+
+    const siaeAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("siae-agency-for-transfer")
+        .withKind("structure-IAE")
+        .build(),
+    );
+
+    const autreAgency = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("autre-agency-for-transfer")
+        .withKind("autre")
+        .build(),
+    );
+
+    const conventionOnSiaeAgency = new ConventionDtoBuilder()
+      .withId("44440000-0000-4000-9000-000000000001")
+      .withAgencyId(siaeAgency.id)
+      .build();
+
+    it("broadcasts when current agency does not qualify but previous agency does", async () => {
+      uow.agencyRepository.agencies = [siaeAgency, peAgency];
+
+      await broadcastToFranceTravailOnConventionUpdates.execute({
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDtoFrom({
+          convention: conventionOnSiaeAgency,
+          agency: {
+            ...siaeAgency,
+            validatorEmails: [],
+            counsellorEmails: [],
+          },
+        }),
+        previousAgencyId: peAgency.id,
+      });
+
+      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
+    });
+
+    it("broadcasts only once when both current and previous agencies qualify", async () => {
+      const conventionOnPeAgency = new ConventionDtoBuilder()
+        .withId("44440000-0000-4000-9000-000000000002")
+        .withAgencyId(peAgency.id)
+        .build();
+      const anotherPeAgency = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("another-pe-agency")
+          .withKind("pole-emploi")
+          .build(),
+      );
+      uow.agencyRepository.agencies = [peAgency, anotherPeAgency];
+
+      await broadcastToFranceTravailOnConventionUpdates.execute({
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDtoFrom({
+          convention: conventionOnPeAgency,
+          agency: {
+            ...peAgency,
+            validatorEmails: [],
+            counsellorEmails: [],
+          },
+        }),
+        previousAgencyId: anotherPeAgency.id,
+      });
+
+      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
+    });
+
+    it("does not broadcast when neither current nor previous agency qualifies", async () => {
+      uow.agencyRepository.agencies = [siaeAgency, autreAgency];
+
+      await broadcastToFranceTravailOnConventionUpdates.execute({
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDtoFrom({
+          convention: conventionOnSiaeAgency,
+          agency: {
+            ...siaeAgency,
+            validatorEmails: [],
+            counsellorEmails: [],
+          },
+        }),
+        previousAgencyId: autreAgency.id,
+      });
+
+      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+    });
+
+    it("does not broadcast when no previousAgencyId and current agency does not qualify", async () => {
+      uow.agencyRepository.agencies = [siaeAgency];
+
+      await broadcastToFranceTravailOnConventionUpdates.execute({
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDtoFrom({
+          convention: conventionOnSiaeAgency,
+          agency: {
+            ...siaeAgency,
+            validatorEmails: [],
+            counsellorEmails: [],
+          },
+        }),
+      });
+
+      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+    });
+  });
 });

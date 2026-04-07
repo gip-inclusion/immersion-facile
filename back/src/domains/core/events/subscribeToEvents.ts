@@ -10,7 +10,9 @@ import type {
   InstantiatedUseCase,
   UseCases,
 } from "../../../config/bootstrap/createUseCases";
+import type { WithConventionIdAndPreviousAgencyId } from "../../convention/use-cases/broadcast/broadcastConventionParams";
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type { TransferConventionToAgencyPayload } from "./eventPayload.dto";
 import type { DomainTopic } from "./events";
 import type { NarrowEvent } from "./ports/EventBus";
 
@@ -151,10 +153,10 @@ const getUseCasesByTopics = (
   ],
   ConventionTransferredToAgency: [
     useCases.notifyAllActorsThatConventionHasBeenTransferred,
-    extractConventionIdFromConvention(
+    extractConventionIdAndPreviousAgencyFromTransfer(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
-    extractConventionIdFromConvention(
+    extractConventionIdAndPreviousAgencyFromTransfer(
       useCases.broadcastToPartnersOnConventionUpdates,
     ),
   ],
@@ -327,6 +329,27 @@ const extractConventionIdFromConvention = <
   execute: (params) =>
     useCase.execute({
       conventionId: params.convention.id,
+    }),
+});
+
+const extractConventionIdAndPreviousAgencyFromTransfer = <
+  UC extends InstantiatedUseCase<
+    WithConventionIdAndPreviousAgencyId,
+    void,
+    any
+  >,
+>(
+  useCase: UC,
+): InstantiatedUseCase<
+  TransferConventionToAgencyPayload & { triggeredBy: unknown },
+  void,
+  any
+> => ({
+  useCaseName: useCase.useCaseName,
+  execute: (params) =>
+    useCase.execute({
+      conventionId: params.convention.id,
+      previousAgencyId: params.previousAgencyId,
     }),
 });
 
