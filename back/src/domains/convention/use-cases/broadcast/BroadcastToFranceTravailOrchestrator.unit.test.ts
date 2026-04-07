@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type AgencyId,
   AssessmentDtoBuilder,
   ConventionDtoBuilder,
   type ConventionReadDto,
@@ -118,6 +119,21 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     ]);
   });
 
+  it("passes previousAgencyId through to standard broadcast", async () => {
+    const previousAgencyId: AgencyId = "previous-agency-id";
+    await broadcastToFranceTravailOrchestrator.execute({
+      conventionId: convention.id,
+      previousAgencyId,
+    });
+    expectStandardBroadcastCallsToEqual([
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDto,
+        previousAgencyId,
+      },
+    ]);
+  });
+
   describe("when eventType is 'ASSESSMENT_CREATED'", () => {
     let broadcastToFranceTravailOrchestratorForAssessmentCreated: BroadcastToFranceTravailOrchestrator;
 
@@ -145,7 +161,6 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       await broadcastToFranceTravailOrchestratorForAssessmentCreated.execute({
         conventionId: convention.id,
       });
-
       expectStandardBroadcastCallsToEqual([
         {
           eventType: "ASSESSMENT_CREATED",

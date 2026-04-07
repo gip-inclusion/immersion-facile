@@ -8,6 +8,7 @@ import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import {
   getLinkedAgencies,
+  getLinkedAgenciesFromAgencyId,
   shouldBroadcastToFranceTravail,
 } from "../../entities/Convention";
 import {
@@ -39,13 +40,36 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
 
     const featureFlags = await uow.featureFlagQueries.getAll();
 
-    if (
-      !shouldBroadcastToFranceTravail({
-        agency: agency,
-        refersToAgency: refersToAgency,
-        featureFlags,
-      })
-    )
+    const shouldBroadcastForCurrentAgency = shouldBroadcastToFranceTravail({
+      agency,
+      refersToAgency,
+      featureFlags,
+    });
+
+    const previousAgencyId =
+      inputParams.eventType === "CONVENTION_UPDATED"
+        ? inputParams.previousAgencyId
+        : undefined;
+
+    if (!shouldBroadcastForCurrentAgency && previousAgencyId) {
+      const { agency: prevAgency, refersToAgency: prevRefersTo } =
+        await getLinkedAgenciesFromAgencyId(uow, previousAgencyId);
+      if (
+        !shouldBroadcastToFranceTravail({
+          agency: prevAgency,
+          refersToAgency: prevRefersTo,
+          featureFlags,
+        })
+      )
+        return deps.options.resyncMode
+          ? uow.conventionsToSyncRepository.save({
+              id: convention.id,
+              status: "SKIP",
+              processDate: deps.timeGateway.now(),
+              reason: "Agency is not of kind pole-emploi",
+            })
+          : undefined;
+    } else if (!shouldBroadcastForCurrentAgency)
       return deps.options.resyncMode
         ? uow.conventionsToSyncRepository.save({
             id: inputParams.convention.id,

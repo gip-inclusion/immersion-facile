@@ -1,4 +1,4 @@
-import { type ConventionId, type ConventionReadDto, errors } from "shared";
+import { type ConventionReadDto, errors } from "shared";
 import type { InstantiatedUseCase } from "../../../../config/bootstrap/createUseCases";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
@@ -6,7 +6,10 @@ import { getReferedAgency } from "../../../core/api-consumer/helpers/agency";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getOnlyAssessmentDto } from "../../entities/AssessmentEntity";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
-import type { BroadcastConventionParams } from "./broadcastConventionParams";
+import type {
+  BroadcastConventionParams,
+  WithConventionIdAndPreviousAgencyId,
+} from "./broadcastConventionParams";
 
 export type BroadcastToFranceTravailOrchestrator = ReturnType<
   typeof makeBroadcastToFranceTravailOrchestrator
@@ -19,9 +22,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
   uowPerformer: UnitOfWorkPerformer;
   eventType: BroadcastConventionParams["eventType"];
   broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
-}): InstantiatedUseCase<{
-  conventionId: ConventionId;
-}> => {
+}): InstantiatedUseCase<WithConventionIdAndPreviousAgencyId> => {
   return {
     useCaseName: "BroadcastToFranceTravailOrchestrator",
     execute: async (params) => {
@@ -96,6 +97,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
       return broadcastToFranceTravailOnConventionUpdates.execute({
         eventType: "CONVENTION_UPDATED",
         convention: conventionRead,
+        previousAgencyId: params.previousAgencyId,
       });
     },
   };

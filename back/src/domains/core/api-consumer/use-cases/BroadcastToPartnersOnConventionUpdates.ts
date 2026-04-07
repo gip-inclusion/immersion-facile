@@ -7,12 +7,14 @@ import {
   errors,
   isApiConsumerAllowed,
   pipeWithValue,
-  type WithConventionId,
-  withConventionIdSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
 import { createLogger } from "../../../../utils/logger";
+import {
+  type WithConventionIdAndPreviousAgencyId,
+  withConventionIdAndPreviousAgencySchema,
+} from "../../../convention/use-cases/broadcast/broadcastConventionParams";
 import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -29,7 +31,9 @@ export type BroadcastToPartnersOnConventionUpdates = ReturnType<
 export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
   "BroadcastToPartnersOnConventionUpdates",
 )
-  .withInput<WithConventionId>(withConventionIdSchema)
+  .withInput<WithConventionIdAndPreviousAgencyId>(
+    withConventionIdAndPreviousAgencySchema,
+  )
   .withDeps<{
     subscribersGateway: SubscribersGateway;
     timeGateway: TimeGateway;
@@ -75,6 +79,13 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
       ...assessmentFields,
     };
 
+    const previousAgencyWithRights = inputParams.previousAgencyId
+      ? await uow.agencyRepository.getById(inputParams.previousAgencyId)
+      : undefined;
+    const previousRefersTo = previousAgencyWithRights?.refersToAgencyId
+      ? await getReferedAgency(uow, previousAgencyWithRights.refersToAgencyId)
+      : undefined;
+
     const apiConsumers = pipeWithValue(
       await uow.apiConsumerRepository.getByFilters({
         agencyIds: [
@@ -82,12 +93,16 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
           ...(conventionRead.agencyRefersTo
             ? [conventionRead.agencyRefersTo.id]
             : []),
+          ...(previousAgencyWithRights ? [previousAgencyWithRights.id] : []),
+          ...(previousRefersTo ? [previousRefersTo.id] : []),
         ],
         agencyKinds: [
           conventionRead.agencyKind,
           ...(conventionRead.agencyRefersTo
             ? [conventionRead.agencyRefersTo.kind]
             : []),
+          ...(previousAgencyWithRights ? [previousAgencyWithRights.kind] : []),
+          ...(previousRefersTo ? [previousRefersTo.kind] : []),
         ],
       }),
       filter<ApiConsumer>(
