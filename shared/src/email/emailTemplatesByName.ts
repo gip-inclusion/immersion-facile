@@ -17,7 +17,6 @@ import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { emailAttachements } from "./email.content";
-import type { Email } from "./email.dto";
 import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind?: InternshipKind) =>
@@ -1388,10 +1387,23 @@ Tél : ${beneficiaryPhone}`,
     },
     DISCUSSION_EXCHANGE_FORBIDDEN: {
       niceName: "Établissement - MER - Réponse à candidature impossible",
-      createEmailVariables: ({ reason, sender, admins }) => ({
+      createEmailVariables: (params) => ({
         subject: "Réponse à la candidature impossible",
         greetings: "Bonjour",
-        content: discussionExchangeForbiddenContents(admins)[sender][reason],
+        content: discussionExchangeForbiddenContents(
+          params.reason === "user_unknown_or_missing_rights_on_establishment"
+            ? params.requestEstablishmentRegistrationUrl
+            : undefined,
+        )[params.sender][params.reason].content,
+        buttons:
+          params.reason === "user_unknown_or_missing_rights_on_establishment"
+            ? [
+                {
+                  label: "Demander le rattachement",
+                  url: params.requestEstablishmentRegistrationUrl,
+                },
+              ]
+            : undefined,
         subContent: defaultSignature("immersion"),
       }),
       tags: ["réponse candidature impossible"],
@@ -2430,53 +2442,71 @@ const generateUserInfo = (
 };
 
 export const discussionExchangeForbiddenContents = (
-  admins: { firstName: string; lastName: string; email: Email }[],
-): Record<ExchangeRole, Record<DiscussionExchangeForbiddenReason, string>> => ({
+  requestEstablishmentRegistrationUrl?: string,
+): Record<
+  ExchangeRole,
+  Record<
+    DiscussionExchangeForbiddenReason,
+    {
+      content: string;
+      subContent?: string;
+      buttons?: {
+        label: string;
+        url: string;
+      }[];
+    }
+  >
+> => ({
   establishment: {
-    user_unknown_or_missing_rights_on_establishment: `
+    user_unknown_or_missing_rights_on_establishment: {
+      content: `
         Vous avez tenté de répondre à un candidat depuis un email de candidature Immersion Facilitée.
         Malheureusement, <strong>votre message n’a pas pu être transmis</strong> : vous ne disposez pas des droits nécessaires pour répondre au nom de l’entreprise concernée.
         
-        Pour pouvoir répondre au candidat via Immersion Facilitée, vous devez être inscrit(e) dans l’espace entreprise avec les bons droits.
-
-        <strong>Administrateurs de l’entreprise sur Immersion Facilitée :</strong>
-        ${admins
-          .map(({ email, firstName, lastName }) =>
-            `${firstName} ${lastName} <a href="mailto:${email}" target="_blank">${email}</a>`.trim(),
-          )
-          .map((line) => `- ${line}`)
-          .join("\n")}
-
-        Nous vous invitons à contacter l’un d’entre eux afin qu’il puisse :
-        - vous ajouter à l’espace entreprise, ou
-        - ajuster vos droits pour vous permettre de répondre directement aux candidatures.
-        
-        Une fois vos droits mis à jour, vous pourrez répondre normalement.
-        
+        Pour pouvoir répondre au candidat via Immersion Facilitée, vous devez être inscrit(e) dans l’espace entreprise avec les bons droits. 
     `,
-    discussion_completed: `
+      buttons: requestEstablishmentRegistrationUrl
+        ? [
+            {
+              label: "Demander le rattachement",
+              url: requestEstablishmentRegistrationUrl,
+            },
+          ]
+        : undefined,
+    },
+    discussion_completed: {
+      content: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         Le candidat ne recevra pas votre message.`,
-    establishment_missing: `
+    },
+    establishment_missing: {
+      content: `
         L'entreprise liée à cette candidature s’est récemment désinscrite d’Immersion Facilitée.
         Le candidat ne recevra pas votre message.
 
         Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
+    },
   },
   potentialBeneficiary: {
-    user_unknown_or_missing_rights_on_establishment: `
+    user_unknown_or_missing_rights_on_establishment: {
+      content: `
         Vous n'êtes pas le candidat associé à cette candidature.
     `,
-    discussion_completed: `
+    },
+    discussion_completed: {
+      content: `
         La candidature à laquelle vous souhaitez répondre n'est plus en cours.
         L'entreprise ne recevra pas votre message.
 
         Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
-    establishment_missing: `
+    },
+    establishment_missing: {
+      content: `
         L’entreprise que vous souhaitez contacter s’est récemment désinscrite d’Immersion Facilitée.
         Elle ne recevra pas votre message et ne propose plus d’immersion pour le moment.
 
         Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
+    },
   },
 });
 
