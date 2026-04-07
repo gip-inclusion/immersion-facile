@@ -266,7 +266,7 @@ export const SearchListResults = ({
                 />
               </div>
             )}
-            <SectionHighlight priority="discrete" className={fr.cx("fr-p-2w")}>
+            <SectionHighlight className={fr.cx("fr-p-2w")}>
               <p>
                 <strong>
                   Certaines entreprises sont temporairement masquées.
