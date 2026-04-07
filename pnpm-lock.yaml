@@ -128,10 +128,10 @@ importers:
         version: 9.0.2
       kysely:
         specifier: ^0.27.4
-        version: 0.27.4
+        version: 0.27.6
       kysely-codegen:
         specifier: ^0.10.1
-        version: 0.10.1(kysely@0.27.4)(pg@8.11.1)
+        version: 0.10.1(kysely@0.27.6)(pg@8.11.1)
       libphonenumber-js:
         specifier: ^1.11.1
         version: 1.11.1
@@ -6686,8 +6686,8 @@ packages:
       pg:
         optional: true
 
-  kysely@0.27.4:
-    resolution: {integrity: sha512-dyNKv2KRvYOQPLCAOCjjQuCk4YFd33BvGdf/o5bC7FiW+BB6snA81Zt+2wT9QDFzKqxKa5rrOmvlK/anehCcgA==}
+  kysely@0.27.6:
+    resolution: {integrity: sha512-FIyV/64EkKhJmjgC0g2hygpBv5RNWVPyNCqSAD7eTCv6eFWNIi4PN1UvdSJGicN/o35bnevgis4Y0UDC0qi8jQ==}
     engines: {node: '>=14.0.0'}
 
   lazy-universal-dotenv@4.0.0:
@@ -16960,17 +16960,17 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  kysely-codegen@0.10.1(kysely@0.27.4)(pg@8.11.1):
+  kysely-codegen@0.10.1(kysely@0.27.6)(pg@8.11.1):
     dependencies:
       chalk: 4.1.2
       dotenv: 16.5.0
-      kysely: 0.27.4
+      kysely: 0.27.6
       micromatch: 4.0.8
       minimist: 1.2.8
     optionalDependencies:
       pg: 8.11.1
 
-  kysely@0.27.4: {}
+  kysely@0.27.6: {}
 
   lazy-universal-dotenv@4.0.0:
     dependencies:
