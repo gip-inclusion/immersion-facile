@@ -612,6 +612,7 @@ export const createUseCases = ({
         createNewEvent,
         saveNotificationAndRelatedEvent,
         timeGateway: gateways.timeGateway,
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
       },
       uowPerformer,
     }),

@@ -21,10 +21,12 @@ import {
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUserForm";
+import { type routes, useRoute } from "src/app/routes/routes";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import type { Route } from "type-route";
 
 const establishmentRegisterEstablishmentModal = createFormModal({
   id: "establishment-register-establishment-modal",
@@ -39,6 +41,9 @@ export const RequestRegisterEstablishmentsForUserForm = ({
   currentUser: ConnectedUser;
 }) => {
   const dispatch = useDispatch();
+  const route = useRoute() as Route<
+    typeof routes.myProfileEstablishmentRegistration
+  >;
   const [inputValue, setInputValue] = useState<string | undefined>(undefined);
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
@@ -72,8 +77,13 @@ export const RequestRegisterEstablishmentsForUserForm = ({
     setSelectedEstablishmentSiret(undefined);
   };
 
-  if (inputValue === undefined && currentUser.proConnect) {
-    setInputValue(currentUser.proConnect.siret);
+  if (inputValue === undefined) {
+    if (currentUser.proConnect) {
+      setInputValue(currentUser.proConnect.siret);
+    }
+    if (route.params.siret) {
+      setInputValue(route.params.siret);
+    }
   }
 
   useEffect(() => {
@@ -98,7 +108,8 @@ export const RequestRegisterEstablishmentsForUserForm = ({
           label="Se rattacher à une entreprise"
           hintText="Rechercher par n° SIRET ou nom sous lequel il est enregistré sur Immersion Facilitée"
           nativeInputProps={{
-            id: domElementIds.profile.registerEstablishmentSearch,
+            id: domElementIds.myProfileEstablishmentRegistration
+              .registerEstablishmentSearch,
             type: "search",
             placeholder: "",
             value: inputValue,
@@ -152,6 +163,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
                           establishmentRegisterEstablishmentModal.open();
                         }}
                         size="small"
+                        id={`${domElementIds.myProfileEstablishmentRegistration.registerEstablishmentButton}-${establishmentPublicOption.siret}`}
                       >
                         Demander le rattachement
                       </Button>

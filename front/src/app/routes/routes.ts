@@ -190,7 +190,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   myProfile,
   myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
   myProfileEstablishmentRegistration: myProfile.extend(
-    "/rattachement-entreprise",
+    { siret: param.query.optional.string },
+    () => `/${frontRoutes.myProfileEstablishmentRegistration}`,
   ),
   agencyDashboardAgencies: agencyDashboardAgencies,
   agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(

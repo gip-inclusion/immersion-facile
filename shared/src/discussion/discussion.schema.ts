@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { absoluteUrlCanBeEmpty } from "../AbsoluteUrl";
+import { absoluteUrlCanBeEmpty, absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressSchema } from "../address/address.schema";
 import { discoverObjective } from "../convention/convention.dto";
@@ -348,13 +348,7 @@ export const discussionExchangeForbiddenParamsSchema: ZodSchemaWithInputMatching
   z.object({
     sender: exchangeRoleSchema,
     reason: discussionExchangeForbidenReasonSchema,
-    admins: z.array(
-      z.object({
-        firstName: firstnameSchema,
-        lastName: lastnameSchema,
-        email: emailSchema,
-      }),
-    ),
+    requestEstablishmentRegistrationUrl: absoluteUrlSchema,
   });
 
 const contactInformationsCommonSchema = z.object({

@@ -14,9 +14,12 @@ export const EstablishmentsTablesSection = ({
   <>
     <div className={fr.cx("fr-grid-row")}>
       <Button
-        id={domElementIds.profile.registerEstablishmentButton}
+        id={
+          domElementIds.myProfileEstablishmentRegistration
+            .registerEstablishmentButton
+        }
         priority="primary"
-        linkProps={routes.myProfileEstablishmentRegistration().link}
+        linkProps={routes.myProfileEstablishmentRegistration({}).link}
         className={fr.cx("fr-ml-auto")}
         iconId="fr-icon-add-line"
       >

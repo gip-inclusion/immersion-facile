@@ -431,13 +431,6 @@ describe("discussion e2e", () => {
           body: {
             reason: "discussion_completed",
             sender: "establishment",
-            admins: [
-              {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-              },
-            ],
           },
         },
       );
