@@ -244,17 +244,25 @@ export const ConventionsWithBroadcastErrorList = ({
       activeAgencyStatuses.includes(agencyRight.agency.status),
   );
 
+  const isMiloUser = currentUser?.agencyRights.some(
+    (agencyRight) =>
+      agencyRight.agency.kind === "mission-locale" &&
+      activeAgencyStatuses.includes(agencyRight.agency.status),
+  );
+
   return (
     <HeadingSection
       title={title}
       titleAs="h2"
       className={fr.cx("fr-mt-2w", "fr-mb-4w")}
       titleAction={
-        isPeUser && (
+        (isPeUser || isMiloUser) && (
           <Button
             priority="secondary"
             linkProps={{
-              href: "https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/Documents/Immersion_facilitee/Immersion_facilitee/Guide_de_gestion_des_conventions_en_erreur.pptx?d=w489a3c6b6e5148e6bea287ddfadba8c7&csf=1&web=1&e=i1GD5H",
+              href: isPeUser
+                ? "https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/Documents/Immersion_facilitee/Immersion_facilitee/Guide_de_gestion_des_conventions_en_erreur.pptx?d=w489a3c6b6e5148e6bea287ddfadba8c7&csf=1&web=1&e=i1GD5H"
+                : "https://docs.google.com/presentation/d/14iN1tBOznkwYka-x-ZHmD-Msy5fE2dYqC3Yc1zfxw8A/edit?slide=id.g3bedc2e4d54_2_0#slide=id.g3bedc2e4d54_2_0",
               target: "_blank",
               rel: "noreferrer",
             }}
