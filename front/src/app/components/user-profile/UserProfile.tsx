@@ -32,7 +32,6 @@ export const UserProfile = ({
             <AgenciesTablesSection
               user={userWithRights}
               agencyRights={userWithRights.agencyRights}
-              isBackofficeAdmin={userWithRights.isBackofficeAdmin}
             />
           ),
         },
