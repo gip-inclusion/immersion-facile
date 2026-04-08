@@ -32,6 +32,10 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import {
+  makeEmptyConventionInitialValues,
+  saveConventionInDeviceAndGetConventionFormRoute,
+} from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -156,29 +160,22 @@ export const ConventionTabContent = ({
   const redirectToConventionPage = (
     agency: AgencyDtoForAgencyUsersAndAdmins,
   ) => {
-    if (miniStageAgencyKinds.includes(agency.kind)) {
-      routes
-        .conventionMiniStage({
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencyId: agency.id,
-          agencyReferentFirstName: currentUser?.firstName ?? "",
-          agencyReferentLastName: currentUser?.lastName ?? "",
-        })
-        .push();
-      return;
-    }
-
-    routes
-      .conventionImmersion({
+    const internshipKind = miniStageAgencyKinds.includes(agency.kind)
+      ? "mini-stage-cci"
+      : "immersion";
+    saveConventionInDeviceAndGetConventionFormRoute({
+      //TODO store in draft
+      convention: makeEmptyConventionInitialValues({
+        internshipKind,
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencyId: agency.id,
         agencyReferentFirstName: currentUser?.firstName ?? "",
         agencyReferentLastName: currentUser?.lastName ?? "",
-        skipIntro: true,
-      })
-      .push();
+      }),
+      queryParams:
+        internshipKind === "immersion" ? { skipIntro: true } : undefined,
+    }).push();
   };
 
   const onInitiateConventionButtonClick = () => {

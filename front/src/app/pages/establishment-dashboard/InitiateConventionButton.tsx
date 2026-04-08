@@ -28,6 +28,10 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import {
+  makeEmptyConventionInitialValues,
+  saveConventionInDeviceAndGetConventionFormRoute,
+} from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -140,14 +144,17 @@ export const InitiateConventionButton = () => {
         (offer) => offer.appellationCode === establishmentValues.appellation,
       );
       closeInitiateConventionModal();
-      routes
-        .conventionImmersion({
+      saveConventionInDeviceAndGetConventionFormRoute({
+        convention: makeEmptyConventionInitialValues({
+          internshipKind: "immersion",
           siret: establishmentValues.siret,
           immersionAppellation: appellation,
           immersionAddress: establishmentValues.location,
+        }),
+        queryParams: {
           skipIntro: true,
-        })
-        .push();
+        },
+      }).push();
     }
     const selectedConventionTemplate = conventionTemplates.find(
       (template) => template.id === selectedConventionTemplateId,

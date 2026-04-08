@@ -14,6 +14,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { makeEmptyConventionInitialValues } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import illustrationShareConvention from "src/assets/img/share-convention.svg";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -46,7 +47,7 @@ const storeConventionRouteParamsOnDevice = (
     fedIdToken: _3,
     jwt: _4,
     conventionDraftId,
-    ...partialConvention
+    ...restQueryParams
   } = routeParams;
   if (conventionDraftId) {
     outOfReduxDependencies.localDeviceRepository.set(
@@ -55,10 +56,10 @@ const storeConventionRouteParamsOnDevice = (
     );
     return;
   }
-  outOfReduxDependencies.localDeviceRepository.set(
-    "partialConventionInUrl",
-    partialConvention,
-  );
+  outOfReduxDependencies.localDeviceRepository.set("partialConvention", {
+    ...makeEmptyConventionInitialValues({ internshipKind: "immersion" }),
+    ...restQueryParams,
+  });
 };
 
 export const ConventionImmersionPage = ({
@@ -181,11 +182,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
     if (
       initialRouteParams.fedId &&
       initialRouteParams.fedIdProvider &&
-      initialRouteParams.fedIdToken &&
-      initialRouteParams.email &&
-      initialRouteParams.firstName &&
-      initialRouteParams.lastName &&
-      initialRouteParams.birthdate
+      initialRouteParams.fedIdToken
     ) {
       const {
         fedId: _,
@@ -200,21 +197,16 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
               provider: initialRouteParams.fedIdProvider,
               token: initialRouteParams.fedId,
               idToken: initialRouteParams.fedIdToken,
-              email: initialRouteParams.email,
-              firstName: initialRouteParams.firstName,
-              lastName: initialRouteParams.lastName,
-              birthdate: initialRouteParams.birthdate,
-              phone: initialRouteParams.phone,
+              email: "",
+              firstName: "",
+              lastName: "",
+              birthdate: "",
+              phone: "",
             },
             feedbackTopic: "auth-global",
           }),
         );
-      routes
-        .conventionImmersion({
-          ...paramsWithoutFederatedIdentity,
-          fromPeConnectedUser: true,
-        })
-        .replace();
+      routes.conventionImmersion(paramsWithoutFederatedIdentity).replace();
     }
   }, [initialRouteParams, dispatch]);
 };
