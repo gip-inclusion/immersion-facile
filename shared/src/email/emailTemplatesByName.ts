@@ -484,15 +484,26 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             ? "immersion professionnelle"
             : "mini-stage"
         } au sein de l'entreprise ${businessName} se termine.
-        
+
+        <strong>Préparez votre bilan avec votre tuteur</strong>
+
         Prenez quelques instants avec votre tuteur : il a reçu par mail l'accès au formulaire de bilan qu'il devra compléter en votre présence.
 
-        <strong>Ce mail lui a été envoyé à l'adresse mentionnée sur la convention : ${establishmentTutorEmail}</strong>
+        Ce mail lui a été envoyé à l'adresse mentionnée sur la convention : ${establishmentTutorEmail}
+
         N'hésitez pas à lui demander s'il l'a bien reçu !
 
-        Ce bilan vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier.
+        <strong>Votre signature est nécessaire</strong>
+
+        Une fois que votre tuteur aura complété le formulaire, vous recevrez un second mail vous invitant à :
+
+        • Consulter et signer votre bilan en ligne
+        • Ajouter votre propre commentaire si vous souhaitez apporter des précisions sur votre expérience
         
-        À la fin de votre immersion, contactez votre conseiller pour faire part de vos impressions et finaliser ainsi votre bilan.
+        <strong>Et après ?</strong>
+
+        Une fois signé, le bilan final vous sera envoyé par mail ainsi qu'à votre conseiller.
+        Ce document est précieux pour la suite de votre parcours professionnel, que ce soit pour une formation, une embauche ou une découverte de métier.
         `,
         subContent: defaultSignature(internshipKind),
       }),
