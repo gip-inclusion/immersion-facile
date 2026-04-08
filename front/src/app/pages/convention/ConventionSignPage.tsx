@@ -20,6 +20,7 @@ import {
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import type { Route } from "type-route";
@@ -27,7 +28,6 @@ import { conventionSlice } from "../../../core-logic/domain/convention/conventio
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "../../contents/forms/convention/textSetup";
 import { useConvention } from "../../hooks/convention.hooks";
-import { useExistingSiret } from "../../hooks/siret.hooks";
 import type { routes } from "../../routes/routes";
 import { ShowConventionErrorOrRenewExpiredJwt } from "./ShowConventionErrorOrRenewExpiredJwt";
 
@@ -86,10 +86,18 @@ const ConventionSignPageContent = ({
     );
   }, [jwt, dispatch]);
 
-  useExistingSiret({
-    siret: convention?.siret,
-    addressAutocompleteLocator: "convention-immersion-address",
-  });
+  useEffect(() => {
+    const siret = convention?.siret;
+    if (siret) {
+      dispatch(
+        siretSlice.actions.siretModified({
+          feedbackTopic: "siret-input",
+          siret: siret,
+          addressAutocompleteLocator: "convention-immersion-address",
+        }),
+      );
+    }
+  }, [dispatch, convention?.siret]);
 
   const t = useConventionTexts(
     convention ? convention.internshipKind : "immersion",

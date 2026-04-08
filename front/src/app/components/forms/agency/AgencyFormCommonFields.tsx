@@ -1,6 +1,12 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
-import { type ReactNode, useCallback, useEffect, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -26,7 +32,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
-import { useExistingSiret } from "../../../hooks/siret.hooks";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
@@ -114,11 +120,22 @@ export const AgencyFormCommonFields = ({
     }
   }, [agencyAddress, onAddressSelected]);
 
-  useExistingSiret({
-    siret: formValues.agencySiret,
-    addressAutocompleteLocator: "agency-address",
-    shouldFetch: mode === "create", // ugly, but we can't use hooks conditionally
-  });
+  const shouldUpdateSiret = useMemo(
+    () => formValues.agencySiret && mode === "create",
+    [formValues.agencySiret, mode],
+  );
+
+  useEffect(() => {
+    if (shouldUpdateSiret) {
+      dispatch(
+        siretSlice.actions.siretModified({
+          siret: formValues.agencySiret,
+          feedbackTopic: "siret-input",
+          addressAutocompleteLocator: "agency-address",
+        }),
+      );
+    }
+  }, [dispatch, shouldUpdateSiret, formValues.agencySiret]);
 
   return (
     <>

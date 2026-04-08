@@ -84,7 +84,6 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import {
   conventionPresentationFromConventionDraft,
   getConventionInitialValuesFromUrl,
@@ -139,7 +138,7 @@ export const ConventionForm = ({
   fromConventionTemplateId?: ConventionTemplateId;
 }) => {
   const route = useRoute() as SupportedConventionRoutes;
-
+  const dispatch = useDispatch();
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
     conventionDraftSelectors.conventionDraft,
@@ -180,10 +179,18 @@ export const ConventionForm = ({
       : {}),
   }).current;
 
-  useExistingSiret({
-    siret: initialValues.siret,
-    addressAutocompleteLocator: "convention-immersion-address",
-  });
+  useEffect(() => {
+    const siret = initialValues.siret;
+    if (siret) {
+      dispatch(
+        siretSlice.actions.siretModified({
+          feedbackTopic: "siret-input",
+          siret,
+          addressAutocompleteLocator: "convention-immersion-address",
+        }),
+      );
+    }
+  }, [dispatch, initialValues.siret]);
 
   const conventionPresentationFromDraft = useMemo(
     () =>
