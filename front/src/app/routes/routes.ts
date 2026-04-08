@@ -13,7 +13,6 @@ import {
   param,
   type ValueSerializer,
 } from "type-route";
-import { conventionValuesFromUrl } from "./routeParams/convention";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 import {
   appellationAndRomeDtoArraySerializer,
@@ -50,10 +49,16 @@ export const acquisitionParams = {
   mtm_kwd: param.query.optional.string,
 };
 
+const ftConnectParams = {
+  fedId: param.query.optional.string,
+  fedIdProvider: param.query.optional.string,
+  fedIdToken: param.query.optional.string,
+};
+
 export const conventionParams = {
-  ...conventionValuesFromUrl,
   discussionId: param.query.optional.string,
   conventionDraftId: param.query.optional.string,
+  ...ftConnectParams,
   ...acquisitionParams,
 };
 
@@ -264,7 +269,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.query.optional.string,
       conventionDraftId: param.query.optional.string,
       conventionTemplateId: param.query.optional.string,
-      ...conventionValuesFromUrl,
     },
     () => `/${frontRoutes.conventionMiniStageRoute}`,
   ),

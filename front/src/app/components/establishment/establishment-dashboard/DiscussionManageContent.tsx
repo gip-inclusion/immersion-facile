@@ -47,8 +47,8 @@ import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
-  getEmptyConventionInitialValues,
-  makeValuesToWatchInUrl,
+  makeEmptyConventionInitialValues,
+  saveConventionInDeviceAndGetConventionFormRoute,
 } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import {
@@ -127,9 +127,8 @@ const getActivateDraftConventionButtonProps = ({
   connectedUser,
 }: DiscussionDetailsProps): ButtonProps => {
   const draftConvention = makeConventionFromDiscussion({
-    initialConvention: getEmptyConventionInitialValues({
-      internshipKind: "immersion",
-      federatedIdentity: null,
+    initialConvention: makeEmptyConventionInitialValues({
+      internshipKind: discussion.kind === "IF" ? "immersion" : "mini-stage-cci",
     }),
     discussion,
     connectedUser,
@@ -140,7 +139,13 @@ const getActivateDraftConventionButtonProps = ({
     priority: "tertiary",
     linkProps: {
       style: { backgroundImage: "none" }, // this is to avoid the underline in the list
-      href: makeDraftConventionLink(draftConvention, discussion.id).href,
+      href: saveConventionInDeviceAndGetConventionFormRoute({
+        convention: draftConvention,
+        queryParams: {
+          discussionId: discussion.id,
+          mtm_campaign: "mise_en_relation_activation_convention",
+        },
+      }).href,
       target: "_blank",
     },
     children: "Pré-remplir la convention pour cette mise en relation",
@@ -417,16 +422,6 @@ const DiscussionExchangesList = ({
     </section>
   );
 };
-
-const makeDraftConventionLink = (
-  convention: CreateConventionPresentationInitialValues,
-  discussionId: DiscussionId,
-) =>
-  routes.conventionImmersion({
-    ...makeValuesToWatchInUrl(convention),
-    discussionId,
-    mtm_campaign: "mise_en_relation_activation_convention",
-  }).link;
 
 const makeConventionFromDiscussion = ({
   initialConvention,

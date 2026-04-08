@@ -2,12 +2,10 @@ import { addDays, startOfToday } from "date-fns";
 import {
   type AgencyKind,
   type AppellationAndRomeDto,
-  addressDtoToString,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionDraftDto,
   type ConventionDto,
-  type ConventionReadDto,
   type ConventionTemplate,
   type CreateConventionPresentationInitialValues,
   type CreateConventionTemplatePresentationInitialValues,
@@ -15,42 +13,71 @@ import {
   type FtConnectIdentity,
   type ImmersionObjective,
   type InternshipKind,
-  isBeneficiaryStudent,
   isFtConnectIdentity,
-  keys,
   type LevelOfEducation,
   reasonableSchedule,
   type ScheduleDto,
   type Signatories,
+  type SiretDto,
   toDateUTCString,
 } from "shared";
-import {
-  appellationAndRomeDtoSerializer,
-  scheduleSerializer,
-} from "src/app/routes/valueSerializer";
+import { routes } from "src/app/routes/routes";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
-import { param, type ValueSerializer } from "type-route";
+import type { PartialConventionInDevice } from "src/core-logic/ports/DeviceRepository";
+import type { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
-export const getEmptyConventionInitialValues = ({
+export const makeEmptyConventionInitialValues = ({
   internshipKind,
+  agencyDepartment,
+  agencyKind,
+  agencyId,
+  agencyReferentFirstName,
+  agencyReferentLastName,
+  siret,
+  immersionAppellation,
+  immersionAddress,
   federatedIdentity,
 }: {
   internshipKind: InternshipKind;
-  federatedIdentity: FederatedIdentityWithUser | null;
+  agencyDepartment?: string;
+  agencyKind?: AgencyKind;
+  agencyId?: string;
+  agencyReferentFirstName?: string;
+  agencyReferentLastName?: string;
+  siret?: SiretDto;
+  immersionAppellation?: AppellationAndRomeDto;
+  immersionAddress?: string;
+  federatedIdentity?: FederatedIdentityWithUser;
 }): CreateConventionPresentationInitialValues => {
   const dateStart = new Date();
   const dateEnd = addDays(dateStart, 1);
   const initialForm: CreateConventionPresentationInitialValues = {
     id: uuidV4(),
 
+    agencyDepartment: agencyDepartment,
+    agencyKind: agencyKind,
+    agencyId: agencyId,
+    agencyReferent: {
+      firstname: agencyReferentFirstName,
+      lastname: agencyReferentLastName,
+    },
     dateStart: dateStart.toISOString(),
     dateEnd: dateEnd.toISOString(),
     schedule: reasonableSchedule({
       start: dateStart,
       end: dateEnd,
     }),
+    siret,
+    immersionAddress: immersionAddress,
+    immersionAppellation: immersionAppellation ?? {
+      romeLabel: "",
+      appellationLabel: "",
+      romeCode: "",
+      appellationCode: "",
+    },
     establishmentTutor: {
       role: "establishment-tutor",
       firstName: "",
@@ -202,275 +229,26 @@ const withDevPrefilledValues = (
   };
 };
 
-const conventionToConventionInUrl = (
-  convention: CreateConventionPresentationInitialValues,
-): ConventionParamsInUrl => {
-  const {
-    signatories: {
-      beneficiary,
-      beneficiaryRepresentative,
-      establishmentRepresentative,
-      beneficiaryCurrentEmployer,
-    },
-    ...flatValues
-  } = convention;
-  const beneficiarySchoolInformations = isBeneficiaryStudent(beneficiary)
-    ? {
-        led: beneficiary.levelOfEducation,
-        schoolName: beneficiary.schoolName,
-        schoolPostcode: beneficiary.schoolPostcode,
-        address: beneficiary.address && addressDtoToString(beneficiary.address),
-      }
-    : undefined;
-
-  return {
-    ...flatValues,
-    ...(beneficiaryRepresentative && {
-      brFirstName: beneficiaryRepresentative.firstName,
-      brLastName: beneficiaryRepresentative.lastName,
-      brPhone: beneficiaryRepresentative.phone,
-      brEmail: beneficiaryRepresentative.email,
-    }),
-    ...(beneficiaryCurrentEmployer && {
-      bceSiret: beneficiaryCurrentEmployer.businessSiret,
-      bceBusinessName: beneficiaryCurrentEmployer.businessName,
-      bceBusinessAddress: beneficiaryCurrentEmployer.businessAddress,
-      bceFirstName: beneficiaryCurrentEmployer.firstName,
-      bceLastName: beneficiaryCurrentEmployer.lastName,
-      bceEmail: beneficiaryCurrentEmployer.email,
-      bcePhone: beneficiaryCurrentEmployer.phone,
-      bceJob: beneficiaryCurrentEmployer.job,
-    }),
-    etFirstName: convention.establishmentTutor?.firstName,
-    etLastName: convention.establishmentTutor?.lastName,
-    etPhone: convention.establishmentTutor?.phone,
-    etEmail: convention.establishmentTutor?.email,
-    etJob: convention.establishmentTutor?.job,
-    erFirstName: establishmentRepresentative.firstName,
-    erLastName: establishmentRepresentative.lastName,
-    erEmail: establishmentRepresentative.email,
-    erPhone: establishmentRepresentative.phone,
-    firstName: beneficiary.firstName,
-    lastName: beneficiary.lastName,
-    birthdate: beneficiary.birthdate,
-    isRqth: beneficiary.isRqth,
-    financiaryHelp: beneficiary.financiaryHelp,
-    email: beneficiary.email,
-    phone: beneficiary.phone,
-    businessAdvantages: flatValues.businessAdvantages,
-    ...(beneficiarySchoolInformations
-      ? { ...beneficiarySchoolInformations }
-      : {}),
-    emergencyContact: beneficiary.emergencyContact,
-    emergencyContactPhone: beneficiary.emergencyContactPhone,
-    emergencyContactEmail: beneficiary.emergencyContactEmail,
-    fedId: beneficiary.federatedIdentity?.token,
-    fedIdProvider: beneficiary.federatedIdentity?.provider,
-    agencyReferentFirstName: convention.agencyReferent?.firstname,
-    agencyReferentLastName: convention.agencyReferent?.lastname,
-  };
-};
-
-export const conventionReadToConventionRouteParams = (
-  convention: ConventionReadDto,
-): ConventionParamsInUrl => {
-  const baseParams = {
-    // Beneficiary information
-    email: convention.signatories.beneficiary.email,
-    firstName: convention.signatories.beneficiary.firstName,
-    lastName: convention.signatories.beneficiary.lastName,
-    phone: convention.signatories.beneficiary.phone,
-    birthdate: convention.signatories.beneficiary.birthdate,
-    isRqth: convention.signatories.beneficiary.isRqth,
-    financiaryHelp: convention.signatories.beneficiary.financiaryHelp,
-    emergencyContact: convention.signatories.beneficiary.emergencyContact,
-    emergencyContactPhone:
-      convention.signatories.beneficiary.emergencyContactPhone,
-    emergencyContactEmail:
-      convention.signatories.beneficiary.emergencyContactEmail,
-    fedId: convention.signatories.beneficiary.federatedIdentity?.token,
-    fedIdProvider:
-      convention.signatories.beneficiary.federatedIdentity?.provider,
-    fromPeConnectedUser: false,
-
-    // Beneficiary representative information
-    brEmail: convention.signatories.beneficiaryRepresentative?.email,
-    brFirstName: convention.signatories.beneficiaryRepresentative?.firstName,
-    brLastName: convention.signatories.beneficiaryRepresentative?.lastName,
-    brPhone: convention.signatories.beneficiaryRepresentative?.phone,
-
-    // Beneficiary current employer information
-    bceEmail: convention.signatories.beneficiaryCurrentEmployer?.email,
-    bceFirstName: convention.signatories.beneficiaryCurrentEmployer?.firstName,
-    bceLastName: convention.signatories.beneficiaryCurrentEmployer?.lastName,
-    bcePhone: convention.signatories.beneficiaryCurrentEmployer?.phone,
-    bceSiret: convention.signatories.beneficiaryCurrentEmployer?.businessSiret,
-    bceBusinessName:
-      convention.signatories.beneficiaryCurrentEmployer?.businessName,
-    bceJob: convention.signatories.beneficiaryCurrentEmployer?.job,
-    bceBusinessAddress:
-      convention.signatories.beneficiaryCurrentEmployer?.businessAddress,
-
-    // Establishment information
-    siret: convention.siret,
-    businessName: convention.businessName,
-    businessAdvantages: convention.businessAdvantages,
-    workConditions: convention.workConditions,
-    immersionAddress: convention.immersionAddress,
-
-    // Establishment tutor information
-    etFirstName: convention.establishmentTutor.firstName,
-    etLastName: convention.establishmentTutor.lastName,
-    etJob: convention.establishmentTutor.job,
-    etPhone: convention.establishmentTutor.phone,
-    etEmail: convention.establishmentTutor.email,
-
-    // Establishment representative information
-    erFirstName: convention.signatories.establishmentRepresentative.firstName,
-    erLastName: convention.signatories.establishmentRepresentative.lastName,
-    erPhone: convention.signatories.establishmentRepresentative.phone,
-    erEmail: convention.signatories.establishmentRepresentative.email,
-
-    // Agency information
-    agencyId: convention.agencyId,
-    agencyDepartment: convention.agencyDepartment,
-    agencyKind: convention.agencyKind,
-    agencyReferentFirstName: convention.agencyReferent?.firstname,
-    agencyReferentLastName: convention.agencyReferent?.lastname,
-
-    // Immersion details
-    immersionObjective: convention.immersionObjective,
-    immersionActivities: convention.immersionActivities,
-    immersionSkills: convention.immersionSkills,
-    immersionAppellation: convention.immersionAppellation,
-
-    // Schedule information
-    dateStart: convention.dateStart,
-    dateEnd: convention.dateEnd,
-    schedule: convention.schedule,
-
-    // Health and safety
-    sanitaryPrevention: convention.sanitaryPrevention,
-    sanitaryPreventionDescription: convention.sanitaryPreventionDescription,
-    individualProtection: convention.individualProtection,
-    individualProtectionDescription: convention.individualProtectionDescription,
-  };
-
-  // Add student-specific fields for mini-stage-cci conventions
-  if (convention.internshipKind === "mini-stage-cci") {
-    return {
-      ...baseParams,
-      address: convention.signatories.beneficiary.address
-        ? `${convention.signatories.beneficiary.address.streetNumberAndAddress} ${convention.signatories.beneficiary.address.postcode} ${convention.signatories.beneficiary.address.city}`
-        : undefined,
-      led: convention.signatories.beneficiary.levelOfEducation,
-      schoolName: convention.signatories.beneficiary.schoolName,
-      schoolPostcode: convention.signatories.beneficiary.schoolPostcode,
-    };
-  }
-
-  // For immersion conventions, student-specific fields are not available
-  return baseParams;
-};
-
-export const makeValuesToWatchInUrl = (
-  convention: CreateConventionPresentationInitialValues,
-) => {
-  const conventionInUrl = conventionToConventionInUrl(convention);
-  const keysToWatch: ConventionFormKeysInUrl[] = [
-    ...keys(conventionValuesFromUrl),
-    "agencyDepartment",
-  ];
-  return keysToWatch.reduce(
-    (acc, watchedKey) => ({
-      ...acc,
-      [watchedKey]: conventionInUrl[watchedKey],
-    }),
-    {} as ConventionParamsInUrl,
+export const saveConventionInDeviceAndGetConventionFormRoute = ({
+  convention,
+  queryParams,
+}: {
+  convention: PartialConventionInDevice;
+  queryParams?:
+    | Route<typeof routes.conventionImmersion>["params"]
+    | Route<typeof routes.conventionMiniStage>["params"];
+}):
+  | Route<typeof routes.conventionImmersion>
+  | Route<typeof routes.conventionMiniStage> => {
+  outOfReduxDependencies.localDeviceRepository.set(
+    "partialConvention",
+    convention,
   );
+
+  return convention.internshipKind === "immersion"
+    ? routes.conventionImmersion(queryParams)
+    : routes.conventionMiniStage(queryParams);
 };
-
-export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
-type ConventionQueryParams = typeof conventionValuesFromUrl;
-
-export const conventionValuesFromUrl = {
-  fedId: param.query.optional.string,
-  fedIdProvider: param.query.optional.string,
-  fedIdToken: param.query.optional.string,
-  fromPeConnectedUser: param.query.optional.boolean,
-  email: param.query.optional.string,
-  firstName: param.query.optional.string,
-  lastName: param.query.optional.string,
-  phone: param.query.optional.string,
-  financiaryHelp: param.query.optional.string,
-  led: param.query.optional.string,
-  address: param.query.optional.string,
-  schoolName: param.query.optional.string,
-  schoolPostcode: param.query.optional.string,
-  emergencyContact: param.query.optional.string,
-  emergencyContactPhone: param.query.optional.string,
-  emergencyContactEmail: param.query.optional.string,
-  isRqth: param.query.optional.boolean,
-  birthdate: param.query.optional.string,
-  agencyDepartment: param.query.optional.string,
-  agencyKind: param.query.optional.string,
-
-  brEmail: param.query.optional.string,
-  brFirstName: param.query.optional.string,
-  brLastName: param.query.optional.string,
-  brPhone: param.query.optional.string,
-
-  bceEmail: param.query.optional.string,
-  bceFirstName: param.query.optional.string,
-  bceLastName: param.query.optional.string,
-  bcePhone: param.query.optional.string,
-  bceSiret: param.query.optional.string,
-  bceBusinessName: param.query.optional.string,
-  bceJob: param.query.optional.string,
-  bceBusinessAddress: param.query.optional.string,
-
-  siret: param.query.optional.string,
-  businessName: param.query.optional.string,
-  businessAdvantages: param.query.optional.string,
-  etFirstName: param.query.optional.string,
-  etLastName: param.query.optional.string,
-  etJob: param.query.optional.string,
-  etPhone: param.query.optional.string,
-  etEmail: param.query.optional.string,
-  erFirstName: param.query.optional.string,
-  erLastName: param.query.optional.string,
-  erPhone: param.query.optional.string,
-  erEmail: param.query.optional.string,
-  immersionAddress: param.query.optional.string,
-  agencyId: param.query.optional.string,
-  agencyReferentFirstName: param.query.optional.string,
-  agencyReferentLastName: param.query.optional.string,
-  immersionObjective: param.query.optional.string,
-  immersionActivities: param.query.optional.string,
-  immersionSkills: param.query.optional.string,
-  sanitaryPreventionDescription: param.query.optional.string,
-  workConditions: param.query.optional.string,
-
-  sanitaryPrevention: param.query.optional.boolean,
-  individualProtection: param.query.optional.boolean,
-  individualProtectionDescription: param.query.optional.string,
-
-  dateStart: param.query.optional.string,
-  dateEnd: param.query.optional.string,
-
-  schedule: param.query.optional.ofType(scheduleSerializer),
-  immersionAppellation: param.query.optional.ofType(
-    appellationAndRomeDtoSerializer,
-  ),
-};
-
-export type ConventionParamsInUrl = Partial<{
-  [K in keyof ConventionQueryParams]: ConventionQueryParams[K]["~internal"]["valueSerializer"] extends ValueSerializer<
-    infer T
-  >
-    ? T
-    : never;
-}>;
 
 export const beneficiaryRepresentativeFromParams = ({
   email,

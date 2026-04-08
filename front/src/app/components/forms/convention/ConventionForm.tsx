@@ -87,8 +87,8 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   conventionPresentationFromConventionDraft,
-  getEmptyConventionInitialValues,
   makeConventionPresentationFromConventionTemplate,
+  makeEmptyConventionInitialValues,
 } from "src/app/routes/routeParams/convention";
 import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -151,7 +151,10 @@ export const ConventionForm = ({
   const acquisitionParams = useGetAcquisitionParams();
 
   const initialValues = useRef<CreateConventionPresentationInitialValues>({
-    ...getEmptyConventionInitialValues({ internshipKind, federatedIdentity }),
+    ...makeEmptyConventionInitialValues({
+      internshipKind,
+      federatedIdentity: federatedIdentity ?? undefined,
+    }),
     ...acquisitionParams,
     ...(federatedIdentity?.payload?.advisor &&
     mode === "create-convention-from-scratch"
@@ -254,8 +257,8 @@ const ConventionFormContent = ({
   const dispatch = useDispatch();
   const route = useRoute() as SupportedConventionRoutes;
   const fromPeConnectedUser =
-    "fromPeConnectedUser" in route.params
-      ? route.params.fromPeConnectedUser
+    "fedIdProvider" in route.params
+      ? route.params.fedIdProvider === "peConnect"
       : undefined;
 
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
@@ -532,9 +535,7 @@ const ConventionFormContent = ({
   useScrollTo(!!conventionTemplateFeedback);
 
   useEffect(() => {
-    outOfReduxDependencies.localDeviceRepository.delete(
-      "partialConventionInUrl",
-    );
+    outOfReduxDependencies.localDeviceRepository.delete("partialConvention");
     outOfReduxDependencies.localDeviceRepository.delete("conventionDraftId");
     dispatch(conventionSlice.actions.setCurrentStep(1));
   }, [dispatch]);
