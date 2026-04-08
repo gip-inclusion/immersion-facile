@@ -6,9 +6,11 @@ import {
   labelsForImmersionObjective,
 } from "../convention/convention.dto";
 import type {
+  DiscussionExchangeForbiddenParams,
   DiscussionExchangeForbiddenReason,
   ExchangeRole,
 } from "../discussion/discussion.dto";
+import { isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl } from "../discussion/discussion.schema";
 import type { AgencyRole } from "../role/role.dto";
 import { frontRoutes } from "../routes/route.utils";
 import { isStringDate, toDisplayedDate } from "../utils/date";
@@ -1401,21 +1403,10 @@ Tél : ${beneficiaryPhone}`,
       createEmailVariables: (params) => ({
         subject: "Réponse à la candidature impossible",
         greetings: "Bonjour",
-        content: discussionExchangeForbiddenContents(
-          params.reason === "user_unknown_or_missing_rights_on_establishment"
-            ? params.requestEstablishmentRegistrationUrl
-            : undefined,
-        )[params.sender][params.reason].content,
-        buttons:
-          params.reason === "user_unknown_or_missing_rights_on_establishment"
-            ? [
-                {
-                  label: "Demander le rattachement",
-                  url: params.requestEstablishmentRegistrationUrl,
-                },
-              ]
-            : undefined,
         subContent: defaultSignature("immersion"),
+        ...discussionExchangeForbiddenContents(params)[params.sender][
+          params.reason
+        ],
       }),
       tags: ["réponse candidature impossible"],
     },
@@ -2453,14 +2444,13 @@ const generateUserInfo = (
 };
 
 export const discussionExchangeForbiddenContents = (
-  requestEstablishmentRegistrationUrl?: string,
+  params: DiscussionExchangeForbiddenParams,
 ): Record<
   ExchangeRole,
   Record<
     DiscussionExchangeForbiddenReason,
     {
       content: string;
-      subContent?: string;
       buttons?: {
         label: string;
         url: string;
@@ -2476,14 +2466,17 @@ export const discussionExchangeForbiddenContents = (
         
         Pour pouvoir répondre au candidat via Immersion Facilitée, vous devez être inscrit(e) dans l’espace entreprise avec les bons droits. 
     `,
-      buttons: requestEstablishmentRegistrationUrl
-        ? [
-            {
-              label: "Demander le rattachement",
-              url: requestEstablishmentRegistrationUrl,
-            },
-          ]
-        : undefined,
+      buttons:
+        isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl(
+          params,
+        )
+          ? [
+              {
+                label: "Demander le rattachement",
+                url: params.requestEstablishmentRegistrationUrl,
+              },
+            ]
+          : undefined,
     },
     discussion_completed: {
       content: `

@@ -48,6 +48,7 @@ import {
   candidateWarnedMethods,
   contactLevelsOfEducation,
   type DiscussionExchangeForbiddenParams,
+  type DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl,
   type DiscussionExchangeForbiddenReason,
   type DiscussionId,
   type DiscussionInList,
@@ -75,10 +76,16 @@ export const withDiscussionIdSchema: ZodSchemaWithInputMatchingOutput<WithDiscus
   });
 
 export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
-export const discussionExchangeForbidenReasons = [
-  "user_unknown_or_missing_rights_on_establishment",
+
+export const discussionUserMissingReason =
+  "user_unknown_or_missing_rights_on_establishment";
+const discussionOtherReasons = [
   "establishment_missing",
   "discussion_completed",
+] as const;
+export const discussionExchangeForbiddenReasons = [
+  ...discussionUserMissingReason,
+  ...discussionOtherReasons,
 ] as const;
 
 export const makeExchangeEmailRegex = (replyDomain: string) =>
@@ -124,7 +131,7 @@ export const exchangeRoleSchema: ZodSchemaWithInputMatchingOutput<ExchangeRole> 
     error: localization.invalidEnum,
   });
 export const discussionExchangeForbidenReasonSchema: ZodSchemaWithInputMatchingOutput<DiscussionExchangeForbiddenReason> =
-  z.enum(discussionExchangeForbidenReasons, {
+  z.enum(discussionExchangeForbiddenReasons, {
     error: localization.invalidEnum,
   });
 
@@ -345,11 +352,19 @@ export const paginatedDiscussionListSchema = createPaginatedSchema(
   discussionInListSchema,
 );
 export const discussionExchangeForbiddenParamsSchema: ZodSchemaWithInputMatchingOutput<DiscussionExchangeForbiddenParams> =
-  z.object({
-    sender: exchangeRoleSchema,
-    reason: discussionExchangeForbidenReasonSchema,
-    requestEstablishmentRegistrationUrl: absoluteUrlSchema,
-  });
+  z.discriminatedUnion("reason", [
+    z.object({
+      reason: z.enum(discussionOtherReasons, {
+        error: localization.invalidEnum,
+      }),
+      sender: exchangeRoleSchema,
+    }),
+    z.object({
+      reason: z.literal(discussionUserMissingReason),
+      sender: exchangeRoleSchema,
+      requestEstablishmentRegistrationUrl: absoluteUrlSchema,
+    }),
+  ]);
 
 const contactInformationsCommonSchema = z.object({
   appellationCode: appellationCodeSchema,
@@ -399,3 +414,10 @@ export const createDiscussionSchema: ZodSchemaWithInputMatchingOutput<CreateDisc
 
 export const contactEstablishmentEventPayloadSchema: ZodSchemaWithInputMatchingOutput<ContactEstablishmentEventPayload> =
   z.object({ discussionId: discussionIdSchema, siret: siretSchema });
+
+export const isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl =
+  (
+    params: DiscussionExchangeForbiddenParams,
+  ): params is DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl => {
+    return params.reason === discussionUserMissingReason;
+  };
