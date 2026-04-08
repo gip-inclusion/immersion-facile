@@ -644,6 +644,7 @@ export const domElementIds = {
       searchableBy: "im-form-edit-establishment__searchable-by",
       refreshEditLink: "im-form-edit-establishment__refresh-link",
       offerCard: "im-form-edit-establishment__offer-card",
+      userRightsList: "establishment-users-list",
     },
     admin: {
       form: "im-form-manage-establishment-admin",

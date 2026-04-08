@@ -4429,6 +4429,23 @@ describe("PgEstablishmentAggregateRepository", () => {
       ])
       .build();
 
+    const establishmentWithUserId2AndStatusPending =
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("00000000000007")
+        .withLocationId(uuid())
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            status: "PENDING",
+            job: "doing other stuffffffffffffff",
+            phone: "+33688445566",
+            userId: user2.id,
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+        ])
+        .build();
+
     const establishmentFindableByName = new EstablishmentAggregateBuilder()
       .withEstablishmentName("establishmentFindableByName")
       .withLocationId(uuid())
@@ -4460,6 +4477,9 @@ describe("PgEstablishmentAggregateRepository", () => {
       );
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         establishmentWithUserId2_2,
+      );
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentWithUserId2AndStatusPending,
       );
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         establishmentFindableByName,
@@ -4525,6 +4545,16 @@ describe("PgEstablishmentAggregateRepository", () => {
           },
         ),
         [establishmentFindableByBothSiretAndName],
+      );
+    });
+    it("return only establishment where userRight is in status ACCEPTED ", async () => {
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
+          {
+            userId: user2.id,
+          },
+        ),
+        [establishmentWithUserId2_1, establishmentWithUserId2_2],
       );
     });
   });
