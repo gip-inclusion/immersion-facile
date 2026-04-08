@@ -23,7 +23,7 @@ import type { Firstname, Lastname } from "../user/user.dto";
 import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import type {
-  discussionExchangeForbidenReasons,
+  discussionExchangeForbiddenReasons,
   exchangeRoles,
 } from "./discussion.schema";
 
@@ -39,21 +39,27 @@ export type CandidateWarnedMethod = (typeof candidateWarnedMethods)[number];
 export type ExchangeRole = (typeof exchangeRoles)[number];
 
 export type DiscussionExchangeForbiddenReason =
-  (typeof discussionExchangeForbidenReasons)[number];
+  (typeof discussionExchangeForbiddenReasons)[number];
+
+type DiscussionExchangeForbiddenParamsWithoutRequestEstablishmentRegistrationUrl =
+  {
+    reason: Exclude<
+      DiscussionExchangeForbiddenReason,
+      "user_unknown_or_missing_rights_on_establishment"
+    >;
+    sender: ExchangeRole;
+  };
+
+export type DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl =
+  {
+    reason: "user_unknown_or_missing_rights_on_establishment";
+    sender: ExchangeRole;
+    requestEstablishmentRegistrationUrl: AbsoluteUrl;
+  };
 
 export type DiscussionExchangeForbiddenParams =
-  | {
-      reason: Exclude<
-        DiscussionExchangeForbiddenReason,
-        "user_unknown_or_missing_rights_on_establishment"
-      >;
-      sender: ExchangeRole;
-    }
-  | {
-      reason: "user_unknown_or_missing_rights_on_establishment";
-      sender: ExchangeRole;
-      requestEstablishmentRegistrationUrl: AbsoluteUrl;
-    };
+  | DiscussionExchangeForbiddenParamsWithoutRequestEstablishmentRegistrationUrl
+  | DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl;
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 export type WithDiscussionId = {

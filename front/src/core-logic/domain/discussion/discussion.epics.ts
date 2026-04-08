@@ -71,12 +71,10 @@ const sendMessageEpic: DiscussionEpic = (
         map((result) =>
           "reason" in result
             ? discussionSlice.actions.sendExchangeFailed({
-                errorMessage: discussionExchangeForbiddenContents(
-                  result.reason ===
-                    "user_unknown_or_missing_rights_on_establishment"
-                    ? result.requestEstablishmentRegistrationUrl
-                    : undefined,
-                )[result.sender][result.reason].content,
+                errorMessage:
+                  discussionExchangeForbiddenContents(result)[result.sender][
+                    result.reason
+                  ].content,
                 feedbackTopic: action.payload.feedbackTopic,
               })
             : discussionSlice.actions.sendExchangeSucceeded({
