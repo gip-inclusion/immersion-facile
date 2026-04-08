@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import type { SiretDto, SiretEstablishmentDto } from "shared";
+import type { SiretEstablishmentDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { AddressAutocompleteLocator } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
@@ -92,53 +92,4 @@ export const useSiretFetcher = ({
       );
     },
   };
-};
-
-export const useInitialSiret = ({
-  siret,
-  addressAutocompleteLocator,
-  shouldFetch,
-}: {
-  siret: SiretDto;
-  addressAutocompleteLocator: AddressAutocompleteLocator;
-  shouldFetch: boolean;
-}) => {
-  const currentSiret = useAppSelector(siretSelectors.currentSiret);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (shouldFetch && siret.length > 0 && siret !== currentSiret) {
-      dispatch(
-        siretSlice.actions.siretModified({
-          siret,
-          feedbackTopic: "siret-input",
-          addressAutocompleteLocator,
-        }),
-      );
-    }
-  }, [siret, currentSiret, addressAutocompleteLocator, dispatch, shouldFetch]);
-};
-
-export const useExistingSiret = ({
-  siret,
-  addressAutocompleteLocator,
-  shouldFetch = true,
-}: {
-  siret?: SiretDto | null;
-  addressAutocompleteLocator: AddressAutocompleteLocator;
-  shouldFetch?: boolean;
-}) => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (siret && shouldFetch) {
-      dispatch(
-        siretSlice.actions.siretModified({
-          feedbackTopic: "siret-input",
-          siret: siret,
-          addressAutocompleteLocator,
-        }),
-      );
-    }
-  }, [siret, dispatch, addressAutocompleteLocator, shouldFetch]);
 };

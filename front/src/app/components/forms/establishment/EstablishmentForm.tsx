@@ -27,7 +27,6 @@ import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { type routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -36,6 +35,8 @@ import { establishmentSelectors } from "src/core-logic/domain/establishment/esta
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 
@@ -170,12 +171,26 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     mode: "onTouched",
   });
   const { handleSubmit, getValues, reset, trigger } = methods;
+  const siret = getValues("siret");
+  const currentSiret = useAppSelector(siretSelectors.currentSiret);
+  const shouldFetch = mode === "create";
+  const shouldUpdateSiret = useMemo(
+    () => shouldFetch && siret.length > 0 && siret !== currentSiret,
+    [siret, currentSiret, shouldFetch],
+  );
 
-  useInitialSiret({
-    siret: getValues("siret"),
-    addressAutocompleteLocator: "multiple-address-0",
-    shouldFetch: mode === "create",
-  });
+  useEffect(() => {
+    if (shouldUpdateSiret) {
+      dispatch(
+        siretSlice.actions.siretModified({
+          siret,
+          feedbackTopic: "siret-input",
+          addressAutocompleteLocator: "multiple-address-0",
+        }),
+      );
+    }
+  }, [siret, dispatch, shouldUpdateSiret]);
+
   useScrollTo(establishmentFeedback?.level === "success" || currentStep);
 
   useEffect(() => {
