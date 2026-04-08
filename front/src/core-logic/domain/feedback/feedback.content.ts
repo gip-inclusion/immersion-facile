@@ -24,6 +24,7 @@ import { conventionTemplateSlice } from "src/core-logic/domain/convention-templa
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
+import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import type {
   ActionKindAndLevel,
   Feedback,
@@ -90,6 +91,7 @@ const topics = [
   "sign-assessment",
   "siret-input",
   "close-agency-and-transfer-conventions",
+  "feature-flags-global",
   "transfer-convention-to-agency",
   "unused",
   "user",
@@ -590,6 +592,13 @@ export const feedbacks: Record<
       title: "Problème lors du transfert des conventions",
       message:
         "Une erreur est survenue lors de la fermeture de l'agence et du transfert des conventions.",
+    },
+  },
+  "feature-flags-global": {
+    "fetch.error": {
+      action: featureFlagsSlice.actions.retrieveFeatureFlagsFailed,
+      title: "Problème de communication avec le serveur Immersion Facilitée",
+      message: "Veuillez réessayer plus tard ou contacter l'assistance.",
     },
   },
   "transfer-convention-to-agency": {

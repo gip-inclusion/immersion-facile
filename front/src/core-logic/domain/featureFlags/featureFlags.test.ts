@@ -12,6 +12,7 @@ import {
   type FeatureFlagsState,
   featureFlagsSlice,
 } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   createTestStore,
   type TestDependencies,
@@ -111,6 +112,34 @@ describe("feature flag slice", () => {
     });
   });
 
+  it("fetches feature flags and shows when failed", () => {
+    expectFeatureFlagsStateToEqual({
+      ...defaultFeatureFlags,
+      isLoading: true,
+    });
+    store.dispatch(featureFlagsSlice.actions.retrieveFeatureFlagsRequested());
+    expectFeatureFlagsStateToEqual({
+      ...defaultFeatureFlags,
+      isLoading: true,
+    });
+    dependencies.technicalGateway.featureFlags$.error(
+      new Error("Failed to fetch feature flags"),
+    );
+    expectFeatureFlagsStateToEqual({
+      ...defaultFeatureFlags,
+      isLoading: false,
+    });
+
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+      "feature-flags-global": {
+        level: "error",
+        message: "Failed to fetch feature flags",
+        on: "fetch",
+        title: "Problème de communication avec le serveur Immersion Facilitée",
+      },
+    });
+  });
+
   it("sets feature flag to given value", () => {
     ({ store, dependencies } = createTestStore({
       featureFlags: {
@@ -164,6 +193,63 @@ describe("feature flag slice", () => {
         title: "",
       }),
     });
+    expectFeatureFlagsStateToEqual({
+      ...defaultFeatureFlags,
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
+        imageAlt: "",
+        imageUrl: "https://",
+        message: "",
+        redirectUrl: "https://",
+        overtitle: "",
+        title: "",
+      }),
+      isLoading: false,
+    });
+  });
+  it("sets feature flag to given value and shows when failed", () => {
+    ({ store, dependencies } = createTestStore({
+      featureFlags: {
+        ...defaultFeatureFlags,
+        enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+          imageAlt: "",
+          imageUrl: "https://",
+          message: "",
+          redirectUrl: "https://",
+          overtitle: "",
+          title: "",
+        }),
+        isLoading: false,
+      },
+    }));
+
+    store.dispatch(
+      featureFlagsSlice.actions.setFeatureFlagRequested({
+        flagName: "enableTemporaryOperation",
+        featureFlag: makeTextImageAndRedirectFeatureFlag(true, {
+          imageAlt: "",
+          imageUrl: "https://",
+          message: "",
+          redirectUrl: "https://",
+          overtitle: "",
+          title: "",
+        }),
+      }),
+    );
+    expectFeatureFlagsStateToEqual({
+      ...defaultFeatureFlags,
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
+        imageAlt: "",
+        imageUrl: "https://",
+        message: "",
+        redirectUrl: "https://",
+        overtitle: "",
+        title: "",
+      }),
+      isLoading: true,
+    });
+    dependencies.adminGateway.setFeatureFlagResponse$.error(
+      new Error("Failed to set feature flag"),
+    );
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
       enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
