@@ -56,6 +56,16 @@ export const featureFlagsSlice = createSlice({
       ...action.payload,
       isLoading: false,
     }),
+    retrieveFeatureFlagsFailed: (
+      state,
+      _action: PayloadAction<{
+        feedbackTopic: "feature-flags-global";
+        errorMessage: string;
+      }>,
+    ): FeatureFlagsState => ({
+      ...state,
+      isLoading: false,
+    }),
     setFeatureFlagRequested: (
       state,
       action: PayloadAction<SetFeatureFlagParam>,
@@ -68,6 +78,10 @@ export const featureFlagsSlice = createSlice({
       },
     }),
     setFeatureFlagSucceeded: (state): FeatureFlagsState => ({
+      ...state,
+      isLoading: false,
+    }),
+    setFeatureFlagFailed: (state): FeatureFlagsState => ({
       ...state,
       isLoading: false,
     }),

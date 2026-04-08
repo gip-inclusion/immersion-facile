@@ -26,6 +26,7 @@ export const App = () => {
   const dispatch = useDispatch();
   const consent = useConsent();
   useSetAcquisitionParams();
+
   return (
     <ErrorBoundary
       fallbackRender={({ error }) => <ErrorPage error={error} />}
@@ -42,7 +43,7 @@ export const App = () => {
           userConsent={!!consent?.finalityConsent?.support}
         />
       )}
-      {ENV.envType === "staging" && (
+      {ENV.envType !== "staging" && (
         <TagContainer
           containerUrl={
             "https://cdn.tagcommander.com/7774/uat/tc_ImmersionFacile_31.js"

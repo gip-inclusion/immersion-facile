@@ -84,6 +84,29 @@ export const frontErrors = {
       }),
   },
   generic: {
+    backendUnreachable: () =>
+      new FrontSpecificError({
+        title: "Immersion Facilitée est momentanément indisponible",
+        description: (
+          <>
+            <p>
+              Ce problème est temporaire. Veuillez réessayer d'ici quelques
+              minutes.
+            </p>
+            <p>
+              Si le problème persiste :{" "}
+              <a
+                href={immersionFacileSupportUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                contactez-nous
+              </a>
+            </p>
+          </>
+        ),
+        buttons: [HomeButton],
+      }),
     pageNotFound: () =>
       new FrontSpecificError({
         title: "Page non trouvée",

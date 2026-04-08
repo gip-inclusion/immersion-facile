@@ -15,6 +15,7 @@ import {
 } from "shared";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
@@ -340,6 +341,14 @@ const getPageByRouteName: {
 };
 
 export const Router = (): ReactNode => {
+  const featureFlagsGlobalFeedback = useFeedbackTopic("feature-flags-global");
+
+  if (
+    featureFlagsGlobalFeedback?.on === "fetch" &&
+    featureFlagsGlobalFeedback.level === "error"
+  )
+    throw frontErrors.generic.backendUnreachable();
+
   const route = useRoute();
   const routeName = route.name;
   const previousRouteName = useRef<keyof Routes | undefined>(undefined);
