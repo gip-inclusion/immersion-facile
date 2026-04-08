@@ -16,7 +16,7 @@ import {
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
-import { makeAssessmentTextsByStatus } from "src/app/utils/assessment.utils";
+import { getAssessmentLabelsAndSeverityByStatus } from "src/app/utils/assessment.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
@@ -122,7 +122,7 @@ const AssessmentToCompleteTaskItem = ({
         small
       >
         {
-          makeAssessmentTextsByStatus({ isPlural: false })[
+          getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
             assessmentCompletionStatus
           ].shortLabel
         }
@@ -138,7 +138,7 @@ const AssessmentToCompleteTaskItem = ({
       title={title}
       titleAs="h3"
       description={
-        makeAssessmentTextsByStatus({ isPlural: false })[
+        getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
           assessmentCompletionStatus
         ].description
       }
