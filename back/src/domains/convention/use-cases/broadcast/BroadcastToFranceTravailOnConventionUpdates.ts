@@ -52,18 +52,18 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
         : undefined;
 
     if (!shouldBroadcastForCurrentAgency && previousAgencyId) {
-      const { agency: prevAgency, refersToAgency: prevRefersTo } =
+      const { agency: previousAgency, refersToAgency: previousAgencyRefersTo } =
         await getLinkedAgenciesFromAgencyId(uow, previousAgencyId);
       if (
         !shouldBroadcastToFranceTravail({
-          agency: prevAgency,
-          refersToAgency: prevRefersTo,
+          agency: previousAgency,
+          refersToAgency: previousAgencyRefersTo,
           featureFlags,
         })
       )
         return deps.options.resyncMode
           ? uow.conventionsToSyncRepository.save({
-              id: convention.id,
+              id: inputParams.convention.id,
               status: "SKIP",
               processDate: deps.timeGateway.now(),
               reason: "Agency is not of kind pole-emploi",
