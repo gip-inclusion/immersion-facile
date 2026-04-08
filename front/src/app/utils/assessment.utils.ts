@@ -1,20 +1,29 @@
-import type { AssessmentCompletionStatusFilter } from "shared";
+import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import type {
+  AssessmentCompletionStatusFilter,
+  ConventionAssessmentFields,
+} from "shared";
 
-export const makeAssessmentTextsByStatus = ({
+export type AssessmentLabelsAndSeverity = {
+  shortLabel: string;
+  longLabel: string;
+  description: string;
+  severity: BadgeProps["severity"];
+};
+
+export const getAssessmentLabelsAndSeverityByStatus = ({
   isPlural,
 }: {
   isPlural: boolean;
-}): Record<
-  AssessmentCompletionStatusFilter,
-  { shortLabel: string; longLabel: string; description?: string }
-> => ({
+}): Record<AssessmentCompletionStatusFilter, AssessmentLabelsAndSeverity> => ({
   finalized: {
-    shortLabel: isPlural ? "Bilans signés" : "Bilan signé",
+    shortLabel: isPlural ? "Bilan complétés" : "Bilan complété",
     longLabel: isPlural
       ? "Bilans complétés et signés"
       : "Bilan complété et signé",
     description:
       "La signature n'est requise que lorsque la personne en immersion s'est présentée.",
+    severity: "success",
   },
   "to-sign": {
     shortLabel: isPlural ? "Bilans à signer" : "Bilan à signer",
@@ -23,6 +32,7 @@ export const makeAssessmentTextsByStatus = ({
       : "Bilan à signer par la personne en immersion",
     description:
       "Le bilan n'a pas encore été signé par la personne en immersion.",
+    severity: "warning",
   },
   "to-complete": {
     shortLabel: isPlural ? "Bilans à compléter" : "Bilan à compléter",
@@ -30,5 +40,19 @@ export const makeAssessmentTextsByStatus = ({
       ? "Bilans à compléter par le tuteur"
       : "Bilan à compléter par le tuteur",
     description: "Le bilan n'a pas encore été complété par l'entreprise.",
+    severity: "warning",
   },
 });
+
+export const getAssessmentCompletionStatus = (
+  assessment: ConventionAssessmentFields["assessment"],
+): AssessmentCompletionStatusFilter => {
+  if (assessment == null) return "to-complete";
+  if (
+    "signedAt" in assessment &&
+    assessment.signedAt === null &&
+    assessment.status !== "DID_NOT_SHOW"
+  )
+    return "to-sign";
+  return "finalized";
+};

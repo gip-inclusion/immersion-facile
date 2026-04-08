@@ -26,7 +26,10 @@ import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenB
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
-import { makeAssessmentTextsByStatus } from "src/app/utils/assessment.utils";
+import {
+  getAssessmentCompletionStatus,
+  getAssessmentLabelsAndSeverityByStatus,
+} from "src/app/utils/assessment.utils";
 import logoFtSvg from "src/assets/img/logo-ft.svg";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -116,8 +119,9 @@ export const ConventionList = () => {
   const assessmentOptions: RadioButtonsProps["options"] = useMemo(
     () => [
       {
-        label: makeAssessmentTextsByStatus({ isPlural: true })["to-complete"]
-          .longLabel,
+        label: getAssessmentLabelsAndSeverityByStatus({ isPlural: true })[
+          "to-complete"
+        ].longLabel,
         nativeInputProps: {
           value: "to-complete",
           checked:
@@ -131,8 +135,9 @@ export const ConventionList = () => {
         },
       },
       {
-        label: makeAssessmentTextsByStatus({ isPlural: true })["to-sign"]
-          .longLabel,
+        label: getAssessmentLabelsAndSeverityByStatus({ isPlural: true })[
+          "to-sign"
+        ].longLabel,
         nativeInputProps: {
           value: "to-sign",
           checked: tempFilters.assessmentCompletionStatus?.includes("to-sign"),
@@ -145,10 +150,10 @@ export const ConventionList = () => {
         },
       },
       {
-        label: makeAssessmentTextsByStatus({ isPlural: true }).finalized
-          .longLabel,
-        hintText: makeAssessmentTextsByStatus({ isPlural: true }).finalized
-          .description,
+        label: getAssessmentLabelsAndSeverityByStatus({ isPlural: true })
+          .finalized.longLabel,
+        hintText: getAssessmentLabelsAndSeverityByStatus({ isPlural: true })
+          .finalized.description,
         nativeInputProps: {
           value: "finalized",
           checked:
@@ -357,10 +362,24 @@ export const ConventionList = () => {
                   </Badge>
                 </Fragment>,
                 <Fragment key={`${convention.id}-assessment`}>
-                  <strong>
-                    {convention.status === "ACCEPTED_BY_VALIDATOR" &&
-                      (convention.assessment ? "✅ oui" : "❌ non")}
-                  </strong>
+                  {convention.status === "ACCEPTED_BY_VALIDATOR" && (
+                    <Badge
+                      small
+                      severity={
+                        getAssessmentLabelsAndSeverityByStatus({
+                          isPlural: false,
+                        })[getAssessmentCompletionStatus(convention.assessment)]
+                          .severity
+                      }
+                    >
+                      {
+                        getAssessmentLabelsAndSeverityByStatus({
+                          isPlural: false,
+                        })[getAssessmentCompletionStatus(convention.assessment)]
+                          .shortLabel
+                      }
+                    </Badge>
+                  )}
                 </Fragment>,
 
                 <Fragment key={`${convention.id}-beneficiary`}>
@@ -471,21 +490,21 @@ export const ConventionList = () => {
                             "finalized",
                           )
                         ) {
-                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true }).finalized.longLabel}`;
+                          return `Bilan : ${getAssessmentLabelsAndSeverityByStatus({ isPlural: true }).finalized.longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
                             "to-sign",
                           )
                         ) {
-                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-sign"].longLabel}`;
+                          return `Bilan : ${getAssessmentLabelsAndSeverityByStatus({ isPlural: true })["to-sign"].longLabel}`;
                         }
                         if (
                           tempFilters.assessmentCompletionStatus?.includes(
                             "to-complete",
                           )
                         ) {
-                          return `Bilan : ${makeAssessmentTextsByStatus({ isPlural: true })["to-complete"].longLabel}`;
+                          return `Bilan : ${getAssessmentLabelsAndSeverityByStatus({ isPlural: true })["to-complete"].longLabel}`;
                         }
                         return "Tous les bilans";
                       })(),
