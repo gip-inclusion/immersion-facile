@@ -1,5 +1,6 @@
 import annuaireDesEntreprises from "./annuaire-des-entreprises.webp";
 import contact from "./contact.webp";
+import discussions from "./discussions.webp";
 import documentsAdministratifs from "./documents-administratifs.webp";
 import error from "./error-illustration.webp";
 import errorMissing from "./error-missing-illustration.webp";
@@ -15,6 +16,7 @@ import search1 from "./search-illustration-0.webp";
 import search2 from "./search-illustration-1.webp";
 import search3 from "./search-illustration-2.webp";
 import search4 from "./search-illustration-3.webp";
+import structureAccueil from "./structure-accueil.webp";
 import success from "./success-illustration.webp";
 
 export const commonIllustrations = {
@@ -31,6 +33,8 @@ export const commonIllustrations = {
   contact,
   errorMissing,
   fillForm,
+  structureAccueil,
+  discussions,
 };
 export const searchIllustrations = [search1, search2, search3, search4];
 export const loginIllustration = login;

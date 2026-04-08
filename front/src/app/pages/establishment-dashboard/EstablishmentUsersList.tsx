@@ -97,7 +97,10 @@ export const EstablishmentUsersList = () => {
   });
 
   return (
-    <div className="fr-mt-4w">
+    <div
+      id={domElementIds.establishment.edit.userRightsList}
+      className="fr-mt-4w"
+    >
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
         <div>
           <h3 className={fr.cx("fr-h6", "fr-mb-0")}>Utilisateurs</h3>

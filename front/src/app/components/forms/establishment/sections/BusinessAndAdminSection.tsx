@@ -18,6 +18,7 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUsersList } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { match, P } from "ts-pattern";
 import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
 
@@ -45,12 +46,36 @@ export const BusinessAndAdminSection = ({
     formEstablishmentFieldsLabels(mode),
   ).getFormErrors();
 
+  const formEstablishment = useAppSelector(
+    establishmentSelectors.formEstablishment,
+  );
+
   return (
     <>
       <HeadingSection
         title="Informations de votre établissement"
         className={fr.cx("fr-mt-0")}
       >
+        {formEstablishment.userRights.some(
+          (userRight) => userRight.status === "PENDING",
+        ) && (
+          <Alert
+            severity="info"
+            small
+            description={
+              <div>
+                Un ou plusieurs utilisateurs ont demandé l'accès à votre
+                entreprise.{" "}
+                <a
+                  href={`#${domElementIds.establishment.edit.userRightsList}`}
+                  className={fr.cx("fr-skiplink")}
+                >
+                  Veuillez examiner leur demande.
+                </a>
+              </div>
+            }
+          />
+        )}
         {match(mode)
           .with("create", () => <CreationSiretRelatedInputs />)
           .with(P.union("admin", "edit"), () => (

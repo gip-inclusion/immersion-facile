@@ -15,7 +15,13 @@ export const EstablishmentLineAdminsInfos = ({
           rel="noreferrer"
           className={fr.cx("fr-tag", "fr-tag--sm")}
         >
-          {admin.firstName} {admin.lastName}
+          {admin.firstName && admin.lastName ? (
+            <>
+              {admin.firstName} {admin.lastName}
+            </>
+          ) : (
+            admin.email
+          )}
         </a>
       </li>
     ))}

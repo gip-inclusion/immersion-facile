@@ -101,7 +101,12 @@ export class PgEstablishmentAggregateRepository
             "establishments__users.siret",
             "e.siret",
           )
-          .where("establishments__users.user_id", "=", userId ?? ""),
+          .where("establishments__users.user_id", "=", userId ?? "")
+          .where(
+            "establishments__users.status",
+            "=",
+            "ACCEPTED" satisfies EstablishmentUserRightStatus,
+          ),
       )
       .$if(!!nameIncludes, (qb) =>
         qb.where("e.name", "ilike", `%${nameIncludes}%`),
