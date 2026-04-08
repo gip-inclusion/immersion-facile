@@ -1,5 +1,4 @@
 import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { loginByEmailLinkDurationInMinutes } from "shared";
 import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
 
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
@@ -932,7 +931,7 @@ export const feedbacks: Record<
   "renew-expired-jwt": {
     "create.success": {
       action: authSlice.actions.renewExpiredJwtSucceded,
-      message: `Le nouveau lien a bien été envoyé par email. Attention, la durée de ce lien, une fois envoyé est de ${loginByEmailLinkDurationInMinutes} minutes.`,
+      message: "Le nouveau lien a bien été envoyé",
       title: "Renouvellement de lien réussi",
     },
     "create.error": {
