@@ -6,10 +6,12 @@ import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  type EstablishmentRole,
   establishmentsRoles,
   type FormEstablishmentUserRight,
   formEstablishmentUserRightSchema,
   localization,
+  type OmitFromExistingKeys,
   type SiretDto,
 } from "shared";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
@@ -34,6 +36,11 @@ type EstablishmentUserUserFormProps = {
   selectedEstablishmentSiret?: SiretDto | undefined;
 };
 
+type EstablishmentUserFormEmptyValues = OmitFromExistingKeys<
+  FormEstablishmentUserRight,
+  "role"
+> & { role?: EstablishmentRole };
+
 export const EstablishmentUserForm = ({
   alreadyExistingUserRight,
   establishmentUsersEditModal,
@@ -54,17 +61,19 @@ export const EstablishmentUserForm = ({
     route.name === "myProfileEstablishmentRegistration";
   const isManageEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
   const dispatch = useDispatch();
-  const emptyValues = useRef({
+  const emptyValues = {
     email: "",
     phone: "",
     job: "",
     role: undefined,
     shouldReceiveDiscussionNotifications: false,
     isMainContactByPhone: false,
-  });
+    status: "ACCEPTED",
+  } satisfies EstablishmentUserFormEmptyValues;
+  const emptyValuesRef = useRef(emptyValues);
 
   const defaultValues = useMemo(
-    () => ({ ...emptyValues.current, ...alreadyExistingUserRight }),
+    () => ({ ...emptyValuesRef.current, ...alreadyExistingUserRight }),
     [alreadyExistingUserRight],
   );
 
