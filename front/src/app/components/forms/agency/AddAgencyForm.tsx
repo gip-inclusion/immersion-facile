@@ -48,9 +48,9 @@ import {
 import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
-import mushroomSvg from "../../../../assets/img/mushroom.svg";
-import roundSquareSvg from "../../../../assets/img/round-square.svg";
-import shurikenSvg from "../../../../assets/img/shuriken.svg";
+import mushroomImage from "../../../../assets/img/mushroom.webp";
+import roundSquareImage from "../../../../assets/img/round-square.webp";
+import shurikenImage from "../../../../assets/img/shuriken.webp";
 
 export const AddAgencyForm = () => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
@@ -82,7 +82,7 @@ export const AddAgencyForm = () => {
 
   const refersToOtherAgencyOptions: RadioButtonsProps["options"] = [
     {
-      illustration: <img src={shurikenSvg} alt="" />,
+      illustration: <img src={shurikenImage} alt="" />,
       label: "Prescripteur de droit commun",
       hintText:
         "Valide les conventions et assure la couverture du risque d'accident du travail et de maladie professionnelle (AT/MP). Exemples : Mission Locale, Cap Emploi, France Travail, Conseil Départemental, Structure IAE (hors ETTI), CEP.",
@@ -95,7 +95,7 @@ export const AddAgencyForm = () => {
       },
     },
     {
-      illustration: <img src={roundSquareSvg} alt="" />,
+      illustration: <img src={roundSquareImage} alt="" />,
       label: "Prescripteur par délégation",
       hintText:
         "Dispose, ou souhaite disposer, d'une convention signée avec un prescripteur de droit commun. Valide les conventions et assure la couverture du risque d'accident du travail et de maladie professionnelle (AT/MP).",
@@ -108,7 +108,7 @@ export const AddAgencyForm = () => {
       },
     },
     {
-      illustration: <img src={mushroomSvg} alt="" />,
+      illustration: <img src={mushroomImage} alt="" />,
       label: "Structure d'accompagnement",
       hintText:
         "Accompagne la personne tout au long de son immersion et pré-valide la convention avant la validation finale par le prescripteur. Ne cotise pas au risque AT/MP. Exemples : club sportif, organismes d'accompagnement sans délégation, etc.",
