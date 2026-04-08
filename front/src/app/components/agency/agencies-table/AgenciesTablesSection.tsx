@@ -20,11 +20,9 @@ import { AgencyRightsTable } from "./AgencyRightsTable";
 export const AgenciesTablesSection = ({
   user,
   agencyRights,
-  isBackofficeAdmin,
 }: {
   user: User;
   agencyRights: AgencyRight[];
-  isBackofficeAdmin?: boolean;
 }) => {
   const dispatch = useDispatch();
 
@@ -96,7 +94,6 @@ export const AgenciesTablesSection = ({
         <AgencyRightsTable
           agencyRights={activeAgencyRights}
           user={user}
-          isBackofficeAdmin={isBackofficeAdmin}
           modalId={domElementIds.admin.agencyTab.editAgencyManageUserModal}
           onUserUpdateRequested={onUserUpdateRequested("user")}
         />

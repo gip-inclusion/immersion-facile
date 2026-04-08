@@ -23,12 +23,12 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { AgencyLineAdminEmails } from "./agency-line/AgencyLineAdminEmails";
 
 type AgencyRightsTableProps = {
   agencyRights: AgencyRight[];
   user: User;
-  isBackofficeAdmin?: boolean;
   title?: string;
   onUserRegistrationCancelledRequested?: (agencyRight: AgencyRight) => void;
 } & (
@@ -42,13 +42,14 @@ type AgencyRightsTableProps = {
 export const AgencyRightsTable = ({
   agencyRights,
   user,
-  isBackofficeAdmin,
   modalId,
   onUserUpdateRequested,
   onUserRegistrationCancelledRequested,
   title,
 }: AgencyRightsTableProps) => {
   const dispatch = useDispatch();
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const isBackofficeAdmin = currentUser?.isBackofficeAdmin;
   const [selectedAgencyRight, setSelectedAgencyRight] =
     useState<AgencyRight | null>(null);
   const selectedAgencyUsersById = useAppSelector(
