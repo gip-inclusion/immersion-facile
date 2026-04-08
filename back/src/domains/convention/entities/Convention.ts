@@ -263,12 +263,6 @@ export const getLinkedAgenciesFromAgencyId = async (
   };
 };
 
-export const getLinkedAgencies = async (
-  uow: UnitOfWork,
-  convention: ConventionDto,
-): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> =>
-  getLinkedAgenciesFromAgencyId(uow, convention.agencyId);
-
 export const shouldBroadcastToFranceTravail = ({
   agency,
   featureFlags,

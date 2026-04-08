@@ -7,7 +7,6 @@ import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/Broad
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import {
-  getLinkedAgencies,
   getLinkedAgenciesFromAgencyId,
   shouldBroadcastToFranceTravail,
 } from "../../entities/Convention";
@@ -33,9 +32,9 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
     options: { resyncMode: boolean };
   }>()
   .build(async ({ inputParams, uow, deps }): Promise<void> => {
-    const { agency, refersToAgency } = await getLinkedAgencies(
+    const { agency, refersToAgency } = await getLinkedAgenciesFromAgencyId(
       uow,
-      inputParams.convention,
+      inputParams.convention.agencyId,
     );
 
     const featureFlags = await uow.featureFlagQueries.getAll();
@@ -46,30 +45,25 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
       featureFlags,
     });
 
-    const previousAgencyId =
-      inputParams.eventType === "CONVENTION_UPDATED"
-        ? inputParams.previousAgencyId
+    const previousLinkedAgencies =
+      inputParams.eventType === "CONVENTION_UPDATED" &&
+      inputParams.previousAgencyId &&
+      !shouldBroadcastForCurrentAgency
+        ? await getLinkedAgenciesFromAgencyId(uow, inputParams.previousAgencyId)
         : undefined;
 
-    if (!shouldBroadcastForCurrentAgency && previousAgencyId) {
-      const { agency: previousAgency, refersToAgency: previousAgencyRefersTo } =
-        await getLinkedAgenciesFromAgencyId(uow, previousAgencyId);
-      if (
-        !shouldBroadcastToFranceTravail({
-          agency: previousAgency,
-          refersToAgency: previousAgencyRefersTo,
+    const shouldBroadcastForPreviousAgency = previousLinkedAgencies
+      ? shouldBroadcastToFranceTravail({
+          agency: previousLinkedAgencies.agency,
+          refersToAgency: previousLinkedAgencies.refersToAgency,
           featureFlags,
         })
-      )
-        return deps.options.resyncMode
-          ? uow.conventionsToSyncRepository.save({
-              id: inputParams.convention.id,
-              status: "SKIP",
-              processDate: deps.timeGateway.now(),
-              reason: "Agency is not of kind pole-emploi",
-            })
-          : undefined;
-    } else if (!shouldBroadcastForCurrentAgency)
+      : false;
+
+    const shouldBroadcast =
+      shouldBroadcastForCurrentAgency || shouldBroadcastForPreviousAgency;
+
+    if (!shouldBroadcast)
       return deps.options.resyncMode
         ? uow.conventionsToSyncRepository.save({
             id: inputParams.convention.id,
