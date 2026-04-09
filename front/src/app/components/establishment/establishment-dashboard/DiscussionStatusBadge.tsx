@@ -5,6 +5,7 @@ import {
   type DiscussionReadDto,
   domElementIds,
   getDiscussionDisplayStatus,
+  isDiscussionInList,
 } from "shared";
 
 export const DiscussionStatusBadge = ({
@@ -19,7 +20,17 @@ export const DiscussionStatusBadge = ({
   const statusBadge =
     statusBadgeData[
       getDiscussionDisplayStatus({
-        discussion,
+        discussion: {
+          createdAt: discussion.createdAt,
+          status: discussion.status,
+          exchangesData: isDiscussionInList(discussion)
+            ? discussion.exchangesData
+            : {
+                count: discussion.exchanges.length,
+                lastExchange:
+                  discussion.exchanges[discussion.exchanges.length - 1],
+              },
+        },
         now: new Date(),
       })
     ];

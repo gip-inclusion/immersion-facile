@@ -11,6 +11,7 @@ describe("GetDiscussionsForUser", () => {
       const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         search: "siret1",
         statuses: ["PENDING", "ACCEPTED"],
+        userRole: "establishment",
       });
       expectToEqual(result, {
         filters: {
@@ -19,22 +20,25 @@ describe("GetDiscussionsForUser", () => {
         },
         sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
+        userRole: "establishment",
       });
     });
 
     it("returns unfiltered results when no status or siret is provided", () => {
-      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams(
-        {},
-      );
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
+        userRole: "potentialBeneficiary",
+      });
       expectToEqual(result, {
         sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
+        userRole: "potentialBeneficiary",
       });
     });
 
     it("wraps a single status in an array", () => {
       const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         statuses: "PENDING",
+        userRole: "establishment",
       });
       expectToEqual(result, {
         filters: {
@@ -42,16 +46,18 @@ describe("GetDiscussionsForUser", () => {
         },
         sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
+        userRole: "establishment",
       });
     });
 
     it("adds a default order by createdAt, desc if none is provided", () => {
-      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams(
-        {},
-      );
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
+        userRole: "establishment",
+      });
       expectToEqual(result, {
         sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
+        userRole: "establishment",
       });
     });
 
@@ -59,10 +65,12 @@ describe("GetDiscussionsForUser", () => {
       const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         orderBy: "createdAt",
         orderDirection: "asc",
+        userRole: "establishment",
       });
       expectToEqual(result, {
         sort: { by: "createdAt", direction: "asc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
+        userRole: "establishment",
       });
     });
 
@@ -70,10 +78,12 @@ describe("GetDiscussionsForUser", () => {
       const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         page: 2,
         perPage: 150,
+        userRole: "establishment",
       });
       expectToEqual(result, {
         sort: { by: "createdAt", direction: "desc" },
         pagination: { page: 2, perPage: maxPerPageInWebPagination },
+        userRole: "establishment",
       });
     });
   });

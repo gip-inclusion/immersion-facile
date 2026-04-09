@@ -171,7 +171,18 @@ describe("Discussions", () => {
       expectedDisplayStatus,
     }) => {
       expectToEqual(
-        getDiscussionDisplayStatus({ discussion, now }),
+        getDiscussionDisplayStatus({
+          discussion: {
+            createdAt: discussion.createdAt,
+            status: discussion.status,
+            exchangesData: {
+              count: discussion.exchanges.length,
+              lastExchange:
+                discussion.exchanges[discussion.exchanges.length - 1],
+            },
+          },
+          now,
+        }),
         expectedDisplayStatus,
       );
     });

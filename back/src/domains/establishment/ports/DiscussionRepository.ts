@@ -9,6 +9,7 @@ import type {
   DiscussionOrderKey,
   DiscussionStatus,
   Email,
+  ExchangeRole,
   LocationId,
   OptionalDateRange,
   SiretDto,
@@ -53,6 +54,7 @@ export type GetPaginatedDiscussionsForUserParams = WithRequiredPagination &
       search?: string;
     };
     userId: UserId;
+    userRole: ExchangeRole;
   };
 
 export interface DiscussionRepository {
