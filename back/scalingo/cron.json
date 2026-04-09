@@ -13,6 +13,10 @@
       "size": "M"
     },
     {
+      "command": "15 0 * * * pnpm back run trigger-resync-old-conventions-to-pe",
+      "size": "M"
+    },
+    {
       "command": "53 0 * * * pnpm back run trigger-refresh-materialized-views",
       "size": "M"
     },
