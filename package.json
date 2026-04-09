@@ -106,7 +106,8 @@
     },
     "onlyBuiltDependencies": [
       "@sentry-internal/node-cpu-profiler",
-      "esbuild"
+      "esbuild",
+      "bun"
     ]
   },
   "engines": {
