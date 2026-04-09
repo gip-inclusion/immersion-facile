@@ -249,6 +249,7 @@ const createConventionSelection = (
         sanitaryPreventionDescription: ref(
           "conventions.sanitary_prevention_description",
         ),
+        remoteWorkMode: ref("conventions.remote_work_mode"),
         immersionAddress: ref("conventions.immersion_address"),
         immersionObjective: ref("conventions.immersion_objective"),
         immersionAppellation: jsonBuildObject({

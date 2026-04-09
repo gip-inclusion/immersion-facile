@@ -130,6 +130,7 @@ export class PgConventionRepository implements ConventionRepository {
       statusJustification,
       agencyReferent,
       renewed,
+      remoteWorkMode,
     } = convention;
 
     // Insert signatories and remember their id
@@ -171,6 +172,7 @@ export class PgConventionRepository implements ConventionRepository {
         individual_protection_description: individualProtectionDescription,
         sanitary_prevention: sanitaryPrevention,
         sanitary_prevention_description: sanitaryPreventionDescription,
+        remote_work_mode: remoteWorkMode,
         immersion_address: immersionAddress,
         immersion_objective: immersionObjective,
         immersion_appellation: sql`${immersionAppellation.appellationCode}`,
