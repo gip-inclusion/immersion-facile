@@ -6,6 +6,7 @@ import {
   DiscussionBuilder,
   type DiscussionDto,
   type DiscussionInList,
+  discussionToExchangesData,
   type Exchange,
   errors,
   expectPromiseToFailWithError,
@@ -71,6 +72,12 @@ describe("PgDiscussionRepository", () => {
     .withId(new UuidV4Generator().new())
     .withEmail("user@test.com")
     .build();
+
+  const bothPotentialBeneficiaryAndEstablishmentUser = new UserBuilder()
+    .withId(new UuidV4Generator().new())
+    .withEmail("both-potential-beneficiary-and-establishment-user@test.com")
+    .build();
+
   const pendingUser = new UserBuilder()
     .withId(new UuidV4Generator().new())
     .withEmail("pending-user@test.com")
@@ -95,6 +102,7 @@ describe("PgDiscussionRepository", () => {
 
     const userRepo = new PgUserRepository(db);
     await userRepo.save(user);
+    await userRepo.save(bothPotentialBeneficiaryAndEstablishmentUser);
     await userRepo.save(pendingUser);
   });
 
@@ -2428,7 +2436,7 @@ describe("PgDiscussionRepository", () => {
         },
         city: discussion2.address.city,
         immersionObjective: discussion2Objective,
-        exchanges: discussion2.exchanges,
+        exchangesData: discussionToExchangesData(discussion2),
       };
 
       const discussion3InList: DiscussionInList = {
@@ -2446,7 +2454,7 @@ describe("PgDiscussionRepository", () => {
         },
         city: discussion3.address.city,
         immersionObjective: discussion3Objective,
-        exchanges: discussion3.exchanges,
+        exchangesData: discussionToExchangesData(discussion3),
       };
 
       const discussion4InList: DiscussionInList = {
@@ -2464,7 +2472,7 @@ describe("PgDiscussionRepository", () => {
         },
         city: discussion4.address.city,
         immersionObjective: discussion4Objective,
-        exchanges: discussion4.exchanges,
+        exchangesData: discussionToExchangesData(discussion4),
       };
 
       beforeEach(async () => {
@@ -2538,6 +2546,7 @@ describe("PgDiscussionRepository", () => {
             },
             sort: { by: "createdAt", direction: "desc" },
             userId: pendingUser.id,
+            userRole: "establishment",
           });
 
         expectToEqual(result, {
@@ -2580,6 +2589,7 @@ describe("PgDiscussionRepository", () => {
             },
             sort: { by: "createdAt", direction: "desc" },
             userId: userOnlyAcceptedOnDiscussion4.id,
+            userRole: "establishment",
           });
 
         expectToEqual(
@@ -2609,6 +2619,7 @@ describe("PgDiscussionRepository", () => {
             },
             sort: { by: "createdAt", direction: "desc" },
             userId: user.id,
+            userRole: "establishment",
           });
 
         expectToEqual(resultWithDefaultOrder, {
@@ -2629,6 +2640,7 @@ describe("PgDiscussionRepository", () => {
             },
             sort: { by: "createdAt", direction: "asc" },
             userId: user.id,
+            userRole: "establishment",
           });
 
         expectToEqual(resultWithAscOrder, {
@@ -2639,6 +2651,181 @@ describe("PgDiscussionRepository", () => {
             totalPages: 1,
             totalRecords: 2,
           },
+        });
+      });
+
+      describe("filters on user role", () => {
+        const discussionWhereUserIsPotentialBeneficiary =
+          new DiscussionBuilder()
+            .withId(uuid())
+            .withSiret("00000000000005")
+            .withPotentialBeneficiaryEmail(
+              bothPotentialBeneficiaryAndEstablishmentUser.email,
+            )
+            .withPotentialBeneficiaryFirstname(
+              bothPotentialBeneficiaryAndEstablishmentUser.firstName,
+            )
+            .withPotentialBeneficiaryLastName(
+              bothPotentialBeneficiaryAndEstablishmentUser.lastName,
+            )
+            .withBusinessName("Something else")
+            .withAppellationCode(styliste.appellationCode)
+            .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
+            .withCreatedAt(new Date("2025-05-21"))
+            .withImmersionObjective(discussion4Objective)
+            .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "phone" })
+            .build();
+
+        const discussionWhereUserIsEstablishment = new DiscussionBuilder()
+          .withId(uuid())
+          .withSiret("00000000000006")
+          .withBusinessName("Something else")
+          .withAppellationCode(styliste.appellationCode)
+          .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
+          .withCreatedAt(new Date("2025-05-21"))
+          .withImmersionObjective(discussion4Objective)
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "phone" })
+          .build();
+
+        const discussionWhereUserIsEstablishmentInList: DiscussionInList = {
+          id: discussionWhereUserIsEstablishment.id,
+          siret: discussionWhereUserIsEstablishment.siret,
+          status: discussionWhereUserIsEstablishment.status,
+          appellation: styliste,
+          businessName: discussionWhereUserIsEstablishment.businessName,
+          createdAt: discussionWhereUserIsEstablishment.createdAt,
+          kind: discussionWhereUserIsEstablishment.kind,
+          potentialBeneficiary: {
+            firstName:
+              discussionWhereUserIsEstablishment.potentialBeneficiary.firstName,
+            lastName:
+              discussionWhereUserIsEstablishment.potentialBeneficiary.lastName,
+            phone: potentialBeneficiaryPhone,
+          },
+          city: discussionWhereUserIsEstablishment.address.city,
+          immersionObjective: "Initier une démarche de recrutement",
+          exchangesData: discussionToExchangesData(
+            discussionWhereUserIsEstablishment,
+          ),
+        };
+
+        const discussionForPotentialBeneficiaryInList: DiscussionInList = {
+          id: discussionWhereUserIsPotentialBeneficiary.id,
+          siret: discussionWhereUserIsPotentialBeneficiary.siret,
+          status: discussionWhereUserIsPotentialBeneficiary.status,
+          appellation: styliste,
+          businessName: discussionWhereUserIsPotentialBeneficiary.businessName,
+          createdAt: discussionWhereUserIsPotentialBeneficiary.createdAt,
+          kind: discussionWhereUserIsPotentialBeneficiary.kind,
+          potentialBeneficiary: {
+            firstName:
+              discussionWhereUserIsPotentialBeneficiary.potentialBeneficiary
+                .firstName,
+            lastName:
+              discussionWhereUserIsPotentialBeneficiary.potentialBeneficiary
+                .lastName,
+            phone: potentialBeneficiaryPhone,
+          },
+          city: discussionWhereUserIsPotentialBeneficiary.address.city,
+          immersionObjective: "Initier une démarche de recrutement",
+          exchangesData: discussionToExchangesData(
+            discussionWhereUserIsPotentialBeneficiary,
+          ),
+        };
+
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(
+            discussionWhereUserIsPotentialBeneficiary,
+          );
+          await pgDiscussionRepository.insert(
+            discussionWhereUserIsEstablishment,
+          );
+
+          await establishmentAggregateRepo.insertEstablishmentAggregate(
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret(
+                discussionWhereUserIsPotentialBeneficiary.siret,
+              )
+              .withUserRights([
+                {
+                  role: "establishment-admin",
+                  status: "ACCEPTED",
+                  userId: user.id,
+                  shouldReceiveDiscussionNotifications: true,
+                  isMainContactByPhone: false,
+                  job: "",
+                  phone: "+33600000000",
+                },
+              ])
+              .withLocationId(uuid())
+              .withOffers([stylisteOffer])
+              .build(),
+          );
+
+          await establishmentAggregateRepo.insertEstablishmentAggregate(
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret(discussionWhereUserIsEstablishment.siret)
+              .withUserRights([
+                {
+                  role: "establishment-admin",
+                  status: "ACCEPTED",
+                  userId: bothPotentialBeneficiaryAndEstablishmentUser.id,
+                  shouldReceiveDiscussionNotifications: true,
+                  isMainContactByPhone: false,
+                  job: "",
+                  phone: "+33600000000",
+                },
+              ])
+              .withLocationId(uuid())
+              .withOffers([stylisteOffer])
+              .build(),
+          );
+        });
+
+        it("filters on establishment role", async () => {
+          const resultWithEstablishmentRole =
+            await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+              userRole: "establishment",
+              pagination: {
+                page: 1,
+                perPage: 10,
+              },
+              sort: { by: "createdAt", direction: "desc" },
+              userId: bothPotentialBeneficiaryAndEstablishmentUser.id,
+            });
+
+          expectToEqual(resultWithEstablishmentRole, {
+            data: [discussionWhereUserIsEstablishmentInList],
+            pagination: {
+              currentPage: 1,
+              numberPerPage: 10,
+              totalPages: 1,
+              totalRecords: 1,
+            },
+          });
+        });
+
+        it("filters on potential beneficiary role", async () => {
+          const resultWithPotentialBeneficiaryRole =
+            await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+              userRole: "potentialBeneficiary",
+              pagination: {
+                page: 1,
+                perPage: 10,
+              },
+              sort: { by: "createdAt", direction: "desc" },
+              userId: bothPotentialBeneficiaryAndEstablishmentUser.id,
+            });
+
+          expectToEqual(resultWithPotentialBeneficiaryRole, {
+            data: [discussionForPotentialBeneficiaryInList],
+            pagination: {
+              currentPage: 1,
+              numberPerPage: 10,
+              totalPages: 1,
+              totalRecords: 1,
+            },
+          });
         });
       });
 
@@ -2654,6 +2841,7 @@ describe("PgDiscussionRepository", () => {
             },
             sort: { by: "createdAt", direction: "desc" },
             userId: user.id,
+            userRole: "establishment",
           });
 
         expectToEqual(result, {
@@ -2680,6 +2868,7 @@ describe("PgDiscussionRepository", () => {
               },
               sort: { by: "createdAt", direction: "desc" },
               userId: user.id,
+              userRole: "establishment",
             });
 
           expectToEqual(result, {
@@ -2705,6 +2894,7 @@ describe("PgDiscussionRepository", () => {
               },
               sort: { by: "createdAt", direction: "desc" },
               userId: user.id,
+              userRole: "establishment",
             });
 
           expectToEqual(result, {
@@ -2730,6 +2920,7 @@ describe("PgDiscussionRepository", () => {
               },
               sort: { by: "createdAt", direction: "desc" },
               userId: user.id,
+              userRole: "establishment",
             });
 
           expectToEqual(result, {
@@ -2755,6 +2946,7 @@ describe("PgDiscussionRepository", () => {
               },
               sort: { by: "createdAt", direction: "desc" },
               userId: user.id,
+              userRole: "establishment",
             });
 
           expectToEqual(result, {
@@ -2780,6 +2972,7 @@ describe("PgDiscussionRepository", () => {
               },
               sort: { by: "createdAt", direction: "desc" },
               userId: user.id,
+              userRole: "establishment",
             });
 
           expectToEqual(result, {
@@ -2805,6 +2998,7 @@ describe("PgDiscussionRepository", () => {
               },
               sort: { by: "createdAt", direction: "desc" },
               userId: user.id,
+              userRole: "establishment",
             });
 
           expectToEqual(result, {
@@ -2828,6 +3022,7 @@ describe("PgDiscussionRepository", () => {
             },
             userId: user.id,
             sort: { by: "createdAt", direction: "desc" },
+            userRole: "establishment",
           });
 
         expectToEqual(resultPage1, {
@@ -2848,6 +3043,7 @@ describe("PgDiscussionRepository", () => {
             },
             userId: user.id,
             sort: { by: "createdAt", direction: "desc" },
+            userRole: "establishment",
           });
 
         expectToEqual(resultPage2, {

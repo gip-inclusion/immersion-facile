@@ -49,6 +49,11 @@ const orderColumnByOrderKey: Record<
   createdAt: "discussions.created_at",
 };
 
+type GetPaginatedDiscussionsForUserFilters =
+  GetPaginatedDiscussionsForUserParams["filters"];
+type GetPaginatedDiscussionsForUserSort =
+  GetPaginatedDiscussionsForUserParams["sort"];
+
 type DeleteDiscussionResultPayload = {
   deletedDiscussionsValues: {
     created_at: string;
@@ -358,6 +363,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     filters,
     userId,
     sort,
+    userRole,
   }: GetPaginatedDiscussionsForUserParams): Promise<
     DataWithPagination<DiscussionInList>
   > {
@@ -365,140 +371,28 @@ export class PgDiscussionRepository implements DiscussionRepository {
       "establishment-admin",
       "establishment-contact",
     ];
-    const builder = pipeWithValue(
-      this.transaction
-        .selectFrom("establishments__users as eu")
-        .innerJoin("discussions", "eu.siret", "discussions.siret")
-        .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
-        .leftJoin(
-          "phone_numbers",
-          "discussions.potential_beneficiary_phone_id",
-          "phone_numbers.id",
-        )
-        .innerJoin(
-          "public_appellations_data as pad",
-          "discussions.appellation_code",
-          "pad.ogr_appellation",
-        )
-        .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
-        .where("eu.user_id", "=", userId)
-        .where("eu.role", "in", authorizedRoles)
-        .where("eu.status", "=", "ACCEPTED"),
-      (b) => {
-        if (!filters?.statuses || filters.statuses.length === 0) return b;
-        return b.where("discussions.status", "in", filters.statuses);
-      },
-      (b) => {
-        if (!filters?.search) return b;
-        return b.where((eb) =>
-          eb.or([
-            eb("discussions.siret", "ilike", `%${filters.search}%`),
-            eb("discussions.business_name", "ilike", `%${filters.search}%`),
-            eb(
-              "discussions.potential_beneficiary_first_name",
-              "ilike",
-              `%${filters.search}%`,
-            ),
-            eb(
-              "discussions.potential_beneficiary_last_name",
-              "ilike",
-              `%${filters.search}%`,
-            ),
-            eb("pad.libelle_appellation_long", "ilike", `%${filters.search}%`),
-            eb(
-              sql`CAST(discussions.immersion_objective AS text)`, // immersion objective is ImmersionObjectives, not a string
-              "ilike",
-              `%${filters.search}%`,
-            ),
-          ]),
-        );
-      },
-    );
-
     const page = pagination.page;
     const limit = pagination.perPage;
     const offset = (page - 1) * limit;
-
-    const addPagination = (b: typeof builder) => b.limit(limit).offset(offset);
-    const addOrder = (b: typeof builder) =>
-      b.orderBy(orderColumnByOrderKey[sort.by], sort.direction);
-
-    const groupByAndSelectAttributes = (b: typeof builder) =>
-      b
-        .groupBy([
-          "discussions.id",
-          "discussions.created_at",
-          "discussions.siret",
-          "discussions.kind",
-          "discussions.status",
-          "discussions.immersion_objective",
-          "discussions.business_name",
-          "discussions.potential_beneficiary_first_name",
-          "discussions.potential_beneficiary_last_name",
-          "phone_numbers.phone_number",
-          "pad.ogr_appellation",
-          "pad.libelle_appellation_long",
-          "prd.code_rome",
-          "prd.libelle_rome",
-        ])
-        .select(({ ref, fn }) => [
-          ref("discussions.id").as("id"),
-          jsonBuildObject({
-            romeCode: ref("prd.code_rome"),
-            romeLabel: ref("prd.libelle_rome"),
-            appellationCode: sql<string>`CAST(${ref("pad.ogr_appellation")} AS text)`,
-            appellationLabel: ref("pad.libelle_appellation_long"),
-          }).as("appellation"),
-          ref("discussions.business_name").as("businessName"),
-          sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
-            "createdAt",
-          ),
-          ref("discussions.city").as("city"),
-          ref("discussions.siret").as("siret"),
-          ref("discussions.kind").as("kind"),
-          ref("discussions.status").as("status"),
-          ref("discussions.immersion_objective").as("immersionObjective"),
-          jsonBuildObject({
-            firstName: ref("potential_beneficiary_first_name"),
-            lastName: ref("potential_beneficiary_last_name"),
-            phone: ref("phone_numbers.phone_number"),
-          }).as("potentialBeneficiary"),
-          fn
-            .coalesce(
-              fn
-                .jsonAgg(
-                  jsonStripNulls(
-                    jsonBuildObject({
-                      subject: ref("exchanges.subject"),
-                      message: ref("exchanges.message"),
-                      sentAt: sql<string>`TO_CHAR(${ref("exchanges.sent_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
-                      attachments: ref("exchanges.attachments"),
-                      sender: ref("exchanges.sender"),
-                      firstname: ref("exchanges.establishment_first_name"),
-                      lastname: ref("exchanges.establishment_last_name"),
-                      email: ref("exchanges.establishment_email"),
-                    }),
-                  ),
-                )
-                .filterWhere("exchanges.id", "is not", null)
-                .$castTo<Exchange[]>(),
-              sql`'[]'`,
-            )
-            .as("exchanges"),
-        ]);
-
-    const [data, totalCount] = await Promise.all([
-      pipeWithValue(
-        builder,
-        addPagination,
-        addOrder,
-        groupByAndSelectAttributes,
-      ).execute(),
-      builder
-        .select(({ fn }) => [fn.count("discussions.id").distinct().as("count")])
-        .executeTakeFirstOrThrow()
-        .then((result) => Number(result.count)),
-    ]);
+    const { data, totalCount } =
+      userRole === "establishment"
+        ? await getPaginatedDiscussionsForEstablishmentUser({
+            transaction: this.transaction,
+            userId,
+            authorizedRoles,
+            filters,
+            limit,
+            offset,
+            sort,
+          })
+        : await getPaginatedDiscussionsForPotentialBeneficiaryUser({
+            transaction: this.transaction,
+            userId,
+            filters,
+            limit,
+            offset,
+            sort,
+          });
 
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -1066,3 +960,245 @@ const executeGetDiscussionsStats = (
     .then((results) =>
       results.map((r) => ({ ...r, creation_date: r.creation_date })),
     );
+
+const getPaginatedDiscussionsForEstablishmentUser = async ({
+  transaction,
+  userId,
+  authorizedRoles,
+  filters,
+  limit,
+  offset,
+  sort,
+}: {
+  transaction: KyselyDb;
+  userId: GetPaginatedDiscussionsForUserParams["userId"];
+  authorizedRoles: EstablishmentRole[];
+  filters: GetPaginatedDiscussionsForUserFilters;
+  limit: number;
+  offset: number;
+  sort: GetPaginatedDiscussionsForUserSort;
+}): Promise<{ data: DiscussionInList[]; totalCount: number }> => {
+  const builder = pipeWithValue(
+    transaction
+      .selectFrom("establishments__users as eu")
+      .innerJoin("discussions", "eu.siret", "discussions.siret")
+      .where("eu.user_id", "=", userId)
+      .where("eu.role", "in", authorizedRoles)
+      .where("eu.status", "=", "ACCEPTED")
+      .leftJoin(
+        "phone_numbers",
+        "discussions.potential_beneficiary_phone_id",
+        "phone_numbers.id",
+      )
+      .innerJoin(
+        "public_appellations_data as pad",
+        "discussions.appellation_code",
+        "pad.ogr_appellation",
+      )
+      .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome"),
+    (b) => {
+      if (!filters?.statuses || filters.statuses.length === 0) return b;
+      return b.where("discussions.status", "in", filters.statuses);
+    },
+    (b) => {
+      if (!filters?.search) return b;
+      return b.where((eb) =>
+        eb.or([
+          eb("discussions.siret", "ilike", `%${filters.search}%`),
+          eb("discussions.business_name", "ilike", `%${filters.search}%`),
+          eb(
+            "discussions.potential_beneficiary_first_name",
+            "ilike",
+            `%${filters.search}%`,
+          ),
+          eb(
+            "discussions.potential_beneficiary_last_name",
+            "ilike",
+            `%${filters.search}%`,
+          ),
+          eb("pad.libelle_appellation_long", "ilike", `%${filters.search}%`),
+          eb(
+            sql`CAST(discussions.immersion_objective AS text)`, // immersion objective is ImmersionObjectives, not a string
+            "ilike",
+            `%${filters.search}%`,
+          ),
+        ]),
+      );
+    },
+  );
+
+  const [data, totalCount] = await Promise.all([
+    builder
+      .limit(limit)
+      .offset(offset)
+      .orderBy(orderColumnByOrderKey[sort.by], sort.direction)
+      .select(({ ref }) => [
+        ref("discussions.id").as("id"),
+        jsonBuildObject({
+          romeCode: ref("prd.code_rome"),
+          romeLabel: ref("prd.libelle_rome"),
+          appellationCode: sql<string>`CAST(${ref("pad.ogr_appellation")} AS text)`,
+          appellationLabel: ref("pad.libelle_appellation_long"),
+        }).as("appellation"),
+        ref("discussions.business_name").as("businessName"),
+        sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
+          "createdAt",
+        ),
+        ref("discussions.city").as("city"),
+        ref("discussions.siret").as("siret"),
+        ref("discussions.kind").as("kind"),
+        ref("discussions.status").as("status"),
+        ref("discussions.immersion_objective").as("immersionObjective"),
+        jsonBuildObject({
+          firstName: ref("potential_beneficiary_first_name"),
+          lastName: ref("potential_beneficiary_last_name"),
+          phone: ref("phone_numbers.phone_number"),
+        }).as("potentialBeneficiary"),
+        jsonBuildObject({
+          count: sql<number>`(
+                  SELECT CAST(COUNT(*) AS INT)
+                  FROM exchanges e
+                  WHERE e.discussion_id = ${ref("discussions.id")}
+                )`,
+          lastExchange: sql<DiscussionInList["exchangesData"]["lastExchange"]>`(
+                  SELECT json_build_object(
+                    'sender', e.sender,
+                    'sentAt', TO_CHAR(e.sent_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
+                  )
+                  FROM exchanges e
+                  WHERE e.discussion_id = ${ref("discussions.id")}
+                  ORDER BY e.sent_at DESC
+                  LIMIT 1
+                )`,
+        }).as("exchangesData"),
+      ])
+      .execute(),
+    builder
+      .select(({ fn }) => [fn.count("discussions.id").distinct().as("count")])
+      .executeTakeFirstOrThrow()
+      .then((result) => Number(result.count)),
+  ]);
+
+  return { data, totalCount };
+};
+
+const getPaginatedDiscussionsForPotentialBeneficiaryUser = async ({
+  transaction,
+  userId,
+  filters,
+  limit,
+  offset,
+  sort,
+}: {
+  transaction: KyselyDb;
+  userId: GetPaginatedDiscussionsForUserParams["userId"];
+  filters: GetPaginatedDiscussionsForUserFilters;
+  limit: number;
+  offset: number;
+  sort: GetPaginatedDiscussionsForUserSort;
+}): Promise<{ data: DiscussionInList[]; totalCount: number }> => {
+  const builder = pipeWithValue(
+    transaction
+      .selectFrom("users")
+      .innerJoin(
+        "discussions",
+        "users.email",
+        "discussions.potential_beneficiary_email",
+      )
+      .where("users.id", "=", userId)
+      .leftJoin(
+        "phone_numbers",
+        "discussions.potential_beneficiary_phone_id",
+        "phone_numbers.id",
+      )
+      .innerJoin(
+        "public_appellations_data as pad",
+        "discussions.appellation_code",
+        "pad.ogr_appellation",
+      )
+      .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome"),
+    (b) => {
+      if (!filters?.statuses || filters.statuses.length === 0) return b;
+      return b.where("discussions.status", "in", filters.statuses);
+    },
+    (b) => {
+      if (!filters?.search) return b;
+      return b.where((eb) =>
+        eb.or([
+          eb("discussions.siret", "ilike", `%${filters.search}%`),
+          eb("discussions.business_name", "ilike", `%${filters.search}%`),
+          eb(
+            "discussions.potential_beneficiary_first_name",
+            "ilike",
+            `%${filters.search}%`,
+          ),
+          eb(
+            "discussions.potential_beneficiary_last_name",
+            "ilike",
+            `%${filters.search}%`,
+          ),
+          eb("pad.libelle_appellation_long", "ilike", `%${filters.search}%`),
+          eb(
+            sql`CAST(discussions.immersion_objective AS text)`, // immersion objective is ImmersionObjectives, not a string
+            "ilike",
+            `%${filters.search}%`,
+          ),
+        ]),
+      );
+    },
+  );
+
+  const [data, totalCount] = await Promise.all([
+    builder
+      .limit(limit)
+      .offset(offset)
+      .orderBy(orderColumnByOrderKey[sort.by], sort.direction)
+      .select(({ ref }) => [
+        ref("discussions.id").as("id"),
+        jsonBuildObject({
+          romeCode: ref("prd.code_rome"),
+          romeLabel: ref("prd.libelle_rome"),
+          appellationCode: sql<string>`CAST(${ref("pad.ogr_appellation")} AS text)`,
+          appellationLabel: ref("pad.libelle_appellation_long"),
+        }).as("appellation"),
+        ref("discussions.business_name").as("businessName"),
+        sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
+          "createdAt",
+        ),
+        ref("discussions.city").as("city"),
+        ref("discussions.siret").as("siret"),
+        ref("discussions.kind").as("kind"),
+        ref("discussions.status").as("status"),
+        ref("discussions.immersion_objective").as("immersionObjective"),
+        jsonBuildObject({
+          firstName: ref("potential_beneficiary_first_name"),
+          lastName: ref("potential_beneficiary_last_name"),
+          phone: ref("phone_numbers.phone_number"),
+        }).as("potentialBeneficiary"),
+        jsonBuildObject({
+          count: sql<number>`(
+                  SELECT CAST(COUNT(*) AS INT)
+                  FROM exchanges e
+                  WHERE e.discussion_id = ${ref("discussions.id")}
+                )`,
+          lastExchange: sql<DiscussionInList["exchangesData"]["lastExchange"]>`(
+                  SELECT json_build_object(
+                    'sender', e.sender,
+                    'sentAt', TO_CHAR(e.sent_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
+                  )
+                  FROM exchanges e
+                  WHERE e.discussion_id = ${ref("discussions.id")}
+                  ORDER BY e.sent_at DESC
+                  LIMIT 1
+                )`,
+        }).as("exchangesData"),
+      ])
+      .execute(),
+    builder
+      .select(({ fn }) => [fn.count("discussions.id").distinct().as("count")])
+      .executeTakeFirstOrThrow()
+      .then((result) => Number(result.count)),
+  ]);
+
+  return { data, totalCount };
+};

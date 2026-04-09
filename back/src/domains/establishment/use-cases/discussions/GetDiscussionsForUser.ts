@@ -10,6 +10,10 @@ import {
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import type { GetPaginatedDiscussionsForUserParams } from "../../ports/DiscussionRepository";
 
+export type GetDiscussionsForUser = ReturnType<
+  typeof makeGetDiscussionsForUser
+>;
+
 export const makeGetDiscussionsForUser = useCaseBuilder("GetDiscussionsForUser")
   .withInput<FlatGetPaginatedDiscussionsParams>(
     flatGetPaginatedDiscussionsParamsSchema,
@@ -29,8 +33,16 @@ export const makeGetDiscussionsForUser = useCaseBuilder("GetDiscussionsForUser")
 export const flatDiscussionQueryParamsToGetPaginatedDiscussionsParams = (
   flatParams: FlatGetPaginatedDiscussionsParams,
 ): OmitFromExistingKeys<GetPaginatedDiscussionsForUserParams, "userId"> => {
-  const { page, perPage, orderBy, orderDirection, statuses, search, ...rest } =
-    flatParams;
+  const {
+    page,
+    perPage,
+    orderBy,
+    orderDirection,
+    statuses,
+    search,
+    userRole,
+    ...rest
+  } = flatParams;
 
   rest satisfies Record<string, never>;
 
@@ -55,5 +67,6 @@ export const flatDiscussionQueryParamsToGetPaginatedDiscussionsParams = (
       direction: orderDirection || "desc",
     },
     pagination,
+    userRole,
   };
 };

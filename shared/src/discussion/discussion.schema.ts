@@ -327,6 +327,7 @@ export const flatGetPaginatedDiscussionsParamsSchema: ZodSchemaWithInputMatching
       .or(z.array(discussionStatusSchema).optional())
       .optional(),
     search: searchTextAlphaNumericSchema.optional(),
+    userRole: exchangeRoleSchema,
   });
 
 export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<DiscussionInList> =
@@ -338,8 +339,14 @@ export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<Discussion
     businessName: zStringMinLength1Max1024,
     createdAt: makeDateStringSchema(),
     kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
-    exchanges: z.array(exchangeReadSchema),
     city: zStringMinLength1Max1024,
+    exchangesData: z.object({
+      count: z.number(),
+      lastExchange: z.object({
+        sender: exchangeRoleSchema,
+        sentAt: makeDateStringSchema(),
+      }),
+    }),
     potentialBeneficiary: z.object({
       firstName: firstnameMandatorySchema,
       lastName: lastnameMandatorySchema,

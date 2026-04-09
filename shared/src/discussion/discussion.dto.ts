@@ -317,7 +317,6 @@ export type DiscussionInList = Pick<
   | "createdAt"
   | "siret"
   | "kind"
-  | "exchanges"
   | "status"
 > & {
   potentialBeneficiary: {
@@ -327,6 +326,10 @@ export type DiscussionInList = Pick<
   };
   immersionObjective: ImmersionObjective | null;
   city: string;
+  exchangesData: {
+    count: number;
+    lastExchange: Pick<ExchangeRead, "sender" | "sentAt"> | null;
+  };
 };
 
 export type DiscussionOrderKey = ExtractFromExisting<
@@ -348,4 +351,23 @@ export type FlatGetPaginatedDiscussionsParams = {
   // filters
   statuses?: DiscussionStatus | DiscussionStatus[];
   search?: SearchTextAlphaNumeric;
+  userRole: ExchangeRole;
+};
+
+export const isDiscussionInList = (
+  discussion: DiscussionReadDto | DiscussionInList,
+): discussion is DiscussionInList => {
+  return "exchangesData" in discussion;
+};
+
+export const discussionToExchangesData = (
+  discussion: DiscussionDto | DiscussionReadDto,
+): DiscussionInList["exchangesData"] => {
+  const lastExchange = discussion.exchanges[discussion.exchanges.length - 1];
+  return {
+    count: discussion.exchanges.length,
+    lastExchange: lastExchange
+      ? { sender: lastExchange.sender, sentAt: lastExchange.sentAt }
+      : null,
+  };
 };
