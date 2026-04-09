@@ -3,7 +3,7 @@ import type { FunctionalBroadcastFeedbackErrorMessage } from "shared";
 
 type BroadcastFeedbackError = {
   description: string;
-  solution: (isConventionValidated?: boolean) => ReactNode;
+  solution: (isConventionValidated?: boolean) => NonNullable<ReactNode>;
 };
 
 export const broadcastFeedbackErrorMessageMap: Record<
@@ -299,3 +299,20 @@ export const broadcastFeedbackErrorMessageMap: Record<
   FunctionalBroadcastFeedbackErrorMessage,
   BroadcastFeedbackError
 >;
+
+export const franceTravailTemporaryNetworkErrorBroadcastFeedback: BroadcastFeedbackError =
+  {
+    description: "La synchronisation n'a pas pu aboutir.",
+    solution: () => (
+      <>
+        <p>
+          Ce problème est souvent temporaire (connexion réseau ou disponibilité
+          du service).
+        </p>
+        <p>
+          Vous pouvez relancer une resynchronisation manuelle depuis le bouton «
+          Gérer la synchronisation ».
+        </p>
+      </>
+    ),
+  };
