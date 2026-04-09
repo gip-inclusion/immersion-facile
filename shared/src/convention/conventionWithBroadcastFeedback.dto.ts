@@ -38,6 +38,15 @@ export const isFunctionalBroadcastFeedbackError = (
     message as FunctionalBroadcastFeedbackErrorMessage,
   );
 
+export const isFranceTravailBroadcastTemporaryNetworkErrorMessage = (
+  message: string,
+): boolean => {
+  const trimmedMessage = message.trim().toLowerCase();
+  return (
+    trimmedMessage === "read econnreset" || trimmedMessage.includes("timeout")
+  );
+};
+
 export type BroadcastErrorKind = "functional" | "technical";
 
 export type ConventionsWithErroredBroadcastFeedbackFilters = {

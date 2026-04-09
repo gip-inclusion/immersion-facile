@@ -22,10 +22,14 @@ import {
   domElementIds,
   type FlatGetConventionsWithErroredBroadcastFeedbackParams,
   getFormattedFirstnameAndLastname,
+  isFranceTravailBroadcastTemporaryNetworkErrorMessage,
   isFunctionalBroadcastFeedbackError,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
 } from "shared";
-import { broadcastFeedbackErrorMessageMap } from "src/app/contents/broadcast-feedback/broadcastFeedback";
+import {
+  broadcastFeedbackErrorMessageMap,
+  franceTravailTemporaryNetworkErrorBroadcastFeedback,
+} from "src/app/contents/broadcast-feedback/broadcastFeedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -79,9 +83,12 @@ export const ConventionsWithBroadcastErrorList = ({
   }, [filters.broadcastErrorKind, filters.conventionStatus, filters.search]);
 
   const getDescription = (errorMessage: string) => {
-    if (isFunctionalBroadcastFeedbackError(errorMessage)) {
+    if (isFunctionalBroadcastFeedbackError(errorMessage))
       return broadcastFeedbackErrorMessageMap[errorMessage].description;
-    }
+
+    if (isFranceTravailBroadcastTemporaryNetworkErrorMessage(errorMessage))
+      return franceTravailTemporaryNetworkErrorBroadcastFeedback.description;
+
     return "Erreur technique : Immersion facilitée travaille actuellement à une proposition de solution avec votre DSI. Elle vous sera proposée prochainement.";
   };
 
