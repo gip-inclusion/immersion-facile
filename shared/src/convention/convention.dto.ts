@@ -25,6 +25,7 @@ import type {
   WithOptionalSort,
 } from "../pagination/pagination.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
+import type { RemoteWorkMode } from "../remoteWorkMode/remoteWorkMode.dto";
 import {
   type AgencyRole,
   allSignatoryRoles,
@@ -322,6 +323,7 @@ export type ConventionCommon = {
   individualProtectionDescription: string;
   sanitaryPrevention: boolean;
   sanitaryPreventionDescription: string;
+  remoteWorkMode: RemoteWorkMode;
   immersionAddress: string;
   immersionObjective: ImmersionObjective;
   immersionAppellation: AppellationAndRomeDto;
