@@ -174,6 +174,76 @@ describe("Broadcasts events to France Travail", () => {
     });
   });
 
+  it("save the convention id with status TO_PROCESS in the conventionsToSyncWithPe repository when FT broadcast times out", async () => {
+    franceTravailGateway.setNextResponse({
+      status: 500,
+      subscriberErrorFeedback: {
+        message: "timeout of 30000ms exceeded",
+        error: new Error("timeout of 30000ms exceeded"),
+      },
+      body: undefined,
+    });
+    const now = new Date();
+    timeGateway.setNextDate(now);
+
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      eventType: "CONVENTION_UPDATED",
+      convention: conventionReadDtoFrom({
+        convention: conventionLinkedToFTWithoutFederatedIdentity,
+        agency: {
+          ...peAgencyWithoutCounsellorsAndValidators,
+          counsellorEmails: [counsellor.email],
+          validatorEmails: [validator.email],
+        },
+      }),
+    });
+
+    expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+      {
+        id: conventionLinkedToFTWithoutFederatedIdentity.id,
+        status: "TO_PROCESS",
+      },
+    ]);
+  });
+
+  it("when FT broadcast times out again for a convention already queued, updates the row to TO_PROCESS", async () => {
+    uow.conventionsToSyncRepository.setForTesting([
+      {
+        id: conventionLinkedToFTWithoutFederatedIdentity.id,
+        status: "SUCCESS",
+        processDate: new Date("2020-01-01"),
+      },
+    ]);
+    franceTravailGateway.setNextResponse({
+      status: 500,
+      subscriberErrorFeedback: {
+        message: "timeout of 30000ms exceeded",
+        error: new Error("timeout of 30000ms exceeded"),
+      },
+      body: undefined,
+    });
+    timeGateway.setNextDate(new Date());
+
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      eventType: "CONVENTION_UPDATED",
+      convention: conventionReadDtoFrom({
+        convention: conventionLinkedToFTWithoutFederatedIdentity,
+        agency: {
+          ...peAgencyWithoutCounsellorsAndValidators,
+          counsellorEmails: [counsellor.email],
+          validatorEmails: [validator.email],
+        },
+      }),
+    });
+
+    expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+      {
+        id: conventionLinkedToFTWithoutFederatedIdentity.id,
+        status: "TO_PROCESS",
+      },
+    ]);
+  });
+
   it("If Pe returns a 404 error, we store the error in a repo", async () => {
     franceTravailGateway.setNextResponse({
       status: 404,
