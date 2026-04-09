@@ -25,6 +25,7 @@ describe("PgConventionDraftRepository", () => {
     individualProtectionDescription: "casque et lunettes",
     sanitaryPrevention: true,
     sanitaryPreventionDescription: "fourniture de gel",
+    remoteWorkMode: "FULL_REMOTE",
     immersionAddress: "169 boulevard de la villette, 75010 Paris",
     immersionObjective: "Confirmer un projet professionnel",
     immersionActivities: "Piloter un automobile",

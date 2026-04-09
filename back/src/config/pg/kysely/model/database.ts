@@ -270,6 +270,7 @@ interface ConventionDrafts {
   individual_protection_description: string | null;
   sanitary_prevention: boolean | null;
   sanitary_prevention_description: string | null;
+  remote_work_mode: string | null;
   immersion_address: string | null;
   immersion_objective: ConventionObjectiveType | null;
   immersion_appellation: number | null;
@@ -306,6 +307,7 @@ interface ConventionTemplates {
   individual_protection_description: string | null;
   sanitary_prevention: boolean | null;
   sanitary_prevention_description: string | null;
+  remote_work_mode: string | null;
   immersion_address: string | null;
   immersion_objective: ConventionObjectiveType | null;
   immersion_appellation: number | null;
@@ -336,6 +338,7 @@ interface Conventions extends WithAcquisition {
   individual_protection: boolean;
   sanitary_prevention: boolean;
   sanitary_prevention_description: string;
+  remote_work_mode: string;
   immersion_address: string;
   immersion_objective: ConventionObjectiveType;
   immersion_activities: string;

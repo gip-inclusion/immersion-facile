@@ -28,6 +28,7 @@ describe("PgConventionTemplateQueries", () => {
     internshipKind: "immersion",
     agencyId: agency.id,
     userId: validator.id,
+    remoteWorkMode: "FULL_REMOTE",
   };
   const now = "2024-10-08T00:00:00.000Z";
 
@@ -42,6 +43,7 @@ describe("PgConventionTemplateQueries", () => {
     await db.deleteFrom("convention_drafts").execute();
     await db.deleteFrom("users__agencies").execute();
     await db.deleteFrom("convention_templates").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("users").execute();
 

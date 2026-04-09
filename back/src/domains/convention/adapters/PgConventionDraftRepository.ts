@@ -7,6 +7,7 @@ import {
   type DateString,
   type DepartmentCode,
   type EstablishmentTutor,
+  isRemoteWorkMode,
   pipeWithValue,
   type ScheduleDto,
   type Signatories,
@@ -67,6 +68,10 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
       sanitaryPrevention: row.sanitary_prevention ?? undefined,
       sanitaryPreventionDescription:
         row.sanitary_prevention_description ?? undefined,
+      remoteWorkMode:
+        row.remote_work_mode && isRemoteWorkMode(row.remote_work_mode)
+          ? row.remote_work_mode
+          : undefined,
       immersionAddress: row.immersion_address ?? undefined,
       immersionObjective: row.immersion_objective ?? undefined,
       immersionAppellation: row.ogr_appellation
@@ -169,6 +174,7 @@ const mapToEntity = (
     sanitary_prevention: conventionDraft.sanitaryPrevention,
     sanitary_prevention_description:
       conventionDraft.sanitaryPreventionDescription,
+    remote_work_mode: conventionDraft.remoteWorkMode,
     immersion_address: conventionDraft.immersionAddress,
     immersion_objective: conventionDraft.immersionObjective,
     immersion_appellation: sql`${conventionDraft.immersionAppellation?.appellationCode}`,
