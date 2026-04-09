@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import type { SubscriberErrorFeedback } from "shared";
 import type { AccessTokenResponse } from "../../../config/bootstrap/appConfig";
 import type { BroadcastConventionParams } from "../use-cases/broadcast/broadcastConventionParams";
@@ -21,6 +22,22 @@ export const isBroadcastResponseOk = (
   response: FranceTravailBroadcastResponse,
 ): response is FtBroadcastSuccessResponse =>
   [200, 201, 204].includes(response.status);
+
+export const isBroadcastTimeoutError = (
+  response: FranceTravailBroadcastResponse,
+): boolean => {
+  if (isBroadcastResponseOk(response)) return false;
+  const message = response.subscriberErrorFeedback.message.toLowerCase();
+  if (message.includes("timeout")) return true;
+  const error = response.subscriberErrorFeedback.error;
+
+  if (
+    isAxiosError(error) &&
+    (error.code === "ECONNABORTED" || error.code === "ECONNRESET")
+  )
+    return true;
+  return false;
+};
 
 export interface FranceTravailGateway {
   notifyOnConventionUpdated: (

@@ -13,6 +13,7 @@ import {
 import {
   type FranceTravailGateway,
   isBroadcastResponseOk,
+  isBroadcastTimeoutError,
 } from "../../ports/FranceTravailGateway";
 import {
   type BroadcastConventionParams,
@@ -78,7 +79,12 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
       convention: makeFranceTravailSupportedConvention(inputParams.convention),
     });
 
-    if (deps.options.resyncMode)
+    if (isBroadcastTimeoutError(response))
+      await uow.conventionsToSyncRepository.save({
+        id: inputParams.convention.id,
+        status: "TO_PROCESS",
+      });
+    else if (deps.options.resyncMode && isBroadcastResponseOk(response))
       await uow.conventionsToSyncRepository.save({
         id: inputParams.convention.id,
         status: "SUCCESS",

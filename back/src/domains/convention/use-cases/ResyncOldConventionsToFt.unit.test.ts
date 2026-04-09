@@ -275,6 +275,43 @@ describe("ResyncOldConventionsToFt use case", () => {
       });
     });
 
+    it("when broadcast times out, keeps TO_PROCESS for a later resync run", async () => {
+      uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
+      uow.conventionRepository.setConventions([conventionToSync1]);
+      uow.conventionsToSyncRepository.setForTesting([
+        {
+          id: conventionToSync1.id,
+          status: "TO_PROCESS",
+        },
+      ]);
+      ftGateway.setNextResponse({
+        status: 500,
+        subscriberErrorFeedback: {
+          message: "timeout of 30000ms exceeded",
+          error: new Error("timeout of 30000ms exceeded"),
+        },
+        body: undefined,
+      });
+
+      const report = await useCase.execute();
+
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+        {
+          id: conventionToSync1.id,
+          status: "TO_PROCESS",
+        },
+      ]);
+      expectToEqual(report, {
+        success: 0,
+        skips: {},
+        errors: {
+          [conventionToSync1.id]: new Error(
+            "Convention still have status TO_PROCESS",
+          ),
+        },
+      });
+    });
+
     it("should consider limit", async () => {
       uow.agencyRepository.agencies = [toAgencyWithRights(agencyFT)];
       uow.conventionRepository.setConventions([
