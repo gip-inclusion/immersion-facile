@@ -86,6 +86,7 @@ const validConvention: ConventionDto = {
   status: "READY_TO_SIGN",
   agencyId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   immersionAddress: "169 boulevard de la villette, 75010 Paris",
+  remoteWorkMode: "ON_SITE",
   dateSubmission: DATE_SUBMISSION,
   dateStart: DATE_START,
   dateEnd: DATE_END,

@@ -23,6 +23,7 @@ import {
   withOptionalSortSchema,
 } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
+import { remoteWorkModeSchema } from "../remoteWorkMode/remoteWorkMode.schema";
 import { allRoles } from "../role/role.dto";
 import { signatoryRoleSchema } from "../role/role.schema";
 import {
@@ -313,6 +314,7 @@ export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<Convention
       individualProtectionDescription: zStringPossiblyEmptyWithMax(255),
       sanitaryPrevention: zBoolean,
       sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
+      remoteWorkMode: remoteWorkModeSchema,
       immersionAddress: addressWithPostalCodeSchema,
       immersionObjective: immersionObjectiveSchema,
       immersionAppellation: appellationAndRomeDtoSchema,

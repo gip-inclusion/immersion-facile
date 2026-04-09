@@ -37,6 +37,13 @@ export const remoteWorkModeLabels: Record<
   },
 };
 
-export const isPhysicalWorkMode = (workMode: RemoteWorkMode) => {
-  return physicalWorkModes.includes(workMode as PhysicalWorkMode);
-};
+export const isPhysicalWorkMode = (workMode: RemoteWorkMode) =>
+  physicalWorkModes.includes(workMode as PhysicalWorkMode);
+
+export const isRemotableWorkMode = (workMode: RemoteWorkMode) =>
+  workMode === "FULL_REMOTE" || workMode === "HYBRID";
+
+export const isRemoteWorkMode = (
+  anyExpression: string,
+): anyExpression is RemoteWorkMode =>
+  remoteWorkModes.includes(anyExpression as RemoteWorkMode);

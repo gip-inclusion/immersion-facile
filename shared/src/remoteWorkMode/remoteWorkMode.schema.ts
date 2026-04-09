@@ -8,7 +8,7 @@ import {
 } from "./remoteWorkMode.dto";
 
 export const remoteWorkModeSchema: ZodSchemaWithInputMatchingOutput<RemoteWorkMode> =
-  z.enum(remoteWorkModes);
+  z.enum(remoteWorkModes, "Veuillez choisir une modalité");
 export const withRemoteWorkModeSchema: ZodSchemaWithInputMatchingOutput<WithRemoteWorkMode> =
   z.object({
     remoteWorkMode: remoteWorkModeSchema,
