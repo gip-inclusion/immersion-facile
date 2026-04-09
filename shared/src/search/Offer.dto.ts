@@ -7,10 +7,10 @@ import type {
   ContactMode,
   EstablishmentWebSite,
   FitForDisableWorkerOption,
-  RemoteWorkMode,
 } from "../formEstablishment/FormEstablishment.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type { NafCode, NafSousClasseLabel } from "../naf/naf.dto";
+import type { WithRemoteWorkMode } from "../remoteWorkMode/remoteWorkMode.dto";
 import type {
   AppellationDto,
   RomeCode,
@@ -51,9 +51,8 @@ export type WithIsAvailable = {
 export type ExternalOfferDto = CommonOfferDto;
 
 export type InternalOfferDto = CommonOfferDto &
-  WithIsAvailable & {
-    remoteWorkMode: RemoteWorkMode;
-  };
+  WithIsAvailable &
+  WithRemoteWorkMode;
 
 export type OfferDto = InternalOfferDto | ExternalOfferDto;
 

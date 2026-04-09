@@ -10,6 +10,7 @@ import type {
 import type { GroupName } from "../group/group.dto";
 import type { NafDto } from "../naf/naf.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
+import type { WithRemoteWorkMode } from "../remoteWorkMode/remoteWorkMode.dto";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
@@ -23,43 +24,7 @@ export type ImmersionContactInEstablishmentId = Flavor<
   "ImmersionContactInEstablishmentId"
 >;
 
-export const physicalWorkModes = ["HYBRID", "ON_SITE"] as const;
-
-export type PhysicalWorkMode = (typeof physicalWorkModes)[number];
-
-export const remoteWorkModes = ["FULL_REMOTE", ...physicalWorkModes] as const;
-
-export type RemoteWorkMode = (typeof remoteWorkModes)[number];
-
-export const remoteWorkModeLabels: Record<
-  RemoteWorkMode,
-  { label: string; answerLabel: string; description: string }
-> = {
-  HYBRID: {
-    label: "Télétravail hybride",
-    answerLabel: "Oui, télétravail hybride",
-    description:
-      "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
-  },
-  FULL_REMOTE: {
-    label: "100% télétravail",
-    answerLabel: "Oui, 100% télétravail",
-    description:
-      "Apparaîtra pour la France entière, quelle que soit la localisation du candidat",
-  },
-  ON_SITE: {
-    label: "100% présentiel",
-    answerLabel: "Non, 100% en présentiel",
-    description:
-      "Apparaîtra dans les recherches pour tous vos lieux d’immersion",
-  },
-};
-
 export type EstablishmentFormOffer = AppellationAndRomeDto & WithRemoteWorkMode;
-
-export type WithRemoteWorkMode = {
-  remoteWorkMode: RemoteWorkMode;
-};
 
 const contactModes = ["EMAIL", "PHONE", "IN_PERSON"] as const;
 export type ContactMode = (typeof contactModes)[number];
@@ -274,8 +239,4 @@ export type FormEstablishmentReadDto = Omit<
   "contactMode"
 > & {
   contactMode: ContactMode | null;
-};
-
-export const isPhysicalWorkMode = (workMode: RemoteWorkMode) => {
-  return physicalWorkModes.includes(workMode as PhysicalWorkMode);
 };

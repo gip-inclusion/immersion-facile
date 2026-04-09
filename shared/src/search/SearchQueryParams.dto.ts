@@ -3,13 +3,13 @@ import type { LocationId } from "../address/address.dto";
 import type {
   EstablishmentSearchableByValue,
   FitForDisableWorkerOption,
-  RemoteWorkMode,
 } from "../formEstablishment/FormEstablishment.dto";
 import type { NafCode, WithNafCodes } from "../naf/naf.dto";
 import type {
   PaginationQueryParams,
   SortDirection,
 } from "../pagination/pagination.dto";
+import type { WithOptionnalRemoteWorkModes } from "../remoteWorkMode/remoteWorkMode.dto";
 import type {
   AppellationCode,
   RomeCode,
@@ -76,10 +76,6 @@ type WithAppellationCodes = {
   appellationCodes: AppellationCode[];
 };
 
-type WithRemoteWorkModes = {
-  remoteWorkModes: RemoteWorkMode[];
-};
-
 type GetOffersFlatParamsCommon = WithAcquisition & {
   place?: string; // this is just to keep, the data typed for location by the user. Lat/Lon will be used in the query
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
@@ -89,7 +85,7 @@ type GetOffersFlatParamsCommon = WithAcquisition & {
   sirets?: SiretDto[];
   showOnlyAvailableOffers?: boolean;
 } & Partial<WithAppellationCodes> &
-  Partial<WithRemoteWorkModes>;
+  WithOptionnalRemoteWorkModes;
 
 export type GeoQueryParamsWithSortedBy<T extends SearchSortedBy> = {
   sortBy: T;

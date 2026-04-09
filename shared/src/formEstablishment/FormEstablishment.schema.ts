@@ -7,6 +7,7 @@ import { emailSchema } from "../email/email.schema";
 import { businessNameSchema } from "../establishment/businessName";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
+import { withRemoteWorkModeSchema } from "../remoteWorkMode/remoteWorkMode.schema";
 import type { EstablishmentRole } from "../role/role.dto";
 import { establishmentRoleSchema } from "../role/role.schema";
 import { appellationAndRomeDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
@@ -45,7 +46,6 @@ import type {
 import {
   establishmentUserRightStatuses,
   fitForDisabledWorkersOptions,
-  remoteWorkModes,
 } from "./FormEstablishment.dto";
 
 export const defaultMaxContactsPerMonth = 6;
@@ -121,11 +121,7 @@ export const formEstablishmentUserRightSchema: ZodSchemaWithInputMatchingOutput<
   establishmentAdminSchema.or(establishmentContactSchema);
 
 export const establishmentFormOfferSchema: ZodSchemaWithInputMatchingOutput<EstablishmentFormOffer> =
-  appellationAndRomeDtoSchema.and(
-    z.object({
-      remoteWorkMode: z.enum(remoteWorkModes),
-    }),
-  );
+  appellationAndRomeDtoSchema.and(withRemoteWorkModeSchema);
 
 export const formEstablishmentPendingUserRightSchema =
   formEstablishmentUserRightSchema.and(
