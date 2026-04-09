@@ -54,6 +54,7 @@ jobs:
       - tag
       - build-front-artefact
       - build-back-artefact
+      - create-wip-pre-release
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
       environment: staging

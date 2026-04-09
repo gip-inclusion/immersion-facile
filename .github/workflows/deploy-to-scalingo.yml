@@ -62,53 +62,55 @@ jobs:
           fi
       - name: Deploy front
         run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz ${{ inputs.tag }}
+      - name: Fetch release body
+        id: release-body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = "${{ inputs.tag }}-rc";
+            const releaseUrl = `https://github.com/${{ github.repository }}/releases/tag/${tag}`;
+            try {
+              const release = await github.request(`GET /repos/${{ github.repository }}/releases/tags/${tag}`);
+              let body = release.data.body || '';
+              if (body.length > 3900) {
+                body = body.substring(0, 3900) + `\n\n... Liste tronquée, voir la release complète sur GitHub : ${releaseUrl}`;
+              }
+              core.setOutput('body', body);
+            } catch (e) {
+              console.log(`Could not fetch release for tag ${tag}: ${e.message}`);
+              core.setOutput('body', '');
+            }
       - name: Send Slack notification
+        env:
+          RELEASE_BODY: ${{ steps.release-body.outputs.body }}
         run: |
           releaseSuffix=$([[ "${{ inputs.isPreRelease }}" == "true" ]] && echo "-rc" || echo "")
-          curl --location "https://slack.com/api/chat.postMessage" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" -d @- <<EOF
-          {
-            "channel": "${{ inputs.slackChannel }}",
-            "blocks": [
-              {"type": "header", "text": {"type": "plain_text", "text": "${{ inputs.tag }}${releaseSuffix}"}},
-              {"type": "section", "text": {"type": "plain_text", "text": "La version ${{ inputs.tag }}${releaseSuffix} est déployée en ${{ inputs.environment }}."}},
-              {
-                "type": "actions",
-                "elements": [
-                  {
-                    "type": "button",
-                    "style": "primary",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Voir les changements"
-                    },
-                    "url": "https://github.com/gip-inclusion/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}"
-                  }, {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Voir les releases"
-                    },
-                    "url": "https://github.com/gip-inclusion/immersion-facile/releases"
-                  }, {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Aller sur l'application"
-                    },
-                    "url": "https://${{ inputs.environment }}.immersion-facile.beta.gouv.fr"
-                  }, {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Voir le workfow github"
-                    },
-                    "url": "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-                  }
-                ]
-              }
-            ]
-          }
-          EOF
+          jq -n \
+            --arg channel "${{ inputs.slackChannel }}" \
+            --arg header "${{ inputs.tag }}${releaseSuffix}" \
+            --arg text "La version ${{ inputs.tag }}${releaseSuffix} est déployée en ${{ inputs.environment }}." \
+            --arg body "$RELEASE_BODY" \
+            --arg changes "https://github.com/gip-inclusion/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}" \
+            --arg releases "https://github.com/gip-inclusion/immersion-facile/releases" \
+            --arg app "https://${{ inputs.environment }}.immersion-facile.beta.gouv.fr" \
+            --arg workflow "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}" \
+            '{
+              channel: $channel,
+              blocks: [
+                { type: "header", text: { type: "plain_text", text: $header } },
+                { type: "section", text: { type: "plain_text", text: $text } },
+                { type: "section", text: { type: "mrkdwn", text: $body } },
+                {
+                  type: "actions",
+                  elements: [
+                    { type: "button", style: "primary", text: { type: "plain_text", text: "Voir les changements" }, url: $changes },
+                    { type: "button", text: { type: "plain_text", text: "Voir les releases" }, url: $releases },
+                    { type: "button", text: { type: "plain_text", text: "Aller sur l\u0027application" }, url: $app },
+                    { type: "button", text: { type: "plain_text", text: "Voir le workfow github" }, url: $workflow }
+                  ]
+                }
+              ]
+            }' | curl --location "https://slack.com/api/chat.postMessage" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" -d @-
       - name: Send Discord notification
         run: |
           releaseSuffix=$([[ "${{ inputs.isPreRelease }}" == "true" ]] && echo "-rc" || echo "")
