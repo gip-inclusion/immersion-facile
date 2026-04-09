@@ -106,6 +106,8 @@ export * from "./phone/phone.schema";
 export * from "./pipeWithValue";
 export * from "./ramdaExtensions/notEqual";
 export * from "./ramdaExtensions/path";
+export * from "./remoteWorkMode/remoteWorkMode.dto";
+export * from "./remoteWorkMode/remoteWorkMode.schema";
 export * from "./role/role.dto";
 export * from "./role/role.schema";
 export * from "./role/role.utils";

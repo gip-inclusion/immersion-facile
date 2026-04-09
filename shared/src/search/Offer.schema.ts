@@ -8,6 +8,7 @@ import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishm
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { nafCodeSchema, nafSousClasseLabelSchema } from "../naf/naf.schema";
 import { createPaginatedSchema } from "../pagination/pagination.schema";
+import { withRemoteWorkModeSchema } from "../remoteWorkMode/remoteWorkMode.schema";
 import { romeCodeSchema } from "../rome";
 import {
   appellationCodeSchema,
@@ -31,11 +32,6 @@ import {
   zBoolean,
 } from "../zodUtils";
 import type { ExternalOfferDto, InternalOfferDto } from "./Offer.dto";
-import { remoteWorkModeSchema } from "./SearchQueryParams.schema";
-
-const withRemoteWorkModeSchema = z.object({
-  remoteWorkMode: remoteWorkModeSchema,
-});
 
 const urlOfPartnerSchema: ZodSchemaWithInputMatchingOutput<string> =
   zStringCanBeEmpty;
@@ -80,9 +76,11 @@ const commonOfferSchema = z.object({
 });
 
 export const internalOfferSchema: ZodSchemaWithInputMatchingOutput<InternalOfferDto> =
-  commonOfferSchema.extend(withRemoteWorkModeSchema.shape).extend({
-    isAvailable: zBoolean,
-  });
+  commonOfferSchema.and(withRemoteWorkModeSchema).and(
+    z.object({
+      isAvailable: zBoolean,
+    }),
+  );
 
 export const externalOfferSchema: ZodSchemaWithInputMatchingOutput<ExternalOfferDto> =
   commonOfferSchema;
