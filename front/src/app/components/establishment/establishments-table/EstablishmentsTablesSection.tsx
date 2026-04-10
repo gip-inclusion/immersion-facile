@@ -1,6 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { domElementIds, type UserEstablishmentRightDetails } from "shared";
+import {
+  domElementIds,
+  type UserEstablishmentRightDetailsWithAcceptedStatus,
+} from "shared";
 import { routes } from "src/app/routes/routes";
 import { EstablishmentsRightsTable } from "./EstablishmentsRightsTable";
 
@@ -8,7 +11,7 @@ export const EstablishmentsTablesSection = ({
   withEstablishmentData,
   isBackofficeAdmin,
 }: {
-  withEstablishmentData?: UserEstablishmentRightDetails[];
+  withEstablishmentData?: UserEstablishmentRightDetailsWithAcceptedStatus[];
   isBackofficeAdmin?: boolean;
 }) => (
   <>

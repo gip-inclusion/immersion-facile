@@ -1,11 +1,13 @@
 import {
   errors,
   type UserEstablishmentRightDetails,
+  type UserEstablishmentRightDetailsWithPendingStatus,
   type UserId,
   type UserWithAdminRights,
   type UserWithRights,
   type WithEstablishmentsData,
 } from "shared";
+import { match } from "ts-pattern";
 import { getAgencyRightByUserId } from "../../../utils/agency";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
@@ -61,17 +63,34 @@ const makeEstablishmentRights = async (
       .map(({ userId }) => userId),
   );
 
-  return {
-    siret: establishment.siret,
-    businessName: establishment.customizedName
-      ? establishment.customizedName
-      : establishment.name,
-    role: userRight.role,
-    status: userRight.status,
-    admins: adminUsers.map(({ firstName, lastName, email }) => ({
-      firstName,
-      lastName,
-      email,
-    })),
-  };
+  return match(userRight)
+    .with({ status: "PENDING" }, (pendingUserRight) => {
+      const pendingUserDetails: UserEstablishmentRightDetailsWithPendingStatus =
+        {
+          siret: establishment.siret,
+          businessName: establishment.customizedName
+            ? establishment.customizedName
+            : establishment.name,
+          role: userRight.role,
+          status: pendingUserRight.status,
+        };
+      return pendingUserDetails;
+    })
+    .with({ status: "ACCEPTED" }, (acceptedUserRight) => {
+      const acceptedUserDetails: UserEstablishmentRightDetails = {
+        siret: establishment.siret,
+        businessName: establishment.customizedName
+          ? establishment.customizedName
+          : establishment.name,
+        role: userRight.role,
+        status: acceptedUserRight.status,
+        admins: adminUsers.map(({ firstName, lastName, email }) => ({
+          firstName,
+          lastName,
+          email,
+        })),
+      };
+      return acceptedUserDetails;
+    })
+    .exhaustive();
 };

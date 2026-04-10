@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import Table from "@codegouvfr/react-dsfr/Table";
 import type { ReactNode } from "react";
-import type { UserEstablishmentRightDetails } from "shared";
+import type { UserEstablishmentRightDetailsWithAcceptedStatus } from "shared";
 import { establishmentRoleToDisplay } from "../establishment-users";
 import { EstablishmentLineAdminsInfos } from "./establishment-line/EstablishmentLineAdminInfos";
 import { EstablishmentLineBusinessName } from "./establishment-line/EstablishmentLineBusinessName";
@@ -11,7 +11,7 @@ export const EstablishmentsRightsTable = ({
   withEstablishmentData,
   isBackofficeAdmin,
 }: {
-  withEstablishmentData: UserEstablishmentRightDetails[];
+  withEstablishmentData: UserEstablishmentRightDetailsWithAcceptedStatus[];
   isBackofficeAdmin?: boolean;
 }) => (
   <>
@@ -29,7 +29,7 @@ const makeEstablishmentRightLine = ({
   data,
   isBackofficeAdmin,
 }: {
-  data: UserEstablishmentRightDetails;
+  data: UserEstablishmentRightDetailsWithAcceptedStatus;
   isBackofficeAdmin?: boolean;
 }): ReactNode[] => {
   const roleDisplay = establishmentRoleToDisplay[data.role];

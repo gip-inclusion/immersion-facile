@@ -74,13 +74,24 @@ export type EstablishmentAdminPrivateData = {
   email: Email;
 };
 
-export type UserEstablishmentRightDetails = {
+export type UserEstablishmentRightDetailsWithAcceptedStatus = {
   siret: SiretDto;
   businessName: BusinessName;
   role: EstablishmentRole;
-  status: EstablishmentUserRightStatus;
+  status: Extract<EstablishmentUserRightStatus, "ACCEPTED">;
   admins: EstablishmentAdminPrivateData[];
 };
+
+export type UserEstablishmentRightDetailsWithPendingStatus = {
+  siret: SiretDto;
+  businessName: BusinessName;
+  role: EstablishmentRole;
+  status: Extract<EstablishmentUserRightStatus, "PENDING">;
+};
+
+export type UserEstablishmentRightDetails =
+  | UserEstablishmentRightDetailsWithAcceptedStatus
+  | UserEstablishmentRightDetailsWithPendingStatus;
 
 export type WithEstablishmentsData = {
   establishments?: UserEstablishmentRightDetails[];

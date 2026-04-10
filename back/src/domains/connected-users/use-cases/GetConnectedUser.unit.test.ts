@@ -593,18 +593,6 @@ describe("GetConnectedUser", () => {
                         establishmentAggregate1.establishment.name,
                       role: "establishment-contact",
                       status: "PENDING",
-                      admins: [
-                        {
-                          email: anotherUser.email,
-                          firstName: anotherUser.firstName,
-                          lastName: anotherUser.lastName,
-                        },
-                        {
-                          email: notAdminUser.email,
-                          firstName: notAdminUser.firstName,
-                          lastName: notAdminUser.lastName,
-                        },
-                      ],
                     },
                   ],
                   dashboards: {

@@ -12,7 +12,6 @@ import type {
   UserEstablishmentRightDetails,
   WithEstablishmentDashboards,
 } from "../establishment/establishment";
-import { formEstablishmentUserRightStatusSchema } from "../formEstablishment/FormEstablishment.schema";
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
@@ -92,21 +91,31 @@ const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =
   });
 
 const userEstablishmentRightDetailsSchema: ZodSchemaWithInputMatchingOutput<UserEstablishmentRightDetails> =
-  z.object({
-    siret: siretSchema,
-    businessName: businessNameSchema,
-    role: z.enum(establishmentsRoles, {
-      error: localization.invalidEnum,
-    }),
-    status: formEstablishmentUserRightStatusSchema,
-    admins: z.array(
-      z.object({
-        firstName: zStringCanBeEmpty,
-        lastName: zStringCanBeEmpty,
-        email: emailSchema,
+  z.discriminatedUnion("status", [
+    z.object({
+      siret: siretSchema,
+      businessName: businessNameSchema,
+      role: z.enum(establishmentsRoles, {
+        error: localization.invalidEnum,
       }),
-    ),
-  });
+      status: z.literal("ACCEPTED"),
+      admins: z.array(
+        z.object({
+          firstName: zStringCanBeEmpty,
+          lastName: zStringCanBeEmpty,
+          email: emailSchema,
+        }),
+      ),
+    }),
+    z.object({
+      siret: siretSchema,
+      businessName: businessNameSchema,
+      role: z.enum(establishmentsRoles, {
+        error: localization.invalidEnum,
+      }),
+      status: z.literal("PENDING"),
+    }),
+  ]);
 
 const dashboardsSchema: ZodSchemaWithInputMatchingOutput<
   WithAgencyDashboards & WithEstablishmentDashboards

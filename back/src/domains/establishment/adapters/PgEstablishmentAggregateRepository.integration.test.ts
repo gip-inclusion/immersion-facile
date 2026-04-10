@@ -4510,7 +4510,11 @@ describe("PgEstablishmentAggregateRepository", () => {
             userId: user2.id,
           },
         ),
-        [establishmentWithUserId2_1, establishmentWithUserId2_2],
+        [
+          establishmentWithUserId2_1,
+          establishmentWithUserId2_2,
+          establishmentWithUserId2AndStatusPending,
+        ],
       );
     });
 
@@ -4545,16 +4549,6 @@ describe("PgEstablishmentAggregateRepository", () => {
           },
         ),
         [establishmentFindableByBothSiretAndName],
-      );
-    });
-    it("return only establishment where userRight is in status ACCEPTED ", async () => {
-      expectToEqual(
-        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
-          {
-            userId: user2.id,
-          },
-        ),
-        [establishmentWithUserId2_1, establishmentWithUserId2_2],
       );
     });
   });
