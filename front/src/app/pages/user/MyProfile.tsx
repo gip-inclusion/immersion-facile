@@ -12,7 +12,11 @@ import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 
 type MyProfileProps = {
-  route: Route<typeof routes.myProfile>;
+  route: Route<
+    | typeof routes.myProfile
+    | typeof routes.myProfileAgencies
+    | typeof routes.myProfileEstablishments
+  >;
 };
 
 const linkToUpdateAccountInfo =

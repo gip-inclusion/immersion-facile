@@ -295,6 +295,27 @@ const getPageByRouteName: {
       <MyProfile route={route} />
     </ConnectedPrivateRoute>
   ),
+  myProfileAgencies: (route) => (
+    <ConnectedPrivateRoute
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
+      }
+    >
+      <MyProfile route={route} />
+    </ConnectedPrivateRoute>
+  ),
+
+  myProfileEstablishments: (route) => (
+    <ConnectedPrivateRoute
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
+      }
+    >
+      <MyProfile route={route} />
+    </ConnectedPrivateRoute>
+  ),
   myProfileAgencyRegistration: () => <RequestAgencyRegistrationPage />,
   myProfileEstablishmentRegistration: (route) => (
     <ConnectedPrivateRoute

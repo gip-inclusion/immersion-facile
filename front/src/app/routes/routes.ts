@@ -188,6 +188,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   establishmentManagement: agencyDashboard.extend("/pilotage-entreprises"),
 
   myProfile,
+  myProfileAgencies: myProfile.extend("/mes-agences"),
+  myProfileEstablishments: myProfile.extend("/mes-etablissements"),
   myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
   myProfileEstablishmentRegistration: myProfile.extend(
     { siret: param.query.optional.string },
