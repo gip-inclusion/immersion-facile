@@ -198,4 +198,4 @@ const generateAddEstablishmentFormLink = ({
   convention: ConventionDto;
   acquisitionCampaign: string;
 }): AbsoluteUrl =>
-  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?conventionId=${convention.id}&mtm_campaign=${acquisitionCampaign}`;
+  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?fromConventionId=${convention.id}&mtm_campaign=${acquisitionCampaign}`;
