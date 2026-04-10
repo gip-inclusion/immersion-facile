@@ -13,6 +13,7 @@ import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
+import { conventionSlice } from "../convention/convention.slice";
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
@@ -242,5 +243,31 @@ export const establishmentSlice = createSlice({
       state.isLoading = false;
     },
     clearEstablishmentRequested: () => initialState,
+  },
+  extraReducers(builder) {
+    builder.addCase(
+      conventionSlice.actions.fetchConventionSucceeded,
+      (state, action) => {
+        if (!action.payload.convention) return;
+        state.isLoading = false;
+        const convention = action.payload.convention;
+
+        state.formEstablishment = {
+          ...state.formEstablishment,
+          siret: convention.siret,
+          businessName: convention.businessName,
+          offers: [
+            {
+              appellationCode: convention.immersionAppellation.appellationCode,
+              appellationLabel:
+                convention.immersionAppellation.appellationLabel,
+              romeCode: convention.immersionAppellation.romeCode,
+              romeLabel: convention.immersionAppellation.romeLabel,
+              remoteWorkMode: "ON_SITE",
+            },
+          ],
+        };
+      },
+    );
   },
 });

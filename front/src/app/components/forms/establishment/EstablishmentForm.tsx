@@ -31,6 +31,7 @@ import { frontErrors } from "src/app/pages/error/front-errors";
 import { type routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -205,7 +206,21 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             name: "formEstablishment",
           },
         },
-        () => {},
+        ({ route, connectedUserJwt }) => {
+          if (
+            mode === "create" &&
+            connectedUserJwt &&
+            route.params.fromConventionId
+          ) {
+            dispatch(
+              conventionSlice.actions.fetchConventionRequested({
+                conventionId: route.params.fromConventionId,
+                jwt: connectedUserJwt,
+                feedbackTopic: "form-establishment",
+              }),
+            );
+          }
+        },
       )
       .with(
         { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
