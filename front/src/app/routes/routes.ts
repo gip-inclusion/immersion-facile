@@ -65,6 +65,7 @@ export const conventionForExternalParams = {
 
 export const establishmentParams = {
   ...acquisitionParams,
+  fromConventionId: param.query.optional.string,
 };
 
 export const searchParams = {
